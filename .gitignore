@@ -1,0 +1,52 @@
+# --- Dependencies -----------------------------------------------------------
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# --- Build output -----------------------------------------------------------
+# packages/web (Vite) and any tsc emit
+dist/
+build/
+*.tsbuildinfo
+
+# --- Test & tooling caches --------------------------------------------------
+coverage/
+.vitest/
+.vite/
+.eslintcache
+.cache/
+
+# --- Local environment ------------------------------------------------------
+# AD-8 / Config: sync reads data/config.json plus a small env overlay for the
+# contact User-Agent. The overlay is local, never committed.
+.env
+.env.*
+!.env.example
+
+# --- Sync runtime state -----------------------------------------------------
+# AD-7: the exclusive on-disk lock is per-run, machine-local state. Everything
+# else sync owns -- dataset.json, sync-report.json, sync-progress.json,
+# catalogue/*.json -- IS committed (AD-14, AD-21) and must never be ignored.
+*.lock
+
+# --- Logs -------------------------------------------------------------------
+# AD-21 / Logging: sync emits structured records into sync-report.json, not
+# free-text console output. Any stray log file is incidental.
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Editors & OS -----------------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Agent tooling ----------------------------------------------------------
+# .serena/ carries its own .gitignore (cache, project.local.yml).
+.claude/settings.local.json
