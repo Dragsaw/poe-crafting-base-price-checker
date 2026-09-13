@@ -17,6 +17,7 @@
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm test:*)",
+      "Bash(npm view:*)",
       "Bash(npx bmad-method:*)",
 
       "Bash(git status:*)",
@@ -50,7 +51,8 @@
       "Bash(sed:*)",
       "Bash(awk:*)",
       "Bash(curl:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(cd \"E:/Program Files/Jetbrains/Projects/poe-crafting-base-price-checker/*)"
     ],
     "deny": [
       "Bash(git push:*)",

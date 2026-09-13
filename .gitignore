@@ -10,6 +10,8 @@ build/
 *.tsbuildinfo
 
 # --- Test & tooling caches --------------------------------------------------
+__pycache__/
+*.py[cod]
 coverage/
 .vitest/
 .vite/
@@ -50,3 +52,5 @@ desktop.ini
 # --- Agent tooling ----------------------------------------------------------
 # .serena/ carries its own .gitignore (cache, project.local.yml).
 .claude/settings.local.json
+# _bmad/render/ is a per-run snapshot of skill workflows, regenerated on demand.
+_bmad/render/

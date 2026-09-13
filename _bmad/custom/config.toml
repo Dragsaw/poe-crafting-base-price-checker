@@ -1,0 +1,11 @@
+# Project overrides layered over the generated _bmad/config.toml.
+# Setup and doctor never modify custom/, so these survive re-runs.
+#
+# This project keeps its BMad artifacts in ./docs, not ./_bmad-output.
+
+[core]
+output_folder = "{project-root}/docs"
+
+[modules.bmm]
+planning_artifacts = "{project-root}/docs"
+implementation_artifacts = "{project-root}/docs/stories"
