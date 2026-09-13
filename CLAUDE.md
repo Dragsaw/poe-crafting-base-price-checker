@@ -2,34 +2,41 @@
 
 ## Shell command style
 
-Bash commands are approved by static analysis of the command text. Anything the
-parser can't resolve to a literal command line requires a human prompt, which
-stalls the run. Keep every Bash call trivially analyzable:
+A static analyzer checks the text of each Bash command. If the analyzer cannot
+resolve a command to one literal command line, it sends a prompt to a human.
+This stops the run until a human answers. Write each Bash call so the
+analyzer can resolve it easily:
 
-- **No command substitution.** Never `$(...)` or backticks — this alone forces a
-  prompt regardless of the allowlist.
-- **No variables or loops.** No `$f`, no `for`/`while`, no `export VAR=x cmd`.
-  Use the tool's own multi-argument form instead (`git check-ignore -v a b c`,
-  `rm a b c`, `ls a b`).
-- **One command per call.** No `&&`, `||`, `;`, or pipes into a second program
-  unless the whole pipeline is literal and short. Prefer separate tool calls —
-  they can run in parallel anyway.
-- **No `cd` prefix.** The working directory is already the project root. Use
-  paths relative to it.
-- **Use the dedicated tools, not shell equivalents:** Read instead of `cat`,
-  Grep instead of `grep`/`rg`, Glob instead of `find`/`ls -R`, Edit/Write
-  instead of `sed -i`/`>` redirection.
-- **If logic is genuinely needed** (a loop, conditionals, string munging), write
-  a script into the scratchpad directory with Write, then run it as one literal
-  command: `uv run <scratchpad>/check.py`. One approvable command, arbitrary
-  logic inside.
+- **Do not use command substitution.** Do not use `$(...)` or backticks.
+  Either one forces a prompt, even if the allowlist approves the command.
+- **Do not use variables or loops.** Do not use `$f`, `for`, `while`, or
+  `export VAR=x cmd`. Instead, give the command multiple arguments directly,
+  for example `git check-ignore -v a b c`, `rm a b c`, or `ls a b`.
+- **Run one command per call.** Do not use `&&`, `||`, `;`, or a pipe into a
+  second program, unless the full pipeline is short and literal. Use separate
+  tool calls instead. These can run at the same time.
+- **Do not add a `cd` prefix.** The working directory is already the project
+  root. Use paths relative to this root.
+- **Do not use `git -C <path>`.** The working directory is already the
+  project root, so `-C` is not necessary. The allowlist does not recognize
+  `-C`, so it forces a prompt to a human every time. Run `git <command>`
+  directly instead.
+- **Use the dedicated tools, not the equivalent shell commands.** Use Read
+  instead of `cat`. Use Grep instead of `grep` or `rg`. Use Glob instead of
+  `find` or `ls -R`. Use Edit or Write instead of `sed -i` or `>` redirection.
+- **When you need real logic** — a loop, a conditional, or string
+  processing — write a script to the scratchpad directory with Write. Then
+  run the script as one literal command, for example
+  `uv run <scratchpad>/check.py`. This gives one command for a human to
+  approve, with any logic inside the script.
 
 ## Python
 
-Run Python through `uv`: `uv run script.py`. Never invoke bare `python`.
+Run Python scripts through `uv`. Use `uv run script.py`. Do not run the bare
+`python` command.
 
 ## UI
 
-The UI is built with Mantine v9 (`@mantine/core` / `@mantine/hooks` 9.6.1, per
-the architecture spine's Stack). Framework documentation for agents:
-https://mantine.dev/llms.txt
+The UI uses Mantine v9. This includes `@mantine/core` and `@mantine/hooks`,
+version 9.6.1, per the architecture spine's Stack component. Framework
+documentation for agents is at this address: https://mantine.dev/llms.txt
