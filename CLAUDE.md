@@ -27,3 +27,9 @@ stalls the run. Keep every Bash call trivially analyzable:
 ## Python
 
 Run Python through `uv`: `uv run script.py`. Never invoke bare `python`.
+
+## UI
+
+The UI is built with Mantine v9 (`@mantine/core` / `@mantine/hooks` 9.6.1, per
+the architecture spine's Stack). Framework documentation for agents:
+https://mantine.dev/llms.txt
