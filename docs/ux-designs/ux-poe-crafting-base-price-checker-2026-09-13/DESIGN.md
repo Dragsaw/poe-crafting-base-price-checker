@@ -3,17 +3,19 @@ title: PoE2 Crafting Base Price Checker — Design
 name: Field Guide
 description: >-
   A reference-book page for one player, fixed at 1060x1920, read across a desk
-  while the game runs. Warm paper, dense uniform rows, and three semantic inks
+  while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
+revision: 2
 created: 2026-09-13
-updated: 2026-09-13
+updated: 2026-09-19
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/sprint-change-proposal-2026-09-13.md
+  - docs/sprint-change-proposal-2026-09-19.md
 mockups:
   - mockups/key-hero-resting.html      # the resting page at 1060x1920, 1:1
   - mockups/key-expanded-states.html   # every expanded and specimen state
@@ -48,8 +50,9 @@ colors:
   edge: '#D2CAB2'              # panel and frame borders
   # --- structural accent: decorative, carries no meaning ---
   sepia: '#6B4A22'
-  # --- the three semantic inks, and there are only three ---
-  slate: '#2F4A73'             # modelled-split
+  # --- the two semantic inks, and there are only two ---
+  # A third, slate '#2F4A73', carried Provenance `modelled-split` and retired
+  # with it at weights contract 5.0.0. The slot is not reserved. See Colors.
   ochre: '#8A5A12'             # uniform-prior, and absent/unknown
   rust: '#8E3B1E'              # stale, never attempted, unresolvable
 
@@ -403,11 +406,6 @@ components:
   # size of the line it sits in — {typography.row-mark} in a ranked row,
   # {typography.appendix-row} in the appendix, {typography.key-body} in the key
   # block — so the vocabulary is one vocabulary at whatever size the line is.
-  trust-mark-split:
-    color: '{colors.slate}'
-    glyph: '◈'
-    word: 'split by model'
-    fontWeight: '600'
   trust-mark-prior:
     color: '{colors.ochre}'
     glyph: '◇'
@@ -689,16 +687,15 @@ the column header, `{colors.edge}` `#D2CAB2` around panels and the frame.
 **`{colors.sepia}` `#6B4A22` is structural and means nothing.** Masthead
 eyebrow, threshold fill, the Raw Base tag, the expand affordance. It is warm
 and it is decorative and it never marks a state. If sepia ever starts to mean
-something, it dilutes the three semantic inks below.
+something, it dilutes the two semantic inks below.
 
-**Three semantic inks. There are three, and a fourth is not available.**
+**Two semantic inks. There are two, and a third is not available.**
 Each ink always comes with a glyph *and* a word, so removing the colour removes
 nothing. This is memlog 15 and 41. It is PRD NFR-10, reframed as legibility.
 See Do's and Don'ts.
 
 | Ink | Hex | Means | Mark |
 |---|---|---|---|
-| `{colors.slate}` | `#2F4A73` | Provenance `modelled-split` — measured, then a model spread it | ◈ *split by model* |
 | `{colors.ochre}` | `#8A5A12` | Provenance `uniform-prior` — someone invented this weight | ◇ *prior only* |
 | `{colors.ochre}` | `#8A5A12` | Provenance `absent` from a `partial` pool — an upper bound, not an estimate | ? *unknown* |
 | `{colors.rust}` | `#8E3B1E` | Staleness, *never attempted*, and `unresolvable` — the things a patch or a stalled sync did | ↻ / ✕ with the word |
@@ -707,7 +704,34 @@ Ochre carries two states and rust carries three. They are told apart by glyph
 and word, not by hue: degraded-weight is one family and broken-or-old is
 another, and that is the distinction the colour draws.
 
-**No fourth ink, no success colour.** There is deliberately no green. A healthy
+**There were three, and the count is a consequence rather than a drift**
+`[decision — memlog 172]`. A third ink, `slate` `#2F4A73`, carried Provenance
+`modelled-split` with the mark ◈ *split by model* — measured, then a model
+spread it across a value interval. Weights contract `5.0.0` withdrew the
+producer's decomposition, which was that value's only source, so the value
+became unreachable and was **retired rather than merged** (PRD §3 *Provenance*,
+FR-10; AD-10). Merging it into `prior only` would have said someone invented a
+weight that was in fact measured. The ink went with the value it existed for,
+and it is recorded here so nobody reads two inks as a palette that lost its
+nerve.
+
+**The freed slot is not reserved, and that is a decision** `[decision — memlog
+173]`. Two live `[NOTE FOR UX]` items are blocked on wanting a colour — the
+`pinned` Curation Status, and the curation fallback for a modifier with no short
+form or no declared Accepted Tier. Neither may have the slate. A semantic ink on
+this page means **something is wrong with what a figure rests on**: ochre says
+the weight is degraded, rust says the data is broken or old. `pinned` is a
+curation *status* and the fallback is a curation *gap*; neither says anything
+about the figure, and admitting either would make the ink family mean "notice
+this", which is the meaning a page with twenty rows cannot afford. Both notes
+should reach for a non-colour cue instead — a weight, an italic, a glyph, a rule
+— which the page's vocabulary already carries and which costs the angled glance
+nothing. Holding the slot open against a future third epistemic state would also
+have been a reservation nobody could spend: if consumer-side pro-rating is ever
+adopted, a middle Provenance value returns in that same change (AD-10's revisit
+condition) and takes a fresh decision with it.
+
+**No third ink, no success colour.** There is deliberately no green. A healthy
 row is marked by nothing at all (memlog 32). Adding a green *measured* badge
 would put a colour on nineteen rows out of twenty and make the one bad row
 harder to find, which is exactly the failure PRD FR-11 describes.
@@ -737,7 +761,7 @@ take a mid-ink numeral. The rest are quiet. Nothing in the top five is larger
 than anything in the bottom five. *The v1 direction gave the top five a 36px
 band and the user rejected it. This is a deliberate departure from it.*
 
-**The mark ramp.** Degraded marks (slate, ochre) sit at `600`. Broken and stale
+**The mark ramp.** Degraded marks (ochre) sit at `600`. Broken and stale
 marks (rust) sit at `700`, and *never attempted* adds italic — the one row with
 no age at all is also the one mark set in italic, so it is distinct from a
 merely old row without a second colour.
@@ -861,15 +885,23 @@ to `{spacing.content-width}`:
 | Chase Combinations | `{spacing.col-chase}` | 492px = three fixed `{spacing.chase-cell}` cells, `{spacing.pad-chase-cell-right}` each |
 
 *Provenance is 88px, and the 12px came out of the chase cells.* At 76px the
-column could not render its own widest mark. `◈ split by model` at
-`{typography.row-mark}` measures about 85px — glyph, hair space and fourteen
-characters at 10px/600. So the mark that names the most consequential Provenance
-state was the one that would have clipped. The word cannot shorten, because
-memlog 41 fixes it and the word is the non-colour cue. The width had to come
-from somewhere. It came from the chase cells, which drop from 168px to 164px
-each, because **a chase cell may ellipsise and a trust mark may not**. The chase
-text resolves one click down in the expansion. The mark has no click beneath it.
-That is the same principle that shapes the combination row below.
+column could not render its own widest mark. The width had to come from
+somewhere. It came from the chase cells, which drop from 168px to 164px each,
+because **a chase cell may ellipsise and a trust mark may not**. The chase text
+resolves one click down in the expansion. The mark has no click beneath it. That
+is the same principle that shapes the combination row below.
+
+*The mark that bought those 12px has since retired, and the width stays*
+`[decision — memlog 174]`. The 88px was sized against `◈ split by model` at
+`{typography.row-mark}` — about 85px of glyph, hair space and fourteen
+characters at 10px/600 — and that mark went with Provenance `modelled-split`
+(see Colors). The widest surviving mark in this column is `◇ prior only`, which
+leaves the column with slack it no longer needs. **The 12px is not clawed back.**
+Every column budget on this page is a verified sum (memlog 140/145), reopening
+one to hand 12px to a cell that is blank on most rows would put all six sums and
+the 27-character chase budget back through verification for no gain the reader
+can see, and a column with headroom cannot clip. `{spacing.col-provenance}` is
+88px and stays 88px.
 
 The Provenance and Age columns are narrow on purpose. Under the
 silent-when-fine rule they are blank most of the time, so the width they would
@@ -959,17 +991,23 @@ curating that entry. In the fallback, and only there, numerals and units keep
 their full symbols — `+240`, `%`, `+35%` are never compressed. That makes the
 fallback the one place in the product where a numeral from modifier text
 survives, which is exactly what makes it recognisable at a glance.
-`[NOTE FOR UX]` No visual treatment for that fallback exists, and it cannot
-borrow one of the three semantic inks — those are spoken for.
+`[NOTE FOR UX]` No visual treatment for that fallback exists, and it may not
+borrow a semantic ink. A semantic ink says something is wrong with what a figure
+rests on; an uncurated entry is a gap in the Tracked List and says nothing about
+the figure (see Colors). The treatment wants a non-colour cue.
 
-`[NOTE FOR UX]` `[memlog 143]` **Two Combinations can now read identically.**
-FR-22 has the curator track an **interior cell**, and one tier can hold more
-than one cell, so two tracked bands of the same modifier on the same Base Type
-may both resolve to `T1`. The value text used to tell them apart. The tier does
-not. Memlog 118 rule 3 guarantees uniqueness across the short-form **table**,
-and that guarantee does not reach this case. The specimen data avoids it only
-because every band in it landed in a distinct tier. Nobody has ruled on what
-the second one prints.
+`[NOTE FOR UX]` `[memlog 143, re-derived]` **Two Combinations can still read
+identically.** The note was first written on the `4.x` reading, in which FR-22
+had the curator track an **interior cell** and one tier could hold several — a
+mechanism `5.0.0` withdrew, since an entry is a tier again and FR-22 now has the
+curator track a whole tier or a run of adjacent tiers. **The hazard survives the
+mechanism that produced it**, because the printed tier is the curator's declared
+`acceptedTier` and nothing requires two tracked bands of the same modifier on
+the same Base Type to declare different ones. The value text used to tell them
+apart. The tier does not. Memlog 118 rule 3 guarantees uniqueness across the
+short-form **table**, and that guarantee does not reach this case. The specimen
+data avoids it only because every band in it landed in a distinct tier. Nobody
+has ruled on what the second one prints.
 
 **What may ellipsise, and where.** Truncation is legitimate only where the text
 has somewhere to go. Every cell on the ranked list — Base Type, chase cell —
@@ -1229,12 +1267,25 @@ under a `WEIGHT` header reads as a claim about how rarely a modifier rolls,
 when the claim being made is about where the figure came from. The key block's
 middle group is likewise *Provenance marks*.
 
-**Trust mark** — a glyph, a hair space, and a word, in one of the three
-semantic inks. It is inline text: no background, no border, no capsule. Six
-marks exist and no seventh may be added without a decision:
-`trust-mark-split`, `-prior`, `-unknown`, `-stale`, `-never`,
-`-unresolvable`. A healthy row renders **no mark element at all** — the cell is
-empty, not filled with a placeholder.
+**Trust mark** — a glyph, a hair space, and a word, in one of the two
+semantic inks. It is inline text: no background, no border, no capsule. Five
+marks exist and no sixth may be added without a decision:
+`trust-mark-prior`, `-unknown`, `-stale`, `-never`, `-unresolvable`. A healthy
+row renders **no mark element at all** — the cell is empty, not filled with a
+placeholder.
+
+*A Provenance mark is one label per Base Type, and it belongs to the ranked
+row.* Provenance propagates **pool-wide** — a probability's inputs are every
+entry in its scoped pool, numerator and denominator alike — so one invented tier
+anywhere makes every probability on that Base Type carry the same label (PRD
+FR-10, FR-11; AD-10). The mark therefore discriminates **between** Base Types
+and never within one. That is the granularity the ranked list already has, since
+a ranked row **is** a Base Type, which is why the Provenance column earns its
+place. It also fixes where the mark may not go: every combination row inside one
+expansion necessarily carries that same label, so a Provenance mark is never
+repeated per combination row. Repeating it would put eight identical marks
+inside one panel and discriminate nothing — the failure FR-11 exists to prevent,
+one surface further down.
 
 **Money slot** (`money-slot`) — the EV or price cell when there is no number. It holds a short
 italic sans phrase naming *which* question is open, never a number-shaped
@@ -1567,8 +1618,9 @@ cannot be specified without inventing them:
 the canonical short-form table falls back to the Trade Catalogue stat name plus
 the value band, and *must be visually identifiable as a fallback* so the missing
 short form gets noticed and added. No treatment for that fallback exists in the
-mock. It cannot borrow a semantic ink — those are spoken for — so it likely
-wants a non-colour cue, but this is unsettled.
+mock. It may not borrow a semantic ink — an ink says a figure's footing is
+degraded or broken, and an uncurated entry says nothing about the figure (see
+Colors) — so it wants a non-colour cue, but which one is unsettled.
 
 `[ASSUMPTION — memlog 49]` In the honest-empty league-reset state the list
 renders every tracked Base Type in canonical order, with **rank numerals
@@ -1646,7 +1698,9 @@ conformance claims.
 | Call the fourth column **Provenance**, in the header and in the key block | Call it "Weight" — a synonym for one Glossary term and a collision with another |
 | Spell *Divine* and *Item Level*, or state the unit once in a column header | Print `div` or `ILVL`, which the Glossary does not license |
 | Pair every semantic ink with its glyph and its word | Distinguish anything by hue alone |
-| Keep to the three semantic inks | Introduce a fourth colour, a success colour, or a severity ramp |
+| Keep to the two semantic inks | Introduce a third colour, a success colour, or a severity ramp |
+| Mark Provenance once, on the ranked row — one label per Base Type | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
+| Reach for a non-colour cue for `pinned` and for the curation fallback | Spend the retired slate on something that is not a statement about a figure's footing |
 | Use `{colors.sepia}` decoratively — eyebrow, threshold fill, affordances | Let sepia start meaning a state |
 | Carry rank emphasis with weight and rank-numeral colour | Make a top-ranked row taller or its type larger |
 | Hold every ranked row at `{spacing.row-height}` | Vary row height by rank, content or state |

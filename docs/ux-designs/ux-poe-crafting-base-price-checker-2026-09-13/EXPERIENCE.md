@@ -1,14 +1,16 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
+revision: 2
 created: 2026-09-13
-updated: 2026-09-13
+updated: 2026-09-19
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/sprint-change-proposal-2026-09-13.md
+  - docs/sprint-change-proposal-2026-09-19.md
 peer-contract: DESIGN.md — the visual identity and token source. This document
   references its tokens by name and never restates their values.
 ---
@@ -157,16 +159,20 @@ Printing any of the five as a bare noun would be jargon without a job.
 - `not-yet-synced` reason — `never-synced`, `league-mismatch`,
   `no-exchange-rate`.
 - Curation Status — `active`, `pinned`, `pruned`.
-- Provenance — `measured`, `modelled-split`, `uniform-prior`, `absent`.
+- Provenance — `measured`, `uniform-prior`, `absent`.
 
 **Reason strings shown verbatim from FR-4:** `pool partial`, `base absent from
 weights file`.
 
 **Back-end only — must not appear on the page:** Modifier Reference, Stat Line,
-Source Modifier, Eligible Pool, Value Cell, Cohort, Modifier Weight, Chunk,
-Workload, Refresh Rotation, `cohortTotals`, `statLineCounts`,
-`sourceModifierId`, `poolCoverage`, `tierLabel`. These may appear inside a
+Source Modifier, Eligible Pool, Modifier Weight, Chunk, Workload, Refresh
+Rotation, `weightSource`, `lines`, `ranges`, `sourceModifierId`, `poolCoverage`,
+`tierLabel`. These may appear inside a
 validation message, where the reader is the person fixing the file.
+`weightSource` is on this list for a second reason as well: its own enum spells
+`"absent"`, and Provenance spells `absent` for a different thing entirely, so
+printing the field's words beside a Provenance mark would invite the reader to
+read one as the other (PRD FR-10, §3 *`weightSource`*).
 `tierLabel` is on this list for a second reason as well: the page must never
 **read** it either. The tier it prints comes from the curator's declaration, not
 from the Weights File `[decision — memlog 135]`.
@@ -212,8 +218,8 @@ to `0.00` renders **`< 0.01`** — that is a quantity, not a missing figure, so 
 is never a money-slot phrase.
 
 **Provenance is spoken twice.** The enum value is the contract. The mark carries
-a plain-English word beside it — `modelled-split` reads *split by model*,
-`uniform-prior` reads *prior only*, `absent` reads *unknown*. The word is not a
+a plain-English word beside it — `uniform-prior` reads *prior only*, `absent`
+reads *unknown*. The word is not a
 synonym replacing the term. It is the term's gloss, and the enum value still
 appears in the `{components.key-block}` and in the expansion.
 
@@ -297,14 +303,20 @@ entry. In the fallback, and only there, numerals and units keep their full
 symbols — `+35%`, `+180`, `118%`. That makes it the one place in the product
 where a numeral from modifier text survives, which is what makes it
 recognisable at a glance. `[NOTE FOR UX]` No treatment for that fallback
-exists, and it cannot borrow one of the three semantic inks — those are spoken
-for.
+exists, and it may not borrow a semantic ink. An ink states that a figure's
+footing is degraded or broken. An uncurated entry states nothing about the
+figure, so it wants a non-colour cue (`DESIGN.md`, Colors).
 
-`[NOTE FOR UX]` `[memlog 143]` **Two Combinations can now read identically.**
-FR-22 has the curator track an **interior cell**, and one tier can hold more
-than one cell, so two tracked bands of the same modifier on the same Base Type
-may both resolve to `T1`. The value text used to tell them apart, and the tier
-does not. Rule 3 above guarantees uniqueness across the short-form **table**,
+`[NOTE FOR UX]` `[memlog 143, re-derived]` **Two Combinations can still read
+identically.** The note was written on the `4.x` reading, in which FR-22 had the
+curator track an **interior cell** and one tier could hold several. Contract
+`5.0.0` withdrew that mechanism: an entry is a tier again, and FR-22 now has the
+curator track a whole tier or a run of adjacent tiers. **The hazard survives the
+mechanism that produced it.** The page prints the curator's declared
+`acceptedTier`, and nothing requires two tracked bands of the same modifier on
+the same Base Type to declare different ones. The value text used to tell them
+apart, and the tier does not. Rule 3 above guarantees uniqueness across the
+short-form **table**,
 which does not reach this case. The specimen data avoids it only because every
 band in it landed in a distinct tier. Nobody has ruled on what the second one
 prints.
@@ -359,14 +371,14 @@ expansion, and `{components.sync-report-panel}`.
 | `{components.ranked-row-tier-1}`, `{components.ranked-row-tier-2}`, `{components.ranked-row-tier-3}` | Ranked list | Purely a function of rank position after a ranking pass. Tiers move when the list reorders. They are not sticky to a Base Type. |
 | `{components.raw-base-row}` | Ranked list | Ranks in the same list as crafted rows (FR-3) but at its own asking price, not a craft outcome. **Expanding it shows one `{components.combination-row}`** `[decision — memlog 71]`, for the degenerate Combination of no affixes. Line one carries the same Price State and listing sample count as any other entry. Line two carries both labelled ages, each in its own cell. Its note is declared `[decision — memlog 117]`: `no affixes — this Base Type priced as it drops, at Item Level 82`. A Raw Base is a Tracked Entry and it has a Combination. An empty expansion would strand its exact ages, and those ages are what the FR-12 override promised to put here. **Below-threshold Raw Bases:** a Raw Base whose asking price is under the Payout Threshold leaves the *ranking* altogether. It is not ranked at its price, so it is absent from the top 20 **and** from the grown list behind the list affordance. Truncation is not what hides it, and it does not reappear further down. |
 | `{components.column-header}` | Above the list | Static. Columns are **not** sortable — the one ordering is EV under the active threshold, and a second ordering would make the page a spreadsheet. **A column header never ellipsises and is never trimmed to fit** `[decision — memlog 119]`. `PROVENANCE`, the widest label, now sits inside the widened `{spacing.col-provenance}` with room to spare. The letter-space trim that used to buy it room is dropped. |
-| Trust marks — `{components.trust-mark-split}`, `{components.trust-mark-prior}`, `{components.trust-mark-unknown}`, `{components.trust-mark-stale}`, `{components.trust-mark-never}`, `{components.trust-mark-unresolvable}` | Rows, appendix, expansion | Inline text, not interactive, no tooltip, no click target. A healthy row renders **no mark element at all** — the cell is empty, not filled. Six marks exist. A seventh needs a decision. |
+| Trust marks — `{components.trust-mark-prior}`, `{components.trust-mark-unknown}`, `{components.trust-mark-stale}`, `{components.trust-mark-never}`, `{components.trust-mark-unresolvable}` | Rows, appendix, expansion | Inline text, not interactive, no tooltip, no click target. A healthy row renders **no mark element at all** — the cell is empty, not filled. Five marks exist. A sixth needs a decision. A Provenance mark carries **one label per Base Type** and belongs to the ranked row: every combination row inside one expansion carries that same label, so the mark is never repeated there (FR-10, FR-11; AD-10). |
 | `{components.price-state-glyph}` | Expansion rows | Always accompanied by the Price State's name in words. The glyph never appears alone and never substitutes for the word. |
 | `{components.money-slot}` | Any cell where a figure is missing | Holds a short phrase naming which question is open, never a number-shaped placeholder. See Epistemics. |
 | `{components.payout-threshold}` | Masthead | **The figure is the input** `[decision — memlog 73]` — click the large serif number and type over it. No field, no box, no form chrome. The `Divine` suffix sits outside the editable region and cannot be typed over. Re-ranks on every valid parse. Constraints `[decision — memlog 74]`: min `0`, max `3`, step `0.05`, two decimals, clamped on blur — a negative threshold is not enterable. **The track and marker survive as a non-interactive readout**: they answer "where does 0.50 sit in the range I have", the marker cannot be dragged, and the track cannot be clicked. |
 | `{components.trust-strip}` | Under the masthead | Carries **five plain facts, unconditionally**, with no mark and no colour on any of them. Line one carries `producer.id`, `generatedAt` and `gamePatch` (FR-10). Line two carries the last-synced time and the **tracked-list edit date** (FR-18) `[decision — memlog 89]`. Always present, never dismissible. `[ASSUMPTION — memlog 59]` Otherwise silent while fine — no counts of nothing, no "0 unresolvable", no green tick. **Loud when wrong** `[decision — memlog 70/88]`: it raises a third line carrying a rust mark with its glyph, its word **and its count**, on exactly two triggers that share the one line — `✕ N unresolvable` (FR-24) and `✕ pinned entries starved this run` (FR-17, FR-25). The line costs `{spacing.frame-reserve-health-line}` and is charged to the resting budget, because data raises it and no click does. **The whole strip is the click target** and it toggles `{components.sync-report-panel}`. |
 | `{components.sync-report-panel}` | Opened from the strip | The full Sync Report — **five figure groups in three columns**: *the sync run* (requests per source, and entries not reached **in the last sync pass**), *what is broken* (the unresolvable count, FR-24, and the pinned-starvation records, FR-17/FR-25), *what the weights cover* (pool coverage as a fraction **with its denominator**, FR-4). The first column is what the run did, the second what broke, the third how much of the Tracked List the weights can speak to. **One heading per column, never per group** (`columnHeadingRule`): a column carrying two groups prints its heading once and separates the groups by vertical space — no second heading, no rule, no bullet. **The tracked-list edit date is not repeated here** `[decision — memlog 89]`. It is a resting fact on the strip two lines above. This panel holds what the resting page cannot show, so it does not restate what is already on screen. `[ASSUMPTION — memlog 59]` Opens **in place**, pushing the asking-price line, the list and the appendix down — not a modal, not a drawer, not a second surface. Closed on every load. Figures are read from `sync-report.json` and never recomputed by the page. |
 | `{components.asking-price-line}` | Under the trust strip | Always rendered, in every state including the honest-empty one. Never dismissible. |
-| `{components.uniform-prior-banner}` | Above the list | Raised by a data condition, never by a build flag (FR-11). Dismiss is per session only — it returns on the next page load while the condition holds, and it lowers itself the moment any `measured` or `modelled-split` figure appears. |
+| `{components.uniform-prior-banner}` | Above the list | Raised by a data condition, never by a build flag (FR-11). Dismiss is per session only — it returns on the next page load while the condition holds, and it lowers itself the moment any `measured` figure appears. |
 | `{components.unrankable-appendix}` | Foot | The count is readable without expanding anything (FR-4). Rows are not interactive and do not expand — an Unrankable Base Type has no ranking to explain. A Base Type with an Unrankable crafted branch and a ranking Raw Base branch appears in both places, each labelled for what that branch is. |
 | `{components.key-block}` | Above the foot | Always rendered, in every state. It is what makes an empty cell mean something (memlog 42) and is not an optional legend. **It covers the resting page only** `[decision — memlog 114]`. It is deliberately not extended to the expansion's four Price State glyphs. Every glyph always appears beside its word, so nothing there is unreadable without a legend. Four more marks on the resting page, to explain a surface one click away, would cost quiet for no gain. The block exists because silent-when-fine makes an empty cell ambiguous, and that ambiguity belongs to the ranked list alone. |
 | `{components.expansion-panel}` | Click a ranked row | Lists **every** Tracked Entry on the Base Type, priced or not, above or below the threshold, including `pruned` tombstones (FR-8). Repeats the active threshold and the asking-price framing, so a panel read on its own cannot be misread. |
@@ -453,33 +465,78 @@ needing a fourth colour.
 
 ### Provenance
 
-Four values, weakest first, and three of them are visible:
+Three values, weakest first, and two of them are visible:
 
 | Provenance | On a ranked row | Why it must not collapse |
 |---|---|---|
 | `measured` | Nothing at all | See *Silence means healthy* |
-| `modelled-split` | `{components.trust-mark-split}` — *split by model* | Collapsing it into the degraded treatment understates a measured weight. Collapsing it into `measured` overstates an invented distribution (FR-10) |
 | `uniform-prior` | `{components.trust-mark-prior}` — *prior only* | Someone invented this weight, and the page says so |
 | `absent` | `{components.trust-mark-unknown}` — *unknown* | An upper bound, not an estimate. It renders as an unknown and never as a number (FR-4) |
+
+**There were four, and the fourth was removed rather than merged.**
+`modelled-split` — *split by model*, a measured weight a model had spread across
+a value interval — had exactly one source, the producer's value decomposition.
+Weights contract `5.0.0` withdrew that decomposition, so the value became
+unreachable (PRD §3 *Provenance*, FR-10; AD-10). **It was not folded into
+`uniform-prior`.** The two say opposite things about where a number came from:
+`prior only` says somebody invented this weight, and a `modelled-split` weight
+was measured and then redistributed. Merging them would have had the page accuse
+a measured weight of being invented, which is a worse lie than the one the mark
+existed to prevent. The value retired, and the `trust-mark-split` component and
+its ink retired with it — both are gone from `DESIGN.md`, so neither resolves as
+a token any more. If consumer-side pro-rating is ever adopted, a middle
+value must return in that same change (AD-10's revisit condition).
 
 `absent` cannot occur on a ranked row: a `partial` pool makes the Base Type
 Unrankable, so `absent` is exercised only inside
 `{components.unrankable-appendix}`, with the same mark vocabulary (memlog 44).
 
-`core` propagates the weakest Provenance and the oldest timestamp of every
-input into each derived figure. `modelled-split` propagates from the numerator
-only. The page displays what it is given and computes no ranking term itself
-(AD-4).
+`core` propagates the weakest Provenance and the oldest timestamp of every input
+into each derived figure, **with no exception**. The numerator-only rule retired
+with the value it governed. The page displays what it is given and computes no
+ranking term itself (AD-4).
+
+**The mark discriminates between Base Types, never within one.** A probability's
+inputs are **pool-wide** — every entry in its scoped pool, numerator and
+denominator alike — so one tier carrying an invented weight anywhere in that
+pool makes **every** probability on that Base Type read `uniform-prior`, however
+many of the pool's other tiers were published (PRD FR-10, FR-11; AD-10). One
+Base Type therefore carries one label. This is what the page is built for: a
+ranked row **is** a Base Type, so the Provenance column marks exactly the unit it
+can speak about, and the comparison the mark supports — this ranked row rests on
+measured weights, that one does not — is the comparison the ranking already asks
+the player to make. Two consequences the builder must not get wrong:
+
+- **The mark is never repeated inside an expansion.** Every combination row in
+  one panel carries the same label by construction, so a per-row Provenance mark
+  there would repeat one fact eight times and discriminate nothing — the failure
+  FR-11 exists to prevent, one surface further down.
+- **A `prior only` badge does not mean the pool is invented.** It states the
+  **weakest** input and never the pool's general condition. The honest reading is
+  the literal one: something in this pool was invented, and the figure inherits
+  it. The page must not word the mark, the key block or the banner in a way that
+  says more.
 
 ### The uniform-prior banner
 
-Raised while **no probability in the loaded set carries `measured` or
-`modelled-split`**. A `modelled-split` figure does not raise it. It states that
-the entire ranking rests on a uniform prior and that relative ordering between
-Base Types is not evidence-backed, and it points the player at per-row
-freshness instead. It lowers itself when the condition stops holding, so nobody
-has to remember to take it down. The per-row mark is required either way
-(FR-11), and a `prior only` row still carries its mark while the banner is up.
+Raised while **no probability in the loaded set carries `measured`** — that is,
+while every probability is `uniform-prior` or `absent`. It states that the
+entire ranking rests on a uniform prior and that relative ordering between Base
+Types is not evidence-backed, and it points the player at per-row freshness
+instead. It lowers itself when the condition stops holding, so nobody has to
+remember to take it down. The per-row mark is required either way (FR-11), and a
+`prior only` row still carries its mark while the banner is up.
+
+**What lowers it is one wholly published pool, and the page claims nothing about
+how likely that is.** Because Provenance propagates pool-wide, a Base Type reads
+`measured` only when **every** entry in its scoped pool was published — a single
+invented tier is enough to hold the banner up across the whole loaded set. So
+the banner is not a build-time placeholder that the first real file will
+obviously clear, and it is not the rarity a per-tier reading of `weightSource`
+would have suggested. It is a function of the data with a stated condition, and
+what the first conforming file does to it is unknown until one lands. The page
+reads the condition and says nothing else `[ASSUMPTION — the banner's frequency
+is unmeasured; only its condition is specified]`.
 
 ### Money slots — the FR-9 / FR-4 resolution
 
@@ -526,11 +583,17 @@ published.
 ## State Patterns
 
 → [`mockups/key-hero-resting.html`](mockups/key-hero-resting.html) shows states
-11, 12, 13, 18, 19, 31 and 32 together on one page, which is the point: the
-marked rows have to be findable among the silent ones.
+11, 12, 17, 18, 30 and 31 together on one page, which is the point: the marked
+rows have to be findable among the silent ones.
 [`mockups/key-expanded-states.html`](mockups/key-expanded-states.html) shows
-states 1 to 7, 10, 21 and 33. The remaining states are specified here and
+states 1 to 7, 10, 20 and 32. The remaining states are specified here and
 nowhere else, by decision — see memlog 98.
+
+*Both mockups still depict the retired `modelled-split` mark, and both predate
+this revision's renumbering.* `DESIGN.md` already binds the resolution — the
+spine wins on conflict with any mockup, and a mockup is an illustration of the
+spine at one moment. They are out of date on this point and were not rewritten,
+because they are a record of what was rendered and verified on 2026-09-13.
 
 | # | State | Where | Treatment |
 |---|---|---|---|
@@ -542,32 +605,31 @@ nowhere else, by decision — see memlog 98.
 | 6 | reason `league-mismatch` | Combination row | Note: *the observation belongs to another league*. Treated as absent, never as stale-but-usable. The attempted clock still shows |
 | 7 | reason `no-exchange-rate` | Combination row | Note: *the listing currency had no rate at sync time*. There is no "priced but not convertible" state. The attempted clock still shows |
 | 8 | Curation Status `active` | Expansion | No marking. It is the ordinary case |
-| 9 | Curation Status `pinned` | Expansion | Marked on its Combination row as `pinned`. `[NOTE FOR UX]` No visual treatment for the pinned mark exists in the chosen direction, and it cannot take a semantic ink |
+| 9 | Curation Status `pinned` | Expansion | Marked on its Combination row as `pinned`. `[NOTE FOR UX]` No visual treatment for the pinned mark exists in the chosen direction, and it may not take a semantic ink — an ink states that a figure's footing is degraded or broken, and a Curation Status states nothing about the figure (`DESIGN.md`, Colors). It wants a non-colour cue |
 | 10 | Curation Status `pruned` | `{components.tombstone-band}` | Collapsed behind `▸ N pruned`. Opened: line one is the Combination struck through with `† pruned` and *not tracked* in the money slot. Line two is the prune reason and `removed YYYY-MM-DD` in `{spacing.col-tombstone-removed}` — **not** the two age cells `[decision — memlog 116]`, because a removal date is not a reading of either clock |
 | 11 | Provenance `measured` | Ranked row | Nothing. The empty cell is the statement |
-| 12 | Provenance `modelled-split` | Ranked row | `{components.trust-mark-split}` |
-| 13 | Provenance `uniform-prior` | Ranked row | `{components.trust-mark-prior}` |
-| 14 | Provenance `absent` | Appendix only | `{components.trust-mark-unknown}` |
-| 15 | Unrankable — `pool partial` | Appendix | Reason verbatim, plus a quiet note where one is known (e.g. which slot's pool has no cell) |
-| 16 | Unrankable — `base absent from weights file` | Appendix | Reason verbatim. Freshly scraped classes may carry a note that the Base Type may return after the next weights run |
-| 17 | Unrankable — both branches | Appendix + ranked list | The crafted branch sits in the appendix labelled *crafted branch* and names where its Raw Base branch ranks. The raw branch ranks normally in the list |
-| 18 | Stale row (≥48h) | Ranked row | `{components.trust-mark-stale}`, with the clock said in words |
-| 19 | Never attempted | Ranked row | `{components.trust-mark-never}`, italic |
-| 20 | Uniform-prior condition true | Banner | `{components.uniform-prior-banner}` above the list, dismissible for the session only |
-| 21 | Below-threshold entry | Combination row | Note *below the threshold — adds nothing to EV*. Shown, never hidden, never greyed |
-| 22 | Base Type with no Chase Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and is shown as such, at 2dp, as a real quantity. A negative EV is never a money-slot phrase — the figure is known, and it is bad news rather than missing news |
-| 23 | Cold load / skeleton | Whole page | Masthead and twenty row slots paint immediately as placeholders in the final layout. The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` All eight artifacts resolve in a **single transition** — never row by row, because a partly filled list would show a ranking computed from an incomplete dataset. `[NOTE FOR UX]` No skeleton fill tone or placeholder shape is drawn anywhere |
-| 24 | Honest empty — league reset | Whole list | `[decision — memlog 48]` Every tracked Base Type renders in **canonical order**, each carrying Price State `not-yet-synced` reason `league-mismatch`, refilling over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed** and the list states that the order is canonical and not ranked. Without that the page asserts a ranking it does not have, which is the failure FR-31's honest-empty rule exists to prevent. `[decision — memlog 83]` **The EV cell is not blank**: every EV there is missing for exactly one reason, so every cell holds the `not-yet-synced` money phrase **no figure yet**. Assumption 49's "empty rather than zero" was aimed at the zero. Blank is the other thing the money slot forbids, and the vocabulary memlog 43 built already answers this without an exemption |
-| 25 | Partially refreshed dataset | Whole list | Renders normally. Per-row freshness is what makes that honest. No global "stale" treatment |
-| 26 | Nothing clears the threshold | Whole list | Distinct from state 24 and from state 23. `[NOTE FOR UX]` The PRD does not settle whether this has its own copy. It must not be confused with "no data" |
-| 27 | Schema-invalid artifact | Whole page | `{components.refusal-screen}` replaces everything (FR-33, NFR-8). It names which artifact, which schema version it declared and which the page expects. The player can do nothing here and is not offered a retry — a schema mismatch is fixed by publishing a valid set. One sentence says the page renders again as soon as one exists, and that nothing old is served meanwhile |
-| 28 | Cross-file policy check failure | Report, never refusal | Edge alignment, straddle, empty containment set, `coOccur` overlap, kind agreement — reported at load. The page still renders. `[NOTE FOR UX]` Whether the report is a global region, inline on the affected Base Type, or both is unsettled. `{components.sync-report-panel}` is the obvious home, since it already carries every other operational figure, but nothing has ruled on it |
-| 29 | Artifact fetch failure (as against invalid) | Whole page | `{components.fetch-failure-screen}` replaces everything and names which of the eight files did not arrive. The player can click `+ Try again`, which re-attempts the whole set. **A partial set is never rendered** — FR-33 requires a single consistent set, and half a ranking is worse than no ranking |
-| 30 | Stale Weights File after a patch | `{components.trust-strip}` | The page is static and makes no call to the game or the trade API, so it has **no live patch to compare against** and claims none. What it does is show the `gamePatch` the loaded Weights File declares, beside its producer and `generatedAt`, so the player — who knows which patch he is playing — can see the mismatch himself. Neither a stale weights file nor a stale catalogue breaks the page |
-| 31 | Trust strip at rest, healthy | `{components.trust-strip}` | Two lines carrying five plain facts — producer, `generatedAt`, `gamePatch`. Last synced, tracked-list edit date — with no mark or colour on any of them `[decision — memlog 89]`, and nothing else `[ASSUMPTION — memlog 59]`. Affordance reads `+ the full sync report`, right-aligned. This is the state on every load |
-| 32 | Trust strip at rest, something broken | `{components.trust-strip}` | `[decision — memlog 70/88]` A third line appears, carrying a rust mark, its word and its count. There are exactly two triggers and they share the one line: unresolvable entries exist (FR-24), and pinned entries starved this run (FR-17, FR-25). Data raises the line, never a click, and `{spacing.frame-reserve-health-line}` budgets it. The five resting facts are unaffected — an old edit date never turns red |
-| 33 | Trust strip expanded | `{components.sync-report-panel}` | Opens in place beneath the strip, pushing the regions below it down `[ASSUMPTION — memlog 59]`. Affordance reads `— the full sync report`. Capped at `{spacing.sync-report-max-height}` (400px) and scrolls inside its own band past that. Because that cap sits inside the worst-case resting budget, the strip alone never makes the page scroll, in any data state |
-| 34 | Ranked list grown past 20 | Ranked list | `{components.expand-affordance}` reads `— Show only the top 20` and the list holds every ranked Base Type. Ranks 21+ all take `{components.ranked-row-tier-3}`. The appendix, key block and foot stay below in the same order. Clicked growth, so it may scroll the page. Clicking again restores the top 20 exactly |
+| 12 | Provenance `uniform-prior` | Ranked row | `{components.trust-mark-prior}`, carried by **every** row whose Base Type has one invented tier anywhere in its scoped pool |
+| 13 | Provenance `absent` | Appendix only | `{components.trust-mark-unknown}` |
+| 14 | Unrankable — `pool partial` | Appendix | Reason verbatim, plus a quiet note where one is known (e.g. which slot's pool has no entry for that stat) |
+| 15 | Unrankable — `base absent from weights file` | Appendix | Reason verbatim. Freshly scraped classes may carry a note that the Base Type may return after the next weights run |
+| 16 | Unrankable — both branches | Appendix + ranked list | The crafted branch sits in the appendix labelled *crafted branch* and names where its Raw Base branch ranks. The raw branch ranks normally in the list |
+| 17 | Stale row (≥48h) | Ranked row | `{components.trust-mark-stale}`, with the clock said in words |
+| 18 | Never attempted | Ranked row | `{components.trust-mark-never}`, italic |
+| 19 | Uniform-prior condition true | Banner | `{components.uniform-prior-banner}` above the list, dismissible for the session only |
+| 20 | Below-threshold entry | Combination row | Note *below the threshold — adds nothing to EV*. Shown, never hidden, never greyed |
+| 21 | Base Type with no Chase Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and is shown as such, at 2dp, as a real quantity. A negative EV is never a money-slot phrase — the figure is known, and it is bad news rather than missing news |
+| 22 | Cold load / skeleton | Whole page | Masthead and twenty row slots paint immediately as placeholders in the final layout. The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` All eight artifacts resolve in a **single transition** — never row by row, because a partly filled list would show a ranking computed from an incomplete dataset. `[NOTE FOR UX]` No skeleton fill tone or placeholder shape is drawn anywhere |
+| 23 | Honest empty — league reset | Whole list | `[decision — memlog 48]` Every tracked Base Type renders in **canonical order**, each carrying Price State `not-yet-synced` reason `league-mismatch`, refilling over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed** and the list states that the order is canonical and not ranked. Without that the page asserts a ranking it does not have, which is the failure FR-31's honest-empty rule exists to prevent. `[decision — memlog 83]` **The EV cell is not blank**: every EV there is missing for exactly one reason, so every cell holds the `not-yet-synced` money phrase **no figure yet**. Assumption 49's "empty rather than zero" was aimed at the zero. Blank is the other thing the money slot forbids, and the vocabulary memlog 43 built already answers this without an exemption |
+| 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row freshness is what makes that honest. No global "stale" treatment |
+| 25 | Nothing clears the threshold | Whole list | Distinct from state 24 and from state 23. `[NOTE FOR UX]` The PRD does not settle whether this has its own copy. It must not be confused with "no data" |
+| 26 | Schema-invalid artifact | Whole page | `{components.refusal-screen}` replaces everything (FR-33, NFR-8). It names which artifact, which schema version it declared and which the page expects. The player can do nothing here and is not offered a retry — a schema mismatch is fixed by publishing a valid set. One sentence says the page renders again as soon as one exists, and that nothing old is served meanwhile |
+| 27 | Cross-file policy check failure | Report, never refusal | **Four checks, not five** — edge alignment, empty containment set, `coOccur` overlap, kind agreement — reported at load. The straddle rule retired with contract `5.0.0`: tiers overlap freely in the raw data and no band could satisfy it (AD-18, FR-29). The page still renders. `[NOTE FOR UX]` Whether the report is a global region, inline on the affected Base Type, or both is unsettled. `{components.sync-report-panel}` is the obvious home, since it already carries every other operational figure, but nothing has ruled on it |
+| 28 | Artifact fetch failure (as against invalid) | Whole page | `{components.fetch-failure-screen}` replaces everything and names which of the eight files did not arrive. The player can click `+ Try again`, which re-attempts the whole set. **A partial set is never rendered** — FR-33 requires a single consistent set, and half a ranking is worse than no ranking |
+| 29 | Stale Weights File after a patch | `{components.trust-strip}` | The page is static and makes no call to the game or the trade API, so it has **no live patch to compare against** and claims none. What it does is show the `gamePatch` the loaded Weights File declares, beside its producer and `generatedAt`, so the player — who knows which patch he is playing — can see the mismatch himself. Neither a stale weights file nor a stale catalogue breaks the page |
+| 30 | Trust strip at rest, healthy | `{components.trust-strip}` | Two lines carrying five plain facts — producer, `generatedAt`, `gamePatch`. Last synced, tracked-list edit date — with no mark or colour on any of them `[decision — memlog 89]`, and nothing else `[ASSUMPTION — memlog 59]`. Affordance reads `+ the full sync report`, right-aligned. This is the state on every load |
+| 31 | Trust strip at rest, something broken | `{components.trust-strip}` | `[decision — memlog 70/88]` A third line appears, carrying a rust mark, its word and its count. There are exactly two triggers and they share the one line: unresolvable entries exist (FR-24), and pinned entries starved this run (FR-17, FR-25). Data raises the line, never a click, and `{spacing.frame-reserve-health-line}` budgets it. The five resting facts are unaffected — an old edit date never turns red |
+| 32 | Trust strip expanded | `{components.sync-report-panel}` | Opens in place beneath the strip, pushing the regions below it down `[ASSUMPTION — memlog 59]`. Affordance reads `— the full sync report`. Capped at `{spacing.sync-report-max-height}` (400px) and scrolls inside its own band past that. Because that cap sits inside the worst-case resting budget, the strip alone never makes the page scroll, in any data state |
+| 33 | Ranked list grown past 20 | Ranked list | `{components.expand-affordance}` reads `— Show only the top 20` and the list holds every ranked Base Type. Ranks 21+ all take `{components.ranked-row-tier-3}`. The appendix, key block and foot stay below in the same order. Clicked growth, so it may scroll the page. Clicking again restores the top 20 exactly |
 
 `{components.asking-price-line}`, `{components.key-block}` and
 `{components.running-foot}` render in every state above except 27 and 29, the
@@ -734,7 +796,7 @@ What does bind:
   distinction — Price State (FR-9), Provenance (FR-10), Raw Base versus crafted
   (FR-3) — carries a non-colour cue alongside any colour: a glyph, a word, a
   weight, a tint plus an italic, never hue alone. The test is whether the page
-  still reads with every colour removed. It does: three semantic inks, each
+  still reads with every colour removed. It does: two semantic inks, each
   always spoken with a glyph *and* a word.
 - The justification is the angled mid-session glance across a desk, not
   conformance. That is an honest statement of why the rule survived, and it is
