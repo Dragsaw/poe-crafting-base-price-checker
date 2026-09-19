@@ -1,9 +1,9 @@
 ---
 title: 'Agent Development Workflow'
-status: draft
+status: final
 created: '2026-09-12'
-updated: '2026-09-12'
-governed_by: [AD-1, AD-2, AD-13]
+updated: '2026-09-19'
+governed_by: [AD-1, AD-13]
 ---
 
 # Agent Development Workflow
@@ -28,7 +28,7 @@ pnpm dev            # web against the committed dataset + fixtures
 pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere
 ```
 
-`pnpm check` is the point that enforces the package boundaries. `dependency-cruiser` fails the build on an import in the wrong direction (AD-2). An agent that imports from `core` into `sync` therefore learns about the fault in seconds, and no reviewer is necessary.
+`pnpm check` is the point that enforces the package boundaries. `dependency-cruiser` fails the build on an import in the wrong direction (AD-1). An agent that imports from `core` into `sync` therefore learns about the fault in seconds, and no reviewer is necessary.
 
 `pnpm sync:dry` is the most important debugging tool. The command runs the full sync pipeline deterministically against recorded fixtures. The command writes a dataset and a run report to stdout, and writes nothing to disk. An agent can therefore examine the actions of the syncer and send no request to GGG.
 
@@ -43,7 +43,7 @@ pnpm catalogue:refresh    # EXPLICIT, human-invoked, hits the live API (AD-25)
 
 Neither command is part of a test run. An agent does not run either command unattended. The output of each command is a diff against the committed files. **That diff is the mechanism that makes a change by GGG visible.** A patch that changes the shape of a response appears as a change that a human can review. Such a patch does not appear as a production incident.
 
-`catalogue:refresh` reads the four trade data endpoints and writes them into `data/catalogue/` (AD-25). Run `catalogue:refresh` when GGG releases a patch. Do not run `catalogue:refresh` on a schedule. A renamed stat id appears as a line in that diff. AD-6 checks the tracked list against the catalogue. That check gives the renamed stat id an `unresolvable` state instead of a silent mismatch.
+`catalogue:refresh` reads the four trade data endpoints and writes them into `data/catalogue/` (AD-25). Run `catalogue:refresh` when GGG releases a patch. Do not run `catalogue:refresh` on a schedule. A renamed stat id appears as a line in that diff. AD-9 checks the tracked list against the catalogue. That check gives the renamed stat id an `unresolvable` state instead of a silent mismatch.
 
 Fixture hygiene:
 
@@ -53,15 +53,15 @@ Fixture hygiene:
 
 ## Parallel worktrees
 
-The package split (AD-2) is what makes parallel work possible. `contracts`, `core`, `sync` and `web` each own a separate directory. Each package has its own test suite. The dependency graph has no cycles and points in one direction. Two agents that work in two different packages change no common file.
+The package split (AD-1) is what makes parallel work possible. `contracts`, `core`, `sync` and `web` each own a separate directory. Each package has its own test suite. The dependency graph has no cycles and points in one direction. Two agents that work in two different packages change no common file.
 
 Rules for the division of work across worktrees:
 
 - **Give a task the scope of one package where possible.** A task that spans packages is a signal that a contract is missing. Such a task is not a signal that the boundary is wrong.
 - **Make `contracts` changes one at a time.** Every other package depends on `contracts`. A change to `contracts` is therefore a wide rebuild and a probable conflict. Land a `contracts` change alone and first. Then rebase the dependent work onto that change.
-- **Each file in `data/` has one writer (AD-21). That writer is never an agent's feature branch.** The player owns the hand-edited inputs `tracked.json`, `currencies.json`, `recipes.json` and `config.json`. The external scraper project owns `weights.json` (AD-11). The syncer owns the sync outputs `catalogue/*.json`, `dataset.json`, `sync-report.json` and `sync-progress.json`. An agent that needs different data uses a fixture. The agent does not edit a file in `data/`.
+- **Each file in `data/` has one writer (AD-3). That writer is never an agent's feature branch.** The player owns the hand-edited inputs `tracked.json`, `currencies.json`, `recipes.json` and `config.json`. The external scraper project owns `weights.json` (AD-11). The syncer owns the sync outputs `catalogue/*.json`, `dataset.json`, `sync-report.json` and `sync-progress.json`. An agent that needs different data uses a fixture. The agent does not edit a file in `data/`.
 - **No worktree runs `pnpm sync` or `pnpm catalogue:refresh` against the live API.** Only the scheduled invoker on the player's machine runs a sync (AD-7, AD-8). The scheduled invoker holds an exclusive lock. A second run on any machine therefore exits immediately, and that behaviour is the intended design. An agent that must check sync behaviour runs `pnpm sync:dry`. A human refreshes the catalogue when GGG releases a patch. An agent that needs a different catalogue uses a fixture.
-- **Never run `git add -A` in sync-related code.** AD-21 requires the syncer to commit only the files that the syncer owns. AD-21 also requires the syncer to name each of those files by an explicit path. An automated commit therefore never includes an unfinished curation edit.
+- **Never run `git add -A` in sync-related code.** AD-3 requires the syncer to commit only the files that the syncer owns. AD-3 also requires the syncer to name each of those files by an explicit path. An automated commit therefore never includes an unfinished curation edit.
 
 ## Determinism
 
@@ -69,7 +69,7 @@ An agent debugs badly when tests are unreliable. The design therefore excludes n
 
 - `core` is pure. The caller passes time, randomness and config into `core` as values (AD-1). A `core` test maps literal inputs to literal outputs.
 - The clock is a port. A test supplies a fixed instant. No code below the shell calls `Date.now()`.
-- Sync ordering is deterministic for a given tracked list, dataset and clock value. AD-26 fixes the rotation order. The order is currency rates first, then `pinned` entries by oldest `lastAttemptedAt`, then `active` entries by oldest `lastAttemptedAt`, then a bounded number of `unresolvable` retries, and never `pruned` entries. `core` computes the order as a pure function. A dry run and a real run therefore select the same entries. The order uses **`lastAttemptedAt`, and never the observation time**. An entry that stays `no-listings` never gets an observation time. A rotation ordered by observation time would therefore select that entry again forever (AD-9).
+- Sync ordering is deterministic for a given tracked list, dataset and clock value. AD-7 fixes the rotation order. The order is currency rates first, then `pinned` entries by oldest `lastAttemptedAt`, then `active` entries by oldest `lastAttemptedAt`, then a bounded number of `unresolvable` retries, and never `pruned` entries. `core` computes the order as a pure function. A dry run and a real run therefore select the same entries. The order uses **`lastAttemptedAt`, and never the observation time**. An entry that stays `no-listings` never gets an observation time. A rotation ordered by observation time would therefore select that entry again forever (AD-9).
 - No test depends on wall-clock timing. A test checks rate-limit backoff with supplied header values, and never by waiting.
 
 ## What an agent needs to know before touching a package
@@ -78,30 +78,34 @@ An agent debugs badly when tests are unreliable. The design therefore excludes n
 | --- | --- | --- |
 | `contracts` | Zod schemas, derived types, port interfaces | Types are `z.infer`red from schemas, never declared in parallel |
 | `core` | Pure valuation, probability, provenance | No I/O, no clock, no randomness, no env — ever (AD-1) |
-| `sync` | Trade client, rate-limit governor, chunk runner, catalogue refresher, dataset writer | One governed HTTP client only (AD-8); bounded work then exit (AD-7); rotation order comes from `core`, not from `sync` (AD-26); a stat filter's shape follows the reference's **kind** — a `banded` reference carries both `min` and `max`, a `valueless` one carries the stat id and **no edges at all**, and emitting a sentinel pair for a valueless stat silently prices the wrong population rather than erroring (AD-16, AD-5) |
+| `sync` | Trade client, rate-limit governor, chunk runner, catalogue refresher, dataset writer | One governed HTTP client only (AD-8); bounded work then exit and rotation order comes from `core`, not from `sync` (AD-7); a stat filter's shape follows the reference's **kind** — a `banded` reference carries both `min` and `max`, a `valueless` one carries the stat id and **no edges at all**, and emitting a sentinel pair for a valueless stat silently prices the wrong population rather than erroring (AD-16, AD-5) |
 | `web` | Static view, read-time ranking | No backend, no write path, no authenticated request (AD-15) |
 
 ## Build order
 
 Two activities run in sequence and not in parallel. Both activities are easy to get wrong at a late stage.
 
-1. **Build `contracts` first and alone.** Revision 2 changed `ModifierRef` to a band and added `itemLevelMin` to `TrackedEntry` (AD-5). Revision 4 makes `ModifierRef` a **discriminated union** of `banded` and `valueless`. Revision 4 also widens `provenance` to four values, and one of the four values is `modelled-split` (AD-10). Revision 4 also raises the weights file to `3.0.0`, and scopes the non-overlap rule of the weights file per `itemLevelMin` (AD-28). Revision 5 raises the weights file again to `4.0.0`. Revision 5 adds a required `sourceModifierId` on every weights entry, and scopes non-overlap by `sourceModifierId` as well (AD-29). Revision 6 raises the weights file to `4.1.0`. Revision 6 is a **non-breaking** minor change. Revision 6 adds the optional `statLineCounts` list and one new hard error: a `sourceModifierId` group that spans more than one `itemLevelMin` (AD-29). All of these changes are contract changes. Land the contract changes on their own, and then rebase all other work onto the contract changes. Land the union with the most care. An exhaustive `switch` over the two kinds is what stops `core` and `sync` from each inventing a different reading of the valueless case.
+1. **Build `contracts` first and alone.** Every other package depends on it, so land it on its own and rebase all other work onto it. Three shapes need the most care:
 
-   Two `core` rules depend on `sourceModifierId`. Both rules are easy to build wrong, because the simple form of each rule looks right. First, **the pool denominator sums over distinct source modifiers, and not over entries** (AD-18). Second, **AD-17's `slotOverlap` treats two different `statId`s as overlapping when one source modifier publishes both `statId`s** (AD-29). Both rules are cross-file checks over `tracked.json` and `weights.json` together. Both rules therefore live in `core`, beside the straddle rule and the edge-alignment rule. Both rules do not live in `contracts`, because `contracts` sees one file at a time. **Revision 7: `core` defines these checks, but `web` is not the only caller of the checks.** `sync` imports the same functions. `sync` runs the functions as a gate at the start of a run, before any priced entry spends a search. `sync` stops the run when a check fails (AD-18, AD-12). Build the checks as exported pure functions over both loaded files. Do not hide the checks inside the load path of `web`. A `sync` author who cannot call the checks will write the checks a second time. A second copy of a check is the divergence that AD-18 exists to prevent.
+   - **`ModifierRef` is a discriminated union** of `banded` — `(statId, valueMin, valueMax)` with both edges always present — and `valueless` — `(statId)` with **no edges at all** (AD-5). An exhaustive `switch` over the two kinds is what stops `core` and `sync` from each inventing a different reading of the valueless case. Emitting a sentinel pair for a valueless stat silently prices the wrong population rather than erroring.
+   - **`provenance` is a three-value order**: `absent`, `uniform-prior`, `measured` (AD-10). `core` derives it from the weights entry's `weightSource` and nothing else in the file — `"published"` → `measured`, `"absent"` → `uniform-prior`. **`"absent"` does not map to provenance `absent`**; that reading is the one the shared word invites and it is wrong.
+   - **`ModifierWeight` follows weights contract `5.0.0`** (AD-11): one entry is one tier of one modifier, carrying `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource` and **`lines[]`**, each line holding its own `statId` (or `null`) and its `ranges` **verbatim**. Write it to `5.0.0` directly; never to a `4.x` shape.
 
-   Revision 6 adds three more traps on the `core` side. In each of the three cases, the obvious implementation is the wrong implementation.
+   **Four cross-file checks live in `core`, and `web` is not their only caller.** All four read `tracked.json` and `weights.json` together, so `contracts` cannot see them — `contracts` sees one file at a time. They are edge alignment, the empty containment set, `coOccur`, and kind agreement (AD-17). Build them as **exported pure functions over both loaded files**. Do not hide them inside `web`'s load path: `sync` imports the same functions and runs them as a gate at the start of a run, before any priced entry spends a search, aborting on failure (AD-12). A `sync` author who cannot call them will write them a second time, and a second copy is the divergence the rule exists to prevent.
 
-   **Do not add a tolerance to the two sum checks**, and **sum the values in the entry order of the file.** Two checks compare values for **exact** equality over **parsed doubles**. The two checks are `cohortTotals` conservation (AD-28) and the per-`statId` agreement of a group (AD-29). Use no epsilon, and do no rounding before the comparison. The faults that these checks find are as large as a whole cell. An epsilon would only admit an unconserved file. The summation order is not a free choice. Float addition is not associative. A left fold in array order, a fold in lattice order, and a sum of per-group subtotals therefore reach different totals and refuse different files. Fold left, in array order. Also do not compare the serialised decimals at a common scale. That comparison is a different test, and that test accepts files that this test refuses. Band edges are exact for a *separate* reason. A half-integer lattice is exact in binary. An edge that misses by a small amount is a straddle and not a rounding artefact. Neither rule is therefore a candidate for a tolerance.
+   Three `core` traps, where the obvious implementation is the wrong one:
 
-   **An empty containment set has two possible causes, and the error must name both causes** (AD-18). The first cause is a tracked reference that the scoped pool never held. The second cause is a weights file that dropped a stat line and still declared `complete`. `core` cannot tell the two causes apart. `core` therefore reports the reference, the floor of the reference and the missing `statId`, and `core` blames neither document.
+   **Derive a line's filter-comparable interval in exactly one exported function** (AD-11). Both the containment test and the edge-alignment test call it. Two call sites that each divide are two chances to round differently, and the edge comparison is **exact, with no tolerance** — an epsilon readmits the sentinel defect AD-5 exists to close. For a two-`#` line the interval is the average of the two ranges, which is exact in binary; for three or more `#` it is unresolved and open as OQ-19. See `IMPLEMENTATION-NOTES.md` §1.
 
-   **Check `statLineCounts` for each group that declares `statLineCounts`** (AD-29), and understand why the check matters. The empty-containment error above fires only when the dropped stat had a *single* publisher. When two source modifiers publish one `statId`, a dropped line is silent. The numerator then loses a share, and the base gets the wrong rank. This optional declaration is the only protection that stands behind that case.
+   **Containment is whole-tier, and a partly-covered tier is not an error** (AD-11, AD-17). A tier whose derived interval lies wholly inside the band contributes its **whole weight, once**, however many of its lines match. A tier only partly covered contributes **nothing to the numerator** and **still counts in the denominator**. The denominator is a **plain sum over entries** — do not group by `sourceModifierId`, which is a `4.x` shape that no longer applies.
+
+   **An empty containment set has two possible causes, and the error must name both** (AD-17). The first is a tracked reference the scoped pool never held. The second is a weights file that dropped a stat line and still declared `complete`. `core` cannot tell them apart, so it reports the reference, its floor and the missing `statId`, and blames neither document. **Nothing mechanical stands behind the second cause under `5.0.0`** — where a second tier publishes the same `statId`, the dropped line fires no error at all and the numerator quietly deflates (AD-11). Do not attempt to close that hole locally; it is recorded under Deferred.
 2. **Measure pool coverage before any view work (AD-27).** Take the weights file that the scraper project produces, and compute:
 
    ```
    rankable(base) = base carries at least one tracked entry that is
                     crafted (AD-5: at least one affix present)
-                    and not pruned (AD-23)
+                    and not pruned (AD-12)
 
    covered(base)  = base is PRESENT in weights.json
                     ∧ both slots declare poolCoverage "complete"
@@ -114,7 +118,7 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 
    *Rankable* excludes two kinds of base. The first kind is a base that the tracked list holds only as a raw base. The second kind is a base whose crafted entries are all tombstones. Neither kind of base needs a pool, and a count that included either kind would lower a number that binds the layout. `rankable` is decidable from `data/tracked.json` alone, and that property is the design intent. The gate runs before any sync exists, so the formula deliberately does not use price state as a term.
 
-   **All three conditions of `covered` are load-bearing.** The condition "both slots `complete`" is **vacuously true** for a base that `weights.json` does not hold at all. Such a base has no slots to fail the condition. A base that declares `complete` over an *empty* pool passes a naive reading of the condition, and AD-18 excludes that base from the ordering anyway. Either gap lets the same tracked list and the same file score 100% or 40%. The consequences of the gate turn at 80% and at 50%.
+   **All three conditions of `covered` are load-bearing.** The condition "both slots `complete`" is **vacuously true** for a base that `weights.json` does not hold at all. Such a base has no slots to fail the condition. A base that declares `complete` over an *empty* pool passes a naive reading of the condition, and AD-17 excludes that base from the ordering anyway. Either gap lets the same tracked list and the same file score 100% or 40%. The consequences of the gate turn at 80% and at 50%.
 
    Apply the thresholds of AD-27, which are disjoint. At **≥ 80%**, proceed as specified. At **≥ 50% and < 80%**, the unrankable group stops being a footer and becomes a primary surface. **Below 50%**, the premise of the ranking fails. Escalate that failure, and do not work around the failure. A commitment to a layout before this number exists is a commitment to an assumption about how much of the product there is.
 

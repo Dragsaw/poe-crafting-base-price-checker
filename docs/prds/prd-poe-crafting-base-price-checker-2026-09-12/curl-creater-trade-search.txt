@@ -1,0 +1,24 @@
+curl --url ^"https://www.pathofexile.com/api/trade2/search/poe2/Forbidden^%^20Rites^" ^
+  -H ^"accept: */*^" ^
+  -H ^"accept-language: en-US,en;q=0.9^" ^
+  -H ^"cache-control: no-cache^" ^
+  -H ^"content-type: application/json^" ^
+  -b ^"POESESSID=<<redacted>>; POETOKEN=<<redacted>>" ^
+  -H ^"origin: https://www.pathofexile.com^" ^
+  -H ^"pragma: no-cache^" ^
+  -H ^"priority: u=1, i^" ^
+  -H ^"referer: https://www.pathofexile.com/trade2/search/poe2/Forbidden^%^20Rites/H4sIAAAAAAAACpWQzY7CMAyE32XOEdqEltK8CkLItAZZCk2VpPyoyruvslyKthd8sjX2Z83MiInSFGFn-DGJH2ARuZsCnR0jqz89wh5mpNfIsKChh8JFXOLwFqSHBT9HJ52kTTk46fqn1dvKmD0U7uQmLh9uMsA2dVboJZYHPeyFXOSsVim13pvWNLvqH0R_Qdm1ut2aqlmhrDCO-bhw93Z9WsyLtqPEVx9eH-E9mEY_bM7-UdILFCR9LtzoKh1yqV_O3q_qfgEAAA^" ^
+  -H ^"sec-ch-ua: ^\^"Brave^\^";v=^\^"153^\^", ^\^"Not_A Brand^\^";v=^\^"8^\^", ^\^"Chromium^\^";v=^\^"153^\^"^" ^
+  -H ^"sec-ch-ua-arch: ^\^"x86^\^"^" ^
+  -H ^"sec-ch-ua-bitness: ^\^"64^\^"^" ^
+  -H ^"sec-ch-ua-full-version-list: ^\^"Brave^\^";v=^\^"153.0.0.0^\^", ^\^"Not_A Brand^\^";v=^\^"8.0.0.0^\^", ^\^"Chromium^\^";v=^\^"153.0.0.0^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-model: ^\^"^\^"^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  -H ^"sec-ch-ua-platform-version: ^\^"19.0.0^\^"^" ^
+  -H ^"sec-fetch-dest: empty^" ^
+  -H ^"sec-fetch-mode: cors^" ^
+  -H ^"sec-fetch-site: same-origin^" ^
+  -H ^"user-agent: Mozilla/5.0 ^(Windows NT 10.0; Win64; x64^) AppleWebKit/537.36 ^(KHTML, like Gecko^) Chrome/153.0.0.0 Safari/537.36^" ^
+  -H ^"x-requested-with: XMLHttpRequest^" ^
+  --data-raw ^"^{^\^"query^\^":^{^\^"status^\^":^{^\^"option^\^":^\^"securable^\^"^},^\^"stats^\^":^[^{^\^"type^\^":^\^"and^\^",^\^"filters^\^":^[^{^\^"id^\^":^\^"explicit.stat_1509134228^\^",^\^"value^\^":^{^\^"min^\^":75^},^\^"disabled^\^":false^},^{^\^"id^\^":^\^"explicit.stat_518292764^\^",^\^"value^\^":^{^\^"min^\^":175^},^\^"disabled^\^":false^},^{^\^"id^\^":^\^"explicit.stat_691932474^\^",^\^"value^\^":^{^\^"min^\^":1^},^\^"disabled^\^":false^}^]^}^],^\^"filters^\^":^{^\^"type_filters^\^":^{^\^"filters^\^":^{^\^"category^\^":^{^\^"option^\^":^\^"weapon.bow^\^"^},^\^"rarity^\^":^{^\^"option^\^":^\^"magic^\^"^}^}^}^}^},^\^"sort^\^":^{^\^"price^\^":^\^"asc^\^"^}^}^"
