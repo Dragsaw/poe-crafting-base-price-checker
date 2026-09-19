@@ -115,6 +115,12 @@ Evaluate the branches in that order. The `coOccur` branch must sit **above** the
    subsumes the other and no two bands intersect, yet an item carrying both named modifiers
    satisfies both entries and is counted twice.
 
+**Error payload.** An overlap is rejected at load as a `data/tracked.json` validation error
+whose payload **names both offending entries by their canonical key** (§4.1) and the slot
+or slots on which they overlap. Naming one entry sends the curator hunting for a partner
+the checker already knows; naming neither turns a two-line fix into a search of the whole
+list. The rejection itself is AD-17's load-time rule, and this payload does not soften it.
+
 ### 2.2 `coOccur` (AD-11, AD-17)
 
 Under `5.0.0` this is a **direct read of one entry's `lines`**, and no cohort reasoning is
@@ -147,9 +153,19 @@ operationally min-only — the sentinel defect verbatim. Therefore, for every tr
 **`banded`** reference, over its containment set under the scope:
 
 ```
-ref.valueMin == min { interval(line).min : line ∈ contained(ref) }
-ref.valueMax == max { interval(line).max : line ∈ contained(ref) }
+lines(ref) = { line : entry ∈ contained(ref)
+                    ∧ line ∈ entry.lines
+                    ∧ line.statId == ref.statId }
+
+ref.valueMin == min { interval(line).min : line ∈ lines(ref) }
+ref.valueMax == max { interval(line).max : line ∈ lines(ref) }
 ```
+
+**`contained(ref)` returns entries, not lines, and the `statId` filter is load-bearing.**
+A hybrid entry is contained on one of its lines while carrying others under different
+`statId`s (AD-11). Taking the extremes over *every* line of a contained entry would pull a
+foreign line's interval into the comparison, and **every** band over a hybrid `statId`
+would fail alignment permanently, with nothing a curator could write to satisfy it.
 
 Worked, against a family whose tiers derive to `T7 = [43.0, 56.5]` and `T8 = [56.0, 80.0]`:
 
@@ -173,7 +189,8 @@ accept exactly the references this check catches.
 ### 2.5 Empty containment set (AD-17)
 
 AD-17 states the rule and its two indistinguishable causes. The mechanical obligation this
-file adds is the **error payload**: report the reference, the reference's floor, and the
+file adds is the **error payload**: report the tracked entry by its canonical key (§4.1), the
+reference, the reference's floor, and the
 absence of any entry carrying that `statId` in the scoped pool — and name **neither file as
 at fault**, because `core` cannot tell the causes apart and blaming the tracked list
 unconditionally sends a curator hunting a defect in a file that is correct.
@@ -211,6 +228,17 @@ needs a pool like any other.
 
 **An unresolved stat line (`statId: null`) does not affect coverage** — it is data, not a
 completeness failure.
+
+**The report carries the denominator beside the fraction.** `sync-report.json` records the
+count `|{ baseTypeId ∈ tracked.json : rankable }|` as its own field next to `coverage`, and
+`web` shows both, so a reader can see when the list is too small for the fraction to mean
+much. **Wire shape:** `coverage` is a `number` in `[0, 1]` — a fraction, never a percentage —
+and `web` formats it; when `weights.json` is absent **both fields are omitted together**,
+which is how "undefined" is spelled, and `web` must not read the omission as `0`. `sync`
+computes the figure and `web` only renders it: `web` does not recompute coverage even though
+it holds both files, because two figures on two surfaces would be the divergence AD-27
+exists to prevent. The size at which AD-27's bands become advisory is the PRD's number (FR-4), not this
+file's.
 
 ---
 
@@ -375,8 +403,23 @@ would take the product down for a curation error that only ever affects a sync r
 the pinned set **plus at least one `active` entry**, truncate the pinned set for that chunk —
 taking them in oldest-`lastAttemptedAt` order, reserving at least one search for the rotation —
 then complete the chunk normally and record a distinct **pinned-starvation** record in
-`sync-report.json` carrying the allowance seen, the pinned count, and how many `active` entries
-were reached. It is not an error and does not change the exit code.
+`sync-report.json`. It is not an error and does not change the exit code.
+
+**The record carries exactly six fields**, and `SyncRunReport` names them so:
+
+| Field | Meaning |
+| --- | --- |
+| `discoveredAllowance` | the search allowance the chunk actually received from the live headers (AD-8) |
+| `declaredMinChunkSearches` | `config.minChunkSearches` as loaded — the yardstick beside the allowance observed |
+| `currencyCost` | `currencyStepSearches`, what step 0 actually cost this chunk (AD-20) |
+| `pinnedCount` | the size of the `pinned` set at load |
+| `pinnedRefreshed` | how many `pinned` entries the truncation kept |
+| `activeRefreshed` | how many `active` entries the chunk reached |
+
+The shortfall is otherwise at least four different numbers, and the declared yardstick
+beside the observed allowance is what turns the record from a symptom into a diagnosis.
+It is distinct from the **not-reached** record AD-7 acknowledges: *not reached* is a normal
+rotation outcome, starvation is a curation defect the player must correct.
 
 ### Seeding `minChunkSearches` — read the sustained bucket, not the burst
 
@@ -392,3 +435,31 @@ The player declares the smallest allowance a chunk will actually receive **at th
 player schedules**, bounded above by `sustainedRate × interval`. AD-7 is untouched: the syncer
 still assumes nothing about its invoker — the player declares the number and the runtime check
 audits it.
+
+---
+
+## 7. The lock and its staleness threshold (AD-7)
+
+The lock file carries **two fields and no others** — the holder's `pid` and its ISO-8601 UTC
+`startedAt`. Anything else invites a reader to reason about a run it cannot see.
+
+```
+stale(lock, now)  ⇔  now − lock.startedAt  >  staleLockAfter
+```
+
+**`staleLockAfter` is 6 hours**, and the figure is a ceiling on a chunk, not an estimate of
+one. A chunk is bounded by AD-7's three allowances and finishes in minutes; six hours is far
+past any legitimate run while still clearing the lock inside a single day's syncing, so a
+crash costs at most one wasted cadence rather than every future one. It is a `sync`-side
+constant, not a `data/config.json` field — AD-19 keeps that file to the two things the player
+owns, and nothing but `sync` reads this.
+
+**A run that breaks a stale lock takes it, proceeds, and records `stale-lock-broken`** in
+`sync-report.json`, carrying the broken lock's `pid` and `startedAt`. The record is not an
+error and does not change the exit code; its job is to make the recovery **visible**, because
+the state it recovers from is otherwise indistinguishable from a healthy idle system.
+
+**Do not check liveness by pid alone.** A pid is reused by the operating system, so a live
+unrelated process can wear a dead run's number and hold the lock forever; the time comparison
+is what bounds the failure. Where a cheap same-host liveness check is available it may
+*shorten* the wait, and may never extend it past the threshold.

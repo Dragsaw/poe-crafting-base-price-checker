@@ -38,11 +38,3 @@ PoE crafting base price checker. Pre-code: planning lives in `docs/` (PRD, archi
 - `PRODUCT.md` is a distillation of `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md`, not an independent source — refresh it when the PRD's user/positioning/constraint facts change. Nothing detects drift between them automatically.
 
 <!-- /bmad:context -->
-
-## Verifying a PRD change
-
-Kept outside the managed block above on purpose, so a context refresh does not drop it.
-
-- **Run `uv run _bmad/scripts/prd_gate.py` after any edit to `prd.md`, and as the first step of any PRD validation or review pass.** Exit code 1 on any FAIL. It is the only automated check that the PRD's citations still resolve against the live spine — `FR-n`, `NFR-n`, `UJ-n`, `AD-n`, `OQ-n` and `IMPLEMENTATION-NOTES.md §n` — and that the drift markers behind ten of twelve past revisions (contract version strings, revision narrative, stray code fences, an asymmetric assumptions index) have not returned.
-- A spine or companion edit can break the PRD without touching it, so run the gate after those too.
-- The word-count lines are reported, not enforced; only `FAIL` lines block.

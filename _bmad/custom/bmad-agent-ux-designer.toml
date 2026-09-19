@@ -1,0 +1,9 @@
+[agent]
+persistent_facts = [
+  "For all UX and visual design work, invoke the `impeccable` skill rather than producing design output directly — critique, polish, layout, and visual craft route through impeccable.",
+]
+
+[[agent.menu]]
+code = "ID"
+description = "Design, critique, or polish a UI directly using the Impeccable skill"
+skill = "impeccable"

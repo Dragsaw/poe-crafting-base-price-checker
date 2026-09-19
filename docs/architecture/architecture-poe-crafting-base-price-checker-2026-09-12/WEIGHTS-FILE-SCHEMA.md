@@ -1,23 +1,21 @@
 ---
 title: 'Weights File Contract'
-status: final
+status: draft
 schemaVersion: '5.0.0'
 created: '2026-09-12'
 updated: '2026-09-19'
-governed_by: [AD-5, AD-9, AD-10, AD-11, AD-17, AD-27]
 ---
 
 # Weights File Contract
 
-> **This is the authoritative copy.** `5.0.0` was adopted on 2026-09-19 by the approved
-> sprint change proposal at `docs/sprint-change-proposal-2026-09-19.md`, which carries the
-> decision trail. This document is owned by `poe-crafting-base-price-checker` and lives in
-> this repository. A working copy held in a producer repo is a **proposal with no effect**;
-> only the text here is binding.
->
-> **AD citations were renumbered by spine revision 10**, which merged nine decisions into
-> their neighbours. AD-6 → AD-9, AD-18 → AD-17, AD-28 and AD-29 → AD-11. See the spine's
-> *Retired AD map*.
+> **Producer-side draft.** This file is a working copy under `poe-mod-weights-producer`,
+> not the authoritative contract. The authoritative copy lives in
+> `poe-crafting-base-price-checker/docs/architecture/.../WEIGHTS-FILE-SCHEMA.md` and is
+> owned by that repo. `5.0.0` below is this producer's proposal for what the contract
+> should become, written here so consumer-side planning can start against it before the
+> producer rebuild lands. It does not take effect until adopted in the consumer repo.
+> See `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-18.md` for the
+> decision trail behind this revision.
 
 The app **consumes** this file. The app never produces this file (AD-11). Any producer
 that satisfies this contract is acceptable. The app does not depend on which producer
@@ -61,18 +59,17 @@ These four revisions built and then were superseded by the decomposition approac
 560 of 8,437 in-scope rows publish several stats at once, 53 of 63 item classes carry a
 two-number modifier, etc. — they just no longer drive this contract's shape. Their full
 text is not reproduced below, to avoid describing machinery this contract no longer
-specifies. **The full `2.0.0`–`4.1.0` text is recoverable from this repository's git
-history**, with the `5.0.0` adoption commit of 2026-09-19 as the boundary.
+specifies; this file is gitignored in this repo (never committed, so there is no commit
+history to point to for the pre-`5.0.0` text) — the authoritative record of the full
+`2.0.0`–`4.1.0` text is the consumer repo's own committed copy of this document.
 
 ## Why this file has to exist
 
-Verified on 2026-09-12, re-checked 2026-09-13, against the live endpoints. The endpoint
-`https://www.pathofexile.com/api/trade2/data/stats` returns **category groups** of the
-form `{id, label, entries[]}`, with each stat nested inside a group as `{id, text, type}`
-— 3,108 explicit stat ids in total, and a consumer flattens the groups before looking an
-id up. A stat entry carries nothing beyond those three fields, and a group's `label` is a
-trade-UI heading carrying no pool meaning. The trade API has no per-base-type association,
-no tier concept, no `required_level` and no spawn weight.
+Verified on 2026-09-12 against the live endpoints. The endpoint
+`https://www.pathofexile.com/api/trade2/data/stats` returns a **flat global list** of
+3,108 explicit stat ids. Each stat id has the shape `{id, text, type}` and carries
+nothing else. The trade API has no per-base-type association, no tier concept, no
+`required_level` and no spawn weight.
 
 The app can therefore learn *that* `explicit.stat_1509134228` exists, and can learn the
 text of that stat. The app does learn both, from the catalogue (AD-25). The app cannot
@@ -98,8 +95,8 @@ slot, itemLevel)` is entirely a consumer concern.
 **The file is not** recipe-aware. Perfect and greater transmute and augment recipes
 change the tier distribution; that is a consumer concern.
 
-**The file is not** deduplicated. Two tiers of one family that overlap in value range are
-both reported, unmodified, exactly as poe2db lists them.
+**The file is not** deduplicated across cohorts. Two tiers of one family that overlap in
+value range are both reported, unmodified, exactly as poe2db lists them.
 
 ## The pool-completeness rule
 
@@ -128,57 +125,59 @@ the producer computes from cell coverage — there are no cells to compute it fr
     "sourceUrl": "https://..."        // where the data came from, if anywhere
   },
   "bases": {
-    "Guardian Bow": {                 // trade API base type `type` string (AD-5, AD-25)
-      "prefix": {
-        "poolCoverage": "complete",   // "complete" | "partial"
-        "entries": [
-          {
-            "sourceModifierId": "prefix\u0000BaseLightningDamage\u000060\u0000...",
-            "itemLevelMin": 60,        // this tier's own item level
-            "tierLabel": "T7",         // display only; never a matching key
-            "weight": 40,              // raw spawn weight as published, unnormalised
-            "weightSource": "published",  // "published" | "absent"
-            "lines": [
-              {
-                "statId": "explicit.stat_1509134228",
-                "ranges": [[43, 43], [56, 56.5]]   // verbatim, both numbers of one stat
-              }
-            ]
-          },
-          {
-            "sourceModifierId": "prefix\u0000BaseEvasionHybrid\u00008\u0000...",
-            "itemLevelMin": 8,
-            "tierLabel": "T1",
-            "weight": 1000,
-            "weightSource": "published",
-            "lines": [
-              { "statId": "explicit.stat_evasion_flat", "ranges": [[4, 6]] },
-              { "statId": "explicit.stat_evasion_pct", "ranges": [[6, 13]] }
-            ]
-          },
-          {
-            "sourceModifierId": "prefix\u0000ExtraBolt\u000045\u0000...",
-            "itemLevelMin": 45,
-            "tierLabel": "T1",
-            "weight": 300,
-            "weightSource": "absent",
-            "lines": [
-              { "statId": "explicit.stat_2954116742", "ranges": [] }   // rolls no number
-            ]
-          },
-          {
-            "sourceModifierId": "prefix\u0000UnmatchedMod\u000030\u0000...",
-            "itemLevelMin": 30,
-            "tierLabel": "T4",
-            "weight": 500,
-            "weightSource": "published",
-            "lines": [
-              { "statId": null, "ranges": [[10, 20]] }   // no trade statId matched
-            ]
-          }
-        ]
-      },
-      "suffix": { "poolCoverage": "complete", "entries": [] }
+    "weapon.bow": {                   // trade category filter id (AD-5, AD-25), collapses many classNames
+      "Bows": {                       // poe2db className verbatim, never a derived display label
+        "prefix": {
+          "poolCoverage": "complete",   // "complete" | "partial"
+          "entries": [
+            {
+              "sourceModifierId": "prefix\u0000BaseLightningDamage\u000060\u0000...",
+              "itemLevelMin": 60,        // this tier's own item level
+              "tierLabel": "T7",         // display only; never a matching key
+              "weight": 40,              // raw spawn weight as published, unnormalised
+              "weightSource": "published",  // "published" | "absent"
+              "lines": [
+                {
+                  "statId": "explicit.stat_1509134228",
+                  "ranges": [[43, 43], [56, 56.5]]   // verbatim, both numbers of one stat
+                }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000BaseEvasionHybrid\u00008\u0000...",
+              "itemLevelMin": 8,
+              "tierLabel": "T1",
+              "weight": 1000,
+              "weightSource": "published",
+              "lines": [
+                { "statId": "explicit.stat_evasion_flat", "ranges": [[4, 6]] },
+                { "statId": "explicit.stat_evasion_pct", "ranges": [[6, 13]] }
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000ExtraBolt\u000045\u0000...",
+              "itemLevelMin": 45,
+              "tierLabel": "T1",
+              "weight": 300,
+              "weightSource": "absent",
+              "lines": [
+                { "statId": "explicit.stat_2954116742", "ranges": [] }   // rolls no number
+              ]
+            },
+            {
+              "sourceModifierId": "prefix\u0000UnmatchedMod\u000030\u0000...",
+              "itemLevelMin": 30,
+              "tierLabel": "T4",
+              "weight": 500,
+              "weightSource": "published",
+              "lines": [
+                { "statId": null, "ranges": [[10, 20]] }   // no trade statId matched
+              ]
+            }
+          ]
+        },
+        "suffix": { "poolCoverage": "complete", "entries": [] }
+      }
     }
   }
 }
@@ -191,7 +190,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
 | `schemaVersion` | Semver. `core` refuses a major version that `core` does not implement. `core` does not guess. |
 | `gamePatch` | A free-form GGG patch string, operator-asserted. Never `"unknown"`, never inferred. A producer refuses to run without it. |
 | `producer.id` | Stable across regenerations by the same producer. |
-| `bases` key | A trade API base type `type` string, spelled exactly as `data/items` spells it. Validated report-only by `sync` (AD-9, AD-25); a base absent from the file is unrankable. |
+| `bases` key | Two levels. Outer key is a trade category filter id (`categoryId`), spelled exactly as the trade category filter list spells it. Inner key is the poe2db `className` verbatim (never a derived display label) that resolved to that `categoryId` -- `className -> categoryId` is many-to-one (e.g. six armour `className`s collapse to `armour.gloves`), so one `categoryId` can carry several distinct `className` sub-keys, each with its own `{prefix, suffix}` pools. There is no cross-class ownership guard: `(categoryId, className)` cannot collide because `className`s are already distinct. Validated report-only by `sync` (AD-6, AD-25); a base absent from the file is unrankable. |
 | `slot` | Exactly `prefix` and `suffix`. |
 | `poolCoverage` | See *The pool-completeness rule*. Required, with no default. |
 | `sourceModifierId` | **Required on every entry.** Names the poe2db tier this entry came from. One entry per tier — never split, never merged. Opaque to the app. |
@@ -200,7 +199,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
 | `weight` | Raw spawn weight as poe2db published it (`DropChance`), unnormalised, non-negative. `0` is meaningful ("cannot roll on this base") and must still be emitted. |
 | `weightSource` | **Required.** `"published"` where poe2db supplied a real weight (a JSON string `DropChance`), `"absent"` where it supplied a filler (a JSON number). Never inferred from the value. |
 | `lines` | **Required, at least one entry.** One item per stat line poe2db's template prints, split at the template's own line breaks — no value math, no partitioning. |
-| `lines[].statId` | A trade API stat id matched by this producer's stat-text resolution, or `null` if unresolved. Never a matching key from `core`'s side — `core` treats it as opaque identity. Validated report-only against the trade catalogue by `sync`; a `null` is **skipped** by that validation, never failed by it, and `sync` must not report it as an uncatalogued id (AD-9, AD-25). |
+| `lines[].statId` | A trade API stat id matched by this producer's stat-text resolution, or `null` if unresolved. Never a matching key from `core`'s side — `core` treats it as opaque identity. Validated report-only against the trade catalogue by `sync`, same as `4.x` (AD-6, AD-25). |
 | `lines[].ranges` | Verbatim `[min, max]` pairs, one per `#` in that line's own template text, in the order poe2db prints them. A line with no `#` (a flat, valueless line) carries an empty array. **Not** cut, cast, or reduced to a single derived value — a two-number stat's two ranges are both reported as poe2db shows them. |
 
 ## Validation
@@ -217,21 +216,14 @@ source of truth; the shape above documents it and is not a parallel definition.
 - `lines` empty
 - a `lines[]` entry whose `ranges` contains a pair where `min > max`
 - a duplicate `sourceModifierId` within one slot
-- a **duplicate `statId` among one entry's `lines`** — malformed by construction, cheap to
-  reject, and what makes `lines.length` mean what this contract says it means
 - a missing or empty `gamePatch`
 - a missing `poolCoverage`
 
 **Not a file error:**
 
-- an unresolved `statId` (`null`) — reported by the producer, never a refusal, and never a
-  reason to declare a pool `partial`
-- an uncatalogued `statId` or `bases` key — `sync`'s concern, report-only (AD-9), same as `4.x`
-- overlapping `ranges` across tiers of one family — expected and left as-is. **The consumer
-  does not derive disjoint intervals from them.** It applies whole-tier containment (AD-11,
-  AD-17): a tier only partly covered by a tracked band contributes nothing to that band's
-  numerator and still counts in the denominator. A producer therefore need not make tiers
-  separable, and **must not merge or trim them to try**.
+- an unresolved `statId` (`null`) — reported by the producer, never a refusal
+- an uncatalogued `statId` or `bases` key — `sync`'s concern, report-only (AD-6), same as `4.x`
+- overlapping `ranges` across tiers of one family — expected and left as-is; the consumer resolves it if its ranking needs disjoint intervals
 
 ## Producer expectations
 
@@ -239,20 +231,9 @@ Regenerate the file on GGG patch boundaries, and on no faster cadence. Report, p
 and in totals, how many stat lines resolved to a `statId` versus did not — this replaces
 `4.x`'s coverage-per-pool measurement, decoupled from cell math.
 
-**Open question for the producer — line arity (spine OQ-19).** The consumer derives one
-filter-comparable interval per line from that line's `ranges`. For a line with two `#` the
-derivation divides by two, which is exact in binary and compares equal against a curator's
-declared edge with no tolerance. **For a line with three or more `#` the derivation is not
-exact**, and every tracked reference against such a line would fail the consumer's
-edge-alignment check permanently, with nothing a curator could write to satisfy it. Whether
-PoE2 publishes any such line is unknown — the `5.0.0` measurements count rows by *stat
-count*, which is a different axis from `#`-per-line. **Please report the maximum number of
-`#` on any single line in scope.** If the answer is three or more, the resolution is an
-amendment to this contract, and never an epsilon in the consumer.
-
 ## Repository placement
 
-**This repository, `poe-crafting-base-price-checker`, owns this document.** A working copy
-held in a producer repo is a proposal with no effect until adopted here. Moving the schema
-itself to a shared package remains **Deferred**: extract once the schema stops moving, and
-`5.0.0` is the third breaking revision in seven days.
+This document is currently drafted and iterated in `poe-mod-weights-producer` as a
+producer-side proposal. The authoritative copy, once `5.0.0` is agreed, lives in
+`poe-crafting-base-price-checker`. Moving the schema itself to a shared package remains
+Deferred, as in prior revisions.
