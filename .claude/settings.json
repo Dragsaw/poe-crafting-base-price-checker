@@ -6,6 +6,7 @@
       "Glob",
       "WebSearch",
       "WebFetch",
+      "mcp__serena__*",
       "Edit(E:/Program Files/Jetbrains/Projects/poe-crafting-base-price-checker/**)",
       "Write(E:/Program Files/Jetbrains/Projects/poe-crafting-base-price-checker/**)",
 
@@ -19,6 +20,11 @@
       "Bash(npm test:*)",
       "Bash(npm view:*)",
       "Bash(npx bmad-method:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm ci:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm view:*)",
 
       "Bash(git status:*)",
       "Bash(git diff:*)",
@@ -42,6 +48,8 @@
       "Bash(pwd)",
       "Bash(date:*)",
       "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(dir:*)",
       "Bash(cat:*)",
       "Bash(head:*)",
       "Bash(tail:*)",

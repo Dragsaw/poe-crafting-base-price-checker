@@ -1,0 +1,15 @@
+[workflow]
+
+activation_steps_prepend = [
+  "Call mcp__serena__initial_instructions and follow it — it governs when to use Serena's tools over Read/Grep/Edit for code.",
+]
+
+implementation_handoff = """
+Launch a subagent with no prior conversation context, with this prompt:
+
+> Read {spec_file} fully and implement it — the spec is the sole source of truth. Load every file listed in its frontmatter `context:` before you start.
+>
+> Call mcp__serena__initial_instructions first and follow it — it governs when to use Serena's tools over Read/Grep/Edit for code.
+>
+> When done, report what you changed, how you verified it, and anything left incomplete or risky.
+"""
