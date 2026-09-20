@@ -2,3 +2,8 @@
 doc_standards = [
   "skill:asd-ste100",
 ]
+
+activation_steps_append = [
+  "Save each review-*.md and reconcile-*.md file in {doc_workspace}/reviews/.",
+  "Save each handover note in {doc_workspace}/handovers/.",
+]

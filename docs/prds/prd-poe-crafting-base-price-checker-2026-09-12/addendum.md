@@ -1,16 +1,16 @@
 ---
 title: "PRD Addendum: PoE2 Crafting Base Price Checker"
 status: final
-revision: 6
+revision: 7
 created: 2026-09-12
-updated: 2026-09-19
+updated: 2026-09-20
 ---
 
 # PRD Addendum
 
-> **Historical record, and the PRD's rationale store.** The analyses from *The Item Level Rule* through *Why the PRD Cites Architecture Decisions* describe weights contracts `2.0.0` to `4.1.0` and architecture spine revisions 2 to 5, as they stood when written. They are superseded by contract `5.0.0` and spine revision 10, which withdrew value cells, cohorts and the straddle rule and merged ten decisions into their neighbours. A retired AD id inside them is annotated inline with its new home rather than rewritten, because the id names what a past revision decided. The *Closed questions register* and *Revision 13 rationale* sections at the end are current: they hold what `prd.md` revision 13 stopped carrying when it became a governing document.
+> **Historical record, and the PRD's rationale store.** The analyses from *The Item Level Rule* through *Why the PRD Cites Architecture Decisions* describe weights contracts `2.0.0` to `4.1.0` and architecture spine revisions 2 to 5, as they stood when written. They are superseded by everything from contract `5.0.0` and spine revision 10 onward. Revision 10 withdrew value cells, cohorts and the straddle rule, and merged ten decisions into their neighbours; later revisions moved more of it, up to `prd.md` revision 18's move of the crafted branch to class altitude. A retired AD id inside them is annotated inline with its new home rather than rewritten, because the id names what a past revision decided. The *Closed questions register*, *Revision 13 rationale*, *Revision 17 rationale* and *Revision 18 rationale* sections at the end are current: they hold what `prd.md` stopped carrying at revision 13, when it became a governing document, and again at revisions 17 and 18. Revision 17's section is the one exception — it is the argument for an altitude revision 18 replaced within the day, kept because its losing half is still true.
 
-This addendum captures depth from the PRD run that belongs to a downstream reader — architecture, solution design, or the curation workflow — rather than to the PRD's main narrative. It does **not** repeat `docs/briefs/.../addendum.md`, which already holds the request-budget analysis, the rejected alternatives for combination discovery, the ranking-metric derivation and the data-source notes.
+This addendum captures the reasoning from the PRD run that belongs to a downstream reader — architecture, solution design, or the curation workflow — rather than to the PRD's main narrative. It does **not** repeat `docs/briefs/.../addendum.md`, which already holds the request-budget analysis, the rejected alternatives for combination discovery, the ranking-metric derivation and the data-source notes.
 
 **Which section is for you.** The topics below are dependency-ordered, not ranked by importance:
 
@@ -18,8 +18,10 @@ This addendum captures depth from the PRD run that belongs to a downstream reade
 - *Recipe Count* and *Curation Surface* — for whoever builds the view and `core`; both are options-considered records.
 - *The Three Blocking Defects* — for the **architect**. Over half the document, and the highest-stakes content.
 - *Why the PRD Cites Architecture Decisions* — for any reader wondering why a requirements document states arithmetic.
+- *Closed questions register* — for anyone who meets a closed OQ or BQ id cited elsewhere.
+- *Revision 13 rationale*, *Revision 17 rationale* and *Revision 18 rationale* — for a builder who arrived from an FR citation and wants the argument behind it. Revision 13 covers the mechanism the PRD stopped restating; revision 17 covers the move of the crafted branch off the Base Type; revision 18 covers its landing on the **Item Class**, which is where it is now.
 
-Each analysis below is a **record of reasoning, not a live proposal**: read the body as it stood when it was written, and the bold **What landed** note that closes it for the current state. Where a later spine revision moved an analysis again, a further bold note follows and names that revision — one for each such revision, oldest first. *Why the PRD Cites Architecture Decisions* is the exception — standing rationale rather than an analysis, so it carries no landing note.
+Each analysis below is a **record of reasoning, not a live proposal**: read the body for the state as it stood when it was written, and the bold **What landed** note that closes it for the current state. Where a later spine or PRD revision moved an analysis again, a further bold note follows and names that revision — one for each such revision, oldest first. *Why the PRD Cites Architecture Decisions* is the exception — standing rationale rather than an analysis, so it carries no landing note.
 
 ## The Item Level Rule — Derivation
 
@@ -60,7 +62,7 @@ The brief ranks "a base paired with a crafting recipe", and AD-18 (retired into 
 
 The distribution transform is the thing actually missing, and it is a data problem rather than a design one. When those numbers exist, recipe becomes a real ranking dimension and option (2) becomes worth shipping.
 
-**What landed.** Nothing changed here. Spine revision 2 left AD-18 (retired into AD-17 by spine rev 10)'s recipe clause untouched — ordering is still recipe-invariant in v1 — so option 1 stands and the open question is still the mechanics numbers (PRD §10 OQ-5).
+**What landed — option 2, at spine revision 14 (2026-09-19).** The premise under which option 1 was adopted has failed. The distribution transform is no longer missing: the player supplied the mechanic, and the quantity it needs was already in the weights file, so the transform needs no number the inputs lack (AD-17, `IMPLEMENTATION-NOTES.md` §9). Option 2's rejection rested entirely on the identity transform — "an identically ordered list with a different constant subtracted" — and that sentence is now false. Recipe is a real ranking dimension, so two recipes ship and the ranking is read under one at a time. Option 3 held, exactly as predicted: the recipes are data and the count cost nothing to change. The budget objection does not carry over, because ranking happens in the browser over one synced Dataset and a second recipe consumes no additional requests (AD-4, AD-12).
 
 ## Curation Surface — Options Considered
 
@@ -130,6 +132,8 @@ The PRD attaches a decision rule (≥80% proceed / 50–80% proceed with the Unr
 
 **What landed.** AD-27 adopts the thresholds verbatim and pins down two things this analysis left loose. The denominator is **the tracked list**, not the catalogue: the question is how much of what the curator wants ranked can be ranked, and a base nobody tracks cannot affect the product. And the rule is **source-agnostic** — it binds whatever produces the weights file. That matters more than it seemed to at the time, because spine revision 2 removed RePoE as the assumed source. This analysis was framed around a RePoE→stat-id mapping of unknown coverage; identity now comes from the trade catalogue (AD-25) and pools from the file (AD-11), and the gate reads the same either way. The 50–80% band is also no longer just advice: it binds a layout decision in `web`, which is why the PRD carries it in FR-4 rather than only here.
 
+**What landed after the crafted branch moved off the Base Type (`prd.md` revision 17, refined at revision 18).** The bands are **withdrawn**. This analysis assumed a denominator of tracked Base Types — hundreds — against which 80% and 50% divide a large list into meaningfully different products. Once the crafted branch ranks Item Classes, the denominator is the tracked classes: dozens at most, and the game publishes 63 in total. Revision 18's move from the category to the class left the denominator in that same order of magnitude, so it changed nothing here. A fraction over a list that size describes the Weights File's progress rather than how much product exists. FR-4's own withdrawn *~20* note called precisely that condition advisory; the note, and its §11 index entry, went with the bands. The measurement survives unchanged: still sequenced first, still re-measured on every regeneration, because *when* it is taken was never the part that depended on the denominator. What is gone is the threshold and the layout it bound. Coverage is now reported with its denominator and read as a judgement, and the prominence of the Unrankable group is UX's call against the observed figure. The three arguments under *Revision 13 rationale* → *Why the coverage predicates were spelled out* survive too: reproducibility matters more, not less, once a single category moves the fraction by two points.
+
 ## Why the PRD Cites Architecture Decisions Instead of Restating Them
 
 The usual PRD discipline is capabilities-not-implementation, with technical choices pushed to an addendum. This PRD deliberately breaks that in a narrow way: the pricing definition (FR-21), the ranking formula (FR-1), the four price states (FR-9), the weight aggregation rule (FR-29) and the currency denomination (FR-23) are stated as requirements with their arithmetic intact.
@@ -143,6 +147,7 @@ Everything genuinely implementation-shaped — the package split, the port-and-a
 `prd.md` §10 carried these until revision 13. Each was raised against the spine, or by the spine against a companion, and each is closed: the cited decision is the copy to build to. Ids are never reused.
 
 - **OQ-4** — Where Accepted Tier item levels come from. `itemLevelMin` became a required Weights File field owned by the producer. Transferred to the weights scraper project.
+- **OQ-5** — Recipe distribution mechanics. The mechanic is a game-side floor the orb imposes on modifier level, and the weights file already carries the matching per-tier quantity, so the eligible pool truncates and renormalises with no new input. Closed by spine rev 14 and promoted into v1: ranking is no longer recipe-invariant and v1 ships two recipes (AD-17, `IMPLEMENTATION-NOTES.md` §9).
 - **OQ-8** — The `pinned` cap re-denominated against a Chunk rather than a full refresh, and enforced at load and at runtime. Retired by spine rev 3/4 (AD-7, `IMPLEMENTATION-NOTES.md` §6).
 - **OQ-9** — The `unresolvable` retry bound's rationale replaced: detection is offline and free, the bound only paces a residual pricing-only retry. Retired by spine rev 3/4 (AD-7).
 - **OQ-10** — The coverage denominator narrowed to Base Types that need a pool; numerator predicate fixed. Retired by spine rev 3/4 (AD-27, `IMPLEMENTATION-NOTES.md` §3).
@@ -158,6 +163,8 @@ Everything genuinely implementation-shaped — the package split, the port-and-a
 ## Revision 13 rationale
 
 PRD revision 13 cut every mechanism sentence and cited the architecture instead. This section keeps the *why* behind requirements whose argument no longer fits a governing document. Each entry names the FR and the decision or companion section that now binds the mechanism.
+
+**Read this section against revision 18.** It was written before the crafted branch moved off the Base Type, so where an entry states a crafted-branch rule in terms of a *Base Type* — pool completeness, the shared item-level floor, the Provenance badge's scope, the coverage denominator — the unit is now the **Item Class**. `prd.md` has already made that change, and the argument is unaffected by the noun. Two arguments below also speak of the coverage gate as live. It is not: revision 17 withdrew the bands, for the reasons recorded against *BQ-3* above. What survives is the case for spelling the predicates out, which the withdrawal strengthens rather than weakens.
 
 ### Valuation and ranking (FR-1, FR-4, FR-16, FR-29)
 
@@ -201,3 +208,59 @@ PRD revision 13 cut every mechanism sentence and cited the architecture instead.
 - **Provenance display.** The file's per-tier source marker is never printed, because its word `absent` beside Provenance `absent` would read as one fact twice or as a contradiction. Revision 10 expected the badge to discriminate within a Base Type; under pool-wide propagation it discriminates between Base Types, and a builder on the old reading would ship a badge varying row by row inside one expansion, which is why the restatement was explicit (AD-10).
 - **The 48-hour cut-off.** Chosen against the ~15-hour partial refresh cycle so normal rotation never marks a row; a mark then means something is wrong, the same argument FR-11 makes. A never-synced row has no attempt timestamp because only an issued request stamps one, and a placeholder would both lie on screen and mis-sort the rotation (AD-9).
 - **Artifact delivery.** The eight-artifact set, the two catalogue files' distinct jobs, the currency-as-text decision, the fetch-versus-navigation boundary and the stale-identifier analysis are all AD-24's and AD-25's. The "a shell that can only render should render" ruling for a cross-file policy failure is AD-17's as of spine rev 12.
+
+## Revision 17 rationale — the crafted branch ranks Item Categories
+
+> **Superseded within the day by revision 18**, which moved the ranked unit one level finer, from the Item Category to the Item Class. Read this section as the argument that was live at revision 17; where it says *category*, `prd.md` now says **Item Class**. The reasoning that survives the move is marked below, and *Revision 18 rationale* holds what replaced the rest.
+
+`prd.md` revision 17 moved the crafted branch's ranked unit from the Base Type to the Item Category, following the architect's OQ-23 handover of 2026-09-20 and the player's confirmation that modifier combinations are curated and checked per category, never per named base. The noun changes are mechanical; the three judgements below are not, and each belongs here rather than in a governing document.
+
+### Why the payout term is allowed to be a category average
+
+FR-1 states the property; the mechanism behind it is that a category search prices the cheapest listings across every base in the category, so a Guardian Bow and a Shortbow carrying the same affixes land in one sample.
+
+It was put to the player on 2026-09-20 and accepted deliberately: the player crafts on whatever the category gives them, so the category is the decision the number is for, and a per-base payout would answer a question the player cannot act on. The cost is recorded as a consequence of FR-1 rather than as a risk in §9, because §9 holds threats the product has not closed, and this is a property the product chose.
+
+Two related facts are worth keeping beside that decision. It compounds with R-1 and pushes in the same direction: both make the displayed figure an artefact of what is listed rather than of what is achievable. Unlike R-1, it has an identified, deliberately unspent remedy — tracking a category's strong bases as separate raw entries already prices them honestly on the other branch.
+
+### Why FR-4's coverage bands were withdrawn rather than re-fitted
+
+Recorded in full against *BQ-3 — The unmeasured gate* above, which is the analysis that produced them. In short: the bands divided a denominator of hundreds, the denominator is now dozens, and a threshold over dozens measures the scraper rather than the product. Re-fitting them to a smaller denominator was considered and rejected: any number set now would be set against an unmeasured list, which is the defect BQ-3 was written to prevent. The honest version of that judgement is a published fraction with its denominator, plus a human reading it. What was given up is explicit — FR-4 no longer instructs anyone to escalate at any coverage figure, and no band now binds `web`'s layout.
+
+### Why `"base absent from weights file"` became `"category absent from weights file"` rather than disappearing
+
+The handover takes the absent-base lookup to stop happening once entries name categories. The enum kept two members anyway. *The producer declared a pool it could not guarantee* and *the producer published nothing for this category at all* are different failures. FR-9's whole argument is that one state covering unrelated causes defeats the point of having states. If the architecture genuinely cannot distinguish the two once pools are keyed per category, the string is dead and the enum collapses to one member — that is a question for the spine revision closing OQ-23, and it is raised in `reply-oq23-class-altitude.md` rather than settled here.
+
+*The argument holds at revision 18 with the noun moved: the second string is now `"class absent from weights file"`, and the question put to the spine is unchanged.*
+
+## Revision 18 rationale — the crafted branch ranks Item Classes
+
+`prd.md` revision 18 moved the crafted branch's ranked unit one level finer, from the Item Category to the Item Class, on the player's call of 2026-09-20 — hours after revision 17 landed the category. The reversal does not correct revision 17's reasoning. It defeats it with a different argument, and the two arguments are worth keeping side by side, because the losing one is still true.
+
+### Why the class beat the category
+
+Revision 17 chose *Item Category* on a **vocabulary** argument: `className` is the weights producer's word and `categoryId` is the trade site's, so a PRD noun spelled *class* would name one half of a pair while meaning the other. The player overruled it on a **product** argument, which outranks vocabulary in a document that owns what the player gets: expected value varies sharply between the classes inside one category, so a blended category row lets a low-value class drag a high-value one down and conceals both. A row that averages two classes the player treats differently is not a ranking of anything he decides about.
+
+The vocabulary problem is real and survives the reversal. It is a naming problem for two documents to settle between them — the PRD names the player-facing unit, the spine keys it — and not a reason to rank the wrong thing. It is handed to the spine in `reply-rev18-class-altitude.md`.
+
+### Why per-class pricing turned out to cost nothing
+
+The objection that defeated class altitude the first time was budget. Pricing a class *looked* as though it needed one search per Base Type in the class, because the trade site does not accept a class name as a filter — and that is OQ-25's third candidate, which spends exactly the budget that moving up to the category had just saved.
+
+The player established on 2026-09-20 that the premise is wrong. A class **is** separable on the existing search, by its defence signature: the classes of one broad kind differ in which defences their bases carry, so a filter can admit one and exclude its siblings without naming any class. The crafted branch therefore still spends one search per tracked entry, and the change is free at the budget. This settles OQ-25 on its **second** candidate — a class-discriminating filter exists — rather than its third.
+
+One objection to that filter was raised and struck down, and is recorded so it is not raised twice: that modifiers grant defences too, so a filter excluding a sibling class by its defence signature could also exclude the item a Combination is pricing. It cannot, because the defence type is what determines the rollable pool in the first place — the Weights File's inner rung is exactly the set of modifiers that class can roll — so the contradictory entry cannot be authored, and FR-29 rejects it at load if it is.
+
+`jewel` is the one fan-out category the defence signature cannot reach, its 8 classes carrying no defences. It is not a residue: the player closed it two ways on 2026-09-20, both at one search per class — `query.type`, since the jewel class names are base names, and the pool acting as its own discriminator, since for jewels the modifiers *are* the identifying property.
+
+The choice between them is the spine's, but it is constrained, and the constraint is worth recording because it is where a product guarantee selects a mechanism. The second option discriminates only usually: where two jewel classes share a tracked modifier it admits both. The player judged that overlap acceptable — the shared modifiers are the low-value ones a curator would not track. It is nonetheless **not** written into `prd.md`, because FR-1's consequence is absolute and the first option satisfies it for free. A deliberate choice of the second would make that guarantee false for `jewel` and is a PRD revision to be asked for, not absorbed.
+
+### What the class average still costs, and what it no longer costs
+
+Revision 17's accepted spread is **narrowed, not withdrawn**. Inside one class the Base Types still differ, so a strong base is still understated and a weak one still overstated, and FR-1 still states it as a property the product chose rather than a defect. What is gone is the larger spread stacked on top of it: no base outside the class now contributes to the price, so the figure can no longer be moved by a class the player would never craft on.
+
+The reasoning that kept the within-class spread is revision 17's own and is unchanged — the player crafts on whatever the class gives him, so the class is the decision the number is for, and a per-base payout would answer a question he cannot act on. It still compounds with R-1 in the same direction, both making the displayed figure an artefact of what is listed rather than of what is achievable. Its remedy is still identified and still deliberately unspent: tracking a class's strong bases as separate raw entries already prices them honestly on the other branch.
+
+### What did not move
+
+FR-4's coverage bands stay withdrawn. Revision 17 removed them because a threshold over dozens of items measures the scraper's progress rather than how much product exists, and moving the denominator from tracked categories to tracked classes does not revive that argument — it lands the count in the same order of magnitude. Coverage remains a published fraction with its denominator, read by a human. The `[ASSUMPTION]` the move did add is §3's: that a class's own name is already the player's word for it. Where several classes of one broad kind differ only in defence type, that may not hold, and the fix is a label in `EXPERIENCE.md` rather than a coarser unit.

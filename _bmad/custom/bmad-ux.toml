@@ -10,3 +10,8 @@ creative_tools = [
 design_handoffs = [
   "skill:impeccable",
 ]
+
+activation_steps_append = [
+  "Save each review-*.md, review-rubric.md, and validation-report.* file in {doc_workspace}/reviews/.",
+  "Save each handover note in {doc_workspace}/handovers/.",
+]

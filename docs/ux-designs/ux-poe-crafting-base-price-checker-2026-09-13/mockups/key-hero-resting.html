@@ -6,100 +6,92 @@
 <style>
 /* ===========================================================================
    KEY SCREEN 1 — THE RESTING PAGE, 1060 x 1920, RENDERED 1:1.
-   Rev 3, final. Built against DESIGN.md / EXPERIENCE.md as finalised through
-   memlog 125.
+   Mockup rev 5, rendered against DESIGN.md / EXPERIENCE.md REVISION 3.
+
+   WHAT REVISION 3 CHANGED HERE (memlog 179-186), because this file was two
+   PRD revisions stale before it:
+
+   1. THE CRAFTED BRANCH RANKS ITEM CLASSES, NOT BASE TYPES (PRD FR-3).
+      A crafted row now reads `Bow`, not `Advanced Dualstring Bow`. The raw
+      branch still ranks Base Types. The list is genuinely MIXED-UNIT, and
+      every row says which it is.
+   2. UNIT GLYPHS. Every row opens with a sepia glyph — the crafted
+      class, the raw base. They are NOT trust marks: sepia is
+      structural and means nothing, and a unit says nothing about whether a
+      figure is sound. The `RAW BASE` word tag RETIRED and the glyph took its
+      job, at the user's direction (the player knows the difference). NFR-10
+      still holds because a glyph survives the removal of colour.
+      These are the page's only WORDLESS glyphs and they take no key-block
+      entry — a unit can be read off the name beside it, a state cannot.
+   3. THE CRAFT RECIPE IS THE SECOND CONTROL (PRD FR-26). v1 ships two
+      recipes, the player chooses, and the choice REORDERS the list. It left
+      the masthead eyebrow — that line is attribution, and a thing the player
+      turns is not. Each recipe prints the ONE WORD that distinguishes its
+      composition. No display name is invented; recipes.json declares none.
+   4. CRAFT COST prints ONCE, on that control. It is a property of the recipe,
+      subtracted once per Item Class, identical down every crafted row — so a
+      seventh column would repeat one invariant figure twenty times.
+   5. `modelled-split` / the slate ink / `split by model` are GONE (withdrawn
+      at weights contract 5.0.0, revision 2). Two semantic inks, not three.
+   6. FR-4's second reason string is now `class absent from weights file`.
 
    THE FRAME IS 1060px, NOT 1080px, AND THAT IS DELIBERATE (memlog 120/121).
    The target monitor is 1080 wide, the document scrolls by design once a panel
    opens, and a vertical scrollbar eats ~15-17px of it; the 1px outline paints
-   outside the box and costs 2px more. At 1080 the frame would clip its right
-   edge or force a horizontal scrollbar the moment anything expanded. DO NOT
-   "correct" this back to 1080.
+   outside the box and costs 2px more. DO NOT "correct" this back to 1080.
 
-   The 20px came out of the GUTTERS, never out of a column:
-   frame-padding-x 34 -> 24, and content-width stays exactly 1012 (1060 - 48).
-   No column contract moves; the chase budget stays at 27 characters.
-
-   REV 4 (memlog 134-142): every Combination now reads as ACCEPTED TIER +
-   canonical short form — "T1 Cold Res · T1 Mana" — on both this page and in
-   the expansion. No column contract moved: the modifier NAME was always the
-   long part, so the longest pairing still runs to 26 of the 27 characters.
-   spacing.gutter (34px) is now the masthead's top padding only — it is no
-   longer the frame's side padding, and the two move independently.
+   COLUMN CONTRACTS ARE UNCHANGED AT REVISION 3. The unit glyph is paid for out
+   of the retired RAW BASE tag, not out of a column. All five verified sums and
+   the 27-character chase budget survive. The masthead's second control panel
+   came out of dek-max-width (640 -> 480), not out of the block's height.
 
    GOVERNED BY — check every value against these sections and nothing else:
 
    DESIGN.md
      · front-matter `colors` ....... every hex below, verbatim
-     · front-matter `typography` ... every size, weight, lineHeight, tracking
+     · front-matter `typography` ... every size, weight, lineHeight, tracking;
+                                     row-unit-name, row-unit-glyph, recipe-*
      · front-matter `spacing` ...... frame-width 1060 / frame-padding-x 24 /
-                                     content-width 1012; the six-column budget;
-                                     the appendix four-column budget; row
-                                     heights; per-column padding; gutter 34
-     · front-matter `components` ... masthead (copyEyebrow), payout-threshold,
+                                     content-width 1012; the six-column budget
+                                     (col-unit, pad-unit-right); the appendix
+                                     four-column budget; row heights;
+                                     recipe-panel-width 216 /
+                                     masthead-control-gap 16 /
+                                     threshold-panel-width 276 /
+                                     dek-max-width 480
+     · front-matter `components` ... masthead (controlPlacement, copyEyebrow),
+                                     craft-recipe, payout-threshold,
+                                     unit-glyph-class, unit-glyph-raw,
                                      trust-strip (restingFacts verbatim),
-                                     asking-price-line, column-header
-                                     (trailingLetterSpace: NOT trimmed),
+                                     asking-price-line, column-header,
                                      ranked-row, ranked-row-tier-1/2/3,
                                      raw-base-row, trust-mark-*,
                                      unrankable-appendix, key-block,
                                      expand-affordance, running-foot
-     · §Brand & Style .............. reference-book register; fixed frame
-     · §Colors ..................... three semantic inks; sepia is decorative
-     · §Typography ................. serif = content, sans = labels; rank
-                                     emphasis by WEIGHT, never by size; every
-                                     role declares a lineHeight
-     · §Layout & Spacing ........... why the frame is 1060; "The 20px came out
-                                     of the gutters, never out of a column";
-                                     the frame box model (1px OUTLINE, not a
-                                     border); Provenance at 88px; the
-                                     27-character chase budget; "A Combination
-                                     reads as tier plus short form, never as a
-                                     value"; "What may
-                                     ellipsise, and where"; the computed
-                                     vertical budget and frame-slack; the
-                                     Spacing scale note on gutter vs padding
-     · §Elevation & Depth .......... no shadows; three tonal steps
-     · §Shapes ..................... rounded: 0 everywhere
-     · §Components ................. masthead, ranked row, Raw Base row, column
-                                     header, trust mark, money slot, threshold,
-                                     trust strip, asking-price line, appendix,
-                                     key block, expand affordance, running foot
+     · §Colors ..................... TWO semantic inks; sepia is decorative and
+                                     is what the unit glyphs take
+     · §Typography ................. serif = content, sans = labels AND both
+                                     unit glyphs; rank emphasis by WEIGHT
+     · §Layout & Spacing ........... why the frame is 1060; the unit column
+                                     keeps 222px; Provenance at 88px; the
+                                     27-character chase budget; the appendix
+                                     at the foot as a DECISION, not a band
+     · §Components ................. Craft Recipe control; the unit glyphs as
+                                     the only wordless glyphs
      · §Do's and Don'ts ............ silence means healthy; loud when wrong;
-                                     no colour-alone; Provenance not "Weight";
-                                     EV (Divine) not `div`; RAW BASE not ILVL
+                                     no colour-alone; unit glyph in sepia only
 
    EXPERIENCE.md
-     · §Information Architecture ... the fixed vertical order of the regions
-     · §Domain Vocabulary .......... verbatim terms; the four wordings memlog 84
-                                     fixed; the trust strip's five labels,
-                                     verbatim; the masthead eyebrow; "How a
-                                     short form may be coined" (borrow, never
-                                     invent — ES is ratified; rule 5 now governs
-                                     the TIER prefix, memlog 141); the
-                                     27-character budget; "A Combination is
-                                     written as tier plus short form"; the
-                                     Accepted Tier is the CURATOR's declaration,
-                                     never the Weights File's tierLabel;
-                                     "What may be cut, and what may not"
-     · §Voice and Tone ............. never "sells for", never "worth"
-     · §Component Patterns ......... ranked-row, tiers, raw-base-row,
-                                     column-header (never trimmed), trust
-                                     marks, money-slot, payout-threshold,
-                                     trust-strip, asking-price-line,
-                                     unrankable-appendix, key-block,
-                                     expand-affordance, running-foot
-     · §Epistemics ................. silence means healthy / and loud when wrong
-                                     / attribution is not a health signal /
-                                     freshness (48h) / provenance / money slots
-     · §State Patterns ............. 11 measured, 12 modelled-split,
-                                     13 uniform-prior, 18 stale, 19 never
-                                     attempted, 31 strip at rest healthy,
-                                     32 strip at rest something broken
-     · §Responsive & Platform ...... the frame is a constant; 1060 not 1080;
-                                     no scrolling in the default state
-     · §Key Flows .................. UJ-1 the pre-session read, UJ-4 the trust
-                                     check — both read entirely off this screen
+     · §Information Architecture ... one list, two ranked units
+     · §Domain Vocabulary .......... Item Class named by its own name, never
+                                     prefixed with the word `class`; the
+                                     reason strings; Craft Cost copy
+     · §Component Patterns ......... craft-recipe, unit glyphs, ranked-row,
+                                     raw-base-row, column-header
+     · §Epistemics ................. the Provenance mark is one label per ITEM
+                                     CLASS; a Raw Base carries none at all
+     · §State Patterns ............. 11, 12, 12a, 14, 15, 16, 17, 18, 30, 31
+     · §Key Flows .................. UJ-1, UJ-4 — both read off this screen
 
    NOT governed by .working/direction-fieldguide-v2.html.
    =========================================================================== */
@@ -109,12 +101,7 @@
 body { margin: 0; background: #E8E3D4; color: #211E17;
        font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif; }
 
-/* ---- the frame -----------------------------------------------------------
-   frame-width 1060 · frame-padding-x 24 · border-box => content-width 1012.
-   The colors.edge rule is a 1px OUTLINE: an outline paints outside the border
-   box and consumes no width, so the six columns keep the widths they were
-   promised. min-height, never height: the document is what scrolls, and the
-   frame is 1060 so the scrollbar it will grow has somewhere to sit.       */
+/* ---- the frame ----------------------------------------------------------- */
 .frame { width: 1060px; min-height: 1920px; margin: 0 auto; padding: 0 24px;
          background: #FDFBF3; outline: 1px solid #D2CAB2;
          display: flex; flex-direction: column; }
@@ -126,19 +113,63 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
                  letter-spacing: .22em; text-transform: uppercase; color: #6B4A22; }
 .mast h1 { margin: 8px 0 0; font-size: 38px; font-weight: 400; line-height: 1.15;
            letter-spacing: -.012em; color: #211E17; }
-.mast .dek { margin-top: 8px; max-width: 640px; font-size: 14px; font-weight: 400;
+/* dek-max-width is 480, NOT 640. The second control panel took the width:
+   216 recipe + 16 gap + 276 threshold = 508, and 1012 - 508 - 24 = 480.
+   It must still set to TWO LINES at that width — the vertical budget commits
+   a two-line dek at 42px, and a third line costs 21px of frame-slack. */
+.mast .dek { margin-top: 8px; max-width: 480px; font-size: 14px; font-weight: 400;
              line-height: 1.5; color: #55503F; }
 
+/* ---- the masthead control group: recipe + threshold, floated right -------
+   Both panels take the SAME chrome, because they do the same kind of work:
+   both reorder the list with no round trip. Equal height so their rules
+   line up — a ragged pair reads as two accidents, not one control group. */
+.controls { float: right; display: flex; gap: 16px; align-items: stretch; }
+.panel { background: #F5F1E4; border: 1px solid #E0DAC6; padding: 13px 15px; }
+.panel .k { font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
+            font-size: 9.5px; font-weight: 600; line-height: 1.2; letter-spacing: .16em;
+            text-transform: uppercase; color: #8B8470; }
+
+/* ---- craft recipe — the WORD is the control. No select, no segmented
+   control, no pill, no chevron. Same argument as the threshold figure. ----- */
+.rec { width: 216px; display: flex; flex-direction: column; }
+.rec .opts { margin-top: 9px; font-size: 15px; line-height: 1.25; }
+/* ACTIVE: ink, 700, on a 2px solid sepia rule. TWO pixels, because the
+   threshold's valueHoverRule is 1px solid sepia and means "the pointer is on
+   this" — these two panels are chrome-identical siblings 16px apart, so an
+   identical rule would put "current value" beside "you are hovering". */
+.rec .opts .on { color: #211E17; font-weight: 700;
+                 border-bottom: 2px solid #6B4A22; padding-bottom: 1px; }
+/* INACTIVE: ink-SECONDARY (not tertiary — an unchosen option is not chrome),
+   and it carries the page's dotted-sepia "this is clickable" mark AT REST.
+   Through this file's first draft the rule was on hover only, which made the
+   page's one new control the only clickable thing with no resting affordance —
+   on a page read at an angle from across a desk with the pointer in the game.
+   On hover the dotted rule goes SOLID, exactly as .expand does. */
+.rec .opts .off { color: #55503F; font-weight: 400; cursor: pointer;
+                  border-bottom: 1px dotted #6B4A22; padding-bottom: 1px; }
+.rec .opts .off:hover { color: #211E17; border-bottom-style: solid; }
+/* The divider is the trust strip's PIPE, not the page's middle dot: `·` JOINS
+   two affixes in every chase cell, and these two options are exclusive. */
+.rec .opts .sep { color: #8B8470; padding: 0 9px; font-weight: 400; }
+/* Craft Cost — the page's ONLY printing of it. The FIGURE is 13px serif in ink;
+   `Divine / craft` stays 9.5px sans in ink-secondary. It borrows the threshold's
+   figure-plus-quiet-unit anatomy. At a flat 9.5px this line was less legible
+   than a rank numeral, while being the constant under every crafted EV on the
+   page. `Divine` is SPELLED (Glossary term); `/ craft` abbreviates no Glossary
+   term, which is why it is the one contraction allowed here. Uncostable -> the
+   money phrase `no figure yet`, never a zero. */
+.rec .cost { margin-top: auto; padding-top: 10px;
+             font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
+             font-size: 9.5px; font-weight: 400; line-height: 1.2; color: #55503F; }
+.rec .cost b { font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+               font-size: 13px; font-weight: 400; line-height: 1.2; color: #211E17;
+               font-variant-numeric: tabular-nums; margin-right: 4px; }
+
 /* ---- payout threshold — the figure IS the input (memlog 73) -------------- */
-.thr { float: right; width: 276px; background: #F5F1E4; border: 1px solid #E0DAC6;
-       padding: 13px 15px; }
-.thr .k { font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
-          font-size: 9.5px; font-weight: 600; line-height: 1.2; letter-spacing: .16em;
-          text-transform: uppercase; color: #8B8470; }
+.thr { width: 276px; }
 .thr .v { margin-top: 4px; font-size: 32px; font-weight: 400; line-height: 1.05;
           color: #211E17; }
-/* the resting affordance: 1px dotted sepia under the FIGURE only, never under
-   the unit. Hover -> solid sepia. Editing -> solid rule-strong.            */
 .thr .v u { text-decoration: none; border-bottom: 1px dotted #6B4A22;
             font-variant-numeric: tabular-nums; }
 .thr .v small { font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
@@ -153,7 +184,7 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
             font-size: 9.5px; font-weight: 400; line-height: 1.2; color: #8B8470; }
 
 /* ---- trust strip --------------------------------------------------------- */
-.trust { border-top: 1px solid #211E17; border-bottom: 1px solid #E0DAC6;
+.trust { clear: both; border-top: 1px solid #211E17; border-bottom: 1px solid #E0DAC6;
          padding: 11px 0 12px; cursor: pointer;
          font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
          font-size: 11.5px; font-weight: 400; line-height: 1.85; color: #55503F; }
@@ -161,7 +192,6 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 .trust b { color: #211E17; font-weight: 600; }
 .trust .sep { color: #8B8470; padding: 0 9px; }
 .trust .aff { font-size: 12.5px; line-height: 1.5; color: #6B4A22; align-self: center; }
-/* the third line. Raised by data, never by a click. frame-reserve-health-line */
 .trust .health { height: 21px; line-height: 21px; }
 
 /* ---- asking-price line --------------------------------------------------- */
@@ -169,10 +199,10 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
           font-style: italic; color: #6B4A22; }
 
 /* ---- column header + the six-cell contract -------------------------------
-   32 + 222 + 84 + 88 + 94 + 492 = 1012 = content-width. Exact.
-   Chase column = three fixed 164px cells: 3 x 164 = 492.
-   Labels are NOT trimmed: PROVENANCE, the widest label, fits 88px as tracked,
-   and a column header never ellipsises.                                   */
+   32 + 222 + 84 + 88 + 94 + 492 = 1012 = content-width. Exact. UNCHANGED.
+   The second header names BOTH units, because the column holds both. It is
+   the LONGEST label (~185px) and clears 222 - 8 = 214px. PROVENANCE is the
+   TIGHTEST fit (~78px in 88px). Two different measurements.              */
 .chead { display: flex; margin-top: 16px; padding-bottom: 4px;
          border-bottom: 1px solid #211E17;
          font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
@@ -191,16 +221,29 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 .rk { width:  32px; flex: 0 0 auto; text-align: right; padding-right: 10px;
       font-size: 12px; font-weight: 400; line-height: 1.2; color: #8B8470;
       font-variant-numeric: tabular-nums; }
-/* Base Type may ellipsise: an expansion beneath holds the same name in full. */
+/* The unit cell: GLYPH then NAME. The glyph is flex 0 0 auto and never
+   ellipsises — it IS the non-colour cue FR-3 relies on, so the name yields
+   first, exactly as a trust mark may never be cut. */
 .bs { width: 222px; flex: 0 0 auto; padding-right: 8px; min-width: 0;
-      font-size: 14px; font-weight: 400; line-height: 1.2; color: #211E17;
-      overflow: hidden; text-overflow: ellipsis; }
+      display: flex; align-items: baseline;
+      font-size: 14px; font-weight: 400; line-height: 1.2; color: #211E17; }
+/* The glyph sits in a FIXED 14px box with 4px of clear space, and both glyphs
+   centre in it. Without a fixed width they size to their own advances — at 10px
+   the class glyph is 6.84px and the raw glyph 3.54px — so a crafted row's name
+   began 3.3px right of a raw row's, leaving a ragged left edge down the page's
+   primary scan column. 11.5px, not 10px: it is the only cue for a distinction
+   FR-3 requires on every row, and the 28px row has the headroom. */
+.bs .g { flex: 0 0 auto; width: 14px; margin-right: 4px; text-align: center;
+         font-style: normal; font-weight: 400;
+         font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
+         font-size: 11.5px; line-height: 1.2; color: #6B4A22; }
+.bs .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .ev { width:  84px; flex: 0 0 auto; text-align: right; padding-right: 12px;
       font-size: 14px; font-weight: 400; line-height: 1.2; color: #211E17;
       font-variant-numeric: tabular-nums; }
-/* Provenance and Age are EMPTY on a healthy row. No placeholder, no element.
-   A trust mark may NOT be cut — the word is the non-colour cue — so these two
-   cells carry no ellipsis rule. 88px is sized to the widest mark, ~85px. */
+/* Provenance and Age are EMPTY on a healthy row. A Raw Base's Provenance cell
+   is ALSO empty, and that is not an omission: it needs no Eligible Pool, so
+   nothing propagates to it. Both empties mean "nothing here is degraded". */
 .pv { width:  88px; flex: 0 0 auto;
       font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
       font-size: 10px; line-height: 1.2; }
@@ -212,63 +255,55 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
            font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
            font-size: 10.5px; font-weight: 400; line-height: 1.2; color: #55503F;
            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* A chase cell MAY ellipsise: the full Combination text is one click down in
-   the expansion. 164 - 10 = 154px of usable width, about 27 characters. Every
-   Combination on this page is 27 characters or fewer, verified by script (the
-   longest is `T1 Minion Skills · T1 Life` at 26), so nothing in the chase
-   column is actually cut.
-   A Combination reads as ACCEPTED TIER + canonical short form, never as a
-   modifier value (memlog 134). The tier is the curator's declaration on the
-   Tracked List, never the Weights File's display-only tierLabel (memlog 135).
-   The budget did not loosen when the values went: the modifier NAME was always
-   the long part. `ES` for Energy Shield therefore still stands — `T1 Energy
-   Shield · T2 Chaos Res` is 31 characters and overruns — and it is a borrowed
-   form the player already reads in game, not a coinage of this table.
-   There is no overflow:hidden on .cb — the v2 render used one to swallow a 2px
-   frame overflow and clipped the third cell. Fixed at the frame instead. */
+/* A chase cell MAY ellipsise: the full Combination text is one click down.
+   164 - 10 = 154px, about 27 characters. Every Combination here is <= 27. */
 
-/* emphasis tiers — weight and rank-numeral colour only. Never size. */
+/* emphasis tiers — weight and rank-numeral colour only. Never size.
+   They are a function of RANK, not of branch: a Raw Base at rank 3 takes
+   tier 1 like any other row. */
 .tier1 .bs, .tier1 .ev { font-weight: 700; }
 .tier1 .rk { color: #6B4A22; font-weight: 700; }
 .tier1 .cb span { color: #3E3A2C; }
 .tier2 .rk { color: #55503F; }
 .tier3 .rk { color: #8B8470; }
 
-/* ---- Raw Base row: tint + italic + the word. Three cues, none load-bearing */
+/* ---- Raw Base row: tint + italic name + glyph. Three cues, none
+   load-bearing alone. The WORD retired at revision 3; the glyph replaced it,
+   and the cue count is unchanged. */
 .raw { background: #F7F3E6; }
-.raw .bs { display: flex; align-items: baseline; overflow: visible; }
-.raw .bs .nm { font-style: italic; flex: 1 1 auto; min-width: 0;
-               overflow: hidden; text-overflow: ellipsis; }
-.raw .bs .tag { flex: 0 0 auto; margin-left: 7px; font-style: normal;
-                font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
-                font-size: 9px; font-weight: 400; line-height: 1.2;
-                letter-spacing: .13em; text-transform: uppercase; color: #6B4A22;
-                border-bottom: 1px solid #6B4A22; }
+.raw .bs .nm { font-style: italic; }
 .rawnote { width: 492px !important; padding-right: 0 !important;
            font-style: italic; color: #8B8470 !important; }
 
-/* ---- trust marks: colour + weight + glyph + word. Six, and no seventh. ---- */
-.m-split { color: #2F4A73; font-weight: 600; }
-.m-split::before { content: "\25C8\00a0"; font-size: 9px; }
+/* ---- trust marks: colour + weight + glyph + word. FIVE, and no sixth. ----
+   `split by model` / the slate ink retired with Provenance modelled-split at
+   weights contract 5.0.0. Two semantic inks: ochre and rust. */
 .m-prior { color: #8A5A12; font-weight: 600; }
-.m-prior::before { content: "\25C7\00a0"; font-size: 9px; }
+.m-prior::before { content: "\25CA\00a0"; font-size: 9px; }
 .m-unknown { color: #8A5A12; font-weight: 600; }
 .m-unknown::before { content: "?\00a0"; }
 .m-stale { color: #8E3B1E; font-weight: 700; }
-.m-stale::before { content: "\21BB\00a0"; }
+.m-stale::before { content: "\00BB\00a0"; }
 .m-never { color: #8E3B1E; font-weight: 700; font-style: italic; }
-.m-never::before { content: "\21BB\00a0"; font-style: normal; }
+.m-never::before { content: "\00BB\00a0"; font-style: normal; }
 .m-unres { color: #8E3B1E; font-weight: 700; }
-.m-unres::before { content: "\2715\00a0"; font-size: 9px; }
+.m-unres::before { content: "\00D7\00a0"; font-size: 9px; }
 
-/* ---- list expand affordance ---------------------------------------------- */
+/* ---- list expand affordance ----------------------------------------------
+   It names NO unit: the remainder holds Item Classes and Base Types together,
+   so either noun would misdescribe half of it. */
 .expand { padding-top: 14px;
           font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
           font-size: 12.5px; font-weight: 400; line-height: 1.5; color: #6B4A22;
           cursor: pointer; }
 
 /* ---- unrankable appendix, pinned to the foot by margin-top:auto ----------
-   292 + 118 + 250 + 310 = 970 = 1012 - 2 border - 40 padding.             */
+   292 + 118 + 250 + 310 = 970 = 1012 - 2 border - 40 padding.
+   EVERY ROW HERE IS AN ITEM CLASS. Unrankability governs the crafted branch
+   only — a Raw Base needs no Eligible Pool and ranks regardless — so a Base
+   Type never appears here. The foot placement is a UX DECISION as of
+   revision 3, not a coverage band: PRD rev 18 withdrew the bands, and the
+   page never switches layout on a measurement. */
 .unr { margin-top: auto; background: #F5F1E4; border: 1px solid #E0DAC6;
        padding: 16px 20px 10px; }
 .unr h2 { margin: 0; font-size: 18px; font-weight: 400; line-height: 1.2; color: #211E17; }
@@ -279,8 +314,11 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 .ur { display: flex; align-items: center; height: 29px; border-bottom: 1px solid #E0DAC6;
       white-space: nowrap; font-size: 13px; font-weight: 400; line-height: 1.2; }
 .ur:last-child { border-bottom: none; }
-.ub { width: 292px; flex: 0 0 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.ub em { font-style: italic; font-size: 10.5px; color: #8B8470; }
+.ub { width: 292px; flex: 0 0 auto; min-width: 0; display: flex; align-items: baseline; }
+.ub .g { flex: 0 0 auto; width: 14px; margin-right: 4px; text-align: center;
+         font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
+         font-size: 11.5px; line-height: 1.2; color: #6B4A22; }
+.ub .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .uu { width: 118px; flex: 0 0 auto; font-size: 13px; line-height: 1.2; }
 .us { width: 250px; flex: 0 0 auto;
       font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
@@ -289,7 +327,9 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
       font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
       font-size: 10.5px; line-height: 1.2; font-style: italic; color: #8B8470; }
 
-/* ---- key block ----------------------------------------------------------- */
+/* ---- key block -----------------------------------------------------------
+   THREE columns, and still three. The unit glyphs get NO entry: the block
+   exists to disambiguate an EMPTY cell, and a unit glyph is never empty. */
 .key { margin-top: 22px; border-top: 1px solid #211E17; padding-top: 11px; display: flex;
        font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
        font-size: 10.5px; font-weight: 400; line-height: 1.85; color: #55503F; }
@@ -298,9 +338,6 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 .key .kt { display: block; margin-bottom: 4px; font-size: 9.5px; font-weight: 600;
            line-height: 1.2; letter-spacing: .18em; text-transform: uppercase;
            color: #8B8470; }
-/* Three columns, and only three. The expansion's four Price State glyphs are
-   deliberately NOT listed here: every one of them carries its word, and the key
-   block explains the resting page it sits on. */
 
 /* ---- running foot -------------------------------------------------------- */
 .foot { margin-top: 18px; margin-bottom: 20px; border-top: 1px solid #E0DAC6;
@@ -328,32 +365,44 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 </head>
 <body>
 
-<p class="caption"><b>Key screen 1 — the resting page.</b> 1060 &times; 1920, rendered 1:1.
-The default state: nothing clicked, nothing opened, no banner raised. The frame is 1060 and not
-1080 so that the vertical scrollbar an expansion will summon has somewhere to sit; the 20px came
-out of the gutters, and content-width is still exactly 1012.</p>
+<p class="caption"><b>Key screen 1 — the resting page.</b> 1060 &times; 1920, rendered 1:1,
+against spines <b>revision 3</b>. The default state: nothing clicked, nothing opened, no banner
+raised. The list is <b>mixed-unit</b> — a crafted row names an Item Class, a raw row names a Base
+Type — and every row says which by its glyph.</p>
 
 <div class="frame">
 
-  <!-- ================= masthead + payout threshold ======================= -->
+  <!-- ============ masthead + BOTH controls, as one group ================= -->
   <div class="mast">
-    <div class="thr">
-      <div class="k">Payout Threshold</div>
-      <div class="v"><u>0.50</u><small>&nbsp;Divine</small></div>
-      <div class="track"><i></i><b></b></div>
-      <div class="rng"><span>0 Divine</span><span>3 Divine</span></div>
+    <div class="controls">
+
+      <!-- craft recipe: the second ranking dial. The active word is not a
+           click target — there is nothing to switch to. -->
+      <div class="panel rec">
+        <div class="k">Craft Recipe</div>
+        <div class="opts"><span class="off">greater</span><span class="sep">|</span><span class="on">perfect</span></div>
+        <div class="cost"><b>0.41</b>Divine / craft</div>
+      </div>
+
+      <div class="panel thr">
+        <div class="k">Payout Threshold</div>
+        <div class="v"><u>0.50</u><small>&nbsp;Divine</small></div>
+        <div class="track"><i></i><b></b></div>
+        <div class="rng"><span>0 Divine</span><span>3 Divine</span></div>
+      </div>
+
     </div>
-    <div class="eyebrow">League Forbidden Rites &nbsp;&middot;&nbsp; one perfect transmute + one perfect augment</div>
+
+    <!-- The eyebrow is the LEAGUE ALONE. The Craft Recipe left it at
+         revision 3: that line is attribution, and a thing the player turns
+         is not attribution. -->
+    <div class="eyebrow">League Forbidden Rites</div>
     <h1>What is worth picking up</h1>
-    <div class="dek">Base Types ordered by expected payout per craft, less the Craft Cost paid on
-      every attempt including the failures. Every figure on this page is in Divine.</div>
+    <div class="dek">Item Classes ranked by expected payout per craft, beside the Base Types worth
+      selling raw. Every figure is in Divine.</div>
   </div>
 
-  <!-- ================= trust strip, at rest ==============================
-       Five plain facts, unconditional, no mark and no colour on any of them.
-       Labels verbatim: lead "Weights File", fields producer / generatedAt /
-       gamePatch; lead "Last synced", then "Tracked List last edited".
-       Fields on a line are separated by | in ink-tertiary.               -->
+  <!-- ================= trust strip, at rest ============================== -->
   <div class="trust">
     <div class="ln">
       <div><b>Weights File</b>&nbsp; producer poe2db-scrape <span class="sep">|</span>
@@ -371,7 +420,7 @@ out of the gutters, and content-width is still exactly 1012.</p>
   <!-- ================= column header ===================================== -->
   <div class="chead">
     <div class="c1"></div>
-    <div class="c2">Base Type</div>
+    <div class="c2">Item Class / Base Type</div>
     <div class="c3">EV (Divine)</div>
     <div class="c4">Provenance</div>
     <div class="c5">Age</div>
@@ -380,76 +429,82 @@ out of the gutters, and content-width is still exactly 1012.</p>
 
   <!-- ================= twenty ranked rows ================================
        Fourteen are silent. Six carry a mark. That ratio is the whole design.
-       Every Combination is tier + short form, inside the 27-character
-       budget. The longest here is "T1 Minion Skills · T1 Life" at 26.  -->
+       Crafted rows name an ITEM CLASS and never prefix it with the word
+       `class`: `Bow`, not `Bow class`. Raw rows name a Base Type.
+       Every Combination is tier + short form, inside 27 characters.     -->
 
-  <div class="r tier1"><div class="rk">1</div><div class="bs">Stellar Amulet</div><div class="ev">2.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Spell Skills &middot; T1 Life</span><span>T1 Spirit &middot; T3 Cast Spd</span><span>T1 Spirit &middot; T1 Life</span></div></div>
+  <div class="r tier1"><div class="rk">1</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Amulet</span></div><div class="ev">2.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Spell Skills &middot; T1 Life</span><span>T1 Spirit &middot; T3 Cast Spd</span><span>T1 Spirit &middot; T1 Life</span></div></div>
 
-  <div class="r tier1"><div class="rk">2</div><div class="bs">Sapphire Ring</div><div class="ev">1.86</div><div class="pv"><span class="m-split">split by model</span></div><div class="ag"></div><div class="cb"><span>T1 Cold Res &middot; T1 Mana</span><span>T1 Cold Res &middot; T2 Life</span><span>T2 Crit Dmg &middot; T1 Mana</span></div></div>
+  <div class="r tier1"><div class="rk">2</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Ring</span></div><div class="ev">1.86</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Cold Res &middot; T1 Mana</span><span>T1 Cold Res &middot; T2 Life</span><span>T2 Crit Dmg &middot; T1 Mana</span></div></div>
 
-  <div class="r tier1"><div class="rk">3</div><div class="bs">Attuned Wand</div><div class="ev">1.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Chaos Skills &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 Cast Spd &middot; T1 Mana</span></div></div>
+  <div class="r tier1"><div class="rk">3</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Wand</span></div><div class="ev">1.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Chaos Skills &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 Cast Spd &middot; T1 Mana</span></div></div>
 
-  <div class="r tier1"><div class="rk">4</div><div class="bs">Gold Ring</div><div class="ev">1.27</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Item Rarity &middot; T1 Mana</span><span>T1 Item Rarity &middot; T1 Life</span><span></span></div></div>
+  <!-- A Raw Base can hold a top-band rank. The tier is a function of RANK,
+       never of branch. Its Provenance cell is empty: no Eligible Pool. -->
+  <div class="r tier1 raw"><div class="rk">4</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Stellar Amulet</span></div><div class="ev">1.27</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
 
-  <div class="r tier1"><div class="rk">5</div><div class="bs">Heavy Belt</div><div class="ev">1.10</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Life &middot; T1 Fire Res</span><span>T2 Life &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Fire Res</span></div></div>
+  <div class="r tier1"><div class="rk">5</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Belt</span></div><div class="ev">1.10</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Life &middot; T1 Fire Res</span><span>T2 Life &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Fire Res</span></div></div>
 
-  <div class="r tier2"><div class="rk">6</div><div class="bs">Ornate Belt</div><div class="ev">0.94</div><div class="pv"></div><div class="ag"><span class="m-stale">priced 5d ago</span></div><div class="cb"><span>T3 Life &middot; T2 Chaos Res</span><span>T3 Life &middot; T1 Fire Res</span><span></span></div></div>
+  <div class="r tier2"><div class="rk">6</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Sceptre</span></div><div class="ev">0.94</div><div class="pv"></div><div class="ag"><span class="m-stale">priced 5d ago</span></div><div class="cb"><span>T3 Spirit &middot; T2 Chaos Res</span><span>T3 Spirit &middot; T1 Fire Res</span><span></span></div></div>
 
-  <!-- Raw Base row: tint, italic name, and the word RAW BASE. The tag is a
-       sibling of the name — the name ellipsises, the tag never truncates.
-       The Item Level is spelled in the note, never abbreviated to ILVL.  -->
-  <div class="r tier2 raw"><div class="rk">7</div><div class="bs"><span class="nm">Stellar Amulet</span><span class="tag">Raw Base</span></div><div class="ev">0.87</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
+  <div class="r tier2"><div class="rk">7</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Bow</span></div><div class="ev">0.87</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Bow Skills &middot; T1 Life</span><span>T2 Phys Dmg &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier2"><div class="rk">8</div><div class="bs">Siphoning Wand</div><div class="ev">0.80</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Spell Dmg &middot; T1 Mana</span><span>T2 Cast Spd &middot; T1 Mana</span><span></span></div></div>
+  <div class="r tier2"><div class="rk">8</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Quarterstaff</span></div><div class="ev">0.80</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Atk Spd</span><span>T2 Crit Chance &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier2"><div class="rk">9</div><div class="bs">Lunar Amulet</div><div class="ev">0.74</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Minion Skills &middot; T1 Life</span><span>T1 Spirit &middot; T1 Life</span><span>T1 Minion Skills &middot; T1 Mana</span></div></div>
+  <div class="r tier2"><div class="rk">9</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Focus</span></div><div class="ev">0.74</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 ES &middot; T2 Chaos Res</span></div></div>
 
-  <div class="r tier2"><div class="rk">10</div><div class="bs">Advanced Dualstring Bow</div><div class="ev">0.69</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Bow Skills &middot; T1 Life</span><span>T2 Phys Dmg &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier2 raw"><div class="rk">10</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Sapphire Ring</span></div><div class="ev">0.69</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
 
-  <div class="r tier3"><div class="rk">11</div><div class="bs">Amethyst Ring</div><div class="ev">0.65</div><div class="pv"><span class="m-split">split by model</span></div><div class="ag"></div><div class="cb"><span>T1 Chaos Res &middot; T1 Mana</span><span>T1 Chaos Res &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">11</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Gloves</span></div><div class="ev">0.65</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Life &middot; T1 Atk Spd</span><span>T1 Life &middot; T1 Accuracy</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">12</div><div class="bs">Bombard Crossbow</div><div class="ev">0.60</div><div class="pv"></div><div class="ag"><span class="m-stale">tried 9d ago</span></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Life</span><span></span><span></span></div></div>
+  <div class="r tier3"><div class="rk">12</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Crossbow</span></div><div class="ev">0.60</div><div class="pv"></div><div class="ag"><span class="m-stale">tried 9d ago</span></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Life</span><span></span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">13</div><div class="bs">Expert Laminated Gloves</div><div class="ev">0.54</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Life &middot; T1 Atk Spd</span><span>T1 Life &middot; T1 Accuracy</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">13</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Body Armour</span></div><div class="ev">0.54</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 ES &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">14</div><div class="bs">Solar Amulet</div><div class="ev">0.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Fire Skills &middot; T1 Life</span><span>T2 Spirit &middot; T1 Fire Res</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">14</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Boots</span></div><div class="ev">0.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Move Spd &middot; T2 Life</span><span>T1 Move Spd &middot; T1 Mana</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">15</div><div class="bs">Ruby Ring</div><div class="ev">0.49</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Fire Res &middot; T1 Mana</span><span>T1 Fire Res &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">15</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Quiver</span></div><div class="ev">0.49</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Phys Dmg &middot; T1 Atk Spd</span><span>T1 Crit Dmg &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier3 raw"><div class="rk">16</div><div class="bs"><span class="nm">Emerald Ring</span><span class="tag">Raw Base</span></div><div class="ev">0.46</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
+  <div class="r tier3 raw"><div class="rk">16</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Emerald Ring</span></div><div class="ev">0.46</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
 
-  <div class="r tier3"><div class="rk">17</div><div class="bs">Grand Regalia</div><div class="ev">0.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 ES &middot; T1 Mana</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">17</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Helmet</span></div><div class="ev">0.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Cold Res</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">18</div><div class="bs">Furtive Wraps</div><div class="ev">0.39</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 ES &middot; T1 Atk Spd</span><span></span><span></span></div></div>
+  <div class="r tier3"><div class="rk">18</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Spear</span></div><div class="ev">0.39</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Atk Spd</span><span></span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">19</div><div class="bs">Omen Crest Shield</div><div class="ev">0.36</div><div class="pv"></div><div class="ag"><span class="m-never">never attempted</span></div><div class="cb"><span>T2 ES &middot; T1 Cold Res</span><span></span><span></span></div></div>
+  <div class="r tier3"><div class="rk">19</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Shield</span></div><div class="ev">0.36</div><div class="pv"></div><div class="ag"><span class="m-never">never attempted</span></div><div class="cb"><span>T2 ES &middot; T1 Cold Res</span><span></span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">20</div><div class="bs">Advanced Feathered Sandals</div><div class="ev">0.34</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Move Spd &middot; T2 Life</span><span>T1 Move Spd &middot; T1 Mana</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">20</div><div class="bs"><span class="g">&#8801;</span><span class="nm">One Hand Mace</span></div><div class="ev">0.34</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Phys Dmg &middot; T2 Life</span><span>T1 Atk Spd &middot; T1 Mana</span><span></span></div></div>
 
-  <div class="expand">+&nbsp;Read the remaining 24 Base Types</div>
+  <div class="expand">+&nbsp;Read the remaining 24 rows</div>
 
-  <!-- ================= unrankable appendix =============================== -->
+  <!-- ================= unrankable appendix ===============================
+       Every row is an ITEM CLASS. The `Ring` row shows the FR-4 case where a
+       class is Unrankable while Base Types belonging to it still rank on the
+       raw branch — and the note names THAT FACT, not a rank, because a class
+       holds several Base Types and they do not rank together.          -->
   <div class="unr">
-    <h2>Appendix: Unrankable &mdash; <em>7 Base Types</em></h2>
+    <h2>Appendix: Unrankable &mdash; <em>7 Item Classes</em></h2>
     <p>Tracked, but kept out of the ordering. A probability taken from a partial pool is an upper
       bound and not an estimate, so it prints as <span class="m-unknown"
       style="font-family:inherit">unknown</span> and never as a number.</p>
-    <div class="ur"><div class="ub">Emerald Ring <em>crafted branch</em></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">its Raw Base branch ranks at 16</div></div>
-    <div class="ur"><div class="ub">Crimson Amulet</div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">prefix pool has no cell for one tracked statId</div></div>
-    <div class="ur"><div class="ub">Volatile Wand</div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">suffix pool has no cell for one tracked statId</div></div>
-    <div class="ur"><div class="ub">Jade Amulet</div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un"></div></div>
-    <div class="ur"><div class="ub">Stone Tower Shield</div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">base absent from weights file</div><div class="un"></div></div>
-    <div class="ur"><div class="ub">Expert Bombard Crossbow</div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">base absent from weights file</div><div class="un">freshly scraped class; may return next weights run</div></div>
-    <div class="ur"><div class="ub">Smuggler Coat</div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">base absent from weights file</div><div class="un"></div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Sceptre</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">prefix pool has no entry for one tracked stat</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Buckler</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">suffix pool has no entry for one tracked stat</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Flail</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un"></div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Two Hand Mace</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un"></div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Trap</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un">freshly scraped; may return next weights run</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Staff</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un"></div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Rune Dagger</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">some of its Base Types rank on the raw branch</div></div>
   </div>
 
-  <!-- ================= key block ========================================= -->
+  <!-- ================= key block =========================================
+       Provenance marks are TWO, not three: modelled-split withdrew at
+       weights contract 5.0.0. The unit glyphs take no entry here.      -->
   <div class="key">
     <div class="kcol"><span class="kt">Silence means healthy</span>
-      An empty Provenance cell and an empty Age cell mean the same thing every time: the weight was
-      measured, the pool was complete, and the price was seen inside the last two days.</div>
+      An empty Provenance cell and an empty Age cell mean the same thing every time: nothing here
+      is degraded. A Raw Base's Provenance cell is always empty &mdash; it rests on no modifier
+      pool at all.</div>
     <div class="kcol"><span class="kt">Provenance marks</span>
-      <span class="m-split">split by model</span> &mdash; <b>modelled-split</b>: measured, then a model spread it<br>
       <span class="m-prior">prior only</span> &mdash; <b>uniform-prior</b>: someone invented this weight<br>
       <span class="m-unknown">unknown</span> &mdash; <b>absent</b>: partial pool, upper bound only</div>
     <div class="kcol"><span class="kt">Age marks</span>
@@ -467,7 +522,7 @@ out of the gutters, and content-width is still exactly 1012.</p>
 
 
 <!-- ======================================================================== -->
-<!-- SECOND SPECIMEN — the other strip state. Both strip states, one file.    -->
+<!-- SPECIMENS — states the resting page does not show when the data is clean -->
 <!-- ======================================================================== -->
 <div class="sheet">
 
@@ -489,32 +544,64 @@ out of the gutters, and content-width is still exactly 1012.</p>
   <p class="gloss">The same strip in the frame above, with a bad health figure in the data.
     The <b>five plain facts do not change</b> &mdash; they are attribution, not health signals, and
     an old Tracked List edit date never turns red. A <b>third line</b> is raised, carrying a rust
-    mark with its glyph, its word <b>and its count</b>. There are exactly two triggers and they
-    share the one line: <b>&#10005; 12 unresolvable</b> (FR-24) and
-    <b>&#10005; pinned entries starved this run</b> (FR-17, FR-25). A healthy sync raises no line
-    at all &mdash; no count of nothing, no green tick, no &ldquo;0 unresolvable&rdquo;. Data raises
-    this line, never a click, so it costs <b>frame-reserve-health-line</b> (21px) against the
-    resting budget rather than against the expansion budget.</p>
+    mark with its glyph, its word <b>and its count</b>. Exactly two triggers share the one line:
+    <b>&#215; 12 unresolvable</b> (FR-24) and <b>&#215; pinned entries starved this run</b>
+    (FR-17, FR-25). A healthy sync raises no line at all. Data raises this line, never a click, so
+    it costs <b>frame-reserve-health-line</b> (21px) against the resting budget.</p>
+
+  <h3>Specimen &mdash; the Craft Recipe control, both states</h3>
+
+  <div class="spec" style="padding-top:18px; padding-bottom:18px;">
+    <div style="display:flex; gap:16px;">
+      <div class="panel rec">
+        <div class="k">Craft Recipe</div>
+        <div class="opts"><span class="on">greater</span><span class="sep">|</span><span class="off">perfect</span></div>
+        <div class="cost"><b>0.06</b>Divine / craft</div>
+      </div>
+      <div class="panel rec">
+        <div class="k">Craft Recipe</div>
+        <div class="opts"><span class="off">greater</span><span class="sep">|</span><span class="on">perfect</span></div>
+        <div class="cost" style="font-style:italic; color:#211E17;">no figure yet</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="gloss"><b>Left: <code>greater</code> active.</b> The word is the control &mdash; no
+    select, no segmented control, no pill, no chevron, the same argument that made the threshold
+    figure its own input. The active word is <b>ink at 700 on a solid sepia rule</b>; the inactive
+    word is tertiary and is the only click target, because there is nothing to switch to on the
+    active one. Switching <b>reorders the list and rewrites every crafted row's Chase
+    Combinations</b>, since a recipe changes which outcomes are <i>reachable</i> and not only what
+    an attempt costs (FR-26). It is not debounced: a click is one deliberate act.</p>
+
+  <p class="gloss"><b>Right: the recipe is uncostable.</b> A recipe naming a currency with no
+    current rate for the active league is <b>uncostable, never costed at zero</b> (FR-26, AD-20),
+    so the cost line holds the money-slot phrase <b>no figure yet</b>. A zero here would be the
+    worst lie the money slot exists to prevent &mdash; it would not look missing, it would look
+    <i>free</i>, and it would inflate every EV on the page by the cost of the craft.
+    <b>What the crafted rows do in that state is deliberately unspecified</b> and must not be
+    invented from this render: an EV needs a Craft Cost, and whether those rows carry a money
+    phrase, leave the ordering, or move to the appendix is a question about the <i>ranking</i>,
+    which is <code>core</code>'s and which the PRD does not answer.</p>
 
   <p class="gloss"><b>Contracts verified on this render.</b> Frame:
     1060 &minus; (2 &times; 24) = <b>1012</b> = content-width, with the edge as a 1px
     <b>outline</b> that consumes no width. Ranked row:
     32 + 222 + 84 + 88 + 94 + 492 = <b>1012</b>, the chase column being three fixed
-    <b>164px</b> cells, 3 &times; 164 = 492. Appendix:
-    292 + 118 + 250 + 310 = <b>970</b> = 1012 &minus; 2 border &minus; 40 padding. Chase budget:
-    164 &minus; 10 padding = 154px, about <b>27 characters</b>; every Combination on this page
-    is 27 characters or fewer, checked by script &mdash; the longest is
-    <code>T1 Minion Skills &middot; T1 Life</code> at 26 &mdash; so nothing in the chase column
-    is cut. There is no <code>overflow:hidden</code> anywhere on this page.</p>
-  <p class="gloss"><b>Combinations read as tier, never as value</b> (memlog 134). <code>T1 Cold
-    Res &middot; T1 Mana</code>, not <code>+35% Cold Res &middot; +180 Mana</code>. The player
-    operates on tiers and does not carry the value spreads in their head. The tier is the
-    <b>Accepted Tier the curator declared</b> on the Tracked List (memlog 135) &mdash; never
-    derived from the band, and never read from the Weights File's display-only
-    <code>tierLabel</code>. A declared label may name a mixture, <code>T1&ndash;T2</code>, where
-    AD-28 means the band cannot isolate one tier (memlog 137). The budget did not loosen when the
-    values went: the modifier <b>name</b> was always the long part, and the change buys two to
-    four characters on average and nothing at the tail.</p>
+    <b>164px</b> cells. Appendix: 292 + 118 + 250 + 310 = <b>970</b>. Masthead controls:
+    216 recipe + 16 gap + 276 threshold = <b>508</b>, and 1012 &minus; 508 &minus; 24 clearance =
+    <b>480</b> = dek-max-width. Chase budget: 164 &minus; 10 = 154px, about <b>27 characters</b>;
+    the longest Combination here is <code>T2 Crit Chance &middot; T1 Life</code> at 26.
+    <b>No column contract moved at revision 3</b> &mdash; the unit glyph is paid for out of the
+    retired <code>RAW BASE</code> tag, and the second control panel out of dek-max-width.</p>
+
+  <p class="gloss"><b>The unit glyphs.</b> <span style="color:#6B4A22">&#8801;</span> an Item
+    Class, <span style="color:#6B4A22">&#9642;</span> a Base Type. They are in
+    <b>sepia</b> &mdash; structural, meaning nothing &mdash; and may <b>never</b> take ochre or
+    rust: a unit says nothing about whether a figure is sound, and these appear on twenty rows in
+    twenty, so an ink here would end silence-means-healthy. They are the page's <b>only wordless
+    glyphs</b> and take no key-block entry, because a unit can be read off the name beside it while
+    a state cannot &mdash; the glyph makes it instant rather than making it possible.</p>
 
 </div>
 

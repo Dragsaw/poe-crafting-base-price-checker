@@ -2,7 +2,7 @@
 title: 'Agent Development Workflow'
 status: final
 created: '2026-09-12'
-updated: '2026-09-19'
+updated: '2026-09-20'
 governed_by: [AD-1, AD-13]
 ---
 
@@ -69,7 +69,7 @@ An agent debugs badly when tests are unreliable. The design therefore excludes n
 
 - `core` is pure. The caller passes time, randomness and config into `core` as values (AD-1). A `core` test maps literal inputs to literal outputs.
 - The clock is a port. A test supplies a fixed instant. No code below the shell calls `Date.now()`.
-- Sync ordering is deterministic for a given tracked list, dataset and clock value. AD-7 fixes the rotation order. The order is currency rates first, then `pinned` entries by oldest `lastAttemptedAt`, then `active` entries by oldest `lastAttemptedAt`, then a bounded number of `unresolvable` retries, and never `pruned` entries. `core` computes the order as a pure function. A dry run and a real run therefore select the same entries. The order uses **`lastAttemptedAt`, and never the observation time**. An entry that stays `no-listings` never gets an observation time. A rotation ordered by observation time would therefore select that entry again forever (AD-9).
+- Sync ordering is deterministic for a given tracked list, dataset and clock value. AD-7 fixes the rotation order. The order is `pinned` entries by oldest `lastAttemptedAt`, then `active` entries by oldest `lastAttemptedAt`, then a bounded number of `unresolvable` retries, and never `pruned` entries. **There is no currency step** — it led the rotation until spine revision 14, when AD-20 made rates hand-maintained committed data that costs no request. `core` computes the order as a pure function. A dry run and a real run therefore select the same entries. The order uses **`lastAttemptedAt`, and never the observation time**. An entry that stays `no-listings` never gets an observation time. A rotation ordered by observation time would therefore select that entry again forever (AD-9).
 - No test depends on wall-clock timing. A test checks rate-limit backoff with supplied header values, and never by waiting.
 
 ## What an agent needs to know before touching a package
@@ -89,40 +89,60 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 
    - **`ModifierRef` is a discriminated union** of `banded` — `(statId, valueMin, valueMax)` with both edges always present — and `valueless` — `(statId)` with **no edges at all** (AD-5). An exhaustive `switch` over the two kinds is what stops `core` and `sync` from each inventing a different reading of the valueless case. Emitting a sentinel pair for a valueless stat silently prices the wrong population rather than erroring.
    - **`provenance` is a three-value order**: `absent`, `uniform-prior`, `measured` (AD-10). `core` derives it from the weights entry's `weightSource` and nothing else in the file — `"published"` → `measured`, `"absent"` → `uniform-prior`. **`"absent"` does not map to provenance `absent`**; that reading is the one the shared word invites and it is wrong.
-   - **`ModifierWeight` follows weights contract `5.0.0`** (AD-11): one entry is one tier of one modifier, carrying `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource` and **`lines[]`**, each line holding its own `statId` (or `null`) and its `ranges` **verbatim**. Write it to `5.0.0` directly; never to a `4.x` shape.
+   - **`ModifierWeight` follows weights contract `5.1.0`** (AD-11): one entry is one tier of one modifier, carrying `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource` and **`lines[]`**, each line holding its own `statId` (or `null`) and its `ranges` **verbatim**. Write it to `5.1.0` directly; never to a `4.x` shape. `5.1.0` is additive over `5.0.0` and changes no field — it makes the inner `className` key's grammar normative, because AD-16 derives the crafted search's class filter from it (`IMPLEMENTATION-NOTES.md` §10).
 
-   **Four cross-file checks live in `core`, and `web` is not their only caller.** All four read `tracked.json` and `weights.json` together, so `contracts` cannot see them — `contracts` sees one file at a time. They are edge alignment, the empty containment set, `coOccur`, and kind agreement (AD-17). Build them as **exported pure functions over both loaded files**. Do not hide them inside `web`'s load path: `sync` imports the same functions and runs them as a gate at the start of a run, before any priced entry spends a search, aborting on failure (AD-12). A `sync` author who cannot call them will write them a second time, and a second copy is the divergence the rule exists to prevent.
+   **Five cross-file checks live in `core`, and `web` is not their only caller.** All five read `tracked.json` and `weights.json` together, so `contracts` cannot see them — `contracts` sees one file at a time. They are edge alignment, the empty containment set, `coOccur`, kind agreement, and **class discriminability** (AD-17). The fifth was added by spine revision 17 and is the odd one: its subject is the **search** rather than the valuation, it asks whether a crafted entry's class can be told apart from its siblings before budget is spent on pricing it across all of them (`IMPLEMENTATION-NOTES.md` §2.6), and it is the only one whose failure would otherwise produce a plausible-looking wrong number rather than a missing one. Build them as **exported pure functions over both loaded files**. Do not hide them inside `web`'s load path: `sync` imports the same functions and runs them as a gate at the start of a run, before any priced entry spends a search, aborting on failure (AD-12). A `sync` author who cannot call them will write them a second time, and a second copy is the divergence the rule exists to prevent.
 
    Three `core` traps, where the obvious implementation is the wrong one:
 
-   **Derive a line's filter-comparable interval in exactly one exported function** (AD-11). Both the containment test and the edge-alignment test call it. Two call sites that each divide are two chances to round differently, and the edge comparison is **exact, with no tolerance** — an epsilon readmits the sentinel defect AD-5 exists to close. For a two-`#` line the interval is the average of the two ranges, which is exact in binary; for three or more `#` it is unresolved and open as OQ-19. See `IMPLEMENTATION-NOTES.md` §1.
+   **Derive a line's filter-comparable interval in exactly one exported function** (AD-11). Both the containment test and the edge-alignment test call it. Two call sites that each divide are two chances to round differently, and the edge comparison is **exact, with no tolerance** — an epsilon readmits the sentinel defect AD-5 exists to close. For a two-`#` line the interval is the average of the two ranges, which is exact in binary; **two `#` is the maximum** (OQ-19, closed 2026-09-19), and `WEIGHTS-FILE-SCHEMA.md` rejects a three-`#` line at the file, so the function needs no branch for one. See `IMPLEMENTATION-NOTES.md` §1.
 
    **Containment is whole-tier, and a partly-covered tier is not an error** (AD-11, AD-17). A tier whose derived interval lies wholly inside the band contributes its **whole weight, once**, however many of its lines match. A tier only partly covered contributes **nothing to the numerator** and **still counts in the denominator**. The denominator is a **plain sum over entries** — do not group by `sourceModifierId`, which is a `4.x` shape that no longer applies.
 
    **An empty containment set has two possible causes, and the error must name both** (AD-17). The first is a tracked reference the scoped pool never held. The second is a weights file that dropped a stat line and still declared `complete`. `core` cannot tell them apart, so it reports the reference, its floor and the missing `statId`, and blames neither document. **Nothing mechanical stands behind the second cause under `5.0.0`** — where a second tier publishes the same `statId`, the dropped line fires no error at all and the numerator quietly deflates (AD-11). Do not attempt to close that hole locally; it is recorded under Deferred.
-2. **Measure pool coverage before any view work (AD-27).** Take the weights file that the scraper project produces, and compute:
+2. **Measure pool coverage before any view work, once a weights file exists (AD-27).**
 
-   ```
-   rankable(base) = base carries at least one tracked entry that is
-                    crafted (AD-5: at least one affix present)
-                    and not pruned (AD-12)
+   **This step cites and does not restate.** The predicates are `IMPLEMENTATION-NOTES.md` §3's
+   and the rule is AD-27's; read them there and compute the fraction they define. Two earlier
+   revisions of this step carried its own copy of the formula and its thresholds, and **both
+   times the copy went stale against AD-27** — once on the absent-file carve-out, once when
+   the coverage bands were withdrawn. A third copy would go stale a third time.
 
-   covered(base)  = base is PRESENT in weights.json
-                    ∧ both slots declare poolCoverage "complete"
-                    ∧ neither slot's pool is empty
+   Three things a builder standing here needs, none of them a restatement:
 
-   coverage = |{ baseTypeId ∈ tracked.json : rankable ∧ covered }|
-              ──────────────────────────────────────────────────
-              |{ baseTypeId ∈ tracked.json : rankable }|
-   ```
+   **The unit is the item class — the `(categoryId, className)` pair — and never the base
+   type or the category alone** (AD-5). Only a `crafted` tracked entry names one, so both
+   halves of the fraction range over classes and a raw entry appears in neither. If you are
+   counting `baseTypeId`s you are reading a pre-revision-16 draft; if you are counting
+   `categoryId`s you are reading revision 16 itself, which spine revision 17 superseded when
+   `prd.md` revision 18 moved the player-facing unit a rung finer.
 
-   *Rankable* excludes two kinds of base. The first kind is a base that the tracked list holds only as a raw base. The second kind is a base whose crafted entries are all tombstones. Neither kind of base needs a pool, and a count that included either kind would lower a number that binds the layout. `rankable` is decidable from `data/tracked.json` alone, and that property is the design intent. The gate runs before any sync exists, so the formula deliberately does not use price state as a term.
+   **No threshold reads the result.** `prd.md` revision 17 withdrew FR-4's coverage bands and
+   spine revision 16 withdrew AD-27's copy of them. There is nothing here to pass or fail and
+   **nothing to escalate to** — the figure is published with its denominator and the layout
+   call is UX's (`EXPERIENCE.md`). Do not reinstate an 80% or 50% rule found in an older
+   draft.
 
-   **All three conditions of `covered` are load-bearing.** The condition "both slots `complete`" is **vacuously true** for a base that `weights.json` does not hold at all. Such a base has no slots to fail the condition. A base that declares `complete` over an *empty* pool passes a naive reading of the condition, and AD-17 excludes that base from the ordering anyway. Either gap lets the same tracked list and the same file score 100% or 40%. The consequences of the gate turn at 80% and at 50%.
+   **Where `data/weights.json` is absent the measurement does not happen at all**, and
+   coverage is undefined rather than `0%` — `sync-report.json` omits the fraction *and* its
+   denominator together (§3). That is the product's **declared day-one phase**, not a defect
+   (AD-12, AD-24). Build the view: every crafted item class is unrankable for a reason
+   `web` states, **raw entries need no pool and still rank**, so the raw-base price list is a
+   working product on day one and the unrankable group is the surface the rest of the work
+   lands into (AD-11, AD-17, AD-24).
 
-   Apply the thresholds of AD-27, which are disjoint. At **≥ 80%**, proceed as specified. At **≥ 50% and < 80%**, the unrankable group stops being a footer and becomes a primary surface. **Below 50%**, the premise of the ranking fails. Escalate that failure, and do not work around the failure. A commitment to a layout before this number exists is a commitment to an assumption about how much of the product there is.
+   **What AD-27 still guards, now that it binds no layout, is the commitment itself:** a view
+   built around a *full ranked list* before anyone knows how much of one the file can populate.
+   Day one makes the opposite commitment visibly — the list is the raw-base list and the
+   unrankable group is most of the product. Build for a view that reads well at both sizes. A
+   view that can only display a long ranked list has made the forbidden commitment even though
+   no threshold was ever crossed.
 
-   **This gate is not spent after one use.** **Measure coverage again on every regeneration of the weights file.** The bands bind on every measurement, and not only on the first measurement. A patch introduces modifiers that the source publishes unnamed. The producer must then drop those rows, and the affected pools correctly fall back to `partial`. A product that measured 85% before launch can therefore sit at 60% in the week after a patch. `sync-report.json` carries the figure that the run computed. A drop across a patch boundary is therefore visible in the same place as the other health data of the run.
+   **Re-measure on every regeneration of the weights file.** A patch introduces modifiers the
+   source publishes unnamed, the producer drops those rows, and the affected pools fall back to
+   `partial` — so a figure taken before launch does not describe the file after a patch.
+   `sync-report.json` carries the figure the run computed, which puts a drop across a patch
+   boundary in the same place as the run's other health data.
 
 ## Definition of done for an agent task
 

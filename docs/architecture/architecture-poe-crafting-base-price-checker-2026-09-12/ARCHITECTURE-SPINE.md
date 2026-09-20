@@ -6,18 +6,18 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 12
+revision: 17
 created: '2026-09-12'
-updated: '2026-09-19'
+updated: '2026-09-20'
 binds: []
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
-  - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/handoff-phase1-architecture.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/curl-creater-trade-search.txt
-  - docs/sprint-change-proposal-2026-09-13.md
-  - docs/sprint-change-proposal-2026-09-19.md
+  - .memlog.md (revisions 2, 9, 10, 12 record the substance of the PM's Phase 1 handoff and
+    both sprint-change proposals; the three source documents themselves are no longer in the
+    repo, deleted in commit 55fe390)
 companions:
   - WEIGHTS-FILE-SCHEMA.md
   - IMPLEMENTATION-NOTES.md
@@ -26,6 +26,138 @@ companions:
 
 # Architecture Spine — PoE2 Crafting Base Price Checker
 
+> **Revision 17 moves the crafted branch one rung finer, to item-class altitude**, following
+> `prd.md` revision 18 — which overruled revision 17's *Item Category* on a product argument
+> the vocabulary argument does not outrank: expected value varies sharply between the classes
+> inside one category, so a blended category row lets a low-value class drag a high-value one
+> down and hides both. **The ranked crafted unit is now the `ItemClass`**, and `ItemCategory`
+> is retired as an entity name after one revision. **AD-5's crafted key does not change** —
+> it was already `(categoryId, className, …)`, so the PRD has adopted the finer half of a
+> pair the spine already carried, and AD-5 now states that relationship where the key is
+> settled rather than leaving a reader to infer it.
+>
+> **OQ-25 closes on its second candidate, and the premise revision 16 recorded was wrong.**
+> That question accepted a spread it called unmeasured and its mitigation *incidental*; both
+> readings are withdrawn. A class **is** reachable on the existing search, by its **defence
+> signature** — the classes of one broad kind differ in which defences their bases carry, so
+> `equipment_filters` admits one class and excludes its siblings **without naming a class**.
+> Measured here against `data/weights.json` (`5.0.0`, patch `0.5.5`), that signature is a
+> **complete** discriminator in five of the six fan-out categories, not a usually-sufficient
+> one: the armour classes of a family are exactly the distinct non-empty subsets of
+> {armour, evasion, energy shield}, so no sibling shares a triple. The sixth is `jewel`,
+> whose eight classes carry no defences and are isolated by `query.type` instead. **The
+> crafted branch still spends one search per tracked entry**, so the closure costs no budget,
+> and the spread OQ-25 described is **eliminated rather than accepted**.
+>
+> **AD-16 therefore gains the class discriminator, and `sync` derives it from `className`.**
+> That is a real decision with a real cost, taken by the player on 2026-09-20 over the
+> alternative of having the curator or the producer declare it: `sync` owns search
+> construction, and a trade-API concern does not belong in a file that knows nothing about
+> the trade API. The cost is that **`className` stops being an opaque producer string on the
+> crafted branch** — so `WEIGHTS-FILE-SCHEMA.md` raises its grammar to a normative rule
+> (contract **`5.1.0`**, additive), which is what turns a parse of a foreign identifier into
+> a read of a contracted key. Two guards keep the failure loud rather than silent: a
+> `className` that satisfies no arm of the grammar is a **load error**, never a fallback to
+> a category-wide search, and the jewel arm's derived base type is **catalogue-validated**
+> (AD-25). **AD-17 gains a fifth cross-file check** — *class discriminability* — so a class
+> that needs a discriminator and cannot yield one is caught before budget is spent.
+> `IMPLEMENTATION-NOTES.md` gains **§10** for the derivation and **§2.6** for the check.
+>
+> **The field spelling is evidence, not assumption.** A second live body captured by the
+> player on 2026-09-20 (§5.1) carries `equipment_filters.filters` with `ar`, `ev` and `es`,
+> which settles the path and the spelling on the request side the same way the first capture
+> settled `status` and `price`. **AD-27 and §3 count tracked classes**; the `covered(base)`
+> finding and the withdrawn coverage bands are untouched, and the denominator stays in the
+> same order of magnitude, so revision 14's reasoning needs no re-deciding.
+>
+> **Revision 16 moved the crafted branch to item-category altitude**, following `prd.md`
+> revision 17 rather than leading it — the change is player-visible, so the PRD settled what
+> the player gets before this document settled how. **AD-5's tracked entry becomes a
+> discriminated union**: a `crafted` entry keys on `(categoryId, className, itemLevelMin,
+> prefix?, suffix?)`, a `raw` entry on `(baseTypeId, itemLevelMin)`, and **the kind is what
+> the entry names rather than an inference from absent affixes**. That one change closes
+> **OQ-23 by withdrawing its premise** — a crafted entry now names its pool's own key, so the
+> `baseTypeId → className` mapping it hunted is needed by nothing, and none of its three
+> candidates was adopted. Nothing was added to carry one: no field, no `baseTypes: []`, no
+> mapping artifact, and **no change to `WEIGHTS-FILE-SCHEMA.md`'s shape**.
+>
+> **AD-16 gains a second query shape** — `type_filters.category` for a crafted entry,
+> `query.type` for a raw one, exactly one emitted — which turns `IMPLEMENTATION-NOTES.md`
+> §5.2 trap 1 from a prohibition into a branch rule, and makes §5.1's captured category
+> browse evidence for the crafted envelope instead of a non-example. **AD-17 ranks two units
+> in one list** and `RankedBase` is renamed **`RankedRow`** for it; `ItemCategory` joins the
+> entity set (renamed to `ItemClass` by revision 17). **AD-27 loses its coverage bands**: FR-4 withdrew them in `prd.md` revision 17
+> rather than re-fit them to a denominator that fell from hundreds of bases to dozens of
+> categories, and a layout rule with no product decision behind it comes out with them. The
+> measurement, its sequencing, its denominator and the absent-file carve-out all survive
+> untouched. AD-27's denominator carve-out for *bases that need a pool* is withdrawn as
+> vacuous; its `pruned` half stays. **`AGENT-WORKFLOW.md` step 2 now cites AD-27 instead of
+> restating it**, which is the second time that restatement had gone stale.
+>
+> **One new open question, raised by this change and not by the PRD: OQ-25.** `className →
+> categoryId` is many-to-one, so where a category fans out the crafted search cannot isolate
+> the entry's own class — measured on the conforming file, **6 of 29 categories fan out,
+> covering 36 of 59 classes**. Stat filters usually exclude the siblings incidentally; a
+> combination of class-agnostic affixes is not excluded at all. This is *beneath* the
+> category spread FR-1 accepts, is unmeasured, and blocks nothing.
+>
+> **Revision 15** closes **OQ-24** on the player's answer and amends **AD-16** with the field
+> it left unaccounted for. `trade_filters.filters.price` takes the **filter** reading: it
+> restricts the result set to listings denominated in exalted or divine, and AD-16 **always
+> emits** `{"option": "exalted_divine"}`. The reason is AD-20's: without it a result set
+> carries vaal, chaos and every other denomination, each of which would need a hand-maintained
+> rate before the median could be taken. The price paid is a **narrower priced population** —
+> a listing asking another currency is invisible to this product — and that narrowing is now
+> the one in AD-16 that is a choice rather than a limitation, recorded as such beside the
+> three effects it already accepts. AD-20 gains the consequence: listing-side normalisation
+> needs exactly one sourced rate. No AD is added or retired, and nothing routes to `prd.md` —
+> the estimate is still *the cheapest live instant-buyout listings*, which is the capability
+> the PRD owns.
+>
+> **Revision 14** answers six open questions from the player's own game and capture
+> knowledge, **retiring five of them and adding one**. Two are decision changes rather than
+> blanks filled. **AD-20 stops fetching currency rates**: `trade2` publishes no exchange
+> surface (OQ-22 closed by its premise vanishing), so rates become hand-maintained committed
+> data in `data/currencies.json`, each carrying its **own `league` and `asOf`** which `sync`
+> copies through rather than stamping — stamping a hand-typed rate with the active league
+> would relabel last league's number as current on the first run after a reset, which is
+> AD-19's central threat re-entering through the currency path. Staleness needs no new
+> mechanism: AD-10 already propagates the oldest timestamp. The step leaves AD-7's rotation,
+> `data/currencies.json` leaves AD-12's request sources (**three**, not four), and
+> `currencyStepSearches` leaves `IMPLEMENTATION-NOTES.md` §6's cap and its record.
+> **AD-17 gains a real distribution term**: a `CraftRecipe` declares a `modifierLevelMin` —
+> the game's *Minimum Modifier Level*, 44 for greater orbs and 70 for perfect — and the pool
+> truncates below it and renormalises (new §9). Weights already carry the matching quantity
+> as `itemLevelMin`, so the transform needs no number the inputs lack, and the two bounds are
+> **one axis**, not two. Ordering is no longer recipe-invariant, which is player-visible and
+> **routed a scope item to `prd.md`** (§9 of this list, FR/§ cited there). **That routing has
+> landed**: `prd.md` revision 16 lifted the second recipe out of v2, so nothing is outstanding
+> against the PRD from this revision.
+>
+> The other four close cleanly. `query.status` is `{"option": "securable"}`, always emitted,
+> and **`trade_filters.sale_type` is dropped** — the player's minimum request body carries no
+> such field, so OQ-20's duplication half closes by removal and AD-16's trap count falls to
+> **three**. The search response's identifier is **`id`**. A stat line carries at most **two**
+> `#`, now enforced as a `WEIGHTS-FILE-SCHEMA.md` hard error so a future patch fails at the
+> file rather than as unsatisfiable edge alignment. `itemLevelMin` is present on every
+> producer tier. That body also settles one edge of **OQ-12** — a non-integer `min` is
+> accepted, so AD-16's no-rounding rule is satisfiable — and raises **OQ-24**, the
+> unaccounted-for `trade_filters.filters.price` the live site sends.
+>
+> **Revision 13** takes the two items `prd.md` revision 14 routed here, and adds no AD.
+> AD-5 gains the missing half of its own subject — *who* derives the declared `itemLevelMin`,
+> and from what — pointing at the new `IMPLEMENTATION-NOTES.md` §8, which states the curator's
+> derivation in full and corrects it to read the affix **band** rather than the display-only
+> `acceptedTier` label. `AGENT-WORKFLOW.md` step 2 gains AD-27's absent-file carve-out and the
+> day-one path, so the build order no longer instructs an escalation for a failure AD-27 says
+> does not exist. With §8 in place, `prd.md` FR-22 can drop the one of its three
+> `*(PRD-owned)*` markers that sits over a computation — and **must** also drop the label as
+> that computation's input, which FR-22 still names and §8 corrects away from. Until it does,
+> one derivation has two owners and two different inputs. The gate also turned up a seam
+> neither routed item named: **OQ-23** records that modifier pools are published per **item
+> class** while a tracked entry is keyed on `baseTypeId`, and `WEIGHTS-FILE-SCHEMA.md`'s three
+> surviving per-base statements are corrected to match the two-level key they contradicted.
+>
 > **Revision 12** absorbs the PM's Phase 1 handoff so that `prd.md` rev 13 can cite this
 > document by stable id instead of restating mechanism. Sixteen one-to-three-sentence
 > absorptions, no AD added or retired: OQ-21 and AD-11 now carry **both** escaping shapes
@@ -67,12 +199,10 @@ companions:
 > **AD ids 1–29 no longer all resolve**, and the *Retired AD map* gives every old id its new
 > home. `prd.md` rev 11 completed its pass: **verified 2026-09-19, it carries 17 retired-id
 > occurrences across 5 lines, every one a deliberately annotated historical record in §0 and
-> §10, where substituting an id would falsify what was decided at the time.** Two documents
-> have **not** had that pass and are stale against this revision — the story spec
-> `docs/stories/spec-contracts-accepted-tier-and-search-id.md` (weights contract `4.1.0`,
-> spine rev 9, retired **AD-2** and **AD-22** cited eight times) and the UX set
-> (`DESIGN.md` 2 occurrences, `EXPERIENCE.md` 4, and `mockups/key-hero-resting.html` 1).
-> The story spec is the artifact a builder opens first.
+> §10, where substituting an id would falsify what was decided at the time.** The story spec
+> and UX set this revision flagged as carrying stale retired-AD citations have since been
+> cleaned up: the story spec no longer exists in the repo and `DESIGN.md`/`EXPERIENCE.md`
+> carry zero such citations as of revision 17 — checked, not assumed.
 
 ## Design Paradigm
 
@@ -183,15 +313,19 @@ never import each other.
 
   Every concept that crosses a package boundary has exactly one Zod schema in
   `contracts` and no parallel definition anywhere: `BaseType`, `TrackedEntry`,
-  `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`,
-  `SyncRunReport`, `RankedBase`, `TradeCatalogue`. Static types are `z.infer`red from
+  `ItemClass`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`,
+  `CurrencyRate`, `SyncRunReport`, `RankedRow`, `TradeCatalogue`. Static types are `z.infer`red from
   those schemas. `CraftRecipe` covers currency composition and the recipe's distribution
-  effect, and is populated from `data/recipes.json`, **an object carrying `schemaVersion`
+  effect — **its currency quantities and its `modifierLevelMin`** (AD-17) — and is
+  populated from `data/recipes.json`, **an object carrying `schemaVersion`
   and a `recipes` list of `CraftRecipe` entries, each with a unique `id`** — an object and
   not a bare array, because a bare array has nowhere to carry the `schemaVersion` every file
   must. **Adding a recipe is a data edit and needs no code change**, because AD-17 ranks the
-  **cross product** of every crafted base with every recipe in the list — a recipe is a cost
-  offset that applies to any base, and the file declares no per-base pairing. The `id` is
+  **cross product** of every crafted item class with every recipe in the list — a recipe applies
+  to any base, and the file declares no per-base pairing. **`modifierLevelMin` is required
+  and is `0` for a recipe that imposes no floor**, so the absence of a floor is written
+  rather than inferred from a missing field; an optional field would let one builder read
+  absent as *no floor* and another as *unknown*. The `id` is
   what AD-17's outer tie-break compares. **`core` computes a recipe's *cost*
   from synced rates, and `sync` never computes a craft cost** — AD-4 permits an artifact to
   carry an observed *rate*, and a craft cost is a derived valuation term, not an
@@ -230,11 +364,66 @@ never import each other.
   expressible. Presence alone is not sufficient — AD-17's edge-alignment check is what
   closes the sentinel loophole.
 
-  A tracked entry is `(baseTypeId, itemLevelMin, prefix?, suffix?)`, where each affix is
-  a modifier reference or is **absent**. An entry with both affixes absent is a **raw
-  base**, which is how the data represents white ilvl-82 bases. `baseTypeId` is the trade
-  API's base type `type` string exactly as `data/items` spells it. **No component may
-  introduce a second modifier identity.**
+  **A tracked entry is one of exactly two kinds, and the kind is what the entry names —
+  never an inference from what it omits:**
+
+  | Kind | Key | For |
+  | --- | --- | --- |
+  | `crafted` | `(categoryId, className, itemLevelMin, prefix?, suffix?)`, at least one affix present | the modifier combinations the product ranks |
+  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all | a white ilvl-82 base, priced as it comes |
+
+  Until revision 16 both kinds shared one key on `baseTypeId` and craftedness was read off
+  *both affixes absent*. Two things were wrong with that. A crafted entry described a
+  modifier pool while naming something that does not have one — pools are published per item
+  class, so a base could not reach its own pool and OQ-23 went hunting for a mapping that
+  never needed to exist. And an inferred discriminator makes *raw* the degenerate case of
+  *crafted*, so a schema could not tell them apart and neither could a reader. **The
+  `raw` arm carries no affix members**, which is a stronger guarantee than two nulls.
+
+  **One item class is one pool, and its name is the pair.** `prd.md` §3's **Item Class** is
+  this spine's `(categoryId, className)` pair — **not `className` alone** — and it is the
+  same key `WEIGHTS-FILE-SCHEMA.md` uses for `bases`. A reader of both documents must not
+  have to infer which of the two the PRD means, so this AD states it where the key is
+  settled: the PRD names the unit the player reads, this spine keys it, and the key has two
+  rungs because the unit is reached two different ways. Revision 16 argued the PRD's noun
+  should be *category* on the grounds that the unit a player reads and the unit a search
+  sends are both the trade site's; `prd.md` revision 18 overruled that on a product
+  argument — **expected value varies sharply between the classes inside one category**, so a
+  category row averages two things the player treats differently and is not a ranking of a
+  decision he makes. The vocabulary problem that argument identified is real, did not
+  vanish with it, and lands here as a display question rather than a modelling one
+  (`EXPERIENCE.md` owns the treatment). `prd.md` §3's `[ASSUMPTION]` that a class's own name
+  is already what the player calls it **holds** — the `className` differs from the player's
+  name by its underscores, which `web` trims at render time. The identity stays verbatim
+  (Consistency Conventions); only the label is trimmed.
+
+  Neither rung suffices alone and the spine states why, because a builder will otherwise
+  drop one:
+
+  - **`categoryId` alone cannot identify a pool.** `className → categoryId` is many-to-one,
+    and measured against the conforming file of 2026-09-19, **6 of 29 categories carry more
+    than one class** — `armour.chest` carries seven, `jewel` eight.
+  - **`className` alone cannot produce a search**, because it is never a value the trade API
+    accepts, and reaching `categoryId` through the weights file would make pricing depend on
+    a file AD-12 guarantees pricing never needs. That guarantee is load-bearing precisely
+    when the weights file is absent, which AD-24 makes the product's day-one state.
+
+  **`className` is still never sent, and since revision 17 it is still read.** AD-16 derives
+  a **class discriminator** from it — a defence signature, or a base type for `jewel` — and
+  emits *that*, never the name itself. The derivation is **local to the one `className`**,
+  which is what preserves the guarantee above: a crafted search is still built from the
+  tracked entry and the catalogue alone, and consults `weights.json` for nothing. `sync`
+  owns it because `sync` owns search construction (`IMPLEMENTATION-NOTES.md` §10, binding
+  under AD-0).
+
+  `baseTypeId` is the trade API's base type `type` string exactly as `data/items` spells it;
+  `categoryId` is spelled exactly as the trade category filter list spells it (AD-25). **No
+  component derives `baseTypeId` and `categoryId` from each other** — that prohibition is
+  untouched and is the load-bearing half of `IMPLEMENTATION-NOTES.md` §5.2 trap 1 — and no
+  component may introduce a second modifier identity. **The one derivation that now exists
+  runs `className → discriminator` and in no other direction**, it is governed by a grammar
+  `WEIGHTS-FILE-SCHEMA.md` makes normative rather than by a guess at a foreign string's
+  shape, and its `jewel` arm's output is checked against the catalogue before it is sent.
 
   **A reference names a stat line, not a game modifier.** One modifier may publish
   several `statId`s that always roll together (AD-11). A `statId` identifies what the
@@ -248,6 +437,23 @@ never import each other.
   component validates its spelling**; and it is **never part of a tracked entry's
   canonical key**. A missing label is a curation gap that `web` renders as a marked
   fallback, and never a load error.
+
+  **What the declared `itemLevelMin` must equal is a conformance condition on
+  `data/tracked.json`, not an instruction to a person.** `IMPLEMENTATION-NOTES.md` §8 states
+  the derivation, and it binds under AD-0 as a property the artifact either has or lacks — a
+  file whose floors do not satisfy it is a defective file, whoever produced it and whatever
+  they intended. **One direction of that property is unchecked and this AD says so:** a floor
+  that is too *low* is caught at load by §2.4 and §2.5, and floors that disagree across one
+  base by AD-17's shared-floor check, but a floor set *higher* than §8 derives is conforming
+  to every mechanical check in the system while scoping a wider pool than the curator chose.
+  That is a trust surface, recorded here rather than implied.
+
+  No component performs the derivation — the file states the result and the code reads it.
+  The derivation takes the
+  **tier an affix band names**, never the `acceptedTier` label: a derivation reading the
+  label would be the label-to-weights join the four prohibitions above exist to close.
+  What the code does with the declared number is AD-17's — it scopes the pool and it
+  enforces one shared crafted floor per **item class**.
 
 ### AD-7 — Sync is a bounded, resumable, single-instance chunk runner with a defined rotation
 
@@ -291,8 +497,7 @@ never import each other.
   **Within a chunk, `sync` selects entries in exactly this order**, stopping when any
   bound is reached:
 
-  0. **currency rates first**, always, before any priced entry in the same chunk (AD-20);
-  1. then every `pinned` entry (AD-12), **oldest `lastAttemptedAt` first**, subject to the
+  1. every `pinned` entry (AD-12), **oldest `lastAttemptedAt` first**, subject to the
      cap below;
   2. then `active` entries by **oldest `lastAttemptedAt` first**, treating an entry that
      **carries no `lastAttemptedAt` at all** as infinitely old. The key is the field's
@@ -380,7 +585,8 @@ never import each other.
   entries outside the ranking. No component may represent absence as `0`, as `null`, or
   as a missing key.
 
-  **Unresolvable.** If a tracked entry references a `statId` or `baseTypeId` the trade API
+  **Unresolvable.** If a tracked entry references a `statId`, `baseTypeId` or `categoryId`
+  the trade API
   no longer exposes, `sync` writes that entry's state as `unresolvable` **and** records it
   in `sync-report.json`. `sync` never skips, defaults, or leaves the entry at its previous
   value. `core` excludes `unresolvable` entries from valuation, and `web` must surface
@@ -392,8 +598,12 @@ never import each other.
 
   | Check | When | Surfaced as |
   | --- | --- | --- |
-  | every `statId` / `baseTypeId` in `data/tracked.json` exists in the catalogue | before issuing any request | the entry's `unresolvable` state + `sync-report.json` |
-  | every `statId` / `baseTypeId` in `data/weights.json` exists in the catalogue | reading the file (`sync` is a reader, not its writer) | `sync-report.json` only; the file is never rewritten and never refused |
+  | every `statId` / `baseTypeId` / `categoryId` in `data/tracked.json` exists in the catalogue | before issuing any request | the entry's `unresolvable` state + `sync-report.json` |
+  | every `statId` / `categoryId` in `data/weights.json` exists in the catalogue | reading the file (`sync` is a reader, not its writer) | `sync-report.json` only; the file is never rewritten and never refused |
+
+  **A tracked entry's `className` has no row here**, and its absence is the point: no
+  catalogue endpoint carries a class axis, so the only artifact that can answer it is
+  `weights.json` and the only check that does is AD-12's cross-file gate (AD-5, AD-25).
 
   A weights line whose `statId` is **`null`** is **skipped** by catalogue validation, not
   failed by it, and `sync` must not report it as an uncatalogued id — the two have
@@ -454,7 +664,7 @@ never import each other.
   **in fact** and not merely in label, so the containment-set-only reading would understate
   what the figure rests on. **The consequence is deliberate and is not a defect:** one
   invented tier anywhere in a scoped pool makes every probability on that base read
-  `uniform-prior`, so the provenance badge discriminates **between base types** rather than
+  `uniform-prior`, so the provenance badge discriminates **between ranked rows** rather than
   within one — which is what PRD FR-11 now states (raise-back closed by PRD rev 11). `web` must
   render a figure resting on anything below `measured` visibly differently from one
   resting on `measured`. **Two render treatments, not three.**
@@ -481,9 +691,18 @@ never import each other.
   producer can satisfy; a pool denominator that double-counts a multi-stat modifier; and
   the permanent loss of the fact that two stats always roll together, which nobody can
   reconstruct once the source row is split.
-- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`5.0.0`**,
+- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`5.1.0`**,
   and never produces one. Any producer that satisfies the contract is acceptable, and the
   app does not depend on which one wrote the file.
+
+  **`5.1.0` is additive over `5.0.0` and a consumer refuses only an unknown *major***
+  (Consistency Conventions), so a file declaring `5.0.0` is still consumed. What `5.1.0`
+  adds is a **normative grammar on the inner `className` key**, which spine revision 17
+  needed because AD-16 now derives a class discriminator from that key
+  (`IMPLEMENTATION-NOTES.md` §10). The conforming file of 2026-09-19 satisfies it unchanged,
+  verified across all 59 classes on 2026-09-20 — **the revision documents what the producer
+  already emits rather than asking for new work**, and exists so that a future patch which
+  breaks the shape fails at the file instead of as a quietly mispriced row.
 
   **One entry is one tier of one modifier, and an entry and a source row are the same
   thing.** An entry carries `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource`,
@@ -563,8 +782,8 @@ never import each other.
   **The file is a prerequisite, not a convenience.** The trade API exposes no pool
   membership, no tier, no item-level availability and no spawn weight (AD-25), so nothing
   in this system can derive what the file carries. Until a conforming file exists, AD-17
-  makes every **crafted** base unrankable, and that outcome is the honest one; **raw bases
-  need no pool and still rank** on AD-17's separate branch, so the Raw Base price list
+  makes every **crafted item class** unrankable, and that outcome is the honest one; **raw
+  entries need no pool and still rank** on AD-17's separate branch, so the Raw Base price list
   survives the file's absence. A uniform-prior file
   (every `weight: 1`, `weightSource: "absent"`) remains a valid *weighting* shortcut, and
   is never a *sourcing* shortcut.
@@ -586,24 +805,25 @@ never import each other.
   second workload silently consuming the same bucket; and the addendum's named risk — *"a
   stale top five that the user trusts is worse than no tool"* — becoming the steady state
   because nothing ever prompts a review.
-- **Rule:** Exactly **four** sources generate a request, and nothing else does:
+- **Rule:** Exactly **three** sources generate a request, and nothing else does:
 
   | Source | Cadence | Cost |
   | --- | --- | --- |
   | `data/tracked.json` — combinations to price | every chunk | one search + one fetch per entry |
-  | `data/currencies.json` — currencies to price for AD-20 | every chunk, **first** (AD-7) | small, fixed |
   | League validation against the live leagues endpoint (AD-19) | once per run | one request |
   | Catalogue refresh (AD-25) | explicit command, patch cadence, never on the chunk path | four requests |
 
-  A fifth source is an amendment to this AD, not an implementation detail.
+  **`data/currencies.json` is not a source.** It was one until revision 14, when AD-20 moved
+  currency rates to a hand-maintained committed file; the file is now read, never fetched
+  against. A fourth source is an amendment to this AD, not an implementation detail.
   `sync-report.json` must report requests consumed **per source**, so budget drift is
   observable per cause.
 
-  **Three run-start gates stand in front of those four sources**, and their consequences
+  **Three run-start gates stand in front of those three sources**, and their consequences
   differ by design. `sync` validates every tracked id against the catalogue (AD-9) — a
   per-entry condition, so the entry is marked `unresolvable` and the run continues.
   `sync` runs `core`'s cross-file validation of `data/tracked.json` against the weights
-  file — **all four checks** (AD-17) — as one gate. `sync` validates the configured league
+  file — **all five checks** (AD-17) — as one gate. `sync` validates the configured league
   (AD-19). A league mismatch or a cross-file failure invalidates the run's premise, so the
   run **aborts**, and **a cross-file failure is recorded in `sync-report.json`** with the
   failing check's payload (AD-17), so the abort is visible on the surface `web` already
@@ -625,7 +845,7 @@ never import each other.
   runtime. `TrackedEntry` carries an explicit `status` of `active`, `pinned` or `pruned`
   as **schema members, not conventions**. `pinned` means *refreshed every chunk, exempt
   from rotation*, subject to AD-7's cap. `pruned` is a **tombstone** carrying its reason:
-  `sync` excludes it from the workload **and** AD-17's sum excludes it from `tracked(base)`,
+  `sync` excludes it from the workload **and** AD-17's sum excludes it from `tracked(class)`,
   because pruning that left the last-good price contributing would be a no-op on the
   ranking. `sync-report.json` records the date of the last tracked-list edit, **derived by
   `sync` from the git history of `data/tracked.json`** — the author date of the last commit
@@ -639,8 +859,11 @@ never import each other.
 
   **The ceiling is denominated in searches, not in entries.** Against the measured 2,400
   searches per day, a full refresh is held to **~1,500 searches**; the remainder serves
-  retries, the currency set, the catalogue refresh, the per-run leagues check and a second
-  recipe. One tracked entry always costs one search. **`pinned` entries spend from that
+  retries, the catalogue refresh and the per-run leagues check — the only other two of
+  AD-12's three request sources. One tracked entry always costs one search. Currency rates
+  (AD-20) and a recipe's ranking effect (AD-4, AD-17) cost nothing at sync time: rates are
+  hand-maintained, never fetched, and a second recipe changes only what `core` computes at
+  read time against prices already synced. **`pinned` entries spend from that
   headroom differently** — a search in *every* chunk, so their daily cost scales with
   invocation cadence rather than with list size, which is the real reason AD-7's cap
   exists. **Under `5.0.0` the curation unit is the tier**, so the entry count a curator
@@ -695,19 +918,40 @@ never import each other.
 
   | Query field | Value |
   | --- | --- |
-  | `query.type` (top level, **not** a filter) | the entry's `baseTypeId`, verbatim |
-  | `type_filters.rarity` | `magic` for an entry carrying affixes, `normal` for a raw base |
+  | **the unit filter** | **`raw` entry:** `query.type` (top level, **not** a filter) = the entry's `baseTypeId`, verbatim. **`crafted` entry:** `type_filters.category` = the entry's `categoryId`, verbatim, **plus the class discriminator below**. The two branches are chosen by the entry's kind (AD-5) and never mixed |
+  | **the class discriminator** | **`crafted` entry only.** Derived from the entry's `className` (§10) and emitted as one of: an `equipment_filters` **defence signature**; `query.type` carrying the class's base type, for `jewel`; or **nothing at all**, where the entry's `categoryId` carries one class and the category filter is already exact |
+  | `type_filters.rarity` | `magic` for a `crafted` entry, `normal` for a `raw` entry |
   | `type_filters.ilvl` | `min` = the entry's `itemLevelMin` |
   | stat filters | one per modifier reference: a `banded` reference carries **both `min` and `max`**; a `valueless` reference carries the stat id and **no edges at all** |
-  | `trade_filters.sale_type` | the option labelled **"Buyout or Fixed Price"**, whose `id` is JSON `null` |
-  | `query.status` | **unsettled — OQ-20.** A live browser search sends `{"option": "securable"}`, and this spine does not yet fix the value |
+  | `query.status` | `{"option": "securable"}`, **always emitted** — the option `/api/trade2/data/filters` labels **"Instant Buyout"** |
+  | `trade_filters.filters.price` | `{"option": "exalted_divine"}`, **always emitted** — see below |
   | `sort` | price **ascending** |
 
-  Four traps make this costly to get right in code, and all four are recorded with their
-  evidence in `IMPLEMENTATION-NOTES.md` §5.2, binding under AD-0: the base type is
-  `query.type` and never
-  `type_filters.category`; `priced_with_info` is *not* instant buyout and its correct
-  option's `id` is `null`, which a serialiser will silently drop; passing the band's
+  **`query.status` is the instant-buyout limb, and `trade_filters.sale_type` is not
+  emitted at all.** Until revision 14 this table required `sale_type` set to *"Buyout or
+  Fixed Price"*; the minimum request body the player supplied (2026-09-19, §5.1) carries
+  `status.securable` and no `sale_type`, and `securable`'s published label expresses the
+  same intent the `sale_type` row was reaching for. One filter now carries that intent, so
+  the two can no longer disagree. Emitting `sale_type` as well is not a belt-and-braces
+  improvement: it is an unmeasured second predicate over the population AD-17 weighs.
+
+  **The price filter is emitted, and it narrows the population on purpose** (OQ-24, closed
+  2026-09-19 on the player's answer). `trade_filters.filters.price` takes the **filter**
+  reading, not PoE1's inert-denomination reading: `{"option": "exalted_divine"}` restricts
+  the results to listings asking exalted or divine. Without it a result set carries vaal,
+  chaos and every other denomination, and AD-20 would need a hand-maintained rate for each
+  before the median could be taken — a per-currency maintenance burden on the player for
+  listings this product does not need. **This is the one narrowing in this AD that is a
+  choice**, and unlike the withdrawn `sale_type` trap it is a measured one: it is stated
+  here, its cost is stated below, and it is not a second predicate reaching for an intent
+  another filter already carries.
+
+  Three traps make this costly to get right in code, and all three are recorded with their
+  evidence in `IMPLEMENTATION-NOTES.md` §5.2, binding under AD-0: `type_filters.category`
+  and a `raw` entry's `query.type` are **not interchangeable**, neither is derivable from
+  the other, and a `raw` entry never carries a category while a `crafted` entry never
+  carries `query.type` **except as its `jewel` discriminator**, which is the one place the
+  two shapes legitimately meet; passing the band's
   `max` as well as its `min` is what keeps the priced population the one AD-17 weighed;
   and a multi-`#` stat filters on one derived value whose identity is a measurement, not
   a choice (OQ-12).
@@ -726,10 +970,76 @@ never import each other.
 
   **`sync` records the search identifier on the entry rather than on the observation**
   (AD-9), whenever the trade site answers the search, **whatever that answer contains**.
+  The identifier is the response's top-level **`id`** field, confirmed against a captured
+  response on 2026-09-19; `tradeId` is not it.
 
-  Three effects are accepted and recorded rather than corrected. The API's ascending sort
+  **A crafted search prices the class, not any one base in it, and that is the product's
+  choice rather than a limitation** — `prd.md` FR-1 owns it, and the spread it produces is
+  stated there. What this AD owns is the mechanical consequence: the priced population is
+  every base type **in the class**, so the payout term describes the class while the
+  probability term (AD-17) describes that same class's pool. The two are scoped to **one**
+  population, which is what revision 17 changed. `core` does not correct for the
+  within-class spread and must not weight the sample.
+
+  **No base outside the class contributes to a crafted row's price** — `prd.md` FR-1 states
+  that as an absolute, and the class discriminator is what makes it true rather than
+  approximately true. Until revision 17 it was false: a crafted search filtered on
+  `type_filters.category` alone, so where a category carried several classes the probability
+  term was one class's while the price spanned all of them. That was **OQ-25**, recorded as
+  an unmeasured residual whose mitigation was *incidental*. **Both readings were wrong and
+  the question closed on 2026-09-20 with no successor**: the mitigation is exact, in every
+  fan-out category, at no extra search.
+
+  **The discriminator is exact, and this AD says why rather than asserting it.** Measured
+  against `data/weights.json` (`5.0.0`, patch `0.5.5`), 6 of 29 categories fan out over 36
+  of 59 classes, and they split cleanly in two:
+
+  - **Five armour families — 28 classes — are separated completely by defence.** The classes
+    of a family are exactly the distinct non-empty subsets of {armour, evasion, energy
+    shield}: `armour.chest` carries all seven, `armour.boots` / `armour.gloves` /
+    `armour.helmet` carry six each (the seven less the triple), `armour.shield` carries the
+    three containing armour. **No sibling shares a triple**, so a signature of `min 1` on
+    each defence the class has and `max 0` on each it lacks admits exactly one class.
+  - **`jewel`'s eight classes carry no defences at all** and are separated by `query.type`
+    instead, because a jewel class's name **is** a base type name (§10).
+
+  **The `max 0` half cannot be contradicted by the Combination's own stat filters**, which
+  is the obvious objection and does not hold. The defence type *is* what determines the
+  rollable pool, and that is exactly what the weights file's inner rung encodes: no
+  energy-shield modifier sits in a `Body_Armours_dex` pool, so a dex chest cannot roll one
+  and cannot be excluded by `es: {"max": 0}`. A curator cannot author the contradictory
+  entry; were one authored anyway, the empty containment set (AD-17) rejects it at load with
+  the offending reference named, rather than ranking it on a guess. **Verified against the
+  conforming file on 2026-09-20: across all 28 defence-suffixed classes, no pool carries a
+  flat modifier granting a defence its class lacks.** The filter and the pool agree by
+  construction, and no new rule is needed to make that true.
+
+  **The `jewel` arm emits `query.type` beside `type_filters.category`, and both are
+  emitted** — verified against a captured working search for `Sapphire` (§5.1c). The two
+  cannot disagree, since a jewel base type is in category `jewel` by construction, so this
+  is not the withdrawn `sale_type` defect where two filters reached for one intent and could
+  diverge. **This is the one shape in which a crafted search carries `query.type`**, and a
+  builder who reads `IMPLEMENTATION-NOTES.md` §5.2 trap 1 as *never both filters* is reading
+  a pre-revision-17 draft: the trap forbids the wrong **value** in either field, and a `raw`
+  entry carrying a category. It does not forbid this.
+
+  **A jewel class could instead have been separated by its own stat filters** — for jewels
+  the modifiers *are* the identifying property — and that option is **the fallback, not the
+  default**. It discriminates *usually*: where two jewel classes share a tracked modifier it
+  admits both, which would make FR-1's absolute guarantee false for `jewel` while
+  `query.type` satisfies it at the same cost. Choosing it deliberately is therefore a PRD
+  revision to ask for, never one to absorb here. **`prd.md` FR-1's class-purity guarantee is
+  therefore load-bearing on this AD's choice of `query.type` over the stat-filter fallback**,
+  with no citation either direction; a future revision adopting the fallback for any class
+  must route back to `prd.md` FR-1 before it lands here, not after.
+
+  Four further effects are accepted and recorded rather than corrected. The API's ascending sort
   is per listing currency, so a result set spanning currencies may not be the globally
-  cheapest ten. Fewer than 10 results is valid and records the true count; zero is
+  cheapest ten — the price filter above holds that span to **two** currencies rather than
+  removing it. That filter's own cost is the second effect: **a listing asking any other
+  currency is invisible**, so the sample can be smaller than the market and `no-listings`
+  can fire on a base that has listings in chaos alone. Fewer than 10 results is valid and
+  records the true count; zero is
   `no-listings`. And **the priced population is deliberately wider than the weighted
   one** — a band containing one tier still admits the neighbouring tier's tail, which
   neither the search nor the curator can exclude (AD-11). *[ASSUMPTION]* What keeps that
@@ -744,12 +1054,16 @@ never import each other.
   denominated differently from the value it filters; and two builders deriving different
   probabilities from the same weights file, which silently reorders the entire ranked list
   rather than failing.
-- **Rule:** For a `(baseTypeId, recipe)` pair whose base is **crafted** — its tracked
-  entries carry affixes:
+- **Rule:** **The ranked list carries two kinds of row and they are ranked by two different
+  branches over two different units** — a crafted row is an item class, a raw row is a
+  base type (AD-5). One ordering holds both, and every row states which unit it names.
+
+  For an `(itemClass, recipe)` pair — `itemClass` being the `(categoryId, className)`
+  pair of AD-5, and the pair's entries being `crafted`:
 
   ```
   EV = ( Σ  P(combo) × price(combo) )  −  craftCost(recipe)
-        combo ∈ tracked(base), state = priced, price(combo) ≥ threshold
+        combo ∈ tracked(class), state = priced, price(combo) ≥ threshold
   ```
 
   The threshold compares against a combination's **gross** price, not the price net of
@@ -759,23 +1073,28 @@ never import each other.
   unit may cross a package boundary. `web` supplies the threshold as a value, renders the
   result, and computes no term.
 
-  **`core` returns the summands, not only the total.** Each `RankedBase` carries its
+  **`core` returns the summands, not only the total.** Each `RankedRow` carries its
   surviving summands — the combinations that passed the threshold — each with its own
   `P(combo) × price(combo)` contribution, **ordered by that contribution, descending**, ties
   breaking on the canonical entry key under the byte-wise ordering the Conventions table
   fixes. `web` renders a prefix of that list and **chooses only how many to show**, which is a
   view constant like AD-10's freshness cut-off. **The ranked list itself breaks ties the same
-  way**, on the `baseTypeId` then the recipe id, so two builders produce the same order from
-  the same files rather than the same *set* in two orders. **A base whose summands all fall
-  below the threshold ranks at `EV = −craftCost`** with an empty summand list — it is ranked,
-  not unrankable, because the threshold excluding every outcome is an answer about that base
+  way** — on the row's unit key, then the recipe id — so two builders produce the same order
+  from the same files rather than the same *set* in two orders. **Because the two branches
+  produce two key shapes, the tie-break compares the serialised canonical key of AD-5's
+  arm**, never a bare string that a `categoryId` and a `baseTypeId` could both supply; a raw
+  row has no recipe id and sorts before a crafted row at an equal `EV`, so the ordering is
+  total across the mixed list rather than only within each branch. **A class whose
+  summands all fall below the threshold ranks at `EV = −craftCost`** with an empty summand
+  list — it is ranked, not unrankable, because the threshold excluding every outcome is an
+  answer about that class
   and not an absence of data. Without this,
-  a surface that names a base's top contributing combinations has no legal implementation at
+  a surface that names a row's top contributing combinations has no legal implementation at
   all: AD-4 forbids `web` from computing a ranking term, and a builder would either break
   AD-4 or invent a `core` API that nothing binds — two builders inventing two different
   tie-breaks for the product's primary screen.
 
-  **Raw bases rank on a separate branch.** A tracked entry with both affixes absent is
+  **Raw bases rank on a separate branch.** A `raw` tracked entry is
   never a summand — at `P = 1` it would enter at certainty and swamp every crafted
   outcome. Its `EV` is its observed price with zero craft cost, ranked in the same list
   and labelled as an uncrafted base. **The threshold applies to a raw base exactly as to a
@@ -788,38 +1107,46 @@ never import each other.
   FR-3 and `EXPERIENCE.md`'s `raw-base-row` component row.
 
   **Summands must be mutually exclusive.** The sum is over a partition, not a list. Two
-  tracked entries on one base whose outcome sets overlap would double-count, inflating that
-  base's `ΣP` past 1 and handing it the top of the ranking. **Overlap is a validation error
+  tracked entries on one item class whose outcome sets overlap would double-count,
+  inflating that class's `ΣP` past 1 and handing it the top of the ranking. **Overlap is a validation error
   on `data/tracked.json`, rejected at load**, and never a case `core` reconciles. A
   **predicate** defines overlap, not an enumeration of shapes — an enumerated list has
   twice been found to miss a case. The predicate, its branch ordering and its four
   consequences are in `IMPLEMENTATION-NOTES.md` §2.1, binding under AD-0.
 
   **Where the pool cannot answer `coOccur`, the answer is `false` and the tracked list still
-  loads.** A base absent from `weights.json`, and a base whose pool is `partial`, have no
+  loads.** A class absent from `weights.json`, and a class whose pool is `partial`, have no
   reading of that branch, and the two available behaviours are not equally safe. Refusing
-  would take the whole site down over a base this AD has **already excluded from the
-  ordering**, so the partition `coOccur` protects is never summed for that base and a missed
+  would take the whole site down over a class this AD has **already excluded from the
+  ordering**, so the partition `coOccur` protects is never summed for that class and a missed
   double-count cannot reorder anything. `core` therefore answers `false`, renders, and
-  reports the base's unrankability as it already would. This is a ruling rather than an
+  reports the class's unrankability as it already would. This is a ruling rather than an
   inference, because two builders split here — one short-circuits silently, the other
   rejects `tracked.json` site-wide — and both readings conform to everything else stated.
 
-  **The crafted entries on one `baseTypeId` must share one `itemLevelMin`.** `EV` is an
+  **The crafted entries on one item class must share one `itemLevelMin`.** `EV` is an
   expectation over one crafting act on one item population, and entries at different floors
-  are normalised against differently-scoped pools. A raw base is exempt, because it is
-  never a summand.
+  are normalised against differently-scoped pools. A raw entry is exempt, because it is
+  never a summand — and it is exempt **by construction now rather than by exception**, since
+  it names a base type and takes no part in any class's floor.
 
   **Probability is a ratio over a pool scoped by item level, and the same scope applies to
-  both halves.** With `L = entry.itemLevelMin`:
+  both halves.** With `L = entry.itemLevelMin` and `cat` the entry's `(categoryId,
+  className)` pair — **the item class, not its category half**; the symbol predates
+  revision 17 and is kept so citations of this formula survive:
 
   ```
-  scoped(base, slot, L) = { entry ∈ pool(base, slot) : entry.itemLevelMin <= L }
+  scoped(cat, slot, L) = { entry ∈ pool(cat, slot) : entry.itemLevelMin <= L }
 
-                           Σ { e.weight : e ∈ scoped(base, slot, L) ∧ contains(ref, e) }
-  P(ref | base, slot, L) = ────────────────────────────────────────────────────────────
-                                   Σ { e.weight : e ∈ scoped(base, slot, L) }
+                          Σ { e.weight : e ∈ scoped(cat, slot, L) ∧ contains(ref, e) }
+  P(ref | cat, slot, L) = ────────────────────────────────────────────────────────────
+                                  Σ { e.weight : e ∈ scoped(cat, slot, L) }
   ```
+
+  **`pool(cat, slot)` is a direct lookup, not a resolution.** It is `bases[categoryId]
+  [className][slot]` of the weights file, and the entry named both rungs (AD-5). No
+  component searches for the pool, derives it, or falls back to a sibling class when the
+  named one is absent — an absent pool is unrankability with a reason, below.
 
   **The denominator is a plain sum over entries** — one entry is one tier is one source
   row, counted once (AD-11), so the double-counting reading is no longer reachable in any
@@ -834,43 +1161,61 @@ never import each other.
   floor, while the `ilvl >=` search returns a superset. Accepted rather than corrected,
   because correcting it needs an exact-item-level filter the trade API does not offer.
 
-  **Four cross-file checks are defined once in `core`, and every shell holding both files
+  **Five cross-file checks are defined once in `core`, and every shell holding both files
   runs them** — `web` at load, and **`sync` as a run-start gate before any priced entry
   consumes budget** (AD-12), a failure aborting the run non-zero and leaving
   `sync-progress.json` untouched. **The two shells differ in consequence by design.**
   `sync` aborts because a failed check means budget would be spent on a configuration
   that cannot be ranked. `web` **reports and still renders**: a cross-file failure is not
   an invalid artifact under AD-3 — each file is valid on its own — so `web` surfaces the
-  failing check's payload, excludes the affected base's **crafted branch** from the ordering
-  as unrankable with that reason, and ranks every unaffected base normally, the same ruling
+  failing check's payload, excludes the affected **item class** from the ordering
+  as unrankable with that reason, and ranks every unaffected row normally, the same ruling
   the `coOccur` paragraph above gives for a pool that cannot answer — `[ADOPTED]` from PRD
-  FR-33 and `EXPERIENCE.md`'s *Cross-file policy check failure* state. **The affected base is
-  well-defined for all four checks**: every check evaluates a reference that belongs to a
-  tracked entry, and **every payload names that entry by its canonical key**, whose first
-  element is the `baseTypeId`. **The overlap predicate straddles the two kinds of check**,
+  FR-33 and `EXPERIENCE.md`'s *Cross-file policy check failure* state. **The affected
+  class is
+  well-defined for all five checks**: each evaluates something belonging to a `crafted`
+  tracked entry — a reference for four of them, the entry's own `className` for class
+  discriminability — and **every payload names that entry by its canonical key**, whose
+  first elements are the `(categoryId, className)` pair. **All five checks are crafted-only**
+  — a `raw` entry carries no reference to check, and needs no discriminator because
+  `query.type` already names exactly one base type — which under AD-5's split is now a
+  property of the key rather than a condition each check restates.
+  **The overlap predicate straddles the two kinds of check**,
   and its consequence follows the branch that fired: the within-file branches — bands
   intersect, both valueless, an absent affix — need only `tracked.json`, are `contracts`'
   per-file validation, and refuse the artifact under AD-3; the `coOccur` branch needs the
-  weights file, is the cross-file check in the table below, and takes the per-base
+  weights file, is the cross-file check in the table below, and takes the per-class
   consequence. `sync` imports `core`,
   so this adds no edge and no second
   implementation; a check re-implemented in a shell would be the divergence this rule
-  prevents. The four:
+  prevents. The five:
 
   | Check | Fails when | Mechanics |
   | --- | --- | --- |
   | **Edge alignment** | a `banded` reference's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | §2.4 |
   | **Empty containment set** | a reference contains no entry under the scope — a validation error, never a `P = 0` | §2.5 |
   | **`coOccur`** | two references in one slot name two lines of one entry, so a single item satisfies both and the partition is not a partition | §2.2 |
+  | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under §10's grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool**, and the only one whose subject is the search rather than the valuation | §2.6 |
   | **Kind agreement** | **any** scoped line sharing the reference's `statId` disagrees with the reference's kind — a line's kind is read from **whether its `ranges` is empty**, since `5.0.0` has no `kind` field. The quantifier is **universal, not existential**: a `statId` either rolls a value or it does not, so one disagreeing line is a defect in the file however many lines agree. `contracts` separately owns the **within-file** half — two tracked entries naming one `statId` under different kinds — which a per-file schema sees on its own | §2.3 |
 
   **The named sections carry the full force of this AD (AD-0).** Each check's mechanics —
   the quantifiers, the scope, the error payload — live there and nowhere else, so a shell
   that re-derives one has diverged from this AD rather than from a style note.
 
+  **Class discriminability is the one check whose `sync` abort saves the budget from being
+  spent wrongly rather than pointlessly.** The other four describe a configuration that
+  cannot be ranked, so the requests would buy nothing; this one describes a configuration
+  that would be ranked on a price gathered across sibling classes, which is worse than no
+  price because nothing downstream can tell it apart from a good one. **It is a cross-file
+  check and not a per-file one** because whether a discriminator is *needed* is a fact about
+  the weights file's fan-out, while whether one can be *produced* is a fact about the
+  tracked entry — no single file holds both. Where `weights.json` is absent the check does
+  not run and nothing is lost: AD-24's day-one state makes every crafted entry unrankable
+  already, and AD-16 still builds every crafted search without consulting that file (AD-5).
+
   Edge alignment is evaluated **under the scope, at the entry's own floor**, and is
-  floor-dependent by design; AD-17 gives a base exactly one crafted floor, so `core`
-  evaluates it once per base. **The straddle rule and band non-overlap are withdrawn**, and
+  floor-dependent by design; AD-17 gives an item class exactly one crafted floor, so `core`
+  evaluates it once per class. **The straddle rule and band non-overlap are withdrawn**, and
   the withdrawal is forced rather than chosen: with cells gone, no closed band contains one
   tier without clipping its neighbour, so retaining them would reject every crafted
   configuration on 53 of 63 item classes. **Edge alignment is therefore not a general bound
@@ -893,20 +1238,58 @@ never import each other.
   the question of which document is at fault to the reader. **Nothing mechanical now stands
   behind the second cause** (AD-11).
 
-  **A base whose pool is not `complete` is not ranked on its crafted branch**, and both
-  halves apply: the base's crafted `(baseTypeId, recipe)` pairs leave the ordering entirely
+  **An item class whose pool is not `complete` is not ranked**, and both
+  halves apply: its `(itemClass, recipe)` pairs leave the ordering entirely
   and return in a separate unrankable group with the reason,
   *and* every probability derived from a `partial` pool carries provenance `absent`
-  (AD-10), because such a probability is an upper bound rather than an estimate. A base
-  absent from the weights file is likewise unrankable on that branch; `core` has no other
-  pool source and must not invent one. **Its raw-base entry, if it has one, still ranks** —
-  the raw branch above never consults a pool.
+  (AD-10), because such a probability is an upper bound rather than an estimate. A class
+  absent from the weights file is likewise unrankable; `core` has no other
+  pool source and must not invent one. **Raw rows are unaffected** — the raw branch above
+  never consults a pool, and under AD-5 a raw entry names a base type that no class's
+  unrankability can reach.
 
-  **Recipe has no distribution term in v1.** `CraftRecipe` contributes **only a cost
-  offset**, and the distribution transform is identity, because the mechanics numbers do
-  not exist (Open Questions). Ordering is therefore recipe-invariant in v1 and differs only
-  by the subtracted cost. This is a stated limitation, not a formula with an empty slot for
-  `core` to fill by invention.
+  **`core` distinguishes the causes, because `prd.md` FR-4 spells two reasons and a reason
+  the code cannot produce is a string nobody can trust.** The named `(categoryId, className)`
+  is either present in `bases` or it is not, which separates *absent from the weights file*
+  from *the producer declared a pool it could not guarantee* on a direct lookup with nothing
+  inferred. **A third cause exists and the spine does not invent a string for it**: a pool
+  present and declaring `complete` over **no entries at all** is excluded by this AD while
+  matching neither published reason. `core` reports the cause it observed and `web` maps it
+  to FR-4's enum; if that enum has no member for the empty pool, that is a finding for the
+  PRD and not a licence for `core` to relabel it as `partial`.
+
+  **A recipe restricts the pool from below, and that is its whole distribution term.** A
+  `CraftRecipe` declares a **`modifierLevelMin`** — the game's *Minimum Modifier Level*,
+  which a greater or perfect orb imposes and a plain orb does not. A tier whose
+  `itemLevelMin` is **below** that floor cannot roll under that recipe, so `core` **removes
+  it from the pool and renormalises the surviving weights** before AD-11's containment and
+  this AD's probability term run. The transform is a truncation and a renormalisation; it
+  is never a reweighting, and `core` invents no numbers. The predicate and the
+  renormalisation are in `IMPLEMENTATION-NOTES.md` §9, binding under AD-0.
+
+  **The floor and the entry's item level are the same axis, bounding the pool from opposite
+  ends.** A tier is eligible when
+  `recipe.modifierLevelMin ≤ tier.itemLevelMin ≤ entry.itemLevelMin`: the recipe's orb
+  cannot reach below the floor, and the item cannot roll a modifier above its own level.
+  Reading them as two axes is the error this sentence exists to prevent — `itemLevelMin` on
+  a weights tier *is* that modifier's level (`WEIGHTS-FILE-SCHEMA.md`), the same quantity
+  the orb's floor names.
+
+  **An empty surviving pool makes that `(itemClass, recipe)` pair unrankable with a
+  reason, never a probability of zero.** A perfect orb's floor of 70 against an entry whose item level
+  floor is 65 admits no tier at all; a zero probability there would rank the pair at
+  `−craftCost` and bury a *this recipe cannot make this class* case inside the ordering,
+  where it reads as a bad craft rather than an impossible one.
+
+  **Ordering is therefore recipe-dependent**, and the cross product AD-3 ranks is a real
+  cross product rather than one distribution repeated at different cost offsets. The floors
+  themselves are recipe **data** and live in `data/recipes.json`, never in this document, so
+  adding a recipe stays the data edit AD-3 promises.
+
+  *[ASSUMPTION]* The floor truncates and the remainder renormalises proportionally — that
+  is, an orb removes mass from the pool without redistributing it unevenly across what
+  survives. Nothing in the inputs measures a second-order effect, and a uniform
+  renormalisation is the only reading that needs no number nobody has.
 
 ### AD-19 — League is part of every observation's identity; the dataset is a snapshot and git is the history
 
@@ -950,39 +1333,58 @@ never import each other.
   the orientation in the `CurrencyRate` schema description, because `contracts` is built
   first, by whoever holds neither side of the calculation.
 
-  **Rates are sourced the one way — a bulk exchange query, not AD-16's path.** `sync` obtains
-  every rate in `data/currencies.json` through the governed client (AD-8) as an **exchange
-  query against divine**, at step 0 of the chunk (AD-7). **Divine's own rate is never fetched
-  and is always written**: `sync` emits a `CurrencyRate` for divine of exactly `1`, stamped
-  with the active league like any other, so the set `core` reads is complete. Omitting it
+  **Rates are hand-maintained committed data, not a fetched observation.** `data/currencies.json`
+  carries the rate itself, and `sync` makes **no request of any kind** to obtain one. The
+  `trade2` site publishes no currency-exchange surface — verified 2026-09-19, which is what
+  closed OQ-22 — and the rates this product needs move slowly enough that a file the player
+  refreshes by hand beats a fabricated substitute. **Divine's own rate is still never
+  sourced and is always written**: `sync` emits a `CurrencyRate` for divine of exactly `1`,
+  so the set `core` reads is complete. Omitting it
   instead would make every divine-denominated recipe uncostable by this AD's own
   missing-rate rule — permanently, and for the denomination everything else is expressed in.
 
-  **AD-16 is expressly not the instrument here, and the reason is not cost.** AD-16's search
-  is item-shaped — `query.type`, rarity, item level, stat filters — and has no form a currency
-  fits; and AD-16's median is taken over prices **already normalised to divine**, which is
-  circular for the step that computes that normalisation. A builder who reached for AD-16
-  would have to invent both a query shape and a way out of the circularity, and two builders
-  would invent them differently.
+  **Listing-side normalisation needs exactly one sourced rate.** AD-16 emits
+  `trade_filters.filters.price` as `exalted_divine` (OQ-24), so a price reaching this step is
+  denominated in exalted or divine and nothing else; the file needs **exalted**, and divine's
+  written `1` covers the rest. That bound holds only on the listing side — a recipe still
+  spends whatever currency it spends, and the missing-rate rule still applies per currency
+  named in `data/recipes.json`. A builder must not read the narrow listing set as permission
+  to trim the file.
 
-  The exchange step is **one request for the whole set, not one per currency**, which is what
-  keeps AD-12's currency row small and fixed and what `IMPLEMENTATION-NOTES.md` §6's
-  `currencyStepSearches` has always denominated. `sync` reports the figure the step actually
-  cost, so the cap and the reality cannot drift. **An exchange ratio is not an asking price**
-  — it is `measured` under AD-10 like any other observation, and AD-12's *"every price in the
-  system is an asking price"* is about payouts, which this is not. **`sync` syncs currency rates before any priced entry
-  in the same chunk** (AD-7). If a listing's currency has no current rate, `sync` writes the
+  **AD-16 is expressly not the instrument here either, and the reason is not cost.** AD-16's
+  search is item-shaped — `query.type`, rarity, item level, stat filters — and has no form a
+  currency fits; and AD-16's median is taken over prices **already normalised to divine**,
+  which is circular for the step that computes that normalisation. A builder who reached for
+  AD-16 would have to invent both a query shape and a way out of the circularity, and two
+  builders would invent them differently. That held when rates were fetched and it holds now.
+
+  **Each rate in the file declares its own `league` and its own `asOf`, and `sync` copies
+  both through unchanged into the `CurrencyRate` it writes.** This is the load-bearing half
+  of the change and the one a builder would get wrong by habit. `sync` must **not** stamp a
+  rate with the active league the way it stamps a price, because a fetched rate was observed
+  at the moment of stamping and a hand-maintained one was not: stamping would relabel last
+  league's hand-typed number as current on the first run after a reset, silently, for every
+  craft cost in the system. That is AD-19's *"central threat to the one-year horizon"*
+  re-entering through the currency path — the same failure the previous revision's stamp
+  prevented, now reachable only by keeping the stamp.
+
+  **A `CurrencyRate` therefore still records the league it was observed in, exactly as a
+  `PriceObservation` does, and `core` still refuses one whose league is not the active
+  league** (AD-19) — a recipe costed from it is **uncostable**, never costed from the stale
+  rate. What changed is who supplies the league, not whether one is checked.
+
+  **Staleness needs no new mechanism.** A hand-maintained rate is `measured` under AD-10 —
+  measured by the player against the in-game exchange, which is what that level has always
+  meant — and its `asOf` enters AD-10's propagation like any other timestamp. Since `core`
+  propagates the **oldest** timestamp of every input, a rate the player last touched months
+  ago drags the freshness of everything costed from it, visibly, without a provenance value
+  invented for this case. **An exchange ratio is not an asking price**
+  — AD-12's *"every price in the
+  system is an asking price"* is about payouts, which this is not. If a listing's currency
+  has no current rate, `sync` writes the
   entry as `not-yet-synced` rather than storing it unnormalised: there is no "priced but not
   yet convertible" state, because a half-normalised dataset is one where the ranking is
   silently wrong rather than visibly empty.
-
-  **A `CurrencyRate` records the league it was observed in, exactly as a `PriceObservation`
-  does, and `core` refuses one whose league is not the active league** (AD-19) — a recipe
-  costed from it is **uncostable**, never costed from the stale rate. Without the stamp,
-  AD-19's refusal reaches every price and no rate: after a league reset the payouts void
-  correctly while last league's rates keep computing `craftCost`, which is AD-19's *"central
-  threat to the one-year horizon"* re-entering through the currency path instead of the
-  price path.
 
   **`dataset.json` carries the current `CurrencyRate` set alongside the per-entry
   observations, and that is how rates reach `core`.** `core` computes craft cost from those
@@ -1025,12 +1427,13 @@ never import each other.
   | **Required for a render** | `dataset.json`, `tracked.json`, `config.json`, `catalogue/stats.json`, `catalogue/static.json` | refuse to render, exactly as for an invalid artifact — without them there is no list, no league and no display text |
   | **Absent-tolerable** | `weights.json`, `recipes.json`, `sync-report.json` | render, and name the absence on screen |
 
-  An absent `weights.json` makes **every crafted base unrankable with that reason** (AD-17)
+  An absent `weights.json` makes **every crafted item class unrankable with that reason**
+  (AD-17)
   rather than blanking the site, **and raw bases still rank** — they need no pool — so the
   Raw Base price list is the day-one content. That state is the product's entire day-one
   phase, before a conforming file exists, so it is the launch experience and not an edge
   case. An absent
-  `recipes.json` leaves **no `(baseTypeId, recipe)` pairs at all**, so the crafted branch is
+  `recipes.json` leaves **no `(itemClass, recipe)` pairs at all**, so the crafted branch is
   empty and only raw bases rank — which is a different state from AD-20's *uncostable*, where
   a recipe exists but a rate for its currency does not. An absent `sync-report.json` costs the
   report surfaces alone. **A degraded render always names what is missing**, and never
@@ -1076,14 +1479,38 @@ never import each other.
 
   | Artifact | Endpoint | Carries | Consumed for |
   | --- | --- | --- | --- |
-  | `items.json` | `/api/trade2/data/items` | base types by category | `baseTypeId` validation (AD-9), curation |
+  | `items.json` | `/api/trade2/data/items` | base types by category | `baseTypeId` validation (AD-9), curation; **and validation of the base type AD-16's `jewel` discriminator derives from a `className`** (§10) — the one derived value in the system that is checked against the catalogue before it is sent, rather than after |
   | `stats.json` | `/api/trade2/data/stats` | stat ids + display text | `statId` validation (AD-9), modifier text in `web` |
   | `static.json` | `/api/trade2/data/static` | currency ids + labels + icons | `data/currencies.json` id validation in `sync`; currency display text in `web` (icons unconsumed in v1) |
-  | `filters.json` | `/api/trade2/data/filters` | filter ids + options | search construction (AD-16) |
+  | `filters.json` | `/api/trade2/data/filters` | filter ids + options, including the category filter's option list | search construction (AD-16); **`categoryId` validation (AD-5, AD-9)**, curation |
 
   The refresh is an **explicit command at GGG patch cadence**, never part of a chunk and
   never on a view path. Its four requests are a declared source under AD-12. The resulting
   diff is how a renamed stat id or a new base type becomes visible.
+
+  **The catalogue validates the trade API's own identifiers and nothing else.** A `crafted`
+  tracked entry names `(categoryId, className)`, and the catalogue reaches **only the
+  `categoryId`**: `className` is a poe2db pool name with no counterpart in any of the four
+  endpoints, so it is validated against `weights.json` by AD-12's cross-file gate and is
+  **uncheckable while that file is absent**. `sync` reports it as uncheckable rather than as
+  clean, which is the same ruling `WEIGHTS-FILE-SCHEMA.md` gives from the file's side.
+
+  **One value *derived from* a `className` is catalogue-checkable, and that is not a
+  contradiction of the above.** AD-16's `jewel` discriminator turns a `className` into a base
+  type (`IMPLEMENTATION-NOTES.md` §10), and `items.json` carries base types, so `sync`
+  validates that **output** before building the search. The `className` itself remains
+  uncheckable here; what the catalogue answers is whether the derivation produced a real base
+  type, which is a different question and the one that matters — an unvalidated derivation
+  would send a search for an item that does not exist and record `no-listings` for it, which
+  is indistinguishable from a base nobody is selling.
+
+  **The check runs per entry, during the chunk, immediately before that entry's search is
+  built — it is not a fourth run-start gate, and AD-12's count of three stands.** On failure
+  `sync` treats the derived value exactly as AD-9 treats any other unresolved `baseTypeId`:
+  the entry is marked `unresolvable`, the failure is recorded in `sync-report.json` naming
+  the entry's canonical key, no search is issued for it, and the chunk continues pricing
+  every other entry. It is **not** a cross-file-gate-style abort — a bad derivation for one
+  `jewel` entry says nothing about any other entry's eligibility.
 
   **The catalogue is an identity and validation authority, and never a pool authority.**
   *Verified 2026-09-12, re-checked 2026-09-13:* `/data/stats` returns **category groups** of
@@ -1099,35 +1526,59 @@ never import each other.
 - **Prevents:** the view being designed around a full ranked list that the weights file
   cannot populate — discovered after the layout is committed rather than while it is still
   free to change.
-- **Rule:** AD-17 excludes any base whose pool is not `complete` from the ordering, so the
+- **Rule:** AD-17 excludes any item class whose pool is not `complete` from the ordering,
+  so the
   size of the ranked list is a direct function of the weights file's coverage, and that
   fraction is **unmeasured until someone measures it**. Coverage is the share of *rankable*
-  tracked bases that are *covered*; both predicates are defined exactly in
-  `IMPLEMENTATION-NOTES.md` §3, binding under AD-0, because a measurement that binds a layout
-  decision must be
+  tracked **item classes** that are *covered*; both predicates are defined exactly in
+  `IMPLEMENTATION-NOTES.md` §3, binding under AD-0, because a measurement that informs a
+  layout decision must be
   reproducible by two people who have never spoken. The denominator is **the tracked list**,
-  not the catalogue, and counts only bases that need a pool. An unresolved stat line does
-  **not** affect coverage.
+  not the catalogue. An unresolved stat line does **not** affect coverage.
 
-  **The gate measures a weights file that exists.** Where `data/weights.json` is **absent**,
-  coverage is not `0%` — it is undefined, and none of the rows below fires. That state is the
-  product's declared day-one phase (AD-12, AD-24), in which every crafted base is
+  **The denominator's old carve-out is withdrawn as vacuous, and one half of it survives.**
+  Until revision 16 the denominator *counted only bases that need a pool*, excluding a base
+  tracked solely as a raw base. Under AD-5's split no such thing can enter the count: the
+  denominator ranges over item classes, and only a `crafted` entry names one, so every
+  member needs a pool by construction. **The `pruned` exclusion is not vacuous and stays** —
+  a class whose every crafted entry is a tombstone is not rankable and must not sit in
+  either half of the fraction.
+
+  **The measurement needs a weights file that exists.** Where `data/weights.json` is
+  **absent**, coverage is not `0%` — it is undefined, and both fields are omitted from the
+  report together (§3). That state is the
+  product's declared day-one phase (AD-12, AD-24), in which every crafted item class is
   unrankable for a reason `web` states, and reading it as a coverage failure would have
-  this AD instruct the player to escalate rather than ship precisely when shipping is the
-  plan.
+  this AD call the product broken precisely when shipping is the plan. The carve-out
+  outlived the bands it was written against and is kept for that reason: **`web` must never
+  render an omitted coverage figure as zero.**
 
   **The figure is always reported with its denominator** — `sync-report.json` carries the
-  count of rankable bases beside the fraction, and `web` shows both — because the fraction
-  alone is meaningless on a small list, and the reader must be able to see when that
-  applies. What size makes the bands advisory is a product judgement the PRD owns (FR-4).
+  count of rankable classes beside the fraction, and `web` shows both — because the
+  fraction alone is meaningless on a small list, and the reader must be able to see when that
+  applies. **That caveat is now the normal reading rather than the edge case**: the
+  denominator moved from hundreds of tracked bases to dozens of tracked classes — the
+  conforming file of 2026-09-19 carries **59** classes across **29** categories — which is
+  what withdrew the bands below. **Revision 17 moved the unit from the category to the class
+  and that reasoning survives unchanged**, because 59 and 29 are the same order of magnitude;
+  the denominator grew by roughly a factor of two, not by the factor of ten that would make a
+  threshold mean something different.
 
-  The result binds, once a file is present:
+  **The coverage bands are withdrawn, and coverage binds nothing on its own.** Until
+  revision 16 this AD carried three bands — proceed at ≥ 80%, promote the unrankable group
+  at 50–80%, escalate below 50% — copied here from `prd.md` FR-4, which owned them. **FR-4
+  withdrew them in `prd.md` revision 17** rather than re-fitting them to the smaller
+  denominator, on the reasoning that a threshold over dozens of classes measures the
+  scraper's progress and not how much product exists. They come out of this AD with them: a
+  layout rule with no product decision behind it is a number a builder would obey without
+  anything standing behind it. **No spine open question replaces them** — a question with no
+  candidate answers is a placeholder — and if a future measurement argues for a threshold,
+  it is `prd.md`'s to re-decide and this AD's to cite, in that order.
 
-  | Coverage | Consequence |
-  | --- | --- |
-  | **≥ 80%** | Proceed as specified. |
-  | **50–80%** | Proceed, but the unrankable group is a **first-class surface** in `web`, not a footer. |
-  | **< 50%** | The ranking premise fails. Escalate rather than ship — either the producer improves coverage, or this spine is amended to rank `partial` pools under explicit upper-bound semantics. Do not resolve this inside `core`. |
+  **What survives is the measurement, and it survives intact**: taken before any view work,
+  re-measured on every regeneration, published in `sync-report.json` with its denominator,
+  computed by `sync` and only rendered by `web`. The layout consequence is now UX's
+  (`EXPERIENCE.md`), informed by the published figure rather than dictated by a band here.
 
   **Coverage is re-measured on every weights-file regeneration**, not once before the view,
   because the fraction moves across a game patch. The measurement is part of accepting a
@@ -1157,13 +1608,13 @@ id resolves here.
 
 | Concern | Convention |
 | --- | --- |
-| Naming — entities | `BaseType`, `TrackedEntry`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `RankedBase`, `SyncRunReport`, `TradeCatalogue`. Singular, PascalCase, defined once in `contracts` (AD-3). |
+| Naming — entities | `BaseType`, `ItemClass`, `TrackedEntry`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `RankedRow`, `SyncRunReport`, `TradeCatalogue`. Singular, PascalCase, defined once in `contracts` (AD-3). **`ItemClass` is the `(categoryId, className)` pair and is `prd.md` §3's *Item Class* — the pair, never the `className` half alone** (AD-5). **It was `ItemCategory` for one revision**: revision 16 introduced that name against `prd.md` revision 17's noun, and revision 17 renamed it when `prd.md` revision 18 moved the player-facing unit a rung finer. The underlying key never changed, so this is a rename and not a re-keying, and **`ItemCategory` is not reused for anything else**. `RankedRow` was `RankedBase` until revision 16 and was renamed because it ranks two units — an `ItemClass` on the crafted branch, a `BaseType` on the raw one (AD-5, AD-17). |
 | Naming — files & modules | kebab-case files; one exported concept per file in `core`; adapters named `<port>-<impl>` (e.g. `trade-client-http`, `trade-client-fixture`). |
 | Naming — ports | Interface `<Thing>Port` in `contracts`; every port ships a fake alongside the real adapter. |
-| Ids | `statId` and `baseTypeId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
+| Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (§10). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (`5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
 | Bands | A modifier reference is `banded` — `(statId, valueMin, valueMax)` with **inclusive, always-present** edges — or `valueless` — `(statId)` with no edges (AD-5). **Weights-file tiers overlap freely in value space; non-overlap is withdrawn at every scope** (AD-11). Edges sit on the lattice the trade filter compares against, which may be finer than the integers. |
-| Entity keys | A `TrackedEntry`'s canonical key is `(baseTypeId, itemLevelMin, prefixBand, suffixBand)`, serialised in that field order, with each affix encoded in one of three distinguishable forms so an absent affix and a valueless affix can never collide (encoding in `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0). **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
-| Item level | `itemLevelMin` is a declared floor, uniform across a base's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it. |
+| Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms so an absent affix and a valueless affix can never collide (encoding in `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
+| Item level | `itemLevelMin` is a declared floor, uniform across an item class's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per `IMPLEMENTATION-NOTES.md` §8 (AD-5). |
 | Dates & time | ISO-8601 UTC strings in all persisted data. Time enters `core` only as a passed-in value (AD-1). |
 | Units | Divine for all currency (AD-20). Band edges and item levels are raw game numbers. No field name implies a unit on its own — schemas name the unit. |
 | Numeric precision | **Band edges are `number`, never `integer`** — the lattice the trade filter compares on may be finer than the integers, and which lattice it is, is a producer-side fact the schema must not pre-empt. AD-17's alignment and containment rules compare edges for **exact equality**, so a producer emits values exact on the lattice and never a rounded approximation. Every persisted divine value — `PriceObservation` and `CurrencyRate` alike — is rounded to **4 decimal places** at the point of normalisation, in `sync`, once; `core` never re-rounds. The figure binds both sides deliberately: a coarser grid would round a cheap crafting currency toward zero and silently collapse AD-17's `craftCost` term. |
@@ -1185,7 +1636,7 @@ Everything in this section is true at cold-start and owned by the code once it e
 | --- | --- |
 | Node.js | 24.21.0 (Krypton LTS) |
 | TypeScript | 6.0.3 |
-| pnpm (workspaces) | 12.4.2 |
+| pnpm (workspaces) | 12.5.1 |
 | React | 19.3.0 |
 | Vite | 8.3.0 |
 | Mantine (`@mantine/core`, `@mantine/hooks`) | 9.6.1 |
@@ -1193,17 +1644,21 @@ Everything in this section is true at cold-start and owned by the code once it e
 | Vitest | 5.0.1 |
 | MSW | 2.15.0 |
 | ESLint + typescript-eslint | 10.11.0 + 8.70.0 |
-| dependency-cruiser | 18.3.1 |
+| dependency-cruiser | 18.4.0 |
 | Hosting | GitHub Pages via Actions build workflow |
 | Sync invoker | Windows Task Scheduler (host-agnostic per AD-7) |
 
 **Upgrade trigger — TypeScript 7.** TS 7.0.2 is current, but two dependencies block the
-upgrade and both must clear (re-verified 2026-09-19): `typescript-eslint` 8.70.0 peers
-`typescript` at `>=4.8.4 <6.1.0`, and `dependency-cruiser` 18.3.1 still declares
-`supportedTranspilers.typescript: ">=2.0.0 <7.0.0"`. **Both blockers have one upstream
-cause** — TS 7 ships no programmatic API yet (typescript-eslint#12518) — so neither will
-clear on its own schedule, and watching that issue is more informative than watching either
-release feed. `dependency-cruiser` is the more consequential of the two, because it is what
+upgrade and both must clear (re-verified 2026-09-20): `typescript-eslint` 8.70.0 peers
+`typescript` at `>=4.8.4 <6.1.0`, and `dependency-cruiser` 18.4.0 still declares
+`supportedTranspilers.typescript: ">=2.0.0 <7.0.0"` — the 18.4.0 release adds only
+baseline-staleness reporting and does not touch the transpiler cap. **Both blockers have one upstream
+cause** — TS 7 ships no programmatic API yet — so neither will clear on its own schedule.
+**Watch the two peer ranges themselves, not an upstream issue:** typescript-eslint#12518 was
+the stated watch and is now **closed as not planned** (re-checked 2026-09-19), so a trigger
+hung on it can never fire. The condition is that `typescript-eslint` widens its `typescript`
+peer past `<6.1.0` **and** `dependency-cruiser` widens `supportedTranspilers.typescript` past
+`<7.0.0`. `dependency-cruiser` is the more consequential of the two, because it is what
 mechanically enforces AD-1's dependency direction; moving first would remove the boundary
 enforcement the whole parallel-worktree workflow rests on. The `@typescript/typescript6`
 shim is **not** an accepted route around this — it would leave the enforcement gap open
@@ -1248,7 +1703,7 @@ graph TB
   sync --> dataset
   sync --> report
   sync --> progress
-  producer -.->|schema-conformant 5.0.0<br/>tiers + lines + itemLevelMin| weights
+  producer -.->|schema-conformant 5.1.0<br/>tiers + lines + itemLevelMin| weights
   dataset --> pages
   pages --> web
   weights --> web
@@ -1263,24 +1718,32 @@ graph TB
 
 ```mermaid
 erDiagram
-  BaseType ||--o{ TrackedEntry : "has tracked"
+  BaseType ||--o{ TrackedEntry : "has tracked, raw kind"
+  ItemClass ||--o{ TrackedEntry : "has tracked, crafted kind"
   TrackedEntry }o--o| ModifierRef : "prefix band"
   TrackedEntry }o--o| ModifierRef : "suffix band"
   TrackedEntry ||--o| PriceObservation : "latest, per league"
-  BaseType ||--o{ ModifierWeight : "eligible pool"
+  ItemClass ||--o{ ModifierWeight : "eligible pool"
   ModifierWeight }o--|| ModifierRef : "weighs, at itemLevelMin"
   CraftRecipe ||--o{ CurrencyRate : "costed from"
   PriceObservation }o--|| CurrencyRate : "normalised by"
-  RankedBase }o--|| BaseType : "ranks"
-  RankedBase }o--|| CraftRecipe : "under"
+  RankedRow }o--o| ItemClass : "ranks, crafted branch"
+  RankedRow }o--o| BaseType : "ranks, raw branch"
+  RankedRow }o--o| CraftRecipe : "under, crafted branch only"
   SyncRunReport ||--o{ TrackedEntry : "reports on"
   TradeCatalogue ||--o{ BaseType : "validates"
+  TradeCatalogue ||--o{ ItemClass : "validates categoryId only"
   TradeCatalogue ||--o{ ModifierRef : "validates statId"
 ```
 
-`web` derives `RankedBase` in the browser and no component persists it (AD-4). A
-`TrackedEntry` with both affixes absent is a raw base, and every crafted entry on one
-`BaseType` shares that `BaseType`'s `itemLevelMin` (AD-17). A `ModifierRef` is a bounded
+`web` derives `RankedRow` in the browser and no component persists it (AD-4). **A
+`TrackedEntry` is `crafted` or `raw` by what it names, never by what it omits** — a
+`crafted` entry names an `ItemClass` and carries at least one affix, a `raw` entry names
+a `BaseType` and carries no affix members at all (AD-5). Every crafted entry on one
+`ItemClass` shares that class's `itemLevelMin` (AD-17). **An `ItemClass` is the
+pair `(categoryId, className)` and only its `categoryId` half is catalogue-validatable**;
+the `className` half is checked against `weights.json` by the cross-file gate and nowhere
+else (AD-25, AD-12). A `ModifierRef` is a bounded
 band or a valueless stat reference, optionally carrying a display-only `acceptedTier` that
 only `web` reads (AD-5). A `PriceObservation` exists only where there is an observation, so
 the attempt-scoped `lastSearchId` and `lastSearchLeague` sit on the dataset entry beside
@@ -1315,10 +1778,10 @@ poe-crafting-base-price-checker/
     web/            # static Mantine view, read-time ranking via core
   data/
     tracked.json    # curated combinations — the request budget (AD-12)
-    currencies.json # currencies to price for normalisation + craft cost (AD-12, AD-20)
+    currencies.json # hand-maintained rates in divine, each with league + asOf (AD-20)
     recipes.json    # CraftRecipe definitions (AD-3)
     config.json     # active league (AD-19) + minChunkSearches (AD-7) + schemaVersion
-    weights.json    # consumed weights file, contract 5.0.0 — external producer (AD-11)
+    weights.json    # consumed weights file, contract 5.1.0 — external producer (AD-11)
     catalogue/      # sync-owned trade catalogue, patch cadence (AD-25)
       items.json
       stats.json
@@ -1336,7 +1799,7 @@ poe-crafting-base-price-checker/
 
 | Scope item | Lives in | Governed by |
 | --- | --- | --- |
-| Ranked base list with chase modifiers | `web` + `core` | AD-4, AD-17, AD-10 |
+| Ranked list with chase modifiers — item classes crafted, base types raw | `web` + `core` | AD-4, AD-17, AD-10, AD-5 |
 | Expandable full combination list | `web` | AD-3, AD-9 |
 | Player-set payout threshold | `web` + `core` | AD-17, AD-4, AD-15 |
 | Price estimation from listings | `sync` + `core` | AD-16, AD-20 |
@@ -1344,8 +1807,8 @@ poe-crafting-base-price-checker/
 | Curation: prune, pin | `data/tracked.json` | AD-12, AD-3 |
 | Weights schema (the contract) | `contracts` | AD-11, AD-17 |
 | Weights file (the data) | external scraper project — **not this repo** | AD-11, AD-27 |
-| Trade catalogue: base types, stat ids, currencies | `sync` + `contracts` | AD-25, AD-9 |
-| Magic bases, one prefix + one suffix | `contracts` | AD-5 |
+| Trade catalogue: base types, categories, stat ids, currencies | `sync` + `contracts` | AD-25, AD-9 |
+| Magic item classes, one prefix + one suffix | `contracts` | AD-5 |
 | White ilvl-82 bases | `contracts` + `core` | AD-5, AD-17 |
 | Craft cost from currency prices | `sync` + `core` | AD-20, AD-3 |
 | Surviving league resets | `core` + config | AD-19 |
@@ -1371,11 +1834,13 @@ poe-crafting-base-price-checker/
   a product. Deferred because it widens `ModifierRef` from a field to a set and touches
   AD-5, AD-16 and AD-17 at once. **Revisit if** a curator finds a hybrid whose two lines are
   individually unremarkable and jointly a chase.
-- **A per-currency search fallback for rates.** If `trade2` exposes no usable exchange
-  surface (OQ-22), AD-20's step becomes one search per currency filtered to divine-denominated
-  listings. Held as the named fallback rather than adopted, because it costs a search per row
-  against AD-7's cap and needs a query shape AD-16 does not define. **Revisit when** OQ-22
-  resolves against the exchange endpoint.
+- **Automated currency rates.** AD-20 makes the rate hand-maintained committed data, because
+  `trade2` exposes no exchange surface (OQ-22). The two paths back are a per-currency search
+  filtered to divine-denominated listings — which costs a search per row against AD-7's cap
+  and needs a query shape AD-16 does not define — or a third-party rate source, which
+  introduces a dependency the product currently has none of. **Revisit if** the player's
+  refresh cadence proves slower than the rates move, which AD-10's propagated `asOf` is
+  what makes observable.
 - **Repository split.** The weights schema stays in this repo until the schema stops moving
   — `5.0.0` is the third breaking revision in seven days. Extraction is then mechanical.
 - **Weights production.** The scraper is a separate project and a **prerequisite**, not an
@@ -1422,8 +1887,11 @@ poe-crafting-base-price-checker/
 - **OQ-12 — the filter unit for a multi-`#` stat.** Exactly one fact defines it: which
   single quantity the `trade2` stat filter compares for a stat whose text carries two `#`.
   The producer's evidence points at the **average**, because a 56.5 range edge can only
-  arise from averaging two integers, but nobody has confirmed it against a live search, nor
-  confirmed the filter's acceptance of **non-integer** `min`/`max`. Under `5.0.0` the unit
+  arise from averaging two integers, but nobody has confirmed it against a live search.
+  **The non-integer half of this question is settled** (2026-09-19): the minimum request
+  body in `IMPLEMENTATION-NOTES.md` §5.1 carries `"value": {"min": 4.5}`, so the filter
+  accepts a non-integer edge and AD-16's no-rounding obligation is satisfiable rather than
+  merely stated. What remains is the identity of the quantity. Under `5.0.0` the unit
   binds **two parties independently** — the producer, which publishes `ranges`, and `core`,
   which derives an interval from them — so a disagreement now fails **loudly**, as
   edge-alignment errors, rather than silently as a wrong population. **A third unverified
@@ -1438,15 +1906,17 @@ poe-crafting-base-price-checker/
   that edge: `sync`'s builder**, by live verification recorded as a fixture (AD-13). **Owner
   for the unit: the weights
   scraper project**, by live verification. *Blocking for correctness, not for building.*
-- **OQ-19 — does any single stat line carry three or more `#`?** AD-17 compares a declared
-  edge against a derived edge for exact equality with no tolerance, and under `5.0.0`
-  `core` computes one side by dividing. Two `#` divide by two, which is exact in binary.
-  **Three or more divide by three or more, which is not**, and every reference against such
-  a line would fail edge alignment permanently, with nothing a curator could write to
-  satisfy it. Whether PoE2 publishes such a line is unknown — the producer's measurement
-  counts rows by stat *count*, a different axis. **The answer is a contract amendment, never
-  an epsilon in `core`. Owner: the weights scraper project.** *Blocking for correctness on
-  affected bases only.*
+- **OQ-19 — ~~does any single stat line carry three or more `#`?~~ Closed 2026-09-19: no,
+  two is the maximum.** AD-17 compares a declared edge against a derived edge for exact
+  equality with no tolerance, and `core` computes one side by dividing; two `#` divide by
+  two, which is exact in binary, so the division can never fail to terminate and no epsilon
+  is needed. **The answer is the player's, from the game's data, not a producer
+  measurement**, so `WEIGHTS-FILE-SCHEMA.md` now makes a `lines` entry carrying three or
+  more `#` a **validation error** — that turns an assertion about today's game into an
+  invariant the contract enforces, and a future patch that introduces such a line fails at
+  the file rather than as permanent, unsatisfiable edge-alignment errors on the affected
+  bases. Should that ever fire, the answer remains a contract amendment and never an epsilon
+  in `core`.
 - **OQ-21 — how far can whole-tier containment understate, and does the gap need a check?**
   AD-11 records that containment understates unevenly and therefore reorders, and that
   neither of the two mitigations is a bound. **Two shapes escape.** A **flush intrusion** is
@@ -1465,42 +1935,89 @@ poe-crafting-base-price-checker/
   question. **Owner: this spine, with the player, once the first conforming `5.0.0` file
   makes the frequency measurable.** *Not blocking for building; blocking for trusting the
   ordering.*
-- **OQ-20 — what `query.status` must carry, and whether it duplicates `sale_type`.** A
-  captured live browser search (2026-09-19) sends `{"option": "securable"}`, and AD-16's
-  search-construction table has never specified `query.status` at all. *Verified live
-  2026-09-19:* `/api/trade2/data/filters` publishes `securable` under `status_filters`
-  with the label **"Instant Buyout"** — so the value is documented by the very endpoint
-  AD-25 commits as `catalogue/filters.json`, and its label is strong evidence that it
-  expresses exactly what this AD's rule intends. **Two things remain open.** First, what
-  omitting the field does — a default could silently widen or narrow the population AD-17
-  weighs, which is the same class of defect as the `priced_with_info` trap. Second, and
-  newly raised by that label: **whether `status_filters.securable` and
-  `trade_filters.sale_type` overlap**, since AD-16 already requires the latter set to
-  *"Buyout or Fixed Price"*. Two filters expressing one intent may be redundant, may
-  compose, or may conflict, and only a live call distinguishes them. **Owner: `sync`'s
-  builder**, by comparing result sets across the combinations. *Not blocking for
-  `contracts`; blocking for a correct first price.*
-- **OQ-22 — what `trade2`'s exchange surface is, and what one query returns.** AD-20 sources
-  every currency rate from a bulk exchange query against divine, and `IMPLEMENTATION-NOTES.md`
-  §6 has always denominated `currencyStepSearches` on that assumption, but **no live call has
-  confirmed the endpoint, its request shape, its rate-limit bucket, or whether one query
-  covers the whole set**. The three consequences differ: a different bucket changes AD-8's
-  pacing, a per-currency shape changes AD-7's cap arithmetic, and no endpoint at all forces
-  the Deferred fallback. **Owner: `sync`'s builder**, by live verification recorded as a
-  fixture (AD-13). *Not blocking for `contracts` or `core`; blocking for a correct first
-  price, alongside OQ-20.*
-- **The trade-site search response's identifier field.** AD-9 persists `lastSearchId` and
-  AD-24 builds a URL from it, and neither names the field `sync` reads it out of — `id` and
-  `tradeId` are both plausible. The 2026-09-19 capture does not settle it: its `referer`
-  ends in an encoded-query blob, which is a different thing from a returned identifier.
-  **Owner: `sync`'s builder, by live verification against a recorded fixture (AD-13).** *Not
-  blocking.*
-- **Recipe distribution mechanics.** Nothing in the inputs supplies the numbers for how
-  perfect and greater transmute or augment shift the tier distribution. v1 ships a single
-  recipe under a documented assumption (AD-17). Ranking per `(base, recipe)` needs this
-  resolved. *Carried; the PRD defers it to v2.*
-- **Per-tier item level availability at the producer.** AD-11 requires `itemLevelMin` on
-  every weights entry and the trade API cannot supply it. Where the scraper sources it is the
-  producer's problem; if no source exists, the producer fills it by hand and stamps
-  `weightSource: "absent"`, which AD-27's coverage gate then measures. **Owner: the weights
-  scraper project.**
+- **OQ-20 — ~~what `query.status` must carry, and whether it duplicates `sale_type`.~~
+  Closed 2026-09-19.** `query.status` carries `{"option": "securable"}` and is always
+  emitted; `/api/trade2/data/filters` publishes that option under `status_filters` with the
+  label **"Instant Buyout"**, which is the intent AD-16's rule expresses. The duplication
+  half is closed by removal rather than by measurement: the minimum request body supplied by
+  the player (§5.1) carries `status` and **no `sale_type` at all**, so AD-16 no longer emits
+  `sale_type` and there is no second filter left to overlap with. The *what does omitting it
+  do* half is moot for the same reason — the field is never omitted.
+- **~~OQ-24 — what `trade_filters.filters.price` does, and whether AD-16 must emit it.~~
+  Closed 2026-09-19 on the player's answer: the filter reading holds, and AD-16 always emits
+  it.** `{"option": "exalted_divine"}` restricts the result set to listings denominated in
+  exalted or divine. The purpose is AD-20's: an unfiltered result set carries vaal, chaos and
+  every other denomination, each needing a hand-maintained rate before the median can be
+  taken. The narrowing the open question feared is real and is **accepted rather than
+  avoided** — AD-16 now records it beside its other accepted effects, which is what separates
+  it from the withdrawn `sale_type` trap: that one narrowed unmeasured and for no stated
+  gain. What no longer needs verifying is whether to emit the field; what a `sync` fixture
+  (AD-13) should still capture is the *shape* of a result set under it, so the sample-size
+  cost is visible in a recorded response rather than only asserted here.
+- **OQ-22 — ~~what `trade2`'s exchange surface is, and what one query returns.~~ Closed
+  2026-09-19: there is no exchange surface, and AD-20 no longer needs one.** The PoE2 trade
+  site publishes no currency exchange, so the question's premise is gone rather than
+  answered. AD-20 now sources rates from hand-maintained committed data, which removes the
+  currency step from AD-7's rotation, removes `data/currencies.json` from AD-12's request
+  sources, and retires the per-currency search fallback this question held under Deferred.
+  The cost is that rate freshness is now a human obligation; AD-20 discharges it through
+  AD-10's oldest-timestamp propagation rather than through a new alarm.
+- **~~OQ-23 — where a crafted base's item class is declared, so it can reach its pool.~~
+  Closed 2026-09-20: the premise was withdrawn, not answered.** None of its three candidates
+  was chosen. The question assumed a crafted tracked entry names a base type and must then
+  reach the pool its affixes need; the player settled (2026-09-20) that **modifier
+  combinations are curated per item class and a named base is tracked only as an
+  uncrafted item**, so AD-5's crafted arm now names the pool's own key and no
+  `baseTypeId → className` mapping exists anywhere in the system. Nothing was added to carry
+  one: no field on a tracked entry, no `baseTypes: []` beside a pool, no committed mapping
+  artifact, and no change to `WEIGHTS-FILE-SCHEMA.md`'s shape. The sub-question of whether
+  coverage counts per class or per base went with it — only classes are counted (AD-27).
+  The change is player-visible and the PRD moved first: `prd.md` **revision 17** carried it,
+  and this spine's revision 16 followed it. **`prd.md` revision 18 then moved the unit one
+  rung finer, to the item class, and this question is unaffected** — the premise it withdrew
+  is the same premise, and the finer unit withdraws it no less.
+- **~~OQ-25 — how much a crafted search's priced population is widened by the classes it
+  cannot exclude.~~ Closed 2026-09-20 on its second candidate, with no successor. The spread
+  is eliminated rather than accepted, and the premise this question recorded was wrong.**
+  It held that the mitigation was *incidental* — stat filters excluding the siblings by
+  accident, failing wherever both affixes were class-agnostic — and that the residual spread
+  was unmeasured. **A class is in fact reachable exactly, on the existing search, at no extra
+  request**, by its **defence signature**: the classes of one broad kind differ in which
+  defences their bases carry, so `equipment_filters` admits one and excludes its siblings
+  without ever naming a class. Measured against `data/weights.json` (`5.0.0`, patch `0.5.5`),
+  the signature is **complete**, not merely usually sufficient, in five of the six fan-out
+  categories — the armour classes of a family are exactly the distinct non-empty subsets of
+  {armour, evasion, energy shield}, so no sibling shares a triple — and the sixth, `jewel`,
+  carries no defences and is isolated by `query.type` on the class's own base type. **The
+  crafted branch still spends one search per tracked entry**, so the third candidate, pricing
+  per base type at the budget cost category altitude had just saved, was never needed.
+
+  **The objection that a rolled modifier could contradict the `max 0` half does not hold**,
+  and it is recorded closed so it is not re-raised: the defence type determines the rollable
+  pool, which is what the weights file's inner rung encodes, so no energy-shield modifier
+  sits in a dex chest's pool. Verified across all 28 defence-suffixed classes on 2026-09-20.
+  **What this question's closure bought is the mechanism behind `prd.md` FR-1's new
+  consequence** — no base outside the class contributes to a crafted row's price — which is
+  an absolute the old category-altitude search could not have satisfied. AD-16 owns the
+  shape, `IMPLEMENTATION-NOTES.md` §10 the derivation, and AD-17's fifth cross-file check
+  the guarantee that a class needing a discriminator always has one.
+- **~~The trade-site search response's identifier field.~~ Closed 2026-09-19: it is `id`.**
+  A captured search response carries the search identifier in a top-level `id`; `tradeId` is
+  not it. AD-9 persists that value as `lastSearchId` and AD-24 builds the outbound link from
+  it. The earlier capture's `referer` blob remains a different thing — the encoded-query URL
+  form, not a returned identifier — and settles nothing either way.
+- **~~Recipe distribution mechanics.~~ Closed 2026-09-19, and promoted into v1.** The
+  mechanic is a **Minimum Modifier Level** the orb imposes: greater transmutation and
+  augmentation floor it at **44**, perfect orbs at **70**, and a plain orb imposes none.
+  Weights already carry the matching quantity per tier as `itemLevelMin`, so the transform
+  needs no number the inputs lack — it truncates the pool from below and renormalises
+  (AD-17, `IMPLEMENTATION-NOTES.md` §9). The two floors are recipe data and live in
+  `data/recipes.json`. This changes player-visible behaviour — the ranking now reorders per
+  recipe rather than shifting by a constant cost — so the scope call was the PRD's to make,
+  not the spine's. **`prd.md` revision 16 made it**: the feature is out of v2, v1 ships two
+  recipes, and PRD OQ-5 closed with it.
+- **~~Per-tier item level availability at the producer.~~ Closed 2026-09-19: the producer
+  has it.** `itemLevelMin` is present on every tier of the conforming weights file, taken
+  verbatim from poe2db (`WEIGHTS-FILE-SCHEMA.md`), so AD-11's requirement is met from a real
+  source and the hand-filled `weightSource: "absent"` fallback is not the expected path. The
+  field now carries a second load: it is the quantity AD-17's recipe floor compares against.

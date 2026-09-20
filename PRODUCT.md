@@ -16,11 +16,11 @@ The author, and only the author. This is a single-player, single-operator tool (
 
 ## Product Purpose
 
-A PoE2 (Path of Exile 2) crafting base price checker. A background sync prices a curated set of base-and-modifier combinations against the official trade API; a static web view ranks Base Types by expected payout per craft, above a player-set payout threshold and net of craft cost. It replaces the player's manual memorisation of "which bases are worth picking up" — knowledge that normally costs weeks to rebuild after every league reset. Success is behavioural: the player stops opening the trade site mid-session, stops keeping a mental top-five list, and the tool keeps running for a year with no credential rot and no server to patch (PRD §8).
+A PoE2 (Path of Exile 2) crafting base price checker. A background sync prices a curated set of base-and-modifier combinations against the official trade API; a static web view ranks Item Classes by expected payout per craft, beside the Base Types worth selling uncrafted, above a player-set payout threshold and net of craft cost. It replaces the player's manual memorisation of "what is worth picking up" — knowledge that normally costs weeks to rebuild after every league reset. Success is behavioural: the player stops opening the trade site mid-session, stops keeping a mental top-five list, and the tool keeps running for a year with no credential rot and no server to patch (PRD §8).
 
 ## Positioning
 
-The ranking is expected value per craft, threshold-truncated at a player-adjustable payout floor and net of craft cost — not "most expensive base." A base with one jackpot combination and a base with many moderate combinations swap rank order as the threshold moves, which is the product's core mechanism (PRD §1). Every displayed figure also carries its Provenance (measured vs. uniform-prior) and freshness, so a placeholder-derived number is never presented indistinguishably from a measured one (PRD §4.4).
+The ranking is expected value per craft, threshold-truncated at a player-adjustable payout floor and net of craft cost — not "most expensive base." An Item Class with one jackpot combination and an Item Class with many moderate combinations swap rank order as the threshold moves, which is the product's core mechanism (PRD §1). The list carries two units: the crafted branch ranks Item Classes and the raw branch ranks Base Types, and each row states which it names (PRD FR-3). Every displayed figure also carries its Provenance (measured vs. uniform-prior) and freshness, so a placeholder-derived number is never presented indistinguishably from a measured one (PRD §4.4).
 
 ## Operating Context
 
@@ -32,14 +32,14 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Capabilities and Constraints
 
-- Magic Base Types only (at most one prefix, one suffix) plus Raw (uncrafted) Bases at item level 82 — rare items are explicitly out of scope (PRD §2.2, §7.1).
-- One Craft Recipe in v1 (one perfect transmute + one perfect augment); a second recipe is deferred (PRD §7.2).
+- Magic items only (at most one prefix, one suffix), tracked per Item Class, plus Raw (uncrafted) Bases at item level 82 — rare items are explicitly out of scope (PRD §2.2, §7.1).
+- Two Craft Recipes in v1 (greater transmute + greater augment; perfect transmute + perfect augment). The active recipe changes the ordering, not just the cost, so the ranking is read under one recipe at a time (PRD FR-1, FR-26).
 - No accounts, no backend, no server, no credentials that expire — static bundle delivery only (NFR-7). Any requirement that appears to need a backend is escalated, not implemented (PRD §6).
 - Zero network calls in the test path; all API interaction is tested against committed, real captured fixtures (NFR-1, NFR-2).
-- A hard external release dependency: the Weights File (pool membership, tier value ranges, item-level availability), produced by a separate scraper project. Until a conforming file exists, every crafted Base Type is Unrankable (PRD §7.3).
+- A hard external release dependency: the Weights File (pool membership, tier value ranges, item-level availability), produced by a separate scraper project. Until a conforming file exists, every Item Class is Unrankable (PRD §7.3).
 - Four-state pricing model (`priced`, `no-listings`, `not-yet-synced`, `unresolvable`) must always render distinctly — never collapsed, never implied to be zero/worthless (AD-9, FR-9).
 - Colour alone must never carry a product-meaningful distinction (Price State, crafted vs. Raw Base, Provenance) — NFR-10, extended beyond the spine's literal scope by this PRD.
-- Domain terminology (Base Type, Modifier Reference, Tracked Entry, Combination, Chase Combination, Payout Threshold, Craft Cost, Provenance, Eligible Pool, Unrankable, etc.) is fixed by the PRD Glossary (§3) and must be used verbatim, not re-synonymised, anywhere in product or design work.
+- Domain terminology (Item Class, Base Type, Modifier Reference, Tracked Entry, Combination, Chase Combination, Payout Threshold, Craft Cost, Provenance, Eligible Pool, Unrankable, etc.) is fixed by the PRD Glossary (§3) and must be used verbatim, not re-synonymised, anywhere in product or design work.
 
 ## Brand Commitments
 

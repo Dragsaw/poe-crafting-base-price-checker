@@ -1,21 +1,23 @@
 ---
 title: 'Weights File Contract'
-status: draft
-schemaVersion: '5.0.0'
+status: final
+governed_by: AD-17
+schemaVersion: '5.1.0'
 created: '2026-09-12'
-updated: '2026-09-19'
+updated: '2026-09-20'
 ---
 
 # Weights File Contract
 
-> **Producer-side draft.** This file is a working copy under `poe-mod-weights-producer`,
-> not the authoritative contract. The authoritative copy lives in
-> `poe-crafting-base-price-checker/docs/architecture/.../WEIGHTS-FILE-SCHEMA.md` and is
-> owned by that repo. `5.0.0` below is this producer's proposal for what the contract
-> should become, written here so consumer-side planning can start against it before the
-> producer rebuild lands. It does not take effect until adopted in the consumer repo.
-> See `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-18.md` for the
-> decision trail behind this revision.
+> **This is the authoritative contract**, owned by this repo (`poe-crafting-base-price-checker`)
+> and binding under the spine's AD-0 ("the weights contract itself"). `5.1.0` is adopted, as
+> of spine revision 17: the `className` grammar below is a normative, enforced rule, not a
+> pending proposal. A separate working copy may still exist inside the external
+> `poe-mod-weights-producer` scraper project for that project's own iteration, but that copy
+> is not authoritative and is not this file — this file is what the producer must satisfy and
+> what `sync`/`core` validate against. The decision trail for `5.1.0` is recorded in this
+> repo's `.memlog.md` (revisions 16–17); the producer-side proposal document that preceded it
+> was never part of this repository and is not cited here.
 
 The app **consumes** this file. The app never produces this file (AD-11). Any producer
 that satisfies this contract is acceptable. The app does not depend on which producer
@@ -25,6 +27,32 @@ wrote the file.
 carries. See *Why this file has to exist* below. The app therefore cannot rank any base
 type until a conforming file is present. The intended producer is a separate scraper
 project. This document is the contract that the scraper project must satisfy.
+
+## 5.1.0 — the inner key's grammar becomes normative
+
+**Additive, and minor rather than major on purpose.** No field is added, removed or
+reshaped, and **the conforming file of 2026-09-19 already satisfies this revision
+unchanged** — verified against all 59 classes on 2026-09-20. What changes is that a rule
+the producer was already following by convention is now one a consumer may rely on.
+
+**Why a consumer needs it.** Spine revision 17 moved the ranked crafted unit to the **item
+class**, and closed **OQ-25** by having the trade search reach that class exactly rather
+than pricing across its siblings. The filter that reaches it is derived from the **inner
+`className` key** — a defence signature for an armour class, the class's own base type for a
+jewel (spine AD-16, `IMPLEMENTATION-NOTES.md` §10). That derivation reads the key's
+structure, so the key's structure has to be a contract term rather than a habit. **Without
+this revision the consumer would be parsing a string the contract calls opaque**, and a
+producer renaming a pool would silently change which items get priced.
+
+| Change | Reason |
+| --- | --- |
+| The inner `className` key must match one of **two grammars**: a **defence-suffixed** name `<family>_<letters>`, where `<letters>` is a `_`-separated non-repeating sequence over `str` / `dex` / `int`; or a **plain** name carrying no such suffix | These are the two shapes the source already produces. The first encodes the class's defence type — `str` armour, `dex` evasion, `int` energy shield — which is the fact the consumer's search filter needs. |
+| **Every class of one fan-out category must be distinguishable** by its grammar: the defence-suffixed classes of one `categoryId` carry **distinct** letter sets, and a `categoryId` does not mix defence-suffixed and plain classes | This is what makes the derived filter exclusive rather than merely inclusive. It holds on the conforming file by construction — the armour families are complete subset lattices — so it is a rule that documents reality rather than one that asks for work. |
+| A **plain** `className` under a `categoryId` whose classes are all plain (today: `jewel`) is a **base type name with spaces written as underscores** | The consumer isolates such a class by `query.type`, and validates the result against the trade catalogue before sending it, so a name that is not a real base type fails loudly at load. |
+
+**This is a producer obligation with no new producer work**, and the rule is written so that
+a future patch which breaks it fails at the file rather than as a quietly wrong price. That
+is the same treatment `5.0.0` gave the three-`#` stat line.
 
 ## 5.0.0 — what changed and why
 
@@ -50,7 +78,8 @@ raw tier data.
 | A tier's stat lines are grouped under **`lines`**, each carrying its own `statId` and verbatim `ranges` | Replaces the `sourceModifierId`-grouped flat-entry model. A tier with two distinct stats (a hybrid modifier) is one entry with two `lines`, never two entries sharing an id. A tier with one stat that rolls two numbers is one entry with one line holding two ranges. See *Shape* below. |
 | `valueMin`/`valueMax` are **removed**; replaced by verbatim `ranges: [[min, max], ...]` per line | The producer no longer derives a single filter-comparable value from a two-number stat (the old "average of two numbers" rule). It reports the numbers as poe2db prints them. Deriving whatever value the trade filter actually compares against is now the consumer's job. |
 | `statLineCounts`, `poolCoverage`'s coupling to the cell math, `tierLabel` matching rules | `statLineCount` is superseded — a tier's line count is just `lines.length`, already on the entry, needing no separate field. `poolCoverage` is retained (see *Field rules*) but is no longer entangled with cohort/cell bookkeeping — it now states only whether the producer believes it enumerated every modifier in the pool. `tierLabel` is unchanged: display-only, never a matching key. |
-| `bases` keying, `producer` block, `gamePatch` requirement | Unchanged from `4.x`. |
+| `bases` keying is **two levels**, `(categoryId, className)` | **Changed from `4.x`**, which keyed a single level on the base type `type` string. A pool is published **per item class**, because that is the granularity poe2db publishes at and the granularity the game rolls at — every base type of one class shares one pool. The single-level key asserted a per-base pool that never existed. A `baseTypeId` never reaches a class: spine **OQ-23** asked how it would and was closed 2026-09-20 by withdrawing the question — a crafted tracked entry names `(categoryId, className)` itself (spine AD-5), and only an uncrafted base is tracked by `baseTypeId`. |
+| `producer` block, `gamePatch` requirement | Unchanged from `4.x`. |
 
 ## 4.1.0, 4.0.0, 3.0.0, 2.0.0 — superseded history
 
@@ -59,9 +88,8 @@ These four revisions built and then were superseded by the decomposition approac
 560 of 8,437 in-scope rows publish several stats at once, 53 of 63 item classes carry a
 two-number modifier, etc. — they just no longer drive this contract's shape. Their full
 text is not reproduced below, to avoid describing machinery this contract no longer
-specifies; this file is gitignored in this repo (never committed, so there is no commit
-history to point to for the pre-`5.0.0` text) — the authoritative record of the full
-`2.0.0`–`4.1.0` text is the consumer repo's own committed copy of this document.
+specifies; this file **is** git-tracked in this repo, and the authoritative record of the
+full `2.0.0`–`4.1.0` text is this document's own git history here.
 
 ## Why this file has to exist
 
@@ -80,7 +108,7 @@ API requests can replace this file.
 ## What the file is and is not
 
 **The file is** raw game modifier spawn weights, reported per tier exactly as poe2db
-publishes them, per base type and affix slot. Each entry names one poe2db tier
+publishes them, per **item class** and affix slot. Each entry names one poe2db tier
 (`sourceModifierId`) and carries one or more stat lines under `lines`, each resolved to
 a trade API `statId` where a match exists.
 
@@ -102,8 +130,8 @@ value range are both reported, unmodified, exactly as poe2db lists them.
 
 Unchanged in spirit from `4.x`, decoupled from the removed cell machinery.
 
-- A `(baseTypeId, slot)` entry that declares `poolCoverage: "complete"` **must enumerate
-  every modifier that can roll in that slot on that base at any item level.**
+- A `(categoryId, className, slot)` pool that declares `poolCoverage: "complete"` **must
+  enumerate every modifier that can roll in that slot on that item class at any item level.**
 - A producer that cannot guarantee that enumeration declares `poolCoverage: "partial"`.
 - **An unnamed placeholder row still counts as missing.** A source that publishes a
   blank placeholder (e.g. poe2db's `TBD` rows) and is dropped by the producer's
@@ -116,7 +144,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
 
 ```jsonc
 {
-  "schemaVersion": "5.0.0",           // semver; core refuses a major it does not know
+  "schemaVersion": "5.1.0",           // semver; core refuses a major it does not know
   "gamePatch": "0.5.5",               // operator-asserted at run time; never defaulted
   "producer": {
     "id": "poe2-weights-scraper",     // stable producer identifier
@@ -190,7 +218,8 @@ the producer computes from cell coverage — there are no cells to compute it fr
 | `schemaVersion` | Semver. `core` refuses a major version that `core` does not implement. `core` does not guess. |
 | `gamePatch` | A free-form GGG patch string, operator-asserted. Never `"unknown"`, never inferred. A producer refuses to run without it. |
 | `producer.id` | Stable across regenerations by the same producer. |
-| `bases` key | Two levels. Outer key is a trade category filter id (`categoryId`), spelled exactly as the trade category filter list spells it. Inner key is the poe2db `className` verbatim (never a derived display label) that resolved to that `categoryId` -- `className -> categoryId` is many-to-one (e.g. six armour `className`s collapse to `armour.gloves`), so one `categoryId` can carry several distinct `className` sub-keys, each with its own `{prefix, suffix}` pools. There is no cross-class ownership guard: `(categoryId, className)` cannot collide because `className`s are already distinct. Validated report-only by `sync` (AD-6, AD-25); a base absent from the file is unrankable. |
+| `bases` key | Two levels. Outer key is a trade category filter id (`categoryId`), spelled exactly as the trade category filter list spells it. Inner key is the poe2db `className` verbatim (never a derived display label) that resolved to that `categoryId` -- `className -> categoryId` is many-to-one (e.g. six armour `className`s collapse to `armour.gloves`), so one `categoryId` can carry several distinct `className` sub-keys, each with its own `{prefix, suffix}` pools. There is no cross-class ownership guard: `(categoryId, className)` cannot collide because `className`s are already distinct. Validated report-only by `sync` (AD-6, AD-25); an item class absent from the file is unrankable. **The pair is the consumer's own key for a crafted tracked entry** (spine AD-5), so a consumer looks a pool up at both rungs directly and **never falls back to a sibling `className`** under a `categoryId` it did find. The fan-out is real and measured on the 2026-09-19 file: 6 of 29 categories carry more than one class, `armour.chest` seven and `jewel` eight. **Since `5.1.0` the inner key also carries a normative grammar** — see the row below, and `5.1.0 — the inner key's grammar becomes normative`. |
+| `className` grammar (`5.1.0`) | The inner key is either **defence-suffixed**, `<family>_<letters>` with `<letters>` a `_`-separated non-repeating sequence over `str` / `dex` / `int` (`Body_Armours_str_dex`, `Boots_int`), or **plain**, carrying no such suffix (`Bows`, `Amulets`, `Time-Lost_Diamond`). Within one `categoryId`: defence-suffixed classes carry **distinct** letter sets, and defence-suffixed and plain classes are **never mixed**. A plain class under an all-plain fan-out `categoryId` is a **base type name with spaces written as underscores**. The consumer derives its trade-search class filter from this grammar (spine AD-16, `IMPLEMENTATION-NOTES.md` §10) and validates the base-type form against the trade catalogue before use, so a violation surfaces at load rather than as a wrong price. **`str` maps to armour, `dex` to evasion, `int` to energy shield** — that mapping is the point of the rule and is stated here because the consumer depends on it. |
 | `slot` | Exactly `prefix` and `suffix`. |
 | `poolCoverage` | See *The pool-completeness rule*. Required, with no default. |
 | `sourceModifierId` | **Required on every entry.** Names the poe2db tier this entry came from. One entry per tier — never split, never merged. Opaque to the app. |
@@ -215,14 +244,49 @@ source of truth; the shape above documents it and is not a parallel definition.
 - `weightSource` not one of `"published"` / `"absent"`
 - `lines` empty
 - a `lines[]` entry whose `ranges` contains a pair where `min > max`
+- a `lines[]` entry whose `ranges` carries **more than two** pairs. The game publishes at most
+  two `#` on a stat line (confirmed 2026-09-19, OQ-19), and `core` derives a line's interval by
+  dividing by that count: two divides exactly in binary, three or more does not, and AD-17
+  compares edges for equality with no tolerance. A three-`#` line would therefore fail edge
+  alignment permanently on every affected base, with nothing a curator could write to satisfy
+  it. Failing at the file turns that into one legible error and a contract amendment, which is
+  the only correct response — never an epsilon in `core`.
 - a duplicate `sourceModifierId` within one slot
+- a duplicate `statId` among one entry's own `lines` — a tier cannot roll the same trade stat
+  twice, so two lines naming it is a producer error, not a hybrid modifier (a hybrid modifier
+  is distinct `statId`s that roll together, which is exactly what `lines` exists to carry)
 - a missing or empty `gamePatch`
 - a missing `poolCoverage`
+- **(`5.1.0`)** an inner `className` key matching neither grammar above, or a `categoryId`
+  whose classes violate the distinctness or the no-mixing rule. The consumer derives its
+  class filter from this key (spine AD-16), so an unparseable or ambiguous key means it
+  cannot build a correct search — and the failure mode without this error is a price
+  gathered across sibling classes, which nothing downstream can distinguish from a good one.
+  **This is a whole-file refusal, and it is what makes spine `IMPLEMENTATION-NOTES.md` §2.6's
+  narrower, per-class check effectively unreachable against a file that passes this one** —
+  the distinctness and no-mixing halves of this same hard error are exactly what guarantee
+  every `className` lands in a discriminable arm of §10.2's grammar. §2.6 is kept as a
+  cross-file backstop (its consequence, if it ever fires, excludes just the one affected
+  class rather than refusing the file), not as a second path to the same outcome as this
+  hard error.
 
 **Not a file error:**
 
 - an unresolved `statId` (`null`) — reported by the producer, never a refusal
-- an uncatalogued `statId` or `bases` key — `sync`'s concern, report-only (AD-6), same as `4.x`
+- an uncatalogued `statId`, or an outer `categoryId` the trade category filter list does not
+  spell — `sync`'s concern, report-only (AD-6), same as `4.x`. **The inner `className` is not
+  checkable against the catalogue**: it is a poe2db name and AD-25's catalogue carries no class
+  axis, so `sync` validates the rung it can reach and reports the other as uncheckable rather
+  than as clean.
+
+  **That is no longer a gap, and spine revision 16 is why.** The note above cited **OQ-23**,
+  which asked how a tracked entry reached the pool `className` keys. It was closed by
+  withdrawing its premise: a crafted tracked entry now names `(categoryId, className)`
+  directly (spine AD-5), so **this file is the authority the `className` is checked against**
+  rather than a name needing an authority of its own. The check is the consumer's cross-file
+  gate (AD-12) — a tracked entry whose pair is absent from `bases` is unrankable with a
+  reason — and it needs nothing added here. **The `bases` key is unchanged by that closure**:
+  no `baseTypes: []` member was added, and none is wanted.
 - overlapping `ranges` across tiers of one family — expected and left as-is; the consumer resolves it if its ranking needs disjoint intervals
 
 ## Producer expectations
@@ -233,7 +297,8 @@ and in totals, how many stat lines resolved to a `statId` versus did not — thi
 
 ## Repository placement
 
-This document is currently drafted and iterated in `poe-mod-weights-producer` as a
-producer-side proposal. The authoritative copy, once `5.0.0` is agreed, lives in
-`poe-crafting-base-price-checker`. Moving the schema itself to a shared package remains
-Deferred, as in prior revisions.
+This document lives, and is authoritative, in `poe-crafting-base-price-checker`. Any copy
+inside the external `poe-mod-weights-producer` scraper project is that project's own working
+reference, not a second authority — a divergence between the two is that project's copy
+falling behind, never a live proposal awaiting adoption here. Moving the schema itself to a
+shared package remains Deferred, as in prior revisions.

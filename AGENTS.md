@@ -1,5 +1,5 @@
 <!-- bmad:context -->
-<!-- Verified 2026-09-19 against d49fd8f3c9c2e4ba2f9b9e4561aee6e2388775d3. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+<!-- Verified 2026-09-20 against 55fe390fc00071dd9843a1d04dfb55dcf17394c6. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
 
 ## poe-crafting-base-price-checker
 
@@ -11,6 +11,7 @@ PoE crafting base price checker. Pre-code: planning lives in `docs/` (PRD, archi
 - One command per call: no `&&`, `||`, `;`, or piping into a second program, unless the full pipeline is short and literal. Use separate calls instead.
 - No `cd` prefix — the working directory is already the project root. No `git -C <path>` — run `git <command>` directly.
 - For real logic (a loop, a conditional, string processing), write a script and run it as one literal command, e.g. `uv run script.py`.
+- Use the agent-browser skill for any browser interaction during development (testing the app in a browser, screenshots, UI verification, exploratory QA) — don't use claude-in-chrome or ad hoc browser automation.
 
 ## Where things are
 

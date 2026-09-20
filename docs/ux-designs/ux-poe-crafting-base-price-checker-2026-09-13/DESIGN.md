@@ -6,9 +6,9 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 2
+revision: 3
 created: 2026-09-13
-updated: 2026-09-19
+updated: 2026-09-20
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -111,6 +111,36 @@ typography:
     fontWeight: '400'
     lineHeight: '1.2'
 
+  # craft recipe control — the page's second ranking dial (PRD FR-26)
+  recipe-label:
+    fontFamily: '{typography.stack-sans.fontFamily}'
+    fontSize: 9.5px
+    fontWeight: '600'
+    lineHeight: '1.2'
+    letterSpacing: 0.16em
+  # The two recipes read as their distinguishing word, set in the serif at the
+  # threshold figure's register but far smaller — this is a choice between two
+  # named things, not a quantity, so it must not look like the figure beside it.
+  recipe-option:
+    fontFamily: '{typography.stack-serif.fontFamily}'
+    fontSize: 15px
+    fontWeight: '400'
+    lineHeight: '1.25'
+  # Craft Cost is set in TWO roles, borrowing {components.payout-threshold}'s own
+  # figure-plus-quiet-unit anatomy [decision — memlog 194]. It was a single 9.5px
+  # sans line until then, which made the figure that validates every EV on the page
+  # less legible than a rank numeral.
+  recipe-cost-figure:
+    fontFamily: '{typography.stack-serif.fontFamily}'
+    fontSize: 13px
+    fontWeight: '400'
+    lineHeight: '1.2'
+  recipe-cost:
+    fontFamily: '{typography.stack-sans.fontFamily}'
+    fontSize: 9.5px
+    fontWeight: '400'
+    lineHeight: '1.2'
+
   # trust strip and asking-price line
   trust-strip:
     fontFamily: '{typography.stack-sans.fontFamily}'
@@ -135,9 +165,21 @@ typography:
     fontSize: 12px
     fontWeight: '400'
     lineHeight: '1.2'
-  row-base-type:
+  # row-unit-name was row-base-type until revision 3 — it sets the name of whichever
+  # unit the row ranks, an Item Class or a Base Type. See {spacing.col-unit}.
+  row-unit-name:
     fontFamily: '{typography.stack-serif.fontFamily}'
     fontSize: 14px
+    fontWeight: '400'
+    lineHeight: '1.2'
+  # The unit glyph that opens every ranked row (PRD FR-3) [decision — memlog 184].
+  # Sans, so it cannot be mistaken for part of the serif name beside it.
+  # 11.5px, NOT 10px [decision — memlog 195]. It is the only cue for a distinction
+  # FR-3 requires on every row, it was the smallest mark on the page, and the 28px
+  # row has ~10px of headroom at the 14px serif. Raising it costs no budget.
+  row-unit-glyph:
+    fontFamily: '{typography.stack-sans.fontFamily}'
+    fontSize: 11.5px
     fontWeight: '400'
     lineHeight: '1.2'
   row-ev:
@@ -155,12 +197,9 @@ typography:
     fontSize: 10.5px
     fontWeight: '400'
     lineHeight: '1.2'
-  raw-base-tag:
-    fontFamily: '{typography.stack-sans.fontFamily}'
-    fontSize: 9px
-    fontWeight: '400'
-    lineHeight: '1.2'
-    letterSpacing: 0.13em
+  # raw-base-tag was here until revision 3 and is REMOVED. It set the `RAW BASE`
+  # word tag, which retired when the unit marker became a glyph [decision — memlog
+  # 184]. Nothing references it. Do not re-add it to bring the word back.
 
   # money-slot phrases (FR-9 / FR-4 resolution)
   money-phrase:
@@ -274,9 +313,13 @@ spacing:
   frame-padding-x: '24px'
   content-width: '1012px'   # 1060 − 48. Unchanged: the scrollbar came out of
                             # the gutters, never out of a column.
-  # the ranked-row column budget (memlog 40) — these six add to content-width, exact
+  # the ranked-row column budget (memlog 40) — these six add to content-width, exact.
+  # col-unit was col-base-type until revision 3. The column now holds BOTH ranked
+  # units — an Item Class on a crafted row, a Base Type on a raw one (PRD FR-3) —
+  # so the old name described only half of what it carries. The WIDTH is unchanged
+  # and no sum is reopened; this is a rename, not a re-cut. [decision — memlog 180]
   col-rank: '32px'
-  col-base-type: '222px'
+  col-unit: '222px'
   col-ev: '84px'
   col-provenance: '88px'
   col-age: '94px'
@@ -285,7 +328,7 @@ spacing:
   # per-column right padding — load-bearing, because every one of these columns
   # ellipsises and the padding decides how much text survives
   pad-rank-right: '10px'
-  pad-base-type-right: '8px'
+  pad-unit-right: '8px'
   pad-ev-right: '12px'
   pad-chase-cell-right: '10px'
   # the Unrankable appendix column budget — sums to 970px (1012 − 2 border − 40 padding)
@@ -335,7 +378,18 @@ spacing:
   '6': '24px'
   gutter: '34px'
   threshold-panel-width: '276px'
-  dek-max-width: '640px'
+  # The masthead's right-hand control group, added at revision 3 when the Craft
+  # Recipe became the page's second ranking dial (PRD FR-26) [decision — memlog 181].
+  # The arithmetic is exact and it is why dek-max-width moved:
+  #   216 recipe + 16 gap + 276 threshold            = 508px of controls
+  #   1012 content − 508 − 24 clearance              = 480px for the title and dek
+  # The dek therefore caps at 480, NOT 640. It must still set to two lines at that
+  # width — ~68 characters a line at {typography.dek} — because the vertical budget
+  # in Layout & Spacing commits a two-line dek at 42px. A three-line dek costs 21px
+  # of {spacing.frame-slack} and is a budget change, not a copy change.
+  recipe-panel-width: '216px'
+  masthead-control-gap: '16px'
+  dek-max-width: '480px'
 
 components:
   masthead:
@@ -350,23 +404,25 @@ components:
     dekMaxWidth: '{spacing.dek-max-width}'
     gapEyebrowToTitle: '{spacing.2}'
     gapTitleToDek: '{spacing.2}'
-    thresholdPlacement: '{components.payout-threshold} floated right inside the masthead block at {spacing.threshold-panel-width}, top-aligned with the eyebrow, cleared by the trust strip'
-    copyEyebrow: 'League {activeLeague} · one perfect transmute + one perfect augment'
+    controlPlacement: 'BOTH controls float right inside the masthead block as one group, top-aligned with the eyebrow and cleared by the trust strip: {components.craft-recipe} at {spacing.recipe-panel-width}, then {spacing.masthead-control-gap}, then {components.payout-threshold} at {spacing.threshold-panel-width}. The threshold keeps the outer edge it has always had. The recipe is the newcomer and takes the inboard slot.'
+    controlPanelsEqualHeight: 'both panels take the height of the taller, so their top and bottom rules line up. A ragged pair of boxes in a masthead reads as two accidents rather than as one control group.'
+    copyEyebrow: 'League {activeLeague} — the league alone. The Craft Recipe left the eyebrow at revision 3, because a recipe the player CHOOSES cannot be printed as an attribution fact. It is now {components.craft-recipe}.'
     copyTitle: 'the question the page answers, as a phrase — not a product name'
     copyDek: 'one sentence naming what the ordering is and that every figure is in Divine'
   ranked-row:
     height: '{spacing.row-height}'
     background: '{colors.paper}'
     borderBottom: '{spacing.hairline} solid {colors.rule-hairline}'
-    columns: 'rank {spacing.col-rank} · base {spacing.col-base-type} · ev {spacing.col-ev} · provenance {spacing.col-provenance} · age {spacing.col-age} · chase {spacing.col-chase}'
+    columns: 'rank {spacing.col-rank} · unit {spacing.col-unit} · ev {spacing.col-ev} · provenance {spacing.col-provenance} · age {spacing.col-age} · chase {spacing.col-chase}'
     rankType: '{typography.row-rank}'
-    nameType: '{typography.row-base-type}'
+    nameType: '{typography.row-unit-name}'
+    unitGlyph: '{components.unit-glyph-class} on a crafted row, {components.unit-glyph-raw} on a raw one. Leads the unit cell, before the name, at {spacing.1} of clear space. Never omitted — every ranked row states its unit (PRD FR-3).'
     evType: '{typography.row-ev}'
     markType: '{typography.row-mark}'
     chaseType: '{typography.row-chase}'
     chaseText: 'Accepted Tier then canonical short form, per affix · never the modifier value · e.g. "T1 Cold Res · T1 Mana" · see Layout & Spacing'
     numerals: 'tabular-nums on rank, EV and every figure'
-    padding: '{spacing.pad-rank-right} · {spacing.pad-base-type-right} · {spacing.pad-ev-right} · {spacing.pad-chase-cell-right}'
+    padding: '{spacing.pad-rank-right} · {spacing.pad-unit-right} · {spacing.pad-ev-right} · {spacing.pad-chase-cell-right}'
     hoverBackground: '{colors.paper-inset}'
     activeBackground: '{colors.paper-deep}'
     openMarker: '{spacing.open-row-marker} solid {colors.sepia} left rule, plus borderBottom to {colors.rule-strong}'
@@ -387,11 +443,8 @@ components:
     background: '{colors.paper-raw}'
     hoverBackground: '{colors.paper-raw-hover}'
     nameStyle: 'italic'
-    nameCell: 'flex: name flexes and ellipsises, tag is flex 0 0 auto and never truncates'
-    tag: '{typography.raw-base-tag}'
-    tagText: 'RAW BASE'
-    tagColor: '{colors.sepia}'
-    tagRule: '{spacing.hairline} solid {colors.sepia}'
+    nameCell: 'flex: glyph is flex 0 0 auto and leads, name flexes and ellipsises after it'
+    unitGlyph: '{components.unit-glyph-raw}'
     chaseSlot: 'one full-width note in {typography.row-chase}, italic, {colors.ink-tertiary}, naming the Item Level Floor'
     expansionNote: 'line two note cell of its single combination row reads "no affixes — this Base Type priced as it drops, at Item Level 82"'
   column-header:
@@ -400,15 +453,48 @@ components:
     borderBottom: '{spacing.hairline} solid {colors.rule-strong}'
     paddingBottom: '{spacing.1}'
     layout: 'the same six fixed-width flex cells as {components.ranked-row}, never inline-block spans'
-    labels: '(blank) · Base Type · EV (Divine) · Provenance · Age · Chase Combinations, by contribution to EV'
+    labels: '(blank) · Item Class / Base Type · EV (Divine) · Provenance · Age · Chase Combinations, by contribution to EV'
+    labelsRule: 'the second label names BOTH ranked units because the column holds both (PRD FR-3). The header says what the column can contain; {components.unit-glyph-class} and {components.unit-glyph-raw} say which one any given row is. ~22 characters at {typography.column-header} is ~185px inside {spacing.col-unit} less {spacing.pad-unit-right} — 214px available, so it fits as tracked.'
     trailingLetterSpace: 'not trimmed. Every label fits its column as tracked. A column header never ellipsises.'
+  # THE UNIT GLYPHS. Added at revision 3 [decision — memlog 184]. They say which of
+  # the two ranked units a row names (PRD FR-3). They are NOT trust marks and must
+  # never be read as one: a trust mark says something is wrong with what a figure
+  # rests on, and a unit glyph says nothing about the figure at all. That is why
+  # both take {colors.sepia} — structural and meaningless by the rule in Colors —
+  # and why neither may ever take {colors.ochre} or {colors.rust}.
+  # BOTH unit glyphs sit in a FIXED-WIDTH box [decision — memlog 195]. Without one
+  # they are `flex: 0 0 auto` over two different advances — ≡ is 6.84px and ▪ is
+  # 3.54px at 10px — so a crafted row's name started 3.3px right of a raw row's,
+  # leaving a ragged left edge down the page's primary scan column. The box is
+  # sized to the wider glyph and both centre in it, so every name starts at the
+  # same x whatever branch the row is on.
+  unit-glyph-box: '14px, {spacing.1} of clear space after it, glyph centred, flex 0 0 auto'
+  unit-glyph-class:
+    glyph: '≡'
+    color: '{colors.sepia}'
+    typography: '{typography.row-unit-glyph}'
+    box: '{components.unit-glyph-box}'
+    means: 'this row is an Item Class — the crafted branch'
+    mnemonic: 'a stack of rules: a class holds several Base Types and the row ranks the class, not any one of them (PRD FR-1, §3 Item Class)'
+    knownWeakness: 'at 11.5px ≡ is three ~1px strokes with ~1px gaps, and an angled glance across a desk closes those gaps first. What survives is a 5.3x5.5px mass against ▪''s 2.6x2.6px — a SIZE contrast, on a page whose Typography section bans size as an emphasis axis. The pair was kept at the user''s direction after a proposed § / ▪ swap was declined; the size raise from 10px to 11.5px is the mitigation. Recorded so nobody rediscovers it as a defect.'
+  unit-glyph-raw:
+    glyph: '▪'
+    color: '{colors.sepia}'
+    typography: '{typography.row-unit-glyph}'
+    box: '{components.unit-glyph-box}'
+    means: 'this row is a single Base Type, uncrafted — the raw branch'
+    mnemonic: 'one solid mark against the class glyph''s three: one base, priced as it drops'
+    adjacencyNote: '▪ is a square and {components.price-state-glyph}.priced is a circle ●. They never share a surface — the unit glyph is in the ranked row''s unit cell, the price-state glyph is in an expansion''s state cell — and they differ in shape as well as in place. Recorded the same way the ×-at-two-weights adjacency is recorded below, so a builder meets it here rather than discovering it.'
   # A trust mark carries colour, weight, glyph and word only. It takes the type
   # size of the line it sits in — {typography.row-mark} in a ranked row,
   # {typography.appendix-row} in the appendix, {typography.key-body} in the key
   # block — so the vocabulary is one vocabulary at whatever size the line is.
+  # EVERY GLYPH BELOW IS RESIDENT IN SEGOE UI REGULAR, SEMIBOLD AND BOLD, and that
+  # is a hard rule of this vocabulary [decision — memlog 196]. See the Typography
+  # section, "The vocabulary is one typeface, and that had to be earned".
   trust-mark-prior:
     color: '{colors.ochre}'
-    glyph: '◇'
+    glyph: '◊'
     word: 'prior only'
     fontWeight: '600'
   trust-mark-unknown:
@@ -418,34 +504,76 @@ components:
     fontWeight: '600'
   trust-mark-stale:
     color: '{colors.rust}'
-    glyph: '↻'
+    glyph: '»'
     word: 'priced Nd ago | tried Nd ago'
     fontWeight: '700'
   trust-mark-never:
     color: '{colors.rust}'
-    glyph: '↻'
+    glyph: '»'
     word: 'never attempted'
     fontWeight: '700'
     fontStyle: 'italic'
   trust-mark-unresolvable:
     color: '{colors.rust}'
-    glyph: '✕'
+    glyph: '×'
     word: 'unresolvable'
     fontWeight: '700'
   # Distinct role from the trust marks: these label a Price State inside an
-  # expansion. ✕ therefore appears twice on purpose — at 700 as the ranked-row
+  # expansion. × therefore appears twice on purpose — at 700 as the ranked-row
   # trust mark, at 600 as the expansion's Price State glyph. Not a contradiction.
   price-state-glyph:
     priced: '●'
     no-listings: '○'
-    not-yet-synced: '△'
-    unresolvable: '✕ in {colors.rust}, fontWeight 600'
+    not-yet-synced: '∆'
+    unresolvable: '× in {colors.rust}, fontWeight 600'
+    massNote: '● is 4.9px of ink and ○ is 8.3px at the same size — the filled and hollow circles are NOT mass-matched, because Segoe UI draws them that way and no resident pair does better. The filled/hollow contrast is what carries the distinction and it survives; the size difference is a property of the face, not a signal. Do not try to correct it with font-size.'
   money-slot:
     typography: '{typography.money-phrase}'
     fontStyle: 'italic'
     color: '{colors.ink}'
     colorUnresolvable: '{colors.rust}'
     phrases: 'an open question | no figure yet | not valued | unknown'
+  # The page's SECOND ranking dial, added at revision 3 (PRD FR-26)
+  # [decision — memlog 181/182]. It is a sibling of {components.payout-threshold}
+  # and takes that panel's chrome exactly, because the two do the same kind of work:
+  # both reorder the list with no round trip, and a player who learns one has
+  # learned the other.
+  craft-recipe:
+    width: '{spacing.recipe-panel-width}'
+    background: '{colors.paper-inset}'
+    border: '{spacing.hairline} solid {colors.rule-hairline}'
+    padding: '13px 15px'
+    label: '{typography.recipe-label}'
+    labelColor: '{colors.ink-tertiary}'
+    labelText: 'CRAFT RECIPE'
+    option: '{typography.recipe-option}'
+    optionSeparator: '{components.trust-strip} separator — a | in {colors.ink-tertiary}, padding 0 9px'
+    optionSeparatorRule: 'a PIPE, never the page''s middle dot [decision — memlog 193]. In every chase cell `·` JOINS — `T1 Cold Res · T1 Mana` means this affix AND that one. Here the two options are exclusive, so the dot would carry the opposite operator in the same ink on one page, and `greater · perfect` would be structurally identical to a chase cell at a glance. The trust strip already owns a divider for independent facts; this reuses it.'
+    activeColor: '{colors.ink}'
+    activeWeight: '700'
+    activeRule: '2px solid {colors.sepia} under the active word only'
+    activeRuleWhy: 'TWO pixels, not one [decision — memlog 192]. {components.payout-threshold}''s valueHoverRule is `1px solid {colors.sepia}` and means THE POINTER IS ON THIS. These two panels are deliberately chrome-identical siblings 16px apart, so an identical 1px solid rule here would mean `this is the current value` beside a rule meaning `you are hovering this`. Doubling it keeps active distinguishable from any hover state on the page.'
+    inactiveColor: '{colors.ink-secondary}'
+    inactiveWeight: '400'
+    inactiveRestingRule: '{spacing.hairline} dotted {colors.sepia} — PRESENT AT REST, not on hover'
+    inactiveHoverRule: '{spacing.hairline} solid {colors.sepia}'
+    inactiveHoverColor: '{colors.ink}'
+    affordanceRule: 'the resting dotted rule is the whole point [decision — memlog 191]. This document declares dotted sepia the page''s ONE vocabulary for `this is clickable`, and says of the threshold figure that the resting dotted rule is what makes it read as editable rather than as a label. Through revision 3 this control carried that rule on HOVER ONLY — and the page is read at an angle from across a desk with the pointer in the game, so an affordance that exists only under the pointer does not exist in the scene the page was designed for. On hover the dotted rule promotes to solid sepia, which is exactly what {components.expand-affordance} already does.'
+    affordanceAsymmetry: 'the dotted rule goes on the INACTIVE option only, never on the active one. Dotted means `you can click this`; the active word is not a click target, so dotting it would be a lie. At rest the panel therefore reads as one word chosen (ink, 700, solid double rule) beside one word available (ink-secondary, 400, dotted rule) — which is what it is.'
+    cursor: 'pointer on an inactive option only. The active option is not a click target — there is nothing to switch to.'
+    # WHAT THE OPTIONS SAY. This resolves the open item memlog 107 recorded.
+    optionText: 'each recipe reads as the ONE WORD that distinguishes its composition — `greater` and `perfect` — never as an invented display name and never as the full composition. v1''s two recipes are one greater transmute + one greater augment and one perfect transmute + one perfect augment (PRD FR-26), so the orb grade is the whole difference and the whole word.'
+    optionTextLimit: 'this rule holds while every recipe in `recipes.json` reduces to a distinct single word. A recipe that does not is a copy decision nobody has taken, and it must NOT be resolved by inventing a name — `recipes.json` declares no display string, which is the fact memlog 107 recorded and revision 3 did not change.'
+    optionTextWhyNotComposition: 'the full composition ran in the masthead eyebrow at revision 2, when there was one recipe and it was attribution. Printing two full compositions side by side is ~60 characters in a 216px panel, and the words they share carry none of the choice.'
+    costFigure: '{typography.recipe-cost-figure} in {colors.ink}, tabular-nums — the figure alone'
+    cost: '{typography.recipe-cost}'
+    costColor: '{colors.ink-secondary}'
+    costText: 'the active recipe''s Craft Cost, in Divine, at 2dp, reading `N.NN Divine / craft` — the page''s ONLY printing of Craft Cost (PRD FR-26). The FIGURE takes {typography.recipe-cost-figure}; `Divine / craft` stays at {typography.recipe-cost} in {colors.ink-secondary}.'
+    costTypeWhy: 'the figure is set in the serif at 13px, not in 9.5px sans [decision — memlog 194]. `core` subtracts Craft Cost once per Item Class and it sits under every crafted EV in the ranking, so if it is wrong, stale or uncostable the whole crafted branch is wrong — and this is deliberately the only place it is ever printed. At 9.5px it was less legible than a rank numeral, which states the inverse of its importance. It borrows {components.payout-threshold}''s figure-plus-quiet-unit anatomy, which also strengthens the sibling reading this control depends on. It costs nothing: the panel carries ~21px of interior slack from controlPanelsEqualHeight, which margin-top:auto was already spending on a void.'
+    costAbbreviation: '`/ craft` is the one contraction this panel allows, because it shortens no Glossary term. *Divine* is spelled, as everywhere.'
+    costRule: 'it sits under the options, inside this panel, because Craft Cost is a property of the recipe and not of a row: `core` subtracts it once per Item Class and it is identical down every crafted row (AD-17). Printing it here states it once where it is true. It is never a ranked-row column and never repeated per row.'
+    costUncostable: 'a recipe whose currency has no current rate for the active league is UNCOSTABLE, never costed at zero (PRD FR-26, AD-20). The cost line then holds a {components.money-slot} phrase — *no figure yet* — and never a number. See State Patterns in EXPERIENCE.md for what the ranked list does in that state.'
+    readoutInteractive: 'n/a — this panel has no readout. {components.payout-threshold}''s track answers "where does this value sit in a range", and a choice between two named things has no range to sit in.'
   # The figure IS the input (memlog 73). There is no field, no box, no form chrome.
   payout-threshold:
     width: '{spacing.threshold-panel-width}'
@@ -484,7 +612,7 @@ components:
     labelColor: '{colors.ink}'
     labelWeight: '600'
     cursor: 'pointer'
-    affordance: '{typography.expand-affordance} in {colors.sepia}, right-aligned on the first line: "+ the full sync report" closed, "— the full sync report" open'
+    affordance: '{typography.expand-affordance} in {colors.sepia}, right-aligned on the first line: "+ the full sync report" closed, "− the full sync report" open'
     affordanceHoverRule: '{spacing.hairline} dotted {colors.sepia}'
     restingFacts: 'line 1 lead "Weights File", then "producer", "generatedAt", "gamePatch" — line 2 "Last synced", then "Tracked List last edited"'
     restingFactsRule: 'five plain facts, unconditional, no mark and no colour on any of them. They are attribution, not health signals.'
@@ -529,7 +657,10 @@ components:
     countColor: '{colors.rust}'
     rowHeight: '{spacing.appendix-row-height}'
     rowType: '{typography.appendix-row}'
-    columns: 'base {spacing.col-appendix-base} · mark {spacing.col-appendix-mark} · reason {spacing.col-appendix-reason} · note {spacing.col-appendix-note}'
+    columns: 'item class {spacing.col-appendix-base} · mark {spacing.col-appendix-mark} · reason {spacing.col-appendix-reason} · note {spacing.col-appendix-note}'
+    unit: 'every row here is an ITEM CLASS. Unrankability governs the crafted branch only — a Raw Base needs no Eligible Pool and ranks regardless (PRD FR-4) — so a Base Type never appears in this appendix.'
+    unitGlyph: '{components.unit-glyph-class}, leading the first cell exactly as it leads a ranked row. The appendix holds one unit, but the glyph is what ties a class here to the same class in the list.'
+    reasonStrings: 'verbatim from PRD FR-4, and there are exactly two: `pool partial` and `class absent from weights file`. The second was `base absent from weights file` until revision 3 and the literal MOVED — see Do''s and Don''ts.'
     lastRowRule: 'none'
   key-block:
     borderTop: '{spacing.hairline} solid {colors.rule-strong}'
@@ -567,6 +698,8 @@ components:
   # adding an SVG or image asset — the page still downloads nothing (NFR-7).
   trade-link:
     glyph: '↗'
+    fontWeight: '400'
+    fontWeightWhy: 'PINNED at 400, and this is not cosmetic [decision — memlog 196]. U+2197 is present in Segoe UI Regular but ABSENT from Segoe UI Semibold and Bold, so the moment this glyph is set at 600 or 700 it falls out of the page''s typeface into Segoe UI Symbol at a different advance. It is the one mark in the vocabulary that is resident at only one weight. Do not bold it.'
     restColor: '{colors.ink-tertiary}'
     hoverColor: '{colors.sepia}'
     typography: 'takes the type size of the line it sits in, same rule as a trust mark'
@@ -581,6 +714,8 @@ components:
     rowColor: '{colors.ink-tertiary}'
     nameDecoration: 'line-through'
     marker: '† pruned'
+    toggleGlyph: '+ closed, − open — the {components.expand-affordance} vocabulary, not a disclosure triangle'
+    toggleGlyphWhy: 'was ▸ / ▾ until revision 3 [decision — memlog 196]. Both fall out of Segoe UI into Segoe UI Symbol, and this document already says the expand affordance is one vocabulary everywhere it appears. Unifying on + / − fixes the fallback and the inconsistency in one move: every openable thing on the page now opens with the same sign.'
     lastRowRule: 'none'
     rowShape: 'the two-line {components.combination-row}, with line two re-cut'
     line2Columns: 'prune reason {spacing.col-combination-note} · removal date {spacing.col-tombstone-removed}'
@@ -588,9 +723,11 @@ components:
   expand-affordance:
     typography: '{typography.expand-affordance}'
     color: '{colors.sepia}'
+    signs: '+ closed, − open (U+2212 MINUS SIGN, not an em dash). Every openable thing on the page uses this one pair, including {components.tombstone-band}''s toggle from revision 3.'
     toggleRule: '{spacing.hairline} dotted {colors.sepia}'
-    listCopyClosed: '+ Read the remaining {N} Base Types'
-    listCopyOpen: '— Show only the top 20'
+    listCopyClosed: '+ Read the remaining {N} rows'
+    listCopyOpen: '− Show only the top 20'
+    listCopyRule: 'it reads `rows`, not a unit name. The list is mixed — the remainder holds Item Classes and Base Types together (PRD FR-3) — so naming either unit would misdescribe the other. It was `{N} Base Types` until revision 3, when that stopped being true of the whole list. [decision — memlog 180]'
   running-foot:
     borderTop: '{spacing.hairline} solid {colors.rule-hairline}'
     typography: '{typography.running-foot}'
@@ -667,8 +804,10 @@ from the page: the threshold control, the Unrankable appendix, the uniform-prior
 banner. `{colors.paper-deep}` `#F0EADA` goes one step further back and has
 exactly two uses, both of them momentary or set-apart: the tombstone band, and
 a row under the pointer. `{colors.paper-raw}` `#F7F3E6` is the faint tint on a
-Raw Base row — never on its own, always with an italic name and the word
-*RAW BASE* (FR-3 forbids colour-alone). `{colors.paper-raw-hover}` `#F2EDDC` is
+Raw Base row — never on its own, always with an italic name and the
+`{components.unit-glyph-raw}` glyph (FR-3 forbids colour-alone). It carried the
+word *RAW BASE* until revision 3, and the glyph now does that work.
+`{colors.paper-raw-hover}` `#F2EDDC` is
 that tint hovered: `paper-raw` stepped toward `paper-deep` by the same distance
 `paper` steps to `paper-inset`, so a hovered Raw Base row still reads as a Raw
 Base row instead of collapsing onto the ordinary hover tone.
@@ -685,9 +824,44 @@ first without being bigger.
 the column header, `{colors.edge}` `#D2CAB2` around panels and the frame.
 
 **`{colors.sepia}` `#6B4A22` is structural and means nothing.** Masthead
-eyebrow, threshold fill, the Raw Base tag, the expand affordance. It is warm
-and it is decorative and it never marks a state. If sepia ever starts to mean
-something, it dilutes the two semantic inks below.
+eyebrow, threshold fill, the expand affordance, the active Craft Recipe's rule,
+and **both unit glyphs**. It is warm and it is decorative and it never marks a
+state. If sepia ever starts to mean something, it dilutes the two semantic inks
+below.
+
+**Sepia may mark what the operator has CHOSEN; it may never mark what the data
+IS** `[decision — memlog 192]`. That sentence is the whole rule, and revision 3
+had to write it because it had started breaking it silently.
+
+The Do's and Don'ts forbid letting sepia mean a state — and revision 3 gave
+`{components.craft-recipe}` a sepia rule under the active option, which is a
+state marker by any honest reading. The two sat in the same table row
+contradicting each other. **The resolution is a distinction, not an exception.**
+A *choice* is something the player made and can unmake with one click; an
+*epistemic state* is something the data is, which he cannot change at all. Sepia
+carries the first: the active recipe's rule, the threshold's readout fill, every
+affordance, both unit glyphs. Ochre and rust carry the second, and nothing else
+may.
+
+*This is what stops the next component reaching for it.* Two live `[NOTE FOR UX]`
+items want a colour — the `pinned` Curation Status and the curation fallback —
+and memlog 173 refused them the retired slate on the ground that neither says
+anything about the figure. Sepia is not a semantic ink, so that refusal did not
+reach it, and after the active recipe's rule sepia was the obvious next home for
+both. It is now closed to them on a stated test rather than by precedent:
+`pinned` is a **Curation Status**, a fact about the Tracked List that the player
+did not choose on this page, and the fallback is a **curation gap**. Neither is
+an operator choice. Both still want a non-colour cue.
+
+*The unit glyphs are the load-bearing case of the sepia-means-nothing rule*
+`[decision — memlog 184]`. `{components.unit-glyph-class}` `≡` and `{components.unit-glyph-raw}` `▪`
+say which of the two ranked units a row names (PRD FR-3). They are in the sepia
+register and **not** in the semantic one, because a unit is not a state: knowing
+that a row is an Item Class tells you nothing about whether its figure is sound.
+Letting them reach for ochre or rust would be the same mistake memlog 173
+refused for `pinned` and for the curation fallback, and it would cost more —
+these two glyphs appear on **every** row, so an ink admitted here would be an ink
+on twenty rows in twenty, which is the end of silence-means-healthy.
 
 **Two semantic inks. There are two, and a third is not available.**
 Each ink always comes with a glyph *and* a word, so removing the colour removes
@@ -696,9 +870,9 @@ See Do's and Don'ts.
 
 | Ink | Hex | Means | Mark |
 |---|---|---|---|
-| `{colors.ochre}` | `#8A5A12` | Provenance `uniform-prior` — someone invented this weight | ◇ *prior only* |
+| `{colors.ochre}` | `#8A5A12` | Provenance `uniform-prior` — someone invented this weight | ◊ *prior only* |
 | `{colors.ochre}` | `#8A5A12` | Provenance `absent` from a `partial` pool — an upper bound, not an estimate | ? *unknown* |
-| `{colors.rust}` | `#8E3B1E` | Staleness, *never attempted*, and `unresolvable` — the things a patch or a stalled sync did | ↻ / ✕ with the word |
+| `{colors.rust}` | `#8E3B1E` | Staleness, *never attempted*, and `unresolvable` — the things a patch or a stalled sync did | » / × with the word |
 
 Ochre carries two states and rust carries three. They are told apart by glyph
 and word, not by hue: degraded-weight is one family and broken-or-old is
@@ -743,19 +917,26 @@ anything that labels it. The split is not decorative: it means the eye can tell
 a figure from a note about a figure without reading either.
 
 - **Serif — `{typography.stack-serif.fontFamily}`.** The masthead title, the
-  dek, Base Type names, EV figures, appendix rows, expansion titles and detail
-  rows. Numerals are tabular everywhere a column of numbers exists
-  (`font-variant-numeric: tabular-nums` on rank, EV and price).
+  dek, ranked-unit names (an Item Class or a Base Type alike), EV figures, the
+  threshold figure, the Craft Recipe's two options, appendix rows, expansion
+  titles and detail rows. Numerals are tabular everywhere a column of numbers
+  exists (`font-variant-numeric: tabular-nums` on rank, EV and price).
 - **Sans — `{typography.stack-sans.fontFamily}`.** Column headers, eyebrow,
-  every trust mark and every word beside one, chase-combination text, the
-  money-slot phrases, the key block, the running foot, listing counts and ages.
+  every trust mark and every word beside one, **both unit glyphs**,
+  chase-combination text, the money-slot phrases, the Craft Cost line, the key
+  block, the running foot, listing counts and ages.
+
+*The unit glyph is sans although the name beside it is serif*, and that is
+deliberate. The glyph labels the name; it is not part of it. The page's whole
+type argument is that the eye can tell a figure from a note about a figure
+without reading either, and a unit marker is a note about a name.
 
 Both stacks are system-resident. The page downloads no font. The page is static
 and must paint before it fetches anything.
 
 **Rank emphasis is carried by weight, never by size** (memlog 31b). Every
-ranked row is `{spacing.row-height}` tall and every Base Type name is
-`{typography.row-base-type.fontSize}`, from rank 1 to rank 20. Ranks 1–5 take
+ranked row is `{spacing.row-height}` tall and every unit name is
+`{typography.row-unit-name.fontSize}`, from rank 1 to rank 20. Ranks 1–5 take
 `fontWeight: 700` on the name and the EV, plus a sepia rank numeral. Ranks 6–10
 take a mid-ink numeral. The rest are quiet. Nothing in the top five is larger
 than anything in the bottom five. *The v1 direction gave the top five a 36px
@@ -766,6 +947,38 @@ marks (rust) sit at `700`, and *never attempted* adds italic — the one row wit
 no age at all is also the one mark set in italic, so it is distinct from a
 merely old row without a second colour.
 
+**The vocabulary is one typeface, and revision 3 had to earn that**
+`[decision — memlog 196]`. This section claimed for two revisions that the marks
+were "one vocabulary rendered at four line sizes, not four vocabularies."
+**Typographically that was false.** Read against the actual font binaries, seven
+of the marks in use were *absent* from Segoe UI and silently substituted by
+Segoe UI Symbol — a different face, at roughly 8.6px of advance against Segoe
+UI's ~6px. The page was mixing two typefaces in one line and calling it one
+vocabulary.
+
+Every mark was re-picked against a hard rule: **a glyph must be resident in
+Segoe UI Regular, Semibold *and* Bold**, because trust marks render at 600 and
+700 and a character present only in the regular face still falls back when it is
+bolded. What changed, and why each replacement is the nearest resident twin
+rather than a new idea:
+
+| Role | Was | Now | Note |
+|---|---|---|---|
+| `uniform-prior` | `◇` U+25C7 | **`◊`** U+25CA | The lozenge is the resident hollow diamond. Same silhouette, same meaning |
+| stale · never attempted | `↻` U+21BB | **`»`** U+00BB | The weakest substitution, chosen for mutual distinctness rather than iconicity. Nothing resident says *clock*, and the mark never appears without its word — *priced 5d ago*, *tried 9d ago*, *never attempted* — which is what carries the meaning under this page's own glyph-plus-word rule |
+| `unresolvable` | `✕` U+2715 | **`×`** U+00D7 | Near-identical silhouette, and Latin-1, so resident everywhere |
+| `not-yet-synced` | `△` U+25B3 | **`∆`** U+2206 | The increment sign, **not** the Greek letter at U+0394. Same outlined triangle, and a mathematical symbol rather than text is the honest codepoint for a mark that is not a letter |
+| tombstone toggle | `▸` `▾` | **`+`** **`−`** | Both triangles fell back, and this document already declares the expand affordance one vocabulary everywhere it appears. Every openable thing on the page now opens with the same sign |
+| trade link | `↗` U+2197 | **`↗`** kept | Resident in Regular **only**. Pinned to `fontWeight: 400` in `{components.trade-link}`; bolding it drops it out of the face |
+
+Unchanged because they were already resident: `●` `○` `†` `?` `≡` `▪`.
+
+*One mismatch survives and is not a defect to fix.* `●` is 4.9px of ink and `○`
+is 8.3px at the same size, because Segoe UI draws them that way and no resident
+pair does better. The **filled against hollow** contrast is what carries
+`priced` from `no-listings`, and it survives; the size difference is a property
+of the face rather than a signal. Do not try to correct it with `font-size`.
+
 **A trust mark has no size of its own.** It carries colour, weight, glyph and
 word, and it takes the type size of the line it sits in:
 `{typography.row-mark}` in a ranked row, `{typography.appendix-row}` in the
@@ -774,10 +987,12 @@ Unrankable appendix, `{typography.key-body}` in the key block, and
 vocabulary rendered at four line sizes, not four vocabularies — the mark is
 recognised by its glyph and its word, which never change.
 
-**Tracking.** Every uppercase label is tracked out — `0.13em` on the Raw Base
-tag, `0.16em` on the threshold label and the tombstone band, `0.18em` on key
-headings, `0.2em` on column headers, `0.22em` on the masthead eyebrow. Uppercase
-appears only at these five sizes and never in a sentence.
+**Tracking.** Every uppercase label is tracked out — `0.16em` on the threshold
+label, the Craft Recipe label and the tombstone band, `0.18em` on key headings,
+`0.2em` on column headers, `0.22em` on the masthead eyebrow. Uppercase appears
+only at these **four** sizes and never in a sentence. *It was five until
+revision 3: `0.13em` set the `RAW BASE` word tag, which retired when the unit
+marker became a glyph* `[decision — memlog 184]`.
 
 **Every role declares a `lineHeight`, and that is load-bearing.** The reference
 render omitted them and fell to the browser's ~1.2. Mantine does not do that.
@@ -785,9 +1000,9 @@ render omitted them and fell to the browser's ~1.2. Mantine does not do that.
 headings ramp. Either value would break the `{spacing.row-height}` row, the
 1920px fit and `{spacing.frame-slack}` at once. So:
 
-- **Every in-row role is `1.2`** — `row-base-type`, `row-ev`, `row-rank`,
-  `row-mark`, `row-chase`, `money-phrase`, `detail-row`, `detail-meta`,
-  `appendix-row`, and every tracked uppercase label. At 14px, the tallest
+- **Every in-row role is `1.2`** — `row-unit-name`, `row-unit-glyph`, `row-ev`,
+  `row-rank`, `row-mark`, `row-chase`, `money-phrase`, `detail-row`,
+  `detail-meta`, `appendix-row`, and every tracked uppercase label. At 14px, the tallest
   in-row type, that is a ~17px line box inside a 28px row with
   `align-items: center` — about 10px of headroom, and the row holds.
 - **Display roles are tight**. `masthead-title` `1.15`, `threshold-value`
@@ -878,11 +1093,50 @@ to `{spacing.content-width}`:
 | Column | Token | Width |
 |---|---|---|
 | rank | `{spacing.col-rank}` | 32px, right-aligned, `{spacing.pad-rank-right}` |
-| Base Type | `{spacing.col-base-type}` | 222px, ellipsis on overflow, `{spacing.pad-base-type-right}` |
+| Item Class / Base Type | `{spacing.col-unit}` | 222px, holding the unit glyph then the name; the **glyph is `flex: 0 0 auto`** and the name flexes and ellipsises, `{spacing.pad-unit-right}` |
 | EV | `{spacing.col-ev}` | 84px, right-aligned, tabular, `{spacing.pad-ev-right}` |
 | Provenance | `{spacing.col-provenance}` | 88px — **empty on a healthy row** |
 | Age | `{spacing.col-age}` | 94px — **empty on a healthy row** |
 | Chase Combinations | `{spacing.col-chase}` | 492px = three fixed `{spacing.chase-cell}` cells, `{spacing.pad-chase-cell-right}` each |
+
+*The unit column keeps its 222px, and the glyph is paid for out of a retirement*
+`[decision — memlog 184]`. The column now opens with
+`{components.unit-glyph-class}` or `{components.unit-glyph-raw}` in a
+**fixed 14px box** plus `{spacing.1}` of clear space — 18px in total. It is affordable because the same
+change **retired the `RAW BASE` word tag**, which was a sibling of the name at
+`flex: 0 0 auto` and cost roughly 62px on every raw row. A raw Base Type name
+therefore has *more* room than it had at revision 2, not less, and a crafted
+Item Class name gives up 18px of a 222px cell for the marker FR-3 requires.
+**No sum is reopened.** The column contract, all five verified sums and the
+27-character chase budget are exactly as memlog 40/122/140/145 left them — this
+is a rename and a swap inside one cell, not a re-cut.
+
+***The box is fixed-width, and that is a correction, not a refinement***
+`[decision — memlog 195]`. Revision 3 first shipped the glyph as `flex: 0 0 auto`
+with no width. The two glyphs do not have the same advance — `≡` is 6.84px and
+`▪` is 3.54px at 10px — so **a crafted row's name began 3.3px to the right of a
+raw row's**, leaving a ragged left edge down the twenty-row column that is this
+page's primary scan target, and giving the two branches different name widths
+before the ellipsis. A 14px box sized to the wider glyph, with both centred in
+it, makes every name start at the same x whatever branch the row is on. The
+ragged edge was invisible in the arithmetic and obvious in the font metrics,
+which is the argument for reading the binary rather than the spec.
+
+*What was NOT done, and is worth doing with a render in front of you.* The glyph
+could instead **hang** — a negative left margin into `{spacing.pad-rank-right}`'s
+10px — so the names return flush to the column's left edge, aligned with their
+own header, and the glyphs form a narrow column of their own between rank and
+name. That is the more print-native answer and it is the same manoeuvre the
+open-row marker already uses to bleed into the frame gutter. It was not applied
+because it changes visual alignment in a way that has to be *seen* to be judged,
+and no browser was available in the session that raised it.
+
+*Item Class names are shorter than Base Type names, and that is not load-bearing.*
+`Bow` and `Sapphire Ring` are the units now, where `Expert Bombard Crossbow` used
+to be. The column has slack it did not have. **It is not clawed back**, for the
+reason the Provenance column's 12px is not clawed back below: a column with
+headroom cannot clip, and reopening a verified sum to harvest width that no cell
+has asked for buys nothing a reader can see.
 
 *Provenance is 88px, and the 12px came out of the chase cells.* At 76px the
 column could not render its own widest mark. The width had to come from
@@ -895,7 +1149,7 @@ is the same principle that shapes the combination row below.
 `[decision — memlog 174]`. The 88px was sized against `◈ split by model` at
 `{typography.row-mark}` — about 85px of glyph, hair space and fourteen
 characters at 10px/600 — and that mark went with Provenance `modelled-split`
-(see Colors). The widest surviving mark in this column is `◇ prior only`, which
+(see Colors). The widest surviving mark in this column is `◊ prior only`, which
 leaves the column with slack it no longer needs. **The 12px is not clawed back.**
 Every column budget on this page is a verified sum (memlog 140/145), reopening
 one to hand 12px to a cell that is blank on most rows would put all six sums and
@@ -1003,16 +1257,20 @@ mechanism `5.0.0` withdrew, since an entry is a tier again and FR-22 now has the
 curator track a whole tier or a run of adjacent tiers. **The hazard survives the
 mechanism that produced it**, because the printed tier is the curator's declared
 `acceptedTier` and nothing requires two tracked bands of the same modifier on
-the same Base Type to declare different ones. The value text used to tell them
+the same Item Class to declare different ones. The value text used to tell them
 apart. The tier does not. Memlog 118 rule 3 guarantees uniqueness across the
 short-form **table**, and that guarantee does not reach this case. The specimen
 data avoids it only because every band in it landed in a distinct tier. Nobody
 has ruled on what the second one prints.
 
 **What may ellipsise, and where.** Truncation is legitimate only where the text
-has somewhere to go. Every cell on the ranked list — Base Type, chase cell —
-sits above an expansion that holds the same content in full, so ellipsis there
-costs a click and nothing else. **The expansion is the bottom of the page.**
+has somewhere to go. Every cell on the ranked list — the unit name, the chase
+cell — sits above an expansion that holds the same content in full, so ellipsis
+there costs a click and nothing else. **A unit glyph is the exception and never
+ellipsises**, for the reason a trust mark never does: the glyph *is* the
+non-colour cue FR-3 relies on, so a clipped one fails the legibility rule rather
+than merely reading badly. It is `flex: 0 0 auto` and the name yields first.
+**The expansion is the bottom of the page.**
 Nothing sits beneath a combination row, so nothing in one may be cut. No
 ellipsis, no truncation, no tooltip standing in for text that did not fit. That
 principle governs every future decision about what may be cut and where. It is
@@ -1021,10 +1279,15 @@ why the combination row is two lines and the chase cell is one.
 *The column header uses the same six fixed-width flex cells as
 `{components.ranked-row}`, never inline-block spans. Inline-block spans drift
 each label right of its column by the width of the source whitespace between
-them.
-`PROVENANCE` is the widest header label at roughly 78px and now sits inside
-`{spacing.col-provenance}` with room to spare. A column header never
-ellipsises.*
+them. A column header never ellipsises.*
+
+*Two headers are worth measuring, for different reasons.* `PROVENANCE` is the
+**tightest fit** — roughly 78px inside `{spacing.col-provenance}`'s 88px, which
+is why that column could not drop to 76px. `ITEM CLASS / BASE TYPE` is the
+**longest label** at roughly 185px, and it sits inside `{spacing.col-unit}`'s
+222px less `{spacing.pad-unit-right}` with about 29px to spare. It names both
+ranked units because the column holds both (PRD FR-3): the header says what the
+column can contain, and the per-row glyph says which one this row is.
 
 **The other two tabular surfaces take contracts too**, on the same argument.
 A reader scans down a column on both, exactly as on the ranked list:
@@ -1050,8 +1313,9 @@ per-column values. The final row of the appendix and the final row of the
 tombstone band drop their bottom hairline. A list does not rule itself off from
 the space below it.
 
-**Vertical order down the page, fixed:** masthead (with the threshold panel
-floated right at `{spacing.threshold-panel-width}`) → trust strip →
+**Vertical order down the page, fixed:** masthead (with
+`{components.craft-recipe}` and `{components.payout-threshold}` floated right as
+one control group) → trust strip →
 *`{components.sync-report-panel}` when open* → asking-price line → column
 header → twenty ranked rows → expand affordance → Unrankable appendix (pushed
 to the foot) → key block → running foot.
@@ -1064,6 +1328,7 @@ last ranked row and the appendix:
 | Block | px |
 |---|---|
 | `{components.masthead}` — 34 pad + eyebrow 14 + 8 + title 44 + 8 + 2-line dek 42 + 20 pad | 170 |
+| *— the masthead is **unchanged** at revision 3.* The second control panel took width from `{spacing.dek-max-width}` (640 → 480) and **no height**: both control panels sit inside the 170px the block already had, and the dek still sets to two lines at 480px. | — |
 | `{components.trust-strip}` — 2 rules + 23 pad + 2 lines @ 11.5 × 1.85 | 68 |
 | `{components.asking-price-line}` | 32 |
 | `{components.column-header}` — 16 margin + label + 4 pad + rule | 32 |
@@ -1094,8 +1359,9 @@ slack. The panel scrolls inside its own band past 400px.
    `{spacing.sync-report-max-height}`. The regions below move down into the
    space the appendix gives back. Because 400 ≤ 433, the strip alone never makes
    the page scroll, in any data state.
-2. **A Base Type expansion is uncapped.** It holds every tracked Combination
-   plus its tombstones, and no cap on it would be honest (FR-8). When an
+2. **A ranked row's expansion is uncapped.** It holds every tracked Combination
+   on that Item Class — or the one degenerate Combination of a Raw Base — plus
+   its tombstones, and no cap on it would be honest (FR-8). When an
    expansion, or an expansion plus the sync report, exceeds the slack, **the
    page scrolls**. That is intended. The no-scroll rule binds the *default
    resting state* (memlog 17), not a state the player opened himself.
@@ -1117,22 +1383,45 @@ it did. Never shrink a row, drop a column, truncate the appendix or hide the key
 block to keep an expanded state inside the frame. Density is fixed and scrolling
 is the release valve.
 
-`[NOTE FOR UX]` FR-4's middle coverage band (50–80%) requires the Unrankable
-group to become a first-class surface rather than a footer. The chosen
-direction depicts the ≥80% footer treatment only. What the first-class
-treatment looks like is unsettled, and coverage is re-measured on every weights
-regeneration, so this will be needed.
+**The appendix sits at the foot, and at revision 3 that became a decision this
+document owns rather than a band it was handed** `[change — memlog 185]`. A
+`[NOTE FOR UX]` stood here through revision 2: FR-4's middle coverage band
+(50–80%) was said to require the Unrankable group to become a first-class
+surface, and this document described the ≥80% footer treatment only.
 
-`[NOTE FOR UX]` **FR-30's world is deliberately unspecified** (memlog 72). Until
-a conforming Weights File exists, every crafted Base Type is Unrankable and the
-page is a white-base price list with an appendix holding the entire crafted
-Tracked List. Three rules collide in that state. The appendix is pinned to the
-foot as a *footer*. Truncating it is forbidden. And nothing unclicked may push
-the page past 1920px. The likeliest resolution is that the appendix becomes the
-surface and the resting-state rule yields to it. The user accepted designing
-this at implementation time rather than now. This note records it so no reader
-mistakes it for an oversight. It is close kin to the 50–80% band above, and
-settling one probably settles the other.
+**PRD revision 18 withdrew the bands.** Coverage is now "reported, not a gate:
+no threshold and no layout binds to it, and how prominently the Unrankable group
+sits beside the ranking is UX's" (FR-4). So the note closes **by removal, not by
+answer**, and what replaces it is a larger obligation rather than a smaller one —
+there is no band left to defer behind.
+
+*The foot is kept, and here is the reason.* The appendix answers a question the
+player asks **after** reading the list, not before: *what did the ranking leave
+out?* Putting it above the list would make every session open on an absence.
+Coverage is also not a property of the ranking's quality — a class the scraper
+has not reached yet says nothing about whether the classes it did reach are
+ranked well — so promoting the appendix on a coverage figure would have
+advertised a correlation the data does not carry. The count is readable without
+expanding anything (FR-4), which is what makes a bad coverage figure visible
+from the resting page, and the exact fraction with its denominator is one click
+down in `{components.sync-report-panel}`. That is the whole treatment, and it no
+longer varies with a measurement.
+
+`[NOTE FOR UX]` **FR-30's world is still unspecified, and it shrank**
+(memlog 72, re-derived at memlog 185). Until a conforming Weights File exists,
+every **Item Class** is Unrankable and the page is a white-base price list with
+an appendix holding the crafted branch entire. Three rules collide in that state.
+The appendix is pinned to the foot as a *footer*. Truncating it is forbidden. And
+nothing unclicked may push the page past 1920px. **What changed is the scale.**
+On revision 2's noun the appendix would have held every crafted Base Type in the
+Tracked List; on revision 18's it holds one row per Item Class — on the order of
+29 rows against the committed budget's 7. That is a much smaller collision than
+the note was written against, and it may now be designable rather than deferred:
+29 rows at `{spacing.appendix-row-height}` is 841px where 7 rows is 203px, so the
+overrun is about 638px against `{spacing.frame-slack}`'s 528px. Still an overrun,
+but one a single decision could absorb. The user accepted designing this at
+implementation time and that acceptance stands. It is recorded here so no reader
+mistakes it for an oversight.
 
 **Spacing scale.** The general scale (`{spacing.1}`–`{spacing.6}`, 4–24px) is
 quantised at 4px from the mock's values. It is the fallback for any gap not
@@ -1177,39 +1466,55 @@ with a glyph, not a badge with a background.
 
 ## Components
 
-Every component below appears in one of the two mockups.
+Every component below appears in one of the two mockups, **both re-rendered at
+revision 3** against this document rather than carried forward.
 [`mockups/key-hero-resting.html`](mockups/key-hero-resting.html) holds the
-resting set: the masthead, the threshold figure as an input, the five-fact trust
-strip, the ranked row in all three tiers, the Raw Base row, the Unrankable
-appendix, the key block and the running foot. It also carries the loud
-health-line strip as a labelled specimen, which the resting page does not show
-when the data is clean.
+resting set: the masthead with both control panels, the threshold figure as an
+input, `{components.craft-recipe}` with its Craft Cost line, the five-fact trust
+strip, the ranked row in all three tiers carrying
+`{components.unit-glyph-class}`, the Raw Base row carrying
+`{components.unit-glyph-raw}`, the Unrankable appendix, the key block and the
+running foot. It also carries the loud health-line strip as a labelled specimen,
+which the resting page does not show when the data is clean.
 [`mockups/key-expanded-states.html`](mockups/key-expanded-states.html) holds
-everything that opens: a Base Type expansion with all four Price States, the
+everything that opens: an Item Class expansion with all four Price States, the
 tombstone band closed and open, the one-row Raw Base expansion, and the sync
 report panel.
 
 **Masthead** (`masthead`) — the first block on the page: `{spacing.gutter}` of
 top padding, `{spacing.5}` beneath, and three lines with `{spacing.2}` between
-each. The eyebrow is sepia tracked uppercase naming the active league and the
-Craft Recipe. The title is the *question the page answers*, set as a phrase —
-never a product name and never a feature label. The dek is one sentence, capped
-at `{spacing.dek-max-width}`, naming what the ordering is and that every figure
-is in Divine. `{components.payout-threshold}` floats right inside the block at
-`{spacing.threshold-panel-width}`, top-aligned with the eyebrow and cleared by
+each. The eyebrow is sepia tracked uppercase naming the active league. The title
+is the *question the page answers*, set as a phrase — never a product name and
+never a feature label. The dek is one sentence, capped at
+`{spacing.dek-max-width}`, naming what the ordering is and that every figure is
+in Divine. **Both controls float right inside the block as one group** —
+`{components.craft-recipe}` at `{spacing.recipe-panel-width}`, then
+`{spacing.masthead-control-gap}`, then `{components.payout-threshold}` at
+`{spacing.threshold-panel-width}` — top-aligned with the eyebrow and cleared by
 the trust strip below.
 
-*The eyebrow's exact copy* is `League {activeLeague} · one perfect transmute +
-one perfect augment` — the Craft Recipe printed as its **composition**, worded
-exactly as the PRD §3 Glossary words it, in the eyebrow's tracked uppercase.
-`[NOTE FOR UX]` **The Craft Recipe has no canonical display name.** The Glossary
-defines it as "a named crafting-currency composition" and then names only the
-composition, never the name. Nothing in `recipes.json`'s stated contract is
-declared to the view as a display string. Printing the composition is accurate
-and unambiguous while v1 has exactly one recipe (FR-26), and it will not survive
-a second one. If `recipes.json` carries a display name, that name should win —
-but nobody has confirmed that it does, so this stays a copy slot with a stated
-source rather than an invented one.
+*The eyebrow's exact copy* is `League {activeLeague}`, and **the Craft Recipe
+left it at revision 3** `[decision — memlog 181]`. Through revision 2 the
+eyebrow read `League {activeLeague} · one perfect transmute + one perfect
+augment`, with a `[NOTE FOR UX]` recording that printing the composition "will
+not survive a second" recipe. **It has not survived.** PRD FR-26 ships two, the
+player chooses which is active, and the choice reorders the list. A thing the
+player *turns* cannot sit in the line that states what the page was built from —
+that line is attribution, and the same argument that keeps the tracked-list edit
+date off the health signals keeps a control out of the eyebrow.
+
+*What the control prints, and why it is not an invented name.* The open question
+memlog 107 recorded was real and is now **resolved rather than carried**:
+`recipes.json` declares no display string, so there was no name to print. There
+is no need for one. v1's two recipes are *one greater transmute + one greater
+augment* and *one perfect transmute + one perfect augment*, so the orb grade is
+the entire difference between them, and `{components.craft-recipe}` prints that
+one distinguishing word — `greater · perfect` — with the active one set solid.
+Nothing is coined: the word is lifted from the composition the Glossary already
+words. **The limit is stated with the rule.** It holds while every recipe in
+`recipes.json` reduces to a distinct single word. A recipe that does not is a
+copy decision nobody has taken, and it must not be settled by inventing a display
+name that no contract declares.
 
 **Ranked row** (`ranked-row`) — `{spacing.row-height}`, six fixed columns, one
 `{colors.rule-hairline}` bottom rule, `white-space: nowrap` throughout. Three
@@ -1236,15 +1541,28 @@ Tone alone cannot mark the open row, because hover uses the same tone — the ru
 is what makes the source of an open panel identifiable at all times.
 
 **Raw Base row** (`raw-base-row`) — `{colors.paper-raw}` tint (hovering to
-`{colors.paper-raw-hover}`), italic Base Type name, and a sepia `RAW BASE` tag
-underlined with a 1px sepia rule. **The tag is a sibling of the name, not part
-of it**: the name flexes and ellipsises, the tag is `flex: 0 0 auto` and never
-truncates, so a long Base Type can never strip away one of the three redundant
-cues. The item level lives in the row's note instead of in the tag, spelled —
-*uncrafted at Item Level 82 — ranked at its own current asking price, not at a
+`{colors.paper-raw-hover}`), the sepia `{components.unit-glyph-raw}` `▪` leading
+the cell, and an italic Base Type name after it. **The glyph is a sibling of the
+name, not part of it**: the glyph is `flex: 0 0 auto` and never truncates, the
+name flexes and ellipsises after it, so a long Base Type can never strip away
+one of the three redundant cues. The item level lives in the row's note, spelled
+— *uncrafted at Item Level 82 — ranked at its own current asking price, not at a
 craft outcome* — which replaces the three chase cells as one full-width italic
-note in `{colors.ink-tertiary}`. Three cues — tint, italic, word — so no one of
+note in `{colors.ink-tertiary}`. Three cues — tint, italic, glyph — so no one of
 them is load-bearing.
+
+*The `RAW BASE` word retired at revision 3, and the third cue is now a glyph*
+`[decision — memlog 184]`. The user's direction was that the player knows the
+difference between a class and a base and does not need it spelled, and asked for
+a glyph or colour instead. **Colour alone was not available**: PRD NFR-10 names
+crafted-versus-Raw-Base as one of its three colour-alone prohibitions, so the
+cue has to survive every colour being removed — which a glyph does and
+colour-coding does not. The count of cues is unchanged at three and the rule the
+count exists to serve is unchanged with it. What did change is that the **crafted
+branch is now marked too**: through revision 2 a crafted row was the unmarked
+default, which was defensible while it was the only kind of row that named an
+Item Class implicitly. FR-3 now makes the two units peers, so both are marked and
+neither is the default.
 
 *Expanding a Raw Base* shows **one `{components.combination-row}`**, drawn in
 [`mockups/key-expanded-states.html`](mockups/key-expanded-states.html), for the
@@ -1257,12 +1575,18 @@ FR-12 override promised to put them.
 **Column header** (`column-header`) — sans, uppercase, tracked `0.2em`,
 `{colors.ink-tertiary}`, sitting on a `{colors.rule-strong}` rule, laid out in
 the same six flex cells as the row. The rank column's header is blank. The
-others read `Base Type`, `EV (Divine)`, `Provenance`, `Age`, and `Chase
-Combinations, by contribution to EV`.
+others read `Item Class / Base Type`, `EV (Divine)`, `Provenance`, `Age`, and
+`Chase Combinations, by contribution to EV`.
+
+*The second header names both units on purpose.* The list is mixed — a crafted
+row ranks an Item Class, a raw row ranks a Base Type, and PRD FR-3 requires every
+row to state which it is. A header states what a **column** holds in general, so
+it names both; a row states what **it** is, which is the unit glyph's job. Naming
+only one unit in the header would have made the other read as an exception to it.
 
 *The fourth column is called **Provenance**, not "Weight".* "Weight" is a
 synonym for a term the Glossary fixes, and it collides with *Modifier Weight* —
-a back-end term this page must not print. Worse, it misleads: `◇ prior only`
+a back-end term this page must not print. Worse, it misleads: `◊ prior only`
 under a `WEIGHT` header reads as a claim about how rarely a modifier rolls,
 when the claim being made is about where the figure came from. The key block's
 middle group is likewise *Provenance marks*.
@@ -1274,18 +1598,54 @@ marks exist and no sixth may be added without a decision:
 row renders **no mark element at all** — the cell is empty, not filled with a
 placeholder.
 
-*A Provenance mark is one label per Base Type, and it belongs to the ranked
-row.* Provenance propagates **pool-wide** — a probability's inputs are every
-entry in its scoped pool, numerator and denominator alike — so one invented tier
-anywhere makes every probability on that Base Type carry the same label (PRD
-FR-10, FR-11; AD-10). The mark therefore discriminates **between** Base Types
-and never within one. That is the granularity the ranked list already has, since
-a ranked row **is** a Base Type, which is why the Provenance column earns its
-place. It also fixes where the mark may not go: every combination row inside one
+*The unit glyphs do not make a sixth and a seventh.* `{components.unit-glyph-class}`
+and `{components.unit-glyph-raw}` are glyphs on the same page, and that is the
+whole of what they share with a trust mark. A trust mark carries a semantic ink
+and says something is wrong with what a figure rests on; a unit glyph carries
+`{colors.sepia}` and says which unit the row names. The count of trust marks is
+**still five**, and a sixth still needs a decision.
+
+*They are also the page's only glyphs without a word, and they take no key-block
+entry* `[decision — memlog 184]`. Everything else here is *glyph, hair space,
+word*. These two are not, because a unit glyph marks a **unit** and every other
+glyph marks a **state**. A state cannot be inferred from the row it sits on, so
+it takes a word; a unit can be read off the name beside it, so the glyph only
+makes that instant. The key block is likewise unneeded: it exists to
+disambiguate an **empty** cell under silence-means-healthy, and a unit glyph is
+never empty — every row carries exactly one of the two. This is not a licence to
+drop the word from any other glyph. See `EXPERIENCE.md`, Component Patterns, for
+the full argument.
+
+*A Provenance mark is one label per Item Class, and it belongs to the ranked
+row* `[decision — memlog 180, re-deriving memlog 175]`. Provenance propagates
+**pool-wide** — a probability's inputs are every entry in its scoped pool,
+numerator and denominator alike — so one invented tier anywhere makes every
+probability on that Item Class carry the same label (PRD FR-10, FR-11; AD-10).
+The mark therefore discriminates **between** Item Classes and never within one.
+
+**The argument was made on the wrong noun at revision 2 and survives the
+correction strengthened.** Memlog 175 reasoned that a ranked row *is* a Base
+Type, so the Provenance column marked exactly the unit it could speak about.
+PRD revision 18 made the crafted branch rank Item Classes (FR-3), which would
+break that reasoning if the mark's granularity and the row's had come apart —
+and they have not. **A modifier pool belongs to a class** (AD-11, PRD §3 *Item
+Class*), so a Provenance label was always a per-class fact, and at revision 2 it
+was being carried on a finer unit than it described. At revision 18 the two
+units coincide: the mark speaks about a class and the crafted row *is* a class.
+The column does not merely still earn its place — it earns it on the unit the
+propagation rule actually has, rather than on one a level below.
+
+*Where the mark may not go, unchanged.* Every combination row inside one
 expansion necessarily carries that same label, so a Provenance mark is never
 repeated per combination row. Repeating it would put eight identical marks
 inside one panel and discriminate nothing — the failure FR-11 exists to prevent,
 one surface further down.
+
+*A raw row has no Provenance mark at all*, and that is not an omission. A Raw
+Base needs no Eligible Pool (PRD FR-4), so there is no pool for a Provenance
+value to propagate from, and its Provenance cell is empty in the same way a
+healthy crafted row's is. The key block's *Silence means healthy* column is what
+keeps that empty cell legible.
 
 **Money slot** (`money-slot`) — the EV or price cell when there is no number. It holds a short
 italic sans phrase naming *which* question is open, never a number-shaped
@@ -1323,8 +1683,97 @@ readout is kept, and it is a readout.*
 threshold. The user ruled for exactness and for masthead width. FR-6's immediate
 reorder still binds and is satisfied by re-ranking on input change.*
 
+**Craft Recipe control** (`craft-recipe`) — a `{spacing.recipe-panel-width}`
+inset panel, inboard of the threshold, holding a tracked label, the two recipe
+options on one line, and the active recipe's Craft Cost beneath them. It takes
+`{components.payout-threshold}`'s chrome exactly — same ground, same hairline,
+same padding — because the two panels do the same kind of work. Both reorder the
+list with no round trip, and a player who has learned one has learned the other
+(PRD FR-1, FR-6, FR-26).
+
+**The word is the control.** There is no select, no segmented button, no pill
+and no chevron — the same argument that made the threshold figure its own input
+(memlog 73). The two options read as the single word that distinguishes each
+composition, `greater | perfect`, divided by the trust strip's pipe in
+`{colors.ink-tertiary}`.
+
+**Both words carry a rule at rest, and they carry different ones**
+`[decision — memlog 191]`. The **inactive** option is `{colors.ink-secondary}`
+at `400` under a **dotted sepia** rule — the page's one vocabulary for *this is
+clickable* — going solid sepia and `{colors.ink}` on hover, exactly as
+`{components.expand-affordance}` does. The **active** option is `{colors.ink}`
+at `700` on a **2px solid sepia** rule. Only the inactive option is a click
+target: there is nothing to switch to on the active one, and a click target that
+does nothing teaches the wrong thing.
+
+*Three corrections are folded into that paragraph, and each closes a real
+defect.*
+
+**The resting rule is the important one.** Through its first draft this control
+took its dotted rule **on hover only**, which made it the single clickable thing
+on the page with no resting affordance — on a page whose stated scene is a glance
+across a desk with the pointer in the game. An affordance that exists only under
+the pointer does not exist in that scene, and the panel's resting anatomy
+(tracked label, two words, a small caption) is *exactly* what it was at revision
+2 when it sat in the eyebrow as attribution. It would have read as a caption with
+one word emphasised, and the failure would have been silent: the page works
+perfectly on the default recipe, so nothing would ever have revealed that the
+second ranking dial was never found.
+
+**The dotted rule goes on the inactive word only.** Dotted means *you can click
+this*, and the active word is not a click target, so dotting it would be a lie.
+At rest the panel reads as one word chosen and one word available, which is what
+it is.
+
+**The active rule is 2px, not 1px.** `{components.payout-threshold}`'s
+`valueHoverRule` is `1px solid {colors.sepia}` and means *the pointer is on
+this*. These two panels are deliberately chrome-identical siblings 16px apart,
+so an identical rule here would have put *this is the current value* beside *you
+are hovering this* in one glance. Doubling it keeps active distinct from every
+hover state on the page.
+
+*The separator is a pipe, not the page's middle dot.* In every chase cell `·`
+**joins** — `T1 Cold Res · T1 Mana` means this affix *and* that one. These two
+options are exclusive, so the dot would carry the opposite operator in the same
+ink on one page, and `greater · perfect` would be structurally indistinguishable
+from a chase cell at an angled glance. The trust strip already owns a divider for
+independent facts; this reuses it rather than inventing a second one.
+
+*Craft Cost is printed here and nowhere else* `[decision — memlog 182]`. The
+line beneath the options reads `N.NN Divine / craft` at the page's 2dp, with the
+**figure** in `{typography.recipe-cost-figure}` — 13px serif, `{colors.ink}`,
+tabular — and `Divine / craft` in `{typography.recipe-cost}`,
+`{colors.ink-secondary}`. **It belongs to the recipe, not to a row**: `core`
+subtracts it once per Item Class and it is identical down every crafted row
+(AD-17), so printing it here states it once where it is true. PRD FR-26 requires
+Craft Cost shown in Divine and neither spine had a home for it before revision 3.
+The alternative — a seventh ranked-row column — would have put all six verified
+column sums and the 27-character chase budget back through verification in order
+to repeat one invariant figure twenty times down the page.
+
+*The figure is serif at 13px because 9.5px sans stated the inverse of its
+importance* `[decision — memlog 194]`. The whole line began at
+`{typography.recipe-cost}` — the size this page otherwise reserves for tracked
+uppercase labels and the threshold's range endpoints — which made it **less
+legible than a rank numeral**, sitting beside a 32px threshold figure. Craft
+Cost is the constant underneath every crafted EV in the ranking; if it is wrong,
+stale or uncostable then the entire crafted branch is wrong, and this is
+deliberately the only place it is ever printed. Splitting it into a figure and a
+quiet unit borrows `{components.payout-threshold}`'s own anatomy, which also
+strengthens the sibling reading this control's discoverability depends on. It
+costs nothing: `controlPanelsEqualHeight` leaves the panel roughly 21px of
+interior slack that `margin-top: auto` was already spending on a void.
+
+*Uncostable is a phrase, not a zero.* A recipe whose currency has no current rate
+for the active league is **uncostable**, never costed at zero (PRD FR-26,
+AD-20). The cost line then holds the `{components.money-slot}` phrase *no figure
+yet* in its italic sans, and never a number — the same rule that governs every
+other missing figure on this page. A zero here would be the worst kind of lie the
+money slot exists to prevent: it would not look missing, it would look free, and
+it would inflate every EV on the page by the cost of the craft.
+
 **Trust strip** — the strip has two states, and it is the only expandable thing
-on the page besides a Base Type row (memlog 57–59, which supersede decision 26).
+on the page besides a ranked row (memlog 57–59, which supersede decision 26).
 
 *At rest.* Two sans lines between a `{colors.rule-strong}` rule above and a
 `{colors.rule-hairline}` rule below, with the field labels in `{colors.ink}`
@@ -1370,8 +1819,8 @@ something actually broke:
 
 | Trigger | Line reads |
 |---|---|
-| any `unresolvable` entries exist (FR-24) | `✕ 12 unresolvable` |
-| a pinned-starvation record is present (FR-17, FR-25) | `✕ pinned entries starved this run` |
+| any `unresolvable` entries exist (FR-24) | `× 12 unresolvable` |
+| a pinned-starvation record is present (FR-17, FR-25) | `× pinned entries starved this run` |
 
 Both triggers share the one line. A healthy sync raises no third line at all —
 no counts of nothing, no green tick, no "0 unresolvable" — but a broken one is
@@ -1445,15 +1894,37 @@ an ochre trust mark, the consequence beneath in
 not always (memlog 30).
 
 **Unrankable appendix** (`unrankable-appendix`) — inset panel pinned to the foot
-of the frame, titled `Appendix: Unrankable — N Base Types` with the count in
+of the frame, titled `Appendix: Unrankable — N Item Classes` with the count in
 `{colors.rust}`, a lead paragraph in `{typography.appendix-lead}` explaining why
 an upper bound is not a number, then `{spacing.appendix-row-height}` rows in
-`{typography.appendix-row}` across four fixed columns: Base Type in
-`{spacing.col-appendix-base}` (with an italic branch note where a Raw Base
-branch ranks separately), the ochre *unknown* mark in
-`{spacing.col-appendix-mark}`, the reason verbatim from FR-4 — `pool partial`,
-`base absent from weights file` — in `{spacing.col-appendix-reason}`, and a
-quiet italic note in `{spacing.col-appendix-note}`. The last row drops its rule.
+`{typography.appendix-row}` across four fixed columns: the Item Class, led by
+`{components.unit-glyph-class}`, in `{spacing.col-appendix-base}`; the ochre
+*unknown* mark in `{spacing.col-appendix-mark}`; the reason verbatim from FR-4 —
+`pool partial`, `class absent from weights file` — in
+`{spacing.col-appendix-reason}`; and a quiet italic note in
+`{spacing.col-appendix-note}`. The last row drops its rule.
+
+*Every row here is an Item Class, and that is a rule rather than an
+observation.* Unrankability governs the crafted branch only — a Raw Base needs
+no Eligible Pool and ranks regardless (PRD FR-4) — so **a Base Type never
+appears in this appendix**. The glyph is carried anyway, because what ties a
+class in the appendix to the same class in the list is the mark they share.
+
+*The second reason string moved at revision 3.* It was `base absent from weights
+file` through PRD revision 16 and is now `class absent from weights file`
+(FR-4). The enum still has exactly two members and they are still different facts
+for the player — a producer that declared what it could not guarantee, against a
+class the producer never published. The literal is PRD-owned, printed verbatim,
+and has now moved in two consecutive PRD revisions; see Do's and Don'ts for the
+standing check.
+
+*Where a class's Base Types still rank.* An Item Class can sit here while Base
+Types belonging to it rank on the raw branch (PRD FR-4), so a class may carry an
+italic note in `{spacing.col-appendix-note}` pointing at that. **The note names
+the fact, not a rank**: a class holds several Base Types and they do not rank
+together, so there is no single position to point at, and a note reading *its
+Raw Base branch ranks at 16* would be inventing one. *some of its Base Types
+rank on the raw branch* is what the page can honestly say.
 
 **Key block** (`key-block`) — three equal columns above the foot, under a
 `{colors.rule-strong}` rule: *Silence means healthy*, *Provenance marks*, *Age
@@ -1466,9 +1937,17 @@ the full `{spacing.content-width}`, never indented and never inset to a column.
 It sits **flush under its row**: no margin above, the row keeps its sepia open
 marker, and the row's own bottom hairline becomes the panel's top edge so there
 is no double rule at the join. `{spacing.4}` of margin below it before the next
-ranked row. Inside: Base Type in `{typography.panel-title}`, a sub-line naming
-the active threshold and repeating the asking-price framing, then one
+ranked row. Inside: the row's unit name in `{typography.panel-title}`, led by the
+same unit glyph the row carries, a sub-line naming the active threshold **and the
+active Craft Recipe** and repeating the asking-price framing, then one
 `{components.combination-row}` per Tracked Entry.
+
+*The sub-line gained the recipe at revision 3.* A panel repeats the active
+threshold so that it cannot be misread on its own (FR-8), and from revision 18
+the recipe is the second thing the figures above depend on — two recipes produce
+genuinely different orderings and can give one class different Chase Combinations
+(PRD FR-26). A panel that named only the threshold would now be repeating half of
+its own context.
 
 **Combination row** (`combination-row`) — **two lines** (memlog 101), each a set
 of fixed columns summing to 966px, together `{spacing.combination-row-height}`
@@ -1481,7 +1960,7 @@ the fastest way to see how little the four treatments have in common.
   `{typography.detail-row}`: the Combination — **tier plus short form, never the
   value**, the same reading as the chase cell (memlog 134) — the Price State with
   its glyph
-  (● priced, ○ no-listings, △ not-yet-synced, ✕ unresolvable in rust), the price
+  (● priced, ○ no-listings, ∆ not-yet-synced, × unresolvable in rust), the price
   or the money phrase, and the listing count the estimate rested on (FR-8).
 - **Line two — the evidence**, at `{spacing.combination-row-line-2-height}` in
   `{typography.combination-line-2}`, `{colors.ink-tertiary}`: the note, then
@@ -1544,12 +2023,12 @@ in a previous league. It is never drawn in `{components.tombstone-band}`. The 24
 `{spacing.col-combination-figure}` (140 → 116), which had slack: a money-phrase
 or a two-decimal Divine figure never approaches 116px minus its padding.
 
-*The `✕` appears at two weights on purpose.* At `700` it is
+*The `×` appears at two weights on purpose.* At `700` it is
 `{components.trust-mark-unresolvable}`, a trust mark on a ranked row. At `600`
 it is `{components.price-state-glyph}`'s `unresolvable`, labelling a Price State
 inside an expansion. Two roles, two surfaces, one glyph — not a contradiction.
 
-**Tombstone band** (`tombstone-band`) — behind a `▸ N pruned` toggle. Opened, it is a
+**Tombstone band** (`tombstone-band`) — behind a `+ N pruned` toggle. Opened, it is a
 `{colors.paper-deep}` band under a 2px `{colors.edge}` rule with its own
 tracked uppercase heading. Both the closed toggle and the open band are in
 [`mockups/key-expanded-states.html`](mockups/key-expanded-states.html). Its rows
@@ -1561,12 +2040,19 @@ prune reason plus `{spacing.col-tombstone-removed}` of `removed YYYY-MM-DD`,
 because a tombstone has no clocks to read and a removal date is a calendar fact
 rather than an age. See the combination-row spec above for the arithmetic.
 
-**Expand affordance** (`expand-affordance`) — sepia sans text with a `+`/`—` or
-a `▸`/`▾`, on a dotted sepia underline where it is a toggle. No button chrome,
-no fill, no border.
+**Expand affordance** (`expand-affordance`) — sepia sans text with a `+` closed
+and a `−` open (U+2212, not an em dash), on a dotted sepia underline where it is
+a toggle. No button chrome, no fill, no border. *One pair, everywhere it
+appears* `[decision — memlog 196]`: the list affordance, the trust strip's
+affordance and — new at revision 3 — `{components.tombstone-band}`'s toggle,
+which used a `▸`/`▾` disclosure triangle that fell out of the typeface. Every
+openable thing on this page now opens with the same sign.
 
-*The list affordance below row 20* reads `+ Read the remaining N Base Types`
-closed and `— Show only the top 20` open, and it is reversible. Opening it grows
+*The list affordance below row 20* reads `+ Read the remaining N rows`
+closed and `— Show only the top 20` open, and it is reversible. **It names no
+unit**, because the remainder holds both — an Item Class and a Base Type rank in
+one list (PRD FR-3), so either noun would misdescribe half of what is behind the
+control. It read `N Base Types` until revision 3. Opening it grows
 the ranked list **in place** to the full ranked length — it does not replace
 rows 1–20 and it does not page. Ranks 21 and beyond all take
 `{components.ranked-row-tier-3}`. The three emphasis tiers describe the top ten,
@@ -1623,9 +2109,10 @@ degraded or broken, and an uncurated entry says nothing about the figure (see
 Colors) — so it wants a non-colour cue, but which one is unsettled.
 
 `[ASSUMPTION — memlog 49]` In the honest-empty league-reset state the list
-renders every tracked Base Type in canonical order, with **rank numerals
-suppressed**, plus a line stating that the order is canonical and not ranked.
-Without that suppression the page asserts a ranking it does not have.
+renders every tracked unit — every Item Class on the crafted branch and every
+Raw Base on the raw one, each with its glyph — in canonical order, with **rank
+numerals suppressed**, plus a line stating that the order is canonical and not
+ranked. Without that suppression the page asserts a ranking it does not have.
 
 *The EV column is not blank in that state.* Memlog 49's "empty rather than
 zero" was aimed at the zero, and blank is the other thing the money slot
@@ -1697,11 +2184,28 @@ conformance claims.
 | Raise a rust mark, a word and a count in the trust strip when a health figure is bad | Read silent-when-fine as silent-always, and let a broken list render as a clean page |
 | Call the fourth column **Provenance**, in the header and in the key block | Call it "Weight" — a synonym for one Glossary term and a collision with another |
 | Spell *Divine* and *Item Level*, or state the unit once in a column header | Print `div` or `ILVL`, which the Glossary does not license |
+| Print FR-4's reasons verbatim as `pool partial` and `class absent from weights file` | Carry `base absent from weights file`, the revision-16 spelling. **Standing check:** this literal is PRD-owned and has moved in two consecutive PRD revisions, so re-read FR-4 on every absorption rather than trusting the copy here |
 | Pair every semantic ink with its glyph and its word | Distinguish anything by hue alone |
 | Keep to the two semantic inks | Introduce a third colour, a success colour, or a severity ramp |
-| Mark Provenance once, on the ranked row — one label per Base Type | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
+| Mark Provenance once, on the ranked row — one label per **Item Class** | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
 | Reach for a non-colour cue for `pinned` and for the curation fallback | Spend the retired slate on something that is not a statement about a figure's footing |
-| Use `{colors.sepia}` decoratively — eyebrow, threshold fill, affordances | Let sepia start meaning a state |
+| Use `{colors.sepia}` decoratively — eyebrow, threshold fill, affordances, the active recipe's rule, both unit glyphs | Let sepia start meaning a state |
+| Open every ranked row with its unit glyph — `≡` an Item Class, `▪` a Raw Base | Leave a crafted row unmarked as the "default" kind, or carry the distinction on tint and italic alone (PRD FR-3, NFR-10) |
+| Keep both unit glyphs in `{colors.sepia}` | Give a unit glyph an ink — it appears on twenty rows in twenty, and an ink there ends silence-means-healthy |
+| Let sepia mark what the operator **chose** — the active recipe, the threshold fill, affordances, unit glyphs | Let sepia mark what the **data is**. That is ochre and rust, and `pinned` and the curation fallback do not get in this way either |
+| Give the inactive recipe option its dotted sepia rule **at rest** | Put a clickable affordance on hover only, on a page read from across a desk with the pointer in the game |
+| Set the active recipe rule at **2px** | Reuse the threshold's 1px solid sepia, which already means *you are hovering this* 16px away |
+| Divide the recipe options with the trust strip's `\|` | Use `·`, which joins two affixes in every chase cell and would carry the opposite operator here |
+| Set the Craft Cost figure in 13px serif | Leave the figure that validates every EV on the page less legible than a rank numeral |
+| Give both unit glyphs one fixed-width box | Let them size to their own advances — `≡` and `▪` differ by 3.3px and ragged the whole name column |
+| Pick every glyph from Segoe UI Regular **and** Semibold **and** Bold | Assume a character exists because it renders — seven marks silently fell back to Segoe UI Symbol for two revisions |
+| Pin `{components.trade-link}` to `fontWeight: 400` | Bold `↗` — it is resident in Regular only and drops out of the face at 600 |
+| Let a unit name ellipsise and hold the glyph at `flex: 0 0 auto` | Clip the glyph to fit a long name — the glyph *is* the non-colour cue |
+| Head the unit column `Item Class / Base Type`, naming both | Name one unit in the header and let the other read as an exception to it |
+| Print Craft Cost once, on `{components.craft-recipe}`, where it is true | Give it a seventh ranked-row column and repeat one invariant figure twenty times |
+| Show an uncostable recipe as *no figure yet* | Cost it at zero — it would not look missing, it would look free, and it would inflate every EV on the page |
+| Print each recipe as the one word that distinguishes its composition | Invent a display name for a recipe: `recipes.json` declares none |
+| Keep the Craft Recipe a control in the masthead | Put it back in the eyebrow — that line is attribution, and a thing the player turns is not |
 | Carry rank emphasis with weight and rank-numeral colour | Make a top-ranked row taller or its type larger |
 | Hold every ranked row at `{spacing.row-height}` | Vary row height by rank, content or state |
 | Reproduce all three column budgets exactly | Let any column flex, or let the chase cells resize per row |
@@ -1722,6 +2226,6 @@ conformance claims.
 | Leave the frame 20px narrower than the 1080px viewport, for the scrollbar | "Correct" `frame-width` back to 1080, or buy width back out of a column |
 | Fit the default state inside 1920px with no scrolling | Trade density for whitespace |
 | Let an expanded region push the frame into scrolling | Shrink rows, drop columns or hide the key block to keep an expanded state inside 1920px |
-| Open the sync report and a Base Type in place, pushing what is below down | Put either in a modal, a drawer, a tooltip or a second route |
+| Open the sync report and a ranked row in place, pushing what is below down | Put either in a modal, a drawer, a tooltip or a second route |
 | Show `{components.trade-link}`'s ↗ where the entry carries a stored `lastSearchId` from a search in the **active league** — a test on data, never on Price State | Key the ↗ on Price State, or draw it greyed-out or disabled where there is no id — absent, not inert |
 | Keep `{components.trade-link}` a single unicode glyph, no colour, no semantic ink | Add a second icon, an SVG asset, or let ↗ start meaning a state |

@@ -34,6 +34,7 @@
       "Bash(git branch:*)",
       "Bash(git check-ignore:*)",
       "Bash(git ls-files:*)",
+      "Bash(git ls-tree:*)",
       "Bash(git rev-parse:*)",
       "Bash(git remote:*)",
       "Bash(git stash list:*)",
@@ -60,7 +61,8 @@
       "Bash(awk:*)",
       "Bash(curl:*)",
       "Bash(grep:*)",
-      "Bash(cd \"E:/Program Files/Jetbrains/Projects/poe-crafting-base-price-checker/*)"
+      "Bash(.claude/skills/impeccable/scripts/impeccable*)",
+      "Bash(agent-browser*)"
     ],
     "deny": [
       "Bash(git push:*)",

@@ -127,9 +127,18 @@ h3 { margin: 34px 0 9px;
 .rk { width:  32px; flex: 0 0 auto; text-align: right; padding-right: 10px;
       font-size: 12px; line-height: 1.2; color: #6B4A22; font-weight: 700;
       font-variant-numeric: tabular-nums; }
+/* The unit cell: GLYPH then NAME. Revision 3. The glyph is flex 0 0 auto and
+   never ellipsises — it IS the non-colour cue FR-3 relies on. */
 .bs { width: 222px; flex: 0 0 auto; padding-right: 8px; min-width: 0;
-      font-size: 14px; font-weight: 700; line-height: 1.2; color: #211E17;
-      overflow: hidden; text-overflow: ellipsis; }
+      display: flex; align-items: baseline;
+      font-size: 14px; font-weight: 700; line-height: 1.2; color: #211E17; }
+/* Fixed 14px box, both glyphs centred, so every unit name starts at the same x
+   whatever branch the row is on. 11.5px, not 10px. See the resting page. */
+.bs .g { flex: 0 0 auto; width: 14px; margin-right: 4px; text-align: center;
+         font-style: normal; font-weight: 400;
+         font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
+         font-size: 11.5px; line-height: 1.2; color: #6B4A22; }
+.bs .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .ev { width:  84px; flex: 0 0 auto; text-align: right; padding-right: 12px;
       font-size: 14px; font-weight: 700; line-height: 1.2; color: #211E17;
       font-variant-numeric: tabular-nums; }
@@ -144,16 +153,13 @@ h3 { margin: 34px 0 9px;
            font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
            font-size: 10.5px; line-height: 1.2; color: #3E3A2C;
            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Raw Base: tint + italic name + glyph. The RAW BASE word tag retired at
+   revision 3 and the glyph took its job — three cues either way. */
 .raw { background: #F7F3E6; }
 .raw .rk { color: #55503F; font-weight: 400; }
-.raw .bs { display: flex; align-items: baseline; overflow: visible; font-weight: 400; }
+.raw .bs { font-weight: 400; }
 .raw .ev { font-weight: 400; }
-.raw .bs .nm { font-style: italic; flex: 1 1 auto; min-width: 0;
-               overflow: hidden; text-overflow: ellipsis; }
-.raw .bs .tag { flex: 0 0 auto; margin-left: 7px; font-style: normal;
-                font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
-                font-size: 9px; font-weight: 400; line-height: 1.2; letter-spacing: .13em;
-                text-transform: uppercase; color: #6B4A22; border-bottom: 1px solid #6B4A22; }
+.raw .bs .nm { font-style: italic; }
 .rawnote { width: 492px !important; padding-right: 0 !important;
            font-style: italic; color: #8B8470 !important; }
 
@@ -164,13 +170,16 @@ h3 { margin: 34px 0 9px;
    Inner width = 1012 - 2 border - 44 padding = 966.                       */
 .panel { width: 1012px; background: #FDFBF3; border: 1px solid #D2CAB2; border-top: none;
          padding: 18px 22px 20px; margin: 0 0 16px; }
+.panel h4 .rawname { font-style: italic; }
 .panel h4 { margin: 0; font-size: 20px; font-weight: 400; line-height: 1.2; color: #211E17; }
 .panel .sub { margin: 4px 0 13px;
               font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
               font-size: 11.5px; font-weight: 400; line-height: 1.5; color: #55503F; }
 
 /* ---- combination row: TWO LINES under ONE hairline ----------------------
-   line 1, the figure:   460 + 250 + 140 + 116 = 966   (detail-row, 28px)
+   line 1, the figure:   460 + 250 + 116 + 116 + 24 = 966   (detail-row, 28px)
+                         the fifth cell is the trade-link, funded out of the
+                         figure cell (140 -> 116), which had the slack.
    line 2, the evidence: 560 + 200 + 206       = 966   (combination-line-2, 20px)
    Every cell takes pad-combination-cell-right 12px. NOTHING here ellipsises:
    the expansion is the bottom of the page and nothing sits beneath a
@@ -188,11 +197,23 @@ h3 { margin: 34px 0 9px;
 .k2 { width: 250px; flex: 0 0 auto; padding-right: 12px;
       font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
       font-size: 10.5px; line-height: 1.2; }
-.k3 { width: 140px; flex: 0 0 auto; padding-right: 12px; text-align: right;
+.k3 { width: 116px; flex: 0 0 auto; padding-right: 12px; text-align: right;
       font-variant-numeric: tabular-nums; }
 .k4 { width: 116px; flex: 0 0 auto; padding-right: 12px;
       font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
       font-size: 10.5px; line-height: 1.2; color: #55503F; }
+/* the trade-link cell. The glyph ALONE is the click target, never the row.
+   It renders where the entry carries a stored lastSearchId AND that search ran
+   in the active league — a test on the stored field, never on Price State.
+   Absent is ABSENT: blank, not greyed and not disabled-looking. Never drawn
+   inside the tombstone band — a pruned entry has no market worth checking. */
+.k5 { width: 24px; flex: 0 0 auto; text-align: right;
+      font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
+      font-size: 10.5px; line-height: 1.2; }
+.k5 a { color: #8B8470; text-decoration: none; cursor: pointer; font-weight: 400; }
+/* font-weight PINNED at 400: U+2197 is present in Segoe UI Regular but ABSENT
+   from Semibold and Bold, so bolding it drops the glyph out of the page. */
+.k5 a:hover { color: #6B4A22; }
 .n1 { width: 560px; flex: 0 0 auto; padding-right: 12px; font-style: italic; }
 .n2 { width: 200px; flex: 0 0 auto; padding-right: 12px; }
 .n3 { width: 206px; flex: 0 0 auto; padding-right: 12px; }
@@ -203,9 +224,9 @@ h3 { margin: 34px 0 9px;
 /* ---- Price State glyphs. Always beside the state's name in words. -------- */
 .ps-priced::before { content: "\25CF\00a0"; font-size: 9px; }
 .ps-nolist::before { content: "\25CB\00a0"; font-size: 9px; }
-.ps-nysync::before { content: "\25B3\00a0"; font-size: 9px; }
+.ps-nysync::before { content: "\2206\00a0"; font-size: 9px; }
 .ps-unres  { color: #8E3B1E; font-weight: 600; }
-.ps-unres::before  { content: "\2715\00a0"; font-size: 9px; }
+.ps-unres::before  { content: "\00D7\00a0"; font-size: 9px; }
 
 /* ---- money slot: a phrase naming which question is open. Never a number. - */
 .word { font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
@@ -215,11 +236,13 @@ h3 { margin: 34px 0 9px;
 
 /* ---- trust marks (same vocabulary, at the size of the line it sits in) --- */
 .m-never { color: #8E3B1E; font-weight: 700; font-style: italic; }
-.m-never::before { content: "\21BB\00a0"; font-style: normal; }
+.m-never::before { content: "\00BB\00a0"; font-style: normal; }
 .m-unres { color: #8E3B1E; font-weight: 700; }
-.m-unres::before { content: "\2715\00a0"; font-size: 9px; }
-.m-split { color: #2F4A73; font-weight: 600; }
-.m-split::before { content: "\25C8\00a0"; font-size: 9px; }
+.m-unres::before { content: "\00D7\00a0"; font-size: 9px; }
+.m-prior { color: #8A5A12; font-weight: 600; }
+.m-prior::before { content: "\25CA\00a0"; font-size: 9px; }
+/* `m-split` / the slate ink is GONE: Provenance modelled-split withdrew at
+   weights contract 5.0.0 and the mark retired with it. Two inks, not three. */
 
 /* ---- tombstone toggle + band -------------------------------------------- */
 .toggle { display: inline-block; margin-top: 12px; border-bottom: 1px dotted #6B4A22;
@@ -272,83 +295,101 @@ h3 { margin: 34px 0 9px;
 <body>
 
 <p class="caption"><b>Key screen 2 — the expanded surfaces.</b> 1060px wide, rendered 1:1, at the
-same box model as the resting page. Four specimens: a Base Type expansion with all four Price
-States on the two-line combination row, the same panel with its tombstone band open, a Raw Base
-expansion, and the full Sync Report open in place under the trust strip. These are the surfaces
-that make the document scroll, which is why the frame is 1060 and not 1080.</p>
+same box model as the resting page, against spines <b>revision 3</b>. Four specimens: an
+<b>Item Class</b> expansion with all four Price States on the two-line combination row, the same
+panel with its tombstone band open, a <b>Raw Base</b> expansion, and the full Sync Report open in
+place under the trust strip. These are the surfaces that make the document scroll, which is why
+the frame is 1060 and not 1080.</p>
+
+<p class="caption" style="margin-top:10px">Revision 3 changed three things here. The crafted
+branch now ranks <b>Item Classes</b>, so specimen 1 opens <code>Ring</code> and not
+<code>Sapphire Ring</code>. Every row carries a <b>unit glyph</b> and the <code>RAW BASE</code>
+word tag has retired. And line one gained its <b>trade-link cell</b>, which this file had never
+drawn &mdash; the figure cell funds it, 140 &rarr; 116, and the sum is still 966.</p>
 
 <div class="page">
 
 <!-- ==================================================================== -->
 <!-- 1. EXPANSION PANEL, OPEN UNDER ITS ROW, TOMBSTONES COLLAPSED         -->
 <!-- ==================================================================== -->
-<h3>Specimen 1 &mdash; a Base Type expansion, all four Price States, tombstone band collapsed</h3>
+<h3>Specimen 1 &mdash; an Item Class expansion, all four Price States, tombstone band collapsed</h3>
 <div class="frame">
 
-  <div class="r open"><div class="rk">2</div><div class="bs">Sapphire Ring</div><div class="ev">1.86</div><div class="pv"><span class="m-split">split by model</span></div><div class="ag"></div><div class="cb"><span>T1 Cold Res &middot; T1 Mana</span><span>T1 Cold Res &middot; T2 Life</span><span>T2 Crit Dmg &middot; T1 Mana</span></div></div>
+  <div class="r open"><div class="rk">2</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Ring</span></div><div class="ev">1.86</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Cold Res &middot; T1 Mana</span><span>T1 Cold Res &middot; T2 Life</span><span>T2 Crit Dmg &middot; T1 Mana</span></div></div>
 
   <div class="panel">
-    <h4>Sapphire Ring</h4>
-    <div class="sub">Every tracked Combination on this Base Type, priced and unpriced alike, above
-      the Payout Threshold and below it. Payout Threshold 0.50 Divine. Every price here is a
-      current asking price from a live instant-buyout listing.</div>
+    <h4><span style="font-family:-apple-system,'Segoe UI',system-ui,sans-serif;font-size:11px;color:#6B4A22;margin-right:8px">&#8801;</span>Ring</h4>
+    <div class="sub">Every tracked Combination on this Item Class, priced and unpriced alike, above
+      the Payout Threshold and below it. Payout Threshold 0.50 Divine &nbsp;|&nbsp; Craft Recipe
+      <b>perfect</b>. Every price here is a current asking price from a live instant-buyout
+      listing.</div>
 
     <!-- state 1 — priced. Line two carries both clocks in their own cells. -->
     <div class="cr">
-      <div class="l1"><div class="k1">T1 Cold Res &middot; T1 Mana</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">2.91</div><div class="k4">10 listings</div></div>
+      <div class="l1"><div class="k1">T1 Cold Res &middot; T1 Mana</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">2.91</div><div class="k4">10 listings</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1"></div><div class="n2">priced 11h ago</div><div class="n3">tried 4h ago</div></div>
     </div>
     <div class="cr">
-      <div class="l1"><div class="k1">T1 Cold Res &middot; T2 Life</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">1.74</div><div class="k4">6 listings</div></div>
+      <div class="l1"><div class="k1">T1 Cold Res &middot; T2 Life</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">1.74</div><div class="k4">6 listings</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1"></div><div class="n2">priced 1d ago</div><div class="n3">tried 1d ago</div></div>
     </div>
     <div class="cr">
-      <div class="l1"><div class="k1">T3 ES &middot; T1 Mana</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">0.82</div><div class="k4">10 listings</div></div>
+      <div class="l1"><div class="k1">T3 ES &middot; T1 Mana</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">0.82</div><div class="k4">10 listings</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1"></div><div class="n2">priced 14h ago</div><div class="n3">tried 14h ago</div></div>
     </div>
 
     <!-- state 21 — below the threshold: present, marked, never greyed, never hidden -->
     <div class="cr">
-      <div class="l1"><div class="k1">T4 Cold Res &middot; T4 Mana</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">0.19</div><div class="k4">10 listings</div></div>
+      <div class="l1"><div class="k1">T4 Cold Res &middot; T4 Mana</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">0.19</div><div class="k4">10 listings</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1">below the threshold &mdash; adds nothing to EV</div><div class="n2">priced 9h ago</div><div class="n3">tried 9h ago</div></div>
     </div>
 
     <!-- a real figure too small to print at 2dp: a quantity, not a money slot -->
     <div class="cr">
-      <div class="l1"><div class="k1">T6 Cold Res &middot; T5 Stun Threshold</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">&lt; 0.01</div><div class="k4">4 listings</div></div>
+      <div class="l1"><div class="k1">T6 Cold Res &middot; T5 Stun Threshold</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">&lt; 0.01</div><div class="k4">4 listings</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1">below the threshold &mdash; adds nothing to EV</div><div class="n2">priced 2d ago</div><div class="n3">tried 2d ago</div></div>
     </div>
 
     <!-- state 2 — no-listings. The attempted clock still shows. -->
     <div class="cr">
-      <div class="l1"><div class="k1">T1 Cold Res &middot; T5 Item Rarity</div><div class="k2"><span class="ps-nolist">no-listings</span></div><div class="k3"><span class="word">an open question</span></div><div class="k4">0 listings found</div></div>
+      <div class="l1"><div class="k1">T1 Cold Res &middot; T5 Item Rarity</div><div class="k2"><span class="ps-nolist">no-listings</span></div><div class="k3"><span class="word">an open question</span></div><div class="k4">0 listings found</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1">nobody is listing this right now &mdash; a jackpot and junk look alike here</div><div class="n2"></div><div class="n3">tried 3h ago</div></div>
     </div>
 
     <!-- state 3 — not-yet-synced, with its reason shown, in all three reasons -->
-    <!-- state 5 — never-synced: the one row with no age at all, so BOTH age cells are empty -->
+    <!-- state 5 — never-synced: the one row with no age at all, so BOTH age cells are empty.
+         NO trade link: the syncer never issued a search, so there is no stored id. -->
     <div class="cr">
-      <div class="l1"><div class="k1">T3 ES &middot; T2 Crit Dmg</div><div class="k2"><span class="ps-nysync">not-yet-synced &middot; never-synced</span></div><div class="k3"><span class="word">no figure yet</span></div><div class="k4">no sample</div></div>
+      <div class="l1"><div class="k1">T3 ES &middot; T2 Crit Dmg</div><div class="k2"><span class="ps-nysync">not-yet-synced &middot; never-synced</span></div><div class="k3"><span class="word">no figure yet</span></div><div class="k4">no sample</div><div class="k5"></div></div>
       <div class="l2"><div class="n1">no request was ever issued for this entry</div><div class="n2"></div><div class="n3"><span class="m-never">never attempted</span></div></div>
     </div>
-    <!-- state 6 — league-mismatch: the attempted clock still shows -->
+    <!-- state 6 — league-mismatch: the attempted clock still shows.
+         NO trade link: an id exists, but it points into a PREVIOUS league, and a
+         link into last league's search is the stale answer honest-empty prevents. -->
     <div class="cr">
-      <div class="l1"><div class="k1">T1 Cold Res &middot; T1 Spirit</div><div class="k2"><span class="ps-nysync">not-yet-synced &middot; league-mismatch</span></div><div class="k3"><span class="word">no figure yet</span></div><div class="k4">no sample</div></div>
+      <div class="l1"><div class="k1">T1 Cold Res &middot; T1 Spirit</div><div class="k2"><span class="ps-nysync">not-yet-synced &middot; league-mismatch</span></div><div class="k3"><span class="word">no figure yet</span></div><div class="k4">no sample</div><div class="k5"></div></div>
       <div class="l2"><div class="n1">the observation belongs to another league</div><div class="n2"></div><div class="n3">tried 2d ago</div></div>
     </div>
-    <!-- state 7 — no-exchange-rate: the attempted clock still shows -->
+    <!-- state 7 — no-exchange-rate: the attempted clock still shows.
+         LINK PRESENT: a search DID run in the active league and returned
+         listings; only the currency conversion failed. The test is on the
+         stored id, never on Price State — this row is the proof of that. -->
     <div class="cr">
-      <div class="l1"><div class="k1">T3 ES &middot; T5 Cast Spd</div><div class="k2"><span class="ps-nysync">not-yet-synced &middot; no-exchange-rate</span></div><div class="k3"><span class="word">no figure yet</span></div><div class="k4">no sample</div></div>
+      <div class="l1"><div class="k1">T3 ES &middot; T5 Cast Spd</div><div class="k2"><span class="ps-nysync">not-yet-synced &middot; no-exchange-rate</span></div><div class="k3"><span class="word">no figure yet</span></div><div class="k4">no sample</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1">the listing currency had no rate at sync time</div><div class="n2"></div><div class="n3">tried 6h ago</div></div>
     </div>
 
-    <!-- state 4 — unresolvable: surfaced, never omitted -->
+    <!-- state 4 — unresolvable: surfaced, never omitted.
+         NO trade link here: this entry was found unresolvable OFFLINE, by
+         validation against the committed Trade Catalogue, before any request
+         was issued — so no search ever ran and no id was stored. An
+         unresolvable entry that HAD been searched earlier would keep its link. -->
     <div class="cr">
-      <div class="l1"><div class="k1">T4 Stun Threshold &middot; T1 Mana</div><div class="k2"><span class="ps-unres">unresolvable</span></div><div class="k3"><span class="word rust">not valued</span></div><div class="k4">no sample</div></div>
+      <div class="l1"><div class="k1">T4 Stun Threshold &middot; T1 Mana</div><div class="k2"><span class="ps-unres">unresolvable</span></div><div class="k3"><span class="word rust">not valued</span></div><div class="k4">no sample</div><div class="k5"></div></div>
       <div class="l2"><div class="n1">the statId is gone from the trade API &mdash; a patch did this</div><div class="n2"></div><div class="n3">tried 22h ago</div></div>
     </div>
 
-    <div class="toggle">&#9656;&nbsp; 3 pruned</div>
+    <div class="toggle">+&nbsp; 3 pruned</div>
   </div>
 
 </div>
@@ -367,6 +408,25 @@ stays literally true. All four Price States are shown, <b>not-yet-synced</b> in 
 entries are shown and marked, and one is a real figure too small to print at 2dp, so it reads
 <b>&lt; 0.01</b> rather than <b>0.00</b>.</p>
 
+<p class="gloss"><b>The Provenance mark is on the row, not in the panel</b>, and this specimen is
+where that rule is visible. The open row carries <span class="m-prior">prior only</span> once;
+<b>no combination row repeats it</b>. Provenance propagates pool-wide, so every entry in this
+panel carries that same label by construction &mdash; ten identical marks would discriminate
+nothing, which is the failure FR-11 exists to prevent, one surface further down. One label per
+<b>Item Class</b>, and a ranked row is now an Item Class, so the mark sits on exactly the unit it
+can speak about.</p>
+
+<p class="gloss"><b>The trade link is keyed on stored data, never on Price State</b>, and the
+spread here is the proof. Six rows carry the <b>&#8599;</b> and four do not. It is present on
+every <code>priced</code> row, on the <code>no-listings</code> row &mdash; nobody is asking today,
+but a search did run &mdash; and, tellingly, on the <b>no-exchange-rate</b> row, where a search
+ran in the active league and only the conversion failed. It is absent on <b>never-synced</b> (no
+search was ever issued, so no id exists), on <b>league-mismatch</b> (an id exists but points into
+last league's search, which is the stale answer honest-empty prevents), and on this
+<b>unresolvable</b> row, which was caught offline against the committed catalogue before any
+request. It is never drawn on a tombstone. Absent means <b>absent</b>: the cell is blank, not
+greyed and not disabled-looking.</p>
+
 
 <!-- ==================================================================== -->
 <!-- 2. THE SAME PANEL, TOMBSTONE BAND OPEN                               -->
@@ -379,27 +439,29 @@ entries are shown and marked, and one is a real figure too small to print at 2dp
       colour.</div>
 
     <div class="cr" style="border-bottom:1px solid #E0DAC6">
-      <div class="l1"><div class="k1">T4 Stun Threshold &middot; T1 Mana</div><div class="k2"><span class="ps-unres">unresolvable</span></div><div class="k3"><span class="word rust">not valued</span></div><div class="k4">no sample</div></div>
+      <div class="l1"><div class="k1">T4 Stun Threshold &middot; T1 Mana</div><div class="k2"><span class="ps-unres">unresolvable</span></div><div class="k3"><span class="word rust">not valued</span></div><div class="k4">no sample</div><div class="k5"></div></div>
       <div class="l2"><div class="n1">the statId is gone from the trade API &mdash; a patch did this</div><div class="n2"></div><div class="n3">tried 22h ago</div></div>
     </div>
 
-    <div class="toggle">&#9662;&nbsp; 3 pruned</div>
+    <div class="toggle">−&nbsp; 3 pruned</div>
 
     <div class="tomb">
       <div class="tz">Pruned &mdash; tombstones, excluded from sync and from the ranking sum</div>
       <!-- line two is re-cut: prune reason 560 + removal date 406 = 966. NOT the
            two age cells — a removal date is not a reading of either clock. -->
+      <!-- NO trade link on any tombstone, ever: a pruned entry has no market
+           worth checking. The cell is held so line one keeps its shape. -->
       <div class="cr tb">
-        <div class="l1"><div class="k1">T6 Stun Threshold &middot; T6 Accuracy</div><div class="k2">&dagger; pruned</div><div class="k3"><span class="word">not tracked</span></div><div class="k4">no sample</div></div>
+        <div class="l1"><div class="k1">T6 Stun Threshold &middot; T6 Accuracy</div><div class="k2">&dagger; pruned</div><div class="k3"><span class="word">not tracked</span></div><div class="k4">no sample</div><div class="k5"></div></div>
         <div class="l2"><div class="n1">dead modifier &mdash; no listing above 0.05 Divine all league</div><div class="d1">removed 2026-08-24</div></div>
       </div>
       <div class="cr tb">
-        <div class="l1"><div class="k1">T8 Cold Res &middot; T5 Mana</div><div class="k2">&dagger; pruned</div><div class="k3"><span class="word">not tracked</span></div><div class="k4">no sample</div></div>
+        <div class="l1"><div class="k1">T8 Cold Res &middot; T5 Mana</div><div class="k2">&dagger; pruned</div><div class="k3"><span class="word">not tracked</span></div><div class="k4">no sample</div><div class="k5"></div></div>
         <div class="l2"><div class="n1">tier band too low to clear any plausible threshold</div><div class="d1">removed 2026-08-24</div></div>
       </div>
       <div class="cr tb">
-        <div class="l1"><div class="k1">T6 Spirit &middot; T5 Crit Dmg</div><div class="k2">&dagger; pruned</div><div class="k3"><span class="word">not tracked</span></div><div class="k4">no sample</div></div>
-        <div class="l2"><div class="n1">rolled off this Base Type in patch 0.3.1</div><div class="d1">removed 2026-07-30</div></div>
+        <div class="l1"><div class="k1">T6 Spirit &middot; T5 Crit Dmg</div><div class="k2">&dagger; pruned</div><div class="k3"><span class="word">not tracked</span></div><div class="k4">no sample</div><div class="k5"></div></div>
+        <div class="l2"><div class="n1">rolled off this Item Class in patch 0.3.1</div><div class="d1">removed 2026-07-30</div></div>
       </div>
     </div>
   </div>
@@ -420,18 +482,19 @@ resets when the panel closes.</p>
 <h3>Specimen 3 &mdash; a Raw Base expansion, its one degenerate Combination</h3>
 <div class="frame">
 
-  <div class="r open raw"><div class="rk">7</div><div class="bs"><span class="nm">Stellar Amulet</span><span class="tag">Raw Base</span></div><div class="ev">0.87</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
+  <div class="r open raw"><div class="rk">4</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Stellar Amulet</span></div><div class="ev">1.27</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; ranked at its own current asking price, not at a craft outcome</span></div></div>
 
   <div class="panel">
-    <h4>Stellar Amulet <span style="font-family:-apple-system,'Segoe UI',system-ui,sans-serif;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#6B4A22;border-bottom:1px solid #6B4A22">Raw Base</span></h4>
+    <h4><span style="font-family:-apple-system,'Segoe UI',system-ui,sans-serif;font-size:11px;color:#6B4A22;margin-right:8px">&#9642;</span><span class="rawname">Stellar Amulet</span></h4>
     <div class="sub">Uncrafted at Item Level 82, ranked at its own current asking price and not at
       a craft outcome. One Combination is tracked here: the degenerate Combination of no affixes.
-      Payout Threshold 0.50 Divine. Every price here is a current asking price from a live
+      Payout Threshold 0.50 Divine. No Craft Recipe applies &mdash; a Raw Base is sold, not
+      crafted, so it carries no Craft Cost. Every price here is a current asking price from a live
       instant-buyout listing.</div>
 
     <!-- the note is declared verbatim by raw-base-row.expansionNote -->
     <div class="cr">
-      <div class="l1"><div class="k1">no affixes</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">0.87</div><div class="k4">9 listings</div></div>
+      <div class="l1"><div class="k1">no affixes</div><div class="k2"><span class="ps-priced">priced</span></div><div class="k3">1.27</div><div class="k4">9 listings</div><div class="k5"><a href="#" onclick="return false">&#8599;</a></div></div>
       <div class="l2"><div class="n1">no affixes &mdash; this Base Type priced as it drops, at Item Level 82</div><div class="n2">priced 11h ago</div><div class="n3">tried 4h ago</div></div>
     </div>
   </div>
@@ -455,7 +518,7 @@ the Item Level is spelled, never abbreviated.</p>
     <div class="ln">
       <div><b>Weights File</b>&nbsp; producer poe2db-scrape <span class="sep">|</span>
         generatedAt 2026-09-09 <span class="sep">|</span> gamePatch 0.3.1b</div>
-      <div class="aff">&mdash;&nbsp;the full sync report</div>
+      <div class="aff">&#8722;&nbsp;the full sync report</div>
     </div>
     <div><b>Last synced</b>&nbsp; 41 minutes ago <span class="sep">|</span>
       <b>Tracked List last edited</b>&nbsp; 2026-08-01</div>
@@ -474,8 +537,8 @@ the Item Level is spelled, never abbreviated.</p>
     </div>
     <div class="col">
       <span class="ch">What is broken</span>
-      <div class="grp"><n>12</n> entries across <n>6</n> Base Types are <b>unresolvable</b>: the
-        statId or the Base Type is no longer exposed by the trade API. They are excluded from
+      <div class="grp"><n>12</n> entries across <n>6</n> Item Classes are <b>unresolvable</b>: the
+        stat or the Base Type is no longer exposed by the trade API. They are excluded from
         valuation and shown everywhere they appear, never omitted.</div>
       <div class="grp"><n>1</n> pinned-starvation record, <n>2026-09-12</n>. The pinned set was
         truncated to reserve room for active entries, so a pin you set is not being served. That
@@ -483,9 +546,10 @@ the Item Level is spelled, never abbreviated.</p>
     </div>
     <div class="col">
       <span class="ch">What the weights cover</span>
-      <div class="grp"><n>38</n> of <n>44</n> rankable Base Types &mdash; <n>86%</n>. Re-measured
+      <div class="grp"><n>25</n> of <n>29</n> tracked Item Classes &mdash; <n>86%</n>. Re-measured
         on every regeneration of the Weights File, so this fraction can fall after a game patch
-        without anything else on the page changing.</div>
+        without anything else on the page changing. It is <b>reported, not a gate</b>: no
+        threshold and no layout binds to it.</div>
     </div>
   </div>
 
@@ -508,13 +572,16 @@ resting budget, so the strip alone never makes the page scroll in any data state
 
 <p class="gloss" style="margin-top:34px"><b>Column contracts, verified on this render.</b>
 Frame: 1060 &minus; (2 &times; 24) = <b>1012</b>. Combination row line one:
-460 + 250 + 140 + 116 = <b>966</b>. Line two: 560 + 200 + 206 = <b>966</b>. Tombstone line two:
+460 + 250 + 116 + 116 + 24 = <b>966</b>. Line two: 560 + 200 + 206 = <b>966</b>. Tombstone line two:
 560 + 406 = <b>966</b>. All three equal 1012 &minus; 2 border &minus; 44 padding, exactly, and
 every cell takes <b>pad-combination-cell-right</b> 12px. Ranked row, where an open row appears:
 32 + 222 + 84 + 88 + 94 + 492 = <b>1012</b> = content-width, with the chase column as three fixed
 164px cells. The 3px open marker is bled into the frame's 24px gutter rather than taken out of a
 column. Sync report: three equal columns of the panel's own inner width, matching the key block.
-No <code>overflow:hidden</code> anywhere, and no ellipsis rule on any cell inside an expansion.</p>
+No <code>overflow:hidden</code> anywhere, and no ellipsis rule on any cell inside an expansion.
+<b>No column contract moved at revision 3</b> &mdash; the unit glyph is paid for out of the
+retired <code>RAW BASE</code> tag, and the trade-link cell out of the figure cell's slack, which
+a two-decimal Divine figure or a money phrase never approached.</p>
 
 </div>
 </body>
