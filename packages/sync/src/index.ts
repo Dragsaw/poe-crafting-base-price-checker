@@ -9,3 +9,33 @@ import { CORE_PLACEHOLDER } from '@poe/core';
 export const SYNC_PLACEHOLDER = `${CORE_PLACEHOLDER}:sync`;
 
 export const SYNC_CONTRACTS_SCHEMA_VERSION = INITIAL_SCHEMA_VERSION;
+
+/**
+ * The one governed trade request path (FR-20, AD-8). `createTradeClient` is the
+ * **only** exported way to make a trade request, and `HttpPort` is deliberately
+ * not re-exported from `sync`: a second call site that wanted to build its own
+ * request would have to reach into `@poe/contracts` for the port, which makes
+ * the violation visible rather than convenient.
+ */
+export { createTradeClient } from './trade/client';
+export type {
+  TradeClient,
+  TradeClientOptions,
+  TradeRequest,
+  TradeResponseResult,
+  TradeResult,
+  TradeYieldReason,
+  TradeYieldResult,
+} from './trade/client';
+
+export { MissingUserAgentError, resolveUserAgent, USER_AGENT_ENV_VAR } from './trade/user-agent';
+export type { UserAgentRefused, UserAgentResolved, UserAgentResult } from './trade/user-agent';
+
+/**
+ * The skip record a `TradeResult` carries. The **parser, the ledger and the
+ * pacing functions are deliberately not exported**: together they are
+ * everything a second call site needs to assemble a parallel pacer against the
+ * same budget, which is exactly what withholding `HttpPort` was meant to
+ * prevent. They are imported by path inside this package, and by its tests.
+ */
+export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-headers';

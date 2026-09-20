@@ -14,7 +14,8 @@
     "check": "pnpm run typecheck && pnpm run lint && pnpm run depcruise",
     "test": "vitest run",
     "dev": "vite --config packages/web/vite.config.ts",
-    "sync:dry": "node packages/sync/src/dry-run.ts"
+    "sync:dry": "node packages/sync/src/dry-run.ts",
+    "fixtures:record": "node packages/sync/src/fixtures-record.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

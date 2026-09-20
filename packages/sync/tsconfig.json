@@ -4,6 +4,11 @@
     "composite": true,
     "declaration": true,
     "emitDeclarationOnly": true,
+    // `fixtures:record` is run by bare `node packages/sync/src/fixtures-record.ts`,
+    // and Node's type stripping performs no extension resolution: a relative
+    // specifier on that entry path must carry `.ts`. Permitted here because the
+    // package is `emitDeclarationOnly`.
+    "allowImportingTsExtensions": true,
     "rootDir": "src",
     "outDir": "dist",
     "types": ["node"]
