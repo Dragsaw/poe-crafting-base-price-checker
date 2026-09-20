@@ -201,10 +201,15 @@ Printing any of the five as a bare noun would be jargon without a job.
 - Provenance — `measured`, `uniform-prior`, `absent`.
 
 **Reason strings shown verbatim from FR-4:** `pool partial`, `class absent from
-weights file`. *The second was `base absent from weights file` through PRD
-revision 16.* The enum still has exactly two members. **Standing check:** this
-literal is PRD-owned and has now moved in two consecutive PRD revisions, so
-re-read FR-4 on every absorption rather than trusting the copy here.
+weights file`, `class disagrees with weights file`. *The second was `base absent
+from weights file` through PRD revision 16. The third was added when D-2 closed:
+a class failing any of AD-17's five cross-file checks has a `complete`,
+published pool, so neither of the first two is true of it.* The enum has exactly
+three members, and **one string covers all five checks** — which check, which
+entry and its canonical key are diagnosis and never reach the appendix.
+**Standing check:** this enum is PRD-owned and has now moved in three
+consecutive PRD revisions, so re-read FR-4 on every absorption rather than
+trusting the copy here.
 
 **Back-end only — must not appear on the page:** Modifier Reference, Stat Line,
 Source Modifier, Eligible Pool, Modifier Weight, Chunk, Workload, Refresh
@@ -733,7 +738,7 @@ dataset in one state at one moment.
 | 6 | reason `league-mismatch` | Combination row | Note: *the observation belongs to another league*. Treated as absent, never as stale-but-usable. The attempted clock still shows |
 | 7 | reason `no-exchange-rate` | Combination row | Note: *the listing currency had no rate at sync time*. There is no "priced but not convertible" state. The attempted clock still shows |
 | 8 | Curation Status `active` | Expansion | No marking. It is the ordinary case |
-| 9 | Curation Status `pinned` | Expansion | Marked on its Combination row as `pinned`. `[NOTE FOR UX]` No visual treatment for the pinned mark exists in the chosen direction, and it may not take a semantic ink — an ink states that a figure's footing is degraded or broken, and a Curation Status states nothing about the figure (`DESIGN.md`, Colors). It wants a non-colour cue |
+| 9 | Curation Status `pinned` | Expansion | `[decision — memlog 199]` Marked on its `{components.combination-row}` by `{components.curation-status-pinned}` — `* pinned`, **leading** line one ahead of tier plus short form. It takes no semantic ink and no sepia: an ink states that a figure's footing is degraded or broken and a Curation Status states nothing about the figure, and sepia carries operator choice, which this is not (`DESIGN.md`, Colors). **It is a lookup key, not a badge.** `{components.trust-strip}` raises `× pinned entries starved this run` (FR-17, FR-25) and names no entries, so this mark is what the player scans open expansions for afterwards — which is why it leads the cell and sits at `600` rather than being quieted to a tertiary decoration |
 | 10 | Curation Status `pruned` | `{components.tombstone-band}` | Collapsed behind `+ N pruned`. Opened: line one is the Combination struck through with `† pruned` and *not tracked* in the money slot. Line two is the prune reason and `removed YYYY-MM-DD` in `{spacing.col-tombstone-removed}` — **not** the two age cells `[decision — memlog 116]`, because a removal date is not a reading of either clock |
 | 11 | Provenance `measured` | Ranked row | Nothing. The empty cell is the statement |
 | 12 | Provenance `uniform-prior` | Ranked row | `{components.trust-mark-prior}`, carried by **every** crafted row whose Item Class has one invented tier anywhere in its scoped pool |
@@ -741,6 +746,7 @@ dataset in one state at one moment.
 | 13 | Provenance `absent` | Appendix only | `{components.trust-mark-unknown}` |
 | 14 | Unrankable — `pool partial` | Appendix | Reason verbatim, plus a quiet note where one is known (e.g. which slot's pool has no entry for that stat) |
 | 15 | Unrankable — `class absent from weights file` | Appendix | Reason verbatim. A freshly scraped class may carry a note that it may return after the next weights run. *This literal moved at revision 3 — see Domain Vocabulary's standing check* |
+| 15a | Unrankable — `class disagrees with weights file` | Appendix | Reason verbatim, and **one string for all five cross-file checks** (state 27, FR-4). The distinguishing fact for the player is that this class's pool is `complete` and published — the disagreement is in his own Tracked List, so this is the one Unrankable row he can fix himself. The quiet note may say so; it may **not** name the check, the entry or its key, which are diagnosis and belong to the fuller report whose home is still open (state 27's `[NOTE FOR UX]`). Lettered rather than numbered, as 12a was, because the state numbers are stable identifiers others cite |
 | 16 | Unrankable class whose Base Types still rank | Appendix + ranked list | The Item Class sits in the appendix with its reason. Its note **names the fact, not a rank**: *some of its Base Types rank on the raw branch*. A class holds several Base Types, they do not rank together, and pointing at one position would invent a relationship the list does not have. Those Base Types rank normally in the list, each carrying `{components.unit-glyph-raw}` |
 | 17 | Stale row (≥48h) | Ranked row | `{components.trust-mark-stale}`, with the clock said in words |
 | 18 | Never attempted | Ranked row | `{components.trust-mark-never}`, italic |
@@ -752,7 +758,7 @@ dataset in one state at one moment.
 | 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row freshness is what makes that honest. No global "stale" treatment |
 | 25 | Nothing clears the threshold | Whole list | Distinct from state 24 and from state 23. `[NOTE FOR UX]` The PRD does not settle whether this has its own copy. It must not be confused with "no data" |
 | 26 | Schema-invalid artifact | Whole page | `{components.refusal-screen}` replaces everything (FR-33, NFR-8). It names which artifact, which schema version it declared and which the page expects. The player can do nothing here and is not offered a retry — a schema mismatch is fixed by publishing a valid set. One sentence says the page renders again as soon as one exists, and that nothing old is served meanwhile |
-| 27 | Cross-file policy check failure | Report, never refusal | **Four checks, not five** — edge alignment, empty containment set, `coOccur` overlap, kind agreement — reported at load. The straddle rule retired with contract `5.0.0`: tiers overlap freely in the raw data and no band could satisfy it (AD-18, FR-29). The page still renders, the affected Item Classes shown as Unrankable with that reason (FR-33). `[NOTE FOR UX]` Whether the report is a global region, inline on the affected Item Class, or both is unsettled. `{components.sync-report-panel}` is the obvious home, since it already carries every other operational figure, but nothing has ruled on it |
+| 27 | Cross-file policy check failure | Report, never refusal | **Five checks** — edge alignment, empty containment set, `coOccur` overlap, kind agreement, class discriminability — reported at load (AD-17). *Revision 3 read "four checks, not five", which was a correction aimed at the retired **straddle rule** — tiers overlap freely in the raw data and no band could satisfy it (AD-18, FR-29) — and not at class discriminability, which spine revision 17 added afterwards into the slot that sentence had emptied. Read as a rejection of the fifth check it was not, it argued against a binding rule, so it is struck rather than renumbered.* The page still renders, the affected Item Classes shown as Unrankable (FR-33). **The reason string is `"class disagrees with weights file"`**, FR-4's third, printed verbatim per `{components.unrankable-appendix}` — one string for all five checks, because such a class has a `complete`, published pool and neither of FR-4's other two strings is true of it. **Which check failed, which entry failed it and that entry's canonical key are diagnosis and never appear in the appendix.** `[NOTE FOR UX]` Whether that fuller report is a global region, inline on the affected Item Class, or both is **still unsettled**. `{components.sync-report-panel}` is the obvious home, since it already carries every other operational figure, but nothing has ruled on it — and FR-4's third string does not rule on it either |
 | 28 | Artifact fetch failure (as against invalid) | Whole page | `{components.fetch-failure-screen}` replaces everything and names which of the eight files did not arrive. The player can click `+ Try again`, which re-attempts the whole set. **A partial set is never rendered** — FR-33 requires a single consistent set, and half a ranking is worse than no ranking |
 | 29 | Stale Weights File after a patch | `{components.trust-strip}` | The page is static and makes no call to the game or the trade API, so it has **no live patch to compare against** and claims none. What it does is show the `gamePatch` the loaded Weights File declares, beside its producer and `generatedAt`, so the player — who knows which patch he is playing — can see the mismatch himself. Neither a stale weights file nor a stale catalogue breaks the page |
 | 30 | Trust strip at rest, healthy | `{components.trust-strip}` | Two lines carrying five plain facts — producer, `generatedAt`, `gamePatch`. Last synced, tracked-list edit date — with no mark or colour on any of them `[decision — memlog 89]`, and nothing else `[ASSUMPTION — memlog 59]`. Affordance reads `+ the full sync report`, right-aligned. This is the state on every load |
@@ -777,18 +783,17 @@ row past the state they meant. All five are corrected here. The numbers are
 stable identifiers that other documents and reviews cite, so **a renumbering is a
 sweep and not a script**.
 
-**A note on the recipe axis, flagged rather than resolved** `[event — memlog
-186]`. AD-17 ranks the **cross product** of every crafted Item Class with every
-recipe, and breaks ties "on the row's unit key, then the recipe id" — a rule that
-only has work to do if both recipes' rows share one ordering, which would make
-the crafted branch carry each class twice. PRD FR-1 says the ranking "is read
-under one recipe at a time". **This document is written to the PRD**, per the
-revision-3 directive that the PRD wins: `core` computes every pair and the view
-renders the pairs for the active recipe only. That reconciliation is plausible
-and **nobody has stated it**. If the spine's reading is the intended one instead,
-what changes here is large — the list doubles, `{components.craft-recipe}` stops
-being a filter, and every row has to name its recipe — so it is raised for the
-spine review rather than absorbed silently.
+**The recipe axis, ratified** `[decision — memlog 186]`. This document's
+revision-3 reconciliation — `core` computes every `(Item Class, recipe)` pair and
+the view renders the active recipe's pairs only — was written to PRD FR-1 by
+directive and stated nowhere. **AD-17 now states it**, so the reading this
+document was built on is the binding one and nothing here changes: the list does
+not double, `{components.craft-recipe}` is a filter, and no row names its recipe.
+The cross product is ordering-internal and never reaches the page. Two
+consequences of AD-17's ruling bind this document: FR-5's bound is applied
+**after** the recipe filter, and a Raw Base — carrying no recipe — renders under
+both recipes, so a switch re-interleaves the mixed list without moving the raw
+rows relative to each other.
 
 `[NOTE FOR UX]` **FR-30's world is still unspecified, and it shrank**
 (memlog 72, re-derived at memlog 185). Until a conforming Weights File exists,
@@ -898,13 +903,12 @@ opened, and the sync report open.
    handled. The cost is one wasted click onto the trade site's own explicit
    *"search is no longer valid"* page, which misleads nobody.
 
-   `[NOTE FOR UX]` One smaller gap, reported not fixed
-   (review-prd-conformance-trade-link.md, finding T3): the brief's SM-1
-   metric ("the trade site stays closed mid-session") sits in tension with the
-   page's one link back to that site. It is not resolved here —
-   SM-1 most likely reads as "stays closed for habitual re-checking", which a
-   deliberate one-off verification click does not violate, but nobody has
-   ruled on it.
+   **Finding T3 is closed, and it was a misreading rather than a tension**
+   (review-prd-conformance-trade-link.md). It held that SM-1 sat in tension with
+   the page's one link back to the trade site. **PRD SM-1 now rules it**, and
+   this document does not restate the ruling: cite SM-1. What binds here is only
+   the consequence — the link is not a metric failure, so nothing about it needs
+   hiding or defending.
 
 Plus one dismissal: the uniform-prior banner's *dismiss for this session ×*.
 
@@ -1292,10 +1296,13 @@ Run against `references/validate.md` Pass 1.
   empty, stale, refusal, fetch-failure, report, sync-health, grown-list and
   **Craft Recipe** conditions. Revision 3 added 12a (a Raw Base's absent
   Provenance), 34 (a recipe switch), 35 (an uncostable recipe) and 36 (a class
-  unrankable under one recipe only). **Six** carry `[NOTE FOR UX]`: the pinned
-  mark (9), the skeleton's own appearance (22), the nothing-clears copy (25),
-  the cross-file report's placement (27), what crafted rows do under an
-  uncostable recipe (35), and the reason string that case would need (36).
+  unrankable under one recipe only). **Five** carry `[NOTE FOR UX]`: the
+  skeleton's own appearance (22), the nothing-clears copy (25), the cross-file
+  report's placement (27), what crafted rows do under an uncostable recipe (35),
+  and the reason string that case would need (36). *It was six until the pinned
+  mark closed* `[decision — memlog 199]` — state 9 now carries
+  `{components.curation-status-pinned}` and no note. The count is a consequence
+  and not a target.
 - **State-number references swept.** Memlog 170 renumbered rows by script
   without sweeping the prose that cites them, so five references were off by
   one. All five are corrected at revision 3 and the numbers are now treated as
@@ -1395,9 +1402,16 @@ Run against `references/validate.md` Pass 1.
     vocabulary (Domain Vocabulary; PRD §3's own `[ASSUMPTION]`).
   - What crafted rows show while the active recipe is uncostable (state 35), and
     the reason string a recipe-scoped Unrankable would need (state 36).
-  - The pinned mark, the skeleton's appearance, and the nothing-clears copy.
+  - The skeleton's appearance, and the nothing-clears copy.
   - Where a cross-file validation report lands.
-- **Raised against the architecture, not resolved here** (186): whether the
-  ranked list shows one recipe at a time (PRD FR-1) or the cross product of
-  classes and recipes (AD-17). These spines are written to the PRD per the
-  revision-3 directive, and the conflict is flagged for the spine review.
+  - Whether `† pruned` and `* pinned` belong in `{components.key-block}`, whose
+    contract is to list every mark that can appear (`DESIGN.md`, Components;
+    memlog 201).
+- **Closed by decision** (199, 200): the pinned mark. It is
+  `{components.curation-status-pinned}`, and the reason it is loud rather than
+  tasteful is recorded with it — it answers the trust strip's unnamed
+  starvation line, so being findable in a scan *is* the requirement.
+- **Closed against the architecture** (186): the ranked list shows one recipe at
+  a time. AD-17 now rules that `core` orders the cross product and the view
+  renders the active recipe's rows, ratifying the reconciliation these spines
+  were already written to. No change here; cite AD-17.

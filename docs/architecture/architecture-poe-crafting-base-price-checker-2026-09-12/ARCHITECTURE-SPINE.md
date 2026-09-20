@@ -343,6 +343,14 @@ never import each other.
   on every change to any input. `sync` must not write a rank, a score, or an ordering.
   `web` may not compute any ranking term itself, and only renders what `core` returns.
 
+  **The pass spans the cross product AD-17 orders**, not only the active recipe's pairs —
+  which is what makes a recipe switch a filter over an ordering already computed rather
+  than a second pass. NFR-6's read-time budget is therefore measured **against the cross
+  product**, and it is a threshold change, not a recipe switch, that has to come in under
+  it. Computing the inactive recipe's pairs inside that pure pass is **not** the
+  precomputation this AD forbids: what is forbidden is a rank, a score or an ordering
+  persisted into an artifact.
+
 ### AD-5 — Canonical modifier identity is the trade stat id plus a bounded value band
 
 - **Binds:** all
@@ -1093,6 +1101,22 @@ never import each other.
   all: AD-4 forbids `web` from computing a ranking term, and a builder would either break
   AD-4 or invent a `core` API that nothing binds — two builders inventing two different
   tie-breaks for the product's primary screen.
+
+  **The ordering spans the cross product; the view renders one recipe's rows.** `core`
+  ranks every `(itemClass, recipe)` pair inside the single ordering above — which is what
+  gives the recipe-id tie-break work to do — and `web` renders only the rows whose recipe
+  is the active one, so a crafted class appears on the page exactly once, under the recipe
+  the player chose (FR-1). The cross product is therefore an **ordering-internal fact and
+  never player-observable**: the recipe-id tie-break is asserted against the ordering
+  `core` returns and never through the view, which cannot see the comparison it would be
+  testing. Two consequences bind. **Any bound on the rendered list's length is applied
+  after the recipe filter, never before** — a bound taken against the cross product and
+  then filtered yields a short list, silently, with nothing in the system to report it.
+  And **a raw row carries no recipe**, so it is rendered under both recipes unchanged: a
+  recipe switch re-interleaves the mixed list without reordering the raw rows relative to
+  each other. `[ADOPTED]` ratifying `EXPERIENCE.md`'s revision-3 reconciliation, which was
+  written to FR-1 and until now unstated here — the gap that made this spine and the PRD
+  appear to own the same fact.
 
   **Raw bases rank on a separate branch.** A `raw` tracked entry is
   never a summand — at `P = 1` it would enter at certainty and swamp every crafted

@@ -22,6 +22,9 @@ PoE crafting base price checker. Pre-code: planning lives in `docs/` (PRD, archi
 ## Running and verifying
 
 - Run Python scripts with `uv run script.py`, never bare `python`.
+- Browser work needs a named session. Run `agent-browser session id --scope worktree --prefix poe`, then put the printed id before every subcommand: `agent-browser --session <id> open <url>`. The unnamed default session is one browser shared by every agent on this machine.
+- The agent-browser docs set that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. It breaks the literal-command rule in Policy.
+- Start the dev server on an explicit port. Read the URL the server prints before you open it. A second worktree takes a different port, so a fixed 5173 can verify another agent's build.
 
 ## Conventions that differ from defaults
 

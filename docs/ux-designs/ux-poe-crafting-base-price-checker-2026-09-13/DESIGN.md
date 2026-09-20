@@ -660,7 +660,7 @@ components:
     columns: 'item class {spacing.col-appendix-base} · mark {spacing.col-appendix-mark} · reason {spacing.col-appendix-reason} · note {spacing.col-appendix-note}'
     unit: 'every row here is an ITEM CLASS. Unrankability governs the crafted branch only — a Raw Base needs no Eligible Pool and ranks regardless (PRD FR-4) — so a Base Type never appears in this appendix.'
     unitGlyph: '{components.unit-glyph-class}, leading the first cell exactly as it leads a ranked row. The appendix holds one unit, but the glyph is what ties a class here to the same class in the list.'
-    reasonStrings: 'verbatim from PRD FR-4, and there are exactly two: `pool partial` and `class absent from weights file`. The second was `base absent from weights file` until revision 3 and the literal MOVED — see Do''s and Don''ts.'
+    reasonStrings: 'verbatim from PRD FR-4, and there are exactly three: `pool partial`, `class absent from weights file` and `class disagrees with weights file`. The second was `base absent from weights file` until revision 3 and the third arrived when D-2 closed — the literal set has MOVED in three consecutive PRD revisions, see Do''s and Don''ts. The third covers all five of AD-17''s cross-file checks; the check name, the failing entry and its key are diagnosis and never print here.'
     lastRowRule: 'none'
   key-block:
     borderTop: '{spacing.hairline} solid {colors.rule-strong}'
@@ -704,9 +704,31 @@ components:
     hoverColor: '{colors.sepia}'
     typography: 'takes the type size of the line it sits in, same rule as a trust mark'
     clickTarget: 'the glyph only — not the row, not the cell'
+    restraintWhy: 'PINNED, and functional rather than stylistic [decision — memlog 202]. This is the page''s ONLY outbound navigation and PRD SM-1 counts sessions in which the trade site stays shut, so a findable link invites the habit SM-1 measures the absence of. Nothing measures the link itself — SM-1''s Validates list omits FR-21 deliberately — so there is no metric to appeal to against a later proposal to promote it. No button, no label, no wider {spacing.col-combination-trade-link}, no click target beyond the glyph.'
     renderedWhen: 'the entry carries a stored lastSearchId AND its lastSearchLeague equals the active league of data/config.json — a test on the stored field, never on Price State (PRD FR-33, FR-21; AD-9, AD-24)'
     hiddenWhen: 'no lastSearchId — a never-synced row, and an entry found unresolvable offline before any request was issued (PRD FR-24) · lastSearchLeague differs from the active league, so the id points into a previous league (PRD FR-31) · a pruned tombstone row'
     appliesTo: '{components.combination-row}, including the Raw Base row''s single combination — never {components.tombstone-band}'
+  # THE LIVE HALF OF THE CURATION STATUS PAIR [decision — memlog 199].
+  # `pruned` is marked by {components.tombstone-band}'s `† pruned`; this is its
+  # sibling on a row that is still tracked. It is NOT a trust mark and NOT a badge.
+  # WHY IT IS LOUD RATHER THAN TASTEFUL: {components.trust-strip}'s third line reads
+  # `× pinned entries starved this run` (FR-17, FR-25) and NAMES NO ENTRIES, so this
+  # mark is the LOOKUP KEY a player scans open expansions for once that line fires.
+  # Findability is the mark's whole job. Do not quiet it down to 400 or to a
+  # trailing position — that reads as good taste and is a functional regression.
+  curation-status-pinned:
+    glyph: '*'
+    word: 'pinned'
+    color: '{colors.ink-tertiary}'
+    fontWeight: '600'
+    fontStyle: 'normal'
+    typography: 'takes the type size of the line it sits in, the same rule as a trust mark'
+    position: 'LEADS {spacing.col-combination} on line one of {components.combination-row}, ahead of tier + short form — the same reading position † pruned holds in a tombstone, and the one column the eye already runs down. Never trailing, and never in the state cell: on a live row that cell is held by {components.price-state-glyph}'
+    appliesTo: 'Curation Status `pinned` only. `active` is marked by NOTHING — silence-means-ordinary holds (memlog 32)'
+    colorWhy: 'no semantic ink (memlog 173) and no sepia (memlog 184). An ink says a figure''s footing is degraded or broken and a Curation Status says nothing about the figure; sepia says the player chose this, and he did not choose it on this page. {colors.ink-tertiary} is the tombstone''s own non-ink and carries the pair consistently.'
+    glyphWhy: 'resident in Segoe UI Regular, Semibold AND Bold per the hard rule above, collides with no mark in the vocabulary (≡ ▪ ● ○ ∆ × ◊ ? » ↗ †), and reads natively as *a human marked this by hand*, which is what a Curation Status is.'
+    glyphRejected: '‡ — pinned and pruned mean INVERSES, and a pair separated by one crossbar at this size whose two meanings are opposites is a worse trade than the ≡/▪ weakness memlog 197 accepted, where the meanings are merely different. • — one nudge from {components.price-state-glyph}.priced ●, on a line that carries both. Weight-alone on the short form — invisible in a scan, and the scan is the job.'
+    widthNote: 'VERIFY AT BUILD, not assumed here. `* pinned ` leads a 460px {spacing.col-combination} that already holds tier + short form, and line one does NOT wrap or ellipsise ({components.combination-row}.ellipsis). The mark appears on pinned rows only, so this is a per-row worst case rather than a column-budget change, and no column sum is reopened. Measure the longest tier + short form against 460px less the mark before shipping.'
   tombstone-band:
     background: '{colors.paper-deep}'
     borderTop: '2px solid {colors.edge}'
@@ -844,14 +866,23 @@ affordance, both unit glyphs. Ochre and rust carry the second, and nothing else
 may.
 
 *This is what stops the next component reaching for it.* Two live `[NOTE FOR UX]`
-items want a colour — the `pinned` Curation Status and the curation fallback —
+items wanted a colour — the `pinned` Curation Status and the curation fallback —
 and memlog 173 refused them the retired slate on the ground that neither says
 anything about the figure. Sepia is not a semantic ink, so that refusal did not
 reach it, and after the active recipe's rule sepia was the obvious next home for
 both. It is now closed to them on a stated test rather than by precedent:
 `pinned` is a **Curation Status**, a fact about the Tracked List that the player
 did not choose on this page, and the fallback is a **curation gap**. Neither is
-an operator choice. Both still want a non-colour cue.
+an operator choice. Both want a non-colour cue.
+
+**`pinned` has since taken one and is closed** `[decision — memlog 199]`. It is
+`{components.curation-status-pinned}` — glyph plus word `* pinned` in
+`{colors.ink-tertiary}` at `600`, leading line one of
+`{components.combination-row}`. The double refusal above is what made it
+findable rather than pretty: denied both registers, the mark had to earn its
+legibility from position and weight, which is the right answer here anyway
+because the mark's job is to be *found*. **The curation fallback is still
+open** and is a different problem — see Components.
 
 *The unit glyphs are the load-bearing case of the sepia-means-nothing rule*
 `[decision — memlog 184]`. `{components.unit-glyph-class}` `≡` and `{components.unit-glyph-raw}` `▪`
@@ -890,7 +921,7 @@ and it is recorded here so nobody reads two inks as a palette that lost its
 nerve.
 
 **The freed slot is not reserved, and that is a decision** `[decision — memlog
-173]`. Two live `[NOTE FOR UX]` items are blocked on wanting a colour — the
+173]`. Two live `[NOTE FOR UX]` items were blocked on wanting a colour — the
 `pinned` Curation Status, and the curation fallback for a modifier with no short
 form or no declared Accepted Tier. Neither may have the slate. A semantic ink on
 this page means **something is wrong with what a figure rests on**: ochre says
@@ -904,6 +935,11 @@ nothing. Holding the slot open against a future third epistemic state would also
 have been a reservation nobody could spend: if consumer-side pro-rating is ever
 adopted, a middle Provenance value returns in that same change (AD-10's revisit
 condition) and takes a fresh decision with it.
+
+*The refusal did its job on the first of the two* `[decision — memlog 199]`.
+`pinned` took a non-colour cue and closed — `{components.curation-status-pinned}`
+— without the ink family gaining a member. One remains open: the curation
+fallback.
 
 **No third ink, no success colour.** There is deliberately no green. A healthy
 row is marked by nothing at all (memlog 32). Adding a green *measured* badge
@@ -1900,8 +1936,8 @@ an upper bound is not a number, then `{spacing.appendix-row-height}` rows in
 `{typography.appendix-row}` across four fixed columns: the Item Class, led by
 `{components.unit-glyph-class}`, in `{spacing.col-appendix-base}`; the ochre
 *unknown* mark in `{spacing.col-appendix-mark}`; the reason verbatim from FR-4 —
-`pool partial`, `class absent from weights file` — in
-`{spacing.col-appendix-reason}`; and a quiet italic note in
+`pool partial`, `class absent from weights file`, `class disagrees with weights
+file` — in `{spacing.col-appendix-reason}`; and a quiet italic note in
 `{spacing.col-appendix-note}`. The last row drops its rule.
 
 *Every row here is an Item Class, and that is a rule rather than an
@@ -1910,13 +1946,25 @@ no Eligible Pool and ranks regardless (PRD FR-4) — so **a Base Type never
 appears in this appendix**. The glyph is carried anyway, because what ties a
 class in the appendix to the same class in the list is the mark they share.
 
-*The second reason string moved at revision 3.* It was `base absent from weights
-file` through PRD revision 16 and is now `class absent from weights file`
-(FR-4). The enum still has exactly two members and they are still different facts
-for the player — a producer that declared what it could not guarantee, against a
-class the producer never published. The literal is PRD-owned, printed verbatim,
-and has now moved in two consecutive PRD revisions; see Do's and Don'ts for the
+*The second reason string moved at revision 3, and a third was added when D-2
+closed.* The second was `base absent from weights file` through PRD revision 16
+and is now `class absent from weights file`; the third is `class disagrees with
+weights file` (FR-4). The enum has exactly three members and they are three
+different facts for the player — a producer that declared what it could not
+guarantee, a class the producer never published, and a class the producer *did*
+publish whose Tracked List entries contradict it. The third is the only one the
+player can fix himself. **One string covers all five of AD-17's cross-file
+checks**: the check name, the failing entry and its canonical key are diagnosis
+and never print in this column. The enum is PRD-owned, printed verbatim, and has
+now moved in three consecutive PRD revisions; see Do's and Don'ts for the
 standing check.
+
+*`{spacing.col-appendix-reason}` is 250px and the longest string is now `class
+disagrees with weights file` at 33 characters, three longer than the previous
+longest.* Appendix rows set in `{typography.appendix-row}`, so this is the cell
+to re-measure if a fourth string is ever coined — a reason that ellipsises is
+worse than no appendix, because the player cannot tell which of three facts he
+is looking at.
 
 *Where a class's Base Types still rank.* An Item Class can sit here while Base
 Types belonging to it rank on the raw branch (PRD FR-4), so a class may carry an
@@ -2023,10 +2071,75 @@ in a previous league. It is never drawn in `{components.tombstone-band}`. The 24
 `{spacing.col-combination-figure}` (140 → 116), which had slack: a money-phrase
 or a two-decimal Divine figure never approaches 116px minus its padding.
 
+*The trade link's restraint is functional and not stylistic* `[decision — memlog
+202]`. Glyph-only, `{colors.ink-tertiary}`, the glyph alone as the click target,
+no row-level affordance and no label — and **none of that is taste**. This is the
+page's only outbound navigation, and PRD **SM-1** counts sessions in which the
+trade site stays shut. A findable link invites exactly the habit SM-1 exists to
+measure the absence of, which makes a prominent trade link the one piece of UI on
+this page that would work against a primary metric. *Nothing measures the link
+itself* — SM-1's `Validates` list omits FR-21 deliberately (see SM-1), and FR-21
+mandates the link regardless. So there is no metric to appeal to if someone later
+proposes making it easier to find; there is only this. **Do not promote it:** no
+button, no label, no widening of
+`{spacing.col-combination-trade-link}`, no extension of the click target to the
+cell or the row.
+
 *The `×` appears at two weights on purpose.* At `700` it is
 `{components.trust-mark-unresolvable}`, a trust mark on a ranked row. At `600`
 it is `{components.price-state-glyph}`'s `unresolvable`, labelling a Price State
 inside an expansion. Two roles, two surfaces, one glyph — not a contradiction.
+
+**Curation status, pinned** (`curation-status-pinned`) `[decision — memlog 199]`
+— glyph plus word `* pinned` in `{colors.ink-tertiary}` at `600`, roman, taking
+the type size of the line it sits in. It **leads** `{spacing.col-combination}` on
+line one of `{components.combination-row}`, ahead of tier plus short form. The
+`active` status is marked by nothing at all; `pruned` is marked by the tombstone's
+`† pruned` below.
+
+*It is a lookup key, not a badge, and that is the whole specification.*
+`{components.trust-strip}` raises `× pinned entries starved this run` (FR-17,
+FR-25) and **names no entries**. The player is then looking for *which ones*,
+across however many expansions he opens. So this mark is the answer to a question
+the page asked three regions further up, and its job is to be **found in a scan** —
+which fixes both the position (leftmost, in the one column the eye already runs
+down) and the weight (`600`, the trust-mark register). A later pass that reads
+"tertiary mark" and quietly takes it to `400`, or moves it to the end of the cell
+where it looks tidier, has broken the feature without touching the ink.
+
+*It may not borrow a colour, and that constraint produced the answer.* No
+semantic ink — an ink says a figure's footing is degraded or broken, and a
+Curation Status says nothing about the figure (memlog 173). No sepia — sepia
+carries operator choice, and this is a fact about the Tracked List the player
+never chose on this page (memlog 184). Denied both registers, the mark had to
+earn legibility from position and weight, which is what it needed anyway.
+
+*The glyph, and the three that were refused.* `*` is resident in Segoe UI
+Regular, Semibold **and** Bold — the hard rule of this vocabulary — collides with
+nothing in it, and reads natively as *a human marked this by hand*. Refused:
+**`‡`**, the obvious dagger sibling of `† pruned`, because `pinned` and `pruned`
+mean **inverses** and a pair separated by one crossbar at this size whose two
+meanings are opposites is a worse trade than the `≡`/`▪` weakness this document
+already accepts, where the meanings are merely different; **`•`**, one nudge from
+`{components.price-state-glyph}`'s `●` *priced*, on a line that carries both; and
+**weight alone** on the short form, which is invisible in exactly the scan the
+mark exists for.
+
+`[NOTE FOR UX]` **Line-one width is to be verified at build, not assumed here.**
+The mark leads a 460px `{spacing.col-combination}` that already holds tier plus
+short form, and line one neither wraps nor ellipsises. It appears on pinned rows
+only, so this is a per-row worst case rather than a column-budget change and **no
+column sum is reopened** — but the longest tier plus short form must be measured
+against 460px less the mark before this ships.
+
+`[NOTE FOR UX]` **Two marks in this vocabulary have no key-block entry**, and
+that is now visible rather than assumed. `{components.key-block}`'s columns are
+*Silence means healthy*, *Provenance marks* and *Age marks*, and its contract
+(memlog 42) is that the latter two "list every mark that can appear". Neither
+`† pruned` nor `* pinned` appears in any of the three. Either curation marks are
+out of scope for a block scoped to trust and age — defensible, since both sit
+inside an expansion the player opened deliberately — or the block needs a fourth
+column and a height re-check. **Reported, not fixed** `[memlog 201]`.
 
 **Tombstone band** (`tombstone-band`) — behind a `+ N pruned` toggle. Opened, it is a
 `{colors.paper-deep}` band under a 2px `{colors.edge}` rule with its own
@@ -2184,7 +2297,7 @@ conformance claims.
 | Raise a rust mark, a word and a count in the trust strip when a health figure is bad | Read silent-when-fine as silent-always, and let a broken list render as a clean page |
 | Call the fourth column **Provenance**, in the header and in the key block | Call it "Weight" — a synonym for one Glossary term and a collision with another |
 | Spell *Divine* and *Item Level*, or state the unit once in a column header | Print `div` or `ILVL`, which the Glossary does not license |
-| Print FR-4's reasons verbatim as `pool partial` and `class absent from weights file` | Carry `base absent from weights file`, the revision-16 spelling. **Standing check:** this literal is PRD-owned and has moved in two consecutive PRD revisions, so re-read FR-4 on every absorption rather than trusting the copy here |
+| Print FR-4's reasons verbatim as `pool partial`, `class absent from weights file` and `class disagrees with weights file` | Carry `base absent from weights file`, the revision-16 spelling; carry a two-member enum, the pre-D-2 set; or print the failing check's name beside the third string. **Standing check:** this enum is PRD-owned and has moved in three consecutive PRD revisions, so re-read FR-4 on every absorption rather than trusting the copy here |
 | Pair every semantic ink with its glyph and its word | Distinguish anything by hue alone |
 | Keep to the two semantic inks | Introduce a third colour, a success colour, or a severity ramp |
 | Mark Provenance once, on the ranked row — one label per **Item Class** | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |

@@ -97,7 +97,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Trade Catalogue** — the committed mirror of the trade API's own data endpoints, refreshed on command at patch cadence. It is an identity and validation authority only and contributes nothing to the Eligible Pool (AD-25).
 - **Eligible Pool** — the set of Modifier Weights that can roll in one Item Class and slot, scoped to a Tracked Entry's Item Level Floor before any probability is computed (AD-11, AD-17). A pool declared anything other than `complete` makes its Item Class Unrankable.
 - **Provenance** — what a derived figure rests on, in a three-value order from weakest to strongest: `absent` (an upper bound from a partial pool, not an estimate), `uniform-prior` (an invented weight), `measured` (a weight someone measured, never ground truth; R-3) (AD-10). Every derived figure carries the weakest Provenance and the oldest timestamp of its inputs.
-- **Unrankable** — an Item Class the tool excludes from the ordering because its Eligible Pool is incomplete or absent; it appears in a separate group with the reason (AD-17, FR-4).
+- **Unrankable** — an Item Class the tool excludes from the ordering because its Eligible Pool is incomplete or absent, or because its Tracked List entries contradict the Weights File; it appears in a separate group with the reason (AD-17, FR-4).
 - **Chunk** — one bounded, resumable unit of sync work, sized at runtime and never configured (AD-7).
 - **Dataset** — the published snapshot of the latest Price Observation per Tracked Entry, together with the current exchange rates (AD-19, AD-20).
 - **Sync Report** — the published structured record of a sync run: requests consumed per source, unresolvable entries, entries not reached in this Chunk *(PRD-owned)*, pinned-starvation records, the measured pool-coverage fraction with its denominator, and the date of the last Tracked List edit (AD-7, AD-12, AD-27, FR-25).
@@ -157,8 +157,10 @@ Item Classes that `core` cannot rank honestly appear in a separate group, each w
 
 **Consequences (testable):**
 - An Item Class whose Eligible Pool for either slot is not `complete`, or for which the Weights File publishes no pool at all, is Unrankable and leaves the ordering. `core` never substitutes an invented pool (AD-17).
+- An Item Class whose Tracked List entries fail a cross-file check against the Weights File is Unrankable for that reason and leaves the ordering, **even though its pool is `complete` and published**. This is a third cause, not a variant of the first two: the producer published what it promised and the curation disagrees with it (AD-17).
 - Unrankability governs the crafted branch only. A Raw Base needs no Eligible Pool and ranks regardless, so an Item Class can sit in the Unrankable group while Base Types belonging to that class rank on the raw branch, each labelled for what it is (AD-17, AD-11, FR-3).
-- The view shows a reason per Unrankable Item Class, using the strings `"pool partial"` and `"class absent from weights file"` verbatim *(PRD-owned)*. The two are different facts for the player — a producer that declared what it could not guarantee, versus a class the producer never published — and FR-9's rule against collapsing distinct causes into one state applies here too.
+- The view shows a reason per Unrankable Item Class, using the strings `"pool partial"`, `"class absent from weights file"` and `"class disagrees with weights file"` verbatim *(PRD-owned)*. The three are different facts for the player — a producer that declared what it could not guarantee, a class the producer never published, and a class the producer did publish whose tracked entries contradict it — and FR-9's rule against collapsing distinct causes into one state applies here too.
+- **One string covers all five cross-file checks** *(PRD-owned)*. Which check failed, which entry failed it and that entry's canonical key are diagnosis, not a player-facing reason: the appendix prints the string and nothing more, and the fuller report carries the rest. Five strings in the appendix would make it a debugging surface, and the player's question there is which classes he cannot rank — not why each one broke. **Where that fuller report lands is `EXPERIENCE.md`'s, and is still open** (state 27's `[NOTE FOR UX]`); this consequence does not settle it.
 - The count of Unrankable Item Classes is visible without expanding the group *(PRD-owned)*.
 - A probability derived from a `partial` pool renders as unknown, not as a number, because it carries Provenance `absent` (AD-17, AD-10, FR-10).
 - Coverage — the share of tracked Item Classes with a complete pool — is measured before any view work, re-measured on every Weights File regeneration, and published in the Sync Report with its denominator (AD-27, FR-25; predicates in `IMPLEMENTATION-NOTES.md` §3). It is **reported, not a gate**: no threshold and no layout binds to it, and how prominently the Unrankable group sits beside the ranking is UX's (`EXPERIENCE.md`) *(PRD-owned)*.
@@ -285,9 +287,9 @@ The view's language never implies that a player achieved a price. Realises UJ-4.
 
 **Functional Requirements:**
 
-#### FR-14: Bound every request to one of four declared sources
+#### FR-14: Bound every request to one of three declared sources
 
-Exactly four declared sources may generate a trade API request, and nothing else may; the Tracked List is one of them, which is why it is also the request budget (AD-12).
+Exactly three declared sources may generate a trade API request, and nothing else may; the Tracked List is one of them, which is why it is also the request budget (AD-12).
 
 **Consequences (testable):**
 - The Sync Report records requests consumed per source, so budget drift is attributable to a cause (AD-12, FR-25).
@@ -594,7 +596,7 @@ One dependency sits outside this repository and gates the release rather than en
 Behavioural, not numeric. There is one user, and instrumenting the tool would be more work than the signal is worth. Each metric is therefore observed by the player's own recollection — the only instrument available.
 
 **Primary**
-- **SM-1: The trade site stays closed mid-session.** The player stops opening the trade site to price-check while mapping. Validates FR-1, FR-2, FR-8.
+- **SM-1: The trade site stays closed mid-session.** The player stops opening the trade site to price-check while mapping. Validates FR-1, FR-2, FR-8. *SM-1 counts whether this page became the **first stop**. Arriving at the trade site through FR-21's link, from a row already read, is not an SM-1 failure; reaching it around the page — to price a class the list already ranks — is. FR-21 mandates that link and no metric validates it, which is why SM-1's list above does not name FR-21.*
 - **SM-2: The mental top-five goes away.** The player stops keeping a list of chase Item Classes and Base Types in his head. Validates FR-1, FR-6.
 - **SM-3: A league start costs days, not weeks.** The list is useful within days of a reset rather than after weeks of relearning. Validates FR-31, FR-32.
 - **SM-4: The list holds up against reality.** Chase decisions made from the list match what actually sells. The player judges this by noticing that his sales agree with the list, because the tool observes no sale (Risk R-1). Validates FR-21, FR-1.
