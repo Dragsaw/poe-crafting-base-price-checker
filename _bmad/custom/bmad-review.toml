@@ -1,0 +1,15 @@
+[workflow]
+
+# Reviews are project artifacts, not chat scrollback — always save the full
+# report to disk instead of only presenting it in chat. report_path is a
+# single fixed path so it can't route by artifact type; on_complete can,
+# since it's a freeform directive the workflow executes at the end.
+on_complete = """
+Save the full markdown report to a new file — never overwrite an existing one; if the chosen name exists, add a numeric suffix. Pick the directory by what was reviewed, creating a reviews/ subfolder if it doesn't exist yet:
+- a story or its implementation → {project-root}/docs/stories/reviews/
+- the PRD or its addendum → {project-root}/docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/reviews/
+- the architecture spine or its companion docs → {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/reviews/
+- a UX document (DESIGN.md / EXPERIENCE.md) → {project-root}/docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/reviews/
+- anything else (a bare code diff, epics.md, or content with no owning folder) → {project-root}/docs/reviews/
+Name the file review-<slug of what was reviewed>.md. Tell the user where it was saved.
+"""

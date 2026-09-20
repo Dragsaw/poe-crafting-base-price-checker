@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 18
+revision: 20
 created: 2026-09-12
 updated: 2026-09-20
 sources:
@@ -171,6 +171,7 @@ The list answers a question rather than presenting an inventory.
 
 **Consequences (testable):**
 - The ranked list shows the top 20 rows by default; the remainder sits behind an explicit expand control *(PRD-owned)*. `[ASSUMPTION: no source names a count. 20 is roughly a screen and comfortably exceeds the "top five" the player acts on.]`
+- Where no ordering exists between the two ranked units FR-3 defines, the bound is applied to each unit separately, and the default view then holds up to 20 rows of each, behind one expand control per unit *(PRD-owned)*. The count does not change; what it is counted over does (FR-3, FR-26).
 - The bound is a display concern only. `core` ranks the full Tracked List and the view truncates, so the Payout Threshold still reorders across everything (AD-4).
 
 **Feature-specific NFRs:**
@@ -415,7 +416,7 @@ Every run's outcome is data the view reads, not console output (Consistency Conv
 - It records the number of due entries not reached in this Chunk, so a partially refreshed Dataset is distinguishable from a stalled one *(PRD-owned; acknowledged in AD-7)*. *Not reached* is a normal rotation outcome, never a skip (AD-7, AD-9).
 - Where a Chunk could not fund the pinned set plus at least one `active` entry, it carries a pinned-starvation record that makes the shortfall diagnosable — the declared yardstick beside the observed allowance (`IMPLEMENTATION-NOTES.md` §6). Starvation is a curation defect the player must correct; *not reached* is not *(PRD-owned)*.
 - The view surfaces the starvation record's presence alongside the tracked-list age and the unresolvable count — the three figures that tell a player the list is not doing what he thinks *(PRD-owned)* (AD-7, FR-18, FR-24).
-- `sync` commits only the files it owns, so an in-progress curation edit neither rides in nor blocks an automated commit (AD-3).
+- A run leaves its output in the player's working tree and commits nothing; what reaches the site is what the player commits and pushes (AD-3).
 
 ### 4.7 Craft Cost
 
@@ -431,6 +432,8 @@ Every run's outcome is data the view reads, not console output (Consistency Conv
 - A Craft Recipe is a currency composition the player declares by hand, and adding one is a data edit that needs no code change (AD-3).
 - v1 ships exactly **two** Craft Recipes: one greater transmute plus one greater augment, and one perfect transmute plus one perfect augment *(PRD-owned)*. `[ASSUMPTION: larger currency quantities and partial-craft abandonment are not modelled.]`
 - A recipe whose currency has no current rate for the active league is reported as uncostable, never costed at zero (AD-20).
+- An uncostable recipe removes no row from the list and makes no Item Class Unrankable. FR-4's reason enum is not extended for it, because such a class's Eligible Pool is complete and agrees with the Weights File, so none of FR-4's three strings is true of it *(PRD-owned)* (FR-4, AD-17).
+- While the active recipe is uncostable the player still sees each of FR-3's two ranked units in its own order, and no ordering between them. The page states that limit and never implies an order across the two that it cannot compute *(PRD-owned)* (FR-1, FR-3, FR-5).
 - A Craft Recipe changes which outcomes are reachable, not only what an attempt costs. Two recipes over the same Tracked List therefore produce genuinely different orderings — not one ordering shifted by a constant — and an Item Class's Chase Combinations can differ between them (AD-17; `IMPLEMENTATION-NOTES.md` §9).
 - Craft Cost is shown in Divine, the unit of every price and the Payout Threshold (AD-20).
 
@@ -509,15 +512,16 @@ The ranking treats a Price Observation from any league but the active one as abs
 
 ### 4.10 Dataset Delivery
 
-**Description.** How data reaches the view looks like an implementation detail and is not one. The delivery method decides whether a sync commit refreshes the site on its own or needs an application rebuild, and so whether the daily refresh is a background fact or a chore. Realises UJ-1, UJ-6.
+**Description.** How data reaches the view looks like an implementation detail and is not one. The delivery method decides whether a data commit refreshes the site on its own or needs an application rebuild, and so whether the daily refresh is a background fact or a chore. Realises UJ-1, UJ-6.
 
 **Functional Requirements:**
 
 #### FR-33: Load published artifacts at runtime as one consistent set
 
-`web` reads its data at runtime, never at build time, so a sync commit updates the site without a rebuild. Realises UJ-1.
+`web` reads its data at runtime, never at build time, so a data commit updates the site without a rebuild. Realises UJ-1.
 
 **Consequences (testable):**
+- Sync runs update the dataset on the player's machine; publishing it to the site is the player's own commit and push, so the page's age is bounded by that cadence and every row still states its own (AD-3, AD-10).
 - The view loads one consistent published set and never mixes artifacts across a refresh; a partial set is never rendered (AD-24; treatment `EXPERIENCE.md`).
 - An invalid artifact is refused loudly: the page names it and serves nothing stale (AD-3, AD-24; treatment `EXPERIENCE.md`).
 - An absent artifact is not an invalid one. Where the set can still render without it, the page renders and names the absence on screen, never presenting a diminished list as whole; where it cannot, it says which file did not arrive (AD-24).

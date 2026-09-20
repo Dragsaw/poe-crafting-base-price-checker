@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 3
+revision: 5
 created: 2026-09-13
 updated: 2026-09-20
 sources:
@@ -62,6 +62,11 @@ typography:
     fontFamily: '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif'
   stack-sans:
     fontFamily: '-apple-system, "Segoe UI", system-ui, "Helvetica Neue", sans-serif'
+  # The verbatim register: text the page did not write, quoted out of a file.
+  # System-resident like the other two — the page still downloads no font. It has
+  # no size, weight or lineHeight of its own; it takes the line's [decision — memlog 208].
+  stack-mono:
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Cascadia Mono", monospace'
 
   # EVERY role declares lineHeight. Mantine's Text resolves 1.55 and Title resolves
   # its own headings ramp where a value is omitted, which breaks the 28px row and
@@ -873,7 +878,8 @@ reach it, and after the active recipe's rule sepia was the obvious next home for
 both. It is now closed to them on a stated test rather than by precedent:
 `pinned` is a **Curation Status**, a fact about the Tracked List that the player
 did not choose on this page, and the fallback is a **curation gap**. Neither is
-an operator choice. Both want a non-colour cue.
+an operator choice. Both wanted a non-colour cue, and both have since taken one —
+`pinned` a mark, the fallback the mono verbatim register (Typography).
 
 **`pinned` has since taken one and is closed** `[decision — memlog 199]`. It is
 `{components.curation-status-pinned}` — glyph plus word `* pinned` in
@@ -931,15 +937,22 @@ about the figure, and admitting either would make the ink family mean "notice
 this", which is the meaning a page with twenty rows cannot afford. Both notes
 should reach for a non-colour cue instead — a weight, an italic, a glyph, a rule
 — which the page's vocabulary already carries and which costs the angled glance
-nothing. Holding the slot open against a future third epistemic state would also
+nothing. *That list was illustrative and not a menu, and one of the two answers
+came from outside it:* `pinned` took a glyph from it, and the fallback took a
+**third type stack**, which the vocabulary did not yet carry `[decision — memlog
+208]`. The binding half of this ruling is the refusal, not the list.
+Holding the slot open against a future third epistemic state would also
 have been a reservation nobody could spend: if consumer-side pro-rating is ever
 adopted, a middle Provenance value returns in that same change (AD-10's revisit
 condition) and takes a fresh decision with it.
 
-*The refusal did its job on the first of the two* `[decision — memlog 199]`.
-`pinned` took a non-colour cue and closed — `{components.curation-status-pinned}`
-— without the ink family gaining a member. One remains open: the curation
-fallback.
+*The refusal did its job on both* `[decision — memlog 199, 208]`. `pinned` took a
+non-colour cue and closed — `{components.curation-status-pinned}`. The curation
+fallback has since taken one too: the **mono verbatim register** (Typography),
+which it shares with the cross-file diagnosis because the two were one question.
+Neither note came back for a colour, and the ink family gained no member from
+either. **Two semantic inks, and the count held under pressure from two
+directions** — that is what makes it a rule rather than a tally.
 
 **No third ink, no success colour.** There is deliberately no green. A healthy
 row is marked by nothing at all (memlog 32). Adding a green *measured* badge
@@ -967,8 +980,54 @@ deliberate. The glyph labels the name; it is not part of it. The page's whole
 type argument is that the eye can tell a figure from a note about a figure
 without reading either, and a unit marker is a note about a name.
 
-Both stacks are system-resident. The page downloads no font. The page is static
-and must paint before it fetches anything.
+**There is a third stack, and it carries one meaning: the page did not write
+this text** `[decision — memlog 208]`. **Mono —
+`{typography.stack-mono.fontFamily}`.** It sets text quoted verbatim out of a
+file, and nothing else. Two surfaces use it and no third may without a decision:
+the **curation fallback** (Components), where a modifier with no short form or
+no declared Accepted Tier falls back to the Trade Catalogue's own stat name plus
+the value band; and the **cross-file diagnosis** inside
+`{components.sync-report-panel}` (`EXPERIENCE.md`, *Two registers in one
+panel*), which names the failing check, the entry and that entry's canonical
+key.
+
+*It is one cue answering one question, which is why it is a stack and not a
+treatment per surface.* Both surfaces were a single `[NOTE FOR UX]` held open
+together precisely so they could not be answered twice with two different cues.
+Both print machine text; neither says anything about a figure's footing, so
+neither may take a semantic ink (see Colors). The mono register is **not** an
+ink, not a mark, and not a member of the glyph vocabulary — so it needs no
+key-block entry, and the open question about `† pruned` and `* pinned` is
+untouched by it.
+
+*The third stack extends the type argument rather than opening a new axis.*
+Serif is content, sans is a note about content, and mono is text the page is
+quoting rather than saying. The eye sorts all three without reading any of them,
+which is the same claim the split was always making. The diagnosis line is the
+case that proves it: it exists to be **selected and pasted into an editor**, and
+mono is the form that says so — it also makes a serialised canonical key legible,
+which a proportional face actively harms.
+
+*What it costs, stated rather than buried.* A third stack on a page that prizes
+two. It is admitted as a consequence of the type thesis and not as a flourish,
+and the narrow licence above is what keeps it from spreading. **It reopens no
+verified number**: the cue changes no width. `{spacing.col-chase}`, the six cell
+sums and the 27-character budget are exactly as memlog 40/122/140/145 left them.
+What changes is only how many characters fill a cell that already ellipsises —
+154px at `{typography.row-chase.fontSize}` holds roughly **24 to 26** monospace
+characters against the sans's 27, depending on which resident face answers. That
+shortfall lands on fallback text alone, which is the longest text on the page and
+the text most likely to ellipsise anyway, and the expansion holds it in full.
+
+**The verbatim register has no size of its own**, exactly as a trust mark has
+none. It takes the `fontSize`, `fontWeight` and `lineHeight` of the line it sits
+in — `{typography.row-chase}` in a chase cell, `{typography.detail-row}` in a
+combination row, the panel's own body role in the diagnosis — so no row height,
+line box or frame number moves. A mark that appears beside verbatim text stays in
+the sans mark vocabulary; the two registers sit on one line without merging.
+
+All three stacks are system-resident. The page downloads no font. The page is
+static and must paint before it fetches anything.
 
 **Rank emphasis is carried by weight, never by size** (memlog 31b). Every
 ranked row is `{spacing.row-height}` tall and every unit name is
@@ -1281,10 +1340,33 @@ curating that entry. In the fallback, and only there, numerals and units keep
 their full symbols — `+240`, `%`, `+35%` are never compressed. That makes the
 fallback the one place in the product where a numeral from modifier text
 survives, which is exactly what makes it recognisable at a glance.
-`[NOTE FOR UX]` No visual treatment for that fallback exists, and it may not
-borrow a semantic ink. A semantic ink says something is wrong with what a figure
-rests on; an uncurated entry is a gap in the Tracked List and says nothing about
-the figure (see Colors). The treatment wants a non-colour cue.
+**The fallback is set in the mono verbatim register, and that is its treatment**
+`[decision — memlog 208]`. It takes `{typography.stack-mono.fontFamily}` at the
+line's own size, weight and line height — `{typography.row-chase}` in a chase
+cell, `{typography.detail-row}` in a combination row — and changes nothing else.
+It takes **no ink**: a semantic ink says something is wrong with what a figure
+rests on, and an uncurated entry is a gap in the Tracked List that says nothing
+about the figure (see Colors). The same register carries the cross-file
+diagnosis in `{components.sync-report-panel}`, because the two were deliberately
+one open question and one cue answers both (`EXPERIENCE.md`, *Two registers in
+one panel*).
+
+*Why this cue and not a marker.* The fallback's existing signal is that numerals
+from modifier text survive there and nowhere else — but that signal only fires
+once you read the cell, and this page is built to be read at an angle from across
+the desk. The face changes before the text does. A delimiter would have spent two
+characters of a 27-character budget on the longest text on the page and would be
+the first thing an ellipsis ate, and the natural pair for machine text, `«»`,
+collides with the stale mark `»`. A tone step would have reused
+`{components.curation-status-pinned}`'s treatment for a second meaning.
+
+*The cell may ellipsise earlier, and that is acceptable here.* 154px holds
+roughly 24 to 26 monospace characters against the sans's 27 (Typography). The
+budget is unchanged and no column sum reopens; only fallback rows lose a
+character or two, they ellipsise like any other cell, and the expansion holds the
+text in full. An uncurated entry running short in a scan is not a cost worth
+buying off — it is the gap making itself noticed, which is what the fallback is
+for.
 
 `[NOTE FOR UX]` `[memlog 143, re-derived]` **Two Combinations can still read
 identically.** The note was first written on the `4.x` reading, in which FR-22
@@ -1412,12 +1494,39 @@ list. The page is a page, and its printed order stays true when it grows longer.
 `margin-top: auto` on the appendix produces slack only while the content is
 shorter than 1920px. Past that it produces none, which is exactly right.
 
-The rule stated plainly: **nothing the player has not clicked may push the page
-past 1920px** — with the banner and the health line as the two named exceptions,
-both budgeted above. Collapse everything and the page must fit again exactly as
-it did. Never shrink a row, drop a column, truncate the appendix or hide the key
-block to keep an expanded state inside the frame. Density is fixed and scrolling
-is the release valve.
+**The rule was always two rules, and revision 4 separates them** `[decision —
+memlog 203]`. It was written as one sentence — *nothing the player has not
+clicked may push the page past 1920px* — with the banner and the health line as
+its two named exceptions. A data condition has now falsified that sentence, and
+what it was protecting splits cleanly. Only the second half moved.
+
+**One — budgeted chrome never overruns the frame.** Anything that can appear at
+rest without a click and is **not a ranked row** is budgeted above, in pixels,
+against `{spacing.frame-slack}`: `{components.uniform-prior-banner}` and the
+health line, both already charged. That clause is unchanged and both exceptions
+keep their exact force. New resting chrome is admissible only by taking a budget
+line of its own. **This is not a list that grows by precedent.** 560px of rows is
+not chrome and cannot be budgeted, which is precisely why the state below does
+**not** join the banner and the health line as a third exception — it is not an
+exception to this clause at all.
+
+**Two — twenty rows is the resting target, and it releases into scroll.** The
+frame is `min-height`, so a data condition that puts more rows on the resting
+page grows the document and scrolls it, with nothing clipped and the printed
+order intact. Two conditions do, and both are accepted rather than designed
+around:
+
+| Condition | Resting rows | Overrun against `{spacing.frame-slack}`'s 528px |
+|---|---|---|
+| Uncostable recipe, bound applied per branch (state 35) | up to 40 against a budget for 20 | ~560px |
+| FR-30's world — one appendix row per Item Class | ~29 against a committed 7 | ~638px |
+
+1920px is what the page is **designed to**, and it is not a constraint the
+content may be cut to satisfy. Collapse everything and the page fits again
+exactly as it did, in every state this document budgets. Never shrink a row,
+drop a column, truncate the appendix or hide the key block — not to keep an
+expanded state inside the frame, and not to keep a **grown** one inside it
+either. Density is fixed and scrolling is the release valve.
 
 **The appendix sits at the foot, and at revision 3 that became a decision this
 document owns rather than a band it was handed** `[change — memlog 185]`. A
@@ -1443,21 +1552,26 @@ from the resting page, and the exact fraction with its denominator is one click
 down in `{components.sync-report-panel}`. That is the whole treatment, and it no
 longer varies with a measurement.
 
-`[NOTE FOR UX]` **FR-30's world is still unspecified, and it shrank**
-(memlog 72, re-derived at memlog 185). Until a conforming Weights File exists,
-every **Item Class** is Unrankable and the page is a white-base price list with
-an appendix holding the crafted branch entire. Three rules collide in that state.
-The appendix is pinned to the foot as a *footer*. Truncating it is forbidden. And
-nothing unclicked may push the page past 1920px. **What changed is the scale.**
-On revision 2's noun the appendix would have held every crafted Base Type in the
-Tracked List; on revision 18's it holds one row per Item Class — on the order of
-29 rows against the committed budget's 7. That is a much smaller collision than
-the note was written against, and it may now be designable rather than deferred:
-29 rows at `{spacing.appendix-row-height}` is 841px where 7 rows is 203px, so the
-overrun is about 638px against `{spacing.frame-slack}`'s 528px. Still an overrun,
-but one a single decision could absorb. The user accepted designing this at
-implementation time and that acceptance stands. It is recorded here so no reader
-mistakes it for an oversight.
+**FR-30's world needs no treatment of its own, and the note is closed**
+`[decision — memlog 203]`, superseding memlog 72 and its re-derivation at memlog
+185. Until a conforming Weights File exists, every **Item Class** is Unrankable
+and the page is a white-base price list with an appendix holding the crafted
+branch entire — on the order of 29 rows against the committed budget's 7. At
+`{spacing.appendix-row-height}` that is 841px where 7 rows is 203px, an overrun
+of about 638px against `{spacing.frame-slack}`'s 528px.
+
+*This was carried as an open note because three rules were read as colliding:*
+the appendix is pinned to the foot as a *footer*, truncating it is forbidden, and
+nothing unclicked may push the page past 1920px. **The first two are mechanism
+and they hold. The third was the sentence the clause split above rewrote.** So
+there is no collision left and nothing to invent: the appendix stays at the foot,
+holds every row, and the document scrolls. `margin-top: auto` produces slack only
+while the content is shorter than 1920px and none past it, which is exactly the
+behaviour this state wants.
+
+This closes **by ruling**, not by deferral. The earlier acceptance of designing
+it at implementation time is discharged rather than still standing, and a builder
+who reaches this state needs no decision that is not already written here.
 
 **Spacing scale.** The general scale (`{spacing.1}`–`{spacing.6}`, 4–24px) is
 quantised at 4px from the mock's values. It is the fallback for any gap not
@@ -2199,27 +2313,33 @@ One sentence explains that the page shows nothing rather than a partial set,
 because FR-33 requires a single consistent set and half a ranking is worse than
 no ranking.
 
-`[NOTE FOR UX]` Two component surfaces still have no visual treatment and
-cannot be specified without inventing them:
-1. **Skeleton rows** for the load state — memlog 50 fixes the behaviour
-   (masthead and 20 row slots paint immediately, resolving in a single
-   transition `[ASSUMPTION — memlog 51]`) but no fill tone, shimmer or
-   placeholder shape was ever drawn. The obvious default, if nobody rules
-   otherwise, is a flat `{colors.paper-inset}` bar per cell at the declared
-   column widths with no shimmer — the vocabulary already forbids animation
-   that attracts attention.
-2. **The cross-file validation report** (FR-33, FR-29, FR-16) — the page still
-   renders in that case, so this is additive rather than a failure screen.
-   `{components.sync-report-panel}` is the obvious home, since it already
-   carries every other operational figure, but nothing has ruled on it.
+`[NOTE FOR UX]` **Skeleton rows** for the load state have no visual treatment and
+cannot be specified without inventing one. Memlog 50 fixes the behaviour —
+masthead and 20 row slots paint immediately, resolving in a single transition
+`[ASSUMPTION — memlog 51]` — but no fill tone, shimmer or placeholder shape was
+ever drawn. The obvious default, if nobody rules otherwise, is a flat
+`{colors.paper-inset}` bar per cell at the declared column widths with no
+shimmer: the vocabulary already forbids animation that attracts attention.
 
-`[NOTE FOR UX]` `[ASSUMPTION — memlog 35]` A tracked modifier with no entry in
-the canonical short-form table falls back to the Trade Catalogue stat name plus
-the value band, and *must be visually identifiable as a fallback* so the missing
-short form gets noticed and added. No treatment for that fallback exists in the
-mock. It may not borrow a semantic ink — an ink says a figure's footing is
-degraded or broken, and an uncurated entry says nothing about the figure (see
-Colors) — so it wants a non-colour cue, but which one is unsettled.
+*This was a list of two until revision 4, and revision 5 leaves the skeleton
+alone above it.* **The cross-file validation report is placed** `[decision — memlog 206]`: it lands in `{components.sync-report-panel}`
+as a third group in that panel's second column, under the existing *what is
+broken* heading, per `columnHeadingRule`. The panel's cap and its own internal
+scroll are what make an unbounded diagnosis list placeable anywhere on this page.
+`EXPERIENCE.md`, *Two registers in one panel*, owns the behaviour and the
+vocabulary boundary. **The non-colour cue that separates the two registers is
+settled** `[decision — memlog 208]`: the diagnosis alone takes the **mono
+verbatim register** (Typography), at the panel's own body size, weight and line
+height. Every figure group stays in the page's voice and its existing face. It is
+the same cue as the curation fallback's — one answer, as the merge required.
+
+`[ASSUMPTION — memlog 35]` A tracked modifier with no entry in the canonical
+short-form table falls back to the Trade Catalogue stat name plus the value band,
+and *must be visually identifiable as a fallback* so the missing short form gets
+noticed and added. **It is identifiable by the mono verbatim register**
+`[decision — memlog 208]`, specified above under Combination text — which is a
+cue and not an ink, because an ink says a figure's footing is degraded or broken
+and an uncurated entry says nothing about the figure (see Colors).
 
 `[ASSUMPTION — memlog 49]` In the honest-empty league-reset state the list
 renders every tracked unit — every Item Class on the crafted branch and every
@@ -2301,7 +2421,8 @@ conformance claims.
 | Pair every semantic ink with its glyph and its word | Distinguish anything by hue alone |
 | Keep to the two semantic inks | Introduce a third colour, a success colour, or a severity ramp |
 | Mark Provenance once, on the ranked row — one label per **Item Class** | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
-| Reach for a non-colour cue for `pinned` and for the curation fallback | Spend the retired slate on something that is not a statement about a figure's footing |
+| Reach for a non-colour cue for `pinned` and for the curation fallback — both have now taken one | Spend the retired slate on something that is not a statement about a figure's footing |
+| Set text quoted verbatim out of a file in the mono verbatim register — the curation fallback and the cross-file diagnosis, and nothing else | Let a third stack spread to text the page wrote itself, or give verbatim text an ink, a mark or a size of its own |
 | Use `{colors.sepia}` decoratively — eyebrow, threshold fill, affordances, the active recipe's rule, both unit glyphs | Let sepia start meaning a state |
 | Open every ranked row with its unit glyph — `≡` an Item Class, `▪` a Raw Base | Leave a crafted row unmarked as the "default" kind, or carry the distinction on tint and italic alone (PRD FR-3, NFR-10) |
 | Keep both unit glyphs in `{colors.sepia}` | Give a unit glyph an ink — it appears on twenty rows in twenty, and an ink there ends silence-means-healthy |
@@ -2337,8 +2458,9 @@ conformance claims.
 | Keep every corner square and every surface flat | Add a radius, a shadow, a gradient or a hover lift |
 | Keep the frame at `{spacing.frame-width}` and centre it | Add a breakpoint, a mobile layout, or a dark palette |
 | Leave the frame 20px narrower than the 1080px viewport, for the scrollbar | "Correct" `frame-width` back to 1080, or buy width back out of a column |
-| Fit the default state inside 1920px with no scrolling | Trade density for whitespace |
-| Let an expanded region push the frame into scrolling | Shrink rows, drop columns or hide the key block to keep an expanded state inside 1920px |
+| Fit the default twenty-row state inside 1920px with no scrolling | Trade density for whitespace |
+| Keep every piece of resting chrome inside its own pixel budget | Add resting chrome without a budget line, or read the banner and health line as a list of exceptions that can grow |
+| Let an expanded **or grown** region push the frame into scrolling | Shrink rows, drop columns, truncate the appendix or hide the key block to keep any state inside 1920px |
 | Open the sync report and a ranked row in place, pushing what is below down | Put either in a modal, a drawer, a tooltip or a second route |
 | Show `{components.trade-link}`'s ↗ where the entry carries a stored `lastSearchId` from a search in the **active league** — a test on data, never on Price State | Key the ↗ on Price State, or draw it greyed-out or disabled where there is no id — absent, not inert |
 | Keep `{components.trade-link}` a single unicode glyph, no colour, no semantic ink | Add a second icon, an SVG asset, or let ↗ start meaning a state |

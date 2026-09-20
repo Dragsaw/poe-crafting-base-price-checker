@@ -20,6 +20,7 @@
       "Bash(npm test:*)",
       "Bash(npm view:*)",
       "Bash(npx bmad-method:*)",
+      "Bash(pnpm:*)",
       "Bash(pnpm run:*)",
       "Bash(pnpm ci:*)",
       "Bash(pnpm install:*)",

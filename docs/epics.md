@@ -3,6 +3,7 @@ stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step
 storiesWrittenForEpics: [1, 2, 3]
 storiesPendingForEpics: []
 blockedStories: []
+revisionPass: 'Re-run 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4. The previous pass completed all four steps; this pass re-walks them against the four rulings of 2026-09-20.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -90,7 +91,7 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
 - **The sync CLI performs one bounded chunk and exits.** It runs under an exclusive recoverable on-disk lock. The lock carries a pid and an ISO-8601 start time. It writes progress into a schema-pinned `sync-progress.json`. It computes a deterministic selection order through `core` (AD-7).
 - **Three request sources, and a fourth needs an amendment.** The three are `data/tracked.json`, the per-run league validation and the explicit catalogue refresh. `sync` reads `data/currencies.json` and never fetches against it (AD-12).
 - **One writer per file**, per AD-3's table. The player owns `tracked.json`, `config.json`, `currencies.json` and `recipes.json`. The external producer owns `weights.json`. `sync` owns `catalogue/*.json`, `dataset.json`, `sync-report.json` and `sync-progress.json`.
-- **`sync` commits only the files it owns, by explicit path.** It never runs `git add -A`. It then pushes to the default branch. The git write path is bounded: `sync` may run `pull --ff-only`. It must not force-push, rebase, merge or resolve a conflict. A failed push leaves the commit in place, records the failure and exits non-zero (AD-3).
+- **`sync` makes no git write.** It writes the files it owns by explicit path and exits. Those files are git-tracked and updated in place. The player commits and pushes them, and that push is what deploys. The git port is read-only and carries one operation: the author date of the last commit touching a path (AD-3, AD-12).
 - **The trade catalogue is four committed artifacts under `data/catalogue/`.** An explicit command refreshes them at GGG patch cadence. That command never runs on the chunk path. The catalogue is an identity and validation authority only. It contributes nothing to the Eligible Pool (AD-25).
 - **`web` fetches exactly eight artifacts at runtime.** Each one is a separate cache-busted request. None is bundled into the JS. Five are required for a render and three are absent-tolerable. A ninth artifact needs an amendment (AD-24).
 - **Currency rates are hand-maintained committed data.** `sync` copies each rate's own `league` and `asOf` through unchanged and must not stamp them. `sync` always writes divine's own rate as exactly `1` (AD-20).
@@ -104,13 +105,13 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
   - Files are UTF-8 without BOM, with LF line endings, stable JSON key order and a trailing newline.
   - `core` returns a typed result and never throws for an expected condition.
 - **`sync-report.json` holds two kinds of entry, and `SyncRunReport` types them apart.** A **figure** describes the latest chunk, and the next chunk overwrites it. A **record** survives the chunk that wrote it. The player's edit clears a record. The next run does not (Consistency Conventions, *Logging*).
-- **Deployment: one environment.** Task Scheduler invokes the syncer on the player's machine. The push triggers a GitHub Actions workflow. That workflow builds the Vite bundle and deploys it to Pages. Branch-published Pages runs Jekyll and cannot build this app. The workflow is therefore required, not optional.
+- **Deployment: one environment.** Task Scheduler invokes the syncer on the player's machine. The syncer writes files and never pushes. **The player's push** triggers a GitHub Actions workflow. That workflow builds the Vite bundle and deploys it to Pages. Branch-published Pages runs Jekyll and cannot build this app. The workflow is therefore required, not optional.
 - **Agent loop and definition of done.** The commands are `pnpm install`, `pnpm check`, `pnpm test`, `pnpm dev` and `pnpm sync:dry`. `pnpm check` enforces the package boundaries. `pnpm sync:dry` runs the full pipeline against fixtures and writes nowhere. `fixtures:record` and `catalogue:refresh` are explicit and human-invoked. Neither is ever part of a test run (`AGENT-WORKFLOW.md`).
 - **`sync` measures pool coverage before any view work, and measures it again on every weights-file regeneration.** It publishes the figure with its denominator. Where `weights.json` is absent, the measurement does not happen at all and both fields are omitted together. Coverage is undefined there. It is never `0%` (AD-27).
 
 ### UX Design Requirements
 
-`DESIGN.md` owns the visual identity and the tokens. `EXPERIENCE.md` owns behaviour, states and flows. Both are at revision 3. Each item below is scoped for a story with testable acceptance criteria.
+`DESIGN.md` owns the visual identity and the tokens. `EXPERIENCE.md` owns behaviour, states and flows. Both are at revision 4. Each item below is scoped for a story with testable acceptance criteria.
 
 **Substrate and foundations**
 
@@ -124,13 +125,17 @@ UX-DR1: Mantine v9 theme override layer. The page inherits Mantine's *behaviour*
 
 UX-DR2: Colour token set, in two registers. The set is five paper tones, four inks, three structure rules, one decorative sepia and exactly two semantic inks (ochre, rust). Sepia may mark what the operator *chose*. Sepia may never mark what the data *is*. There is no third ink, no success colour and no green.
 
-UX-DR3: Typography token set. Every role declares an explicit `lineHeight`. In-row roles sit at 1.2, display roles are tight, and reading roles sit at 1.5–1.85. Two system-resident stacks carry the page: a book serif for content and a system sans for labels. The page downloads no font.
+UX-DR3: Typography token set. Every role declares an explicit `lineHeight`. In-row roles sit at 1.2, display roles are tight, and reading roles sit at 1.5–1.85. **Three** system-resident stacks carry the page: a book serif for content, a system sans for labels, and a mono **verbatim register** for text the page did not write but quoted out of a file. The third is reserved to the two surfaces UX-DR40 names and has no size of its own — it takes the line's. The page downloads no font.
 
 UX-DR4: Every glyph in the vocabulary must be resident in Segoe UI Regular, Semibold **and** Bold. `↗` is the single exception, and it is pinned to `fontWeight: 400`.
 
 UX-DR5: Fixed frame. The frame is 1060px wide, with a `min-height` of 1920px. The width is 1060 and not 1080: the 20px is scrollbar clearance, and it came out of the gutters and never out of a column. The frame is centred with a surround fill. Its edge is a 1px `outline` and not a `border`. There are no breakpoints, no responsive story and no dark mode.
 
-UX-DR6: Overflow contract. Nothing the player has not clicked may push the page past 1920px. The banner (74px) and the health line (21px) are the two budgeted data-raised exceptions, against 528px of computed slack. The document scrolls, and the frame does not. Only the sync report panel takes `overflow-y`. Shrinking rows, dropping columns, truncating the appendix and hiding the key block are forbidden as escape hatches.
+UX-DR6: Overflow contract, **in two clauses**. Revision 4 separated a single sentence into the two rules it always contained, and only the second one moved.
+  - **Clause one — budgeted chrome never overruns the frame.** Anything that can appear at rest without a click and is **not a ranked row** is budgeted in pixels against 528px of computed slack. The banner (74px) and the health line (21px) are the two budgeted data-raised exceptions, and both keep their exact force. New resting chrome is admissible only by taking a budget line of its own. This is not a list that grows by precedent.
+  - **Clause two — twenty rows is the resting *target*, and it releases into scroll.** The frame is `min-height`, so a data condition that puts more rows on the resting page grows the document and scrolls it, with nothing clipped and the printed order intact. Two conditions do, and both are accepted rather than designed around: the per-branch bound under an uncostable recipe (up to 40 rows, about 560px over) and FR-30's world (about 29 appendix rows, about 638px over).
+  - Rows are not chrome and cannot be budgeted, so neither condition is a third exception to clause one. It is not an exception to that clause at all.
+  - The document scrolls and the frame does not. Only the sync report panel takes `overflow-y`. Shrinking rows, dropping columns, truncating the appendix and hiding the key block stay forbidden as escape hatches — for a **grown** state exactly as for an expanded one.
 
 **Layout contracts. Each one is a verified sum, and this document reproduces it literally.**
 
@@ -168,7 +173,11 @@ UX-DR20: Craft Cost line. The page prints it once, inside the recipe panel. It i
 
 UX-DR21: `trust-strip`. The strip carries five plain unconditional facts, with verbatim labels, across two lines. No fact carries a mark, and no fact carries colour. The whole strip is the click target. Data raises a third rust line on exactly two triggers: unresolvable entries exist, or pinned entries starved. Each trigger carries a glyph, a word **and** a count.
 
-UX-DR22: `sync-report-panel`. The panel holds five figure groups in three columns. It carries one heading per column and never one per group. It opens in place beneath the strip. It is capped at 400px and scrolls inside its own band. It is closed on every load. It renders `sync-report.json` as published, and it computes nothing.
+UX-DR22: `sync-report-panel`. The panel holds **six groups** in three columns, and it held five until revision 4. It carries one heading per column and never one per group. It opens in place beneath the strip. It is capped at 400px and scrolls inside its own band. It is closed on every load. It renders `sync-report.json` as published, and it computes nothing.
+
+UX-DR49: The cross-file diagnosis is the panel's **sixth group**, and it is the third group of the **second** column, under that column's existing *what is broken* heading, separated from the two groups above it by vertical space alone. `columnHeadingRule` is intact: no second heading, no rule, no bullet. It is neither a global region nor inline on the affected Item Class. It is the only group that is not a figure — one line per failing check, naming the check, the entry and that entry's canonical key — and therefore the only group whose length is unbounded, which is why the panel's own cap and internal scroll are what make it placeable at all. It is never promoted to the trust strip, which keeps exactly two health triggers.
+
+UX-DR50: **Two registers in one panel.** The panel is the one region on the page carrying two registers at once. Every figure group takes the page's voice. The diagnosis alone takes the file's voice, and the back-end-only vocabulary is licensed inside it. The licence is one of **register, not of audience** — there is one user, he wrote the Tracked List and he is the person fixing the file, so audience never discriminated in this product. The cue separating the two registers may not be a semantic ink, and it is **settled**: the diagnosis alone takes the mono verbatim register, the same cue UX-DR40 takes, at the panel's own size and weight.
 
 UX-DR23: `asking-price-line`. The page renders this line in every state. It is never dismissible and never below the fold. It is FR-13's only mitigation for Risk R-1.
 
@@ -218,11 +227,17 @@ UX-DR38: Domain vocabulary enforcement. The page prints twenty player-facing Glo
 
 UX-DR39: Combination text rule. The page prints the tier plus the canonical short form (`T1 Cold Res · T1 Mana`), and never the value, on **both** surfaces. A hand-maintained short-form table serves a chase-cell budget of about 27 characters. Five coining rules govern that table. Pruning is the escape valve, and a shorter coinage is not.
 
-UX-DR40: The curation fallback. A modifier missing either its short form or its declared Accepted Tier falls back to the catalogue stat name plus the value band. That is the one place in the product where a numeral from modifier text survives. The fallback must be identifiable as a fallback, and it must not borrow a semantic ink.
+UX-DR40: The curation fallback. A modifier missing either its short form or its declared Accepted Tier falls back to the catalogue stat name plus the value band. That is the one place in the product where a numeral from modifier text survives. The fallback must be identifiable as a fallback, and it must not borrow a semantic ink. **Its cue is settled and is shared with UX-DR50**: both surfaces print text the page did not write, so both take the **mono verbatim register** — a third type stack reserved to that one meaning. It is not an ink, not a mark and not a glyph, it has no size of its own and takes the line's, and it reopens no column budget. One cue, answered once, as the merged question required.
 
 UX-DR41: Money display precision. EV, price and threshold take 2 decimal places. `core` persists 4dp, and the page never re-rounds what it passes on. A column header states the unit once, and no row repeats it.
 
 UX-DR42: Honest-empty league-reset presentation. The page renders every tracked unit in canonical order with its glyph. It **suppresses** the rank numerals. It states that the order is canonical and not ranked. Every EV cell holds *no figure yet*, and never a blank or a zero.
+
+UX-DR51: Nothing-clears-the-threshold presentation (state 25). The copy is `EXPERIENCE.md`'s, ruled at revision 4 — the PRD's silence on it was never ownership. The state is **not an empty list**: every crafted Item Class is still ranked, at an EV of minus its Craft Cost, so the crafted branch is twenty rows carrying the same figure, while Raw Bases under the threshold leave the ranking altogether and the raw branch may be empty beside a full crafted one. **Rank numerals stay.** The order here is computed and the figures merely tie, unlike the honest-empty state whose order is canonical rather than ranked, and hiding a computed result because it is flat would be the page editing its own answer. A **plain declarative** sits above the list, under the asking-price line, naming the live Payout Threshold figure at the page's 2dp — the condition, and **no instruction**, because the player set that number deliberately and the remedy is already on screen 16px away. It is not the uniform-prior banner, which a data condition raises and this is not one. It is not a money-slot phrase either, because no figure is missing.
+
+UX-DR52: Uncostable-recipe presentation (state 35). **Every row stays.** No row leaves the list, and no Item Class becomes Unrankable — FR-4's reason enum is **not** extended, because such a class's pool is complete, published and agreeing, so all three of its strings are false of it. The class is unpriced, not unrankable. **Each branch keeps its own order, and neither is ordered against the other**, because Craft Cost is one figure subtracted equally from every crafted row and the threshold compares a Combination's gross price; what is unavailable is only the *distance* between a crafted row and a Raw Base row. **No rank numeral spans the two**: numerals are suppressed, for the same reason the honest-empty state suppresses them. The three emphasis tiers run **per branch**, so two tier-1 rows is the correct render and is the only thing left marking the strong end of each order. Every crafted EV cell holds the money-slot phrase *no figure yet*, and never `0.00`. A plain declarative sits above the list in UX-DR51's register, naming the active recipe and stating that the two branches are not comparable while it holds. **FR-5's bound applies per branch** — 20 rows of each, one expand affordance under each, neither naming a unit — so the resting page can hold 40 rows and scroll, which UX-DR6's clause two accepts. This is a routine state on the costlier recipe, not a defensive one.
+
+UX-DR53: FR-30's no-weights-file world needs **no treatment of its own**. Until a conforming Weights File exists, every Item Class is Unrankable and the page is a white-base price list with an appendix holding the crafted branch entire — about 29 rows against a committed budget of 7. The three rules read as colliding there do not: the footer pin and the no-truncation rule are mechanism and hold, and the third was the sentence UX-DR6 has now split. So the behaviour is the ordinary behaviour — the appendix sits at the foot, holds every row untruncated, and the document grows and scrolls beneath it. This closes **by ruling**. The earlier acceptance of designing it at implementation time is **discharged, not still standing**, and no story may re-defer it.
 
 UX-DR43: Cold load. The masthead and twenty row slots render immediately in the final layout. All eight artifacts resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset.
 
@@ -242,24 +257,29 @@ The consequence is deliberate, and this document records it rather than leaving 
 
 **Known UX gaps — carried, not invented**
 
-Five gaps carry the tag `[NOTE FOR UX]`, and they are unresolved by decision. A story that touches one must surface it rather than settle it silently. The five gaps are:
+**Two** gaps in the state table carry the tag `[NOTE FOR UX]`, and they are unresolved by decision. A story that touches one must surface it rather than settle it silently. The two gaps are:
   - The skeleton's own appearance (state 22).
-  - The nothing-clears-the-threshold copy (state 25).
-  - Where a cross-file validation report lands (state 27).
-  - What crafted rows render while the active recipe is uncostable (state 35).
-  - The reason string a recipe-scoped Unrankable would need (state 36).
+  - The reason string a recipe-scoped Unrankable would need (state 36). That enum is the PRD's to extend, not UX's, and it stays declined: no base is tracked below item level 70, so the case is defensive rather than live.
 
-Two further gaps sit outside the state table. The first is the curation fallback's visual treatment (UX-DR40). The second is whether `† pruned` and `* pinned` belong in `{components.key-block}`, whose contract is to list every mark that can appear (memlog 201, Story 2.5).
+**It was six, then five, and revision 4 closed three at once.** The nothing-clears copy (state 25) is ruled and UX-DR51 holds it. What crafted rows do under an uncostable recipe (state 35) is ruled, with PRD revision 19 carrying the player-visible half and UX-DR52 the rest. Where the cross-file report lands (state 27) is ruled, and UX-DR49 holds it. The sixth closed earlier, when the `pinned` mark settled: state 9 carries `{components.curation-status-pinned}` and no note, UX-DR48 holds the treatment, and Story 2.5 builds it.
 
-**There were six gaps until the `pinned` mark closed.** State 9 carries `{components.curation-status-pinned}` and no note. UX-DR48 holds the treatment, and Story 2.5 builds it. The narrower key-block question above is that gap's successor rather than a restatement of it. The mark's own appearance is settled, and only its key-block membership is open. A third gap outside the state table is **closed**. No Item Class name needs a display mapping. The only transform is the underscore-to-space trim that AD-5 already owns, applied at render time, with the identity left verbatim (AD-5, Story 2.3).
+Two gaps sit outside the state table.
+  - Whether `† pruned` and `* pinned` belong in `{components.key-block}`, whose contract is to list every mark that can appear (Story 2.5). The mark's own appearance is settled; only its key-block membership is open.
+  - Two Combinations that read identically on the page. The hazard survived the mechanism that produced it: the page prints the curator's declared Accepted Tier, and nothing stops two tracked bands on one Item Class declaring the same one.
+
+**The one non-colour cue is no longer a gap either.** It closed on 2026-09-20 and UX-DR40 holds it, with UX-DR50 citing the same cue: both surfaces print text the page did not write, and both take the mono verbatim register. It closed as **one** answer, which is what the merge was protecting. A story that touches either surface now cites UX-DR40 and does not re-raise the question.
+
+**FR-30's world is no longer a gap.** It closed by ruling, not by deferral, and UX-DR53 holds it. The earlier acceptance of designing it at implementation time is discharged, so no story may re-defer it. One further gap outside the state table is also **closed**: no Item Class name needs a display mapping. The only transform is the underscore-to-space trim that AD-5 already owns, applied at render time, with the identity left verbatim (AD-5, Story 2.3).
 
 ### Extraction Findings
 
-No open findings remain. All three closed on 2026-09-20, and the owning documents carry the rulings. Ids are stable and are never reused, so each finding keeps its line.
+All four findings closed on 2026-09-20 and the owning documents carry those rulings. No finding is open. Ids are stable and are never reused, so each finding keeps its line.
 
 **D-1 — CLOSED 2026-09-20.** There was never a real disagreement. Currency rates became hand-maintained committed data at spine revision 14, and FR-14 carried a stale numeral. FR-14 now reads *one of three declared sources*, which matches AD-12. Cite AD-12.
 
 **D-2 — CLOSED 2026-09-20.** The count was the shallow half of this finding. State 27's *"four checks, not five"* was a correction aimed at the retired straddle rule. Class discriminability arrived later and landed in the slot that sentence had emptied, so the sentence read as a rejection of a binding check. State 27 now enumerates five checks, and the defence is struck. The real payload was FR-4's reason enum. A class that fails any of the five has a `complete`, published pool, so neither existing string was true of it. FR-4 now carries a third string. Cite AD-17.
+
+**D-4 — CLOSED 2026-09-20.** `EXPERIENCE.md` carried *a declared tiebreak for equal EV* on its unresolved list as `core`'s and unanswered, on the ground that state 25 ties every crafted row at minus its Craft Cost and the rank numerals print over that tie, so an undeclared tiebreak would shift the printed order between loads. **AD-17 already declares it.** The ranked list breaks ties on the row's unit key, then the recipe id; the comparison is against the serialised canonical key of AD-5's arm rather than a bare string; and a raw row, having no recipe id, sorts before a crafted row at an equal EV, which makes the ordering total across the mixed list. Under that rule a twenty-way tie on one figure is fully determined and stable across loads, because unit keys are distinct. **The gap is therefore a citation gap and not a missing decision.** Two consequences: `IMPLEMENTATION-NOTES.md` does not own this rule and none of its sections state it, so an acceptance criterion cites AD-17 directly; and `EXPERIENCE.md`'s entry closes against AD-17 rather than waiting on a fresh ruling. UX made that edit on 2026-09-20: the unresolved bullet is gone, state 25 cites AD-17, and the closure is recorded under *Closed against the architecture*. Cite AD-17. No story invents a tiebreak of its own.
 
 **D-3 — CLOSED 2026-09-20.** The recipe axis is settled, and AD-17 now carries the ruling. `core` ranks every `(Item Class, recipe)` pair inside one ordering, which is what gives the recipe-id tie-break work to do. `web` renders only the rows whose recipe is the active one, so a crafted class appears on the page exactly once. The cross product is an ordering-internal fact and is never player-observable. The list does not double, the Craft Recipe control is a filter, and no row names its recipe. AD-4 carries the read-time consequence. Cite AD-17.
 
@@ -267,11 +287,13 @@ No open findings remain. All three closed on 2026-09-20, and the owning document
 
 Every FR maps to exactly one owning epic. Where a second epic touches an FR, that touch is a story inside the second epic. The FR's acceptance still belongs to the owner named here.
 
+Four touches are recorded rather than left to be discovered. Epic 2 builds `{components.unrankable-appendix}`'s structure under **FR-4**, because FR-30's world is Epic 2's own shipped state and UX-DR53 now specifies its treatment. Epic 3 applies **FR-5**'s bound per branch under an uncostable recipe, and adds a sixth group to the sync report panel Epic 2 built. Epic 3 also owns the crafted half of state 25, whose copy Epic 2 writes.
+
 FR-1: Epic 3 — the ranking figure itself, EV under the active recipe and threshold
 FR-2: Epic 3 — Chase Combinations on each collapsed crafted row
 FR-3: Epic 2 — the raw branch, and the unit glyph that labels every row's unit
-FR-4: Epic 3 — the Unrankable group, its reasons and its count
-FR-5: Epic 2 — the top-20 bound and the expand affordance
+FR-4: Epic 3 — the Unrankable group, its reasons and its count. Epic 2 builds the appendix's structure and its one day-one reason
+FR-5: Epic 2 — the top-20 bound and the expand affordance. Epic 3 applies it per branch under an uncostable recipe
 FR-6: Epic 2 — the Payout Threshold control and the immediate re-rank
 FR-7: Epic 2 — threshold persistence in browser storage
 FR-8: Epic 2 — row expansion to the full tracked Combination list, tombstones included
@@ -296,7 +318,7 @@ FR-26: Epic 3 — Craft Cost and the Craft Recipe control
 FR-27: Epic 3 — consuming a schema-conformant Weights File
 FR-28: Epic 3 — the pool-completeness contract, both halves
 FR-29: Epic 3 — probabilities scoped to the entry's floor
-FR-30: Epic 3 — the external Weights File as a v1 prerequisite
+FR-30: Epic 3 — the external Weights File as a v1 prerequisite. Its no-weights-file world is Epic 2's shipped state, and Epic 2 renders it
 FR-31: Epic 2 — refusing to value an observation from another league
 FR-32: Epic 1 — validating the configured league before the run spends budget
 FR-33: Epic 2 — runtime artifact loading as one consistent set
@@ -305,7 +327,7 @@ FR-33: Epic 2 — runtime artifact loading as one consistent set
 
 ### Epic 1: Foundations and the Background Sync
 
-The player installs one scheduled command. That command keeps a committed, league-correct price dataset up to date on its own. It paces itself, so the product never loses the API access it depends on. It resumes where it left off. It publishes a Sync Report that says what the run did and what broke. Nothing in this epic reads the Weights File. The epic therefore delivers in full, before the external dependency of §7.3 arrives.
+The player installs one scheduled command. That command keeps a git-tracked, league-correct price dataset up to date on its own. The player publishes it when he chooses. It paces itself, so the product never loses the API access it depends on. It resumes where it left off. It publishes a Sync Report that says what the run did and what broke. Nothing in this epic reads the Weights File. The epic therefore delivers in full, before the external dependency of §7.3 arrives.
 
 **FRs covered:** FR-14, FR-15, FR-17, FR-19, FR-20, FR-21, FR-23, FR-24, FR-25, FR-32
 
@@ -331,15 +353,16 @@ The player opens a page on the second monitor before a session. The page renders
   - the Mantine v9 override layer
   - the colour, typography and spacing token sets
   - the fixed 1060x1920 frame, and every verified column sum
-  - the trust strip with its health line, and the sync report panel
+  - the trust strip with its health line, and the sync report panel's **five** figure groups
   - the expansion panel, the two-line combination row, the tombstone band and the trade link
+  - `{components.unrankable-appendix}`'s structure, holding every crafted Item Class under FR-4's day-one reason
   - both page-replacing failure screens
   - the key block and the running foot
   - the GitHub Actions build-and-deploy workflow
 
 **NFRs addressed:** NFR-6, NFR-7, NFR-10
 
-**Standalone:** yes. This is a complete and useful product that never reads `weights.json`. Crafted Item Classes are Unrankable for a reason the page states, exactly as AD-24 and AD-27 require.
+**Standalone:** yes. This is a complete and useful product that never reads `weights.json`. Crafted Item Classes are Unrankable for a reason the page states, exactly as AD-24 and AD-27 require — and that is FR-30's world, which UX-DR53 now specifies rather than defers. **Epic 2 therefore builds the appendix itself**, at UX-DR8's four-cell 970px budget, pinned to the foot, its count readable without expanding anything, its rows non-interactive, holding on the order of 29 rows untruncated while the document scrolls beneath it. Every row there carries FR-4's second string, `class absent from weights file`, because on day one that string is true of every crafted class. FR-4's acceptance still belongs to Epic 3, which adds the other two strings and the Provenance `absent` case to an appendix that already exists.
 
 ### Epic 3: The Crafted Ranking, on a Real Weights File
 
@@ -351,19 +374,20 @@ The player reads Item Classes ranked by threshold-truncated expected value, unde
   - the five cross-file checks as exported pure functions that both shells call
   - the Craft Recipe control, and the single printing of Craft Cost
   - the chase cells, with their short-form table and coining rules
-  - the Unrankable appendix
+  - the appendix's remaining two reason strings, its quiet notes and the Provenance `absent` case, added to the structure Epic 2 built
+  - the sync report panel's **sixth** group — the cross-file diagnosis, in the file's voice
   - the Provenance marks and the uniform-prior banner
   - the pool-coverage figure, published with its denominator
 
 **NFRs addressed:** NFR-3, NFR-5, NFR-6, NFR-8, NFR-10
 
-**Standalone:** yes. It builds on Epics 1 and 2, and neither of them requires it to function.
+**Standalone:** yes. It builds on Epics 1 and 2, and neither of them requires it to function. It adds to two components Epic 2 shipped — the appendix and the sync report panel — rather than replacing either.
 
 **Why this is not folded into Epic 2.** Epics 2 and 3 both extend `core` and `web`. The overlap was examined rather than assumed. Consolidation is rejected for two reasons, and neither is a matter of taste. First, Epic 3 is gated on an artifact this project does not produce. FR-30 makes an externally produced Weights File a v1 prerequisite, so merging the epics would make the whole page wait on a dependency that §7.3 does not control. Second, AD-24 declares the raw-only page a *shipped phase* and not a milestone. Epic 2 deploys to Pages and is read during a real league, so its feedback arrives before anyone designs Epic 3's ranking against it. The split therefore buys a real release and a real feedback loop, and that is what justifies touching the same files twice. The two epics also divide cleanly inside those packages. Epic 2 owns the substrate, the raw branch and every chrome component. Epic 3 adds the weights-fed valuation path beside them, rather than rewriting it.
 
 ## Epic 1: Foundations and the Background Sync
 
-The player installs one scheduled command. That command keeps a committed, league-correct price dataset up to date on its own. It paces itself, so the product never loses the API access it depends on. It resumes where it left off. It publishes a Sync Report that says what the run did and what broke. Nothing in this epic reads the Weights File. The epic therefore delivers in full, before the external dependency of §7.3 arrives.
+The player installs one scheduled command. That command keeps a git-tracked, league-correct price dataset up to date on its own. The player publishes it when he chooses. It paces itself, so the product never loses the API access it depends on. It resumes where it left off. It publishes a Sync Report that says what the run did and what broke. Nothing in this epic reads the Weights File. The epic therefore delivers in full, before the external dependency of §7.3 arrives.
 
 ### Story 1.1: The four-package workspace and the offline development loop
 
@@ -400,7 +424,7 @@ So that I can run the whole development loop at machine speed without a human un
 
 **Given** a test that issues an HTTP request with no matching fixture
 **When** the suite runs
-**Then** MSW in `onUnhandledRequest: "error"` mode fails that test loudly
+**Then** the suite fails that test loudly, naming the request
 **And** the request does not escape to the network (NFR-1, AD-13).
 
 **Given** each of the four packages
@@ -453,7 +477,7 @@ So that the producer and the consumer of an artifact cannot drift apart while bo
 **When** `contracts` writes its schema description
 **Then** the description states the orientation explicitly: `rate` is divine per one unit of the named currency. `contracts` is built first, by whoever holds neither side of the calculation (AD-20).
 
-**Given** every external effect this epic touches — HTTP, the filesystem, git and the clock
+**Given** every external effect this epic touches — HTTP, the filesystem, **git (read-only)** and the clock
 **When** `contracts` declares that effect
 **Then** it declares the effect as a `<Thing>Port` interface
 **And** every port ships a fake beside the real adapter (AD-1, Consistency Conventions).
@@ -732,11 +756,11 @@ So that every figure the tool shows me is one comparable number resting on a met
 **Then** it stamps `lastAttemptedAt`, leaves the entry's state as it was, and writes a record
 **And** it aborts the run non-zero, rather than spending the rest of the chunk on requests it knows are malformed (AD-9).
 
-### Story 1.8: The published Dataset and the bounded git write path
+### Story 1.8: The published Dataset, written to a git-tracked working tree
 
 As the player,
-I want each run to publish what it observed and commit only the files it owns,
-So that a refresh deploys itself and an unfinished curation edit never rides along with it.
+I want each run to write what it observed into files I already track in git,
+So that every chunk leaves a reviewable change I publish when I choose, instead of a robot committing on my behalf a thousand times a day.
 
 **Acceptance Criteria:**
 
@@ -750,21 +774,11 @@ So that a refresh deploys itself and an unfinished curation edit never rides alo
 **When** `sync` writes the dataset
 **Then** it does not filter the dataset on write, so the site is not blanked while a re-sync runs (AD-19).
 
-**Given** a commit
-**When** `sync` stages files
-**Then** it commits only the files `sync` owns, by explicit path
-**And** it never runs `git add -A`, so a dirty working tree elsewhere neither blocks the sync nor enters the commit (AD-3, NFR-5).
-
-**Given** a commit
-**When** `sync` publishes it
-**Then** it pushes to the default branch
-**And** it may run `pull --ff-only` beforehand
-**And** it never force-pushes, rebases, merges or resolves a conflict.
-
-**Given** a push that fails against a non-fast-forward remote
-**When** the run ends
-**Then** the commit stays in place, `sync` records the failure, and the run exits non-zero
-**And** the next chunk re-attempts the push (AD-3).
+**Given** a completed chunk
+**When** `sync` finishes writing
+**Then** it performs no `git add`, `commit`, `push` or `pull`
+**And** the files it wrote are git-tracked and updated in place, by explicit path
+**And** publishing them is the player's own commit and push (AD-3, NFR-5).
 
 **Given** any artifact
 **When** `sync` writes it
@@ -773,9 +787,9 @@ So that a refresh deploys itself and an unfinished curation edit never rides alo
 
 **Given** any file this epic writes
 **When** `sync` serialises it
-**Then** the file is UTF-8 without BOM, with LF line endings, JSON with stable key order, and a trailing newline. A sync commit's diff then shows changed data rather than reserialisation noise (Consistency Conventions).
+**Then** the file is UTF-8 without BOM, with LF line endings, JSON with stable key order, and a trailing newline. A data commit's diff then shows changed data rather than reserialisation noise (Consistency Conventions).
 
-**Given** the filesystem, git and clock effects
+**Given** the filesystem, **read-only git** and clock effects
 **When** `sync` reaches them
 **Then** it reaches them through the ports `contracts` declares
 **And** time enters `core` only as a passed-in value (AD-1, NFR-3).
@@ -891,8 +905,8 @@ So that a mistyped league name shows up where I already look instead of quietly 
 
 **Given** an aborting run
 **When** it exits
-**Then** it still commits and pushes `sync-report.json` alone, by AD-3's explicit path
-**And** it leaves `dataset.json` and `sync-progress.json` untouched. A record that never deploys is a record nobody reads (AD-12).
+**Then** it still writes `sync-report.json` alone, by AD-3's explicit path
+**And** it leaves `dataset.json` and `sync-progress.json` untouched. A run that aborts without recording why leaves nothing to diagnose (AD-12).
 
 **Given** `data/config.json`
 **When** a component reads it
@@ -934,8 +948,9 @@ So that I never read half a ranking and never mistake a partial set for the list
 
 **Given** every typography role
 **When** `web` declares it
-**Then** the role carries an explicit `lineHeight`, drawn from the two system-resident stacks
-**And** the page downloads no font (UX-DR3, NFR-7).
+**Then** the role carries an explicit `lineHeight`, drawn from the three system-resident stacks
+**And** the third stack is the **mono verbatim register**, which no role on this page's resting surfaces selects — it is applied by the two surfaces UX-DR40 names, at the line's own size, weight and line height
+**And** the page downloads no font (UX-DR3, UX-DR40, NFR-7).
 
 **Given** the page's glyph vocabulary
 **When** `web` fixes it
@@ -953,11 +968,17 @@ So that I never read half a ranking and never mistake a partial set for the list
 **Then** `{spacing.content-width}` is exactly 1012px
 **And** the 20px of scrollbar clearance came out of `{spacing.frame-padding-x}`, and never out of a column contract (UX-DR5, UX-DR7).
 
-**Given** the resting page
-**When** the player clicks nothing
-**Then** nothing pushes the page past `{spacing.frame-height}`. The banner and the health line are the two data-raised exceptions, budgeted against `{spacing.frame-slack}`
+**Given** resting **chrome** — anything that can appear without a click and is not a ranked row
+**When** it renders
+**Then** it never overruns `{spacing.frame-height}`. The banner and the health line are the two data-raised exceptions, budgeted in pixels against `{spacing.frame-slack}`
+**And** new resting chrome is admissible only by taking a budget line of its own, so the two exceptions are not a list that grows by precedent (UX-DR6 clause one).
+
+**Given** a **row count** above the twenty-row resting target
+**When** a data condition produces one
+**Then** the frame is `min-height`, so the document grows and scrolls, with nothing clipped and the printed order intact
+**And** rows are not chrome and are never budgeted, so this is not a third exception to clause one — it is not an exception to that clause at all
 **And** the document scrolls rather than the frame, and no region takes `overflow-y` except the sync report panel
-**And** shrinking rows, dropping columns, truncating the appendix and hiding the key block are forbidden as escape hatches (UX-DR6).
+**And** shrinking rows, dropping columns, truncating the appendix and hiding the key block are forbidden as escape hatches, for a **grown** state exactly as for an expanded one (UX-DR6 clause two).
 
 **Given** a load
 **When** `web` fetches its data
@@ -1363,7 +1384,9 @@ So that a rank stops being a claim and becomes an argument I can check.
 **When** it renders
 **Then** it falls back to the Trade Catalogue stat name plus the value band. That is the one place in the product where a numeral from modifier text survives
 **And** the fallback is identifiable as a fallback, and it does not borrow a semantic ink
-**And** the fallback's treatment is an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than settling it (UX-DR40).
+**And** it is identifiable by the **mono verbatim register** — the third type stack, meaning *the page did not write this text* — taking the line's own size, weight and line height and adding no ink, no mark and no glyph
+**And** the cell may ellipsise a character or two earlier than a curated one, which is accepted: the column budget is unchanged, the cell already ellipsises, and the expansion holds the text in full
+**And** this story invents no cue of its own. Story 3.3 renders the same register on the other surface, and the two must not diverge (UX-DR40, UX-DR50).
 
 **Given** the Provenance mark
 **When** the panel renders
@@ -1473,13 +1496,19 @@ So that a list that is not doing what I think is visible without my going to loo
 **Then** it holds five figure groups in three columns: the sync run, what is broken, and what the weights cover
 **And** it carries **one heading per column, and never one per group**, with vertical space alone separating two groups in one column (UX-DR22).
 
+**Given** that `columnHeadingRule`
+**When** Epic 3 adds the panel's sixth group beneath *what is broken*
+**Then** this story builds the second column so a third group is admitted by vertical space alone, with no second heading, no rule and no bullet
+**And** five is the correct count for this epic, because no cross-file check runs without a weights file, so nothing here renders an empty group against a future one (UX-DR22, UX-DR49).
+
 **Given** the figures themselves
 **When** they render
 **Then** they are the requests consumed per source and the entries not reached, the unresolvable count and the pinned-starvation records, and pool coverage as a fraction **with its denominator** (FR-14, FR-24, FR-25, FR-4, AD-27).
 
 **Given** the entries-not-reached figure
 **When** someone words it
-**Then** it reads *in the last sync pass*, and never *in this Chunk*. *Chunk* is back-end-only vocabulary, and the player reads this panel (UX-DR38).
+**Then** it reads *in the last sync pass*, and never *in this Chunk*
+**And** the ground for that is **register, not audience**: it is a figure-group label, read at a glance, in the page's voice. The rule stood on audience until revision 4, and audience never discriminated in this product — there is one user, he wrote the Tracked List and he is the person fixing the file (UX-DR38, UX-DR50).
 
 **Given** every figure in the panel
 **When** it renders
@@ -1501,7 +1530,7 @@ So that a list that is not doing what I think is visible without my going to loo
 ### Story 2.7: Day one, deployed — the honest-empty league reset and the published site
 
 As the player,
-I want a league reset to leave the page honestly empty, and the site to refresh itself from a sync commit,
+I want a league reset to leave the page honestly empty, and the site to refresh itself from the data commit I push,
 So that I never read last league's numbers and never have to rebuild anything by hand.
 
 **Acceptance Criteria:**
@@ -1529,8 +1558,16 @@ So that I never read last league's numbers and never have to rebuild anything by
 
 **Given** a threshold that nothing clears
 **When** the list renders
-**Then** that state is distinguishable from both a partial refresh and an empty league, and it must not read as a data outage
-**And** the copy for that state is an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than inventing an answer (state 25, UJ-2 failure path).
+**Then** a **plain declarative** sits above the list, under `{components.asking-price-line}`, naming the live Payout Threshold figure at the page's 2dp
+**And** it states the condition and **no instruction**, because the player set that number deliberately and its remedy is the figure he typed, 16px away
+**And** it is not `{components.uniform-prior-banner}`, which a data condition raises and this is not one, and it is not a `{components.money-slot}` phrase either, because no figure is missing
+**And** that makes the state distinguishable from both a partial refresh and an empty league, so it never reads as a data outage (state 25, UX-DR51, UJ-2 failure path).
+
+**Given** that same state
+**When** the rows render
+**Then** the rows **stay** and the **rank numerals stay**
+**And** numerals are suppressed in the honest-empty state because its order is canonical rather than ranked, where here the order is computed and the figures merely tie — hiding a computed result because it is flat would be the page editing its own answer
+**And** in this epic a Raw Base under the threshold leaves the ranking altogether, so the list may be short or empty without any crafted row to tie against. The twenty tied crafted rows are Epic 3's (state 25, UX-DR51, FR-5).
 
 **Given** `{components.running-foot}`
 **When** it renders
@@ -1548,7 +1585,7 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Then** what binds is NFR-10 reframed as legibility, and rendered text rather than raw ids
 **And** nobody infers a WCAG level, a contrast claim, a screen-reader behaviour, a keyboard path, focus-visible styling or reduced-motion handling from the floor's existence (UX-DR45, NFR-10).
 
-**Given** a sync commit pushed to the default branch
+**Given** the player pushing a data commit to the default branch
 **When** it lands
 **Then** a GitHub Actions workflow builds the Vite bundle and deploys it to Pages
 **And** the workflow is required rather than optional. Branch-published Pages runs Jekyll and cannot build this app (spine *Deployment & environments*, NFR-7).
@@ -1556,12 +1593,63 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Given** the deployed site
 **When** it serves
 **Then** it is a static bundle, with no server, no secret material and no expiring credential
-**And** a sync commit updates the data without rebuilding the app. The page fetches the eight artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
+**And** a data commit updates the data without rebuilding the app. The page fetches the eight artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
 
 **Given** the deployed page with no `weights.json` published
 **When** a player opens it
 **Then** the Raw Base price list is the day-one content, and the page names the absence
-**And** that is the product's declared launch experience, rather than an edge case (AD-24, AD-27, FR-30).
+**And** that is the product's declared launch experience, rather than an edge case
+**And** Story 2.8 renders the crafted classes that absence makes Unrankable. This story does not (AD-24, AD-27, FR-30).
+
+### Story 2.8: The Unrankable appendix, and the day-one page it completes
+
+As the player,
+I want the crafted Item Classes the tool cannot rank to sit at the foot of the page with their reason, on a day when that is all of them,
+So that the launch page states what it is not showing me instead of quietly showing me a shorter list.
+
+**Acceptance Criteria:**
+
+**Given** `{components.unrankable-appendix}`
+**When** `web` builds it
+**Then** it is four cells summing to 970px — 292 + 118 + 250 + 310 — pinned to the foot of the document
+**And** the pin is a decision, and never a coverage band. The page never switches layout on a measurement, and there is one arrangement in every data state (UX-DR8, UX-DR29, FR-4).
+
+**Given** the count of Unrankable Item Classes
+**When** the page renders
+**Then** that count is readable without expanding anything (FR-4, UX-DR29).
+
+**Given** every row in the appendix
+**When** it renders
+**Then** it is an Item Class, and never a Base Type. Unrankability governs the crafted branch alone, and a Raw Base needs no Eligible Pool
+**And** the rows are not interactive and do not expand. An Unrankable Item Class has no ranking to explain (FR-4, FR-3, UX-DR29).
+
+**Given** `data/weights.json` absent, which is this epic's shipped state
+**When** the appendix renders
+**Then** every crafted Item Class sits in it, carrying FR-4's second reason string verbatim — `class absent from weights file`
+**And** that is the only string this epic renders, because on day one it is true of every crafted class. Story 3.6 adds the other two (FR-4, FR-30, AD-24, state 15).
+
+**Given** that world's row count — on the order of 29 rows against a committed budget of 7
+**When** the page rests
+**Then** the appendix holds **every** row, untruncated, and the document grows and scrolls beneath it
+**And** `margin-top: auto` produces slack only while the content is shorter than the frame, and none past it, which is the behaviour this state wants
+**And** nothing shrinks a row, drops a column, truncates the appendix or hides the key block to keep the page inside 1920px (UX-DR53, UX-DR6 clause two, FR-30).
+
+**Given** that treatment
+**When** a developer looks for a decision to make
+**Then** there is none left to make. The three rules once read as colliding do not: the footer pin and the no-truncation rule are mechanism and hold, and the third was the sentence UX-DR6 has split
+**And** the earlier acceptance of designing this at implementation time is **discharged**. This story may not re-defer it (UX-DR53).
+
+**Given** an Unrankable Item Class some of whose Base Types still rank on the raw branch
+**When** its note renders
+**Then** the note names that fact, and not a rank. A class holds several Base Types, they do not rank together, and pointing at one position would invent a relationship the list does not have (FR-4, FR-3, state 16).
+
+**Given** the appendix, the key block and the running foot
+**When** the page renders in any state this epic reaches
+**Then** all three still render, and they stay below the list in that order. A page with no crafted ranking still has to say what it is not ranking (FR-13, UX-DR23, UX-DR29, UX-DR30, UX-DR32).
+
+**Given** the appendix rows
+**When** the pointer moves over them
+**Then** they take no hover state at all (UX-DR44).
 
 ## Epic 3: The Crafted Ranking, on a Real Weights File
 
@@ -1638,7 +1726,8 @@ So that the ranking rests on a file somebody else produced and this app never in
 **Given** `data/weights.json` absent from the repository
 **When** the page loads
 **Then** every crafted Item Class is Unrankable with that reason, Raw Bases still rank, and the page names the absence
-**And** that state is the product's declared day-one phase, rather than an error (FR-30, AD-24, AD-11).
+**And** that state is the product's declared day-one phase, rather than an error
+**And** its page treatment is **specified and not deferred** — the appendix sits at the foot, holds every row untruncated, and the document scrolls. Story 2.8 built that, and this story neither re-designs it nor re-defers it (FR-30, AD-24, AD-11, UX-DR53).
 
 **Given** a uniform-prior file, with every `weight: 1` and `weightSource: "absent"`
 **When** `core` loads it
@@ -1774,9 +1863,42 @@ So that a double-counted Combination cannot hand an Item Class the top of the li
 **And** a cross-file failure is not an invalid artifact, because each file is valid on its own (FR-33, FR-16, AD-17, state 27).
 
 **Given** that report
-**When** someone chooses its home on the page
-**Then** whether it is a global region, inline on the affected Item Class, or both is an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than settling it
-**And** `{components.sync-report-panel}` is the obvious candidate, because it already carries every other operational figure. Nothing has ruled on it (state 27, UX-DR22).
+**When** `web` places it
+**Then** it lands in `{components.sync-report-panel}` as a **third group in that panel's second column**, under the existing *what is broken* heading, separated from the unresolvable count and the pinned-starvation records by vertical space alone
+**And** `columnHeadingRule` is intact: no second heading, no rule, no bullet. The panel goes from five groups to six
+**And** it is neither a global region nor inline on the affected Item Class (state 27, UX-DR49, UX-DR22).
+
+**Given** why the panel is the only home that works
+**When** a developer is tempted to move it
+**Then** the diagnosis is the one piece of content on the page whose length is genuinely unbounded — one line per failing check, across as many as every tracked Item Class — and the panel is the one region permitted to cap itself at `{spacing.sync-report-max-height}` and scroll inside its own band
+**And** everywhere else an unbounded list moves the page (UX-DR49, UX-DR6).
+
+**Given** the group's contents
+**When** it renders
+**Then** it is a **list and not a figure** — one line per failing check, naming the check, the entry and that entry's canonical key
+**And** it is the only group in the panel that is not a figure (UX-DR49).
+
+**Given** the back-end-only vocabulary inside those lines
+**When** someone checks it against the page's rules
+**Then** it is licensed, because this group speaks in **the file's voice** while every figure group speaks in the page's
+**And** the licence is one of **register, not audience**. Audience never discriminated in this product: there is one user, he wrote the Tracked List and he is the person fixing the file
+**And** a canonical key is a string he copies into an editor, where a figure-group label is read at a glance. Both are legitimate for this reader, and not in the same typographic breath (UX-DR50, UX-DR38).
+
+**Given** the cue that separates the two registers
+**When** a developer reaches for one
+**Then** it may **not** be a semantic ink. An ink states that a *figure's* footing is degraded or broken, and a failing cross-file check says nothing about any figure on the page — the affected classes are already in the appendix carrying their reason
+**And** it is the **mono verbatim register**, at the panel's own size, weight and line height — the diagnosis alone, with every figure group left in the page's voice and its existing face
+**And** it is **the same cue** the curation fallback takes, because both print text the page did not write. This story invents no second cue, and a divergence from Story 2.5's rendering of it is a defect in whichever shipped later (UX-DR50, UX-DR40).
+
+**Given** the diagnosis
+**When** someone proposes promoting it
+**Then** it is never promoted out of this panel and never reaches `{components.trust-strip}`, which keeps exactly two health triggers
+**And** the player already sees its result as Unrankable rows he can count without expanding anything (UX-DR49, FR-4).
+
+**Given** the payload `sync` writes for the same failure
+**When** `SyncRunReport` carries it
+**Then** it is a **record** rather than a figure, because it survives the chunk that wrote it and the player's edit is what clears it
+**And** if the schema Story 1.2 declared cannot carry the per-check lines this group renders, extending it is this story's work (FR-25, AD-3, Consistency Conventions *Logging*).
 
 **Given** `sync`
 **When** a check fails
@@ -2027,10 +2149,58 @@ So that the list ranks the decision I actually make rather than the price of a b
 **Then** computing them is not the precomputation AD-4 forbids. What AD-4 forbids is a rank, a score or an ordering persisted into an artifact (AD-4).
 
 **Given** state 35, where the active recipe is uncostable
-**When** crafted rows render
-**Then** whatever they render is a money-slot phrase, and never `0.00`
-**And** the raw branch is unaffected, because it has no Craft Cost to be missing
-**And** whether those rows carry the `not-yet-synced` phrase, leave the ordering, or move to the appendix is an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than inventing an answer (state 35, FR-26, AD-17).
+**When** the list renders
+**Then** **every row stays.** No row leaves the list, and no Item Class becomes Unrankable
+**And** FR-4's reason enum is **not** extended for it, because such a class's Eligible Pool is complete, published and agreeing, so none of FR-4's three strings is true of it. The class is unpriced, not unrankable
+**And** the appendix option is dead by name: moving those rows there would print a reason that is not the reason (state 35, FR-26, FR-4, AD-17).
+
+**Given** why the rows can stay
+**When** a developer checks the reasoning
+**Then** Craft Cost is one figure subtracted equally from every crafted row, and the Payout Threshold compares against a Combination's **gross** price and never touches the cost
+**And** the crafted order and the Chase Combination sets are therefore exactly what they would have been
+**And** what is genuinely unavailable is only the *distance* between a crafted row and a Raw Base row, which is the missing figure itself (state 35, FR-1, FR-26).
+
+**Given** the two branches in that state
+**When** they render
+**Then** each keeps its own order, and neither is ordered against the other
+**And** **no rank numeral spans the two** — numerals are suppressed, as in the honest-empty state and for the same reason: a numeral is an explicit claim about position that the line below cannot retract, where vertical adjacency under a stated limit is not a claim
+**And** `{components.ranked-row-tier-1/2/3}` run **per branch**, so two tier-1 rows is the correct render, and that is the only thing left saying *this is the strong end of its order* (state 35, UX-DR52, UX-DR11).
+
+**Given** the merged-order alternative
+**When** someone re-proposes it
+**Then** it is rejected on a stated ground and not on taste: its error is **anti-correlated with its own trigger**. A recipe goes uncostable when a currency has no league rate, likeliest for the thinly traded one, and of FR-26's two recipes the rarer-orb recipe carries the larger Craft Cost — so the approximation is worst exactly where it fires
+**And** the revisit condition is a **measurement** and never a preference: if Craft Cost is shown small against typical payouts at the default threshold, the merged order becomes defensible and the PRD addendum's revision-19 bullet reopens (state 35, FR-26, PRD `addendum.md` revision 19).
+
+**Given** FR-5's bound in that state
+**When** `web` applies it
+**Then** it applies **per branch** — up to 20 rows of each, one `{components.expand-affordance}` under each, and neither affordance naming a unit
+**And** the count 20 is held rather than halved, because it is a product-owned number and halving it would make the top 20 sometimes a top 10, which is a capability change bought to reclaim page height
+**And** the resting page can therefore hold up to 40 rows and scroll, which UX-DR6's clause two accepts as an overrun rather than a breach (state 35, FR-5, FR-26, UX-DR52, UX-DR6).
+
+**Given** the EV cells on crafted rows in that state
+**When** they render
+**Then** every one holds the money-slot phrase *no figure yet*, and never `0.00` and never a blank
+**And** a plain declarative sits above the list in state 25's register, naming the active recipe and stating that the two branches are not comparable while it holds
+**And** the raw branch is otherwise unaffected, because it has no Craft Cost to be missing (state 35, UX-DR52, UX-DR17, UX-DR51).
+
+**Given** how often this state fires
+**When** someone sizes the work
+**Then** it is a **routine** state on the costlier recipe, and not a defensive one. It is built to the same standard as any resting state (state 35, PRD `addendum.md` revision 19).
+
+**Given** state 25, where nothing clears the threshold
+**When** the crafted branch renders
+**Then** every crafted Item Class is still ranked, at an EV of minus its Craft Cost, so the branch is twenty rows carrying the **same figure** — not an empty list
+**And** the rank numerals **print over that tie**, because the order is computed and the figures merely tie (state 25, UX-DR51, FR-1).
+
+**Given** that twenty-way tie
+**When** `core` orders it
+**Then** AD-17's declared tie-break settles it — on the row's unit key, then the recipe id, comparing the serialised canonical key of AD-5's arm rather than a bare string
+**And** because unit keys are distinct, the printed order is fully determined and identical across loads. Nothing here shifts between two builders or two page loads
+**And** no story invents a tie-break of its own. `IMPLEMENTATION-NOTES.md` does not own this rule and none of its sections state it, so an acceptance criterion cites AD-17 directly (state 25, FR-1, AD-17, AD-5, finding D-4).
+
+**Given** a raw row and a crafted row at an equal EV
+**When** `core` compares them
+**Then** the raw row has no recipe id and sorts first, which is what makes the ordering **total across the mixed list** rather than total only within each branch (FR-1, FR-3, AD-17).
 
 **Given** state 36, an Item Class unrankable under one recipe only
 **When** it renders
@@ -2101,7 +2271,7 @@ So that I know what to look for without expanding anything.
 **Then** they can read identically. The value text that used to tell them apart has gone, and short-form uniqueness does not reach this case
 **And** what the second one prints is an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than settling it (UX-DR39).
 
-### Story 3.6: Provenance, the uniform-prior banner, and the Unrankable appendix
+### Story 3.6: Provenance, the uniform-prior banner, and the appendix's remaining reasons
 
 As the player,
 I want to tell a figure resting on measured weights from one resting on an invented prior, and to see the classes the tool cannot rank at all,
@@ -2192,29 +2362,18 @@ So that I discount a row rather than acting on it, and a placeholder never keeps
 **Given** that row's quiet note
 **When** someone writes it
 **Then** it may say that the class's pool is published and complete, and that the disagreement is in the player's own Tracked List. It is the one Unrankable row the player can fix
-**And** it may not name the check, the entry or its key. Those belong to the fuller report, whose home is still an unresolved `[NOTE FOR UX]` that the third string does not rule on (state 15a, state 27).
+**And** it may **not** name the check, the entry or its key. Those are diagnosis, and they belong in `{components.sync-report-panel}`'s second column, which Story 3.3 builds (state 15a, state 27, UX-DR49).
 
 **Given** a pool present, declaring `complete`, over no entries at all
 **When** `core` meets it
 **Then** it reports the cause it observed, and it never relabels that cause as `partial`
 **And** if FR-4's enum has no member for that cause, that is a finding for the PRD rather than a licence to relabel (FR-4, AD-17).
 
-**Given** the appendix
-**When** it renders
-**Then** it is four cells summing to 970px — 292 + 118 + 250 + 310 — pinned to the foot as a decision rather than as a coverage band
-**And** its rows are not interactive and do not expand. An Unrankable Item Class has no ranking to explain (FR-4, UX-DR8, UX-DR29).
-
-**Given** the count of Unrankable Item Classes
-**When** the page renders
-**Then** that count is readable without expanding anything (FR-4, UX-DR29).
-
-**Given** every row in the appendix
-**When** it renders
-**Then** it is an Item Class, and never a Base Type. Unrankability governs the crafted branch alone, and a Raw Base needs no Eligible Pool (FR-4, FR-3, UX-DR29).
-
-**Given** an Unrankable Item Class some of whose Base Types still rank on the raw branch
-**When** its note renders
-**Then** the note names that fact, and not a rank. A class holds several Base Types, and they do not rank together. Pointing at one position would invent a relationship the list does not have (FR-4, FR-3, state 16).
+**Given** `{components.unrankable-appendix}`
+**When** this story reaches it
+**Then** Story 2.8 already built it — the four cells summing to 970px, the foot pin, the readable count, the non-interactive rows, the Item-Class-only rule and the Base-Types-still-rank note
+**And** this story **adds to that structure** rather than rebuilding it: the two reason strings day one never renders, the quiet notes those strings carry, and the Provenance `absent` case
+**And** no column sum and no layout decision is reopened here (FR-4, UX-DR8, UX-DR29, Story 2.8).
 
 **Given** any coverage figure
 **When** it moves

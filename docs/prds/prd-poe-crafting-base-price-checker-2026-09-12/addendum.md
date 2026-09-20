@@ -264,3 +264,25 @@ The reasoning that kept the within-class spread is revision 17's own and is unch
 ### What did not move
 
 FR-4's coverage bands stay withdrawn. Revision 17 removed them because a threshold over dozens of items measures the scraper's progress rather than how much product exists, and moving the denominator from tracked categories to tracked classes does not revive that argument — it lands the count in the same order of magnitude. Coverage remains a published fraction with its denominator, read by a human. The `[ASSUMPTION]` the move did add is §3's: that a class's own name is already the player's word for it. Where several classes of one broad kind differ only in defence type, that may not hold, and the fix is a label in `EXPERIENCE.md` rather than a coarser unit.
+
+## Revision 19 rationale — what the ranking does with no Craft Cost
+
+FR-26 has said since revision 13 that an uncostable recipe is reported and never costed at zero. It has never said what the *ranking* then shows, and the gap was carried as an open UX note rather than as a requirement. It is a requirement: every crafted row on the page loses its figure at once, so this is player-visible behaviour and not a view treatment. Revision 19 states it, on the player's rulings of 2026-09-20.
+
+### Why the rows stay, and what survives with them
+
+Craft Cost is subtracted once per Item Class and is the same figure for every crafted row under the active recipe (FR-1, FR-26). Losing it therefore costs the crafted branch **one constant, applied equally**, and costs it nothing else: gross payouts are intact, the Payout Threshold compares against a Combination's gross price (FR-1), so the chase sets and the within-branch order are exactly what they would have been. What is genuinely unavailable is the *distance* between a crafted row and a Raw Base row, because that distance is the missing constant. So the branches keep their orders and lose only the merge.
+
+### Why the appendix was rejected
+
+Moving the crafted rows to the Unrankable group was the tidiest-looking option and is the one the PRD now forbids by name. Such a class's Eligible Pool is complete, published and in agreement with the Weights File, so all three of FR-4's reason strings are false of it, and the page would print a reason that is not the reason. Extending the enum to make it true is a fourth string for a condition that is not unrankability at all — the class ranks perfectly well, it is the *page* that cannot price it. The class is unpriced, not unrankable.
+
+### Why the merged order was rejected, and the condition on which it may return
+
+The cheapest option was to keep the single interleaved list ordered on gross payout, print the money-slot phrase in the EV cells, and accept a provisional merge — defensible if Craft Cost is small against the payouts it is subtracted from. It was rejected because **the size of that error is anti-correlated with its own trigger**. A recipe becomes uncostable when one of its currencies has no rate for the active league, which is likeliest for the thinly traded currency — and of v1's two recipes (FR-26) the one built on the rarer orbs is also the one with the larger Craft Cost. The state therefore fires disproportionately on the recipe where the merge is most wrong, under a threshold whose default is a quarter of a Divine. The approximation is worst exactly when it is used.
+
+No figure stands behind either side of that: nothing in this corpus states a Craft Cost in Divine for either recipe. **Revisit condition** — if a measurement shows Craft Cost is small against typical payouts at the default threshold, the merged order becomes defensible again and this bullet should be reopened on that evidence rather than on preference.
+
+### Why FR-5's count did not change
+
+Applying the bound per unit was chosen over halving it. 20 is a product-owned number (FR-5) and halving it in one state would make the top 20 sometimes a top 10, which is a capability change to buy back page height. The count is held and the thing it counts over is what varies. The consequence is that the default view can hold up to 40 rows in this state; where that lands on the page is `DESIGN.md`'s, and the player accepted it on 2026-09-20 on the ground that the page already scrolls.

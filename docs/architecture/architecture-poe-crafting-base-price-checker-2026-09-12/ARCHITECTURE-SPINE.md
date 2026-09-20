@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 17
+revision: 18
 created: '2026-09-12'
 updated: '2026-09-20'
 binds: []
@@ -26,6 +26,17 @@ companions:
 
 # Architecture Spine — PoE2 Crafting Base Price Checker
 
+> **Revision 18 takes `sync` off the git write path entirely.** AD-3 had the syncer commit its own
+> files and push on every run, which AD-7's repeatedly-invoked chunk runner multiplies into
+> thousands of commits a day. The sync-owned files are now **git-tracked and written in place**, and
+> **committing and pushing is the player's act** — the same act UJ-5 and UJ-6 already describe for
+> curation and league changes. The git port narrows to read-only, carrying only AD-12's
+> last-commit-date read. The whole non-fast-forward reconciliation path (pull, retry, the
+> prohibition on force-push and rebase) is **withdrawn rather than relocated**, because an automated
+> push is what made it necessary. GitHub Actions and Pages are unchanged; only the push's author
+> moves, and *Deployment & environments* now says so. The cost is that the site ages behind the
+> working tree when the player does not push, which AD-10's per-row freshness already makes visible.
+>
 > **Revision 17 moves the crafted branch one rung finer, to item-class altitude**, following
 > `prd.md` revision 18 — which overruled revision 17's *Item Category* on a product argument
 > the vocabulary argument does not outrank: expected value varies sharply between the classes
@@ -301,15 +312,23 @@ never import each other.
   | `data/dataset.json`, `data/sync-report.json` | `sync` only | `web` |
   | `data/sync-progress.json` | `sync` only | `sync` only — internal |
 
-  `sync` commits **only the files `sync` owns**, by explicit path, and never runs
-  `git add -A`, so a dirty working tree elsewhere neither blocks a sync nor enters its
-  commit. **`sync` then pushes to the default branch, and the git write path is bounded:**
-  `sync` may `pull --ff-only` before committing, and may **never** force-push, rebase,
-  merge, or resolve a conflict. A push that fails **leaves the commit in place, records the
-  failure in `sync-report.json`, and exits non-zero**; the next chunk re-attempts. A
-  non-fast-forward remote is an operator problem, not a case for `sync` to reconcile —
-  reconciling would let an automated job rewrite history that the dataset's own audit trail
-  depends on (AD-19).
+  **`sync` makes no git write of any kind** — it does not add, commit, push, pull, or tag. It
+  writes the files it owns to the working tree, by explicit path, and exits. Those files are
+  **git-tracked and updated in place**, so a chunk's output is an ordinary working-tree change.
+
+  **Publishing is a human act.** The player commits and pushes the sync-owned files at whatever
+  cadence he chooses, and that push is what deploys (*Deployment & environments*). The rule exists
+  because AD-7 makes `sync` a bounded chunk invoked repeatedly: an automated commit-and-push per
+  run produces thousands of commits a day, which buries the curation history the audit trail
+  depends on (AD-19) and puts an unattended job on the write path of a shared remote. With no
+  automated push, a non-fast-forward remote cannot arise from this product at all.
+
+  **The git port is therefore read-only** (AD-1) and carries exactly one operation: the author date
+  of the last commit touching a path (AD-12). A component that needs a git write is an amendment to
+  this AD.
+
+  The one-writer table above still binds: it governs **who writes a file**, and it is unaffected by
+  who commits it.
 
   Every concept that crosses a package boundary has exactly one Zod schema in
   `contracts` and no parallel definition anywhere: `BaseType`, `TrackedEntry`,
@@ -474,7 +493,8 @@ never import each other.
 - **Rule:** The syncer is a CLI that performs **one chunk, then exits**. Whichever of
   three bounds runs out first bounds the chunk: the remaining search allowance, the
   remaining fetch allowance, or the unprocessed remainder of the workload. Progress lives
-  in a schema-pinned `sync-progress.json`, committed alongside the dataset. A run
+  in a schema-pinned `sync-progress.json`, written alongside the dataset and tracked in git
+  like it (AD-3). A run
   acquires an exclusive on-disk lock; if another **live** run holds it, the new run logs that
   fact and **exits 0**, because a busy lock is a normal outcome for a repeatedly-invoked job.
   The syncer makes no assumption about what invokes it, how often, or where it runs.
@@ -835,10 +855,11 @@ never import each other.
   (AD-19). A league mismatch or a cross-file failure invalidates the run's premise, so the
   run **aborts**, and **a cross-file failure is recorded in `sync-report.json`** with the
   failing check's payload (AD-17), so the abort is visible on the surface `web` already
-  reads and not only in an exit code nobody watches. **An aborting run still commits and
-  pushes `sync-report.json`** — that file alone, by AD-3's path, with `dataset.json` and
-  `sync-progress.json` untouched — because a record that never deploys is a record nobody
-  reads. The league gate does the same.
+  reads and not only in an exit code nobody watches. **An aborting run still writes
+  `sync-report.json`** — that file alone, by AD-3's path, with `dataset.json` and
+  `sync-progress.json` untouched — because a run that aborts without recording why leaves
+  nothing to diagnose. The report reaches the site on the player's next push, like every other
+  sync output (AD-3). The league gate does the same.
 
   **An absent `weights.json` is not a cross-file failure — there is no cross-file to check.**
   `sync` skips that gate, records the absence in `sync-report.json`, and **runs normally**:
@@ -1334,8 +1355,10 @@ never import each other.
   `dataset.json` carries **only the latest observation per tracked entry** — no history —
   each stamped with its league, alongside the current `CurrencyRate` set (AD-20). **`sync` does not filter `dataset.json` on write** — league filtering
   happens once, in `core`, so a league change neither rewrites the dataset nor blanks the
-  site while a re-sync runs. Historical prices are recovered from the git log of sync
-  commits, and no component may depend on in-file history. A chunked partial refresh
+  site while a re-sync runs. Historical prices are recovered from the git log of the player's
+  data commits — so history is as fine as his commit cadence, not the chunk cadence (AD-3) —
+  and **no component may depend on in-file history or on git history**. No v1 feature reads
+  either (*Deferred*). A chunked partial refresh
   publishes normally, and AD-10's per-row freshness is what makes that honest.
 
 ### AD-20 — One currency unit crosses every boundary
@@ -1463,7 +1486,7 @@ never import each other.
   report surfaces alone. **A degraded render always names what is missing**, and never
   presents a diminished list as a whole one.
 
-  The build never bundles the eight artifacts into the JS, so a sync commit updates data
+  The build never bundles the eight artifacts into the JS, so a data commit updates data
   without rebuilding the app. Each carries `schemaVersion` and is validated on load (AD-3).
   `web` renders from a single consistent set and does not mix artifacts across a refresh.
   **Ranking the full tracked list must complete under 100 ms** on a mid-range machine and
@@ -1642,7 +1665,7 @@ id resolves here.
 | Dates & time | ISO-8601 UTC strings in all persisted data. Time enters `core` only as a passed-in value (AD-1). |
 | Units | Divine for all currency (AD-20). Band edges and item levels are raw game numbers. No field name implies a unit on its own — schemas name the unit. |
 | Numeric precision | **Band edges are `number`, never `integer`** — the lattice the trade filter compares on may be finer than the integers, and which lattice it is, is a producer-side fact the schema must not pre-empt. AD-17's alignment and containment rules compare edges for **exact equality**, so a producer emits values exact on the lattice and never a rounded approximation. Every persisted divine value — `PriceObservation` and `CurrencyRate` alike — is rounded to **4 decimal places** at the point of normalisation, in `sync`, once; `core` never re-rounds. The figure binds both sides deliberately: a coarser grid would round a cheap crafting currency toward zero and silently collapse AD-17's `craftCost` term. |
-| Encoding | All files UTF-8 without BOM, LF line endings, JSON with stable key order and a trailing newline — so a sync commit's diff shows changed data, not reserialisation noise. |
+| Encoding | All files UTF-8 without BOM, LF line endings, JSON with stable key order and a trailing newline — so a data commit's diff shows changed data, not reserialisation noise. |
 | Error shape | `core` returns typed results and never throws for expected conditions such as no listings, a missing weight, or an unresolvable stat. `sync` throws only for unrecoverable run failures. Everything else lands in `sync-report.json`. |
 | Validation | Zod schemas in `contracts` are the single source of truth and types are `z.infer`red. Validate at every trust boundary: API response, before artifact write, and on artifact load. |
 | Schema versioning | Every published artifact and input file carries `schemaVersion`. A consumer refuses an unknown major version rather than guessing. |
@@ -1662,11 +1685,13 @@ Everything in this section is true at cold-start and owned by the code once it e
 | TypeScript | 6.0.3 |
 | pnpm (workspaces) | 12.5.1 |
 | React | 19.3.0 |
+| React type definitions (`@types/react`, `@types/react-dom`) | 19.3.0 |
 | Vite | 8.3.0 |
 | Mantine (`@mantine/core`, `@mantine/hooks`) | 9.6.1 |
 | Zod | 4.6.5 |
 | Vitest | 5.0.1 |
 | MSW | 2.15.0 |
+| jsdom (Vitest DOM environment for `web`) | 30.1.0 |
 | ESLint + typescript-eslint | 10.11.0 + 8.70.0 |
 | dependency-cruiser | 18.4.0 |
 | Hosting | GitHub Pages via Actions build workflow |
@@ -1728,7 +1753,7 @@ graph TB
   sync --> report
   sync --> progress
   producer -.->|schema-conformant 5.1.0<br/>tiers + lines + itemLevelMin| weights
-  dataset --> pages
+  dataset -->|player commits + pushes| pages
   pages --> web
   weights --> web
   recipes --> web
@@ -1778,12 +1803,19 @@ and contributes nothing to the eligible pool (AD-25).
 ### Deployment & environments
 
 There is one environment. The syncer runs on the player's machine under Task Scheduler,
-invoked repeatedly; each run takes the lock, does one bounded chunk, commits the files it
-owns, and exits. That push triggers a **GitHub Actions workflow** that builds the Vite
-bundle and deploys to Pages — branch-published Pages runs Jekyll and cannot build this app,
-so the workflow is required, not optional. There is no staging environment, no secret
-material (the trade API is used unauthenticated, as confirmed), and nothing to patch on a
-server. Local development is `pnpm dev` against committed fixtures, with no network.
+invoked repeatedly; each run takes the lock, does one bounded chunk, **writes the files it owns,
+and exits — it touches git not at all** (AD-3). **Publishing is a separate, human act:** the
+player commits the sync-owned files and pushes them to the default branch, and *that* push
+triggers a **GitHub Actions workflow** that builds the Vite bundle and deploys to Pages —
+branch-published Pages runs Jekyll and cannot build this app, so the workflow is required, not
+optional. There is no staging environment, no secret material (the trade API is used
+unauthenticated, as confirmed), and nothing to patch on a server. Local development is
+`pnpm dev` against committed fixtures, with no network.
+
+The site's freshness is therefore bounded by the player's push cadence rather than the sync
+cadence, and the dataset on disk is routinely newer than the dataset on the site. This costs no
+honesty: AD-10 stamps freshness per row at observation time, so a page published from a
+three-day-old push states three-day-old ages rather than implying current ones.
 
 Two recurring maintenance dependencies run on GGG patch cadence and neither is on the chunk
 path: the weights file (AD-11), owned by the separate scraper project, and the trade
@@ -1858,6 +1890,12 @@ poe-crafting-base-price-checker/
   a product. Deferred because it widens `ModifierRef` from a field to a set and touches
   AD-5, AD-16 and AD-17 at once. **Revisit if** a curator finds a hybrid whose two lines are
   individually unremarkable and jointly a chase.
+- **A publish command.** `sync` makes no git write (AD-3) and the player commits by hand, so
+  nothing in the product prevents a `git commit -a` from sweeping an unfinished `tracked.json`
+  edit into a data commit — a separation AD-3's explicit-path commit used to enforce. A
+  human-invoked `publish` command that commits the sync-owned paths and pushes would restore it
+  without putting git back on the chunk path. **Revisit if** a mixed commit actually costs the
+  player something.
 - **Automated currency rates.** AD-20 makes the rate hand-maintained committed data, because
   `trade2` exposes no exchange surface (OQ-22). The two paths back are a per-currency search
   filtered to divine-denominated listings — which costs a search per row against AD-7's cap
