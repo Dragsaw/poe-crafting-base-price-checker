@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { CurrencyRateSchema } from './currency-rate';
-import { DivineAmountSchema, IsoTimestampSchema, LeagueIdSchema } from './primitives';
+import { CurrencyRateSchema } from './currency-rate.ts';
+import { DivineAmountSchema, IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 
 /**
  * A `PriceObservation` **exists only where there is an observation** (AD-9). It

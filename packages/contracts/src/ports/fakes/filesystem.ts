@@ -1,4 +1,4 @@
-import type { FilesystemPort } from '../filesystem';
+import type { FilesystemPort } from '../filesystem.ts';
 
 /**
  * A pure in-memory `FilesystemPort`. `contracts` has no `node:` types

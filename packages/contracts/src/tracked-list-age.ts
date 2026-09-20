@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import type { FilesystemPort } from './ports/filesystem';
-import type { GitPort } from './ports/git';
-import { IsoTimestampSchema } from './primitives';
+import type { FilesystemPort } from './ports/filesystem.ts';
+import type { GitPort } from './ports/git.ts';
+import { IsoTimestampSchema } from './primitives.ts';
 
 /**
  * The date of the last tracked-list edit, **tagged with the clock that produced

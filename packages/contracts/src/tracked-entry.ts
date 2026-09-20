@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { BaseTypeIdSchema } from './base-type';
-import { CategoryIdSchema, ClassNameSchema } from './item-class';
-import { ModifierRefSchema } from './modifier-ref';
-import { ItemLevelSchema } from './primitives';
+import { BaseTypeIdSchema } from './base-type.ts';
+import { CategoryIdSchema, ClassNameSchema } from './item-class.ts';
+import { ModifierRefSchema } from './modifier-ref.ts';
+import { ItemLevelSchema } from './primitives.ts';
 
 /**
  * A tracked entry is one of exactly **two kinds, and the kind is what the entry

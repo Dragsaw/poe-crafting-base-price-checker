@@ -1,4 +1,4 @@
-import type { GitPort } from '../git';
+import type { GitPort } from '../git.ts';
 
 /**
  * A pure in-memory `GitPort`. It carries the one read-only operation the real

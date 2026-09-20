@@ -1,4 +1,4 @@
-import type { HttpPort, HttpRequest, HttpResponse } from '../http';
+import type { HttpPort, HttpRequest, HttpResponse } from '../http.ts';
 
 /**
  * A pure in-memory `HttpPort`. It holds its state in the closure and imports no

@@ -1,4 +1,4 @@
-import type { ClockPort } from '../clock';
+import type { ClockPort } from '../clock.ts';
 
 /**
  * A pure in-memory `ClockPort`. Time is a passed-in value everywhere in this

@@ -15,27 +15,27 @@ export {
   majorOf,
   SchemaVersionSchema,
   SUPPORTED_SCHEMA_VERSION,
-} from './schema-version';
+} from './schema-version.ts';
 export type {
   SchemaVersion,
   SchemaVersionAccepted,
   SchemaVersionCheck,
   SchemaVersionRefused,
-} from './schema-version';
+} from './schema-version.ts';
 
 export {
   DivineAmountSchema,
   IsoTimestampSchema,
   ItemLevelSchema,
   LeagueIdSchema,
-} from './primitives';
-export type { DivineAmount, IsoTimestamp, ItemLevel, LeagueId } from './primitives';
+} from './primitives.ts';
+export type { DivineAmount, IsoTimestamp, ItemLevel, LeagueId } from './primitives.ts';
 
-export { BaseTypeIdSchema, BaseTypeSchema } from './base-type';
-export type { BaseType, BaseTypeId } from './base-type';
+export { BaseTypeIdSchema, BaseTypeSchema } from './base-type.ts';
+export type { BaseType, BaseTypeId } from './base-type.ts';
 
-export { CategoryIdSchema, ClassNameSchema, ItemClassSchema } from './item-class';
-export type { CategoryId, ClassName, ItemClass } from './item-class';
+export { CategoryIdSchema, ClassNameSchema, ItemClassSchema } from './item-class.ts';
+export type { CategoryId, ClassName, ItemClass } from './item-class.ts';
 
 export {
   AcceptedTierSchema,
@@ -43,13 +43,13 @@ export {
   ModifierRefSchema,
   StatIdSchema,
   ValuelessModifierRefSchema,
-} from './modifier-ref';
+} from './modifier-ref.ts';
 export type {
   BandedModifierRef,
   ModifierRef,
   StatId,
   ValuelessModifierRef,
-} from './modifier-ref';
+} from './modifier-ref.ts';
 
 /**
  * The two arm schemas are **not** exported. They carry none of the union's
@@ -61,13 +61,13 @@ export {
   CurationStatusSchema,
   PrunedReasonSchema,
   TrackedEntrySchema,
-} from './tracked-entry';
+} from './tracked-entry.ts';
 export type {
   CraftedTrackedEntry,
   CurationStatus,
   RawTrackedEntry,
   TrackedEntry,
-} from './tracked-entry';
+} from './tracked-entry.ts';
 
 export {
   canonicalKey,
@@ -76,21 +76,21 @@ export {
   compareCanonicalKeys,
   compareTrackedEntries,
   encodeAffix,
-} from './canonical-key';
-export type { CanonicalAffix, CanonicalKeyElements } from './canonical-key';
+} from './canonical-key.ts';
+export type { CanonicalAffix, CanonicalKeyElements } from './canonical-key.ts';
 
-export { PriceObservationSchema } from './price-observation';
-export type { PriceObservation } from './price-observation';
+export { PriceObservationSchema } from './price-observation.ts';
+export type { PriceObservation } from './price-observation.ts';
 
-export { CurrencyIdSchema, CurrencyRateSchema } from './currency-rate';
-export type { CurrencyId, CurrencyRate } from './currency-rate';
+export { CurrencyIdSchema, CurrencyRateSchema } from './currency-rate.ts';
+export type { CurrencyId, CurrencyRate } from './currency-rate.ts';
 
 export {
   DatasetEntrySchema,
   NotYetSyncedReasonSchema,
   PriceStateSchema,
-} from './dataset';
-export type { DatasetEntry, NotYetSyncedReason, PriceState } from './dataset';
+} from './dataset.ts';
+export type { DatasetEntry, NotYetSyncedReason, PriceState } from './dataset.ts';
 
 export {
   filterOptionIds,
@@ -112,7 +112,7 @@ export {
   StaticCatalogueGroupSchema,
   StaticCatalogueSchema,
   TradeCatalogueSchema,
-} from './trade-catalogue';
+} from './trade-catalogue.ts';
 export type {
   CatalogueFilter,
   FilterCatalogue,
@@ -128,7 +128,7 @@ export type {
   StaticCatalogueEntry,
   StaticCatalogueGroup,
   TradeCatalogue,
-} from './trade-catalogue';
+} from './trade-catalogue.ts';
 
 export {
   CrossFileCheckSchema,
@@ -141,7 +141,7 @@ export {
   SyncRunRecordSchema,
   SyncRunReportSchema,
   UnresolvableRecordSchema,
-} from './sync-run-report';
+} from './sync-run-report.ts';
 export type {
   CrossFileCheck,
   CrossFileGateFailureRecord,
@@ -152,10 +152,10 @@ export type {
   SyncRunRecord,
   SyncRunReport,
   UnresolvableRecord,
-} from './sync-run-report';
+} from './sync-run-report.ts';
 
-export { resolveTrackedListAge, TrackedListAgeSchema } from './tracked-list-age';
-export type { TrackedListAge, TrackedListAgeSources } from './tracked-list-age';
+export { resolveTrackedListAge, TrackedListAgeSchema } from './tracked-list-age.ts';
+export type { TrackedListAge, TrackedListAgeSources } from './tracked-list-age.ts';
 
 export {
   catalogueFileEnvelope,
@@ -169,7 +169,7 @@ export {
   parseEnvelope,
   SyncReportFileSchema,
   TrackedFileSchema,
-} from './envelopes';
+} from './envelopes.ts';
 export type {
   CatalogueFiltersFile,
   CatalogueItemsFile,
@@ -185,18 +185,18 @@ export type {
   EnvelopeVersionRefused,
   SyncReportFile,
   TrackedFile,
-} from './envelopes';
+} from './envelopes.ts';
 
-export type { HttpPort, HttpRequest, HttpResponse } from './ports/http';
-export type { FilesystemPort } from './ports/filesystem';
-export type { GitPort } from './ports/git';
-export type { ClockPort } from './ports/clock';
+export type { HttpPort, HttpRequest, HttpResponse } from './ports/http.ts';
+export type { FilesystemPort } from './ports/filesystem.ts';
+export type { GitPort } from './ports/git.ts';
+export type { ClockPort } from './ports/clock.ts';
 
-export { createFakeHttpPort } from './ports/fakes/http';
-export type { FakeHttpPort, HttpFixtures } from './ports/fakes/http';
-export { createFakeFilesystemPort } from './ports/fakes/filesystem';
-export type { FakeFile, FakeFilesystemPort, FakeFiles } from './ports/fakes/filesystem';
-export { createFakeGitPort } from './ports/fakes/git';
-export type { FakeCommitDates, FakeGitPort } from './ports/fakes/git';
-export { createFakeClockPort } from './ports/fakes/clock';
-export type { FakeClockPort } from './ports/fakes/clock';
+export { createFakeHttpPort } from './ports/fakes/http.ts';
+export type { FakeHttpPort, HttpFixtures } from './ports/fakes/http.ts';
+export { createFakeFilesystemPort } from './ports/fakes/filesystem.ts';
+export type { FakeFile, FakeFilesystemPort, FakeFiles } from './ports/fakes/filesystem.ts';
+export { createFakeGitPort } from './ports/fakes/git.ts';
+export type { FakeCommitDates, FakeGitPort } from './ports/fakes/git.ts';
+export { createFakeClockPort } from './ports/fakes/clock.ts';
+export type { FakeClockPort } from './ports/fakes/clock.ts';

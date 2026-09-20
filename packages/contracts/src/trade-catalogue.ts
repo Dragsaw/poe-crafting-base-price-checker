@@ -62,9 +62,16 @@ export const StaticCatalogueEntrySchema = z.looseObject({
   image: z.string().optional(),
 });
 
+/**
+ * A static group's `label` is **optional and nullable**: the live API sends
+ * `{"id": "Misc", "label": null, "entries": []}` (*verified against the
+ * recorded `fixtures/trade-data-static.json`, 2026-09-20*). The label is a
+ * heading and carries no pool meaning either way, so a missing one is data, not
+ * a fault — and refusing it would refuse the real response.
+ */
 export const StaticCatalogueGroupSchema = z.looseObject({
   id: z.string(),
-  label: z.string().optional(),
+  label: z.string().nullable().optional(),
   entries: z.array(StaticCatalogueEntrySchema),
 });
 
@@ -76,8 +83,18 @@ export const StaticCatalogueSchema = z.looseObject({
  * `/api/trade2/data/filters` — filter ids and options, **including the category
  * filter's option list**, which is the authority for `categoryId` (AD-5, AD-9).
  */
+/**
+ * One option of one filter.
+ *
+ * `id` is **nullable**: every option list the live API sends opens with
+ * `{"id": null, "text": "Any"}`, the sentinel for "this filter is not applied"
+ * (*verified against the recorded `fixtures/trade-data-filters.json`,
+ * 2026-09-20*). It is not an option id and never a `categoryId` — refusing it
+ * would refuse the real response, and `filterOptionIds` drops it rather than
+ * handing a consumer a `null` to look an id up by.
+ */
 export const FilterOptionSchema = z.looseObject({
-  id: z.string().min(1),
+  id: z.string().min(1).nullable(),
   text: z.string().optional(),
 });
 
@@ -140,10 +157,15 @@ export function flattenFilterCatalogue(catalogue: FilterCatalogue): CatalogueFil
 /**
  * The option ids of one named filter — `category` being the one AD-16's crafted
  * branch sends and AD-9 validates a `categoryId` against.
+ *
+ * The `"Any"` sentinel, whose `id` is `null`, is **not** an option id and is
+ * dropped here: it means "this filter is not applied", so admitting it would
+ * make an unfiltered search look like a validated category.
  */
 export function filterOptionIds(catalogue: FilterCatalogue, filterId: string): string[] {
   return flattenFilterCatalogue(catalogue)
     .filter((filter) => filter.id === filterId)
     .flatMap((filter) => filter.option?.options ?? [])
-    .map((option) => option.id);
+    .map((option) => option.id)
+    .filter((id): id is string => id !== null);
 }

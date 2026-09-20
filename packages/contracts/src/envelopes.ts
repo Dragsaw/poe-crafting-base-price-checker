@@ -1,21 +1,21 @@
 import { z } from 'zod';
 
-import { CurrencyRateSchema } from './currency-rate';
-import { DatasetEntrySchema } from './dataset';
-import { IsoTimestampSchema, LeagueIdSchema } from './primitives';
+import { CurrencyRateSchema } from './currency-rate.ts';
+import { DatasetEntrySchema } from './dataset.ts';
+import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 import {
   checkSchemaVersion,
   SchemaVersionSchema,
   SUPPORTED_SCHEMA_VERSION,
-} from './schema-version';
-import { SyncRunReportSchema } from './sync-run-report';
-import { TrackedEntrySchema } from './tracked-entry';
+} from './schema-version.ts';
+import { SyncRunReportSchema } from './sync-run-report.ts';
+import { TrackedEntrySchema } from './tracked-entry.ts';
 import {
   FilterCatalogueSchema,
   ItemCatalogueSchema,
   StatCatalogueSchema,
   StaticCatalogueSchema,
-} from './trade-catalogue';
+} from './trade-catalogue.ts';
 
 /**
  * Every file envelope, declared here. **One versioning mechanism and one

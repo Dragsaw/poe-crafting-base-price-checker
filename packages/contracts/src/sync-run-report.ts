@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { IsoTimestampSchema } from './primitives';
-import { TrackedListAgeSchema } from './tracked-list-age';
+import { IsoTimestampSchema } from './primitives.ts';
+import { TrackedListAgeSchema } from './tracked-list-age.ts';
 
 /**
  * `SyncRunReport` **types a figure apart from a record** (Consistency

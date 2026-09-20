@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { DivineAmountSchema, IsoTimestampSchema, LeagueIdSchema } from './primitives';
+import { DivineAmountSchema, IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 
 export const CurrencyIdSchema = z
   .string()

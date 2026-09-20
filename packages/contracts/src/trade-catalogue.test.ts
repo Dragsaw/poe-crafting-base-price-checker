@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   FilterCatalogueSchema,
+  FilterOptionSchema,
   filterOptionIds,
   flattenFilterCatalogue,
   flattenItemCatalogue,
@@ -9,6 +10,7 @@ import {
   flattenStaticCatalogue,
   ItemCatalogueSchema,
   StatCatalogueSchema,
+  StaticCatalogueGroupSchema,
   StaticCatalogueSchema,
   TradeCatalogueSchema,
 } from './trade-catalogue';
@@ -48,6 +50,8 @@ const statics = {
         { id: 'exalted', text: 'Exalted Orb' },
       ],
     },
+    // The live API sends this group with a null label and no entries.
+    { id: 'Misc', label: null, entries: [] },
   ],
 };
 
@@ -62,6 +66,8 @@ const filters = {
           text: 'Item Category',
           option: {
             options: [
+              // The live API opens every option list with this sentinel.
+              { id: null, text: 'Any' },
               { id: 'weapon.bow', text: 'Bow' },
               { id: 'armour.chest', text: 'Body Armour' },
               { id: 'jewel', text: 'Jewel' },
@@ -105,12 +111,29 @@ describe('the four catalogue artifacts', () => {
   });
 
   it("reaches the category filter's own option list, which is the categoryId authority", () => {
+    // The `"Any"` sentinel is parsed — refusing it would refuse the real
+    // response — and then dropped, because it is not a `categoryId`.
     expect(filterOptionIds(FilterCatalogueSchema.parse(filters), 'category')).toEqual([
       'weapon.bow',
       'armour.chest',
       'jewel',
     ]);
     expect(filterOptionIds(FilterCatalogueSchema.parse(filters), 'ilvl')).toEqual([]);
+  });
+
+  it('admits the null sentinels the API sends, and nothing further', () => {
+    // `null` is the "Any" option; `""` is not an id and never was.
+    expect(FilterOptionSchema.safeParse({ id: null, text: 'Any' }).success).toBe(true);
+    expect(FilterOptionSchema.safeParse({ id: '', text: 'Any' }).success).toBe(false);
+
+    // A group may omit its label or send it as null; anything else is a shape
+    // change worth failing on.
+    expect(
+      StaticCatalogueGroupSchema.safeParse({ id: 'Misc', label: null, entries: [] }).success,
+    ).toBe(true);
+    expect(
+      StaticCatalogueGroupSchema.safeParse({ id: 'Misc', label: 7, entries: [] }).success,
+    ).toBe(false);
   });
 
   it('preserves fields this product does not consume, rather than stripping them', () => {

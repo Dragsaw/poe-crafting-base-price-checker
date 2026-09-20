@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { PriceObservationSchema } from './price-observation';
-import { IsoTimestampSchema, LeagueIdSchema } from './primitives';
+import { PriceObservationSchema } from './price-observation.ts';
+import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 
 /**
  * The dataset entry. It is declared here and not left to Story 1.8, because

@@ -4,6 +4,12 @@
     "composite": true,
     "declaration": true,
     "emitDeclarationOnly": true,
+    // `exports.default` of this package is `./src/index.ts`, so a bare-`node`
+    // entry such as `catalogue:refresh` loads this source directly. Node's type
+    // stripping performs no extension resolution, so every relative specifier
+    // here carries `.ts`. Permitted because the package is
+    // `emitDeclarationOnly`.
+    "allowImportingTsExtensions": true,
     "rootDir": "src",
     "outDir": "dist"
   },

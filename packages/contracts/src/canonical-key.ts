@@ -1,5 +1,5 @@
-import type { ModifierRef } from './modifier-ref';
-import type { TrackedEntry } from './tracked-entry';
+import type { ModifierRef } from './modifier-ref.ts';
+import type { TrackedEntry } from './tracked-entry.ts';
 
 /**
  * The canonical `TrackedEntry` key, per `IMPLEMENTATION-NOTES.md` §4.1

@@ -13,30 +13,32 @@
  * issues nothing.
  *
  * **It records only what it can construct by itself today**: the leagues
- * endpoint and the four `data/*` endpoints. Stories 1.4 and 1.7 add their own
- * interactions when they have a real request to record. No request body is
- * hand-written here; a hand-written body records what the team believes the API
- * takes rather than what it takes, which is the defect the fixture rules exist
- * to prevent.
+ * endpoint and the four `data/*` endpoints, whose URLs it takes from
+ * `trade/endpoints.ts` — the same declaration `catalogue:refresh` reads. Story
+ * 1.7 adds its own interactions when it has a real request to record. No
+ * request body is hand-written here; a hand-written body records what the team
+ * believes the API takes rather than what it takes, which is the defect the
+ * fixture rules exist to prevent.
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { ClockPort, HttpPort } from '@poe/contracts';
 
+import {
+  createFetchHttpPort,
+  serialiseJsonArtifact,
+  sleep,
+  systemClock,
+  writeTextFile,
+} from './shell.ts';
 import { createTradeClient } from './trade/client.ts';
+import { CATALOGUE_ENDPOINTS, DATA_LANE, TRADE_LEAGUES_URL } from './trade/endpoints.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
-
-/** `IMPLEMENTATION-NOTES.md` §5.1: realm `poe2` on the `trade2` API. */
-const TRADE_API_BASE = 'https://www.pathofexile.com/api/trade2';
 
 /** The repository's `fixtures/` directory, three levels up from `src/`. */
 const FIXTURES_DIR = fileURLToPath(new URL('../../../fixtures/', import.meta.url));
-
-/** How long a single live request may take before it is abandoned. */
-const REQUEST_TIMEOUT_MS = 30_000;
 
 /**
  * One recordable interaction. All five share a lane because they are the same
@@ -50,14 +52,19 @@ export interface FixtureInteraction {
   readonly url: string;
 }
 
-const DATA_LANE = 'trade-data-get';
-
+/**
+ * The five interactions: the leagues endpoint plus the four the catalogue is
+ * made of. **Both spellings come from `endpoints.ts`**, so a recorded fixture
+ * and the artifact `catalogue:refresh` commits can never describe two different
+ * URLs.
+ */
 export const FIXTURE_INTERACTIONS: readonly FixtureInteraction[] = [
-  { name: 'trade-data-leagues', method: 'GET', url: `${TRADE_API_BASE}/data/leagues` },
-  { name: 'trade-data-items', method: 'GET', url: `${TRADE_API_BASE}/data/items` },
-  { name: 'trade-data-stats', method: 'GET', url: `${TRADE_API_BASE}/data/stats` },
-  { name: 'trade-data-filters', method: 'GET', url: `${TRADE_API_BASE}/data/filters` },
-  { name: 'trade-data-static', method: 'GET', url: `${TRADE_API_BASE}/data/static` },
+  { name: 'trade-data-leagues', method: 'GET', url: TRADE_LEAGUES_URL },
+  ...CATALOGUE_ENDPOINTS.map((endpoint) => ({
+    name: `trade-data-${endpoint.artifact}`,
+    method: 'GET' as const,
+    url: endpoint.url,
+  })),
 ];
 
 export const REDACTED = '[redacted]';
@@ -140,7 +147,7 @@ export function fixturePathOf(interaction: FixtureInteraction): string {
  * reserialisation noise.
  */
 export function serialiseFixture(payload: unknown): string {
-  return `${JSON.stringify(payload, null, 2)}\n`;
+  return serialiseJsonArtifact(payload);
 }
 
 /** The seam the co-located test drives. Everything it needs is passed in. */
@@ -225,39 +232,6 @@ export async function recordFixtures(ports: RecorderPorts): Promise<RecordOutcom
   return { ok: true, written };
 }
 
-/**
- * The real `HttpPort`. It lives at the shell edge, in the one file no test
- * executes, so `fetch` never appears below the factory.
- */
-function createFetchHttpPort(): HttpPort {
-  return {
-    async send(request) {
-      // Without a signal a stalled connection hangs the command indefinitely,
-      // with no output and no exit.
-      const response = await fetch(request.url, {
-        method: request.method,
-        headers: { ...request.headers },
-        body: request.body,
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      });
-      const headers: Record<string, string> = {};
-      response.headers.forEach((headerValue, headerName) => {
-        headers[headerName.toLowerCase()] = headerValue;
-      });
-      return { status: response.status, headers, body: await response.text() };
-    },
-  };
-}
-
-const systemClock: ClockPort = {
-  now: () => new Date().toISOString(),
-};
-
-const sleep = (ms: number): Promise<void> =>
-  new Promise((done) => {
-    setTimeout(done, ms);
-  });
-
 async function main(): Promise<void> {
   const contact = resolveUserAgent();
   if (!contact.ok) {
@@ -271,10 +245,7 @@ async function main(): Promise<void> {
     clock: systemClock,
     wait: sleep,
     userAgent: contact.userAgent,
-    writeFixture: async (path, contents) => {
-      await mkdir(dirname(path), { recursive: true });
-      await writeFile(path, contents, { encoding: 'utf8' });
-    },
+    writeFixture: writeTextFile,
   });
 
   if (!outcome.ok) {
