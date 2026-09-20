@@ -2,8 +2,9 @@
 title: 'Story 1.1: The four-package workspace and the offline development loop'
 type: 'feature'
 created: '2026-09-20'
-status: 'ready-for-dev'
+status: 'done'
 route: 'full'
+baseline_commit: '8996831b19879fd8444a8c5fa364b38e29b18bff'
 review_loop_iteration: 1
 context:
   - '{project-root}/docs/stories/epic-1-context.md'
@@ -69,26 +70,26 @@ Greenfield — no application source exists. Everything this story creates is ne
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `pnpm-workspace.yaml` — declare `packages/*`.
-- [ ] `package.json` (root) — private; `packageManager` pnpm 12.5.1, `engines.node` `>=24.21.0 <25`, shared devDependencies at Stack-table versions written as **exact** strings, scripts `check` (typecheck + lint + depcruise), `test`, `dev`, `sync:dry`.
-- [ ] `.npmrc` — `engine-strict=true`, `manage-package-manager-versions=true`, `save-exact=true`. The second makes pnpm self-correct to the pinned 12.5.1 rather than trusting whatever pnpm is on PATH.
-- [ ] `.gitattributes` — `* text=auto eol=lf`, so the epic's LF convention survives a Windows checkout with `core.autocrlf=true` and `git status` stays clean.
-- [ ] `tsconfig.base.json` + `packages/*/tsconfig.json` — strict shared base. `contracts`, `core` and `sync` are referenced by something, so they set `composite: true`, `declaration: true`, `emitDeclarationOnly: true`, `rootDir: "src"` and `outDir: "dist"`, with `types` pointing at `dist/index.d.ts`. A referenced project **may not disable emit** (TS6310); `emitDeclarationOnly` satisfies that while leaving JS emit to Vite. `web` is a leaf and may use `noEmit` — on TypeScript 6 that is compatible with `composite`. Do **not** pass a global `tsc -b --noEmit`: it forces `noEmit` onto the upstream projects and trips TS6310. References buy build ordering and incrementality, **not** graph enforcement — see §Design Notes.
-- [ ] `eslint.config.mjs` — flat config scoped to `packages/**` plus `tools/boundary-check/*.test.ts`. ESM, not TypeScript: ESLint 10 needs `jiti` to load a `.ts` config, and `.mjs` removes that dependency entirely.
-- [ ] `.dependency-cruiser.mjs` + `depcruise.rules.mjs` — the shared module exports a plain rules array; the config file spreads it into an exported **object literal** (dependency-cruiser requires an object, not a factory). Forbid every edge in the matrix row at `error` severity with a message naming the edge, and set `dependencyTypes` so a type-only `import type` is caught too.
-- [ ] `vitest.config.ts` (root) — `test.projects` listing `'packages/*'` **plus an inline project** covering `test/**/*.test.ts` and `tools/boundary-check/*.test.ts`. `vitest.workspace.ts` does not exist in Vitest 5 and must not be created.
-- [ ] `test/setup.ts` — `setupServer()` with no handlers, started before all tests and closed after. `onUnhandledRequest` is a **callback** that filters static-asset requests and pushes the rest onto a module-level array; a global `afterEach` throws when that array is non-empty, naming every URL, then clears it.
-- [ ] `packages/contracts/{package.json,src/index.ts}` — no workspace dependency; placeholder export only.
-- [ ] `packages/core/{package.json,src/index.ts}` — depends on `contracts` only.
-- [ ] `packages/sync/{package.json,src/index.ts}` — depends on `contracts` and `core`.
-- [ ] `packages/web/` — depends on `contracts` and `core`, plus `@types/react` and `@types/react-dom` at 19.3.0; minimal Vite + React + Mantine shell rendering one placeholder element, backing `pnpm dev`. No PostCSS and no `@vitejs/plugin-react` — see §Design Notes.
-- [ ] `packages/web/vite.config.ts` — `server.strictPort: true`; `server.port: 5173`, overridden only by a CLI `--port`. No JSX configuration is needed: Vite 8 transforms JSX with Oxc and the automatic runtime is its default. If a JSX option is ever required, it belongs under the `oxc` key — the `esbuild` key is deprecated in Vite 8 and converted internally.
-- [ ] `packages/web/src/App.test.tsx` — mounts the shell through `MantineProvider` with `react-dom/client` inside `act`, and asserts the placeholder text is in `document.body`. Its setup sets `globalThis.IS_REACT_ACT_ENVIRONMENT = true`, stubs `window.matchMedia` and `ResizeObserver`, and unmounts the root in a cleanup hook. The `web` Vitest project uses the `jsdom` environment.
-- [ ] `packages/sync/` `sync:dry` stub — prints "not implemented yet" to **stderr** and exits non-zero. Stdout is the report channel `AGENT-WORKFLOW.md` reserves for the real pipeline.
-- [ ] `packages/*/src/*.test.ts` — one smoke test per package, proving its suite runs.
-- [ ] `test/no-network.test.ts` — an unhandled `fetch` fails the test rather than reaching the network.
-- [ ] `tools/boundary-check/boundary.test.ts` — in scope for ESLint, tsconfig and the root Vitest project. Calls `cruise(['packages/core'], { baseDir: <fixture>, ruleSet, validate: true })` with the **unmodified** shared rules and asserts the violation is reported by its named rule id.
-- [ ] `tools/boundary-check/fixture/packages/{core,sync}/src/` — a fixture tree mirroring the real `packages/<name>/src` shape so the shipped path regexes match it verbatim; holds one forbidden `core`→`sync` import. Excluded by explicit named entry from lint, typecheck and the shipped depcruise run.
+- [x] `pnpm-workspace.yaml` — declare `packages/*`.
+- [x] `package.json` (root) — private; `packageManager` pnpm 12.5.1, `engines.node` `>=24.21.0 <25`, shared devDependencies at Stack-table versions written as **exact** strings, scripts `check` (typecheck + lint + depcruise), `test`, `dev`, `sync:dry`.
+- [x] `.npmrc` — `engine-strict=true`, `manage-package-manager-versions=true`, `save-exact=true`. The second makes pnpm self-correct to the pinned 12.5.1 rather than trusting whatever pnpm is on PATH.
+- [x] `.gitattributes` — `* text=auto eol=lf`, so the epic's LF convention survives a Windows checkout with `core.autocrlf=true` and `git status` stays clean.
+- [x] `tsconfig.base.json` + `packages/*/tsconfig.json` — strict shared base. `contracts`, `core` and `sync` are referenced by something, so they set `composite: true`, `declaration: true`, `emitDeclarationOnly: true`, `rootDir: "src"` and `outDir: "dist"`, with `types` pointing at `dist/index.d.ts`. A referenced project **may not disable emit** (TS6310); `emitDeclarationOnly` satisfies that while leaving JS emit to Vite. `web` is a leaf and may use `noEmit` — on TypeScript 6 that is compatible with `composite`. Do **not** pass a global `tsc -b --noEmit`: it forces `noEmit` onto the upstream projects and trips TS6310. References buy build ordering and incrementality, **not** graph enforcement — see §Design Notes.
+- [x] `eslint.config.mjs` — flat config scoped to `packages/**` plus `tools/boundary-check/*.test.ts`. ESM, not TypeScript: ESLint 10 needs `jiti` to load a `.ts` config, and `.mjs` removes that dependency entirely.
+- [x] `.dependency-cruiser.mjs` + `depcruise.rules.mjs` — the shared module exports a plain rules array; the config file spreads it into an exported **object literal** (dependency-cruiser requires an object, not a factory). Forbid every edge in the matrix row at `error` severity with a message naming the edge, and set `dependencyTypes` so a type-only `import type` is caught too.
+- [x] `vitest.config.ts` (root) — `test.projects` listing `'packages/*'` **plus an inline project** covering `test/**/*.test.ts` and `tools/boundary-check/*.test.ts`. `vitest.workspace.ts` does not exist in Vitest 5 and must not be created.
+- [x] `test/setup.ts` — `setupServer()` with no handlers, started before all tests and closed after. `onUnhandledRequest` is a **callback** that filters static-asset requests and pushes the rest onto a module-level array; a global `afterEach` throws when that array is non-empty, naming every URL, then clears it.
+- [x] `packages/contracts/{package.json,src/index.ts}` — no workspace dependency; placeholder export only.
+- [x] `packages/core/{package.json,src/index.ts}` — depends on `contracts` only.
+- [x] `packages/sync/{package.json,src/index.ts}` — depends on `contracts` and `core`.
+- [x] `packages/web/` — depends on `contracts` and `core`, plus `@types/react` and `@types/react-dom` at 19.3.0; minimal Vite + React + Mantine shell rendering one placeholder element, backing `pnpm dev`. No PostCSS and no `@vitejs/plugin-react` — see §Design Notes.
+- [x] `packages/web/vite.config.ts` — `server.strictPort: true`; `server.port: 5173`, overridden only by a CLI `--port`. No JSX configuration is needed: Vite 8 transforms JSX with Oxc and the automatic runtime is its default. If a JSX option is ever required, it belongs under the `oxc` key — the `esbuild` key is deprecated in Vite 8 and converted internally.
+- [x] `packages/web/src/App.test.tsx` — mounts the shell through `MantineProvider` with `react-dom/client` inside `act`, and asserts the placeholder text is in `document.body`. Its setup sets `globalThis.IS_REACT_ACT_ENVIRONMENT = true`, stubs `window.matchMedia` and `ResizeObserver`, and unmounts the root in a cleanup hook. The `web` Vitest project uses the `jsdom` environment.
+- [x] `packages/sync/` `sync:dry` stub — prints "not implemented yet" to **stderr** and exits non-zero. Stdout is the report channel `AGENT-WORKFLOW.md` reserves for the real pipeline.
+- [x] `packages/*/src/*.test.ts` — one smoke test per package, proving its suite runs.
+- [x] `test/no-network.test.ts` — an unhandled `fetch` fails the test rather than reaching the network.
+- [x] `tools/boundary-check/boundary.test.ts` — in scope for ESLint, tsconfig and the root Vitest project. Calls `cruise(['packages/core'], { baseDir: <fixture>, ruleSet, validate: true })` with the **unmodified** shared rules and asserts the violation is reported by its named rule id.
+- [x] `tools/boundary-check/fixture/packages/{core,sync}/src/` — a fixture tree mirroring the real `packages/<name>/src` shape so the shipped path regexes match it verbatim; holds one forbidden `core`→`sync` import. Excluded by explicit named entry from lint, typecheck and the shipped depcruise run.
 
 **Acceptance Criteria:**
 - Given a clean checkout, when `pnpm install` runs, then it succeeds with no credentials and no human, and every installed version matches the Stack table exactly.
@@ -105,7 +106,70 @@ Greenfield — no application source exists. Everything this story creates is ne
 
 ## Implementation Notes
 
-_None yet._
+Implemented 2026-09-20. Every Stack-table version resolved and installed exactly as pinned;
+nothing was substituted. The registry was probed for all of them before the first install, so
+the "stop and report" rule never fired.
+
+**Deviations and the reasons for them.**
+
+- **`@eslint/js` is 10.0.1, not 10.11.0.** ESLint itself is 10.11.0 per the Stack table, but
+  `@eslint/js` no longer shares ESLint's version line — its latest release is 10.0.1 and
+  10.11.0 does not exist. `@eslint/js` is not a Stack-table entry, so this pins the newest
+  real version rather than substituting for a table entry. It supplies `js.configs.recommended`
+  only; the parser and the TypeScript rules come from `typescript-eslint` 8.70.0.
+- **pnpm 12 renamed the build-script allowlist.** `onlyBuiltDependencies` is gone;
+  `pnpm-workspace.yaml` uses `allowBuilds` (msw's postinstall only prints a notice). pnpm 12
+  also gates freshly published versions behind a minimum release age, so
+  `minimumReleaseAgeExclude` waives it for `dependency-cruiser@18.4.0`. Both are install-time
+  policy, not stack changes. `manage-package-manager-versions` did its job: the machine's
+  pnpm 12.4.1 self-corrected to 12.5.1.
+- **Internal packages resolve to source at runtime, to `dist` for types.** Each of
+  `contracts`/`core`/`sync` declares
+  `"exports": { ".": { "types": "./dist/index.d.ts", "default": "./src/index.ts" } }`.
+  `emitDeclarationOnly` means there is no JS in `dist` to import, so Vite and Vitest run the
+  TypeScript source directly while `tsc -b` still type-checks across the reference graph.
+- **Two files the task list did not name were needed.** `tsconfig.json` at the root is the
+  solution file `tsc -b` walks (it carries `files: []` and the references, and passes no
+  `--noEmit`, per the TS6310 warning). `tsconfig.tools.json` puts `test/**`,
+  `tools/boundary-check/*.ts` and the two depcruise `.mjs` modules in typecheck scope; the
+  boundary fixture is excluded there by name, as it is in ESLint's ignores.
+- **`lint` runs with `--max-warnings=0`,** so a warning cannot pass `pnpm check` silently.
+
+**Two mechanisms were verified by breaking them, not by watching them stay green.**
+
+- `tsPreCompilationDeps` is load-bearing and `dependencyTypes` was not needed. Cruising the
+  fixture with the shipped rules reports `no-core-to-sync` with the option on and **zero**
+  violations with it off — the fixture's forbidden import is deliberately spelled
+  `import type`, which TypeScript erases before dependency-cruiser sees it. Because that
+  option lives in the config rather than in the rules, `boundary.test.ts` spreads the shipped
+  `options` into its `cruise()` call as well as using the shipped rules; rules alone would not
+  have caught its removal.
+- Flipping `no-core-to-sync` to `severity: "warn"` in `depcruise.rules.mjs` fails
+  `boundary.test.ts`, which is the AC that test exists to serve. Reverted.
+
+**MSW answers a blocked request with a synthetic 500, it does not reject.** Throwing from the
+`onUnhandledRequest` callback stops the request inside the process — the live trade API never
+sees it — but MSW converts the throw into a `500 Unhandled Exception` response rather than a
+rejected promise. `test/no-network.test.ts` therefore asserts on that response plus the
+recorded URL. The escaped-URL record and the global `afterEach` are what fail *any other*
+test that escapes; that guard was observed firing (naming the URL) before the assertion was
+corrected.
+
+**A note for whoever commits next.** `.gitattributes` is new, so the first `git add` of an
+already-tracked CRLF file will renormalise it to LF and show it as modified. That is the
+convention landing, not a stray edit.
+
+**Not verified mechanically: the network-down run.** `pnpm check` and `pnpm test` were not run
+with the interface physically down. Nothing in either command resolves a remote — `tsc`,
+`eslint`, `depcruise` and `vitest` are wholly local after install, and the one deliberate
+request in the suite is proven to be intercepted. A human closing this AC should still pull the
+cable once.
+
+**Added during task verification: `test/contracts-isolation.test.ts`.** The matrix row *`contracts`
+isolation* was proven only by reading the manifest, which no command re-checks. The test asserts
+`contracts` declares no `workspace:` range in any dependency field, and that `core`, `sync` and
+`web` each declare exactly the ones the one-way graph allows — so a dependency added in the wrong
+direction fails `pnpm test` even before the import that would trip depcruise exists.
 
 ## Spec Change Log
 

@@ -26,7 +26,10 @@
       "Bash(pnpm install:*)",
       "Bash(pnpm test:*)",
       "Bash(pnpm view:*)",
+      "Bash(node:*)",
+      "Bash(npx eslint*)",
 
+      "Bash(git:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -63,7 +66,8 @@
       "Bash(curl:*)",
       "Bash(grep:*)",
       "Bash(.claude/skills/impeccable/scripts/impeccable*)",
-      "Bash(agent-browser*)"
+      "Bash(agent-browser*)",
+      "Bash(netstat:*)"
     ],
     "deny": [
       "Bash(git push:*)",

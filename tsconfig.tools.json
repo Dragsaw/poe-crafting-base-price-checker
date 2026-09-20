@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
+    "types": ["node"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tools.tsbuildinfo"
+  },
+  "//": "Also holds the build and test configs: they are outside every package's `rootDir: src`, so without this entry a type error in one passes `pnpm check`.",
+  "include": [
+    "test/**/*.ts",
+    "tools/boundary-check/*.ts",
+    "depcruise.rules.mjs",
+    ".dependency-cruiser.mjs",
+    "vitest.config.ts",
+    "packages/*/vitest.config.ts",
+    "packages/web/vite.config.ts",
+    "packages/web/vite.config.test.ts"
+  ],
+  "exclude": ["tools/boundary-check/fixture"]
+}

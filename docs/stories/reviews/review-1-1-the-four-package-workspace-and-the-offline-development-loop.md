@@ -399,3 +399,49 @@ the remainder editorial.
 - dependency-cruiser 18.4.0 live `cruise()` run against a scratch mirrored fixture with `baseDir` set; violation reported as the named rule. `baseDir` has no CLI equivalent, and the config must export an object, not a factory.
 - Registry: `eslint@10.11.0` `peerDependenciesMeta.jiti.optional = true`; `@types/react` and `@types/react-dom` both 19.3.0.
 - Local environment at triage time: Node 24.21.0, pnpm 12.4.1, npm 11.19.0, `core.autocrlf=true`, no `.gitattributes`.
+
+---
+
+# Triage outcome — 2026-09-20, implementation review
+
+**Implementation review** (blind-hunter, edge-case-hunter, verification-gap) over the unified diff
+since `8996831`. 31 findings triaged: 13 patched, 3 deferred, 15 rejected. No `intent_gap` and no
+`bad_spec` entry, so no loopback — `review_loop_iteration` stays at 1.
+
+The pattern across the confirmed findings is one failure mode, not thirteen: **a mechanism that is
+configured but never exercised**. Each one passes `pnpm check` and `pnpm test` today while its
+guarantee is absent, which is exactly what §Spec Change Log's *mechanisms that failed green* entry
+was written about.
+
+| Finding | Verdict | Route | Action / evidence |
+|---|---|---|---|
+| Static-asset exemption in `test/setup.ts` waves through **remote** requests by file extension | high | patch | **Demonstrated live:** an MSW `onUnhandledRequest` callback that returns without throwing lets the request reach the internet — a probe against `example.com/probe.json` returned a real 404 with the URL recorded but unblocked. This project's upstream endpoints are JSON, so NFR-1 has a live hole |
+| The `afterEach` guard's failing branch is executed by no test | medium | patch | Pre-verified by the verification-gap layer. `no-network.test.ts` drains the record *before* asserting, so deleting the `throw` leaves 9/9 green |
+| `boundary.test.ts` validates against `rules`, never `shippedConfig.forbidden` | medium | patch | Confirmed in the diff: only `...shippedConfig.options` comes from the config. `forbidden: []` in `.dependency-cruiser.mjs` disarms the shipped check with the suite green — the precise failure the AC names |
+| Four of five depcruise rules have no fixture and no assertion | medium | patch | Only `no-core-to-sync` is exercised. A mistyped regex in the other four ships silently and the real tree is vacuously clean (16 modules, 0 violations) |
+| `pnpm sync:dry` stream and exit code asserted by nothing | medium | patch | Grep confirms the only non-doc hits are `package.json` and the file itself. The stdout-purity constraint that motivated the design is unpinned |
+| `test/**`, `vitest.config.ts` and the root configs match no ESLint config block | medium | patch | **Verified by running it:** `eslint test/setup.ts vitest.config.ts` → *"File ignored because no matching configuration was supplied"* for both. `--max-warnings=0` is vacuous there |
+| `strictPort` and the 5173 default asserted by nothing | medium | patch | The config's own comment calls `strictPort` load-bearing; deleting it leaves every test green and returns the silent cross-worktree port bump |
+| `process.exit(1)` can truncate an async stderr write on a pipe | medium | patch | Real Node pitfall when stderr is captured rather than a TTY — the exact case the agent runtime creates. `process.exitCode` is a direct correction |
+| `no-network.test.ts` targets the **live** trade URL | medium | patch | If MSW setup ever fails, the guard's own test POSTs to the real pathofexile.com. An unroutable host removes the hazard without weakening the test |
+| `contracts-isolation.test.ts` hardcodes four names and only `workspace:` ranges | low | patch | Mine, added during task verification. A fifth package, or a `link:`/`*` sibling range, is invisible to it |
+| Second boundary assertion passes vacuously | low | patch | `toHaveLength(0)` is also what an analysis of zero modules returns |
+| Redundant `toContain` after a `toBe` on the same value | low | patch | Direct deletion |
+| `statusText === 'Unhandled Exception'` is MSW-internal wording | low | patch | Not a documented contract; a patch release rewording it turns this red for no project reason. Direct deletion |
+| Phantom dependencies: packages import `vitest`/`msw` declared only at the root | low | rejected | Real, but this is the ordinary pnpm workspace-root devDependency convention and nothing here is ever published. The fix duplicates ten pins across four manifests — more than a direct correction |
+| `web` declares `@poe/contracts` without importing it | low | rejected | The declaration is spec-mandated (Tasks: *`packages/web` — depends on `contracts` and `core`*). Removing it would deviate from the spec to satisfy a tidiness claim |
+| No `not-to-unresolvable` rule, so an import added before its manifest entry is unreported | — | **false** | The bad outcome does not occur: an unresolvable workspace import fails `tsc -b` with TS2307, and typecheck runs first in `pnpm check`. Verified against the spec's own §Design Notes, which records this exact TS2307 behaviour |
+| `core` purity (no `node:*`, no runtime deps) is unenforced | low | defer | True, but the intent covers the *direction* of the graph, not purity of a package's imports. Recorded rather than patched |
+| A fire-and-forget request settling after its own `afterEach` | maybe-false | defer | Plausible and would be medium if real; neither the diff nor a run settles it. Would be settled by a test that starts a request and resolves it after the hook |
+| Hand-rolled `Violation` type and `any` from the untyped `.mjs` import | low | rejected | Contained to one test; a dependency-cruiser shape change surfaces as a loud assertion failure. `checkJs` on the config modules adds more than a direct correction |
+| `App.test.tsx` cleanup lacks try/finally | low | rejected | Adds a branch to guard a state never shown reachable — a throwing `unmount` in a two-element placeholder render |
+| No CI runs `pnpm check`/`pnpm test` | — | rejected | Excluded by the intent itself: frozen **Never** bullet, *No CI workflow or Pages deploy (Story 2.7)* |
+| Nothing mechanically enforces "every installed version matches the Stack table" | low | defer | Real gap in AC coverage, but the Stack table is prose in the spine and not machine-readable; a manifest test would pin a hand-copied second source of truth |
+| Task line still says `dependencyTypes` while the notes say `tsPreCompilationDeps` | — | rejected | Rejected by rule: the fix is an edit to this build's spec. The correction is already recorded in §Implementation Notes |
+| Spec says `status: in-review`, sprint-status says `review` | — | rejected | Two vocabularies owned by the workflow, not by this change; harmless and outside the diff |
+| `packages/*/vitest.config.ts` and `packages/web/vite.config.ts` are in no tsconfig `include` | low | patch | Folded into the ESLint/tsconfig scope patch — a broken build config currently type-checks clean |
+| Forbidden fixture edge is spelled relatively, not as `@poe/sync` | low | rejected | The blind-hunter layer checked the same suspicion independently and refuted it: real workspace imports resolve to `packages/<name>/src/index.ts`, so the shipped `^packages/` regexes match real violations |
+| `cruise()` returning a string rather than an object | maybe-false | rejected | Only when `outputType` is set to a reporter; the shipped options set none |
+
+Patched findings were sent to the implementation agent as one batch. The three deferred entries are
+recorded in `docs/stories/deferred-work.md`.

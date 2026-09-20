@@ -1,0 +1,11 @@
+{
+  "//": "Solution file. `tsc -b` builds every project in dependency order. Never pass a global --noEmit here: it forces noEmit onto the referenced projects and trips TS6310.",
+  "files": [],
+  "references": [
+    { "path": "./packages/contracts" },
+    { "path": "./packages/core" },
+    { "path": "./packages/sync" },
+    { "path": "./packages/web" },
+    { "path": "./tsconfig.tools.json" }
+  ]
+}
