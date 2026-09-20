@@ -9,5 +9,8 @@
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
     }
+  },
+  "dependencies": {
+    "zod": "4.6.5"
   }
 }

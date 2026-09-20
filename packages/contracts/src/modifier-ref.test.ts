@@ -1,0 +1,123 @@
+import { describe, expect, it } from 'vitest';
+
+import { ModifierRefSchema } from './modifier-ref';
+import type { ModifierRef } from './modifier-ref';
+
+function issuePaths(data: unknown): string[] {
+  const result = ModifierRefSchema.safeParse(data);
+  if (result.success) {
+    return [];
+  }
+  return result.error.issues.map((issue) => issue.path.join('.'));
+}
+
+function unrecognisedKeys(data: unknown): string[] {
+  const result = ModifierRefSchema.safeParse(data);
+  if (result.success) {
+    return [];
+  }
+  return result.error.issues.flatMap((issue) =>
+    issue.code === 'unrecognized_keys' ? issue.keys : [],
+  );
+}
+
+describe('ModifierRefSchema', () => {
+  it('accepts a closed band carrying both edges', () => {
+    expect(
+      ModifierRefSchema.parse({
+        kind: 'banded',
+        statId: 'explicit.stat_1509134228',
+        valueMin: 43,
+        valueMax: 56.5,
+      }),
+    ).toEqual({
+      kind: 'banded',
+      statId: 'explicit.stat_1509134228',
+      valueMin: 43,
+      valueMax: 56.5,
+    });
+  });
+
+  it('takes a non-integer edge — band edges are `number`, never `integer`', () => {
+    const parsed = ModifierRefSchema.parse({
+      kind: 'banded',
+      statId: 'explicit.stat_518292764',
+      valueMin: 4.5,
+      valueMax: 6.5,
+    });
+    expect(parsed).toMatchObject({ valueMin: 4.5, valueMax: 6.5 });
+  });
+
+  // I/O matrix: "Open-top band".
+  it('refuses an open-top band, with the issue on valueMax', () => {
+    expect(
+      issuePaths({ kind: 'banded', statId: 'explicit.stat_1', valueMin: 43 }),
+    ).toContain('valueMax');
+  });
+
+  it('accepts a valueless reference carrying no edges at all', () => {
+    expect(ModifierRefSchema.parse({ kind: 'valueless', statId: 'explicit.stat_9' })).toEqual({
+      kind: 'valueless',
+      statId: 'explicit.stat_9',
+    });
+  });
+
+  // I/O matrix: "Valueless with edges".
+  it('refuses a valueless reference carrying edges — never sentinels', () => {
+    expect(
+      unrecognisedKeys({
+        kind: 'valueless',
+        statId: 'explicit.stat_9',
+        valueMin: 0,
+        valueMax: 9999,
+      }),
+    ).toEqual(expect.arrayContaining(['valueMin', 'valueMax']));
+  });
+
+  it('carries acceptedTier as an optional free string on both arms', () => {
+    expect(
+      ModifierRefSchema.parse({
+        kind: 'banded',
+        statId: 'explicit.stat_1',
+        valueMin: 1,
+        valueMax: 2,
+        acceptedTier: 'not a tier name at all',
+      }),
+    ).toMatchObject({ acceptedTier: 'not a tier name at all' });
+
+    expect(
+      ModifierRefSchema.parse({
+        kind: 'valueless',
+        statId: 'explicit.stat_1',
+        acceptedTier: 'T1',
+      }),
+    ).toMatchObject({ acceptedTier: 'T1' });
+  });
+
+  it('names its own kind, so a reference with no kind does not parse', () => {
+    expect(
+      ModifierRefSchema.safeParse({ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }).success,
+    ).toBe(false);
+  });
+
+  /**
+   * AC: an exhaustive `switch` over the two kinds type-checks with **no default
+   * arm**. `tsc -b` compiles this file; a third arm added to the union without
+   * a case here is a compile error, not a runtime surprise.
+   */
+  it('exhausts both kinds with no default arm', () => {
+    function describeRef(ref: ModifierRef): string {
+      switch (ref.kind) {
+        case 'banded':
+          return `${ref.statId}:${String(ref.valueMin)}-${String(ref.valueMax)}`;
+        case 'valueless':
+          return `${ref.statId}:valueless`;
+      }
+    }
+
+    expect(
+      describeRef({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),
+    ).toBe('s:1-2');
+    expect(describeRef({ kind: 'valueless', statId: 's' })).toBe('s:valueless');
+  });
+});

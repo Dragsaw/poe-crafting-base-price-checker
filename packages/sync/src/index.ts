@@ -1,4 +1,4 @@
-import { CONTRACTS_PLACEHOLDER } from '@poe/contracts';
+import { INITIAL_SCHEMA_VERSION } from '@poe/contracts';
 import { CORE_PLACEHOLDER } from '@poe/core';
 
 /**
@@ -8,4 +8,4 @@ import { CORE_PLACEHOLDER } from '@poe/core';
  */
 export const SYNC_PLACEHOLDER = `${CORE_PLACEHOLDER}:sync`;
 
-export const SYNC_CONTRACTS_ROOT = CONTRACTS_PLACEHOLDER;
+export const SYNC_CONTRACTS_SCHEMA_VERSION = INITIAL_SCHEMA_VERSION;

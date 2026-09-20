@@ -2,9 +2,10 @@
 title: 'Story 1.2: Contract schemas and ports for the curated workload and the published dataset'
 type: 'feature'
 created: '2026-09-20'
-status: 'ready-for-dev'
+status: 'done'
 route: 'full'
 review_loop_iteration: 0
+baseline_commit: '8fd611d2ea687abe6bf0ab07cea90fdf8f7ef86d'
 context:
   - '{project-root}/docs/stories/epic-1-context.md'
   - '{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/IMPLEMENTATION-NOTES.md'
@@ -84,23 +85,23 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `packages/contracts/package.json` — add `zod` as an exact runtime dependency at the Stack-table version; add a `minimumReleaseAgeExclude` entry in `pnpm-workspace.yaml` only if the install refuses it.
-- [ ] `packages/contracts/src/schema-version.ts` — the `schemaVersion` semver field and the shared major-compatibility check used by every envelope.
-- [ ] `packages/contracts/src/base-type.ts`, `item-class.ts` — `BaseType` keyed on the trade API's own `type` string, never re-encoded; `ItemClass` as the pair `(categoryId, className)`, never `className` alone.
-- [ ] `packages/contracts/src/modifier-ref.ts` — the `banded`/`valueless` union with `acceptedTier` on both arms.
-- [ ] `packages/contracts/src/tracked-entry.ts` — the `crafted`/`raw` union, `status` with its prune reason, `itemLevelMin`.
-- [ ] `packages/contracts/src/canonical-key.ts` — serialise a `TrackedEntry` per §4.1, plus the code-unit comparator every tie-break in the system resolves on.
-- [ ] `packages/contracts/src/price-observation.ts` — league, `observedAt`, the exchange observation used, and the true sample size returned.
-- [ ] `packages/contracts/src/currency-rate.ts` — with the orientation stated in the schema description; its own `league` and `asOf`.
-- [ ] `packages/contracts/src/trade-catalogue.ts` — the four catalogue artifacts, with `stats.json`'s `{id, label, entries[]}` category groups flattened rather than assumed flat.
-- [ ] `packages/contracts/src/sync-run-report.ts` — figures and records typed apart, including the five named pinned-starvation fields.
-- [ ] `packages/contracts/src/dataset.ts` — the dataset entry: its `PriceObservation` where one exists, its Price State with `not-yet-synced`'s reason enum, and `lastSearchId`/`lastSearchLeague`/`lastAttemptedAt` on the entry rather than on the observation.
-- [ ] `packages/contracts/src/envelopes.ts` — the six file envelopes, each carrying `schemaVersion` over the entity schemas above.
-- [ ] `packages/contracts/src/ports/{http,filesystem,git,clock}.ts` — four `<Thing>Port` interfaces; the git port has one read-only operation, and the filesystem port carries a last-modified read beside its other operations.
-- [ ] `packages/contracts/src/tracked-list-age.ts` — the tagged edit-date value (`git-author-date` | `file-modified` | absent), consumed by `SyncRunReport`'s figure.
-- [ ] `packages/contracts/src/ports/fakes/*.ts` — one pure in-memory fake per port, holding its state in the closure. No `node:` import anywhere.
-- [ ] `packages/contracts/src/index.ts` — the barrel; `export type { … }` for every inferred type.
-- [ ] `packages/contracts/src/*.test.ts` — one co-located suite per module, covering every I/O matrix row.
+- [x] `packages/contracts/package.json` — add `zod` as an exact runtime dependency at the Stack-table version; add a `minimumReleaseAgeExclude` entry in `pnpm-workspace.yaml` only if the install refuses it.
+- [x] `packages/contracts/src/schema-version.ts` — the `schemaVersion` semver field and the shared major-compatibility check used by every envelope.
+- [x] `packages/contracts/src/base-type.ts`, `item-class.ts` — `BaseType` keyed on the trade API's own `type` string, never re-encoded; `ItemClass` as the pair `(categoryId, className)`, never `className` alone.
+- [x] `packages/contracts/src/modifier-ref.ts` — the `banded`/`valueless` union with `acceptedTier` on both arms.
+- [x] `packages/contracts/src/tracked-entry.ts` — the `crafted`/`raw` union, `status` with its prune reason, `itemLevelMin`.
+- [x] `packages/contracts/src/canonical-key.ts` — serialise a `TrackedEntry` per §4.1, plus the code-unit comparator every tie-break in the system resolves on.
+- [x] `packages/contracts/src/price-observation.ts` — league, `observedAt`, the exchange observation used, and the true sample size returned.
+- [x] `packages/contracts/src/currency-rate.ts` — with the orientation stated in the schema description; its own `league` and `asOf`.
+- [x] `packages/contracts/src/trade-catalogue.ts` — the four catalogue artifacts, with `stats.json`'s `{id, label, entries[]}` category groups flattened rather than assumed flat.
+- [x] `packages/contracts/src/sync-run-report.ts` — figures and records typed apart, including the five named pinned-starvation fields.
+- [x] `packages/contracts/src/dataset.ts` — the dataset entry: its `PriceObservation` where one exists, its Price State with `not-yet-synced`'s reason enum, and `lastSearchId`/`lastSearchLeague`/`lastAttemptedAt` on the entry rather than on the observation.
+- [x] `packages/contracts/src/envelopes.ts` — the six file envelopes, each carrying `schemaVersion` over the entity schemas above.
+- [x] `packages/contracts/src/ports/{http,filesystem,git,clock}.ts` — four `<Thing>Port` interfaces; the git port has one read-only operation, and the filesystem port carries a last-modified read beside its other operations.
+- [x] `packages/contracts/src/tracked-list-age.ts` — the tagged edit-date value (`git-author-date` | `file-modified` | absent), consumed by `SyncRunReport`'s figure.
+- [x] `packages/contracts/src/ports/fakes/*.ts` — one pure in-memory fake per port, holding its state in the closure. No `node:` import anywhere.
+- [x] `packages/contracts/src/index.ts` — the barrel; `export type { … }` for every inferred type.
+- [x] `packages/contracts/src/*.test.ts` — one co-located suite per module, covering every I/O matrix row.
 
 **Acceptance Criteria:**
 - Given each of the eight schemas, when the package is inspected, then each has exactly one Zod schema with no parallel definition anywhere, and every exported type is `z.infer`red from it.
@@ -114,9 +115,98 @@ context:
 
 ## Implementation Notes
 
+**`zod@4.6.5` installed without a release-age waiver.** `pnpm-workspace.yaml`'s
+`minimumReleaseAgeExclude` is untouched — the gate did not refuse the version, and the task's
+conditional said to add an entry only if it did.
+
+**Two modules beyond the task list.** `src/primitives.ts` holds the scalars several concepts
+share — `IsoTimestampSchema`, `LeagueIdSchema`, `DivineAmountSchema`, `ItemLevelSchema` — because
+a second spelling of "an ISO-8601 UTC timestamp" is exactly the drift AD-3 exists to prevent.
+`src/test-support.ts` holds one `without(value, key)` helper for the suites; it is deliberately
+not re-exported from the barrel.
+
+**The placeholder is retired, with its three call sites.** `CONTRACTS_PLACEHOLDER` is gone;
+`packages/core/src/index.ts` and `packages/sync/src/index.ts` now prove their allowed workspace
+edge against `INITIAL_SCHEMA_VERSION`, a real export, and both suites assert the new values.
+
+**`resolveTrackedListAge` lives in `contracts` beside the tagged value.** The task named only the
+value; the resolver is here because the *Decided* bullet fixes one resolution order (git author
+date first, filesystem mtime second, absent third) and two shells spelling it differently is the
+divergence the tag exists to prevent. It takes the two ports as arguments and performs no effect
+of its own.
+
+**`parseEnvelope` reads the version before it parses the body.** An unknown major is refused
+*rather than parsed on*, so the refusal is one version mismatch rather than a pile of shape errors
+a reader would go fixing fields over. The refusal names both versions, and a malformed version is
+reported apart from an unknown one.
+
+**`requestsBySource` is exhaustive over the three declared sources.** Zod's enum-keyed record
+requires every key, so a chunk accounts for all three sources — `catalogue-refresh: 0` on a chunk
+that did not refresh — and a fourth source does not parse, which is AD-12's amendment rule
+enforced at the schema.
+
+**No predicate beyond the two the I/O matrix fixes.** The *Never* list forbids validation
+predicates, so the schemas carry exactly two cross-field rules: a `crafted` entry needs one affix,
+and a `pruned` entry needs its reason. `valueMin <= valueMax`, "coverage and its denominator are
+omitted together", and the five cross-file checks are all left to `core` in Epic 3.
+
+**Catalogue schemas are loose, everything else is strict.** The four catalogue artifacts are
+captured third-party payloads carrying fields this product does not consume, and a strict parse
+would refuse a live response over a field GGG added. Every product-owned schema is a
+`strictObject`, which is what turns "a raw entry carries no affix members" and "a
+`PriceObservation` carries no search field" into parse failures rather than conventions.
+
+**Four record kinds in `SyncRunReport`, per the Conventions *Logging* enumeration** —
+`stale-lock-broken`, pinned-starvation, `unresolvable` and a cross-file gate failure. No
+`failed push`. AD-12's *record the absence of `weights.json`* and AD-9's uncatalogued-weights-id
+report have no record kind yet; Story 1.9 either maps them onto these four or the Conventions
+list gains a member, and that is a decision for the story that has the payload in front of it.
+
+**Spine edits this story's *Decided* bullets require, not made here.** The tagged tracked-list
+edit date supersedes AD-12's "a file with no commit history yields no date at all" and its "an
+uncommitted working-tree edit does not move the date"; AD-12's surviving "commit, pull and push"
+phrasing is stale against revision 18. Both are spine edits, and `contracts` is the wrong
+document to make them in.
+
+**Verification run 2026-09-20:** `pnpm install` (zod 4.6.5, exact, no prompt), `pnpm check`
+(typecheck, lint, depcruise — 57 modules, 113 dependencies, zero violations), `pnpm test`
+(24 files, 127 tests after the review patches, no network). The `@ts-expect-error` in `tracked-list-age.test.ts` is
+load-bearing: `tsc -b` compiles the suites, so an untagged date that started type-checking would
+fail `pnpm check` on the unused directive.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Iteration 1 — blind-hunter, edge-case-hunter, verification-gap.
+
+| Verdict | Finding | Evidence | Route |
+|---|---|---|---|
+| medium | Catalogue schemas use `z.object`, which **strips** unknown keys | Probed against zod 4.6.5: `z.object` drops `label`/`icon` on parse, `z.looseObject` keeps them. The module's own docstring says a refresh diff must stay a diff of the API's own response, and the "tolerates fields" test only asserts a known field survives. | patch |
+| medium | `DivineAmountSchema` is a bare `z.number()` | `currencies.json` is hand-maintained; a typed `0` or `-0.0042` parses and silently zeroes or inverts every normalised price and every crafted EV. Nothing downstream can detect it — `currency-rate.ts`'s own docstring says so. | patch |
+| medium | Five of the nine envelopes are never parsed by a test | `CurrenciesFile`, `SyncReportFile` and three catalogue envelopes appear only in a `schemaVersion`-key loop and a `toBeDefined()` list; the body could be mis-bound and the suite stays green. | patch |
+| medium | Arm schemas exported from the barrel bypass the union's `superRefine` | `CraftedTrackedEntrySchema` parses a crafted entry with no affix, and either arm parses `status: 'pruned'` with no reason — the two matrix rows that must fail. | patch |
+| low | `checkSchemaVersion`'s `malformed` is re-spelled `malformed-version` by a ternary | `envelopes.ts` maps any non-`unknown-major` reason onto `malformed-version` with no compile error, so a third reason would be silently mislabelled. | patch |
+| low | `bmp` in `canonical-key.test.ts` is a literal U+FFFD | `cat -A` shows `M-oM-?M-=`. The assertion is correct today but the glyph is indistinguishable from encoding damage; the astral side is already escaped. | patch |
+| low | `raw` fixture uses `baseTypeId: 'weapon.bow'` | A category id in a base-type field, which `item-class.ts` explicitly forbids; `tracked-entry.test.ts` uses a real base type. | patch |
+| low | `index.test.ts` says "the six file envelopes" over a list of nine plus `parseEnvelope` | The spec's six are files (`catalogue/*` is one); the test title counts schemas. Title is simply wrong. | patch |
+| low | `SYNC_CONTRACTS_ROOT` now holds a schema version | The constant proved the barrel's root export resolved; it now names a version, so the name states a fact that is no longer true. | patch |
+| low | Implementation Notes say "exactly two cross-field rules"; `superRefine` has three | The third (a reason only on a pruned entry) is real and tested; only the count is wrong. Fix is a spec edit. | rejected |
+| low | Tests assert `INITIAL_SCHEMA_VERSION` where they mean `SUPPORTED_SCHEMA_VERSION` | The two are aliases today and the refusal's `expected` is documented as the supported version; no behaviour change, and the drift is hypothetical. | rejected |
+| low | `parseEnvelope` reports a non-string `schemaVersion` as `invalid`, not `malformed-version` | The refusal still names `schemaVersion` in its issues, the case needs a hand-broken file, and the fix adds a branch. | rejected |
+| low | `parseEnvelope`'s `expected` is an unvalidated `string` | Caller-side only; every in-repo call uses the default. The fix adds a guard for a situation not shown reachable. | rejected |
+| low | `compareByCodeUnit` compares code points, not code units | The name mirrors the Consistency Conventions wording the spec cites; the implementation and its docstring already state that UTF-8 byte order is code-point order. | rejected |
+| low | `compareCanonicalKeys` is a bare alias of `compareByCodeUnit` | Two names, one behaviour — but the alias is the documented public spelling and the comparator is the primitive. Cosmetic. | rejected |
+| low | `FakeHttpPort.requests` hands out the live array | Test-only surface; a test mutating its own recorded history harms nobody. | rejected |
+| low | Fake filesystem `writeTextFile` does not advance `modifiedAt` | Real asymmetry, but `FakeFile` documents "omitted means no readable modification time" and `setFile` is the sanctioned way to stamp one. A clock inside the fake would add surface and break the passed-in-time rule (AD-1). | rejected |
+| low | `PriceObservation` carries no original listed amount and currency | An addition beyond the fields the task enumerates, argued for auditability. Belongs to the story that computes the median (1.7), not to this one. | rejected |
+| low | `AcceptedTierSchema` has no `.min(1)` | The spec says `acceptedTier` is a free string nothing validates; an empty one is a free string. | rejected |
+| low | `IsoTimestampSchema` accepts both `…:00Z` and `…:00.000Z` | ISO-8601 UTC is what the spec requires; pinning one sub-second spelling is tightening beyond it. | rejected |
+| low | `filterOptionIds` conflates "filter absent" with "filter has no options", and concatenates duplicate ids | A GGG rename would surface as every `categoryId` unknown rather than a named catalogue failure — a Story 1.4/1.9 reporting concern, not a contract defect. | rejected |
+| low | `resolveTrackedListAge` does not validate the port's timestamp | The `GitPort` and `FilesystemPort` docstrings make ISO-8601 UTC the adapter's obligation; `contracts` trusting its own port contract is the design. | rejected |
+| low | Code Map's reason for "no `node:` builtins" is inverted | Verified the conclusion holds (`node:fs` fails typecheck with TS2591); only the stated reason is wrong, and the fix is a spec edit. | rejected |
+| false | Spec says `in-review` while `sprint-status.yaml` says `in-progress` | Not a defect in the change: the build workflow moves sprint-status to `review` at presentation, after this review step. | rejected |
+| false | `ItemClassSchema` is exported but unused; the crafted arm inlines the pair | §4.1 fixes the canonical key as flat declared fields, so the crafted arm must carry `categoryId` and `className` directly; both spellings share `CategoryIdSchema`/`ClassNameSchema`, so there is no second source of truth. | rejected |
 
 ## Design Notes
 
