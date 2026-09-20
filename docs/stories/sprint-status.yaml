@@ -37,7 +37,7 @@ story_location: docs/stories
 development_status:
   epic-1: in-progress
   1-1-the-four-package-workspace-and-the-offline-development-loop: review
-  1-2-contract-schemas-and-ports-for-the-curated-workload-and-the: backlog
+  1-2-contract-schemas-and-ports-for-the-curated-workload-and-the: ready-for-dev
   1-3-one-governed-trade-client-that-paces-itself-from-live-header: backlog
   1-4-the-committed-trade-catalogue-and-its-explicit-refresh-comma: backlog
   1-5-one-bounded-resumable-single-instance-chunk: backlog

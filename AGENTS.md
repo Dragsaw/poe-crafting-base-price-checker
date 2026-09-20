@@ -1,44 +1,49 @@
 <!-- bmad:context -->
-<!-- Verified 2026-09-20 against 55fe390fc00071dd9843a1d04dfb55dcf17394c6. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+<!-- Verified 2026-09-20 against d4315f0. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
 
 ## poe-crafting-base-price-checker
 
-PoE crafting base price checker. Pre-code: planning lives in `docs/` (PRD, architecture spine, UX designs, stories); no application source exists yet. Decided stack: pnpm workspaces, React 19, Vite, Mantine v9, Zod, Vitest, MSW — TypeScript, no Python in the product itself.
+A crafting base price checker for Path of Exile. The repository is a pnpm workspace of four packages. The stack is TypeScript, React 19, Vite, Mantine v9, Zod, Vitest and MSW. The product contains no Python. Planning documents are in `docs/`.
 
 ## Policy
 
-- Bash commands run through a permission allowlist that only matches literal, single-line commands — an unresolvable command stops the run for a human prompt. Avoid command substitution (`$()`/backticks), variables, loops, and `export VAR=x cmd`.
-- One command per call: no `&&`, `||`, `;`, or piping into a second program, unless the full pipeline is short and literal. Use separate calls instead.
-- No `cd` prefix — the working directory is already the project root. No `git -C <path>` — run `git <command>` directly.
-- For real logic (a loop, a conditional, string processing), write a script and run it as one literal command, e.g. `uv run script.py`.
-- Use the agent-browser skill for any browser interaction during development (testing the app in a browser, screenshots, UI verification, exploratory QA) — don't use claude-in-chrome or ad hoc browser automation.
+- Bash commands run through a permission allowlist. The allowlist matches only literal, single-line commands. An unresolvable command stops the run for a human prompt. Do not use command substitution, variables, loops, or `export VAR=x cmd`.
+- Use one command for each call. Do not use `&&`, `||`, `;`, or a pipe into a second program. Use separate calls instead. A short, literal pipeline is the one exception.
+- Do not use a `cd` prefix. The working directory is already the project root. Do not use `git -C <path>`. Run `git <command>` directly.
+- Write a script for real logic, such as a loop, a conditional, or string processing. Run the script as one literal command, for example `uv run script.py`.
+- Use the agent-browser skill for all browser work during development. This includes tests in a browser, screenshots, UI checks and exploratory QA. Do not use claude-in-chrome. Do not use other browser automation.
 
 ## Where things are
 
-- Architecture spine (canonical stack versions): `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md`
-- Mantine docs for agents: https://mantine.dev/llms.txt
-- UX design system: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md` — impeccable auto-discovers only `PROJECT_ROOT/DESIGN.md`; pass `--target <path>` explicitly to use this file.
+- Architecture spine, which holds the canonical stack versions: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md`
+- Story specs, their reviews, `sprint-status.yaml` and `deferred-work.md`: `docs/stories/`. Append to `deferred-work.md`. Do not rewrite it.
+- Mantine documentation for agents: https://mantine.dev/llms.txt
+- UX design system: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md`. impeccable finds only `PROJECT_ROOT/DESIGN.md`. Give `--target <path>` to use this file.
 
 ## Running and verifying
 
-- Run Python scripts with `uv run script.py`, never bare `python`.
-- Browser work needs a named session. Run `agent-browser session id --scope worktree --prefix poe`, then put the printed id before every subcommand: `agent-browser --session <id> open <url>`. The unnamed default session is one browser shared by every agent on this machine.
-- The agent-browser docs set that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. It breaks the literal-command rule in Policy.
-- Start the dev server on an explicit port. Read the URL the server prints before you open it. A second worktree takes a different port, so a fixed 5173 can verify another agent's build.
+- Run Python scripts with `uv run script.py`. Do not run bare `python`.
+- Browser work needs a named session. Run `agent-browser session id --scope worktree --prefix poe`. Put the printed id before each subcommand: `agent-browser --session <id> open <url>`. The unnamed default session is one browser for every agent on this machine.
+- The agent-browser documentation sets that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. It breaks the literal-command rule in Policy.
+- `pnpm dev` binds port 5173 with `strictPort`. A taken port gives a loud bind failure, and Vite does not move to the next port. To use a different port, run `pnpm dev --port <n>`. Do not edit `packages/web/vite.config.ts`.
+- `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. Stop it after use. The repository ships no supervisor.
+- `pnpm sync:dry` writes to stderr and exits non-zero on purpose. The command is a stub until story 1.5. Do not change it.
 
 ## Conventions that differ from defaults
 
-- UI is Mantine v9 (`@mantine/core`, `@mantine/hooks`), pinned to 9.6.1 per the architecture spine's Stack table — don't install a different major version.
+- The UI uses Mantine v9 (`@mantine/core`, `@mantine/hooks`) at version 9.6.1, which the Stack table of the architecture spine pins. Do not install a different major version.
+- A test setup blocks the network with an MSW `onUnhandledRequest` callback. The callback records the URL and throws. A global `afterEach` then fails the test and names each escaped URL. Copy `test/setup.ts`. The `"error"` string does not fail a test. Do not substitute that string for the callback.
 
 ## Known pitfalls
 
-- Every planning fact has exactly one owning document; write it there and cite it everywhere else by stable id (`FR-n`, `AD-n`, `OQ-n`, companion `§n`) — never restate the owner's text inline, because a citation survives the source changing and a copy silently drifts. Ownership:
-  - `prd.md` owns *what the player gets and why*: capabilities, player-observable behaviour, scope, risks, metrics, product-owned numbers (e.g. top 20, 0.25 Divine default), and literal strings the UI prints (reason enums). Never mechanism — no formulas (FR-1's EV formula is the one exception), predicates, field names, file paths, schema versions, filter shapes, or revision narrative.
-  - `ARCHITECTURE-SPINE.md` owns decisions (ADs) and spine-owned open questions; `IMPLEMENTATION-NOTES.md` owns formulas, predicates, report field identifiers, and error payloads; `WEIGHTS-FILE-SCHEMA.md` owns the weights contract and its version; `AGENT-WORKFLOW.md` owns command-level rules; UX `EXPERIENCE.md` owns view treatments (the PRD keeps the requirement, UX owns how it looks).
-  - Rationale and rejected alternatives go to the PRD's `addendum.md`; revision history goes to `.memlog.md` and git, not into document bodies.
-  - A spine change needs a PRD edit only if a capability, player-visible behaviour, scope boundary, product-owned number, or an OQ's owner changed. Retired-id retargets follow the spine's *Retired AD map* and are a citation sweep, not a PRD revision.
-  - A review request to *add* mechanism to the PRD is a finding against the reviewer's brief; propose the citation instead.
-  Observed 2026-09-19: ten of twelve PRD revisions were propagation of spine changes into copied mechanism, and ~79% of the PRD's ~407 normative rules duplicated the spine or a companion (see `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/handoff-phase1-architecture.md`).
-- `PRODUCT.md` is a distillation of `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md`, not an independent source — refresh it when the PRD's user/positioning/constraint facts change. Nothing detects drift between them automatically.
+- A new package needs three edits, not one. Add its `workspace:*` dependencies. Add its entry to `ALLOWED_EDGES` in `test/contracts-isolation.test.ts`. Add its tsconfig `references`. TypeScript gives no diagnostic for a missing reference (microsoft/TypeScript#43770). The fault shows as `TS2307` at the importer, and only on a clean checkout.
+- Each planning fact has one owner document. Write the fact there. Cite it elsewhere by stable id (`FR-n`, `AD-n`, `OQ-n`, companion `§n`). Do not restate the text of the owner. A citation stays correct when the source changes, and a copy drifts without a signal. The owners are:
+  - `prd.md` owns what the player gets, and why. This covers capabilities, player-observable behavior, scope, risks and metrics. It also covers product-owned numbers, such as top 20 and the 0.25 Divine default. It also covers the literal strings the UI prints (reason enums). `prd.md` owns no mechanism. It holds no formulas, predicates, field names, file paths, schema versions, filter shapes or revision narrative. The EV formula of FR-1 is the one exception.
+  - `ARCHITECTURE-SPINE.md` owns decisions (ADs) and the open questions of the spine. `IMPLEMENTATION-NOTES.md` owns formulas, predicates, report field identifiers and error payloads. `WEIGHTS-FILE-SCHEMA.md` owns the weights contract and its version. `AGENT-WORKFLOW.md` owns command-level rules. UX `EXPERIENCE.md` owns view treatments. The PRD keeps the requirement, and UX owns the appearance.
+  - Write rationale and rejected alternatives in `addendum.md` of the PRD. Write revision history in `.memlog.md` and in git. Do not write revision history into a document body.
+  - A spine change needs a PRD edit only when one of five things changes. Those five are a capability, player-visible behavior, a scope boundary, a product-owned number, and the owner of an OQ. A retired-id retarget follows the Retired AD map of the spine. Such a retarget is a citation sweep, not a PRD revision.
+  - A review that asks you to add mechanism to the PRD is a finding against the brief of the reviewer. Propose the citation instead.
+  Observed 2026-09-19: ten of twelve PRD revisions propagated spine changes into copied mechanism. About 79% of the approximately 407 normative rules of the PRD duplicated the spine or a companion.
+- `PRODUCT.md` is a distillation of `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md`. It is not an independent source. Refresh `PRODUCT.md` when the user, positioning or constraint facts of the PRD change. No tool detects drift between the two files.
 
 <!-- /bmad:context -->

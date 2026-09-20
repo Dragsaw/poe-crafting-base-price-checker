@@ -14,7 +14,7 @@ The brief makes three statements hard requirements and not preferences. First, a
 
 **No test at any level makes a network call** (AD-13). This rule is the load-bearing property of the workflow. The rule lets an agent repeat the development loop at machine speed. The service would otherwise rate-limit the agent until the agent can do no useful work. The rule also makes a failed test mean "the code is wrong" and not "GGG was slow".
 
-The project enforces the rule and does not trust the rule. The test setup installs an MSW server in `onUnhandledRequest: "error"` mode. A request without a matching fixture therefore fails the test with a loud error, and the request does not escape to the network.
+The project enforces the rule and does not trust the rule. The test setup installs an MSW server with an `onUnhandledRequest` callback. The callback records the escaped URL and throws. A global `afterEach` then fails the test and names each URL that escaped. A request without a matching fixture therefore fails the test, and the request does not reach the network. The `"error"` string mode does not fail a test, because a floating or a swallowed request leaves the suite green. Do not substitute that string for the callback.
 
 An agent can therefore run the entire test suite with no network connection. No step in the loop below needs credentials, a network, or a human.
 
