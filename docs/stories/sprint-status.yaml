@@ -44,7 +44,7 @@ development_status:
   1-6-the-deterministic-refresh-rotation: done
   1-7-a-divine-price-estimate-for-one-tracked-entry: done
   1-8-the-published-dataset-written-to-a-git-tracked-working-tr: done
-  1-9-the-structured-sync-report-with-requests-accounted-per-sourc: backlog
+  1-9-the-structured-sync-report-with-requests-accounted-per-sourc: done
   1-10-unresolvable-ids-detected-offline-and-reported: backlog
   1-11-league-validation-as-a-run-start-gate: backlog
   epic-1-retrospective: optional
