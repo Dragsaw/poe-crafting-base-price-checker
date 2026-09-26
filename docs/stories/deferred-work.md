@@ -68,10 +68,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 
 ## Deferred from: story 1.10 (2026-09-26)
 
-- source_spec: `docs/stories/spec-1-10-unresolvable-ids-detected-offline-and-reported.md`
-  summary: The `IMPLEMENTATION-NOTES.md` §10.2 fix is still owed. §10.2 says a `jewel`-arm derived base type the catalogue does not carry is a "load error naming the class". AD-25 says the entry is marked `unresolvable`, reported, and the chunk continues. The spine owns the ruling, so Story 1.10 implements AD-25. The §10.2 text is out of date and must be changed to cite AD-25.
-  evidence: The spec's agent decision *The spine owns the `jewel` ruling* says "The §10 fix is logged in `deferred-work.md`. It is not made here." `packages/sync/src/pricing/price-entry.ts` now catches `UnknownClassBaseTypeError` and returns a `completed` step with an `unresolvable` entry and a `baseTypeId` record.
-
 - source_spec: `docs/stories/spec-deferred-forbid-core-node-builtin-imports.md`
   summary: Nothing forbids `core` from doing I/O, reading the clock, generating randomness or reading env through globals such as `fetch`, `Date.now()`, `Math.random()` or `process.env`. The depcruise purity rules see imports only.
   evidence: AD-1 says no `core` module performs I/O, reads the clock, generates randomness or reads environment or config. The deferred-forbid-core-node-builtin-imports rules (`no-core-to-node-builtin`, `no-core-to-npm-package`) close the import path only, and a `Date.now()` in `packages/core/src` still passes `pnpm check`. An ESLint `no-restricted-globals` / `no-restricted-properties` block scoped to `packages/core/src/**` (tests excluded) would make it checkable. Out of scope here because the closed entry covered imports only.
