@@ -118,17 +118,41 @@ export const CrossFileGateFailureRecordSchema = z.strictObject({
   detail: z.string().min(1).describe('The failing check’s payload, as its § defines it.'),
 });
 
+/**
+ * Why a chunk stopped on a throw. A record, not a figure: a failed unattended
+ * run otherwise leaves only an exit code (FR-25, FR-19).
+ */
+export const RunFailureReasonSchema = z.enum(['trade-request-rejected', 'unrecoverable-error']);
+
+export type RunFailureReason = z.infer<typeof RunFailureReasonSchema>;
+
+export const RunFailureRecordSchema = z.strictObject({
+  kind: z.literal('run-failure'),
+  reason: RunFailureReasonSchema.describe(
+    '`trade-request-rejected`: the trade API answered a non-429 4xx and the chunk aborted. `unrecoverable-error`: any other throw.',
+  ),
+  entryKey: z
+    .string()
+    .min(1)
+    .optional()
+    .describe('The canonical key of the entry the chunk was on, where the failure names one (§4.1).'),
+  status: z.int().optional().describe('The HTTP status the trade API answered, where there was one.'),
+  message: z.string().min(1).describe('The error message, as thrown.'),
+});
+
 export const SyncRunRecordSchema = z.discriminatedUnion('kind', [
   StaleLockBrokenRecordSchema,
   PinnedStarvationRecordSchema,
   UnresolvableRecordSchema,
   CrossFileGateFailureRecordSchema,
+  RunFailureRecordSchema,
 ]);
 
 export type StaleLockBrokenRecord = z.infer<typeof StaleLockBrokenRecordSchema>;
 export type PinnedStarvationRecord = z.infer<typeof PinnedStarvationRecordSchema>;
 export type UnresolvableRecord = z.infer<typeof UnresolvableRecordSchema>;
 export type CrossFileGateFailureRecord = z.infer<typeof CrossFileGateFailureRecordSchema>;
+export type RunFailureRecord = z.infer<typeof RunFailureRecordSchema>;
 export type SyncRunRecord = z.infer<typeof SyncRunRecordSchema>;
 
 export const SyncRunReportSchema = z

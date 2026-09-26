@@ -113,6 +113,36 @@ describe('SyncRunRecordSchema', () => {
     ).toBe(true);
   });
 
+  it('carries a run-failure record, with the entry and status optional', () => {
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'run-failure',
+        reason: 'trade-request-rejected',
+        entryKey: '["raw","Advanced Dualstring Bow",82]',
+        status: 400,
+        message: 'the trade search answered 400; the chunk is aborted',
+      }).success,
+    ).toBe(true);
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'run-failure',
+        reason: 'unrecoverable-error',
+        message: 'boom',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('refuses a run-failure record with an unknown reason or no message', () => {
+    expect(
+      SyncRunRecordSchema.safeParse({ kind: 'run-failure', reason: 'timeout', message: 'x' })
+        .success,
+    ).toBe(false);
+    expect(
+      SyncRunRecordSchema.safeParse({ kind: 'run-failure', reason: 'unrecoverable-error' })
+        .success,
+    ).toBe(false);
+  });
+
   it('has no `failed push` record — revision 18 removed every git write', () => {
     expect(SyncRunRecordSchema.safeParse({ kind: 'failed-push', remote: 'origin' }).success).toBe(
       false,

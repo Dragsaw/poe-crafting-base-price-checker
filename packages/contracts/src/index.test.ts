@@ -18,6 +18,7 @@ describe('the contracts barrel', () => {
       'CurrencyRateSchema',
       'TradeCatalogueSchema',
       'SyncRunReportSchema',
+      'RunFailureRecordSchema',
       'DatasetEntrySchema',
       'SchemaVersionSchema',
       'TrackedListAgeSchema',
