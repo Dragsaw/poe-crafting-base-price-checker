@@ -5,6 +5,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
   summary: Nothing forbids `core` from importing `node:*` builtins or a runtime dependency, so its documented purity is unenforced.
   evidence: `packages/core/src/index.ts` states "no I/O, no clock, no randomness, no env" and AD-1 calls `core` pure, but the five depcruise rules constrain only the direction of workspace edges. The first `import { readFileSync } from 'node:fs'` in `core` passes `pnpm check`. A `core`-scoped rule over `dependencyTypes` would make the claim checkable; deferred because story 1.1's intent covers the graph's direction, not import purity.
+  auto_attempt: 2026-09-26 — attempt 1 — status blocked. PRIMARY dirty, busy or not on master, and branch worktree-dw-forbid-core-node-builtin-imports-2026-09-26-154006 holds the finished work. Branch `worktree-dw-forbid-core-node-builtin-imports-2026-09-26-154006`, spec `docs/stories/spec-deferred-forbid-core-node-builtin-imports.md`.
+  retry_when: PRIMARY is on master with a clean status
+  integrate_branch: worktree-dw-forbid-core-node-builtin-imports-2026-09-26-154006
 
 - source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
   summary: A request that settles after its own test's `afterEach` may escape the no-network guard, or fail an innocent later test naming a foreign URL.
