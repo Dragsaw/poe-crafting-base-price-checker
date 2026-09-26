@@ -26,15 +26,55 @@ interface EscapedRequest {
   readonly issuedBy: TestIdentity | undefined;
 }
 
-const escapedRequests: EscapedRequest[] = [];
-
 /**
- * Carries the running test's identity from the test body into the timers and
- * promise continuations it starts. A request a test does not await is then
- * charged to that test, not to whichever test happens to be running when MSW
- * calls `onUnhandledRequest`.
+ * One guard per worker (process or thread), installed once and never uninstalled.
+ *
+ * A closed server restores the real `fetch`, `http`/`https` and
+ * `XMLHttpRequest`. In a reused worker (`isolate: false`) a timer that one file
+ * started can fire after that file's `afterAll`, while the next file imports:
+ * with the server closed, that request would reach the network. The worker
+ * ends when Vitest is done with it, so an interceptor that stays
+ * installed costs nothing — `setupServer` opens no socket.
+ *
+ * The setup file is evaluated again for each file of a reused worker. A second
+ * `setupServer().listen()` would stack a second interceptor, and the first one's
+ * closure would still write to the first file's record. So the server, the
+ * record and the identity store live in one object on `globalThis`, and the
+ * first evaluation creates it.
  */
-const currentTest = new AsyncLocalStorage<TestIdentity>();
+interface NoNetworkGuard {
+  readonly server: ReturnType<typeof setupServer>;
+  readonly escapedRequests: EscapedRequest[];
+  /**
+   * Carries the running test's identity from the test body into the timers and
+   * promise continuations it starts. A request a test does not await is then
+   * charged to that test, not to whichever test happens to be running when MSW
+   * calls `onUnhandledRequest`.
+   */
+  readonly currentTest: AsyncLocalStorage<TestIdentity>;
+  listening: boolean;
+}
+
+const GUARD_KEY = Symbol.for('poe-crafting-base-price-checker/no-network-guard');
+
+function processGuard(): NoNetworkGuard {
+  const holder = globalThis as typeof globalThis & { [GUARD_KEY]?: NoNetworkGuard };
+  const existing = holder[GUARD_KEY];
+  if (existing !== undefined) {
+    return existing;
+  }
+  const created: NoNetworkGuard = {
+    server: setupServer(),
+    escapedRequests: [],
+    currentTest: new AsyncLocalStorage<TestIdentity>(),
+    listening: false,
+  };
+  holder[GUARD_KEY] = created;
+  return created;
+}
+
+const guard = processGuard();
+const { server, escapedRequests, currentTest } = guard;
 
 /**
  * The only exemption is by **origin**, never by file extension. A callback that
@@ -49,9 +89,12 @@ function isNonRemote(url: URL): boolean {
   return url.protocol === 'file:' || LOOPBACK_HOSTS.has(url.hostname);
 }
 
-const server = setupServer();
-
 beforeAll(() => {
+  // Once per worker. A later file of a reused worker finds the interceptor
+  // already installed, and its closure writes to the same shared record.
+  if (guard.listening) {
+    return;
+  }
   server.listen({
     onUnhandledRequest(request) {
       if (isNonRemote(new URL(request.url))) {
@@ -62,6 +105,9 @@ beforeAll(() => {
       throw new Error(`[no-network] unhandled request escaped the fixture set: ${described}`);
     },
   });
+  // After `listen` returns: a throwing `listen` leaves the flag false, so the
+  // next file of the worker tries again instead of running unguarded.
+  guard.listening = true;
 });
 
 beforeEach((context) => {
@@ -78,12 +124,14 @@ afterEach((context) => {
 });
 
 afterAll(() => {
-  // Before `server.close()`: a request recorded after the last `afterEach`, or
-  // outside any test, fails the file here instead of passing silently.
+  // A request recorded after the last `afterEach`, or outside any test, fails
+  // the file here instead of passing silently. So does a late request from an
+  // earlier file of a reused worker. The server is never closed (see
+  // `NoNetworkGuard`), so a request that fires after this hook is still blocked.
   try {
     assertNoEscapedRequests();
   } finally {
-    server.close();
+    server.resetHandlers();
   }
 });
 
