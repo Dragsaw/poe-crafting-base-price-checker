@@ -471,7 +471,7 @@ A producer's completeness claim and the consumer's treatment of it are two halve
 - A Tracked Entry a Weights File cannot support is reported at load with the offending entry named, rather than ranked on a guess (AD-17; `IMPLEMENTATION-NOTES.md` §2.4, §2.5).
 - The view reports such a failure at load and still renders the unaffected rows; a sync run treats the same check as a run-start gate and aborts before spending budget (AD-17, AD-12).
 - Whole-tier containment understates probabilities unevenly and can reorder the list. How far it does so is unmeasured and owned by OQ-21 (AD-11). `[ASSUMPTION: the understatement stays acceptable in practice for v1 — an operating bet, not a bound; OQ-21 is the measurement that would settle it.]`
-- Prefix and suffix are independent draws, and an absent affix is certain (AD-17).
+- A Combination's probability follows one crafting act on the Item Class, and an absent affix is certain (AD-17; `IMPLEMENTATION-NOTES.md` §11).
 
 #### FR-30: Depend on an externally produced Weights File as a v1 prerequisite
 
@@ -536,7 +536,7 @@ The ranking treats a Price Observation from any league but the active one as abs
 - **NFR-2 — Fixtures are real captured responses.** A fixture is a committed real payload, never a hand-written mock. Re-recording is a separate, human-invoked command, never part of a test run, and its diff is what makes GGG's changes visible (AD-13).
 - **NFR-3 — Determinism.** Valuation is pure; time, randomness and configuration enter only as passed-in values, and no test depends on wall-clock timing (AD-1).
 - **NFR-4 — Parallel worktree development.** Packages own disjoint directories with a one-way dependency graph that CI enforces, so two agents in two packages touch no common file (AD-1). The working rules for contracts changes, live sync and dry runs are `AGENT-WORKFLOW.md`'s.
-- **NFR-5 — One writer per file.** Every shared file has exactly one writer; an agent that needs different data uses a fixture, never an edit (AD-3).
+- **NFR-5 — One writer per file.** Every shared file has exactly one writer, and no component of the product writes a file another owns (AD-3).
 - **NFR-6 — Read-time budget.** A full ranking pass completes in under 100 ms on a mid-range machine and re-runs synchronously on a threshold change; the remedy for a miss is memoisation, never precomputation (AD-4, AD-24).
 - **NFR-7 — Static delivery, zero upkeep.** The view is a static bundle that CI deploys: no server, no secret material, no expiring credential (AD-15).
 - **NFR-8 — Schema versioning at every trust boundary.** Every published artifact and input file carries a schema version, a consumer refuses an unknown major rather than guessing, and a producer validates before it writes (AD-3, Consistency Conventions).

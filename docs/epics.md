@@ -67,7 +67,7 @@ NFR-1: Zero network in the test path. No test at any level makes a real network 
 NFR-2: Fixtures are real captured responses, never hand-written mocks. Re-recording is a separate human-invoked command (AD-13)
 NFR-3: Determinism. Valuation is pure. Time, randomness and configuration enter only as passed-in values (AD-1)
 NFR-4: Parallel worktree development. Packages own disjoint directories. The dependency graph is one-way, and CI enforces it (AD-1)
-NFR-5: One writer per file. An agent that needs different data uses a fixture, never an edit (AD-3)
+NFR-5: One writer per file. No component of the product writes a file another owns (AD-3)
 NFR-6: Read-time budget. A full ranking pass completes under 100 ms on a mid-range machine. It re-runs synchronously on a threshold change. The remedy for a miss is memoisation, never precomputation (AD-4, AD-24)
 NFR-7: Static delivery, zero upkeep. No server, no secret material, no expiring credential (AD-15)
 NFR-8: Schema versioning at every trust boundary. A consumer refuses an unknown major rather than guessing (AD-3)
@@ -1667,8 +1667,8 @@ So that the ranking rests on a file somebody else produced and this app never in
 
 **Given** `data/weights.json`
 **When** `core` loads it
-**Then** it accepts a file conforming to `WEIGHTS-FILE-SCHEMA.md` `5.1.0`
-**And** it still accepts a file declaring `5.0.0`, because `5.1.0` is additive and a consumer refuses only an unknown **major** (FR-27, AD-11, NFR-8).
+**Then** it accepts a file conforming to `WEIGHTS-FILE-SCHEMA.md` `6.0.0`
+**And** it refuses a file declaring any `5.x` as an unknown **major**, because `6.0.0` adds the required `modGroup` that exclusion reads (FR-27, AD-11, NFR-8).
 
 **Given** a file that trips any hard error in `WEIGHTS-FILE-SCHEMA.md` *Validation*, an unknown schema major among them
 **When** `core` loads it
@@ -1686,8 +1686,9 @@ So that the ranking rests on a file somebody else produced and this app never in
 
 **Given** one entry of the file
 **When** `core` reads it
-**Then** the entry is one tier of one modifier, carrying `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource` and its `lines[]` nested inside it
+**Then** the entry is one tier of one modifier, carrying `sourceModifierId`, `modGroup`, `itemLevelMin`, `weight`, `weightSource` and its `lines[]` nested inside it
 **And** each line carries its own `statId`, or `null`, and its `ranges` verbatim
+**And** `core` reads the entry's mutual-exclusion group from `modGroup`, never by parsing `sourceModifierId` (AD-11)
 **And** the entry carries the tier's weight once (AD-11).
 
 **Given** all of one entry's lines
@@ -1804,8 +1805,18 @@ So that two builders cannot produce two different orderings from the same two fi
 
 **Given** a Combination's probability
 **When** `core` computes it
-**Then** prefix and suffix are independent draws, `P(prefix) × P(suffix)`
-**And** `P = 1` for an absent affix (FR-29, AD-17).
+**Then** the transmute draws its affix from the prefix and suffix pools combined, by weight, and the augment draws from the other slot's pool with the first affix's `modGroup` removed
+**And** scope, truncate, exclude and renormalise run in that order
+**And** `P = 1` for an absent affix (FR-29, AD-17, `IMPLEMENTATION-NOTES.md` §11).
+
+**Given** a class where no `modGroup` spans both slots
+**When** `core` computes a Combination's probability
+**Then** it equals `P(prefix) × P(suffix)` to 1e-12 relative, asserted on every tracked entry of the real file (§11).
+
+**Given** a cross-slot `modGroup` built inside a test
+**When** `core` computes the probability
+**Then** it matches §11's two-order sum
+**And** an augment left with no eligible entry is unrankable with a reason, never a zero (AD-17, §11, NFR-2).
 
 **Given** a tier only partly covered by a curated band
 **When** `core` computes the probability
@@ -1963,7 +1974,7 @@ So that a double-counted Combination cannot hand an Item Class the top of the li
 **Given** kind agreement
 **When** `core` evaluates it
 **Then** the quantifier is **universal**: any scoped line sharing the reference's `statId` that disagrees with the reference's kind is a defect, however many lines agree
-**And** a line's kind is read from whether its `ranges` is empty, because `5.0.0` carries no `kind` field (§2.3, AD-17).
+**And** a line's kind is read from whether its `ranges` is empty, because the contract carries no `kind` field (§2.3, AD-17).
 
 **Given** class discriminability
 **When** `core` evaluates it

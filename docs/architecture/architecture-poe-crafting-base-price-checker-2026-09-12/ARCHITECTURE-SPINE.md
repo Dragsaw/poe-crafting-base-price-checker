@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 18
+revision: 19
 created: '2026-09-12'
-updated: '2026-09-20'
+updated: '2026-09-26'
 binds: []
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -299,6 +299,11 @@ never import each other.
   Hand-owned inputs (`tracked.json`, `currencies.json`, `recipes.json`, `config.json`,
   `weights.json`) and cached external facts (`catalogue/*.json`, AD-25) also cross the
   boundary and are **not** a sync→web channel, because neither class carries sync state.
+
+  **"By hand" names a writer outside the app, not a typist.** The table binds components:
+  no component of the product writes a hand-owned file. A development agent that edits one
+  on the player's behalf writes as the player's hand, and the agent-side rule for that is
+  `AGENT-WORKFLOW.md`'s.
 
   Every shared file has exactly one writer:
 
@@ -719,21 +724,20 @@ never import each other.
   producer can satisfy; a pool denominator that double-counts a multi-stat modifier; and
   the permanent loss of the fact that two stats always roll together, which nobody can
   reconstruct once the source row is split.
-- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`5.1.0`**,
+- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`6.0.0`**,
   and never produces one. Any producer that satisfies the contract is acceptable, and the
   app does not depend on which one wrote the file.
 
-  **`5.1.0` is additive over `5.0.0` and a consumer refuses only an unknown *major***
-  (Consistency Conventions), so a file declaring `5.0.0` is still consumed. What `5.1.0`
-  adds is a **normative grammar on the inner `className` key**, which spine revision 17
-  needed because AD-16 now derives a class discriminator from that key
-  (`IMPLEMENTATION-NOTES.md` §10). The conforming file of 2026-09-19 satisfies it unchanged,
-  verified across all 59 classes on 2026-09-20 — **the revision documents what the producer
-  already emits rather than asking for new work**, and exists so that a future patch which
-  breaks the shape fails at the file instead of as a quietly mispriced row.
+  **`6.0.0` is breaking, and `core` refuses a `5.x` file as an unknown major** (Consistency
+  Conventions). It adds a required **`modGroup`** on every entry — the game's
+  mutual-exclusion group, which AD-17 needs to condition the second affix draw — and
+  renumbers the display-only `tierLabel` per stat, T1 = highest item level. **The normative
+  `className` grammar that `5.1.0` introduced carries forward unchanged**, because AD-16
+  derives a class discriminator from that key (`IMPLEMENTATION-NOTES.md` §10). The
+  producer-6.0.0 file of 2026-09-26 satisfies the contract, verified across all 59 classes.
 
   **One entry is one tier of one modifier, and an entry and a source row are the same
-  thing.** An entry carries `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource`,
+  thing.** An entry carries `sourceModifierId`, `modGroup`, `itemLevelMin`, `weight`, `weightSource`,
   and **`lines[]`** — that tier's stat lines nested inside it, each line carrying its own
   `statId` (or **`null`**, where the producer resolved none) and its `ranges` **verbatim**,
   exactly as the source published them. The tier's weight is carried **once**, on the
@@ -745,7 +749,9 @@ never import each other.
   modifier rather than the line. That fact is the only thing `core` cannot reconstruct
   once it is lost, and it is why the lines are nested rather than flattened. `core` reads
   co-occurrence directly off one entry's `lines` (AD-17). In valuation `core` never reads
-  `sourceModifierId` at all; it reads it at load, for the duplicate-entry check.
+  `sourceModifierId` at all; it reads it at load, for the duplicate-entry check. **`core`
+  reads `modGroup` for AD-17's exclusion only, and never parses `sourceModifierId` to
+  recover it.**
 
   **Tiers overlap in value space, and the file reports the overlap rather than resolving
   it.** Band non-overlap is withdrawn at every scope. For a modifier whose text carries
@@ -1197,10 +1203,23 @@ never import each other.
   row, counted once (AD-11), so the double-counting reading is no longer reachable in any
   shape the file admits. `ModifierRef` itself carries no item level: the scope comes from
   the entry's floor and the weights entry's `itemLevelMin`, and from no third source.
-  `P(combination)` treats prefix and suffix as **independent draws** — `P(prefix) ×
-  P(suffix)`, with `P = 1` for an absent affix. *[ASSUMPTION]* Independence holds because a
-  transmute rolls one affix and an augment adds the other; mod-group exclusion makes the
-  second draw weakly conditional, and that refinement is Deferred.
+  `P(combination)` is the probability that one crafting act lands both references: a
+  transmute rolls one affix and an augment adds the other, **and the second draw is
+  conditioned on the first by mod-group exclusion** (`WEIGHTS-FILE-SCHEMA.md` *The
+  exclusivity rule*). **The transmute draws from the prefix and suffix pools combined, by
+  weight**, so the first affix is a prefix with probability `W_prefix / (W_prefix +
+  W_suffix)` over the eligible pools — a game fact, confirmed by the player 2026-09-26. The
+  augment draws from the other slot's pool with every entry sharing the first affix's
+  `modGroup` removed, and renormalises the rest. `P = 1` for an absent affix. The formula,
+  and its order after the recipe floor below (scope, truncate, exclude, renormalise), are in
+  `IMPLEMENTATION-NOTES.md` §11, binding under AD-0.
+
+  **Where no `modGroup` spans both slots of a class, the result is exactly `P(prefix) ×
+  P(suffix)`** — true of all 59 classes on the 2026-09-26 file — so the exclusion changes no
+  number today, and exists so a patch that shares a group across slots is valued correctly
+  rather than overstated. **An augment left with no eligible entry makes that `(itemClass,
+  recipe)` pair unrankable with a reason, never a zero**, on the same ruling as an empty
+  recipe-floor pool below.
 
   *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** the entry's
   floor, while the `ilvl >=` search returns a superset. Accepted rather than corrected,
@@ -1658,7 +1677,7 @@ id resolves here.
 | Naming — entities | `BaseType`, `ItemClass`, `TrackedEntry`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `RankedRow`, `SyncRunReport`, `TradeCatalogue`. Singular, PascalCase, defined once in `contracts` (AD-3). **`ItemClass` is the `(categoryId, className)` pair and is `prd.md` §3's *Item Class* — the pair, never the `className` half alone** (AD-5). **It was `ItemCategory` for one revision**: revision 16 introduced that name against `prd.md` revision 17's noun, and revision 17 renamed it when `prd.md` revision 18 moved the player-facing unit a rung finer. The underlying key never changed, so this is a rename and not a re-keying, and **`ItemCategory` is not reused for anything else**. `RankedRow` was `RankedBase` until revision 16 and was renamed because it ranks two units — an `ItemClass` on the crafted branch, a `BaseType` on the raw one (AD-5, AD-17). |
 | Naming — files & modules | kebab-case files; one exported concept per file in `core`; adapters named `<port>-<impl>` (e.g. `trade-client-http`, `trade-client-fixture`). |
 | Naming — ports | Interface `<Thing>Port` in `contracts`; every port ships a fake alongside the real adapter. |
-| Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (§10). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (`5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
+| Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (§10). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (since `5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
 | Bands | A modifier reference is `banded` — `(statId, valueMin, valueMax)` with **inclusive, always-present** edges — or `valueless` — `(statId)` with no edges (AD-5). **Weights-file tiers overlap freely in value space; non-overlap is withdrawn at every scope** (AD-11). Edges sit on the lattice the trade filter compares against, which may be finer than the integers. |
 | Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms so an absent affix and a valueless affix can never collide (encoding in `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
 | Item level | `itemLevelMin` is a declared floor, uniform across an item class's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per `IMPLEMENTATION-NOTES.md` §8 (AD-5). |
@@ -1752,7 +1771,7 @@ graph TB
   sync --> dataset
   sync --> report
   sync --> progress
-  producer -.->|schema-conformant 5.1.0<br/>tiers + lines + itemLevelMin| weights
+  producer -.->|schema-conformant 6.0.0<br/>tiers + lines + modGroup + itemLevelMin| weights
   dataset -->|player commits + pushes| pages
   pages --> web
   weights --> web
@@ -1837,7 +1856,7 @@ poe-crafting-base-price-checker/
     currencies.json # hand-maintained rates in divine, each with league + asOf (AD-20)
     recipes.json    # CraftRecipe definitions (AD-3)
     config.json     # active league (AD-19) + minChunkSearches (AD-7) + schemaVersion
-    weights.json    # consumed weights file, contract 5.1.0 — external producer (AD-11)
+    weights.json    # consumed weights file, contract 6.0.0 — external producer (AD-11)
     catalogue/      # sync-owned trade catalogue, patch cadence (AD-25)
       items.json
       stats.json

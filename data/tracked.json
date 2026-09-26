@@ -11,7 +11,7 @@
         "statId": "explicit.stat_3981240776",
         "valueMin": 47,
         "valueMax": 50,
-        "acceptedTier": "T5"
+        "acceptedTier": "T1"
       },
       "suffix": {
         "kind": "banded",

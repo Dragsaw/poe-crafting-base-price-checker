@@ -35,3 +35,17 @@ Append-only. Each entry names work carved out of a spec so it is not lost.
 - source_spec: `docs/stories/spec-1-4-the-committed-trade-catalogue-and-its-explicit-refresh-command.md`
   summary: The emitted `packages/contracts/dist/index.d.ts` carries `.ts` relative specifiers, and the prescribed fix is inert.
   evidence: Already recorded in the spec's `deferred` block; carried here because the ledger is where carved-out work lives and the Auto Run Result points readers at "the deferred entry". `rewriteRelativeImportExtensions` does not affect declaration emit under `emitDeclarationOnly`, reproduced in a minimal project. A consumer probe resolved the `.ts` specifier through to `schema-version.d.ts`, so TypeScript follows it; the risk is a non-TypeScript consumer of `dist`. Settling it needs dropping `emitDeclarationOnly` or a post-emit rewrite.
+
+## Deferred from: sprint change proposal 2026-09-26 (weights contract 6.0.0)
+
+- source_spec: `docs/sprint-change-proposal-2026-09-26.md`
+  summary: The Emerald crafted entry's prefix band `[12, 15]` does not contain its only tier `[5, 15]`, so Story 3.3's empty-containment check will reject it.
+  evidence: `data/tracked.json`, `jewel`/`Emerald` prefix `explicit.stat_2843214518` `[12, 15]`; `data/weights.json` 6.0.0 carries one tier of that stat on that pool, `T1` at item level 1 with ranges `[[5, 15]]`. Whole-tier containment (IN §1) admits no tier, so §2.5 fires. It predates the 6.0.0 change and is the player's data to fix (AGENT-WORKFLOW: agents do not edit `data/`).
+
+- source_spec: `docs/sprint-change-proposal-2026-09-26.md`
+  summary: Resolved 2026-09-26 — the Emerald prefix band entry above is fixed. The player chose `[5, 15]`, the only band whole-tier containment accepts on that pool, and the agent applied it under the revised AGENT-WORKFLOW data rule. The entry prices every roll of the tier (5–15), not only its top end.
+  evidence: `data/tracked.json` `jewel`/`Emerald` prefix `explicit.stat_2843214518` now `[5, 15]`, `acceptedTier` `T1`; the band equals its containment set's extremes on the 6.0.0 file.
+
+- source_spec: `docs/sprint-change-proposal-2026-09-26.md`
+  summary: Correction 2026-09-26 — the "Resolved" note directly above is WITHDRAWN. The player reverted the Emerald prefix band to `[12, 15]`, and the original Emerald entry stands, now covering the suffix `[3, 4]` over its only tier `[2, 4]` as well.
+  evidence: The player wants mid-to-high rolls of one tier only, because the full tier prices quite differently. Whole-tier containment (AD-11) cannot express a band inside one tier, so Story 3.3's empty-containment check (IN §2.5) will reject both Emerald bands once it is built. This is a live case for the pro-rating alternative that AD-11 rejected and carries under Deferred; revisit it when Story 3.3 lands. `[5, 15]` also broke the recorded pricing fixtures (a new search body needs `pnpm fixtures:record`), so the revert keeps them valid.

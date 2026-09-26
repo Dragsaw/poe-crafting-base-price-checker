@@ -4,7 +4,7 @@ type: architecture-companion
 status: final
 binding: true
 created: '2026-09-19'
-updated: '2026-09-20'
+updated: '2026-09-26'
 governed_by: ARCHITECTURE-SPINE.md
 ---
 
@@ -1003,3 +1003,44 @@ None here. The discriminator's values ride in the **JSON request body**, not in 
 `Time-Lost Diamond`'s space needs no encoding. §5.4's encoding rule applies to the league
 segment of a URL and nowhere else — a builder who encodes a body value produces a search for
 a base type that does not exist.
+
+---
+
+## 11. Mod-group exclusion across the two draws (AD-17)
+
+A crafted entry's combination is made by one transmute and one augment on a magic item. The
+transmute's one affix is drawn by weight from the prefix and suffix pools **combined**; the
+augment then draws from the **other** slot's pool with every entry sharing the first affix's
+`modGroup` removed (`WEIGHTS-FILE-SCHEMA.md` *The exclusivity rule*). A magic item holds one
+affix per slot, so exclusion never acts **within** a slot here; rare items are out of v1.
+
+Let `E_P` and `E_S` be the prefix and suffix `eligible(entry, recipe)` sets of §9, and `W_P`,
+`W_S` their totals. Let `C_p = contained(p) ∩ E_P` and `C_s = contained(s) ∩ E_S`; an
+**absent** affix contains its whole eligible set, `C = E`. Let `g(e)` be `e.modGroup`, and
+`W_X∖G` the sum of the weights in `E_X` whose `modGroup ≠ G`.
+
+```
+                 Σ_{e ∈ C_p}  e.weight · Σ{ f.weight : f ∈ C_s, g(f) ≠ g(e) } / W_S∖g(e)
+P(p ∧ s)  =   ───────────────────────────────────────────────────────────────────────────
+                                        W_P + W_S
+
+                 Σ_{f ∈ C_s}  f.weight · Σ{ e.weight : e ∈ C_p, g(e) ≠ g(f) } / W_P∖g(f)
+           +  ───────────────────────────────────────────────────────────────────────────
+                                        W_P + W_S
+```
+
+The first term is a prefix drawn first, the second a suffix drawn first. **The order is scope
+(AD-17), truncate (§9), exclude (here), renormalise.** Excluding before truncating removes
+groups against tiers that could never roll, and the denominators stop summing their own
+numerators — §9's error again.
+
+**It reduces to §9's product where no group spans both slots.** If no `modGroup` of `E_P`
+occurs in `E_S`, every `W_X∖G` equals `W_X` and the two terms sum to `P(p | recipe) ×
+P(s | recipe)`. On the 2026-09-26 file that holds for all 59 classes. Tests therefore assert
+§11 against the product to 1e-12 relative on every tracked entry of the real file, and assert
+§11 against a cross-slot `modGroup` built inside the test itself (no hand-written fixture
+file, NFR-2).
+
+**A zero `W_X∖g(·)` under a positive weight is a reason, not a zero.** The augment has nothing
+it can add after that first affix, so `core` returns the `(itemClass, recipe)` pair as
+unrankable with that reason (AD-17), as §9 does for an empty `eligible` set.

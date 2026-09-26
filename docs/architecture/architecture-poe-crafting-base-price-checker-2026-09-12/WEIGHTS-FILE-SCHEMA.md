@@ -2,22 +2,23 @@
 title: 'Weights File Contract'
 status: final
 governed_by: AD-17
-schemaVersion: '5.1.0'
+schemaVersion: '6.0.0'
 created: '2026-09-12'
-updated: '2026-09-20'
+updated: '2026-09-26'
 ---
 
 # Weights File Contract
 
 > **This is the authoritative contract**, owned by this repo (`poe-crafting-base-price-checker`)
-> and binding under the spine's AD-0 ("the weights contract itself"). `5.1.0` is adopted, as
-> of spine revision 17: the `className` grammar below is a normative, enforced rule, not a
-> pending proposal. A separate working copy may still exist inside the external
-> `poe-mod-weights-producer` scraper project for that project's own iteration, but that copy
+> and binding under the spine's AD-0 ("the weights contract itself"). `6.0.0` is adopted, as
+> of spine revision 19: `modGroup`, the per-stat `tierLabel` rule, the exclusivity rule and
+> the `className` grammar below are normative, enforced rules, not pending proposals. A
+> separate working copy may still exist inside the external `poe-mod-weights-producer` scraper
+> project for that project's own iteration, but that copy
 > is not authoritative and is not this file — this file is what the producer must satisfy and
-> what `sync`/`core` validate against. The decision trail for `5.1.0` is recorded in this
-> repo's `.memlog.md` (revisions 16–17); the producer-side proposal document that preceded it
-> was never part of this repository and is not cited here.
+> what `sync`/`core` validate against. The decision trail for `5.1.0` and `6.0.0` is
+> recorded in this repo's `.memlog.md` (revisions 16–17, 19); the producer-side proposal
+> documents that preceded them were never part of this repository and are not cited here.
 
 The app **consumes** this file. The app never produces this file (AD-11). Any producer
 that satisfies this contract is acceptable. The app does not depend on which producer
@@ -27,6 +28,21 @@ wrote the file.
 carries. See *Why this file has to exist* below. The app therefore cannot rank any base
 type until a conforming file is present. The intended producer is a separate scraper
 project. This document is the contract that the scraper project must satisfy.
+
+## 6.0.0 — modGroup and per-stat tierLabel
+
+**Breaking.** Every entry gains a required `modGroup`, and `tierLabel` is renumbered. `core`
+implements `6` and refuses a `5.x` file as an unknown major (spine AD-11).
+
+| Change | Reason |
+| --- | --- |
+| New required field **`modGroup`** on every entry, poe2db's `ModFamilyList` value verbatim | The family is the game's **mutual-exclusion group**: an item holding a modifier from one group cannot roll another from it. Roll-odds math has to know it, and in `5.x` it reached the file only inside the opaque `sourceModifierId`. See *The exclusivity rule*. |
+| `tierLabel` is **numbered per stat within `(slot, modGroup)`, T1 = highest `itemLevelMin`** | `5.x` numbered a whole family ascending by item level, so distinct stats in one group shared one run (Amulets suffix `IncreaseSocketedGemLevel` ran T1–T12 across four stats, and +3 Spell Skills came out as T9). Now each stat in a group has its own T1-first run, matching PoE2's in-game convention. |
+| Nothing else | `sourceModifierId`, weights, ranges, `statId`s, ordering, `poolCoverage`, **the `5.1.0` `className` grammar and every `5.x` hard error** are unchanged. The producer emits no group totals, per-group probabilities or adjusted weights. |
+
+**The producer-6.0.0 file of 2026-09-26 satisfies this revision.** All 8,437 entries carry
+`modGroup`, 53 of 1,758 groups hold more than one stat, **no `modGroup` appears in both slots
+of any of the 59 pools**, and the grammar and every hard error pass.
 
 ## 5.1.0 — the inner key's grammar becomes normative
 
@@ -140,11 +156,24 @@ Unchanged in spirit from `4.x`, decoupled from the removed cell machinery.
 There is no third option. `poolCoverage` is an honest per-pool assertion, not something
 the producer computes from cell coverage — there are no cells to compute it from.
 
+## The exclusivity rule
+
+- **An item holds at most one modifier per `modGroup`**, item-wide across prefix and
+  suffix — not per slot.
+- A consumer predicting the next roll on an item **removes every entry whose `modGroup` is
+  already on the item** (from both pools) **before normalising** the remaining weights.
+- `modGroup` is published verbatim and nothing is derived from it: the file carries no
+  group totals, per-group probabilities or adjusted weights. Pools stay flat entry lists;
+  entries are not nested under groups.
+
+How `core` applies this rule to a crafting act is spine AD-17 and
+`IMPLEMENTATION-NOTES.md` §11.
+
 ## Shape
 
 ```jsonc
 {
-  "schemaVersion": "5.1.0",           // semver; core refuses a major it does not know
+  "schemaVersion": "6.0.0",           // semver; core refuses a major it does not know
   "gamePatch": "0.5.5",               // operator-asserted at run time; never defaulted
   "producer": {
     "id": "poe2-weights-scraper",     // stable producer identifier
@@ -160,6 +189,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
           "entries": [
             {
               "sourceModifierId": "prefix\u0000BaseLightningDamage\u000060\u0000...",
+              "modGroup": "BaseLightningDamage",   // mutual-exclusion group, verbatim
               "itemLevelMin": 60,        // this tier's own item level
               "tierLabel": "T7",         // display only; never a matching key
               "weight": 40,              // raw spawn weight as published, unnormalised
@@ -173,6 +203,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
             },
             {
               "sourceModifierId": "prefix\u0000BaseEvasionHybrid\u00008\u0000...",
+              "modGroup": "BaseEvasionHybrid",
               "itemLevelMin": 8,
               "tierLabel": "T1",
               "weight": 1000,
@@ -184,6 +215,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
             },
             {
               "sourceModifierId": "prefix\u0000ExtraBolt\u000045\u0000...",
+              "modGroup": "ExtraBolt",
               "itemLevelMin": 45,
               "tierLabel": "T1",
               "weight": 300,
@@ -194,6 +226,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
             },
             {
               "sourceModifierId": "prefix\u0000UnmatchedMod\u000030\u0000...",
+              "modGroup": "UnmatchedMod",
               "itemLevelMin": 30,
               "tierLabel": "T4",
               "weight": 500,
@@ -223,8 +256,9 @@ the producer computes from cell coverage — there are no cells to compute it fr
 | `slot` | Exactly `prefix` and `suffix`. |
 | `poolCoverage` | See *The pool-completeness rule*. Required, with no default. |
 | `sourceModifierId` | **Required on every entry.** Names the poe2db tier this entry came from. One entry per tier — never split, never merged. Opaque to the app. |
+| `modGroup` (`6.0.0`) | **Required on every entry**, a non-empty string: poe2db's `ModFamilyList` value for this tier, verbatim (a producer refuses a row whose list is not exactly one string). The game's mutual-exclusion group — see *The exclusivity rule*. Nothing is derived from it, and a consumer never recovers it by parsing `sourceModifierId`. |
 | `itemLevelMin` | **Required.** The lowest item level at which this tier's mass can roll, taken verbatim from poe2db. |
-| `tierLabel` | Display only. Never a matching key. |
+| `tierLabel` | Display only. Never a matching key. **Since `6.0.0`**, numbered per stat within `(slot, modGroup)`, T1 = highest `itemLevelMin`: one `T1..Tn` run per distinct stat template in a group, an `itemLevelMin` tie broken by poe2db's page order. No label repeats within a run. |
 | `weight` | Raw spawn weight as poe2db published it (`DropChance`), unnormalised, non-negative. `0` is meaningful ("cannot roll on this base") and must still be emitted. |
 | `weightSource` | **Required.** `"published"` where poe2db supplied a real weight (a JSON string `DropChance`), `"absent"` where it supplied a filler (a JSON number). Never inferred from the value. |
 | `lines` | **Required, at least one entry.** One item per stat line poe2db's template prints, split at the template's own line breaks — no value math, no partitioning. |
@@ -240,6 +274,7 @@ source of truth; the shape above documents it and is not a parallel definition.
 
 - unknown `schemaVersion` major
 - a missing `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource`, or `lines`
+- **(`6.0.0`)** a missing, non-string or empty `modGroup`
 - a negative `weight`
 - `weightSource` not one of `"published"` / `"absent"`
 - `lines` empty
