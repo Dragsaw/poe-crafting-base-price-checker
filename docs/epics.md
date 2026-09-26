@@ -749,11 +749,11 @@ So that every figure the tool shows me is one comparable number resting on a met
 **Given** an attempt that issues a request and receives no answer — a 429, a 5xx or a timeout
 **When** `sync` writes the entry
 **Then** it stamps `lastAttemptedAt` alone
-**And** it leaves `lastSearchId` and `lastSearchLeague` exactly as they were.
+**And** it leaves `lastSearchId` and `lastSearchLeague` exactly as they were — unless the request that got no answer was the fetch after an answered search, in which case the answered search's `id` and league are recorded, because the unit is the request, not the attempt (AD-9).
 
 **Given** a 4xx response other than 429
 **When** `sync` receives it
-**Then** it stamps `lastAttemptedAt`, leaves the entry's state as it was, and writes a record
+**Then** it stamps `lastAttemptedAt`, leaves the entry's price state as it was (an answered search still sets `lastSearchId` and `lastSearchLeague`), and writes a record
 **And** it aborts the run non-zero, rather than spending the rest of the chunk on requests it knows are malformed (AD-9).
 
 ### Story 1.8: The published Dataset, written to a git-tracked working tree
@@ -820,11 +820,12 @@ So that what the run did and what broke reaches the surface I already read inste
 
 **Given** the requests a run consumed
 **When** the report accounts for them
-**Then** it accounts for them per declared source, so budget drift is attributable to a cause (FR-14, AD-12).
+**Then** it accounts for them per source a chunk spends — the tracked list and the league validation — so budget drift is attributable to a cause (FR-14, AD-12).
 
 **Given** the declared request sources
-**When** the report enumerates them
+**When** AD-12 declares them
 **Then** exactly three generate a request: `data/tracked.json`, the per-run league validation, and the explicit catalogue refresh
+**And** the catalogue refresh is not a report figure, because it never runs on the chunk path; the refresh command prints its own request count (AD-12)
 **And** `sync` reads `data/currencies.json` and never fetches against it. It left the set at spine revision 14 (AD-12).
 
 **Given** the entries that rows 1 to 3 of the rotation made eligible for this chunk and the chunk did not attempt
@@ -904,6 +905,11 @@ So that a mistyped league name shows up where I already look instead of quietly 
 **When** the check fails
 **Then** the run aborts, records the failure in `sync-report.json`, and releases its lock
 **And** it prices no entry (AD-7, AD-12).
+
+**Given** a leagues request that gets no answer — a 429, a 5xx or a timeout
+**When** the check cannot run
+**Then** the run does not abort: it is a chunk yield with no entry attempted, exits 0 and publishes like any yielded chunk
+**And** its not-reached figure counts every entry the rotation made eligible, so a yielded run is distinguishable from an empty tracked list (AD-8, AD-7, AD-12).
 
 **Given** an aborting run
 **When** it exits

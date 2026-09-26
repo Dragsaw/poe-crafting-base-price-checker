@@ -600,6 +600,39 @@ compile in**:
 | `trade-search-request-limit` | `5:10:60, 15:60:300, 30:300:1800, 600:21600:3600` | 600 searches / 6h |
 | `trade-fetch-request-limit` | `12:4:10, 16:12:300, 50:300:300, 1000:21600:1800` | 1000 fetches / 6h |
 
+**The Invalid Requests Threshold.** GGG's developer documentation counts every `4xx` — `401`,
+`403` and `429` named — toward a threshold past which a client "will be restricted from
+further access". Counting per policy is this project's choice, not GGG's. The client refuses
+to send once a policy's count reaches `invalidRequestThreshold`, a **`sync`-side constant of
+`1`**, passed into the client factory as a value by every shell that builds one. The client
+keys the count on the policy a lane has learned from the headers, so a lane that has not yet
+learned its policy is not refused by another lane's `4xx`; on the chunk path this never
+matters, because the first `4xx` ends the chunk. The value is a constant for the reason §7's
+`staleLockAfter` is: nothing but `sync` reads it, and AD-19 keeps `data/config.json` to three
+keys.
+
+**Penalty memory across processes (AD-8).** Two chunk endings write a `notBefore` instant into
+`sync-progress.json`, and nothing else does:
+
+```
+after a 429:                  notBefore  =  now + min(retryAfter, staleLockAfter)
+after a malformed-request
+abort (AD-9):                 notBefore  =  now + staleLockAfter
+```
+
+`retryAfter` is the delay the client's yield carried for that `429` — the `Retry-After`
+header, or the floor the client derived from the same response. A chunk that is bounded by
+its allowance, completes, or ends for any other reason clears the field. An absent
+`notBefore` never defers a run. The field is additive, so `sync-progress.json` takes a minor
+version; its schema is strict, so a build older than the change refuses a file carrying the
+field, which is acceptable because only `sync` reads it.
+
+**The check sits between the lock and every other load.** A run takes the lock — breaking a
+stale one per §7 — and then reads `notBefore` before it loads anything else. When
+`now < notBefore`, the run releases the lock, sends nothing and exits 0. It writes nothing,
+with one exception: a run that broke a stale lock to get here writes `sync-report.json` alone,
+carrying the `stale-lock-broken` record, because that record is the only trace of the crash.
+
 ### 5.4 The outbound link URL (AD-24)
 
 ```
@@ -946,8 +979,10 @@ inclusive where the whole point is exclusivity. §5.1b's captured body emits all
 
 **Arm 2's output is a `baseTypeId` and is treated as one.** It is validated against
 `items.json` (AD-25) before the search is built; an underscore-to-space substitution that
-produces a string the catalogue does not carry is a **load error naming the class**, never a
-search issued in hope. This is the only derived value in the system checked against the
+produces a string the catalogue does not carry marks **that entry** `unresolvable` with a
+`baseTypeId` record naming its canonical key, and the chunk continues (AD-25) — never a
+search issued in hope, and never a load error: a bad derivation for one entry says nothing
+about any other entry. This is the only derived value in the system checked against the
 catalogue before use rather than after.
 
 **Arm 2 emits `query.type` and `type_filters.category` together, and that pair is verified**
@@ -1044,3 +1079,41 @@ file, NFR-2).
 **A zero `W_X∖g(·)` under a positive weight is a reason, not a zero.** The augment has nothing
 it can add after that first affix, so `core` returns the `(itemClass, recipe)` pair as
 unrankable with that reason (AD-17), as §9 does for an empty `eligible` set.
+
+---
+
+## 12. Report record identity (Consistency Conventions, *Logging*)
+
+A record survives the chunk that wrote it, so a chunk that meets the same condition again must
+recognise the record already present. **Deep equality is the wrong test**: a record that carries
+a live measurement differs on almost every chunk, and the report then grows by one record per
+tick for as long as the condition lasts.
+
+Every field of a record is one of two things. A **subject** field names *what is wrong* and is
+part of the identity. An **observation** field states *what this chunk measured* and is not.
+
+```
+same(a, b)  ⇔  a.kind = b.kind  ∧  subject(a) = subject(b)
+```
+
+`sync` carries every earlier record forward in its order. For each new record, if an earlier
+record is `same`, the earlier record's observation fields are **replaced** by the new one's and
+it keeps its position; otherwise the new record is appended. A replacement is not a clear: only
+the player's edit removes a record.
+
+| Kind | Subject | Observation |
+| --- | --- | --- |
+| `stale-lock-broken` | `pid`, `startedAt` | — |
+| `pinned-starvation` | `declaredMinChunkSearches`, `pinnedCount` | `discoveredAllowance`, `pinnedRefreshed`, `activeRefreshed` |
+| `unresolvable` | `entryKey`, `identifier`, `identifierKind` | — |
+| `weights-absent` | — (the kind alone) | `uncheckableClassNames` |
+| `uncatalogued-weights-id` | `identifier`, `identifierKind` | — |
+| `cross-file-gate-failure` | `check`, `entryKey` | `detail` |
+| `run-failure` | `reason`, `entryKey`, `status` | `message` |
+| `league-mismatch` | `configuredLeague` | `availableLeagues` |
+
+An absent optional subject field is a value: two `run-failure` records that both lack
+`entryKey` agree on it. A `pinned-starvation` whose yardstick or pinned set changed is a new
+record, because the player's correction is exactly a change to one of those two. **The
+function is defined once, in `contracts`, beside the record schemas**, so a new record kind
+cannot land without declaring its subject.

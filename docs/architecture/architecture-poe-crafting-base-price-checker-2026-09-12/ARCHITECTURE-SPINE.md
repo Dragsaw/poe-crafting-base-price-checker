@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 20
+revision: 21
 created: '2026-09-12'
 updated: '2026-09-26'
 binds: []
@@ -502,6 +502,10 @@ never import each other.
   like it (AD-3). A run
   acquires an exclusive on-disk lock; if another **live** run holds it, the new run logs that
   fact and **exits 0**, because a busy lock is a normal outcome for a repeatedly-invoked job.
+  **A run inside a trade penalty is the same outcome:** `sync-progress.json` also carries
+  AD-8's `notBefore` instant, and a run that takes the lock before that instant releases it,
+  sends nothing and exits 0, writing nothing except a `stale-lock-broken` record if it broke
+  a lock to get there (`IMPLEMENTATION-NOTES.md` §5.3).
   The syncer makes no assumption about what invokes it, how often, or where it runs.
 
   **The lock is recoverable, and a crash may not wedge the product.** The lock file carries
@@ -591,7 +595,19 @@ never import each other.
   then parses the policy and `-State` header for each named rule. `X-Rate-Limit-Policy`
   distinguishes the search bucket from the fetch bucket, and the adapter paces against
   the tightest unsatisfied bucket. **No rate is hardcoded.** On a 429 the adapter honours
-  `Retry-After` and yields the chunk rather than retrying tightly. The adapter sends a
+  `Retry-After` and yields the chunk rather than retrying tightly. **`Retry-After` binds
+  across processes, not only within one.** A chunk runs once and exits, so a process sees at
+  most one refused request on the chunk path, and an in-memory backoff protects nothing: the
+  next invocation would spend a request inside the same penalty, and GGG counts every `4xx`
+  toward an Invalid Requests Threshold past which a client is restricted from further
+  access. A chunk that ends on a refused request therefore persists a **`notBefore`**
+  instant in `sync-progress.json`, and AD-7 turns a run started before it into a no-op. A
+  429 sets it to now plus the retry delay; AD-9's malformed-request abort sets it to now plus
+  `IMPLEMENTATION-NOTES.md` §7's staleness threshold, because a request `sync` built wrong
+  will be refused again on the next tick. Both are capped at that threshold, so a malformed
+  header cannot wedge syncing (formula in §5.3). The
+  in-process threshold is a `sync`-side constant (§5.3), never a `data/config.json` field
+  (AD-19). The adapter sends a
   descriptive `User-Agent` naming the tool and a contact address, as GGG asks of
   third-party tools. Header-parsing detail and the measured 2026-09-12 buckets are in
   `IMPLEMENTATION-NOTES.md` §5.3, binding under AD-0.
@@ -657,12 +673,16 @@ never import each other.
   observation, and `no-listings` and `unresolvable` are two of the states in which the
   player most wants to open the market themselves. **An attempt that issues a request but
   receives no answer — a 429, a 5xx, a timeout — stamps `lastAttemptedAt` alone and
-  leaves the other two exactly as they were.** `lastSearchId` may therefore be older than
+  leaves the other two exactly as they were.** **The unit is the request, not the attempt:**
+  a search that is answered sets `lastSearchId` and `lastSearchLeague` whatever the fetch
+  that follows it returns, because the answered identifier is a valid link to the market the
+  player wants to open. `lastSearchId` may therefore be older than
   `lastAttemptedAt`, which is harmless because AD-24 tests the identifier's league and not
   its age. **A 4xx other than 429 is not a market fact and is not a price state:** it means
   the request `sync` built is malformed — the `valueless` wire shape of OQ-12 is the live
   candidate — and the same defect will fail every entry, so `sync` stamps `lastAttemptedAt`,
-  leaves the entry's state as it was, writes a record to `sync-report.json` and **aborts the
+  leaves the entry's **price state** as it was (an answered search still sets its two search
+  fields), writes a record to `sync-report.json`, persists AD-8's `notBefore` and **aborts the
   run non-zero** (Consistency Conventions, *Error shape*) rather than spending the rest of
   the chunk on requests it knows are broken. **`core` never reads either field**, and
   neither enters a ranking term.
@@ -850,10 +870,14 @@ never import each other.
   **`data/currencies.json` is not a source.** It was one until revision 14, when AD-20 moved
   currency rates to a hand-maintained committed file; the file is now read, never fetched
   against. A fourth source is an amendment to this AD, not an implementation detail.
-  `sync-report.json` must report requests consumed **per source**, so budget drift is
-  observable per cause.
+  `sync-report.json` must report requests consumed **per source a chunk spends** — the
+  tracked list and league validation — so budget drift is observable per cause. **The
+  catalogue refresh is not a figure there:** the report describes one chunk, the refresh
+  never runs on the chunk path, and a count written by the refresh process would give the
+  report a second writer (AD-3) and be overwritten by the next chunk. The refresh command
+  prints its own request count when it finishes.
 
-  **Three run-start gates stand in front of those three sources**, and their consequences
+  **Three run-start gates stand in front of the two sources a chunk spends**, and their consequences
   differ by design. `sync` validates every tracked id against the catalogue (AD-9) — a
   per-entry condition, so the entry is marked `unresolvable` and the run continues.
   `sync` runs `core`'s cross-file validation of `data/tracked.json` against the weights
@@ -865,7 +889,22 @@ never import each other.
   `sync-report.json`** — that file alone, by AD-3's path, with `dataset.json` and
   `sync-progress.json` untouched — because a run that aborts without recording why leaves
   nothing to diagnose. The report reaches the site on the player's next push, like every other
-  sync output (AD-3). The league gate does the same.
+  sync output (AD-3). The league gate does the same. This rule covers the gate aborts only;
+  AD-9's malformed-request abort happens mid-chunk and is not a gate abort.
+
+  **The gates run in cost order, free before costly**, under the lock and in exactly this
+  sequence: AD-8's `notBefore` check; the file loads and their load-time validation, including `IMPLEMENTATION-NOTES.md`
+  §6's pinned-cap inequality; the cross-file gate, or the `weights-absent` record in its
+  place; the catalogue check; the rotation order (AD-7); then the league gate, the only one
+  that costs a request; then the rotation. No request precedes an offline check that could
+  have aborted the run. Because the order exists before the league request, **a league
+  request that gets no answer — a 429, a 5xx, a timeout — is a chunk yield with no entry
+  attempted**, not an abort: it publishes the catalogue marks like any yielded chunk, and
+  its not-reached figure counts every entry the order made eligible (AD-7). A league
+  **mismatch** still aborts and writes the report alone: the catalogue check's marks and
+  records are discarded with the dataset write, since the next run that passes the gate
+  recomputes them, and the report carries the `league-mismatch` record plus the records it
+  carries forward.
 
   **An absent `weights.json` is not a cross-file failure — there is no cross-file to check.**
   `sync` skips that gate, records the absence in `sync-report.json`, and **runs normally**:
@@ -1693,7 +1732,7 @@ id resolves here.
 | Error shape | `core` returns typed results and never throws for expected conditions such as no listings, a missing weight, or an unresolvable stat. `sync` throws only for unrecoverable run failures. Everything else lands in `sync-report.json`. |
 | Validation | Zod schemas in `contracts` are the single source of truth and types are `z.infer`red. Validate at every trust boundary: API response, before artifact write, and on artifact load. |
 | Schema versioning | Every published artifact and input file carries `schemaVersion`. A consumer refuses an unknown major version rather than guessing. |
-| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
+| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. **A repeat is the same record, not a new one:** a record's identity is its kind plus its subject fields, and a repeat replaces its observation fields in place and keeps its position — replacing is not clearing (per-kind fields in `IMPLEMENTATION-NOTES.md` §12, binding under AD-0). A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
 | Config | No runtime environment lookups in `core`. `sync` reads `data/config.json` plus a small env overlay for the contact `User-Agent`. |
 | Tests | Vitest everywhere. `core` is tested as pure functions with literal inputs, `sync` against recorded fixtures through ports, `web` with MSW-served artifacts. |
 

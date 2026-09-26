@@ -32,6 +32,8 @@ pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere
 
 `pnpm sync:dry` is the most important debugging tool. The command runs the full sync pipeline deterministically against recorded fixtures. The command writes a dataset and a run report to stdout, and writes nothing to disk. An agent can therefore examine the actions of the syncer and send no request to GGG.
 
+**The dry run's clock comes from its inputs.** By default, the clock of `pnpm sync:dry` is the latest `lastAttemptedAt` in the dataset snapshot. When no entry carries a `lastAttemptedAt`, the clock is the fixed instant `2026-01-01T00:00:00.000Z`. `pnpm sync:dry --at <iso>` sets the clock explicitly. The same inputs therefore print the same bytes. The default predicts the live run that immediately follows the last live run. Use `--at` to predict a run at another time, for example now. A fixed constant does not do this: when the dataset is newer than the constant, every entry has a negative age and the predicted order is not the live order (AD-7). The dry run predicts the order, not the penalty: it ignores the `notBefore` instant in `sync-progress.json` (AD-8) and prints it. Otherwise the default clock would fall inside the penalty after every 429 and the dry run would print a no-op.
+
 ## Fixtures
 
 Fixtures are **real captured trade-API responses**. The project commits the fixtures under `fixtures/` (AD-13). Nobody writes a fixture by hand. A hand-written mock records what the team believes the API returns, and not what the API actually returns. A hand-written mock also continues to pass on the day the belief becomes wrong.

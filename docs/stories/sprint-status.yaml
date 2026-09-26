@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-26-2026 16:47
+last_updated: 09-26-2026 18:30
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -70,30 +70,33 @@ development_status:
 action_items:
   - id: "epic-1-retro-item-1-rule-the-run-start-order-in-ad-7-offline"
     epic: 1
-    action: "Rule the run-start order in AD-7 (offline catalogue check before the
-      league gate), then reorder runChunk"
-    owner: "spine, then dev"
+    action: "Reorder runChunk to AD-12's run-start sequence (ruled spine rev 21): notBefore
+      check, loads + pinned-cap inequality, cross-file gate, catalogue check, order, then
+      the league gate"
+    owner: "dev"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-2-on-a-gate-yield-report-the-eligible-coun"
     epic: 1
-    action: "On a gate yield, report the eligible count as notReachedCount (or omit
-      the figure) so a yielded run is distinguishable from an empty tracked list"
+    action: "On a league-gate yield, publish the catalogue marks and report notReachedCount
+      as the eligible count (AD-7 definition; AD-12 rev 21 makes the gate yield an ordinary
+      chunk yield)"
     owner: "dev"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-3-publish-completed-entries-and-catalogue"
     epic: 1
-    action: "Publish completed entries and catalogue marks on every throw path, not
-      only MalformedRequestError; append the story 1.7 deferral to deferred-work.md"
+    action: "Publish completed entries and catalogue marks on every throw path, not only MalformedRequestError;
+      append the story 1.7 deferral to deferred-work.md"
     owner: "dev"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-4-define-record-identity-per-record-kind-i"
     epic: 1
-    action: "Define record identity per record kind in IN section 6 and dedup carryRecords
-      on it; add a two-chunk record-growth test"
-    owner: "spine, then dev"
+    action: "Implement record identity per IN section 12 (spine rev 21): one identity function
+      in contracts, carryRecords replaces observation fields in place; add a two-chunk record-growth
+      test"
+    owner: "dev (contracts first)"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-5-add-a-canonical-key-uniqueness-refinemen"
@@ -104,8 +107,8 @@ action_items:
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-6-extract-one-composechunk-ports-used-by-s"
     epic: 1
-    action: "Extract one composeChunk(ports) used by sync.ts and dry-run.ts; pass
-      the under-lock dataset to the pricing step"
+    action: "Extract one composeChunk(ports) used by sync.ts and dry-run.ts; pass the under-lock
+      dataset to the pricing step"
     owner: "dev"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
@@ -117,21 +120,25 @@ action_items:
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-8-decide-where-invalidrequestthreshold-liv"
     epic: 1
-    action: "Decide where invalidRequestThreshold lives and pass it in the live shell"
-    owner: "spine, then dev"
+    action: "Implement AD-8 penalty memory (spine rev 21, IN 5.3): optional notBefore in sync-progress.json
+      (additive minor), written after a 429 or a malformed abort, checked right after the
+      lock; carry retryAfterMs through sendLeg and the step/gate results; pass invalidRequestThreshold
+      = 1 from every shell"
+    owner: "dev (contracts first)"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-9-drop-the-catalogue-refresh-figure-from-s"
     epic: 1
-    action: "Drop the catalogue-refresh figure from SyncRunFiguresSchema, or have
-      the refresh command write its own count"
-    owner: "spine, then dev"
+    action: "Drop catalogue-refresh from the per-chunk requestsBySource figure (AD-12 rev
+      21); the reader must accept and drop the legacy key in the committed data/sync-report.json
+      (a major bump alone refuses it); the refresh command prints its request count"
+    owner: "dev (contracts first)"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-10-loopback-server-test-for-createfetchhttp"
     epic: 1
-    action: "Loopback-server test for createFetchHttpPort: the TimeoutError name and
-      the 'fetch failed' literal"
+    action: "Loopback-server test for createFetchHttpPort: the TimeoutError name and the 'fetch
+      failed' literal"
     owner: "dev"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
@@ -144,10 +151,10 @@ action_items:
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-12-edit-implementation-notes-section-10-2-t"
     epic: 1
-    action: "Edit IMPLEMENTATION-NOTES section 10.2 to cite AD-25; update docs/epics.md
-      story 1.11 so a 429 on the leagues GET is a yield, not an abort"
+    action: "Edit IMPLEMENTATION-NOTES section 10.2 to cite AD-25; update docs/epics.md story
+      1.11 so a 429 on the leagues GET is a yield, not an abort"
     owner: "docs owners"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-13-replace-comparecodeunits-in-weights-ids"
     epic: 1
@@ -157,9 +164,9 @@ action_items:
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-14-decide-the-dry-run-instant-derive-it-fro"
     epic: 1
-    action: "Decide the dry-run instant: derive it from the snapshot rather than the
-      constant 2026-01-01"
-    owner: "spine, then dev"
+    action: "Default sync:dry's clock to the snapshot's latest lastAttemptedAt, add --at <iso>,
+      ignore and print notBefore (AGENT-WORKFLOW, spine rev 21)"
+    owner: "dev"
     status: open
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-15-process-the-build-skill-appends-every-sp"
@@ -171,8 +178,15 @@ action_items:
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-16-commit-the-first-live-run-s-data-dataset"
     epic: 1
-    action: "Commit the first live run's data/dataset.json, data/sync-progress.json
-      and data/sync-report.json"
+    action: "Commit the first live run's data/dataset.json, data/sync-progress.json and data/sync-report.json"
     owner: "player"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: epic-1-retro-item-17-an-answered-search-keeps-its-lastsearchid
+    epic: 1
+    action: Keep an answered search's lastSearchId and lastSearchLeague when the fetch 
+      leg yields or returns a 4xx (AD-9 rev 21, finding L-E2); fix the price-entry.ts 
+      header table and the spec 1.7 matrix row
+    owner: dev
+    status: open
+    ref: docs/stories/epic-1-retro-2026-09-26.md
