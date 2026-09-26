@@ -3,10 +3,6 @@
 Each entry names work carved out of a spec so it is not lost. Stories and reviews append; they do not rewrite. The `deferred-work-sweep` skill (`.claude/skills/deferred-work-sweep/SKILL.md`) removes an entry in the last commit of the branch that closes it, so the removal reaches `master` with the work, and adds `auto_attempt:` / `retry_when:` lines to an entry it could not close.
 
 - source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
-  summary: A request that settles after its own test's `afterEach` may escape the no-network guard, or fail an innocent later test naming a foreign URL.
-  evidence: `test/setup.ts` drains a module-level array per test, with no association between a recorded URL and the test that issued it. Unverified: neither the diff nor a run settles whether MSW's interception can deliver the callback after the hook has drained. Would be settled by a test that starts a fire-and-forget request and resolves it in a later tick, then observes which test fails.
-
-- source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
   summary: No mechanical check enforces the AC "every installed version matches the Stack table exactly".
   evidence: `save-exact=true` governs only future `pnpm add`; a `^` range edited into a manifest later fails nothing. The obstacle is that the spine's Stack table is prose, so any test would pin a hand-copied second source of truth that can drift from the table it claims to enforce — worth solving only alongside a machine-readable Stack table.
 
@@ -69,3 +65,15 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-deferred-forbid-core-node-builtin-imports.md`
   summary: Nothing forbids `core` from doing I/O, reading the clock, generating randomness or reading env through globals such as `fetch`, `Date.now()`, `Math.random()` or `process.env`. The depcruise purity rules see imports only.
   evidence: AD-1 says no `core` module performs I/O, reads the clock, generates randomness or reads environment or config. The deferred-forbid-core-node-builtin-imports rules (`no-core-to-node-builtin`, `no-core-to-npm-package`) close the import path only, and a `Date.now()` in `packages/core/src` still passes `pnpm check`. An ESLint `no-restricted-globals` / `no-restricted-properties` block scoped to `packages/core/src/**` (tests excluded) would make it checkable. Out of scope here because the closed entry covered imports only.
+
+- source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
+  summary: A request that starts after the setup file's afterAll has run server.close() is not intercepted and would reach the real network.
+  evidence: Pre-existing: server.close() restores the real fetch, and this change does not alter that. A probe on 2026-09-26 found that a timer due after the last test never fired, because the Vitest worker ended first. Unverified: whether a reused worker (isolate false, or a slow teardown) can run such a timer. Would be settled by a probe that keeps the worker alive past afterAll (for example, a slow afterAll in another file of a non-isolated run) and observes whether the request is sent.
+
+- source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
+  summary: Attribution under it.concurrent / describe.concurrent is unverified. enterWith in interleaved beforeEach hooks could charge a request to the wrong test.
+  evidence: No test in the repository uses .concurrent (a search of packages/ and test/ found none), so no current test is affected. A reviewer's probe was refused by the sandbox. Would be settled by a concurrent pair in which each test issues its own unfixtured request, observing that each test's afterEach names only its own URL.
+
+- source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
+  summary: The test identity set by enterWith may linger into a hook that belongs to no test, such as a file-level afterAll, so a request issued there could be charged to the last test.
+  evidence: enterWith never clears the store. A beforeAll in a nested describe did not inherit an earlier test's identity (test/no-network.test.ts, attempt 1), but a file-level afterAll or a later suite's hooks were not probed. If true, the file still fails, but it names the wrong test. Would be settled by a test file whose afterAll issues an unfixtured request, observing the issuer in the file-level message.
