@@ -16,3 +16,7 @@ export const CORE_PLACEHOLDER = `contracts@${INITIAL_SCHEMA_VERSION}:core`;
  */
 export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.ts';
 export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';
+
+/** The ranking, raw branch (AD-17): computed at read time, league-scoped. */
+export { compareRankedRows, rank } from './rank.ts';
+export type { NotYetSyncedEntry, RankInput, Ranking, UnrankedEntry } from './rank.ts';
