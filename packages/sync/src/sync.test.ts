@@ -229,15 +229,36 @@ describe('pnpm sync: the live composition with injected ports', () => {
     expect(err[0]).toContain(USER_AGENT_ENV_VAR);
   });
 
-  it('refuses an absent config, naming it, before any request or write', async () => {
+  it('refuses an absent config under the lock, naming it: no request, the report is the only write', async () => {
     const { deps, fs, http, writes, err } = depsFor(LEAGUE);
     await fs.deleteFile('data/config.json');
 
     expect(await syncCommand(deps)).toBe(1);
 
     expect(http.requests).toEqual([]);
-    expect(writes).toEqual([]);
+    expect(writes).toEqual([REPORT_PATH]);
     expect(err[0]).toContain('data/config.json');
+    const records = (await reportOf(fs))?.records ?? [];
+    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure', reason: 'unrecoverable-error' })]);
+    expect(records[0]).toHaveProperty('message', expect.stringContaining('data/config.json'));
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('refuses a pinned set over the cap: exit 1, no request, a run-failure naming data/tracked.json', async () => {
+    // One pinned entry against a yardstick of 1: 1 > 0.5 × 1 (IMPLEMENTATION-NOTES.md §6).
+    const { deps, fs, http, writes, err } = depsFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
+
+    expect(await syncCommand(deps)).toBe(1);
+
+    expect(http.requests).toEqual([]);
+    expect(writes).toEqual([REPORT_PATH]);
+    expect(err[0]).toContain(TRACKED_PATH);
+    const records = (await reportOf(fs))?.records ?? [];
+    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
+    expect(records[0]).toHaveProperty('message', expect.stringContaining(TRACKED_PATH));
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
   it('publishes the priced entry under the configured league', async () => {
@@ -255,14 +276,14 @@ describe('pnpm sync: the live composition with injected ports', () => {
     ]);
   });
 
-  it('a gate 429 yields the chunk: exit 0, no search, progress and the report, no run-failure', async () => {
+  it('a gate 429 yields the chunk: exit 0, no search, dataset, progress and the report, no run-failure', async () => {
     const { deps, fs, writes, http, out } = depsFor(LEAGUE, { answers: { leagues: THROTTLED } });
 
     expect(await syncCommand(deps)).toBe(0);
 
     expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
-    // Progress carries the penalty as notBefore, its completed keys unchanged (§5.3).
-    expect(writes).toEqual([PROGRESS_PATH, REPORT_PATH]);
+    // A gate yield publishes like a yielded chunk; progress carries the penalty as notBefore (§5.3).
+    expect(writes).toEqual([DATASET_PATH, PROGRESS_PATH, REPORT_PATH]);
     expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
       completed: [],
       notBefore: '2026-09-26T12:01:00.000Z',
@@ -276,7 +297,33 @@ describe('pnpm sync: the live composition with injected ports', () => {
       'league-validation': 1,
     });
     expect(out).toEqual(['pnpm sync: yielded, 0 completed']);
+    expect(report?.figures.notReachedCount).toBe(1);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('a gate 429 publishes the catalogue marks, and the not-reached count is every eligible entry', async () => {
+    const ghost: TrackedEntry = { kind: 'raw', baseTypeId: 'Ghost Amulet', itemLevelMin: 82, status: 'active' };
+    const others: TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }, { ...ENTRY, itemLevelMin: 84 }];
+    const { deps, fs, http } = depsFor(LEAGUE, {
+      tracked: [ghost, ...others],
+      answers: { leagues: THROTTLED },
+    });
+
+    expect(await syncCommand(deps)).toBe(0);
+
+    expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
+    const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as {
+      entries: DatasetEntry[];
+    };
+    expect(dataset.entries.find((entry) => entry.entryKey === canonicalKey(ghost))?.price).toEqual(
+      expect.objectContaining({ state: 'unresolvable' }),
+    );
+    const report = await reportOf(fs);
+    expect(report?.figures.notReachedCount).toBe(3);
+    expect(report?.records).toEqual([
+      expect.objectContaining({ kind: 'unresolvable', entryKey: canonicalKey(ghost) }),
+    ]);
+    expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toHaveProperty('notBefore');
   });
 
   it('paces the tracked-list searches off the leagues GET: one governor for both sources', async () => {
@@ -410,7 +457,7 @@ describe('pnpm sync: the live composition with injected ports', () => {
     expect((await reportOf(fs))?.records).toEqual([]);
   });
 
-  it('a malformed published dataset: exit 1, no request, no write', async () => {
+  it('a malformed published dataset: exit 1, no request, a run-failure naming it, the dataset untouched', async () => {
     const { deps, fs, writes, http, err } = depsFor(LEAGUE, {
       seeded: { [DATASET_PATH]: { contents: '{ not json' } },
     });
@@ -418,8 +465,12 @@ describe('pnpm sync: the live composition with injected ports', () => {
     expect(await syncCommand(deps)).toBe(1);
 
     expect(http.requests).toEqual([]);
-    expect(writes).toEqual([]);
+    expect(writes).toEqual([REPORT_PATH]);
     expect(err[0]).toContain(DATASET_PATH);
+    expect(await fs.readTextFile(DATASET_PATH)).toBe('{ not json');
+    const records = (await reportOf(fs))?.records ?? [];
+    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
+    expect(records[0]).toHaveProperty('message', expect.stringContaining(DATASET_PATH));
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 

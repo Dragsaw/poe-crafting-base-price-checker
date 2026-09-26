@@ -96,3 +96,13 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 ## Resolved by epic 1 retro item 11 (2026-09-26)
 
 - Two story 1.4 entries are **retired**. First, "`data/catalogue/{items,stats,filters,static}.json` are not on disk yet" was already closed by `edd2c97`, as the Resolved note above records. Second, "Nothing checks that the committed catalogue still parses against the `contracts` catalogue schemas" is closed by `packages/sync/src/catalogue/committed-catalogue.test.ts`. That test parses each `CATALOGUE_ENDPOINTS` file, `static.json` included, with `parseEnvelope` against its `Catalogue*FileSchema`. It also fails when `data/catalogue/` holds a `.json` file that is not one of the endpoint artifacts, or lacks one of them. Both entries stay in place because this ledger is append-only; `deferred-work-sweep` owns removal.
+
+## Deferred from: story 1.7 (2026-09-26)
+
+- source_spec: `docs/stories/spec-1-7-a-divine-price-estimate-for-one-tracked-entry.md`
+  summary: A step that throws (`UnknownClassBaseTypeError`, `UnexpectedTradeResponseError`) loses the progress of every entry the chunk completed before it, so those entries are searched again on the next run.
+  evidence: The spec's frontmatter `deferred` recorded this, and it was never appended here. `runChunk` wrote `data/sync-progress.json` once, after the loop, so a throw skipped that write. The behaviour predates story 1.7 (the story 1.5 runner). Location: `packages/sync/src/chunk/run-chunk.ts`.
+
+## Resolved by epic 1 retro items 1, 2, 3, 6, 7 (2026-09-26)
+
+- Two entries are **closed** by `docs/stories/spec-epic-1-retro-items-6-7-1-2-3-run-start-sequence.md`. First, the story 1.7 entry directly above: once the order exists, any throw other than a league mismatch now publishes the step entries so far and the catalogue marks, and writes progress for the completed rotation keys (`packages/sync/src/chunk/run-chunk.ts`). Second, the story 1.11 entry "The live `pnpm sync` does not call `checkPinnedCap`": `packages/sync/src/compose-chunk.ts`, which both `pnpm sync` and `pnpm sync:dry` use, evaluates the inequality under the lock and throws `PinnedCapExceededError`, reported as a `run-failure` that names `data/tracked.json` before any request. Both entries stay in place because this ledger is append-only; `deferred-work-sweep` owns removal. The retro item 17 entry on `UnexpectedTradeResponseError` stays open: the publish path now exists, but the error still carries no entry payload.

@@ -2,12 +2,12 @@
  * `pnpm sync` — the live background sync: one bounded chunk per invocation
  * (FR-19, AD-7), behind the run-start league gate (FR-32, AD-19).
  *
- * The composition: the real filesystem at the repository root, the real
- * clock, the `fetch` http port, **one governor** of two sibling trade clients
- * (`createTradeClients`) whose ports are counted as `league-validation` and
- * `tracked-list`, the pricing step, the committed catalogue loader, and the
- * league gate. `runChunk` does the rest under the lock: the gate first, then
- * the catalogue check, the rotation, the steps, and the writes.
+ * The composition is `composeChunk` (`./compose-chunk.ts`), the one
+ * `pnpm sync:dry` shares: this command passes the real filesystem at the
+ * repository root, the real clock and the `fetch` http port. `runChunk` does
+ * the rest under the lock, in AD-12's cost order: the `notBefore` check, the
+ * loads, the catalogue check, the order, the league gate, the rotation and
+ * the writes.
  *
  * **The git port is the in-memory fake, with no history.** A real adapter
  * needs a process spawn, which `no-git-write.test.ts` forbids everywhere in
@@ -16,10 +16,11 @@
  * which AD-12 allows where the repository yields no date.
  *
  * The config, the rates, the item types and the published dataset are loaded
- * before the lock, as values, and a refusal names its file before any request.
- * A throw from the chunk — a league mismatch included — has already written
- * `sync-report.json` and released the lock by the time it reaches here; the
- * command reports it on stderr and exits `1`.
+ * under the lock, and a refusal names its file before any request, in a
+ * `run-failure` record. A pinned set over IMPLEMENTATION-NOTES.md §6's cap is
+ * refused the same way. A throw from the chunk — a league mismatch included —
+ * has already written `sync-report.json` and released the lock by the time it
+ * reaches here; the command reports it on stderr and exits `1`.
  *
  * **No test runs `main`.** `sync.test.ts` drives `syncCommand` with injected
  * ports; the entry guard at the bottom means importing the module runs nothing.
@@ -29,100 +30,20 @@ import { realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createFakeGitPort, DatasetFileSchema, parseEnvelope } from '@poe/contracts';
-import type { ClockPort, FilesystemPort, GitPort, HttpPort } from '@poe/contracts';
+import { createFakeGitPort } from '@poe/contracts';
 
-import { loadCatalogueIds } from './catalogue/catalogue-ids.ts';
-import { DATASET_PATH, runChunk } from './chunk/run-chunk.ts';
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
-import { createLeagueGate } from './league/league-gate.ts';
-import { loadConfig } from './load-config.ts';
-import { loadDataFile } from './load-data-file.ts';
-import type { DataFileResult } from './load-data-file.ts';
-import { pinnedStarvationRecord } from './pinned-cap.ts';
-import { loadCurrencies } from './pricing/load-currencies.ts';
-import { loadItemTypes } from './pricing/load-item-types.ts';
-import { outputRates } from './pricing/normalise.ts';
-import { createPricingStep } from './pricing/price-entry.ts';
-import { createRequestCounter } from './request-counter.ts';
+import { composeChunk } from './compose-chunk.ts';
+import type { ComposeChunkPorts } from './compose-chunk.ts';
 import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
-import { createTradeClients } from './trade/client.ts';
-import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
-export interface SyncPorts {
-  readonly fs: FilesystemPort;
-  readonly clock: ClockPort;
-  readonly http: HttpPort;
-  /** Read-only. The live command passes the history-less fake (see above). */
-  readonly git: GitPort;
-  readonly wait: (ms: number) => Promise<void>;
-  /** The whole `User-Agent` header (NFR-9). */
-  readonly userAgent: string;
-  /** The process id written into the lock. */
-  readonly pid: number;
-  /** One line of operator output. Defaults to stderr inside `runChunk`. */
-  readonly log?: (line: string) => void;
-}
-
-function valueOf<T>(loaded: DataFileResult<T>): T {
-  if (!loaded.ok) {
-    throw loaded.error;
-  }
-  return loaded.value;
-}
+/** The live command's ports. The live command passes the history-less git fake (see above). */
+export type SyncPorts = ComposeChunkPorts;
 
 /** Composes one live chunk from its ports and runs it. Throws what the chunk throws. */
-export async function runSync(ports: SyncPorts): Promise<ChunkOutcome> {
-  const { fs, clock, http, git, wait, userAgent, pid, log } = ports;
-
-  const config = valueOf(await loadConfig(fs));
-  const league = config.league;
-  const rates = valueOf(await loadCurrencies(fs));
-  const itemTypes = valueOf(await loadItemTypes(fs));
-  // Absent means every entry is never attempted, exactly as `runChunk` reads it.
-  const published =
-    (await fs.exists(DATASET_PATH))
-      ? valueOf(
-          await loadDataFile(fs, DATASET_PATH, (data) => parseEnvelope(DatasetFileSchema, data)),
-        ).entries
-      : [];
-
-  const requests = createRequestCounter();
-  const clients = createTradeClients({
-    http: {
-      'league-validation': requests.counted(http, 'league-validation'),
-      'tracked-list': requests.counted(http, 'tracked-list'),
-    },
-    clock,
-    wait,
-    userAgent,
-    invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
-  });
-  const step = createPricingStep({
-    client: clients['tracked-list'],
-    league,
-    rates,
-    itemTypes,
-    dataset: published,
-    clock,
-  });
-
-  return runChunk(
-    {
-      fs,
-      clock,
-      pid,
-      publication: { league, currencyRates: outputRates(rates) },
-      git,
-      requests,
-      starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
-      catalogue: () => loadCatalogueIds(fs),
-      gate: createLeagueGate({ client: clients['league-validation'], league }),
-      ...(log === undefined ? {} : { log }),
-    },
-    step,
-  );
+export function runSync(ports: SyncPorts): Promise<ChunkOutcome> {
+  return composeChunk(ports).run();
 }
 
 export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent'> {

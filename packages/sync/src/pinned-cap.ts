@@ -52,6 +52,21 @@ export function checkPinnedCap(
   };
 }
 
+/**
+ * A pinned-cap excess as a load refusal (IMPLEMENTATION-NOTES.md §6): the
+ * shell's `load` throws it before any request, and the runner reports it as a
+ * `run-failure` whose message names `data/tracked.json`.
+ */
+export class PinnedCapExceededError extends Error {
+  readonly exceeded: PinnedCapExceeded;
+
+  constructor(exceeded: PinnedCapExceeded) {
+    super(exceeded.message);
+    this.name = 'PinnedCapExceededError';
+    this.exceeded = exceeded;
+  }
+}
+
 export function pinnedStarvationRecord(
   starvation: ChunkStarvation,
   config: Pick<ConfigFile, 'minChunkSearches'>,

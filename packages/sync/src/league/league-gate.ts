@@ -1,10 +1,12 @@
 /**
  * The run-start league gate (FR-32, AD-19, AD-12).
  *
- * `runChunk` calls it through `ChunkPorts.gate`, under the lock and before any
- * search. It sends **exactly one** GET to the trade leagues endpoint through
- * the governed client, which the shell counts as `league-validation`, and
- * checks that the configured league is one of the ids the endpoint answered.
+ * `runChunk` calls it through `ChunkSetup.gate` (built by
+ * `../compose-chunk.ts`), under the lock, after every offline check and the
+ * order, and before any search (AD-12's cost order). It sends **exactly one**
+ * GET to the trade leagues endpoint through the governed client, which the
+ * shell counts as `league-validation`, and checks that the configured league
+ * is one of the ids the endpoint answered.
  * The ids compare **byte for byte**: `forbidden rites` is not
  * `Forbidden Rites`, because the search URL addresses the league by that
  * exact string.

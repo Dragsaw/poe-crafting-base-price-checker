@@ -2,7 +2,7 @@ import { PinnedStarvationRecordSchema } from '@poe/contracts';
 import type { TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { checkPinnedCap, pinnedStarvationRecord } from './pinned-cap.ts';
+import { checkPinnedCap, PinnedCapExceededError, pinnedStarvationRecord } from './pinned-cap.ts';
 
 function raw(baseTypeId: string, status: TrackedEntry['status']): TrackedEntry {
   return status === 'pruned'
@@ -62,5 +62,21 @@ describe('pinnedStarvationRecord', () => {
       activeRefreshed: 1,
     });
     expect(PinnedStarvationRecordSchema.parse(record)).toEqual(record);
+  });
+});
+
+describe('PinnedCapExceededError', () => {
+  it('carries the result as its payload and its message, naming data/tracked.json', () => {
+    const result = checkPinnedCap(threePinned, { minChunkSearches: 5 });
+    if (result.ok) {
+      throw new Error('expected an excess');
+    }
+    const error = new PinnedCapExceededError(result.error);
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error.name).toBe('PinnedCapExceededError');
+    expect(error.message).toBe(result.error.message);
+    expect(error.message).toContain('data/tracked.json');
+    expect(error.exceeded).toBe(result.error);
   });
 });

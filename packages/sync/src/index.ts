@@ -54,6 +54,13 @@ export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-head
  * drive it against in-memory fakes.
  */
 export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
+/**
+ * The one chunk composition `pnpm sync` and `pnpm sync:dry` share: one
+ * governor of two counted trade clients, the catalogue loader and the
+ * runner's under-lock `load` hook (AD-8, AD-12).
+ */
+export { composeChunk } from './compose-chunk';
+export type { ComposeChunkPorts, ComposedChunk } from './compose-chunk';
 export { buildDatasetFile } from './chunk/publish-dataset';
 export type { DatasetInputs } from './chunk/publish-dataset';
 export { buildSyncReport, carryRecords } from './chunk/sync-report';
@@ -68,10 +75,12 @@ export { createRequestCounter, requestsBetween, zeroRequests } from './request-c
 export type { RequestCounter, RequestsBySource } from './request-counter';
 export type {
   ChunkBound,
+  ChunkLoadContext,
   ChunkOutcome,
   ChunkOutcomeKind,
   ChunkPorts,
   ChunkPublication,
+  ChunkSetup,
   ChunkStarvation,
   ChunkStep,
   GateContext,
@@ -94,7 +103,7 @@ export type { ArtifactSchema } from './write-artifact';
  * IMPLEMENTATION-NOTES.md §6) — the only readers of `minChunkSearches`, kept
  * outside `chunk/` so the yardstick can never bound a chunk.
  */
-export { checkPinnedCap, pinnedStarvationRecord } from './pinned-cap';
+export { checkPinnedCap, PinnedCapExceededError, pinnedStarvationRecord } from './pinned-cap';
 export type { PinnedCapExceeded, PinnedCapResult } from './pinned-cap';
 
 /**

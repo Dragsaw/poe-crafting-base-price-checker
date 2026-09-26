@@ -6,8 +6,9 @@
  * (when present), `data/config.json`, `data/currencies.json`,
  * `data/catalogue/{items,stats,filters}.json` and `data/weights.json` (when
  * present) into an in-memory fake filesystem, and runs **the same
- * `runChunk`** a live run uses with **the same pricing step**, on a fixed
- * pid, behind **the same league gate** (`./league/league-gate.ts`). The
+ * composition** a live run uses (`./compose-chunk.ts`: the same `runChunk`,
+ * the same pricing step, the same league gate and the same under-lock loads),
+ * on a fixed pid, with no pacing wait. The
  * gate's GET is served the recorded `fixtures/trade-data-leagues.json` and
  * counted as `league-validation`. The step's requests go to an offline port
  * that serves the recorded `fixtures/trade-{search,fetch}-*.json` back by
@@ -65,34 +66,18 @@ import type {
   SyncRunRecord,
 } from '@poe/contracts';
 
-import {
-  DATASET_PATH,
-  PROGRESS_PATH,
-  REPORT_PATH,
-  runChunk,
-  TRACKED_PATH,
-} from './chunk/run-chunk.ts';
+import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import type { ChunkOutcomeKind, ChunkStarvation } from './chunk/run-chunk.ts';
-import {
-  CATALOGUE_FILTERS_PATH,
-  CATALOGUE_STATS_PATH,
-  loadCatalogueIds,
-} from './catalogue/catalogue-ids.ts';
+import { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH } from './catalogue/catalogue-ids.ts';
 import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
-import { createLeagueGate } from './league/league-gate.ts';
-import { CONFIG_PATH, loadConfig } from './load-config.ts';
+import { composeChunk } from './compose-chunk.ts';
+import { CONFIG_PATH } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
 import type { DataFileResult } from './load-data-file.ts';
-import { pinnedStarvationRecord } from './pinned-cap.ts';
 import { createFixtureHttpPort, readPricingFixtures } from './pricing/fixture-port.ts';
 import type { PricingFixtures } from './pricing/fixture-port.ts';
-import { CURRENCIES_PATH, loadCurrencies } from './pricing/load-currencies.ts';
-import { outputRates } from './pricing/normalise.ts';
-import { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types.ts';
-import { createPricingStep } from './pricing/price-entry.ts';
-import { createRequestCounter } from './request-counter.ts';
-import { createTradeClients } from './trade/client.ts';
-import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
+import { CURRENCIES_PATH } from './pricing/load-currencies.ts';
+import { CATALOGUE_ITEMS_PATH } from './pricing/load-item-types.ts';
 
 /**
  * The clock's fallback when the dataset snapshot carries no `lastAttemptedAt`
@@ -219,10 +204,8 @@ export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = 
     ),
   );
 
-  const config = valueOf(await loadConfig(fs));
-  const league = config.league;
-  const rates = valueOf(await loadCurrencies(fs));
-  const itemTypes = valueOf(await loadItemTypes(fs));
+  // The snapshot's dataset is parsed here for the clock only; the chunk loads
+  // its own copy under the lock.
   const previous =
     snapshot.dataset === undefined
       ? []
@@ -232,44 +215,17 @@ export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = 
 
   const clock = createFakeClockPort(options.at ?? latestAttemptedAt(previous) ?? DRY_RUN_INSTANT);
   const notBefore = readProgressNotBefore(snapshot.progress);
-  const requests = createRequestCounter();
-  // One offline port, counted twice: the gate's GET as `league-validation`,
-  // the step's requests as `tracked-list`. The two clients are one governor,
-  // so pacing stays global (AD-8, AD-12).
-  const fixtureHttp = createFixtureHttpPort(snapshot.fixtures);
-  const clients = createTradeClients({
-    http: {
-      'league-validation': requests.counted(fixtureHttp, 'league-validation'),
-      'tracked-list': requests.counted(fixtureHttp, 'tracked-list'),
-    },
+  // The same composition a live run uses, over the offline fixture port and
+  // with no pacing wait (AD-8, AD-12).
+  const outcome = await composeChunk({
+    fs,
     clock,
+    http: createFixtureHttpPort(snapshot.fixtures),
+    git: createFakeGitPort(),
     wait: () => Promise.resolve(),
     userAgent: DRY_RUN_USER_AGENT,
-    invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
-  });
-  const step = createPricingStep({
-    client: clients['tracked-list'],
-    league,
-    rates,
-    itemTypes,
-    dataset: previous,
-    clock,
-  });
-
-  const outcome = await runChunk(
-    {
-      fs,
-      clock,
-      pid: DRY_RUN_PID,
-      publication: { league, currencyRates: outputRates(rates) },
-      git: createFakeGitPort(),
-      requests,
-      starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
-      catalogue: () => loadCatalogueIds(fs),
-      gate: createLeagueGate({ client: clients['league-validation'], league }),
-    },
-    step,
-  );
+    pid: DRY_RUN_PID,
+  }).run();
   // Each artifact was written in its schema's key order, so the parsed value
   // prints as written.
   const progress = await readWritten(fs, PROGRESS_PATH, SyncProgressFileSchema);

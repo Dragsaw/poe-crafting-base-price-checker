@@ -74,7 +74,7 @@ action_items:
       check, loads + pinned-cap inequality, cross-file gate, catalogue check, order, then
       the league gate"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-2-on-a-gate-yield-report-the-eligible-coun"
     epic: 1
@@ -82,14 +82,14 @@ action_items:
       as the eligible count (AD-7 definition; AD-12 rev 21 makes the gate yield an ordinary
       chunk yield)"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-3-publish-completed-entries-and-catalogue"
     epic: 1
     action: "Publish completed entries and catalogue marks on every throw path, not only MalformedRequestError;
       append the story 1.7 deferral to deferred-work.md"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-4-define-record-identity-per-record-kind-i"
     epic: 1
@@ -110,13 +110,13 @@ action_items:
     action: "Extract one composeChunk(ports) used by sync.ts and dry-run.ts; pass the under-lock
       dataset to the pricing step"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-7-call-checkpinnedcap-from-the-shared-comp"
     epic: 1
     action: "Call checkPinnedCap from the shared composition and record its refusal"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-8-decide-where-invalidrequestthreshold-liv"
     epic: 1

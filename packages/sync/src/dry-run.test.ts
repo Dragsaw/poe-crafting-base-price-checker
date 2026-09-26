@@ -46,7 +46,8 @@ const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 
 const LEAGUE = 'Test League';
-const CONFIG = JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 });
+/** A yardstick of 2, so the one pinned entry fits the load-time cap (IMPLEMENTATION-NOTES.md §6). */
+const CONFIG = JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 2 });
 const CURRENCIES = JSON.stringify({
   schemaVersion: '1.0.0',
   rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
@@ -342,27 +343,28 @@ describe('dryRun: the dataset snapshot', () => {
       [DATASET_PATH]: { contents: datasetText },
     });
     const visited: string[] = [];
-    await runChunk(
-      {
+    await runChunk({
         fs,
         clock: createFakeClockPort(A_ATTEMPTED_AT),
         pid: 1,
         git: createFakeGitPort(),
         requests: createRequestCounter(),
-        starvationRecord: (starvation) => pinnedStarvationRecord(starvation, { minChunkSearches: 1 }),
-        publication: { league: LEAGUE, currencyRates: [] },
+        load: () =>
+          Promise.resolve({
+            publication: { league: LEAGUE, currencyRates: [] },
+            starvationRecord: (starvation) => pinnedStarvationRecord(starvation, { minChunkSearches: 2 }),
+            step: (entry) => {
+              visited.push(canonicalKey(entry));
+              return Promise.resolve({ kind: 'completed' });
+            },
+          }),
         log: () => undefined,
         catalogue: () =>
           Promise.resolve({
             ok: true,
             value: { statIds: new Set(), baseTypeIds: new Set(['A', 'B', 'C', 'P']), categoryIds: new Set() },
           }),
-      },
-      (entry) => {
-        visited.push(canonicalKey(entry));
-        return Promise.resolve({ kind: 'completed' });
-      },
-    );
+      });
 
     const report = await dryRun(withDataset);
     expect(report.completed).toEqual(visited);
