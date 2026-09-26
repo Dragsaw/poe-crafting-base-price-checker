@@ -836,8 +836,10 @@ So that what the run did and what broke reaches the surface I already read inste
 **Given** the tracked-list edit date
 **When** `sync` derives it
 **Then** it reads the author date of the last commit touching `data/tracked.json`, through the git port, and never a hand-maintained field
-**And** an uncommitted working-tree edit does not move that date
-**And** a file with no commit history yields no date at all, and never a placeholder (AD-12, AD-9).
+**And** where the file has commit history, an uncommitted working-tree edit does not move that date
+**And** where git yields no date, it reads the file's last-modified time through the filesystem port
+**And** the date carries the clock that produced it, `git-author-date` or `file-modified`, and no component drops that tag
+**And** where neither clock answers, the report carries no date at all, and never a placeholder (AD-12, AD-9).
 
 **Given** a chunk that truncated its pinned set
 **When** `sync` writes the report
@@ -1467,7 +1469,8 @@ So that a list that is not doing what I think is visible without my going to loo
 **Given** the tracked-list edit date
 **When** it renders
 **Then** the page prints it plainly as attribution, with no staleness threshold and no age at which it turns red
-**And** a Tracked List with no commit history renders *unknown*, and never a placeholder date (FR-18, AD-12, AD-9).
+**And** a `file-modified` date renders with the plain suffix `(not committed)`, with no mark and no colour
+**And** a Tracked List with no date renders *unknown*, and never a placeholder date (FR-18, AD-12, AD-9).
 
 **Given** a healthy run
 **When** the strip renders

@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 20
+revision: 21
 created: 2026-09-12
-updated: 2026-09-20
+updated: 2026-09-26
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -335,8 +335,9 @@ The player can see how long it has been since anyone last edited the Tracked Lis
 
 **Consequences (testable):**
 - The Sync Report records the date of the last tracked-list edit, and the view shows it unconditionally, so a list running unattended for months is visible as such (AD-12).
-- The date comes from the file's commit history, never from a field a curator must remember to update; an uncommitted edit does not move it (AD-12).
-- A Tracked List with no commit history shows *unknown*, never a placeholder date (AD-12, AD-9).
+- The date comes from the file's commit history, never from a field a curator must remember to update; while the file has commit history, an uncommitted edit does not move it (AD-12).
+- A Tracked List with no commit history shows the date the file last changed, and the view says that this date is not committed, so the player never reads it as a committed edit (AD-12).
+- A Tracked List with neither date shows *unknown*, never a placeholder date (AD-12, AD-9).
 
 **Notes:** The tool cannot show a Combination nobody told it to watch (Risk R-2, §9). FR-18 prompts a periodic deliberate review; it does not close the gap.
 

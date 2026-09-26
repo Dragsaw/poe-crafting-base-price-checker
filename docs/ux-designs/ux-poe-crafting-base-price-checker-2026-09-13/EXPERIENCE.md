@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 5
+revision: 6
 created: 2026-09-13
-updated: 2026-09-20
+updated: 2026-09-26
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -255,6 +255,13 @@ Line one prints its three field names as FR-10 and the Glossary spell them —
 they identify a file, and this strip is the one place on the page where that
 spelling is licensed. Line two is plain English using *Tracked List* verbatim.
 Fields on a line are separated by `|`.
+
+**The edit date says which clock it came from** `[decision — memlog 209]`. A
+committed date prints bare. A date read from the file's last change, because the
+Tracked List has no commit history, prints with the suffix `(not committed)`,
+verbatim. The suffix is plain text in the fact's own ink, with no mark and no
+colour: it is still attribution, not a health signal. With neither date, the
+field reads *unknown* (FR-18, AD-12, AD-9).
 
 **The masthead eyebrow** reads `League {activeLeague}` and nothing else. **The
 Craft Recipe left it at revision 3** `[decision — memlog 181]`, and the open item

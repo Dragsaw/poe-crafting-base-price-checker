@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 19
+revision: 20
 created: '2026-09-12'
 updated: '2026-09-26'
 binds: []
@@ -883,13 +883,18 @@ never import each other.
   `sync` excludes it from the workload **and** AD-17's sum excludes it from `tracked(class)`,
   because pruning that left the last-good price contributing would be a no-op on the
   ranking. `sync-report.json` records the date of the last tracked-list edit, **derived by
-  `sync` from the git history of `data/tracked.json`** — the author date of the last commit
-  touching it, read through the git port (AD-1), **which therefore carries one read
-  operation beside its commit, pull and push — the last-commit author date of a path** —
-  **and never from a hand-maintained field**, because a field the curator must remember to update is exactly the kind of
-  memorised number this tool exists to abolish. An uncommitted working-tree edit does not
-  move the date, and a file with no commit history yields no date at all, which `web`
-  renders as *unknown* and never as a placeholder (AD-9's rule for absence). `web`
+  `sync`, never from a hand-maintained field**, because a field the curator must remember to
+  update is exactly the kind of memorised number this tool exists to abolish. **Two clocks
+  answer, in one fixed order:** first the author date of the last commit touching
+  `data/tracked.json`, read through the git port's one operation (AD-3); where git yields no
+  date, the file's last-modified time, read through the filesystem port (AD-1). **The date is
+  tagged with the clock that produced it** — `git-author-date` or `file-modified` — and no
+  component drops the tag, because a committed edit and an edit that may never have been
+  committed mean different things to the player reading the date (FR-12). `contracts` writes
+  the order once, so `sync` and `sync:dry` cannot resolve it differently. Where the file has
+  commit history, an uncommitted working-tree edit does not move the date. Where neither clock
+  answers, there is no date at all, which `web` renders as *unknown* and never as a
+  placeholder (AD-9's rule for absence). `web`
   surfaces the tracked list's age, so a list running unattended is visible as such.
 
   **The ceiling is denominated in searches, not in entries.** Against the measured 2,400
@@ -1688,7 +1693,7 @@ id resolves here.
 | Error shape | `core` returns typed results and never throws for expected conditions such as no listings, a missing weight, or an unresolvable stat. `sync` throws only for unrecoverable run failures. Everything else lands in `sync-report.json`. |
 | Validation | Zod schemas in `contracts` are the single source of truth and types are `z.infer`red. Validate at every trust boundary: API response, before artifact write, and on artifact load. |
 | Schema versioning | Every published artifact and input file carries `schemaVersion`. A consumer refuses an unknown major version rather than guessing. |
-| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12), a failed push (AD-3). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
+| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
 | Config | No runtime environment lookups in `core`. `sync` reads `data/config.json` plus a small env overlay for the contact `User-Agent`. |
 | Tests | Vitest everywhere. `core` is tested as pure functions with literal inputs, `sync` against recorded fixtures through ports, `web` with MSW-served artifacts. |
 
