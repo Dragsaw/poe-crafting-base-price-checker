@@ -134,15 +134,19 @@ export { LeagueEntrySchema, LeaguesPayloadSchema } from './trade-leagues.ts';
 export type { LeagueEntry, LeaguesPayload } from './trade-leagues.ts';
 
 export {
+  ChunkRequestSourceSchema,
   CrossFileCheckSchema,
   CrossFileGateFailureRecordSchema,
   LeagueMismatchRecordSchema,
   PinnedStarvationRecordSchema,
+  RECORD_SUBJECTS,
   RequestSourceSchema,
   RequestsBySourceSchema,
   RunFailureReasonSchema,
   RunFailureRecordSchema,
+  sameRecord,
   StaleLockBrokenRecordSchema,
+  SYNC_REPORT_SCHEMA_VERSION,
   SyncRunFiguresSchema,
   SyncRunRecordSchema,
   SyncRunReportSchema,
@@ -151,6 +155,7 @@ export {
   WeightsAbsentRecordSchema,
 } from './sync-run-report.ts';
 export type {
+  ChunkRequestSource,
   CrossFileCheck,
   CrossFileGateFailureRecord,
   LeagueMismatchRecord,
@@ -161,13 +166,14 @@ export type {
   StaleLockBrokenRecord,
   SyncRunFigures,
   SyncRunRecord,
+  SyncRunRecordKind,
   SyncRunReport,
   UncataloguedWeightsIdRecord,
   UnresolvableRecord,
   WeightsAbsentRecord,
 } from './sync-run-report.ts';
 
-export { SyncLockSchema, SyncProgressSchema } from './sync-progress.ts';
+export { SYNC_PROGRESS_SCHEMA_VERSION, SyncLockSchema, SyncProgressSchema } from './sync-progress.ts';
 export type { SyncLock, SyncProgress } from './sync-progress.ts';
 
 export { resolveTrackedListAge, TrackedListAgeSchema } from './tracked-list-age.ts';

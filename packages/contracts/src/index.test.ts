@@ -51,6 +51,14 @@ describe('the contracts barrel', () => {
     }
   });
 
+  it('exports record identity and the per-file schema versions', () => {
+    expect(contracts.sameRecord).toBeTypeOf('function');
+    expect(contracts.RECORD_SUBJECTS).toBeDefined();
+    expect(contracts.ChunkRequestSourceSchema).toBeDefined();
+    expect(contracts.SYNC_REPORT_SCHEMA_VERSION).toBe('1.1.0');
+    expect(contracts.SYNC_PROGRESS_SCHEMA_VERSION).toBe('1.1.0');
+  });
+
   it('exports a fake for each of the four ports', () => {
     expect(contracts.createFakeHttpPort).toBeTypeOf('function');
     expect(contracts.createFakeFilesystemPort).toBeTypeOf('function');

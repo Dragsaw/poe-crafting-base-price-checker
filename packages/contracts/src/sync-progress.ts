@@ -33,6 +33,16 @@ export const SyncProgressSchema = z.strictObject({
       message: 'completed keys must be unique',
     })
     .describe('Canonical keys (§4.1) of the entries this pass has completed.'),
+  notBefore: IsoTimestampSchema.optional().describe(
+    'Penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3). A run that starts before this instant defers: it sends nothing and exits 0. Written only by a chunk that ends on a 429 or a malformed-request abort; every other ending that writes progress clears it. Absent never defers.',
+  ),
 });
+
+/**
+ * The `sync-progress.json` contract version. 1.1.0 added the optional
+ * `notBefore`. The schema is strict, so a build older than the change refuses a
+ * file carrying the field, which is acceptable because only `sync` reads it.
+ */
+export const SYNC_PROGRESS_SCHEMA_VERSION = '1.1.0';
 
 export type SyncProgress = z.infer<typeof SyncProgressSchema>;

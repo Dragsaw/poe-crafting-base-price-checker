@@ -27,9 +27,45 @@ export const RequestSourceSchema = z.enum([
 
 export type RequestSource = z.infer<typeof RequestSourceSchema>;
 
+/**
+ * The two sources a chunk spends requests on (AD-12). The report figure keys on
+ * these alone: `catalogue-refresh` runs as its own command and never inside a
+ * chunk, so a chunk report that carried it would always print 0.
+ */
+export const ChunkRequestSourceSchema = RequestSourceSchema.extract(['tracked-list', 'league-validation']);
+
+export type ChunkRequestSource = z.infer<typeof ChunkRequestSourceSchema>;
+
+/** The key a report written before spine revision 21 still carries. */
+const LEGACY_REQUEST_SOURCE_KEY = 'catalogue-refresh';
+
+/**
+ * Drops the legacy key and nothing else, so a report written at 1.0.0 still
+ * parses while every other unknown key is still refused. The drop lives here
+ * rather than in `sync`, so that every reader inherits it.
+ */
+function dropLegacyRequestSource(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value) || !(LEGACY_REQUEST_SOURCE_KEY in value)) {
+    return value;
+  }
+  return Object.fromEntries(Object.entries(value).filter(([key]) => key !== LEGACY_REQUEST_SOURCE_KEY));
+}
+
 export const RequestsBySourceSchema = z
-  .record(RequestSourceSchema, z.int().min(0))
-  .describe('Requests consumed per declared source, so budget drift is attributable (AD-12, FR-14).');
+  .preprocess(dropLegacyRequestSource, z.record(ChunkRequestSourceSchema, z.int().min(0)))
+  .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
+
+export type RequestsBySource = z.infer<typeof RequestsBySourceSchema>;
+
+/**
+ * The `sync-report.json` contract version. 1.1.0 narrowed `requestsBySource`
+ * to the chunk sources; the reader drops the legacy key, so a 1.0.0 file still
+ * parses (the major is unchanged). A build older than 1.1.0 refuses a 1.1.0
+ * report, because its figure required the third key; that is acceptable
+ * because only `sync` writes and reads the report today, the same trade
+ * IMPLEMENTATION-NOTES.md §5.3 accepts for progress.
+ */
+export const SYNC_REPORT_SCHEMA_VERSION = '1.1.0';
 
 export const SyncRunFiguresSchema = z
   .strictObject({
@@ -199,6 +235,46 @@ export type CrossFileGateFailureRecord = z.infer<typeof CrossFileGateFailureReco
 export type RunFailureRecord = z.infer<typeof RunFailureRecordSchema>;
 export type LeagueMismatchRecord = z.infer<typeof LeagueMismatchRecordSchema>;
 export type SyncRunRecord = z.infer<typeof SyncRunRecordSchema>;
+
+export type SyncRunRecordKind = SyncRunRecord['kind'];
+
+type RecordOfKind<Kind extends SyncRunRecordKind> = Extract<SyncRunRecord, { kind: Kind }>;
+
+/**
+ * The **subject** fields of each record kind: the fields that name *what is
+ * wrong* and so make up the record's identity. Every other field is an
+ * observation of the chunk that wrote it (IMPLEMENTATION-NOTES.md §12).
+ *
+ * The map is exhaustive over the kinds, so a new record kind that declares no
+ * subject list fails type-checking.
+ */
+export const RECORD_SUBJECTS: {
+  readonly [Kind in SyncRunRecordKind]: readonly Exclude<keyof RecordOfKind<Kind>, 'kind'>[];
+} = {
+  'stale-lock-broken': ['pid', 'startedAt'],
+  'pinned-starvation': ['declaredMinChunkSearches', 'pinnedCount'],
+  unresolvable: ['entryKey', 'identifier', 'identifierKind'],
+  'weights-absent': [],
+  'uncatalogued-weights-id': ['identifier', 'identifierKind'],
+  'cross-file-gate-failure': ['check', 'entryKey'],
+  'run-failure': ['reason', 'entryKey', 'status'],
+  'league-mismatch': ['configuredLeague'],
+};
+
+/**
+ * `same(a, b) ⇔ a.kind = b.kind ∧ subject(a) = subject(b)` (§12). Every
+ * subject field is a scalar, so `===` compares it. An absent optional subject
+ * is a value: two records that both lack it agree on it.
+ */
+export function sameRecord(a: SyncRunRecord, b: SyncRunRecord): boolean {
+  if (a.kind !== b.kind) {
+    return false;
+  }
+  const subjects: readonly string[] = RECORD_SUBJECTS[a.kind];
+  const left = a as Readonly<Record<string, unknown>>;
+  const right = b as Readonly<Record<string, unknown>>;
+  return subjects.every((key) => left[key] === right[key]);
+}
 
 export const SyncRunReportSchema = z
   .strictObject({

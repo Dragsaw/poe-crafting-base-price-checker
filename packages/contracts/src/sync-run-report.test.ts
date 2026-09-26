@@ -1,24 +1,172 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ChunkRequestSourceSchema,
   LeagueMismatchRecordSchema,
   PinnedStarvationRecordSchema,
+  RECORD_SUBJECTS,
+  RequestSourceSchema,
+  RequestsBySourceSchema,
+  sameRecord,
+  SYNC_REPORT_SCHEMA_VERSION,
   SyncRunFiguresSchema,
   SyncRunRecordSchema,
   SyncRunReportSchema,
+  type SyncRunRecord,
 } from './sync-run-report';
 
 const figures = {
   requestsBySource: {
     'tracked-list': 8,
     'league-validation': 1,
-    'catalogue-refresh': 0,
   },
   notReachedCount: 41,
 };
 
+describe('RequestsBySourceSchema', () => {
+  it('keeps three declared request sources, and keys the figure on the two chunk sources (AD-12)', () => {
+    expect(RequestSourceSchema.options).toEqual([
+      'tracked-list',
+      'league-validation',
+      'catalogue-refresh',
+    ]);
+    expect(ChunkRequestSourceSchema.options).toEqual(['tracked-list', 'league-validation']);
+  });
+
+  it('drops the legacy catalogue-refresh key of a 1.0.0 report', () => {
+    const parsed = RequestsBySourceSchema.parse({
+      'tracked-list': 8,
+      'league-validation': 1,
+      'catalogue-refresh': 0,
+    });
+    expect(parsed).toEqual({ 'tracked-list': 8, 'league-validation': 1 });
+    expect('catalogue-refresh' in parsed).toBe(false);
+  });
+
+  it('refuses any other unknown key', () => {
+    expect(
+      RequestsBySourceSchema.safeParse({ 'tracked-list': 8, 'league-validation': 1, other: 0 })
+        .success,
+    ).toBe(false);
+  });
+
+  it('refuses a figure missing a chunk source, even beside the legacy key', () => {
+    expect(RequestsBySourceSchema.safeParse({ 'tracked-list': 8, 'catalogue-refresh': 0 }).success).toBe(
+      false,
+    );
+  });
+
+  it('stamps a minor version, so a 1.0.0 report keeps its major', () => {
+    expect(SYNC_REPORT_SCHEMA_VERSION).toBe('1.1.0');
+  });
+});
+
+describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
+  /** One record per kind, plus an observation-only change where the kind has observations. */
+  const cases: readonly {
+    readonly base: SyncRunRecord;
+    readonly observation: SyncRunRecord | undefined;
+  }[] = [
+    {
+      base: { kind: 'stale-lock-broken', pid: 1, startedAt: '2026-09-20T01:00:00Z' },
+      observation: undefined,
+    },
+    {
+      base: {
+        kind: 'pinned-starvation',
+        discoveredAllowance: 3,
+        declaredMinChunkSearches: 10,
+        pinnedCount: 4,
+        pinnedRefreshed: 2,
+        activeRefreshed: 1,
+      },
+      observation: {
+        kind: 'pinned-starvation',
+        discoveredAllowance: 1,
+        declaredMinChunkSearches: 10,
+        pinnedCount: 4,
+        pinnedRefreshed: 0,
+        activeRefreshed: 0,
+      },
+    },
+    {
+      base: { kind: 'unresolvable', entryKey: 'k', identifier: 'a', identifierKind: 'statId' },
+      observation: undefined,
+    },
+    {
+      base: { kind: 'weights-absent', uncheckableClassNames: ['Bows'] },
+      observation: { kind: 'weights-absent', uncheckableClassNames: ['Bows', 'Rings'] },
+    },
+    {
+      base: { kind: 'uncatalogued-weights-id', identifier: 'a', identifierKind: 'statId' },
+      observation: undefined,
+    },
+    {
+      base: { kind: 'cross-file-gate-failure', check: 'co-occur', entryKey: 'k', detail: 'x' },
+      observation: { kind: 'cross-file-gate-failure', check: 'co-occur', entryKey: 'k', detail: 'y' },
+    },
+    {
+      base: { kind: 'run-failure', reason: 'unrecoverable-error', entryKey: 'k', status: 500, message: 'a' },
+      observation: {
+        kind: 'run-failure',
+        reason: 'unrecoverable-error',
+        entryKey: 'k',
+        status: 500,
+        message: 'b',
+      },
+    },
+    {
+      base: { kind: 'league-mismatch', configuredLeague: 'A', availableLeagues: ['B'] },
+      observation: { kind: 'league-mismatch', configuredLeague: 'A', availableLeagues: ['B', 'C'] },
+    },
+  ];
+
+  it('declares a subject list for every record kind', () => {
+    const kinds = SyncRunRecordSchema.options.map((option) => option.shape.kind.value).sort();
+    expect(Object.keys(RECORD_SUBJECTS).sort()).toEqual(kinds);
+    expect(cases.map((c) => c.base.kind).sort()).toEqual(kinds);
+  });
+
+  /** A value of the same type that differs from `value`. */
+  function changed(value: unknown): unknown {
+    return typeof value === 'number' ? value + 1 : `${String(value)}-changed`;
+  }
+
+  for (const { base, observation } of cases) {
+    it(`${base.kind}: the same record, ignoring observations`, () => {
+      expect(sameRecord(base, { ...base })).toBe(true);
+      if (observation !== undefined) {
+        expect(sameRecord(base, observation)).toBe(true);
+      }
+    });
+
+    const subjects: readonly string[] = RECORD_SUBJECTS[base.kind];
+    for (const subjectKey of subjects) {
+      it(`${base.kind}: a change to ${subjectKey} alone is a new record`, () => {
+        const fields = base as Readonly<Record<string, unknown>>;
+        const other = { ...fields, [subjectKey]: changed(fields[subjectKey]) } as SyncRunRecord;
+        expect(sameRecord(base, other)).toBe(false);
+      });
+    }
+  }
+
+  it('a record of another kind is never the same, whatever its fields', () => {
+    const absent: SyncRunRecord = { kind: 'weights-absent', uncheckableClassNames: [] };
+    const broken: SyncRunRecord = { kind: 'stale-lock-broken', pid: 1, startedAt: '2026-09-20T01:00:00Z' };
+    expect(sameRecord(absent, broken)).toBe(false);
+    expect(sameRecord(broken, absent)).toBe(false);
+  });
+
+  it('treats an absent optional subject on both sides as agreement', () => {
+    const a: SyncRunRecord = { kind: 'run-failure', reason: 'unrecoverable-error', message: 'a' };
+    const b: SyncRunRecord = { kind: 'run-failure', reason: 'unrecoverable-error', message: 'b' };
+    expect(sameRecord(a, b)).toBe(true);
+    expect(sameRecord(a, { ...b, status: 500 })).toBe(false);
+  });
+});
+
 describe('SyncRunFiguresSchema', () => {
-  it('accounts requests per declared source, all three of them', () => {
+  it('accounts requests per chunk source, both of them', () => {
     expect(SyncRunFiguresSchema.parse(figures)).toEqual(figures);
     expect(
       SyncRunFiguresSchema.safeParse({

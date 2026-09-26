@@ -194,7 +194,6 @@ describe('the sync-owned envelopes', () => {
         requestsBySource: {
           'tracked-list': 8,
           'league-validation': 1,
-          'catalogue-refresh': 0,
         },
         notReachedCount: 41,
       },
