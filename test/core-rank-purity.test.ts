@@ -9,7 +9,8 @@ import { expect, it } from 'vitest';
  */
 it('core/src/rank.ts references no Date, Math.random, process or import.meta', () => {
   const source = readFileSync(new URL('../packages/core/src/rank.ts', import.meta.url), 'utf8');
-  for (const banned of ['Date', 'Math.random', 'process', 'import.meta']) {
-    expect(source, `rank.ts references ${banned}`).not.toContain(banned);
+  // Whole identifiers only, so prose such as "processed" or "Dated" in a comment passes.
+  for (const banned of [/\bDate\b/, /\bMath\.random\b/, /\bprocess\b/, /\bimport\.meta\b/]) {
+    expect(source, `rank.ts references ${banned.source}`).not.toMatch(banned);
   }
 });

@@ -1166,11 +1166,9 @@ never import each other.
   total across the mixed list rather than only within each branch. At an equal `EV` the
   kind therefore orders first, raw before crafted, and the serialised canonical key breaks
   ties only within a kind, so the key's own leading kind tag never decides between kinds.
-  **A class whose
-  summands all fall below the threshold ranks at `EV = −craftCost`** with an empty summand
-  list — it is ranked, not unrankable, because the threshold excluding every outcome is an
-  answer about that class
-  and not an absence of data. Without this,
+  **A class whose summands all fall below the threshold ranks at `EV = −craftCost`** with
+  an empty summand list — it is ranked, not unrankable, because the threshold excluding
+  every outcome is an answer about that class and not an absence of data. Without this,
   a surface that names a row's top contributing combinations has no legal implementation at
   all: AD-4 forbids `web` from computing a ranking term, and a builder would either break
   AD-4 or invent a `core` API that nothing binds — two builders inventing two different
