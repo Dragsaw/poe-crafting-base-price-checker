@@ -2,9 +2,12 @@ import { execFile } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createFakeClockPort, createFakeHttpPort } from '@poe/contracts';
-import type { HttpResponse } from '@poe/contracts';
-import { expect, it } from 'vitest';
+import type { HttpRequest, HttpResponse, TrackedEntry } from '@poe/contracts';
+import { describe, expect, it } from 'vitest';
 
+import { pricingFixtureName } from './pricing/fixture-names.ts';
+import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
+import { tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
 import {
   FIXTURE_INTERACTIONS,
   fixturePathOf,
@@ -324,5 +327,117 @@ it('leaves a catalogue label named `name` alone — only an identity container h
 it('leaves a non-string identifier value alone rather than inventing a shape', () => {
   expect(stripPersonalIdentifiers({ account: { name: null, lastCharacterName: 7 } })).toEqual({
     account: { name: null, lastCharacterName: 7 },
+  });
+});
+
+// --- the pricing interactions (Story 1.7) ------------------------------------
+
+describe('recordFixtures: the search and fetch leg per tracked entry', () => {
+  const league = 'Forbidden Rites';
+  const itemTypes = itemTypesOf({ result: [] });
+  const priced: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
+  const empty: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'pinned' };
+  const pruned: TrackedEntry = {
+    kind: 'raw',
+    baseTypeId: 'Wide Belt',
+    itemLevelMin: 82,
+    status: 'pruned',
+    prunedReason: 'no market',
+  };
+  const resultIds = Array.from({ length: 12 }, (_, index) => `r${String(index)}`);
+
+  function searchOf(entry: TrackedEntry) {
+    return {
+      method: 'POST' as const,
+      url: tradeSearchUrl(league),
+      body: JSON.stringify(buildSearchBody(entry, itemTypes)),
+    };
+  }
+  const fetchOfPriced = { method: 'GET' as const, url: tradeFetchUrl(resultIds.slice(0, 10), 'S1') };
+
+  /** The fake keys by method and URL; every search shares one URL, so answer by body. */
+  function pricingHarness(searchStatus = 200) {
+    const base = createFakeHttpPort({
+      ...fixturesFor({}),
+      [`GET ${fetchOfPriced.url}`]: respond({
+        result: [{ id: 'r0', listing: { account: { name: 'Someone#1' }, price: { amount: 1, currency: 'divine' } } }],
+      }),
+    });
+    const bodies = new Map([
+      [searchOf(priced).body, { id: 'S1', result: resultIds, total: 12 }],
+      [searchOf(empty).body, { id: 'S2', result: [], total: 0 }],
+    ]);
+    const requests: HttpRequest[] = [];
+    const http = {
+      send(request: HttpRequest) {
+        requests.push(request);
+        if (request.method === 'POST') {
+          const answer = bodies.get(request.body ?? '');
+          return answer === undefined
+            ? Promise.reject(new Error('unfixtured search'))
+            : Promise.resolve({ status: searchStatus, headers: RATE_LIMIT_HEADERS, body: JSON.stringify(answer) });
+        }
+        return base.send(request);
+      },
+    };
+    const writes: { path: string; contents: string }[] = [];
+    return {
+      requests,
+      writes,
+      record: () =>
+        recordFixtures(
+          {
+            http,
+            clock: createFakeClockPort('2026-09-20T12:00:00.000Z'),
+            wait: () => Promise.resolve(),
+            userAgent: CONTACT,
+            writeFixture: (path, contents) => {
+              writes.push({ path, contents });
+              return Promise.resolve();
+            },
+          },
+          { league, entries: [priced, empty, pruned], itemTypes },
+        ),
+    };
+  }
+
+  it('records one search per non-pruned entry and one fetch of at most 10 ids where it found any', async () => {
+    const harness = pricingHarness();
+
+    const outcome = await harness.record();
+
+    expect(outcome.ok).toBe(true);
+    const pricing = harness.requests.slice(FIXTURE_INTERACTIONS.length);
+    expect(pricing.map((request) => `${request.method} ${request.url}`)).toEqual([
+      `POST ${searchOf(priced).url}`,
+      `GET ${fetchOfPriced.url}`,
+      `POST ${searchOf(empty).url}`,
+    ]);
+    expect(pricing[0]?.body).toBe(searchOf(priced).body);
+    expect(pricing[0]?.headers['user-agent']).toBe(CONTACT);
+
+    const names = harness.writes.map((write) => write.path).slice(FIXTURE_INTERACTIONS.length);
+    expect(names).toEqual([
+      fixturePathOf({ name: pricingFixtureName(searchOf(priced)) }),
+      fixturePathOf({ name: pricingFixtureName(fetchOfPriced) }),
+      fixturePathOf({ name: pricingFixtureName(searchOf(empty)) }),
+    ]);
+    expect(names.every((path) => /trade-(search|fetch)-[0-9a-f]{16}\.json$/.test(path))).toBe(true);
+  });
+
+  it('strips personal identifiers from the fetch payload', async () => {
+    const harness = pricingHarness();
+    await harness.record();
+    const fetchWrite = harness.writes.find((write) => write.path.includes('trade-fetch-'));
+    expect(fetchWrite?.contents).toContain(REDACTED);
+    expect(fetchWrite?.contents).not.toContain('Someone#1');
+  });
+
+  it('writes nothing when a search is refused', async () => {
+    const harness = pricingHarness(400);
+    const outcome = await harness.record();
+    expect(outcome.ok).toBe(false);
+    expect(outcome.failure).toContain('trade-search-');
+    expect(harness.writes).toEqual([]);
   });
 });

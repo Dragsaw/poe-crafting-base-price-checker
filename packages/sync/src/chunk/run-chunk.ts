@@ -37,6 +37,7 @@ import {
 } from '@poe/contracts';
 import type {
   ClockPort,
+  DatasetEntry,
   EnvelopeResult,
   FilesystemPort,
   SyncProgressFile,
@@ -58,15 +59,20 @@ export const DATASET_PATH = 'data/dataset.json';
  * step observed in the live headers of its last search and fetch; an absent
  * allowance bounds nothing, because nothing was observed. `yielded` means the
  * entry was **not** completed and the chunk must stop now — a `429`, or the
- * client's invalid-request refusal.
+ * client's invalid-request refusal, or a 5xx or timeout from the pricing step.
+ *
+ * Either kind may carry the step's updated `DatasetEntry`: a completed entry
+ * with its new price state, or a yielded one stamped with `lastAttemptedAt`.
+ * The runner collects them on the outcome for Story 1.8 to publish.
  */
 export type StepResult =
   | {
       readonly kind: 'completed';
       readonly searchRemaining?: number;
       readonly fetchRemaining?: number;
+      readonly entry?: DatasetEntry;
     }
-  | { readonly kind: 'yielded' };
+  | { readonly kind: 'yielded'; readonly entry?: DatasetEntry };
 
 export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
 
@@ -97,6 +103,11 @@ interface ChunkOutcomeBase {
    * included. Progress records only the rows 2–3 subset of these.
    */
   readonly completed: readonly string[];
+  /**
+   * The dataset entries the steps returned, in visiting order — completed and
+   * yielded alike. Story 1.8 publishes them. A step that throws loses them.
+   */
+  readonly entries: readonly DatasetEntry[];
   /** Report records this chunk produced. Story 1.9 writes them out. */
   readonly records: readonly SyncRunRecord[];
   /**
@@ -189,7 +200,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         ? 'an unreadable lock'
         : `pid ${String(acquisition.holder.pid)} since ${acquisition.holder.startedAt}`;
     log(`sync: another run holds the lock (${holder}); nothing to do this invocation`);
-    return { kind: 'busy', completed: [], records: [] };
+    return { kind: 'busy', completed: [], entries: [], records: [] };
   }
 
   const mine = acquisition.lock;
@@ -220,6 +231,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
     });
 
     const completed: string[] = [];
+    const stepEntries: DatasetEntry[] = [];
     // Only rotation completions enter the pass: row 1 is exempt (AD-7).
     const rotationCompleted: string[] = [];
     let ending: { readonly kind: 'completed' } | { readonly kind: 'yielded' } | {
@@ -241,6 +253,9 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         break;
       }
       const result = await step(entry);
+      if (result.entry !== undefined) {
+        stepEntries.push(result.entry);
+      }
       if (result.kind === 'yielded') {
         ending = { kind: 'yielded' };
         break;
@@ -290,7 +305,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
     // releases nothing, because the lock on disk is no longer its own.
     if (!(await holdsLock(fs, mine))) {
       log('sync: the lock was taken over during this chunk; writing nothing');
-      return { kind: 'dispossessed', completed, records, ...starvation };
+      return { kind: 'dispossessed', completed, entries: stepEntries, records, ...starvation };
     }
 
     const file: SyncProgressFile = {
@@ -301,7 +316,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
     };
     await fs.writeTextFile(PROGRESS_PATH, serialiseJsonArtifact(file));
 
-    return { ...ending, completed, records, ...starvation };
+    return { ...ending, completed, entries: stepEntries, records, ...starvation };
   } finally {
     await releaseLockIfOwn(fs, mine);
   }

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0.0",
+  "rates": [
+    { "currencyId": "divine", "rate": 1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" },
+    { "currencyId": "exalted", "rate": 0.002012, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" },
+    { "currencyId": "chaos", "rate": 0.13078, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" }
+  ]
+}

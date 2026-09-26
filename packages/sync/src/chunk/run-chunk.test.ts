@@ -8,9 +8,10 @@ import {
   createFakeFilesystemPort,
   SyncProgressFileSchema,
 } from '@poe/contracts';
-import type { FakeFilesystemPort, TrackedEntry } from '@poe/contracts';
+import type { DatasetEntry, FakeFilesystemPort, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { MalformedRequestError } from '../pricing/price-entry.ts';
 import { LOCK_PATH, serialiseLock } from './lock.ts';
 import { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './run-chunk.ts';
 import type { ChunkPorts, ChunkStep, StepResult } from './run-chunk.ts';
@@ -99,7 +100,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     const outcome = await runChunk(ports, step);
 
-    expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B), key(C)], records: [] });
+    expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B), key(C)], entries: [], records: [] });
     expect(visited).toEqual([key(A), key(B), key(C)]);
     expect(await progressOf(fs)).toEqual({
       schemaVersion: '1.0.0',
@@ -147,7 +148,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     const outcome = await runChunk(ports, step);
 
-    expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B)], records: [] });
+    expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B)], entries: [], records: [] });
     expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(B)] });
   });
 
@@ -180,7 +181,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     const outcome = await runChunk(ports, step);
 
-    expect(outcome).toEqual({ kind: 'yielded', completed: [key(A)], records: [] });
+    expect(outcome).toEqual({ kind: 'yielded', completed: [key(A)], entries: [], records: [] });
     expect(visited).toEqual([key(A), key(B)]);
     expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A)] });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -199,9 +200,43 @@ describe('runChunk: the three bounds and the yield', () => {
 
     const outcome = await runChunk({ fs, clock: createFakeClockPort(NOW), pid: PID }, step);
 
-    expect(outcome).toEqual({ kind: 'completed', completed: [], records: [] });
+    expect(outcome).toEqual({ kind: 'completed', completed: [], entries: [], records: [] });
     expect(visited).toEqual([]);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+});
+
+describe('runChunk: the step entries', () => {
+  function entryOf(tracked: TrackedEntry, state: 'no-listings' | 'never-synced'): DatasetEntry {
+    return {
+      entryKey: key(tracked),
+      price:
+        state === 'no-listings'
+          ? { state: 'no-listings' }
+          : { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    };
+  }
+
+  it('collects completed and yielded entries on the outcome, in visiting order', async () => {
+    const { ports } = harness();
+    const { step } = scriptedStep((entry) =>
+      key(entry) === key(B)
+        ? { kind: 'yielded', entry: entryOf(entry, 'never-synced') }
+        : { kind: 'completed', entry: entryOf(entry, 'no-listings') },
+    );
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome.kind).toBe('yielded');
+    expect(outcome.completed).toEqual([key(A)]);
+    expect(outcome.entries).toEqual([entryOf(A, 'no-listings'), entryOf(B, 'never-synced')]);
+  });
+
+  it('a step that returns no entry adds nothing', async () => {
+    const { ports } = harness();
+    const outcome = await runChunk(ports, scriptedStep().step);
+    expect(outcome.entries).toEqual([]);
   });
 });
 
@@ -279,7 +314,7 @@ describe('runChunk: the lock', () => {
 
     const outcome = await runChunk(ports, step);
 
-    expect(outcome).toEqual({ kind: 'busy', completed: [], records: [] });
+    expect(outcome).toEqual({ kind: 'busy', completed: [], entries: [], records: [] });
     expect(visited).toEqual([]);
     expect(await fs.readTextFile(LOCK_PATH)).toBe(held);
     expect(await fs.exists(PROGRESS_PATH)).toBe(false);
@@ -382,6 +417,23 @@ describe('runChunk: the lock', () => {
 
     expect(await fs.exists(LOCK_PATH)).toBe(false);
     expect(await fs.exists(PROGRESS_PATH)).toBe(false);
+  });
+
+  it('a MalformedRequestError from the step releases the lock and is rethrown', async () => {
+    const { fs, ports } = harness();
+    const failure = new MalformedRequestError(key(B), 'search', 400, {
+      entryKey: key(B),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    });
+
+    await expect(
+      runChunk(ports, (entry) =>
+        key(entry) === key(B) ? Promise.reject(failure) : Promise.resolve({ kind: 'completed' }),
+      ),
+    ).rejects.toBe(failure);
+
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
   it('a throw from the gate releases the lock, is rethrown, and no step runs', async () => {
@@ -487,6 +539,7 @@ describe('runChunk: the Refresh Rotation', () => {
     expect(outcome).toEqual({
       kind: 'completed',
       completed: [key(P1), key(P2), key(A), key(B)],
+      entries: [],
       records: [],
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 2, activeRefreshed: 2 },
     });
@@ -526,6 +579,7 @@ describe('runChunk: the Refresh Rotation', () => {
       kind: 'bounded',
       bound: 'search',
       completed: [key(P1)],
+      entries: [],
       records: [],
       pinnedStarvation: { discoveredAllowance: 1, pinnedCount: 1, pinnedRefreshed: 1, activeRefreshed: 0 },
     });
@@ -543,6 +597,7 @@ describe('runChunk: the Refresh Rotation', () => {
     expect(outcome).toEqual({
       kind: 'completed',
       completed: [key(P1), key(P2), key(A), key(B)],
+      entries: [],
       records: [],
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 2, activeRefreshed: 2 },
     });
@@ -559,7 +614,7 @@ describe('runChunk: the Refresh Rotation', () => {
     const outcome = await runChunk(ports, step);
 
     expect(visited).toEqual([key(P1), key(A)]);
-    expect(outcome).toEqual({ kind: 'bounded', bound: 'search', completed: [key(P1), key(A)], records: [] });
+    expect(outcome).toEqual({ kind: 'bounded', bound: 'search', completed: [key(P1), key(A)], entries: [], records: [] });
   });
 
   it('a yield in row 1 after a cut: kind yielded, the record still carried', async () => {
@@ -574,6 +629,7 @@ describe('runChunk: the Refresh Rotation', () => {
     expect(outcome).toEqual({
       kind: 'yielded',
       completed: [key(P1)],
+      entries: [],
       records: [],
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 1, activeRefreshed: 0 },
     });
@@ -602,7 +658,7 @@ describe('runChunk: the Refresh Rotation', () => {
     const outcome = await runChunk(ports, step);
 
     expect(visited).toEqual([key(P1), key(P2), key(P3)]);
-    expect(outcome).toEqual({ kind: 'completed', completed: visited, records: [] });
+    expect(outcome).toEqual({ kind: 'completed', completed: visited, entries: [], records: [] });
     expect(outcome.pinnedStarvation).toBeUndefined();
   });
 

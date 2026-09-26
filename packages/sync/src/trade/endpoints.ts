@@ -29,6 +29,38 @@ export const DATA_LANE = 'trade-data-get';
  */
 export const TRADE_LEAGUES_URL = `${TRADE_API_BASE}/data/leagues`;
 
+/** `IMPLEMENTATION-NOTES.md` §5.1: the realm segment of every search and fetch path. */
+export const TRADE_REALM = 'poe2';
+
+/**
+ * The lane labels the pricing step's two requests travel in. Like
+ * `DATA_LANE`, each is **opaque to the client**, which learns the policy
+ * behind it from `X-Rate-Limit-Policy`. Two labels, because a search and a
+ * fetch spend against two different buckets (AD-8).
+ */
+export const SEARCH_LANE = 'trade-search-post';
+export const FETCH_LANE = 'trade-fetch-get';
+
+/**
+ * The search URL, `/search/poe2/{league}` (`IMPLEMENTATION-NOTES.md` §5.1).
+ * **Only the league segment is percent-encoded**: live league ids carry
+ * spaces, and an unencoded segment silently addresses another path (§5.4).
+ */
+export function tradeSearchUrl(league: string): string {
+  return `${TRADE_API_BASE}/search/${TRADE_REALM}/${encodeURIComponent(league)}`;
+}
+
+/**
+ * The fetch URL for up to ten result ids of one search:
+ * `/fetch/{id,id,…}?query={searchId}&realm=poe2`. The ids and the search id
+ * are the trade site's own opaque strings; each is encoded as one component so
+ * a stray character can never split the path.
+ */
+export function tradeFetchUrl(ids: readonly string[], searchId: string): string {
+  const segment = ids.map((id) => encodeURIComponent(id)).join(',');
+  return `${TRADE_API_BASE}/fetch/${segment}?query=${encodeURIComponent(searchId)}&realm=${TRADE_REALM}`;
+}
+
 /** The four committed catalogue artifacts, named by their file stem. */
 export type CatalogueArtifact = 'items' | 'stats' | 'filters' | 'static';
 

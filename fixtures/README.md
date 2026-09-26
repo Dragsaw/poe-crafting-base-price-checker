@@ -35,8 +35,11 @@ reviews, rather than as a production incident.
 
 ## What is recorded today
 
-The five GET interactions the recorder can construct by itself: the leagues
-endpoint and the four `data/*` endpoints, as `trade-data-*.json`. The POST
-search and its fetch leg need a real request body, and a body written from
-belief is exactly what the rules above forbid — Stories 1.4 and 1.7 add those
-interactions when they have one to record.
+The leagues endpoint and the four `data/*` endpoints, as `trade-data-*.json`.
+Since Story 1.7, also the POST search and its fetch leg for every non-pruned
+entry of `data/tracked.json`, in the league `data/config.json` names, as
+`trade-search-<digest>.json` and `trade-fetch-<digest>.json`. The search body
+is built by the same builder the pricing step sends, and each file is named for
+a digest of its own request (method, URL and body), so `pnpm sync:dry` serves
+back only the answer to exactly that request. A search that found nothing has
+no fetch file.

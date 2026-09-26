@@ -1,0 +1,922 @@
+{
+  "result": [
+    {
+      "id": "56cad94105b49e1f690c8d694ef13c4fccdf25800614a10139704f9dcd7d3d14",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-24T21:34:08Z",
+        "stash": {
+          "name": "1",
+          "x": 9,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "56cad94105b49e1f690c8d694ef13c4fccdf25800614a10139704f9dcd7d3d14",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "19% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "b0ef963da70924fbf3c3e9828642542760b120a0398a0987d403a72bfeaee0e8",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-12T12:37:16Z",
+        "stash": {
+          "name": "12",
+          "x": 6,
+          "y": 4
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "b0ef963da70924fbf3c3e9828642542760b120a0398a0987d403a72bfeaee0e8",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "17% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "3d1f94413de71047ee96717624c49032015c6e9cde5214ac1f0cfadd0d093f38",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-23T19:53:14Z",
+        "stash": {
+          "name": "3",
+          "x": 7,
+          "y": 9
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "3d1f94413de71047ee96717624c49032015c6e9cde5214ac1f0cfadd0d093f38",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "15% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "14d839c364b5011f381cd48e70f0305ee28d33dd12d1399154a78daf190219f5",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-17T13:30:03Z",
+        "stash": {
+          "name": "7",
+          "x": 0,
+          "y": 3
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "14d839c364b5011f381cd48e70f0305ee28d33dd12d1399154a78daf190219f5",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "15% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "fa6aa36cde93940afa4bddf3642aa3362634eb7e0f00d3a3f7c96932967ec818",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-24T00:16:39Z",
+        "stash": {
+          "name": "1",
+          "x": 1,
+          "y": 4
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "fa6aa36cde93940afa4bddf3642aa3362634eb7e0f00d3a3f7c96932967ec818",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "13% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "86a953dd38dd1f97108382a3226ff3fe7c328c00ac5289de0cb62d628445d685",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-22T01:18:43Z",
+        "stash": {
+          "name": "6",
+          "x": 8,
+          "y": 6
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "86a953dd38dd1f97108382a3226ff3fe7c328c00ac5289de0cb62d628445d685",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "12% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "2ae3892d172ce032bb36f68ba447ccd97d70de82fb54355484805919172afe7a",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-25T21:55:26Z",
+        "stash": {
+          "name": "focus / rings / amulets / wands",
+          "x": 1,
+          "y": 1
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "en_US",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "2ae3892d172ce032bb36f68ba447ccd97d70de82fb54355484805919172afe7a",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "18% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "f3f426ce2098810eca016dc1088903e758f2e80c36183e7dbc4cea01211e8ee5",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-16T12:57:37Z",
+        "stash": {
+          "name": "Bases",
+          "x": 0,
+          "y": 7
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "f3f426ce2098810eca016dc1088903e758f2e80c36183e7dbc4cea01211e8ee5",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "17% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "47d214be6f1fac7280bb172d8020e42056c3a4162a79fc35a781c17d618d6906",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-24T04:11:31Z",
+        "stash": {
+          "name": "7",
+          "x": 11,
+          "y": 6
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "zh_TW",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "47d214be6f1fac7280bb172d8020e42056c3a4162a79fc35a781c17d618d6906",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "16% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "387597a9a144622b6a739867e8ebce179f12c9754f63461cf045020266b2dab2",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-17T21:24:05Z",
+        "stash": {
+          "name": "7",
+          "x": 0,
+          "y": 4
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "387597a9a144622b6a739867e8ebce179f12c9754f63461cf045020266b2dab2",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "17% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

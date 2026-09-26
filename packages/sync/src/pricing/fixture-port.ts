@@ -1,0 +1,63 @@
+/**
+ * An offline `HttpPort` that serves the recorded pricing fixtures back
+ * (NFR-1, NFR-2). `pnpm sync:dry` and the fixture-backed tests use it.
+ *
+ * A request is answered only where a fixture carries **its own name**
+ * (`fixture-names.ts`, a digest of method, URL and body). Every other request
+ * rejects loudly with a message naming the missing fixture. The pricing step
+ * yields only on a timeout or a network failure, so this rejection is
+ * rethrown and fails the run, rather than yielding or pricing from an answer
+ * to another question.
+ */
+
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+import type { HttpPort, HttpRequest } from '@poe/contracts';
+
+import { pricingFixtureName } from './fixture-names.ts';
+
+/** Fixture name (no extension) → the recorded body text. */
+export type PricingFixtures = ReadonlyMap<string, string>;
+
+const PRICING_FIXTURE_FILE = /^(trade-(?:search|fetch)-[0-9a-f]+)\.json$/;
+
+/** Reads every `trade-search-*` and `trade-fetch-*` file of a directory. */
+export async function readPricingFixtures(directory: string): Promise<PricingFixtures> {
+  const fixtures = new Map<string, string>();
+  const names = (await readdir(directory)).toSorted();
+  for (const file of names) {
+    const match = PRICING_FIXTURE_FILE.exec(file);
+    const name = match?.[1];
+    if (name === undefined) {
+      continue;
+    }
+    fixtures.set(name, await readFile(join(directory, file), { encoding: 'utf8' }));
+  }
+  return fixtures;
+}
+
+export interface FixtureHttpPort extends HttpPort {
+  /** Every request sent, in order. */
+  readonly requests: readonly HttpRequest[];
+}
+
+export function createFixtureHttpPort(fixtures: PricingFixtures): FixtureHttpPort {
+  const requests: HttpRequest[] = [];
+  return {
+    requests,
+    send(request) {
+      requests.push(request);
+      const name = pricingFixtureName(request);
+      const body = fixtures.get(name);
+      if (body === undefined) {
+        return Promise.reject(
+          new Error(
+            `[fixture-http] no recorded fixture ${name} for ${request.method} ${request.url} — run pnpm fixtures:record (NFR-2)`,
+          ),
+        );
+      }
+      return Promise.resolve({ status: 200, headers: {}, body });
+    },
+  };
+}

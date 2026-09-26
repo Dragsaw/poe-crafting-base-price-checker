@@ -4,51 +4,129 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { canonicalKey, createFakeClockPort, createFakeFilesystemPort } from '@poe/contracts';
-import type { TrackedEntry } from '@poe/contracts';
+import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { DATASET_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
-import { DRY_RUN_INSTANT, dryRun } from './dry-run.ts';
+import { DRY_RUN_INSTANT, dryRun, readRepositorySnapshot } from './dry-run.ts';
+import type { DryRunSnapshot } from './dry-run.ts';
+import { pricingFixtureName } from './pricing/fixture-names.ts';
+import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
+import { tradeSearchUrl } from './trade/endpoints.ts';
 
 const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
+
+const LEAGUE = 'Test League';
+const CONFIG = JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 });
+const CURRENCIES = JSON.stringify({
+  schemaVersion: '1.0.0',
+  rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
+});
+const ITEMS_CATALOGUE = { result: [] };
+const ITEMS = JSON.stringify({ schemaVersion: '1.0.0', ...ITEMS_CATALOGUE });
+
+/**
+ * An in-memory answer per entry: a search that found nothing. It is not a
+ * fixture file — the ordering tests below need synthetic entries, and the
+ * recorded captures are exercised by the repository run at the bottom.
+ */
+function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
+  const itemTypes = itemTypesOf(ITEMS_CATALOGUE);
+  return new Map(
+    entries.map((entry, index) => [
+      pricingFixtureName({
+        method: 'POST',
+        url: tradeSearchUrl(LEAGUE),
+        body: JSON.stringify(buildSearchBody(entry, itemTypes)),
+      }),
+      JSON.stringify({ id: `S${String(index)}`, complexity: 1, result: [], total: 0 }),
+    ]),
+  );
+}
+
+function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial<DryRunSnapshot> = {}): DryRunSnapshot {
+  return {
+    ...(entries === undefined ? {} : { tracked: JSON.stringify({ schemaVersion: '1.0.0', entries }) }),
+    config: CONFIG,
+    currencies: CURRENCIES,
+    items: ITEMS,
+    fixtures: emptySearches(entries ?? []),
+    ...extra,
+  };
+}
+
+function noListings(entry: TrackedEntry, index: number): DatasetEntry {
+  return {
+    entryKey: canonicalKey(entry),
+    price: { state: 'no-listings' },
+    lastAttemptedAt: DRY_RUN_INSTANT,
+    lastSearchId: `S${String(index)}`,
+    lastSearchLeague: LEAGUE,
+  };
+}
 
 const entries: TrackedEntry[] = [
   { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' },
   { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'pinned' },
   { kind: 'raw', baseTypeId: 'Wide Belt', itemLevelMin: 82, status: 'pruned', prunedReason: 'x' },
 ];
-const trackedText = JSON.stringify({ schemaVersion: '1.0.0', entries });
 
 describe('dryRun', () => {
-  it('runs the chunk in memory and reports what it completed and would record', async () => {
-    const pinned = canonicalKey(entries[1] as TrackedEntry);
-    const active = canonicalKey(entries[0] as TrackedEntry);
+  it('runs the chunk in memory through the pricing step and reports each entry', async () => {
+    const [active, pinned] = entries as [TrackedEntry, TrackedEntry];
 
-    expect(await dryRun(trackedText)).toEqual({
+    expect(await dryRun(snapshotOf(entries))).toEqual({
       outcome: 'completed',
-      completed: [pinned, active],
+      completed: [canonicalKey(pinned), canonicalKey(active)],
+      entries: [noListings(pinned, 1), noListings(active, 0)],
       // Pinned entries are exempt from the pass, so only the active key is recorded.
-      progress: { schemaVersion: '1.0.0', completed: [active] },
+      progress: { schemaVersion: '1.0.0', completed: [canonicalKey(active)] },
       records: [],
     });
   });
 
   it('treats an absent tracked file as an empty workload', async () => {
-    expect(await dryRun(undefined)).toEqual({
+    expect(await dryRun(snapshotOf(undefined))).toEqual({
       outcome: 'completed',
       completed: [],
+      entries: [],
       progress: { schemaVersion: '1.0.0', completed: [] },
       records: [],
     });
   });
 
-  it('is deterministic for a given tracked list', async () => {
-    expect(await dryRun(trackedText)).toEqual(await dryRun(trackedText));
+  it('is deterministic for a given snapshot', async () => {
+    expect(await dryRun(snapshotOf(entries))).toEqual(await dryRun(snapshotOf(entries)));
   });
 
   it('refuses an invalid tracked file loudly', async () => {
-    await expect(dryRun('{"schemaVersion":"9.0.0","entries":[]}')).rejects.toThrow(/9\.0\.0/);
+    await expect(
+      dryRun(snapshotOf([], { tracked: '{"schemaVersion":"9.0.0","entries":[]}' })),
+    ).rejects.toThrow(/9\.0\.0/);
+  });
+
+  it.each([
+    ['config', 'data/config.json'],
+    ['currencies', 'data/currencies.json'],
+    ['items', 'data/catalogue/items.json'],
+  ] as const)('refuses an absent or invalid %s file, naming it, before any request', async (key, path) => {
+    for (const contents of [undefined, '{"schemaVersion":"1.0.0"}']) {
+      await expect(dryRun(snapshotOf(entries, { [key]: contents }))).rejects.toThrow(path);
+    }
+  });
+
+  it('fails loudly, naming the missing fixture, when a request has no recorded fixture', async () => {
+    const [active] = entries as [TrackedEntry];
+    const missing = pricingFixtureName({
+      method: 'POST',
+      url: tradeSearchUrl(LEAGUE),
+      body: JSON.stringify(buildSearchBody(active, itemTypesOf(ITEMS_CATALOGUE))),
+    });
+    const fixtures = emptySearches(entries);
+    fixtures.delete(missing);
+
+    await expect(dryRun(snapshotOf(entries, { fixtures }))).rejects.toThrow(missing);
   });
 });
 
@@ -72,9 +150,10 @@ describe('dryRun: the dataset snapshot', () => {
     ],
     currencyRates: [],
   });
+  const withDataset = snapshotOf(rotation, { dataset: datasetText });
 
   it('orders the rotation by the snapshot’s lastAttemptedAt', async () => {
-    const report = await dryRun(rotationTracked, datasetText);
+    const report = await dryRun(withDataset);
     expect(report.completed).toEqual([P, C, B, A].map(canonicalKey));
   });
 
@@ -89,17 +168,36 @@ describe('dryRun: the dataset snapshot', () => {
       return Promise.resolve({ kind: 'completed' });
     });
 
-    const report = await dryRun(rotationTracked, datasetText);
+    const report = await dryRun(withDataset);
     expect(report.completed).toEqual(visited);
     expect(visited).toHaveLength(4);
   });
 
   it('is deterministic with a dataset', async () => {
-    expect(await dryRun(rotationTracked, datasetText)).toEqual(await dryRun(rotationTracked, datasetText));
+    expect(await dryRun(withDataset)).toEqual(await dryRun(withDataset));
   });
 
   it('refuses an invalid dataset loudly', async () => {
-    await expect(dryRun(rotationTracked, '{"schemaVersion":"9.0.0"}')).rejects.toThrow(/dataset\.json/);
+    await expect(dryRun(snapshotOf(rotation, { dataset: '{"schemaVersion":"9.0.0"}' }))).rejects.toThrow(
+      /dataset\.json/,
+    );
+  });
+});
+
+describe('dryRun: the repository snapshot and its recorded fixtures', () => {
+  it('prices every non-pruned tracked entry from the recorded captures', async () => {
+    const snapshot = await readRepositorySnapshot();
+    const tracked = JSON.parse(snapshot.tracked ?? '{"entries":[]}') as { entries: TrackedEntry[] };
+    const active = tracked.entries.filter((entry) => entry.status !== 'pruned');
+
+    const report = await dryRun(snapshot);
+
+    expect(report.outcome).toBe('completed');
+    expect(report.entries).toHaveLength(active.length);
+    expect(new Set(report.entries.map((entry) => entry.entryKey))).toEqual(new Set(active.map(canonicalKey)));
+    for (const entry of report.entries) {
+      expect(entry.price.state, entry.entryKey).toBe('priced');
+    }
   });
 });
 
@@ -152,7 +250,7 @@ describe('pnpm sync:dry', () => {
     expect(first.stderr).toBe('');
 
     const report = JSON.parse(first.stdout) as Record<string, unknown>;
-    expect(Object.keys(report)).toEqual(['outcome', 'completed', 'progress', 'records']);
+    expect(Object.keys(report)).toEqual(['outcome', 'completed', 'entries', 'progress', 'records']);
     expect(report['outcome']).toBe('completed');
 
     expect(snapshot(DATA_DIR)).toEqual(before);

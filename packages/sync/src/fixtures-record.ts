@@ -12,33 +12,63 @@
  * `fixtures-record.test.ts` does, to drive `recordFixtures` against the fakes —
  * issues nothing.
  *
- * **It records only what it can construct by itself today**: the leagues
- * endpoint and the four `data/*` endpoints, whose URLs it takes from
- * `trade/endpoints.ts` — the same declaration `catalogue:refresh` reads. Story
- * 1.7 adds its own interactions when it has a real request to record. No
- * request body is hand-written here; a hand-written body records what the team
- * believes the API takes rather than what it takes, which is the defect the
- * fixture rules exist to prevent.
+ * **What it records**: the leagues endpoint and the four `data/*` endpoints,
+ * whose URLs it takes from `trade/endpoints.ts` — the same declaration
+ * `catalogue:refresh` reads — and, for every non-pruned entry of
+ * `data/tracked.json`, the POST search and its fetch leg (Story 1.7). The
+ * search body is built by `buildSearchBody`, the same builder the pricing
+ * step sends, in the league `data/config.json` names. No request body is
+ * hand-written here; a hand-written body records what the team believes the
+ * API takes rather than what it takes, which is the defect the fixture rules
+ * exist to prevent. `data/` is read and never written.
  */
 
+import { readdir, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { ClockPort, HttpPort } from '@poe/contracts';
+import { canonicalKey, parseEnvelope, TrackedFileSchema } from '@poe/contracts';
+import type { ClockPort, HttpPort, LeagueId, TrackedEntry } from '@poe/contracts';
 
+import { loadActiveLeague } from './load-config.ts';
+import { loadDataFile } from './load-data-file.ts';
+import { pricingFixtureName } from './pricing/fixture-names.ts';
+import { loadItemTypes } from './pricing/load-item-types.ts';
+import { FETCH_LIMIT } from './pricing/price-entry.ts';
+import { buildSearchBody } from './pricing/search-body.ts';
+import type { ItemTypes } from './pricing/search-body.ts';
 import {
   createFetchHttpPort,
+  createNodeFilesystemPort,
   serialiseJsonArtifact,
   sleep,
   systemClock,
   writeTextFile,
 } from './shell.ts';
 import { createTradeClient } from './trade/client.ts';
-import { CATALOGUE_ENDPOINTS, DATA_LANE, TRADE_LEAGUES_URL } from './trade/endpoints.ts';
+import type { TradeRequest } from './trade/client.ts';
+import {
+  CATALOGUE_ENDPOINTS,
+  DATA_LANE,
+  FETCH_LANE,
+  SEARCH_LANE,
+  TRADE_LEAGUES_URL,
+  tradeFetchUrl,
+  tradeSearchUrl,
+} from './trade/endpoints.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 /** The repository's `fixtures/` directory, three levels up from `src/`. */
 const FIXTURES_DIR = fileURLToPath(new URL('../../../fixtures/', import.meta.url));
+
+/** The recorded pricing fixtures, as `pricing/fixture-names.ts` names them. */
+const PRICING_FIXTURE_FILE = /^trade-(search|fetch)-[0-9a-f]+\.json$/;
+
+/** The repository root, whose `data/` files the recorder reads and never writes. */
+const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
+
+/** The tracked list the pricing interactions are built from (read-only). */
+const TRACKED_PATH = 'data/tracked.json';
 
 /**
  * One recordable interaction. All five share a lane because they are the same
@@ -137,7 +167,7 @@ export function stripPersonalIdentifiers(
 }
 
 /** The fixture file one interaction writes. */
-export function fixturePathOf(interaction: FixtureInteraction): string {
+export function fixturePathOf(interaction: Pick<FixtureInteraction, 'name'>): string {
   return join(FIXTURES_DIR, `${interaction.name}.json`);
 }
 
@@ -167,12 +197,82 @@ export interface RecordOutcome {
 }
 
 /**
+ * What the pricing interactions are built from: the active league (from
+ * `data/config.json`), the tracked entries and the committed item catalogue.
+ */
+export interface PricingWorkload {
+  readonly league: LeagueId;
+  readonly entries: readonly TrackedEntry[];
+  readonly itemTypes: ItemTypes;
+}
+
+type Capture = (
+  name: string,
+  request: TradeRequest,
+) => Promise<{ readonly payload: unknown } | string>;
+
+/** The search id and result ids of a captured search payload, if it has them. */
+function searchAnswerOf(payload: unknown): { id: string; result: string[] } | undefined {
+  if (typeof payload !== 'object' || payload === null) {
+    return undefined;
+  }
+  const { id, result } = payload as { id?: unknown; result?: unknown };
+  if (typeof id !== 'string' || !Array.isArray(result)) {
+    return undefined;
+  }
+  return { id, result: result.filter((item): item is string => typeof item === 'string') };
+}
+
+/**
+ * One tracked entry's two interactions: the POST search, built by
+ * `buildSearchBody` exactly as the pricing step builds it, and — where the
+ * search found anything — the fetch of its cheapest ten ids. Each is named
+ * for its own request (`pricing/fixture-names.ts`), which is what lets the
+ * dry run serve it back. Returns the failure, or `undefined`.
+ */
+async function recordPricing(
+  entry: TrackedEntry,
+  workload: PricingWorkload,
+  capture: Capture,
+): Promise<string | undefined> {
+  let body: string;
+  try {
+    body = JSON.stringify(buildSearchBody(entry, workload.itemTypes));
+  } catch (error) {
+    return `${canonicalKey(entry)}: ${String(error)}. Nothing was written.`;
+  }
+
+  const search = { method: 'POST' as const, url: tradeSearchUrl(workload.league), body };
+  const searched = await capture(pricingFixtureName(search), { ...search, lane: SEARCH_LANE });
+  if (typeof searched === 'string') {
+    return searched;
+  }
+  const answer = searchAnswerOf(searched.payload);
+  if (answer === undefined) {
+    return `${canonicalKey(entry)}: the search answer carries no \`id\` and \`result\`. Nothing was written.`;
+  }
+  if (answer.result.length === 0) {
+    return undefined;
+  }
+
+  const fetch = {
+    method: 'GET' as const,
+    url: tradeFetchUrl(answer.result.slice(0, FETCH_LIMIT), answer.id),
+  };
+  const fetched = await capture(pricingFixtureName(fetch), { ...fetch, lane: FETCH_LANE });
+  return typeof fetched === 'string' ? fetched : undefined;
+}
+
+/**
  * Issues every interaction, **buffers every payload, and writes only once all
- * five succeeded.** A mid-loop failure would otherwise leave `fixtures/` half
+ * of them succeeded.** A mid-loop failure would otherwise leave `fixtures/` half
  * re-recorded — a diff that mixes today's capture with last month's, which is
  * unreviewable and is exactly what the fixture set exists to make legible.
  */
-export async function recordFixtures(ports: RecorderPorts): Promise<RecordOutcome> {
+export async function recordFixtures(
+  ports: RecorderPorts,
+  workload?: PricingWorkload,
+): Promise<RecordOutcome> {
   const client = createTradeClient({
     http: ports.http,
     clock: ports.clock,
@@ -182,27 +282,19 @@ export async function recordFixtures(ports: RecorderPorts): Promise<RecordOutcom
 
   const captured: { path: string; contents: string }[] = [];
 
-  for (const interaction of FIXTURE_INTERACTIONS) {
-    const result = await client.send({
-      method: interaction.method,
-      url: interaction.url,
-      lane: DATA_LANE,
-    });
+  /** One live request, parsed and stripped; a string is the failure. */
+  async function capture(
+    name: string,
+    request: TradeRequest,
+  ): Promise<{ readonly payload: unknown } | string> {
+    const result = await client.send(request);
 
     if (result.kind === 'yield') {
-      return {
-        ok: false,
-        failure: `rate limited on ${interaction.name}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`,
-        written: [],
-      };
+      return `rate limited on ${name}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`;
     }
 
     if (result.response.status !== 200) {
-      return {
-        ok: false,
-        failure: `${interaction.name} answered ${String(result.response.status)}. Nothing was written.`,
-        written: [],
-      };
+      return `${name} answered ${String(result.response.status)}. Nothing was written.`;
     }
 
     let payload: unknown;
@@ -211,17 +303,35 @@ export async function recordFixtures(ports: RecorderPorts): Promise<RecordOutcom
     } catch (error) {
       // A 200 carrying an HTML error page is the usual cause, and a bare
       // SyntaxError names neither the endpoint nor the fact that it answered.
-      return {
-        ok: false,
-        failure: `${interaction.name} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`,
-        written: [],
-      };
+      return `${name} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`;
     }
 
-    captured.push({
-      path: fixturePathOf(interaction),
-      contents: serialiseFixture(stripPersonalIdentifiers(payload)),
+    const stripped = stripPersonalIdentifiers(payload);
+    captured.push({ path: fixturePathOf({ name }), contents: serialiseFixture(stripped) });
+    return { payload: stripped };
+  }
+
+  for (const interaction of FIXTURE_INTERACTIONS) {
+    const outcome = await capture(interaction.name, {
+      method: interaction.method,
+      url: interaction.url,
+      lane: DATA_LANE,
     });
+    if (typeof outcome === 'string') {
+      return { ok: false, failure: outcome, written: [] };
+    }
+  }
+
+  if (workload !== undefined) {
+    for (const entry of workload.entries) {
+      if (entry.status === 'pruned') {
+        continue;
+      }
+      const failure = await recordPricing(entry, workload, capture);
+      if (failure !== undefined) {
+        return { ok: false, failure, written: [] };
+      }
+    }
   }
 
   const written: string[] = [];
@@ -240,13 +350,32 @@ async function main(): Promise<void> {
     return;
   }
 
-  const outcome = await recordFixtures({
-    http: createFetchHttpPort(),
-    clock: systemClock,
-    wait: sleep,
-    userAgent: contact.userAgent,
-    writeFixture: writeTextFile,
-  });
+  // Read-only: the recorder writes under `fixtures/` and nowhere under `data/`.
+  const data = createNodeFilesystemPort(REPO_ROOT);
+  const league = await loadActiveLeague(data);
+  const tracked = await loadDataFile(data, TRACKED_PATH, (value) =>
+    parseEnvelope(TrackedFileSchema, value),
+  );
+  const itemTypes = await loadItemTypes(data);
+  if (!league.ok || !tracked.ok || !itemTypes.ok) {
+    const refused = [league, tracked, itemTypes].flatMap((loaded) => (loaded.ok ? [] : [loaded.error]));
+    for (const error of refused) {
+      process.stderr.write(`pnpm fixtures:record: ${error.message}\n`);
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  const outcome = await recordFixtures(
+    {
+      http: createFetchHttpPort(),
+      clock: systemClock,
+      wait: sleep,
+      userAgent: contact.userAgent,
+      writeFixture: writeTextFile,
+    },
+    { league: league.value, entries: tracked.value.entries, itemTypes: itemTypes.value },
+  );
 
   if (!outcome.ok) {
     process.stderr.write(`pnpm fixtures:record: ${outcome.failure ?? 'failed'}\n`);
@@ -256,6 +385,18 @@ async function main(): Promise<void> {
 
   for (const path of outcome.written) {
     process.stdout.write(`recorded ${path}\n`);
+  }
+
+  // Pricing fixtures are named by request digest, so a changed tracked list,
+  // builder or league leaves the old names behind. Only after a successful
+  // record, remove every pricing fixture this run did not write.
+  const written = new Set(outcome.written.map((path) => resolve(path)));
+  for (const name of await readdir(FIXTURES_DIR)) {
+    const path = resolve(join(FIXTURES_DIR, name));
+    if (PRICING_FIXTURE_FILE.test(name) && !written.has(path)) {
+      await rm(path);
+      process.stdout.write(`removed ${path}\n`);
+    }
   }
 }
 

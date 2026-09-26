@@ -5,13 +5,41 @@
       "kind": "crafted",
       "categoryId": "accessory.amulet",
       "className": "Amulets",
-      "itemLevelMin": 54,
+      "itemLevelMin": 75,
       "prefix": {
         "kind": "banded",
         "statId": "explicit.stat_3981240776",
         "valueMin": 47,
         "valueMax": 50,
         "acceptedTier": "T5"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Emerald",
+      "itemLevelMin": 1,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2843214518",
+        "valueMin": 12,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_681332047",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1"
       },
       "status": "active"
     },

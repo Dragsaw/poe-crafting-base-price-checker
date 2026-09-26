@@ -64,3 +64,29 @@ export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';
  */
 export { checkPinnedCap, pinnedStarvationRecord } from './pinned-cap';
 export type { PinnedCapExceeded, PinnedCapResult } from './pinned-cap';
+
+/**
+ * The pricing step (FR-21, FR-23, AD-16, AD-20): one search and at most one
+ * fetch per tracked entry through the governed client, normalised to divine
+ * once. It plugs into `runChunk` as its `ChunkStep`; Story 1.8 publishes the
+ * entries it returns.
+ */
+export {
+  createPricingStep,
+  FETCH_LIMIT,
+  MalformedRequestError,
+  UnexpectedTradeResponseError,
+} from './pricing/price-entry';
+export type { PricingStepOptions, RequestKind } from './pricing/price-entry';
+export {
+  buildSearchBody,
+  itemTypesOf,
+  UnknownClassBaseTypeError,
+} from './pricing/search-body';
+export type { ItemTypes, SearchBody } from './pricing/search-body';
+export { currentRates, lowerMedian, outputRates, roundDivine, toDivine } from './pricing/normalise';
+export { CURRENCIES_PATH, loadCurrencies } from './pricing/load-currencies';
+export { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types';
+export { CONFIG_PATH, loadActiveLeague } from './load-config';
+export { DataFileError } from './load-data-file';
+export type { DataFileRefusal, DataFileResult } from './load-data-file';
