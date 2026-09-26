@@ -17,6 +17,9 @@
     ]
   },
   "defaultShell": "bash",
+  "worktree": {
+    "baseRef": "head"
+  },
   "enabledPlugins": {
     "bmad-method@bmad": true,
     "bmad-toolbox@bmad": true

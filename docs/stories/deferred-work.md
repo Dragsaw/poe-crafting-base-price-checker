@@ -1,6 +1,6 @@
 # Deferred work
 
-Append-only. Each entry names work carved out of a spec so it is not lost.
+Each entry names work carved out of a spec so it is not lost. Stories and reviews append; they do not rewrite. The `deferred-work-sweep` skill (`.claude/skills/deferred-work-sweep/SKILL.md`) removes an entry in the last commit of the branch that closes it, so the removal reaches `master` with the work, and adds `auto_attempt:` / `retry_when:` lines to an entry it could not close.
 
 - source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
   summary: Nothing forbids `core` from importing `node:*` builtins or a runtime dependency, so its documented purity is unenforced.
