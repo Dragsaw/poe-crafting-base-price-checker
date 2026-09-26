@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { IsoTimestampSchema } from './primitives.ts';
+import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 import { TrackedListAgeSchema } from './tracked-list-age.ts';
 
 /**
@@ -165,6 +165,20 @@ export const RunFailureRecordSchema = z.strictObject({
   message: z.string().min(1).describe('The error message, as thrown.'),
 });
 
+/**
+ * The configured league is not among the ids the trade leagues endpoint
+ * answered, so the run aborted before it spent any search (AD-19, FR-32).
+ * A routine configuration fault, not a `run-failure`: the player needs the
+ * list to correct `config.json`.
+ */
+export const LeagueMismatchRecordSchema = z.strictObject({
+  kind: z.literal('league-mismatch'),
+  configuredLeague: LeagueIdSchema.describe('`config.league` as loaded.'),
+  availableLeagues: z
+    .array(LeagueIdSchema)
+    .describe('Every id the leagues endpoint answered, in endpoint order. Ids compare byte for byte.'),
+});
+
 export const SyncRunRecordSchema = z.discriminatedUnion('kind', [
   StaleLockBrokenRecordSchema,
   PinnedStarvationRecordSchema,
@@ -173,6 +187,7 @@ export const SyncRunRecordSchema = z.discriminatedUnion('kind', [
   UncataloguedWeightsIdRecordSchema,
   CrossFileGateFailureRecordSchema,
   RunFailureRecordSchema,
+  LeagueMismatchRecordSchema,
 ]);
 
 export type StaleLockBrokenRecord = z.infer<typeof StaleLockBrokenRecordSchema>;
@@ -182,6 +197,7 @@ export type WeightsAbsentRecord = z.infer<typeof WeightsAbsentRecordSchema>;
 export type UncataloguedWeightsIdRecord = z.infer<typeof UncataloguedWeightsIdRecordSchema>;
 export type CrossFileGateFailureRecord = z.infer<typeof CrossFileGateFailureRecordSchema>;
 export type RunFailureRecord = z.infer<typeof RunFailureRecordSchema>;
+export type LeagueMismatchRecord = z.infer<typeof LeagueMismatchRecordSchema>;
 export type SyncRunRecord = z.infer<typeof SyncRunRecordSchema>;
 
 export const SyncRunReportSchema = z

@@ -130,9 +130,13 @@ export type {
   TradeCatalogue,
 } from './trade-catalogue.ts';
 
+export { LeagueEntrySchema, LeaguesPayloadSchema } from './trade-leagues.ts';
+export type { LeagueEntry, LeaguesPayload } from './trade-leagues.ts';
+
 export {
   CrossFileCheckSchema,
   CrossFileGateFailureRecordSchema,
+  LeagueMismatchRecordSchema,
   PinnedStarvationRecordSchema,
   RequestSourceSchema,
   RequestsBySourceSchema,
@@ -149,6 +153,7 @@ export {
 export type {
   CrossFileCheck,
   CrossFileGateFailureRecord,
+  LeagueMismatchRecord,
   PinnedStarvationRecord,
   RequestSource,
   RunFailureReason,

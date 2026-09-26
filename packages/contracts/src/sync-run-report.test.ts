@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  LeagueMismatchRecordSchema,
   PinnedStarvationRecordSchema,
   SyncRunFiguresSchema,
   SyncRunRecordSchema,
@@ -184,6 +185,41 @@ describe('SyncRunRecordSchema', () => {
         identifier: 'explicit.stat_1',
         identifierKind: 'statId',
         entryKey: 'x',
+      }).success,
+    ).toBe(false);
+  });
+
+  it('carries a league-mismatch record with the configured league and every available id', () => {
+    const record = {
+      kind: 'league-mismatch',
+      configuredLeague: 'forbidden rites',
+      availableLeagues: ['Forbidden Rites', 'Standard'],
+    };
+    expect(SyncRunRecordSchema.parse(record)).toEqual(record);
+    expect(Object.keys(LeagueMismatchRecordSchema.shape).sort()).toEqual([
+      'availableLeagues',
+      'configuredLeague',
+      'kind',
+    ]);
+    expect(
+      SyncRunRecordSchema.safeParse({ ...record, availableLeagues: [] }).success,
+    ).toBe(true);
+  });
+
+  it('refuses a league-mismatch record with no league, no list or an extra field', () => {
+    expect(
+      SyncRunRecordSchema.safeParse({ kind: 'league-mismatch', availableLeagues: [] }).success,
+    ).toBe(false);
+    expect(
+      SyncRunRecordSchema.safeParse({ kind: 'league-mismatch', configuredLeague: 'Standard' })
+        .success,
+    ).toBe(false);
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'league-mismatch',
+        configuredLeague: 'Standard',
+        availableLeagues: [],
+        message: 'x',
       }).success,
     ).toBe(false);
   });
