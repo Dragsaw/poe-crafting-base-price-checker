@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 6
+revision: 7
 created: 2026-09-13
 updated: 2026-09-26
 sources:
@@ -55,7 +55,7 @@ Mantine's defaults are recorded here:
 | `theme.primaryColor` defaults to blue | Repointed off blue, per `DESIGN.md`. Blue would tint carets, selections and every input focus on a page that contains no blue. |
 | `theme.lineHeights` and `theme.headings` supply their own ramps | Both **replaced, not extended**. Every type role declares its own `lineHeight`. The 28px row, the 1920px fit and `{spacing.frame-slack}` are all computed against those declared values. |
 | Font sizes resolved through `--mantine-scale`'s rem conversion | Sizes are passed as literal px, so the 9.5 / 10.5 / 11.5 / 12.5 / 13.5px roles cannot be rounded away. |
-| `Skeleton` animated shimmer | The load state is skeleton rows in the final layout (memlog 50). Whether they shimmer is a `DESIGN.md` gap, not a behavioural one. |
+| `Skeleton` animated shimmer | The load state is skeleton rows in the final layout (memlog 50). **No shimmer and no animation** `[decision — memlog 211]`: flat bars, whose treatment `DESIGN.md` owns under Components. |
 | Focus ring and keyboard traversal | Out of scope — see Accessibility Floor. |
 
 Two rules that are not Mantine deltas but read like them, recorded so nobody
@@ -82,7 +82,7 @@ One surface. Everything below is a region of it, in fixed vertical order.
 | Region | Reached from | Purpose |
 |---|---|---|
 | Masthead + `{components.craft-recipe}` + `{components.payout-threshold}` | Always visible | Names the league. Holds **both** controls on the page, as one right-floated group |
-| `{components.trust-strip}` | Always visible | What the ranking rests on, as five plain facts: Weights File producer, `generatedAt`, `gamePatch`, last synced, tracked-list edit date (FR-10, FR-18). Raises a rust line when something is broken. The whole strip is a click target |
+| `{components.trust-strip}` | Always visible | What the ranking rests on, as five plain facts: Weights File producer, `generatedAt`, `gamePatch`, last synced, tracked-list edit date (FR-10, FR-18). Names each absent tolerable artifact on a plain line of its own (state 38). Raises a rust line when something is broken. The whole strip is a click target |
 | `{components.sync-report-panel}` | Click `{components.trust-strip}` | The full Sync Report, opened in place beneath the strip (FR-24, FR-25, FR-4) |
 | `{components.asking-price-line}` | Always visible | FR-13's framing, above the list, never below the fold |
 | `{components.uniform-prior-banner}` | Raised by data condition | The whole-ranking warning (FR-11) |
@@ -262,6 +262,24 @@ Tracked List has no commit history, prints with the suffix `(not committed)`,
 verbatim. The suffix is plain text in the fact's own ink, with no mark and no
 colour: it is still attribution, not a health signal. With neither date, the
 field reads *unknown* (FR-18, AD-12, AD-9).
+
+**A missing file is named in the strip** `[decision — memlog 213]`. Each absent
+tolerable artifact (AD-24) adds one line inside the strip, after line two and
+before the health line. The lead is `Not published`, and the three bodies are
+verbatim:
+
+| Absent file | Body |
+|---|---|
+| `weights.json` | `weights.json — every crafted class is unrankable.` |
+| `recipes.json` | `recipes.json — no crafted rows can be ranked.` |
+| `sync-report.json` | `sync-report.json — the sync report is unavailable.` |
+
+The lines carry no mark and no colour, like the five facts above them. AD-24
+makes each file absent-tolerable, so its absence is attribution and not a health
+signal. The committed deploy has no `recipes.json`, so a marked line would sit
+on the page every day. The line gives the reason once, and nothing else on the
+page repeats it: not the appendix (state 37) and not the *unknown* fields.
+`DESIGN.md`, Components, owns the treatment and the budget line.
 
 **The masthead eyebrow** reads `League {activeLeague}` and nothing else. **The
 Craft Recipe left it at revision 3** `[decision — memlog 181]`, and the open item
@@ -504,11 +522,11 @@ takes its word.
 | `{components.money-slot}` | Any cell where a figure is missing | Holds a short phrase naming which question is open, never a number-shaped placeholder. See Epistemics. |
 | `{components.craft-recipe}` | Masthead, inboard of the threshold | The page's **second ranking dial** (FR-26) `[decision — memlog 181]`. Two options on one line, each the single word that distinguishes its composition — `greater | perfect`, divided by the trust strip's pipe rather than the page's middle dot, which joins two affixes in every chase cell and would carry the opposite operator here. **Both words carry a rule at rest and they carry different ones** `[decision — memlog 191]`: the inactive word takes the page's dotted sepia *this is clickable* mark **at rest**, going solid on hover exactly as `{components.expand-affordance}` does; the active word takes a 2px solid sepia rule, doubled so it cannot be read as `{components.payout-threshold}`'s 1px solid *you are hovering this* on the sibling panel 16px away. **Clicking the inactive option makes it active**; the active option is not a click target, because there is nothing to switch to, and it carries no dotted rule because dotted means *you can click this*. The switch re-ranks synchronously against the already-loaded artifacts, exactly as a threshold change does: no network request, no sync (FR-1, AD-24). It is **not debounced** — a click is a discrete, deliberate act, where a keystroke is one of several on the way to a value. A recipe change reorders the list *and* rewrites every crafted row's Chase Combination set, because a recipe changes which outcomes are reachable rather than only what an attempt costs (FR-26). **A Raw Base row does not move** relative to its own price, since a Raw Base has no Craft Cost — but its *rank* can change as crafted rows move around it. Craft Cost for the active recipe prints beneath the options, at 2dp, in Divine — the page's only printing of it (FR-26). An **uncostable** recipe (no current rate for a currency in the active league) shows *no figure yet* there and never a zero (FR-26, AD-20). **The active recipe persists across a reload** — see *What survives a reload*. |
 | `{components.payout-threshold}` | Masthead | **The figure is the input** `[decision — memlog 73]` — click the large serif number and type over it. No field, no box, no form chrome. The `Divine` suffix sits outside the editable region and cannot be typed over. Re-ranks on every valid parse. Constraints `[decision — memlog 74]`: min `0`, max `3`, step `0.05`, two decimals, clamped on blur — a negative threshold is not enterable. **The track and marker survive as a non-interactive readout**: they answer "where does 0.50 sit in the range I have", the marker cannot be dragged, and the track cannot be clicked. |
-| `{components.trust-strip}` | Under the masthead | Carries **five plain facts, unconditionally**, with no mark and no colour on any of them. Line one carries `producer.id`, `generatedAt` and `gamePatch` (FR-10). Line two carries the last-synced time and the **tracked-list edit date** (FR-18) `[decision — memlog 89]`. Always present, never dismissible. `[ASSUMPTION — memlog 59]` Otherwise silent while fine — no counts of nothing, no "0 unresolvable", no green tick. **Loud when wrong** `[decision — memlog 70/88]`: it raises a third line carrying a rust mark with its glyph, its word **and its count**, on exactly two triggers that share the one line — `× N unresolvable` (FR-24) and `× pinned entries starved this run` (FR-17, FR-25). The line costs `{spacing.frame-reserve-health-line}` and is charged to the resting budget, because data raises it and no click does. **The whole strip is the click target** and it toggles `{components.sync-report-panel}`. |
-| `{components.sync-report-panel}` | Opened from the strip | The full Sync Report — **six groups in three columns** `[decision — memlog 206]`: *the sync run* (requests per source, and entries not reached **in the last sync pass**), *what is broken* (the unresolvable count, FR-24; the pinned-starvation records, FR-17/FR-25; **and the cross-file check diagnosis**, state 27), *what the weights cover* (pool coverage as a fraction **with its denominator**, FR-4). *It was five groups until revision 4.* The sixth is the only one that is not a figure — it is a list, one line per failing check naming the check, the entry and that entry's canonical key — and it is therefore the only group whose length is unbounded, which is why the panel's cap is what makes it placeable at all. The first column is what the run did, the second what broke, the third how much of the Tracked List the weights can speak to. **One heading per column, never per group** (`columnHeadingRule`): a column carrying two groups prints its heading once and separates the groups by vertical space — no second heading, no rule, no bullet. **The tracked-list edit date is not repeated here** `[decision — memlog 89]`. It is a resting fact on the strip two lines above. This panel holds what the resting page cannot show, so it does not restate what is already on screen. `[ASSUMPTION — memlog 59]` Opens **in place**, pushing the asking-price line, the list and the appendix down — not a modal, not a drawer, not a second surface. Closed on every load. Figures are read from `sync-report.json` and never recomputed by the page. |
+| `{components.trust-strip}` | Under the masthead | Carries **five plain facts, unconditionally**, with no mark and no colour on any of them. Line one carries `producer.id`, `generatedAt` and `gamePatch` (FR-10). Line two carries the last-synced time and the **tracked-list edit date** (FR-18) `[decision — memlog 89]`. Always present, never dismissible. `[ASSUMPTION — memlog 59]` Otherwise silent while fine — no counts of nothing, no "0 unresolvable", no green tick. **Loud when wrong** `[decision — memlog 70/88]`: it raises a third line carrying a rust mark with its glyph, its word **and its count**, on exactly two triggers that share the one line — `× N unresolvable` (FR-24) and `× pinned entries starved this run` (FR-17, FR-25). The line costs `{spacing.frame-reserve-health-line}` and is charged to the resting budget, because data raises it and no click does. **An absent tolerable artifact adds a plain `Not published` line** after line two and before the health line, with no mark and no colour `[decision — memlog 213]` (state 38). **The whole strip is the click target** and it toggles `{components.sync-report-panel}`. |
+| `{components.sync-report-panel}` | Opened from the strip | The full Sync Report — **six groups in three columns** `[decision — memlog 206]`: *the sync run* (requests per source, and entries not reached **in the last sync pass**), *what is broken* (the unresolvable count, FR-24; the pinned-starvation records, FR-17/FR-25; **and the cross-file check diagnosis**, state 27), *what the weights cover* (pool coverage as a fraction **with its denominator**, FR-4). *It was five groups until revision 4.* The sixth is the only one that is not a figure — it is a list, one line per failing check naming the check, the entry and that entry's canonical key — and it is therefore the only group whose length is unbounded, which is why the panel's cap is what makes it placeable at all. The first column is what the run did, the second what broke, the third how much of the Tracked List the weights can speak to. **One heading per column, never per group** (`columnHeadingRule`): a column carrying two groups prints its heading once and separates the groups by vertical space — no second heading, no rule, no bullet. **The tracked-list edit date is not repeated here** `[decision — memlog 89]`. It is a resting fact on the strip two lines above. This panel holds what the resting page cannot show, so it does not restate what is already on screen. `[ASSUMPTION — memlog 59]` Opens **in place**, pushing the asking-price line, the list and the appendix down — not a modal, not a drawer, not a second surface. Closed on every load. Figures are read from `sync-report.json` and never recomputed by the page. A coverage figure the report omits reads *not measured* while a weights envelope is loaded, and *unknown* without one `[decision — memlog 212]`. |
 | `{components.asking-price-line}` | Under the trust strip | Always rendered, in every state including the honest-empty one. Never dismissible. |
 | `{components.uniform-prior-banner}` | Above the list | Raised by a data condition, never by a build flag (FR-11). Dismiss is per session only — it returns on the next page load while the condition holds, and it lowers itself the moment any `measured` figure appears. |
-| `{components.unrankable-appendix}` | Foot | The count is readable without expanding anything (FR-4). Rows are not interactive and do not expand — an Unrankable Item Class has no ranking to explain. **Every row here is an Item Class**: unrankability governs the crafted branch only, a Raw Base needs no Eligible Pool and ranks regardless (FR-4), so a Base Type never appears in this appendix. An Item Class sitting here may still have Base Types ranking on the raw branch; where it does, its note **names that fact and not a rank** — a class holds several Base Types, they do not rank together, and there is no single position to point at. The appendix's prominence is a UX decision as of revision 3, not a coverage band: the page never switches layout on a measurement `[change — memlog 185]`. |
+| `{components.unrankable-appendix}` | Foot | The count is readable without expanding anything (FR-4). Rows are not interactive and do not expand — an Unrankable Item Class has no ranking to explain. **Every row here is an Item Class**: unrankability governs the crafted branch only, a Raw Base needs no Eligible Pool and ranks regardless (FR-4), so a Base Type never appears in this appendix. An Item Class sitting here may still have Base Types ranking on the raw branch; where it does, its note **names that fact and not a rank** — a class holds several Base Types, they do not rank together, and there is no single position to point at. The appendix's prominence is a UX decision as of revision 3, not a coverage band: the page never switches layout on a measurement `[change — memlog 185]`. **With no rows it shows its title alone**, the count in ink, and says nothing about why `[decision — memlog 214]` (state 37). |
 | `{components.key-block}` | Above the foot | Always rendered, in every state. It is what makes an empty cell mean something (memlog 42) and is not an optional legend. **It covers the resting page only** `[decision — memlog 114]`. It is deliberately not extended to the expansion's four Price State glyphs. Every glyph always appears beside its word, so nothing there is unreadable without a legend. Four more marks on the resting page, to explain a surface one click away, would cost quiet for no gain. The block exists because silent-when-fine makes an empty cell ambiguous, and that ambiguity belongs to the ranked list alone. |
 | `{components.expansion-panel}` | Click a ranked row | Lists **every** Tracked Entry on the Item Class, priced or not, above or below the threshold, including `pruned` tombstones (FR-8). A Raw Base row expands to the single entry it names. Its title carries the row's unit name led by the same glyph the row carries. Repeats the active threshold **and the active Craft Recipe**, plus the asking-price framing, so a panel read on its own cannot be misread — from revision 3 the recipe is the second thing the figures depend on, and naming only the threshold would repeat half the panel's own context. |
 | `{components.combination-row}` | Inside the expansion | **Two lines under one hairline** `[decision — memlog 101]`, and the two-line shape exists in the expansion only — the 28px ranked row is untouched. *Line one, the figure:* the Combination — **tier plus short form, never the value**, the same reading as the chase cell `[decision — memlog 134]` — the Price State with its glyph **and** its word, the price in Divine or a money phrase, and the listing sample count. *Line two, the evidence:* the note, then **both labelled ages in their own cells** — the observation age (*priced 11h ago*) and the last-attempted age (*tried 4h ago*). Each says which clock it reads, so the two are never collapsed (FR-12). Line two is **always present**, so rows scan evenly down the expansion. It **wraps rather than truncating**: a long note grows the row by whole `{spacing.combination-row-line-2-height}` lines, which is why `{spacing.combination-row-height}` is a minimum and not a height. That arithmetic holds only because line two is set in `{typography.combination-line-2}` `[decision — memlog 115]`, whose `lineHeight` is **absolute**. The wrap quantum equals the declared token, so a builder never has to compute it and the spine's `48 + 20n` stays literally true. Below-threshold entries are marked by the note reading *below the threshold — adds nothing to EV*. They are never greyed out and never hidden. |
@@ -675,6 +693,13 @@ instead. It lowers itself when the condition stops holding, so nobody has to
 remember to take it down. The per-row mark is required either way (FR-11), and a
 `prior only` row still carries its mark while the banner is up.
 
+**It needs a ranking to speak about** `[decision — memlog 213]`. The condition
+above is vacuously true when no crafted row is ranked, which happens when
+`weights.json` or `recipes.json` is absent. The banner is not raised then. Its
+sentence would be false, because no ranking rests on a prior when no crafted
+ranking exists. The trust strip's absence line already says why. This also sets
+the co-occurrence bound in `DESIGN.md`'s vertical budget.
+
 **What lowers it is one wholly published pool, and the page claims nothing about
 how likely that is.** Because Provenance propagates pool-wide, an Item Class reads
 `measured` only when **every** entry in its scoped pool was published — a single
@@ -717,6 +742,12 @@ the health line above when something is broken. **One click** opens
 per-source request counts, entries not reached in the last sync pass, the
 pinned-starvation records, the unresolvable count (FR-24) and the measured
 pool-coverage fraction with its denominator (FR-4).
+
+**A missing coverage figure** `[decision — memlog 212]`. When `weights.json` is
+loaded but `sync-report.json` carries no coverage figure, the panel reads *not
+measured*. When `weights.json` is absent, it reads *unknown*. It is never `0`
+and never marked. The page tells the two apart by the weights envelope it
+loaded. The first case lasts only until `sync` measures coverage (Story 3.6).
 
 This is what satisfies FR-25's own argument that "a report field that nothing
 renders is a field that nobody reads", without putting operational counts in
@@ -814,7 +845,7 @@ dataset in one state at one moment.
 | 19 | Uniform-prior condition true | Banner | `{components.uniform-prior-banner}` above the list, dismissible for the session only |
 | 20 | Below-threshold entry | Combination row | Note *below the threshold — adds nothing to EV*. Shown, never hidden, never greyed |
 | 21 | Item Class with no Chase Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and is shown as such, at 2dp, as a real quantity. A negative EV is never a money-slot phrase — the figure is known, and it is bad news rather than missing news. It is **ranked, not Unrankable** (FR-1): a threshold that excludes every outcome is an answer about that class, not an absence of data |
-| 22 | Cold load / skeleton | Whole page | Masthead and twenty row slots paint immediately as placeholders in the final layout. The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` All eight artifacts resolve in a **single transition** — never row by row, because a partly filled list would show a ranking computed from an incomplete dataset. `[NOTE FOR UX]` No skeleton fill tone or placeholder shape is drawn anywhere |
+| 22 | Cold load / skeleton | Whole page | Masthead and twenty row slots paint immediately as placeholders in the final layout. The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` All eight artifacts resolve in a **single transition** — never row by row, because a partly filled list would show a ranking computed from an incomplete dataset. `[decision — memlog 211]` Flat `{colors.paper-inset}` bars with no shimmer, and the column header painted with its final labels. `DESIGN.md`, Components, owns the treatment |
 | 23 | Honest empty — league reset | Whole list | `[decision — memlog 48]` Every tracked unit renders in **canonical order** — every Item Class and every Raw Base, each with its glyph — carrying Price State `not-yet-synced` reason `league-mismatch`, refilling over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed** and the list states that the order is canonical and not ranked. Without that the page asserts a ranking it does not have, which is the failure FR-31's honest-empty rule exists to prevent. `[decision — memlog 83]` **The EV cell is not blank**: every EV there is missing for exactly one reason, so every cell holds the `not-yet-synced` money phrase **no figure yet**. Assumption 49's "empty rather than zero" was aimed at the zero. Blank is the other thing the money slot forbids, and the vocabulary memlog 43 built already answers this without an exemption |
 | 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row freshness is what makes that honest. No global "stale" treatment |
 | 25 | Nothing clears the threshold | Whole list | Distinct from state 24 and from state 23, and **it is the one state in this table the player typed** `[decision — memlog 204]`. Every crafted Item Class is still ranked, at an EV of minus its Craft Cost (FR-1) — so this is not an empty list, it is twenty rows carrying the same figure. Raw Bases under the threshold leave the ranking altogether, so the raw branch may be empty while the crafted one is full. **Rank numerals stay.** State 23 suppresses them because its order is canonical rather than ranked; here the order *is* computed and the figures merely tie, and hiding a computed result because it is flat would be the page editing its own answer. A plain declarative sits above the list, under `{components.asking-price-line}`, naming the live Payout Threshold figure at the page's 2dp — the condition, not an instruction. It is not `{components.uniform-prior-banner}`, which is raised by a data condition; this is not one. It is not a `{components.money-slot}` phrase either, because no figure is missing. **A tie of this size needs a declared tiebreak** or the order shifts between loads; AD-17 declares it, so the printed order is fully determined and identical across loads (AD-17) |
@@ -829,6 +860,8 @@ dataset in one state at one moment.
 | 34 | Craft Recipe switched | Whole list + `{components.craft-recipe}` | `[decision — memlog 181]` The clicked word becomes solid and takes the sepia rule; the other goes tertiary. The list **re-ranks synchronously** against loaded artifacts — no network, no sync (FR-1, AD-24) — and it is **not debounced**, because a click is one deliberate act where a keystroke is one of several. Ranks, EV figures **and Chase Combination sets** all change, since a recipe changes which outcomes are reachable and not only what an attempt costs (FR-26). The Craft Cost line updates with it. Open panels stay open and re-render against the new recipe; nothing closes. Raw Base rows keep their own prices — they have no Craft Cost — but their **ranks** can move as crafted rows reorder around them |
 | 35 | Active recipe uncostable | `{components.craft-recipe}` + ranked list | A recipe naming a currency with no current rate for the active league is **uncostable**, never costed at zero (FR-26, AD-20). The Craft Cost line holds the money-slot phrase *no figure yet*. **The note that stood here is closed** `[decision — memlog 205]`, and PRD revision 19 now carries the player-visible half of it (FR-26, FR-5). **Every row stays.** No row leaves the list and no Item Class becomes Unrankable — the appendix would print an FR-4 reason that is false of a class whose pool is complete and agrees with the Weights File. **Each branch keeps its own order and neither is ordered against the other.** Craft Cost is one figure subtracted equally from every crafted row, so the crafted order and the Chase Combination sets are exactly what they would have been — the Payout Threshold compares against a Combination's gross price and never touches the cost (FR-1). What is unavailable is the *distance* between a crafted row and a Raw Base row, which is the missing figure itself. **So no rank numeral spans the two.** Numerals are suppressed, as in state 23 and for the same reason — a numeral is an explicit claim about position and the line below cannot retract it, where vertical adjacency under a stated limit is not a claim. `{components.ranked-row-tier-1/2/3}` run **per branch**, so two tier-1 rows is the correct render and is the only thing left saying *this is the strong end of its order*. A plain declarative sits above the list in state 25's register, naming the active recipe and stating that the two branches are not comparable while it holds. Every EV cell on a crafted row holds *no figure yet*, never `0.00`. **FR-5's bound applies per branch** — up to 20 rows of each, one `{components.expand-affordance}` under each, still naming no unit. The resting page can therefore hold 40 rows and scroll; `DESIGN.md`, Layout & Spacing carries that as an accepted overrun rather than a rule breach. Per PRD addendum revision 19 this state fires disproportionately on the costlier recipe, so it is a routine state and not a defensive one |
 | 36 | An Item Class unrankable under one recipe only | Appendix or list | AD-17 truncates the Eligible Pool below a recipe's `modifierLevelMin`, and an empty surviving pool makes that `(Item Class, recipe)` pair unrankable. Under the one-recipe-at-a-time reading (see *A note on the recipe axis* below), the class is simply Unrankable while that recipe is active and ranks normally under the other. **FR-4's reason enum is not extended** — PRD memlog 151 declines a third string on the ground that no base is tracked below item level 70, so the case is defensive rather than live. `[NOTE FOR UX]` If it ever does fire, neither existing string describes it and the enum is the PRD's to extend, not this document's |
+| 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | `[decision — memlog 214]` The committed state: `weights.json` present and `recipes.json` absent, so no class is Unrankable in FR-4's sense (AD-24). The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with the count in ink rather than rust. No lead and no rows. **It does not say why it is empty.** State 38's absence line already says so, and the empty appendix must not say it again or contradict it. It never prints `class absent from weights file` while a weights envelope is loaded |
+| 38 | A tolerable artifact absent | `{components.trust-strip}` | `[decision — memlog 213]` One plain `Not published` line per absent file, inside the strip after line two, with no mark and no colour. The strings are verbatim under Domain Vocabulary. Each line is budgeted at `{spacing.frame-reserve-absence-line}`. An absent `weights.json` also turns the strip's three line-one fields to *unknown*. An absent `weights.json` or `recipes.json` holds the uniform-prior banner down, because there is no crafted ranking for it to describe |
 
 `{components.asking-price-line}`, `{components.key-block}` and
 `{components.running-foot}` render in every state above except **26 and 28**, the
@@ -1123,16 +1156,18 @@ push the page past 1920px.*** `[decision — memlog 63/64/65]` The no-scroll rul
 binds the resting state — what the player reads at a glance — and not a state he
 opened himself.
 
-1. **`{spacing.frame-slack}` is the expansion budget** — **528px**, computed
-   from the committed block heights at the declared line-heights, sitting
-   between the last ranked row and the appendix. Two things are charged against
-   it by *data* rather than by a click and therefore belong to the resting
-   budget: `{spacing.frame-reserve-banner}` for the uniform-prior banner, and
-   `{spacing.frame-reserve-health-line}` for the trust strip's health line.
-   Worst-case resting height is 1485px, leaving 433px.
+1. **`{spacing.frame-slack}` is the expansion budget** — **530px** `[change —
+   memlog 210]`, computed from the committed block heights at the declared
+   line-heights, sitting between the last ranked row and the appendix. Three
+   things are charged against it by *data* rather than by a click and therefore
+   belong to the resting budget: `{spacing.frame-reserve-banner}` for the
+   uniform-prior banner, `{spacing.frame-reserve-health-line}` for the trust
+   strip's health line, and `{spacing.frame-reserve-absence-line}` for each
+   absence line (state 38). They cannot all co-occur (`DESIGN.md`, Layout &
+   Spacing). Worst-case resting height is 1485px, leaving 435px.
 2. **The sync report opens against the slack first.** It is capped at
    `{spacing.sync-report-max-height}` — an independent **400px**, chosen to sit
-   inside that 433px worst case — and scrolls inside its own band past that. So
+   inside that 435px worst case — and scrolls inside its own band past that. So
    `{components.sync-report-panel}` alone never makes the page scroll, in any
    data state.
 3. **A ranked row's expansion is deliberately uncapped.** Capping it would hide
@@ -1360,15 +1395,16 @@ Run against `references/validate.md` Pass 1.
   Flow with numbered steps and a climax beat. Failure paths where one exists:
   UJ-1, UJ-2. UJ-5's partial support and UJ-6's honest-empty landing are stated
   as such. Protagonist is "the player" by deliberate override (memlog 21).
-- **State coverage — 37 states enumerated** across Price States and their
+- **State coverage — 39 states enumerated** across Price States and their
   reasons, Curation Statuses, Provenance values, Unrankable reasons, load,
-  empty, stale, refusal, fetch-failure, report, sync-health, grown-list and
-  **Craft Recipe** conditions. Revision 3 added 12a (a Raw Base's absent
-  Provenance), 34 (a recipe switch), 35 (an uncostable recipe) and 36 (a class
-  unrankable under one recipe only). **Two** carry `[NOTE FOR UX]`: the
-  skeleton's own appearance (22) and the reason string a recipe-scoped Unrankable
-  would need (36), which is the PRD's to extend and stays declined per PRD memlog
-  151. *It was six, then five, and revision 4 closed three at once* — the
+  empty, stale, refusal, fetch-failure, report, sync-health, grown-list,
+  **Craft Recipe** and **absent-artifact** conditions. Revision 3 added 12a (a
+  Raw Base's absent Provenance), 34 (a recipe switch), 35 (an uncostable recipe)
+  and 36 (a class unrankable under one recipe only). Revision 7 added 37 (the
+  empty appendix) and 38 (a tolerable artifact absent). **One** carries `[NOTE
+  FOR UX]`: the reason string a recipe-scoped Unrankable would need (36), which
+  is the PRD's to extend and stays declined per PRD memlog 151. Revision 7
+  closed the skeleton's appearance (22, memlog 211). *It was six, then five, and revision 4 closed three at once* — the
   nothing-clears copy (25, memlog 204), what crafted rows do under an uncostable
   recipe (35, memlog 205, with PRD revision 19 carrying the player-visible half),
   and the cross-file report's placement (27, memlog 206). The pinned mark closed
@@ -1506,11 +1542,23 @@ Run against `references/validate.md` Pass 1.
     AD-17, and an acceptance criterion cites AD-17 directly because
     `IMPLEMENTATION-NOTES.md` does not own this rule. No story invents a
     tiebreak of its own.
+- **Closed at revision 7** (210–214), from the `[NOTE FOR UX]` entries Epic 2
+  logged in `docs/stories/deferred-work.md`:
+  - **The vertical budget's 2px** (210). `{spacing.frame-slack}` is 530, not
+    528; the gap was the frame's old border, which became an outline.
+  - **The skeleton's appearance** (211, state 22). The flat-bar default is
+    ratified, and the column header paints with its final labels.
+  - **A coverage figure the report omits** (212). *not measured* with a weights
+    envelope loaded, *unknown* without one.
+  - **Absence lines** (213, state 38). Plain lines inside the trust strip, with
+    a budget line of their own. The uniform-prior banner stays down when no
+    crafted ranking exists, which bounds how many reservations can co-occur.
+  - **The empty Unrankable appendix** (214, state 37). Its title alone, the
+    count in ink.
 - **Unresolved, reported not fixed.** None of these is resolved by invention:
   - Two Combinations that read identically (Domain Vocabulary; memlog 143).
   - The reason string a recipe-scoped Unrankable would need (state 36), which is
     the PRD's to extend and stays declined per PRD memlog 151.
-  - The skeleton's appearance (state 22).
   - Whether `† pruned` and `* pinned` belong in `{components.key-block}`, whose
     contract is to list every mark that can appear (`DESIGN.md`, Components;
     memlog 201).

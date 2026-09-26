@@ -6,9 +6,9 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 5
+revision: 6
 created: 2026-09-13
-updated: 2026-09-20
+updated: 2026-09-26
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -367,11 +367,15 @@ spacing:
   open-row-marker: '3px'
   # the vertical budget. frame-slack is COMPUTED from the committed block heights
   # at the line-heights declared above (see Layout & Spacing for the arithmetic).
-  # The two reservations are charged against it by data, not by a click.
+  # The reservations are charged against it by data, not by a click.
   # sync-report-max-height is an INDEPENDENT cap, chosen to fit the worst case.
-  frame-slack: '528px'
+  # frame-slack is 1920 − 1390 = 530. It read 528 through revision 5, a
+  # leftover of the 2px frame border that became a 1px outline [memlog 210].
+  frame-slack: '530px'
   frame-reserve-banner: '74px'
   frame-reserve-health-line: '21px'
+  # one per absent tolerable artifact, at most three [memlog 213]
+  frame-reserve-absence-line: '21px'
   sync-report-max-height: '400px'
   # the general fallback scale, quantised from the mock at 4px. Used for any gap
   # not given an exact token above. Nothing here is dead.
@@ -624,6 +628,9 @@ components:
     healthLine: 'a third line, raised only when a health figure is bad. Each signal is a rust mark with its glyph, its word and its count.'
     healthSignals: 'unresolvable entries exist · pinned entries starved'
     healthLineHeight: '{spacing.frame-reserve-health-line}'
+    absenceLines: 'one line per absent tolerable artifact (AD-24), inside the strip, after line 2 and before the health line. Lead "Not published" in the label style, then the file and its consequence in the value style. Plain: no mark, no colour. Attribution, not a health signal [decision — memlog 213].'
+    absenceLineCopy: '"Not published" · "weights.json — every crafted class is unrankable." | "recipes.json — no crafted rows can be ranked." | "sync-report.json — the sync report is unavailable." In that order.'
+    absenceLineHeight: '{spacing.frame-reserve-absence-line}'
   sync-report-panel:
     background: '{colors.paper-inset}'
     borderTop: '{spacing.hairline} solid {colors.rule-hairline}'
@@ -642,6 +649,7 @@ components:
     column1: 'THE SYNC RUN — requests per source · entries not reached in the last sync pass'
     column2: 'WHAT IS BROKEN — unresolvable count · pinned-starvation records'
     column3: 'WHAT THE WEIGHTS COVER — pool coverage, as a fraction with its denominator. The tracked-list edit date is NOT repeated here. It is a resting fact on the strip two lines above.'
+    column3Missing: 'weights.json loaded but sync-report.json carries no coverage figure: *not measured*. weights.json absent: *unknown*. Both in the missing-figure italic sans, no mark, never `0` [decision — memlog 212].'
   asking-price-line:
     typography: '{typography.asking-note}'
     fontStyle: 'italic'
@@ -667,6 +675,7 @@ components:
     unitGlyph: '{components.unit-glyph-class}, leading the first cell exactly as it leads a ranked row. The appendix holds one unit, but the glyph is what ties a class here to the same class in the list.'
     reasonStrings: 'verbatim from PRD FR-4, and there are exactly three: `pool partial`, `class absent from weights file` and `class disagrees with weights file`. The second was `base absent from weights file` until revision 3 and the third arrived when D-2 closed — the literal set has MOVED in three consecutive PRD revisions, see Do''s and Don''ts. The third covers all five of AD-17''s cross-file checks; the check name, the failing entry and its key are diagnosis and never print here.'
     lastRowRule: 'none'
+    emptyState: 'zero rows: the title alone, `Appendix: Unrankable — 0 Item Classes`, with the 0 in {colors.ink}, not rust. No lead and no rows. Bottom padding matches the top, 16px. The panel keeps its place above the key block [decision — memlog 214].'
   key-block:
     borderTop: '{spacing.hairline} solid {colors.rule-strong}'
     columns: '3 equal'
@@ -1456,26 +1465,41 @@ last ranked row and the appendix:
 | `{components.key-block}` — 22 margin + rule + 11 pad + tallest column 73 | 107 |
 | `{components.running-foot}` — 18 margin + rule + 10 pad + 2 lines + 20 margin | 82 |
 | **committed** | **1390** |
-| **`{spacing.frame-slack}`** = 1920 − 1390 | **528** |
+| **`{spacing.frame-slack}`** = 1920 − 1390 | **530** |
 
-Two things are charged against that slack by **data**, not by a click, so they
+*The slack read 528 through revision 5* `[change — memlog 210]`. The table
+always summed to 1390; the 2px gap was the frame's old top and bottom border,
+which the box model below turned into a 1px `outline` that consumes no height.
+
+Three things are charged against that slack by **data**, not by a click, so they
 belong to the resting budget and not to the expansion budget:
 
 - `{spacing.frame-reserve-banner}` — 74px for `{components.uniform-prior-banner}`
   when the data raises it (memlog 30).
 - `{spacing.frame-reserve-health-line}` — 21px for the trust strip's third line
   when a health figure is bad (memlog 70).
+- `{spacing.frame-reserve-absence-line}` — 21px for each absence line in the
+  trust strip, one per absent tolerable artifact, at most three `[decision —
+  memlog 213]`.
 
-Worst-case resting height is therefore 1390 + 74 + 21 = **1485px**, leaving
-**433px**. `{spacing.sync-report-max-height}` is set at **400px** — an
-independent cap chosen to sit inside that worst case, not a restatement of the
-slack. The panel scrolls inside its own band past 400px.
+**They do not all co-occur, and the worst case counts only those that can.** The
+banner needs at least one ranked crafted row, so it needs both `weights.json`
+and `recipes.json` loaded (`EXPERIENCE.md`, *The uniform-prior banner*,
+`[decision — memlog 213]`). The health line reads its counts from
+`sync-report.json`, so it needs that file loaded. The largest set that can
+appear together is therefore 95px: the banner with either the health line or
+the `sync-report.json` absence line. Without the banner, the most is 63px.
+Worst-case resting height is 1390 + 95 = **1485px**, leaving **435px**. Summing
+all five reservations (179px) would describe a page no data state can produce.
+`{spacing.sync-report-max-height}` is set at **400px** — an independent cap
+chosen to sit inside that worst case, not a restatement of the slack. The panel
+scrolls inside its own band past 400px.
 
 **What expansion spends, in order.**
 
 1. **`{components.sync-report-panel}` opens against the slack**, capped at
    `{spacing.sync-report-max-height}`. The regions below move down into the
-   space the appendix gives back. Because 400 ≤ 433, the strip alone never makes
+   space the appendix gives back. Because 400 ≤ 435, the strip alone never makes
    the page scroll, in any data state.
 2. **A ranked row's expansion is uncapped.** It holds every tracked Combination
    on that Item Class — or the one degenerate Combination of a Raw Base — plus
@@ -1516,7 +1540,7 @@ page grows the document and scrolls it, with nothing clipped and the printed
 order intact. Two conditions do, and both are accepted rather than designed
 around:
 
-| Condition | Resting rows | Overrun against `{spacing.frame-slack}`'s 528px |
+| Condition | Resting rows | Overrun against `{spacing.frame-slack}`'s 530px |
 |---|---|---|
 | Uncostable recipe, bound applied per branch (state 35) | up to 40 against a budget for 20 | ~560px |
 | FR-30's world — one appendix row per Item Class | ~29 against a committed 7 | ~638px |
@@ -1558,7 +1582,7 @@ longer varies with a measurement.
 and the page is a white-base price list with an appendix holding the crafted
 branch entire — on the order of 29 rows against the committed budget's 7. At
 `{spacing.appendix-row-height}` that is 841px where 7 rows is 203px, an overrun
-of about 638px against `{spacing.frame-slack}`'s 528px.
+of about 638px against `{spacing.frame-slack}`'s 530px.
 
 *This was carried as an open note because three rules were read as colliding:*
 the appendix is pinned to the foot as a *footer*, truncating it is forbidden, and
@@ -1979,6 +2003,33 @@ words. The line costs `{spacing.frame-reserve-health-line}` and is budgeted in
 Layout & Spacing. `[ASSUMPTION — memlog 59]` that the strip is otherwise silent
 at rest.
 
+**A missing file is named in the strip, quietly** `[decision — memlog 213]`. Each
+absent tolerable artifact (AD-24) adds one line inside the strip, after line two
+and before the health line, set exactly like a resting fact: the lead `Not
+published` in `{colors.ink}` `600`, then the file and its consequence in
+`{colors.ink-secondary}`.
+
+| Absent file | Line reads |
+|---|---|
+| `weights.json` | `Not published` `weights.json — every crafted class is unrankable.` |
+| `recipes.json` | `Not published` `recipes.json — no crafted rows can be ranked.` |
+| `sync-report.json` | `Not published` `sync-report.json — the sync report is unavailable.` |
+
+Lines appear in that order and only for files that are absent. Each costs
+`{spacing.frame-reserve-absence-line}`, budgeted in Layout & Spacing.
+
+*Why here and not above the strip.* The strip is where the page says what it was
+built from. A missing file is part of that statement, so it belongs with
+`producer`, `generatedAt` and the edit date. Printing it above the strip would
+split that one statement across two places. The line gives the reason once, so
+the appendix and the strip's *unknown* fields do not repeat it.
+
+*Why no mark.* AD-24 makes these files absent-tolerable. Absence is a declared
+state, not a break. The committed deploy has no `recipes.json`, so that line
+appears on every load. A rust or ochre mark there would sit on the page every
+day and teach the player to read past the inks that mean something is wrong.
+Rust stays for the health line's two triggers.
+
 *The affordance.* The whole strip is the click target — the player is mouse-only
 (memlog 13) and there is no keyboard affordance to add. It is marked by
 `{typography.expand-affordance}` in `{colors.sepia}`, right-aligned on the first
@@ -2014,6 +2065,13 @@ Its five figure groups are assigned to the three columns, in this order:
 
 The first column is what the run did, the second is what broke, the third is how
 much of the Tracked List the weights can actually speak to.
+
+*When the coverage figure is missing* `[decision — memlog 212]`. With
+`weights.json` loaded but no coverage figure in `sync-report.json`, column three
+reads *not measured*. With `weights.json` absent it reads *unknown*, as the
+strip's line one does. Both are set in the italic sans every missing figure on
+this page takes, with no mark, and never as `0`. The page tells the two cases
+apart by whether it loaded a weights envelope, not by the report.
 
 *The tracked-list edit date is not repeated here.* It is a resting fact on the
 strip two lines above (memlog 89), and a panel whose job is to hold what the
@@ -2053,6 +2111,15 @@ an upper bound is not a number, then `{spacing.appendix-row-height}` rows in
 `pool partial`, `class absent from weights file`, `class disagrees with weights
 file` — in `{spacing.col-appendix-reason}`; and a quiet italic note in
 `{spacing.col-appendix-note}`. The last row drops its rule.
+
+*With no rows, the appendix is its title* `[decision — memlog 214]`. It reads
+`Appendix: Unrankable — 0 Item Classes`. The count is in `{colors.ink}`, not
+rust, because rust says something is broken and nothing here is. There is no
+lead and there are no rows, and the bottom padding matches the top, 16px. The
+panel keeps its place above the key block, so the page's order does not change
+with the data. It says nothing about why it is empty: when `recipes.json` is
+absent, the trust strip's absence line already says so, and repeating it here
+would state one fact in two places.
 
 *Every row here is an Item Class, and that is a rule rather than an
 observation.* Unrankability governs the crafted branch only — a Raw Base needs
@@ -2313,16 +2380,24 @@ One sentence explains that the page shows nothing rather than a partial set,
 because FR-33 requires a single consistent set and half a ranking is worse than
 no ranking.
 
-`[NOTE FOR UX]` **Skeleton rows** for the load state have no visual treatment and
-cannot be specified without inventing one. Memlog 50 fixes the behaviour —
-masthead and 20 row slots paint immediately, resolving in a single transition
-`[ASSUMPTION — memlog 51]` — but no fill tone, shimmer or placeholder shape was
-ever drawn. The obvious default, if nobody rules otherwise, is a flat
-`{colors.paper-inset}` bar per cell at the declared column widths with no
-shimmer: the vocabulary already forbids animation that attracts attention.
+**Skeleton rows** (state 22) `[decision — memlog 211]`. Memlog 50 fixes the
+behaviour: the masthead and 20 row slots paint immediately and resolve in a
+single transition `[ASSUMPTION — memlog 51]`. The treatment is the default this
+note held open through revision 5, now ratified:
 
-*This was a list of two until revision 4, and revision 5 leaves the skeleton
-alone above it.* **The cross-file validation report is placed** `[decision — memlog 206]`: it lands in `{components.sync-report-panel}`
+- Twenty `{spacing.row-height}` slots in the six-column layout. Each cell is a
+  flat `{colors.paper-inset}` bar 10px tall, as wide as its column less its
+  right padding.
+- No shimmer and no animation. The vocabulary already forbids animation that
+  draws the eye, and a load that resolves in one transition has no progress to
+  show.
+- **The column header paints with its final labels.** Its text depends on no
+  artifact, so drawing it early leaves one less thing to change when the data
+  arrives.
+- The masthead eyebrow holds a blank line until the league is known.
+
+*This was a list of two until revision 4. Revision 5 left the skeleton open, and
+revision 6 closes it above.* **The cross-file validation report is placed** `[decision — memlog 206]`: it lands in `{components.sync-report-panel}`
 as a third group in that panel's second column, under the existing *what is
 broken* heading, per `columnHeadingRule`. The panel's cap and its own internal
 scroll are what make an unbounded diagnosis list placeable anywhere on this page.
