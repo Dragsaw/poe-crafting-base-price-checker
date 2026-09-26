@@ -1,5 +1,5 @@
 <!-- bmad:context -->
-<!-- Verified 2026-09-20 against d4315f0. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+<!-- Verified 2026-09-26 against 83c6894. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
 
 ## poe-crafting-base-price-checker
 
@@ -7,10 +7,6 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 
 ## Policy
 
-- Bash commands run through a permission allowlist. The allowlist matches only literal, single-line commands. An unresolvable command stops the run for a human prompt. Do not use command substitution, variables, loops, or `export VAR=x cmd`.
-- Use one command for each call. Do not use `&&`, `||`, `;`, or a pipe into a second program. Use separate calls instead. A short, literal pipeline is the one exception.
-- Do not use a `cd` prefix. The working directory is already the project root. Do not use `git -C <path>`. Run `git <command>` directly.
-- Write a script for real logic, such as a loop, a conditional, or string processing. Run the script as one literal command, for example `uv run script.py`.
 - Use the agent-browser skill for all browser work during development. This includes tests in a browser, screenshots, UI checks and exploratory QA. Do not use claude-in-chrome. Do not use other browser automation.
 
 ## Where things are
@@ -24,7 +20,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 
 - Run Python scripts with `uv run script.py`. Do not run bare `python`.
 - Browser work needs a named session. Run `agent-browser session id --scope worktree --prefix poe`. Put the printed id before each subcommand: `agent-browser --session <id> open <url>`. The unnamed default session is one browser for every agent on this machine.
-- The agent-browser documentation sets that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. It breaks the literal-command rule in Policy.
+- The agent-browser documentation sets that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. Shell state does not carry between tool calls, so the variable is empty in the next call and agent-browser falls back to the shared default session. Pass `--session <id>` on each call.
 - `pnpm dev` binds port 5173 with `strictPort`. A taken port gives a loud bind failure, and Vite does not move to the next port. To use a different port, run `pnpm dev --port <n>`. Do not edit `packages/web/vite.config.ts`.
 - `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. Stop it after use. The repository ships no supervisor.
 - `pnpm sync:dry` writes to stderr and exits non-zero on purpose. The command is a stub until story 1.5. Do not change it.
