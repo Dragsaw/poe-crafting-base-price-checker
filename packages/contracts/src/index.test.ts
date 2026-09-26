@@ -29,6 +29,7 @@ describe('the contracts barrel', () => {
       'SyncLockSchema',
       'SyncProgressSchema',
       'CraftRecipeSchema',
+      'RankedRowSchema',
     ] as const) {
       expect(contracts[name], `${name} is not re-exported from the barrel`).toBeDefined();
     }

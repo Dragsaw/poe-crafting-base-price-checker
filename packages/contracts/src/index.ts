@@ -95,6 +95,9 @@ export {
 } from './dataset.ts';
 export type { DatasetEntry, NotYetSyncedReason, PriceState } from './dataset.ts';
 
+export { RankedRowSchema } from './ranked-row.ts';
+export type { RankedRow, RawRankedRow } from './ranked-row.ts';
+
 export {
   filterOptionIds,
   FilterCatalogueGroupSchema,
