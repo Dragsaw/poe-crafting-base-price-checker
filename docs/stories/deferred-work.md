@@ -89,6 +89,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
   summary: A 429's `retryAfterMs` is not kept across processes, so the next scheduled `pnpm sync` may send inside the penalty window. Unverified.
   evidence: The ledger is per process by AD-8's design (`packages/sync/src/trade/client.ts`), and both the pricing step's yield and the league gate's yield (`packages/sync/src/league/league-gate.ts`) drop the delay. To settle it, compare the player's scheduler interval with the `Retry-After` windows the trade API actually returns.
+- source_spec: `docs/stories/spec-epic-1-retro-item-17-answered-search-keeps-its-fields.md`
+  summary: A fetch answered 200 with an unparseable body throws `UnexpectedTradeResponseError` with no entry, so the answered search's `lastSearchId`/`lastSearchLeague` are not published, against AD-9 rev 21 ("whatever the fetch that follows it returns").
+  evidence: `price-entry.ts` throws `UnexpectedTradeResponseError(entryKey, 'fetch', …)` after `searched` is built. `run-chunk.ts` publishes the failing entry only for a `MalformedRequestError`. The fix needs an entry payload on the error and a publish path, which overlaps retro item 3 (publish on every throw path).
 
 ## Resolved by epic 1 retro item 11 (2026-09-26)
 

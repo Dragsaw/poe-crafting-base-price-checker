@@ -68,8 +68,9 @@
  * `runFinishedAt` absent, and is rethrown. A `MalformedRequestError` (a
  * non-429 4xx) first publishes the dataset and progress for the entries
  * completed so far, plus the failing entry stamped with `lastAttemptedAt`
- * (AD-9). Any other throw writes the report only: the entries it completed are
- * searched again next run.
+ * and, after an answered search, its search fields (AD-9). Any other throw
+ * writes the report only: the entries it completed are searched again next
+ * run.
  */
 
 import {
@@ -136,7 +137,8 @@ export const REPORT_PATH = 'data/sync-report.json';
  * client's invalid-request refusal, or a 5xx or timeout from the pricing step.
  *
  * Either kind may carry the step's updated `DatasetEntry`: a completed entry
- * with its new price state, or a yielded one stamped with `lastAttemptedAt`.
+ * with its new price state, or a yielded one stamped with `lastAttemptedAt`
+ * (and, after an answered search, carrying its search fields).
  * The runner publishes them into `data/dataset.json` and reports them on the
  * outcome.
  */
@@ -732,7 +734,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
       };
       if (error instanceof MalformedRequestError && order !== undefined) {
         // A rejected request publishes what the chunk completed, and the
-        // failing entry stamped with `lastAttemptedAt` (AD-9).
+        // failing entry as the step left it (AD-9).
         try {
           await publish([...stepEntries, error.entry], notBeforeAfterAbort(clock.now()));
         } catch (fault) {

@@ -188,5 +188,5 @@ action_items:
       leg yields or returns a 4xx (AD-9 rev 21, finding L-E2); fix the price-entry.ts 
       header table and the spec 1.7 matrix row
     owner: dev
-    status: open
+    status: done
     ref: docs/stories/epic-1-retro-2026-09-26.md

@@ -12,9 +12,9 @@
  *
  * | Answer | Entry | Chunk |
  * | --- | --- | --- |
- * | search answered | `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` set | — |
- * | 429, 5xx, timeout (search or fetch) | `lastAttemptedAt` stamped, the rest unchanged | yields |
- * | any other 4xx | `lastAttemptedAt` stamped, price state kept | `MalformedRequestError` thrown |
+ * | search answered | `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` set, whatever the fetch returns | — |
+ * | 429, 5xx, timeout | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | yields |
+ * | any other 4xx | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | `MalformedRequestError` thrown |
  * | none: the `jewel` arm derives a base type `items.json` lacks | `unresolvable`, nothing stamped, a `baseTypeId` record | continues |
  *
  * The league, the rates and the item types arrive as values; this module
@@ -327,13 +327,13 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
     const fetched = await sendLeg(() =>
       client.send({ method: 'GET', url: tradeFetchUrl(ids, answer.id), lane: FETCH_LANE }),
     );
-    // A 429, 5xx or timeout stamps `lastAttemptedAt` alone, on either leg: the
-    // search fields stay as published until the entry is completed.
+    // The unit is the request (AD-9): a fetch that yields or answers 4xx keeps
+    // the answered search's fields, and the price state stays as published.
     if (fetched.kind === 'yield') {
-      return yieldedWith(fetched, stamped);
+      return yieldedWith(fetched, searched);
     }
     if (fetched.kind === 'malformed') {
-      throw new MalformedRequestError(entryKey, 'fetch', fetched.status, stamped);
+      throw new MalformedRequestError(entryKey, 'fetch', fetched.status, searched);
     }
 
     const listings = parseListings(fetched.result.response.body);

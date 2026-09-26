@@ -51,11 +51,12 @@ export type PriceState = z.infer<typeof PriceStateSchema>;
  * nothing historical (AD-19).
  *
  * `lastSearchId` and `lastSearchLeague` sit **beside** `lastAttemptedAt`, on
- * the entry (AD-9). An attempt that issues a request but receives no answer —
- * a 429, a 5xx, a timeout — stamps `lastAttemptedAt` alone and leaves the other
- * two exactly as they were, so `lastSearchId` may legitimately be older than
- * `lastAttemptedAt`. A never-synced entry carries none of the three, and **no
- * component may give it a placeholder**.
+ * the entry (AD-9). The unit is the request: a request that gets no answer —
+ * a 429, a 5xx, a timeout — stamps `lastAttemptedAt` and changes neither
+ * search field, so `lastSearchId` may legitimately be older than
+ * `lastAttemptedAt`. An answered search sets both, whatever the fetch after it
+ * returns. A never-synced entry carries none of the three, and **no component
+ * may give it a placeholder**.
  */
 export const DatasetEntrySchema = z
   .strictObject({

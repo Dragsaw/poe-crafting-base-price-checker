@@ -112,7 +112,8 @@ const PREVIOUS: DatasetEntry = {
   price: { state: 'no-listings' },
   lastAttemptedAt: '2026-09-20T00:00:00.000Z',
   lastSearchId: 'old',
-  lastSearchLeague: LEAGUE,
+  // A past league, so a test can tell a kept search field from a set one.
+  lastSearchLeague: 'Standard',
 };
 
 describe('createPricingStep: a priced entry', () => {
@@ -302,12 +303,13 @@ describe('createPricingStep: unanswered and refused requests', () => {
     ['a 429', { status: 429, headers: {}, body: '' }, false, { retryAfterMs: 1000 }],
     ['a 502', status(502), false, {}],
     ['a timeout', undefined, true, {}],
-  ])('%s on the fetch stamps lastAttemptedAt alone and yields', async (_label, response, rejectFetch, penalty) => {
+  ])('%s on the fetch keeps the answered search fields and the price state, and yields', async (_label, response, rejectFetch, penalty) => {
     const { run } = setup({ results: ids(1), fetch: response ?? status(200), rejectFetch, dataset: [PREVIOUS] });
 
+    // The unit is the request (AD-9): the answered search sets its two fields.
     expect(await run()).toStrictEqual({
       kind: 'yielded',
-      entry: { ...PREVIOUS, lastAttemptedAt: NOW },
+      entry: { ...PREVIOUS, lastAttemptedAt: NOW, lastSearchId: SEARCH_ID, lastSearchLeague: LEAGUE },
       ...penalty,
     });
   });
@@ -329,12 +331,21 @@ describe('createPricingStep: unanswered and refused requests', () => {
     });
   });
 
-  it('another 4xx on the fetch throws MalformedRequestError with the stamped entry', async () => {
+  it('another 4xx on the fetch throws MalformedRequestError with the answered search fields and the price state kept', async () => {
     const { run } = setup({ results: ids(1), fetch: status(404), dataset: [PREVIOUS] });
-    await expect(run()).rejects.toMatchObject({
-      requestKind: 'fetch',
-      status: 404,
-      entry: { ...PREVIOUS, lastAttemptedAt: NOW },
+
+    const error = await run().then(
+      () => undefined,
+      (thrown: unknown) => thrown,
+    );
+
+    expect(error).toBeInstanceOf(MalformedRequestError);
+    expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch', status: 404 });
+    expect((error as MalformedRequestError).entry).toStrictEqual({
+      ...PREVIOUS,
+      lastAttemptedAt: NOW,
+      lastSearchId: SEARCH_ID,
+      lastSearchLeague: LEAGUE,
     });
   });
 

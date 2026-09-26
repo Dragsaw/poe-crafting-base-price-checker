@@ -62,8 +62,8 @@ context:
 | Zero results | search `result: []` | `no-listings`, no fetch, search fields set |
 | Missing rate | a listing in a currency with no current rate | `not-yet-synced`/`no-exchange-rate` |
 | Stale-league rate | rate `league` ≠ active | treated as missing |
-| 429 / 5xx / timeout | on search or fetch | `lastAttemptedAt` only, search fields unchanged, chunk yields |
-| Other 4xx | 400 on search | `MalformedRequestError` carrying the entry with `lastAttemptedAt` stamped and the state unchanged; lock released |
+| 429 / 5xx / timeout | on search / on fetch after an answered search | `lastAttemptedAt` stamped and the price state kept; search fields unchanged / set from the answered search (AD-9 rev 21); chunk yields |
+| Other 4xx | 400 on search / 404 on fetch | `MalformedRequestError` carrying the entry with `lastAttemptedAt` stamped and the state unchanged; search fields unchanged / set from the answered search (AD-9 rev 21); lock released |
 | Currencies file | absent / fails `CurrenciesFileSchema` | typed load error, no request |
 | Rates out | currencies file | divine `1`, rates at 4dp, `league`/`asOf` verbatim |
 
@@ -171,6 +171,7 @@ A valueless stat is sent as `"value": {}`, because OQ-12 says to try `{}` first.
   - `[low]` `[reject]` EC: `fixtures:record` refuses when `data/tracked.json` is absent — the repository carries the file, and the refusal is typed and names it; making the file optional adds a branch.
   - `[false]` `[reject]` EC: a missing `fixtures/` directory gives a raw ENOENT — the directory is committed, and the failure is loud anyway.
   - `[false]` `[reject]` EC: a fetch-leg yield drops the spent search id — the matrix row "429/5xx/timeout on search or fetch → search fields unchanged" settles it.
+  - Superseded 2026-09-26 by AD-9 rev 21 (retro item 17, `spec-epic-1-retro-item-17-answered-search-keeps-its-fields.md`): after an answered search, a fetch-leg yield or 4xx now carries the search fields. The two matrix rows are updated, and the `stamped` reasoning in the fetch-4xx patch row and the fetch-yield reject row above no longer holds.
 
 ## Auto Run Result
 
