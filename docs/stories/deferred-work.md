@@ -38,10 +38,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
   summary: The "a second refresh leaves no diff" criterion and the real `createFetchHttpPort` are exercised by nothing.
   evidence: Already recorded in the spec's `deferred` block and confirmed by this review pass — the suite compares one `serialiseCatalogue(...)` result against itself, and every test drives `createFakeHttpPort`. New since that entry was written: four artifacts now sit under `data/catalogue/`, so the two-run check is runnable for the first time. A spot check of those files (LF, one trailing newline, `schemaVersion` last, byte-identical under re-serialisation at two-space JSON) is consistent with a stable second run but is not the run itself.
 
-- source_spec: `docs/stories/spec-1-4-the-committed-trade-catalogue-and-its-explicit-refresh-command.md`
-  summary: The emitted `packages/contracts/dist/index.d.ts` carries `.ts` relative specifiers, and the prescribed fix is inert.
-  evidence: Already recorded in the spec's `deferred` block; carried here because the ledger is where carved-out work lives and the Auto Run Result points readers at "the deferred entry". `rewriteRelativeImportExtensions` does not affect declaration emit under `emitDeclarationOnly`, reproduced in a minimal project. A consumer probe resolved the `.ts` specifier through to `schema-version.d.ts`, so TypeScript follows it; the risk is a non-TypeScript consumer of `dist`. Settling it needs dropping `emitDeclarationOnly` or a post-emit rewrite.
-
 ## Deferred from: sprint change proposal 2026-09-26 (weights contract 6.0.0)
 
 - source_spec: `docs/sprint-change-proposal-2026-09-26.md`
@@ -171,3 +167,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-2-the-raw-ranking-branch-league-scoped-and-computed-at-read-time.md`
   summary: (unverified, would be medium) `RankInput.threshold` is a bare `number`; a `NaN` threshold sends every priced entry to `ordering`, and a negative or infinite one misgroups silently.
   evidence: `rank` has no caller yet. Story 2.4 owns the Payout Threshold input: settle it there by validating the value (finite, ≥ 0, `DivineAmountSchema`) before it reaches `rank`, with a test.
+- source_spec: `docs/stories/spec-deferred-emitted-dts-carries-ts-specifiers.md`
+  summary: The post-emit rewrite covers only `packages/contracts/dist`; `packages/core/dist` and `packages/sync/dist` emit the same `.d.ts` shape and still carry relative `.ts` specifiers.
+  evidence: The spec's Never boundary excludes them because the closed entry named only contracts. A grep after `pnpm typecheck` on 2026-09-26 finds `.ts` specifiers in `packages/core/dist/index.d.ts` and `packages/sync/dist/dry-run.d.ts`. The fix is to add both directories to `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts`.
