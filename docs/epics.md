@@ -3,7 +3,7 @@ stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step
 storiesWrittenForEpics: [1, 2, 3]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Re-run 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4. The previous pass completed all four steps; this pass re-walks them against the four rulings of 2026-09-20.'
+revisionPass: 'Targeted revision 2026-09-26 of Epic 2 and Stories 2.6 to 2.8 for the committed weights.json 6.0.0 with recipes.json absent. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -362,7 +362,9 @@ The player opens a page on the second monitor before a session. The page renders
 
 **NFRs addressed:** NFR-6, NFR-7, NFR-10
 
-**Standalone:** yes. This is a complete and useful product that never reads `weights.json`. Crafted Item Classes are Unrankable for a reason the page states, exactly as AD-24 and AD-27 require — and that is FR-30's world, which UX-DR53 now specifies rather than defers. **Epic 2 therefore builds the appendix itself**, at UX-DR8's four-cell 970px budget, pinned to the foot, its count readable without expanding anything, its rows non-interactive, holding on the order of 29 rows untruncated while the document scrolls beneath it. Every row there carries FR-4's second string, `class absent from weights file`, because on day one that string is true of every crafted class. FR-4's acceptance still belongs to Epic 3, which adds the other two strings and the Provenance `absent` case to an appendix that already exists.
+**Standalone:** yes. This is a complete and useful product that never reads `weights.json`. Crafted Item Classes are Unrankable for a reason the page states, exactly as AD-24 and AD-27 require — and that is FR-30's world, which UX-DR53 now specifies rather than defers. **Epic 2 therefore builds the appendix itself**, at UX-DR8's four-cell 970px budget, pinned to the foot, its count readable without expanding anything, its rows non-interactive, holding on the order of 29 rows untruncated while the document scrolls beneath it. Where `weights.json` is absent, every row there carries FR-4's second string, `class absent from weights file`, because in that world the string is true of every crafted class. FR-4's acceptance still belongs to Epic 3, which adds the other two strings and the Provenance `absent` case to an appendix that already exists.
+
+**Two day-one worlds, and the committed data sits in the second.** The Epic was written against an absent `weights.json`, but a 6.0.0 file is committed, and `data/recipes.json` is not. Epic 2 builds no weights-fed valuation, so the page does not read the file's `bases` and cannot say which classes it publishes. The day-one state on the committed data is therefore AD-24's **absent `recipes.json`**: no `(itemClass, recipe)` pair exists, the crafted branch is empty, raw bases rank, and Story 2.1's absence line names why. No class is Unrankable in FR-4's sense there, so the appendix is empty. The absent-weights world stays a real, tested state, because the file is absent-tolerable and a player can remove it. Stories 2.6 to 2.8 state both.
 
 ### Epic 3: The Crafted Ranking, on a Real Weights File
 
@@ -1472,6 +1474,12 @@ So that a list that is not doing what I think is visible without my going to loo
 **And** line two reads `Last synced`, with `Tracked List last edited`, and `|` separates the fields
 **And** the strip is always present, and never dismissible (FR-10, FR-18, UX-DR21).
 
+**Given** line one's three fields
+**When** `weights.json` is present, which is the committed state
+**Then** the page reads `producer`, `generatedAt` and `gamePatch` from the file's header as published
+**And** Story 2.1's `WeightsFileEnvelopeSchema` widens to type those three header fields and nothing more. It still does not read `bases`, which remains Story 3.1's (AD-3, AD-24)
+**And** where `weights.json` is absent, each of the three renders *unknown*, as a Tracked List with no date does, and never a placeholder value. Story 2.1's absence line already names the missing file (AD-24, FR-30).
+
 **Given** the tracked-list edit date
 **When** it renders
 **Then** the page prints it plainly as attribution, with no staleness threshold and no age at which it turns red
@@ -1508,7 +1516,7 @@ So that a list that is not doing what I think is visible without my going to loo
 **Given** that `columnHeadingRule`
 **When** Epic 3 adds the panel's sixth group beneath *what is broken*
 **Then** this story builds the second column so a third group is admitted by vertical space alone, with no second heading, no rule and no bullet
-**And** five is the correct count for this epic, because no cross-file check runs without a weights file, so nothing here renders an empty group against a future one (UX-DR22, UX-DR49).
+**And** five is the correct count for this epic, because no cross-file check runs until Story 3.3 builds them, with or without a weights file, so nothing here renders an empty group against a future one (UX-DR22, UX-DR49).
 
 **Given** the figures themselves
 **When** they render
@@ -1526,6 +1534,12 @@ So that a list that is not doing what I think is visible without my going to loo
 **Given** an omitted coverage figure, where `weights.json` is absent and the fraction and its denominator are omitted together
 **When** the panel renders
 **Then** the page never renders that omission as `0`. Coverage is undefined there, rather than zero (AD-27, §3).
+
+**Given** an omitted coverage figure while `weights.json` is **present** — the committed state until Story 3.6 teaches `sync` to measure it
+**When** the panel renders
+**Then** the page renders the figure as *not measured*, and never as `0`, and never with wording that says the file is absent
+**And** the page tells this case apart from the absent-file case by the weights envelope it loaded itself, and never by inferring a file state from `sync-report.json`
+**And** the words are provisional. UX owns the final copy and placement, and a `[NOTE FOR UX]` in `deferred-work.md` holds that question open (AD-27, AD-24, UX-DR22).
 
 **Given** the tracked-list edit date
 **When** the panel renders
@@ -1604,10 +1618,15 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Then** it is a static bundle, with no server, no secret material and no expiring credential
 **And** a data commit updates the data without rebuilding the app. The page fetches the eight artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
 
+**Given** the deployed page on the committed artifact set, where `weights.json` is published and `recipes.json` is not
+**When** a player opens it
+**Then** the Raw Base price list is the day-one content, and Story 2.1's absence line names the missing `recipes.json`
+**And** the crafted branch is empty because no `(itemClass, recipe)` pair exists, which is AD-24's absent-recipes state and not a failure
+**And** that is the launch experience this epic deploys, rather than an edge case (AD-24, FR-30).
+
 **Given** the deployed page with no `weights.json` published
 **When** a player opens it
-**Then** the Raw Base price list is the day-one content, and the page names the absence
-**And** that is the product's declared launch experience, rather than an edge case
+**Then** the Raw Base price list is still the day-one content, and the page names the absence
 **And** Story 2.8 renders the crafted classes that absence makes Unrankable. This story does not (AD-24, AD-27, FR-30).
 
 ### Story 2.8: The Unrankable appendix, and the day-one page it completes
@@ -1632,12 +1651,18 @@ So that the launch page states what it is not showing me instead of quietly show
 **Then** it is an Item Class, and never a Base Type. Unrankability governs the crafted branch alone, and a Raw Base needs no Eligible Pool
 **And** the rows are not interactive and do not expand. An Unrankable Item Class has no ranking to explain (FR-4, FR-3, UX-DR29).
 
-**Given** `data/weights.json` absent, which is this epic's shipped state
+**Given** `weights.json` absent, which is a state this epic must reach and test against a fixture, because the file is absent-tolerable
 **When** the appendix renders
 **Then** every crafted Item Class sits in it, carrying FR-4's second reason string verbatim — `class absent from weights file`
-**And** that is the only string this epic renders, because on day one it is true of every crafted class. Story 3.6 adds the other two (FR-4, FR-30, AD-24, state 15).
+**And** that is the only string this epic renders, because in that world it is true of every crafted class. Story 3.6 adds the other two (FR-4, FR-30, AD-24, state 15).
 
-**Given** that world's row count — on the order of 29 rows against a committed budget of 7
+**Given** `weights.json` present and `recipes.json` absent, which is the committed state this epic deploys
+**When** the appendix renders
+**Then** it holds no row, because no `(itemClass, recipe)` pair exists and no class is Unrankable in FR-4's sense. Story 2.1's absence line names why the crafted branch is empty (AD-24)
+**And** the page never prints `class absent from weights file` while it holds a loaded weights envelope. Epic 2 does not read `bases`, so the string would be a claim it cannot check (FR-4, FR-9)
+**And** the empty appendix still renders in its place, with its count readable. The empty treatment is UX's, and a `[NOTE FOR UX]` in `deferred-work.md` holds it open. This story builds the empty case to whatever UX rules and does not invent copy for it (UX-DR29, FR-4).
+
+**Given** the absent-weights world's row count — on the order of 29 rows against a committed budget of 7
 **When** the page rests
 **Then** the appendix holds **every** row, untruncated, and the document grows and scrolls beneath it
 **And** `margin-top: auto` produces slack only while the content is shorter than the frame, and none past it, which is the behaviour this state wants

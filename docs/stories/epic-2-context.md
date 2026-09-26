@@ -1,0 +1,62 @@
+# Epic 2 Context: Day One — the Deployed Raw Base Price List
+
+<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
+
+## Goal
+
+Epic 2 ships the first page the player uses. It is a static page deployed to GitHub Pages, and it sits on a second monitor before a session. The page shows an ordered list of the Base Types worth picking up to sell raw, under a Payout Threshold the player sets. Each row states how old its price is and what Price State it is in. The player can expand any row to read the evidence behind it. After a league reset the list is honestly empty, and it never serves last league's prices. The page never fetches a weights-fed valuation. Every crafted Item Class sits in the Unrankable appendix with the day-one reason. This is the shipped day-one phase that AD-24 declares, and it is not a milestone. It also builds every chrome component that Epic 3 extends: the Mantine override layer, the tokens, the fixed frame, the trust strip, the sync report panel, the expansion panel, the appendix, the key block and the running foot.
+
+## Stories
+
+- Story 2.1: The page's substrate — the override layer, the fixed frame, and one consistent artifact set
+- Story 2.2: The raw ranking branch, league-scoped and computed at read time
+- Story 2.3: The ranked list at rest — rows, units, freshness and the key block
+- Story 2.4: The Payout Threshold, and what survives a reload
+- Story 2.5: Row expansion — the evidence behind a row, its tombstones and its trade link
+- Story 2.6: The trust strip, its health line, and the Sync Report panel
+- Story 2.7: Day one, deployed — the honest-empty league reset and the published site
+- Story 2.8: The Unrankable appendix, and the day-one page it completes
+
+## Requirements & Constraints
+
+- This epic owns acceptance of FR-3, FR-5, FR-6, FR-7, FR-8, FR-9, FR-12, FR-13, FR-18, FR-31 and FR-33. It also covers NFR-6 (the read-time budget), NFR-7 (a static bundle that downloads no font) and NFR-10 (legibility with colour removed).
+- A Raw Base's EV is its observed price, and its Craft Cost is zero. A Raw Base below the threshold leaves the ordering completely. It goes into a separate below-threshold group, and it never gets a row at zero. It is never a summand in any Item Class's EV (FR-3).
+- The ranking covers the full Tracked List. The top-20 bound is a display concern only (FR-5). The threshold starts at 0.25 Divine. It is the only value that persists across a reload, in the viewer's browser storage (FR-7).
+- Freshness is per row. The cut-off is 48 hours. A row younger than the cut-off shows no age. An older row names its clock: *priced* for `observedAt`, *tried* for `lastAttemptedAt`. A never-synced row reads *never attempted* (FR-12).
+- A missing figure is never `0`, a blank or a dash. It takes one of the five money-slot phrases. A real figure too small to print reads `< 0.01`. `unresolvable` and `no-listings` entries are rendered, and never omitted (FR-9, FR-24).
+- No copy implies an observed sale. Do not write "sells for", "worth" or "market value". The asking-price line is always present (FR-13).
+- An observation from another league becomes `not-yet-synced` with reason `league-mismatch`. It is never treated as stale but usable (FR-31).
+- Colour alone never carries a distinction. Each distinction also needs a glyph, a word, a weight or an italic (NFR-10). No WCAG level, keyboard path or reduced-motion handling is implied.
+- Tests stay offline. Copy `test/setup.ts` with its recording `onUnhandledRequest` callback. The `"error"` string fails no test (AGENTS.md). Browser QA uses the agent-browser skill with a named `--session` on every call.
+
+## Technical Decisions
+
+- **Graph and purity (AD-1, AD-4).** `web` depends on `contracts` and `core` only. `core` computes every ranking term, and `web` only renders what `core` returns. No artifact persists a rank, a score or an ordering. `RankedRow` is a `contracts` Zod schema, derived in the browser on every input change. Time and configuration enter `core` as passed-in values. `core` returns typed results for expected conditions and never throws for them.
+- **New schemas land in `contracts` first.** Story 2.1 adds `CraftRecipe`, with `schemaVersion` and `modifierLevelMin`, and Story 2.2 adds `RankedRow`. Each is one schema, with its type `z.infer`red from it (AD-3). Nothing in this epic reads a recipe for valuation.
+- **Eight fetched artifacts (AD-24).** They are `dataset.json`, `sync-report.json`, `weights.json`, `recipes.json`, `tracked.json`, `config.json`, `catalogue/stats.json` and `catalogue/static.json`. Each is a separate cache-busted runtime fetch, validated on load, and none is bundled. A ninth artifact needs an AD amendment. The first five are required: a missing one is refused in the same way as an invalid one. The last three are absent-tolerable: the page renders and names each absence. Render from one consistent set. Resolve all eight in one transition, and never row by row.
+- **Display text** for a `statId` comes from `catalogue/stats.json`. A currency label comes from `catalogue/static.json`, as text with no icon. The page makes no runtime call to pathofexile.com (AD-24, AD-25).
+- **Ordering (AD-17, IN §4.1).** Ties break on the serialised canonical key of each entry's own arm. A raw row has no recipe id, so it sorts before a crafted row, and the mixed list is totally ordered. League filtering happens once, in `core`, at ranking time. `sync` never filters on write (AD-19).
+- **Performance (AD-24, NFR-6).** A full ranking pass runs in under 100 ms and re-runs synchronously on a threshold change. If it misses the budget, memoise the pure function. Never precompute in `sync`.
+- **Precision.** `sync` has already rounded Divine values to 4 decimal places, and `core` never rounds them again. The view prints EV, price and threshold to 2 decimal places.
+- **Trade link (AD-24, IN §5.4).** Render it only when `lastSearchId` is present, `lastSearchLeague` equals the active league, and the entry is not `pruned`. Never read Price State for this test. Percent-encode the league segment only. The link is `target="_blank" rel="noopener"`, which is allowed under AD-15.
+- **No backend (AD-15).** The page makes no authenticated request and has no write path except browser storage for the threshold.
+- **Coverage (AD-27).** Read it from `sync-report.json` as published, together with its denominator. The page computes nothing. An omitted coverage figure is undefined, and it never renders as `0`.
+- **Deploy.** A push to the default branch triggers a GitHub Actions workflow, `.github/workflows/deploy.yml`, that builds Vite and deploys to Pages. The workflow is required because branch-published Pages runs Jekyll. The site has no server and no secrets.
+- **Mantine 9.6.1 is pinned.** Replace `theme.lineHeights` and `theme.headings`; do not extend them. Set `primaryColor` to a colour other than blue and `defaultRadius` to `0`, and use `shadow="none"` everywhere. Pass font sizes as literal px, because rem conversion rounds away the .5px roles. Strip `Accordion` and `Collapse` of chevrons, padding and hover, with no height animation. Do not edit `packages/web/vite.config.ts`. `pnpm dev` uses port 5173 with `strictPort`, so pass `--port` to use another port.
+
+## UX & Interaction Patterns
+
+- **Frame.** A fixed frame at `{spacing.frame-width}` with `min-height: {spacing.frame-height}`, a 1px `outline`, and no breakpoints or dark mode. The content width is 1012px. Column sums are fixed: the ranked row is 32+222+84+88+94+492, the masthead controls are 216+16+276, the combination row is 460+250+116+116+24 on line one and 560+200+206 on line two, a tombstone line two is 560+406, and the appendix is 292+118+250+310 (970). Resting chrome never overruns the frame height. Only the banner and the health line are budgeted exceptions. Extra rows grow the document, and only the sync report panel scrolls internally. Never shrink rows, drop columns, truncate the appendix or hide the key block (UX-DR5–DR10).
+- **Tokens (UX-DR2–DR4).** Five paper tones, four inks, three rules, one decorative sepia and exactly two semantic inks, with no green or success colour. Sepia marks what the operator *chose*, never what the data *is*. Use three system font stacks with no download. The third stack is the mono verbatim register, used only for fallback modifier text. Every glyph must exist in Segoe UI Regular, Semibold and Bold, except `↗`, which is pinned to weight 400.
+- **Silence means healthy.** A healthy cell holds no mark element. Trust marks are inline text with no background, border or capsule. The key block is mandatory in every state except the two full-page failure screens.
+- **Price State glyphs** are `●` priced, `○` no-listings, `∆` not-yet-synced and `×` unresolvable, in rust. Each glyph always appears with its word. A Combination is printed as its Accepted Tier plus the canonical short form, never the value. The fallback is the catalogue stat name plus the band, in the mono register.
+- **Interactions.** The page is mouse-only, with seven interactions and one banner dismissal. Epic 2 builds six of them; the Craft Recipe switch is Epic 3's. They are: typing the threshold (debounced about 150 ms; range 0–3, step 0.05, clamped on blur), expanding a row (click anywhere on it; many panels can be open at once; no animation), toggling the tombstone band, `+ Read the remaining N rows`, the sync report strip, and the trade link. Nothing sorts, and there are no tooltips, modals or auto-refresh. Everything except the threshold resets on reload.
+- **States this epic must reach.** Skeleton, with its fill left as an open `[NOTE FOR UX]`. The refusal screen, which names the artifact and the declared and expected versions, with no retry. The fetch-failure screen, with `+ Try again`. The honest-empty league reset, in canonical order, with the rank numerals suppressed and *no figure yet* in every EV cell. Nothing-clears-the-threshold, a plain declarative that keeps the rows and numerals. The health line, raised only for unresolvable entries or pinned starvation. The appendix below the list, followed by the key block and the running foot.
+
+## Cross-Story Dependencies
+
+- Story 2.1 is the base for every other story. Story 2.2 delivers `core`'s raw branch and `RankedRow`, and Stories 2.3–2.8 render from them. Story 2.8 completes the day-one page that Story 2.7 deploys.
+- The inputs from Epic 1 are `dataset.json`, `sync-report.json` and the committed catalogue. The trust strip must render the `(not committed)` suffix for a `file-modified` Tracked List date. `sync` already writes the tag, and this is code owed from Story 1.9 in `deferred-work.md`.
+- **Settled 2026-09-26 in `docs/epics.md`: `weights.json` is present and `recipes.json` is absent.** The committed day-one state is AD-24's absent-recipes state. Story 2.8: on the committed data the appendix holds no row and never prints `class absent from weights file`. That string belongs to the absent-weights state, which Story 2.8 tests against a fixture. Story 2.6: line one reads `producer`, `generatedAt` and `gamePatch` from the weights envelope, so Story 2.1's envelope widens to type them. An omitted coverage figure with the file present renders as provisional *not measured*, never `0`. Both open UX questions are `[NOTE FOR UX]` entries in `deferred-work.md`.
+- Epic 3 extends the chrome and does not rewrite it. It adds the sixth panel group under *what is broken*, so build that column so that vertical space alone admits a new group. It adds the other two appendix reasons, the Craft Recipe context in the panel title, and the mono register on the chase cells. Keep Story 2.5's fallback treatment identical to the one Epic 3 uses.
+- Open `[NOTE FOR UX]` items to raise, not settle: the skeleton's fill and shape, and whether the key block lists `† pruned` and `* pinned`.
