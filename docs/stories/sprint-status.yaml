@@ -167,8 +167,8 @@ action_items:
     action: "Default sync:dry's clock to the snapshot's latest lastAttemptedAt, add --at <iso>,
       ignore and print notBefore (AGENT-WORKFLOW, spine rev 21)"
     owner: "dev"
-    status: open
-    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+    status: done
+    ref: "docs/stories/spec-epic-1-retro-item-14-dry-run-instant.md"
   - id: "epic-1-retro-item-15-process-the-build-skill-appends-every-sp"
     epic: 1
     action: "Process: the build skill appends every spec deferred entry to deferred-work.md

@@ -7,22 +7,32 @@
  * `data/catalogue/{items,stats,filters}.json` and `data/weights.json` (when
  * present) into an in-memory fake filesystem, and runs **the same
  * `runChunk`** a live run uses with **the same pricing step**, on a fixed
- * clock and a fixed pid, behind **the same league gate**
- * (`./league/league-gate.ts`). The gate's GET is served the recorded
- * `fixtures/trade-data-leagues.json` and counted as `league-validation`. The
- * step's requests go to an offline port that serves the recorded
- * `fixtures/trade-{search,fetch}-*.json` back by request digest; an
- * unrecorded request fails loudly — the run rejects, naming the missing
- * fixture, and never yields. A league mismatch rejects too. It prints
- * `{outcome, completed, entries, progress, dataset, records, report}` — plus
- * `pinnedStarvation` when the chunk truncated the pinned set — as JSON to
- * stdout and writes nothing to disk: the lock, `sync-progress.json`,
- * `dataset.json` and `sync-report.json` land in the fake. `dataset` is the
- * file as the chunk wrote it, with the active league and the output rate set
- * passed in. `report` is the Sync Report as the chunk wrote it: the offline
- * port's pricing requests are counted as `tracked-list`, the git port is a fake with
- * no history, and a snapshot of `data/sync-report.json` (when present)
- * supplies the records it carries forward.
+ * pid, behind **the same league gate** (`./league/league-gate.ts`). The
+ * gate's GET is served the recorded `fixtures/trade-data-leagues.json` and
+ * counted as `league-validation`. The step's requests go to an offline port
+ * that serves the recorded `fixtures/trade-{search,fetch}-*.json` back by
+ * request digest; an unrecorded request fails loudly — the run rejects,
+ * naming the missing fixture, and never yields. A league mismatch rejects
+ * too. It prints `{outcome, completed, entries, progress, dataset, records,
+ * report}` — plus `pinnedStarvation` when the chunk truncated the pinned
+ * set, and `notBefore` when the real `data/sync-progress.json` carries one —
+ * as JSON to stdout and writes nothing to disk: the lock,
+ * `sync-progress.json`, `dataset.json` and `sync-report.json` land in the
+ * fake. `dataset` is the file as the chunk wrote it, with the active league
+ * and the output rate set passed in. `report` is the Sync Report as the
+ * chunk wrote it: the offline port's pricing requests are counted as
+ * `tracked-list`, the git port is a fake with no history, and a snapshot of
+ * `data/sync-report.json` (when present) supplies the records it carries
+ * forward.
+ *
+ * **The clock.** By default the clock is the latest `lastAttemptedAt` across
+ * the dataset snapshot's entries, so the run predicts the live run that
+ * immediately follows the last one; with no such entry it falls back to the
+ * fixed instant `DRY_RUN_INSTANT`. `--at <iso>` (or the `at` option) sets it
+ * explicitly. The dry run never lets the real `data/sync-progress.json`'s
+ * `notBefore` (AD-8's cross-run penalty) defer the simulated run — it is
+ * read but never fed into the fake filesystem — and only surfaces it in the
+ * printed report (AGENT-WORKFLOW.md).
  *
  * An absent tracked file is an empty workload, and an absent dataset means
  * every entry is never attempted. An absent weights file is a `weights-absent`
@@ -34,12 +44,14 @@ import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
 import {
   createFakeClockPort,
   createFakeFilesystemPort,
   createFakeGitPort,
   DatasetFileSchema,
+  IsoTimestampSchema,
   parseEnvelope,
   SyncProgressFileSchema,
   SyncReportFileSchema,
@@ -82,7 +94,12 @@ import { createRequestCounter } from './request-counter.ts';
 import { createTradeClients } from './trade/client.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
-/** Fixed, so two dry runs over the same inputs print the same bytes. */
+/**
+ * The clock's fallback when the dataset snapshot carries no `lastAttemptedAt`
+ * and `--at` is absent. Fixed, so that case still prints the same bytes on
+ * repeat; the default case's determinism instead comes from the snapshot's
+ * own latest `lastAttemptedAt`.
+ */
 export const DRY_RUN_INSTANT = '2026-01-01T00:00:00.000Z';
 export const DRY_RUN_PID = 0;
 /** The offline client still refuses a blank contact, so the dry run names itself. */
@@ -102,6 +119,12 @@ export interface DryRunReport {
   readonly report: SyncReportFile | null;
   /** Present only when the chunk truncated the pinned set (AD-7). */
   readonly pinnedStarvation?: ChunkStarvation;
+  /**
+   * The real `data/sync-progress.json`'s `notBefore` (AD-8), when the
+   * snapshot carries one. The dry run never lets it defer the simulated run;
+   * this is surfaced only so an agent can see a pending penalty.
+   */
+  readonly notBefore?: string;
 }
 
 /** Every input as text; an absent key is an absent file. */
@@ -117,7 +140,18 @@ export interface DryRunSnapshot {
   readonly weights?: string | undefined;
   /** The previous Sync Report, whose records the chunk carries forward. */
   readonly report?: string | undefined;
+  /**
+   * The real `data/sync-progress.json`. Read only for its `notBefore`
+   * (AD-8); never fed into the simulated run, so it cannot defer it.
+   */
+  readonly progress?: string | undefined;
   readonly fixtures: PricingFixtures;
+}
+
+/** Additional dry-run behaviour outside the file snapshot. */
+export interface DryRunOptions {
+  /** Overrides the default clock (the latest `lastAttemptedAt`, or `DRY_RUN_INSTANT`). */
+  readonly at?: string | undefined;
 }
 
 function valueOf<T>(loaded: DataFileResult<T>): T {
@@ -125,6 +159,35 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
     throw loaded.error;
   }
   return loaded.value;
+}
+
+/** The latest `lastAttemptedAt` among the entries, or `undefined` if none carry one. */
+function latestAttemptedAt(entries: readonly DatasetEntry[]): string | undefined {
+  let latest: string | undefined;
+  for (const entry of entries) {
+    if (
+      entry.lastAttemptedAt !== undefined &&
+      (latest === undefined || Date.parse(entry.lastAttemptedAt) > Date.parse(latest))
+    ) {
+      latest = entry.lastAttemptedAt;
+    }
+  }
+  return latest;
+}
+
+/**
+ * The real `data/sync-progress.json`'s `notBefore`, when the snapshot carries
+ * one — a typed refusal naming the file, as every other input file gets.
+ */
+function readProgressNotBefore(text: string | undefined): string | undefined {
+  if (text === undefined) {
+    return undefined;
+  }
+  try {
+    return SyncProgressFileSchema.parse(JSON.parse(text)).notBefore;
+  } catch (error) {
+    throw new Error(`${PROGRESS_PATH}: invalid: ${String(error)}`, { cause: error });
+  }
 }
 
 /** A file the chunk wrote into the fake, validated; `null` if it wrote none. */
@@ -138,7 +201,7 @@ async function readWritten<T>(
 }
 
 /** Pure apart from the fakes it builds: the snapshot in, the report out. */
-export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
+export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = {}): Promise<DryRunReport> {
   const files: [string, string | undefined][] = [
     [TRACKED_PATH, snapshot.tracked],
     [DATASET_PATH, snapshot.dataset],
@@ -167,7 +230,8 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
           await loadDataFile(fs, DATASET_PATH, (data) => parseEnvelope(DatasetFileSchema, data)),
         ).entries;
 
-  const clock = createFakeClockPort(DRY_RUN_INSTANT);
+  const clock = createFakeClockPort(options.at ?? latestAttemptedAt(previous) ?? DRY_RUN_INSTANT);
+  const notBefore = readProgressNotBefore(snapshot.progress);
   const requests = createRequestCounter();
   // One offline port, counted twice: the gate's GET as `league-validation`,
   // the step's requests as `tracked-list`. The two clients are one governor,
@@ -220,6 +284,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     records: outcome.records,
     report,
     ...(outcome.pinnedStarvation === undefined ? {} : { pinnedStarvation: outcome.pinnedStarvation }),
+    ...(notBefore === undefined ? {} : { notBefore }),
   };
 }
 
@@ -251,12 +316,27 @@ export async function readRepositorySnapshot(): Promise<DryRunSnapshot> {
     filters: await readSnapshot(CATALOGUE_FILTERS_PATH),
     weights: await readSnapshot(WEIGHTS_PATH),
     report: await readSnapshot(REPORT_PATH),
+    progress: await readSnapshot(PROGRESS_PATH),
     fixtures: await readPricingFixtures(FIXTURES_DIR),
   };
 }
 
+/** `--at <iso>` overrides the default clock; every other argument is a usage error. */
+function parseCliOptions(argv: readonly string[]): DryRunOptions {
+  const { values } = parseArgs({ args: argv, options: { at: { type: 'string' } }, strict: true });
+  if (values.at === undefined) {
+    return {};
+  }
+  const parsed = IsoTimestampSchema.safeParse(values.at);
+  if (!parsed.success) {
+    throw new Error(`--at: not an ISO-8601 instant: ${values.at}`);
+  }
+  return { at: parsed.data };
+}
+
 async function main(): Promise<void> {
-  const report = await dryRun(await readRepositorySnapshot());
+  const options = parseCliOptions(process.argv.slice(2));
+  const report = await dryRun(await readRepositorySnapshot(), options);
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
 }
 

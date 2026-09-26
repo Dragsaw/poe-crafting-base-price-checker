@@ -316,14 +316,16 @@ describe('dryRun: the dataset snapshot', () => {
   ];
   const [A, B, C, P] = rotation as [TrackedEntry, TrackedEntry, TrackedEntry, TrackedEntry];
   const rotationTracked = JSON.stringify({ schemaVersion: '1.0.0', entries: rotation });
-  // Before DRY_RUN_INSTANT, so the order depends on them. C is never attempted.
+  /** The snapshot's own latest `lastAttemptedAt`, so this is the run's default clock. */
+  const A_ATTEMPTED_AT = '2025-12-31T00:00:00.000Z';
+  const B_ATTEMPTED_AT = '2025-12-30T00:00:00.000Z';
   const datasetText = JSON.stringify({
     schemaVersion: '1.0.0',
     league: 'Standard',
-    generatedAt: '2025-12-31T00:00:00.000Z',
+    generatedAt: A_ATTEMPTED_AT,
     entries: [
-      { entryKey: canonicalKey(A), price: { state: 'no-listings' }, lastAttemptedAt: '2025-12-31T00:00:00.000Z' },
-      { entryKey: canonicalKey(B), price: { state: 'no-listings' }, lastAttemptedAt: '2025-12-30T00:00:00.000Z' },
+      { entryKey: canonicalKey(A), price: { state: 'no-listings' }, lastAttemptedAt: A_ATTEMPTED_AT },
+      { entryKey: canonicalKey(B), price: { state: 'no-listings' }, lastAttemptedAt: B_ATTEMPTED_AT },
     ],
     currencyRates: [],
   });
@@ -343,7 +345,7 @@ describe('dryRun: the dataset snapshot', () => {
     await runChunk(
       {
         fs,
-        clock: createFakeClockPort(DRY_RUN_INSTANT),
+        clock: createFakeClockPort(A_ATTEMPTED_AT),
         pid: 1,
         git: createFakeGitPort(),
         requests: createRequestCounter(),
@@ -377,15 +379,48 @@ describe('dryRun: the dataset snapshot', () => {
     expect(report.dataset?.entries.map((entry) => entry.entryKey)).toEqual(
       rotation.map(canonicalKey).toSorted(compareCanonicalKeys),
     );
-    // Every tracked entry was visited, so every entry is this run's.
+    // Every tracked entry was visited, so every entry is this run's, stamped
+    // with the default clock: the snapshot's own latest `lastAttemptedAt`.
     for (const entry of report.dataset?.entries ?? []) {
-      expect(entry.lastAttemptedAt, entry.entryKey).toBe(DRY_RUN_INSTANT);
+      expect(entry.lastAttemptedAt, entry.entryKey).toBe(A_ATTEMPTED_AT);
     }
   });
 
   it('refuses an invalid dataset loudly', async () => {
     await expect(dryRun(snapshotOf(rotation, { dataset: '{"schemaVersion":"9.0.0"}' }))).rejects.toThrow(
       /dataset\.json/,
+    );
+  });
+
+  it('an --at option overrides the snapshot’s own latest lastAttemptedAt', async () => {
+    const at = '2026-06-01T00:00:00.000Z';
+    const report = await dryRun(withDataset, { at });
+    for (const entry of report.dataset?.entries ?? []) {
+      expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
+    }
+  });
+});
+
+describe('dryRun: notBefore', () => {
+  it('surfaces the real sync-progress.json’s notBefore without deferring the run', async () => {
+    const progress = JSON.stringify({
+      completed: [],
+      notBefore: '2099-01-01T00:00:00.000Z',
+      schemaVersion: '1.1.0',
+    });
+    const report = await dryRun(snapshotOf(entries, { progress }));
+    expect(report.notBefore).toBe('2099-01-01T00:00:00.000Z');
+    expect(report.outcome).toBe('completed');
+  });
+
+  it('omits notBefore when the snapshot carries no progress file', async () => {
+    const report = await dryRun(snapshotOf(entries));
+    expect(report.notBefore).toBeUndefined();
+  });
+
+  it('refuses an invalid progress file loudly, naming the file', async () => {
+    await expect(dryRun(snapshotOf(entries, { progress: '{"schemaVersion":"9.0.0"}' }))).rejects.toThrow(
+      /sync-progress\.json/,
     );
   });
 });
@@ -424,9 +459,9 @@ interface Run {
 }
 
 /** Spawns the script the way `pnpm sync:dry` does, with both streams piped. */
-function runScript(): Promise<Run> {
+function runScript(args: readonly string[] = []): Promise<Run> {
   return new Promise((resolve) => {
-    const child = execFile(process.execPath, [SCRIPT], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       resolve({ code: child.exitCode, stdout, stderr });
     });
   });
@@ -501,5 +536,33 @@ describe('pnpm sync:dry', () => {
     expect(printed.records.some((record) => record.kind === 'league-mismatch')).toBe(false);
 
     expect(snapshot(DATA_DIR)).toEqual(before);
+  });
+
+  it('--at sets the clock explicitly and writes nothing to disk', async () => {
+    const before = snapshot(DATA_DIR);
+    const at = '2026-06-01T00:00:00.000Z';
+
+    const run = await runScript(['--at', at]);
+
+    expect(run.code, run.stderr).toBe(0);
+    const report = JSON.parse(run.stdout) as { dataset: DatasetFile };
+    const attempted = report.dataset.entries.filter((entry) => entry.lastAttemptedAt !== undefined);
+    expect(attempted.length).toBeGreaterThan(0);
+    for (const entry of attempted) {
+      expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
+    }
+    expect(snapshot(DATA_DIR)).toEqual(before);
+  });
+
+  it('exits non-zero, naming the flag, on an unrecognised option', async () => {
+    const run = await runScript(['--bogus']);
+    expect(run.code).not.toBe(0);
+    expect(run.stderr).toMatch(/--bogus/);
+  });
+
+  it('exits non-zero, naming --at, when --at is not an ISO-8601 instant', async () => {
+    const run = await runScript(['--at', 'not-a-date']);
+    expect(run.code).not.toBe(0);
+    expect(run.stderr).toMatch(/--at/);
   });
 });
