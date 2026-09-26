@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-26-2026 15:45
+last_updated: 09-26-2026 16:47
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -47,7 +47,7 @@ development_status:
   1-9-the-structured-sync-report-with-requests-accounted-per-sourc: done
   1-10-unresolvable-ids-detected-offline-and-reported: done
   1-11-league-validation-as-a-run-start-gate: done
-  epic-1-retrospective: optional
+  epic-1-retrospective: done
 
   epic-2: backlog
   2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and: backlog
@@ -67,3 +67,112 @@ development_status:
   3-5-chase-combinations-on-the-collapsed-crafted-row: backlog
   3-6-provenance-the-uniform-prior-banner-and-the-unrankable-appen: backlog
   epic-3-retrospective: optional
+action_items:
+  - id: "epic-1-retro-item-1-rule-the-run-start-order-in-ad-7-offline"
+    epic: 1
+    action: "Rule the run-start order in AD-7 (offline catalogue check before the
+      league gate), then reorder runChunk"
+    owner: "spine, then dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-2-on-a-gate-yield-report-the-eligible-coun"
+    epic: 1
+    action: "On a gate yield, report the eligible count as notReachedCount (or omit
+      the figure) so a yielded run is distinguishable from an empty tracked list"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-3-publish-completed-entries-and-catalogue"
+    epic: 1
+    action: "Publish completed entries and catalogue marks on every throw path, not
+      only MalformedRequestError; append the story 1.7 deferral to deferred-work.md"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-4-define-record-identity-per-record-kind-i"
+    epic: 1
+    action: "Define record identity per record kind in IN section 6 and dedup carryRecords
+      on it; add a two-chunk record-growth test"
+    owner: "spine, then dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-5-add-a-canonical-key-uniqueness-refinemen"
+    epic: 1
+    action: "Add a canonical-key uniqueness refinement to TrackedFileSchema"
+    owner: "dev (contracts)"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-6-extract-one-composechunk-ports-used-by-s"
+    epic: 1
+    action: "Extract one composeChunk(ports) used by sync.ts and dry-run.ts; pass
+      the under-lock dataset to the pricing step"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-7-call-checkpinnedcap-from-the-shared-comp"
+    epic: 1
+    action: "Call checkPinnedCap from the shared composition and record its refusal"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-8-decide-where-invalidrequestthreshold-liv"
+    epic: 1
+    action: "Decide where invalidRequestThreshold lives and pass it in the live shell"
+    owner: "spine, then dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-9-drop-the-catalogue-refresh-figure-from-s"
+    epic: 1
+    action: "Drop the catalogue-refresh figure from SyncRunFiguresSchema, or have
+      the refresh command write its own count"
+    owner: "spine, then dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-10-loopback-server-test-for-createfetchhttp"
+    epic: 1
+    action: "Loopback-server test for createFetchHttpPort: the TimeoutError name and
+      the 'fetch failed' literal"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-11-one-test-parsing-all-four-data-catalogue"
+    epic: 1
+    action: "One test parsing all four data/catalogue/*.json against the Catalogue*FileSchema;
+      retire the two 1.4 ledger entries it closes"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-12-edit-implementation-notes-section-10-2-t"
+    epic: 1
+    action: "Edit IMPLEMENTATION-NOTES section 10.2 to cite AD-25; update docs/epics.md
+      story 1.11 so a 429 on the leagues GET is a yield, not an abort"
+    owner: "docs owners"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-13-replace-comparecodeunits-in-weights-ids"
+    epic: 1
+    action: "Replace compareCodeUnits in weights-ids.ts with the contracts comparator"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-14-decide-the-dry-run-instant-derive-it-fro"
+    epic: 1
+    action: "Decide the dry-run instant: derive it from the snapshot rather than the
+      constant 2026-01-01"
+    owner: "spine, then dev"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-15-process-the-build-skill-appends-every-sp"
+    epic: 1
+    action: "Process: the build skill appends every spec deferred entry to deferred-work.md
+      in the same commit; write the story-id commit subject convention into AGENT-WORKFLOW.md"
+    owner: "workflow docs"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-16-commit-the-first-live-run-s-data-dataset"
+    epic: 1
+    action: "Commit the first live run's data/dataset.json, data/sync-progress.json
+      and data/sync-report.json"
+    owner: "player"
+    status: open
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
