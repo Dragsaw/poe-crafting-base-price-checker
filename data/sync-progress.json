@@ -1,0 +1,10 @@
+{
+  "completed": [
+    "[\"crafted\",\"accessory.amulet\",\"Amulets\",75,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_124131830\",3,3]]",
+    "[\"crafted\",\"jewel\",\"Emerald\",1,[\"explicit.stat_2843214518\",12,15],[\"explicit.stat_681332047\",3,4]]",
+    "[\"raw\",\"Gold Amulet\",82]",
+    "[\"raw\",\"Solar Amulet\",82]",
+    "[\"raw\",\"Utility Belt\",82]"
+  ],
+  "schemaVersion": "1.0.0"
+}
