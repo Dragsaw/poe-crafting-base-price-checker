@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "entries": [
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 54,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T5"
+      },
+      "status": "active"
+    },
+    { "kind": "raw", "baseTypeId": "Gold Amulet", "itemLevelMin": 82, "status": "active" },
+    { "kind": "raw", "baseTypeId": "Solar Amulet", "itemLevelMin": 82, "status": "active" },
+    { "kind": "raw", "baseTypeId": "Utility Belt", "itemLevelMin": 82, "status": "active" },
+    { "kind": "raw", "baseTypeId": "Wide Belt", "itemLevelMin": 82, "status": "pruned", "prunedReason": "no market" }
+  ]
+}
