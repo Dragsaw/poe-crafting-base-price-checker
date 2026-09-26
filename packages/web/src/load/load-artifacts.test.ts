@@ -206,6 +206,6 @@ describe('the committed data/ set', () => {
     if (outcome.kind !== 'ready') return;
     expect(missing.every((key) => ARTIFACTS[key].class === 'tolerable')).toBe(true);
     expect(outcome.absent).toEqual(missing);
-    expect(outcome.absent).toEqual(['recipes']);
+    expect(outcome.absent).toEqual([]);
   });
 });
