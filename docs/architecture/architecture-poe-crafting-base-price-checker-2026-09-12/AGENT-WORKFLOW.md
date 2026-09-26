@@ -148,7 +148,7 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 
 ## Commit conventions
 
-The `.githooks/commit-msg` hook checks a commit subject (skipping a merge, revert, fixup, or squash commit) and prints a fix when it fails. `pnpm install` wires it in (`prepare` sets `core.hooksPath`). Read the hook for the exact rule; in short, a `feat`/`fix`/`test` commit scoped to a package names its story (`story 1.N`) or retro item (`retro item(s) N`) — a `docs`/`chore` commit, or one with no package scope, does not need to.
+A commit subject is `type(scope): description` or `type: description`. A `feat`/`fix`/`test` commit scoped to a package (`contracts`, `core`, `sync`, `web`) names its story (`story 1.N`) or retro item (`retro item(s) N`) in the description — a `docs`/`chore` commit, or one with no package scope, does not need to. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`).
 
 ## Definition of done for an agent task
 
