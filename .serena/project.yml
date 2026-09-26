@@ -169,3 +169,4 @@ language_servers:
 - typescript
 - html
 - json
+- yaml
