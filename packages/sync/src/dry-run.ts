@@ -80,6 +80,7 @@ import { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types.t
 import { createPricingStep } from './pricing/price-entry.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { createTradeClients } from './trade/client.ts';
+import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
 /** Fixed, so two dry runs over the same inputs print the same bytes. */
 export const DRY_RUN_INSTANT = '2026-01-01T00:00:00.000Z';
@@ -180,6 +181,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     clock,
     wait: () => Promise.resolve(),
     userAgent: DRY_RUN_USER_AGENT,
+    invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
   });
   const step = createPricingStep({
     client: clients['tracked-list'],

@@ -4,15 +4,33 @@ import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createFakeClockPort, createFakeHttpPort, SUPPORTED_SCHEMA_VERSION } from '@poe/contracts';
 import type { HttpResponse } from '@poe/contracts';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 
 import {
   catalogueFilePathOf,
+  printRefreshOutcome,
   refreshCatalogue,
   serialiseCatalogue,
 } from './catalogue-refresh.ts';
+import type * as TradeClientModule from './trade/client.ts';
 import { CATALOGUE_ENDPOINTS, TRADE_LEAGUES_URL } from './trade/endpoints.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
+
+/** Every option set the command built its trade client with, in build order. */
+const tradeClientOptions = vi.hoisted((): unknown[] => []);
+
+// A pass-through: the real client is built, and the options are recorded so a
+// test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+vi.mock('./trade/client.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof TradeClientModule>();
+  return {
+    ...actual,
+    createTradeClient: (options: Parameters<typeof actual.createTradeClient>[0]) => {
+      tradeClientOptions.push(options);
+      return actual.createTradeClient(options);
+    },
+  };
+});
 
 /**
  * Importing the refresher is deliberate: the module has an entry guard, so the
@@ -329,6 +347,41 @@ it('issues exactly four requests, one per data endpoint and no leagues request',
     expect(request.method).toBe('GET');
     expect(request.url).not.toBe(TRADE_LEAGUES_URL);
   }
+});
+
+it('builds its trade client with the invalid-request threshold of 1 (§5.3)', async () => {
+  tradeClientOptions.length = 0;
+
+  await harness(capturedResponses()).refresh();
+
+  expect(tradeClientOptions).toEqual([expect.objectContaining({ invalidRequestThreshold: 1 })]);
+});
+
+it('counts its requests: four on success, and the count printed (AD-12)', async () => {
+  const outcome = await harness(capturedResponses()).refresh();
+
+  expect(outcome).toMatchObject({ ok: true, requests: 4 });
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: (line) => stderr.push(line) })).toBe(0);
+  expect(stdout[0]).toBe('requests: 4');
+  expect(stderr).toEqual([]);
+});
+
+it('counts the requests sent before a failure, and prints the count beside it', async () => {
+  const fixtures = capturedResponses();
+  const second = CATALOGUE_ENDPOINTS[1];
+  if (second === undefined) {
+    throw new Error('the catalogue declares fewer than two endpoints');
+  }
+  fixtures[`GET ${second.url}`] = { status: 503, headers: RATE_LIMIT_HEADERS, body: '' };
+
+  const outcome = await harness(fixtures).refresh();
+
+  expect(outcome).toMatchObject({ ok: false, requests: 2 });
+  const stdout: string[] = [];
+  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: () => undefined })).toBe(1);
+  expect(stdout).toEqual(['requests: 2']);
 });
 
 it('carries the standing headers on every request', async () => {

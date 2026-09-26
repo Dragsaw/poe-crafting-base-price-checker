@@ -13,7 +13,7 @@ import {
   SyncReportFileSchema,
 } from '@poe/contracts';
 import type { CurrencyRate, DatasetEntry, DatasetFile, SyncReportFile, TrackedEntry } from '@poe/contracts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DATASET_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { DRY_RUN_INSTANT, dryRun, readRepositorySnapshot } from './dry-run.ts';
@@ -23,7 +23,24 @@ import { LeagueMismatchError } from './league/league-gate.ts';
 import { LEAGUES_FIXTURE_NAME, pricingFixtureName } from './pricing/fixture-names.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
+import type * as TradeClientModule from './trade/client.ts';
 import { tradeSearchUrl } from './trade/endpoints.ts';
+
+/** Every option set the dry run built its trade clients with, in build order. */
+const tradeClientOptions = vi.hoisted((): unknown[] => []);
+
+// A pass-through: the real clients are built, and the options are recorded so
+// a test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+vi.mock('./trade/client.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof TradeClientModule>();
+  return {
+    ...actual,
+    createTradeClients: (options: Parameters<typeof actual.createTradeClients>[0]) => {
+      tradeClientOptions.push(options);
+      return actual.createTradeClients(options);
+    },
+  };
+});
 
 const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
@@ -119,11 +136,11 @@ function reportOf(trackedListRequests: number, notReachedCount = 0): SyncReportF
     runStartedAt: DRY_RUN_INSTANT,
     runFinishedAt: DRY_RUN_INSTANT,
     figures: {
-      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 1, 'catalogue-refresh': 0 },
+      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 1 },
       notReachedCount,
     },
     records: [],
-    schemaVersion: '1.0.0',
+    schemaVersion: '1.1.0',
   };
 }
 
@@ -136,7 +153,7 @@ describe('dryRun', () => {
       completed: [canonicalKey(pinned), canonicalKey(active)],
       entries: [noListings(pinned, 1), noListings(active, 0)],
       // Pinned entries are exempt from the pass, so only the active key is recorded.
-      progress: { schemaVersion: '1.0.0', completed: [canonicalKey(active)] },
+      progress: { schemaVersion: '1.1.0', completed: [canonicalKey(active)] },
       dataset: datasetOf(
         [
           noListings(pinned, 1),
@@ -150,12 +167,20 @@ describe('dryRun', () => {
     });
   });
 
+  it('builds its trade clients with the invalid-request threshold of 1 (§5.3)', async () => {
+    tradeClientOptions.length = 0;
+
+    await dryRun(snapshotOf(entries));
+
+    expect(tradeClientOptions).toEqual([expect.objectContaining({ invalidRequestThreshold: 1 })]);
+  });
+
   it('treats an absent tracked file as an empty workload', async () => {
     expect(await dryRun(snapshotOf(undefined))).toEqual({
       outcome: 'completed',
       completed: [],
       entries: [],
-      progress: { schemaVersion: '1.0.0', completed: [] },
+      progress: { schemaVersion: '1.1.0', completed: [] },
       dataset: datasetOf([]),
       records: [],
       report: reportOf(0),
@@ -264,7 +289,6 @@ describe('dryRun: the league gate', () => {
     expect(report.report?.figures.requestsBySource).toEqual({
       'tracked-list': 2,
       'league-validation': 1,
-      'catalogue-refresh': 0,
     });
   });
 
@@ -468,14 +492,12 @@ describe('pnpm sync:dry', () => {
     const printed = report['report'] as SyncReportFile;
     expect(Object.keys(printed)).toEqual(['runStartedAt', 'runFinishedAt', 'figures', 'records', 'schemaVersion']);
     expect(Object.keys(printed.figures.requestsBySource).toSorted()).toEqual([
-      'catalogue-refresh',
       'league-validation',
       'tracked-list',
     ]);
     expect(printed.figures.requestsBySource['tracked-list']).toBeGreaterThan(0);
     // The league gate ran once, against the recorded leagues fixture (Story 1.11).
     expect(printed.figures.requestsBySource['league-validation']).toBe(1);
-    expect(printed.figures.requestsBySource['catalogue-refresh']).toBe(0);
     expect(printed.records.some((record) => record.kind === 'league-mismatch')).toBe(false);
 
     expect(snapshot(DATA_DIR)).toEqual(before);

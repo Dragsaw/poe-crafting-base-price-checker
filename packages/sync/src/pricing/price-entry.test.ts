@@ -266,12 +266,17 @@ describe('createPricingStep: states by cause', () => {
 
 describe('createPricingStep: unanswered and refused requests', () => {
   it.each([
-    ['a 429', { status: 429, headers: { 'retry-after': '60' }, body: '' }],
-    ['a 503', status(503)],
-  ])('%s on the search stamps lastAttemptedAt alone and yields', async (_label, response) => {
+    ['a 429', { status: 429, headers: { 'retry-after': '60' }, body: '' }, { retryAfterMs: 60_000 }],
+    ['a 503', status(503), {}],
+  ])('%s on the search stamps lastAttemptedAt alone and yields', async (_label, response, penalty) => {
     const { run } = setup({ search: response, dataset: [PREVIOUS] });
 
-    expect(await run()).toEqual({ kind: 'yielded', entry: { ...PREVIOUS, lastAttemptedAt: NOW } });
+    // Only a 429 carries the delay the chunk remembers as notBefore (§5.3).
+    expect(await run()).toStrictEqual({
+      kind: 'yielded',
+      entry: { ...PREVIOUS, lastAttemptedAt: NOW },
+      ...penalty,
+    });
   });
 
   it('a timeout on the search stamps lastAttemptedAt alone and yields', async () => {
@@ -293,13 +298,18 @@ describe('createPricingStep: unanswered and refused requests', () => {
   });
 
   it.each([
-    ['a 429', { status: 429, headers: {}, body: '' }, false],
-    ['a 502', status(502), false],
-    ['a timeout', undefined, true],
-  ])('%s on the fetch stamps lastAttemptedAt alone and yields', async (_label, response, rejectFetch) => {
+    // No Retry-After: the client derives the floor from the same response.
+    ['a 429', { status: 429, headers: {}, body: '' }, false, { retryAfterMs: 1000 }],
+    ['a 502', status(502), false, {}],
+    ['a timeout', undefined, true, {}],
+  ])('%s on the fetch stamps lastAttemptedAt alone and yields', async (_label, response, rejectFetch, penalty) => {
     const { run } = setup({ results: ids(1), fetch: response ?? status(200), rejectFetch, dataset: [PREVIOUS] });
 
-    expect(await run()).toEqual({ kind: 'yielded', entry: { ...PREVIOUS, lastAttemptedAt: NOW } });
+    expect(await run()).toStrictEqual({
+      kind: 'yielded',
+      entry: { ...PREVIOUS, lastAttemptedAt: NOW },
+      ...penalty,
+    });
   });
 
   it('another 4xx on the search throws MalformedRequestError with the stamped entry', async () => {

@@ -158,6 +158,18 @@ export interface TradeYieldResult extends TradeExchange {
   readonly response?: HttpResponse;
 }
 
+/**
+ * The delay a `429` yield carried — the `Retry-After` header, or the floor the
+ * client derived from the same response — or `undefined` on a threshold
+ * refusal, which no wait recovers. This is the `retryAfter` of
+ * IMPLEMENTATION-NOTES.md §5.3, the input to a chunk's `notBefore`.
+ */
+export function penaltyRetryAfterMs(result: TradeYieldResult): number | undefined {
+  return result.reason === 'retry-after-header' || result.reason === 'derived-penalty'
+    ? result.retryAfterMs
+    : undefined;
+}
+
 export type TradeResult = TradeResponseResult | TradeYieldResult;
 
 export interface TradeClient {

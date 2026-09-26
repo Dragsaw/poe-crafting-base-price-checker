@@ -47,6 +47,7 @@ import {
 } from './shell.ts';
 import { createTradeClient } from './trade/client.ts';
 import type { TradeRequest } from './trade/client.ts';
+import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 import {
   CATALOGUE_ENDPOINTS,
   DATA_LANE,
@@ -278,6 +279,7 @@ export async function recordFixtures(
     clock: ports.clock,
     wait: ports.wait,
     userAgent: ports.userAgent,
+    invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
   });
 
   const captured: { path: string; contents: string }[] = [];

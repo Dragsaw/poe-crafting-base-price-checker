@@ -30,8 +30,18 @@
  * then `data/sync-report.json` (`./sync-report.ts`), all through
  * `writeArtifact`. The dataset goes first, so progress never records a
  * completion the dataset does not publish. `busy` and `dispossessed` write
- * nothing. The league and the rate set arrive as `publication`, so this
- * directory names no player file other than its own inputs.
+ * nothing.
+ *
+ * Penalty memory (AD-8, IMPLEMENTATION-NOTES.md §5.3): right after the lock,
+ * before every other load, the run reads `notBefore` from progress. While the
+ * clock is before it the run is `deferred`: it sends nothing and writes
+ * nothing, except the report alone where it broke a stale lock. A chunk that
+ * ends on a `429` (a step's or the gate's) writes `notBefore = now +
+ * min(retryAfter, staleLockAfter)`; a malformed-request abort writes `now +
+ * staleLockAfter`; every other ending that writes progress clears it.
+ *
+ * The league and the rate set arrive as `publication`, so this directory
+ * names no player file other than its own inputs.
  *
  * The report carries this chunk's figures (requests per source, the
  * not-reached count, the tracked-list edit date) and its records after every
@@ -50,8 +60,9 @@
  * `gate`: it runs after the tracked load and before every other load, check
  * and request. A mismatch is a `league-mismatch` record rather than a
  * `run-failure`; like any gate throw it writes the report alone. A gate
- * `yield` (no answer to check against) is a chunk yield: the report alone,
- * with `runFinishedAt`.
+ * `yield` (no answer to check against) is a chunk yield: the report, with
+ * `runFinishedAt`, and on a `429` also progress with its completed keys
+ * unchanged and `notBefore` set.
  *
  * A throw writes the report with a `run-failure` record, leaves
  * `runFinishedAt` absent, and is rethrown. A `MalformedRequestError` (a
@@ -67,7 +78,7 @@ import {
   DatasetFileSchema,
   parseEnvelope,
   resolveTrackedListAge,
-  SUPPORTED_SCHEMA_VERSION,
+  SYNC_PROGRESS_SCHEMA_VERSION,
   SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
@@ -98,7 +109,7 @@ import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
 import { checkCatalogue } from './catalogue-check.ts';
-import { acquireLock, holdsLock, releaseLockIfOwn } from './lock.ts';
+import { acquireLock, holdsLock, releaseLockIfOwn, STALE_LOCK_AFTER_MS } from './lock.ts';
 import { buildDatasetFile } from './publish-dataset.ts';
 import { buildSyncReport } from './sync-report.ts';
 
@@ -138,7 +149,16 @@ export type StepResult =
       /** Report records the step raised for this entry (a `jewel`-arm miss). */
       readonly records?: readonly SyncRunRecord[];
     }
-  | { readonly kind: 'yielded'; readonly entry?: DatasetEntry };
+  | {
+      readonly kind: 'yielded';
+      readonly entry?: DatasetEntry;
+      /**
+       * Set only when the yield was a `429`: the delay the client's yield
+       * carried. The chunk writes it into `notBefore` (IMPLEMENTATION-NOTES.md
+       * §5.3). Absent on a 5xx, a timeout or a threshold refusal.
+       */
+      readonly retryAfterMs?: number;
+    };
 
 export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
 
@@ -151,9 +171,16 @@ export interface GateContext {
  * What the run-start gate answers. `pass` lets the chunk go on. `yield` is a
  * chunk yield (AD-8): the gate got no answer to check against (a 429, the
  * invalid-request threshold, a 5xx, a timeout or a network failure), so the
- * chunk visits no entry and writes only the report.
+ * chunk visits no entry and writes the report, plus progress with
+ * `notBefore` where the yield was a 429.
  */
-export type GateResult = { readonly kind: 'pass' } | { readonly kind: 'yield' };
+export type GateResult =
+  | { readonly kind: 'pass' }
+  | {
+      readonly kind: 'yield';
+      /** Set only when the gate's request answered `429`, as on `StepResult`. */
+      readonly retryAfterMs?: number;
+    };
 
 /** What the caller supplies for the published Dataset's top level (AD-19, AD-20). */
 export interface ChunkPublication {
@@ -194,8 +221,9 @@ export interface ChunkPorts {
   /**
    * The run-start gate. It runs under the lock, before any step. A throw
    * aborts the chunk; the lock is still released. A `yield` ends the chunk
-   * `yielded` with no entry visited: no dataset or progress write, and the
-   * report written with `runFinishedAt`.
+   * `yielded` with no entry visited: no dataset write, progress written only
+   * to set `notBefore` after a 429, and the report written with
+   * `runFinishedAt`.
    */
   readonly gate?: (context: GateContext) => Promise<GateResult>;
   /** One line of operator output. Defaults to stderr. */
@@ -248,6 +276,13 @@ export type ChunkOutcome =
   | (ChunkOutcomeBase & { readonly kind: 'bounded'; readonly bound: ChunkBound })
   | (ChunkOutcomeBase & { readonly kind: 'yielded' })
   | (ChunkOutcomeBase & { readonly kind: 'busy' })
+  /**
+   * A previous chunk ended on a `429` or a malformed-request abort and wrote a
+   * `notBefore` still in the future (AD-8, IMPLEMENTATION-NOTES.md §5.3). The
+   * run released the lock, sent nothing and wrote nothing — except the report
+   * alone where it broke a stale lock to get here.
+   */
+  | (ChunkOutcomeBase & { readonly kind: 'deferred'; readonly notBefore: string })
   | (ChunkOutcomeBase & { readonly kind: 'dispossessed' });
 
 export type ChunkOutcomeKind = ChunkOutcome['kind'];
@@ -288,6 +323,19 @@ async function loadEnvelope<T>(
     throw new Error(describeRefusal(path, result));
   }
   return result.value;
+}
+
+/**
+ * The two `notBefore` formulas (IMPLEMENTATION-NOTES.md §5.3). The cap is
+ * `staleLockAfter`, so no `Retry-After` defers a run past the window that
+ * clears a crashed run's lock.
+ */
+function notBeforeAfter429(now: string, retryAfterMs: number): string {
+  return new Date(Date.parse(now) + Math.min(retryAfterMs, STALE_LOCK_AFTER_MS)).toISOString();
+}
+
+function notBeforeAfterAbort(now: string): string {
+  return new Date(Date.parse(now) + STALE_LOCK_AFTER_MS).toISOString();
 }
 
 function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound | undefined {
@@ -359,6 +407,46 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
   const records: SyncRunRecord[] = acquisition.broken === undefined ? [] : [acquisition.broken];
 
   try {
+    // The penalty memory (AD-8, IMPLEMENTATION-NOTES.md §5.3) is read between
+    // the lock and every other load. A progress file this build cannot read
+    // is thrown at its usual place below, so it still fails the run with a
+    // report; it can defer nothing.
+    let progress: SyncProgressFile | undefined;
+    let progressFault: { readonly error: unknown } | undefined;
+    try {
+      progress = await loadEnvelope(fs, PROGRESS_PATH, (data) =>
+        parseEnvelope(SyncProgressFileSchema, data),
+      );
+    } catch (error) {
+      progressFault = { error };
+    }
+    const notBefore = progress?.notBefore;
+    if (notBefore !== undefined && Date.parse(clock.now()) < Date.parse(notBefore)) {
+      log(
+        `sync: a previous chunk set a pause until ${notBefore} (a 429 or a rejected request); nothing sent this invocation`,
+      );
+      // The one write: a broken stale lock's record is the only trace of the
+      // crash, so the report carries it alone.
+      if (acquisition.broken !== undefined && (await holdsLock(fs, mine))) {
+        const previous = await loadEnvelope(fs, REPORT_PATH, (data) =>
+          parseEnvelope(SyncReportFileSchema, data),
+        );
+        await writeArtifact(
+          fs,
+          REPORT_PATH,
+          SyncReportFileSchema,
+          buildSyncReport({
+            previous,
+            newRecords: records,
+            figures: { requestsBySource: {}, notReachedCount: 0 },
+            runStartedAt,
+            runFinishedAt: clock.now(),
+          }),
+        );
+      }
+      return { kind: 'deferred', completed: [], entries: [], records, notBefore };
+    }
+
     // Read first and outside the failure path: a report this build cannot
     // read is refused with nothing written, so the player's records are never
     // overwritten by a file that lost them (NFR-8).
@@ -414,8 +502,28 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
       ];
     };
 
-    /** Dataset first, then progress, so progress never records a completion the dataset does not publish. */
-    const publish = async (published: readonly DatasetEntry[]): Promise<void> => {
+    /** `notBefore` is written where `until` is present, and cleared where it is absent (§5.3). */
+    const writeProgress = async (
+      completedKeys: readonly string[],
+      until: string | undefined,
+    ): Promise<void> => {
+      const file: SyncProgressFile = {
+        schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
+        completed: [...completedKeys],
+        ...(until === undefined ? {} : { notBefore: until }),
+      };
+      await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, file);
+    };
+
+    /**
+     * Dataset first, then progress, so progress never records a completion the
+     * dataset does not publish. `until` is the `notBefore` this ending writes;
+     * absent clears the field.
+     */
+    const publish = async (
+      published: readonly DatasetEntry[],
+      until: string | undefined,
+    ): Promise<void> => {
       await writeArtifact(
         fs,
         DATASET_PATH,
@@ -430,13 +538,12 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
           now: clock.now(),
         }),
       );
-      const file: SyncProgressFile = {
-        schemaVersion: SUPPORTED_SCHEMA_VERSION,
-        completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
+      await writeProgress(
+        [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
           compareCanonicalKeys,
         ),
-      };
-      await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, file);
+        until,
+      );
     };
 
     const writeReport = async (
@@ -471,21 +578,33 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
       );
       entries = tracked?.entries ?? [];
 
-      if (gate !== undefined && (await gate({ entries })).kind === 'yield') {
-        // A gate yield is a chunk yield (AD-8): no entry, no dataset, no
-        // progress; the report alone, under the same lock check as a commit.
+      const gated = gate === undefined ? undefined : await gate({ entries });
+      if (gated?.kind === 'yield') {
+        // A gate yield is a chunk yield (AD-8): no entry and no dataset; the
+        // report, under the same lock check as a commit. A gate 429 also
+        // writes progress, its completed keys unchanged, to remember the
+        // penalty as `notBefore` (§5.3). Any other gate yield leaves progress.
         if (!(await holdsLock(fs, mine))) {
           log('sync: the lock was taken over during this chunk; writing nothing');
           return { kind: 'dispossessed', completed, entries: stepEntries, records };
+        }
+        if (gated.retryAfterMs !== undefined) {
+          if (progressFault !== undefined) {
+            throw progressFault.error;
+          }
+          await writeProgress(
+            progress?.completed ?? [],
+            notBeforeAfter429(clock.now(), gated.retryAfterMs),
+          );
         }
         log('sync: the league check got no answer; the chunk yields with no entry visited');
         await writeReport(newRecords(), clock.now());
         return { kind: 'yielded', completed, entries: stepEntries, records };
       }
 
-      const progress = await loadEnvelope(fs, PROGRESS_PATH, (data) =>
-        parseEnvelope(SyncProgressFileSchema, data),
-      );
+      if (progressFault !== undefined) {
+        throw progressFault.error;
+      }
       // Absent means every entry is never attempted.
       dataset = await loadEnvelope(fs, DATASET_PATH, (data) =>
         parseEnvelope(DatasetFileSchema, data),
@@ -523,6 +642,8 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         readonly kind: 'bounded';
         readonly bound: ChunkBound;
       } = { kind: 'completed' };
+      /** The `notBefore` this ending writes: set only by a step's 429 (§5.3). */
+      let until: string | undefined;
 
       const rotationWaiting = plan.rotation.length > 0;
       let pinnedLimit = plan.pinned.length;
@@ -546,6 +667,9 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         }
         if (result.kind === 'yielded') {
           ending = { kind: 'yielded' };
+          if (result.retryAfterMs !== undefined) {
+            until = notBeforeAfter429(clock.now(), result.retryAfterMs);
+          }
           break;
         }
         const key = canonicalKey(entry);
@@ -587,7 +711,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         return { kind: 'dispossessed', completed, entries: stepEntries, records, ...starvation };
       }
 
-      await publish(stepEntries);
+      await publish(stepEntries, until);
       await writeReport(newRecords(), clock.now());
 
       return { ...ending, completed, entries: stepEntries, records, ...starvation };
@@ -610,7 +734,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         // A rejected request publishes what the chunk completed, and the
         // failing entry stamped with `lastAttemptedAt` (AD-9).
         try {
-          await publish([...stepEntries, error.entry]);
+          await publish([...stepEntries, error.entry], notBeforeAfterAbort(clock.now()));
         } catch (fault) {
           secondary('publishing the dataset and progress', fault);
         }

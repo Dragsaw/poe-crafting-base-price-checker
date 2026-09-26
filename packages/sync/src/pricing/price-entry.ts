@@ -33,6 +33,7 @@ import type {
 
 import { markUnresolvable } from '../chunk/catalogue-check.ts';
 import type { ChunkStep, StepResult } from '../chunk/run-chunk.ts';
+import { penaltyRetryAfterMs } from '../trade/client.ts';
 import type { TradeClient, TradeResult } from '../trade/client.ts';
 import { FETCH_LANE, SEARCH_LANE, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { isTransportFailure } from '../trade/transport-failure.ts';
@@ -168,8 +169,24 @@ function parseListings(body: string): Listing[] | undefined {
 
 type Leg =
   | { readonly kind: 'answered'; readonly result: Extract<TradeResult, { kind: 'response' }> }
-  | { readonly kind: 'yield' }
+  | {
+      readonly kind: 'yield';
+      /** Set only on a `429` yield: the delay the client's yield carried (§5.3). */
+      readonly retryAfterMs?: number;
+    }
   | { readonly kind: 'malformed'; readonly status: number };
+
+/** The step's yield, carrying the leg's `retryAfterMs` where it has one. */
+function yieldedWith(
+  leg: Extract<Leg, { kind: 'yield' }>,
+  entry: DatasetEntry,
+): Extract<StepResult, { kind: 'yielded' }> {
+  return {
+    kind: 'yielded',
+    entry,
+    ...(leg.retryAfterMs === undefined ? {} : { retryAfterMs: leg.retryAfterMs }),
+  };
+}
 
 const SERVER_ERROR = 500;
 
@@ -188,7 +205,8 @@ async function sendLeg(send: () => Promise<TradeResult>): Promise<Leg> {
     throw error;
   }
   if (result.kind === 'yield') {
-    return { kind: 'yield' };
+    const retryAfterMs = penaltyRetryAfterMs(result);
+    return retryAfterMs === undefined ? { kind: 'yield' } : { kind: 'yield', retryAfterMs };
   }
   const { status } = result.response;
   if (status >= SERVER_ERROR) {
@@ -279,7 +297,7 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
       client.send({ method: 'POST', url: tradeSearchUrl(league), body, lane: SEARCH_LANE }),
     );
     if (search.kind === 'yield') {
-      return { kind: 'yielded', entry: stamped };
+      return yieldedWith(search, stamped);
     }
     if (search.kind === 'malformed') {
       throw new MalformedRequestError(entryKey, 'search', search.status, stamped);
@@ -312,7 +330,7 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
     // A 429, 5xx or timeout stamps `lastAttemptedAt` alone, on either leg: the
     // search fields stay as published until the entry is completed.
     if (fetched.kind === 'yield') {
-      return { kind: 'yielded', entry: stamped };
+      return yieldedWith(fetched, stamped);
     }
     if (fetched.kind === 'malformed') {
       throw new MalformedRequestError(entryKey, 'fetch', fetched.status, stamped);

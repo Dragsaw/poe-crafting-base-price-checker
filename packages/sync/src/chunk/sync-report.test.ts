@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 import { SyncReportFileSchema } from '@poe/contracts';
 import type { PinnedStarvationRecord, SyncReportFile, SyncRunRecord } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
@@ -22,7 +25,7 @@ function previousWith(records: readonly SyncRunRecord[]): SyncReportFile {
     runStartedAt: '2026-09-26T11:00:00.000Z',
     runFinishedAt: '2026-09-26T11:01:00.000Z',
     figures: {
-      requestsBySource: { 'tracked-list': 40, 'league-validation': 1, 'catalogue-refresh': 0 },
+      requestsBySource: { 'tracked-list': 40, 'league-validation': 1 },
       notReachedCount: 9,
     },
     records: [...records],
@@ -44,11 +47,11 @@ describe('buildSyncReport', () => {
       runStartedAt: STARTED,
       runFinishedAt: FINISHED,
       figures: {
-        requestsBySource: { 'tracked-list': 6, 'league-validation': 0, 'catalogue-refresh': 0 },
+        requestsBySource: { 'tracked-list': 6, 'league-validation': 0 },
         notReachedCount: 0,
       },
       records: [],
-      schemaVersion: '1.0.0',
+      schemaVersion: '1.1.0',
     });
     expect(SyncReportFileSchema.safeParse(report).success).toBe(true);
   });
@@ -62,7 +65,7 @@ describe('buildSyncReport', () => {
       runFinishedAt: FINISHED,
     });
     expect(report.figures).toEqual({
-      requestsBySource: { 'tracked-list': 2, 'league-validation': 0, 'catalogue-refresh': 0 },
+      requestsBySource: { 'tracked-list': 2, 'league-validation': 0 },
       notReachedCount: 3,
     });
   });
@@ -87,6 +90,51 @@ describe('buildSyncReport', () => {
       runFinishedAt: FINISHED,
     });
     expect(report.records).toEqual([STARVED]);
+  });
+
+  it('growth: a starvation whose measurement changed replaces the earlier record at its position', () => {
+    const report = buildSyncReport({
+      previous: previousWith([STARVED, BROKEN]),
+      newRecords: [{ ...STARVED, discoveredAllowance: 1, pinnedRefreshed: 0, activeRefreshed: 0 }],
+      figures: { requestsBySource: {}, notReachedCount: 0 },
+      runStartedAt: STARTED,
+      runFinishedAt: FINISHED,
+    });
+    expect(report.records).toEqual([
+      { ...STARVED, discoveredAllowance: 1, pinnedRefreshed: 0, activeRefreshed: 0 },
+      BROKEN,
+    ]);
+  });
+
+  it('new subject: a starvation whose pinned set changed is a second record', () => {
+    const report = buildSyncReport({
+      previous: previousWith([STARVED]),
+      newRecords: [{ ...STARVED, pinnedCount: 4 }],
+      figures: { requestsBySource: {}, notReachedCount: 0 },
+      runStartedAt: STARTED,
+      runFinishedAt: FINISHED,
+    });
+    expect(report.records).toEqual([STARVED, { ...STARVED, pinnedCount: 4 }]);
+  });
+
+  it('legacy report: a previous figure with catalogue-refresh parses, and the next report has no such key', () => {
+    const legacy = SyncReportFileSchema.parse({
+      ...previousWith([]),
+      figures: {
+        requestsBySource: { 'tracked-list': 40, 'league-validation': 1, 'catalogue-refresh': 0 },
+        notReachedCount: 9,
+      },
+    });
+    expect('catalogue-refresh' in legacy.figures.requestsBySource).toBe(false);
+
+    const report = buildSyncReport({
+      previous: legacy,
+      newRecords: [],
+      figures: { requestsBySource: { 'tracked-list': 3, 'catalogue-refresh': 5 }, notReachedCount: 0 },
+      runStartedAt: STARTED,
+      runFinishedAt: FINISHED,
+    });
+    expect(report.figures.requestsBySource).toEqual({ 'tracked-list': 3, 'league-validation': 0 });
   });
 
   it('player cleared: a previous file with no records keeps only this chunk’s records', () => {
@@ -127,7 +175,26 @@ describe('buildSyncReport', () => {
   });
 });
 
+describe('the committed data/sync-report.json', () => {
+  it('parses, legacy catalogue-refresh key and all, and the key is gone after the parse', () => {
+    const text = readFileSync(
+      fileURLToPath(new URL('../../../../data/sync-report.json', import.meta.url)),
+      'utf8',
+    );
+    const parsed = SyncReportFileSchema.parse(JSON.parse(text));
+    expect(Object.keys(parsed.figures.requestsBySource).sort()).toEqual([
+      'league-validation',
+      'tracked-list',
+    ]);
+  });
+});
+
 describe('carryRecords', () => {
+  it('replaces the first match only, and leaves a record of another kind in place', () => {
+    const later = { ...STARVED, discoveredAllowance: 0 };
+    expect(carryRecords([BROKEN, STARVED, STARVED], [later])).toEqual([BROKEN, later, STARVED]);
+  });
+
   it('keeps previous duplicates as the player left them, and dedups new ones against each other', () => {
     expect(carryRecords([BROKEN, BROKEN], [STARVED, STARVED])).toEqual([BROKEN, BROKEN, STARVED]);
   });

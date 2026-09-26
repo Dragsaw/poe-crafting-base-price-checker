@@ -18,15 +18,32 @@ import type {
   SyncReportFile,
   TrackedEntry,
 } from '@poe/contracts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { LOCK_PATH, serialiseLock } from './chunk/lock.ts';
 import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { LeagueMismatchError } from './league/league-gate.ts';
 import { runSync, syncCommand } from './sync.ts';
 import type { SyncCommandDeps } from './sync.ts';
+import type * as TradeClientModule from './trade/client.ts';
 import { TRADE_LEAGUES_URL, tradeSearchUrl } from './trade/endpoints.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
+
+/** Every option set the shell built its trade clients with, in build order. */
+const tradeClientOptions = vi.hoisted((): unknown[] => []);
+
+// A pass-through: the real clients are built, and the options are recorded so
+// a test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+vi.mock('./trade/client.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof TradeClientModule>();
+  return {
+    ...actual,
+    createTradeClients: (options: Parameters<typeof actual.createTradeClients>[0]) => {
+      tradeClientOptions.push(options);
+      return actual.createTradeClients(options);
+    },
+  };
+});
 
 /**
  * The live `pnpm sync` composition, driven with injected ports. Nothing here
@@ -164,7 +181,6 @@ describe('pnpm sync: the live composition with injected ports', () => {
     expect(report?.figures.requestsBySource).toEqual({
       'tracked-list': 1,
       'league-validation': 1,
-      'catalogue-refresh': 0,
     });
     // No git history, so the edit date falls to the file's modification time (AD-12).
     expect(report?.figures.trackedListEditedAt).toEqual({
@@ -239,20 +255,25 @@ describe('pnpm sync: the live composition with injected ports', () => {
     ]);
   });
 
-  it('a gate 429 yields the chunk: exit 0, no search, the report alone, no run-failure', async () => {
+  it('a gate 429 yields the chunk: exit 0, no search, progress and the report, no run-failure', async () => {
     const { deps, fs, writes, http, out } = depsFor(LEAGUE, { answers: { leagues: THROTTLED } });
 
     expect(await syncCommand(deps)).toBe(0);
 
     expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
-    expect(writes).toEqual([REPORT_PATH]);
+    // Progress carries the penalty as notBefore, its completed keys unchanged (§5.3).
+    expect(writes).toEqual([PROGRESS_PATH, REPORT_PATH]);
+    expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
+      completed: [],
+      notBefore: '2026-09-26T12:01:00.000Z',
+      schemaVersion: '1.1.0',
+    });
     const report = await reportOf(fs);
     expect(report?.records).toEqual([]);
     expect(report?.runFinishedAt).toBe(NOW);
     expect(report?.figures.requestsBySource).toEqual({
       'tracked-list': 0,
       'league-validation': 1,
-      'catalogue-refresh': 0,
     });
     expect(out).toEqual(['pnpm sync: yielded, 0 completed']);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -300,6 +321,33 @@ describe('pnpm sync: the live composition with injected ports', () => {
     // waits out the Client window the leagues GET recorded. Two independent
     // clients would record no wait.
     expect(waits).toEqual([300_000]);
+  });
+
+  it('builds its trade clients with the invalid-request threshold of 1 (§5.3)', async () => {
+    tradeClientOptions.length = 0;
+    const { deps } = depsFor(LEAGUE);
+
+    expect(await syncCommand(deps)).toBe(0);
+
+    expect(tradeClientOptions).toEqual([expect.objectContaining({ invalidRequestThreshold: 1 })]);
+  });
+
+  it('a penalty still running defers: exit 0, no request, no write, the pause printed', async () => {
+    const progress = JSON.stringify({
+      schemaVersion: '1.1.0',
+      completed: [],
+      notBefore: '2026-09-26T12:30:00.000Z',
+    });
+    const { deps, fs, writes, http, out } = depsFor(LEAGUE, {
+      seeded: { [PROGRESS_PATH]: { contents: progress } },
+    });
+
+    expect(await syncCommand(deps)).toBe(0);
+
+    expect(http.requests).toEqual([]);
+    expect(writes).toEqual([]);
+    expect(out).toEqual(['pnpm sync: deferred until 2026-09-26T12:30:00.000Z, 0 completed']);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
   it('a live lock is busy: exit 0, no request, no write', async () => {

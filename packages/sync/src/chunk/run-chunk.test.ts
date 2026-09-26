@@ -179,7 +179,7 @@ describe('runChunk: the three bounds and the yield', () => {
     expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B), key(C)], entries: [], records: [] });
     expect(visited).toEqual([key(A), key(B), key(C)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.0.0',
+      schemaVersion: '1.1.0',
       completed: [key(A), key(B), key(C)],
     });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -197,7 +197,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     expect(outcome).toMatchObject({ kind: 'bounded', bound: 'search', completed: [key(A), key(B)] });
     expect(visited).not.toContain(key(C));
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -225,7 +225,7 @@ describe('runChunk: the three bounds and the yield', () => {
     const outcome = await runChunk(ports, step);
 
     expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B)], entries: [], records: [] });
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
   });
 
   it('an allowance of exactly 1 does not bound', async () => {
@@ -259,7 +259,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     expect(outcome).toEqual({ kind: 'yielded', completed: [key(A)], entries: [], records: [] });
     expect(visited).toEqual([key(A), key(B)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -537,7 +537,7 @@ describe('runChunk: resume and pass', () => {
     expect(visited).toEqual([key(B), key(C)]);
     expect(outcome.completed).toEqual([key(B), key(C)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.0.0',
+      schemaVersion: '1.1.0',
       completed: [key(A), key(B), key(C)],
     });
   });
@@ -554,13 +554,13 @@ describe('runChunk: resume and pass', () => {
 
     expect(visited).toEqual([key(A)]);
     // The earlier pass's B and C are gone: only this pass's work is recorded.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
   });
 
   it('records completed entries only, never the planned ones', async () => {
     const { fs, ports } = harness();
     await runChunk(ports, scriptedStep(() => ({ kind: 'yielded' })).step);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
   });
 
   it('refuses a progress file of an unknown major and still releases the lock', async () => {
@@ -569,6 +569,10 @@ describe('runChunk: resume and pass', () => {
     });
     await expect(runChunk(ports, scriptedStep().step)).rejects.toThrow(/2\.0\.0/);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+    // Read before the gate now, it still fails the run at its usual place, with a report.
+    const report = SyncReportFileSchema.parse(JSON.parse((await fs.readTextFile(REPORT_PATH)) ?? ''));
+    expect(report.records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
+    expect('runFinishedAt' in report).toBe(false);
   });
 
   it('serialises progress through writeArtifact: the schema’s key order, LF, one trailing newline', async () => {
@@ -577,7 +581,7 @@ describe('runChunk: resume and pass', () => {
     // `SyncProgressFileSchema` extends the progress shape with `schemaVersion`,
     // so the declared order puts it last.
     expect(await fs.readTextFile(PROGRESS_PATH)).toBe(
-      `{\n  "completed": [\n    ${JSON.stringify(key(A))}\n  ],\n  "schemaVersion": "1.0.0"\n}\n`,
+      `{\n  "completed": [\n    ${JSON.stringify(key(A))}\n  ],\n  "schemaVersion": "1.1.0"\n}\n`,
     );
   });
 });
@@ -809,7 +813,7 @@ describe('runChunk: the Refresh Rotation', () => {
     // it is recovered into row 2 rather than waiting in row 3 (AD-7).
     expect(visited).toEqual([key(C), key(U), key(B), key(A)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.0.0',
+      schemaVersion: '1.1.0',
       completed: [key(A), key(B), key(C), key(U)],
     });
   });
@@ -841,7 +845,7 @@ describe('runChunk: the Refresh Rotation', () => {
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 2, activeRefreshed: 2 },
     });
     // Row 1 is exempt from the pass.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
   });
 
   it('starvation leaves the outcome kind unchanged: the reserved search still bounds the chunk', async () => {
@@ -930,7 +934,7 @@ describe('runChunk: the Refresh Rotation', () => {
       records: [],
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 1, activeRefreshed: 0 },
     });
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
   });
 
   it('a recovered pinned + unresolvable entry rejoins row 1, exempt from the pass', async () => {
@@ -945,7 +949,7 @@ describe('runChunk: the Refresh Rotation', () => {
     await runChunk(ports, step);
 
     expect(visited).toEqual([key(PU), key(A)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
   });
 
   it('no rotation waiting: 3 pinned alone with R=1 are all visited, with no record', async () => {
@@ -976,7 +980,7 @@ describe('runChunk: the Refresh Rotation', () => {
     await runChunk(ports, step);
 
     expect(visited).toEqual([key(P1), key(B)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
   });
 });
 
@@ -1025,7 +1029,7 @@ describe('runChunk: the Sync Report', () => {
   const P1 = raw('P1', 'pinned');
   const P2 = raw('P2', 'pinned');
   const P3 = raw('P3', 'pinned');
-  const ZERO = { 'tracked-list': 0, 'league-validation': 0, 'catalogue-refresh': 0 };
+  const ZERO = { 'tracked-list': 0, 'league-validation': 0 };
   const STARVED: PinnedStarvationRecord = {
     kind: 'pinned-starvation',
     discoveredAllowance: 3,
@@ -1091,7 +1095,7 @@ describe('runChunk: the Sync Report', () => {
       runFinishedAt: NOW,
       figures: { requestsBySource: { ...ZERO, 'tracked-list': 6 }, notReachedCount: 0 },
       records: [],
-      schemaVersion: '1.0.0',
+      schemaVersion: '1.1.0',
     });
   });
 
@@ -1267,7 +1271,12 @@ describe('runChunk: the Sync Report', () => {
       entryKey: key(D),
       price: { state: 'not-yet-synced', reason: 'never-synced' },
     });
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(B)] });
+    // A malformed-request abort remembers the full staleLockAfter (§5.3).
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [key(A), key(B)],
+      notBefore: '2026-09-26T18:00:00.000Z',
+    });
 
     const report = await reportOf(fs);
     expect(report).toEqual({
@@ -1282,7 +1291,7 @@ describe('runChunk: the Sync Report', () => {
           message: failure.message,
         },
       ],
-      schemaVersion: '1.0.0',
+      schemaVersion: '1.1.0',
     });
     expect(report !== undefined && 'runFinishedAt' in report).toBe(false);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -1789,7 +1798,7 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
 });
 
 describe('runChunk: the league gate (Story 1.11)', () => {
-  const ZERO = { 'tracked-list': 0, 'league-validation': 0, 'catalogue-refresh': 0 };
+  const ZERO = { 'tracked-list': 0, 'league-validation': 0 };
   const LEAGUES = {
     result: [
       { id: 'Forbidden Rites', realm: 'poe2', text: 'Forbidden Rites' },
@@ -1955,7 +1964,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     expect(await fs.exists(REPORT_PATH)).toBe(false);
   });
 
-  it('gate 429: the chunk yields, no step, dataset and progress unchanged, report finished with no run-failure', async () => {
+  it('gate 429: the chunk yields, no step, dataset unchanged, progress remembers the penalty, report finished with no run-failure', async () => {
     const { fs, ports, leaguesHttp, visited, step, logs } = gated(
       'Standard',
       { status: 429, headers: { 'retry-after': '60' }, body: '' },
@@ -1972,12 +1981,63 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     expect(visited).toEqual([]);
     expect(leaguesHttp.requests).toHaveLength(1);
     expect(await fs.readTextFile(DATASET_PATH)).toBe(PREVIOUS_DATASET);
-    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(PREVIOUS_PROGRESS);
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [key(A)],
+      notBefore: '2026-09-26T12:01:00.000Z',
+    });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
     const report = await reportOf(fs);
     expect(report?.runFinishedAt).toBe(NOW);
     expect(report?.figures.requestsBySource).toEqual({ ...ZERO, 'league-validation': 1 });
     expect(report?.records).toEqual([]);
+  });
+
+  it('gate 429 with a two-hour Retry-After: notBefore is NOW + 2h, completed kept, dataset unchanged', async () => {
+    const { fs, ports } = gated(
+      'Standard',
+      { status: 429, headers: { 'retry-after': '7200' }, body: '' },
+      {
+        [DATASET_PATH]: { contents: PREVIOUS_DATASET },
+        [PROGRESS_PATH]: { contents: PREVIOUS_PROGRESS },
+      },
+    );
+
+    expect((await runChunk(ports, scriptedStep().step)).kind).toBe('yielded');
+
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [key(A)],
+      notBefore: '2026-09-26T14:00:00.000Z',
+    });
+    expect(await fs.readTextFile(DATASET_PATH)).toBe(PREVIOUS_DATASET);
+  });
+
+  it('gate 429 over an unknown-major progress file: rejects, progress untouched, a run-failure reported', async () => {
+    const unknown = JSON.stringify({ schemaVersion: '2.0.0', completed: [] });
+    const { fs, ports } = gated(
+      'Standard',
+      { status: 429, headers: { 'retry-after': '60' }, body: '' },
+      { [PROGRESS_PATH]: { contents: unknown } },
+    );
+
+    await expect(runChunk(ports, scriptedStep().step)).rejects.toThrow(/2\.0\.0/);
+
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(unknown);
+    expect((await reportOf(fs))?.records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('gate 5xx: the chunk yields and progress is left byte for byte (no notBefore)', async () => {
+    const { fs, ports } = gated(
+      'Standard',
+      { status: 503, headers: {}, body: '' },
+      { [PROGRESS_PATH]: { contents: PREVIOUS_PROGRESS } },
+    );
+
+    expect((await runChunk(ports, scriptedStep().step)).kind).toBe('yielded');
+
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(PREVIOUS_PROGRESS);
   });
 
   it('gate yield after the lock was taken over writes nothing and is dispossessed', async () => {
@@ -2014,5 +2074,267 @@ describe('runChunk: the league gate (Story 1.11)', () => {
         availableLeagues: ['Forbidden Rites', 'Standard'],
       },
     ]);
+  });
+});
+
+describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3)', () => {
+  /** The progress file of a previous chunk that ended on a penalty. */
+  function progressWithNotBefore(completed: readonly string[], notBefore: string): string {
+    return JSON.stringify({ schemaVersion: '1.1.0', completed, notBefore });
+  }
+
+  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
+    const text = await fs.readTextFile(REPORT_PATH);
+    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
+  }
+
+  /** A filesystem that records every path written through it. */
+  function recording(fs: FakeFilesystemPort): { readonly fs: FakeFilesystemPort; readonly writes: string[] } {
+    const writes: string[] = [];
+    return {
+      writes,
+      fs: {
+        ...fs,
+        writeTextFile: (path, contents) => {
+          writes.push(path);
+          return fs.writeTextFile(path, contents);
+        },
+      },
+    };
+  }
+
+  it('step 429: progress gets notBefore = NOW + the yield’s retry-after', async () => {
+    const { fs, ports } = harness([A, B]);
+    const { step } = scriptedStep((entry) =>
+      key(entry) === key(B) ? { kind: 'yielded', retryAfterMs: 60_000 } : { kind: 'completed' },
+    );
+
+    expect((await runChunk(ports, step)).kind).toBe('yielded');
+
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [key(A)],
+      notBefore: '2026-09-26T12:01:00.000Z',
+    });
+  });
+
+  it('huge Retry-After: notBefore is capped at NOW + staleLockAfter', async () => {
+    const { fs, ports } = harness([A]);
+    const { step } = scriptedStep(() => ({ kind: 'yielded', retryAfterMs: 86_400_000 }));
+
+    await runChunk(ports, step);
+
+    expect(await progressOf(fs)).toMatchObject({ notBefore: '2026-09-26T18:00:00.000Z' });
+  });
+
+  it('a step yield with no retry-after (a 5xx, a timeout, the threshold) writes no notBefore', async () => {
+    const { fs, ports } = harness([A], {
+      [PROGRESS_PATH]: { contents: progressWithNotBefore([], '2026-09-26T11:00:00.000Z') },
+    });
+    const { step } = scriptedStep(() => ({ kind: 'yielded' }));
+
+    expect((await runChunk(ports, step)).kind).toBe('yielded');
+
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+  });
+
+  it.each([
+    ['completed', () => ({ kind: 'completed' }) as const],
+    ['bounded', () => ({ kind: 'completed', searchRemaining: 0 }) as const],
+  ])('clearing: a %s chunk over a past notBefore writes progress without the field', async (kind, script) => {
+    const { fs, ports } = harness([A, B], {
+      [PROGRESS_PATH]: { contents: progressWithNotBefore([], '2026-09-26T11:59:59.000Z') },
+    });
+
+    expect((await runChunk(ports, scriptedStep(script).step)).kind).toBe(kind);
+
+    const progress = await progressOf(fs);
+    expect(progress).toBeDefined();
+    expect(progress !== null && typeof progress === 'object' && 'notBefore' in progress).toBe(false);
+  });
+
+  it('deferred: now < notBefore releases the lock, sends nothing and writes nothing', async () => {
+    const until = '2026-09-26T12:00:01.000Z';
+    const progress = progressWithNotBefore([key(A)], until);
+    const built = harness([A, B], { [PROGRESS_PATH]: { contents: progress } });
+    const { fs, writes } = recording(built.fs);
+    let gateCalled = false;
+    let catalogueCalled = false;
+    const { visited, step } = scriptedStep();
+
+    const outcome = await runChunk(
+      {
+        ...built.ports,
+        fs,
+        gate: () => {
+          gateCalled = true;
+          return Promise.resolve({ kind: 'pass' });
+        },
+        catalogue: () => {
+          catalogueCalled = true;
+          return Promise.resolve({ ok: true, value: RESOLVES_ALL });
+        },
+      },
+      step,
+    );
+
+    expect(outcome).toEqual({ kind: 'deferred', completed: [], entries: [], records: [], notBefore: until });
+    expect(visited).toEqual([]);
+    expect(gateCalled).toBe(false);
+    expect(catalogueCalled).toBe(false);
+    // The lock is the only file touched, and it is gone again.
+    expect(writes.filter((path) => path !== LOCK_PATH)).toEqual([]);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(progress);
+    expect(await fs.exists(REPORT_PATH)).toBe(false);
+    expect(built.logs).toEqual([
+      `sync: a previous chunk set a pause until ${until} (a 429 or a rejected request); nothing sent this invocation`,
+    ]);
+  });
+
+  it('round trip: a step 429 chunk, then a second chunk at the same NOW is deferred with no step visited', async () => {
+    const { fs, ports } = harness([A, B]);
+    const first = scriptedStep((entry) =>
+      key(entry) === key(B) ? { kind: 'yielded', retryAfterMs: 60_000 } : { kind: 'completed' },
+    );
+    expect((await runChunk(ports, first.step)).kind).toBe('yielded');
+
+    const second = scriptedStep();
+    expect(await runChunk(ports, second.step)).toMatchObject({
+      kind: 'deferred',
+      notBefore: '2026-09-26T12:01:00.000Z',
+    });
+    expect(second.visited).toEqual([]);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('round trip: a malformed-request abort, then a second chunk at the same NOW is deferred with no step visited', async () => {
+    const { fs, ports } = harness([A, B]);
+    const stamped: DatasetEntry = {
+      entryKey: key(B),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    };
+    const failure = new MalformedRequestError(key(B), 'search', 400, stamped);
+    await expect(
+      runChunk(ports, (entry) =>
+        key(entry) === key(B) ? Promise.reject(failure) : Promise.resolve({ kind: 'completed' }),
+      ),
+    ).rejects.toBe(failure);
+
+    const second = scriptedStep();
+    expect(await runChunk(ports, second.step)).toMatchObject({
+      kind: 'deferred',
+      notBefore: '2026-09-26T18:00:00.000Z',
+    });
+    expect(second.visited).toEqual([]);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('now = notBefore does not defer: the pause has run out', async () => {
+    const { ports } = harness([A], {
+      [PROGRESS_PATH]: { contents: progressWithNotBefore([], NOW) },
+    });
+
+    expect((await runChunk(ports, scriptedStep().step)).kind).toBe('completed');
+  });
+
+  it('deferred after breaking a stale lock: only sync-report.json is written, carrying stale-lock-broken', async () => {
+    const stale = serialiseLock({ pid: 7, startedAt: SEVEN_HOURS_AGO });
+    const progress = progressWithNotBefore([], '2026-09-26T13:00:00.000Z');
+    const previousRecord: SyncRunRecord = { kind: 'weights-absent', uncheckableClassNames: [] };
+    const previousReport = JSON.stringify({
+      schemaVersion: '1.0.0',
+      runStartedAt: SEVEN_HOURS_AGO,
+      figures: {
+        requestsBySource: { 'tracked-list': 3, 'league-validation': 1, 'catalogue-refresh': 0 },
+        notReachedCount: 0,
+      },
+      records: [previousRecord],
+    });
+    const built = harness([A], {
+      [LOCK_PATH]: { contents: stale },
+      [PROGRESS_PATH]: { contents: progress },
+      [REPORT_PATH]: { contents: previousReport },
+    });
+    const { fs, writes } = recording(built.fs);
+    const { visited, step } = scriptedStep();
+
+    const outcome = await runChunk({ ...built.ports, fs }, step);
+
+    expect(outcome.kind).toBe('deferred');
+    expect(visited).toEqual([]);
+    expect(writes.filter((path) => path !== LOCK_PATH && !path.endsWith('.break.lock'))).toEqual([REPORT_PATH]);
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(progress);
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    const report = await reportOf(fs);
+    expect(report).toEqual({
+      runStartedAt: NOW,
+      runFinishedAt: NOW,
+      figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0 }, notReachedCount: 0 },
+      records: [previousRecord, { kind: 'stale-lock-broken', pid: 7, startedAt: SEVEN_HOURS_AGO }],
+      schemaVersion: '1.1.0',
+    });
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('growth: two starving chunks leave one pinned-starvation record, at its first position, carrying the latest allowance', async () => {
+    const P1 = raw('P1', 'pinned');
+    const P2 = raw('P2', 'pinned');
+    const P3 = raw('P3', 'pinned');
+    const entries = [P1, P2, P3, A];
+    const earlier: SyncRunRecord = { kind: 'stale-lock-broken', pid: 7, startedAt: SEVEN_HOURS_AGO };
+    const fsShared = createFakeFilesystemPort({
+      [TRACKED_PATH]: { contents: trackedText(entries) },
+      [WEIGHTS_PATH]: { contents: EMPTY_WEIGHTS },
+      [REPORT_PATH]: {
+        contents: JSON.stringify({
+          schemaVersion: '1.1.0',
+          runStartedAt: SEVEN_HOURS_AGO,
+          figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0 }, notReachedCount: 0 },
+          records: [earlier],
+        }),
+      },
+    });
+    const chunk = (remaining: number) =>
+      runChunk(
+        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+        scriptedStep(() => ({ kind: 'completed', searchRemaining: remaining })).step,
+      );
+
+    // First chunk: allowance 3 (2 remaining after the first step). Second: 1 (0 remaining).
+    expect((await chunk(2)).pinnedStarvation).toMatchObject({ discoveredAllowance: 3 });
+    const second = await chunk(0);
+    expect(second.pinnedStarvation).toMatchObject({ discoveredAllowance: 1 });
+
+    const records = (await reportOf(fsShared))?.records ?? [];
+    expect(records.filter((record) => record.kind === 'pinned-starvation')).toHaveLength(1);
+    expect(records[0]).toEqual(earlier);
+    expect(records[1]).toMatchObject({ kind: 'pinned-starvation', discoveredAllowance: 1, pinnedCount: 3 });
+  });
+
+  it('new subject: a second chunk whose pinned set changed adds a second starvation record', async () => {
+    const P1 = raw('P1', 'pinned');
+    const P2 = raw('P2', 'pinned');
+    const P3 = raw('P3', 'pinned');
+    const fsShared = createFakeFilesystemPort({
+      [TRACKED_PATH]: { contents: trackedText([P1, P2, P3, A]) },
+      [WEIGHTS_PATH]: { contents: EMPTY_WEIGHTS },
+    });
+    const chunk = () =>
+      runChunk(
+        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+        scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 })).step,
+      );
+
+    await chunk();
+    // The player unpins one entry: the yardstick is unchanged, the pinned count is not.
+    await fsShared.writeTextFile(TRACKED_PATH, trackedText([P1, P2, raw('P3'), A]));
+    await chunk();
+
+    const starvations = ((await reportOf(fsShared))?.records ?? []).filter(
+      (record): record is PinnedStarvationRecord => record.kind === 'pinned-starvation',
+    );
+    expect(starvations.map((record) => record.pinnedCount)).toEqual([3, 2]);
   });
 });

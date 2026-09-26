@@ -11,9 +11,19 @@
  * Counted **per policy**, on the same key the bucket ledger uses, so a run of
  * invalid searches does not close the fetch bucket.
  *
- * **No threshold number lives here.** The threshold arrives as a factory value,
- * exactly as no rate, window or penalty is compiled in.
+ * **The client compiles in no threshold.** The threshold arrives as a factory
+ * value, exactly as no rate, window or penalty is compiled in. Every shell that
+ * builds a client passes `INVALID_REQUEST_THRESHOLD`.
  */
+
+/**
+ * The `sync`-side threshold every shell passes to the client factory
+ * (IMPLEMENTATION-NOTES.md §5.3). A constant, not a `data/config.json` field:
+ * nothing but `sync` reads it, and AD-19 keeps that file to three keys. On the
+ * chunk path the first `4xx` ends the chunk, so `1` refuses any second request
+ * on a policy that has already answered one.
+ */
+export const INVALID_REQUEST_THRESHOLD = 1;
 
 /** Counts keyed by policy, exactly as the ledger is keyed. */
 export type InvalidRequestCounts = Readonly<Record<string, number>>;

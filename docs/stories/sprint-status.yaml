@@ -97,7 +97,7 @@ action_items:
       in contracts, carryRecords replaces observation fields in place; add a two-chunk record-growth
       test"
     owner: "dev (contracts first)"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-5-add-a-canonical-key-uniqueness-refinemen"
     epic: 1
@@ -125,7 +125,7 @@ action_items:
       lock; carry retryAfterMs through sendLeg and the step/gate results; pass invalidRequestThreshold
       = 1 from every shell"
     owner: "dev (contracts first)"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-9-drop-the-catalogue-refresh-figure-from-s"
     epic: 1
@@ -133,7 +133,7 @@ action_items:
       21); the reader must accept and drop the legacy key in the committed data/sync-report.json
       (a major bump alone refuses it); the refresh command prints its request count"
     owner: "dev (contracts first)"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-10-loopback-server-test-for-createfetchhttp"
     epic: 1

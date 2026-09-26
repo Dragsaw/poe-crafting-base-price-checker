@@ -31,6 +31,7 @@ import { LeaguesPayloadSchema } from '@poe/contracts';
 import type { LeagueId } from '@poe/contracts';
 
 import type { GateContext, GateResult } from '../chunk/run-chunk.ts';
+import { penaltyRetryAfterMs } from '../trade/client.ts';
 import type { TradeClient, TradeResult } from '../trade/client.ts';
 import { DATA_LANE, TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
 import { isTransportFailure } from '../trade/transport-failure.ts';
@@ -125,9 +126,11 @@ export function createLeagueGate(
       }
       throw error;
     }
-    // A 429 and the invalid-request threshold arrive as a client yield.
+    // A 429 and the invalid-request threshold arrive as a client yield. Only
+    // a 429 carries the delay the chunk remembers as `notBefore` (§5.3).
     if (result.kind === 'yield') {
-      return YIELD;
+      const retryAfterMs = penaltyRetryAfterMs(result);
+      return retryAfterMs === undefined ? YIELD : { kind: 'yield', retryAfterMs };
     }
     const { status, body } = result.response;
     if (status >= SERVER_ERROR) {

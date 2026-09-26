@@ -47,6 +47,7 @@ import { createPricingStep } from './pricing/price-entry.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
 import { createTradeClients } from './trade/client.ts';
+import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 export interface SyncPorts {
@@ -96,6 +97,7 @@ export async function runSync(ports: SyncPorts): Promise<ChunkOutcome> {
     clock,
     wait,
     userAgent,
+    invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
   });
   const step = createPricingStep({
     client: clients['tracked-list'],
@@ -141,7 +143,8 @@ export async function syncCommand(deps: SyncCommandDeps): Promise<number> {
   }
   try {
     const outcome = await runSync({ ...ports, userAgent: contact.userAgent });
-    stdout(`pnpm sync: ${outcome.kind}, ${String(outcome.completed.length)} completed`);
+    const kind = outcome.kind === 'deferred' ? `deferred until ${outcome.notBefore}` : outcome.kind;
+    stdout(`pnpm sync: ${kind}, ${String(outcome.completed.length)} completed`);
     return 0;
   } catch (error) {
     stderr(`pnpm sync: ${error instanceof Error ? error.message : String(error)}`);

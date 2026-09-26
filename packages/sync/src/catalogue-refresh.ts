@@ -50,7 +50,9 @@ import {
   systemClock,
   writeTextFile,
 } from './shell.ts';
+import { createRequestCounter } from './request-counter.ts';
 import { createTradeClient } from './trade/client.ts';
+import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 import {
   CATALOGUE_ENDPOINTS,
   type CatalogueArtifact,
@@ -137,17 +139,27 @@ export interface CatalogueRefreshPorts {
  * cannot be missing, and no caller can read `failure` off a success.
  */
 export type CatalogueRefreshOutcome =
-  | { readonly ok: true; readonly written: readonly string[] }
+  | {
+      readonly ok: true;
+      readonly written: readonly string[];
+      /**
+       * The requests this refresh sent, counted as `catalogue-refresh` (AD-12).
+       * The command prints it: no chunk report carries this source.
+       */
+      readonly requests: number;
+    }
   | {
       readonly ok: false;
       /** The reason, naming the artifact. */
       readonly failure: string;
       /** What had already landed — empty unless a write failed part way. */
       readonly written: readonly string[];
+      /** The requests sent before the refresh stopped, as on the success arm. */
+      readonly requests: number;
     };
 
-function refused(failure: string): CatalogueRefreshOutcome {
-  return { ok: false, failure, written: [] };
+function refused(failure: string, requests: number): CatalogueRefreshOutcome {
+  return { ok: false, failure, written: [], requests };
 }
 
 /**
@@ -161,11 +173,14 @@ function refused(failure: string): CatalogueRefreshOutcome {
 export async function refreshCatalogue(
   ports: CatalogueRefreshPorts,
 ): Promise<CatalogueRefreshOutcome> {
+  const counter = createRequestCounter();
+  const requests = (): number => counter.snapshot()['catalogue-refresh'];
   const client = createTradeClient({
-    http: ports.http,
+    http: counter.counted(ports.http, 'catalogue-refresh'),
     clock: ports.clock,
     wait: ports.wait,
     userAgent: ports.userAgent,
+    invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
   });
 
   const captured: { path: string; contents: string }[] = [];
@@ -187,6 +202,7 @@ export async function refreshCatalogue(
       // sentence naming which endpoint went quiet.
       return refused(
         `${endpoint.artifact} could not be reached (${String(error)}). Nothing was written.`,
+        requests(),
       );
     }
 
@@ -196,12 +212,14 @@ export async function refreshCatalogue(
       // return.
       return refused(
         `rate limited on ${endpoint.artifact}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`,
+        requests(),
       );
     }
 
     if (result.response.status !== 200) {
       return refused(
         `${endpoint.artifact} answered ${String(result.response.status)}. Nothing was written.`,
+        requests(),
       );
     }
 
@@ -213,6 +231,7 @@ export async function refreshCatalogue(
       // SyntaxError names neither the endpoint nor the fact that it answered.
       return refused(
         `${endpoint.artifact} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`,
+        requests(),
       );
     }
 
@@ -222,6 +241,7 @@ export async function refreshCatalogue(
     if (!parsedPayload.success) {
       return refused(
         `${endpoint.artifact} does not match its catalogue schema — ${describeIssues(parsedPayload.error.issues)}. Nothing was written.`,
+        requests(),
       );
     }
 
@@ -244,6 +264,7 @@ export async function refreshCatalogue(
     if (!parsedFile.success) {
       return refused(
         `${endpoint.artifact} does not match its file envelope — ${describeIssues(parsedFile.error.issues)}. Nothing was written.`,
+        requests(),
       );
     }
 
@@ -267,11 +288,12 @@ export async function refreshCatalogue(
         ok: false,
         failure: `writing ${path} failed (${String(error)}). ${String(written.length)} of ${String(captured.length)} artifacts had already been written; the catalogue is now mixed, so re-run pnpm catalogue:refresh or revert data/catalogue/.`,
         written,
+        requests: requests(),
       };
     }
     written.push(path);
   }
-  return { ok: true, written };
+  return { ok: true, written, requests: requests() };
 }
 
 async function main(): Promise<void> {
@@ -292,20 +314,36 @@ async function main(): Promise<void> {
     writeCatalogueFile: writeTextFile,
   });
 
+  process.exitCode = printRefreshOutcome(outcome, {
+    stdout: (line) => process.stdout.write(`${line}\n`),
+    stderr: (line) => process.stderr.write(`${line}\n`),
+  });
+}
+
+/**
+ * Prints an outcome and answers the exit code. The request count is printed on
+ * both arms: `catalogue-refresh` is the one declared source no chunk report
+ * carries, so this line is where its spend is seen (AD-12).
+ */
+export function printRefreshOutcome(
+  outcome: CatalogueRefreshOutcome,
+  out: { readonly stdout: (line: string) => void; readonly stderr: (line: string) => void },
+): number {
+  out.stdout(`requests: ${String(outcome.requests)}`);
   if (!outcome.ok) {
-    process.stderr.write(`pnpm catalogue:refresh: ${outcome.failure}\n`);
+    out.stderr(`pnpm catalogue:refresh: ${outcome.failure}`);
     // The count in the failure says how many landed; only this says which. A
     // human staring at a mixed `data/catalogue/` needs the names, not a number.
     for (const path of outcome.written) {
-      process.stderr.write(`  already written: ${path}\n`);
+      out.stderr(`  already written: ${path}`);
     }
-    process.exitCode = 1;
-    return;
+    return 1;
   }
 
   for (const path of outcome.written) {
-    process.stdout.write(`refreshed ${path}\n`);
+    out.stdout(`refreshed ${path}`);
   }
+  return 0;
 }
 
 /**

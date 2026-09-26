@@ -129,15 +129,16 @@ describe('createLeagueGate', () => {
   it('yields on a 429, with the one request sent and nothing slept out', async () => {
     const { http, gate } = gateAnswering({ status: 429, headers: { 'retry-after': '60' }, body: '' }, 'Standard');
 
-    await expect(gate({ entries: [] })).resolves.toEqual(YIELD);
+    // The yield carries the delay the chunk remembers as notBefore (§5.3).
+    await expect(gate({ entries: [] })).resolves.toStrictEqual({ kind: 'yield', retryAfterMs: 60_000 });
     expect(http.requests).toHaveLength(1);
   });
 
-  it('yields on a refusal at the invalid-request threshold, with nothing sent', async () => {
+  it('yields on a refusal at the invalid-request threshold, with nothing sent and no delay', async () => {
     const http = createFakeHttpPort({ [`GET ${TRADE_LEAGUES_URL}`]: ok(LEAGUES) });
     const gate = gateOver(http, 'Standard', 0);
 
-    await expect(gate({ entries: [] })).resolves.toEqual(YIELD);
+    await expect(gate({ entries: [] })).resolves.toStrictEqual(YIELD);
     expect(http.requests).toHaveLength(0);
   });
 

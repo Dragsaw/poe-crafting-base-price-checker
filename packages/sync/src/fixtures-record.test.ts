@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createFakeClockPort, createFakeHttpPort } from '@poe/contracts';
 import type { HttpRequest, HttpResponse, TrackedEntry } from '@poe/contracts';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { pricingFixtureName } from './pricing/fixture-names.ts';
 import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
@@ -16,7 +16,24 @@ import {
   serialiseFixture,
   stripPersonalIdentifiers,
 } from './fixtures-record.ts';
+import type * as TradeClientModule from './trade/client.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
+
+/** Every option set the command built its trade client with, in build order. */
+const tradeClientOptions = vi.hoisted((): unknown[] => []);
+
+// A pass-through: the real client is built, and the options are recorded so a
+// test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+vi.mock('./trade/client.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof TradeClientModule>();
+  return {
+    ...actual,
+    createTradeClient: (options: Parameters<typeof actual.createTradeClient>[0]) => {
+      tradeClientOptions.push(options);
+      return actual.createTradeClient(options);
+    },
+  };
+});
 
 /**
  * Importing the recorder is deliberate: the module has an entry guard, so the
@@ -184,6 +201,14 @@ it('writes one stripped, newline-terminated payload per interaction', async () =
     }),
   );
   expect(first?.contents.endsWith('}\n')).toBe(true);
+});
+
+it('builds its trade client with the invalid-request threshold of 1 (§5.3)', async () => {
+  tradeClientOptions.length = 0;
+
+  await recorderHarness(fixturesFor({})).record();
+
+  expect(tradeClientOptions).toEqual([expect.objectContaining({ invalidRequestThreshold: 1 })]);
 });
 
 it('issues every interaction through the governed client, standing headers and all', async () => {
