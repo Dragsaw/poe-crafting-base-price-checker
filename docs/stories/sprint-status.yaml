@@ -42,7 +42,7 @@ development_status:
   1-4-the-committed-trade-catalogue-and-its-explicit-refresh-comma: done
   1-5-one-bounded-resumable-single-instance-chunk: done
   1-6-the-deterministic-refresh-rotation: done
-  1-7-a-divine-price-estimate-for-one-tracked-entry: backlog
+  1-7-a-divine-price-estimate-for-one-tracked-entry: done
   1-8-the-published-dataset-written-to-a-git-tracked-working-tr: backlog
   1-9-the-structured-sync-report-with-requests-accounted-per-sourc: backlog
   1-10-unresolvable-ids-detected-offline-and-reported: backlog
