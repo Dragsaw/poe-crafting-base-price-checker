@@ -19,6 +19,8 @@ describe('the contracts barrel', () => {
       'TradeCatalogueSchema',
       'SyncRunReportSchema',
       'RunFailureRecordSchema',
+      'WeightsAbsentRecordSchema',
+      'UncataloguedWeightsIdRecordSchema',
       'DatasetEntrySchema',
       'SchemaVersionSchema',
       'TrackedListAgeSchema',

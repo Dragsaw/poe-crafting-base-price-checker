@@ -142,7 +142,9 @@ export {
   SyncRunFiguresSchema,
   SyncRunRecordSchema,
   SyncRunReportSchema,
+  UncataloguedWeightsIdRecordSchema,
   UnresolvableRecordSchema,
+  WeightsAbsentRecordSchema,
 } from './sync-run-report.ts';
 export type {
   CrossFileCheck,
@@ -155,7 +157,9 @@ export type {
   SyncRunFigures,
   SyncRunRecord,
   SyncRunReport,
+  UncataloguedWeightsIdRecord,
   UnresolvableRecord,
+  WeightsAbsentRecord,
 } from './sync-run-report.ts';
 
 export { SyncLockSchema, SyncProgressSchema } from './sync-progress.ts';

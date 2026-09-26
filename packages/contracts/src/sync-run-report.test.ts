@@ -143,6 +143,51 @@ describe('SyncRunRecordSchema', () => {
     ).toBe(false);
   });
 
+  it('carries a weights-absent record naming the uncheckable classes', () => {
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'weights-absent',
+        uncheckableClassNames: ['Body Armours', 'Bows'],
+      }).success,
+    ).toBe(true);
+    expect(
+      SyncRunRecordSchema.safeParse({ kind: 'weights-absent', uncheckableClassNames: [] }).success,
+    ).toBe(true);
+    expect(SyncRunRecordSchema.safeParse({ kind: 'weights-absent' }).success).toBe(false);
+  });
+
+  it('carries an uncatalogued-weights-id record for a statId or a categoryId only', () => {
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'uncatalogued-weights-id',
+        identifier: 'explicit.stat_1',
+        identifierKind: 'statId',
+      }).success,
+    ).toBe(true);
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'uncatalogued-weights-id',
+        identifier: 'weapon.bow',
+        identifierKind: 'categoryId',
+      }).success,
+    ).toBe(true);
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'uncatalogued-weights-id',
+        identifier: 'Advanced Dualstring Bow',
+        identifierKind: 'baseTypeId',
+      }).success,
+    ).toBe(false);
+    expect(
+      SyncRunRecordSchema.safeParse({
+        kind: 'uncatalogued-weights-id',
+        identifier: 'explicit.stat_1',
+        identifierKind: 'statId',
+        entryKey: 'x',
+      }).success,
+    ).toBe(false);
+  });
+
   it('has no `failed push` record — revision 18 removed every git write', () => {
     expect(SyncRunRecordSchema.safeParse({ kind: 'failed-push', remote: 'origin' }).success).toBe(
       false,

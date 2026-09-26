@@ -97,6 +97,31 @@ export const UnresolvableRecordSchema = z.strictObject({
   identifierKind: z.enum(['statId', 'baseTypeId', 'categoryId']),
 });
 
+/**
+ * `weights.json` is absent, so the cross-file gate is skipped and `className`
+ * cannot be checked. The classes are reported as uncheckable rather than clean
+ * (AD-12, AD-25).
+ */
+export const WeightsAbsentRecordSchema = z.strictObject({
+  kind: z.literal('weights-absent'),
+  uncheckableClassNames: z
+    .array(z.string().min(1))
+    .describe(
+      'The distinct `className` values of the non-pruned `crafted` entries, sorted by UTF-8 code unit.',
+    ),
+});
+
+/**
+ * A `statId` or `categoryId` in a present `weights.json` that the committed
+ * catalogue does not expose. Reported only: the file is never rewritten or
+ * refused for it (AD-9).
+ */
+export const UncataloguedWeightsIdRecordSchema = z.strictObject({
+  kind: z.literal('uncatalogued-weights-id'),
+  identifier: z.string().min(1).describe('The identifier the catalogue does not expose.'),
+  identifierKind: z.enum(['statId', 'categoryId']),
+});
+
 /** The five cross-file checks AD-17 defines once in `core`. */
 export const CrossFileCheckSchema = z.enum([
   'edge-alignment',
@@ -144,6 +169,8 @@ export const SyncRunRecordSchema = z.discriminatedUnion('kind', [
   StaleLockBrokenRecordSchema,
   PinnedStarvationRecordSchema,
   UnresolvableRecordSchema,
+  WeightsAbsentRecordSchema,
+  UncataloguedWeightsIdRecordSchema,
   CrossFileGateFailureRecordSchema,
   RunFailureRecordSchema,
 ]);
@@ -151,6 +178,8 @@ export const SyncRunRecordSchema = z.discriminatedUnion('kind', [
 export type StaleLockBrokenRecord = z.infer<typeof StaleLockBrokenRecordSchema>;
 export type PinnedStarvationRecord = z.infer<typeof PinnedStarvationRecordSchema>;
 export type UnresolvableRecord = z.infer<typeof UnresolvableRecordSchema>;
+export type WeightsAbsentRecord = z.infer<typeof WeightsAbsentRecordSchema>;
+export type UncataloguedWeightsIdRecord = z.infer<typeof UncataloguedWeightsIdRecordSchema>;
 export type CrossFileGateFailureRecord = z.infer<typeof CrossFileGateFailureRecordSchema>;
 export type RunFailureRecord = z.infer<typeof RunFailureRecordSchema>;
 export type SyncRunRecord = z.infer<typeof SyncRunRecordSchema>;
