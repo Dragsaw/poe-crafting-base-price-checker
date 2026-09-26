@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { canonicalKey } from './canonical-key.ts';
 import { CurrencyRateSchema } from './currency-rate.ts';
 import { DatasetEntrySchema } from './dataset.ts';
 import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
@@ -25,11 +26,35 @@ import {
  * file do not repeat `schemaVersion`; the envelope carries it for them.
  */
 
-/** `data/tracked.json` — the player's curated workload (AD-12). */
-export const TrackedFileSchema = z.strictObject({
-  schemaVersion: SchemaVersionSchema,
-  entries: z.array(TrackedEntrySchema),
-});
+/**
+ * `data/tracked.json` — the player's curated workload (AD-12).
+ *
+ * One file-level rule: each `canonicalKey` (§4.1) appears once in `entries`,
+ * so entries equal under it are twins whatever else differs. Each repeat is
+ * one issue at its own index, naming the key and its first occurrence.
+ * FR-16's overlap rejection of *distinct* keys stays `core`'s, in Epic 3.
+ */
+export const TrackedFileSchema = z
+  .strictObject({
+    schemaVersion: SchemaVersionSchema,
+    entries: z.array(TrackedEntrySchema),
+  })
+  .superRefine((file, ctx) => {
+    const firstIndexByKey = new Map<string, number>();
+    file.entries.forEach((entry, index) => {
+      const key = canonicalKey(entry);
+      const first = firstIndexByKey.get(key);
+      if (first === undefined) {
+        firstIndexByKey.set(key, index);
+        return;
+      }
+      ctx.addIssue({
+        code: 'custom',
+        path: ['entries', index],
+        message: `canonical key ${key} repeats entries.${String(first)}; a key may appear once in the tracked list`,
+      });
+    });
+  });
 
 /** `data/currencies.json` — hand-maintained rates, read and never fetched (AD-20). */
 export const CurrenciesFileSchema = z.strictObject({

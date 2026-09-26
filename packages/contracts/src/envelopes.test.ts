@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { canonicalKey } from './canonical-key';
 import {
   CatalogueFiltersFileSchema,
   CatalogueItemsFileSchema,
@@ -108,6 +109,96 @@ describe('parseEnvelope', () => {
   it('reports a file with no version field as invalid rather than guessing', () => {
     const result = parseEnvelope(TrackedFileSchema, { entries: [] });
     expect(result.ok === false && result.reason).toBe('invalid');
+  });
+});
+
+describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
+  const rawTwin = {
+    kind: 'raw',
+    baseTypeId: 'Advanced Dualstring Bow',
+    itemLevelMin: 82,
+    status: 'active',
+  } as const;
+  const rawKey = canonicalKey(rawTwin);
+
+  function fileOf(entries: readonly unknown[]) {
+    return { schemaVersion: INITIAL_SCHEMA_VERSION, entries };
+  }
+
+  function issuesOf(entries: readonly unknown[]) {
+    const result = parseEnvelope(TrackedFileSchema, fileOf(entries));
+    expect(result.ok).toBe(false);
+    if (result.ok || result.reason !== 'invalid') {
+      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+    }
+    return result.issues;
+  }
+
+  // I/O matrix: "Distinct keys".
+  it('accepts two entries on one base with different itemLevelMin', () => {
+    const result = parseEnvelope(TrackedFileSchema, fileOf([rawTwin, { ...rawTwin, itemLevelMin: 84 }]));
+    expect(result.ok).toBe(true);
+  });
+
+  // I/O matrix: "Exact twin".
+  it('refuses an exact twin with one issue at the repeat, naming the key and the first index', () => {
+    const issues = issuesOf([rawTwin, rawTwin]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['entries', 1]);
+    expect(issues[0]?.message).toContain(rawKey);
+    expect(issues[0]?.message).toContain('entries.0');
+  });
+
+  // I/O matrix: "Status twin".
+  it('refuses one key held active and pinned', () => {
+    const issues = issuesOf([rawTwin, { ...rawTwin, status: 'pinned' }]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['entries', 1]);
+  });
+
+  // I/O matrix: "Pruned twin".
+  it('refuses one key held active and pruned', () => {
+    const issues = issuesOf([rawTwin, { ...rawTwin, status: 'pruned', prunedReason: 'too slow' }]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['entries', 1]);
+  });
+
+  // I/O matrix: "Tier-only difference".
+  it('refuses two crafted entries that differ only in acceptedTier (AD-5)', () => {
+    const crafted = {
+      kind: 'crafted',
+      categoryId: 'weapon.bow',
+      className: 'Bows',
+      itemLevelMin: 79,
+      prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5, acceptedTier: 'T7' },
+      status: 'active',
+    } as const;
+    const issues = issuesOf([
+      crafted,
+      { ...crafted, prefix: { ...crafted.prefix, acceptedTier: 'T6' } },
+    ]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['entries', 1]);
+    expect(issues[0]?.message).toContain(canonicalKey(crafted));
+  });
+
+  // I/O matrix: "Triplet".
+  it('reports each repeat of a key at its own index, each naming the first occurrence', () => {
+    const other = { ...rawTwin, itemLevelMin: 84 };
+    const issues = issuesOf([rawTwin, other, rawTwin, rawTwin]);
+    expect(issues.map((issue) => issue.path)).toEqual([
+      ['entries', 2],
+      ['entries', 3],
+    ]);
+    for (const issue of issues) {
+      expect(issue.message).toContain(rawKey);
+      expect(issue.message).toContain('entries.0');
+    }
+  });
+
+  // I/O matrix: "Empty list".
+  it('accepts an empty list', () => {
+    expect(parseEnvelope(TrackedFileSchema, fileOf([])).ok).toBe(true);
   });
 });
 

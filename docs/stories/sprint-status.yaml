@@ -103,7 +103,7 @@ action_items:
     epic: 1
     action: "Add a canonical-key uniqueness refinement to TrackedFileSchema"
     owner: "dev (contracts)"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-6-extract-one-composechunk-ports-used-by-s"
     epic: 1

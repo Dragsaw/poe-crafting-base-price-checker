@@ -815,6 +815,25 @@ describe('runChunk: the lock', () => {
     ).rejects.toThrow(/tracked\.json/);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
+
+  it('a tracked list holding one canonical key twice throws before any step and still releases the lock (L-A1)', async () => {
+    const { fs, ports } = harness([A, B, A]);
+    const { visited, step } = scriptedStep();
+
+    const failure = run(ports, step);
+
+    await expect(failure).rejects.toThrow(/tracked\.json/);
+    await expect(failure).rejects.toThrow(key(A));
+    expect(visited).toEqual([]);
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    const report = SyncReportFileSchema.parse(JSON.parse((await fs.readTextFile(REPORT_PATH)) ?? ''));
+    const failures = report.records.filter((record) => record.kind === 'run-failure');
+    expect(failures).toHaveLength(1);
+    expect(failures[0]).toMatchObject({ message: expect.stringContaining('tracked.json') });
+    expect(failures[0]).toMatchObject({ message: expect.stringContaining(key(A)) });
+  });
 });
 
 function datasetText(entries: readonly { key: string; at?: string; unresolvable?: boolean }[]): string {
