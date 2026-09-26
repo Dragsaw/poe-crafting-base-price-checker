@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
@@ -10,9 +10,23 @@ import { expect, it } from 'vitest';
  * reads every non-test source under `packages/sync/src` and refuses any
  * process spawn and any git subcommand that would change a repository.
  * Test files are exempt: a test may spawn `node` to run a script.
+ *
+ * One source file is exempt from one rule. `git/read-only-git-port.ts` is the
+ * real `GitPort` (AD-12), and reading a commit's author date needs a spawn, so
+ * the spawn rule is lifted for that path alone. The git-library and
+ * git-subcommand rules still apply to it, and a further test pins it to the
+ * one read-only invocation: `execFile` of `git --no-optional-locks log`, with
+ * no `exec`, no `spawn`, no `fork` and no shell option.
  */
 
 const ROOT = fileURLToPath(new URL('.', import.meta.url));
+
+const READ_ONLY_GIT_PORT = 'git/read-only-git-port.ts';
+
+/** Path relative to `ROOT`, with `/` separators → the rules lifted for that one file. */
+const EXEMPTIONS: Readonly<Record<string, readonly string[]>> = {
+  [READ_ONLY_GIT_PORT]: ['a process spawn'],
+};
 
 function sources(directory: string): string[] {
   return readdirSync(directory).flatMap((name) => {
@@ -22,6 +36,11 @@ function sources(directory: string): string[] {
     }
     return /\.[cm]?[jt]sx?$/.test(name) && !name.includes('.test.') ? [path] : [];
   });
+}
+
+/** The exemption key for `file`: relative to `ROOT`, `/`-separated on every platform. */
+function exemptionKey(file: string): string {
+  return relative(ROOT, file).split(sep).join('/');
 }
 
 const FORBIDDEN: readonly [string, RegExp][] = [
@@ -38,10 +57,38 @@ it('no source under packages/sync/src spawns a process or names a git subcommand
   expect(files.length).toBeGreaterThan(0);
   for (const file of files) {
     const text = readFileSync(file, 'utf8');
+    const lifted = EXEMPTIONS[exemptionKey(file)] ?? [];
     for (const [what, pattern] of FORBIDDEN) {
-      expect(text, `${relative(ROOT, file)} contains ${what}`).not.toMatch(pattern);
+      if (lifted.includes(what)) {
+        continue;
+      }
+      expect(text, `${exemptionKey(file)} contains ${what}`).not.toMatch(pattern);
     }
   }
+});
+
+it('the one exemption names an existing file and lifts only the spawn rule', () => {
+  expect(Object.entries(EXEMPTIONS)).toEqual([[READ_ONLY_GIT_PORT, ['a process spawn']]]);
+  expect(existsSync(join(ROOT, READ_ONLY_GIT_PORT))).toBe(true);
+});
+
+it('the exempted file makes only the read-only git log call', () => {
+  const text = readFileSync(join(ROOT, READ_ONLY_GIT_PORT), 'utf8');
+  const childProcessImports = [...text.matchAll(/^import\b[^;]*?from\s+['"]([^'"]+)['"]/gm)]
+    .filter(([, from]) => from?.includes('child_process'))
+    .map(([statement]) => statement);
+  expect(childProcessImports).toEqual(["import { execFile } from 'node:child_process'"]);
+  // A dynamic `import()` or a `createRequire` call would name it a second time.
+  expect(text.match(/child_process/g)).toHaveLength(1);
+  expect(text).not.toMatch(/\bexec\s*\(/);
+  expect(text).not.toMatch(/spawn/);
+  expect(text).not.toMatch(/fork/);
+  expect(text).not.toMatch(/shell\s*:/);
+  // The whole argument array, to its closing `]`: an added argument such as `--output=<file>` fails here.
+  expect(text).toMatch(
+    /execFile\(\s*'git',\s*\[\s*'--no-optional-locks',\s*'log',\s*'--no-show-signature',\s*'-1',\s*'--format=%at',\s*'--',\s*path\s*\]/,
+  );
+  expect(text.match(/execFile\(/g)).toHaveLength(1);
 });
 
 it('the patterns catch what they are meant to catch', () => {
@@ -52,6 +99,7 @@ it('the patterns catch what they are meant to catch', () => {
   expect("spawn('git', ['push'])").toMatch(subcommand);
   expect('git update-ref refs/heads/main HEAD').toMatch(subcommand);
   expect("execFile('git', ['worktree', 'add'])").toMatch(subcommand);
+  expect("execFile('git', ['--no-optional-locks', 'log', '-1'])").not.toMatch(subcommand);
   expect('a git-tracked working tree').not.toMatch(subcommand);
   expect('no git write of any kind').not.toMatch(subcommand);
 });

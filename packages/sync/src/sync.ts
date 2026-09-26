@@ -9,11 +9,13 @@
  * loads, the catalogue check, the order, the league gate, the rotation and
  * the writes.
  *
- * **The git port is the in-memory fake, with no history.** A real adapter
- * needs a process spawn, which `no-git-write.test.ts` forbids everywhere in
- * `sync`, so it waits for its own design pass (`docs/stories/deferred-work.md`).
- * Until then the tracked-list edit date comes from the `file-modified` clock,
- * which AD-12 allows where the repository yields no date.
+ * **The git port is the real read-only one** (`./git/read-only-git-port.ts`),
+ * reading the repository at the same root. The tracked-list edit date is
+ * therefore the author date of `data/tracked.json`'s last commit, tagged
+ * `git-author-date` — AD-12's first clock. Where the repository yields no date
+ * (no commit yet, no repository, no `git` binary is found) the resolver falls back to
+ * the `file-modified` clock. `pnpm sync:dry` keeps the history-less fake: its
+ * report is a prediction over a fake filesystem.
  *
  * The config, the rates, the item types and the published dataset are loaded
  * under the lock, and a refusal names its file before any request, in a
@@ -30,15 +32,14 @@ import { realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createFakeGitPort } from '@poe/contracts';
-
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
 import { composeChunk } from './compose-chunk.ts';
 import type { ComposeChunkPorts } from './compose-chunk.ts';
+import { createReadOnlyGitPort } from './git/read-only-git-port.ts';
 import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
-/** The live command's ports. The live command passes the history-less git fake (see above). */
+/** The live command's ports. The live command passes the read-only git port at the repository root (see above). */
 export type SyncPorts = ComposeChunkPorts;
 
 /** Composes one live chunk from its ports and runs it. Throws what the chunk throws. */
@@ -81,7 +82,7 @@ async function main(): Promise<void> {
     fs: createNodeFilesystemPort(REPO_ROOT),
     clock: systemClock,
     http: createFetchHttpPort(),
-    git: createFakeGitPort(),
+    git: createReadOnlyGitPort(REPO_ROOT),
     wait: sleep,
     pid: process.pid,
     env: process.env,
