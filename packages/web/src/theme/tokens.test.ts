@@ -74,6 +74,24 @@ describe('the frame and its column contracts', () => {
   });
 });
 
+describe('the payout-threshold panel', () => {
+  it('takes the mockup geometry: 13×15 padding, 4/10/7 gaps, a 4px track and an 11×14 marker centred on it', () => {
+    expect([spacing.controlPanelPadY, spacing.controlPanelPadX]).toEqual([13, 15]);
+    expect([spacing.thresholdValueGap, spacing.thresholdTrackGap, spacing.thresholdRangeGap]).toEqual([4, 10, 7]);
+    expect(spacing.thresholdTrackHeight).toBe(4);
+    expect([spacing.thresholdMarkerWidth, spacing.thresholdMarkerHeight]).toEqual([11, 14]);
+    expect(spacing.thresholdMarkerRise).toBe((spacing.thresholdMarkerHeight - spacing.thresholdTrackHeight) / 2);
+  });
+
+  it('keeps the control group widths the spacing tokens name', () => {
+    expect(columnSums.mastheadControls).toEqual([
+      spacing.recipePanelWidth,
+      spacing.mastheadControlGap,
+      spacing.thresholdPanelWidth,
+    ]);
+  });
+});
+
 describe('the vertical budget', () => {
   it('commits 1390px, and the frame-slack token is exactly what is left', () => {
     expect(sumPx(committedChrome)).toBe(1390);

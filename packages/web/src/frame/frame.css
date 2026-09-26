@@ -56,3 +56,39 @@
 .fg-row[data-raw]:active {
   background: var(--fg-color-paper-deep);
 }
+
+/*
+ * The Payout Threshold figure. The figure IS the input: no border, no
+ * background, no padding, no form chrome. The rule sits under the figure only
+ * (the unit is outside the input): dotted sepia at rest, solid sepia under the
+ * pointer, solid rule-strong while the player edits. Caret ink, selection
+ * paper-deep.
+ */
+.fg-threshold input {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px dotted var(--fg-color-sepia);
+  background: none;
+  box-shadow: none;
+  outline: none;
+  color: var(--fg-color-ink);
+  caret-color: var(--fg-color-ink);
+  transition: none;
+}
+
+.fg-threshold input:hover {
+  border-bottom-style: solid;
+}
+
+.fg-threshold input:focus {
+  border-bottom: 1px solid var(--fg-color-rule-strong);
+}
+
+.fg-threshold input::selection {
+  background: var(--fg-color-paper-deep);
+  color: var(--fg-color-ink);
+}

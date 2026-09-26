@@ -8,12 +8,12 @@ import { Masthead } from './frame/Masthead';
 import { RowSlots } from './frame/RowSlots';
 import { AskingPriceLine } from './list/AskingPriceLine';
 import { toDisplayRows } from './list/display-rows';
-import { DEFAULT_THRESHOLD } from './list/format';
 import { KeyBlock } from './list/KeyBlock';
 import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
+import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold-storage';
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
 
@@ -52,6 +52,13 @@ export function App(): JSX.Element {
     };
   }, [attempt]);
 
+  // The only value that survives a reload (FR-7): read once at mount, written on each change.
+  const [threshold, setThreshold] = useState(() => readStoredThreshold());
+  const changeThreshold = useCallback((value: number) => {
+    setThreshold(value);
+    writeStoredThreshold(value);
+  }, []);
+
   const retry = useCallback(() => {
     setView({ kind: 'pending' });
     setAttempt((count) => count + 1);
@@ -61,7 +68,7 @@ export function App(): JSX.Element {
     case 'pending':
       return (
         <Frame state="pending">
-          <Masthead league={undefined} />
+          <Masthead league={undefined} threshold={threshold} onThresholdChange={changeThreshold} />
           <AskingPriceLine />
           <RowSlots />
           <PageTail />
@@ -70,10 +77,10 @@ export function App(): JSX.Element {
     case 'ready':
       return (
         <Frame state="ready">
-          <Masthead league={view.set.config.league} />
+          <Masthead league={view.set.config.league} threshold={threshold} onThresholdChange={changeThreshold} />
           <AbsenceLines absent={view.absent} />
           <AskingPriceLine />
-          <ReadyList set={view.set} now={view.now} />
+          <ReadyList set={view.set} now={view.now} threshold={threshold} />
           <PageTail />
         </Frame>
       );
@@ -93,19 +100,28 @@ export function App(): JSX.Element {
 }
 
 /**
- * `core` ranks the whole loaded set at the default threshold; `web` renders
- * what it returns and orders nothing itself (AD-4). Memoised on the set.
+ * `core` ranks the whole loaded set at the player's threshold; `web` renders
+ * what it returns and orders nothing itself (AD-4). Memoised on the set,
+ * `now` and the threshold.
  */
-function ReadyList({ set, now }: { readonly set: ArtifactSet; readonly now: number }): JSX.Element {
+function ReadyList({
+  set,
+  now,
+  threshold,
+}: {
+  readonly set: ArtifactSet;
+  readonly now: number;
+  readonly threshold: number;
+}): JSX.Element {
   const rows = useMemo(() => {
     const ranking = rank({
       tracked: set.tracked.entries,
       dataset: set.dataset.entries,
       activeLeague: set.config.league,
-      threshold: DEFAULT_THRESHOLD,
+      threshold,
     });
     return toDisplayRows(ranking, set.dataset.entries, now);
-  }, [set, now]);
+  }, [set, now, threshold]);
   return <RankedList rows={rows} />;
 }
 

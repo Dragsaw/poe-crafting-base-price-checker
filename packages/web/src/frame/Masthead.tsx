@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
+import { PayoutThreshold } from '../threshold/PayoutThreshold';
 
 /** The DESIGN mockup strings (`mockups/key-hero-resting.html`). */
 export const MASTHEAD_TITLE = 'What is worth picking up';
@@ -12,14 +13,23 @@ export function eyebrowText(league: string): string {
 }
 
 /** The right-hand control group's width: 216 recipe + 16 gap + 276 threshold. */
-const CONTROL_SLOT_WIDTH = columnSums.mastheadControls.reduce((a, b) => a + b, 0);
+export const CONTROL_GROUP_WIDTH = columnSums.mastheadControls.reduce((a, b) => a + b, 0);
 
 /**
  * The 170px masthead: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42
- * + 20 pad. The eyebrow reads the league alone. The right-hand control slot is
- * reserved and left empty; Stories 2.4 and 3.x fill it.
+ * + 20 pad. The eyebrow reads the league alone. The right-hand control group holds
+ * the Payout Threshold at the outer edge and an empty inboard slot the Craft
+ * Recipe fills in Epic 3.
  */
-export function Masthead({ league }: { readonly league: string | undefined }): JSX.Element {
+export function Masthead({
+  league,
+  threshold,
+  onThresholdChange,
+}: {
+  readonly league: string | undefined;
+  readonly threshold: number;
+  readonly onThresholdChange: (value: number) => void;
+}): JSX.Element {
   return (
     <header
       data-masthead=""
@@ -44,7 +54,20 @@ export function Masthead({ league }: { readonly league: string | undefined }): J
           {MASTHEAD_DEK}
         </p>
       </div>
-      <div data-control-slot="" aria-hidden="true" style={{ width: px(CONTROL_SLOT_WIDTH), flex: '0 0 auto' }} />
+      <div
+        data-control-group=""
+        style={{
+          display: 'flex',
+          alignItems: 'stretch',
+          gap: px(spacing.mastheadControlGap),
+          width: px(CONTROL_GROUP_WIDTH),
+          flex: '0 0 auto',
+        }}
+      >
+        {/* The Craft Recipe's inboard slot, empty until Epic 3. */}
+        <div data-recipe-slot="" aria-hidden="true" style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto' }} />
+        <PayoutThreshold value={threshold} onChange={onThresholdChange} />
+      </div>
     </header>
   );
 }

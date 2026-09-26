@@ -75,6 +75,21 @@ export const spacing = {
   recipePanelWidth: 216,
   mastheadControlGap: 16,
   thresholdPanelWidth: 276,
+  /**
+   * `{components.payout-threshold}` (and its Epic 3 sibling, `craft-recipe`):
+   * padding 13×15, and the 4/10/7px gaps of `mockups/key-hero-resting.html`
+   * between label and figure, figure and track, track and range.
+   */
+  controlPanelPadY: 13,
+  controlPanelPadX: 15,
+  thresholdValueGap: 4,
+  thresholdTrackGap: 10,
+  thresholdRangeGap: 7,
+  thresholdTrackHeight: 4,
+  thresholdMarkerWidth: 11,
+  thresholdMarkerHeight: 14,
+  /** The marker's rise above the track's top edge: (14 − 4) / 2. */
+  thresholdMarkerRise: 5,
   s1: 4,
   s2: 8,
   s3: 12,
