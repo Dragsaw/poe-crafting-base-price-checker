@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forge Report: tracked.json</title>
+<style>
+  :root { --bg:#f6f1e7; --ink:#2a2118; --muted:#6b5d4c; --card:#fffaf1; --line:#d9ccb5; --wax:#8e1f1f; --wax2:#b83232; --ok:#2f6b3a; --warn:#9a6a12; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#1b1713; --ink:#efe6d6; --muted:#b3a58f; --card:#252019; --line:#3d352a; --ok:#7fc28c; --warn:#e0b25a; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 Georgia, "Iowan Old Style", serif; }
+  main { max-width:860px; margin:0 auto; padding:40px 16px 64px; }
+  header { display:flex; gap:28px; align-items:center; flex-wrap:wrap; border-bottom:2px solid var(--line); padding-bottom:24px; }
+  h1 { margin:0 0 6px; font-size:30px; }
+  .sub { color:var(--muted); margin:0; }
+  h2 { font-size:19px; margin:34px 0 10px; letter-spacing:.02em; }
+  ul { margin:0; padding-left:20px; }
+  li { margin:6px 0; }
+  code { font:13.5px ui-monospace, Consolas, monospace; background:var(--card); border:1px solid var(--line); padding:1px 5px; border-radius:4px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 20px; }
+  .lock li::marker { content:"🔒 "; }
+  .kill li::marker { content:"✗ "; color:var(--wax2); }
+  .crack li::marker { content:"⚠ "; color:var(--warn); }
+  .flow { display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:15px; }
+  .flow span.step { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 14px; }
+  .personas { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+  .p { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .p b { display:block; }
+  .p i { color:var(--muted); font-size:14px; }
+  .tag { font:12px ui-monospace, monospace; color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Wax seal: Hardened">
+    <defs>
+      <radialGradient id="g" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#c94040"/><stop offset="1" stop-color="#7a1616"/></radialGradient>
+      <path id="arc" d="M75,75 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0"/>
+    </defs>
+    <path d="M75 6 C92 4 104 14 116 20 C130 28 142 40 143 58 C146 74 140 88 144 102 C140 120 126 132 110 138 C96 146 80 142 66 145 C48 144 32 136 22 122 C10 108 6 92 8 76 C4 60 10 44 20 32 C32 18 50 8 75 6Z" fill="url(#g)"/>
+    <circle cx="75" cy="75" r="56" fill="none" stroke="#f3d0c4" stroke-opacity=".45" stroke-width="2"/>
+    <circle cx="75" cy="75" r="38" fill="none" stroke="#f3d0c4" stroke-opacity=".35" stroke-width="1.5"/>
+    <text font-family="Georgia,serif" font-size="11" letter-spacing="3" fill="#f7e3d9"><textPath href="#arc">FORGED · TRACKED.JSON · 2026 ·</textPath></text>
+    <text x="75" y="81" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="17" letter-spacing="1.5" fill="#fff4ee">HARDENED</text>
+  </svg>
+  <div>
+    <h1>Curating tracked.json</h1>
+    <p class="sub">The idea started as "a cheap web page for editing tracked.json, with full UI". It ended as: judge in the web view, edit through an agent skill.</p>
+    <p class="sub">Forged 2026-09-26 · outcome <b>Hardened</b></p>
+  </div>
+</header>
+
+<h2>The workflow that survived</h2>
+<div class="flow">
+  <span class="step">Judge in the web view (Epic 2: 2.5 · 2.6 · 2.8)</span> →
+  <span class="step">Tell the agent the edit</span> →
+  <span class="step"><code>tracked:lookup</code></span> →
+  <span class="step">edit <code>data/tracked.json</code></span> →
+  <span class="step"><code>tracked:check</code></span> →
+  <span class="step">you commit</span>
+</div>
+
+<h2>Locked decisions</h2>
+<div class="card"><ul class="lock">
+  <li>No editor code goes into <code>packages/web</code>. Work on curation tooling can't regress the ranking page.</li>
+  <li>You judge the list in the planned Epic 2 view, which already has the price data. Nothing new is added to it.</li>
+  <li>Edits and first-version seeding go through Claude Code with a skill at <code>.claude/skills/tracked-json/SKILL.md</code>. The skill follows the AGENT-WORKFLOW reporting rule and applies FR-22's Accepted Tier rule.</li>
+  <li>The scripts are read-only <code>sync</code> commands in Node/TS: <code>pnpm tracked:lookup stat|base|class|tiers</code> and <code>pnpm tracked:check</code>. There's no new package and no Python.</li>
+  <li>The page and the tooling stay local. Nothing new is published, and the PRD is unchanged.</li>
+</ul></div>
+
+<h2>Rejected, and why</h2>
+<div class="card"><ul class="kill">
+  <li><b>An editor inside the deployed app.</b> It conflicts with AD-15, AD-3 and PRD §4.5/§7.1, and would need a PRD edit.</li>
+  <li><b>An editor inside <code>packages/web</code>, fenced by a separate entry point.</b> It breaks the strict-separation lock.</li>
+  <li><b>A <code>packages/curate</code> local page with a Vite write endpoint.</b> Deferred. It would duplicate Epic 2's judging view without the prices, and it can't import <code>web</code>. <span class="tag">Revisit if a curation pass after Epic 2 needs something the view and the skill together can't give.</span></li>
+  <li><b>A standalone console curator.</b> Its UX is no better than the agent working with scripts.</li>
+</ul></div>
+
+<h2>Weak points that survived</h2>
+<div class="card"><ul class="crack">
+  <li>The cross-file checks are Story 3.3, still in backlog. Until it lands, <code>tracked:check</code> is schema-only and misses band edge-alignment and overlap errors, which are the ones seeding is most likely to make.</li>
+  <li>"Full UI support" has been traded away for now. The whole bet rests on Epic 2's view being enough to judge the list.</li>
+</ul></div>
+
+<h2>Who pressure-tested it</h2>
+<div class="personas">
+  <div class="p"><b>🏗️ Winston · Architect</b><i>"Where it runs decides what it costs." Pushed for the local option and for a fence the build enforces.</i></div>
+  <div class="p"><b>🎨 Sally · UX Designer</b><i>Pointed out that the deployed app already fetches the catalogue, and named the manual save step as the weak point.</i></div>
+  <div class="p"><b>💻 Amelia · Senior Engineer</b><i>Showed the lookup and check layer is common to both options, and moved the scripts into <code>sync</code>.</i></div>
+  <div class="p"><b>📋 John · Product Manager</b><i>"Where's the job the page does that nothing else does?"</i></div>
+  <div class="p"><b>🧾 Priya · fixed-price contractor</b> <span class="tag">generated</span><i>Asked what "cheap" would cost to lose, and marked where the fence stops protecting shared code.</i></div>
+  <div class="p"><b>🗡️ Dmitri · spreadsheet crafter</b> <span class="tag">generated</span><i>"I judge a base by 'no listings for three weeks', not by its JSON."</i></div>
+</div>
+</main>
+</body>
+</html>
