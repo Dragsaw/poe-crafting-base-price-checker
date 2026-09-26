@@ -1,13 +1,27 @@
-import { useCallback, useEffect, useState, type JSX } from 'react';
+import { rank } from '@poe/core';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 
 import { AbsenceLines } from './frame/AbsenceLines';
 import { FailureScreen } from './frame/FailureScreen';
 import { Frame } from './frame/Frame';
 import { Masthead } from './frame/Masthead';
 import { RowSlots } from './frame/RowSlots';
+import { AskingPriceLine } from './list/AskingPriceLine';
+import { toDisplayRows } from './list/display-rows';
+import { DEFAULT_THRESHOLD } from './list/format';
+import { KeyBlock } from './list/KeyBlock';
+import { RankedList } from './list/RankedList';
+import { RunningFoot } from './list/RunningFoot';
+import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
 
-type ViewState = { readonly kind: 'pending' } | LoadOutcome;
+type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
+
+/** A ready outcome carries the "now" its ages are read against, taken once when the load resolved. */
+type ViewState =
+  | { readonly kind: 'pending' }
+  | Exclude<LoadOutcome, ReadyOutcome>
+  | (ReadyOutcome & { readonly now: number });
 
 /**
  * The page's substrate. It paints the masthead and twenty skeleton slots at
@@ -15,7 +29,9 @@ type ViewState = { readonly kind: 'pending' } | LoadOutcome;
  * whole set, the refusal screen or the fetch-failure screen — never row by row
  * (AD-24, FR-33). `+ Try again` re-runs all eight fetches.
  *
- * Stories 2.2 and 2.3 render the ranked rows into the ready state.
+ * The resting chrome, in order: masthead, asking-price line, column header,
+ * list, then the key block and the running foot. The skeleton paints the same
+ * chrome around its slots; the two failure screens paint none of it.
  */
 export function App(): JSX.Element {
   const [attempt, setAttempt] = useState(0);
@@ -26,7 +42,8 @@ export function App(): JSX.Element {
     const controller = new AbortController();
     void loadArtifacts({ signal: controller.signal }).then((outcome) => {
       if (live) {
-        setView(outcome);
+        // "Now" is read once, as the set resolves, and held: ages never tick.
+        setView(outcome.kind === 'ready' ? { ...outcome, now: Date.now() } : outcome);
       }
     });
     return () => {
@@ -45,7 +62,9 @@ export function App(): JSX.Element {
       return (
         <Frame state="pending">
           <Masthead league={undefined} />
+          <AskingPriceLine />
           <RowSlots />
+          <PageTail />
         </Frame>
       );
     case 'ready':
@@ -53,6 +72,9 @@ export function App(): JSX.Element {
         <Frame state="ready">
           <Masthead league={view.set.config.league} />
           <AbsenceLines absent={view.absent} />
+          <AskingPriceLine />
+          <ReadyList set={view.set} now={view.now} />
+          <PageTail />
         </Frame>
       );
     case 'refused':
@@ -68,4 +90,34 @@ export function App(): JSX.Element {
         </Frame>
       );
   }
+}
+
+/**
+ * `core` ranks the whole loaded set at the default threshold; `web` renders
+ * what it returns and orders nothing itself (AD-4). Memoised on the set.
+ */
+function ReadyList({ set, now }: { readonly set: ArtifactSet; readonly now: number }): JSX.Element {
+  const rows = useMemo(() => {
+    const ranking = rank({
+      tracked: set.tracked.entries,
+      dataset: set.dataset.entries,
+      activeLeague: set.config.league,
+      threshold: DEFAULT_THRESHOLD,
+    });
+    return toDisplayRows(ranking, set.dataset.entries, now);
+  }, [set, now]);
+  return <RankedList rows={rows} />;
+}
+
+/**
+ * What closes every state but the two failure screens: the key block and the
+ * running foot, pushed to the frame's foot. Story 2.8's appendix leads this group.
+ */
+function PageTail(): JSX.Element {
+  return (
+    <div data-page-tail="" style={{ marginTop: 'auto' }}>
+      <KeyBlock />
+      <RunningFoot />
+    </div>
+  );
 }

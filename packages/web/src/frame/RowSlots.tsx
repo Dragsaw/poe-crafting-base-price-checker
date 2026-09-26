@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 
+import { ColumnHeader } from '../list/ColumnHeader';
 import { colors, px, rankedRowColumns, spacing } from '../theme/tokens';
 
 export const ROW_SLOT_COUNT = 20;
@@ -10,16 +11,19 @@ const BAR_HEIGHT = 10;
 /**
  * The load state: twenty 28px slots in the final six-column layout. Each cell
  * is a flat `paper-inset` bar at its column width less its right padding —
- * DESIGN.md's documented fallback, with no shimmer and no animation. The fill
- * is an open `[NOTE FOR UX]` (state 22).
+ * DESIGN.md's treatment (state 22, UX memlog 211), with no shimmer and no
+ * animation. The column header paints with its final labels: its text depends
+ * on no artifact.
  */
 export function RowSlots(): JSX.Element {
   return (
-    <div data-row-slots="" aria-hidden="true">
+    <div data-row-slots="">
+      <ColumnHeader />
       {Array.from({ length: ROW_SLOT_COUNT }, (_, row) => (
         <div
           key={row}
           data-row-slot=""
+          aria-hidden="true"
           style={{
             display: 'flex',
             alignItems: 'center',

@@ -75,12 +75,11 @@ describe('the frame and its column contracts', () => {
 });
 
 describe('the vertical budget', () => {
-  it('commits 1390px, and the frame-slack token fits inside what is left', () => {
+  it('commits 1390px, and the frame-slack token is exactly what is left', () => {
     expect(sumPx(committedChrome)).toBe(1390);
-    // DESIGN.md's frontmatter says 528; its own table gives 1920 − 1390 = 530.
-    // The frontmatter value wins and is 2px conservative, so assert the bound.
-    expect(spacing.frameSlack).toBe(528);
-    expect(spacing.frameSlack).toBeLessThanOrEqual(spacing.frameHeight - sumPx(committedChrome));
+    // UX memlog 210: the frontmatter now reads 530, which is 1920 − 1390.
+    expect(spacing.frameSlack).toBe(530);
+    expect(spacing.frameSlack).toBe(spacing.frameHeight - sumPx(committedChrome));
   });
 
   it('keeps committed chrome plus every reserve inside the frame height', () => {

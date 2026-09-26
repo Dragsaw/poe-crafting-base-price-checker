@@ -66,7 +66,8 @@ export const spacing = {
   hairline: 1,
   rowHeight: 28,
   appendixRowHeight: 29,
-  frameSlack: 528,
+  /** 1920 − 1390 committed = 530 (UX memlog 210; it read 528 through revision 5). */
+  frameSlack: 530,
   frameReserveBanner: 74,
   frameReserveHealthLine: 21,
   syncReportMaxHeight: 400,
@@ -80,6 +81,25 @@ export const spacing = {
   s4: 16,
   s5: 20,
   s6: 24,
+  /** The open row's sepia left rule; it bleeds into the gutter on a negative margin. */
+  openRowMarker: 3,
+  /** The fixed box both unit glyphs centre in, so every unit name starts at one x. */
+  unitGlyphBox: 14,
+  /**
+   * The resting chrome's own gaps, from DESIGN.md's vertical budget and
+   * `mockups/key-hero-resting.html`. Each block's committed height depends on them.
+   */
+  askingPadTop: 12,
+  askingPadBottom: 3,
+  columnHeaderMarginTop: 16,
+  expandPadTop: 14,
+  keyMarginTop: 22,
+  keyPadTop: 11,
+  keyColumnGap: 22,
+  keyHeadingGap: 4,
+  footMarginTop: 18,
+  footPadTop: 10,
+  footMarginBottom: 20,
 } as const;
 
 /** A px number as a CSS length. */

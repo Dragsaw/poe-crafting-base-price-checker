@@ -12,8 +12,10 @@ import {
   REFUSAL_TITLE,
   TRY_AGAIN,
 } from './frame/FailureScreen';
-import { MASTHEAD_TITLE } from './frame/Masthead';
+import { MASTHEAD_DEK, MASTHEAD_TITLE } from './frame/Masthead';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
+import { ASKING_PRICE_COPY } from './list/AskingPriceLine';
+import { bodiesWith, hoursBefore, priced, rawEntry, unpriced } from './test-support/list-fixtures';
 import {
   gate,
   serveArtifacts,
@@ -247,6 +249,116 @@ describe('the outcomes', () => {
     await settleTo('refused');
     expect(frame().querySelector('[data-artifact]')?.textContent).toBe('dataset.json');
     expect(frame().querySelector('[data-declared]')?.textContent).toBe('none');
+  });
+});
+
+describe('the resting chrome', () => {
+  function chrome(): Record<string, boolean> {
+    return Object.fromEntries(
+      ['data-asking-price-line', 'data-column-header', 'data-key-block', 'data-running-foot'].map((attr) => [
+        attr,
+        frame().querySelector(`[${attr}]`) !== null,
+      ]),
+    );
+  }
+  const ALL = {
+    'data-asking-price-line': true,
+    'data-column-header': true,
+    'data-key-block': true,
+    'data-running-foot': true,
+  };
+  const NONE = Object.fromEntries(Object.keys(ALL).map((key) => [key, false]));
+
+  // Matrix: skeleton.
+  it('paints the asking line, the labelled header, the slots, the key block and the foot while pending', () => {
+    const gates = ARTIFACT_ORDER.map(() => gate());
+    serveArtifacts(
+      server,
+      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+    );
+    mount();
+    expect(frame().dataset['state']).toBe('pending');
+    expect(chrome()).toEqual(ALL);
+    expect(frame().querySelector('[data-column-header]')?.textContent).toContain('Item Class / Base Type');
+    expect(frame().textContent).toContain(ASKING_PRICE_COPY);
+    for (const g of gates) g.open();
+  });
+
+  it('renders the chrome in order around the ranked rows when ready', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const ring = rawEntry('Coral Ring');
+    const lost = rawEntry('Lost Ring');
+    const bodies = bodiesWith(
+      [belt, ring, lost],
+      [
+        priced(belt, 0.5, hoursBefore(now, 3)),
+        unpriced(ring, { state: 'no-listings' }, hoursBefore(now, 9 * 24 + 2)),
+        unpriced(lost, { state: 'unresolvable' }, hoursBefore(now, 1)),
+      ],
+    );
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+    });
+    mount();
+    await settleTo('ready');
+    expect(chrome()).toEqual(ALL);
+    const order = Array.from(
+      frame().querySelectorAll('[data-masthead], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-key-block], [data-running-foot]'),
+      (node) => Object.keys((node as HTMLElement).dataset)[0],
+    );
+    expect(order).toEqual(['masthead', 'askingPriceLine', 'columnHeader', 'rankedRow', 'rankedRow', 'keyBlock', 'runningFoot']);
+    const rows = frame().querySelectorAll('[data-ranked-row]');
+    expect(rows[0]?.textContent).toContain('0.50');
+    expect(rows[1]?.textContent).toContain('an open question');
+    expect(rows[1]?.textContent).toContain('tried 9d ago');
+    // Matrix: unresolvable — no row.
+    expect(frame().textContent).not.toContain('Lost Ring');
+  });
+
+  it('paints none of it on the refusal screen', async () => {
+    serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
+    mount();
+    await settleTo('refused');
+    expect(chrome()).toEqual(NONE);
+  });
+
+  it('paints none of it on the fetch-failure screen', async () => {
+    serveArtifacts(server, { config: { kind: 'network-error' } });
+    mount();
+    await settleTo('failed');
+    expect(chrome()).toEqual(NONE);
+  });
+
+  it('ranks the committed data/ into rows, dropping the below-threshold base', async () => {
+    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked}.json', { eager: true, import: 'default' });
+    const dataset = committed['../../../data/dataset.json'];
+    const tracked = committed['../../../data/tracked.json'];
+    serveArtifacts(server, { tracked: { kind: 'json', body: tracked }, dataset: { kind: 'json', body: dataset } });
+    mount();
+    await settleTo('ready');
+    const rows = Array.from(frame().querySelectorAll('[data-ranked-row]'));
+    expect(rows.map((row) => row.querySelector('[data-unit-name]')?.textContent)).toEqual(['Gold Amulet', 'Solar Amulet']);
+    expect(frame().textContent).not.toContain('Utility Belt');
+    for (const row of rows) {
+      expect(row.querySelectorAll('[data-unit-glyph]')).toHaveLength(1);
+    }
+  });
+});
+
+describe('the copy', () => {
+  it('never says sells for, worth or market value in web source, outside the masthead copy DESIGN.md owns', () => {
+    const sources = import.meta.glob<string>(['./**/*.{ts,tsx}', '!./**/*.test.{ts,tsx}'], {
+      eager: true,
+      query: '?raw',
+      import: 'default',
+    });
+    expect(Object.keys(sources).length).toBeGreaterThan(10);
+    for (const [path, text] of Object.entries(sources)) {
+      const scanned = text.replaceAll(MASTHEAD_TITLE, '').replaceAll(MASTHEAD_DEK, '');
+      expect(scanned, path).not.toMatch(/sells for|worth|market value/i);
+    }
   });
 });
 
