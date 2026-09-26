@@ -1,5 +1,5 @@
 <!-- bmad:context -->
-<!-- Verified 2026-09-26 against 83c6894. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+<!-- Verified 2026-09-26 against a6b67c9. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
 
 ## poe-crafting-base-price-checker
 
@@ -23,12 +23,12 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 - The agent-browser documentation sets that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. Shell state does not carry between tool calls, so the variable is empty in the next call and agent-browser falls back to the shared default session. Pass `--session <id>` on each call.
 - `pnpm dev` binds port 5173 with `strictPort`. A taken port gives a loud bind failure, and Vite does not move to the next port. To use a different port, run `pnpm dev --port <n>`. Do not edit `packages/web/vite.config.ts`.
 - `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. Stop it after use. The repository ships no supervisor.
-- `pnpm sync:dry` writes to stderr and exits non-zero on purpose. The command is a stub until story 1.5. Do not change it.
 
 ## Conventions that differ from defaults
 
 - The UI uses Mantine v9 (`@mantine/core`, `@mantine/hooks`) at version 9.6.1, which the Stack table of the architecture spine pins. Do not install a different major version.
 - A test setup blocks the network with an MSW `onUnhandledRequest` callback. The callback records the URL and throws. A global `afterEach` then fails the test and names each escaped URL. Copy `test/setup.ts`. The `"error"` string does not fail a test. Do not substitute that string for the callback.
+- Use a connected MCP tool, not Read, Grep or Edit, when the tool does the task above the text level. Examples are symbol lookup, references, implementations, renames, symbol-body edits and diagnostics. MCP tools start deferred, so load them with ToolSearch before the first call. When a server's instructions name a first call, such as Serena `initial_instructions`, make that call before any other tool of that server. Use Read, Grep and Edit for docs, YAML, JSON and config.
 
 ## Known pitfalls
 
