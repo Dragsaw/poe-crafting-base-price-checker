@@ -9,7 +9,6 @@
       "mcp__serena__*",
       "Edit(E:/Program Files/Jetbrains/Projects/poe-crafting-base-price-checker/**)",
       "Write(E:/Program Files/Jetbrains/Projects/poe-crafting-base-price-checker/**)",
-
       "Bash(uv run:*)",
       "Bash(uv sync:*)",
       "Bash(uv add:*)",
@@ -19,7 +18,8 @@
       "Bash(npm install:*)",
       "Bash(npm test:*)",
       "Bash(npm view:*)",
-      "Bash(npx bmad-method:*)",
+      "Bash(npx bmad-method*)",
+      "Bash(npx vitest*)",
       "Bash(pnpm:*)",
       "Bash(pnpm run:*)",
       "Bash(pnpm ci:*)",
@@ -28,7 +28,7 @@
       "Bash(pnpm view:*)",
       "Bash(node:*)",
       "Bash(npx eslint*)",
-
+      "Bash(npx tsc*)",
       "Bash(git:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
@@ -48,7 +48,6 @@
       "Bash(git switch:*)",
       "Bash(git restore:*)",
       "Bash(git fetch:*)",
-
       "Bash(ls:*)",
       "Bash(pwd)",
       "Bash(date:*)",
@@ -83,6 +82,7 @@
   },
   "defaultShell": "bash",
   "enabledPlugins": {
-    "bmad-method@bmad": true
+    "bmad-method@bmad": true,
+    "bmad-toolbox@bmad": true
   }
 }
