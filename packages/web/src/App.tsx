@@ -23,13 +23,15 @@ export function App(): JSX.Element {
 
   useEffect(() => {
     let live = true;
-    void loadArtifacts().then((outcome) => {
+    const controller = new AbortController();
+    void loadArtifacts({ signal: controller.signal }).then((outcome) => {
       if (live) {
         setView(outcome);
       }
     });
     return () => {
       live = false;
+      controller.abort();
     };
   }, [attempt]);
 

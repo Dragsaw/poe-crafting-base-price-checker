@@ -7,7 +7,11 @@ import { colors, stacks, typeRoles } from './tokens';
 const merged = mergeMantineTheme(DEFAULT_THEME, theme);
 
 describe('the Mantine override layer', () => {
-  it('replaces lineHeights: no key keeps Mantine’s 1.55', () => {
+  it('replaces lineHeights: every key takes a DESIGN.md role value, none left at Mantine’s default for that key', () => {
+    const roleValues = new Set(Object.values(typeRoles).map((role) => role.lineHeight));
+    for (const [key, value] of Object.entries(merged.lineHeights)) {
+      expect(roleValues, key).toContain(value);
+    }
     for (const [key, value] of Object.entries(merged.lineHeights)) {
       expect(value, key).not.toBe(DEFAULT_THEME.lineHeights[key as keyof typeof DEFAULT_THEME.lineHeights]);
     }

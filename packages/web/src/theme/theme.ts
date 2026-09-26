@@ -12,7 +12,11 @@ import { colors, stacks, typeRoles } from './tokens';
 
 const NONE = 'none';
 
-/** Mantine's `lineHeights` keys, every one pinned so no `Text` falls back to 1.55. */
+/**
+ * Mantine's `lineHeights` keys, each replaced with a DESIGN.md role's value, so
+ * none keeps Mantine's default for that key. (`xl` is `failure-body`'s 1.55 by
+ * DESIGN.md's choice, not by inheritance.)
+ */
 const lineHeights = {
   xs: typeRoles['row-mark'].lineHeight,
   sm: typeRoles['detail-row'].lineHeight,

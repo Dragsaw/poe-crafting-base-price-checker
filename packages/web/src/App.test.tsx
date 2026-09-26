@@ -96,6 +96,7 @@ describe('the pending state', () => {
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
+    expect(frame().getAttribute('aria-busy')).toBe('true');
     expect(frame().textContent).toContain(MASTHEAD_TITLE);
     const slots = frame().querySelectorAll('[data-row-slot]');
     expect(slots).toHaveLength(ROW_SLOT_COUNT);
@@ -147,6 +148,8 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const text = frame().textContent;
+    expect(frame().querySelector('section')?.getAttribute('role')).toBe('alert');
+    expect(frame().hasAttribute('aria-busy')).toBe(false);
     expect(text).toContain(REFUSAL_EYEBROW);
     expect(text).toContain(REFUSAL_TITLE);
     expect(frame().querySelector('[data-artifact]')?.textContent).toBe('tracked.json');

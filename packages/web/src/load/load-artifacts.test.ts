@@ -1,8 +1,19 @@
+// Node types for this test only: it reads the committed data/ folder from disk.
+/// <reference types="node" />
+import { existsSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
 import type { SetupServerApi } from 'msw/node';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { sharedServer, serveArtifacts, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
-import { ARTIFACT_ORDER, ARTIFACTS } from './artifacts';
+import {
+  sharedServer,
+  serveArtifacts,
+  TEST_LEAGUE,
+  VALID_BODIES,
+  type ArtifactAnswer,
+} from '../test-support/artifact-server';
+import { ARTIFACT_ORDER, ARTIFACTS, type ArtifactKey } from './artifacts';
 import { loadArtifacts, NO_DECLARED_VERSION } from './load-artifacts';
 
 let server: SetupServerApi;
@@ -175,5 +186,29 @@ describe('loadArtifacts', () => {
       },
     });
     expect(outcome).toEqual({ kind: 'failed', path: 'dataset.json' });
+  });
+});
+
+describe('the committed data/ set', () => {
+  it('loads as ready through the page’s own descriptors, naming only the missing tolerable files', async () => {
+    const dataDir = resolve(import.meta.dirname, '../../../../data');
+    const missing: ArtifactKey[] = [];
+    const answers = Object.fromEntries(
+      ARTIFACT_ORDER.map((key): [ArtifactKey, ArtifactAnswer] => {
+        const file = join(dataDir, ARTIFACTS[key].path);
+        if (!existsSync(file)) {
+          missing.push(key);
+          return [key, { kind: 'status', status: 404 }];
+        }
+        return [key, { kind: 'json', body: JSON.parse(readFileSync(file, 'utf8')) as unknown }];
+      }),
+    );
+    serveArtifacts(server, answers);
+    const outcome = await loadArtifacts({ baseUrl: '/' });
+    expect(outcome.kind).toBe('ready');
+    if (outcome.kind !== 'ready') return;
+    expect(missing.every((key) => ARTIFACTS[key].class === 'tolerable')).toBe(true);
+    expect(outcome.absent).toEqual(missing);
+    expect(outcome.absent).toEqual(['recipes']);
   });
 });

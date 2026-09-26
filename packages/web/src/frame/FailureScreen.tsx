@@ -34,7 +34,7 @@ const bodyStyle = {
 export function FailureScreen(props: FailureScreenProps): JSX.Element {
   const refused = props.variant === 'refused';
   return (
-    <section data-failure={props.variant} style={{ paddingTop: px(spacing.gutter) }}>
+    <section data-failure={props.variant} role="alert" style={{ paddingTop: px(spacing.gutter) }}>
       <div style={{ ...typeStyle('eyebrow'), color: colors.rust }}>
         {refused ? REFUSAL_EYEBROW : FETCH_FAILURE_EYEBROW}
       </div>

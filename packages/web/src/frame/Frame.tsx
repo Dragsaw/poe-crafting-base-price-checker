@@ -18,6 +18,7 @@ export function Frame({ state, children }: { readonly state: FrameState; readonl
     <div
       data-frame=""
       data-state={state}
+      aria-busy={state === 'pending' ? true : undefined}
       style={{
         width: px(spacing.frameWidth),
         minHeight: px(spacing.frameHeight),

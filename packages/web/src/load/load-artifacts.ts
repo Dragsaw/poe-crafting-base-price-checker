@@ -46,6 +46,8 @@ export interface LoadOptions {
   readonly fetch?: FetchLike;
   /** The site base. Vite's `import.meta.env.BASE_URL` unless a test overrides it. */
   readonly baseUrl?: string;
+  /** Aborts every in-flight fetch of a superseded load. */
+  readonly signal?: AbortSignal;
 }
 
 function declaredVersion(data: unknown): string {
@@ -63,11 +65,17 @@ export function artifactUrl(baseUrl: string, path: string): string {
   return new URL(baseUrl + path, document.baseURI).href;
 }
 
-async function fetchOne(key: ArtifactKey, fetchImpl: FetchLike, baseUrl: string): Promise<Fetched> {
+async function fetchOne(
+  key: ArtifactKey,
+  fetchImpl: FetchLike,
+  baseUrl: string,
+  signal: AbortSignal | undefined,
+): Promise<Fetched> {
   const descriptor = ARTIFACTS[key];
+  const init: RequestInit = signal === undefined ? { cache: 'no-store' } : { cache: 'no-store', signal };
   let body: string;
   try {
-    const response = await fetchImpl(artifactUrl(baseUrl, descriptor.path), { cache: 'no-store' });
+    const response = await fetchImpl(artifactUrl(baseUrl, descriptor.path), init);
     // 404 is absent. Any other non-OK status did not arrive.
     if (response.status === 404) {
       return { kind: 'absent' };
@@ -136,7 +144,7 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
 export async function loadArtifacts(options: LoadOptions = {}): Promise<LoadOutcome> {
   const fetchImpl = options.fetch ?? ((input, init) => fetch(input, init));
   const baseUrl = options.baseUrl ?? import.meta.env.BASE_URL;
-  const settled = await Promise.all(ARTIFACT_ORDER.map((key) => fetchOne(key, fetchImpl, baseUrl)));
+  const settled = await Promise.all(ARTIFACT_ORDER.map((key) => fetchOne(key, fetchImpl, baseUrl, options.signal)));
   const results = Object.fromEntries(
     ARTIFACT_ORDER.map((key, index) => [key, settled[index]]),
   ) as Record<ArtifactKey, Fetched>;
