@@ -3,13 +3,6 @@
 Each entry names work carved out of a spec so it is not lost. Stories and reviews append; they do not rewrite. The `deferred-work-sweep` skill (`.claude/skills/deferred-work-sweep/SKILL.md`) removes an entry in the last commit of the branch that closes it, so the removal reaches `master` with the work, and adds `auto_attempt:` / `retry_when:` lines to an entry it could not close.
 
 - source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
-  summary: Nothing forbids `core` from importing `node:*` builtins or a runtime dependency, so its documented purity is unenforced.
-  evidence: `packages/core/src/index.ts` states "no I/O, no clock, no randomness, no env" and AD-1 calls `core` pure, but the five depcruise rules constrain only the direction of workspace edges. The first `import { readFileSync } from 'node:fs'` in `core` passes `pnpm check`. A `core`-scoped rule over `dependencyTypes` would make the claim checkable; deferred because story 1.1's intent covers the graph's direction, not import purity.
-  auto_attempt: 2026-09-26 — attempt 1 — status blocked. PRIMARY dirty, busy or not on master, and branch worktree-dw-forbid-core-node-builtin-imports-2026-09-26-154006 holds the finished work. Branch `worktree-dw-forbid-core-node-builtin-imports-2026-09-26-154006`, spec `docs/stories/spec-deferred-forbid-core-node-builtin-imports.md`.
-  retry_when: PRIMARY is on master with a clean status
-  integrate_branch: worktree-dw-forbid-core-node-builtin-imports-2026-09-26-154006
-
-- source_spec: `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md`
   summary: A request that settles after its own test's `afterEach` may escape the no-network guard, or fail an innocent later test naming a foreign URL.
   evidence: `test/setup.ts` drains a module-level array per test, with no association between a recorded URL and the test that issued it. Unverified: neither the diff nor a run settles whether MSW's interception can deliver the callback after the hook has drained. Would be settled by a test that starts a fire-and-forget request and resolves it in a later tick, then observes which test fails.
 
@@ -72,3 +65,7 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-1-10-unresolvable-ids-detected-offline-and-reported.md`
   summary: The `IMPLEMENTATION-NOTES.md` §10.2 fix is still owed. §10.2 says a `jewel`-arm derived base type the catalogue does not carry is a "load error naming the class". AD-25 says the entry is marked `unresolvable`, reported, and the chunk continues. The spine owns the ruling, so Story 1.10 implements AD-25. The §10.2 text is out of date and must be changed to cite AD-25.
   evidence: The spec's agent decision *The spine owns the `jewel` ruling* says "The §10 fix is logged in `deferred-work.md`. It is not made here." `packages/sync/src/pricing/price-entry.ts` now catches `UnknownClassBaseTypeError` and returns a `completed` step with an `unresolvable` entry and a `baseTypeId` record.
+
+- source_spec: `docs/stories/spec-deferred-forbid-core-node-builtin-imports.md`
+  summary: Nothing forbids `core` from doing I/O, reading the clock, generating randomness or reading env through globals such as `fetch`, `Date.now()`, `Math.random()` or `process.env`. The depcruise purity rules see imports only.
+  evidence: AD-1 says no `core` module performs I/O, reads the clock, generates randomness or reads environment or config. The deferred-forbid-core-node-builtin-imports rules (`no-core-to-node-builtin`, `no-core-to-npm-package`) close the import path only, and a `Date.now()` in `packages/core/src` still passes `pnpm check`. An ESLint `no-restricted-globals` / `no-restricted-properties` block scoped to `packages/core/src/**` (tests excluded) would make it checkable. Out of scope here because the closed entry covered imports only.
