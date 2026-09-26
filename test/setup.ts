@@ -1,5 +1,7 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+
 import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
 /**
  * NFR-1: no test at any level makes a network call.
@@ -11,7 +13,28 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
  * callback is what stops the request before it reaches the network.
  */
 
-const escapedRequests: string[] = [];
+/** The test a request is charged to. `id` is unique; `name` is what a message prints. */
+interface TestIdentity {
+  readonly id: string;
+  readonly name: string;
+}
+
+interface EscapedRequest {
+  /** `METHOD URL`. */
+  readonly described: string;
+  /** `undefined` when no test was running: a `beforeAll`, or module top level. */
+  readonly issuedBy: TestIdentity | undefined;
+}
+
+const escapedRequests: EscapedRequest[] = [];
+
+/**
+ * Carries the running test's identity from the test body into the timers and
+ * promise continuations it starts. A request a test does not await is then
+ * charged to that test, not to whichever test happens to be running when MSW
+ * calls `onUnhandledRequest`.
+ */
+const currentTest = new AsyncLocalStorage<TestIdentity>();
 
 /**
  * The only exemption is by **origin**, never by file extension. A callback that
@@ -35,41 +58,100 @@ beforeAll(() => {
         return;
       }
       const described = `${request.method} ${request.url}`;
-      escapedRequests.push(described);
+      escapedRequests.push({ described, issuedBy: currentTest.getStore() });
       throw new Error(`[no-network] unhandled request escaped the fixture set: ${described}`);
     },
   });
 });
 
-afterEach(() => {
+beforeEach((context) => {
+  // `enterWith`, not `run`: Vitest calls this hook and the test body in one
+  // async chain, so the store set here reaches the body and everything it starts.
+  currentTest.enterWith({ id: context.task.id, name: context.task.name });
+});
+
+afterEach((context) => {
   server.resetHandlers();
-  assertNoEscapedRequests();
+  // Only this test's own requests. A request another test issued and did not
+  // await is not this test's fault; the file-level check below reports it.
+  assertNoEscapedRequests(context.task);
 });
 
 afterAll(() => {
-  server.close();
+  // Before `server.close()`: a request recorded after the last `afterEach`, or
+  // outside any test, fails the file here instead of passing silently.
+  try {
+    assertNoEscapedRequests();
+  } finally {
+    server.close();
+  }
 });
 
+/** Removes from the record every request that `matches` accepts, and returns them in record order. */
+function takeEscapedRequests(matches: (entry: EscapedRequest) => boolean): EscapedRequest[] {
+  const taken: EscapedRequest[] = [];
+  for (let index = 0; index < escapedRequests.length; ) {
+    const entry = escapedRequests[index];
+    if (entry !== undefined && matches(entry)) {
+      taken.push(entry);
+      escapedRequests.splice(index, 1);
+    } else {
+      index += 1;
+    }
+  }
+  return taken;
+}
+
 /**
- * Returns every request recorded since the last drain and clears the record.
- * The guard calls it; a test that *asserts on* the guard (see
- * `test/no-network.test.ts`) calls it first so the guard does not then fail the
- * very test that proved it works.
+ * Returns, as `METHOD URL`, the requests that the **running** test issued since
+ * the last drain, and removes them from the record. Called outside any test, it
+ * takes the requests issued outside any test. A test that *asserts on* the
+ * guard (see `test/no-network.test.ts`) calls it first so the guard does not
+ * then fail the very test that proved it works.
+ *
+ * It never takes another test's request. A late request from an earlier test
+ * stays recorded, so the file-level check still reports it: a draining test
+ * cannot swallow it.
  */
 export function drainEscapedRequests(): string[] {
-  return escapedRequests.splice(0, escapedRequests.length);
+  const runningId = currentTest.getStore()?.id;
+  return takeEscapedRequests((entry) => entry.issuedBy?.id === runningId).map(
+    (entry) => entry.described,
+  );
+}
+
+function describeIssuer(issuedBy: TestIdentity | undefined): string {
+  return issuedBy === undefined ? 'issued outside any test' : `issued by test "${issuedBy.name}"`;
 }
 
 /**
  * The guard itself, exported so a test can execute its failing branch. Inlined
  * in `afterEach` it was unreachable from any assertion: deleting the throw left
  * the suite green.
+ *
+ * With an `owner`, it drains and fails on that test's requests only, and leaves
+ * every other request recorded. With no `owner`, it drains and fails on every
+ * request still recorded, and names the test that issued each one.
  */
-export function assertNoEscapedRequests(): void {
-  const escaped = drainEscapedRequests();
+export function assertNoEscapedRequests(owner?: Pick<TestIdentity, 'id'>): void {
+  if (owner !== undefined) {
+    const own = takeEscapedRequests((entry) => entry.issuedBy?.id === owner.id).map(
+      (entry) => entry.described,
+    );
+    if (own.length > 0) {
+      throw new Error(
+        `[no-network] ${String(own.length)} request(s) had no fixture and were blocked:\n  ${own.join('\n  ')}`,
+      );
+    }
+    return;
+  }
+
+  const escaped = takeEscapedRequests(() => true);
   if (escaped.length > 0) {
+    const lines = escaped.map((entry) => `${entry.described} (${describeIssuer(entry.issuedBy)})`);
     throw new Error(
-      `[no-network] ${String(escaped.length)} request(s) had no fixture and were blocked:\n  ${escaped.join('\n  ')}`,
+      `[no-network] ${String(escaped.length)} request(s) had no fixture and were blocked. ` +
+        `No test's afterEach reported these requests:\n  ${lines.join('\n  ')}`,
     );
   }
 }
