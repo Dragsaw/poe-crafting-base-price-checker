@@ -279,7 +279,13 @@ it('names the real fetch port in no test file', () => {
   // specifier therefore forbade the wrong thing — it also forbade testing
   // `writeTextFile`, whose `mkdir` is what makes the first refresh work, and so
   // made that gap permanently unclosable in-package. `shell.test.ts` now covers
-  // the safe exports; this scan pins the one export that must stay untouched.
+  // the safe exports.
+  //
+  // The narrowed property: **the real port runs only against loopback, and only
+  // in `shell-fetch.test.ts`**. That one file starts its own `node:http` server
+  // on `127.0.0.1` and pins the rejections `isTransportFailure` depends on
+  // (AD-8); the MSW guard in `test/setup.ts` still fails any request it makes to
+  // a remote host. Every other test file must not name the port at all.
   //
   // A bare identifier scan, not an import-specifier regex: a specifier regex
   // misses `from './shell'`, a dynamic `await import(...)` and a re-export, all
@@ -290,9 +296,17 @@ it('names the real fetch port in no test file', () => {
   );
 
   expect(testFiles.length).toBeGreaterThan(0);
+  // The exemption below must not go dead silently: a rename or a deletion of the
+  // loopback test would reopen L-V1 with no failure.
+  expect(testFiles).toContain('shell-fetch.test.ts');
+  expect(readFileSync(`${sourceDir}shell-fetch.test.ts`, 'utf8')).toContain('createFetchHttpPort');
   for (const name of testFiles) {
     if (name === 'catalogue-refresh.test.ts') {
       // This file names it in the comment above, and nowhere else.
+      continue;
+    }
+    if (name === 'shell-fetch.test.ts') {
+      // The one file that executes the port, against its own loopback server.
       continue;
     }
     const source = readFileSync(`${sourceDir}${name}`, 'utf8');

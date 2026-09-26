@@ -16,9 +16,10 @@ import {
 /**
  * The shell's testable half.
  *
- * The real HTTP port is deliberately absent from the import above and must stay
- * absent — a sibling scan in `catalogue-refresh.test.ts` fails if any test file
- * so much as names it, which is why it is unnamed even in this comment.
+ * The real HTTP port is deliberately absent from the import above. It runs
+ * only in `shell-fetch.test.ts`, against a loopback server that file starts; a
+ * sibling scan in `catalogue-refresh.test.ts` fails if any other test file so
+ * much as names it, which is why it is unnamed even in this comment.
  * Everything below is ordinary code that happens to live at the edge, and
  * the `mkdir` inside `writeTextFile` is the load-bearing piece: `data/catalogue/`
  * does not exist on a fresh checkout, so without it the human's first

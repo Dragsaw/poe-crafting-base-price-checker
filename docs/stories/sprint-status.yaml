@@ -140,8 +140,8 @@ action_items:
     action: "Loopback-server test for createFetchHttpPort: the TimeoutError name and the 'fetch
       failed' literal"
     owner: "dev"
-    status: open
-    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+    status: done
+    ref: "docs/stories/spec-epic-1-retro-item-10-loopback-server-test-for-createfetchhttp.md"
   - id: "epic-1-retro-item-11-one-test-parsing-all-four-data-catalogue"
     epic: 1
     action: "One test parsing all four data/catalogue/*.json against the Catalogue*FileSchema;

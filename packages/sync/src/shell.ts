@@ -8,11 +8,13 @@
  * a terminal is written once. A second hand-written `HttpPort` is exactly
  * where that detail gets dropped.
  *
- * **No test executes `createFetchHttpPort`**, and `catalogue-refresh.test.ts`
- * asserts that no test file so much as names it. Every unit below the commands
- * takes its ports as values, so a test drives the fakes in `@poe/contracts`
- * instead. The rest of this module is ordinary code and `shell.test.ts` covers
- * it against a temporary directory — the `mkdir` below is what makes the first
+ * **`createFetchHttpPort` runs only against loopback, and only in
+ * `shell-fetch.test.ts`**: that file starts a `node:http` server on
+ * `127.0.0.1` and pins the rejections `isTransportFailure` depends on (AD-8).
+ * `catalogue-refresh.test.ts` asserts that no other test file so much as names
+ * it. Every unit below the commands takes its ports as values, so a test
+ * drives the fakes in `@poe/contracts` instead. The rest of this module is
+ * ordinary code and `shell.test.ts` covers it against a temporary directory — the `mkdir` below is what makes the first
  * refresh on a fresh checkout work, and a claim that load-bearing needs a test
  * rather than a comment.
  */
@@ -38,10 +40,15 @@ export function serialiseJsonArtifact(value: unknown): string {
 }
 
 /**
- * The real `HttpPort`. It lives at the shell edge, in a file no test executes,
- * so `fetch` never appears below a command's port wiring.
+ * The real `HttpPort`. It lives at the shell edge, so `fetch` never appears
+ * below a command's port wiring. Only `shell-fetch.test.ts` executes it, and
+ * only against a loopback server that test starts.
+ *
+ * `timeoutMs` exists for that test, so a timeout case does not wait 30 s. The
+ * commands call this with no argument and get `REQUEST_TIMEOUT_MS`.
  */
-export function createFetchHttpPort(): HttpPort {
+export function createFetchHttpPort(options: { timeoutMs?: number } = {}): HttpPort {
+  const timeoutMs = options.timeoutMs ?? REQUEST_TIMEOUT_MS;
   return {
     async send(request) {
       // Without a signal a stalled connection hangs the command indefinitely,
@@ -50,7 +57,7 @@ export function createFetchHttpPort(): HttpPort {
         method: request.method,
         headers: { ...request.headers },
         body: request.body,
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(timeoutMs),
       });
       const headers: Record<string, string> = {};
       response.headers.forEach((headerValue, headerName) => {
