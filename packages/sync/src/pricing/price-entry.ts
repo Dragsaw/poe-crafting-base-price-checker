@@ -35,6 +35,7 @@ import { markUnresolvable } from '../chunk/catalogue-check.ts';
 import type { ChunkStep, StepResult } from '../chunk/run-chunk.ts';
 import type { TradeClient, TradeResult } from '../trade/client.ts';
 import { FETCH_LANE, SEARCH_LANE, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
+import { isTransportFailure } from '../trade/transport-failure.ts';
 import { currentRates, lowerMedian, outputRate, toDivine } from './normalise.ts';
 import { buildSearchBody, UnknownClassBaseTypeError } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
@@ -171,18 +172,6 @@ type Leg =
   | { readonly kind: 'malformed'; readonly status: number };
 
 const SERVER_ERROR = 500;
-
-/**
- * A timeout (`AbortSignal.timeout` in `shell.ts`, `REQUEST_TIMEOUT_MS`) or a
- * `fetch` network failure. Only these rejections yield; anything else — an
- * unrecorded fixture, a programming error — is rethrown and fails loudly.
- */
-function isTransportFailure(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-  return error.name === 'TimeoutError' || (error instanceof TypeError && error.message === 'fetch failed');
-}
 
 /**
  * One request's consequence. A timeout or a lost connection yields exactly as

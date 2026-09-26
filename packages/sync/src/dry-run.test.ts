@@ -19,7 +19,8 @@ import { DATASET_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { DRY_RUN_INSTANT, dryRun, readRepositorySnapshot } from './dry-run.ts';
 import type { DryRunSnapshot } from './dry-run.ts';
 import { pinnedStarvationRecord } from './pinned-cap.ts';
-import { pricingFixtureName } from './pricing/fixture-names.ts';
+import { LeagueMismatchError } from './league/league-gate.ts';
+import { LEAGUES_FIXTURE_NAME, pricingFixtureName } from './pricing/fixture-names.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
 import { tradeSearchUrl } from './trade/endpoints.ts';
@@ -49,6 +50,9 @@ const FILTERS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
 /** A present weights file with no ids, so no weights record arises. */
 const WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', bases: {} });
 
+/** The league gate's answer: the synthetic league is one the API carries. */
+const LEAGUES_ANSWER = JSON.stringify({ result: [{ id: 'Standard' }, { id: LEAGUE }] });
+
 /**
  * An in-memory answer per entry: a search that found nothing. It is not a
  * fixture file — the ordering tests below need synthetic entries, and the
@@ -56,16 +60,17 @@ const WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', bases: {} });
  */
 function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
   const itemTypes = itemTypesOf(ITEMS_CATALOGUE);
-  return new Map(
-    entries.map((entry, index) => [
+  return new Map([
+    [LEAGUES_FIXTURE_NAME, LEAGUES_ANSWER],
+    ...entries.map((entry, index) => [
       pricingFixtureName({
         method: 'POST',
         url: tradeSearchUrl(LEAGUE),
         body: JSON.stringify(buildSearchBody(entry, itemTypes)),
       }),
       JSON.stringify({ id: `S${String(index)}`, complexity: 1, result: [], total: 0 }),
-    ]),
-  );
+    ] as const),
+  ]);
 }
 
 function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial<DryRunSnapshot> = {}): DryRunSnapshot {
@@ -114,7 +119,7 @@ function reportOf(trackedListRequests: number, notReachedCount = 0): SyncReportF
     runStartedAt: DRY_RUN_INSTANT,
     runFinishedAt: DRY_RUN_INSTANT,
     figures: {
-      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 0, 'catalogue-refresh': 0 },
+      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 1, 'catalogue-refresh': 0 },
       notReachedCount,
     },
     records: [],
@@ -250,6 +255,31 @@ describe('dryRun', () => {
     fixtures.delete(missing);
 
     await expect(dryRun(snapshotOf(entries, { fixtures }))).rejects.toThrow(missing);
+  });
+});
+
+describe('dryRun: the league gate', () => {
+  it('sends one leagues GET, counted as league-validation, before the searches', async () => {
+    const report = await dryRun(snapshotOf(entries));
+    expect(report.report?.figures.requestsBySource).toEqual({
+      'tracked-list': 2,
+      'league-validation': 1,
+      'catalogue-refresh': 0,
+    });
+  });
+
+  it('rejects on a league the recorded answer does not carry, and prices nothing', async () => {
+    const fixtures = emptySearches(entries);
+    fixtures.set(LEAGUES_FIXTURE_NAME, JSON.stringify({ result: [{ id: 'Standard' }] }));
+
+    await expect(dryRun(snapshotOf(entries, { fixtures }))).rejects.toBeInstanceOf(LeagueMismatchError);
+  });
+
+  it('fails loudly, naming the fixture, when the leagues answer is not recorded', async () => {
+    const fixtures = emptySearches(entries);
+    fixtures.delete(LEAGUES_FIXTURE_NAME);
+
+    await expect(dryRun(snapshotOf(entries, { fixtures }))).rejects.toThrow(LEAGUES_FIXTURE_NAME);
   });
 });
 
@@ -443,6 +473,10 @@ describe('pnpm sync:dry', () => {
       'tracked-list',
     ]);
     expect(printed.figures.requestsBySource['tracked-list']).toBeGreaterThan(0);
+    // The league gate ran once, against the recorded leagues fixture (Story 1.11).
+    expect(printed.figures.requestsBySource['league-validation']).toBe(1);
+    expect(printed.figures.requestsBySource['catalogue-refresh']).toBe(0);
+    expect(printed.records.some((record) => record.kind === 'league-mismatch')).toBe(false);
 
     expect(snapshot(DATA_DIR)).toEqual(before);
   });

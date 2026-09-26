@@ -14,6 +14,7 @@
     "check": "pnpm run typecheck && pnpm run lint && pnpm run depcruise",
     "test": "vitest run",
     "dev": "vite --config packages/web/vite.config.ts",
+    "sync": "node --env-file-if-exists=.env packages/sync/src/sync.ts",
     "sync:dry": "node packages/sync/src/dry-run.ts",
     "fixtures:record": "node --env-file-if-exists=.env packages/sync/src/fixtures-record.ts",
     "catalogue:refresh": "node --env-file-if-exists=.env packages/sync/src/catalogue-refresh.ts"

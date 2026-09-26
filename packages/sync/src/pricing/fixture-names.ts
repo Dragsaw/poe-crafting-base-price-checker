@@ -14,6 +14,8 @@ import { createHash } from 'node:crypto';
 
 import type { HttpRequest } from '@poe/contracts';
 
+import { TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
+
 /** Long enough that two distinct requests never share a name in practice. */
 const DIGEST_LENGTH = 16;
 
@@ -30,4 +32,22 @@ export function requestDigest(request: PricingFixtureRequest): string {
 export function pricingFixtureName(request: PricingFixtureRequest): string {
   const kind = request.method === 'POST' ? 'search' : 'fetch';
   return `trade-${kind}-${requestDigest(request)}`;
+}
+
+/**
+ * The recorded leagues answer, `fixtures/trade-data-leagues.json`. The leagues
+ * GET carries no body and one fixed URL, so `fixtures:record` names it for the
+ * interaction rather than by digest (`FIXTURE_INTERACTIONS`).
+ */
+export const LEAGUES_FIXTURE_NAME = 'trade-data-leagues';
+
+/**
+ * The fixture an offline run serves a request from: the leagues fixture for
+ * the league gate's GET, the digest name for every pricing request.
+ */
+export function servedFixtureName(request: PricingFixtureRequest): string {
+  if (request.method === 'GET' && request.url === TRADE_LEAGUES_URL && request.body === undefined) {
+    return LEAGUES_FIXTURE_NAME;
+  }
+  return pricingFixtureName(request);
 }

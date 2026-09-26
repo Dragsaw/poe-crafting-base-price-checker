@@ -5,19 +5,22 @@
  * It takes read-only snapshots of `data/tracked.json`, `data/dataset.json`
  * (when present), `data/config.json`, `data/currencies.json`,
  * `data/catalogue/{items,stats,filters}.json` and `data/weights.json` (when
- * present) into an in-memory fake filesystem, and runs **the
- * same `runChunk`** a live run uses with **the same pricing step**, on a fixed
- * clock and a fixed pid. The step's requests go to an offline port that serves
- * the recorded `fixtures/trade-{search,fetch}-*.json` back by request digest;
- * an unrecorded request fails loudly — the run rejects, naming the missing
- * fixture, and never yields. It prints
+ * present) into an in-memory fake filesystem, and runs **the same
+ * `runChunk`** a live run uses with **the same pricing step**, on a fixed
+ * clock and a fixed pid, behind **the same league gate**
+ * (`./league/league-gate.ts`). The gate's GET is served the recorded
+ * `fixtures/trade-data-leagues.json` and counted as `league-validation`. The
+ * step's requests go to an offline port that serves the recorded
+ * `fixtures/trade-{search,fetch}-*.json` back by request digest; an
+ * unrecorded request fails loudly — the run rejects, naming the missing
+ * fixture, and never yields. A league mismatch rejects too. It prints
  * `{outcome, completed, entries, progress, dataset, records, report}` — plus
  * `pinnedStarvation` when the chunk truncated the pinned set — as JSON to
  * stdout and writes nothing to disk: the lock, `sync-progress.json`,
  * `dataset.json` and `sync-report.json` land in the fake. `dataset` is the
  * file as the chunk wrote it, with the active league and the output rate set
  * passed in. `report` is the Sync Report as the chunk wrote it: the offline
- * port's requests are counted as `tracked-list`, the git port is a fake with
+ * port's pricing requests are counted as `tracked-list`, the git port is a fake with
  * no history, and a snapshot of `data/sync-report.json` (when present)
  * supplies the records it carries forward.
  *
@@ -64,6 +67,7 @@ import {
   loadCatalogueIds,
 } from './catalogue/catalogue-ids.ts';
 import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
+import { createLeagueGate } from './league/league-gate.ts';
 import { CONFIG_PATH, loadConfig } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
 import type { DataFileResult } from './load-data-file.ts';
@@ -75,7 +79,7 @@ import { outputRates } from './pricing/normalise.ts';
 import { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types.ts';
 import { createPricingStep } from './pricing/price-entry.ts';
 import { createRequestCounter } from './request-counter.ts';
-import { createTradeClient } from './trade/client.ts';
+import { createTradeClients } from './trade/client.ts';
 
 /** Fixed, so two dry runs over the same inputs print the same bytes. */
 export const DRY_RUN_INSTANT = '2026-01-01T00:00:00.000Z';
@@ -164,13 +168,27 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
 
   const clock = createFakeClockPort(DRY_RUN_INSTANT);
   const requests = createRequestCounter();
-  const client = createTradeClient({
-    http: requests.counted(createFixtureHttpPort(snapshot.fixtures), 'tracked-list'),
+  // One offline port, counted twice: the gate's GET as `league-validation`,
+  // the step's requests as `tracked-list`. The two clients are one governor,
+  // so pacing stays global (AD-8, AD-12).
+  const fixtureHttp = createFixtureHttpPort(snapshot.fixtures);
+  const clients = createTradeClients({
+    http: {
+      'league-validation': requests.counted(fixtureHttp, 'league-validation'),
+      'tracked-list': requests.counted(fixtureHttp, 'tracked-list'),
+    },
     clock,
     wait: () => Promise.resolve(),
     userAgent: DRY_RUN_USER_AGENT,
   });
-  const step = createPricingStep({ client, league, rates, itemTypes, dataset: previous, clock });
+  const step = createPricingStep({
+    client: clients['tracked-list'],
+    league,
+    rates,
+    itemTypes,
+    dataset: previous,
+    clock,
+  });
 
   const outcome = await runChunk(
     {
@@ -182,6 +200,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
       requests,
       starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
       catalogue: () => loadCatalogueIds(fs),
+      gate: createLeagueGate({ client: clients['league-validation'], league }),
     },
     step,
   );

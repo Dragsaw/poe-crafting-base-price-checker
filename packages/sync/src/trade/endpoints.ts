@@ -24,8 +24,9 @@ export const DATA_LANE = 'trade-data-get';
 
 /**
  * The leagues endpoint. It is recorded as a fixture and is **not** part of the
- * catalogue: `catalogue:refresh` costs exactly four requests (AD-25), and a
- * league gate is Story 1.11's, not this command's.
+ * catalogue: `catalogue:refresh` costs exactly four requests (AD-25). The
+ * run-start league gate (`../league/league-gate.ts`, AD-19) sends one GET here
+ * per chunk, in `DATA_LANE`, counted as `league-validation`.
  */
 export const TRADE_LEAGUES_URL = `${TRADE_API_BASE}/data/leagues`;
 

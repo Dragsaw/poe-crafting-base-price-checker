@@ -18,6 +18,7 @@ import type {
   DatasetFile,
   FakeFilesystemPort,
   HttpPort,
+  HttpResponse,
   PinnedStarvationRecord,
   SyncReportFile,
   SyncRunRecord,
@@ -27,10 +28,17 @@ import { describe, expect, it } from 'vitest';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { WEIGHTS_PATH } from '../catalogue/weights-ids.ts';
+import {
+  createLeagueGate,
+  LeagueMismatchError,
+  LeagueRequestRejectedError,
+} from '../league/league-gate.ts';
 import { DataFileError } from '../load-data-file.ts';
 import { pinnedStarvationRecord } from '../pinned-cap.ts';
 import { MalformedRequestError } from '../pricing/price-entry.ts';
 import { createRequestCounter } from '../request-counter.ts';
+import { createTradeClient } from '../trade/client.ts';
+import { TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
 import { InvalidArtifactError } from '../write-artifact.ts';
 import { LOCK_PATH, serialiseLock } from './lock.ts';
 import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, runChunk, TRACKED_PATH } from './run-chunk.ts';
@@ -738,6 +746,7 @@ describe('runChunk: the lock', () => {
       gate: async ({ entries }) => {
         lockDuringGate = await fs.exists(LOCK_PATH);
         order.push(`gate:${String(entries.length)}`);
+        return { kind: 'pass' };
       },
     });
 
@@ -1775,6 +1784,235 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
 
     expect((await reportOf(fs))?.records).toEqual([
       { kind: 'unresolvable', entryKey: key(X), identifier: 'X', identifierKind: 'baseTypeId' },
+    ]);
+  });
+});
+
+describe('runChunk: the league gate (Story 1.11)', () => {
+  const ZERO = { 'tracked-list': 0, 'league-validation': 0, 'catalogue-refresh': 0 };
+  const LEAGUES = {
+    result: [
+      { id: 'Forbidden Rites', realm: 'poe2', text: 'Forbidden Rites' },
+      { id: 'Standard', realm: 'poe2', text: 'Standard' },
+    ],
+  };
+  const SEARCH_URL = 'https://example.test/search';
+  const PREVIOUS_DATASET = 'the previous dataset, byte for byte\n';
+  const PREVIOUS_PROGRESS = progressText([key(A)]);
+
+  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
+    const text = await fs.readTextFile(REPORT_PATH);
+    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
+  }
+
+  /**
+   * The real gate over a governed client whose port is counted as
+   * `league-validation`, beside a step whose port is counted as
+   * `tracked-list`: the composition every shell builds.
+   */
+  function gated(
+    league: string,
+    answer: HttpResponse,
+    extra: Parameters<typeof createFakeFilesystemPort>[0] = {},
+    reuse?: FakeFilesystemPort,
+  ): {
+    readonly fs: FakeFilesystemPort;
+    readonly ports: ChunkPorts;
+    readonly leaguesHttp: ReturnType<typeof createFakeHttpPort>;
+    readonly visited: string[];
+    readonly step: ChunkStep;
+    readonly logs: readonly string[];
+  } {
+    const requests = createRequestCounter();
+    const leaguesHttp = createFakeHttpPort({ [`GET ${TRADE_LEAGUES_URL}`]: answer });
+    const stepHttp = requests.counted(
+      createFakeHttpPort({ [`POST ${SEARCH_URL}`]: { status: 200, headers: {}, body: '{}' } }),
+      'tracked-list',
+    );
+    const client = createTradeClient({
+      http: requests.counted(leaguesHttp, 'league-validation'),
+      clock: createFakeClockPort(NOW),
+      wait: () => Promise.resolve(),
+      userAgent: 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)',
+    });
+    const built = harness([A, B], extra, { requests, gate: createLeagueGate({ client, league }) });
+    const fs = reuse ?? built.fs;
+    const { visited, step } = scriptedStep();
+    const pricing: ChunkStep = async (entry) => {
+      await stepHttp.send({ method: 'POST', url: SEARCH_URL, headers: {} });
+      return step(entry);
+    };
+    return { fs, ports: { ...built.ports, fs }, leaguesHttp, visited, step: pricing, logs: built.logs };
+  }
+
+  const ok = (body: unknown): HttpResponse => ({ status: 200, headers: {}, body: JSON.stringify(body) });
+
+  it('match: the chunk runs, one league-validation request, no record', async () => {
+    const { fs, ports, leaguesHttp, visited, step } = gated('Standard', ok(LEAGUES));
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome.kind).toBe('completed');
+    expect(visited).toEqual([key(A), key(B)]);
+    expect(leaguesHttp.requests).toHaveLength(1);
+    const report = await reportOf(fs);
+    expect(report?.figures.requestsBySource).toEqual({
+      ...ZERO,
+      'tracked-list': 2,
+      'league-validation': 1,
+    });
+    expect(report?.records).toEqual([]);
+    expect(report?.runFinishedAt).toBe(NOW);
+  });
+
+  it('mismatch: a league-mismatch record, no dataset or progress write, lock released, no step', async () => {
+    const { fs, ports, visited, step } = gated('Runes of Aldur', ok(LEAGUES), {
+      [DATASET_PATH]: { contents: PREVIOUS_DATASET },
+      [PROGRESS_PATH]: { contents: PREVIOUS_PROGRESS },
+    });
+
+    await expect(runChunk(ports, step)).rejects.toBeInstanceOf(LeagueMismatchError);
+
+    expect(visited).toEqual([]);
+    expect(await fs.readTextFile(DATASET_PATH)).toBe(PREVIOUS_DATASET);
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(PREVIOUS_PROGRESS);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    const report = await reportOf(fs);
+    expect(report?.records).toEqual([
+      {
+        kind: 'league-mismatch',
+        configuredLeague: 'Runes of Aldur',
+        availableLeagues: ['Forbidden Rites', 'Standard'],
+      },
+    ]);
+    expect(report?.figures.requestsBySource).toEqual({ ...ZERO, 'league-validation': 1 });
+    expect(report !== undefined && 'runFinishedAt' in report).toBe(false);
+  });
+
+  it('case or spacing: ids compare byte for byte, so "forbidden rites" is a mismatch', async () => {
+    const { fs, ports, visited, step } = gated('forbidden rites', ok(LEAGUES));
+
+    await expect(runChunk(ports, step)).rejects.toBeInstanceOf(LeagueMismatchError);
+
+    expect(visited).toEqual([]);
+    expect((await reportOf(fs))?.records).toEqual([
+      {
+        kind: 'league-mismatch',
+        configuredLeague: 'forbidden rites',
+        availableLeagues: ['Forbidden Rites', 'Standard'],
+      },
+    ]);
+  });
+
+  it('empty list: a mismatch with no available leagues', async () => {
+    const { fs, ports, step } = gated('Standard', ok({ result: [] }));
+
+    await expect(runChunk(ports, step)).rejects.toBeInstanceOf(LeagueMismatchError);
+
+    expect((await reportOf(fs))?.records).toEqual([
+      { kind: 'league-mismatch', configuredLeague: 'Standard', availableLeagues: [] },
+    ]);
+  });
+
+  it('rejected: a 404 is a trade-request-rejected run-failure with the status and no entry key', async () => {
+    const { fs, ports, visited, step } = gated('Standard', { status: 404, headers: {}, body: '' });
+
+    await expect(runChunk(ports, step)).rejects.toBeInstanceOf(LeagueRequestRejectedError);
+
+    expect(visited).toEqual([]);
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    expect((await reportOf(fs))?.records).toEqual([
+      {
+        kind: 'run-failure',
+        reason: 'trade-request-rejected',
+        status: 404,
+        message: 'the trade leagues request answered 404; the run is aborted',
+      },
+    ]);
+  });
+
+  it('malformed: a body that is not the payload shape is an unrecoverable-error run-failure', async () => {
+    const { fs, ports, visited, step } = gated('Standard', ok({ leagues: ['Standard'] }));
+
+    await expect(runChunk(ports, step)).rejects.toThrow(/unexpected body/);
+
+    expect(visited).toEqual([]);
+    const records = (await reportOf(fs))?.records ?? [];
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({ kind: 'run-failure', reason: 'unrecoverable-error' });
+    expect(records[0] !== undefined && 'entryKey' in records[0]).toBe(false);
+  });
+
+  it('busy: a live lock means no leagues request at all', async () => {
+    const { fs, ports, leaguesHttp, step } = gated('Standard', ok(LEAGUES), {
+      [LOCK_PATH]: { contents: serialiseLock({ pid: 99, startedAt: FIVE_HOURS_AGO }) },
+    });
+
+    expect((await runChunk(ports, step)).kind).toBe('busy');
+
+    expect(leaguesHttp.requests).toEqual([]);
+    expect(await fs.exists(REPORT_PATH)).toBe(false);
+  });
+
+  it('gate 429: the chunk yields, no step, dataset and progress unchanged, report finished with no run-failure', async () => {
+    const { fs, ports, leaguesHttp, visited, step, logs } = gated(
+      'Standard',
+      { status: 429, headers: { 'retry-after': '60' }, body: '' },
+      {
+        [DATASET_PATH]: { contents: PREVIOUS_DATASET },
+        [PROGRESS_PATH]: { contents: PREVIOUS_PROGRESS },
+      },
+    );
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome).toEqual({ kind: 'yielded', completed: [], entries: [], records: [] });
+    expect(logs).toEqual(['sync: the league check got no answer; the chunk yields with no entry visited']);
+    expect(visited).toEqual([]);
+    expect(leaguesHttp.requests).toHaveLength(1);
+    expect(await fs.readTextFile(DATASET_PATH)).toBe(PREVIOUS_DATASET);
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(PREVIOUS_PROGRESS);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    const report = await reportOf(fs);
+    expect(report?.runFinishedAt).toBe(NOW);
+    expect(report?.figures.requestsBySource).toEqual({ ...ZERO, 'league-validation': 1 });
+    expect(report?.records).toEqual([]);
+  });
+
+  it('gate yield after the lock was taken over writes nothing and is dispossessed', async () => {
+    const { fs, ports, step } = gated('Standard', ok(LEAGUES));
+    const outcome = await runChunk(
+      {
+        ...ports,
+        gate: async () => {
+          await fs.writeTextFile(LOCK_PATH, serialiseLock({ pid: 99, startedAt: NOW }));
+          return { kind: 'yield' };
+        },
+      },
+      step,
+    );
+
+    expect(outcome.kind).toBe('dispossessed');
+    expect(await fs.exists(REPORT_PATH)).toBe(false);
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
+    // The foreign lock is not this run's to release.
+    expect(await fs.readTextFile(LOCK_PATH)).toBe(serialiseLock({ pid: 99, startedAt: NOW }));
+  });
+
+  it('repeat: a mismatch two runs running leaves one league-mismatch record', async () => {
+    const first = gated('Runes of Aldur', ok(LEAGUES));
+    await expect(runChunk(first.ports, first.step)).rejects.toBeInstanceOf(LeagueMismatchError);
+    const second = gated('Runes of Aldur', ok(LEAGUES), {}, first.fs);
+    await expect(runChunk(second.ports, second.step)).rejects.toBeInstanceOf(LeagueMismatchError);
+
+    expect((await reportOf(first.fs))?.records).toEqual([
+      {
+        kind: 'league-mismatch',
+        configuredLeague: 'Runes of Aldur',
+        availableLeagues: ['Forbidden Rites', 'Standard'],
+      },
     ]);
   });
 });

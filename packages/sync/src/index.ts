@@ -11,16 +11,19 @@ export const SYNC_PLACEHOLDER = `${CORE_PLACEHOLDER}:sync`;
 export const SYNC_CONTRACTS_SCHEMA_VERSION = INITIAL_SCHEMA_VERSION;
 
 /**
- * The one governed trade request path (FR-20, AD-8). `createTradeClient` is the
- * **only** exported way to make a trade request, and `HttpPort` is deliberately
- * not re-exported from `sync`: a second call site that wanted to build its own
- * request would have to reach into `@poe/contracts` for the port, which makes
- * the violation visible rather than convenient.
+ * The one governed trade request path (FR-20, AD-8). `createTradeClient`, and
+ * `createTradeClients` for sibling clients that share one governor (one per
+ * request source), are the **only** exported ways to make a trade request,
+ * and `HttpPort` is deliberately not re-exported from `sync`: a second call
+ * site that wanted to build its own request would have to reach into
+ * `@poe/contracts` for the port, which makes the violation visible rather
+ * than convenient.
  */
-export { createTradeClient } from './trade/client';
+export { createTradeClient, createTradeClients } from './trade/client';
 export type {
   TradeClient,
   TradeClientOptions,
+  TradeClientsOptions,
   TradeRequest,
   TradeResponseResult,
   TradeResult,
@@ -46,9 +49,9 @@ export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-head
  * `data/sync-report.json` by explicit path and performs no git write (AD-3).
  * The report carries requests per source (AD-12, FR-14), the not-reached count
  * and the tracked-list edit date as figures, and every unacknowledged record
- * (FR-25). A throw still writes the report, with a `run-failure` record. No
- * live command drives it yet (Story 1.11); the tests and `pnpm sync:dry` do,
- * against in-memory fakes.
+ * (FR-25). A throw still writes the report, with a `run-failure` record.
+ * `pnpm sync` (`./sync.ts`) drives it live; the tests and `pnpm sync:dry`
+ * drive it against in-memory fakes.
  */
 export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
 export { buildDatasetFile } from './chunk/publish-dataset';
@@ -72,6 +75,7 @@ export type {
   ChunkStarvation,
   ChunkStep,
   GateContext,
+  GateResult,
   StepResult,
 } from './chunk/run-chunk';
 export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';
@@ -137,3 +141,17 @@ export {
   weightsAbsentRecord,
 } from './catalogue/weights-ids';
 export type { WeightsIds } from './catalogue/weights-ids';
+
+/**
+ * The run-start league gate (FR-32, AD-19): one `league-validation` GET under
+ * the lock, before any search. A mismatch throws `LeagueMismatchError`, which
+ * `runChunk` reports as a `league-mismatch` record; an unanswered request
+ * yields the chunk (AD-8).
+ */
+export {
+  createLeagueGate,
+  LeagueMismatchError,
+  LeagueRequestRejectedError,
+  UnexpectedLeaguesResponseError,
+} from './league/league-gate';
+export type { LeagueGateOptions } from './league/league-gate';

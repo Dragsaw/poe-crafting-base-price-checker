@@ -46,7 +46,7 @@ development_status:
   1-8-the-published-dataset-written-to-a-git-tracked-working-tr: done
   1-9-the-structured-sync-report-with-requests-accounted-per-sourc: done
   1-10-unresolvable-ids-detected-offline-and-reported: done
-  1-11-league-validation-as-a-run-start-gate: ready-for-dev
+  1-11-league-validation-as-a-run-start-gate: done
   epic-1-retrospective: optional
 
   epic-2: backlog

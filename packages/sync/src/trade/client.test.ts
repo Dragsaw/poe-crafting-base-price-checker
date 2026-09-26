@@ -2,8 +2,8 @@ import { createFakeClockPort, createFakeHttpPort } from '@poe/contracts';
 import type { HttpResponse } from '@poe/contracts';
 import { expect, it } from 'vitest';
 
-import { createTradeClient } from './client.ts';
-import { USER_AGENT_ENV_VAR } from './user-agent.ts';
+import { createTradeClient, createTradeClients } from './client.ts';
+import { MissingUserAgentError, USER_AGENT_ENV_VAR } from './user-agent.ts';
 
 /**
  * Every rule name, policy name and bucket figure in this file is a **fixture**,
@@ -611,4 +611,41 @@ it('omits the remaining allowance on a threshold refusal, because nothing was is
   const refused = await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
   expect(refused.kind).toBe('yield');
   expect(refused.remaining).toBeUndefined();
+});
+
+it('paces sibling clients against one ledger while each sends through its own port', async () => {
+  const fixtures = {
+    [`GET ${DATA_URL}`]: response(200, SATURATED_SEARCH_HEADERS),
+    [`POST ${SEARCH_URL}`]: response(200, CLEAR_SEARCH_HEADERS),
+  };
+  const gateHttp = createFakeHttpPort(fixtures);
+  const stepHttp = createFakeHttpPort(fixtures);
+  const { waits, wait } = recordingWait();
+  const clients = createTradeClients({
+    http: { gate: gateHttp, step: stepHttp },
+    clock: createFakeClockPort(NOW),
+    wait,
+    userAgent: CONTACT,
+  });
+
+  await clients.gate.send({ method: 'GET', url: DATA_URL, lane: 'data' });
+  // A cold lane on the sibling issues, and learns it spends the same policy.
+  await clients.step.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  // The sibling now paces off what the first client recorded.
+  await clients.step.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+
+  expect(waits).toEqual([300_000]);
+  expect(gateHttp.requests.map((request) => request.url)).toEqual([DATA_URL]);
+  expect(stepHttp.requests.map((request) => request.url)).toEqual([SEARCH_URL, SEARCH_URL]);
+});
+
+it('refuses sibling clients at construction when the contact User-Agent is blank', () => {
+  expect(() =>
+    createTradeClients({
+      http: { only: createFakeHttpPort({}) },
+      clock: createFakeClockPort(NOW),
+      wait: () => Promise.resolve(),
+      userAgent: '  ',
+    }),
+  ).toThrow(MissingUserAgentError);
 });

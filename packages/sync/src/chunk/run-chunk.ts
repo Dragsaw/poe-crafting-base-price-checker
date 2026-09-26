@@ -46,6 +46,13 @@
  * `weights-absent` record and the run goes on; present has its ids checked,
  * report-only; an unknown major is a throw like any other load (NFR-8).
  *
+ * The run-start league gate (`../league/league-gate.ts`, AD-19) plugs into
+ * `gate`: it runs after the tracked load and before every other load, check
+ * and request. A mismatch is a `league-mismatch` record rather than a
+ * `run-failure`; like any gate throw it writes the report alone. A gate
+ * `yield` (no answer to check against) is a chunk yield: the report alone,
+ * with `runFinishedAt`.
+ *
  * A throw writes the report with a `run-failure` record, leaves
  * `runFinishedAt` absent, and is rethrown. A `MalformedRequestError` (a
  * non-429 4xx) first publishes the dataset and progress for the entries
@@ -73,6 +80,7 @@ import type {
   EnvelopeResult,
   FilesystemPort,
   GitPort,
+  LeagueMismatchRecord,
   RunFailureRecord,
   SyncProgressFile,
   SyncRunRecord,
@@ -83,6 +91,7 @@ import type { ChunkOrder } from '@poe/core';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
+import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/league-gate.ts';
 import type { DataFileResult } from '../load-data-file.ts';
 import { MalformedRequestError } from '../pricing/price-entry.ts';
 import { requestsBetween } from '../request-counter.ts';
@@ -138,6 +147,14 @@ export interface GateContext {
   readonly entries: readonly TrackedEntry[];
 }
 
+/**
+ * What the run-start gate answers. `pass` lets the chunk go on. `yield` is a
+ * chunk yield (AD-8): the gate got no answer to check against (a 429, the
+ * invalid-request threshold, a 5xx, a timeout or a network failure), so the
+ * chunk visits no entry and writes only the report.
+ */
+export type GateResult = { readonly kind: 'pass' } | { readonly kind: 'yield' };
+
 /** What the caller supplies for the published Dataset's top level (AD-19, AD-20). */
 export interface ChunkPublication {
   /** The active league, written as the dataset's `league`. */
@@ -176,9 +193,11 @@ export interface ChunkPorts {
   readonly catalogue: () => Promise<DataFileResult<CatalogueIds>>;
   /**
    * The run-start gate. It runs under the lock, before any step. A throw
-   * aborts the chunk; the lock is still released.
+   * aborts the chunk; the lock is still released. A `yield` ends the chunk
+   * `yielded` with no entry visited: no dataset or progress write, and the
+   * report written with `runFinishedAt`.
    */
-  readonly gate?: (context: GateContext) => Promise<void>;
+  readonly gate?: (context: GateContext) => Promise<GateResult>;
   /** One line of operator output. Defaults to stderr. */
   readonly log?: (line: string) => void;
 }
@@ -282,11 +301,27 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
 }
 
 /**
- * The record a throw leaves in the report. A non-429 4xx names its entry and
- * status; any other throw names the entry the step was on, where it was on one.
+ * The record a throw leaves in the report. A league mismatch is its own
+ * record, with the list the player corrects the configured league from
+ * (AD-19). A non-429 4xx names its status, and its entry where it was on one:
+ * the league gate's request names none. Any other throw names the entry the
+ * step was on, where it was on one.
  */
-function failureRecord(error: unknown, current: TrackedEntry | undefined): RunFailureRecord {
+function failureRecord(
+  error: unknown,
+  current: TrackedEntry | undefined,
+): LeagueMismatchRecord | RunFailureRecord {
+  if (error instanceof LeagueMismatchError) {
+    return {
+      kind: 'league-mismatch',
+      configuredLeague: error.configuredLeague,
+      availableLeagues: [...error.availableLeagues],
+    };
+  }
   const message = (error instanceof Error ? error.message : String(error)) || 'unknown error';
+  if (error instanceof LeagueRequestRejectedError) {
+    return { kind: 'run-failure', reason: 'trade-request-rejected', status: error.status, message };
+  }
   if (error instanceof MalformedRequestError) {
     return {
       kind: 'run-failure',
@@ -368,7 +403,7 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
      * This chunk's records: the broken lock, the run-start check, the steps,
      * then the starvation, then any failure.
      */
-    const newRecords = (failure?: RunFailureRecord): SyncRunRecord[] => {
+    const newRecords = (failure?: LeagueMismatchRecord | RunFailureRecord): SyncRunRecord[] => {
       const { pinnedStarvation } = starvationNow();
       return [
         ...records,
@@ -436,8 +471,16 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
       );
       entries = tracked?.entries ?? [];
 
-      if (gate !== undefined) {
-        await gate({ entries });
+      if (gate !== undefined && (await gate({ entries })).kind === 'yield') {
+        // A gate yield is a chunk yield (AD-8): no entry, no dataset, no
+        // progress; the report alone, under the same lock check as a commit.
+        if (!(await holdsLock(fs, mine))) {
+          log('sync: the lock was taken over during this chunk; writing nothing');
+          return { kind: 'dispossessed', completed, entries: stepEntries, records };
+        }
+        log('sync: the league check got no answer; the chunk yields with no entry visited');
+        await writeReport(newRecords(), clock.now());
+        return { kind: 'yielded', completed, entries: stepEntries, records };
       }
 
       const progress = await loadEnvelope(fs, PROGRESS_PATH, (data) =>

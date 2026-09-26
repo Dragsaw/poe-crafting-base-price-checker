@@ -274,7 +274,32 @@ function declaredYieldFloorMs(parsed: RateLimitHeaders): number {
  * `User-Agent` is blank, so no request is ever issued without one (NFR-9).
  */
 export function createTradeClient(options: TradeClientOptions): TradeClient {
-  const { http, clock, wait, userAgent, invalidRequestThreshold } = options;
+  const { http, ...shared } = options;
+  return createTradeClients({ ...shared, http: { only: http } }).only;
+}
+
+export interface TradeClientsOptions<Source extends string>
+  extends Omit<TradeClientOptions, 'http'> {
+  /** One `HttpPort` per client, typically one per request source (`../request-counter.ts`). */
+  readonly http: Readonly<Record<Source, HttpPort>>;
+}
+
+/**
+ * Sibling clients, one per `HttpPort`, that are **one governor**: they share
+ * the ledger, the invalid-request counts, the lane memo and the serial queue.
+ *
+ * This is how two request sources are counted apart without being paced
+ * apart. The counter tells a source by the port it wrapped (AD-12), so each
+ * source needs its own port; but the budget is the trade API's, not the
+ * source's. Two independent clients would each start cold and each spend
+ * unpaced against the same buckets, which is the failure this module exists
+ * to prevent (AD-8). It refuses a blank `User-Agent` exactly as
+ * `createTradeClient` does.
+ */
+export function createTradeClients<Source extends string>(
+  options: TradeClientsOptions<Source>,
+): Readonly<Record<Source, TradeClient>> {
+  const { clock, wait, userAgent, invalidRequestThreshold } = options;
   if (userAgent.trim() === '') {
     throw new MissingUserAgentError();
   }
@@ -309,7 +334,7 @@ export function createTradeClient(options: TradeClientOptions): TradeClient {
    */
   let tail: Promise<unknown> = Promise.resolve();
 
-  async function exchange(request: TradeRequest): Promise<TradeResult> {
+  async function exchange(http: HttpPort, request: TradeRequest): Promise<TradeResult> {
     const lane = laneOf(request);
     const knownPolicy = lanePolicies.get(lane);
 
@@ -393,16 +418,23 @@ export function createTradeClient(options: TradeClientOptions): TradeClient {
     };
   }
 
-  return {
+  const clientFor = (http: HttpPort): TradeClient => ({
     send(request) {
       const issued = tail.then(
-        () => exchange(request),
-        () => exchange(request),
+        () => exchange(http, request),
+        () => exchange(http, request),
       );
       // The queue must survive a rejected exchange, or one failure would wedge
       // every later request behind it.
       tail = issued.catch(() => undefined);
       return issued;
     },
-  };
+  });
+
+  return Object.fromEntries(
+    (Object.entries(options.http) as [Source, HttpPort][]).map(([source, http]) => [
+      source,
+      clientFor(http),
+    ]),
+  ) as Record<Source, TradeClient>;
 }
