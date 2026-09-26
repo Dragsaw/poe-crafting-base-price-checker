@@ -147,7 +147,7 @@ action_items:
     action: "One test parsing all four data/catalogue/*.json against the Catalogue*FileSchema;
       retire the two 1.4 ledger entries it closes"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-12-edit-implementation-notes-section-10-2-t"
     epic: 1
