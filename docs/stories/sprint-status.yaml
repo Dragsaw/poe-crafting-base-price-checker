@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-26-2026 23:30
+last_updated: 09-26-2026 23:59
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -52,7 +52,7 @@ development_status:
   epic-2: in-progress
   2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and: done
   2-2-the-raw-ranking-branch-league-scoped-and-computed-at-read-ti: review
-  2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-blo: backlog
+  2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-blo: review
   2-4-the-payout-threshold-and-what-survives-a-reload: backlog
   2-5-row-expansion-the-evidence-behind-a-row-its-tombstones-and-i: backlog
   2-6-the-trust-strip-its-health-line-and-the-sync-report-panel: backlog

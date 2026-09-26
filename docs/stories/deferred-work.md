@@ -162,3 +162,21 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-deferred-emitted-dts-carries-ts-specifiers.md`
   summary: The post-emit rewrite covers only `packages/contracts/dist`; `packages/core/dist` and `packages/sync/dist` emit the same `.d.ts` shape and still carry relative `.ts` specifiers.
   evidence: The spec's Never boundary excludes them because the closed entry named only contracts. A grep after `pnpm typecheck` on 2026-09-26 finds `.ts` specifiers in `packages/core/dist/index.d.ts` and `packages/sync/dist/dry-run.d.ts`. The fix is to add both directories to `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts`.
+
+## Deferred from: story 2.3 (2026-09-26)
+
+- source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
+  summary: [NOTE FOR UX] The key block does not list `† pruned` or `* pinned`. The open UX note must rule whether and when they join the key, and `packages/web/src/list/KeyBlock.tsx` must then add them.
+  evidence: Spec 2.3 Boundaries say "`† pruned` / `* pinned` are not listed (open UX note)". No story owns adding them after the ruling.
+- source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
+  summary: [NOTE FOR UX] The key block and running foot copy exists only in `mockups/key-hero-resting.html`, not in DESIGN.md prose. DESIGN.md must write it out, or state that the mockup is normative for it. Then check `KeyBlock.tsx` and `RunningFoot.tsx` against DESIGN.md.
+  evidence: Spec 2.3 Implementation Notes record that the copy was taken verbatim from the mockup. A mockup is not an owner document, so the copy can drift without a signal.
+- source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
+  summary: [NOTE FOR UX] Tier 2 and tier 3 ranked rows differ only in rank-numeral colour (`ranked-row-tier-2` / `-3` in DESIGN.md set only `rankColor`). Spec 2.3's grayscale AC asks that tiers be told apart by a glyph, a word, a weight or an italic.
+  evidence: `packages/web/src/list/RankedRow.tsx` follows DESIGN.md: tier 1 sets 700, tiers 2 and 3 are both 400 with no other cue. In grayscale, only the gray level of the numeral separates them. Settle it with a DESIGN.md ruling: add a non-colour cue to tier 2, or state that luminance alone is enough between tiers 2 and 3.
+- source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
+  summary: [NOTE FOR UX] With exactly 21 rows the list affordance prints `+ Read the remaining 1 rows`. DESIGN.md `listCopyClosed` is `+ Read the remaining {N} rows` and gives no singular form.
+  evidence: `expandCopy` in `packages/web/src/list/RankedList.tsx` prints DESIGN.md's copy verbatim for every N. Settle it with a DESIGN.md singular form, then a one-branch change and a test.
+- source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
+  summary: `− Show only the top 20` hides rows 21 and up but leaves them in `RankedList`'s open set, so they reappear open on the next grow. Story 2.5 must decide whether collapse closes hidden rows, once a panel hangs off an open row.
+  evidence: `RankedList.tsx` keeps `open` across the grown toggle. In Story 2.3 an open row shows only the 3px marker, so nothing visible is lost. EXPERIENCE state 33 says clicking again "restores the top 20 exactly" but says nothing about open rows.
