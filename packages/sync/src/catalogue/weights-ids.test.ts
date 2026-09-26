@@ -30,6 +30,10 @@ function fsWith(contents: string | undefined) {
   return createFakeFilesystemPort(contents === undefined ? {} : { [WEIGHTS_PATH]: { contents } });
 }
 
+/** The last BMP code point and the first astral one: code-unit and code-point order disagree on them. */
+const BMP_LAST = String.fromCodePoint(0xffff);
+const ASTRAL = String.fromCodePoint(0x10000);
+
 describe('readWeightsIds', () => {
   it('reads the outer categoryIds and every non-null line statId', async () => {
     expect(await readWeightsIds(fsWith(JSON.stringify(WEIGHTS)))).toEqual({
@@ -95,20 +99,40 @@ describe('checkWeightsIds', () => {
       checkWeightsIds({ kind: 'present', statIds: new Set(['explicit.a']), categoryIds: new Set(['jewel']) }, catalogue),
     ).toEqual([]);
   });
+
+  it('sorts identifiers by code point, not by UTF-16 code unit', () => {
+    // U+10000 encodes as 0xD800 0xDC00, which precedes 0xFFFF by code unit but follows U+FFFF by code point.
+    expect(
+      checkWeightsIds(
+        {
+          kind: 'present',
+          statIds: new Set([ASTRAL, BMP_LAST]),
+          categoryIds: new Set(['jewel', `weapon.${ASTRAL}`, `weapon.${BMP_LAST}`]),
+        },
+        catalogue,
+      ).map((record) => [record.identifierKind, record.identifier]),
+    ).toEqual([
+      ['categoryId', `weapon.${BMP_LAST}`],
+      ['categoryId', `weapon.${ASTRAL}`],
+      ['statId', BMP_LAST],
+      ['statId', ASTRAL],
+    ]);
+  });
 });
 
 describe('weightsAbsentRecord', () => {
-  it('names the distinct classNames of non-pruned crafted entries, sorted by code unit', () => {
-    const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
-      ({
-        kind: 'crafted',
-        categoryId: 'c',
-        className,
-        itemLevelMin: 1,
-        prefix: { kind: 'valueless', statId: 's' },
-        status,
-        ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
-      }) as TrackedEntry;
+  const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
+    ({
+      kind: 'crafted',
+      categoryId: 'c',
+      className,
+      itemLevelMin: 1,
+      prefix: { kind: 'valueless', statId: 's' },
+      status,
+      ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
+    }) as TrackedEntry;
+
+  it('names the distinct classNames of non-pruned crafted entries, sorted by code point', () => {
     expect(
       weightsAbsentRecord([
         craftedOf('bows'),
@@ -119,5 +143,12 @@ describe('weightsAbsentRecord', () => {
         { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 1, status: 'active' },
       ]),
     ).toEqual({ kind: 'weights-absent', uncheckableClassNames: ['Amulets', 'Bows', 'bows'] });
+  });
+
+  it('sorts classNames by code point, not by UTF-16 code unit', () => {
+    expect(weightsAbsentRecord([craftedOf(ASTRAL), craftedOf(BMP_LAST)]).uncheckableClassNames).toEqual([
+      BMP_LAST,
+      ASTRAL,
+    ]);
   });
 });

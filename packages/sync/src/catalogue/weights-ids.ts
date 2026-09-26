@@ -18,7 +18,7 @@
  * rewritten, and a miss never refuses it.
  */
 
-import { checkSchemaVersion } from '@poe/contracts';
+import { checkSchemaVersion, compareCanonicalKeys } from '@poe/contracts';
 import type {
   FilesystemPort,
   TrackedEntry,
@@ -114,16 +114,10 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   return { kind: 'present', statIds, categoryIds: new Set(Object.keys(bases)) };
 }
 
-function compareCodeUnits(left: string, right: string): number {
-  if (left === right) {
-    return 0;
-  }
-  return left < right ? -1 : 1;
-}
-
 /**
  * One `uncatalogued-weights-id` record per distinct id the catalogue does not
- * expose, sorted by `identifierKind`, then by `identifier`, by code unit.
+ * expose, sorted by `identifierKind`, then by `identifier`, with
+ * `compareCanonicalKeys` (Consistency Conventions, *Entity keys*).
  */
 export function checkWeightsIds(
   weights: Extract<WeightsIds, { kind: 'present' }>,
@@ -139,14 +133,15 @@ export function checkWeightsIds(
   ].map((miss) => ({ kind: 'uncatalogued-weights-id', ...miss }));
   return records.toSorted(
     (left, right) =>
-      compareCodeUnits(left.identifierKind, right.identifierKind) ||
-      compareCodeUnits(left.identifier, right.identifier),
+      compareCanonicalKeys(left.identifierKind, right.identifierKind) ||
+      compareCanonicalKeys(left.identifier, right.identifier),
   );
 }
 
 /**
  * The record an absent `weights.json` leaves (AD-12, AD-25): the distinct
- * `className` values of the non-pruned `crafted` entries, sorted by code unit.
+ * `className` values of the non-pruned `crafted` entries, sorted with
+ * `compareCanonicalKeys` (Consistency Conventions, *Entity keys*).
  * Without the file those classes are uncheckable, and they are reported so
  * rather than passed as clean.
  */
@@ -157,5 +152,5 @@ export function weightsAbsentRecord(tracked: readonly TrackedEntry[]): WeightsAb
       classNames.add(entry.className);
     }
   }
-  return { kind: 'weights-absent', uncheckableClassNames: [...classNames].toSorted(compareCodeUnits) };
+  return { kind: 'weights-absent', uncheckableClassNames: [...classNames].toSorted(compareCanonicalKeys) };
 }

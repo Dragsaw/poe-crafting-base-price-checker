@@ -160,7 +160,7 @@ action_items:
     epic: 1
     action: "Replace compareCodeUnits in weights-ids.ts with the contracts comparator"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-1-retro-2026-09-26.md"
   - id: "epic-1-retro-item-14-decide-the-dry-run-instant-derive-it-fro"
     epic: 1
