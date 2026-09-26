@@ -65,10 +65,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 ## Deferred from: story 1.10 (2026-09-26)
 
 - source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
-  summary: A request that starts after the setup file's afterAll has run server.close() is not intercepted and would reach the real network.
-  evidence: Pre-existing: server.close() restores the real fetch, and this change does not alter that. A probe on 2026-09-26 found that a timer due after the last test never fired, because the Vitest worker ended first. Unverified: whether a reused worker (isolate false, or a slow teardown) can run such a timer. Would be settled by a probe that keeps the worker alive past afterAll (for example, a slow afterAll in another file of a non-isolated run) and observes whether the request is sent.
-
-- source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
   summary: Attribution under it.concurrent / describe.concurrent is unverified. enterWith in interleaved beforeEach hooks could charge a request to the wrong test.
   evidence: No test in the repository uses .concurrent (a search of packages/ and test/ found none), so no current test is affected. A reviewer's probe was refused by the sandbox. Would be settled by a concurrent pair in which each test issues its own unfixtured request, observing that each test's afterEach names only its own URL.
 
@@ -176,3 +172,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
   summary: `− Show only the top 20` hides rows 21 and up but leaves them in `RankedList`'s open set, so they reappear open on the next grow. Story 2.5 must decide whether collapse closes hidden rows, once a panel hangs off an open row.
   evidence: `RankedList.tsx` keeps `open` across the grown toggle. In Story 2.3 an open row shows only the 3px marker, so nothing visible is lost. EXPERIENCE state 33 says clicking again "restores the top 20 exactly" but says nothing about open rows.
+- source_spec: `docs/stories/spec-deferred-request-after-afterall-reaches-network.md`
+  summary: A request that a test starts but does not await, and that fires after the last file's afterAll in a worker, is blocked by the process-wide guard but reported by nothing, so the run passes.
+  evidence: Pre-existing in kind: before this change the same request passed silently and also escaped. Now it is blocked, because the interceptor stays installed. The file-level check in afterAll reports a late request only when a later file's afterAll runs in the same worker. The 2026-09-26 probe found that a 4000 ms timer never fired, because the worker ended first, so whether such a request can happen at all is unverified. A fix needs a hook that runs in the worker after its last file and before the worker ends, and that can fail the run. A globalSetup teardown runs in the main process and cannot see the worker's record. First settle whether Vitest offers such a hook.
