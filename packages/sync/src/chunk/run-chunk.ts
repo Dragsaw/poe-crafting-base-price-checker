@@ -24,6 +24,15 @@
  * and 1.9 add to the outcome, and Story 1.11 plugs its run-start check into
  * `gate`. Release runs in a `finally`, so a throw from `gate` or from the step
  * still releases a lock this run holds.
+ *
+ * Under the lock, a `completed`, `bounded` or `yielded` chunk writes
+ * `data/dataset.json` (`./publish-dataset.ts`) and then `sync-progress.json`,
+ * both through `writeArtifact`. The dataset goes first, so progress never
+ * records a completion the dataset does not publish. `busy` and
+ * `dispossessed` write nothing, and neither does a step that throws: the
+ * entries it completed are searched again next run. The league and the rate
+ * set arrive as `publication`, so this directory names no player file other
+ * than its own inputs.
  */
 
 import {
@@ -37,6 +46,7 @@ import {
 } from '@poe/contracts';
 import type {
   ClockPort,
+  CurrencyRate,
   DatasetEntry,
   EnvelopeResult,
   FilesystemPort,
@@ -46,12 +56,17 @@ import type {
 } from '@poe/contracts';
 import { chunkOrder, pinnedToKeep } from '@poe/core';
 
-import { serialiseJsonArtifact } from '../shell.ts';
+import { writeArtifact } from '../write-artifact.ts';
 import { acquireLock, holdsLock, releaseLockIfOwn } from './lock.ts';
+import { buildDatasetFile } from './publish-dataset.ts';
 
 export const TRACKED_PATH = 'data/tracked.json';
 export const PROGRESS_PATH = 'data/sync-progress.json';
-/** Read only, for the rotation's `lastAttemptedAt` and price state. Story 1.8 writes it. */
+/**
+ * The published Dataset (AD-19). Read at the start of a chunk for the
+ * rotation's `lastAttemptedAt` and price state, and written under the lock at
+ * its end, by explicit path, with this chunk's step entries merged in.
+ */
 export const DATASET_PATH = 'data/dataset.json';
 
 /**
@@ -63,7 +78,8 @@ export const DATASET_PATH = 'data/dataset.json';
  *
  * Either kind may carry the step's updated `DatasetEntry`: a completed entry
  * with its new price state, or a yielded one stamped with `lastAttemptedAt`.
- * The runner collects them on the outcome for Story 1.8 to publish.
+ * The runner publishes them into `data/dataset.json` and reports them on the
+ * outcome.
  */
 export type StepResult =
   | {
@@ -81,11 +97,20 @@ export interface GateContext {
   readonly entries: readonly TrackedEntry[];
 }
 
+/** What the caller supplies for the published Dataset's top level (AD-19, AD-20). */
+export interface ChunkPublication {
+  /** The active league, written as the dataset's `league`. */
+  readonly league: string;
+  /** The rate set as `sync` writes it out: `outputRates` of the loaded rates. */
+  readonly currencyRates: readonly CurrencyRate[];
+}
+
 export interface ChunkPorts {
   readonly fs: FilesystemPort;
   readonly clock: ClockPort;
   /** The process id written into the lock. */
   readonly pid: number;
+  readonly publication: ChunkPublication;
   /**
    * The run-start gate. It runs under the lock, before any step. A throw
    * aborts the chunk; the lock is still released.
@@ -105,7 +130,8 @@ interface ChunkOutcomeBase {
   readonly completed: readonly string[];
   /**
    * The dataset entries the steps returned, in visiting order — completed and
-   * yielded alike. Story 1.8 publishes them. A step that throws loses them.
+   * yielded alike. `completed`, `bounded` and `yielded` publish them into the
+   * dataset; `busy` and `dispossessed` write nothing. A step that throws loses them.
    */
   readonly entries: readonly DatasetEntry[];
   /** Report records this chunk produced. Story 1.9 writes them out. */
@@ -190,7 +216,7 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
 }
 
 export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<ChunkOutcome> {
-  const { fs, clock, pid, gate } = ports;
+  const { fs, clock, pid, gate, publication } = ports;
   const log = ports.log ?? writeStderr;
 
   const acquisition = await acquireLock(fs, clock, pid);
@@ -308,13 +334,23 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
       return { kind: 'dispossessed', completed, entries: stepEntries, records, ...starvation };
     }
 
+    const published = buildDatasetFile({
+      tracked: entries,
+      previous: dataset?.entries ?? [],
+      stepEntries,
+      league: publication.league,
+      currencyRates: publication.currencyRates,
+      now: clock.now(),
+    });
+    await writeArtifact(fs, DATASET_PATH, DatasetFileSchema, published);
+
     const file: SyncProgressFile = {
       schemaVersion: SUPPORTED_SCHEMA_VERSION,
       completed: [...new Set([...order.completed, ...rotationCompleted])].toSorted(
         compareCanonicalKeys,
       ),
     };
-    await fs.writeTextFile(PROGRESS_PATH, serialiseJsonArtifact(file));
+    await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, file);
 
     return { ...ending, completed, entries: stepEntries, records, ...starvation };
   } finally {

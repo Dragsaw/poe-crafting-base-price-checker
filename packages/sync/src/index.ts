@@ -41,21 +41,35 @@ export type { UserAgentRefused, UserAgentResolved, UserAgentResult } from './tra
 export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-headers';
 
 /**
- * One bounded, resumable, single-instance chunk (FR-19, AD-7). Stories 1.7 and
- * 1.8 wire the live command; until then the tests and `pnpm sync:dry` drive it.
+ * One bounded, resumable, single-instance chunk (FR-19, AD-7). Under the lock
+ * it writes `data/dataset.json` and `data/sync-progress.json` by explicit path
+ * and performs no git write (AD-3). No live command drives it yet (Stories 1.9
+ * and 1.11); the tests and `pnpm sync:dry` do, against in-memory fakes.
  */
 export { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
+export { buildDatasetFile } from './chunk/publish-dataset';
+export type { DatasetInputs } from './chunk/publish-dataset';
 export type {
   ChunkBound,
   ChunkOutcome,
   ChunkOutcomeKind,
   ChunkPorts,
+  ChunkPublication,
   ChunkStarvation,
   ChunkStep,
   GateContext,
   StepResult,
 } from './chunk/run-chunk';
 export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';
+
+/**
+ * The one validate-then-serialise write for every artifact `sync` writes: the
+ * value is parsed with its schema and the parsed value is serialised, so the
+ * keys follow the schema's declared order. An invalid artifact is refused with
+ * `InvalidArtifactError` and nothing is written.
+ */
+export { InvalidArtifactError, writeArtifact } from './write-artifact';
+export type { ArtifactSchema } from './write-artifact';
 
 /**
  * The load-time pinned cap and the starvation record (AD-7,
@@ -68,8 +82,8 @@ export type { PinnedCapExceeded, PinnedCapResult } from './pinned-cap';
 /**
  * The pricing step (FR-21, FR-23, AD-16, AD-20): one search and at most one
  * fetch per tracked entry through the governed client, normalised to divine
- * once. It plugs into `runChunk` as its `ChunkStep`; Story 1.8 publishes the
- * entries it returns.
+ * once. It plugs into `runChunk` as its `ChunkStep`, and `runChunk` publishes
+ * the entries it returns into the dataset.
  */
 export {
   createPricingStep,

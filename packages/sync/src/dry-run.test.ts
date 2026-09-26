@@ -3,8 +3,14 @@ import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { canonicalKey, createFakeClockPort, createFakeFilesystemPort } from '@poe/contracts';
-import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
+import {
+  canonicalKey,
+  compareCanonicalKeys,
+  createFakeClockPort,
+  createFakeFilesystemPort,
+  DatasetFileSchema,
+} from '@poe/contracts';
+import type { CurrencyRate, DatasetEntry, DatasetFile, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { DATASET_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
@@ -72,9 +78,19 @@ const entries: TrackedEntry[] = [
   { kind: 'raw', baseTypeId: 'Wide Belt', itemLevelMin: 82, status: 'pruned', prunedReason: 'x' },
 ];
 
+function datasetOf(published: readonly DatasetEntry[]): DatasetFile {
+  return {
+    schemaVersion: '1.0.0',
+    league: LEAGUE,
+    generatedAt: DRY_RUN_INSTANT,
+    entries: [...published],
+    currencyRates: JSON.parse(CURRENCIES).rates as CurrencyRate[],
+  };
+}
+
 describe('dryRun', () => {
   it('runs the chunk in memory through the pricing step and reports each entry', async () => {
-    const [active, pinned] = entries as [TrackedEntry, TrackedEntry];
+    const [active, pinned, pruned] = entries as [TrackedEntry, TrackedEntry, TrackedEntry];
 
     expect(await dryRun(snapshotOf(entries))).toEqual({
       outcome: 'completed',
@@ -82,6 +98,13 @@ describe('dryRun', () => {
       entries: [noListings(pinned, 1), noListings(active, 0)],
       // Pinned entries are exempt from the pass, so only the active key is recorded.
       progress: { schemaVersion: '1.0.0', completed: [canonicalKey(active)] },
+      dataset: datasetOf(
+        [
+          noListings(pinned, 1),
+          noListings(active, 0),
+          { entryKey: canonicalKey(pruned), price: { state: 'not-yet-synced', reason: 'never-synced' } } satisfies DatasetEntry,
+        ].toSorted((a, b) => compareCanonicalKeys(a.entryKey, b.entryKey)),
+      ),
       records: [],
     });
   });
@@ -92,8 +115,27 @@ describe('dryRun', () => {
       completed: [],
       entries: [],
       progress: { schemaVersion: '1.0.0', completed: [] },
+      dataset: datasetOf([]),
       records: [],
     });
+  });
+
+  it('publishes the output rate set: divine exactly 1, others at 4dp, league and asOf verbatim', async () => {
+    const currencies = JSON.stringify({
+      schemaVersion: '1.0.0',
+      rates: [
+        { currencyId: 'divine', rate: 1, source: 'measured', league: 'Old League', asOf: '2025-12-01T00:00:00Z' },
+        { currencyId: 'chaos', rate: 0.00812345, source: 'measured', league: 'Old League', asOf: '2025-12-02T00:00:00Z' },
+      ],
+    });
+
+    const report = await dryRun(snapshotOf(entries, { currencies }));
+
+    expect(report.dataset?.league).toBe(LEAGUE);
+    expect(report.dataset?.currencyRates).toEqual([
+      { currencyId: 'divine', rate: 1, source: 'measured', league: 'Old League', asOf: '2025-12-01T00:00:00Z' },
+      { currencyId: 'chaos', rate: 0.0081, source: 'measured', league: 'Old League', asOf: '2025-12-02T00:00:00Z' },
+    ]);
   });
 
   it('is deterministic for a given snapshot', async () => {
@@ -163,10 +205,19 @@ describe('dryRun: the dataset snapshot', () => {
       [DATASET_PATH]: { contents: datasetText },
     });
     const visited: string[] = [];
-    await runChunk({ fs, clock: createFakeClockPort(DRY_RUN_INSTANT), pid: 1, log: () => undefined }, (entry) => {
-      visited.push(canonicalKey(entry));
-      return Promise.resolve({ kind: 'completed' });
-    });
+    await runChunk(
+      {
+        fs,
+        clock: createFakeClockPort(DRY_RUN_INSTANT),
+        pid: 1,
+        publication: { league: LEAGUE, currencyRates: [] },
+        log: () => undefined,
+      },
+      (entry) => {
+        visited.push(canonicalKey(entry));
+        return Promise.resolve({ kind: 'completed' });
+      },
+    );
 
     const report = await dryRun(withDataset);
     expect(report.completed).toEqual(visited);
@@ -175,6 +226,18 @@ describe('dryRun: the dataset snapshot', () => {
 
   it('is deterministic with a dataset', async () => {
     expect(await dryRun(withDataset)).toEqual(await dryRun(withDataset));
+  });
+
+  it('publishes the snapshot’s entries merged with the step entries, under the active league', async () => {
+    const report = await dryRun(withDataset);
+    expect(report.dataset?.league).toBe(LEAGUE);
+    expect(report.dataset?.entries.map((entry) => entry.entryKey)).toEqual(
+      rotation.map(canonicalKey).toSorted(compareCanonicalKeys),
+    );
+    // Every tracked entry was visited, so every entry is this run's.
+    for (const entry of report.dataset?.entries ?? []) {
+      expect(entry.lastAttemptedAt, entry.entryKey).toBe(DRY_RUN_INSTANT);
+    }
   });
 
   it('refuses an invalid dataset loudly', async () => {
@@ -198,6 +261,12 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     for (const entry of report.entries) {
       expect(entry.price.state, entry.entryKey).toBe('priced');
     }
+    // The published dataset holds every tracked entry, pruned ones included.
+    expect(report.dataset).not.toBeNull();
+    expect(DatasetFileSchema.safeParse(report.dataset).success).toBe(true);
+    expect(report.dataset?.entries.map((entry) => entry.entryKey)).toEqual(
+      [...new Set(tracked.entries.map(canonicalKey))].toSorted(compareCanonicalKeys),
+    );
   });
 });
 
@@ -250,8 +319,17 @@ describe('pnpm sync:dry', () => {
     expect(first.stderr).toBe('');
 
     const report = JSON.parse(first.stdout) as Record<string, unknown>;
-    expect(Object.keys(report)).toEqual(['outcome', 'completed', 'entries', 'progress', 'records']);
+    expect(Object.keys(report)).toEqual(['outcome', 'completed', 'entries', 'progress', 'dataset', 'records']);
     expect(report['outcome']).toBe('completed');
+    // Printed as written: the schema accepts it and its keys are in declared order.
+    expect(DatasetFileSchema.safeParse(report['dataset']).success).toBe(true);
+    expect(Object.keys(report['dataset'] as object)).toEqual([
+      'schemaVersion',
+      'league',
+      'generatedAt',
+      'entries',
+      'currencyRates',
+    ]);
 
     expect(snapshot(DATA_DIR)).toEqual(before);
   });

@@ -10,9 +10,11 @@
  * the recorded `fixtures/trade-{search,fetch}-*.json` back by request digest;
  * an unrecorded request fails loudly — the run rejects, naming the missing
  * fixture, and never yields. It prints
- * `{outcome, completed, entries, progress, records}` — plus `pinnedStarvation`
- * when the chunk truncated the pinned set — as JSON to stdout and writes
- * nothing to disk: the lock and `sync-progress.json` land in the fake.
+ * `{outcome, completed, entries, progress, dataset, records}` — plus
+ * `pinnedStarvation` when the chunk truncated the pinned set — as JSON to
+ * stdout and writes nothing to disk: the lock, `sync-progress.json` and
+ * `dataset.json` land in the fake. `dataset` is the file as the chunk wrote
+ * it, with the active league and the output rate set passed in.
  *
  * An absent tracked file is an empty workload, and an absent dataset means
  * every entry is never attempted. An absent or invalid config, currencies or
@@ -31,7 +33,13 @@ import {
   parseEnvelope,
   SyncProgressFileSchema,
 } from '@poe/contracts';
-import type { DatasetEntry, SyncProgressFile, SyncRunRecord } from '@poe/contracts';
+import type {
+  DatasetEntry,
+  DatasetFile,
+  FilesystemPort,
+  SyncProgressFile,
+  SyncRunRecord,
+} from '@poe/contracts';
 
 import { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
 import type { ChunkOutcomeKind, ChunkStarvation } from './chunk/run-chunk.ts';
@@ -41,6 +49,7 @@ import type { DataFileResult } from './load-data-file.ts';
 import { createFixtureHttpPort, readPricingFixtures } from './pricing/fixture-port.ts';
 import type { PricingFixtures } from './pricing/fixture-port.ts';
 import { CURRENCIES_PATH, loadCurrencies } from './pricing/load-currencies.ts';
+import { outputRates } from './pricing/normalise.ts';
 import { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types.ts';
 import { createPricingStep } from './pricing/price-entry.ts';
 import { createTradeClient } from './trade/client.ts';
@@ -58,6 +67,8 @@ export interface DryRunReport {
   readonly entries: readonly DatasetEntry[];
   /** The progress file the chunk wrote into the fake, or `null` if none. */
   readonly progress: SyncProgressFile | null;
+  /** The dataset file the chunk wrote into the fake, or `null` if none. */
+  readonly dataset: DatasetFile | null;
   readonly records: readonly SyncRunRecord[];
   /** Present only when the chunk truncated the pinned set (AD-7). */
   readonly pinnedStarvation?: ChunkStarvation;
@@ -80,6 +91,16 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
   return loaded.value;
 }
 
+/** A file the chunk wrote into the fake, validated; `null` if it wrote none. */
+async function readWritten<T>(
+  fs: FilesystemPort,
+  path: string,
+  schema: { parse(data: unknown): T },
+): Promise<T | null> {
+  const text = await fs.readTextFile(path);
+  return text === undefined ? null : schema.parse(JSON.parse(text));
+}
+
 /** Pure apart from the fakes it builds: the snapshot in, the report out. */
 export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
   const files: [string, string | undefined][] = [
@@ -98,7 +119,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
   const league = valueOf(await loadActiveLeague(fs));
   const rates = valueOf(await loadCurrencies(fs));
   const itemTypes = valueOf(await loadItemTypes(fs));
-  const dataset =
+  const previous =
     snapshot.dataset === undefined
       ? []
       : valueOf(
@@ -112,22 +133,22 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     wait: () => Promise.resolve(),
     userAgent: DRY_RUN_USER_AGENT,
   });
-  const step = createPricingStep({ client, league, rates, itemTypes, dataset, clock });
+  const step = createPricingStep({ client, league, rates, itemTypes, dataset: previous, clock });
 
-  const outcome = await runChunk({ fs, clock, pid: DRY_RUN_PID }, step);
-  const progressText = await fs.readTextFile(PROGRESS_PATH);
-  let progress: SyncProgressFile | null = null;
-  if (progressText !== undefined) {
-    // Validated, then printed as written: the parse would reorder the keys.
-    const written: unknown = JSON.parse(progressText);
-    SyncProgressFileSchema.parse(written);
-    progress = written as SyncProgressFile;
-  }
+  const outcome = await runChunk(
+    { fs, clock, pid: DRY_RUN_PID, publication: { league, currencyRates: outputRates(rates) } },
+    step,
+  );
+  // Each artifact was written in its schema's key order, so the parsed value
+  // prints as written.
+  const progress = await readWritten(fs, PROGRESS_PATH, SyncProgressFileSchema);
+  const dataset = await readWritten(fs, DATASET_PATH, DatasetFileSchema);
   return {
     outcome: outcome.kind,
     completed: outcome.completed,
     entries: outcome.entries,
     progress,
+    dataset,
     records: outcome.records,
     ...(outcome.pinnedStarvation === undefined ? {} : { pinnedStarvation: outcome.pinnedStarvation }),
   };

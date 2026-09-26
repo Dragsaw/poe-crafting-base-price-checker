@@ -4,17 +4,20 @@ import { fileURLToPath } from 'node:url';
 
 import {
   canonicalKey,
+  compareCanonicalKeys,
   createFakeClockPort,
   createFakeFilesystemPort,
+  DatasetFileSchema,
   SyncProgressFileSchema,
 } from '@poe/contracts';
-import type { DatasetEntry, FakeFilesystemPort, TrackedEntry } from '@poe/contracts';
+import type { DatasetEntry, DatasetFile, FakeFilesystemPort, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { MalformedRequestError } from '../pricing/price-entry.ts';
+import { InvalidArtifactError } from '../write-artifact.ts';
 import { LOCK_PATH, serialiseLock } from './lock.ts';
 import { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './run-chunk.ts';
-import type { ChunkPorts, ChunkStep, StepResult } from './run-chunk.ts';
+import type { ChunkPorts, ChunkPublication, ChunkStep, StepResult } from './run-chunk.ts';
 
 const NOW = '2026-09-26T12:00:00.000Z';
 /** Five hours before NOW: a live lock. */
@@ -22,6 +25,7 @@ const FIVE_HOURS_AGO = '2026-09-26T07:00:00.000Z';
 /** Seven hours before NOW: a stale lock. */
 const SEVEN_HOURS_AGO = '2026-09-26T05:00:00.000Z';
 const PID = 1000;
+const PUBLICATION: ChunkPublication = { league: 'Standard', currencyRates: [] };
 
 function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): TrackedEntry {
   return status === 'pruned'
@@ -59,12 +63,14 @@ function harness(
     ...extra,
   });
   const logs: string[] = [];
+  const { publication = PUBLICATION, ...rest } = overrides;
   const ports: ChunkPorts = {
     fs,
     clock: createFakeClockPort(NOW),
     pid: PID,
     log: (line) => logs.push(line),
-    ...overrides,
+    ...rest,
+    publication,
   };
   return { fs, ports, logs };
 }
@@ -198,7 +204,10 @@ describe('runChunk: the three bounds and the yield', () => {
     const fs = createFakeFilesystemPort();
     const { visited, step } = scriptedStep();
 
-    const outcome = await runChunk({ fs, clock: createFakeClockPort(NOW), pid: PID }, step);
+    const outcome = await runChunk(
+      { fs, clock: createFakeClockPort(NOW), pid: PID, publication: PUBLICATION },
+      step,
+    );
 
     expect(outcome).toEqual({ kind: 'completed', completed: [], entries: [], records: [] });
     expect(visited).toEqual([]);
@@ -237,6 +246,212 @@ describe('runChunk: the step entries', () => {
     const { ports } = harness();
     const outcome = await runChunk(ports, scriptedStep().step);
     expect(outcome.entries).toEqual([]);
+  });
+});
+
+describe('runChunk: the published dataset', () => {
+  const DIVINE: ChunkPublication['currencyRates'][number] = {
+    currencyId: 'divine',
+    rate: 1,
+    source: 'measured',
+    league: 'Old League',
+    asOf: '2026-09-01T00:00:00Z',
+  };
+  const RATES = [DIVINE];
+  const PUBLISHING: ChunkPublication = { league: 'New League', currencyRates: RATES };
+
+  function noListings(tracked: TrackedEntry, at = NOW): DatasetEntry {
+    return { entryKey: key(tracked), price: { state: 'no-listings' }, lastAttemptedAt: at };
+  }
+
+  function neverSynced(tracked: TrackedEntry): DatasetEntry {
+    return { entryKey: key(tracked), price: { state: 'not-yet-synced', reason: 'never-synced' } };
+  }
+
+  function previousFile(entries: readonly DatasetEntry[]): string {
+    return `${JSON.stringify(
+      { schemaVersion: '1.0.0', league: 'Old League', generatedAt: SEVEN_HOURS_AGO, entries, currencyRates: [] },
+      null,
+      2,
+    )}\n`;
+  }
+
+  async function datasetOf(fs: FakeFilesystemPort): Promise<DatasetFile | undefined> {
+    const text = await fs.readTextFile(DATASET_PATH);
+    return text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text));
+  }
+
+  it('completed: one entry per tracked entry, pruned included, sorted, with the passed-in league and rates', async () => {
+    const { fs, ports } = harness([C, A, B, PRUNED], {}, { publication: PUBLISHING });
+    const step = scriptedStep((entry) =>
+      key(entry) === key(B) ? { kind: 'completed', entry: noListings(entry) } : { kind: 'completed' },
+    ).step;
+
+    expect((await runChunk(ports, step)).kind).toBe('completed');
+
+    const expectedKeys = [key(A), key(B), key(C), key(PRUNED)].toSorted(compareCanonicalKeys);
+    expect(await datasetOf(fs)).toEqual({
+      schemaVersion: '1.0.0',
+      league: 'New League',
+      generatedAt: NOW,
+      entries: expectedKeys.map((entryKey) =>
+        entryKey === key(B) ? noListings(B) : { entryKey, price: { state: 'not-yet-synced', reason: 'never-synced' } },
+      ),
+      currencyRates: RATES,
+    });
+  });
+
+  it('writes the schema’s key order, LF, no BOM and one trailing newline, whatever order the caller built', async () => {
+    const { fs, ports } = harness([A], {}, { publication: PUBLISHING });
+    await runChunk(ports, scriptedStep().step);
+
+    const text = (await fs.readTextFile(DATASET_PATH)) ?? '';
+    expect(text.charCodeAt(0)).not.toBe(0xfeff);
+    expect(text).not.toContain('\r');
+    expect(text.endsWith('}\n')).toBe(true);
+    expect(text.endsWith('\n\n')).toBe(false);
+    expect(Object.keys(JSON.parse(text) as object)).toEqual([
+      'schemaVersion',
+      'league',
+      'generatedAt',
+      'entries',
+      'currencyRates',
+    ]);
+  });
+
+  it('carry-over: an unvisited previous entry is written byte-identical; an untracked key is dropped', async () => {
+    const carried: DatasetEntry = {
+      entryKey: key(C),
+      price: { state: 'no-listings' },
+      lastAttemptedAt: FIVE_HOURS_AGO,
+      lastSearchId: 'abc',
+      lastSearchLeague: 'Old League',
+    };
+    const gone = noListings(raw('GONE'), FIVE_HOURS_AGO);
+    const previous = previousFile([carried, gone]);
+    const { fs, ports } = harness([A, C], { [DATASET_PATH]: { contents: previous } });
+    // A is never attempted, so it goes first; the chunk bounds after it and never visits C.
+    const step = scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 })).step;
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome.kind).toBe('bounded');
+    const written = (await fs.readTextFile(DATASET_PATH)) ?? '';
+    const block = (entry: DatasetEntry): string =>
+      JSON.stringify(entry, null, 2).split('\n').map((line) => `    ${line}`).join('\n');
+    expect(previous).toContain(block(carried));
+    expect(written).toContain(block(carried));
+    expect((await datasetOf(fs))?.entries.map((entry) => entry.entryKey)).toEqual(
+      [key(A), key(C)].toSorted(compareCanonicalKeys),
+    );
+    expect(written).not.toContain(gone.entryKey);
+  });
+
+  it('league change: a previous observation from another league is carried over unchanged', async () => {
+    const priced: DatasetEntry = {
+      entryKey: key(B),
+      price: {
+        state: 'priced',
+        observation: {
+          league: 'Old League',
+          observedAt: FIVE_HOURS_AGO,
+          priceDivine: 0.5,
+          sampleSize: 10,
+          exchangeObservation: DIVINE,
+        },
+      },
+      lastAttemptedAt: FIVE_HOURS_AGO,
+    };
+    const { fs, ports } = harness([B], { [DATASET_PATH]: { contents: previousFile([priced]) } }, {
+      publication: PUBLISHING,
+    });
+
+    // The step returns no entry for B, so its previous observation carries over.
+    await runChunk(ports, scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 })).step);
+
+    expect(await datasetOf(fs)).toMatchObject({ league: 'New League', entries: [priced] });
+  });
+
+  it('pruned: keeps its previous entry, or is never-synced', async () => {
+    const PRUNED_TOO = raw('Q', 'pruned');
+    const kept = noListings(PRUNED, SEVEN_HOURS_AGO);
+    const { fs, ports } = harness([PRUNED, PRUNED_TOO], { [DATASET_PATH]: { contents: previousFile([kept]) } });
+
+    await runChunk(ports, scriptedStep().step);
+
+    expect((await datasetOf(fs))?.entries).toEqual(
+      [kept, neverSynced(PRUNED_TOO)].toSorted((a, b) => compareCanonicalKeys(a.entryKey, b.entryKey)),
+    );
+  });
+
+  it('yielded: the stamped entry replaces the previous one', async () => {
+    const stamped: DatasetEntry = {
+      entryKey: key(A),
+      price: { state: 'no-listings' },
+      lastAttemptedAt: NOW,
+      lastSearchId: 'old-search',
+    };
+    const previous = { ...stamped, lastAttemptedAt: SEVEN_HOURS_AGO };
+    const { fs, ports } = harness([A], { [DATASET_PATH]: { contents: previousFile([previous]) } });
+
+    const outcome = await runChunk(ports, scriptedStep(() => ({ kind: 'yielded', entry: stamped })).step);
+
+    expect(outcome.kind).toBe('yielded');
+    expect((await datasetOf(fs))?.entries).toEqual([stamped]);
+  });
+
+  it('re-serialise: the same inputs write byte-identical files', async () => {
+    const texts: (string | undefined)[] = [];
+    for (let run = 0; run < 2; run += 1) {
+      const { fs, ports } = harness(undefined, {}, { publication: PUBLISHING });
+      await runChunk(ports, scriptedStep((entry) => ({ kind: 'completed', entry: noListings(entry) })).step);
+      texts.push(await fs.readTextFile(DATASET_PATH));
+    }
+    expect(texts[0]).toBeDefined();
+    expect(texts[1]).toBe(texts[0]);
+  });
+
+  it('busy: writes no dataset', async () => {
+    const held = serialiseLock({ pid: 7, startedAt: FIVE_HOURS_AGO });
+    const { fs, ports } = harness(undefined, { [LOCK_PATH]: { contents: held } });
+    expect((await runChunk(ports, scriptedStep().step)).kind).toBe('busy');
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+  });
+
+  it('dispossessed: writes no dataset', async () => {
+    const { fs, ports } = harness();
+    const outcome = await runChunk(ports, (entry) => {
+      fs.setFile(LOCK_PATH, { contents: serialiseLock({ pid: 99, startedAt: NOW }) });
+      return Promise.resolve({ kind: 'completed', entry: noListings(entry) });
+    });
+    expect(outcome.kind).toBe('dispossessed');
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+  });
+
+  it('a step throw writes no dataset', async () => {
+    const { fs, ports } = harness();
+    await expect(
+      runChunk(ports, (entry) =>
+        key(entry) === key(B)
+          ? Promise.reject(new Error('step exploded'))
+          : Promise.resolve({ kind: 'completed', entry: noListings(entry) }),
+      ),
+    ).rejects.toThrow('step exploded');
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+  });
+
+  it('an invalid artifact is refused: InvalidArtifactError, the file untouched, no progress, lock released', async () => {
+    const previous = previousFile([noListings(A, SEVEN_HOURS_AGO)]);
+    const { fs, ports } = harness([A], { [DATASET_PATH]: { contents: previous } });
+    const invalid = { ...noListings(A), lastAttemptedAt: 'not a timestamp' };
+
+    const failure = runChunk(ports, scriptedStep(() => ({ kind: 'completed', entry: invalid })).step);
+
+    await expect(failure).rejects.toBeInstanceOf(InvalidArtifactError);
+    await expect(failure).rejects.toMatchObject({ path: DATASET_PATH });
+    expect(await fs.readTextFile(DATASET_PATH)).toBe(previous);
+    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 });
 
@@ -286,11 +501,13 @@ describe('runChunk: resume and pass', () => {
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
-  it('serialises progress with the one artifact serialisation', async () => {
+  it('serialises progress through writeArtifact: the schema’s key order, LF, one trailing newline', async () => {
     const { fs, ports } = harness([A]);
     await runChunk(ports, scriptedStep().step);
+    // `SyncProgressFileSchema` extends the progress shape with `schemaVersion`,
+    // so the declared order puts it last.
     expect(await fs.readTextFile(PROGRESS_PATH)).toBe(
-      `{\n  "schemaVersion": "1.0.0",\n  "completed": [\n    ${JSON.stringify(key(A))}\n  ]\n}\n`,
+      `{\n  "completed": [\n    ${JSON.stringify(key(A))}\n  ],\n  "schemaVersion": "1.0.0"\n}\n`,
     );
   });
 });
@@ -366,8 +583,8 @@ describe('runChunk: the lock', () => {
     const second = scriptedStep();
 
     const outcomes = await Promise.all([
-      runChunk({ fs, clock, pid: 1, log: (line) => logs.push(line) }, first.step),
-      runChunk({ fs, clock, pid: 2, log: (line) => logs.push(line) }, second.step),
+      runChunk({ fs, clock, pid: 1, publication: PUBLICATION, log: (line) => logs.push(line) }, first.step),
+      runChunk({ fs, clock, pid: 2, publication: PUBLICATION, log: (line) => logs.push(line) }, second.step),
     ]);
 
     const kinds = outcomes.map((outcome) => outcome.kind).toSorted();
@@ -381,7 +598,12 @@ describe('runChunk: the lock', () => {
     const fs = createFakeFilesystemPort({ [TRACKED_PATH]: { contents: trackedText([A]) } });
     const clock = createFakeClockPort(NOW);
     const outcomes = await Promise.all(
-      [1, 2, 3, 4].map((pid) => runChunk({ fs, clock, pid, log: () => undefined }, scriptedStep().step)),
+      [1, 2, 3, 4].map((pid) =>
+        runChunk(
+          { fs, clock, pid, publication: PUBLICATION, log: () => undefined },
+          scriptedStep().step,
+        ),
+      ),
     );
     expect(outcomes.filter((outcome) => outcome.kind === 'completed')).toHaveLength(1);
     expect(outcomes.filter((outcome) => outcome.kind === 'busy')).toHaveLength(3);
@@ -469,7 +691,10 @@ describe('runChunk: the lock', () => {
   it('an invalid tracked list throws and still releases the lock', async () => {
     const fs = createFakeFilesystemPort({ [TRACKED_PATH]: { contents: '{not json' } });
     await expect(
-      runChunk({ fs, clock: createFakeClockPort(NOW), pid: PID }, scriptedStep().step),
+      runChunk(
+        { fs, clock: createFakeClockPort(NOW), pid: PID, publication: PUBLICATION },
+        scriptedStep().step,
+      ),
     ).rejects.toThrow(/tracked\.json/);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
@@ -717,6 +942,7 @@ describe('runChunk: the declared yardstick is never a chunk bound', () => {
       const text = readFileSync(join(directory, name), 'utf8');
       expect(text, name).not.toMatch(/minChunkSearches/);
       expect(text, name).not.toMatch(/config\.json/);
+      expect(text, name).not.toMatch(/currencies\.json/);
     }
   });
 });
