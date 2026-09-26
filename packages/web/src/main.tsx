@@ -1,10 +1,10 @@
 import '@mantine/core/styles.css';
 
-import { MantineProvider } from '@mantine/core';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from './App';
+import { PageProvider } from './theme/PageProvider';
 
 const container = document.getElementById('root');
 if (container === null) {
@@ -13,8 +13,8 @@ if (container === null) {
 
 createRoot(container).render(
   <StrictMode>
-    <MantineProvider>
+    <PageProvider>
       <App />
-    </MantineProvider>
+    </PageProvider>
   </StrictMode>,
 );

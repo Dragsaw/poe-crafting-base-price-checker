@@ -1,0 +1,29 @@
+/*
+ * The few rules inline styles cannot express: hover states. Every value is a
+ * token custom property (`--fg-color-*`, set by theme.ts from tokens.ts), so
+ * this file holds no colour of its own. No transition, no shadow, no radius.
+ */
+
+.fg-affordance {
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted var(--fg-color-sepia);
+  border-radius: 0;
+  padding: 0;
+  color: var(--fg-color-sepia);
+  cursor: pointer;
+}
+
+.fg-affordance:hover {
+  border-bottom-style: solid;
+}
+
+.fg-trade-glyph {
+  color: var(--fg-color-ink-tertiary);
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.fg-trade-glyph:hover {
+  color: var(--fg-color-sepia);
+}

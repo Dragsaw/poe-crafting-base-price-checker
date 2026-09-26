@@ -1,15 +1,69 @@
-import { Text } from '@mantine/core';
-import type { JSX } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 
-import { CORE_PLACEHOLDER } from '@poe/core';
+import { AbsenceLines } from './frame/AbsenceLines';
+import { FailureScreen } from './frame/FailureScreen';
+import { Frame } from './frame/Frame';
+import { Masthead } from './frame/Masthead';
+import { RowSlots } from './frame/RowSlots';
+import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
+
+type ViewState = { readonly kind: 'pending' } | LoadOutcome;
 
 /**
- * The placeholder the shell renders. Story 2.1 replaces the whole component;
- * until then this string is what the jsdom mount test asserts against. It names
- * `core` so the `web` -> `core` edge is genuinely exercised at build time.
+ * The page's substrate. It paints the masthead and twenty skeleton slots at
+ * once, then moves to exactly one outcome in a single state transition — a
+ * whole set, the refusal screen or the fetch-failure screen — never row by row
+ * (AD-24, FR-33). `+ Try again` re-runs all eight fetches.
+ *
+ * Stories 2.2 and 2.3 render the ranked rows into the ready state.
  */
-export const PLACEHOLDER_TEXT = `poe-crafting-base-price-checker: ${CORE_PLACEHOLDER}:web shell`;
-
 export function App(): JSX.Element {
-  return <Text>{PLACEHOLDER_TEXT}</Text>;
+  const [attempt, setAttempt] = useState(0);
+  const [view, setView] = useState<ViewState>({ kind: 'pending' });
+
+  useEffect(() => {
+    let live = true;
+    void loadArtifacts().then((outcome) => {
+      if (live) {
+        setView(outcome);
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, [attempt]);
+
+  const retry = useCallback(() => {
+    setView({ kind: 'pending' });
+    setAttempt((count) => count + 1);
+  }, []);
+
+  switch (view.kind) {
+    case 'pending':
+      return (
+        <Frame state="pending">
+          <Masthead league={undefined} />
+          <RowSlots />
+        </Frame>
+      );
+    case 'ready':
+      return (
+        <Frame state="ready">
+          <Masthead league={view.set.config.league} />
+          <AbsenceLines absent={view.absent} />
+        </Frame>
+      );
+    case 'refused':
+      return (
+        <Frame state="refused">
+          <FailureScreen variant="refused" path={view.path} declared={view.declared} expected={view.expected} />
+        </Frame>
+      );
+    case 'failed':
+      return (
+        <Frame state="failed">
+          <FailureScreen variant="failed" path={view.path} onRetry={retry} />
+        </Frame>
+      );
+  }
 }
