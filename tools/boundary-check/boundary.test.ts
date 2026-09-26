@@ -53,6 +53,13 @@ const EXPECTED_VIOLATIONS = [
     from: 'packages/contracts/src/index.ts',
     to: 'packages/core/src/index.ts',
   },
+  { rule: 'no-core-to-node-builtin', from: 'packages/core/src/index.ts', to: 'fs' },
+  {
+    rule: 'no-core-to-npm-package',
+    from: 'packages/core/src/index.ts',
+    // Matched by package directory, not version, so a dependency bump holds.
+    to: expect.stringMatching(/node_modules\/dependency-cruiser\//),
+  },
   { rule: 'no-core-to-sync', from: 'packages/core/src/index.ts', to: 'packages/sync/src/index.ts' },
   { rule: 'no-core-to-web', from: 'packages/core/src/index.ts', to: 'packages/web/src/index.ts' },
   { rule: 'no-sync-to-web', from: 'packages/sync/src/index.ts', to: 'packages/web/src/index.ts' },
@@ -87,6 +94,22 @@ it('reports every forbidden edge, by rule name and at error severity', async () 
 
   // One fixture edge per rule, so a rule with no fixture cannot hide here.
   expect(violations).toHaveLength(rules.length);
+});
+
+it('keeps resolved npm modules in the graph of the real repo-root cruise', async () => {
+  // The fixture cruise sees npm paths as `../../../../node_modules/...`, so a
+  // root-anchored exclude such as `^node_modules/` would pass it while leaving
+  // `no-core-to-npm-package` inert in `pnpm check`. Cruise as `pnpm check` does.
+  const result = await cruise(['packages'], {
+    ...shippedConfig.options,
+    ruleSet: { forbidden: shippedConfig.forbidden },
+    validate: true,
+  });
+  const output = result.output as unknown as {
+    readonly modules: readonly { readonly source: string }[];
+  };
+
+  expect(output.modules.some((module) => module.source.startsWith('node_modules/'))).toBe(true);
 });
 
 it('leaves every allowed edge unreported, having analysed the mirror tree', async () => {

@@ -1,5 +1,11 @@
 /**
- * The one-way package graph (AD-1, NFR-4): `contracts` -> `core` -> `sync` / `web`.
+ * The one-way package graph (AD-1, NFR-4): `contracts` -> `core` -> `sync` / `web`,
+ * plus the import purity of `core` (AD-1): a `core` module imports no Node
+ * builtin and nothing outside `packages/`. Edges into `packages/` are left to
+ * the direction rules above.
+ * The purity rules cover `packages/core/src/` only; test files (`*.test.ts`)
+ * there are exempt, and package tooling such as `vitest.config.ts` is outside
+ * it: neither is a valuation module.
  *
  * This module is the single source of the rules. `.dependency-cruiser.mjs`
  * spreads it into the shipped config, and `tools/boundary-check/boundary.test.ts`
@@ -51,6 +57,22 @@ export const rules = [
       'Forbidden edge contracts -> sibling. `contracts` sits at the root of the graph and depends on nothing in this workspace (AD-1).',
     from: { path: '^packages/contracts/' },
     to: { path: '^packages/(core|sync|web)/' },
+  },
+  {
+    name: 'no-core-to-node-builtin',
+    severity: 'error',
+    comment:
+      'Forbidden edge core -> Node builtin (`node:fs`, `fs`, ...). `core` performs no I/O; I/O belongs in the imperative shell (AD-1). Test files are exempt.',
+    from: { path: '^packages/core/src/', pathNot: '\\.test\\.ts$' },
+    to: { dependencyTypes: ['core'] },
+  },
+  {
+    name: 'no-core-to-npm-package',
+    severity: 'error',
+    comment:
+      'Forbidden edge core -> npm package. `core` is pure and imports nothing outside `packages/`; workspace edges are left to the direction rules (AD-1). Path-based, so an undeclared package (npm-no-pkg, unknown) is caught too; builtins are left to no-core-to-node-builtin. Test files are exempt.',
+    from: { path: '^packages/core/src/', pathNot: '\\.test\\.ts$' },
+    to: { pathNot: '^packages/', dependencyTypesNot: ['core'] },
   },
 ];
 
