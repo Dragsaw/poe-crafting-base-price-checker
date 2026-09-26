@@ -8,15 +8,19 @@ import {
   compareCanonicalKeys,
   createFakeClockPort,
   createFakeFilesystemPort,
+  createFakeGitPort,
   DatasetFileSchema,
+  SyncReportFileSchema,
 } from '@poe/contracts';
-import type { CurrencyRate, DatasetEntry, DatasetFile, TrackedEntry } from '@poe/contracts';
+import type { CurrencyRate, DatasetEntry, DatasetFile, SyncReportFile, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { DATASET_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { DRY_RUN_INSTANT, dryRun, readRepositorySnapshot } from './dry-run.ts';
 import type { DryRunSnapshot } from './dry-run.ts';
+import { pinnedStarvationRecord } from './pinned-cap.ts';
 import { pricingFixtureName } from './pricing/fixture-names.ts';
+import { createRequestCounter } from './request-counter.ts';
 import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
 import { tradeSearchUrl } from './trade/endpoints.ts';
 
@@ -88,6 +92,20 @@ function datasetOf(published: readonly DatasetEntry[]): DatasetFile {
   };
 }
 
+/** The report of a finished dry run over no previous report, with no git history and no mtime. */
+function reportOf(trackedListRequests: number, notReachedCount = 0): SyncReportFile {
+  return {
+    runStartedAt: DRY_RUN_INSTANT,
+    runFinishedAt: DRY_RUN_INSTANT,
+    figures: {
+      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 0, 'catalogue-refresh': 0 },
+      notReachedCount,
+    },
+    records: [],
+    schemaVersion: '1.0.0',
+  };
+}
+
 describe('dryRun', () => {
   it('runs the chunk in memory through the pricing step and reports each entry', async () => {
     const [active, pinned, pruned] = entries as [TrackedEntry, TrackedEntry, TrackedEntry];
@@ -106,6 +124,8 @@ describe('dryRun', () => {
         ].toSorted((a, b) => compareCanonicalKeys(a.entryKey, b.entryKey)),
       ),
       records: [],
+      // Two searches that found nothing, so no fetch.
+      report: reportOf(2),
     });
   });
 
@@ -117,6 +137,7 @@ describe('dryRun', () => {
       progress: { schemaVersion: '1.0.0', completed: [] },
       dataset: datasetOf([]),
       records: [],
+      report: reportOf(0),
     });
   });
 
@@ -140,6 +161,27 @@ describe('dryRun', () => {
 
   it('is deterministic for a given snapshot', async () => {
     expect(await dryRun(snapshotOf(entries))).toEqual(await dryRun(snapshotOf(entries)));
+  });
+
+  it('carries the snapshot report’s records into the report, and replaces its figures', async () => {
+    const broken = { kind: 'stale-lock-broken', pid: 7, startedAt: '2025-12-31T00:00:00.000Z' } as const;
+    const previous = JSON.stringify({
+      ...reportOf(99, 5),
+      runStartedAt: '2025-12-31T00:00:00.000Z',
+      runFinishedAt: '2025-12-31T00:01:00.000Z',
+      records: [broken],
+    });
+
+    const report = await dryRun(snapshotOf(entries, { report: previous }));
+
+    expect(report.records).toEqual([]);
+    expect(report.report).toEqual({ ...reportOf(2), records: [broken] });
+  });
+
+  it('refuses a snapshot report of an unknown major loudly', async () => {
+    await expect(
+      dryRun(snapshotOf(entries, { report: JSON.stringify({ ...reportOf(0), schemaVersion: '9.0.0' }) })),
+    ).rejects.toThrow(/sync-report\.json/);
   });
 
   it('refuses an invalid tracked file loudly', async () => {
@@ -210,6 +252,9 @@ describe('dryRun: the dataset snapshot', () => {
         fs,
         clock: createFakeClockPort(DRY_RUN_INSTANT),
         pid: 1,
+        git: createFakeGitPort(),
+        requests: createRequestCounter(),
+        starvationRecord: (starvation) => pinnedStarvationRecord(starvation, { minChunkSearches: 1 }),
         publication: { league: LEAGUE, currencyRates: [] },
         log: () => undefined,
       },
@@ -319,7 +364,15 @@ describe('pnpm sync:dry', () => {
     expect(first.stderr).toBe('');
 
     const report = JSON.parse(first.stdout) as Record<string, unknown>;
-    expect(Object.keys(report)).toEqual(['outcome', 'completed', 'entries', 'progress', 'dataset', 'records']);
+    expect(Object.keys(report)).toEqual([
+      'outcome',
+      'completed',
+      'entries',
+      'progress',
+      'dataset',
+      'records',
+      'report',
+    ]);
     expect(report['outcome']).toBe('completed');
     // Printed as written: the schema accepts it and its keys are in declared order.
     expect(DatasetFileSchema.safeParse(report['dataset']).success).toBe(true);
@@ -330,6 +383,18 @@ describe('pnpm sync:dry', () => {
       'entries',
       'currencyRates',
     ]);
+
+    // The run-report assertion Story 1.5 left open: the schema accepts it, in
+    // declared key order, with all three sources present.
+    expect(SyncReportFileSchema.safeParse(report['report']).success).toBe(true);
+    const printed = report['report'] as SyncReportFile;
+    expect(Object.keys(printed)).toEqual(['runStartedAt', 'runFinishedAt', 'figures', 'records', 'schemaVersion']);
+    expect(Object.keys(printed.figures.requestsBySource).toSorted()).toEqual([
+      'catalogue-refresh',
+      'league-validation',
+      'tracked-list',
+    ]);
+    expect(printed.figures.requestsBySource['tracked-list']).toBeGreaterThan(0);
 
     expect(snapshot(DATA_DIR)).toEqual(before);
   });

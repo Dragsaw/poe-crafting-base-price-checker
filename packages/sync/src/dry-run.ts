@@ -10,11 +10,15 @@
  * the recorded `fixtures/trade-{search,fetch}-*.json` back by request digest;
  * an unrecorded request fails loudly — the run rejects, naming the missing
  * fixture, and never yields. It prints
- * `{outcome, completed, entries, progress, dataset, records}` — plus
+ * `{outcome, completed, entries, progress, dataset, records, report}` — plus
  * `pinnedStarvation` when the chunk truncated the pinned set — as JSON to
- * stdout and writes nothing to disk: the lock, `sync-progress.json` and
- * `dataset.json` land in the fake. `dataset` is the file as the chunk wrote
- * it, with the active league and the output rate set passed in.
+ * stdout and writes nothing to disk: the lock, `sync-progress.json`,
+ * `dataset.json` and `sync-report.json` land in the fake. `dataset` is the
+ * file as the chunk wrote it, with the active league and the output rate set
+ * passed in. `report` is the Sync Report as the chunk wrote it: the offline
+ * port's requests are counted as `tracked-list`, the git port is a fake with
+ * no history, and a snapshot of `data/sync-report.json` (when present)
+ * supplies the records it carries forward.
  *
  * An absent tracked file is an empty workload, and an absent dataset means
  * every entry is never attempted. An absent or invalid config, currencies or
@@ -29,29 +33,40 @@ import { fileURLToPath } from 'node:url';
 import {
   createFakeClockPort,
   createFakeFilesystemPort,
+  createFakeGitPort,
   DatasetFileSchema,
   parseEnvelope,
   SyncProgressFileSchema,
+  SyncReportFileSchema,
 } from '@poe/contracts';
 import type {
   DatasetEntry,
   DatasetFile,
   FilesystemPort,
   SyncProgressFile,
+  SyncReportFile,
   SyncRunRecord,
 } from '@poe/contracts';
 
-import { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
+import {
+  DATASET_PATH,
+  PROGRESS_PATH,
+  REPORT_PATH,
+  runChunk,
+  TRACKED_PATH,
+} from './chunk/run-chunk.ts';
 import type { ChunkOutcomeKind, ChunkStarvation } from './chunk/run-chunk.ts';
-import { CONFIG_PATH, loadActiveLeague } from './load-config.ts';
+import { CONFIG_PATH, loadConfig } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
 import type { DataFileResult } from './load-data-file.ts';
+import { pinnedStarvationRecord } from './pinned-cap.ts';
 import { createFixtureHttpPort, readPricingFixtures } from './pricing/fixture-port.ts';
 import type { PricingFixtures } from './pricing/fixture-port.ts';
 import { CURRENCIES_PATH, loadCurrencies } from './pricing/load-currencies.ts';
 import { outputRates } from './pricing/normalise.ts';
 import { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types.ts';
 import { createPricingStep } from './pricing/price-entry.ts';
+import { createRequestCounter } from './request-counter.ts';
 import { createTradeClient } from './trade/client.ts';
 
 /** Fixed, so two dry runs over the same inputs print the same bytes. */
@@ -70,6 +85,8 @@ export interface DryRunReport {
   /** The dataset file the chunk wrote into the fake, or `null` if none. */
   readonly dataset: DatasetFile | null;
   readonly records: readonly SyncRunRecord[];
+  /** The Sync Report the chunk wrote into the fake, or `null` if none. */
+  readonly report: SyncReportFile | null;
   /** Present only when the chunk truncated the pinned set (AD-7). */
   readonly pinnedStarvation?: ChunkStarvation;
 }
@@ -81,6 +98,8 @@ export interface DryRunSnapshot {
   readonly config?: string | undefined;
   readonly currencies?: string | undefined;
   readonly items?: string | undefined;
+  /** The previous Sync Report, whose records the chunk carries forward. */
+  readonly report?: string | undefined;
   readonly fixtures: PricingFixtures;
 }
 
@@ -109,6 +128,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     [CONFIG_PATH, snapshot.config],
     [CURRENCIES_PATH, snapshot.currencies],
     [CATALOGUE_ITEMS_PATH, snapshot.items],
+    [REPORT_PATH, snapshot.report],
   ];
   const fs = createFakeFilesystemPort(
     Object.fromEntries(
@@ -116,7 +136,8 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     ),
   );
 
-  const league = valueOf(await loadActiveLeague(fs));
+  const config = valueOf(await loadConfig(fs));
+  const league = config.league;
   const rates = valueOf(await loadCurrencies(fs));
   const itemTypes = valueOf(await loadItemTypes(fs));
   const previous =
@@ -127,8 +148,9 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
         ).entries;
 
   const clock = createFakeClockPort(DRY_RUN_INSTANT);
+  const requests = createRequestCounter();
   const client = createTradeClient({
-    http: createFixtureHttpPort(snapshot.fixtures),
+    http: requests.counted(createFixtureHttpPort(snapshot.fixtures), 'tracked-list'),
     clock,
     wait: () => Promise.resolve(),
     userAgent: DRY_RUN_USER_AGENT,
@@ -136,13 +158,22 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
   const step = createPricingStep({ client, league, rates, itemTypes, dataset: previous, clock });
 
   const outcome = await runChunk(
-    { fs, clock, pid: DRY_RUN_PID, publication: { league, currencyRates: outputRates(rates) } },
+    {
+      fs,
+      clock,
+      pid: DRY_RUN_PID,
+      publication: { league, currencyRates: outputRates(rates) },
+      git: createFakeGitPort(),
+      requests,
+      starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
+    },
     step,
   );
   // Each artifact was written in its schema's key order, so the parsed value
   // prints as written.
   const progress = await readWritten(fs, PROGRESS_PATH, SyncProgressFileSchema);
   const dataset = await readWritten(fs, DATASET_PATH, DatasetFileSchema);
+  const report = await readWritten(fs, REPORT_PATH, SyncReportFileSchema);
   return {
     outcome: outcome.kind,
     completed: outcome.completed,
@@ -150,6 +181,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     progress,
     dataset,
     records: outcome.records,
+    report,
     ...(outcome.pinnedStarvation === undefined ? {} : { pinnedStarvation: outcome.pinnedStarvation }),
   };
 }
@@ -178,6 +210,7 @@ export async function readRepositorySnapshot(): Promise<DryRunSnapshot> {
     config: await readSnapshot(CONFIG_PATH),
     currencies: await readSnapshot(CURRENCIES_PATH),
     items: await readSnapshot(CATALOGUE_ITEMS_PATH),
+    report: await readSnapshot(REPORT_PATH),
     fixtures: await readPricingFixtures(FIXTURES_DIR),
   };
 }

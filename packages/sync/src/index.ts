@@ -42,13 +42,27 @@ export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-head
 
 /**
  * One bounded, resumable, single-instance chunk (FR-19, AD-7). Under the lock
- * it writes `data/dataset.json` and `data/sync-progress.json` by explicit path
- * and performs no git write (AD-3). No live command drives it yet (Stories 1.9
- * and 1.11); the tests and `pnpm sync:dry` do, against in-memory fakes.
+ * it writes `data/dataset.json`, `data/sync-progress.json` and
+ * `data/sync-report.json` by explicit path and performs no git write (AD-3).
+ * The report carries requests per source (AD-12, FR-14), the not-reached count
+ * and the tracked-list edit date as figures, and every unacknowledged record
+ * (FR-25). A throw still writes the report, with a `run-failure` record. No
+ * live command drives it yet (Story 1.11); the tests and `pnpm sync:dry` do,
+ * against in-memory fakes.
  */
-export { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
+export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
 export { buildDatasetFile } from './chunk/publish-dataset';
 export type { DatasetInputs } from './chunk/publish-dataset';
+export { buildSyncReport, carryRecords } from './chunk/sync-report';
+export type { SyncReportFigures, SyncReportInputs } from './chunk/sync-report';
+
+/**
+ * Per-source request accounting (AD-12, FR-14): a shell wraps each `HttpPort`
+ * it hands out with the source it serves, and passes the counter to
+ * `runChunk`. The wrapper adds no request path of its own.
+ */
+export { createRequestCounter, requestsBetween, zeroRequests } from './request-counter';
+export type { RequestCounter, RequestsBySource } from './request-counter';
 export type {
   ChunkBound,
   ChunkOutcome,
@@ -101,6 +115,6 @@ export type { ItemTypes, SearchBody } from './pricing/search-body';
 export { currentRates, lowerMedian, outputRates, roundDivine, toDivine } from './pricing/normalise';
 export { CURRENCIES_PATH, loadCurrencies } from './pricing/load-currencies';
 export { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types';
-export { CONFIG_PATH, loadActiveLeague } from './load-config';
+export { CONFIG_PATH, loadActiveLeague, loadConfig } from './load-config';
 export { DataFileError } from './load-data-file';
 export type { DataFileRefusal, DataFileResult } from './load-data-file';
