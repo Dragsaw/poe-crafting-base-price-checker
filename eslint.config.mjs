@@ -61,7 +61,16 @@ export default tseslint.config(
       'docs/**',
       'data/**',
       '_bmad/**',
-      '.claude/**',
+      // Everything under `.claude/` except the tracked-json skill's scripts,
+      // which are code that `pnpm check` judges. A negation cannot reach inside
+      // an ignored directory, so each level ignores its children with `*` and
+      // un-ignores the one directory on the path.
+      '.claude/*',
+      '!.claude/skills/',
+      '.claude/skills/*',
+      '!.claude/skills/tracked-json/',
+      '.claude/skills/tracked-json/*',
+      '!.claude/skills/tracked-json/scripts/',
       '.serena/**',
       '.impeccable/**',
     ],
@@ -71,6 +80,7 @@ export default tseslint.config(
       'packages/**/*.{ts,tsx,mts,cts}',
       'test/**/*.ts',
       'tools/**/*.ts',
+      '.claude/skills/tracked-json/scripts/*.ts',
       '*.{ts,mts,cts,mjs}',
       // Leading-dot filenames are not matched by a `*` glob.
       '.dependency-cruiser.mjs',

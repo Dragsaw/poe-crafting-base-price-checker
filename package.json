@@ -18,7 +18,9 @@
     "sync": "node --env-file-if-exists=.env packages/sync/src/sync.ts",
     "sync:dry": "node packages/sync/src/dry-run.ts",
     "fixtures:record": "node --env-file-if-exists=.env packages/sync/src/fixtures-record.ts",
-    "catalogue:refresh": "node --env-file-if-exists=.env packages/sync/src/catalogue-refresh.ts"
+    "catalogue:refresh": "node --env-file-if-exists=.env packages/sync/src/catalogue-refresh.ts",
+    "tracked:lookup": "node .claude/skills/tracked-json/scripts/lookup.ts",
+    "tracked:check": "node packages/sync/src/curation/check.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

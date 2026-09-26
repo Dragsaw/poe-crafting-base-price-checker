@@ -197,3 +197,12 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-6-the-trust-strip-its-health-line-and-the-sync-report-panel.md`
   summary: [NOTE FOR UX] The Sync Report panel copy is provisional. It prints only figures `sync-report.json` publishes, with no sum and no numerator: `10 tracked list · 1 league validation requests this pass.` · `N tracked entries were not reached in the last sync pass.` · `N entries are unresolvable.` · `N pinned-starvation records.` with one `pinnedRefreshed of pinnedCount pinned entries refreshed` line per record · `86% of 29 tracked Item Classes.` Zeros print in the panel. With `sync-report.json` absent, each of the five groups reads italic *unknown*. The mockup's prose (a request total, a measured daily ceiling, `N of M tracked entries`, `across N Item Classes`, a record date, a coverage numerator, explanatory sentences) needs figures the report does not publish. UX owns the final wording, including singular forms (`1 entries`, `1 pinned-starvation records` read as written) and whether the panel explains any figure.
   evidence: Spec 2.6 decision 2026-09-27. The copy lives in `panelColumns` in `packages/web/src/frame/trust-facts.ts`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert it, so a ruling changes those three files.
+
+## Deferred from: tracked.json curation tooling (2026-09-27)
+
+- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
+  summary: When Story 3.3 builds the five cross-file checks in `core`, `checkTracked` in `packages/sync/src/curation/check.ts` must call them over `data/tracked.json` and `data/weights.json` and drop its `pending` item "five cross-file checks (Story 3.3)".
+  evidence: The spec's Never list forbids a local implementation of the five checks, so `pnpm tracked:check` runs only the schema, the pinned cap and catalogue resolvability, and it lists the rest under `pending`. The five checks are named in `AGENT-WORKFLOW.md` (the five cross-file checks rule; AD-17).
+- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
+  summary: When `checkTracked` calls the five cross-file checks, remove the "Open weak point" section and the hand-check step 8 of the loop from `.claude/skills/tracked-json/SKILL.md`, and renumber the steps that cite it.
+  evidence: The spec's Always list makes the skill state the weak point until Story 3.3. The hand check exists only because `tracked:check` cannot yet see `data/weights.json`.

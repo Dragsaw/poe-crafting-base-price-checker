@@ -13,7 +13,12 @@ export default defineConfig({
         test: {
           name: 'root',
           root: import.meta.dirname,
-          include: ['test/**/*.test.ts', 'tools/boundary-check/*.test.ts', 'tools/dts-specifiers/*.test.ts'],
+          include: [
+            'test/**/*.test.ts',
+            'tools/boundary-check/*.test.ts',
+            'tools/dts-specifiers/*.test.ts',
+            '.claude/skills/tracked-json/scripts/*.test.ts',
+          ],
           setupFiles: ['./test/setup.ts'],
         },
       },
