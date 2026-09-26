@@ -64,10 +64,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 
 ## Deferred from: story 1.10 (2026-09-26)
 
-- source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
-  summary: The test identity set by enterWith may linger into a hook that belongs to no test, such as a file-level afterAll, so a request issued there could be charged to the last test.
-  evidence: enterWith never clears the store. A beforeAll in a nested describe did not inherit an earlier test's identity (test/no-network.test.ts, attempt 1), but a file-level afterAll or a later suite's hooks were not probed. If true, the file still fails, but it names the wrong test. Would be settled by a test file whose afterAll issues an unfixtured request, observing the issuer in the file-level message.
-
 ## Deferred from: story 1.11 (2026-09-26)
 
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
