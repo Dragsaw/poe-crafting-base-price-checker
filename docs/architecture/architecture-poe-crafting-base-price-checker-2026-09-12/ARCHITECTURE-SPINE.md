@@ -1512,8 +1512,12 @@ never import each other.
   dataset, which changes cache behaviour, staleness and deploy semantics. Also prevents a
   read-time ranking that AD-4 mandates but nobody sized.
 - **Rule:** `web` **fetches** exactly **eight** artifacts at runtime, as separate
-  cache-busted requests: `dataset.json`, `sync-report.json`, `weights.json`, `recipes.json`,
-  `tracked.json`, `config.json`, `catalogue/stats.json` and `catalogue/static.json`. It
+  requests, each with `cache: 'no-store'` and **no query token**: `dataset.json`,
+  `sync-report.json`, `weights.json`, `recipes.json`, `tracked.json`, `config.json`,
+  `catalogue/stats.json` and `catalogue/static.json`. `no-store` bypasses the browser cache
+  only; the Pages CDN still serves with `max-age=600`, so a published artifact can be up to
+  10 minutes stale, and a set fetched across a data commit can rarely mix old and new files.
+  Both costs are accepted. It
   never fetches `sync-progress.json` (internal to `sync`), `catalogue/items.json` or
   `catalogue/filters.json` (only `sync` needs them), or `data/currencies.json` (a sync-side
   workload declaration, whose absence is what makes AD-7's cap a `sync`-side check). **A

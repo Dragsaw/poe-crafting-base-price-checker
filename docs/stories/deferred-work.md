@@ -129,3 +129,15 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/epics.md` (Epic 2, Story 2.6)
   summary: [NOTE FOR UX] Coverage wording when `weights.json` is present but `sync-report.json` omits the figure. `sync` does not measure coverage until Story 3.6, so on the committed data the figure is omitted while the file is present. AD-27 describes omission only for an absent file.
   evidence: Story 2.6 renders the case as provisional *not measured*, never `0`, and never as file absence. The page tells the two cases apart by the weights envelope it loaded. UX owns the final copy and placement in the *what the weights cover* column. The case goes away once Story 3.6 ships the sync-side measurement.
+
+## Deferred from: story 2.1 (2026-09-26)
+
+- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
+  summary: [NOTE FOR UX] Skeleton rows (state 22) still have no designed treatment. Story 2.1 ships DESIGN.md's documented fallback: twenty 28px slots in the six-column layout, each cell a flat `paper-inset` bar 10px tall at its column width less its right padding, no shimmer, no animation, and no column header. The masthead eyebrow holds a blank line until the league is known.
+  evidence: DESIGN.md Components, the skeleton `[NOTE FOR UX]`, names the fallback but draws no fill, bar height or header. `packages/web/src/frame/RowSlots.tsx` holds the treatment in one place, so a ruling changes one file.
+- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
+  summary: [NOTE FOR UX] Absence-line copy and placement. Each absent tolerable artifact prints one plain sans line under the masthead in `ink-secondary`, at 11.5px on a 21px line: `Not published: recipes.json — no crafted rows can be ranked.`, `Not published: weights.json — every crafted class is unrankable.`, `Not published: sync-report.json — the sync report is unavailable.` Each takes its own 21px entry in the chrome budget (`packages/web/src/theme/tokens.ts`, `reservedChrome`). UX owns the final wording, the position relative to the trust strip (Story 2.6), and whether a line carries a mark.
+  evidence: Story 2.1 decision 2026-09-26. EXPERIENCE.md has no treatment for a named absence; AD-24 requires only that a degraded render names what is missing.
+- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
+  summary: [NOTE FOR UX] DESIGN.md's vertical budget does not add up. The table commits 1390px and says `frame-slack = 1920 − 1390 = 528`, but 1920 − 1390 is 530. The frontmatter token `spacing.frame-slack` is `528px`. Story 2.1 keeps the frontmatter value, which is 2px conservative, and the token test asserts the bound rather than equality.
+  evidence: Found while writing `packages/web/src/theme/tokens.test.ts`. Either a committed block is 2px taller than its row in the table, or the token is off by 2px; UX owns which.
