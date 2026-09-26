@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest';
 import {
   colors,
   columnSums,
+  combinationLine1Columns,
+  combinationLine2Columns,
   committedChrome,
   glyphs,
   INKS,
   PAPER_TONES,
+  px,
   rankedRowColumns,
   REGULAR_ONLY_GLYPHS,
   reservedChrome,
@@ -89,6 +92,37 @@ describe('the payout-threshold panel', () => {
       spacing.mastheadControlGap,
       spacing.thresholdPanelWidth,
     ]);
+  });
+});
+
+describe('the expansion panel and the combination row', () => {
+  it('pads the panel 18/22/20 inside a 1px border, leaving 966 inside the content width', () => {
+    expect([spacing.panelPadTop, spacing.panelPadX, spacing.panelPadBottom]).toEqual([18, 22, 20]);
+    expect([spacing.panelSubMarginTop, spacing.panelSubMarginBottom]).toEqual([4, 13]);
+    expect(spacing.contentWidth - 2 * spacing.hairline - 2 * spacing.panelPadX).toBe(966);
+  });
+
+  it('cuts line one as 460 + 250 + 116 + 116 + 24 and line two as 560 + 200 + 206, each 966', () => {
+    const line1 = combinationLine1Columns.map((column) => column.width);
+    const line2 = combinationLine2Columns.map((column) => column.width);
+    expect(line1).toEqual([...columnSums.combinationLine1]);
+    expect(line2).toEqual([...columnSums.combinationLine2]);
+    expect(sum(line1)).toBe(966);
+    expect(sum(line2)).toBe(966);
+  });
+
+  it('pads every text cell 12px on the right, and the trade-link cell not at all', () => {
+    for (const column of [...combinationLine1Columns, ...combinationLine2Columns]) {
+      expect(column.padRight, column.name).toBe(column.name === 'trade-link' ? 0 : spacing.padCombinationCellRight);
+    }
+    expect(spacing.padCombinationCellRight).toBe(12);
+  });
+
+  it('is 28 + 20 = 48 at minimum, and line two steps by its absolute 20px lineHeight', () => {
+    expect(spacing.detailRowHeight).toBe(28);
+    expect(spacing.combinationRowLine2Height).toBe(20);
+    expect(spacing.combinationRowHeight).toBe(spacing.detailRowHeight + spacing.combinationRowLine2Height);
+    expect(typeRoles['combination-line-2'].lineHeight).toBe(px(spacing.combinationRowLine2Height));
   });
 });
 

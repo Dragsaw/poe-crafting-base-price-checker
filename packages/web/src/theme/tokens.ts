@@ -115,6 +115,25 @@ export const spacing = {
   footMarginTop: 18,
   footPadTop: 10,
   footMarginBottom: 20,
+  /**
+   * `{components.expansion-panel}`: padding 18/22/20 inside a 1px `edge`
+   * border, so the inner width is 1012 − 2 − 44 = 966. The sub-line sits 4px
+   * under the title and 13px above the first combination row
+   * (`mockups/key-expanded-states.html`). `{spacing.4}` follows the panel.
+   */
+  panelPadTop: 18,
+  panelPadX: 22,
+  panelPadBottom: 20,
+  panelSubMarginTop: 4,
+  panelSubMarginBottom: 13,
+  /** `{components.combination-row}`: every cell but the trade-link cell pads 12px on the right. */
+  padCombinationCellRight: 12,
+  /** Line one of a combination row. */
+  detailRowHeight: 28,
+  /** Line two's wrap quantum: `combination-line-2` sets an absolute 20px lineHeight. */
+  combinationRowLine2Height: 20,
+  /** A MINIMUM, 28 + 20: a wrapped note grows the row by whole line-two steps. */
+  combinationRowHeight: 48,
 } as const;
 
 /** A px number as a CSS length. */
@@ -140,6 +159,26 @@ export const columnSums = {
   tombstoneLine2: [560, 406],
   appendix: [292, 118, 250, 310],
 } as const;
+
+/**
+ * `{components.combination-row}` line one, the figure: `col-combination`,
+ * `-state`, `-figure`, `-sample` and `-trade-link`. The trade-link cell takes
+ * no right padding: the mockup right-aligns `↗` flush to the panel's inner edge.
+ */
+export const combinationLine1Columns = [
+  { name: 'combination', width: 460, padRight: 12 },
+  { name: 'state', width: 250, padRight: 12 },
+  { name: 'figure', width: 116, padRight: 12 },
+  { name: 'sample', width: 116, padRight: 12 },
+  { name: 'trade-link', width: 24, padRight: 0 },
+] as const;
+
+/** Line two, the evidence: `col-combination-note`, `-age-observed` and `-age-attempted`. */
+export const combinationLine2Columns = [
+  { name: 'note', width: 560, padRight: 12 },
+  { name: 'observed', width: 200, padRight: 12 },
+  { name: 'attempted', width: 206, padRight: 12 },
+] as const;
 
 // --- type -----------------------------------------------------------------
 

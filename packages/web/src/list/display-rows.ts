@@ -1,7 +1,15 @@
-import type { DatasetEntry } from '@poe/contracts';
+import type { CurationStatus, DatasetEntry } from '@poe/contracts';
 import type { Ranking, UnrankedEntry } from '@poe/core';
 
-import { ageMark, formatDivine, MONEY_PHRASES, type AgeMark } from './format';
+import {
+  ageMark,
+  combinationAges,
+  formatDivine,
+  MONEY_PHRASES,
+  type AgeMark,
+  type CombinationAges,
+  type CombinationState,
+} from './format';
 
 /** Ranks 1–5, 6–10, and 11 onward — by position only, never by branch (UX-DR11). */
 export type Tier = 1 | 2 | 3;
@@ -24,6 +32,14 @@ export interface DisplayRow {
   readonly itemLevel: number;
   readonly ev: EvCell;
   readonly age: AgeMark | undefined;
+  /** The Curation Status. `pinned` leads the combination cell; the trade-link test refuses `pruned`. */
+  readonly status: CurationStatus;
+  /** The Price State the expansion prints, as `core` resolved it (a league mismatch included). */
+  readonly state: CombinationState;
+  /** The row's dataset entry, joined by `entryKey`: its clocks and stored search. `undefined` when never synced. */
+  readonly entry: DatasetEntry | undefined;
+  /** The expansion's two exact labelled ages, read against the same `now` as `age`. */
+  readonly ages: CombinationAges;
 }
 
 export function tierOf(position: number): Tier {
@@ -39,22 +55,45 @@ export function tierOf(position: number): Tier {
  * `notYetSynced` (decision 2026-09-26, option a), unnumbered and at tier 3.
  * `belowThreshold` leaves the list (FR-3); `unresolvable` is Story 2.6's health
  * line (FR-24). The age reads the row's dataset entry, joined by `entryKey`.
+ * Each row also carries what its expansion prints (Story 2.5): the resolved
+ * Price State, the Curation Status, the dataset entry and both exact ages.
  */
 export function toDisplayRows(ranking: Ranking, dataset: readonly DatasetEntry[], now: number): DisplayRow[] {
   const byKey = new Map(dataset.map((entry) => [entry.entryKey, entry]));
 
-  const ranked = ranking.ordering.map((row, index): DisplayRow => ({
-    key: row.entryKey,
-    numeral: index + 1,
-    tier: tierOf(index + 1),
-    unit: 'raw',
-    label: row.baseTypeId,
-    itemLevel: row.itemLevelMin,
-    ev: { kind: 'figure', text: formatDivine(row.ev) },
-    age: ageMark(byKey.get(row.entryKey), now),
-  }));
+  const detail = (
+    entryKey: string,
+    state: CombinationState,
+  ): Pick<DisplayRow, 'age' | 'state' | 'entry' | 'ages'> => {
+    const entry = byKey.get(entryKey);
+    return {
+      age: ageMark(entry, now),
+      state,
+      entry,
+      ages: combinationAges(state, entry?.lastAttemptedAt, now),
+    };
+  };
 
-  const unpriced = (entry: UnrankedEntry, phrase: string): DisplayRow => ({
+  const ranked = ranking.ordering.map(
+    (row, index): DisplayRow => ({
+      key: row.entryKey,
+      numeral: index + 1,
+      tier: tierOf(index + 1),
+      unit: 'raw',
+      label: row.baseTypeId,
+      itemLevel: row.itemLevelMin,
+      ev: { kind: 'figure', text: formatDivine(row.ev) },
+      status: row.status,
+      ...detail(row.entryKey, {
+        state: 'priced',
+        priceDivine: row.observation.priceDivine,
+        sampleSize: row.observation.sampleSize,
+        observedAt: row.observation.observedAt,
+      }),
+    }),
+  );
+
+  const unpriced = (entry: UnrankedEntry, phrase: string, state: CombinationState): DisplayRow => ({
     key: entry.entryKey,
     numeral: undefined,
     tier: 3,
@@ -62,12 +101,15 @@ export function toDisplayRows(ranking: Ranking, dataset: readonly DatasetEntry[]
     label: entry.entry.baseTypeId,
     itemLevel: entry.entry.itemLevelMin,
     ev: { kind: 'phrase', text: phrase },
-    age: ageMark(byKey.get(entry.entryKey), now),
+    status: entry.entry.status,
+    ...detail(entry.entryKey, state),
   });
 
   return [
     ...ranked,
-    ...ranking.noListings.map((entry) => unpriced(entry, MONEY_PHRASES.noListings)),
-    ...ranking.notYetSynced.map((entry) => unpriced(entry, MONEY_PHRASES.notYetSynced)),
+    ...ranking.noListings.map((entry) => unpriced(entry, MONEY_PHRASES.noListings, { state: 'no-listings' })),
+    ...ranking.notYetSynced.map((entry) =>
+      unpriced(entry, MONEY_PHRASES.notYetSynced, { state: 'not-yet-synced', reason: entry.reason }),
+    ),
   ];
 }

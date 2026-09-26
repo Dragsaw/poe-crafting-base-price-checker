@@ -18,13 +18,25 @@ export function hoursBefore(now: number, hours: number): string {
   return new Date(now - hours * HOUR).toISOString();
 }
 
+/** A stored trade search: `lastSearchId` and the league it ran in. */
+export interface StoredSearch {
+  readonly id: string;
+  readonly league: string;
+}
+
+function searchFields(search: StoredSearch | undefined): Pick<DatasetEntry, 'lastSearchId' | 'lastSearchLeague'> {
+  return search === undefined ? {} : { lastSearchId: search.id, lastSearchLeague: search.league };
+}
+
 export function priced(
   entry: RawTrackedEntry,
   priceDivine: number,
   observedAt: string,
   league: string = TEST_LEAGUE,
+  search?: StoredSearch,
 ): DatasetEntry {
   return {
+    ...searchFields(search),
     entryKey: canonicalKey(entry),
     price: {
       state: 'priced',
@@ -40,10 +52,14 @@ export function priced(
   };
 }
 
-export function unpriced(entry: RawTrackedEntry, price: PriceState, lastAttemptedAt?: string): DatasetEntry {
-  return lastAttemptedAt === undefined
-    ? { entryKey: canonicalKey(entry), price }
-    : { entryKey: canonicalKey(entry), price, lastAttemptedAt };
+export function unpriced(
+  entry: RawTrackedEntry,
+  price: PriceState,
+  lastAttemptedAt?: string,
+  search?: StoredSearch,
+): DatasetEntry {
+  const base = { ...searchFields(search), entryKey: canonicalKey(entry), price };
+  return lastAttemptedAt === undefined ? base : { ...base, lastAttemptedAt };
 }
 
 /** `VALID_BODIES` with the tracked list and the dataset's entries replaced. */

@@ -347,6 +347,39 @@ describe('the resting chrome', () => {
       expect(row.querySelectorAll('[data-unit-glyph]')).toHaveLength(1);
     }
   });
+
+  it('opens two panels on the committed data/, each priced row linking a Forbidden%20Rites search, with no request', async () => {
+    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked}.json', { eager: true, import: 'default' });
+    const requests = serveArtifacts(server, {
+      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
+    });
+    mount();
+    await settleTo('ready');
+    const fetched = requests.length;
+    const rows = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'));
+    act(() => {
+      rows[0]?.click();
+    });
+    act(() => {
+      rows[1]?.click();
+    });
+    await flush();
+    const panels = Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel]'));
+    expect(panels).toHaveLength(2);
+    expect(panels.map((panel) => panel.previousElementSibling)).toEqual(rows.slice(0, 2));
+    const links = panels.map((panel) => panel.querySelector<HTMLAnchorElement>('[data-cell="trade-link"] a'));
+    for (const link of links) {
+      expect(link?.getAttribute('href')).toMatch(
+        /^https:\/\/www\.pathofexile\.com\/trade2\/search\/poe2\/Forbidden%20Rites\/[^/\s]+$/,
+      );
+    }
+    expect(panels.map((panel) => panel.querySelector('[data-panel-sub]')?.textContent)).toEqual([
+      expect.stringContaining('Payout Threshold 0.25 Divine.'),
+      expect.stringContaining('Payout Threshold 0.25 Divine.'),
+    ]);
+    expect(requests).toHaveLength(fetched);
+  });
 });
 
 describe('the copy', () => {

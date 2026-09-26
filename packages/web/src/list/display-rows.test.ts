@@ -86,3 +86,36 @@ describe('toDisplayRows', () => {
     expect(only?.ev).toEqual({ kind: 'figure', text: '< 0.01' });
   });
 });
+
+describe('the detail each row carries for its expansion', () => {
+  it('carries the priced state, status, dataset entry and both exact ages on a ranked row', () => {
+    const belt = { ...rawEntry('Wide Belt', 75), status: 'pinned' as const };
+    const published = {
+      ...priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, { id: 'abc', league: TEST_LEAGUE }),
+      lastAttemptedAt: hoursBefore(NOW, 4),
+    };
+    const [row] = rowsFor([belt], [published]);
+    expect(row?.status).toBe('pinned');
+    expect(row?.itemLevel).toBe(75);
+    expect(row?.entry).toBe(published);
+    expect(row?.state).toEqual({ state: 'priced', priceDivine: 0.8, sampleSize: 10, observedAt: hoursBefore(NOW, 11) });
+    expect(row?.ages).toEqual({ observed: 'priced 11h ago', attempted: 'tried 4h ago' });
+  });
+
+  it('resolves no-listings, never-synced and league-mismatch, keeping the ordering', () => {
+    const tried = rawEntry('Coral Ring');
+    const never = rawEntry('Wide Belt');
+    const old = rawEntry('Jade Amulet');
+    const rows = rowsFor(
+      [never, tried, old],
+      [unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 3)), priced(old, 3, hoursBefore(NOW, 72), 'Standard')],
+    );
+    expect(rows.map((row) => [row.label, row.state, row.ages])).toEqual([
+      ['Coral Ring', { state: 'no-listings' }, { observed: undefined, attempted: 'tried 3h ago' }],
+      ['Jade Amulet', { state: 'not-yet-synced', reason: 'league-mismatch' }, { observed: undefined, attempted: 'tried 3d ago' }],
+      ['Wide Belt', { state: 'not-yet-synced', reason: 'never-synced' }, { observed: undefined, attempted: undefined }],
+    ]);
+    expect(rows[2]?.entry).toBeUndefined();
+    expect(rows.every((row) => row.status === 'active')).toBe(true);
+  });
+});

@@ -122,7 +122,7 @@ function ReadyList({
     });
     return toDisplayRows(ranking, set.dataset.entries, now);
   }, [set, now, threshold]);
-  return <RankedList rows={rows} />;
+  return <RankedList rows={rows} threshold={threshold} activeLeague={set.config.league} />;
 }
 
 /**

@@ -43,7 +43,7 @@ function mountList(tracked: readonly RawTrackedEntry[], dataset: readonly Datase
   const mounted = createRoot(container);
   root = mounted;
   act(() => {
-    mounted.render(<RankedList rows={rows} />);
+    mounted.render(<RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />);
   });
   return container;
 }
