@@ -79,6 +79,9 @@ export {
 } from './canonical-key.ts';
 export type { CanonicalAffix, CanonicalKeyElements } from './canonical-key.ts';
 
+export { CraftRecipeSchema } from './craft-recipe.ts';
+export type { CraftRecipe } from './craft-recipe.ts';
+
 export { PriceObservationSchema } from './price-observation.ts';
 export type { PriceObservation } from './price-observation.ts';
 
@@ -189,9 +192,11 @@ export {
   CurrenciesFileSchema,
   DatasetFileSchema,
   parseEnvelope,
+  RecipesFileSchema,
   SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
+  WeightsFileEnvelopeSchema,
 } from './envelopes.ts';
 export type {
   CatalogueFiltersFile,
@@ -206,9 +211,11 @@ export type {
   EnvelopeIssues,
   EnvelopeResult,
   EnvelopeVersionRefused,
+  RecipesFile,
   SyncProgressFile,
   SyncReportFile,
   TrackedFile,
+  WeightsFileEnvelope,
 } from './envelopes.ts';
 
 export type { HttpPort, HttpRequest, HttpResponse } from './ports/http.ts';

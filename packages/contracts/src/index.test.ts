@@ -28,6 +28,7 @@ describe('the contracts barrel', () => {
       'TrackedListAgeSchema',
       'SyncLockSchema',
       'SyncProgressSchema',
+      'CraftRecipeSchema',
     ] as const) {
       expect(contracts[name], `${name} is not re-exported from the barrel`).toBeDefined();
     }
@@ -45,6 +46,8 @@ describe('the contracts barrel', () => {
       'CatalogueStatsFileSchema',
       'CatalogueStaticFileSchema',
       'CatalogueFiltersFileSchema',
+      'RecipesFileSchema',
+      'WeightsFileEnvelopeSchema',
       'parseEnvelope',
     ] as const) {
       expect(contracts[name], `${name} is not re-exported from the barrel`).toBeDefined();

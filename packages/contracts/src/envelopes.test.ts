@@ -10,9 +10,11 @@ import {
   CurrenciesFileSchema,
   DatasetFileSchema,
   parseEnvelope,
+  RecipesFileSchema,
   SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
+  WeightsFileEnvelopeSchema,
 } from './envelopes';
 import { INITIAL_SCHEMA_VERSION } from './schema-version';
 import { without } from './test-support';
@@ -301,5 +303,60 @@ describe('the sync-owned envelopes', () => {
         figures: { requestsBySource: { 'tracked-list': 8 }, notReachedCount: 41 },
       }).success,
     ).toBe(false);
+  });
+});
+
+describe('RecipesFileSchema', () => {
+  const recipe = {
+    id: 'greater',
+    currencies: [{ currencyId: 'greater-transmute', quantity: 1 }],
+    modifierLevelMin: 0,
+  } as const;
+
+  function fileOf(recipes: readonly unknown[]) {
+    return { schemaVersion: INITIAL_SCHEMA_VERSION, recipes };
+  }
+
+  it('parses a versioned file of recipes', () => {
+    const result = parseEnvelope(RecipesFileSchema, fileOf([recipe, { ...recipe, id: 'perfect' }]));
+    expect(result.ok).toBe(true);
+    expect(result.ok === true && result.value.recipes).toHaveLength(2);
+  });
+
+  it('declares schemaVersion and refuses a file with none', () => {
+    expect(Object.keys(RecipesFileSchema.shape)).toContain('schemaVersion');
+    expect(RecipesFileSchema.safeParse({ recipes: [] }).success).toBe(false);
+  });
+
+  it('refuses a repeated id with one issue at the repeat, naming the id and the first index', () => {
+    const result = parseEnvelope(RecipesFileSchema, fileOf([recipe, { ...recipe, modifierLevelMin: 5 }]));
+    if (result.ok || result.reason !== 'invalid') {
+      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+    }
+    expect(result.issues).toHaveLength(1);
+    expect(result.issues[0]?.path).toEqual(['recipes', 1]);
+    expect(result.issues[0]?.message).toContain('greater');
+    expect(result.issues[0]?.message).toContain('recipes.0');
+  });
+
+  it('accepts an empty list', () => {
+    expect(parseEnvelope(RecipesFileSchema, fileOf([])).ok).toBe(true);
+  });
+});
+
+describe('WeightsFileEnvelopeSchema', () => {
+  it('reads the version and passes every other key through untouched', () => {
+    const file = { schemaVersion: '6.0.0', gamePatch: '0.5.5', bases: {} };
+    const result = parseEnvelope(WeightsFileEnvelopeSchema, file, '6.0.0');
+    expect(result).toEqual({ ok: true, value: file });
+  });
+
+  it('refuses any major but the expected one', () => {
+    const result = parseEnvelope(WeightsFileEnvelopeSchema, { schemaVersion: '5.2.0' }, '6.0.0');
+    expect(result).toEqual({ ok: false, reason: 'unknown-major', expected: '6.0.0', found: '5.2.0' });
+  });
+
+  it('refuses a file with no version', () => {
+    expect(parseEnvelope(WeightsFileEnvelopeSchema, { bases: {} }, '6.0.0').ok).toBe(false);
   });
 });

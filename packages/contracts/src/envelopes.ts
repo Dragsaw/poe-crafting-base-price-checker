@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { canonicalKey } from './canonical-key.ts';
+import { CraftRecipeSchema } from './craft-recipe.ts';
 import { CurrencyRateSchema } from './currency-rate.ts';
 import { DatasetEntrySchema } from './dataset.ts';
 import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
@@ -55,6 +56,44 @@ export const TrackedFileSchema = z
       });
     });
   });
+
+/**
+ * `data/recipes.json` — the Craft Recipes (AD-20). Absent-tolerable (AD-24).
+ *
+ * One file-level rule, the same shape as `TrackedFileSchema`'s: each `id`
+ * appears once. Each repeat is one issue at its own index, naming the id and
+ * its first occurrence.
+ */
+export const RecipesFileSchema = z
+  .strictObject({
+    schemaVersion: SchemaVersionSchema,
+    recipes: z.array(CraftRecipeSchema),
+  })
+  .superRefine((file, ctx) => {
+    const firstIndexById = new Map<string, number>();
+    file.recipes.forEach((recipe, index) => {
+      const first = firstIndexById.get(recipe.id);
+      if (first === undefined) {
+        firstIndexById.set(recipe.id, index);
+        return;
+      }
+      ctx.addIssue({
+        code: 'custom',
+        path: ['recipes', index],
+        message: `recipe id ${recipe.id} repeats recipes.${String(first)}; an id may appear once in recipes.json`,
+      });
+    });
+  });
+
+/**
+ * `data/weights.json` — the **envelope only**: `schemaVersion` plus a loose
+ * passthrough of everything else. It lets `web` refuse an unknown weights major
+ * (NFR-8) without owning the weights contract, which is `WEIGHTS-FILE-SCHEMA.md`'s
+ * and which Story 3.1 tightens this schema to.
+ */
+export const WeightsFileEnvelopeSchema = z.looseObject({
+  schemaVersion: SchemaVersionSchema,
+});
 
 /** `data/currencies.json` — hand-maintained rates, read and never fetched (AD-20). */
 export const CurrenciesFileSchema = z.strictObject({
@@ -123,6 +162,8 @@ export const CatalogueStaticFileSchema = catalogueFileEnvelope(StaticCatalogueSc
 export const CatalogueFiltersFileSchema = catalogueFileEnvelope(FilterCatalogueSchema);
 
 export type TrackedFile = z.infer<typeof TrackedFileSchema>;
+export type RecipesFile = z.infer<typeof RecipesFileSchema>;
+export type WeightsFileEnvelope = z.infer<typeof WeightsFileEnvelopeSchema>;
 export type CurrenciesFile = z.infer<typeof CurrenciesFileSchema>;
 export type ConfigFile = z.infer<typeof ConfigFileSchema>;
 export type DatasetFile = z.infer<typeof DatasetFileSchema>;
