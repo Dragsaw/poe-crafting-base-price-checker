@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
-import { isAbsolute, relative, sep } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createFakeClockPort, createFakeHttpPort, SUPPORTED_SCHEMA_VERSION } from '@poe/contracts';
 import type { HttpResponse } from '@poe/contracts';
@@ -143,6 +143,21 @@ function endpointFor(artifact: string): (typeof CATALOGUE_ENDPOINTS)[number] {
   return endpoint;
 }
 
+/**
+ * Narrows an outcome to its failure branch, which is what makes `failure` a
+ * plain `string` rather than an optional one. The assertion is the narrowing:
+ * `expect(outcome.ok).toBe(false)` reads well but tells the compiler nothing,
+ * so a test written that way would silently go back to reading an optional.
+ */
+function failureOf(
+  outcome: Awaited<ReturnType<typeof refreshCatalogue>>,
+): { readonly failure: string; readonly written: readonly string[] } {
+  if (outcome.ok) {
+    throw new Error('expected a refused refresh, got a successful one');
+  }
+  return outcome;
+}
+
 function writtenValue(
   writes: readonly { path: string; contents: string }[],
   artifact: string,
@@ -175,25 +190,43 @@ it('runs nothing when the module is imported rather than invoked', async () => {
 });
 
 it('is referenced by no vitest config and by no setup file', () => {
-  const entryPoints = [
+  // Split deliberately. A missing *required* entry means a config was renamed
+  // or moved, and a scan that skipped it would pass while saying nothing — the
+  // failure mode of a single list read through a bare `catch { continue }`.
+  // `web` has no suite yet, so its paths are genuinely optional today.
+  const required = [
     'vitest.config.ts',
     'test/setup.ts',
     'packages/contracts/vitest.config.ts',
     'packages/core/vitest.config.ts',
     'packages/sync/vitest.config.ts',
+  ];
+  const optional = [
     'packages/web/vitest.config.ts',
     'packages/web/vite.config.ts',
     'packages/web/src/test-setup.ts',
   ];
 
-  for (const relative of entryPoints) {
-    let source: string;
+  const read = (entryPoint: string): string | undefined => {
     try {
-      source = readFileSync(`${REPO_ROOT}${relative}`, 'utf8');
+      return readFileSync(`${REPO_ROOT}${entryPoint}`, 'utf8');
     } catch {
+      return undefined;
+    }
+  };
+
+  for (const entryPoint of required) {
+    const source = read(entryPoint);
+    expect(source, `${entryPoint} must exist for this scan to mean anything`).toBeDefined();
+    expect(source, `${entryPoint} must not reach the refresher`).not.toContain('catalogue-refresh');
+  }
+
+  for (const entryPoint of optional) {
+    const source = read(entryPoint);
+    if (source === undefined) {
       continue;
     }
-    expect(source, `${relative} must not reach the refresher`).not.toContain('catalogue-refresh');
+    expect(source, `${entryPoint} must not reach the refresher`).not.toContain('catalogue-refresh');
   }
 });
 
@@ -221,10 +254,18 @@ it('loads @poe/contracts under bare node, as the command itself must', async () 
   expect(result.code).toBe(0);
 });
 
-it('imports the real shell in no test file', () => {
-  // `shell.ts` holds the real `fetch`, the system clock and the real write. It
-  // is importable now that two commands share it, so the "no test executes it"
-  // property has to be asserted rather than assumed.
+it('names the real fetch port in no test file', () => {
+  // The property worth protecting is that **`fetch` never runs in a test**, not
+  // that `shell.ts` is unimportable: the module is already evaluated in every
+  // run, because `catalogue-refresh.ts` imports it. Scanning for the module
+  // specifier therefore forbade the wrong thing — it also forbade testing
+  // `writeTextFile`, whose `mkdir` is what makes the first refresh work, and so
+  // made that gap permanently unclosable in-package. `shell.test.ts` now covers
+  // the safe exports; this scan pins the one export that must stay untouched.
+  //
+  // A bare identifier scan, not an import-specifier regex: a specifier regex
+  // misses `from './shell'`, a dynamic `await import(...)` and a re-export, all
+  // of which reach the same function.
   const sourceDir = fileURLToPath(new URL('.', import.meta.url));
   const testFiles = readdirSync(sourceDir, { recursive: true, encoding: 'utf8' }).filter((name) =>
     name.endsWith('.test.ts'),
@@ -232,11 +273,32 @@ it('imports the real shell in no test file', () => {
 
   expect(testFiles.length).toBeGreaterThan(0);
   for (const name of testFiles) {
+    if (name === 'catalogue-refresh.test.ts') {
+      // This file names it in the comment above, and nowhere else.
+      continue;
+    }
     const source = readFileSync(`${sourceDir}${name}`, 'utf8');
-    expect(source, `${name} must not import the real shell`).not.toMatch(
-      /from '\.{1,2}(\/\.\.)*\/shell\.ts'/,
+    expect(source, `${name} must not name the real fetch port`).not.toContain(
+      'createFetchHttpPort',
     );
   }
+});
+
+it('is reachable at the script name the human is told to run', () => {
+  // Every other test here spawns an absolute path this file computes. The one
+  // string a human actually types lives in the root manifest, and a rename or a
+  // typo in it is caught by nothing else — the command simply dies with
+  // ERR_MODULE_NOT_FOUND on the day someone needs it.
+  const manifest = JSON.parse(readFileSync(`${REPO_ROOT}package.json`, 'utf8')) as {
+    scripts: Record<string, string>;
+  };
+  const script = manifest.scripts['catalogue:refresh'];
+
+  expect(script).toBeDefined();
+  const entry = (script ?? '').split(/\s+/).at(-1);
+  expect(resolve(REPO_ROOT, entry ?? '')).toBe(SCRIPT);
+  // The recorder's precedent, and what lets `.env` supply the contact overlay.
+  expect(script).toContain('--env-file-if-exists=.env');
 });
 
 // --- the four requests ------------------------------------------------------
@@ -258,7 +320,6 @@ it('issues exactly four requests, one per data endpoint and no leagues request',
 
   const outcome = await instance.refresh();
 
-  expect(outcome.failure).toBeUndefined();
   expect(outcome.ok).toBe(true);
   expect(instance.http.requests).toHaveLength(4);
   expect(instance.http.requests.map((request) => request.url).sort()).toEqual(
@@ -399,10 +460,10 @@ it('writes nothing at all when one endpoint answers a non-200 mid-run', async ()
 
   const outcome = await instance.refresh();
 
-  expect(outcome.ok).toBe(false);
-  expect(outcome.failure).toContain(failing.artifact);
-  expect(outcome.failure).toContain('503');
-  expect(outcome.written).toEqual([]);
+  const failed = failureOf(outcome);
+  expect(failed.failure).toContain(failing.artifact);
+  expect(failed.failure).toContain('503');
+  expect(failed.written).toEqual([]);
   expect(instance.writes).toEqual([]);
 });
 
@@ -418,10 +479,10 @@ it('returns a failure naming the yield rather than throwing when rate limited', 
 
   const outcome = await instance.refresh();
 
-  expect(outcome.ok).toBe(false);
-  expect(outcome.failure).toContain('rate limited');
-  expect(outcome.failure).toContain('43000');
-  expect(outcome.failure).toContain('retry-after-header');
+  const failed = failureOf(outcome);
+  expect(failed.failure).toContain('rate limited');
+  expect(failed.failure).toContain('43000');
+  expect(failed.failure).toContain('retry-after-header');
   expect(instance.writes).toEqual([]);
 });
 
@@ -437,9 +498,9 @@ it('names the artifact when a 200 carries an HTML interstitial', async () => {
 
   const outcome = await instance.refresh();
 
-  expect(outcome.ok).toBe(false);
-  expect(outcome.failure).toContain(html.artifact);
-  expect(outcome.failure).toContain('not JSON');
+  const failed = failureOf(outcome);
+  expect(failed.failure).toContain(html.artifact);
+  expect(failed.failure).toContain('not JSON');
   expect(instance.writes).toEqual([]);
 });
 
@@ -457,9 +518,9 @@ it('names the artifact and the first issue path when a payload is schema-invalid
 
   const outcome = await instance.refresh();
 
-  expect(outcome.ok).toBe(false);
-  expect(outcome.failure).toContain('stats');
-  expect(outcome.failure).toContain('result.0.entries.0.id');
+  const failed = failureOf(outcome);
+  expect(failed.failure).toContain('stats');
+  expect(failed.failure).toContain('result.0.entries.0.id');
   expect(instance.writes).toEqual([]);
 });
 
@@ -475,10 +536,10 @@ it('returns a failure naming the artifact when the request itself rejects', asyn
 
   const outcome = await instance.refresh();
 
-  expect(outcome.ok).toBe(false);
-  expect(outcome.failure).toContain(unreachable.artifact);
-  expect(outcome.failure).toContain('could not be reached');
-  expect(outcome.written).toEqual([]);
+  const failed = failureOf(outcome);
+  expect(failed.failure).toContain(unreachable.artifact);
+  expect(failed.failure).toContain('could not be reached');
+  expect(failed.written).toEqual([]);
   expect(instance.writes).toEqual([]);
 });
 
@@ -488,12 +549,12 @@ it('says how many artifacts landed when a write fails part way down', async () =
 
   const outcome = await instance.refresh();
 
-  expect(outcome.ok).toBe(false);
-  expect(outcome.failure).toContain(refusedPath);
+  const failed = failureOf(outcome);
+  expect(failed.failure).toContain(refusedPath);
   // Two had already landed, so the tree is mixed and the message has to say so
   // — nothing here can roll a completed write back.
-  expect(outcome.failure).toContain('2 of 4');
-  expect(outcome.written).toEqual([
+  expect(failed.failure).toContain('2 of 4');
+  expect(failed.written).toEqual([
     catalogueFilePathOf(endpointFor('items')),
     catalogueFilePathOf(endpointFor('stats')),
   ]);

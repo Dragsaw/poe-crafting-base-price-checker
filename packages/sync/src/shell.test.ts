@@ -1,0 +1,96 @@
+import { Buffer } from 'node:buffer';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, expect, it } from 'vitest';
+
+import { REQUEST_TIMEOUT_MS, serialiseJsonArtifact, sleep, systemClock, writeTextFile } from './shell.ts';
+
+/**
+ * The shell's testable half.
+ *
+ * The real HTTP port is deliberately absent from the import above and must stay
+ * absent — a sibling scan in `catalogue-refresh.test.ts` fails if any test file
+ * so much as names it, which is why it is unnamed even in this comment.
+ * Everything below is ordinary code that happens to live at the edge, and
+ * the `mkdir` inside `writeTextFile` is the load-bearing piece: `data/catalogue/`
+ * does not exist on a fresh checkout, so without it the human's first
+ * `pnpm catalogue:refresh` spends four live rate-limited requests, passes every
+ * validation gate, and then dies on a missing directory.
+ *
+ * These tests write under the OS temp directory, never under `data/`.
+ */
+
+const temporaryDirectories: string[] = [];
+
+async function temporaryDirectory(): Promise<string> {
+  const directory = await mkdtemp(join(tmpdir(), 'poe-shell-'));
+  temporaryDirectories.push(directory);
+  return directory;
+}
+
+afterEach(async () => {
+  for (const directory of temporaryDirectories.splice(0)) {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+it('creates a missing parent directory rather than failing on it', async () => {
+  const root = await temporaryDirectory();
+  // Two levels that do not exist, mirroring `data/catalogue/` on a fresh
+  // checkout, where neither `data` nor `catalogue` is present.
+  const path = join(root, 'data', 'catalogue', 'items.json');
+
+  await writeTextFile(path, '{}\n');
+
+  expect(await readFile(path, 'utf8')).toBe('{}\n');
+});
+
+it('overwrites an existing file rather than appending to it', async () => {
+  const root = await temporaryDirectory();
+  const path = join(root, 'stats.json');
+  await writeFile(path, 'a much longer stale artifact\n', { encoding: 'utf8' });
+
+  await writeTextFile(path, '{}\n');
+
+  // A second refresh against unchanged data has to leave the file byte-identical
+  // to a first one, which an append or a partial overwrite would not.
+  expect(await readFile(path, 'utf8')).toBe('{}\n');
+});
+
+it('writes UTF-8 with no BOM and keeps LF as it was given', async () => {
+  const root = await temporaryDirectory();
+  const path = join(root, 'static.json');
+  const contents = serialiseJsonArtifact({ text: 'Gebänderter Amulett — ✦', nested: { a: 1 } });
+
+  await writeTextFile(path, contents);
+
+  const raw = await readFile(path);
+  expect(raw.subarray(0, 3)).not.toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
+  expect(raw.includes(Buffer.from('\r\n'))).toBe(false);
+  expect(raw.toString('utf8')).toBe(contents);
+});
+
+it('serialises as two-space JSON with exactly one trailing newline', () => {
+  const contents = serialiseJsonArtifact({ result: [{ id: 'a' }] });
+
+  expect(contents).toBe('{\n  "result": [\n    {\n      "id": "a"\n    }\n  ]\n}\n');
+  expect(contents.endsWith('\n\n')).toBe(false);
+});
+
+it('reports the clock as an ISO-8601 UTC instant', () => {
+  const now = systemClock.now();
+
+  expect(now).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+  expect(new Date(now).toISOString()).toBe(now);
+});
+
+it('resolves sleep without waiting on a real window', async () => {
+  // Zero only: no test in this project may depend on wall-clock timing, so this
+  // pins that `sleep` resolves at all, not how long it takes.
+  await expect(sleep(0)).resolves.toBeUndefined();
+});
+
+it('bounds a single request so a hung connection cannot block a terminal', () => {
+  expect(REQUEST_TIMEOUT_MS).toBe(30_000);
+});

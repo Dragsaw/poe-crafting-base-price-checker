@@ -4,8 +4,8 @@ type: 'feature'
 created: '2026-09-20'
 status: 'done'
 route: 'full'
-review_loop_iteration: 0
-followup_review_recommended: true
+review_loop_iteration: 1
+followup_review_recommended: false
 context:
   - '{project-root}/docs/stories/epic-1-context.md'
   - '{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md'
@@ -244,3 +244,46 @@ Status: done
 **Follow-up review recommended: true.** Two medium entries were patched on a first pass, and one specific risk is unverified: the `contracts` change (a module-resolution change plus two schema loosenings) landed inside a `sync` story against the "alone and first" rule, and its emitted `dist` declarations carry `.ts` specifiers whose only demonstrated consumer is TypeScript itself. Patched counts by verdict: medium 6, low 7; high 0.
 
 **Residual risks.** `data/catalogue/*.json` does not exist until a human runs the command once — until then Story 1.10 has nothing to validate against, and the "second run leaves no diff" criterion is unprovable. The four-request behaviour is proven against recorded fixtures, not against the live endpoints.
+
+### Review Findings
+
+#### 2026-09-26 — Follow-up review pass
+
+Layers: blind-hunter, edge-case-hunter, verification-gap, intent-alignment (acceptance auditor). 2 decision-needed, 9 patch, 2 deferred, 10 rejected.
+
+- [x] [Review][Decision] **Resolved 2026-09-26: a human ran the command; the four files are committed as `edd2c97`.** This retires the `deferred-work.md` step that carved out the live run, and gives Story 1.10 the authority it validates against. The second 1.4 deferral — a test parsing the four committed files against their `Catalogue*FileSchema` — was deferred only because the files did not exist, and is now actionable. Four untracked artifacts now sit under `data/catalogue/` — `git status` reports `?? data/catalogue/` with `items.json`, `stats.json`, `filters.json` and `static.json` present, contradicting the Verification section's "nothing under `data/`", the Auto Run Result, and the `deferred-work.md` entry that says they "are not on disk yet". Independently checked: all four are LF, end in one newline, carry `"schemaVersion": "1.0.0"` as their last key, are non-empty (`result` lengths 10/10/7/15), and re-serialise byte-identically at two-space JSON — consistent with a real `pnpm catalogue:refresh` run, and the first evidence the idempotence criterion has ever had. Needs a human to confirm they came from a human-invoked run (not an agent and not a test — a test-authored file under `data/` would violate the "no test writes under `data/`" AC and AGENT-WORKFLOW §Parallel worktrees), then decide whether to commit them, which retires one deferred entry and unblocks Story 1.10.
+- [x] [Review][Decision] **Resolved 2026-09-26: accepted in place; the exception is recorded here.** The `contracts` change stays in commit `224aab7` rather than being split out ahead of Story 1.5. The accepted exception to AGENT-WORKFLOW §Parallel worktrees "Land a `contracts` change alone and first" is this one landing, on these grounds: both schema loosenings are forced by recorded fixtures that the schemas as written refused, the `.ts` specifier rewrite is what makes `contracts` loadable under bare `node` at all, and re-derivation hits the same two walls. The rule is not amended and this sets no precedent — the next `contracts` change lands alone and first. Story 1.5 rebases onto `224aab7` as it stands. Original finding: the `packages/contracts` change landed inside a `sync` story and the story was marked `done` anyway — 15 files: `allowImportingTsExtensions` plus 13 relative-specifier rewrites (a module-resolution change every consumer sees) and two schema loosenings in `trade-catalogue.ts` that change the type Stories 1.7 and 1.10 consume. Violates the spec's own "No change to `packages/contracts`", AGENT-WORKFLOW §Parallel worktrees "Land a `contracts` change alone and first", and epic-1-context's "`contracts` lands alone and first". Both loosenings are evidence-backed and re-derivation hits the same walls, so the decision is whether to split the `contracts` change into its own commit ahead of 1.5, or accept it in place and record the exception.
+- [x] [Review][Patch] The human-invoked path — `package.json` script → `main()` → `writeTextFile` — is exercised by no test, and the containment scan makes closing that unclosable in-package [packages/sync/src/shell.ts:72; packages/sync/src/catalogue-refresh.test.ts:224]
+- [x] [Review][Patch] The write phase's non-atomicity is under-reported: the module docblock still claims plain "all-or-nothing", and `main` drops `outcome.written` on a partial-write failure [packages/sync/src/catalogue-refresh.ts:9, :280]
+- [x] [Review][Patch] `CatalogueRefreshOutcome` is not a discriminated union, so `main` carries an unreachable `?? 'failed'` and a caller may read `failure` on success [packages/sync/src/catalogue-refresh.ts:127]
+- [x] [Review][Patch] The shipped `FilterOptionSchema` doc comment's universal claim is false — 19 option lists in `fixtures/trade-data-filters.json`, 17 open with `{"id": null}`; `status` opens with `{"id": "available"}` and `sale_type` with `{"id": "any"}` [packages/contracts/src/trade-catalogue.ts:88]
+- [x] [Review][Patch] `endpoints.ts` says "Nothing depends on it" of the endpoint order, but the write-failure test hardcodes `[items, stats]` and `'2 of 4'` [packages/sync/src/trade/endpoints.ts:47; packages/sync/src/catalogue-refresh.test.ts:496]
+- [x] [Review][Patch] The `/data/filters` endpoint doc comment is stranded between `StaticCatalogueSchema` and `FilterOptionSchema`, leaving two consecutive block comments on one declaration and detaching it from `FilterCatalogueSchema` [packages/contracts/src/trade-catalogue.ts:82]
+- [x] [Review][Patch] The loop variable `relative` shadows the imported `node:path` `relative` inside the config-scan test [packages/sync/src/catalogue-refresh.test.ts:189]
+- [x] [Review][Patch] The config scan's `catch { continue }` lets a renamed or moved vitest config pass vacuously [packages/sync/src/catalogue-refresh.test.ts:193]
+- [x] [Review][Patch] Two of the four frontmatter deferrals never reached `deferred-work.md` — the `dist` declaration specifiers and the `contracts`-inside-`sync` landing exist only in this spec's frontmatter, while the Auto Run Result points the reader at "the deferred entry" [docs/stories/deferred-work.md]
+- [x] [Review][Defer] The idempotence AC and the real `createFetchHttpPort` are exercised by nothing [packages/sync/src/shell.ts:38] — deferred: pre-existing, already recorded in this spec's `deferred` block. Note for whoever picks it up: the four artifacts now on disk make the two-run check runnable for the first time.
+- [x] [Review][Defer] Emitted `packages/contracts/dist/index.d.ts` carries `.ts` relative specifiers [packages/contracts/tsconfig.json] — deferred: pre-existing, already recorded in this spec's `deferred` block with the prescribed fix refuted.
+
+#### Applied 2026-09-26
+
+All nine patches are in. `pnpm check` — typecheck, lint and dependency-cruiser clean, 79 modules, zero violations, `sync` still declaring only `@poe/contracts` and `@poe/core`. `pnpm test` — 33 files, 227 tests, no escaped request. `git status` — nothing under `data/`.
+
+- `packages/sync/src/shell.test.ts` is new: seven tests over the shell's safe exports, writing under the OS temp directory. The `mkdir` case was mutation-checked — deleting `await mkdir(dirname(path), …)` fails it with the same `ENOENT` the human's first refresh on a fresh checkout would have hit.
+- The containment scan changed subject. It forbade the `shell.ts` module specifier, which both missed the evasions (`from './shell'`, a dynamic import, a re-export) and forbade testing `writeTextFile` at all. It now forbids naming the real fetch port, which is the property actually worth holding, and `shell.test.ts` exists because of it.
+- `CatalogueRefreshOutcome` is now a discriminated union. This surfaced real slack in the suite: fourteen assertions read `outcome.failure` off an un-narrowed outcome and typechecked only because the field was optional. They now narrow through `failureOf(...)`.
+
+**Still uncovered, deliberately.** `main()`'s success and failure output formatting is exercised by nothing. Covering it needs either exporting `main` — public surface this review will not add on its own initiative — or a spawn that reaches the live API, which AGENT-WORKFLOW forbids. The refusal branch remains covered by the existing spawn. Raised here rather than patched.
+
+#### Rejected
+
+- `[false]` No `.gitattributes` rule pins LF for the committed catalogue — refuted: `.gitattributes` is `* text=auto eol=lf`, and `git check-attr text eol -- data/catalogue/items.json` reports `eol: lf`.
+- `[false]` The AC "no endpoint URL is spelled in more than one module" is broken by `catalogue-refresh.test.ts` — refuted: the AC's subject is the production path, where `endpoints.ts` is the only spelling. The test's literal is the anti-mutation pin a previous review pass added deliberately; removing it reopens the hole where a `/data/stat` mutation left 213 tests green.
+- `[low]` An empty `{"result": []}` passes every gate and overwrites the authority — the command's output is a human-reviewed git diff, where an emptied catalogue is the most conspicuous diff possible; the fix guards a state never shown reachable.
+- `[low]` The `.ts` convention rests on one spawn test, and `contracts` test files remain extensionless — the spawn test covers everything reachable from `index.ts`, which is the whole public graph; the fix adds a lint rule for a narrow residual.
+- `[low]` `REPO_ROOT` is spelled three times — one of the three is the test's deliberate independent recomputation, leaving two spellings of a one-line constant.
+- `[low]` Frontmatter inconsistency and the Approach paragraph's `{items,stats,static,filters}` ordering — rejected on the rule that a finding whose fix is to edit this build's spec is not actioned.
+- `[low]` Refuse a payload that carries its own `schemaVersion` — undemonstrated state, and the fix adds a branch. Same rejection as the first pass.
+- `[low]` Write to a `.tmp` and rename, so an interrupt cannot commit truncated JSON — the file is git-tracked and the human reviews the diff before committing; a truncated artifact fails to parse loudly. The fix adds machinery for a path never shown reached.
+- `[low]` Make `items`/`stats` group `label` nullable like `static`'s — undemonstrated state. Same rejection as the first pass.
+- `[low]` The direct spawn stays offline by env deletion rather than by the entry guard — accurate as a reading, but the harm needs a user-agent fallback that does not exist. Same rejection as the first pass.

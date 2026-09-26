@@ -80,18 +80,19 @@ export const StaticCatalogueSchema = z.looseObject({
 });
 
 /**
- * `/api/trade2/data/filters` — filter ids and options, **including the category
- * filter's option list**, which is the authority for `categoryId` (AD-5, AD-9).
- */
-/**
  * One option of one filter.
  *
- * `id` is **nullable**: every option list the live API sends opens with
+ * `id` is **nullable**: most option lists the live API sends open with
  * `{"id": null, "text": "Any"}`, the sentinel for "this filter is not applied"
- * (*verified against the recorded `fixtures/trade-data-filters.json`,
- * 2026-09-20*). It is not an option id and never a `categoryId` — refusing it
- * would refuse the real response, and `filterOptionIds` drops it rather than
- * handing a consumer a `null` to look an id up by.
+ * — 17 of the 19 option lists in the recorded
+ * `fixtures/trade-data-filters.json` (*verified 2026-09-20, recounted
+ * 2026-09-26*). The two that do not are `status`, which opens with
+ * `{"id": "available", …}`, and `sale_type`, which opens with
+ * `{"id": "any", …}`; both carry a real id, so the sentinel is common rather
+ * than universal. Where it does appear it is not an option id and never a
+ * `categoryId` — refusing it would refuse the real response, and
+ * `filterOptionIds` drops it rather than handing a consumer a `null` to look an
+ * id up by.
  */
 export const FilterOptionSchema = z.looseObject({
   id: z.string().min(1).nullable(),
@@ -110,6 +111,10 @@ export const FilterCatalogueGroupSchema = z.looseObject({
   filters: z.array(FilterSchema),
 });
 
+/**
+ * `/api/trade2/data/filters` — filter ids and options, **including the category
+ * filter's option list**, which is the authority for `categoryId` (AD-5, AD-9).
+ */
 export const FilterCatalogueSchema = z.looseObject({
   result: z.array(FilterCatalogueGroupSchema),
 });

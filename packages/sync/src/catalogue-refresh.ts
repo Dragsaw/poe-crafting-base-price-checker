@@ -6,9 +6,16 @@
  * `baseTypeId` or a `categoryId` means. This command issues **exactly four
  * GETs** through the one governed client, validates each response against its
  * `contracts` schema, stamps `schemaVersion`, and writes
- * `data/catalogue/{items,stats,filters,static}.json` **all-or-nothing**. Its
- * output is a git diff: a GGG patch that renames a stat id arrives as one
- * reviewable line rather than as a silent behaviour change.
+ * `data/catalogue/{items,stats,filters,static}.json`. Its output is a git diff:
+ * a GGG patch that renames a stat id arrives as one reviewable line rather
+ * than as a silent behaviour change.
+ *
+ * **All-or-nothing across fetch and validation**, which is the failure mode
+ * that matters: no byte is written until all four have arrived and parsed, so
+ * a mid-run 503 cannot commit a new `stats.json` beside a stale `items.json`.
+ * The write loop itself is **not** transactional — nothing here can roll a
+ * completed `writeFile` back — so a filesystem failure part way down leaves a
+ * mixed tree and says so, naming the path that refused and how many landed.
  *
  * **No test runs this against the network.** It is referenced by no vitest
  * config and by no setup file; the entry guard at the bottom means importing
@@ -124,12 +131,20 @@ export interface CatalogueRefreshPorts {
   readonly writeCatalogueFile: (path: string, contents: string) => Promise<void>;
 }
 
-export interface CatalogueRefreshOutcome {
-  readonly ok: boolean;
-  /** Absent on success; the reason, naming the artifact, on failure. */
-  readonly failure?: string;
-  readonly written: readonly string[];
-}
+/**
+ * A discriminated union rather than `{ok, failure?}`: on the failure side the
+ * reason is **always** present, so no caller needs a fallback for a string that
+ * cannot be missing, and no caller can read `failure` off a success.
+ */
+export type CatalogueRefreshOutcome =
+  | { readonly ok: true; readonly written: readonly string[] }
+  | {
+      readonly ok: false;
+      /** The reason, naming the artifact. */
+      readonly failure: string;
+      /** What had already landed — empty unless a write failed part way. */
+      readonly written: readonly string[];
+    };
 
 function refused(failure: string): CatalogueRefreshOutcome {
   return { ok: false, failure, written: [] };
@@ -278,7 +293,12 @@ async function main(): Promise<void> {
   });
 
   if (!outcome.ok) {
-    process.stderr.write(`pnpm catalogue:refresh: ${outcome.failure ?? 'failed'}\n`);
+    process.stderr.write(`pnpm catalogue:refresh: ${outcome.failure}\n`);
+    // The count in the failure says how many landed; only this says which. A
+    // human staring at a mixed `data/catalogue/` needs the names, not a number.
+    for (const path of outcome.written) {
+      process.stderr.write(`  already written: ${path}\n`);
+    }
     process.exitCode = 1;
     return;
   }

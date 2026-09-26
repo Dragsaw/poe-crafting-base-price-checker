@@ -21,3 +21,17 @@ Append-only. Each entry names work carved out of a spec so it is not lost.
 - source_spec: `docs/stories/spec-1-4-the-committed-trade-catalogue-and-its-explicit-refresh-command.md`
   summary: Nothing checks that the committed catalogue still parses against the `contracts` catalogue schemas, so a GGG shape change is caught only on the next refresh.
   evidence: Story 1.4 validates at write time, inside `refreshCatalogue`. Once `data/catalogue/*.json` exists, a schema tightened in `contracts` could contradict the committed file and no test would say so — the same class of mismatch story 1.4 found twice in the recorded fixtures (a null filter-option id, a null static group label). A test that parses the four committed files against their `Catalogue*FileSchema` would close it; deferred because the files do not exist yet.
+
+## Resolved (2026-09-26)
+
+- The 1.4 entry above that carved out the live `pnpm catalogue:refresh` run is **retired**: a human ran the command and the four files are committed as `edd2c97`. The entry stays in place because this ledger is append-only. Consequence for the entry after it — the committed-catalogue parse check was deferred only because the files did not exist, and is now actionable.
+
+## Deferred from: code review of spec-1-4-the-committed-trade-catalogue-and-its-explicit-refresh-command (2026-09-26)
+
+- source_spec: `docs/stories/spec-1-4-the-committed-trade-catalogue-and-its-explicit-refresh-command.md`
+  summary: The "a second refresh leaves no diff" criterion and the real `createFetchHttpPort` are exercised by nothing.
+  evidence: Already recorded in the spec's `deferred` block and confirmed by this review pass — the suite compares one `serialiseCatalogue(...)` result against itself, and every test drives `createFakeHttpPort`. New since that entry was written: four artifacts now sit under `data/catalogue/`, so the two-run check is runnable for the first time. A spot check of those files (LF, one trailing newline, `schemaVersion` last, byte-identical under re-serialisation at two-space JSON) is consistent with a stable second run but is not the run itself.
+
+- source_spec: `docs/stories/spec-1-4-the-committed-trade-catalogue-and-its-explicit-refresh-command.md`
+  summary: The emitted `packages/contracts/dist/index.d.ts` carries `.ts` relative specifiers, and the prescribed fix is inert.
+  evidence: Already recorded in the spec's `deferred` block; carried here because the ledger is where carved-out work lives and the Auto Run Result points readers at "the deferred entry". `rewriteRelativeImportExtensions` does not affect declaration emit under `emitDeclarationOnly`, reproduced in a minimal project. A consumer probe resolved the `.ts` specifier through to `schema-version.d.ts`, so TypeScript follows it; the risk is a non-TypeScript consumer of `dist`. Settling it needs dropping `emitDeclarationOnly` or a post-emit rewrite.

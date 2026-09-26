@@ -44,8 +44,13 @@ export interface CatalogueEndpoint {
  * The four data endpoints the catalogue is made of.
  *
  * The order is the recorder's original capture order, kept so that a re-record
- * diffs as changed data rather than as a reordered capture. Nothing depends on
- * it: the refresh is all-or-nothing, so no partial prefix is ever observable.
+ * diffs as changed data rather than as a reordered capture.
+ *
+ * **No consumer** can observe it — a successful refresh writes all four — but
+ * the suite does: the partial-write case in `catalogue-refresh.test.ts` names
+ * `items` and `stats` as the two that land before `filters` refuses. That
+ * assertion is a deliberate pin on the write order, not an accident, so
+ * reordering this array is a test change as well as a data change.
  */
 export const CATALOGUE_ENDPOINTS: readonly CatalogueEndpoint[] = [
   {

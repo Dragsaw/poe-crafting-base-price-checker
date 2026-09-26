@@ -7,8 +7,13 @@
  * that keeps a hung connection from blocking a terminal is written once. A
  * second hand-written `HttpPort` is exactly where that detail gets dropped.
  *
- * **No test executes anything here.** Every unit below the commands takes its
- * ports as values, so a test drives the fakes in `@poe/contracts` instead.
+ * **No test executes `createFetchHttpPort`**, and `catalogue-refresh.test.ts`
+ * asserts that no test file so much as names it. Every unit below the commands
+ * takes its ports as values, so a test drives the fakes in `@poe/contracts`
+ * instead. The rest of this module is ordinary code and `shell.test.ts` covers
+ * it against a temporary directory — the `mkdir` below is what makes the first
+ * refresh on a fresh checkout work, and a claim that load-bearing needs a test
+ * rather than a comment.
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
