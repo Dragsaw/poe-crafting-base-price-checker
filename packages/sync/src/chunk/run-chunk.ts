@@ -38,6 +38,14 @@
  * record the previous report still holds. A previous report this build cannot
  * read is refused before anything is written (NFR-8).
  *
+ * Before the order is computed, the run-start catalogue check tests every
+ * tracked id against the committed catalogue (`./catalogue-check.ts`, AD-9,
+ * AD-25). A miss is marked `unresolvable`, reported, published with the step
+ * entries and kept out of this order; nothing is stamped. `data/weights.json`
+ * is then read narrowly (`../catalogue/weights-ids.ts`): absent is a
+ * `weights-absent` record and the run goes on; present has its ids checked,
+ * report-only; an unknown major is a throw like any other load (NFR-8).
+ *
  * A throw writes the report with a `run-failure` record, leaves
  * `runFinishedAt` absent, and is rethrown. A `MalformedRequestError` (a
  * non-429 4xx) first publishes the dataset and progress for the entries
@@ -73,10 +81,14 @@ import type {
 import { chunkOrder, pinnedToKeep } from '@poe/core';
 import type { ChunkOrder } from '@poe/core';
 
+import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
+import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
+import type { DataFileResult } from '../load-data-file.ts';
 import { MalformedRequestError } from '../pricing/price-entry.ts';
 import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
+import { checkCatalogue } from './catalogue-check.ts';
 import { acquireLock, holdsLock, releaseLockIfOwn } from './lock.ts';
 import { buildDatasetFile } from './publish-dataset.ts';
 import { buildSyncReport } from './sync-report.ts';
@@ -114,6 +126,8 @@ export type StepResult =
       readonly searchRemaining?: number;
       readonly fetchRemaining?: number;
       readonly entry?: DatasetEntry;
+      /** Report records the step raised for this entry (a `jewel`-arm miss). */
+      readonly records?: readonly SyncRunRecord[];
     }
   | { readonly kind: 'yielded'; readonly entry?: DatasetEntry };
 
@@ -153,6 +167,13 @@ export interface ChunkPorts {
    * shell cannot silently drop the record (FR-25).
    */
   readonly starvationRecord: (starvation: ChunkStarvation) => SyncRunRecord;
+  /**
+   * Loads the committed catalogue's id sets (`../catalogue/catalogue-ids.ts`).
+   * Called under the lock, after the dataset load and before the order, so a
+   * `busy` run does no catalogue work. A refusal aborts the chunk with a
+   * `run-failure` record, before any request.
+   */
+  readonly catalogue: () => Promise<DataFileResult<CatalogueIds>>;
   /**
    * The run-start gate. It runs under the lock, before any step. A throw
    * aborts the chunk; the lock is still released.
@@ -319,6 +340,12 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
     let writingReport = false;
     const completed: string[] = [];
     const stepEntries: DatasetEntry[] = [];
+    /** The run-start check's offline marks (AD-9). They publish beneath the step entries. */
+    let marked: readonly DatasetEntry[] = [];
+    /** The run-start records: `unresolvable`, then `weights-absent` or `uncatalogued-weights-id`. */
+    const checkRecords: SyncRunRecord[] = [];
+    /** The records the steps raised, in visiting order. */
+    const stepRecords: SyncRunRecord[] = [];
     // Only rotation completions enter the pass: row 1 is exempt (AD-7).
     const rotationCompleted: string[] = [];
     let pinnedVisited = 0;
@@ -337,11 +364,16 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
           }
         : {};
 
-    /** This chunk's records: the broken lock, then the starvation, then any failure. */
+    /**
+     * This chunk's records: the broken lock, the run-start check, the steps,
+     * then the starvation, then any failure.
+     */
     const newRecords = (failure?: RunFailureRecord): SyncRunRecord[] => {
       const { pinnedStarvation } = starvationNow();
       return [
         ...records,
+        ...checkRecords,
+        ...stepRecords,
         ...(pinnedStarvation === undefined ? [] : [ports.starvationRecord(pinnedStarvation)]),
         ...(failure === undefined ? [] : [failure]),
       ];
@@ -356,7 +388,8 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         buildDatasetFile({
           tracked: entries,
           previous: dataset?.entries ?? [],
-          stepEntries: published,
+          // A step entry for the same key wins over an offline mark.
+          stepEntries: [...marked, ...published],
           league: publication.league,
           currencyRates: publication.currencyRates,
           now: clock.now(),
@@ -414,9 +447,30 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
       dataset = await loadEnvelope(fs, DATASET_PATH, (data) =>
         parseEnvelope(DatasetFileSchema, data),
       );
+      // The run-start catalogue check (AD-9, AD-25): offline, before any
+      // request, and never a stamp. A miss is marked, reported and kept out of
+      // this order; a recovered entry enters it as an ordinary entry (AD-7).
+      const catalogue = await ports.catalogue();
+      if (!catalogue.ok) {
+        throw catalogue.error;
+      }
+      // Read before the check: a weights refusal must not leave a failure
+      // report listing marks that were never published. An absent file is
+      // recorded and the run goes on (AD-12); a present one has its ids
+      // checked, report-only (AD-9).
+      const weights = await readWeightsIds(fs);
+      const check = checkCatalogue(entries, dataset?.entries ?? [], catalogue.value);
+      marked = check.marked;
+      checkRecords.push(...check.records);
+      checkRecords.push(
+        ...(weights.kind === 'absent'
+          ? [weightsAbsentRecord(entries)]
+          : checkWeightsIds(weights, catalogue.value)),
+      );
+
       const plan = chunkOrder({
-        tracked: entries,
-        dataset: dataset?.entries ?? [],
+        tracked: entries.filter((entry) => !check.excludedKeys.has(canonicalKey(entry))),
+        dataset: check.orderDataset,
         completed: progress?.completed ?? [],
         now: clock.now(),
       });
@@ -443,6 +497,9 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
         current = undefined;
         if (result.entry !== undefined) {
           stepEntries.push(result.entry);
+        }
+        if (result.kind === 'completed' && result.records !== undefined) {
+          stepRecords.push(...result.records);
         }
         if (result.kind === 'yielded') {
           ending = { kind: 'yielded' };

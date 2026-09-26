@@ -5,7 +5,8 @@
  * Pure: an entry and the committed item catalogue in, a body out. It issues no
  * request and reads no file. The one refusal it can raise — a `jewel`-arm base
  * type the catalogue does not carry — is thrown **before** any request exists,
- * so a wrong class name is a load error rather than a search issued in hope.
+ * so a wrong class name never becomes a search issued in hope. The pricing
+ * step catches it and marks that one entry `unresolvable` (AD-25).
  *
  * The object literals below are written in one fixed key order. The body is
  * serialised with `JSON.stringify`, and a stable order is what makes one entry

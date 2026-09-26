@@ -1,0 +1,123 @@
+import { createFakeFilesystemPort } from '@poe/contracts';
+import type { TrackedEntry } from '@poe/contracts';
+import { describe, expect, it } from 'vitest';
+
+import { DataFileError } from '../load-data-file.ts';
+import type { CatalogueIds } from './catalogue-ids.ts';
+import { checkWeightsIds, readWeightsIds, weightsAbsentRecord, WEIGHTS_PATH } from './weights-ids.ts';
+
+function line(statId: string | null): unknown {
+  return { statId, ranges: [] };
+}
+
+function pool(...lines: unknown[]): unknown {
+  return { poolCoverage: 'complete', entries: [{ sourceModifierId: 'x', lines }] };
+}
+
+const WEIGHTS = {
+  schemaVersion: '6.1.0',
+  gamePatch: '0.5.5',
+  bases: {
+    'weapon.bow': { Bows: { prefix: pool(line('explicit.a'), line(null)), suffix: pool(line('explicit.b')) } },
+    jewel: {
+      Emerald: { prefix: pool(line('explicit.a')), suffix: pool() },
+      Ruby: { prefix: pool(line('explicit.c')), suffix: pool(line(null)) },
+    },
+  },
+};
+
+function fsWith(contents: string | undefined) {
+  return createFakeFilesystemPort(contents === undefined ? {} : { [WEIGHTS_PATH]: { contents } });
+}
+
+describe('readWeightsIds', () => {
+  it('reads the outer categoryIds and every non-null line statId', async () => {
+    expect(await readWeightsIds(fsWith(JSON.stringify(WEIGHTS)))).toEqual({
+      kind: 'present',
+      statIds: new Set(['explicit.a', 'explicit.b', 'explicit.c']),
+      categoryIds: new Set(['weapon.bow', 'jewel']),
+    });
+  });
+
+  it('answers absent for an absent file', async () => {
+    expect(await readWeightsIds(fsWith(undefined))).toEqual({ kind: 'absent' });
+  });
+
+  it.each([
+    ['not JSON', '{', 'not-json'],
+    ['an unknown major', JSON.stringify({ ...WEIGHTS, schemaVersion: '5.1.0' }), 'unknown-major'],
+    ['a malformed version', JSON.stringify({ ...WEIGHTS, schemaVersion: 'six' }), 'malformed-version'],
+    ['no version', JSON.stringify({ bases: {} }), 'invalid'],
+    ['no bases', JSON.stringify({ schemaVersion: '6.0.0' }), 'invalid'],
+  ])('refuses %s loudly, naming the file', async (_label, contents, reason) => {
+    const read = readWeightsIds(fsWith(contents));
+    await expect(read).rejects.toBeInstanceOf(DataFileError);
+    await expect(read).rejects.toMatchObject({ path: WEIGHTS_PATH, reason });
+  });
+
+  it('leaves the rest of the shape to the weights schema: odd members are not read', async () => {
+    const odd = { schemaVersion: '6.0.0', bases: { jewel: { Emerald: { prefix: 'nonsense', suffix: pool(7) } } } };
+    expect(await readWeightsIds(fsWith(JSON.stringify(odd)))).toEqual({
+      kind: 'present',
+      statIds: new Set(),
+      categoryIds: new Set(['jewel']),
+    });
+  });
+});
+
+describe('checkWeightsIds', () => {
+  const catalogue: CatalogueIds = {
+    statIds: new Set(['explicit.a']),
+    baseTypeIds: new Set(),
+    categoryIds: new Set(['jewel']),
+  };
+
+  it('reports each distinct miss once, sorted by kind then identifier', () => {
+    expect(
+      checkWeightsIds(
+        {
+          kind: 'present',
+          statIds: new Set(['explicit.c', 'explicit.a', 'explicit.b']),
+          categoryIds: new Set(['weapon.bow', 'jewel', 'armour.chest']),
+        },
+        catalogue,
+      ),
+    ).toEqual([
+      { kind: 'uncatalogued-weights-id', identifier: 'armour.chest', identifierKind: 'categoryId' },
+      { kind: 'uncatalogued-weights-id', identifier: 'weapon.bow', identifierKind: 'categoryId' },
+      { kind: 'uncatalogued-weights-id', identifier: 'explicit.b', identifierKind: 'statId' },
+      { kind: 'uncatalogued-weights-id', identifier: 'explicit.c', identifierKind: 'statId' },
+    ]);
+  });
+
+  it('reports nothing where every id is catalogued', () => {
+    expect(
+      checkWeightsIds({ kind: 'present', statIds: new Set(['explicit.a']), categoryIds: new Set(['jewel']) }, catalogue),
+    ).toEqual([]);
+  });
+});
+
+describe('weightsAbsentRecord', () => {
+  it('names the distinct classNames of non-pruned crafted entries, sorted by code unit', () => {
+    const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
+      ({
+        kind: 'crafted',
+        categoryId: 'c',
+        className,
+        itemLevelMin: 1,
+        prefix: { kind: 'valueless', statId: 's' },
+        status,
+        ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
+      }) as TrackedEntry;
+    expect(
+      weightsAbsentRecord([
+        craftedOf('bows'),
+        craftedOf('Bows'),
+        craftedOf('Amulets', 'pinned'),
+        craftedOf('Bows'),
+        craftedOf('Pruned_Class', 'pruned'),
+        { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 1, status: 'active' },
+      ]),
+    ).toEqual({ kind: 'weights-absent', uncheckableClassNames: ['Amulets', 'Bows', 'bows'] });
+  });
+});

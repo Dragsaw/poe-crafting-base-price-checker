@@ -63,3 +63,9 @@ Append-only. Each entry names work carved out of a spec so it is not lost.
   evidence: Spine memlog, revision 20 entries.
 - resolved_by: PRD FR-18 revision 21, `docs/epics.md`, and `EXPERIENCE.md` revision 6 (2026-09-26). The PRD, the epics and the UX now match AD-12. The UX adds the plain-text suffix `(not committed)` for a `file-modified` date.
   code_owed: The trust strip must render that suffix when Epic 2 builds it. Story 1.9's code already writes the tag, so `sync` needs no change.
+
+## Deferred from: story 1.10 (2026-09-26)
+
+- source_spec: `docs/stories/spec-1-10-unresolvable-ids-detected-offline-and-reported.md`
+  summary: The `IMPLEMENTATION-NOTES.md` §10.2 fix is still owed. §10.2 says a `jewel`-arm derived base type the catalogue does not carry is a "load error naming the class". AD-25 says the entry is marked `unresolvable`, reported, and the chunk continues. The spine owns the ruling, so Story 1.10 implements AD-25. The §10.2 text is out of date and must be changed to cite AD-25.
+  evidence: The spec's agent decision *The spine owns the `jewel` ruling* says "The §10 fix is logged in `deferred-work.md`. It is not made here." `packages/sync/src/pricing/price-entry.ts` now catches `UnknownClassBaseTypeError` and returns a `completed` step with an `unresolvable` entry and a `baseTypeId` record.

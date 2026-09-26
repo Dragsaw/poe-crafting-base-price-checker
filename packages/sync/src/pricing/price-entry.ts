@@ -15,6 +15,7 @@
  * | search answered | `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` set | — |
  * | 429, 5xx, timeout (search or fetch) | `lastAttemptedAt` stamped, the rest unchanged | yields |
  * | any other 4xx | `lastAttemptedAt` stamped, price state kept | `MalformedRequestError` thrown |
+ * | none: the `jewel` arm derives a base type `items.json` lacks | `unresolvable`, nothing stamped, a `baseTypeId` record | continues |
  *
  * The league, the rates and the item types arrive as values; this module
  * names no player file.
@@ -30,11 +31,12 @@ import type {
   TrackedEntry,
 } from '@poe/contracts';
 
+import { markUnresolvable } from '../chunk/catalogue-check.ts';
 import type { ChunkStep, StepResult } from '../chunk/run-chunk.ts';
 import type { TradeClient, TradeResult } from '../trade/client.ts';
 import { FETCH_LANE, SEARCH_LANE, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { currentRates, lowerMedian, outputRate, toDivine } from './normalise.ts';
-import { buildSearchBody } from './search-body.ts';
+import { buildSearchBody, UnknownClassBaseTypeError } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
 
 /** AD-16: the cheapest ten result ids are fetched, never more. */
@@ -256,8 +258,29 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
 
   return async (tracked: TrackedEntry): Promise<StepResult> => {
     const entryKey = canonicalKey(tracked);
-    // Built first: a jewel-arm refusal is raised before any request.
-    const body = JSON.stringify(buildSearchBody(tracked, itemTypes));
+    // Built first: a jewel-arm miss is decided before any request.
+    let body: string;
+    try {
+      body = JSON.stringify(buildSearchBody(tracked, itemTypes));
+    } catch (error) {
+      if (!(error instanceof UnknownClassBaseTypeError)) {
+        throw error;
+      }
+      // AD-25: the entry is marked and reported, no search is issued, and the
+      // chunk continues. Offline work stamps nothing.
+      return {
+        kind: 'completed',
+        entry: markUnresolvable(entryKey, published.get(entryKey)),
+        records: [
+          {
+            kind: 'unresolvable',
+            entryKey,
+            identifier: error.baseTypeId,
+            identifierKind: 'baseTypeId',
+          },
+        ],
+      };
+    }
     const before: DatasetEntry = published.get(entryKey) ?? { entryKey, price: NEVER_SYNCED };
 
     const attemptedAt = clock.now();

@@ -33,8 +33,21 @@ const CURRENCIES = JSON.stringify({
   schemaVersion: '1.0.0',
   rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
 });
-const ITEMS_CATALOGUE = { result: [] };
+/** Every base type the synthetic entries below name, in one group no category id matches. */
+const ITEMS_CATALOGUE = {
+  result: [
+    {
+      id: 'test',
+      label: 'Test',
+      entries: ['Solar Amulet', 'Gold Amulet', 'Wide Belt', 'A', 'B', 'C', 'P'].map((type) => ({ type })),
+    },
+  ],
+};
 const ITEMS = JSON.stringify({ schemaVersion: '1.0.0', ...ITEMS_CATALOGUE });
+const STATS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
+const FILTERS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
+/** A present weights file with no ids, so no weights record arises. */
+const WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', bases: {} });
 
 /**
  * An in-memory answer per entry: a search that found nothing. It is not a
@@ -61,6 +74,9 @@ function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial
     config: CONFIG,
     currencies: CURRENCIES,
     items: ITEMS,
+    stats: STATS,
+    filters: FILTERS,
+    weights: WEIGHTS,
     fixtures: emptySearches(entries ?? []),
     ...extra,
   };
@@ -194,10 +210,33 @@ describe('dryRun', () => {
     ['config', 'data/config.json'],
     ['currencies', 'data/currencies.json'],
     ['items', 'data/catalogue/items.json'],
+    ['stats', 'data/catalogue/stats.json'],
+    ['filters', 'data/catalogue/filters.json'],
   ] as const)('refuses an absent or invalid %s file, naming it, before any request', async (key, path) => {
     for (const contents of [undefined, '{"schemaVersion":"1.0.0"}']) {
       await expect(dryRun(snapshotOf(entries, { [key]: contents }))).rejects.toThrow(path);
     }
+  });
+
+  it('records an absent weights file and runs otherwise unchanged', async () => {
+    const report = await dryRun(snapshotOf(entries, { weights: undefined }));
+    expect(report.outcome).toBe('completed');
+    expect(report.report?.records).toEqual([{ kind: 'weights-absent', uncheckableClassNames: [] }]);
+    expect(report.report?.figures.requestsBySource['tracked-list']).toBe(2);
+  });
+
+  it('marks an uncatalogued base type offline: no request, the others priced', async () => {
+    const unknown: TrackedEntry = { kind: 'raw', baseTypeId: 'Patched Out', itemLevelMin: 82, status: 'active' };
+    const report = await dryRun(snapshotOf([...entries, unknown]));
+    expect(report.completed).not.toContain(canonicalKey(unknown));
+    expect(report.report?.figures.requestsBySource['tracked-list']).toBe(2);
+    expect(report.dataset?.entries.find((entry) => entry.entryKey === canonicalKey(unknown))).toEqual({
+      entryKey: canonicalKey(unknown),
+      price: { state: 'unresolvable' },
+    });
+    expect(report.report?.records).toEqual([
+      { kind: 'unresolvable', entryKey: canonicalKey(unknown), identifier: 'Patched Out', identifierKind: 'baseTypeId' },
+    ]);
   });
 
   it('fails loudly, naming the missing fixture, when a request has no recorded fixture', async () => {
@@ -257,6 +296,11 @@ describe('dryRun: the dataset snapshot', () => {
         starvationRecord: (starvation) => pinnedStarvationRecord(starvation, { minChunkSearches: 1 }),
         publication: { league: LEAGUE, currencyRates: [] },
         log: () => undefined,
+        catalogue: () =>
+          Promise.resolve({
+            ok: true,
+            value: { statIds: new Set(), baseTypeIds: new Set(['A', 'B', 'C', 'P']), categoryIds: new Set() },
+          }),
       },
       (entry) => {
         visited.push(canonicalKey(entry));
@@ -306,6 +350,10 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     for (const entry of report.entries) {
       expect(entry.price.state, entry.entryKey).toBe('priced');
     }
+    // Every tracked id resolves against the committed catalogue.
+    expect(report.report?.records.filter((record) => record.kind === 'unresolvable')).toEqual([]);
+    // weights.json is committed, so its absence is not recorded.
+    expect(report.report?.records.some((record) => record.kind === 'weights-absent')).toBe(false);
     // The published dataset holds every tracked entry, pruned ones included.
     expect(report.dataset).not.toBeNull();
     expect(DatasetFileSchema.safeParse(report.dataset).success).toBe(true);

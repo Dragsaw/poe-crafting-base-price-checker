@@ -10,7 +10,8 @@ import { describe, expect, it } from 'vitest';
 import { createTradeClient } from '../trade/client.ts';
 import { tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { createPricingStep, MalformedRequestError, UnexpectedTradeResponseError } from './price-entry.ts';
-import { itemTypesOf, UnknownClassBaseTypeError } from './search-body.ts';
+import { itemTypesOf } from './search-body.ts';
+import type { ItemTypes } from './search-body.ts';
 
 const LEAGUE = 'Forbidden Rites';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -367,19 +368,87 @@ describe('createPricingStep: unanswered and refused requests', () => {
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch' });
   });
 
-  it('a jewel-arm class the catalogue lacks is refused before any request', async () => {
-    const { http, run } = setup({
-      entry: {
-        kind: 'crafted',
-        categoryId: 'jewel',
-        className: 'Emerld',
-        itemLevelMin: 1,
-        prefix: { kind: 'valueless', statId: 'explicit.x' },
-        status: 'active',
+  const MISSPELT: TrackedEntry = {
+    kind: 'crafted',
+    categoryId: 'jewel',
+    className: 'Emerld',
+    itemLevelMin: 1,
+    prefix: { kind: 'valueless', statId: 'explicit.x' },
+    status: 'active',
+  };
+
+  it('a jewel-arm class the catalogue lacks is marked unresolvable, reported, and costs no request', async () => {
+    const { http, run } = setup({ entry: MISSPELT });
+
+    const result = await run();
+
+    expect(http.requests).toHaveLength(0);
+    // Completed, so the chunk continues; no allowance, so it bounds nothing.
+    expect(result).toEqual({
+      kind: 'completed',
+      entry: { entryKey: canonicalKey(MISSPELT), price: { state: 'unresolvable' } },
+      records: [
+        {
+          kind: 'unresolvable',
+          entryKey: canonicalKey(MISSPELT),
+          identifier: 'Emerld',
+          identifierKind: 'baseTypeId',
+        },
+      ],
+    });
+  });
+
+  it('a jewel-arm miss keeps the attempt metadata, drops the observation, and stamps nothing', async () => {
+    const previous: DatasetEntry = {
+      entryKey: canonicalKey(MISSPELT),
+      price: {
+        state: 'priced',
+        observation: {
+          league: LEAGUE,
+          observedAt: '2026-09-20T00:00:00.000Z',
+          priceDivine: 1,
+          sampleSize: 1,
+          exchangeObservation: rate('divine', 1),
+        },
       },
+      lastAttemptedAt: '2026-09-20T00:00:00.000Z',
+      lastSearchId: 'old',
+      lastSearchLeague: LEAGUE,
+    };
+    const { run } = setup({ entry: MISSPELT, dataset: [previous] });
+
+    const result = await run();
+
+    expect(result.entry).toEqual({
+      entryKey: canonicalKey(MISSPELT),
+      price: { state: 'unresolvable' },
+      lastAttemptedAt: '2026-09-20T00:00:00.000Z',
+      lastSearchId: 'old',
+      lastSearchLeague: LEAGUE,
+    });
+    expect(DatasetEntrySchema.safeParse(result.entry).success).toBe(true);
+  });
+
+  it('rethrows any other build failure', async () => {
+    const step = createPricingStep({
+      client: createTradeClient({
+        http: createFakeHttpPort({}),
+        clock: createFakeClockPort(NOW),
+        wait: () => Promise.resolve(),
+        userAgent: 'test (x@y.test)',
+      }),
+      league: LEAGUE,
+      rates: RATES,
+      // Only the jewel-arm miss is caught: a fault in the catalogue itself is not.
+      itemTypes: {
+        get: () => {
+          throw new RangeError('broken catalogue');
+        },
+      } as unknown as ItemTypes,
+      dataset: [],
+      clock: createFakeClockPort(NOW),
     });
 
-    await expect(run()).rejects.toBeInstanceOf(UnknownClassBaseTypeError);
-    expect(http.requests).toHaveLength(0);
+    await expect(step(MISSPELT)).rejects.toBeInstanceOf(RangeError);
   });
 });

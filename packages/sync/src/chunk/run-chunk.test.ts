@@ -25,6 +25,9 @@ import type {
 } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
+import { WEIGHTS_PATH } from '../catalogue/weights-ids.ts';
+import { DataFileError } from '../load-data-file.ts';
 import { pinnedStarvationRecord } from '../pinned-cap.ts';
 import { MalformedRequestError } from '../pricing/price-entry.ts';
 import { createRequestCounter } from '../request-counter.ts';
@@ -61,14 +64,48 @@ function progressText(completed: readonly string[]): string {
   return JSON.stringify({ schemaVersion: '1.0.0', completed });
 }
 
-/** The read-only git port, the request counter and the starvation record every runner needs: no history, nothing counted, a yardstick of 10. */
-function shellPorts(): Pick<ChunkPorts, 'git' | 'requests' | 'starvationRecord'> {
+/** A set that holds every id except the ones named: a catalogue that is not the test's subject. */
+class EverySetExcept extends Set<string> {
+  readonly #missing: ReadonlySet<string>;
+
+  constructor(missing: readonly string[] = []) {
+    super();
+    this.#missing = new Set(missing);
+  }
+
+  override has(id: string): boolean {
+    return !this.#missing.has(id);
+  }
+}
+
+/** A catalogue that exposes every id except the ones named. */
+function catalogueWithout(...missing: string[]): CatalogueIds {
+  return {
+    statIds: new EverySetExcept(missing),
+    baseTypeIds: new EverySetExcept(missing),
+    categoryIds: new EverySetExcept(missing),
+  };
+}
+
+/** A catalogue in which every tracked id resolves. */
+const RESOLVES_ALL = catalogueWithout();
+
+/**
+ * The read-only git port, the request counter, the starvation record and the
+ * catalogue every runner needs: no history, nothing counted, a yardstick of
+ * 10, and every id resolving.
+ */
+function shellPorts(): Pick<ChunkPorts, 'git' | 'requests' | 'starvationRecord' | 'catalogue'> {
   return {
     git: createFakeGitPort(),
     requests: createRequestCounter(),
     starvationRecord: (starvation) => pinnedStarvationRecord(starvation, { minChunkSearches: 10 }),
+    catalogue: () => Promise.resolve({ ok: true, value: RESOLVES_ALL }),
   };
 }
+
+/** A present weights file with no ids: no weights record arises. */
+const EMPTY_WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', bases: {} });
 
 interface Harness {
   readonly fs: FakeFilesystemPort;
@@ -83,6 +120,7 @@ function harness(
 ): Harness {
   const fs = createFakeFilesystemPort({
     [TRACKED_PATH]: { contents: trackedText(entries) },
+    [WEIGHTS_PATH]: { contents: EMPTY_WEIGHTS },
     ...extra,
   });
   const logs: string[] = [];
@@ -758,8 +796,9 @@ describe('runChunk: the Refresh Rotation', () => {
 
     await runChunk(ports, step);
 
-    // C never attempted, then B, then A; U exactly 24 h old is due in row 3.
-    expect(visited).toEqual([key(C), key(B), key(A), key(U)]);
+    // C never attempted, then U, B, A oldest first. U's id resolves again, so
+    // it is recovered into row 2 rather than waiting in row 3 (AD-7).
+    expect(visited).toEqual([key(C), key(U), key(B), key(A)]);
     expect(await progressOf(fs)).toEqual({
       schemaVersion: '1.0.0',
       completed: [key(A), key(B), key(C), key(U)],
@@ -885,7 +924,7 @@ describe('runChunk: the Refresh Rotation', () => {
     expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [] });
   });
 
-  it('a due pinned + unresolvable entry is visited in row 3 and its key is written to progress', async () => {
+  it('a recovered pinned + unresolvable entry rejoins row 1, exempt from the pass', async () => {
     const PU = raw('PU', 'pinned');
     const { fs, ports } = harness([PU, A], {
       [DATASET_PATH]: {
@@ -896,8 +935,8 @@ describe('runChunk: the Refresh Rotation', () => {
 
     await runChunk(ports, step);
 
-    expect(visited).toEqual([key(A), key(PU)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A), key(PU)] });
+    expect(visited).toEqual([key(PU), key(A)]);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.0.0', completed: [key(A)] });
   });
 
   it('no rotation waiting: 3 pinned alone with R=1 are all visited, with no record', async () => {
@@ -1156,10 +1195,10 @@ describe('runChunk: the Sync Report', () => {
     expect((await reportOf(fs))?.figures.notReachedCount).toBe(1);
   });
 
-  it('excluded: a pruned entry and an unresolvable entry inside its retry interval never count', async () => {
+  it('excluded: a pruned entry and an entry the catalogue check marked never count', async () => {
     const U = raw('U');
-    const { fs, ports } = harness([A, B, PRUNED, U], {
-      [DATASET_PATH]: { contents: datasetText([{ key: key(U), at: FIVE_HOURS_AGO, unresolvable: true }]) },
+    const { fs, ports } = harness([A, B, PRUNED, U], {}, {
+      catalogue: () => Promise.resolve({ ok: true, value: catalogueWithout('U') }),
     });
     const { visited, step } = scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 }));
 
@@ -1375,5 +1414,367 @@ describe('runChunk: the Sync Report', () => {
     expect(await fs.exists(DATASET_PATH)).toBe(false);
     expect(await fs.exists(PROGRESS_PATH)).toBe(false);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+});
+
+describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
+  const STAT_GONE = 'explicit.gone';
+
+  function craftedEntry(
+    categoryId: string,
+    prefix: string,
+    className = 'Bows',
+    status: TrackedEntry['status'] = 'active',
+  ): TrackedEntry {
+    const base = { kind: 'crafted', categoryId, className, itemLevelMin: 75, prefix: { kind: 'valueless', statId: prefix } } as const;
+    return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
+  }
+
+  const withCatalogue = (...missing: string[]): Partial<ChunkPorts> => ({
+    catalogue: () => Promise.resolve({ ok: true, value: catalogueWithout(...missing) }),
+  });
+
+  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
+    const text = await fs.readTextFile(REPORT_PATH);
+    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
+  }
+
+  async function publishedOf(fs: FakeFilesystemPort, entry: TrackedEntry): Promise<DatasetEntry | undefined> {
+    const text = await fs.readTextFile(DATASET_PATH);
+    const file = text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text));
+    return file?.entries.find((published) => published.entryKey === key(entry));
+  }
+
+  const noListingsOf = (entry: TrackedEntry): DatasetEntry => ({
+    entryKey: key(entry),
+    price: { state: 'no-listings' },
+    lastAttemptedAt: NOW,
+  });
+
+  it('unknown stat: marked unresolvable and recorded, never searched, and the others are priced', async () => {
+    const X = craftedEntry('weapon.bow', STAT_GONE);
+    const { fs, ports } = harness([A, X, B], {}, withCatalogue(STAT_GONE));
+    const { visited, step } = scriptedStep((entry) => ({ kind: 'completed', entry: noListingsOf(entry) }));
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome.kind).toBe('completed');
+    expect(visited).toEqual([key(A), key(B)]);
+    expect(await publishedOf(fs, X)).toEqual({ entryKey: key(X), price: { state: 'unresolvable' } });
+    expect(await publishedOf(fs, A)).toEqual(noListingsOf(A));
+    expect((await reportOf(fs))?.records).toEqual([
+      { kind: 'unresolvable', entryKey: key(X), identifier: STAT_GONE, identifierKind: 'statId' },
+    ]);
+  });
+
+  it('unknown base type and unknown category: the same, with their own identifier kinds', async () => {
+    const RAW_GONE = raw('Gone Base');
+    const CAT_GONE = craftedEntry('weapon.gone', 'explicit.ok');
+    const { fs, ports } = harness([RAW_GONE, CAT_GONE, A], {}, withCatalogue('Gone Base', 'weapon.gone'));
+    const { visited, step } = scriptedStep();
+
+    await runChunk(ports, step);
+
+    expect(visited).toEqual([key(A)]);
+    expect((await reportOf(fs))?.records).toEqual([
+      { kind: 'unresolvable', entryKey: key(RAW_GONE), identifier: 'Gone Base', identifierKind: 'baseTypeId' },
+      { kind: 'unresolvable', entryKey: key(CAT_GONE), identifier: 'weapon.gone', identifierKind: 'categoryId' },
+    ]);
+    expect((await publishedOf(fs, RAW_GONE))?.price).toEqual({ state: 'unresolvable' });
+    expect((await publishedOf(fs, CAT_GONE))?.price).toEqual({ state: 'unresolvable' });
+  });
+
+  it('was priced: the mark keeps the old lastAttemptedAt and search fields, drops the observation, stamps nothing', async () => {
+    const X = raw('X');
+    const priced: DatasetEntry = {
+      entryKey: key(X),
+      price: {
+        state: 'priced',
+        observation: {
+          league: 'Standard',
+          observedAt: FIVE_HOURS_AGO,
+          priceDivine: 2,
+          sampleSize: 4,
+          exchangeObservation: {
+            currencyId: 'divine',
+            rate: 1,
+            source: 'measured',
+            league: 'Standard',
+            asOf: '2026-09-20T00:00:00Z',
+          },
+        },
+      },
+      lastAttemptedAt: FIVE_HOURS_AGO,
+      lastSearchId: 'S9',
+      lastSearchLeague: 'Standard',
+    };
+    const dataset = JSON.stringify({
+      schemaVersion: '1.0.0',
+      league: 'Standard',
+      generatedAt: FIVE_HOURS_AGO,
+      entries: [priced],
+      currencyRates: [],
+    });
+    const { fs, ports } = harness([X], { [DATASET_PATH]: { contents: dataset } }, withCatalogue('X'));
+
+    await runChunk(ports, scriptedStep().step);
+
+    expect(await publishedOf(fs, X)).toEqual({
+      entryKey: key(X),
+      price: { state: 'unresolvable' },
+      lastAttemptedAt: FIVE_HOURS_AGO,
+      lastSearchId: 'S9',
+      lastSearchLeague: 'Standard',
+    });
+  });
+
+  it('not reached: 3 tracked, 1 a miss, bounded after 1, counts 1', async () => {
+    const X = raw('X');
+    const { fs, ports } = harness([A, X, B], {}, withCatalogue('X'));
+    const { visited, step } = scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 }));
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome).toMatchObject({ kind: 'bounded', bound: 'search' });
+    expect(visited).toHaveLength(1);
+    expect((await reportOf(fs))?.figures.notReachedCount).toBe(1);
+  });
+
+  it('pruned: a pruned entry with a missing id is not checked, marked or recorded', async () => {
+    const PX = craftedEntry('weapon.gone', STAT_GONE, 'Bows', 'pruned');
+    const { fs, ports } = harness([A, PX], {}, withCatalogue('weapon.gone', STAT_GONE));
+
+    await runChunk(ports, scriptedStep().step);
+
+    expect(await publishedOf(fs, PX)).toEqual({
+      entryKey: key(PX),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+    });
+    expect((await reportOf(fs))?.records).toEqual([]);
+  });
+
+  it('recovery: an unresolvable entry whose ids resolve sits in row 2, not row 3', async () => {
+    const U = raw('U');
+    // U was attempted five hours ago: inside row 3's 24 h interval, so only
+    // row 2 can place it this chunk. A is older, so row 2 visits it first.
+    const { ports } = harness([A, U], {
+      [DATASET_PATH]: {
+        contents: datasetText([
+          { key: key(A), at: SEVEN_HOURS_AGO },
+          { key: key(U), at: FIVE_HOURS_AGO, unresolvable: true },
+        ]),
+      },
+    });
+    const { visited, step } = scriptedStep();
+
+    await runChunk(ports, step);
+
+    expect(visited).toEqual([key(A), key(U)]);
+  });
+
+  it('recovery: a recovered entry the chunk does not reach stays unresolvable in the dataset', async () => {
+    const U = raw('U');
+    const { fs, ports } = harness([A, U], {
+      [DATASET_PATH]: {
+        contents: datasetText([
+          { key: key(A), at: SEVEN_HOURS_AGO },
+          { key: key(U), at: FIVE_HOURS_AGO, unresolvable: true },
+        ]),
+      },
+    });
+    const { visited, step } = scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 }));
+
+    await runChunk(ports, step);
+
+    expect(visited).toEqual([key(A)]);
+    expect(await publishedOf(fs, U)).toEqual({
+      entryKey: key(U),
+      price: { state: 'unresolvable' },
+      lastAttemptedAt: FIVE_HOURS_AGO,
+    });
+    expect((await reportOf(fs))?.records).toEqual([]);
+  });
+
+  it('jewel miss: the step’s mark and record are published, and the chunk continues', async () => {
+    const J = craftedEntry('jewel', 'explicit.ok', 'Emerld');
+    const mark: DatasetEntry = { entryKey: key(J), price: { state: 'unresolvable' } };
+    const record: SyncRunRecord = {
+      kind: 'unresolvable',
+      entryKey: key(J),
+      identifier: 'Emerld',
+      identifierKind: 'baseTypeId',
+    };
+    const { fs, ports } = harness([J, A]);
+    const { visited, step } = scriptedStep((entry) =>
+      key(entry) === key(J) ? { kind: 'completed', entry: mark, records: [record] } : { kind: 'completed' },
+    );
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome.kind).toBe('completed');
+    expect(visited).toHaveLength(2);
+    expect(await publishedOf(fs, J)).toEqual(mark);
+    expect((await reportOf(fs))?.records).toEqual([record]);
+  });
+
+  it('empty search: zero results stay no-listings, never unresolvable', async () => {
+    const { fs, ports } = harness([A]);
+
+    await runChunk(ports, scriptedStep((entry) => ({ kind: 'completed', entry: noListingsOf(entry) })).step);
+
+    expect((await publishedOf(fs, A))?.price).toEqual({ state: 'no-listings' });
+    expect((await reportOf(fs))?.records).toEqual([]);
+  });
+
+  it('weights absent: a weights-absent record naming the uncheckable classes, the run otherwise unchanged', async () => {
+    const X = craftedEntry('weapon.bow', 'explicit.ok', 'Bows');
+    const Y = craftedEntry('armour.chest', 'explicit.ok', 'Body_Armours_str');
+    const Z = craftedEntry('armour.chest', 'explicit.ok', 'Pruned_Class', 'pruned');
+    const present = harness([A, X, Y, Z]);
+    const absent = harness([A, X, Y, Z]);
+    await absent.fs.deleteFile(WEIGHTS_PATH);
+    const presentRun = scriptedStep();
+    const absentRun = scriptedStep();
+
+    await runChunk(present.ports, presentRun.step);
+    await runChunk(absent.ports, absentRun.step);
+
+    expect(absentRun.visited).toEqual(presentRun.visited);
+    expect(await absent.fs.readTextFile(DATASET_PATH)).toBe(await present.fs.readTextFile(DATASET_PATH));
+    expect((await reportOf(absent.fs))?.records).toEqual([
+      { kind: 'weights-absent', uncheckableClassNames: ['Body_Armours_str', 'Bows'] },
+    ]);
+    // Weights present: no weights-absent record.
+    expect((await reportOf(present.fs))?.records).toEqual([]);
+  });
+
+  it('weights miss: one record per distinct uncatalogued id, nulls skipped, and the run continues', async () => {
+    const lineOf = (statId: string | null): unknown => ({ statId, ranges: [] });
+    const weights = JSON.stringify({
+      schemaVersion: '6.0.0',
+      bases: {
+        'weapon.bow': {
+          Bows: {
+            prefix: { entries: [{ lines: [lineOf('explicit.w1'), lineOf(null)] }] },
+            suffix: { entries: [{ lines: [lineOf('explicit.w1')] }, { lines: [lineOf('explicit.ok')] }] },
+          },
+        },
+        'weapon.gone': { Gone: { prefix: { entries: [] }, suffix: { entries: [] } } },
+      },
+    });
+    const { fs, ports } = harness(
+      [A],
+      { [WEIGHTS_PATH]: { contents: weights } },
+      withCatalogue('explicit.w1', 'weapon.gone'),
+    );
+    const { visited, step } = scriptedStep();
+
+    const outcome = await runChunk(ports, step);
+
+    expect(outcome.kind).toBe('completed');
+    expect(visited).toEqual([key(A)]);
+    expect((await reportOf(fs))?.records).toEqual([
+      { kind: 'uncatalogued-weights-id', identifier: 'weapon.gone', identifierKind: 'categoryId' },
+      { kind: 'uncatalogued-weights-id', identifier: 'explicit.w1', identifierKind: 'statId' },
+    ]);
+    // The file is never rewritten.
+    expect(await fs.readTextFile(WEIGHTS_PATH)).toBe(weights);
+  });
+
+  it('weights bad major: a run-failure record, the error rethrown, nothing searched', async () => {
+    const { fs, ports } = harness([A], {
+      [WEIGHTS_PATH]: { contents: JSON.stringify({ schemaVersion: '5.1.0', bases: {} }) },
+    });
+    const { visited, step } = scriptedStep();
+
+    await expect(runChunk(ports, step)).rejects.toThrow(/weights\.json.*5\.1\.0/);
+
+    expect(visited).toEqual([]);
+    const report = await reportOf(fs);
+    expect(report?.runFinishedAt).toBeUndefined();
+    expect(report?.records).toEqual([
+      expect.objectContaining({ kind: 'run-failure', reason: 'unrecoverable-error' }),
+    ]);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('a catalogue that cannot be loaded aborts before any request, with a run-failure record', async () => {
+    const { fs, ports } = harness([A], {}, {
+      catalogue: () =>
+        Promise.resolve({
+          ok: false,
+          error: new DataFileError('data/catalogue/stats.json', 'absent', 'the file is absent'),
+        }),
+    });
+    const { visited, step } = scriptedStep();
+
+    await expect(runChunk(ports, step)).rejects.toThrow(/stats\.json/);
+
+    expect(visited).toEqual([]);
+    expect((await reportOf(fs))?.records).toEqual([
+      expect.objectContaining({ kind: 'run-failure', message: expect.stringContaining('stats.json') as unknown }),
+    ]);
+  });
+
+  it('busy lock: no catalogue work', async () => {
+    let loads = 0;
+    const held = serialiseLock({ pid: 7, startedAt: FIVE_HOURS_AGO });
+    const { ports } = harness(undefined, { [LOCK_PATH]: { contents: held } }, {
+      catalogue: () => {
+        loads += 1;
+        return Promise.resolve({ ok: true, value: catalogueWithout() });
+      },
+    });
+
+    expect((await runChunk(ports, scriptedStep().step)).kind).toBe('busy');
+    expect(loads).toBe(0);
+  });
+
+  it('jewel: a published-unresolvable jewel entry whose ids resolve is not recovered, and waits in row 3', async () => {
+    const J = craftedEntry('jewel', 'explicit.ok', 'Emerld');
+    const { ports } = harness([J, A], {
+      [DATASET_PATH]: { contents: datasetText([{ key: key(J), at: FIVE_HOURS_AGO, unresolvable: true }]) },
+    });
+    const { visited, step } = scriptedStep();
+
+    await runChunk(ports, step);
+
+    // Inside row 3's 24 h interval, so not visited.
+    expect(visited).toEqual([key(A)]);
+  });
+
+  it('4xx abort after an offline miss: the mark is published and its record precedes the run-failure', async () => {
+    const X = raw('X');
+    const { fs, ports } = harness([X, B], {}, withCatalogue('X'));
+    const stamped: DatasetEntry = {
+      entryKey: key(B),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    };
+    const failure = new MalformedRequestError(key(B), 'search', 400, stamped);
+
+    await expect(
+      runChunk(ports, (entry) =>
+        key(entry) === key(B) ? Promise.reject(failure) : Promise.resolve({ kind: 'completed' }),
+      ),
+    ).rejects.toBe(failure);
+
+    expect(await publishedOf(fs, X)).toEqual({ entryKey: key(X), price: { state: 'unresolvable' } });
+    expect((await reportOf(fs))?.records).toEqual([
+      { kind: 'unresolvable', entryKey: key(X), identifier: 'X', identifierKind: 'baseTypeId' },
+      expect.objectContaining({ kind: 'run-failure', reason: 'trade-request-rejected', entryKey: key(B) }),
+    ]);
+  });
+
+  it('repeat: the same miss two chunks running is one record', async () => {
+    const X = raw('X');
+    const { fs, ports } = harness([A, X], {}, withCatalogue('X'));
+
+    await runChunk(ports, scriptedStep().step);
+    await runChunk(ports, scriptedStep().step);
+
+    expect((await reportOf(fs))?.records).toEqual([
+      { kind: 'unresolvable', entryKey: key(X), identifier: 'X', identifierKind: 'baseTypeId' },
+    ]);
   });
 });

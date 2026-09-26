@@ -3,8 +3,9 @@
  * (AGENT-WORKFLOW.md, NFR-1, NFR-3).
  *
  * It takes read-only snapshots of `data/tracked.json`, `data/dataset.json`
- * (when present), `data/config.json`, `data/currencies.json` and
- * `data/catalogue/items.json` into an in-memory fake filesystem, and runs **the
+ * (when present), `data/config.json`, `data/currencies.json`,
+ * `data/catalogue/{items,stats,filters}.json` and `data/weights.json` (when
+ * present) into an in-memory fake filesystem, and runs **the
  * same `runChunk`** a live run uses with **the same pricing step**, on a fixed
  * clock and a fixed pid. The step's requests go to an offline port that serves
  * the recorded `fixtures/trade-{search,fetch}-*.json` back by request digest;
@@ -21,8 +22,9 @@
  * supplies the records it carries forward.
  *
  * An absent tracked file is an empty workload, and an absent dataset means
- * every entry is never attempted. An absent or invalid config, currencies or
- * item catalogue is a typed refusal naming the file.
+ * every entry is never attempted. An absent weights file is a `weights-absent`
+ * record, as in a live run. An absent or invalid config, currencies or
+ * catalogue file is a typed refusal naming the file.
  */
 
 import { realpathSync } from 'node:fs';
@@ -56,6 +58,12 @@ import {
   TRACKED_PATH,
 } from './chunk/run-chunk.ts';
 import type { ChunkOutcomeKind, ChunkStarvation } from './chunk/run-chunk.ts';
+import {
+  CATALOGUE_FILTERS_PATH,
+  CATALOGUE_STATS_PATH,
+  loadCatalogueIds,
+} from './catalogue/catalogue-ids.ts';
+import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
 import { CONFIG_PATH, loadConfig } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
 import type { DataFileResult } from './load-data-file.ts';
@@ -98,6 +106,10 @@ export interface DryRunSnapshot {
   readonly config?: string | undefined;
   readonly currencies?: string | undefined;
   readonly items?: string | undefined;
+  readonly stats?: string | undefined;
+  readonly filters?: string | undefined;
+  /** `data/weights.json`; absent is recorded, never refused. */
+  readonly weights?: string | undefined;
   /** The previous Sync Report, whose records the chunk carries forward. */
   readonly report?: string | undefined;
   readonly fixtures: PricingFixtures;
@@ -128,6 +140,9 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
     [CONFIG_PATH, snapshot.config],
     [CURRENCIES_PATH, snapshot.currencies],
     [CATALOGUE_ITEMS_PATH, snapshot.items],
+    [CATALOGUE_STATS_PATH, snapshot.stats],
+    [CATALOGUE_FILTERS_PATH, snapshot.filters],
+    [WEIGHTS_PATH, snapshot.weights],
     [REPORT_PATH, snapshot.report],
   ];
   const fs = createFakeFilesystemPort(
@@ -166,6 +181,7 @@ export async function dryRun(snapshot: DryRunSnapshot): Promise<DryRunReport> {
       git: createFakeGitPort(),
       requests,
       starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
+      catalogue: () => loadCatalogueIds(fs),
     },
     step,
   );
@@ -210,6 +226,9 @@ export async function readRepositorySnapshot(): Promise<DryRunSnapshot> {
     config: await readSnapshot(CONFIG_PATH),
     currencies: await readSnapshot(CURRENCIES_PATH),
     items: await readSnapshot(CATALOGUE_ITEMS_PATH),
+    stats: await readSnapshot(CATALOGUE_STATS_PATH),
+    filters: await readSnapshot(CATALOGUE_FILTERS_PATH),
+    weights: await readSnapshot(WEIGHTS_PATH),
     report: await readSnapshot(REPORT_PATH),
     fixtures: await readPricingFixtures(FIXTURES_DIR),
   };
