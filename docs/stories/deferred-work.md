@@ -65,10 +65,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 ## Deferred from: story 1.10 (2026-09-26)
 
 - source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
-  summary: Attribution under it.concurrent / describe.concurrent is unverified. enterWith in interleaved beforeEach hooks could charge a request to the wrong test.
-  evidence: No test in the repository uses .concurrent (a search of packages/ and test/ found none), so no current test is affected. A reviewer's probe was refused by the sandbox. Would be settled by a concurrent pair in which each test issues its own unfixtured request, observing that each test's afterEach names only its own URL.
-
-- source_spec: `docs/stories/spec-deferred-late-request-escapes-no-network-guard.md`
   summary: The test identity set by enterWith may linger into a hook that belongs to no test, such as a file-level afterAll, so a request issued there could be charged to the last test.
   evidence: enterWith never clears the store. A beforeAll in a nested describe did not inherit an earlier test's identity (test/no-network.test.ts, attempt 1), but a file-level afterAll or a later suite's hooks were not probed. If true, the file still fails, but it names the wrong test. Would be settled by a test file whose afterAll issues an unfixtured request, observing the issuer in the file-level message.
 
