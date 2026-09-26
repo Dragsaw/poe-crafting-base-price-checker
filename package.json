@@ -9,7 +9,7 @@
   },
   "scripts": {
     "prepare": "node tools/setup-git-hooks.mjs",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -b && node tools/dts-specifiers/rewrite-dts-specifiers.ts",
     "lint": "eslint . --max-warnings=0",
     "depcruise": "depcruise packages --config .dependency-cruiser.mjs",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run depcruise",

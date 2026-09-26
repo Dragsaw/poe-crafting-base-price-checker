@@ -12,6 +12,7 @@
   "include": [
     "test/**/*.ts",
     "tools/boundary-check/*.ts",
+    "tools/dts-specifiers/*.ts",
     "depcruise.rules.mjs",
     ".dependency-cruiser.mjs",
     "vitest.config.ts",
