@@ -1,8 +1,3 @@
-// Node types for this test only: it reads the committed data/ folder from disk.
-/// <reference types="node" />
-import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-
 import type { SetupServerApi } from 'msw/node';
 import { beforeAll, describe, expect, it } from 'vitest';
 
@@ -191,16 +186,18 @@ describe('loadArtifacts', () => {
 
 describe('the committed data/ set', () => {
   it('loads as ready through the page’s own descriptors, naming only the missing tolerable files', async () => {
-    const dataDir = resolve(import.meta.dirname, '../../../../data');
+    // Vite's glob, not node:fs: the web project carries no Node types. A test
+    // file never enters the bundle, so this is not a source import of data/**.
+    const committed = import.meta.glob<unknown>('../../../../data/**/*.json', { eager: true, import: 'default' });
     const missing: ArtifactKey[] = [];
     const answers = Object.fromEntries(
       ARTIFACT_ORDER.map((key): [ArtifactKey, ArtifactAnswer] => {
-        const file = join(dataDir, ARTIFACTS[key].path);
-        if (!existsSync(file)) {
+        const file = `../../../../data/${ARTIFACTS[key].path}`;
+        if (!(file in committed)) {
           missing.push(key);
           return [key, { kind: 'status', status: 404 }];
         }
-        return [key, { kind: 'json', body: JSON.parse(readFileSync(file, 'utf8')) as unknown }];
+        return [key, { kind: 'json', body: committed[file] }];
       }),
     );
     serveArtifacts(server, answers);
