@@ -19,7 +19,7 @@ context:
 
 **Approach:** Contracts first, then sync. (4) Implement IN §12: one `sameRecord` function in contracts, and a `carryRecords` that replaces a matched record in place. (8) Implement IN §5.3: an optional `notBefore` in sync-progress.json, written by a chunk that ends on a 429 or a malformed abort and checked right after the lock. Carry `retryAfterMs` through the leg, step and gate results, and give every shell a sync-side threshold constant of 1. (9) Implement AD-12 rev 21: the report figure keys only the two chunk sources, its reader drops the legacy key, and the refresh command prints its request count.
 
-**Decisions (from the user):** The three items ship together in one spec, committed on `master`. The spec stays whole even though it runs over the token guideline. sync:dry gets no `notBefore` handling here. Item 14 owns ignoring and printing it, so until item 14 ships a dry run over a snapshot that carries a live `notBefore` defers.
+**Decisions (from the user):** The three items ship together in one spec, committed on `master`. The spec stays whole even though it runs over the token guideline. sync:dry gets no `notBefore` handling here. Item 14 owns ignoring and printing it. `DryRunSnapshot` carries no progress file, so until item 14 ships a dry run never reads `notBefore` and never defers.
 
 ## Boundaries & Constraints
 
@@ -176,7 +176,7 @@ Status: done
 - The matrix audit found every row covered by a test that passed.
 
 **Residual risks.**
-- `DryRunSnapshot` has no progress field, so `sync:dry` never reads `notBefore` and never defers. This contradicts the intent's note that "a dry run over a live `notBefore` defers" until item 14. Item 14 should take this into account.
+- `DryRunSnapshot` has no progress field, so `sync:dry` never reads `notBefore` and never defers. Item 14 should take this into account. (The intent's Decisions note first said the opposite. The user corrected it after the run.)
 - A deferred run that breaks a stale lock writes zeroed figures.
 - `notBefore` is capped only when it is written.
 - A build older than this one refuses a 1.1.0 report or progress file.
