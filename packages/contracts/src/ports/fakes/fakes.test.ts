@@ -79,6 +79,23 @@ describe('createFakeFilesystemPort', () => {
     await expect(filesystem.exists('data/dataset.json')).resolves.toBe(false);
   });
 
+  it('creates exclusively: exactly one of several concurrent callers wins', async () => {
+    const filesystem = createFakeFilesystemPort();
+    const outcomes = await Promise.all([
+      filesystem.createExclusive('data/sync.lock', 'a'),
+      filesystem.createExclusive('data/sync.lock', 'b'),
+      filesystem.createExclusive('data/sync.lock', 'c'),
+    ]);
+    expect(outcomes).toEqual([true, false, false]);
+    await expect(filesystem.readTextFile('data/sync.lock')).resolves.toBe('a');
+  });
+
+  it('leaves an existing file untouched when an exclusive create loses', async () => {
+    const filesystem = createFakeFilesystemPort({ 'data/sync.lock': { contents: 'held' } });
+    await expect(filesystem.createExclusive('data/sync.lock', 'mine')).resolves.toBe(false);
+    await expect(filesystem.readTextFile('data/sync.lock')).resolves.toBe('held');
+  });
+
   it('answers undefined for a path it does not hold', async () => {
     const filesystem = createFakeFilesystemPort();
     await expect(filesystem.readTextFile('nowhere')).resolves.toBeUndefined();

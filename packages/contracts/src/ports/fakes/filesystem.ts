@@ -40,6 +40,17 @@ export function createFakeFilesystemPort(initial: FakeFiles = {}): FakeFilesyste
       files.set(path, { contents, modifiedAt: existing?.modifiedAt });
       return Promise.resolve();
     },
+    createExclusive(path, contents) {
+      // The check and the set run in one synchronous turn, before the promise
+      // exists, so no other caller can interleave between them: the fake is
+      // atomic by construction, which is what lets a `Promise.all` race test
+      // prove that exactly one taker wins.
+      if (files.has(path)) {
+        return Promise.resolve(false);
+      }
+      files.set(path, { contents });
+      return Promise.resolve(true);
+    },
     deleteFile(path) {
       files.delete(path);
       return Promise.resolve();

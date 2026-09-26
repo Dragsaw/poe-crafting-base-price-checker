@@ -8,6 +8,7 @@ import {
   SchemaVersionSchema,
   SUPPORTED_SCHEMA_VERSION,
 } from './schema-version.ts';
+import { SyncProgressSchema } from './sync-progress.ts';
 import { SyncRunReportSchema } from './sync-run-report.ts';
 import { TrackedEntrySchema } from './tracked-entry.ts';
 import {
@@ -71,6 +72,14 @@ export const SyncReportFileSchema = SyncRunReportSchema.extend({
 });
 
 /**
+ * `data/sync-progress.json` — the keys the current pass has completed (AD-7).
+ * Internal to `sync`: `web` never fetches it.
+ */
+export const SyncProgressFileSchema = SyncProgressSchema.extend({
+  schemaVersion: SchemaVersionSchema,
+});
+
+/**
  * `data/catalogue/*.json` — the four committed catalogue artifacts. One
  * envelope shape over all four: the captured `result` payload with
  * `schemaVersion` beside it, so a refresh diff stays a diff of the trade API's
@@ -93,6 +102,7 @@ export type CurrenciesFile = z.infer<typeof CurrenciesFileSchema>;
 export type ConfigFile = z.infer<typeof ConfigFileSchema>;
 export type DatasetFile = z.infer<typeof DatasetFileSchema>;
 export type SyncReportFile = z.infer<typeof SyncReportFileSchema>;
+export type SyncProgressFile = z.infer<typeof SyncProgressFileSchema>;
 export type CatalogueItemsFile = z.infer<typeof CatalogueItemsFileSchema>;
 export type CatalogueStatsFile = z.infer<typeof CatalogueStatsFileSchema>;
 export type CatalogueStaticFile = z.infer<typeof CatalogueStaticFileSchema>;

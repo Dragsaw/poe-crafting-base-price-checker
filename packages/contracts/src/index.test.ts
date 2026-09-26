@@ -21,6 +21,8 @@ describe('the contracts barrel', () => {
       'DatasetEntrySchema',
       'SchemaVersionSchema',
       'TrackedListAgeSchema',
+      'SyncLockSchema',
+      'SyncProgressSchema',
     ] as const) {
       expect(contracts[name], `${name} is not re-exported from the barrel`).toBeDefined();
     }
@@ -32,6 +34,7 @@ describe('the contracts barrel', () => {
       'CurrenciesFileSchema',
       'ConfigFileSchema',
       'SyncReportFileSchema',
+      'SyncProgressFileSchema',
       'DatasetFileSchema',
       'CatalogueItemsFileSchema',
       'CatalogueStatsFileSchema',

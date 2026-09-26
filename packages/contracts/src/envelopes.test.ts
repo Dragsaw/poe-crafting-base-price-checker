@@ -9,6 +9,7 @@ import {
   CurrenciesFileSchema,
   DatasetFileSchema,
   parseEnvelope,
+  SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
 } from './envelopes';
@@ -34,6 +35,7 @@ describe('every file envelope carries schemaVersion', () => {
     ConfigFileSchema,
     DatasetFileSchema,
     SyncReportFileSchema,
+    SyncProgressFileSchema,
     CatalogueItemsFileSchema,
     CatalogueStatsFileSchema,
     CatalogueStaticFileSchema,

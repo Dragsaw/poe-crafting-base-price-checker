@@ -14,6 +14,14 @@ export interface FilesystemPort {
    */
   writeTextFile(path: string, contents: string): Promise<void>;
 
+  /**
+   * Creates the path with `contents` **only if it does not already exist**, as
+   * one atomic operation: of any number of concurrent callers, exactly one
+   * resolves `true`. Every other caller resolves `false` and the existing file
+   * is untouched. This is what makes taking the sync lock safe (AD-7).
+   */
+  createExclusive(path: string, contents: string): Promise<boolean>;
+
   /** Removes the path. Removing a path that does not exist is not an error. */
   deleteFile(path: string): Promise<void>;
 

@@ -154,6 +154,9 @@ export type {
   UnresolvableRecord,
 } from './sync-run-report.ts';
 
+export { SyncLockSchema, SyncProgressSchema } from './sync-progress.ts';
+export type { SyncLock, SyncProgress } from './sync-progress.ts';
+
 export { resolveTrackedListAge, TrackedListAgeSchema } from './tracked-list-age.ts';
 export type { TrackedListAge, TrackedListAgeSources } from './tracked-list-age.ts';
 
@@ -167,6 +170,7 @@ export {
   CurrenciesFileSchema,
   DatasetFileSchema,
   parseEnvelope,
+  SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
 } from './envelopes.ts';
@@ -183,6 +187,7 @@ export type {
   EnvelopeIssues,
   EnvelopeResult,
   EnvelopeVersionRefused,
+  SyncProgressFile,
   SyncReportFile,
   TrackedFile,
 } from './envelopes.ts';
