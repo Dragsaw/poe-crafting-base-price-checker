@@ -5,7 +5,7 @@ created: '2026-09-26'
 status: 'done'
 baseline_revision: '5e8285abf9ed076b87361b1f5aec5f38d127b117'
 review_loop_iteration: 0
-followup_review_recommended: true
+followup_review_recommended: false
 context:
   - '{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md'
   - '{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/IMPLEMENTATION-NOTES.md'
@@ -121,6 +121,36 @@ deferred:
   - `[false]` `[reject]` (intent) The `publishAttempted` guard is unstated in the intent — it is in the spec's Always list and covered by the "attempted once" test.
   - `[medium]` `[patch]` (verification-gap) Nothing asserts `load` is never called on a busy or deferred run — fixed: both tests pass a counting `load` and assert 0 calls; grouped with the cost-order row.
 
+### 2026-09-26 — Review pass
+- verdicts: 26 findings — high 0, medium 1, low 13, false 12, maybe-false 0
+- findings:
+  - `[false]` `[reject]` (edge) A league-gate 4xx (`LeagueRequestRejectedError`) clears `notBefore` instead of setting the abort pause — IN §5.3: only a 429 and a malformed-request abort (AD-9) write `notBefore`; "a chunk that … ends for any other reason clears the field".
+  - `[false]` `[reject]` (edge) A gate yield rewrites the completed keys from `order.completed` — carried: `chunkOrder` returns `completed: []` exactly when a new pass starts, so the next run computes the same pass from the written file.
+  - `[low]` `[reject]` (edge) `dry-run.ts` still parses the snapshot dataset before the lock, so a malformed snapshot throws with no `run-failure` — the dry run writes nothing and fails loudly; the parse is the dry-run clock, which the Never list keeps unchanged.
+  - `[false]` `[reject]` (intent) No test compares `pnpm sync:dry` bytes with the pre-change output — the Verification command performs it; this pass re-ran it (output identical to HEAD, which the first pass matched to the baseline).
+  - `[false]` `[reject]` (intent) The under-lock dataset reaching the pricing step has no shell-level evidence — carried: see the fifth row of the first pass.
+  - `[low]` `[reject]` (intent) The dry-run shell is not tested for the new refusals — both shells call the same `composeChunk` `load`; `dry-run.test.ts` already runs a per-file refusal loop; a duplicate cap test adds no coverage.
+  - `[false]` `[reject]` (intent) "Marks only" read loosely: a gate yield also refreshes rates and `generatedAt`, and keeps the league label — a yielded chunk writes the same fields; "marks only" means no step entries; the label rule was patched on the first pass and accepted by the human decision.
+  - `[false]` `[reject]` (intent) Records are built catalogue-check first, weights second, against AD-12's step order — the intent names "weights records and catalogue check" as one offline step; the report keeps the order it already printed (Design Notes).
+  - `[false]` `[reject]` (intent) Progress is read before the previous report — the `notBefore` read is AD-12's step 1; the load-time order is then previous report, progress validation, tracked, as the intent lists; now pinned by the cost-order test.
+  - `[false]` `[reject]` (intent) Exit codes are asserted for only four matrix rows — `syncCommand` maps every throw to 1 and every outcome to 0 in one place; the other rows differ only in runner outcome, which each runner test asserts.
+  - `[false]` `[reject]` (blind) The spec's `deferred` gate-4xx item never reached `deferred-work.md` — the human decision of 2026-09-26 settled it; there is no open work to ledger.
+  - `[false]` `[reject]` (blind) Sprint item 1 is `done` though no cross-file gate was built — the cross-file checks are tracked in the same file as story `3-3-the-five-cross-file-checks-…` (backlog); nothing is lost.
+  - `[medium]` `[reject]` (blind) A non-malformed step throw leaves the failing entry unstamped, so later chunks reach it first — `UnknownClassBaseTypeError` is caught by `price-entry.ts` (ledger story 1.10 entry); the remaining case, `UnexpectedTradeResponseError`, is the retro item 17 ledger entry, which the Never list keeps out of scope; the baseline published nothing at all on this path.
+  - `[false]` `[reject]` (blind) The two `trade-request-rejected` causes get different penalties — same refutation as the first row (IN §5.3).
+  - `[false]` `[reject]` (blind) The pinned-cap refusal loses its payload as a generic `run-failure` — carried: the Never list forbids a new record kind or reason literal.
+  - `[low]` `[reject]` (blind) The runner pinned-cap test builds its message by hand — carried: the real message is asserted through `syncCommand`.
+  - `[low]` `[patch]` (blind) The two-hour Retry-After test only asserts the dataset changed — fixed: parses it and asserts `Old League` and the entry keys.
+  - `[low]` `[patch]` (blind) The league-label fallback (no previous dataset) and the gate-4xx label are untested — fixed: the 404 test asserts `Standard`; new test "rejected over a previous dataset labelled Old League: the publish keeps Old League".
+  - `[low]` `[patch]` (blind) The cost-order test omits the previous-report read — fixed: `REPORT_PATH` recorded; expected order progress, report, tracked, ….
+  - `[low]` `[patch]` (blind) `composeChunk` has no test of its own; the cap-before-currencies order is unguarded — grouped with the last row; fixed: `sync.test.ts` "reports a pinned-cap excess ahead of a later load refusal (the currencies file absent)".
+  - `[low]` `[reject]` (blind) `dry-run.ts` pre-lock dataset parse diverges from the live run — same as the third row.
+  - `[low]` `[patch]` (blind) The header says a mismatch discards the catalogue check's records but not the weights records — fixed: header names the weights records; the test half is carried as rejected (first pass).
+  - `[low]` `[patch]` (blind) `ChunkOutcomeBase.entries` documents throw behaviour on a type a throw never returns — fixed: sentence deleted; the module header owns it.
+  - `[low]` `[patch]` (blind) The ledger's resolved note cites "the story 1.7 entry directly above" — fixed: cites it by heading; the note is this unmerged branch's own append.
+  - `[low]` `[patch]` (verification-gap) A weights refusal is not pinned to report-only — fixed: the weights bad-major test adds an uncatalogued X and asserts no dataset, no progress and a lone `run-failure`.
+  - `[low]` `[patch]` (verification-gap) The pinned-cap-straight-after-config order has no test — grouped with the `composeChunk` row; same fix.
+
 ## Design Notes
 
 - **Why a `load` hook, not a pre-lock shell load.** AD-12 puts every file load after the `notBefore` check, and IN §5.3 says the check comes "before it loads anything else". The step and gate need config values, so they are built in `load` and returned; the runner never reads config.
@@ -172,3 +202,11 @@ Status: done
 - Gate 4xx (the `deferred` item): accepted as built. A league-gate throw that is not a mismatch publishes the catalogue marks and progress, with the dataset keeping its previous league label. The `deferred` entry stays in place (append-only) and is settled by this decision.
 - `minChunkSearches: 1` with no pinned entries: known and acceptable; not a residual risk to act on.
 - The recommended follow-up review runs in a separate session.
+
+**Follow-up review pass (2026-09-26).**
+- Summary: a fresh four-layer review of the whole change since `5e8285a`. It found no defect in the runtime behaviour. Eight low entries were patched, all in tests, comments and the ledger wording.
+- Files changed: `packages/sync/src/chunk/run-chunk.test.ts` (weights-refusal report-only assertions, parsed-dataset assertion, league-label tests, previous-report read in the cost-order test); `packages/sync/src/sync.test.ts` (pinned-cap excess reported ahead of an absent currencies file); `packages/sync/src/chunk/run-chunk.ts` (comments only: mismatch discards the weights records; stray throw sentence removed from `ChunkOutcomeBase.entries`); `docs/stories/deferred-work.md` (the resolved note cites the story 1.7 entry by heading).
+- Review: 26 findings. Patched: 8 low entries (10 rows). Deferred: none. Rejected: 1 medium (retro item 17, out of scope by the Never list), 5 low, 12 false, each with its reason in the second triage-log pass.
+- Follow-up review recommended: false. This is a follow-up pass, and it patched no high entry. Patched counts by verdict: high 0, medium 0, low 8.
+- Verification: `pnpm check` pass (tsc, eslint 0 warnings, depcruise 137 modules clean). `pnpm test` 57 files, 673 tests passed. `node packages/sync/src/dry-run.ts` exit 0, stdout byte-identical to HEAD `c224f95`, which the first pass matched to the pre-change baseline.
+- Residual risks: the retro item 17 entry (`UnexpectedTradeResponseError` without an entry payload) stays open. After one pass, a persistently failing fetch still ends every chunk at that entry.

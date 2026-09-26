@@ -261,6 +261,18 @@ describe('pnpm sync: the live composition with injected ports', () => {
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
+  it('reports a pinned-cap excess ahead of a later load refusal (the currencies file absent)', async () => {
+    const { deps, fs, http } = depsFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
+    await fs.deleteFile('data/currencies.json');
+
+    expect(await syncCommand(deps)).toBe(1);
+
+    expect(http.requests).toEqual([]);
+    const records = (await reportOf(fs))?.records ?? [];
+    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
+    expect(records[0]).toHaveProperty('message', expect.stringContaining(TRACKED_PATH));
+  });
+
   it('publishes the priced entry under the configured league', async () => {
     const { deps, fs } = depsFor(LEAGUE);
 

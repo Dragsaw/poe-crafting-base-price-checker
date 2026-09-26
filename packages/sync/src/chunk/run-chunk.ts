@@ -73,9 +73,9 @@
  * - before the order exists (a load refusal, a pinned-cap excess, a
  *   catalogue or weights refusal): the report only;
  * - a league mismatch: the report only, carrying this chunk's lock record and
- *   the `league-mismatch` record; the catalogue check's marks and records are
- *   discarded, since the next run that passes the gate recomputes them
- *   (AD-12);
+ *   the `league-mismatch` record; the catalogue check's marks and records and
+ *   the weights records are discarded, since the next run that passes the
+ *   gate recomputes them (AD-12);
  * - any other throw once the order exists: first the dataset and progress
  *   for the step entries so far and the marks, then the report. A
  *   `MalformedRequestError` (a non-429 4xx, AD-9) also publishes the failing
@@ -275,8 +275,7 @@ interface ChunkOutcomeBase {
   /**
    * The dataset entries the steps returned, in visiting order — completed and
    * yielded alike. `completed`, `bounded` and `yielded` publish them into the
-   * dataset; `busy` and `dispossessed` write nothing. A throw after the order
-   * exists still publishes them, a league mismatch excepted.
+   * dataset; `busy` and `dispossessed` write nothing.
    */
   readonly entries: readonly DatasetEntry[];
   /**

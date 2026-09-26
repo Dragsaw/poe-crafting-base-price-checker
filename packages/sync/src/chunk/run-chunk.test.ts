@@ -1743,15 +1743,21 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
     expect(await fs.readTextFile(WEIGHTS_PATH)).toBe(weights);
   });
 
-  it('weights bad major: a run-failure record, the error rethrown, nothing searched', async () => {
-    const { fs, ports } = harness([A], {
-      [WEIGHTS_PATH]: { contents: JSON.stringify({ schemaVersion: '5.1.0', bases: {} }) },
-    });
+  it('weights bad major: a run-failure record, the error rethrown, nothing searched, nothing published', async () => {
+    // X is uncatalogued: a refusal before the order exists writes the report
+    // only, so neither its mark nor its `unresolvable` record appears.
+    const { fs, ports } = harness(
+      [A, raw('X')],
+      { [WEIGHTS_PATH]: { contents: JSON.stringify({ schemaVersion: '5.1.0', bases: {} }) } },
+      { catalogue: () => Promise.resolve({ ok: true, value: catalogueWithout('X') }) },
+    );
     const { visited, step } = scriptedStep();
 
     await expect(run(ports, step)).rejects.toThrow(/weights\.json.*5\.1\.0/);
 
     expect(visited).toEqual([]);
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
     const report = await reportOf(fs);
     expect(report?.runFinishedAt).toBeUndefined();
     expect(report?.records).toEqual([
@@ -1985,7 +1991,9 @@ describe('runChunk: the league gate (Story 1.11)', () => {
 
     expect(visited).toEqual([]);
     // The order exists, so the throw publishes the marks and clears notBefore.
-    expect(await fs.exists(DATASET_PATH)).toBe(true);
+    // With no previous dataset there is no earlier label, so the configured one is written.
+    const published = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
+    expect(published.league).toBe('Standard');
     expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
     expect((await reportOf(fs))?.records).toEqual([
@@ -1996,6 +2004,19 @@ describe('runChunk: the league gate (Story 1.11)', () => {
         message: 'the trade leagues request answered 404; the run is aborted',
       },
     ]);
+  });
+
+  it('rejected over a previous dataset labelled Old League: the publish keeps Old League', async () => {
+    const { fs, ports, step } = gated(
+      'Standard',
+      { status: 404, headers: {}, body: '' },
+      { [DATASET_PATH]: { contents: PREVIOUS_DATASET } },
+    );
+
+    await expect(run(ports, step)).rejects.toBeInstanceOf(LeagueRequestRejectedError);
+
+    const published = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
+    expect(published.league).toBe('Old League');
   });
 
   it('malformed: a body that is not the payload shape is an unrecoverable-error run-failure', async () => {
@@ -2073,7 +2094,9 @@ describe('runChunk: the league gate (Story 1.11)', () => {
       completed: [key(A)],
       notBefore: '2026-09-26T14:00:00.000Z',
     });
-    expect(await fs.readTextFile(DATASET_PATH)).not.toBe(PREVIOUS_DATASET);
+    const published = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
+    expect(published.league).toBe('Old League');
+    expect(published.entries.map((entry) => entry.entryKey)).toEqual([key(A), key(B)]);
   });
 
   it('gate 429 over an unknown-major progress file: rejects, progress untouched, a run-failure reported', async () => {
@@ -2428,11 +2451,12 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
   };
   const UNRESOLVABLE_X = { kind: 'unresolvable', entryKey: key(X), identifier: 'X', identifierKind: 'baseTypeId' };
 
-  it('runs in cost order: progress, tracked, dataset, load, catalogue, weights, gate, then the step', async () => {
+  it('runs in cost order: progress, report, tracked, dataset, load, catalogue, weights, gate, then the step', async () => {
     const events: string[] = [];
     const { fs, ports } = harness([A]);
     const named: Readonly<Record<string, string>> = {
       [PROGRESS_PATH]: 'progress',
+      [REPORT_PATH]: 'report',
       [TRACKED_PATH]: 'tracked',
       [DATASET_PATH]: 'dataset',
       [WEIGHTS_PATH]: 'weights',
@@ -2475,6 +2499,7 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
 
     expect(events).toEqual([
       'progress',
+      'report',
       'tracked',
       'dataset',
       'load',
