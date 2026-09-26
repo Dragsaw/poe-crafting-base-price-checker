@@ -14,5 +14,5 @@ export const CORE_PLACEHOLDER = `contracts@${INITIAL_SCHEMA_VERSION}:core`;
  * `pnpm sync:dry` loads this source under bare `node`, whose type stripping
  * performs no extension resolution.
  */
-export { chunkOrder } from './chunk-order.ts';
-export type { ChunkOrder } from './chunk-order.ts';
+export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.ts';
+export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';

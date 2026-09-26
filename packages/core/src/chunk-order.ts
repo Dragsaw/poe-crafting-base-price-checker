@@ -1,48 +1,139 @@
-import { canonicalKey, compareTrackedEntries } from '@poe/contracts';
-import type { TrackedEntry } from '@poe/contracts';
+import { canonicalKey, compareCanonicalKeys, compareTrackedEntries } from '@poe/contracts';
+import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
 
 /**
- * The chunk runner's selection order (AD-7). Pure: the tracked entries and the
- * completed keys go in, the order comes out, and nothing is read from anywhere
- * else.
+ * The chunk runner's selection order: the Refresh Rotation (AD-7, FR-17).
  *
- * **A minimal body.** Story 1.6 replaces it with the Refresh Rotation — pinned
- * then active by oldest `lastAttemptedAt`, then bounded `unresolvable` retries.
- * This version sorts by canonical key only. The signature and the pass-reset
- * rule are what the runner depends on, and they stay.
+ * Pure. The tracked list, the dataset entries, the pass's completed keys and
+ * the instant go in; the order comes out. Nothing is read from anywhere else,
+ * so a dry run and a live run given the same inputs visit the same keys.
+ *
+ * Rows, in order:
+ *
+ * 1. `pinned` entries whose dataset price state is not `unresolvable`.
+ * 2. `active` entries whose dataset price state is not `unresolvable`, less
+ *    the pass's completed keys.
+ * 3. every non-pruned entry whose dataset price state is `unresolvable` and
+ *    that is due — no `lastAttemptedAt`, or at least 24 h since it — less the
+ *    pass's completed keys.
+ *
+ * `pruned` is never selected. Within a row: oldest `lastAttemptedAt` first,
+ * compared as instants; an absent one sorts before any present one; ties by
+ * `compareTrackedEntries`. The key is the field's absence, never the
+ * `not-yet-synced` state.
+ *
+ * The pass covers rows 2–3 only. `pinned` is exempt from rotation, so row 1
+ * never consults or produces completed keys.
  */
 
+/** The bounded retry interval for row 3 (AD-7). */
+export const UNRESOLVABLE_RETRY_MS = 24 * 60 * 60 * 1000;
+
+export interface ChunkOrderInput {
+  readonly tracked: readonly TrackedEntry[];
+  /** The published dataset's entries. Empty means every entry is never-attempted. */
+  readonly dataset: readonly DatasetEntry[];
+  /** The canonical keys the current pass has completed. */
+  readonly completed: readonly string[];
+  /** The current instant, ISO-8601 UTC. */
+  readonly now: string;
+}
+
 export interface ChunkOrder {
-  /** The entries this chunk may visit, in visiting order. */
-  readonly entries: readonly TrackedEntry[];
+  /** Row 1, in visiting order. Subject to the runner's runtime truncation. */
+  readonly pinned: readonly TrackedEntry[];
+  /** Rows 2 then 3, in visiting order. */
+  readonly rotation: readonly TrackedEntry[];
   /**
    * The completed keys that remain in force, in canonical-key order. It is
    * empty when a new pass started, and it drops any key that no longer names a
-   * non-pruned tracked entry.
+   * rotation (rows 2–3) entry.
    */
   readonly completed: readonly string[];
-  /** `true` when every non-pruned entry was complete, so the pass restarted. */
+  /** `true` when every due row 2–3 entry was complete, so the pass restarted. */
   readonly newPass: boolean;
 }
 
-export function chunkOrder(
-  tracked: readonly TrackedEntry[],
-  completedKeys: readonly string[],
-): ChunkOrder {
-  const eligible = tracked
-    .filter((entry) => entry.status !== 'pruned')
-    .toSorted(compareTrackedEntries);
+interface Placed {
+  readonly entry: TrackedEntry;
+  readonly key: string;
+  /** Milliseconds since the epoch, or `undefined` for never attempted. */
+  readonly attemptedAt: number | undefined;
+}
 
-  const done = new Set(completedKeys);
-  const completed = eligible.map(canonicalKey).filter((key) => done.has(key));
+function compareOldestFirst(left: Placed, right: Placed): number {
+  if (left.attemptedAt !== right.attemptedAt) {
+    if (left.attemptedAt === undefined) {
+      return -1;
+    }
+    if (right.attemptedAt === undefined) {
+      return 1;
+    }
+    return left.attemptedAt - right.attemptedAt;
+  }
+  return compareTrackedEntries(left.entry, right.entry);
+}
 
-  if (eligible.length > 0 && completed.length === eligible.length) {
-    return { entries: eligible, completed: [], newPass: true };
+const entriesOf = (placed: readonly Placed[]): TrackedEntry[] =>
+  placed.toSorted(compareOldestFirst).map((item) => item.entry);
+
+export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
+  const now = Date.parse(input.now);
+  const byKey = new Map(input.dataset.map((entry) => [entry.entryKey, entry]));
+
+  const pinned: Placed[] = [];
+  const active: Placed[] = [];
+  const unresolvable: Placed[] = [];
+  /** Every key a pass may hold: rows 2–3, due or not. */
+  const rotationKeys = new Set<string>();
+
+  for (const entry of input.tracked) {
+    if (entry.status === 'pruned') {
+      continue;
+    }
+    const key = canonicalKey(entry);
+    const published = byKey.get(key);
+    const attemptedAt =
+      published?.lastAttemptedAt === undefined ? undefined : Date.parse(published.lastAttemptedAt);
+    const placed: Placed = { entry, key, attemptedAt };
+
+    if (published?.price.state === 'unresolvable') {
+      rotationKeys.add(key);
+      if (attemptedAt === undefined || now - attemptedAt >= UNRESOLVABLE_RETRY_MS) {
+        unresolvable.push(placed);
+      }
+    } else if (entry.status === 'pinned') {
+      pinned.push(placed);
+    } else {
+      rotationKeys.add(key);
+      active.push(placed);
+    }
   }
 
+  const done = new Set(input.completed);
+  const completed = [...rotationKeys].filter((key) => done.has(key)).toSorted(compareCanonicalKeys);
+  const due = [...active, ...unresolvable];
+  const newPass = due.length > 0 && due.every((item) => done.has(item.key));
+  const open = (item: Placed): boolean => newPass || !done.has(item.key);
+
   return {
-    entries: eligible.filter((entry) => !done.has(canonicalKey(entry))),
-    completed,
-    newPass: false,
+    pinned: entriesOf(pinned),
+    rotation: [...entriesOf(active.filter(open)), ...entriesOf(unresolvable.filter(open))],
+    completed: newPass ? [] : completed,
+    newPass,
   };
+}
+
+/**
+ * The runtime `pinned` truncation (AD-7, IMPLEMENTATION-NOTES.md §6). After a
+ * pinned step reports `remaining` searches with `left` pinned entries still
+ * unvisited: when the rotation has work waiting and `remaining < left + 1`,
+ * visit only `max(remaining − 1, 0)` more, reserving a search for the rotation.
+ * Otherwise visit all `left`.
+ */
+export function pinnedToKeep(left: number, remaining: number, rotationWaiting: boolean): number {
+  if (!rotationWaiting || remaining >= left + 1) {
+    return left;
+  }
+  return Math.min(left, Math.max(remaining - 1, 0));
 }

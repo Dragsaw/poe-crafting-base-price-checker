@@ -7,9 +7,18 @@
  * allowances are whatever the step read from live headers; this module holds
  * no rate and no floor of its own.
  *
- * The order comes from `core` and is recomputed on every run from the tracked
- * list and the completed keys, so a resumed chunk never replays a frozen plan.
- * `sync-progress.json` records only what was **completed**.
+ * The order comes from `core` (the Refresh Rotation, AD-7) and is recomputed
+ * on every run from the tracked list, `data/dataset.json`, the completed keys
+ * and the clock, so a resumed chunk never replays a frozen plan.
+ * `sync-progress.json` records only what was **completed**, and only in rows
+ * 2–3: row 1 is exempt from the pass. A pinned entry that is `unresolvable`
+ * sits in row 3, so its key is recorded like any other row 3 key.
+ *
+ * The runtime half of the pinned cap lives here: after each pinned step that
+ * reports a search allowance, `pinnedToKeep` may cut the rest of row 1 so the
+ * rotation keeps at least one search. A shortfall surfaces as
+ * `pinnedStarvation` on the outcome; the kind is unchanged. The load-time half, which reads the
+ * player's declared yardstick, is outside this directory (`../pinned-cap.ts`).
  *
  * The lock path is fixed here and later stories do not rewrite it: Story 1.8
  * and 1.9 add to the outcome, and Story 1.11 plugs its run-start check into
@@ -20,6 +29,7 @@
 import {
   canonicalKey,
   compareCanonicalKeys,
+  DatasetFileSchema,
   parseEnvelope,
   SUPPORTED_SCHEMA_VERSION,
   SyncProgressFileSchema,
@@ -33,13 +43,15 @@ import type {
   SyncRunRecord,
   TrackedEntry,
 } from '@poe/contracts';
-import { chunkOrder } from '@poe/core';
+import { chunkOrder, pinnedToKeep } from '@poe/core';
 
 import { serialiseJsonArtifact } from '../shell.ts';
 import { acquireLock, holdsLock, releaseLockIfOwn } from './lock.ts';
 
 export const TRACKED_PATH = 'data/tracked.json';
 export const PROGRESS_PATH = 'data/sync-progress.json';
+/** Read only, for the rotation's `lastAttemptedAt` and price state. Story 1.8 writes it. */
+export const DATASET_PATH = 'data/dataset.json';
 
 /**
  * What one step reports for one entry. `completed` carries the allowances the
@@ -80,10 +92,33 @@ export interface ChunkPorts {
 export type ChunkBound = 'search' | 'fetch';
 
 interface ChunkOutcomeBase {
-  /** Canonical keys this chunk completed, in visiting order. */
+  /**
+   * Canonical keys this chunk completed, in visiting order, row 1 (pinned)
+   * included. Progress records only the rows 2–3 subset of these.
+   */
   readonly completed: readonly string[];
   /** Report records this chunk produced. Story 1.9 writes them out. */
   readonly records: readonly SyncRunRecord[];
+  /**
+   * Present only when a pinned step reported an allowance below the pinned
+   * entries left plus one while rows 2–3 had work waiting, whether or not any
+   * pinned entry was left to cut (AD-7, IMPLEMENTATION-NOTES.md §6). It is not an error and does not
+   * change the outcome kind. `pinnedStarvationRecord` in `../pinned-cap.ts`
+   * adds the declared yardstick to make the report record.
+   */
+  readonly pinnedStarvation?: ChunkStarvation;
+}
+
+/** The four observed fields of a pinned-starvation record. */
+export interface ChunkStarvation {
+  /** The search allowance the chunk received: the first reported remaining search count plus the steps it had already taken. */
+  readonly discoveredAllowance: number;
+  /** The size of the pinned set at load: every tracked entry with status `pinned`, `unresolvable` ones included. */
+  readonly pinnedCount: number;
+  /** How many pinned entries the chunk completed. */
+  readonly pinnedRefreshed: number;
+  /** How many rotation (rows 2–3) entries the chunk completed. */
+  readonly activeRefreshed: number;
 }
 
 export type ChunkOutcome =
@@ -173,43 +208,100 @@ export async function runChunk(ports: ChunkPorts, step: ChunkStep): Promise<Chun
     const progress = await loadEnvelope(fs, PROGRESS_PATH, (data) =>
       parseEnvelope(SyncProgressFileSchema, data),
     );
-    const order = chunkOrder(entries, progress?.completed ?? []);
+    // Absent means every entry is never attempted.
+    const dataset = await loadEnvelope(fs, DATASET_PATH, (data) =>
+      parseEnvelope(DatasetFileSchema, data),
+    );
+    const order = chunkOrder({
+      tracked: entries,
+      dataset: dataset?.entries ?? [],
+      completed: progress?.completed ?? [],
+      now: clock.now(),
+    });
 
     const completed: string[] = [];
+    // Only rotation completions enter the pass: row 1 is exempt (AD-7).
+    const rotationCompleted: string[] = [];
     let ending: { readonly kind: 'completed' } | { readonly kind: 'yielded' } | {
       readonly kind: 'bounded';
       readonly bound: ChunkBound;
     } = { kind: 'completed' };
 
-    for (const [index, entry] of order.entries.entries()) {
+    const rotationWaiting = order.rotation.length > 0;
+    let pinnedLimit = order.pinned.length;
+    let pinnedVisited = 0;
+    let rotationVisited = 0;
+    let discoveredAllowance: number | undefined;
+    let truncated = false;
+
+    for (;;) {
+      const inPinned = pinnedVisited < pinnedLimit;
+      const entry = inPinned ? order.pinned[pinnedVisited] : order.rotation[rotationVisited];
+      if (entry === undefined) {
+        break;
+      }
       const result = await step(entry);
       if (result.kind === 'yielded') {
         ending = { kind: 'yielded' };
         break;
       }
-      completed.push(canonicalKey(entry));
+      const key = canonicalKey(entry);
+      completed.push(key);
+
+      if (inPinned) {
+        pinnedVisited += 1;
+        const remaining = result.searchRemaining;
+        if (remaining !== undefined) {
+          // Every step so far spent one search, the reporting one included.
+          discoveredAllowance ??= remaining + completed.length;
+          const left = pinnedLimit - pinnedVisited;
+          // R < P + 1 with rows 2–3 waiting is starvation, even when nothing is left to cut.
+          if (rotationWaiting && remaining < left + 1) {
+            truncated = true;
+          }
+          pinnedLimit = pinnedVisited + pinnedToKeep(left, remaining, rotationWaiting);
+        }
+      } else {
+        rotationVisited += 1;
+        rotationCompleted.push(key);
+      }
+
+      const hasNext = pinnedVisited < pinnedLimit || rotationVisited < order.rotation.length;
       const bound = boundOf(result);
-      if (bound !== undefined && index < order.entries.length - 1) {
+      if (bound !== undefined && hasNext) {
         ending = { kind: 'bounded', bound };
         break;
       }
     }
+
+    const starvation: { readonly pinnedStarvation?: ChunkStarvation } = truncated
+      ? {
+          pinnedStarvation: {
+            discoveredAllowance: discoveredAllowance ?? 0,
+            pinnedCount: entries.filter((entry) => entry.status === 'pinned').length,
+            pinnedRefreshed: pinnedVisited,
+            activeRefreshed: rotationCompleted.length,
+          },
+        }
+      : {};
 
     // Re-read immediately before committing. A run dispossessed at the
     // staleness threshold writes nothing, and the `finally` below then
     // releases nothing, because the lock on disk is no longer its own.
     if (!(await holdsLock(fs, mine))) {
       log('sync: the lock was taken over during this chunk; writing nothing');
-      return { kind: 'dispossessed', completed, records };
+      return { kind: 'dispossessed', completed, records, ...starvation };
     }
 
     const file: SyncProgressFile = {
       schemaVersion: SUPPORTED_SCHEMA_VERSION,
-      completed: [...new Set([...order.completed, ...completed])].toSorted(compareCanonicalKeys),
+      completed: [...new Set([...order.completed, ...rotationCompleted])].toSorted(
+        compareCanonicalKeys,
+      ),
     };
     await fs.writeTextFile(PROGRESS_PATH, serialiseJsonArtifact(file));
 
-    return { ...ending, completed, records };
+    return { ...ending, completed, records, ...starvation };
   } finally {
     await releaseLockIfOwn(fs, mine);
   }

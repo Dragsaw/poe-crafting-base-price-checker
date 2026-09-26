@@ -3,11 +3,12 @@ import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { canonicalKey } from '@poe/contracts';
+import { canonicalKey, createFakeClockPort, createFakeFilesystemPort } from '@poe/contracts';
 import type { TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { dryRun } from './dry-run.ts';
+import { DATASET_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk.ts';
+import { DRY_RUN_INSTANT, dryRun } from './dry-run.ts';
 
 const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
@@ -21,12 +22,14 @@ const trackedText = JSON.stringify({ schemaVersion: '1.0.0', entries });
 
 describe('dryRun', () => {
   it('runs the chunk in memory and reports what it completed and would record', async () => {
-    const expected = [canonicalKey(entries[1] as TrackedEntry), canonicalKey(entries[0] as TrackedEntry)];
+    const pinned = canonicalKey(entries[1] as TrackedEntry);
+    const active = canonicalKey(entries[0] as TrackedEntry);
 
     expect(await dryRun(trackedText)).toEqual({
       outcome: 'completed',
-      completed: expected,
-      progress: { schemaVersion: '1.0.0', completed: expected },
+      completed: [pinned, active],
+      // Pinned entries are exempt from the pass, so only the active key is recorded.
+      progress: { schemaVersion: '1.0.0', completed: [active] },
       records: [],
     });
   });
@@ -46,6 +49,57 @@ describe('dryRun', () => {
 
   it('refuses an invalid tracked file loudly', async () => {
     await expect(dryRun('{"schemaVersion":"9.0.0","entries":[]}')).rejects.toThrow(/9\.0\.0/);
+  });
+});
+
+describe('dryRun: the dataset snapshot', () => {
+  const rotation: TrackedEntry[] = [
+    { kind: 'raw', baseTypeId: 'A', itemLevelMin: 82, status: 'active' },
+    { kind: 'raw', baseTypeId: 'B', itemLevelMin: 82, status: 'active' },
+    { kind: 'raw', baseTypeId: 'C', itemLevelMin: 82, status: 'active' },
+    { kind: 'raw', baseTypeId: 'P', itemLevelMin: 82, status: 'pinned' },
+  ];
+  const [A, B, C, P] = rotation as [TrackedEntry, TrackedEntry, TrackedEntry, TrackedEntry];
+  const rotationTracked = JSON.stringify({ schemaVersion: '1.0.0', entries: rotation });
+  // Before DRY_RUN_INSTANT, so the order depends on them. C is never attempted.
+  const datasetText = JSON.stringify({
+    schemaVersion: '1.0.0',
+    league: 'Standard',
+    generatedAt: '2025-12-31T00:00:00.000Z',
+    entries: [
+      { entryKey: canonicalKey(A), price: { state: 'no-listings' }, lastAttemptedAt: '2025-12-31T00:00:00.000Z' },
+      { entryKey: canonicalKey(B), price: { state: 'no-listings' }, lastAttemptedAt: '2025-12-30T00:00:00.000Z' },
+    ],
+    currencyRates: [],
+  });
+
+  it('orders the rotation by the snapshot’s lastAttemptedAt', async () => {
+    const report = await dryRun(rotationTracked, datasetText);
+    expect(report.completed).toEqual([P, C, B, A].map(canonicalKey));
+  });
+
+  it('visits the same keys in the same order as runChunk on the same fake and clock', async () => {
+    const fs = createFakeFilesystemPort({
+      [TRACKED_PATH]: { contents: rotationTracked },
+      [DATASET_PATH]: { contents: datasetText },
+    });
+    const visited: string[] = [];
+    await runChunk({ fs, clock: createFakeClockPort(DRY_RUN_INSTANT), pid: 1, log: () => undefined }, (entry) => {
+      visited.push(canonicalKey(entry));
+      return Promise.resolve({ kind: 'completed' });
+    });
+
+    const report = await dryRun(rotationTracked, datasetText);
+    expect(report.completed).toEqual(visited);
+    expect(visited).toHaveLength(4);
+  });
+
+  it('is deterministic with a dataset', async () => {
+    expect(await dryRun(rotationTracked, datasetText)).toEqual(await dryRun(rotationTracked, datasetText));
+  });
+
+  it('refuses an invalid dataset loudly', async () => {
+    await expect(dryRun(rotationTracked, '{"schemaVersion":"9.0.0"}')).rejects.toThrow(/dataset\.json/);
   });
 });
 

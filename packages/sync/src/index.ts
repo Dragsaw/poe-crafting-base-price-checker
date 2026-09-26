@@ -44,14 +44,23 @@ export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-head
  * One bounded, resumable, single-instance chunk (FR-19, AD-7). Stories 1.7 and
  * 1.8 wire the live command; until then the tests and `pnpm sync:dry` drive it.
  */
-export { PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
+export { DATASET_PATH, PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
 export type {
   ChunkBound,
   ChunkOutcome,
   ChunkOutcomeKind,
   ChunkPorts,
+  ChunkStarvation,
   ChunkStep,
   GateContext,
   StepResult,
 } from './chunk/run-chunk';
 export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';
+
+/**
+ * The load-time pinned cap and the starvation record (AD-7,
+ * IMPLEMENTATION-NOTES.md §6) — the only readers of `minChunkSearches`, kept
+ * outside `chunk/` so the yardstick can never bound a chunk.
+ */
+export { checkPinnedCap, pinnedStarvationRecord } from './pinned-cap';
+export type { PinnedCapExceeded, PinnedCapResult } from './pinned-cap';
