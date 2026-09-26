@@ -1163,7 +1163,10 @@ never import each other.
   produce two key shapes, the tie-break compares the serialised canonical key of AD-5's
   arm**, never a bare string that a `categoryId` and a `baseTypeId` could both supply; a raw
   row has no recipe id and sorts before a crafted row at an equal `EV`, so the ordering is
-  total across the mixed list rather than only within each branch. **A class whose
+  total across the mixed list rather than only within each branch. At an equal `EV` the
+  kind therefore orders first, raw before crafted, and the serialised canonical key breaks
+  ties only within a kind, so the key's own leading kind tag never decides between kinds.
+  **A class whose
   summands all fall below the threshold ranks at `EV = −craftCost`** with an empty summand
   list — it is ranked, not unrankable, because the threshold excluding every outcome is an
   answer about that class
