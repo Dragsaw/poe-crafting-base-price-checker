@@ -174,8 +174,8 @@ action_items:
     action: "Process: the build skill appends every spec deferred entry to deferred-work.md
       in the same commit; write the story-id commit subject convention into AGENT-WORKFLOW.md"
     owner: "workflow docs"
-    status: open
-    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+    status: done
+    ref: "docs/stories/spec-epic-1-retro-item-15-deferred-ledger-and-commit-convention.md"
   - id: "epic-1-retro-item-16-commit-the-first-live-run-s-data-dataset"
     epic: 1
     action: "Commit the first live run's data/dataset.json, data/sync-progress.json and data/sync-report.json"

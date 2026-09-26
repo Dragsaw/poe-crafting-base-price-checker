@@ -146,6 +146,10 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
    `sync-report.json` carries the figure the run computed, which puts a drop across a patch
    boundary in the same place as the run's other health data.
 
+## Commit conventions
+
+The `.githooks/commit-msg` hook checks a commit subject (skipping a merge, revert, fixup, or squash commit) and prints a fix when it fails. `pnpm install` wires it in (`prepare` sets `core.hooksPath`). Read the hook for the exact rule; in short, a `feat`/`fix`/`test` commit scoped to a package names its story (`story 1.N`) or retro item (`retro item(s) N`) — a `docs`/`chore` commit, or one with no package scope, does not need to.
+
 ## Definition of done for an agent task
 
 1. `pnpm check` and `pnpm test` pass, and neither command makes a network call.

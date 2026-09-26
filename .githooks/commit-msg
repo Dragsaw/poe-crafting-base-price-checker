@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+// Lints a commit subject against AGENT-WORKFLOW.md's Commit conventions.
+// Exit 1 blocks the commit and prints one reason plus the fix.
+// Installed via `core.hooksPath .githooks` (see package.json "prepare").
+
+import { readFileSync } from 'node:fs';
+
+const KNOWN_TYPES = ['feat', 'fix', 'test', 'docs', 'chore', 'wip', 'refactor', 'perf', 'build', 'ci'];
+const ID_TYPES = ['feat', 'fix', 'test'];
+const KNOWN_PACKAGES = ['contracts', 'core', 'sync', 'web'];
+const SUBJECT_PATTERN = /^([a-z]+)(\(([a-z0-9,\- ]+)\))?: (.+)$/;
+// The deferred-work-sweep skill's own automation commits carry a full,
+// period-terminated ledger `summary:`/`evidence:` sentence after the dash
+// (`chore(deferred): resolve — <summary>.`, `wip(deferred): blocked run
+// state — <slug>`), so the trailing-period rule does not apply to them.
+const PERIOD_EXEMPT_SCOPE = 'deferred';
+
+function fail(reason, fix) {
+  console.error(`commit-msg hook: ${reason}\n\nFix: ${fix}`);
+  process.exit(1);
+}
+
+function readSubject(messagePath) {
+  const message = readFileSync(messagePath, 'utf8');
+  const firstLine = message.split('\n', 1)[0];
+  return firstLine.replace(/\s+$/, '');
+}
+
+function lint(subject) {
+  if (subject.startsWith('Merge ') || subject.startsWith('Revert ') || subject.startsWith('fixup!') || subject.startsWith('squash!')) {
+    return;
+  }
+
+  const match = subject.match(SUBJECT_PATTERN);
+  if (!match) {
+    const caseInsensitiveMatch = subject.match(new RegExp(SUBJECT_PATTERN.source, 'i'));
+    if (caseInsensitiveMatch && KNOWN_TYPES.includes(caseInsensitiveMatch[1].toLowerCase())) {
+      fail(
+        `the commit type "${caseInsensitiveMatch[1]}" is not lowercase.`,
+        `Lowercase the type: "${caseInsensitiveMatch[1].toLowerCase()}${caseInsensitiveMatch[2] ?? ''}: ${caseInsensitiveMatch[4]}".`,
+      );
+    }
+    fail(
+      `the subject "${subject}" is not "type: description" or "type(scope): description".`,
+      `Start the subject with one of: ${KNOWN_TYPES.join(', ')}. Example: "feat(sync): story 1.9 short description".`,
+    );
+  }
+
+  const [, type, , scope, description] = match;
+  if (!KNOWN_TYPES.includes(type)) {
+    fail(
+      `the commit type "${type}" is not one of: ${KNOWN_TYPES.join(', ')}.`,
+      `Use one of the listed types.`,
+    );
+  }
+
+  if (subject.endsWith('.') && scope !== PERIOD_EXEMPT_SCOPE) {
+    fail(`the subject ends with a period.`, `Remove the trailing period.`);
+  }
+
+  if (!ID_TYPES.includes(type)) {
+    return;
+  }
+
+  const scopedPackages = scope ? scope.split(',').map((s) => s.trim()) : [];
+  const scopesAllKnown = scopedPackages.length > 0 && scopedPackages.every((s) => KNOWN_PACKAGES.includes(s));
+  if (!scopesAllKnown) {
+    return;
+  }
+
+  const hasStoryId = /\bstor(?:y|ies)\s+\d+\.\d+\b/i.test(description);
+  const hasRetroId = /\bretro items?\b/i.test(description);
+  if (!hasStoryId && !hasRetroId) {
+    fail(
+      `type "${type}" with a package scope (${scope}) names no story or retro item.`,
+      `Name the work in the description: "story <epic>.<number>" or "retro item(s) <n>". See AGENT-WORKFLOW.md's Commit conventions. If this commit is tooling or ledger housekeeping instead of story/retro work, use "chore" or "docs" instead of "${type}".`,
+    );
+  }
+}
+
+const messagePath = process.argv[2];
+if (!messagePath) {
+  fail(`the hook received no commit-message file path.`, `Run this hook only through git's commit-msg stage.`);
+}
+
+lint(readSubject(messagePath));

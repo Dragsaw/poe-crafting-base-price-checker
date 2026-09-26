@@ -13,3 +13,78 @@ Launch a subagent with no prior conversation context, with this prompt:
 >
 > When done, report what you changed, how you verified it, and anything left incomplete or risky.
 """
+
+# Epic 1 retro item 15. This layer stops a lost ledger entry. It runs in
+# the review step. The review step always runs before this workflow's one
+# commit (step-05-present.md's Commit and Complete, or step-oneshot.md's
+# Commit). A finding from this layer gets fixed before that commit. The
+# fix and the carved-out change land in the same commit.
+#
+# The dispatch layer reads `{claims_file}`. The oneshot layer reads
+# `{spec_file}`. Both paths point at the spec under review.
+
+[[workflow.review_layers]]
+id = "deferred-ledger-audit"
+name = "Deferred Ledger Auditor"
+instruction = """
+Launch a context-free subagent with this prompt:
+
+You are a deferred-work ledger auditor.
+
+Do this:
+
+1. Read the spec at `{claims_file}` in full.
+2. Find every carved-out item in the spec. A carved-out item is text that says the agent did not do some work here, put it off, or still owes it. Look in Implementation Notes, Design Notes, Open Questions decisions, the Spec Change Log, and the Review Triage Log.
+3. Read `docs/stories/deferred-work.md` in full.
+4. For each carved-out item, check `docs/stories/deferred-work.md` for a matching entry. A matching entry names this spec as its `source_spec` and states the same carved-out item. The wording may differ from the spec's wording. Treat an entry as a match when it names the same file, the same decision, or the same carved-out item. When you cannot tell if an entry matches, treat it as a match.
+5. Report one finding for each carved-out item with no matching entry.
+
+Each finding must:
+
+- Name `docs/stories/deferred-work.md` as the file.
+- State the carved-out item in one sentence.
+- Give the entry `docs/stories/deferred-work.md` needs, in its format: `source_spec`, `summary`, `evidence`.
+- State this warning: a carved-out item with no ledger entry is lost work. Story 1.7 lost a carved-out item this way. No one recorded the loss until a later, separate item caught it.
+
+Output a Markdown list of findings. Output nothing else.
+
+If every carved-out item has a matching entry, or the spec has no carved-out item, report zero findings. Say so.
+
+Do not invoke any skill. Do not start any subagent of your own. You are the reviewer.
+
+Return your findings as text in your final message. Do not send your findings through any findings-reporting tool the host may offer.
+
+"""
+
+[[workflow.oneshot_review_layers]]
+id = "deferred-ledger-audit"
+name = "Deferred Ledger Auditor"
+instruction = """
+Launch a context-free subagent with this prompt:
+
+You are a deferred-work ledger auditor.
+
+Do this:
+
+1. Read the spec at `{spec_file}` in full.
+2. Find every carved-out item in the spec. A carved-out item is text that says the agent did not do some work here, put it off, or still owes it. Look in the Implementation Notes section, the Spec Change Log, and the Review Triage Log.
+3. Read `docs/stories/deferred-work.md` in full.
+4. For each carved-out item, check `docs/stories/deferred-work.md` for a matching entry. A matching entry names this spec as its `source_spec` and states the same carved-out item. The wording may differ from the spec's wording. Treat an entry as a match when it names the same file, the same decision, or the same carved-out item. When you cannot tell if an entry matches, treat it as a match.
+5. Report one finding for each carved-out item with no matching entry.
+
+Each finding must:
+
+- Name `docs/stories/deferred-work.md` as the file.
+- State the carved-out item in one sentence.
+- Give the entry `docs/stories/deferred-work.md` needs, in its format: `source_spec`, `summary`, `evidence`.
+- State this warning: a carved-out item with no ledger entry is lost work. Story 1.7 lost a carved-out item this way. No one recorded the loss until a later, separate item caught it.
+
+Output a Markdown list of findings. Output nothing else.
+
+If every carved-out item has a matching entry, or the spec has no carved-out item, report zero findings. Say so.
+
+Do not invoke any skill. Do not start any subagent of your own. You are the reviewer.
+
+Return your findings as text in your final message. Do not send your findings through any findings-reporting tool the host may offer.
+
+"""

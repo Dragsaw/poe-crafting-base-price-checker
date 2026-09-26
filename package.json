@@ -8,6 +8,7 @@
     "node": ">=24.21.0 <25"
   },
   "scripts": {
+    "prepare": "node tools/setup-git-hooks.mjs",
     "typecheck": "tsc -b",
     "lint": "eslint . --max-warnings=0",
     "depcruise": "depcruise packages --config .dependency-cruiser.mjs",
