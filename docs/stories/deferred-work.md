@@ -69,6 +69,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
   summary: The live `pnpm sync` runs on the in-memory fake git port, so the tracked-list edit date never comes from the `git-author-date` clock of AD-12. A real read-only git adapter is owed.
   evidence: The spec's human decision *Scope* defers the adapter. `packages/sync/src/sync.ts` passes `createFakeGitPort()`, so `resolveTrackedListAge` always falls to `file-modified`. The adapter needs a process spawn, and `packages/sync/src/no-git-write.test.ts` forbids `child_process` in every non-test source under `packages/sync/src`. The design pass must decide where a read-only spawn may live (a separate module the scan exempts, or a narrower rule that forbids only write subcommands) without weakening the no-git-write guarantee of AD-3.
+  auto_attempt: 2026-09-27 — attempt 1 — status done. build-auto recommends a follow-up review. Branch `worktree-dw-live-sync-runs-on-fake-git-port-2026-09-26-235651`, spec `docs/stories/spec-deferred-live-sync-runs-on-fake-git-port.md`.
+  retry_when: never — needs a human
+  integrate_branch: worktree-dw-live-sync-runs-on-fake-git-port-2026-09-26-235651
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
   summary: The live `pnpm sync` does not call `checkPinnedCap`, the load-time half of AD-7's pinned cap. A tracked list over the cap therefore runs live and reports only `pinned-starvation` at runtime.
   evidence: `packages/sync/src/pinned-cap.ts` documents `count(pinned) > 0.5 × minChunkSearches` as "a `tracked.json` validation error". No shell calls `checkPinnedCap` (only `index.ts` and `pinned-cap.test.ts` name it). `sync:dry` never did either, and the spec's composition list does not name it. Location: `packages/sync/src/sync.ts` (live composition).
