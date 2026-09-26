@@ -545,3 +545,70 @@ it('defaults the lane to the request method and path when the caller names none'
   await client.send({ method: 'POST', url: SEARCH_URL });
   expect(waits).toEqual([300_000]);
 });
+
+// Story 1.5: the chunk runner's allowance comes from the live headers.
+it('reports the smallest remaining allowance over every bucket of every rule', async () => {
+  const { client } = harness({
+    [`POST ${SEARCH_URL}`]: response(200, {
+      'x-rate-limit-policy': SEARCH_POLICY,
+      'x-rate-limit-rules': 'Ip,Client',
+      'x-rate-limit-ip': '5:10:60,15:60:300',
+      'x-rate-limit-ip-state': '1:10:0,12:60:0',
+      'x-rate-limit-client': '30:300:1800',
+      'x-rate-limit-client-state': '20:300:0',
+    }),
+  });
+
+  const result = await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+
+  // 5-1=4, 15-12=3, 30-20=10: the tightest bucket governs.
+  expect(result.remaining).toBe(3);
+});
+
+it('reports zero, never a negative, when a bucket is spent past its limit', async () => {
+  const { client } = harness({
+    [`POST ${SEARCH_URL}`]: response(429, {
+      'x-rate-limit-policy': SEARCH_POLICY,
+      'x-rate-limit-rules': 'Ip',
+      'x-rate-limit-ip': '5:10:60',
+      'x-rate-limit-ip-state': '7:10:60',
+      'retry-after': '60',
+    }),
+  });
+
+  const result = await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+
+  expect(result.kind).toBe('yield');
+  expect(result.remaining).toBe(0);
+});
+
+it('omits the remaining allowance where the response declared no readable rule', async () => {
+  const { client } = harness({
+    [`GET ${DATA_URL}`]: response(200, {}, '[]'),
+  });
+
+  const result = await client.send({ method: 'GET', url: DATA_URL });
+
+  expect(result.remaining).toBeUndefined();
+  expect('remaining' in result).toBe(false);
+});
+
+it('omits the remaining allowance on a threshold refusal, because nothing was issued', async () => {
+  const http = createFakeHttpPort({
+    [`POST ${SEARCH_URL}`]: response(403, CLEAR_SEARCH_HEADERS, 'forbidden'),
+  });
+  const client = createTradeClient({
+    http,
+    clock: createFakeClockPort(NOW),
+    wait: () => Promise.resolve(),
+    userAgent: CONTACT,
+    invalidRequestThreshold: 1,
+  });
+
+  const first = await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  expect(first.remaining).toBe(4);
+
+  const refused = await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  expect(refused.kind).toBe('yield');
+  expect(refused.remaining).toBeUndefined();
+});

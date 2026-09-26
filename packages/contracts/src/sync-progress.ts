@@ -1,10 +1,10 @@
-import { z } from 'zod';
-
-import { IsoTimestampSchema } from './primitives.ts';
-
 /**
  * The chunk runner's two on-disk shapes (AD-7, IMPLEMENTATION-NOTES.md §7).
  */
+
+import { z } from 'zod';
+
+import { IsoTimestampSchema } from './primitives.ts';
 
 /**
  * `data/sync.lock` — **two fields and no others**. Anything else invites a

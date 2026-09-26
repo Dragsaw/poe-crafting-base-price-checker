@@ -8,3 +8,11 @@ import { INITIAL_SCHEMA_VERSION } from '@poe/contracts';
  * workspace edge against a real `contracts` export.
  */
 export const CORE_PLACEHOLDER = `contracts@${INITIAL_SCHEMA_VERSION}:core`;
+
+/**
+ * The chunk runner's selection order (AD-7). Relative specifiers carry `.ts`:
+ * `pnpm sync:dry` loads this source under bare `node`, whose type stripping
+ * performs no extension resolution.
+ */
+export { chunkOrder } from './chunk-order.ts';
+export type { ChunkOrder } from './chunk-order.ts';

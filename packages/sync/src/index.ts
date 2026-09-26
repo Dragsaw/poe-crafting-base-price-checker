@@ -39,3 +39,19 @@ export type { UserAgentRefused, UserAgentResolved, UserAgentResult } from './tra
  * prevent. They are imported by path inside this package, and by its tests.
  */
 export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-headers';
+
+/**
+ * One bounded, resumable, single-instance chunk (FR-19, AD-7). Stories 1.7 and
+ * 1.8 wire the live command; until then the tests and `pnpm sync:dry` drive it.
+ */
+export { PROGRESS_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
+export type {
+  ChunkBound,
+  ChunkOutcome,
+  ChunkOutcomeKind,
+  ChunkPorts,
+  ChunkStep,
+  GateContext,
+  StepResult,
+} from './chunk/run-chunk';
+export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';

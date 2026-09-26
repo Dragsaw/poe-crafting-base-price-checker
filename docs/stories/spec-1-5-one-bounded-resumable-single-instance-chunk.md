@@ -2,7 +2,10 @@
 title: 'Story 1.5: One bounded, resumable, single-instance chunk'
 type: 'feature'
 created: '2026-09-26'
-status: 'ready-for-dev'
+status: 'done'
+baseline_revision: '2618142b3a59703b6415641ca978eb1179a2ed29'
+followup_review_recommended: false
+deferred: []
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -84,14 +87,14 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `packages/contracts/src/{sync-progress.ts,envelopes.ts,ports/filesystem.ts,ports/fakes/filesystem.ts,index.ts}`: add the progress and lock schemas and `createExclusive`. Make the fake atomic.
-- [ ] `packages/core/src/chunk-order.ts` + test: add the pure order function.
-- [ ] `packages/sync/src/trade/client.ts` + test: add `remaining` to each result.
-- [ ] `packages/sync/src/chunk/lock.ts`: take, break-if-stale, verify-own, release-if-own.
-- [ ] `packages/sync/src/chunk/run-chunk.ts`: add `runChunk({fs, clock, pid, gate?}, step)` returning a typed outcome (`completed|bounded|yielded|busy|dispossessed`, `completed` keys, `records`).
-- [ ] `packages/sync/src/chunk/*.test.ts`: cover every matrix row, including a `Promise.all` race on the fake, and a source scan proving no `minChunkSearches` or `config.json` reference in `chunk/`.
-- [ ] `packages/sync/src/shell.ts`: add the real `FilesystemPort` adapter.
-- [ ] `packages/sync/src/dry-run.ts` + `dry-run.test.ts`: implement the read-only in-memory dry run from the Decisions. Keep a pure `dryRun(trackedText)` that is unit-tested with a fake filesystem. The spawned test asserts exit 0, identical stdout across two runs, parseable JSON, and no write.
+- [x] `packages/contracts/src/{sync-progress.ts,envelopes.ts,ports/filesystem.ts,ports/fakes/filesystem.ts,index.ts}`: add the progress and lock schemas and `createExclusive`. Make the fake atomic.
+- [x] `packages/core/src/chunk-order.ts` + test: add the pure order function.
+- [x] `packages/sync/src/trade/client.ts` + test: add `remaining` to each result.
+- [x] `packages/sync/src/chunk/lock.ts`: take, break-if-stale, verify-own, release-if-own.
+- [x] `packages/sync/src/chunk/run-chunk.ts`: add `runChunk({fs, clock, pid, gate?}, step)` returning a typed outcome (`completed|bounded|yielded|busy|dispossessed`, `completed` keys, `records`).
+- [x] `packages/sync/src/chunk/*.test.ts`: cover every matrix row, including a `Promise.all` race on the fake, and a source scan proving no `minChunkSearches` or `config.json` reference in `chunk/`.
+- [x] `packages/sync/src/shell.ts`: add the real `FilesystemPort` adapter.
+- [x] `packages/sync/src/dry-run.ts` + `dry-run.test.ts`: implement the read-only in-memory dry run from the Decisions. Keep a pure `dryRun(trackedText)` that is unit-tested with a fake filesystem. The spawned test asserts exit 0, identical stdout across two runs, parseable JSON, and no write.
 
 **Acceptance Criteria:**
 - Given `pnpm check`, when it runs, then typecheck, lint and depcruise pass.
@@ -103,6 +106,88 @@ context:
 ## Spec Change Log
 
 ## Review Triage Log
+
+### 2026-09-26 — Review pass
+- verdicts: 45 findings — high 0, medium 0, low 30, false 12, maybe-false 3
+- findings:
+  - `[low]` `[patch]` (verification-gap) A bound on the last entry resolving to `completed` has no test — added a `harness([A, B])` test with `searchRemaining: 0` on B asserting `completed` and full progress.
+  - `[low]` `[patch]` (verification-gap, other) A run losing the break-marker race reports the dead stale holder as the live holder — the loser now returns the break-marker holder; the lock test asserts pid 8.
+  - `[low]` `[patch]` (blind) `breakAndTake` deletes the lock unconditionally after the re-read, so a fresh lock taken by a plain create in the gap can be deleted — delete now goes through `deleteIfText(LOCK_PATH, stale.text)`, returning busy on a mismatch.
+  - `[low]` `[reject]` (blind) `releaseLockIfOwn` is check-then-delete — real but needs a compare-and-delete port operation (new public surface); the window requires a >6 h chunk plus a break within one await.
+  - `[low]` `[reject]` (blind) Stale-marker clean-up via `deleteIfText` is read-then-delete — same class; closing it needs a new port primitive, and it requires a crashed breaker plus two concurrent clearers.
+  - `[low]` `[reject]` (blind) A dispossessed run keeps visiting entries until the loop ends — only reachable after a chunk runs past 6 h; the spec places the check before the progress write, and a per-entry check adds a branch.
+  - `[low]` `[reject]` (blind) Progress is lost when the step throws — costs one chunk of repeated searches; 429s and invalid-request refusals yield rather than throw, so throws are exceptional; persisting on the throw path adds a branch.
+  - `[low]` `[reject]` (blind) Real `createExclusive` leaves an empty lock if the post-create write fails — ENOSPC/EIO on a tiny write is rare, and the mtime rule clears it after 6 h; the cleanup is an added guard.
+  - `[low]` `[patch]` (blind) Node `lastModifiedAt` swallows every error, so EACCES makes an unreadable lock never stale — now returns undefined only on ENOENT and rethrows otherwise.
+  - `[maybe-false]` `[reject]` (blind) `remainingAllowance` ignores the active-restriction field, and `?? 0` fails open — the parser refuses length mismatches (rate-limit-headers.ts:190), so `?? 0` is dead; whether a non-429 response ever carries an active restriction with hits under the limit would settle the rest; if true it is only low (a restricted request yields on 429).
+  - `[false]` `[reject]` (blind) Nothing maps the client's `remaining` into `StepResult` — the Code Map assigns that to Story 1.7's step ("1.7's step reports it").
+  - `[low]` `[patch]` (blind) Busy log names the wrong run during a break — same root cause and fix as the verification-gap other finding.
+  - `[false]` `[reject]` (blind) A corrupt `sync-progress.json` wedges every run — it fails loudly and names the file, which is correct behaviour for an envelope refusal.
+  - `[low]` `[reject]` (blind) `ChunkOutcome` does not expose `newPass` — no consumer yet; the AC has Story 1.9 add to the outcome.
+  - `[false]` `[reject]` (blind) The dry run ignores real progress and lock state — the intent's Decisions require a snapshot of `data/tracked.json` only.
+  - `[low]` `[patch]` (blind) The spawned `sync:dry` test never asserts empty stderr — added `expect(first.stderr).toBe('')`; the dependence on the real tracked file is by Decision.
+  - `[low]` `[patch]` (blind) Missing runner and adapter tests — added allowance-exactly-1 and a Node `createExclusive` loses-against-existing-file test; the progress-refusal-after-gate case is covered by the unknown-major test, and new-pass-with-added-entry by the chunk-order recompute test.
+  - `[low]` `[patch]` (blind) `shell.ts` header line not rewrapped; orphan module JSDoc in `sync-progress.ts` — rewrapped the header; moved the block above the imports.
+  - `[false]` `[reject]` (intent) Busy/stale/throw exit behaviour is verified only in-process — the Decision "no live `pnpm sync` script yet" leaves `runChunk`'s returned outcome as the surface.
+  - `[low]` `[reject]` (intent) The full acquire/break path never runs against the real adapter — the adapter's atomic `createExclusive` is tested directly, and the lock logic is port-generic.
+  - `[false]` `[reject]` (intent) "Retaken atomically" is delete then create — the retake itself is one atomic exclusive create, and a race test shows exactly one winner.
+  - `[low]` `[reject]` (intent) Breaking an unreadable lock by mtime produces no `stale-lock-broken` record — the record schema needs a pid and startedAt the file lacks; this only happens after a crash between create and write.
+  - `[false]` `[reject]` (intent) No link from client `remaining` to the step allowances — same as the blind finding; deferred to Story 1.7 by the Code Map.
+  - `[low]` `[patch]` (intent) The last-entry bound is untested — same root cause and fix as the first verification-gap finding.
+  - `[false]` `[reject]` (intent) `sync:dry` depends on the player's real `data/tracked.json` — mandated by the Decisions.
+  - `[false]` `[reject]` (intent) The dispossessed outcome lists unpersisted keys — the `dispossessed` kind states that nothing was written; the keys describe what the chunk did.
+  - `[low]` `[reject]` (intent) Steps keep running after dispossession — same as the blind finding.
+  - `[low]` `[reject]` (intent) A throw mid-chunk drops progress — same as the blind finding.
+  - `[low]` `[reject]` (intent) The default `log` writes `process.stderr` below the shell — the constraint names the clock and the filesystem; the spec requires the stderr line, and `log` is injectable.
+  - `[false]` `[reject]` (intent) `allowImportingTsExtensions` and `.ts` specifiers in core — required for `sync:dry` under bare `node` type stripping, and `pnpm check` passes.
+  - `[low]` `[reject]` (edge) A future `startedAt` after clock skew is never stale — rare; treating future instants as stale would break live locks under skew, so the fix is a policy change.
+  - `[low]` `[reject]` (edge) Successor breaks the lock between `holdsLock` and `deleteFile` in release — same as the blind finding.
+  - `[low]` `[reject]` (edge) Takeover between `holdsLock` and the progress write — same check-then-act class; needs a >6 h chunk and a break within one await, and closing it needs a new port primitive.
+  - `[low]` `[reject]` (edge) Marker replaced between the `deleteIfText` read and delete — same as the blind marker finding.
+  - `[maybe-false]` `[reject]` (edge) Windows delete-pending EPERM on a create right after a delete — libuv uses POSIX delete semantics on current Windows, and no handle stays open; settle by reproducing a concurrent open during a delete on Windows 10+; if true it is only low (the run throws once, and the next invocation proceeds).
+  - `[maybe-false]` `[reject]` (edge) `open(wx)` throws EPERM rather than resolving false on Windows — same as the previous finding.
+  - `[low]` `[patch]` (edge) `lastModifiedAt` hides non-ENOENT errors — same root cause and fix as the blind finding.
+  - `[false]` `[reject]` (edge) A clock value that `SyncLockSchema` rejects makes the run's own lock unreadable — the `ClockPort` contract and `systemClock` (`toISOString`) guarantee ISO-8601 UTC.
+  - `[low]` `[reject]` (edge) Unreadable lock deleted between the read and `lastModifiedAt` reports busy — the next invocation proceeds; a retry adds a branch for a microsecond window.
+  - `[low]` `[reject]` (edge) A release throw in `finally` masks the step error — needs a filesystem failure on delete right after a step failure; the fix adds a nested try.
+  - `[false]` `[reject]` (edge) Skipped rules make `remaining` overstate the allowance — the proposed `undefined` would bound nothing, which is less safe than the readable-rule minimum.
+  - `[low]` `[patch]` (edge) `sync:dry`'s entry guard fails under a junction, subst or symlink path, so it prints nothing and exits 0 — the guard now compares `realpathSync` of both paths, and a throw counts as not invoked directly.
+  - `[false]` `[reject]` (edge) A `data/` file disappears between `readdirSync` and `statSync` in the test snapshot — nothing writes `data/` during the test run.
+  - `[low]` `[reject]` (edge, claim) "Broken and then retaken atomically" oversells the marker's guarantees — the retake is one atomic create, and the remaining marker races are the rejected check-then-delete class.
+  - `[low]` `[reject]` (edge, claim) "If the lock is not its own, it writes nothing" has a check-then-write gap — same as the edge takeover finding.
+
+## Auto Run Result
+
+**Summary:** Story 1.5 adds the chunk runner. `runChunk({fs, clock, pid, gate?, log?}, step)` takes an atomic, recoverable lock at `data/sync.lock` and gets its order from `core`'s `chunkOrder`. It stops on a search or fetch allowance below 1, on a yield, or when the workload runs out. It re-reads the lock before it writes `data/sync-progress.json`, and it releases only its own lock, in a `finally`. `pnpm sync:dry` runs the same runner in memory over a read-only snapshot of `data/tracked.json` and prints `{outcome, completed, progress, records}`. The contracts change landed first as a separate commit, `571e55d`.
+
+**Files changed:**
+- `packages/contracts/src/sync-progress.ts` (+test): the `SyncLockSchema` and `SyncProgressSchema`.
+- `packages/contracts/src/envelopes.ts`, `index.ts` (+tests): `SyncProgressFileSchema` and the barrel exports.
+- `packages/contracts/src/ports/filesystem.ts`, `ports/fakes/filesystem.ts` (+test): `createExclusive`, with an atomic fake.
+- `packages/core/src/chunk-order.ts` (+test), `index.ts`, `tsconfig.json`: the pure order function, its export, and `.ts` specifiers for bare `node`.
+- `packages/sync/src/trade/client.ts` (+test): `remaining` on each result.
+- `packages/sync/src/chunk/lock.ts` (+test): take, break-if-stale under a break marker, verify-own, and release-if-own.
+- `packages/sync/src/chunk/run-chunk.ts` (+test): the runner and its typed outcome. The tests cover every matrix row.
+- `packages/sync/src/shell.ts` (+test): `createNodeFilesystemPort`, with `createExclusive` via `open(path, 'wx')`.
+- `packages/sync/src/dry-run.ts` (+test): a pure `dryRun(trackedText)` and the read-only script.
+- `packages/sync/src/index.ts`: the runner exports.
+
+**Review:** 45 findings. Of these, 11 low findings were patched, covering 8 distinct fixes. Nothing was deferred. 19 low, 12 false and 3 maybe-false findings were rejected, each with its reason in the triage log above.
+
+**Follow-up review recommended:** `false`. By verdict, 0 high, 0 medium and 11 low findings were patched.
+
+**Verification:** after the patches:
+- `pnpm check` passes: typecheck, lint, and depcruise (no violations).
+- `pnpm test`: 37 files, 295 tests, all passed, none skipped.
+- `pnpm sync:dry` exits 0 and prints JSON on stdout.
+- `git status -- data/` is clean.
+- Matrix audit: every row has a passing test.
+
+**Residual risks:**
+- **Check-then-delete gaps:** release-if-own, the progress-write ownership check, and the break-marker clean-up are each a read followed by an act. `FilesystemPort` has no compare-and-delete or rename that would close the gap.
+- **Unreadable lock break:** a lock broken by file time produces no `stale-lock-broken` record.
+- **Throw loses progress:** a throw from the step loses that chunk's progress.
+- **Stale `AGENTS.md`:** it still says `pnpm sync:dry` exits non-zero on purpose and must not be changed. That text needs a manual refresh; this workflow does not edit agent-context files.
 
 ## Verification
 

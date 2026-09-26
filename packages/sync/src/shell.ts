@@ -1,11 +1,12 @@
 /**
  * The imperative shell's real effects, in one module (AD-1).
  *
- * `fetch`, the system clock, a real delay and a real write live here and
- * nowhere else in `sync`. Both human-invoked commands — `fixtures:record` and
- * `catalogue:refresh` — take their ports from this file, so the request timeout
- * that keeps a hung connection from blocking a terminal is written once. A
- * second hand-written `HttpPort` is exactly where that detail gets dropped.
+ * `fetch`, the system clock, a real delay, a real write and the real
+ * `FilesystemPort` live here and nowhere else in `sync`. Both human-invoked
+ * commands — `fixtures:record` and `catalogue:refresh` — take their ports from
+ * this file, so the request timeout that keeps a hung connection from blocking
+ * a terminal is written once. A second hand-written `HttpPort` is exactly
+ * where that detail gets dropped.
  *
  * **No test executes `createFetchHttpPort`**, and `catalogue-refresh.test.ts`
  * asserts that no test file so much as names it. Every unit below the commands
@@ -16,10 +17,10 @@
  * rather than a comment.
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname } from 'node:path';
+import { mkdir, open, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
 
-import type { ClockPort, HttpPort } from '@poe/contracts';
+import type { ClockPort, FilesystemPort, HttpPort } from '@poe/contracts';
 
 /** How long a single live request may take before it is abandoned. */
 export const REQUEST_TIMEOUT_MS = 30_000;
@@ -77,4 +78,83 @@ export const sleep = (ms: number): Promise<void> =>
 export async function writeTextFile(path: string, contents: string): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, contents, { encoding: 'utf8' });
+}
+
+function hasErrorCode(error: unknown, code: string): boolean {
+  return error instanceof Error && 'code' in error && error.code === code;
+}
+
+/**
+ * The real `FilesystemPort`. Every path is resolved against `root`, so the
+ * shell names the repository once and the code below it names `data/...`
+ * exactly as the fakes do.
+ */
+export function createNodeFilesystemPort(root: string): FilesystemPort {
+  const at = (path: string): string => resolve(root, path);
+
+  return {
+    async readTextFile(path) {
+      try {
+        return await readFile(at(path), { encoding: 'utf8' });
+      } catch (error) {
+        if (hasErrorCode(error, 'ENOENT')) {
+          return undefined;
+        }
+        throw error;
+      }
+    },
+    writeTextFile(path, contents) {
+      return writeTextFile(at(path), contents);
+    },
+    /**
+     * `wx` is `O_CREAT | O_EXCL`: the operating system creates the file only
+     * if it is absent, in one step, so of two concurrent takers exactly one
+     * succeeds. The contents are written after the create, so a reader can see
+     * the file empty for an instant; the lock reader treats an unreadable lock
+     * as held, never as free.
+     */
+    async createExclusive(path, contents) {
+      const target = at(path);
+      await mkdir(dirname(target), { recursive: true });
+      let handle;
+      try {
+        handle = await open(target, 'wx');
+      } catch (error) {
+        if (hasErrorCode(error, 'EEXIST')) {
+          return false;
+        }
+        throw error;
+      }
+      try {
+        await handle.writeFile(contents, { encoding: 'utf8' });
+      } finally {
+        await handle.close();
+      }
+      return true;
+    },
+    async deleteFile(path) {
+      await rm(at(path), { force: true });
+    },
+    async exists(path) {
+      try {
+        await stat(at(path));
+        return true;
+      } catch (error) {
+        if (hasErrorCode(error, 'ENOENT')) {
+          return false;
+        }
+        throw error;
+      }
+    },
+    async lastModifiedAt(path) {
+      try {
+        return (await stat(at(path))).mtime.toISOString();
+      } catch (error) {
+        if (hasErrorCode(error, 'ENOENT')) {
+          return undefined;
+        }
+        throw error;
+      }
+    },
+  };
 }

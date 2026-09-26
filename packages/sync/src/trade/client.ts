@@ -118,6 +118,14 @@ interface TradeExchange {
    * than only learning it has arrived.
    */
   readonly invalidRequests: number;
+  /**
+   * The allowance left on the policy this response was spent against: the
+   * smallest `hits - state.hits` over every bucket of every rule the response
+   * declared, never below `0`. Absent where the response declared no readable
+   * rule, or where nothing was issued. The chunk runner stops once it drops
+   * below `1`; the number is always read from the headers, never assumed.
+   */
+  readonly remaining?: number;
 }
 
 export interface TradeResponseResult extends TradeExchange {
@@ -234,6 +242,23 @@ function retryAfterMsOf(headers: Readonly<Record<string, string>>): number | und
  */
 const MINIMUM_YIELD_MS = 1000;
 
+/**
+ * The allowance a response declares is left, or `undefined` where it declared
+ * no readable rule. Positional pairing is the header contract, and the parser
+ * has already refused any rule whose two lists disagree in length.
+ */
+function remainingAllowance(parsed: RateLimitHeaders): number | undefined {
+  let remaining: number | undefined;
+  for (const rule of parsed.rules) {
+    rule.buckets.forEach((bucket, index) => {
+      const used = rule.state[index]?.hits ?? 0;
+      const left = Math.max(0, bucket.hits - used);
+      remaining = remaining === undefined ? left : Math.min(remaining, left);
+    });
+  }
+  return remaining;
+}
+
 function declaredYieldFloorMs(parsed: RateLimitHeaders): number {
   let floor = 0;
   for (const rule of parsed.rules) {
@@ -334,6 +359,7 @@ export function createTradeClient(options: TradeClientOptions): TradeClient {
       invalidRequests = countInvalidRequest(invalidRequests, policy);
     }
     const counted = invalidRequestsFor(invalidRequests, policy);
+    const remaining = remainingAllowance(parsed);
 
     if (response.status === TOO_MANY_REQUESTS) {
       const fromHeader = retryAfterMsOf(response.headers);
@@ -345,6 +371,7 @@ export function createTradeClient(options: TradeClientOptions): TradeClient {
         waitedMs,
         skips: parsed.skips,
         invalidRequests: counted,
+        ...(remaining === undefined ? {} : { remaining }),
         response,
         retryAfterMs: fromHeader ?? (derived > 0 ? derived : declaredYieldFloorMs(parsed)),
         reason: fromHeader === undefined ? 'derived-penalty' : 'retry-after-header',
@@ -361,6 +388,7 @@ export function createTradeClient(options: TradeClientOptions): TradeClient {
       waitedMs,
       skips: parsed.skips,
       invalidRequests: counted,
+      ...(remaining === undefined ? {} : { remaining }),
       response,
     };
   }

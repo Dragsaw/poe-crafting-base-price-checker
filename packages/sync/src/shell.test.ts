@@ -2,9 +2,16 @@ import { Buffer } from 'node:buffer';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { REQUEST_TIMEOUT_MS, serialiseJsonArtifact, sleep, systemClock, writeTextFile } from './shell.ts';
+import {
+  createNodeFilesystemPort,
+  REQUEST_TIMEOUT_MS,
+  serialiseJsonArtifact,
+  sleep,
+  systemClock,
+  writeTextFile,
+} from './shell.ts';
 
 /**
  * The shell's testable half.
@@ -93,4 +100,48 @@ it('resolves sleep without waiting on a real window', async () => {
 
 it('bounds a single request so a hung connection cannot block a terminal', () => {
   expect(REQUEST_TIMEOUT_MS).toBe(30_000);
+});
+
+describe('createNodeFilesystemPort', () => {
+  it('reads, writes, checks and deletes relative to its root', async () => {
+    const root = await temporaryDirectory();
+    const filesystem = createNodeFilesystemPort(root);
+
+    await expect(filesystem.readTextFile('data/x.json')).resolves.toBeUndefined();
+    await expect(filesystem.exists('data/x.json')).resolves.toBe(false);
+    await expect(filesystem.lastModifiedAt('data/x.json')).resolves.toBeUndefined();
+
+    await filesystem.writeTextFile('data/x.json', '{}\n');
+    expect(await readFile(join(root, 'data', 'x.json'), 'utf8')).toBe('{}\n');
+    await expect(filesystem.readTextFile('data/x.json')).resolves.toBe('{}\n');
+    await expect(filesystem.exists('data/x.json')).resolves.toBe(true);
+    await expect(filesystem.lastModifiedAt('data/x.json')).resolves.toMatch(/Z$/);
+
+    await filesystem.deleteFile('data/x.json');
+    await expect(filesystem.exists('data/x.json')).resolves.toBe(false);
+    // Removing a path that does not exist is not an error.
+    await expect(filesystem.deleteFile('data/x.json')).resolves.toBeUndefined();
+  });
+
+  it('creates exclusively: of concurrent takers exactly one wins, and the loser changes nothing', async () => {
+    const root = await temporaryDirectory();
+    const filesystem = createNodeFilesystemPort(root);
+
+    const outcomes = await Promise.all(
+      ['a', 'b', 'c', 'd'].map((who) => filesystem.createExclusive('data/sync.lock', who)),
+    );
+
+    expect(outcomes.filter(Boolean)).toHaveLength(1);
+    const winner = ['a', 'b', 'c', 'd'][outcomes.indexOf(true)];
+    expect(await readFile(join(root, 'data', 'sync.lock'), 'utf8')).toBe(winner);
+  });
+
+  it('leaves an existing file untouched when an exclusive create loses', async () => {
+    const root = await temporaryDirectory();
+    const filesystem = createNodeFilesystemPort(root);
+    await filesystem.writeTextFile('data/sync.lock', 'held');
+
+    await expect(filesystem.createExclusive('data/sync.lock', 'mine')).resolves.toBe(false);
+    expect(await readFile(join(root, 'data', 'sync.lock'), 'utf8')).toBe('held');
+  });
 });

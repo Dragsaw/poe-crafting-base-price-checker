@@ -4,6 +4,10 @@
     "composite": true,
     "declaration": true,
     "emitDeclarationOnly": true,
+    // `pnpm sync:dry` loads this source under bare `node`, whose type stripping
+    // performs no extension resolution, so relative specifiers carry `.ts`.
+    // Permitted because the package is `emitDeclarationOnly`.
+    "allowImportingTsExtensions": true,
     "rootDir": "src",
     "outDir": "dist"
   },
