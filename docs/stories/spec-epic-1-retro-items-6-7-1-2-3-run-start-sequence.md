@@ -167,3 +167,8 @@ Status: done
 - The committed `data/config.json` has `minChunkSearches: 1`, so the load-time cap (`count(pinned) ≤ 0.5 × minChunkSearches`) refuses the first pinned entry the player adds: exit 1 with a `run-failure` naming `data/tracked.json`. Correct per IN §6; the player should raise the yardstick before pinning.
 - An absent config or an unreadable dataset now writes `sync-report.json` with a `run-failure` (previously nothing was written).
 - The retro item 17 ledger entry (`UnexpectedTradeResponseError` carries no entry payload) stays open.
+
+**Human decisions (2026-09-26).**
+- Gate 4xx (the `deferred` item): accepted as built. A league-gate throw that is not a mismatch publishes the catalogue marks and progress, with the dataset keeping its previous league label. The `deferred` entry stays in place (append-only) and is settled by this decision.
+- `minChunkSearches: 1` with no pinned entries: known and acceptable; not a residual risk to act on.
+- The recommended follow-up review runs in a separate session.
