@@ -22,6 +22,7 @@ export default defineConfig({
             '.claude/skills/tracked-json/scripts/*.test.ts',
           ],
           setupFiles: ['./test/setup.ts'],
+          globalSetup: ['./test/global-setup.ts'],
         },
       },
     ],
