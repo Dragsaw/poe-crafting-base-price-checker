@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 8
+revision: 9
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -848,7 +848,7 @@ dataset in one state at one moment.
 | 1 | Price State `priced` | `{components.combination-row}` | **Line one:** `●` plus the word `priced`, the figure in Divine at 2dp, the listing sample count. **Line two:** both clocks in their own cells — *priced Nh ago* and *tried Nh ago* |
 | 2 | Price State `no-listings` | Combination row | **Line one:** `○` plus the word, `{components.money-slot}` *an open question*, `0 listings found`. **Line two:** note *nobody is listing this right now — a jackpot and junk look alike here*, then both clocks |
 | 3 | Price State `not-yet-synced` | Combination row | **Line one:** `∆` plus the word **and its reason**, money slot *no figure yet*, `no sample`. **Line two:** the reason's note (states 5–7), then whichever clocks exist |
-| 4 | Price State `unresolvable` | Combination row, and surfaced not omitted | **Line one:** `×` in `{colors.rust}` plus the word, money slot *not valued*, `no sample`. **Line two:** note *the statId is gone from the trade API — a patch did this*, then *tried Nh ago* |
+| 4 | Price State `unresolvable` | Combination row, and surfaced not omitted | **Line one:** `×` in `{colors.rust}` plus the word, money slot *not valued*, `no sample`. **Line two:** note *its id is gone from the trade API — a patch did this*, then *tried Nh ago*. `[decision — revision 9, 2026-09-27]` One wording for every `unresolvable` row, a Raw Base (its Base Type or category id) or a Combination (a stat id). The note does not name the id kind, because the row already names what it prices |
 | 5 | reason `never-synced` | Combination row | Rendered *never attempted* — **the one row with no age at all**, so both age cells on line two are empty rather than filled. Note: *no request was ever issued for this entry* |
 | 6 | reason `league-mismatch` | Combination row | Note: *the observation belongs to another league*. Treated as absent, never as stale-but-usable. The attempted clock still shows |
 | 7 | reason `no-exchange-rate` | Combination row | Note: *the listing currency had no rate at sync time*. There is no "priced but not convertible" state. The attempted clock still shows |
@@ -929,6 +929,17 @@ document grows and scrolls beneath it.
 
 Nothing here is deferred to implementation any more. The earlier acceptance of
 designing it later is discharged, not still standing.
+
+**A list of only `unresolvable` rows drops "yet"** `[decision — revision 9,
+2026-09-27]`. State 23's statement holds whenever nothing is priced in the
+active league, and `unresolvable` rows count toward it. Its copy ends in *yet*:
+`In canonical order, not ranked: no tracked unit has a price from <league> yet.`
+When every row the list shows is `unresolvable`, no sync will bring a price, so
+the statement ends without the word:
+`In canonical order, not ranked: no tracked unit has a price from <league>.`
+When at least one row is `no-listings` or `not-yet-synced`, the statement keeps
+*yet*, because it is true of those rows. The statement does not name the cause:
+the trust strip's health line already carries `× N unresolvable` (state 31).
 
 ## Interaction Primitives
 
