@@ -49,6 +49,11 @@ export function RankedList({
   }, []);
 
   const remaining = rows.length - TOP_ROWS;
+  // A drop to TOP_ROWS or fewer clears the grown state, so a later rise opens
+  // collapsed (React adjust-state-during-render pattern).
+  if (grown && remaining <= 0) {
+    setGrown(false);
+  }
   const visible = grown ? rows : rows.slice(0, TOP_ROWS);
 
   return (

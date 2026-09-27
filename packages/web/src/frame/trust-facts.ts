@@ -187,7 +187,22 @@ function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): 
   }
   const denominator =
     figures.rankableClassCount === undefined ? missing(UNKNOWN) : figure(figures.rankableClassCount);
-  return [[figure(`${String(Math.round(figures.coverage * 100))}%`), text(' of '), denominator, text(' tracked Item Classes.')]];
+  return [[figure(`${String(coveragePercent(figures.coverage))}%`), text(' of '), denominator, text(' tracked Item Classes.')]];
+}
+
+/**
+ * The displayed coverage percent, with three guards: it floors the percent;
+ * it lifts a non-zero fraction that floors to 0 up to 1%, so non-zero coverage
+ * never reads 0%; and it caps partial coverage at 99%, so it never reads 100%.
+ * The epsilon absorbs float error such as `0.29 * 100 === 28.999999999999996`,
+ * which is why the 99 cap, not the floor, keeps partial coverage below 100%.
+ */
+function coveragePercent(coverage: number): number {
+  const floored = Math.floor(coverage * 100 + 1e-9);
+  if (coverage > 0 && floored === 0) {
+    return 1;
+  }
+  return coverage < 1 ? Math.min(floored, 99) : floored;
 }
 
 /** A group as plain text, for tests and for reading. */

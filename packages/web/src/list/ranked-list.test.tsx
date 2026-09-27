@@ -37,15 +37,23 @@ afterEach(() => {
 });
 
 function mountList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold = DEFAULT_THRESHOLD): HTMLDivElement {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), dataset, NOW);
   container = document.createElement('div');
   document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
+  root = createRoot(container);
+  rerenderList(tracked, dataset, threshold);
+  return container;
+}
+
+/** Renders new rows into the kept root, so RankedList keeps its state. */
+function rerenderList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold = DEFAULT_THRESHOLD): void {
+  const mounted = root;
+  if (mounted === undefined) {
+    throw new Error('no mounted root');
+  }
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), dataset, NOW);
   act(() => {
     mounted.render(<RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />);
   });
-  return container;
 }
 
 function rowsIn(within: HTMLElement): HTMLElement[] {
@@ -247,6 +255,28 @@ describe('the top-20 bound', () => {
       button?.click();
     });
     expect(rowsIn(view)).toHaveLength(20);
+  });
+
+  // Matrix: grown, then shrink to 20, then grow back.
+  it('forgets the grown state when the rows drop to 20, so a later rise opens collapsed', () => {
+    const big = many(25);
+    const view = mountList(big.tracked, big.dataset);
+    act(() => {
+      view.querySelector<HTMLButtonElement>('[data-expand-affordance]')?.click();
+    });
+    expect(rowsIn(view)).toHaveLength(25);
+    const grown = view.querySelector<HTMLButtonElement>('[data-expand-affordance]');
+    expect(grown?.getAttribute('aria-expanded')).toBe('true');
+    expect(grown?.textContent).toBe(COLLAPSE_COPY);
+    const small = many(20);
+    rerenderList(small.tracked, small.dataset);
+    expect(rowsIn(view)).toHaveLength(20);
+    expect(view.querySelector('[data-expand-affordance]')).toBeNull();
+    rerenderList(big.tracked, big.dataset);
+    expect(rowsIn(view)).toHaveLength(20);
+    const button = view.querySelector<HTMLButtonElement>('[data-expand-affordance]');
+    expect(button?.textContent).toBe(expandCopy(5));
+    expect(button?.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('counts the unpriced trail toward the 20 and toward N', () => {

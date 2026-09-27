@@ -970,6 +970,8 @@ describe('the Unrankable appendix', () => {
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.
     expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
+    expect(frame().style.display).toBe('flex');
+    expect(frame().style.flexDirection).toBe('column');
   });
 
   // Matrix: absent weights.

@@ -2,6 +2,7 @@ import type { UnrankableClass } from '@poe/core';
 import type { CSSProperties, JSX } from 'react';
 
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
+import { unitLabel } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
@@ -98,7 +99,7 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
       <div data-cell="class" style={{ ...cell(baseWidth), display: 'flex', alignItems: 'baseline' }}>
         <UnitGlyph unit="class" />
         <span data-appendix-class="" style={{ flex: '1 1 auto', minWidth: 0 }}>
-          {item.className}
+          {unitLabel(item.className)}
         </span>
       </div>
       <div data-cell="mark" style={cell(markWidth)}>

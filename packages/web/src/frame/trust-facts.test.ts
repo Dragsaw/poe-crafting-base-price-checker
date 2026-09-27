@@ -159,6 +159,20 @@ describe('the panel copy', () => {
     }
   });
 
+  it.each([
+    [0.862, '86%'],
+    [0.996, '99%'],
+    [1, '100%'],
+    [0.004, '1%'],
+    [0, '0%'],
+    [0.29, '29%'],
+    [1 - 1e-12, '99%'],
+    [0.01, '1%'],
+  ])('prints coverage %s as %s', (coverage, percent) => {
+    const [, , cover] = panelColumns(report({}, { coverage, rankableClassCount: 29 }), true);
+    expect(cover.map(groupText)).toEqual([`${percent} of 29 tracked Item Classes.`]);
+  });
+
   it('reads omitted coverage as not measured with weights loaded, unknown without, never 0', () => {
     const [, , loaded] = panelColumns(report(), true);
     const [, , absent] = panelColumns(report(), false);

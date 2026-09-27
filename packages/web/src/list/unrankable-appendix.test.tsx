@@ -105,6 +105,12 @@ describe('the non-empty appendix', () => {
     expect(count(panel).textContent).toBe('29 Item Classes');
   });
 
+  // Matrix: underscored class. The web trims at render time (AD-5).
+  it('prints an underscored class name with spaces', () => {
+    const panel = mountAppendix([klass('Body_Armours_dex_int')]);
+    expect(panel.querySelector('[data-appendix-class]')?.textContent).toBe('Body Armours dex int');
+  });
+
   it('leads each row with the class glyph, marks it unknown, and prints the reason verbatim with an empty note', () => {
     const panel = mountAppendix([klass('Bows'), klass('Wands')]);
     for (const row of Array.from(panel.querySelectorAll<HTMLElement>('[data-appendix-row]'))) {
