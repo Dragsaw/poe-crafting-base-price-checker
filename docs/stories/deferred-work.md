@@ -289,3 +289,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Update the "cache-busted" wording at `docs/epics.md:96` and `:995` to the ruled `no-store` fetch. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
   evidence: Retro F8, F9 and F19.
+
+## Deferred from: epic 2 retro item 20 (2026-09-27)
+
+- source_spec: `docs/stories/spec-epic-2-retro-item-20-order-the-honest-empty-rows-canonically.md`
+  summary: [NOTE FOR UX] EXPERIENCE.md state 23 says every EV cell in the honest-empty state holds *no figure yet*. That holds only for a pure league reset. In a mixed reset, where some entries already read `no-listings` in the new league, those rows keep the phrase *an open question* and now sit in canonical order among the *no figure yet* rows. State 23 needs a ruling on the mixed case: widen the wording, or state that a `no-listings` row keeps its own phrase.
+  evidence: Retro F3 names the wording (`docs/stories/epic-2-retro-2026-09-27.md:46`). Sprint item `epic-2-retro-item-24-…` and retro F15 cover only the raw row note, not the state 23 cell wording. The mixed-reset tests in `packages/web/src/list/display-rows.test.ts` and `packages/web/src/App.test.tsx` assert `no figure yet`, `an open question`, `no figure yet`, so a ruling that changes the phrase must update them.

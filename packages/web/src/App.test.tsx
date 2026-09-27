@@ -822,6 +822,35 @@ describe('the list statement', () => {
     expectChromeAround();
   });
 
+  // Matrix: mixed reset. A league reset mid-refill, where one entry already reads no-listings.
+  it('lists a mixed reset in canonical order across both unpriced groups, each row keeping its phrase', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const ring = rawEntry('Coral Ring');
+    const amulet = rawEntry('Gold Amulet');
+    serveBodies(
+      bodiesWith(
+        [belt, ring, amulet],
+        [
+          priced(belt, 1.5, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(ring, 0.8, hoursBefore(now, 30 * 24), 'Standard'),
+          unpriced(amulet, { state: 'no-listings' }, hoursBefore(now, 2)),
+        ],
+      ),
+    );
+    mount();
+    await settleTo('ready');
+    expect(statement()?.dataset['listStatement']).toBe('honest-empty');
+    expect(statement()?.textContent).toBe(
+      `In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE} yet.`,
+    );
+    // Canonical key order across the groups, not no-listings first.
+    expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
+    expect(numerals()).toEqual(['', '', '']);
+    expect(evCells()).toEqual(['no figure yet', 'an open question', 'no figure yet']);
+    expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
+  });
+
   // Matrix: partial refresh.
   it('ranks a partial refresh normally, with no statement', async () => {
     const now = Date.now();

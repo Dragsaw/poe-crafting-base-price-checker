@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
-import { honestEmptyCopy, listStatement, nothingClearsCopy } from './list-statement';
+import { honestEmptyCopy, isHonestEmpty, listStatement, nothingClearsCopy } from './list-statement';
 
 const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
@@ -49,6 +49,21 @@ describe('listStatement', () => {
     expect(statementFor([belt], [unpriced(belt, { state: 'no-listings' }, hoursBefore(NOW, 1))]).kind).toBe(
       'honest-empty',
     );
+  });
+
+  // Matrix: mixed reset.
+  it('is honest-empty when no-listings and not-yet-synced rows mix', () => {
+    const tracked = [belt, ring, amulet];
+    const dataset = [
+      priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
+      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+      unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+    ];
+    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weightsLoaded: true });
+    expect(ranking.noListings).toHaveLength(1);
+    expect(ranking.notYetSynced).toHaveLength(2);
+    expect(isHonestEmpty(ranking)).toBe(true);
+    expect(statementFor(tracked, dataset)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
   });
 
   // Matrix: partial refresh.

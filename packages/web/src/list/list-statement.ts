@@ -21,25 +21,35 @@ export function nothingClearsCopy(threshold: number): string {
 }
 
 /**
+ * State 23's predicate, the one definition the statement and the row order share:
+ * nothing is priced in the active league — `ordering` and `belowThreshold` are
+ * both empty — and the list still has an unpriced row to show. While it holds,
+ * `toDisplayRows` prints the unpriced rows in canonical key order, so the
+ * statement's "In canonical order" is true.
+ */
+export function isHonestEmpty(ranking: Ranking): boolean {
+  return (
+    ranking.ordering.length === 0 &&
+    ranking.belowThreshold.length === 0 &&
+    ranking.noListings.length + ranking.notYetSynced.length > 0
+  );
+}
+
+/**
  * A pure predicate over `core`'s ranking; it never re-ranks.
  *
- * - Honest-empty (state 23): nothing is priced in the active league — `ordering`
- *   and `belowThreshold` are both empty — and the list still has a row to show.
+ * - Honest-empty (state 23): when `isHonestEmpty` holds.
  * - Nothing-clears (state 25): something is priced, and all of it is below the
  *   threshold.
  * - Otherwise, including a partial refresh (state 24) and an empty Tracked
  *   List, the list makes no statement.
  */
 export function listStatement(ranking: Ranking, threshold: number, league: string): ListStatement {
-  if (ranking.ordering.length > 0) {
-    return { kind: 'none' };
-  }
-  if (ranking.belowThreshold.length > 0) {
-    return { kind: 'nothing-clears', text: nothingClearsCopy(threshold) };
-  }
-  // The rows the list prints when nothing is priced: `noListings` then `notYetSynced`.
-  if (ranking.noListings.length + ranking.notYetSynced.length > 0) {
+  if (isHonestEmpty(ranking)) {
     return { kind: 'honest-empty', text: honestEmptyCopy(league) };
+  }
+  if (ranking.ordering.length === 0 && ranking.belowThreshold.length > 0) {
+    return { kind: 'nothing-clears', text: nothingClearsCopy(threshold) };
   }
   return { kind: 'none' };
 }

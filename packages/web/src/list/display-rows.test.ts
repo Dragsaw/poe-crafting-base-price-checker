@@ -1,11 +1,12 @@
 import { rank } from '@poe/core';
-import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
+import { compareCanonicalKeys, type DatasetEntry, type RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { tierOf, toDisplayRows } from './display-rows';
 import { DEFAULT_THRESHOLD } from './format';
+import { isHonestEmpty } from './list-statement';
 
 const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
@@ -42,6 +43,83 @@ describe('toDisplayRows', () => {
     ]);
     expect(rows.map((row) => row.ev.kind)).toEqual(['figure', 'figure', 'phrase', 'phrase']);
     expect(rows.every((row) => row.unit === 'raw' && row.itemLevel === 82)).toBe(true);
+  });
+
+  // Matrix: mixed reset. A league reset mid-refill: some entries already read no-listings.
+  it('prints an honest-empty list in canonical key order across both unpriced groups', () => {
+    const ring = rawEntry('Coral Ring');
+    const amulet = rawEntry('Gold Amulet');
+    const belt = rawEntry('Wide Belt');
+    // Lowercase-initial: last by code unit, first by locale — pins the comparator.
+    const amber = rawEntry('amber Ring');
+    const rows = rowsFor(
+      [amber, belt, amulet, ring],
+      [
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
+        unpriced(amber, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+      ],
+    );
+    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.state.state])).toEqual([
+      ['Coral Ring', undefined, 'no figure yet', 'not-yet-synced'],
+      ['Gold Amulet', undefined, 'an open question', 'no-listings'],
+      ['Wide Belt', undefined, 'no figure yet', 'not-yet-synced'],
+      ['amber Ring', undefined, 'an open question', 'no-listings'],
+    ]);
+    const keys = rows.map((row) => row.key);
+    expect(keys).toEqual(keys.toSorted(compareCanonicalKeys));
+    expect(rows.every((row) => row.ev.kind === 'phrase' && row.tier === 3)).toBe(true);
+  });
+
+  // Matrix: partial refresh. A ranked row prints, so the unpriced groups stay as option a.
+  it('keeps the unpriced rows grouped, noListings then notYetSynced, on a partial refresh', () => {
+    const solar = rawEntry('Solar Amulet');
+    const ring = rawEntry('Coral Ring');
+    const amulet = rawEntry('Gold Amulet');
+    const belt = rawEntry('Wide Belt');
+    const rows = rowsFor(
+      [belt, amulet, ring, solar],
+      [
+        priced(solar, 1.25, hoursBefore(NOW, 1)),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+      ],
+    );
+    expect(rows.map((row) => [row.label, row.numeral, row.ev.text])).toEqual([
+      ['Solar Amulet', 1, '1.25'],
+      ['Gold Amulet', undefined, 'an open question'],
+      ['Coral Ring', undefined, 'no figure yet'],
+      ['Wide Belt', undefined, 'no figure yet'],
+    ]);
+  });
+
+  // Matrix: nothing clears. No order claim prints, so the groups stay as option a.
+  it('keeps the unpriced rows grouped, noListings then notYetSynced, when nothing clears', () => {
+    const cheap = rawEntry('Iron Ring');
+    const ring = rawEntry('Coral Ring');
+    const amulet = rawEntry('Gold Amulet');
+    const belt = rawEntry('Wide Belt');
+    const dataset = [
+      priced(cheap, 0.1, hoursBefore(NOW, 1)),
+      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+      unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+    ];
+    const ranking = rank({
+      tracked: [belt, amulet, ring, cheap],
+      dataset,
+      activeLeague: TEST_LEAGUE,
+      threshold: DEFAULT_THRESHOLD,
+      weightsLoaded: true,
+    });
+    expect(ranking.belowThreshold.length).toBeGreaterThan(0);
+    expect(isHonestEmpty(ranking)).toBe(false);
+    const rows = toDisplayRows(ranking, dataset, NOW);
+    expect(rows.map((row) => [row.label, row.ev.text])).toEqual([
+      ['Gold Amulet', 'an open question'],
+      ['Coral Ring', 'no figure yet'],
+      ['Wide Belt', 'no figure yet'],
+    ]);
   });
 
   it('drops unresolvable and below-threshold entries, and gives a league mismatch its observation age', () => {

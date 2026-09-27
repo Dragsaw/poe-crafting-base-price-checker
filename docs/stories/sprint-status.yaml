@@ -214,8 +214,8 @@ action_items:
     action: "Order the honest-empty rows canonically across the no-listings and not-yet-synced
       groups, or reword 'In canonical order'; add a mixed-group test (retro F3)"
     owner: "dev"
-    status: open
-    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+    status: done
+    ref: "docs/stories/spec-epic-2-retro-item-20-order-the-honest-empty-rows-canonically.md"
   - id: "epic-2-retro-item-21-configure-a-git-remote-set-pages-source"
     epic: 2
     action: "Configure a git remote, set Pages source to GitHub Actions, run deploy.yml
