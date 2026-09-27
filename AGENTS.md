@@ -22,7 +22,8 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 - Browser work needs a named session. Run `agent-browser session id --scope worktree --prefix poe`. Put the printed id before each subcommand: `agent-browser --session <id> open <url>`. The unnamed default session is one browser for every agent on this machine.
 - The agent-browser documentation sets that id with `export AGENT_BROWSER_SESSION="$(...)"`. Do not use that form. Shell state does not carry between tool calls, so the variable is empty in the next call and agent-browser falls back to the shared default session. Pass `--session <id>` on each call.
 - `pnpm dev` binds port 5173 with `strictPort`. A taken port gives a loud bind failure, and Vite does not move to the next port. To use a different port, run `pnpm dev --port <n>`. Do not edit `packages/web/vite.config.ts`.
-- `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. Stop it after use. The repository ships no supervisor.
+- `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. The repository ships no supervisor.
+- Stop it with `pnpm dev:stop`, and give `--port <n>` if you started it on another port. Run this even after you stop the background task. On Windows, a task stop kills only the top process, and Vite keeps the port. `pnpm dev:stop` kills the whole `pnpm dev` process tree and exits 1 if the port stays taken. It refuses a listener that is not the Vite of this checkout, for example the server of another worktree.
 
 ## Conventions that differ from defaults
 

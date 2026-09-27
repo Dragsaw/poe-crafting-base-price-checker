@@ -12,6 +12,7 @@
   "include": [
     "test/**/*.ts",
     "tools/boundary-check/*.ts",
+    "tools/dev-stop/*.ts",
     "tools/dts-specifiers/*.ts",
     "tools/prune-pages.mjs",
     ".claude/skills/tracked-json/scripts/*.ts",
