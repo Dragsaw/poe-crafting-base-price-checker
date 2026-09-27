@@ -2,7 +2,13 @@ import { createFakeClockPort, createFakeHttpPort } from '@poe/contracts';
 import type { HttpResponse } from '@poe/contracts';
 import { expect, it } from 'vitest';
 
-import { createTradeClient, createTradeClients } from './client.ts';
+import {
+  createPacingState,
+  createTradeClient,
+  createTradeClients,
+  createTradeGovernor,
+  laneDelayMs,
+} from './client.ts';
 import { MissingUserAgentError, USER_AGENT_ENV_VAR } from './user-agent.ts';
 
 /**
@@ -648,4 +654,102 @@ it('refuses sibling clients at construction when the contact User-Agent is blank
       userAgent: '  ',
     }),
   ).toThrow(MissingUserAgentError);
+});
+
+// The governor and its shared pacing state (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+const MEASURED_SEARCH_HEADERS = {
+  'x-rate-limit-policy': SEARCH_POLICY,
+  'x-rate-limit-rules': 'Ip',
+  'x-rate-limit-ip': '5:10:60,30:300:1800,600:21600:3600',
+  'x-rate-limit-ip-state': '1:10:0,20:300:0,100:21600:0',
+};
+
+it('spreads the next search evenly when asked to, and never without', async () => {
+  const fixtures = { [`POST ${SEARCH_URL}`]: response(200, MEASURED_SEARCH_HEADERS) };
+  const spread = recordingWait();
+  const spreadGovernor = createTradeGovernor({
+    http: { only: createFakeHttpPort(fixtures) },
+    clock: createFakeClockPort(NOW),
+    wait: spread.wait,
+    userAgent: CONTACT,
+    spread: true,
+  });
+  const batch = recordingWait();
+  const batchClients = createTradeClients({
+    http: { only: createFakeHttpPort(fixtures) },
+    clock: createFakeClockPort(NOW),
+    wait: batch.wait,
+    userAgent: CONTACT,
+  });
+
+  for (let sent = 0; sent < 2; sent += 1) {
+    await spreadGovernor.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+    await batchClients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  }
+
+  // Cold first, then max(300 000 / 10, 21 600 000 / 500).
+  expect(spread.waits).toEqual([43_200]);
+  expect(batch.waits).toEqual([]);
+});
+
+it('shares one pacing state across governors, so a fresh governor starts warm', async () => {
+  const fixtures = { [`POST ${SEARCH_URL}`]: response(200, MEASURED_SEARCH_HEADERS) };
+  const pacing = createPacingState();
+  const clock = createFakeClockPort(NOW);
+  const first = createTradeGovernor({
+    http: { only: createFakeHttpPort(fixtures) },
+    clock,
+    wait: () => Promise.resolve(),
+    userAgent: CONTACT,
+    pacing,
+    spread: true,
+  });
+  await first.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+
+  const { waits, wait } = recordingWait();
+  const second = createTradeGovernor({
+    http: { only: createFakeHttpPort(fixtures) },
+    clock,
+    wait,
+    userAgent: CONTACT,
+    pacing,
+    spread: true,
+  });
+  expect(second.pacing).toBe(pacing);
+  expect(second.delayBeforeMs('search')).toBe(43_200);
+  expect(laneDelayMs(pacing, 'search', NOW, true)).toBe(43_200);
+  // The batch pacer on the same reading sees every bucket satisfied.
+  expect(laneDelayMs(pacing, 'search', NOW, false)).toBe(0);
+  // A lane with no known policy goes out cold.
+  expect(second.delayBeforeMs('fetch')).toBe(0);
+
+  clock.set('2026-09-20T12:00:10.000Z');
+  await second.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  expect(waits).toEqual([33_200]);
+});
+
+it('keeps invalid-request counts per governor, so one 4xx does not close a policy for the next', async () => {
+  const pacing = createPacingState();
+  const first = createTradeGovernor({
+    http: { only: createFakeHttpPort({ [`POST ${SEARCH_URL}`]: response(400, CLEAR_SEARCH_HEADERS) }) },
+    clock: createFakeClockPort(NOW),
+    wait: () => Promise.resolve(),
+    userAgent: CONTACT,
+    invalidRequestThreshold: 1,
+    pacing,
+  });
+  await first.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  const refused = await first.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  expect(refused.kind).toBe('yield');
+
+  const second = createTradeGovernor({
+    http: { only: createFakeHttpPort({ [`POST ${SEARCH_URL}`]: response(200, CLEAR_SEARCH_HEADERS) }) },
+    clock: createFakeClockPort(NOW),
+    wait: () => Promise.resolve(),
+    userAgent: CONTACT,
+    invalidRequestThreshold: 1,
+    pacing,
+  });
+  const answered = await second.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  expect(answered.kind).toBe('response');
 });

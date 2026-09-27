@@ -257,3 +257,12 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
   summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
   evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.
+
+## Deferred from: spec-sync-continuous (2026-09-27)
+
+- source_spec: `docs/stories/spec-sync-continuous.md`
+  summary: "Note. `pnpm sync` is now the long-running session, and the one-chunk command moved to `pnpm sync:batch` (`packages/sync/src/sync-batch.ts`). An open entry written before 2026-09-27 that names `pnpm sync` or `packages/sync/src/sync.ts` for the one-chunk command now means `pnpm sync:batch` and `sync-batch.ts`. The entries themselves are not edited."
+  evidence: Spec `spec-sync-continuous.md`, Code Map. `package.json` scripts `sync` and `sync:batch`.
+- source_spec: `docs/stories/spec-sync-continuous.md`
+  summary: "[NOTE FOR ARCHITECT] Two owner-document sentences no longer match the code. First, `IMPLEMENTATION-NOTES.md` §5.3 *Penalty memory across processes* says \"Two chunk endings write a `notBefore` … and nothing else does\", and spine AD-8 names only the 429 and the malformed-request abort. But the gate's non-429 4xx (`LeagueRequestRejectedError`) now writes the abort `notBefore` (`now + staleLockAfter`) in both `pnpm sync` and `pnpm sync:batch`. Second, spine AD-7 says the session's lock \"is never held across a wait\", but the in-chunk spread waits between fetches do hold it. The sentence means a session wait."
+  evidence: Review Triage Log row 33. `packages/sync/src/chunk/run-chunk.ts` failure path (`rejected ? notBeforeAfterAbort(...)`), and the run-chunk test that expects `notBefore: '2026-09-26T18:00:00.000Z'` after a gate 4xx. The Review brief (`AGENT-WORKFLOW.md`) forbids a triager to edit the owner document.

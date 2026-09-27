@@ -12,42 +12,67 @@ import {
 } from '@poe/contracts';
 import type {
   DatasetEntry,
+  FakeClockPort,
   FakeFilesystemPort,
-  FilesystemPort,
+  HttpPort,
   HttpResponse,
   SyncReportFile,
   TrackedEntry,
 } from '@poe/contracts';
 import { describe, expect, it, vi } from 'vitest';
 
-import { LOCK_PATH, serialiseLock } from './chunk/lock.ts';
-import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
-import { LeagueMismatchError } from './league/league-gate.ts';
-import { runSync, syncCommand } from './sync.ts';
-import type { SyncCommandDeps } from './sync.ts';
+import { LOCK_PATH, serialiseLock, STALE_LOCK_AFTER_MS } from './chunk/lock.ts';
+import type { ChunkOutcome } from './chunk/run-chunk.ts';
+import { DATASET_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
+import { LeagueMismatchError, LeagueRequestRejectedError } from './league/league-gate.ts';
+import { DataFileError } from './load-data-file.ts';
+import { MalformedRequestError, UnexpectedTradeResponseError } from './pricing/price-entry.ts';
+import { zeroRequests } from './request-counter.ts';
+import { abortableSleep } from './shell.ts';
+import {
+  backoffMs,
+  COLD_EVEN_INTERVAL_MS,
+  gateDue,
+  INITIAL_SESSION_STATE,
+  inputSignature,
+  lockIsFree,
+  LOCAL_POLL_MS,
+  nextState,
+  nextWait,
+  parseArgs,
+  preWaitMs,
+  runWait,
+  sessionEvenIntervalMs,
+  syncSessionCommand,
+} from './sync.ts';
+import type { ChunkContext, ChunkResult, SessionState, SyncSessionDeps } from './sync.ts';
+import { createPacingState } from './trade/client.ts';
 import type * as TradeClientModule from './trade/client.ts';
-import { TRADE_LEAGUES_URL, tradeSearchUrl } from './trade/endpoints.ts';
+import { DATA_LANE, FETCH_LANE, SEARCH_LANE, TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
+import { recordObservation } from './trade/ledger.ts';
+import { parseRateLimitHeaders } from './trade/rate-limit-headers.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 
-/** Every option set the shell built its trade clients with, in build order. */
-const tradeClientOptions = vi.hoisted((): unknown[] => []);
+/** Every option set a chunk built its governor with, in build order. */
+const governorOptions = vi.hoisted((): Record<string, unknown>[] => []);
 
-// A pass-through: the real clients are built, and the options are recorded so
-// a test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// A pass-through: the real governor is built, and the options are recorded so
+// a test can inspect what the session passed (AD-8).
 vi.mock('./trade/client.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof TradeClientModule>();
   return {
     ...actual,
-    createTradeClients: (options: Parameters<typeof actual.createTradeClients>[0]) => {
-      tradeClientOptions.push(options);
-      return actual.createTradeClients(options);
+    createTradeGovernor: (options: Parameters<typeof actual.createTradeGovernor>[0]) => {
+      governorOptions.push(options as unknown as Record<string, unknown>);
+      return actual.createTradeGovernor(options);
     },
   };
 });
 
 /**
- * The live `pnpm sync` composition, driven with injected ports. Nothing here
- * runs the command itself, touches the network, or writes under `data/`.
+ * The `pnpm sync` session, driven with injected ports and a fake clock that
+ * each session wait advances. Nothing here runs the command itself, touches
+ * the network, or writes under `data/`.
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -58,17 +83,29 @@ const NOW = '2026-09-26T12:00:00.000Z';
 const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
 
 const ENTRY: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' };
+const SECOND: TrackedEntry = { ...ENTRY, itemLevelMin: 83 };
+
+const LEAGUES_BODY = JSON.stringify({
+  result: [
+    { id: 'Standard', realm: 'poe2', text: 'Standard' },
+    { id: LEAGUE, realm: 'poe2', text: LEAGUE },
+  ],
+});
+const NO_RESULTS = JSON.stringify({ id: 'S0', complexity: 1, result: [], total: 0 });
 
 function inputs(
-  league: string,
-  tracked: readonly TrackedEntry[] = [ENTRY],
+  tracked: readonly TrackedEntry[],
+  minChunkSearches = 1,
 ): Parameters<typeof createFakeFilesystemPort>[0] {
   return {
     [TRACKED_PATH]: {
       contents: JSON.stringify({ schemaVersion: '1.0.0', entries: tracked }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league, minChunkSearches: 1 }) },
+    'data/config.json': {
+      contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches }),
+      modifiedAt: '2026-09-20T07:00:00.000Z',
+    },
     'data/currencies.json': {
       contents: JSON.stringify({
         schemaVersion: '1.0.0',
@@ -87,406 +124,716 @@ function inputs(
   };
 }
 
-const LEAGUES_BODY = JSON.stringify({
-  result: [
-    { id: 'Standard', realm: 'poe2', text: 'Standard' },
-    { id: LEAGUE, realm: 'poe2', text: LEAGUE },
-  ],
-});
-
-interface Answers {
-  readonly leagues?: HttpResponse;
-  readonly search?: HttpResponse;
-}
-
-const THROTTLED: HttpResponse = { status: 429, headers: { 'retry-after': '60' }, body: '' };
-
-function httpFor(league: string, answers: Answers = {}) {
-  return createFakeHttpPort({
-    [`GET ${TRADE_LEAGUES_URL}`]: answers.leagues ?? { status: 200, headers: {}, body: LEAGUES_BODY },
-    [`POST ${tradeSearchUrl(league)}`]: answers.search ?? {
-      status: 200,
-      headers: {},
-      body: JSON.stringify({ id: 'S0', complexity: 1, result: [], total: 0 }),
-    },
-  });
-}
-
-/** A fake filesystem that records every path written through it. */
-function recording(fs: FakeFilesystemPort): { readonly fs: FakeFilesystemPort; readonly writes: string[] } {
-  const writes: string[] = [];
+function headers(policy: string, rule: string, state: string): Record<string, string> {
   return {
-    writes,
-    fs: {
-      ...fs,
-      writeTextFile: (path, contents) => {
-        writes.push(path);
-        return fs.writeTextFile(path, contents);
-      },
-    },
+    'x-rate-limit-policy': policy,
+    'x-rate-limit-rules': 'Ip',
+    'x-rate-limit-ip': rule,
+    'x-rate-limit-ip-state': state,
   };
 }
 
-interface Setup {
-  readonly env?: Record<string, string | undefined>;
-  readonly answers?: Answers;
-  /** Files seeded beside the inputs, e.g. a published dataset or a live lock. */
-  readonly seeded?: Parameters<typeof createFakeFilesystemPort>[0];
-  /** The tracked entries; one `ENTRY` by default. */
+interface SessionSetup {
   readonly tracked?: readonly TrackedEntry[];
-  readonly wait?: (ms: number) => Promise<void>;
+  readonly minChunkSearches?: number;
+  readonly seeded?: Parameters<typeof createFakeFilesystemPort>[0];
+  readonly fixtures?: Readonly<Record<string, HttpResponse>>;
+  /** Replaces the fake http port, e.g. to fail with a network error. */
+  readonly http?: (fake: ReturnType<typeof createFakeHttpPort>) => HttpPort;
+  readonly env?: Record<string, string | undefined>;
+  readonly argv?: readonly string[];
+  /** The session stops after this many chunk lines (stdout outcome or stderr error). */
+  readonly stopAfter?: number;
 }
 
-function depsFor(league: string, setup: Setup = {}) {
-  const env = setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT };
-  const recorded = recording(createFakeFilesystemPort({ ...inputs(league, setup.tracked), ...setup.seeded }));
-  const http = httpFor(league, setup.answers);
-  const out: string[] = [];
+const OUTCOME_LINE = /^pnpm sync: (completed|bounded|yielded|busy|deferred|dispossessed)/;
+
+function sessionFor(setup: SessionSetup = {}) {
+  const fs = createFakeFilesystemPort({
+    ...inputs(setup.tracked ?? [ENTRY], setup.minChunkSearches),
+    ...setup.seeded,
+  });
+  const clock = createFakeClockPort(NOW);
+  const fake = createFakeHttpPort({
+    [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
+    [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: NO_RESULTS },
+    ...setup.fixtures,
+  });
+  const http = setup.http === undefined ? fake : setup.http(fake);
+  const controller = new AbortController();
+  const out: { readonly line: string; readonly at: string }[] = [];
   const err: string[] = [];
-  const deps: SyncCommandDeps = {
-    fs: recorded.fs,
-    clock: createFakeClockPort(NOW),
+  /** The session's waits, in order. Each advances the fake clock. */
+  const sleeps: number[] = [];
+  /** The in-chunk waits the governor asked for. */
+  const waits: number[] = [];
+  const stopAfter = setup.stopAfter ?? 1;
+  let chunks = 0;
+  const countChunk = (): void => {
+    chunks += 1;
+    if (chunks >= stopAfter) {
+      controller.abort();
+    }
+  };
+  const deps: SyncSessionDeps = {
+    fs,
+    clock,
     http,
     git: createFakeGitPort(),
-    wait: setup.wait ?? (() => Promise.resolve()),
+    wait: (ms) => {
+      waits.push(ms);
+      clock.set(new Date(Date.parse(clock.now()) + ms).toISOString());
+      return Promise.resolve();
+    },
+    sleep: (ms) => {
+      sleeps.push(ms);
+      clock.set(new Date(Date.parse(clock.now()) + ms).toISOString());
+      // A guard against a test that never stops.
+      if (sleeps.length > 200) {
+        controller.abort();
+      }
+      return Promise.resolve();
+    },
     pid: 4242,
     log: () => undefined,
-    env,
-    stdout: (line) => out.push(line),
-    stderr: (line) => err.push(line),
+    env: setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT },
+    argv: setup.argv ?? [],
+    signal: controller.signal,
+    stdout: (line) => {
+      out.push({ line, at: clock.now() });
+      if (OUTCOME_LINE.test(line)) {
+        countChunk();
+      }
+    },
+    stderr: (line) => {
+      err.push(line);
+      countChunk();
+    },
   };
-  return { deps, fs: recorded.fs, writes: recorded.writes, http, out, err };
+  return { deps, fs, clock, http: fake, out, err, sleeps, waits, controller };
 }
 
-async function reportOf(fs: FilesystemPort): Promise<SyncReportFile | undefined> {
+async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
   const text = await fs.readTextFile(REPORT_PATH);
   return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
 }
 
-describe('pnpm sync: the live composition with injected ports', () => {
-  it('runs the gate first, then the pricing step as the chunk step, and exits 0', async () => {
-    const { deps, fs, http, out } = depsFor(LEAGUE);
+const lines = (out: readonly { readonly line: string }[]): string[] => out.map((entry) => entry.line);
 
-    expect(await syncCommand(deps)).toBe(0);
+/** The duration each matching wait line announced, from the instant it was printed. */
+function announced(out: readonly { readonly line: string; readonly at: string }[], reason: string): number[] {
+  return out
+    .filter((entry) => entry.line.includes(`(${reason}`))
+    .map((entry) => {
+      const until = /waiting until (\S+)/.exec(entry.line)?.[1] ?? '';
+      return Date.parse(until) - Date.parse(entry.at);
+    });
+}
 
+const networkDown = (): HttpPort => ({
+  send: () => Promise.reject(new TypeError('fetch failed')),
+});
+
+// ---------------------------------------------------------------------------
+
+describe('parseArgs', () => {
+  it('defaults the pinned maximum age to 4 hours', () => {
+    expect(parseArgs([])).toEqual({ ok: true, options: { pinnedMaxAgeMs: 4 * 3_600_000 } });
+  });
+
+  it('reads --pinned-max-age in hours and skips a literal --', () => {
+    expect(parseArgs(['--', '--pinned-max-age', '2'])).toEqual({
+      ok: true,
+      options: { pinnedMaxAgeMs: 2 * 3_600_000 },
+    });
+  });
+
+  it.each([[['--pinned-max-age']], [['--pinned-max-age', '0']], [['--pinned-max-age', 'x']], [['--nope']]])(
+    'refuses %j',
+    (argv) => {
+      expect(parseArgs(argv)).toMatchObject({ ok: false });
+    },
+  );
+});
+
+describe('nextWait: the session matrix', () => {
+  const COLD: ChunkContext = { now: NOW, freshReading: false, evenIntervalMs: COLD_EVEN_INTERVAL_MS };
+  const base = { completed: [], entries: [], records: [] };
+  const outcome = (value: ChunkOutcome): ChunkResult => ({ kind: 'outcome', outcome: value });
+  const failure = (error: unknown): ChunkResult => ({ kind: 'error', error });
+  const at = (ms: number): string => new Date(Date.parse(NOW) + ms).toISOString();
+
+  it('5xx or timeout with a State reading: continue, the spread paces the retry', () => {
+    expect(nextWait(outcome({ ...base, kind: 'yielded' }), INITIAL_SESSION_STATE, { ...COLD, freshReading: true })).toEqual({
+      kind: 'none',
+    });
+  });
+
+  it('no answer on a cold lane: 36 s, then 72 s, then back to 36 s after a reading', () => {
+    const noAnswer = outcome({ ...base, kind: 'yielded', newPass: false });
+    const first = nextWait(noAnswer, INITIAL_SESSION_STATE, COLD);
+    expect(first).toEqual({ kind: 'until', until: at(36_000), reason: 'no answer', orInputChange: false });
+
+    const once = nextState(INITIAL_SESSION_STATE, noAnswer, COLD, { signature: 's', before: zeroRequests() });
+    expect(nextWait(noAnswer, once, COLD)).toMatchObject({ until: at(72_000) });
+
+    const twice = nextState(once, noAnswer, COLD, { signature: 's', before: zeroRequests() });
+    const read = nextState(twice, outcome({ ...base, kind: 'bounded', bound: 'entries', newPass: false }), {
+      ...COLD,
+      freshReading: true,
+    }, { signature: 's', before: zeroRequests() });
+    expect(read.backoffCount).toBe(0);
+    expect(nextWait(noAnswer, read, COLD)).toMatchObject({ until: at(36_000) });
+  });
+
+  it('caps the backoff at the 6 h stale threshold', () => {
+    expect(backoffMs(COLD_EVEN_INTERVAL_MS, 30)).toBe(STALE_LOCK_AFTER_MS);
+  });
+
+  it('other throw: until an input change, or at most the backoff', () => {
+    for (const error of [new UnexpectedTradeResponseError('k', 'search', 'bad'), Object.assign(new Error('EBUSY'), { code: 'EBUSY' })]) {
+      expect(nextWait(failure(error), INITIAL_SESSION_STATE, COLD)).toEqual({
+        kind: 'input-change',
+        reason: 'an unexpected failure',
+        until: at(36_000),
+      });
+    }
+  });
+
+  it('429: until the notBefore the chunk wrote', () => {
+    expect(
+      nextWait(outcome({ ...base, kind: 'yielded' }), INITIAL_SESSION_STATE, { ...COLD, notBefore: at(60_000) }),
+    ).toEqual({ kind: 'until', until: at(60_000), reason: 'a 429', orInputChange: false });
+  });
+
+  it('penalty: a deferred chunk waits until its notBefore', () => {
+    expect(nextWait(outcome({ ...base, kind: 'deferred', notBefore: at(5_000) }), INITIAL_SESSION_STATE, COLD)).toEqual({
+      kind: 'until',
+      until: at(5_000),
+      reason: 'a trade penalty',
+      orInputChange: false,
+    });
+  });
+
+  it('gate 4xx: until the abort notBefore, not ended by an input change', () => {
+    expect(
+      nextWait(failure(new LeagueRequestRejectedError(404)), INITIAL_SESSION_STATE, {
+        ...COLD,
+        notBefore: at(STALE_LOCK_AFTER_MS),
+      }),
+    ).toMatchObject({ kind: 'until', until: at(STALE_LOCK_AFTER_MS), orInputChange: false });
+  });
+
+  it('malformed request: until the abort notBefore, or an input change if sooner', () => {
+    expect(
+      nextWait(failure(new MalformedRequestError('k', 'search', 400, undefined as never)), INITIAL_SESSION_STATE, {
+        ...COLD,
+        notBefore: at(STALE_LOCK_AFTER_MS),
+      }),
+    ).toMatchObject({ kind: 'until', until: at(STALE_LOCK_AFTER_MS), orInputChange: true });
+  });
+
+  it('refusal or league mismatch: until an input file changes, with no time bound', () => {
+    for (const error of [new DataFileError('data/config.json', 'absent', 'the file is absent'), new LeagueMismatchError('X', [])]) {
+      expect(nextWait(failure(error), INITIAL_SESSION_STATE, COLD)).toEqual({
+        kind: 'input-change',
+        reason: 'a refused input or a league mismatch',
+      });
+    }
+  });
+
+  it('a refused sync-owned file is not watched, so it takes the other-throw backoff', () => {
+    const error = new DataFileError(DATASET_PATH, 'invalid', 'invalid: entries');
+    expect(nextWait(failure(error), INITIAL_SESSION_STATE, COLD)).toEqual({
+      kind: 'input-change',
+      reason: 'an unexpected failure',
+      until: at(36_000),
+    });
+  });
+
+  it('a throw keeps the confirmed league, except a league mismatch', () => {
+    const confirmed: SessionState = { ...INITIAL_SESSION_STATE, confirmedLeague: LEAGUE, confirmedSignature: 's' };
+    const iteration = { signature: 's', before: zeroRequests() };
+    const transient = nextState(confirmed, failure(new Error('EBUSY')), COLD, iteration);
+    expect(transient).toEqual({ ...confirmed, backoffCount: 1 });
+    const mismatch = nextState(confirmed, failure(new LeagueMismatchError('X', [])), COLD, iteration);
+    expect(mismatch.confirmedLeague).toBeUndefined();
+    expect(mismatch.backoffCount).toBe(0);
+  });
+
+  it('a malformed request with no notBefore doubles its backoff like any other throw', () => {
+    const malformed = failure(new MalformedRequestError('k', 'search', 400, undefined as never));
+    const once = nextState(INITIAL_SESSION_STATE, malformed, COLD, { signature: 's', before: zeroRequests() });
+    expect(once.backoffCount).toBe(1);
+    expect(nextWait(malformed, once, COLD)).toMatchObject({ until: at(72_000) });
+  });
+
+  it('nothing due: until an input change, or at most the unresolvable retry interval', () => {
+    expect(nextWait(outcome({ ...base, kind: 'completed' }), INITIAL_SESSION_STATE, COLD)).toEqual({
+      kind: 'input-change',
+      reason: 'nothing due',
+      until: at(24 * 3_600_000),
+    });
+  });
+
+  it('an entry completed or bounded: continue', () => {
+    expect(nextWait(outcome({ ...base, completed: ['k'], kind: 'completed' }), INITIAL_SESSION_STATE, COLD)).toEqual({ kind: 'none' });
+    expect(nextWait(outcome({ ...base, kind: 'bounded', bound: 'entries' }), INITIAL_SESSION_STATE, COLD)).toEqual({ kind: 'none' });
+  });
+
+  it('lock held: poll the lock file', () => {
+    expect(nextWait(outcome({ ...base, kind: 'busy' }), INITIAL_SESSION_STATE, COLD)).toMatchObject({ kind: 'lock' });
+    expect(nextWait(outcome({ ...base, kind: 'dispossessed' }), INITIAL_SESSION_STATE, COLD)).toMatchObject({ kind: 'lock' });
+  });
+});
+
+describe('the gate-due pre-wait', () => {
+  const DATA_POLICY = 'data-policy';
+
+  it('is due with no confirmed league, after a completed pass, and after an input change', () => {
+    const confirmed: SessionState = { ...INITIAL_SESSION_STATE, confirmedLeague: LEAGUE, confirmedSignature: 's' };
+    expect(gateDue(INITIAL_SESSION_STATE, 's')).toBe(true);
+    expect(gateDue(confirmed, 's')).toBe(false);
+    expect(gateDue({ ...confirmed, passEnded: true }, 's')).toBe(true);
+    expect(gateDue(confirmed, 't')).toBe(true);
+  });
+
+  it('includes DATA_LANE only when the gate is due', () => {
+    const pacing = createPacingState();
+    pacing.ledger = recordObservation(
+      pacing.ledger,
+      parseRateLimitHeaders(headers(DATA_POLICY, '10:100:60', '5:100:0')),
+      NOW,
+    );
+    pacing.lanePolicies.set(DATA_LANE, DATA_POLICY);
+
+    expect(preWaitMs(pacing, NOW, true)).toBe(20_000);
+    expect(preWaitMs(pacing, NOW, false)).toBe(0);
+    // A cold lane counts as the measured 36 s for the backoff.
+    expect(sessionEvenIntervalMs(pacing, false)).toBe(COLD_EVEN_INTERVAL_MS);
+    pacing.lanePolicies.set(SEARCH_LANE, DATA_POLICY);
+    pacing.lanePolicies.set(FETCH_LANE, DATA_POLICY);
+    expect(sessionEvenIntervalMs(pacing, false)).toBe(10_000);
+  });
+});
+
+describe('runWait and the local polls', () => {
+  function waitPorts(fs: FakeFilesystemPort, clock: FakeClockPort, step = LOCAL_POLL_MS) {
+    const controller = new AbortController();
+    const sleeps: number[] = [];
+    return {
+      controller,
+      sleeps,
+      ports: {
+        fs,
+        clock,
+        signal: controller.signal,
+        sleep: (ms: number) => {
+          sleeps.push(ms);
+          clock.set(new Date(Date.parse(clock.now()) + Math.min(ms, step)).toISOString());
+          return Promise.resolve();
+        },
+      },
+    };
+  }
+
+  it('an other-throw wait ends at the backoff', async () => {
+    const fs = createFakeFilesystemPort(inputs([ENTRY]));
+    const clock = createFakeClockPort(NOW);
+    const { ports } = waitPorts(fs, clock);
+    const until = new Date(Date.parse(NOW) + 36_000).toISOString();
+
+    await runWait({ kind: 'input-change', reason: 'r', until }, ports, await inputSignature(fs));
+
+    expect(clock.now()).toBe(until);
+  });
+
+  it('an other-throw wait ends at an input change, if that is sooner', async () => {
+    const fs = createFakeFilesystemPort(inputs([ENTRY]));
+    const clock = createFakeClockPort(NOW);
+    const { ports, sleeps } = waitPorts(fs, clock);
+    const signature = await inputSignature(fs);
+    const edit = ports.sleep;
+    const until = new Date(Date.parse(NOW) + 36_000).toISOString();
+
+    await runWait(
+      { kind: 'input-change', reason: 'r', until },
+      {
+        ...ports,
+        sleep: async (ms) => {
+          await edit(ms);
+          fs.setFile('data/config.json', { contents: '{}', modifiedAt: clock.now() });
+        },
+      },
+      signature,
+    );
+
+    expect(sleeps).toHaveLength(1);
+    expect(clock.now()).toBe(new Date(Date.parse(NOW) + LOCAL_POLL_MS).toISOString());
+  });
+
+  it('a held lock that ages past 6 h ends the wait', async () => {
+    const fs = createFakeFilesystemPort({ [LOCK_PATH]: { contents: serialiseLock({ pid: 99, startedAt: NOW }) } });
+    const clock = createFakeClockPort(NOW);
+    const { ports } = waitPorts(fs, clock, 3_600_000);
+
+    expect(await lockIsFree(fs, clock)).toBe(false);
+    await runWait({ kind: 'lock', reason: 'r' }, ports, '');
+
+    expect(Date.parse(clock.now()) - Date.parse(NOW)).toBeGreaterThan(STALE_LOCK_AFTER_MS);
+    expect(await lockIsFree(fs, clock)).toBe(true);
+  });
+
+  it('an unreadable lock is free only once its file time is stale', async () => {
+    const clock = createFakeClockPort(NOW);
+    const recent = createFakeFilesystemPort({ [LOCK_PATH]: { contents: '', modifiedAt: NOW } });
+    const old = createFakeFilesystemPort({ [LOCK_PATH]: { contents: '', modifiedAt: '2026-09-26T05:00:00.000Z' } });
+    const untimed = createFakeFilesystemPort({ [LOCK_PATH]: { contents: '' } });
+
+    expect(await lockIsFree(recent, clock)).toBe(false);
+    expect(await lockIsFree(old, clock)).toBe(true);
+    expect(await lockIsFree(untimed, clock)).toBe(false);
+    expect(await lockIsFree(createFakeFilesystemPort(), clock)).toBe(true);
+  });
+
+  it('a lock read that throws is not free, and an input read that throws still signs', async () => {
+    const fs = createFakeFilesystemPort(inputs([ENTRY]));
+    const broken: FakeFilesystemPort = {
+      ...fs,
+      readTextFile: () => Promise.reject(new Error('EPERM')),
+      lastModifiedAt: () => Promise.reject(new Error('EBUSY')),
+    };
+
+    expect(await lockIsFree(broken, createFakeClockPort(NOW))).toBe(false);
+    await expect(inputSignature(broken)).resolves.toContain('error');
+  });
+
+  it('a wait cancels at once on an abort', async () => {
+    const fs = createFakeFilesystemPort(inputs([ENTRY]));
+    const clock = createFakeClockPort(NOW);
+    const controller = new AbortController();
+    const started = Date.now();
+    const waiting = runWait(
+      { kind: 'until', until: new Date(Date.parse(NOW) + 3_600_000).toISOString(), reason: 'r', orInputChange: false },
+      { fs, clock, signal: controller.signal, sleep: abortableSleep },
+      '',
+    );
+    setTimeout(() => {
+      controller.abort();
+    }, 10);
+
+    await waiting;
+
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+});
+
+describe('pnpm sync: the session with injected ports', () => {
+  it('refuses a blank contact before any request, with exit 1', async () => {
+    const { deps, http, err } = sessionFor({ env: {} });
+
+    expect(await syncSessionCommand(deps)).toBe(1);
+
+    expect(http.requests).toEqual([]);
+    expect(err[0]).toContain(USER_AGENT_ENV_VAR);
+  });
+
+  it('refuses an unknown argument with exit 1', async () => {
+    const { deps, http, err } = sessionFor({ argv: ['--nope'] });
+
+    expect(await syncSessionCommand(deps)).toBe(1);
+
+    expect(http.requests).toEqual([]);
+    expect(err[0]).toMatch(/^pnpm sync: unknown argument "--nope"/);
+  });
+
+  it('cold start: the gate request goes out at once, one entry per chunk, exit 0 on the stop', async () => {
+    governorOptions.length = 0;
+    const { deps, http, out, sleeps, fs } = sessionFor({ tracked: [ENTRY, SECOND] });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(sleeps).toEqual([]);
     expect(http.requests.map((request) => `${request.method} ${request.url}`)).toEqual([
       `GET ${TRADE_LEAGUES_URL}`,
       `POST ${tradeSearchUrl(LEAGUE)}`,
     ]);
-    // The contact overlay reached both requests through the one governor.
-    for (const request of http.requests) {
-      expect(request.headers['user-agent']).toBe(CONTACT);
-    }
-    const report = await reportOf(fs);
-    expect(report?.figures.requestsBySource).toEqual({
-      'tracked-list': 1,
-      'league-validation': 1,
-    });
-    // No git history, so the edit date falls to the file's modification time (AD-12).
-    expect(report?.figures.trackedListEditedAt).toEqual({
-      source: 'file-modified',
-      at: '2026-09-20T07:00:00.000Z',
-    });
-    expect(report?.runFinishedAt).toBe(NOW);
-    expect(out).toEqual(['pnpm sync: completed, 1 completed']);
-    expect(await fs.exists(LOCK_PATH)).toBe(false);
-  });
-
-  it('a league mismatch: exit 1, the report is the only write, the lock is released', async () => {
-    const { deps, fs, writes, http, err } = depsFor('Nope League');
-
-    expect(await syncCommand(deps)).toBe(1);
-
-    expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
-    expect(writes).toEqual([REPORT_PATH]);
-    expect(await fs.exists(DATASET_PATH)).toBe(false);
-    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
-    expect(await fs.exists(LOCK_PATH)).toBe(false);
-    expect((await reportOf(fs))?.records).toEqual([
-      { kind: 'league-mismatch', configuredLeague: 'Nope League', availableLeagues: ['Standard', LEAGUE] },
+    expect(lines(out)).toEqual([
+      `pnpm sync: bounded by entries, 1 completed: ${canonicalKey(ENTRY)}`,
+      'pnpm sync: stopped',
     ]);
-    expect(err).toHaveLength(1);
-    expect(err[0]).toMatch(/^pnpm sync: the configured league "Nope League"/);
-  });
-
-  it('runSync rethrows the gate throw after the report is written', async () => {
-    const { deps } = depsFor('Nope League');
-    const { fs, clock, http, git, wait, pid, log } = deps;
-
-    await expect(
-      runSync({ fs, clock, http, git, wait, pid, log, userAgent: CONTACT }),
-    ).rejects.toBeInstanceOf(LeagueMismatchError);
-    expect((await reportOf(fs))?.records.map((record) => record.kind)).toEqual(['league-mismatch']);
-  });
-
-  it('refuses a blank contact before any request or write, with exit 1', async () => {
-    const { deps, http, writes, err } = depsFor(LEAGUE, { env: {} });
-
-    expect(await syncCommand(deps)).toBe(1);
-
-    expect(http.requests).toEqual([]);
-    expect(writes).toEqual([]);
-    expect(err[0]).toContain(USER_AGENT_ENV_VAR);
-  });
-
-  it('refuses an absent config under the lock, naming it: no request, the report is the only write', async () => {
-    const { deps, fs, http, writes, err } = depsFor(LEAGUE);
-    await fs.deleteFile('data/config.json');
-
-    expect(await syncCommand(deps)).toBe(1);
-
-    expect(http.requests).toEqual([]);
-    expect(writes).toEqual([REPORT_PATH]);
-    expect(err[0]).toContain('data/config.json');
-    const records = (await reportOf(fs))?.records ?? [];
-    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure', reason: 'unrecoverable-error' })]);
-    expect(records[0]).toHaveProperty('message', expect.stringContaining('data/config.json'));
     expect(await fs.exists(LOCK_PATH)).toBe(false);
-  });
-
-  it('refuses a pinned set over the cap: exit 1, no request, a run-failure naming data/tracked.json', async () => {
-    // One pinned entry against a yardstick of 1: 1 > 0.5 × 1 (IMPLEMENTATION-NOTES.md §6).
-    const { deps, fs, http, writes, err } = depsFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
-
-    expect(await syncCommand(deps)).toBe(1);
-
-    expect(http.requests).toEqual([]);
-    expect(writes).toEqual([REPORT_PATH]);
-    expect(err[0]).toContain(TRACKED_PATH);
-    const records = (await reportOf(fs))?.records ?? [];
-    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
-    expect(records[0]).toHaveProperty('message', expect.stringContaining(TRACKED_PATH));
-    expect(await fs.exists(DATASET_PATH)).toBe(false);
-    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
-    expect(await fs.exists(LOCK_PATH)).toBe(false);
-  });
-
-  it('reports a pinned-cap excess ahead of a later load refusal (the currencies file absent)', async () => {
-    const { deps, fs, http } = depsFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
-    await fs.deleteFile('data/currencies.json');
-
-    expect(await syncCommand(deps)).toBe(1);
-
-    expect(http.requests).toEqual([]);
-    const records = (await reportOf(fs))?.records ?? [];
-    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
-    expect(records[0]).toHaveProperty('message', expect.stringContaining(TRACKED_PATH));
-  });
-
-  it('publishes the priced entry under the configured league', async () => {
-    const { deps, fs } = depsFor(LEAGUE);
-
-    await syncCommand(deps);
-
-    const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as {
-      league: string;
-      entries: { entryKey: string; price: { state: string } }[];
-    };
-    expect(dataset.league).toBe(LEAGUE);
-    expect(dataset.entries).toEqual([
-      expect.objectContaining({ entryKey: canonicalKey(ENTRY), price: { state: 'no-listings' } }),
+    // Each chunk: the spread pacer, the shared pacing state and the threshold of 1.
+    expect(governorOptions).toEqual([
+      expect.objectContaining({ spread: true, pacing: expect.any(Object), invalidRequestThreshold: 1 }),
     ]);
   });
 
-  it('a gate 429 yields the chunk: exit 0, no search, dataset, progress and the report, no run-failure', async () => {
-    const { deps, fs, writes, http, out } = depsFor(LEAGUE, { answers: { leagues: THROTTLED } });
+  it('pass-level requestsBySource after two iterations, and the gate runs once', async () => {
+    const { deps, http, fs } = sessionFor({ tracked: [ENTRY, SECOND], stopAfter: 2 });
 
-    expect(await syncCommand(deps)).toBe(0);
-
-    expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
-    // A gate yield publishes like a yielded chunk; progress carries the penalty as notBefore (§5.3).
-    expect(writes).toEqual([DATASET_PATH, PROGRESS_PATH, REPORT_PATH]);
-    expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
-      completed: [],
-      notBefore: '2026-09-26T12:01:00.000Z',
-      schemaVersion: '1.1.0',
-    });
-    const report = await reportOf(fs);
-    expect(report?.records).toEqual([]);
-    expect(report?.runFinishedAt).toBe(NOW);
-    expect(report?.figures.requestsBySource).toEqual({
-      'tracked-list': 0,
-      'league-validation': 1,
-    });
-    expect(out).toEqual(['pnpm sync: yielded, 0 completed']);
-    expect(report?.figures.notReachedCount).toBe(1);
-    expect(await fs.exists(LOCK_PATH)).toBe(false);
-  });
-
-  it('a gate 429 publishes the catalogue marks, and the not-reached count is every eligible entry', async () => {
-    const ghost: TrackedEntry = { kind: 'raw', baseTypeId: 'Ghost Amulet', itemLevelMin: 82, status: 'active' };
-    const others: TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }, { ...ENTRY, itemLevelMin: 84 }];
-    const { deps, fs, http } = depsFor(LEAGUE, {
-      tracked: [ghost, ...others],
-      answers: { leagues: THROTTLED },
-    });
-
-    expect(await syncCommand(deps)).toBe(0);
-
-    expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
-    const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as {
-      entries: DatasetEntry[];
-    };
-    expect(dataset.entries.find((entry) => entry.entryKey === canonicalKey(ghost))?.price).toEqual(
-      expect.objectContaining({ state: 'unresolvable' }),
-    );
-    const report = await reportOf(fs);
-    expect(report?.figures.notReachedCount).toBe(3);
-    expect(report?.records).toEqual([
-      expect.objectContaining({ kind: 'unresolvable', entryKey: canonicalKey(ghost) }),
-    ]);
-    expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toHaveProperty('notBefore');
-  });
-
-  it('paces the tracked-list searches off the leagues GET: one governor for both sources', async () => {
-    const policy = 'trade-search-request-limit';
-    // The leagues answer saturates the Client rule; the searches report only the Ip rule.
-    const saturated = {
-      'x-rate-limit-policy': policy,
-      'x-rate-limit-rules': 'Ip,Client',
-      'x-rate-limit-ip': '5:10:60',
-      'x-rate-limit-ip-state': '5:10:0',
-      'x-rate-limit-client': '30:300:1800',
-      'x-rate-limit-client-state': '30:300:0',
-    };
-    const clear = {
-      'x-rate-limit-policy': policy,
-      'x-rate-limit-rules': 'Ip',
-      'x-rate-limit-ip': '5:10:60',
-      'x-rate-limit-ip-state': '1:10:0',
-    };
-    const waits: number[] = [];
-    const second: TrackedEntry = { ...ENTRY, itemLevelMin: 83 };
-    const { deps, http } = depsFor(LEAGUE, {
-      tracked: [ENTRY, second],
-      wait: (ms) => {
-        waits.push(ms);
-        return Promise.resolve();
-      },
-      answers: {
-        leagues: { status: 200, headers: saturated, body: LEAGUES_BODY },
-        search: {
-          status: 200,
-          headers: clear,
-          body: JSON.stringify({ id: 'S0', complexity: 1, result: [], total: 0 }),
-        },
-      },
-    });
-
-    expect(await syncCommand(deps)).toBe(0);
+    expect(await syncSessionCommand(deps)).toBe(0);
 
     expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST']);
-    // The first search, on a cold lane, learns the shared policy; the second
-    // waits out the Client window the leagues GET recorded. Two independent
-    // clients would record no wait.
-    expect(waits).toEqual([300_000]);
+    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2 });
   });
 
-  it('builds its trade clients with the invalid-request threshold of 1 (§5.3)', async () => {
-    tradeClientOptions.length = 0;
-    const { deps } = depsFor(LEAGUE);
+  it('a new pass restarts the pass-level requestsBySource', async () => {
+    // Pass 1: gate + search, search. Pass 2: gate + search, search.
+    const { deps, http, fs } = sessionFor({ tracked: [ENTRY, SECOND], stopAfter: 4 });
 
-    expect(await syncCommand(deps)).toBe(0);
+    expect(await syncSessionCommand(deps)).toBe(0);
 
-    expect(tradeClientOptions).toEqual([expect.objectContaining({ invalidRequestThreshold: 1 })]);
+    expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST', 'GET', 'POST', 'POST']);
+    // The new pass only, not the six requests of both passes.
+    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2 });
   });
 
-  it('a penalty still running defers: exit 0, no request, no write, the pause printed', async () => {
-    const progress = JSON.stringify({
-      schemaVersion: '1.1.0',
-      completed: [],
-      notBefore: '2026-09-26T12:30:00.000Z',
-    });
-    const { deps, fs, writes, http, out } = depsFor(LEAGUE, {
-      seeded: { [PROGRESS_PATH]: { contents: progress } },
-    });
-
-    expect(await syncCommand(deps)).toBe(0);
-
-    expect(http.requests).toEqual([]);
-    expect(writes).toEqual([]);
-    expect(out).toEqual(['pnpm sync: deferred until 2026-09-26T12:30:00.000Z, 0 completed']);
-    expect(await fs.exists(LOCK_PATH)).toBe(false);
-  });
-
-  it('a live lock is busy: exit 0, no request, no write', async () => {
-    const lock = serialiseLock({ pid: 99, startedAt: NOW });
-    const { deps, fs, writes, http, out } = depsFor(LEAGUE, { seeded: { [LOCK_PATH]: { contents: lock } } });
-
-    expect(await syncCommand(deps)).toBe(0);
-
-    expect(http.requests).toEqual([]);
-    expect(writes).toEqual([]);
-    expect(out).toEqual(['pnpm sync: busy, 0 completed']);
-    expect(await fs.readTextFile(LOCK_PATH)).toBe(lock);
-  });
-
-  it('a priced entry whose search answers 429 keeps its price in the written dataset', async () => {
-    const priced: DatasetEntry = {
-      entryKey: canonicalKey(ENTRY),
-      price: {
-        state: 'priced',
-        observation: {
-          league: LEAGUE,
-          observedAt: '2026-09-25T12:00:00.000Z',
-          priceDivine: 0.5,
-          sampleSize: 10,
-          exchangeObservation: {
-            currencyId: 'divine',
-            rate: 1,
-            source: 'measured',
-            league: LEAGUE,
-            asOf: '2026-01-01T00:00:00Z',
-          },
+  it('a transient fs fault on a local read does not end the session', async () => {
+    const { deps, out } = sessionFor();
+    let faults = 0;
+    const flaky: SyncSessionDeps = {
+      ...deps,
+      fs: {
+        ...deps.fs,
+        lastModifiedAt: (path) => {
+          if (faults === 0) {
+            faults += 1;
+            return Promise.reject(Object.assign(new Error('EBUSY: resource busy'), { code: 'EBUSY' }));
+          }
+          return deps.fs.lastModifiedAt(path);
         },
       },
-      lastAttemptedAt: '2026-09-25T12:00:00.000Z',
     };
-    const published = `${JSON.stringify(
-      {
-        schemaVersion: '1.0.0',
-        league: LEAGUE,
-        generatedAt: '2026-09-25T12:00:00.000Z',
-        entries: [priced],
-        currencyRates: [],
+
+    expect(await syncSessionCommand(flaky)).toBe(0);
+
+    expect(faults).toBe(1);
+    expect(lines(out)[0]).toBe(`pnpm sync: completed, 1 completed: ${canonicalKey(ENTRY)}`);
+  });
+
+  /** A pinned entry last attempted 1 h before NOW, beside one active entry. */
+  function hourOldPinned(argv: readonly string[]) {
+    const pinned: TrackedEntry = { ...SECOND, status: 'pinned' };
+    const dataset = {
+      schemaVersion: '1.0.0',
+      league: LEAGUE,
+      generatedAt: NOW,
+      entries: [
+        { entryKey: canonicalKey(pinned), price: { state: 'no-listings' }, lastAttemptedAt: '2026-09-26T11:00:00.000Z' },
+      ] satisfies DatasetEntry[],
+      currencyRates: [],
+    };
+    const session = sessionFor({
+      tracked: [pinned, ENTRY],
+      minChunkSearches: 2,
+      seeded: { [DATASET_PATH]: { contents: JSON.stringify(dataset) } },
+      argv,
+    });
+    return { ...session, pinned };
+  }
+
+  it('a fresh pinned entry is skipped under the 4 h default: the first search prices the active one', async () => {
+    const { deps, out } = hourOldPinned([]);
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(lines(out)[0]).toBe(`pnpm sync: completed, 1 completed: ${canonicalKey(ENTRY)}`);
+  });
+
+  it('--pinned-max-age 0.5 makes the 1 h old pinned entry stale, so it goes first', async () => {
+    const { deps, out, pinned } = hourOldPinned(['--pinned-max-age', '0.5']);
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(lines(out)[0]).toBe(`pnpm sync: bounded by entries, 1 completed: ${canonicalKey(pinned)}`);
+  });
+
+  it('a stale pinned entry goes first', async () => {
+    const pinned: TrackedEntry = { ...SECOND, status: 'pinned' };
+    const { deps, out } = sessionFor({ tracked: [pinned, ENTRY], minChunkSearches: 2 });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(lines(out)[0]).toBe(`pnpm sync: bounded by entries, 1 completed: ${canonicalKey(pinned)}`);
+  });
+
+  it('spreads the fetch inside the lock once the pre-wait has cleared the entry lanes', async () => {
+    const policy = 'shared-policy';
+    const state = (used: number): Record<string, string> => headers(policy, '5:10:60', `${String(used)}:10:0`);
+    let searches = 0;
+    const listing = JSON.stringify({
+      result: [{ id: 'a', listing: { price: { type: '~price', amount: 1, currency: 'divine' } } }],
+    });
+    const { deps, sleeps, waits } = sessionFor({
+      tracked: [ENTRY, SECOND],
+      stopAfter: 2,
+      http: (fake) => ({
+        send: async (request) => {
+          if (request.method === 'POST') {
+            searches += 1;
+            await fake.send(request);
+            return {
+              status: 200,
+              headers: state(searches * 2 - 1),
+              body: JSON.stringify({ id: 'S0', complexity: 1, result: ['a'], total: 1 }),
+            };
+          }
+          if (request.url === tradeFetchUrl(['a'], 'S0')) {
+            await fake.send({ ...request, url: TRADE_LEAGUES_URL });
+            return { status: 200, headers: state(searches * 2), body: listing };
+          }
+          return fake.send(request);
+        },
+      }),
+    });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    // Iteration 1: search (1 used), fetch on a cold lane (2 used). The pre-wait
+    // of iteration 2 spreads the 3 left over 10 s (rounded up to a whole
+    // millisecond); its search then leaves 2, so the fetch inside the lock
+    // waits 10 000 / 2 − 0.
+    expect(sleeps).toEqual([3_334]);
+    expect(waits).toEqual([10_000 / 2]);
+  });
+
+  it('a new pass pre-waits DATA_LANE before the gate runs again', async () => {
+    const { deps, sleeps, http } = sessionFor({
+      stopAfter: 2,
+      fixtures: {
+        [`GET ${TRADE_LEAGUES_URL}`]: {
+          status: 200,
+          headers: headers('data-policy', '10:100:60', '5:100:0'),
+          body: LEAGUES_BODY,
+        },
       },
-      null,
-      2,
-    )}\n`;
-    const { deps, fs, out } = depsFor(LEAGUE, {
-      seeded: { [DATASET_PATH]: { contents: published } },
-      answers: { search: THROTTLED },
     });
 
-    expect(await syncCommand(deps)).toBe(0);
+    expect(await syncSessionCommand(deps)).toBe(0);
 
-    expect(out).toEqual(['pnpm sync: yielded, 0 completed']);
-    const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as {
-      entries: DatasetEntry[];
+    expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'GET', 'POST']);
+    expect(sleeps).toEqual([20_000]);
+  });
+
+  it('no answer on a cold lane waits 36 s, then 72 s, and resets after a reading', async () => {
+    let calls = 0;
+    const { deps, out } = sessionFor({
+      stopAfter: 5,
+      http: () => ({
+        send: () => {
+          calls += 1;
+          if (calls === 3) {
+            // A 503 that carried headers: a State reading.
+            return Promise.resolve({
+              status: 503,
+              headers: headers('data-policy', '600:21600:60', '0:21600:0'),
+              body: '',
+            });
+          }
+          return networkDown().send({ method: 'GET', url: TRADE_LEAGUES_URL, headers: {} });
+        },
+      }),
+    });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(announced(out, 'no answer')).toEqual([36_000, 72_000, 36_000]);
+  });
+
+  it('a 429 on the search waits until the notBefore the chunk wrote', async () => {
+    const { deps, out } = sessionFor({
+      fixtures: { [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 429, headers: { 'retry-after': '60' }, body: '' } },
+      stopAfter: 2,
+    });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(lines(out)).toContain('pnpm sync: waiting until 2026-09-26T12:01:00.000Z (a 429)');
+  });
+
+  it('a league mismatch is printed and waited out until an input file changes', async () => {
+    const { deps, err, out, fs, http } = sessionFor({ stopAfter: 2 });
+    fs.setFile('data/config.json', {
+      contents: JSON.stringify({ schemaVersion: '1.0.0', league: 'Nope League', minChunkSearches: 1 }),
+      modifiedAt: NOW,
+    });
+    let polls = 0;
+    const sleep = deps.sleep;
+    const edited: SyncSessionDeps = {
+      ...deps,
+      sleep: async (ms, signal) => {
+        await sleep(ms, signal);
+        polls += 1;
+        if (polls === 3) {
+          fs.setFile('data/config.json', {
+            contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 }),
+            modifiedAt: '2026-09-26T13:00:00.000Z',
+          });
+        }
+      },
     };
-    expect(dataset.entries).toHaveLength(1);
-    expect(dataset.entries[0]?.price).toEqual(priced.price);
-    expect((await reportOf(fs))?.records).toEqual([]);
+
+    expect(await syncSessionCommand(edited)).toBe(0);
+
+    expect(err[0]).toMatch(/^pnpm sync: the configured league "Nope League"/);
+    expect(lines(out)).toContain(
+      'pnpm sync: waiting for an input file under data/ to change (a refused input or a league mismatch)',
+    );
+    expect(polls).toBe(3);
+    expect(lines(out)).toContain(`pnpm sync: completed, 1 completed: ${canonicalKey(ENTRY)}`);
+    expect(http.requests.filter((request) => request.method === 'GET')).toHaveLength(2);
   });
 
-  it('a malformed published dataset: exit 1, no request, a run-failure naming it, the dataset untouched', async () => {
-    const { deps, fs, writes, http, err } = depsFor(LEAGUE, {
-      seeded: { [DATASET_PATH]: { contents: '{ not json' } },
+  it('a live lock is waited for by polling, then the entry runs', async () => {
+    const { deps, fs, out } = sessionFor({
+      seeded: { [LOCK_PATH]: { contents: serialiseLock({ pid: 99, startedAt: NOW }) } },
+      stopAfter: 2,
     });
+    let polls = 0;
+    const sleep = deps.sleep;
+    const released: SyncSessionDeps = {
+      ...deps,
+      sleep: async (ms, signal) => {
+        await sleep(ms, signal);
+        polls += 1;
+        if (polls === 2) {
+          await fs.deleteFile(LOCK_PATH);
+        }
+      },
+    };
 
-    expect(await syncCommand(deps)).toBe(1);
+    expect(await syncSessionCommand(released)).toBe(0);
 
-    expect(http.requests).toEqual([]);
-    expect(writes).toEqual([REPORT_PATH]);
-    expect(err[0]).toContain(DATASET_PATH);
-    expect(await fs.readTextFile(DATASET_PATH)).toBe('{ not json');
-    const records = (await reportOf(fs))?.records ?? [];
-    expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
-    expect(records[0]).toHaveProperty('message', expect.stringContaining(DATASET_PATH));
-    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    expect(lines(out).slice(0, 3)).toEqual([
+      'pnpm sync: busy, 0 completed',
+      'pnpm sync: waiting for the lock to be free (another run holds the lock)',
+      `pnpm sync: completed, 1 completed: ${canonicalKey(ENTRY)}`,
+    ]);
   });
 
-  it('is reachable at the script name, with the .env overlay', () => {
+  it('an abort during a chunk lets the entry finish, releases the lock and exits 0', async () => {
+    const { deps, fs, http, out, controller } = sessionFor({ stopAfter: 100 });
+    const aborting: SyncSessionDeps = {
+      ...deps,
+      http: {
+        send: (request) => {
+          if (request.method === 'POST') {
+            controller.abort();
+          }
+          return http.send(request);
+        },
+      },
+    };
+
+    expect(await syncSessionCommand(aborting)).toBe(0);
+
+    expect(lines(out)).toEqual([`pnpm sync: completed, 1 completed: ${canonicalKey(ENTRY)}`, 'pnpm sync: stopped']);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+    expect(http.requests).toHaveLength(2);
+  });
+
+  it('is reachable at the script name, with the .env overlay; sync:batch is the one-chunk command', () => {
     const manifest = JSON.parse(readFileSync(`${REPO_ROOT}package.json`, 'utf8')) as {
       scripts: Record<string, string>;
     };
@@ -496,5 +843,6 @@ describe('pnpm sync: the live composition with injected ports', () => {
     const entry = (script ?? '').split(/\s+/).at(-1);
     expect(resolve(REPO_ROOT, entry ?? '')).toBe(SCRIPT);
     expect(script).toContain('--env-file-if-exists=.env');
+    expect(manifest.scripts['sync:batch']).toContain('--env-file-if-exists=.env');
   });
 });

@@ -13,17 +13,27 @@ export const SYNC_CONTRACTS_SCHEMA_VERSION = INITIAL_SCHEMA_VERSION;
 /**
  * The one governed trade request path (FR-20, AD-8). `createTradeClient`, and
  * `createTradeClients` for sibling clients that share one governor (one per
- * request source), are the **only** exported ways to make a trade request,
+ * request source), and `createTradeGovernor`, which makes that governor's
+ * pacing memory (`PacingState`) and its pacer explicit for the `pnpm sync`
+ * session, are the **only** exported ways to make a trade request,
  * and `HttpPort` is deliberately not re-exported from `sync`: a second call
  * site that wanted to build its own request would have to reach into
  * `@poe/contracts` for the port, which makes the violation visible rather
  * than convenient.
  */
-export { createTradeClient, createTradeClients } from './trade/client';
+export {
+  createPacingState,
+  createTradeClient,
+  createTradeClients,
+  createTradeGovernor,
+} from './trade/client';
 export type {
+  PacingState,
   TradeClient,
   TradeClientOptions,
   TradeClientsOptions,
+  TradeGovernor,
+  TradeGovernorOptions,
   TradeRequest,
   TradeResponseResult,
   TradeResult,
@@ -50,12 +60,13 @@ export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-head
  * The report carries requests per source (AD-12, FR-14), the not-reached count
  * and the tracked-list edit date as figures, and every unacknowledged record
  * (FR-25). A throw still writes the report, with a `run-failure` record.
- * `pnpm sync` (`./sync.ts`) drives it live; the tests and `pnpm sync:dry`
- * drive it against in-memory fakes.
+ * `pnpm sync` (`./sync.ts`, a long-running session of one-entry chunks) and
+ * `pnpm sync:batch` (`./sync-batch.ts`, one chunk per invocation) drive it
+ * live; the tests and `pnpm sync:dry` drive it against in-memory fakes.
  */
 export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
 /**
- * The one chunk composition `pnpm sync` and `pnpm sync:dry` share: one
+ * The one chunk composition `pnpm sync`, `pnpm sync:batch` and `pnpm sync:dry` share: one
  * governor of two counted trade clients, the catalogue loader and the
  * runner's under-lock `load` hook (AD-8, AD-12).
  */
@@ -80,6 +91,7 @@ export type {
   ChunkOutcomeKind,
   ChunkPorts,
   ChunkPublication,
+  ChunkSession,
   ChunkSetup,
   ChunkStarvation,
   ChunkStep,

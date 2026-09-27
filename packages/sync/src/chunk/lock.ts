@@ -92,8 +92,11 @@ export function isStaleInstant(startedAt: string, now: string): boolean {
  * the only clock available, and the same threshold applies to it. Without
  * that, a run that crashed between the create and the write would leave a
  * lock nobody ever clears.
+ *
+ * Exported for the `pnpm sync` session (`../sync.ts`), which waits for a held
+ * lock to be free or stale by this same rule rather than a copy of it.
  */
-async function isStaleState(
+export async function isStaleState(
   fs: FilesystemPort,
   found: Exclude<LockState, { state: 'absent' }>,
   now: string,

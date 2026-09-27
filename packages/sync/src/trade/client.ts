@@ -22,6 +22,7 @@ import {
   EMPTY_LEDGER,
   paceBeforeNext,
   recordObservation,
+  spreadBeforeNext,
   type RateLimitLedger,
 } from './ledger.ts';
 import {
@@ -311,15 +312,80 @@ export interface TradeClientsOptions<Source extends string>
 export function createTradeClients<Source extends string>(
   options: TradeClientsOptions<Source>,
 ): Readonly<Record<Source, TradeClient>> {
+  return createTradeGovernor(options).clients;
+}
+
+/**
+ * The pacing memory a governor reads and writes: the bucket ledger and the lane
+ * memo. **Mutable and shared on purpose.** A governor built without one starts
+ * cold and keeps its own. The `pnpm sync` session builds one per process and
+ * hands it to the fresh governor of every chunk, so a chunk starts from what
+ * the previous one read rather than cold (AD-8). Invalid-request counts are
+ * **not** part of it: they stay per governor, because a shared count would
+ * refuse a policy for the rest of the session after one `4xx`.
+ */
+export interface PacingState {
+  ledger: RateLimitLedger;
+  /** lane -> the policy that lane's last response was accounted against. */
+  readonly lanePolicies: Map<string, string>;
+}
+
+export function createPacingState(): PacingState {
+  return { ledger: EMPTY_LEDGER, lanePolicies: new Map<string, string>() };
+}
+
+/**
+ * The delay the governor would ask before the next request on `lane`, at
+ * `now`. `spread` selects the session's even spread (`spreadBeforeNext`) over
+ * the batch pacer (`paceBeforeNext`). A lane whose policy is unknown asks
+ * nothing: the request goes out cold.
+ */
+export function laneDelayMs(pacing: PacingState, lane: string, now: string, spread: boolean): number {
+  const policy = pacing.lanePolicies.get(lane);
+  const decision = spread
+    ? spreadBeforeNext(pacing.ledger, policy, now)
+    : paceBeforeNext(pacing.ledger, policy, now);
+  // Whole milliseconds, rounded up: the clock reads whole milliseconds, so a
+  // fractional spread would leave a sub-millisecond residue to wait again.
+  return Math.max(0, Math.ceil(decision.delayMs));
+}
+
+export interface TradeGovernorOptions<Source extends string> extends TradeClientsOptions<Source> {
+  /** Shared pacing memory. Omitted, the governor starts cold with its own. */
+  readonly pacing?: PacingState;
+  /**
+   * `true` paces with the even spread (`spreadBeforeNext`). Omitted or
+   * `false`, the batch pacer (`paceBeforeNext`), which waits only on a
+   * restriction or a full bucket.
+   */
+  readonly spread?: boolean;
+}
+
+export interface TradeGovernor<Source extends string> {
+  readonly clients: Readonly<Record<Source, TradeClient>>;
+  /** The pacing memory this governor reads and writes. */
+  readonly pacing: PacingState;
+  /** The delay the next request on `lane` would wait now. */
+  delayBeforeMs(lane: string): number;
+}
+
+/**
+ * The one governor behind `createTradeClients`, with the pacing memory and the
+ * pacer made explicit (AD-8). Every request of every client it builds passes
+ * through one serial queue and one ledger.
+ */
+export function createTradeGovernor<Source extends string>(
+  options: TradeGovernorOptions<Source>,
+): TradeGovernor<Source> {
   const { clock, wait, userAgent, invalidRequestThreshold } = options;
   if (userAgent.trim() === '') {
     throw new MissingUserAgentError();
   }
+  const spread = options.spread === true;
+  const pacing = options.pacing ?? createPacingState();
+  const { lanePolicies } = pacing;
 
-  let ledger: RateLimitLedger = EMPTY_LEDGER;
   let invalidRequests: InvalidRequestCounts = NO_INVALID_REQUESTS;
-  /** lane -> the policy that lane's last response was accounted against. */
-  const lanePolicies = new Map<string, string>();
 
   function rememberPolicy(lane: string, policy: string): void {
     // Delete-then-set moves the lane to the end of the Map's insertion order,
@@ -370,11 +436,11 @@ export function createTradeClients<Source extends string>(
     // terminate under a fixed test clock, and the ledger cannot have changed
     // in the meantime — `send` queues, so only this call's own response moves
     // it.
-    const pace = paceBeforeNext(ledger, knownPolicy, clock.now());
+    const delayMs = laneDelayMs(pacing, lane, clock.now(), spread);
     let waitedMs = 0;
-    if (pace.delayMs > 0) {
-      waitedMs = pace.delayMs;
-      await wait(pace.delayMs);
+    if (delayMs > 0) {
+      waitedMs = delayMs;
+      await wait(delayMs);
     }
 
     const response = await http.send({
@@ -385,7 +451,7 @@ export function createTradeClients<Source extends string>(
     });
 
     const parsed = parseRateLimitHeaders(response.headers);
-    ledger = recordObservation(ledger, parsed, clock.now());
+    pacing.ledger = recordObservation(pacing.ledger, parsed, clock.now());
     if (parsed.policy !== undefined) {
       rememberPolicy(lane, parsed.policy);
     }
@@ -400,7 +466,7 @@ export function createTradeClients<Source extends string>(
 
     if (response.status === TOO_MANY_REQUESTS) {
       const fromHeader = retryAfterMsOf(response.headers);
-      const derived = derivedYieldDelayMs(ledger, policy);
+      const derived = derivedYieldDelayMs(pacing.ledger, policy);
       return {
         kind: 'yield',
         lane,
@@ -443,10 +509,16 @@ export function createTradeClients<Source extends string>(
     },
   });
 
-  return Object.fromEntries(
+  const clients = Object.fromEntries(
     (Object.entries(options.http) as [Source, HttpPort][]).map(([source, http]) => [
       source,
       clientFor(http),
     ]),
   ) as Record<Source, TradeClient>;
+
+  return {
+    clients,
+    pacing,
+    delayBeforeMs: (lane) => laneDelayMs(pacing, lane, clock.now(), spread),
+  };
 }

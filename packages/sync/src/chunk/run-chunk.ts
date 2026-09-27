@@ -51,7 +51,7 @@
  * completion the dataset does not publish. `busy` and `dispossessed` write
  * nothing. A chunk that ends on a `429` (a step's or the gate's) writes
  * `notBefore = now + min(retryAfter, staleLockAfter)`; a malformed-request
- * abort writes `now + staleLockAfter`; every other ending that writes
+ * abort or a gate 4xx writes `now + staleLockAfter`; every other ending that writes
  * progress clears it.
  *
  * **A gate yield is an ordinary yielded chunk** with no entry attempted: it
@@ -81,8 +81,15 @@
  *   entry, as the step left it, is published too for a `MalformedRequestError`
  *   (a non-429 4xx, AD-9) and for an `UnexpectedTradeResponseError` that
  *   carries one (a 2xx body of the wrong shape on the fetch). Only a
- *   `MalformedRequestError` writes the abort `notBefore`; every other throw
- *   clears it.
+ *   `MalformedRequestError` and the gate's `LeagueRequestRejectedError` (a
+ *   non-429 4xx on the leagues request) write the abort `notBefore`; every
+ *   other throw clears it.
+ *
+ * **Under a session** (`ChunkPorts.session`, `../sync.ts`) the chunk is the
+ * same chunk with four differences: it attempts at most `maxEntries` entries
+ * (`bounded` by `'entries'`), its order keeps only stale pinned entries, and
+ * it skips the gate while the session's confirmed league still holds. Its
+ * `requestsBySource` figure covers the session's current pass.
  *
  * A publish or report write that was already attempted on the normal path is
  * never attempted again on the failure path.
@@ -119,6 +126,7 @@ import type { ChunkOrder } from '@poe/core';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
 import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/league-gate.ts';
+import { DataFileError } from '../load-data-file.ts';
 import type { DataFileResult } from '../load-data-file.ts';
 import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
 import { requestsBetween } from '../request-counter.ts';
@@ -264,9 +272,38 @@ export interface ChunkPorts {
   readonly catalogue: () => Promise<DataFileResult<CatalogueIds>>;
   /** One line of operator output. Defaults to stderr. */
   readonly log?: (line: string) => void;
+  /**
+   * Set only by the long-running `pnpm sync` session (`../sync.ts`), which
+   * runs one chunk per entry (AD-7). Absent, the chunk is the batch chunk of
+   * `pnpm sync:batch` and `pnpm sync:dry`, unchanged.
+   */
+  readonly session?: ChunkSession;
 }
 
-export type ChunkBound = 'search' | 'fetch';
+/** What the session tells each of its chunks. Every field is optional. */
+export interface ChunkSession {
+  /**
+   * The chunk attempts at most this many entries. Reaching it with an entry
+   * left ends the chunk `bounded` by `'entries'`.
+   */
+  readonly maxEntries?: number;
+  /**
+   * The request counter's snapshot at the start of the current pass. The
+   * report's `requestsBySource` then covers the pass, not only this chunk. A
+   * chunk that starts a new pass (`newPass`) counts from its own start.
+   */
+  readonly requestsSince?: RequestsBySource;
+  /**
+   * The league an earlier chunk of this session confirmed. The gate is skipped
+   * while it equals the configured league and the order is not a new pass.
+   */
+  readonly confirmedLeague?: string;
+  /** Row 1's stale-pinned rule (`chunkOrder`'s `pinnedMaxAgeMs`). */
+  readonly pinnedMaxAgeMs?: number;
+}
+
+/** `'entries'` is reached only under a session's `maxEntries`. */
+export type ChunkBound = 'search' | 'fetch' | 'entries';
 
 interface ChunkOutcomeBase {
   /**
@@ -293,6 +330,16 @@ interface ChunkOutcomeBase {
    * adds the declared yardstick to make the report record.
    */
   readonly pinnedStarvation?: ChunkStarvation;
+  /**
+   * A session's chunk only (`ChunkPorts.session`), once the order exists:
+   * `true` when this chunk's order started a new pass.
+   */
+  readonly newPass?: boolean;
+  /**
+   * A session's chunk only: the configured league, present when this chunk
+   * confirmed it — the gate passed, or the session's earlier confirmation held.
+   */
+  readonly confirmedLeague?: string;
 }
 
 /** The four observed fields of a pinned-starvation record. */
@@ -327,15 +374,23 @@ const writeStderr = (line: string): void => {
   process.stderr.write(`${line}\n`);
 };
 
-function describeRefusal(path: string, result: Exclude<EnvelopeResult<unknown>, { ok: true }>): string {
+function describeRefusal(path: string, result: Exclude<EnvelopeResult<unknown>, { ok: true }>): DataFileError {
   switch (result.reason) {
     case 'unknown-major':
     case 'malformed-version':
-      return `${path}: schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`;
+      return new DataFileError(
+        path,
+        result.reason,
+        `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
+      );
     case 'invalid':
-      return `${path}: invalid: ${result.issues
-        .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
-        .join('; ')}`;
+      return new DataFileError(
+        path,
+        'invalid',
+        `invalid: ${result.issues
+          .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
+          .join('; ')}`,
+      );
   }
 }
 
@@ -352,11 +407,11 @@ async function loadEnvelope<T>(
   try {
     data = JSON.parse(text);
   } catch (error) {
-    throw new Error(`${path}: not valid JSON: ${String(error)}`, { cause: error });
+    throw new DataFileError(path, 'not-json', `not valid JSON: ${String(error)}`, { cause: error });
   }
   const result = parse(data);
   if (!result.ok) {
-    throw new Error(describeRefusal(path, result));
+    throw describeRefusal(path, result);
   }
   return result.value;
 }
@@ -424,7 +479,7 @@ function failureRecord(
 }
 
 export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
-  const { fs, clock, pid, git, requests } = ports;
+  const { fs, clock, pid, git, requests, session } = ports;
   const log = ports.log ?? writeStderr;
 
   const acquisition = await acquireLock(fs, clock, pid);
@@ -515,6 +570,27 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
     let discoveredAllowance: number | undefined;
     let truncated = false;
 
+    /**
+     * Where the report's request figure counts from: this chunk's start, or,
+     * inside a session pass this chunk did not start, the pass's start.
+     */
+    const countFrom = (): RequestsBySource =>
+      session?.requestsSince !== undefined && order !== undefined && !order.newPass
+        ? session.requestsSince
+        : requestsAtStart;
+
+    /**
+     * The session fields of an outcome reached once the order exists. Only a
+     * session's chunk carries them, so a batch outcome is unchanged.
+     */
+    const passNow = (): { readonly newPass?: boolean; readonly confirmedLeague?: string } =>
+      session === undefined
+        ? {}
+        : {
+            ...(order === undefined ? {} : { newPass: order.newPass }),
+            ...(gatePassed && setup !== undefined ? { confirmedLeague: setup.publication.league } : {}),
+          };
+
     const starvationNow = (): { readonly pinnedStarvation?: ChunkStarvation } =>
       truncated
         ? {
@@ -597,7 +673,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         previous: previousReport,
         newRecords: chunkRecords,
         figures: {
-          requestsBySource: requestsBetween(requestsAtStart, requests.snapshot()),
+          requestsBySource: requestsBetween(countFrom(), requests.snapshot()),
           notReachedCount: Math.max(0, eligible - attempted),
           ...(trackedListEditedAt === undefined ? {} : { trackedListEditedAt }),
         },
@@ -650,16 +726,24 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         dataset: check.orderDataset,
         completed: progress?.completed ?? [],
         now: clock.now(),
+        ...(session?.pinnedMaxAgeMs === undefined ? {} : { pinnedMaxAgeMs: session.pinnedMaxAgeMs }),
       });
       order = plan;
 
       // The league gate, the only run-start check that costs a request (AD-12).
-      const gated = ready.gate === undefined ? undefined : await ready.gate({ entries });
+      // A session skips it while an earlier chunk's confirmation still holds:
+      // the same league, and the same pass.
+      const alreadyConfirmed =
+        session?.confirmedLeague !== undefined &&
+        !plan.newPass &&
+        session.confirmedLeague === ready.publication.league;
+      const gated =
+        ready.gate === undefined || alreadyConfirmed ? undefined : await ready.gate({ entries });
       if (gated?.kind === 'yield') {
         // A gate yield is a chunk yield with no entry attempted (AD-8, AD-12).
         if (!(await holdsLock(fs, mine))) {
           log('sync: the lock was taken over during this chunk; writing nothing');
-          return { kind: 'dispossessed', completed, entries: stepEntries, records };
+          return { kind: 'dispossessed', completed, entries: stepEntries, records, ...passNow() };
         }
         log('sync: the league check got no answer; the chunk yields with no entry attempted');
         await publish(
@@ -670,7 +754,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
             : notBeforeAfter429(clock.now(), gated.retryAfterMs),
         );
         await writeReport(newRecords(), clock.now());
-        return { kind: 'yielded', completed, entries: stepEntries, records };
+        return { kind: 'yielded', completed, entries: stepEntries, records, ...passNow() };
       }
       gatePassed = true;
 
@@ -735,6 +819,10 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           ending = { kind: 'bounded', bound };
           break;
         }
+        if (hasNext && session?.maxEntries !== undefined && attempted >= session.maxEntries) {
+          ending = { kind: 'bounded', bound: 'entries' };
+          break;
+        }
       }
 
       const starvation = starvationNow();
@@ -744,13 +832,20 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // releases nothing, because the lock on disk is no longer its own.
       if (!(await holdsLock(fs, mine))) {
         log('sync: the lock was taken over during this chunk; writing nothing');
-        return { kind: 'dispossessed', completed, entries: stepEntries, records, ...starvation };
+        return {
+          kind: 'dispossessed',
+          completed,
+          entries: stepEntries,
+          records,
+          ...starvation,
+          ...passNow(),
+        };
       }
 
       await publish(ready.publication, stepEntries, until);
       await writeReport(newRecords(), clock.now());
 
-      return { ...ending, completed, entries: stepEntries, records, ...starvation };
+      return { ...ending, completed, entries: stepEntries, records, ...starvation, ...passNow() };
     } catch (error) {
       // A report that could not be written is not written again.
       if (reportAttempted) {
@@ -785,13 +880,16 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // unexpected fetch body also publishes the failing entry, which keeps
         // the answered search's fields (AD-9).
         const malformed = error instanceof MalformedRequestError;
+        // The gate's non-429 4xx is a rejected request too, and would be
+        // refused again on the next tick: it writes the same abort `notBefore`.
+        const rejected = malformed || error instanceof LeagueRequestRejectedError;
         const failing =
           (malformed || error instanceof UnexpectedTradeResponseError) ? error.entry : undefined;
         try {
           await publish(
             setup.publication,
             failing === undefined ? stepEntries : [...stepEntries, failing],
-            malformed ? notBeforeAfterAbort(clock.now()) : undefined,
+            rejected ? notBeforeAfterAbort(clock.now()) : undefined,
           );
         } catch (fault) {
           secondary('publishing the dataset and progress', fault);

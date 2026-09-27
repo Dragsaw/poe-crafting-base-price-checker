@@ -19,6 +19,7 @@
     "deferred:issues": "node tools/deferred-issues/deferred-issues.ts",
     "build": "vite build --config packages/web/vite.config.ts && node tools/prune-pages.mjs",
     "sync": "node --env-file-if-exists=.env packages/sync/src/sync.ts",
+    "sync:batch": "node --env-file-if-exists=.env packages/sync/src/sync-batch.ts",
     "sync:dry": "node packages/sync/src/dry-run.ts",
     "fixtures:record": "node --env-file-if-exists=.env packages/sync/src/fixtures-record.ts",
     "catalogue:refresh": "node --env-file-if-exists=.env packages/sync/src/catalogue-refresh.ts",

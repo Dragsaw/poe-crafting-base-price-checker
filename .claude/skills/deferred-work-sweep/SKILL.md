@@ -98,7 +98,7 @@ Set `PRIMARY` and `RUN_ID` now, before the session enters a worktree. Set `CLAIM
    3. The entry needs one of these:
       - the live trade API
       - network access
-      - a run of `pnpm sync` or `pnpm catalogue:refresh`
+      - a run of `pnpm sync`, `pnpm sync:batch` or `pnpm catalogue:refresh`
       - a decision that belongs to a human, for example the value of a hand-edited `data/` entry
 
       `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md` forbids an agent to use the first three unattended.

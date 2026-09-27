@@ -12,8 +12,9 @@
  * in the response itself — so the split between the search bucket and the fetch
  * bucket arrives for free, and survives GGG adding a third policy.
  *
- * The ledger is in memory and per client instance. Nothing here persists across
- * processes.
+ * The ledger is in memory and per governor (`./client.ts`). The `pnpm sync`
+ * session shares one ledger across its chunks through a `PacingState`; nothing
+ * here persists across processes.
  */
 
 import type { RateLimitBucket, RateLimitHeaders, RateLimitRule } from './rate-limit-headers.ts';
@@ -43,8 +44,12 @@ export type RateLimitLedger = Readonly<Record<string, PolicyObservation>>;
 
 export const EMPTY_LEDGER: RateLimitLedger = {};
 
-/** Why a bucket is unsatisfied — a serving penalty, or a saturated window. */
-export type PaceCause = 'penalty' | 'window';
+/**
+ * Why a bucket is unsatisfied — a serving penalty, or a saturated window — or,
+ * from `spreadBeforeNext` only, why a satisfied bucket still asks for a gap:
+ * its remaining capacity spread evenly over its period.
+ */
+export type PaceCause = 'penalty' | 'window' | 'spread';
 
 export interface PaceDecision {
   /** Milliseconds to wait before issuing. `0` when every bucket is clear. */
@@ -164,6 +169,78 @@ export function paceBeforeNext(
   }
 
   return decision;
+}
+
+/**
+ * The spread pacer of the long-running `pnpm sync` session (AD-8,
+ * IMPLEMENTATION-NOTES.md §5.3): the larger of
+ *
+ * - `paceBeforeNext` — a restriction, or a full bucket's remaining window; and
+ * - the even spread — over every bucket still below its limit, the largest
+ *   `seconds × 1000 / (hits − used) − elapsed`.
+ *
+ * The even spread never spends more than the capacity the last State reading
+ * left in any bucket's period, so no bucket fills in normal use, under a
+ * rolling or a fixed window alike. Each response replaces the reading, so the
+ * spread corrects itself. A policy with no reading asks for no delay: the first
+ * request goes out cold and its response seeds the ledger.
+ */
+export function spreadBeforeNext(
+  ledger: RateLimitLedger,
+  policy: string | undefined,
+  now: string,
+): PaceDecision {
+  let decision = paceBeforeNext(ledger, policy, now);
+  if (policy === undefined) {
+    return decision;
+  }
+  const observation = ledger[policy];
+  if (observation === undefined) {
+    return decision;
+  }
+  for (const rule of observation.rules) {
+    const elapsedMs = elapsedMsSince(rule.observedAt, now);
+    for (const [index, limit] of rule.buckets.entries()) {
+      const used = rule.state[index];
+      if (used === undefined || used.hits >= limit.hits) {
+        // A full bucket is `paceBeforeNext`'s window, already in `decision`.
+        continue;
+      }
+      const spreadMs = (limit.seconds * MS_PER_SECOND) / (limit.hits - used.hits) - elapsedMs;
+      if (spreadMs > decision.delayMs) {
+        decision = { delayMs: spreadMs, policy, rule: rule.name, bucket: limit, cause: 'spread' };
+      }
+    }
+  }
+  return decision;
+}
+
+/**
+ * The tightest bucket's even interval on `policy`: the largest
+ * `seconds × 1000 / hits` over every bucket of every rule the ledger holds for
+ * it, or `undefined` where nothing has been read. It is the sustained gap a
+ * policy allows, and the session's first backoff after a request that got no
+ * answer (AD-7, IMPLEMENTATION-NOTES.md §5.3).
+ */
+export function evenIntervalMs(ledger: RateLimitLedger, policy: string | undefined): number | undefined {
+  if (policy === undefined) {
+    return undefined;
+  }
+  const observation = ledger[policy];
+  if (observation === undefined) {
+    return undefined;
+  }
+  let interval: number | undefined;
+  for (const rule of observation.rules) {
+    for (const limit of rule.buckets) {
+      if (limit.hits <= 0) {
+        continue;
+      }
+      const gap = (limit.seconds * MS_PER_SECOND) / limit.hits;
+      interval = interval === undefined ? gap : Math.max(interval, gap);
+    }
+  }
+  return interval;
 }
 
 /**
