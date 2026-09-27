@@ -185,9 +185,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: code review of the uncommitted `declared: null` and dev:stop climb diff (2026-09-27)
 
-- source_spec: `docs/reviews/review-changes-since-78db4da.md`
-  summary: The `NO_DECLARED_VERSION = 'none'` sentinel is replaced by `declared: null`, but the item 22 spec still describes the old design. Its Code Map says "Split these with `declaredVersion(data) === NO_DECLARED_VERSION`", and its triage rows still record the `"none"` collision as `reject`. Neither says the fix has now landed. Add a Spec Change Log note to `spec-epic-2-retro-item-22-refusal-cause.md`, and mark the sentinel finding in the review as closed.
-  evidence: `docs/stories/spec-epic-2-retro-item-22-refusal-cause.md:51`, `:83`, `:101`, `:111`, `:151`. `docs/reviews/review-changes-since-78db4da.md:13`, `:56`, `:105`, `:136`. The diff deletes `NO_DECLARED_VERSION` from `packages/web/src/load/load-artifacts.ts`.
 - source_spec: `tools/dev-stop/dev-stop.ts`
   summary: `listenerScript` runs `Get-NetTCPConnection ... -ErrorAction SilentlyContinue`. A failed query, for example a missing NetTCPIP module or access denied, therefore returns `[]`, and dev:stop prints "port is free". `listenersPosix` explicitly refuses to read a failed `lsof` as a free port. The Windows path has no such guard.
   evidence: This was already true before the diff: `snapshotWindows` used the same `$l` line. The diff now also routes the stop poll through it (`listenersWindows`).
