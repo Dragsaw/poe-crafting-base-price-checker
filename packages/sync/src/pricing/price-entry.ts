@@ -15,7 +15,7 @@
  * | search answered | `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` set, whatever the fetch returns | — |
  * | 429, 5xx, timeout | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | yields |
  * | any other 4xx | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | `MalformedRequestError` thrown |
- * | 2xx, body of the wrong shape | on the fetch: `lastAttemptedAt` and the search fields set, price state kept; on the search: nothing published | `UnexpectedTradeResponseError` thrown |
+ * | 2xx, body of the wrong shape | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | `UnexpectedTradeResponseError` thrown |
  * | none: the `jewel` arm derives a base type `items.json` lacks | `unresolvable`, nothing stamped, a `baseTypeId` record | continues |
  *
  * The league, the rates and the item types arrive as values; this module
@@ -72,10 +72,11 @@ export class MalformedRequestError extends Error {
 /**
  * A 2xx whose body is not the shape the trade site returns. It is not a
  * request fault and not a rate limit, so it is neither counted nor yielded:
- * the chunk aborts loudly and names the entry. On the fetch, `entry` is the
- * dataset entry with the answered search's fields set and the price state
- * unchanged, and the runner publishes it (AD-9). On the search there is no
- * answered search to keep, so `entry` is absent.
+ * the chunk aborts loudly and names the entry. `entry` is the dataset entry
+ * with `lastAttemptedAt` stamped and the price state unchanged, and the runner
+ * publishes it (AD-9). On the fetch it also has the answered search's fields
+ * set; on the search no search was answered, so the search fields stay as
+ * published before (AD-16).
  */
 export class UnexpectedTradeResponseError extends Error {
   readonly entryKey: string;
@@ -313,7 +314,7 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
 
     const answer = parseSearchAnswer(search.result.response.body);
     if (answer === undefined) {
-      throw new UnexpectedTradeResponseError(entryKey, 'search', 'no top-level `id` and `result`');
+      throw new UnexpectedTradeResponseError(entryKey, 'search', 'no top-level `id` and `result`', stamped);
     }
     // An answered search sets the search fields, whatever the answer holds (AD-16).
     const searched: DatasetEntry = {

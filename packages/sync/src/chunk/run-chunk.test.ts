@@ -1414,9 +1414,16 @@ describe('runChunk: the Sync Report', () => {
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
-  it('unparseable search body: entries 1–2 published, entry 3 unchanged, an unrecoverable-error record, no notBefore, lock released, rethrown', async () => {
+  it('unparseable search body: entries 1–2 published, entry 3 stamped with lastAttemptedAt, an unrecoverable-error record, no notBefore, lock released, rethrown', async () => {
     const { fs, ports } = harness([A, B, C, D, E]);
-    const failure = new UnexpectedTradeResponseError(key(C), 'search', 'no top-level `id` and `result`');
+    const stamped: DatasetEntry = {
+      entryKey: key(C),
+      price: { state: 'no-listings' },
+      lastAttemptedAt: NOW,
+      lastSearchId: 'Zz9yX',
+      lastSearchLeague: 'Standard',
+    };
+    const failure = new UnexpectedTradeResponseError(key(C), 'search', 'no top-level `id` and `result`', stamped);
     const done = (entry: TrackedEntry): DatasetEntry => ({
       entryKey: key(entry),
       price: { state: 'no-listings' },
@@ -1435,10 +1442,8 @@ describe('runChunk: the Sync Report', () => {
     const byKey = new Map(dataset.entries.map((entry) => [entry.entryKey, entry]));
     expect(byKey.get(key(A))).toEqual(done(A));
     expect(byKey.get(key(B))).toEqual(done(B));
-    expect(byKey.get(key(C))).toEqual({
-      entryKey: key(C),
-      price: { state: 'not-yet-synced', reason: 'never-synced' },
-    });
+    expect(byKey.get(key(C))).toEqual(stamped);
+    // Only a rejected request writes the abort notBefore.
     expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
 
     const report = await reportOf(fs);

@@ -80,8 +80,8 @@
  *   for the step entries so far and the marks, then the report. The failing
  *   entry, as the step left it, is published too for a `MalformedRequestError`
  *   (a non-429 4xx, AD-9) and for an `UnexpectedTradeResponseError` that
- *   carries one (a 2xx body of the wrong shape on the fetch). Only a
- *   `MalformedRequestError` and the gate's `LeagueRequestRejectedError` (a
+ *   carries one (a 2xx body of the wrong shape on the search or the fetch).
+ *   Only a `MalformedRequestError` and the gate's `LeagueRequestRejectedError` (a
  *   non-429 4xx on the leagues request) write the abort `notBefore`; every
  *   other throw clears it.
  *
@@ -877,8 +877,9 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // step entries so far and the marks. A rejected request also
         // publishes the failing entry as the step left it and remembers the
         // abort as `notBefore` (AD-9, §5.3); every other throw clears it. An
-        // unexpected fetch body also publishes the failing entry, which keeps
-        // the answered search's fields (AD-9).
+        // unexpected search or fetch body also publishes the failing entry with
+        // `lastAttemptedAt` stamped; after a fetch it keeps the answered
+        // search's fields (AD-9).
         const malformed = error instanceof MalformedRequestError;
         // The gate's non-429 4xx is a rejected request too, and would be
         // refused again on the next tick: it writes the same abort `notBefore`.
