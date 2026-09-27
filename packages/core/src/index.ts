@@ -27,3 +27,21 @@ export type {
   UnrankableReason,
   UnrankedEntry,
 } from './rank.ts';
+
+/** The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11). */
+export {
+  affixProbability,
+  combinationProbability,
+  contains,
+  eligible,
+  interval,
+  poolOf,
+} from './probability.ts';
+export type {
+  CombinationInput,
+  Interval,
+  PoolLookup,
+  ProbabilityReason,
+  ProbabilityResult,
+  Slot,
+} from './probability.ts';

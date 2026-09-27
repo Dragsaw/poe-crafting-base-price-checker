@@ -34,6 +34,14 @@ import {
  * so entries equal under it are twins whatever else differs. Each repeat is
  * one issue at its own index, naming the key and its first occurrence.
  * FR-16's overlap rejection of *distinct* keys stays `core`'s, in Epic 3.
+ *
+ * A second rule, the shared floor (AD-17, FR-22): every non-`pruned` crafted
+ * entry of one `(categoryId, className)` declares the same `itemLevelMin`. The
+ * first such entry sets the class's floor; each later entry that declares
+ * another is one issue at its own index, naming the class, both floors and the
+ * first entry's index. `pruned` tombstones are exempt — they are never
+ * summands — and a `raw` entry names no class, so it takes no part. The floor
+ * is declared, never derived here (AD-5, IMPLEMENTATION-NOTES.md §8).
  */
 export const TrackedFileSchema = z
   .strictObject({
@@ -53,6 +61,26 @@ export const TrackedFileSchema = z
         code: 'custom',
         path: ['entries', index],
         message: `canonical key ${key} repeats entries.${String(first)}; a key may appear once in the tracked list`,
+      });
+    });
+    const firstFloorByClass = new Map<string, { readonly index: number; readonly floor: number }>();
+    file.entries.forEach((entry, index) => {
+      if (entry.kind !== 'crafted' || entry.status === 'pruned') {
+        return;
+      }
+      const classKey = JSON.stringify([entry.categoryId, entry.className]);
+      const first = firstFloorByClass.get(classKey);
+      if (first === undefined) {
+        firstFloorByClass.set(classKey, { index, floor: entry.itemLevelMin });
+        return;
+      }
+      if (first.floor === entry.itemLevelMin) {
+        return;
+      }
+      ctx.addIssue({
+        code: 'custom',
+        path: ['entries', index, 'itemLevelMin'],
+        message: `item class ${entry.categoryId}/${entry.className} declares itemLevelMin ${String(entry.itemLevelMin)} here and ${String(first.floor)} at entries.${String(first.index)}; the crafted entries of one item class share one floor (AD-17)`,
       });
     });
   });

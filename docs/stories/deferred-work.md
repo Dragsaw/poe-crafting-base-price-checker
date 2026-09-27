@@ -320,3 +320,12 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
   summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
   evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.
+
+## Deferred from: story 3.2 (2026-09-27)
+
+- source_spec: `docs/stories/spec-3-2-the-probability-term-a-tier-s-interval-containment-and-the-entry-s-floor.md`
+  summary: "[NOTE FOR ARCHITECT] AD-10 maps only `weightSource: \"published\"` and `\"absent\"` to a Provenance. A `not-in-game` tier carries weight 0 and stays in the pool, so it is an input of every probability on its class. How it counts toward a figure's weakest Provenance is unstated. This blocks Story 3.6."
+  evidence: Story 3.2 spec, Tasks. `ARCHITECTURE-SPINE.md` AD-10; `epic-3-context.md` *Open architect and UX rulings*. `packages/core/src/probability.ts` keeps `not-in-game` tiers in the eligible set as `IMPLEMENTATION-NOTES.md` §9, §11 require.
+- source_spec: `docs/stories/spec-3-2-the-probability-term-a-tier-s-interval-containment-and-the-entry-s-floor.md`
+  summary: "`BandedModifierRefSchema` does not refuse `valueMin > valueMax`. An inverted band contains no tier, so `affixProbability` and `combinationProbability` return `ok` with `p = 0` and no reason. Add a `valueMin <= valueMax` refine in `contracts`, or name the check that owns it."
+  evidence: Story 3.2 review, triage row 16. `packages/contracts/src/modifier-ref.ts` has no order refine. `IMPLEMENTATION-NOTES.md` §2.5 checks only whether the `statId` is absent, so a curator typo in `tracked.json` would rank an entry at P = 0 without a signal.
