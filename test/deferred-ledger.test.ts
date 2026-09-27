@@ -20,6 +20,11 @@ describe('docs/stories/deferred-work.md', () => {
     expect(entries.length).toBeGreaterThan(0);
   });
 
+  it('parses every top-level source_spec bullet as an entry, so none is dropped for a missing or mis-indented field', () => {
+    const bullets = LEDGER.split(/\r?\n/).filter((line) => /^- source_spec:/.test(line)).length;
+    expect(entries.length).toBe(bullets);
+  });
+
   it('has no duplicate entry id', () => {
     const seen = new Map<string, string>();
     const duplicates: string[] = [];

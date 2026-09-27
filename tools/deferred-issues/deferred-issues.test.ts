@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { LIST_LIMIT, main, type RunResult, type Runner } from './deferred-issues.ts';
+import { LABELS, LIST_LIMIT, main, type RunResult, type Runner } from './deferred-issues.ts';
 import { FIXTURE_LEDGER } from './fixture.ts';
 import { parseLedger } from './ledger.ts';
 import type { IssueInfo } from './plan.ts';
@@ -19,6 +19,7 @@ interface FakeOptions {
   readonly lists?: readonly (readonly IssueInfo[] | null)[];
   readonly failCreate?: (title: string) => boolean;
   readonly failLabel?: boolean;
+  readonly failClose?: boolean;
 }
 
 const OK = (stdout = ''): RunResult => ({ status: 0, stdout, stderr: '' });
@@ -53,7 +54,7 @@ function fake(options: FakeOptions = {}): { runner: Runner; calls: Call[] } {
       return OK(`https://github.com/o/r/issues/${nextNumber}\n`);
     }
     if (cmd === 'gh' && args[0] === 'issue' && args[1] === 'close') {
-      return OK();
+      return options.failClose === true ? FAIL('HTTP 500') : OK();
     }
     throw new Error(`unexpected call: ${cmd} ${args.join(' ')}`);
   };
@@ -101,8 +102,8 @@ describe('pnpm deferred:issues', () => {
     expect(code).toBe(0);
     const labels = calls.filter((call) => call.args[0] === 'label').map((call) => call.args);
     expect(labels).toEqual([
-      ['label', 'create', 'deferred', '--force'],
-      ['label', 'create', 'sweep:blocked', '--force'],
+      ['label', 'create', 'deferred', '--color', LABELS[0].color, '--description', LABELS[0].description, '--force'],
+      ['label', 'create', 'sweep:blocked', '--color', LABELS[1].color, '--description', LABELS[1].description, '--force'],
     ]);
     const creates = calls.filter((call) => call.args[0] === 'issue' && call.args[1] === 'create');
     expect(creates).toHaveLength(ENTRIES.length);
@@ -137,6 +138,32 @@ describe('pnpm deferred:issues', () => {
     expect(calls.filter((call) => call.args[1] === 'list')).toHaveLength(2);
     const closes = calls.filter((call) => call.args[1] === 'close').map((call) => call.args);
     expect(closes).toEqual([['issue', 'close', '901', '--reason', 'not planned', '--comment', 'Duplicate of #7']]);
+  });
+
+  it('Race on create: a failed close is reported, and the exit is 2', () => {
+    const first = ENTRIES[0]?.id ?? '';
+    const before = ALL_OPEN.filter((each) => each.number !== 1);
+    const after = [...before, marked(7, 'OPEN', first), marked(901, 'OPEN', first)];
+    const { code, out } = exec([], { lists: [before, after], failClose: true });
+    expect(code).toBe(2);
+    expect(out).toContain('report: Close failed: #901: HTTP 500');
+  });
+
+  it('Race on create: a failed re-list after the creates exits 1, after the creates and with no close', () => {
+    const { code, calls } = exec([], { lists: [[], null] });
+    expect(code).toBe(1);
+    expect(calls.filter((call) => call.args[0] === 'issue' && call.args[1] === 'create')).toHaveLength(ENTRIES.length);
+    expect(calls.filter((call) => call.args[1] === 'close')).toEqual([]);
+  });
+
+  it('a duplicate open issue from before the run is closed from the first list, with the labels created', () => {
+    const first = ENTRIES[0]?.id ?? '';
+    const { code, calls } = exec([], { lists: [[...ALL_OPEN, marked(70, 'OPEN', first)]] });
+    expect(code).toBe(0);
+    expect(calls.filter((call) => call.args[1] === 'list')).toHaveLength(1);
+    expect(calls.filter((call) => call.args[0] === 'label').map((call) => call.args[2])).toEqual(['deferred', 'sweep:blocked']);
+    const closes = calls.filter((call) => call.args[1] === 'close').map((call) => call.args);
+    expect(closes).toEqual([['issue', 'close', '70', '--reason', 'not planned', '--comment', 'Duplicate of #1']]);
   });
 
   it('Entry gone: reports an open issue whose id is not on origin/master, and writes nothing', () => {
@@ -233,6 +260,14 @@ describe('pnpm deferred:issues', () => {
     const { code, calls } = exec(['--force']);
     expect(code).toBe(1);
     expect(calls).toEqual([]);
+  });
+
+  it('--list names the lowest open issue when one id has two, whatever the list order', () => {
+    const id = ENTRIES[0]?.id ?? '';
+    const { code, out } = exec(['--list'], { lists: [[marked(9, 'OPEN', id), marked(7, 'OPEN', id)]] });
+    expect(code).toBe(0);
+    const listed = JSON.parse(out) as { issue: number | null }[];
+    expect(listed[0]?.issue).toBe(7);
   });
 
   it('--list prints one JSON object for each entry with its open issue, and writes nothing', () => {

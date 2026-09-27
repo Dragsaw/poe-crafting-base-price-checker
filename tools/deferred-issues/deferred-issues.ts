@@ -21,8 +21,10 @@ import { LEDGER_PATH, planDuplicateCloses, planSync, readMarker, type IssueInfo,
  * - `--list` prints JSON, one object for each entry, for section 1 of the
  *   sweep. It writes nothing.
  *
- * Exit 0 on success, 1 when the ledger or the issue list cannot be read (no
- * write happens), 2 when a write failed or the ledger has a duplicate id.
+ * Exit 0 on success. Exit 1 when the ledger or the issue list cannot be read
+ * before any write (no write happens), or when the re-list after the creates
+ * fails: the creates are then already done, and the next sync closes any
+ * duplicate. Exit 2 when a write failed or the ledger has a duplicate id.
  *
  * Every `git` and `gh` call goes through one injectable `Runner`, so tests
  * spawn no process. Run by bare `node` (type stripping), so this module
@@ -43,7 +45,11 @@ export interface Output {
 
 export const DEFAULT_REF = 'origin/master';
 export const LIST_LIMIT = 2000;
-export const LABELS = ['deferred', 'sweep:blocked'] as const;
+/** Fixed color and description, so `--force` does not recolor a label on each writing run. */
+export const LABELS = [
+  { name: 'deferred', color: '5319e7', description: 'One entry of docs/stories/deferred-work.md' },
+  { name: 'sweep:blocked', color: 'b60205', description: 'deferred-work-sweep could not close it; see the sweep-attempt comment' },
+] as const;
 
 const PROGRAM = 'pnpm deferred:issues';
 const USAGE = `usage: ${PROGRAM} [--dry-run [--ref <ref>]] | [--list]\n`;
@@ -213,9 +219,18 @@ export function main(argv: readonly string[], runner: Runner, out: Output, err: 
   // Labels are written only when an issue is: an up-to-date run writes nothing.
   if (plan.creates.length > 0 || plan.closes.length > 0) {
     for (const label of LABELS) {
-      const made = runner('gh', ['label', 'create', label, '--force']);
+      const made = runner('gh', [
+        'label',
+        'create',
+        label.name,
+        '--color',
+        label.color,
+        '--description',
+        label.description,
+        '--force',
+      ]);
       if (made.status !== 0) {
-        err.write(`${PROGRAM}: gh label create ${label} failed: ${firstLine(made.stderr)}\n`);
+        err.write(`${PROGRAM}: gh label create ${label.name} failed: ${firstLine(made.stderr)}\n`);
         return 1;
       }
     }

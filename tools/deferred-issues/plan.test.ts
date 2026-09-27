@@ -71,6 +71,15 @@ describe('planSync', () => {
     ]);
   });
 
+  it('Race on create: keeps the lowest open issue when a lower issue is closed', () => {
+    const issues = [issue(1, 'CLOSED', FIRST!.id), issue(5, 'OPEN', FIRST!.id), issue(7, 'OPEN', FIRST!.id)];
+    expect(planDuplicateCloses(issues)).toEqual([{ number: 7, keep: 5 }]);
+  });
+
+  it('Race on create: a group with no open issue gets no close', () => {
+    expect(planDuplicateCloses([issue(1, 'CLOSED', FIRST!.id), issue(2, 'CLOSED', FIRST!.id)])).toEqual([]);
+  });
+
   it('Race on create: does not close a duplicate that is already closed', () => {
     expect(planDuplicateCloses([issue(1, 'OPEN', FIRST!.id), issue(2, 'CLOSED', FIRST!.id)])).toEqual([]);
   });

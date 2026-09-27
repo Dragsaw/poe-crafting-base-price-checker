@@ -24,7 +24,7 @@ export interface PlannedCreate {
 
 export interface PlannedClose {
   readonly number: number;
-  /** The issue that stays: the lowest number with the same id. */
+  /** The issue that stays: the lowest open number with the same id. */
   readonly keep: number;
 }
 
@@ -80,18 +80,20 @@ function byId(issues: readonly IssueInfo[]): Map<string, IssueInfo[]> {
   return groups;
 }
 
-/** Each open issue that shares its id with a lower-numbered issue. */
+/**
+ * Each open issue that shares its id with a lower-numbered open issue. The
+ * lowest open issue stays, so the sync never closes the issue that `--list`
+ * names. A group with no open issue gets no close.
+ */
 export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[] {
   const closes: PlannedClose[] = [];
   for (const group of byId(issues).values()) {
-    const [keep, ...rest] = group;
+    const [keep, ...rest] = group.filter((issue) => issue.state === 'OPEN');
     if (keep === undefined) {
       continue;
     }
     for (const issue of rest) {
-      if (issue.state === 'OPEN') {
-        closes.push({ number: issue.number, keep: keep.number });
-      }
+      closes.push({ number: issue.number, keep: keep.number });
     }
   }
   return closes.sort((a, b) => a.number - b.number);
