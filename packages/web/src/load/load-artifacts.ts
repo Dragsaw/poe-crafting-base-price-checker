@@ -15,9 +15,6 @@ import {
  * accepted. The loader never rejects — every failure is a typed outcome.
  */
 
-/** What a refusal prints for a file whose `schemaVersion` is missing or not a string. */
-export const NO_DECLARED_VERSION = 'none';
-
 /**
  * Why a file was refused, so the refusal screen blames the right thing:
  * - `version`: the file declares an unknown major, a malformed version, or no
@@ -39,8 +36,11 @@ export type LoadOutcome =
       readonly kind: 'refused';
       readonly path: string;
       readonly cause: RefusalCause;
-      /** The declared `schemaVersion`, or `NO_DECLARED_VERSION`. */
-      readonly declared: string;
+      /**
+       * The declared `schemaVersion`, or `null` where the file declares no
+       * string one. A null, not a sentinel string: a file may declare any string.
+       */
+      readonly declared: string | null;
       readonly expected: string;
     }
   | { readonly kind: 'failed'; readonly path: string };
@@ -50,7 +50,7 @@ type Fetched =
   | { readonly kind: 'valid'; readonly value: unknown }
   | { readonly kind: 'absent' }
   | { readonly kind: 'not-arrived' }
-  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string };
+  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | null };
 
 export type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
@@ -62,14 +62,15 @@ export interface LoadOptions {
   readonly signal?: AbortSignal;
 }
 
-function declaredVersion(data: unknown): string {
+/** The file's `schemaVersion` string, or `null` where it is missing or not a string. */
+function declaredVersion(data: unknown): string | null {
   if (typeof data === 'object' && data !== null && 'schemaVersion' in data) {
     const version = (data as { schemaVersion: unknown }).schemaVersion;
     if (typeof version === 'string') {
       return version;
     }
   }
-  return NO_DECLARED_VERSION;
+  return null;
 }
 
 /** `BASE_URL + path`, resolved against the document so Node's fetch accepts it in tests too. */
@@ -105,7 +106,7 @@ async function fetchOne(
     data = JSON.parse(body);
   } catch {
     // Not JSON at all: nothing declared, and the fault is the content.
-    return { kind: 'invalid', cause: 'content', declared: NO_DECLARED_VERSION };
+    return { kind: 'invalid', cause: 'content', declared: null };
   }
 
   const result = parseEnvelope(descriptor.schema, data, descriptor.expected);
@@ -123,7 +124,7 @@ async function fetchOne(
       // Covers both a failed version probe (no string version declared) and a
       // failed shape parse at the expected major. A non-object body or a
       // non-string version reads as `version` on purpose (item 22 review).
-      return { kind: 'invalid', cause: declared === NO_DECLARED_VERSION ? 'version' : 'content', declared };
+      return { kind: 'invalid', cause: declared === null ? 'version' : 'content', declared };
     default:
       return result satisfies never;
   }
@@ -160,7 +161,7 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
         kind: 'refused',
         path: descriptor.path,
         cause: 'missing',
-        declared: NO_DECLARED_VERSION,
+        declared: null,
         expected: descriptor.expected,
       };
     }

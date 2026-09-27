@@ -232,6 +232,17 @@ describe('the outcomes', () => {
     expect(refusalBody('dataset.json')).toBe(`${REFUSAL_VERSION_DECLARES} abc; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
   });
 
+  // Regression: a declared "none" is printed as declared, not read as no version.
+  it('refuses dataset.json declaring "none" by naming it, not as declaring no version', async () => {
+    serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: 'none' } } });
+    mount();
+    await settleTo('refused');
+    const sentence = refusalBody('dataset.json');
+    expect(sentence).toBe(`${REFUSAL_VERSION_DECLARES} none; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
+    expect(sentence).not.toContain(REFUSAL_NO_VERSION_DECLARED);
+    expect(frame().querySelector('[data-declared]')?.textContent).toBe('none');
+  });
+
   // Matrix: missing version.
   it('refuses config.json with no schemaVersion, declaring no schema version', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });

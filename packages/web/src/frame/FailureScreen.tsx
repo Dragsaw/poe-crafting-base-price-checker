@@ -2,7 +2,7 @@ import '../shared/affordance.css';
 
 import type { JSX } from 'react';
 
-import { NO_DECLARED_VERSION, type RefusalCause } from '../load/load-artifacts';
+import type { RefusalCause } from '../load/load-artifacts';
 import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
 
 /** DESIGN.md `components.refusal-screen` / `components.fetch-failure-screen` copy. */
@@ -31,8 +31,8 @@ export type FailureScreenProps =
       readonly variant: 'refused';
       readonly path: string;
       readonly cause: RefusalCause;
-      /** The declared `schemaVersion`, or `NO_DECLARED_VERSION`. */
-      readonly declared: string;
+      /** The declared `schemaVersion`, or `null` where the file declares no string one. */
+      readonly declared: string | null;
       readonly expected: string;
     }
   | { readonly variant: 'failed'; readonly path: string; readonly onRetry: () => void };
@@ -55,14 +55,14 @@ function RefusalCauseSentence({
   expected,
 }: {
   readonly cause: RefusalCause;
-  readonly declared: string;
+  readonly declared: string | null;
   readonly expected: string;
 }): JSX.Element {
   switch (cause) {
     case 'version':
       return (
         <>
-          {declared === NO_DECLARED_VERSION ? (
+          {declared === null ? (
             REFUSAL_NO_VERSION_DECLARED
           ) : (
             <>

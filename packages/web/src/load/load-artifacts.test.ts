@@ -9,7 +9,7 @@ import {
   type ArtifactAnswer,
 } from '../test-support/artifact-server';
 import { ARTIFACT_ORDER, ARTIFACTS, type ArtifactKey } from './artifacts';
-import { loadArtifacts, NO_DECLARED_VERSION } from './load-artifacts';
+import { loadArtifacts } from './load-artifacts';
 
 let server: SetupServerApi;
 
@@ -110,13 +110,13 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: missing version.
-  it('declares none when the file carries no schemaVersion, or a non-string one', async () => {
+  it('declares null when the file carries no schemaVersion, or a non-string one', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });
     expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
-      declared: NO_DECLARED_VERSION,
+      declared: null,
     });
 
     serveArtifacts(server, { config: { kind: 'json', body: { schemaVersion: 1 } } });
@@ -124,7 +124,7 @@ describe('loadArtifacts', () => {
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
-      declared: NO_DECLARED_VERSION,
+      declared: null,
     });
   });
 
@@ -136,6 +136,18 @@ describe('loadArtifacts', () => {
       path: 'dataset.json',
       cause: 'version',
       declared: 'abc',
+      expected: '1.0.0',
+    });
+  });
+
+  // Regression: the word "none" is a declared string, not the absence of one.
+  it('keeps a declared "none" as a declared malformed version', async () => {
+    serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: 'none' } } });
+    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+      kind: 'refused',
+      path: 'dataset.json',
+      cause: 'version',
+      declared: 'none',
       expected: '1.0.0',
     });
   });
@@ -163,13 +175,13 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: required absent.
-  it('refuses a required artifact that is absent, declaring none', async () => {
+  it('refuses a required artifact that is absent, declaring null', async () => {
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'tracked.json',
       cause: 'missing',
-      declared: NO_DECLARED_VERSION,
+      declared: null,
       expected: '1.0.0',
     });
   });
@@ -206,13 +218,13 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: non-JSON body.
-  it('refuses a 200 that is not JSON, declaring none', async () => {
+  it('refuses a 200 that is not JSON, declaring null', async () => {
     serveArtifacts(server, { weights: { kind: 'text', body: '<!doctype html><html></html>' } });
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'weights.json',
       cause: 'content',
-      declared: NO_DECLARED_VERSION,
+      declared: null,
       expected: '6.0.0',
     });
   });
