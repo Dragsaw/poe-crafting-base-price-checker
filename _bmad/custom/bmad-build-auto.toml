@@ -14,7 +14,7 @@ Launch a subagent with no prior conversation context, with this prompt:
 > When done, report what you changed, how you verified it, and anything left incomplete or risky.
 """
 
-# Epic 1 retro item 15. This layer stops a lost ledger entry. It runs in
+# This layer stops a lost ledger entry. It runs in
 # the review step. The review step always runs before this workflow's
 # commit (step-04's Finalize section, "Commit any reviewed-diff files
 # that remain uncommitted"). A finding from this layer gets fixed before
