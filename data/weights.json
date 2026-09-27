@@ -1,10 +1,10 @@
 {
-  "schemaVersion": "6.0.0",
+  "schemaVersion": "6.1.0",
   "gamePatch": "0.5.5",
   "producer": {
     "id": "poe-mod-weights-producer",
-    "version": "6.0.0",
-    "generatedAt": "2026-09-26T10:52:22.504Z"
+    "version": "6.1.0",
+    "generatedAt": "2026-09-27T17:38:24.207Z"
   },
   "bases": {
     "accessory.amulet": {
@@ -101903,7 +101903,7 @@
     "jewel": {
       "Diamond": {
         "prefix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "prefix\u0000AilmentEffect\u00001\u0000#% increased Magnitude of Ailments you inflict",
@@ -102613,8 +102613,8 @@
               "modGroup": "IncisionChance",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -103238,7 +103238,7 @@
           ]
         },
         "suffix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "suffix\u0000AilmentChance\u00001\u0000#% increased chance to inflict Ailments",
@@ -103739,8 +103739,8 @@
               "modGroup": "DazeBuildup",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -105530,7 +105530,7 @@
           ]
         },
         "suffix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "suffix\u0000AilmentChance\u00001\u0000#% increased chance to inflict Ailments",
@@ -105822,8 +105822,8 @@
               "modGroup": "DazeBuildup",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -106373,7 +106373,7 @@
       },
       "Ruby": {
         "prefix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "prefix\u0000AreaOfEffect\u00001\u0000#% increased Area of Effect",
@@ -106646,8 +106646,8 @@
               "modGroup": "IncisionChance",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -108449,7 +108449,7 @@
       },
       "Time-Lost_Diamond": {
         "prefix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "prefix\u0000AilmentEffect\u00001\u0000Notable Passive Skills in Radius also grant #% increased Magnitude of Ailments you inflict",
@@ -109159,8 +109159,8 @@
               "modGroup": "IncisionChance",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -109830,7 +109830,7 @@
           ]
         },
         "suffix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "suffix\u0000AilmentChance\u00001\u0000Notable Passive Skills in Radius also grant #% increased chance to inflict Ailments",
@@ -110312,8 +110312,8 @@
               "modGroup": "DazeBuildup",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -111509,7 +111509,7 @@
       },
       "Time-Lost_Emerald": {
         "prefix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "prefix\u0000AilmentEffect\u00001\u0000Notable Passive Skills in Radius also grant #% increased Magnitude of Ailments you inflict",
@@ -112130,7 +112130,7 @@
           ]
         },
         "suffix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "suffix\u0000AilmentChance\u00001\u0000Notable Passive Skills in Radius also grant #% increased chance to inflict Ailments",
@@ -112422,8 +112422,8 @@
               "modGroup": "DazeBuildup",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -112992,7 +112992,7 @@
       },
       "Time-Lost_Ruby": {
         "prefix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "prefix\u0000AreaOfEffect\u00001\u0000Notable Passive Skills in Radius also grant #% increased Area of Effect",
@@ -113265,8 +113265,8 @@
               "modGroup": "IncisionChance",
               "itemLevelMin": 1,
               "tierLabel": "T1",
-              "weight": 1,
-              "weightSource": "absent",
+              "weight": 0,
+              "weightSource": "not-in-game",
               "lines": [
                 {
                   "statId": null,
@@ -114019,7 +114019,7 @@
       },
       "Time-Lost_Sapphire": {
         "prefix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "prefix\u0000AilmentEffect\u00001\u0000Notable Passive Skills in Radius also grant #% increased Magnitude of Ailments you inflict",
@@ -122811,7 +122811,7 @@
           ]
         },
         "suffix": {
-          "poolCoverage": "partial",
+          "poolCoverage": "complete",
           "entries": [
             {
               "sourceModifierId": "suffix\u0000AdditionalAmmo\u000055\u0000Loads an additional bolt",
@@ -122836,7 +122836,7 @@
               "weightSource": "published",
               "lines": [
                 {
-                  "statId": null,
+                  "statId": "explicit.stat_1967051901",
                   "ranges": [
                     [
                       2,
