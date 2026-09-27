@@ -6,7 +6,7 @@ status: 'done'
 baseline_revision: 'c6b576c9f21a9937bbbfd1528afdd7b880785808'
 route: 'dispatch'
 review_loop_iteration: 0
-followup_review_recommended: true
+followup_review_recommended: false
 context:
   - '{project-root}/docs/stories/epic-2-context.md'
 ---
@@ -131,6 +131,7 @@ context:
 ## Auto Run Result
 
 Status: done
+Accepted by the human on 2026-09-27.
 
 **Summary.** `core`'s `rank` takes `weightsLoaded` and returns `unrankable`: one `class absent from weights file` entry per distinct non-pruned crafted `(categoryId, className)` when no weights envelope is loaded, and none otherwise. `web` renders `UnrankableAppendix` at the head of `PageTail` in every ready state, in both the empty (state 37) and non-empty treatments. The appendix, key block and foot stay under one `margin-top: auto`.
 
@@ -149,8 +150,8 @@ Status: done
 
 **Review.** 27 findings: 14 routed to patch (4 medium, 10 low, including the grouped rows), 0 deferred, 13 rejected (7 false, 6 low). Each reason is in the Review Triage Log.
 
-**Follow-up review recommended: true.** Three medium entries were patched on this first pass: the appendix-row typography, the DESIGN.md ledger note and the list-statement appendix assertion. The unverified risk: after the typography patch, the reason and mark cells render in serif 13px `appendix-row`, and no browser screenshot was taken after that change. That the reason fits its 250px cell without overflow is estimated, not observed.
+**Follow-up review recommended: false.** Three medium entries were patched on this first pass: the appendix-row typography, the DESIGN.md ledger note and the list-statement appendix assertion. The one named risk was that the typography patch was not re-screenshotted; the human checked the font on 2026-09-27 and found no issue. The other two patches are a ledger line and a test that ran green, so no unverified risk remains.
 
 **Verification.** `pnpm check` is clean: tsc, eslint and depcruise. `pnpm test` passes 87 files and 1134 tests, with no escaped request. Before the review patches, agent-browser (a named session) took full-page screenshots. On the committed page, the title alone reads `— 0 Item Classes`. In the absent-weights world (a scratch build, `weights.json` removed, 29 crafted classes), all 29 rows show, and the key block and foot sit below them.
 
-**Residual risks.** The typography change is not re-screenshotted. `weightsLoaded` is required, so every future `rank` caller must set it. A className wider than 292px would spill into the mark cell, and today's class names do not reach that width.
+**Residual risks.** `weightsLoaded` is required, so every future `rank` caller must set it. A className wider than 292px would spill into the mark cell, and today's class names do not reach that width.
