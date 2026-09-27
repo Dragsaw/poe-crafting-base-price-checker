@@ -88,9 +88,14 @@ export function interval(line: WeightsLine): Interval | undefined {
  * of its lines carries the reference's `statId` and a derived interval wholly
  * inside the band. A `valueless` reference contains an entry when one of its
  * lines carries the `statId` with empty `ranges`. A `null`-`statId` line never
- * matches.
+ * matches. An entry whose `weight` is `0` is never contained, whatever its
+ * `weightSource` or lines (§1). It still enters the denominator,
+ * where it adds nothing.
  */
 export function contains(ref: ModifierRef, entry: ModifierWeight): boolean {
+  if (entry.weight === 0) {
+    return false;
+  }
   return entry.lines.some((line) => {
     if (line.statId !== ref.statId) {
       return false;

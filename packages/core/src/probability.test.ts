@@ -118,6 +118,20 @@ describe('contains (§1)', () => {
     expect(contains(band(10, 12), unresolved)).toBe(false);
     expect(pOf(affixProbability(pools([unresolved, hit], []), 'prefix', band(10, 12), 82, 0))).toBe(0.5);
   });
+
+  it('never contains a weight-0 tier, not-in-game or published, whatever its lines carry', () => {
+    const notInGame = { ...tier([line(STAT, [10, 12])], 0), weightSource: 'not-in-game' as const };
+    const published = tier([line(STAT, [10, 12])], 0);
+    expect(contains(band(10, 12), notInGame)).toBe(false);
+    expect(contains(band(10, 12), published)).toBe(false);
+    expect(contains({ kind: 'valueless', statId: STAT }, tier([line(STAT)], 0))).toBe(false);
+  });
+
+  it('gives an empty containment set, not a weight-0 one, for a band that covers only weight-0 tiers', () => {
+    const zero = { ...tier([line(STAT, [10, 12])], 0), weightSource: 'not-in-game' as const };
+    const other = tier([line(STAT, [20, 30])], 100);
+    expect([zero, other].filter((entry) => contains(band(10, 12), entry))).toEqual([]);
+  });
 });
 
 describe('poolOf', () => {
@@ -170,6 +184,21 @@ describe('eligible (§9)', () => {
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
   });
+
+  it('gives empty-eligible-pool, never 0, for a slot of only weight-0 tiers (W = 0)', () => {
+    const zeroA = { ...tier([line(STAT, [1, 2])], 0), weightSource: 'not-in-game' as const };
+    const zeroB = { ...tier([line(STAT, [3, 4])], 0), weightSource: 'not-in-game' as const };
+    const live = tier([line(OTHER, [1, 2])], 100);
+    const classPools = pools([zeroA, zeroB], [live]);
+    expect(affixProbability(classPools, 'prefix', band(1, 4), 82, 0)).toEqual({
+      ok: false,
+      reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
+    });
+    expect(combinationProbability(classPools, { itemLevelMin: 82, suffix: band(1, 2, OTHER) }, 0)).toEqual({
+      ok: false,
+      reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
+    });
+  });
 });
 
 describe('combinationProbability (§11)', () => {
@@ -199,14 +228,20 @@ describe('combinationProbability (§11)', () => {
     ).toEqual({ ok: false, reason: { kind: 'augment-exhausted', firstDrawSlot: 'prefix', modGroup: 'A' } });
   });
 
-  it('skips a weight-0 first draw that would exhaust the augment', () => {
+  it('skips a weight-0 first draw of an absent affix that would exhaust the augment', () => {
     const zero = { ...tier([line(STAT, [10, 12])], 0, { modGroup: 'A' }), weightSource: 'not-in-game' as const };
     const a = tier([line(STAT, [10, 12])], 100, { modGroup: 'B' });
     const b = tier([line(STAT, [20, 30])], 100, { modGroup: 'C' });
     const c = tier([line(OTHER, [1, 2])], 200, { modGroup: 'A' });
-    // Prefix first: zero skipped; a → 100 · 200 / 200 = 100. Suffix first: c → 200 · 100 / 200 = 100.
-    const result = combinationProbability(pools([zero, a, b], [c]), { itemLevelMin: 82, prefix: band(10, 12) }, 0);
-    expect(result).toEqual({ ok: true, p: 200 / 400 });
+    // The absent prefix contains its whole eligible set, zero included.
+    // Prefix first: zero skipped; a → 100 · 200 / 200 = 100; b → 100 · 200 / 200 = 100.
+    // Suffix first: c → 200 · 200 / 200 = 200.
+    const result = combinationProbability(
+      pools([zero, a, b], [c]),
+      { itemLevelMin: 82, suffix: band(1, 2, OTHER) },
+      0,
+    );
+    expect(result).toEqual({ ok: true, p: 1 });
   });
 
   it('gives empty-eligible-pool for the suffix when only the suffix slot is empty', () => {
