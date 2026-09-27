@@ -2,9 +2,9 @@
 title: 'Weights File Contract'
 status: final
 governed_by: AD-17
-schemaVersion: '6.0.0'
+schemaVersion: '6.1.0'
 created: '2026-09-12'
-updated: '2026-09-26'
+updated: '2026-09-27'
 ---
 
 # Weights File Contract
@@ -28,6 +28,22 @@ wrote the file.
 carries. See *Why this file has to exist* below. The app therefore cannot rank any base
 type until a conforming file is present. The intended producer is a separate scraper
 project. This document is the contract that the scraper project must satisfy.
+
+## 6.1.0 — not-in-game tiers and internal lines
+
+**Additive.** No field is added, removed or reshaped; `weightSource` gains one value and a
+`statId: null` line gains two sanctioned meanings. A reader implementing only `6.0.0`
+will refuse a file carrying `not-in-game`, because its own hard-error list rejects any
+`weightSource` other than `published`/`absent`; a consumer must implement `6.1.0` to accept it.
+
+| Change | Reason |
+| --- | --- |
+| New **`weightSource: "not-in-game"`**, with **`weight` forced to `0`** | poe2db lists a few modifiers that cannot roll in game (the Incision-chance and Daze-chance jewel mods: the trade catalogue carries only a different, boolean stat for each). They stay in the file as one entry per tier, with `sourceModifierId`, `modGroup` and verbatim `ranges`, but can never be drawn. This is the **one** exception to publishing `DropChance` verbatim. The list is hand-kept by the producer, never inferred from an unmatched line. |
+| A `statId: null` line inside a **`complete`** pool is either **not-in-game** or an **internal engine line** | An internal line (`local jewel effect base radius [#]`) is poe2db leaking a raw engine stat next to a real one; it has no trade stat of its own and never changes the tier's weight. Neither kind is a gap in the pool, so neither makes it `partial`. Any other `null` line still does. |
+| New hard error: `weightSource: "not-in-game"` with a non-zero `weight` | The marker exists only to say "cannot roll"; a non-zero weight contradicts it. |
+
+**The producer-6.1.0 file of 2026-09-27** has 0 of 118 pools `partial`: 8 tiers are
+`not-in-game`, 8 lines are internal, and no line is unresolved.
 
 ## 6.0.0 — modGroup and per-stat tierLabel
 
@@ -152,6 +168,9 @@ Unchanged in spirit from `4.x`, decoupled from the removed cell machinery.
 - **An unnamed placeholder row still counts as missing.** A source that publishes a
   blank placeholder (e.g. poe2db's `TBD` rows) and is dropped by the producer's
   placeholder policy makes that pool `partial`, not `complete`.
+- **(`6.1.0`) A `statId: null` line makes its pool `partial`** unless the producer's
+  hand-kept list marks it `not-in-game` (the whole tier then carries `weight: 0`) or as an
+  internal engine line. A marked line is not a gap: the pool still enumerates that tier.
 
 There is no third option. `poolCoverage` is an honest per-pool assertion, not something
 the producer computes from cell coverage — there are no cells to compute it from.
@@ -173,7 +192,7 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 
 ```jsonc
 {
-  "schemaVersion": "6.0.0",           // semver; core refuses a major it does not know
+  "schemaVersion": "6.1.0",           // semver; core refuses a major it does not know
   "gamePatch": "0.5.5",               // operator-asserted at run time; never defaulted
   "producer": {
     "id": "poe2-weights-scraper",     // stable producer identifier
@@ -193,7 +212,7 @@ How `core` applies this rule to a crafting act is spine AD-17 and
               "itemLevelMin": 60,        // this tier's own item level
               "tierLabel": "T7",         // display only; never a matching key
               "weight": 40,              // raw spawn weight as published, unnormalised
-              "weightSource": "published",  // "published" | "absent"
+              "weightSource": "published",  // "published" | "absent" | "not-in-game"
               "lines": [
                 {
                   "statId": "explicit.stat_1509134228",
@@ -259,10 +278,10 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 | `modGroup` (`6.0.0`) | **Required on every entry**, a non-empty string: poe2db's `ModFamilyList` value for this tier, verbatim (a producer refuses a row whose list is not exactly one string). The game's mutual-exclusion group — see *The exclusivity rule*. Nothing is derived from it, and a consumer never recovers it by parsing `sourceModifierId`. |
 | `itemLevelMin` | **Required.** The lowest item level at which this tier's mass can roll, taken verbatim from poe2db. |
 | `tierLabel` | Display only. Never a matching key. **Since `6.0.0`**, numbered per stat within `(slot, modGroup)`, T1 = highest `itemLevelMin`: one `T1..Tn` run per distinct stat template in a group, an `itemLevelMin` tie broken by poe2db's page order. No label repeats within a run. |
-| `weight` | Raw spawn weight as poe2db published it (`DropChance`), unnormalised, non-negative. `0` is meaningful ("cannot roll on this base") and must still be emitted. |
-| `weightSource` | **Required.** `"published"` where poe2db supplied a real weight (a JSON string `DropChance`), `"absent"` where it supplied a filler (a JSON number). Never inferred from the value. |
+| `weight` | Raw spawn weight as poe2db published it (`DropChance`), unnormalised, non-negative. `0` is meaningful ("cannot roll on this base") and must still be emitted. **Sole exception (`6.1.0`):** a `weightSource: "not-in-game"` entry carries `0` whatever poe2db published. |
+| `weightSource` | **Required.** `"published"` where poe2db supplied a real weight (a JSON string `DropChance`), `"absent"` where it supplied a filler (a JSON number). Never inferred from the value. **`"not-in-game"` (`6.1.0`):** poe2db lists the tier but it cannot roll in game; `weight` is forced to `0`. Set only from the producer's hand-kept list, never inferred from an unmatched line. |
 | `lines` | **Required, at least one entry.** One item per stat line poe2db's template prints, split at the template's own line breaks — no value math, no partitioning. |
-| `lines[].statId` | A trade API stat id matched by this producer's stat-text resolution, or `null` if unresolved. Never a matching key from `core`'s side — `core` treats it as opaque identity. Validated report-only against the trade catalogue by `sync`, same as `4.x` (AD-6, AD-25). |
+| `lines[].statId` | A trade API stat id matched by this producer's stat-text resolution, or `null` if unresolved. **Since `6.1.0`, a `null` line inside a `complete` pool is either not-in-game (its entry is `weightSource: "not-in-game"`, `weight: 0`) or an internal engine line with no trade stat of its own (weight unchanged)**; any other `null` line makes its pool `partial`. Never a matching key from `core`'s side — `core` treats it as opaque identity. Validated report-only against the trade catalogue by `sync`, same as `4.x` (AD-6, AD-25). |
 | `lines[].ranges` | Verbatim `[min, max]` pairs, one per `#` in that line's own template text, in the order poe2db prints them. A line with no `#` (a flat, valueless line) carries an empty array. **Not** cut, cast, or reduced to a single derived value — a two-number stat's two ranges are both reported as poe2db shows them. |
 
 ## Validation
@@ -276,7 +295,8 @@ source of truth; the shape above documents it and is not a parallel definition.
 - a missing `sourceModifierId`, `itemLevelMin`, `weight`, `weightSource`, or `lines`
 - **(`6.0.0`)** a missing, non-string or empty `modGroup`
 - a negative `weight`
-- `weightSource` not one of `"published"` / `"absent"`
+- `weightSource` not one of `"published"` / `"absent"` / `"not-in-game"`
+- **(`6.1.0`)** `weightSource: "not-in-game"` with a `weight` other than `0`
 - `lines` empty
 - a `lines[]` entry whose `ranges` contains a pair where `min > max`
 - a `lines[]` entry whose `ranges` carries **more than two** pairs. The game publishes at most

@@ -104,9 +104,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-2-2-the-raw-ranking-branch-league-scoped-and-computed-at-read-time.md`
   summary: A `no-listings` state recorded in a previous league stays `no-listings` after a league reset. The state carries no league, so `core` (`packages/core/src/rank.ts`) cannot restate it as `not-yet-synced` / `league-mismatch`. The only league-bearing field is the entry's `lastSearchLeague`, and AD-9 forbids `core` to read it.
   evidence: Spec 2.2 restates only a `priced` observation whose `observation.league` differs from the active league. `unresolvable` has the same shape, and so does a published `not-yet-synced` state such as `no-exchange-rate`: it carries no league either, so it outlives a reset under its old reason instead of `league-mismatch`. Settle it with an AD-9 or AD-19 ruling: either `sync` resets carried-over states on a league change, or `core` gains a sanctioned league input for non-`priced` states.
-- source_spec: `docs/stories/spec-deferred-emitted-dts-carries-ts-specifiers.md`
-  summary: The post-emit rewrite covers only `packages/contracts/dist`; `packages/core/dist` and `packages/sync/dist` emit the same `.d.ts` shape and still carry relative `.ts` specifiers.
-  evidence: The spec's Never boundary excludes them because the closed entry named only contracts. A grep after `pnpm typecheck` on 2026-09-26 finds `.ts` specifiers in `packages/core/dist/index.d.ts` and `packages/sync/dist/dry-run.d.ts`. The fix is to add both directories to `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts`.
 
 ## Deferred from: story 2.3 (2026-09-26)
 
@@ -167,9 +164,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: code review of spec-tracked-json-curation-tooling.md (2026-09-27)
 
-- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
-  summary: No test checks that `tsconfig.tools.json`, `vitest.config.ts` and `eslint.config.mjs` still cover `.claude/skills/tracked-json/scripts/*.ts`.
-  evidence: If the vitest include line or one negation in the eslint ignore chain (`eslint.config.mjs:25`) is dropped, `lookup.ts` silently loses type, lint or test coverage, and `pnpm check` and `pnpm test` still pass. `tools/boundary-check` has no wiring guard either, so this belongs to a general "every .ts file is covered" guard. The spec frontmatter recorded this item but did not append it here.
 - source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
   summary: `modText` in `.claude/skills/tracked-json/scripts/lookup.ts` gets the mod text by parsing `sourceModifierId`, and `WEIGHTS-FILE-SCHEMA.md` (the `sourceModifierId` row) calls that field "Opaque to the app".
   evidence: The spec's Always list authorizes the parse. So the spec and the weights contract disagree. The owner of the weights contract decides between two options: allow this curation-only consumer to depend on the layout, or make the producer emit the mod text as its own field. Until that decision, a test over the committed weights detects a change of the layout.
@@ -314,15 +308,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
   summary: "Note. The epic 2 retrospective entry \"Parse the eight kept artifacts … during `pnpm build`\" predates this change. Its \"eight\" now means the seven AD-24 artifacts (`ALLOWLIST` in `tools/prune-pages.mjs`); `catalogue/static.json` is no longer kept in the Pages build."
   evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`. `pnpm build` logs `prune-pages: removed … catalogue/static.json …`.
+- source_spec: `docs/stories/spec-deferred-post-emit-rewrite-covers-only-contracts.md`
+  summary: `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts` is a hand-kept list of packages, and nothing checks it against the `emitDeclarationOnly` packages, so a new such package keeps its `.ts` specifiers in `dist` with no signal.
+  evidence: Review of this spec (blind and edge-case layers). The list was hand-kept before this change too (contracts only), which is how the closed entry arose. A test that reads each `packages/*/tsconfig.json` and compares the `emitDeclarationOnly` ones with `TARGET_DIRS`, or a fourth item in the AGENTS.md "A new package needs three edits" pitfall, would close it.
+- source_spec: `docs/stories/spec-deferred-no-test-checks-scripts-coverage.md`
+  summary: No test checks that the hand-listed `tools/` entries in `tsconfig.tools.json`, `vitest.config.ts` and `eslint.config.mjs` (`tools/boundary-check`, `tools/dev-stop`, `tools/dts-specifiers`, `tools/prune-pages.mjs`) still cover their files; only `.claude/skills/tracked-json/scripts/` has a wiring guard.
+  evidence: The closed entry's evidence says `tools/boundary-check` has no wiring guard either and that the fix belongs to a general "every .ts file is covered" guard. This change built only the tracked-json guard (`test/tracked-json-scripts-coverage.test.ts`), whose checkers are per directory. Dropping, for example, `tools/dev-stop/*.ts` from `tsconfig.tools.json` still fails neither `pnpm check` nor `pnpm test`. Extending the same checkers over each hand-listed directory would close it.
 
 ## Deferred from: story 3.1 (2026-09-27)
 
-- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
-  summary: "Producer request (`poe-mod-weights-producer`). Declare `poolCoverage: \"complete\"` for a pool whose only missing rows are data-mined mods that cannot roll. Today the Emerald suffix and the Crossbows suffix declare `partial` only for that reason, so the page lists Emerald and Crossbows in the appendix as `pool partial`. They rank once the producer regenerates `data/weights.json` with those pools declared `complete`. The app does not change: it trusts `poolCoverage` as declared (AD-11). `packages/contracts/src/weights-file.test.ts` (8,437 entries, 17 `null` statIds, 11 partial pools) and `packages/web/src/App.test.tsx` (the committed-data appendix test) assert the current file's counts and rows, so those tests change in the same commit as the regenerated `data/weights.json`."
-  evidence: Spec decision (human, 2026-09-27). `data/weights.json` of 2026-09-26 has 11 partial pools; `jewel/Emerald` suffix and `weapon.crossbow/Crossbows` suffix are the only partial slots of a tracked class. `packages/web/src/App.test.tsx`, the committed-data appendix test, asserts the two rows.
-- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
-  summary: "[NOTE FOR ARCHITECT] Reword the *placeholder row* bullet of *The pool-completeness rule* in `WEIGHTS-FILE-SCHEMA.md` to match the producer request above: a dropped row that names a data-mined mod that cannot roll does not count as missing, so it does not make the pool `partial`. The bullet today says only that an unnamed placeholder row counts as missing."
-  evidence: Spec decision (human, 2026-09-27). `WEIGHTS-FILE-SCHEMA.md`, *The pool-completeness rule*, third bullet.
 - source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
   summary: "[NOTE FOR ARCHITECT] `WeightsFileSchema` refuses a few values that *Validation* in `WEIGHTS-FILE-SCHEMA.md` does not list as hard errors: an empty `producer.id`, a `producer.generatedAt` that is not ISO-8601 UTC, and an empty `categoryId`, `className` or `statId`. The trust strip needs the first two (`utcDate` throws on a non-ISO instant). The reused id schemas carry the rest. Either list them in *Validation*, or say that *Validation* covers only the rules beyond the typed Shape."
   evidence: Story 3.1 review, triage row 2. `packages/contracts/src/weights-file.ts`, `packages/web/src/frame/trust-facts.ts` `utcDate`.

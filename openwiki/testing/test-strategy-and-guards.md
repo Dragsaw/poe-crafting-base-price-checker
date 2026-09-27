@@ -22,6 +22,8 @@ sources:
     resource: repo://packages/web/src/test-setup.ts
   - id: openwiki-source-d518aa7bfa6850809e2f0f46
     resource: repo://packages/web/src/test-support/artifact-server.ts
+  - id: openwiki-source-573123b18d7e9f56e46bd1ce
+    resource: repo://packages/web/src/test-support/dom.tsx
   - id: openwiki-source-ccecd3ec2865b64b4ea6f780
     resource: repo://packages/web/vite.config.ts
   - id: openwiki-source-d121a27980b15c40a65a882b
@@ -36,10 +38,10 @@ sources:
     resource: repo://test/setup.ts
   - id: openwiki-source-fbadcd8591b65031efaaedce
     resource: repo://vitest.config.ts
-generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T13:11:02.100Z
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Test strategy and network guards
@@ -51,7 +53,7 @@ verified:
 `pnpm test` runs `vitest run`. The root `vitest.config.ts` declares projects, because Vitest 5 has no `vitest.workspace.ts`:
 
 - `packages/*`: each package's own config. `contracts`, `core` and `sync` run in Node with `src/**/*.test.ts`. `web` is declared in `packages/web/vite.config.ts` and runs under **jsdom** with `src/**/*.test.{ts,tsx}`.
-- `root`: the workspace-level guards that belong to no package: `test/**/*.test.ts`, `tools/boundary-check/*.test.ts`, `tools/dts-specifiers/*.test.ts` and the tracked-json skill's script tests.
+- `root`: the workspace-level guards that belong to no package: `test/**/*.test.ts`, `tools/boundary-check/*.test.ts`, `tools/dev-stop/*.test.ts`, `tools/dts-specifiers/*.test.ts` and the tracked-json skill's script tests.
 
 Every project lists `test/setup.ts` in `setupFiles`. `web` also adds `src/test-setup.ts`, which provides jsdom shims for Mantine and React 19 (`matchMedia`, `ResizeObserver`, `IS_REACT_ACT_ENVIRONMENT`).
 
@@ -99,6 +101,7 @@ The real hooks are tested by running a **child Vitest** over a fixture directory
 | `test/no-hardcoded-rate-limits.test.ts` | no rate-limit rule, policy or rate constant in non-test source |
 | `test/prune-pages.test.ts` | the Pages prune step |
 | `test/commit-msg-hook.test.ts` | the commit subject rules |
+| `tools/dev-stop/dev-stop.test.ts` | `pnpm dev:stop` port parsing and stop planning over recorded process chains. The chains are data, so the test kills nothing. |
 
 See [Package graph, ports and purity boundaries](../architecture/package-graph-and-ports.md) for what these guards protect.
 
@@ -107,7 +110,8 @@ See [Package graph, ports and purity boundaries](../architecture/package-graph-a
 - **Port fakes.** `createFakeHttpPort(fixtures)` answers requests keyed `"METHOD url"`, records every request it received, and **rejects** an unfixtured request instead of returning a default 404. Filesystem, git and clock fakes work the same way. Units take ports as values, so `sync` tests build a chunk entirely in memory. `run-chunk.test.ts` is the largest suite.
 - **Recorded fixtures.** `fixtures/` holds real trade-API responses captured by `pnpm fixtures:record`, a command that only a human runs. Nobody writes a fixture by hand. Personal identifiers are redacted when the fixture is recorded. The pricing fixture port (`packages/sync/src/pricing/fixture-port.ts`) serves `trade-search-*`/`trade-fetch-*` files by a digest of method, URL and body. It serves `trade-data-leagues.json` for the league gate. It rejects any other request with a message that names the missing fixture. `price-entry.fixtures.test.ts` and `pnpm sync:dry` use it.
 - **The fixture workload.** `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH` in `packages/sync/src/pricing/fixture-names.ts`) is the one hand-edited file in `fixtures/`. It is the recorder's input, not a capture: a small fixed list with one entry per distinct search shape, owned by the fixture-backed tests. It is deliberately not `data/tracked.json`, so the player's list can grow with no new recording. `price-entry.fixtures.test.ts` checks that every non-pruned workload entry has a recorded search. An edit to the workload changes the digests and needs a new `pnpm fixtures:record`.
-- **Web artifact server.** `packages/web/src/test-support/artifact-server.ts` registers MSW handlers for all eight artifacts on the shared server, with minimal valid bodies. Every web fetch test registers all eight. Loopback URLs pass through the guard, so a missing handler would reach a real socket instead of failing.
+- **Web artifact server.** `serveArtifacts` in `packages/web/src/test-support/artifact-server.ts` registers MSW handlers for all seven artifacts on the shared server, with minimal valid bodies (`VALID_BODIES`). Every web fetch test registers all seven. Loopback URLs pass through the guard, so a missing handler would reach a real socket instead of failing. It also serves a trap for `catalogue/static.json` (`NEVER_FETCHED_PATH`), a file the site publishes but the page must never fetch. It returns a log of each request's URL and `cache` mode, so a test can assert the fetch set and the `no-cache` mode. A per-artifact `ArtifactAnswer` overrides a response with a JSON or text body, a status, a network error, or a `gated` answer that waits on a `gate()` promise to test the loading order.
+- **DOM helpers.** `packages/web/src/test-support/dom.tsx` holds the shared helpers for the web component tests: the fixed test clock `NOW`, `rgb(hex)` (a token colour as jsdom reports it), one mounted React root per test (`mount`, `rerender`, `unmount`), `mountList`/`rerenderList`, which rank a raw workload through `core` and mount `RankedList`, and the `rowsIn`/`cellIn` queries. A file that mounts through these calls `unmount` in its `afterEach`.
 
 ## Commands no test runs
 

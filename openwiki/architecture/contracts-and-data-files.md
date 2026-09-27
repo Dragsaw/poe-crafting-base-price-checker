@@ -5,7 +5,7 @@ description: How @poe/contracts defines every cross-package concept as a Zod sch
 tags: [contracts, zod, schema-versioning, data-files, canonical-key, dataset]
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
+    at: 2026-09-27T16:49:38.941Z
 sources:
   - id: openwiki-source-91bd8d7e3af778926d4b2592
     resource: repo://packages/contracts/src/canonical-key.ts
@@ -23,7 +23,9 @@ sources:
     resource: repo://packages/sync/src/shell.ts
   - id: openwiki-source-64f4b9e1de8f9b00250b3775
     resource: repo://packages/sync/src/write-artifact.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+  - id: openwiki-source-f20f60e1ecaf073e364173ca
+    resource: repo://packages/web/src/load/artifacts.ts
+generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
 ---
 
 # Contracts, envelopes and the data/ files
@@ -44,9 +46,9 @@ The repository is its own database. `sync` writes JSON files under `data/`, the 
 | `data/sync-progress.json` | `sync` chunk | `sync` only | Completed keys of the current pass and the `notBefore` penalty. |
 | `data/weights.json` | External producer | `sync` (report-only checks), `web` (tolerable) | Only the envelope and header are typed here. |
 | `data/recipes.json` | The player | `web` (tolerable) | Craft recipes. Ids must be unique. |
-| `data/catalogue/{items,stats,filters,static}.json` | `pnpm catalogue:refresh` | `sync`, `web` (stats, static) | Captured trade-API catalogue payloads. |
+| `data/catalogue/{items,stats,filters,static}.json` | `pnpm catalogue:refresh` | `sync`, `web` (`stats.json` only) | Captured trade-API catalogue payloads. |
 
-The eight files `web` fetches, and whether each is required or tolerable, are covered in [Web page: artifact load and ranked list](../web/page-load-and-ranked-list.md). How the chunk writes the `sync` files is in [The sync chunk runner](../sync/chunk-runner.md).
+The seven files `web` fetches (AD-24), and whether each is required or tolerable, are covered in [Web page: artifact load and ranked list](../web/page-load-and-ranked-list.md). How the chunk writes the `sync` files is in [The sync chunk runner](../sync/chunk-runner.md).
 
 ## Versioned envelopes
 
@@ -116,7 +118,7 @@ The request fields sit beside the state:
 
 A request with no answer (429, 5xx, timeout) stamps `lastAttemptedAt` and leaves both search fields unchanged. So `lastSearchId` can be older than `lastAttemptedAt`. A never-synced entry carries none of the three fields, and no component may insert a placeholder. `core` never reads the search fields.
 
-The dataset file also carries the top-level `league`, `generatedAt`, and `currencyRates`. The rate set travels inside the dataset so that the page's fetch set stays at eight files.
+The dataset file also carries the top-level `league`, `generatedAt`, and `currencyRates`. The rate set travels inside the dataset so that the page's fetch set stays at seven files.
 
 ## Sync progress and the sync report
 

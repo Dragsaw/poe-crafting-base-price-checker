@@ -1127,7 +1127,7 @@ describe('the Unrankable appendix', () => {
   }
 
   // Matrix: committed.
-  it('lists the two partial classes on the committed data/, and neither complete one, above the key block and the foot', async () => {
+  it('renders the empty appendix on the committed data/, whose pools are all complete, above the key block and the foot', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights}.json', {
       eager: true,
       import: 'default',
@@ -1140,16 +1140,11 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    // Emerald and Crossbows each declare one `partial` slot; Amulets and Bows are complete (Story 3.1).
-    const rows = appendixRows();
-    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Crossbows', 'Emerald']);
-    for (const row of rows) {
-      expect(row.querySelector('[data-cell="reason"]')?.textContent).toBe('pool partial');
-    }
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('2 Item Classes');
-    expect(appendix().textContent).not.toContain('Amulets');
-    expect(appendix().textContent).not.toMatch(/\bBows\b/);
-    expect(frame().textContent).toContain(APPENDIX_LEAD);
+    // Producer 6.1.0 declares every pool `complete` (the not-in-game tiers no longer make a pool partial).
+    expect(appendixRows()).toEqual([]);
+    expect(appendix().dataset['unrankableAppendix']).toBe('empty');
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('0 Item Classes');
+    expect(frame().textContent).not.toContain(APPENDIX_LEAD);
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.

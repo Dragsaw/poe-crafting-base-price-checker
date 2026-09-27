@@ -3,9 +3,6 @@ type: subsystem
 title: Pricing step and league gate
 description: How sync prices one tracked entry against the Path of Exile 2 trade API — the deterministic search body, one search and at most one fetch of the ten cheapest results, Divine normalisation from data/currencies.json, the lower median, the outcome per response class — and how the run-start league gate validates the configured league.
 tags: [sync, pricing, trade-api, search-body, divine, median, league]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-1586f13640754a9ac798c146
     resource: repo://packages/sync/src/league/league-gate.ts
@@ -18,6 +15,9 @@ sources:
   - id: openwiki-source-f003d449d6194f288151c79f
     resource: repo://packages/sync/src/trade/endpoints.ts
 generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Pricing step and league gate

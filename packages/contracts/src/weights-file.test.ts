@@ -63,11 +63,11 @@ describe('WeightsFileSchema — conforming files', () => {
     expect(entries).toHaveLength(8437);
     expect(entries.every((entry) => entry.lines.length > 0)).toBe(true);
     const nullStatIds = entries.flatMap((entry) => entry.lines).filter((line) => line.statId === null);
-    expect(nullStatIds).toHaveLength(17);
+    expect(nullStatIds).toHaveLength(16);
     const partialPools = pools
       .flatMap((pools) => [pools.prefix, pools.suffix])
       .filter((pool) => pool.poolCoverage === 'partial');
-    expect(partialPools).toHaveLength(11);
+    expect(partialPools).toHaveLength(0);
   });
 
   it('keeps a hybrid tier as one entry with two nested lines', () => {
@@ -90,6 +90,7 @@ describe('WeightsFileSchema — conforming files', () => {
     ['a null statId', fileWithEntries(entryOf({ lines: [{ statId: null, ranges: [[10, 20]] }] }))],
     ['two null statIds in one entry', fileWithEntries(entryOf({ lines: [{ statId: null, ranges: [] }, { statId: null, ranges: [] }] }))],
     ['weightSource absent', fileWithEntries(entryOf({ weightSource: 'absent' }))],
+    ['a not-in-game entry with weight 0 and a null statId (6.1.0)', fileWithEntries(entryOf({ weight: 0, weightSource: 'not-in-game', lines: [{ statId: null, ranges: [[5, 10]] }] }))],
     ['no tierLabel, producer.version or producer.sourceUrl', fileOf(
       { 'accessory.amulet': { Amulets: classOf(poolOf([{ ...entryOf(), tierLabel: undefined }])) } },
       { producer: { id: 'p', generatedAt: '2026-09-26T10:52:22.504Z' } },
@@ -115,7 +116,7 @@ describe('WeightsFileSchema — refusals', () => {
     expect(parse({ schemaVersion: '5.1.0', bases: 'not even an object' })).toEqual({
       ok: false,
       reason: 'unknown-major',
-      expected: '6.0.0',
+      expected: '6.1.0',
       found: '5.1.0',
     });
   });
@@ -136,6 +137,7 @@ describe('WeightsFileSchema — refusals', () => {
     ['a non-string modGroup', fileWithEntries(entryOf({ modGroup: 7 })), [...ENTRY_PATH, 'modGroup'], 'not a string'],
     ['a negative weight', fileWithEntries(entryOf({ weight: -1 })), [...ENTRY_PATH, 'weight'], 'weight'],
     ['a bad weightSource', fileWithEntries(entryOf({ weightSource: 'measured' })), [...ENTRY_PATH, 'weightSource'], 'weightSource is not'],
+    ['a not-in-game entry with a non-zero weight', fileWithEntries(entryOf({ weightSource: 'not-in-game' })), [...ENTRY_PATH, 'weight'], 'not-in-game'],
     ['empty lines', fileWithEntries(entryOf({ lines: [] })), [...ENTRY_PATH, 'lines'], 'lines'],
     [
       'min > max',
@@ -227,7 +229,7 @@ describe('the className grammar', () => {
   it('is exported once, from the contracts barrel', () => {
     expect(contracts.defenceLettersOf).toBe(defenceLettersOf);
     expect(contracts.DEFENCE_OF_LETTER).toEqual({ str: 'ar', dex: 'ev', int: 'es' });
-    expect(contracts.WEIGHTS_SCHEMA_VERSION).toBe('6.0.0');
+    expect(contracts.WEIGHTS_SCHEMA_VERSION).toBe('6.1.0');
     expect(contracts.WeightsFileSchema).toBe(WeightsFileSchema);
   });
 });

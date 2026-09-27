@@ -21,7 +21,7 @@ import { SchemaVersionSchema } from './schema-version.ts';
  */
 
 /** The weights contract this build reads. Only the major is compared. */
-export const WEIGHTS_SCHEMA_VERSION = '6.0.0';
+export const WEIGHTS_SCHEMA_VERSION = '6.1.0';
 
 /** One verbatim `[min, max]` pair; `min > max` is a hard error. */
 const RangePairSchema = z
@@ -53,12 +53,19 @@ export const ModifierWeightSchema = z
     itemLevelMin: z.number(),
     tierLabel: z.string().optional(),
     weight: z.number().min(0, { message: 'weight is negative; a raw spawn weight is >= 0' }),
-    weightSource: z.enum(['published', 'absent'], {
-      error: 'weightSource is not "published" or "absent"; it is one of the two, never inferred',
+    weightSource: z.enum(['published', 'absent', 'not-in-game'], {
+      error: 'weightSource is not "published", "absent" or "not-in-game"; it is one of the three, never inferred',
     }),
     lines: z.array(WeightsLineSchema).min(1, { message: 'lines is empty; an entry carries at least one line' }),
   })
   .superRefine((entry, ctx) => {
+    if (entry.weightSource === 'not-in-game' && entry.weight !== 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['weight'],
+        message: `weight is ${String(entry.weight)} on a not-in-game entry; a not-in-game tier carries weight 0`,
+      });
+    }
     const firstIndexByStatId = new Map<string, number>();
     entry.lines.forEach((line, index) => {
       if (line.statId === null) {

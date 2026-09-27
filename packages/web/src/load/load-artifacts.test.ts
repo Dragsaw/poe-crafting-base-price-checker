@@ -38,7 +38,7 @@ describe('the seven artifacts', () => {
   });
 
   it('expects weights major 6 and version 1 elsewhere', () => {
-    expect(ARTIFACTS.weights.expected).toBe('6.0.0');
+    expect(ARTIFACTS.weights.expected).toBe('6.1.0');
     expect(ARTIFACTS.dataset.expected).toBe('1.0.0');
   });
 });
@@ -161,7 +161,7 @@ describe('loadArtifacts', () => {
       path: 'weights.json',
       cause: 'version',
       declared: '5.1.0',
-      expected: '6.0.0',
+      expected: '6.1.0',
     });
   });
 
@@ -179,7 +179,7 @@ describe('loadArtifacts', () => {
       path: 'weights.json',
       cause: 'content',
       declared: '6.0.0',
-      expected: '6.0.0',
+      expected: '6.1.0',
     });
   });
 
@@ -245,7 +245,7 @@ describe('loadArtifacts', () => {
       path: 'weights.json',
       cause: 'content',
       declared: null,
-      expected: '6.0.0',
+      expected: '6.1.0',
     });
   });
 
