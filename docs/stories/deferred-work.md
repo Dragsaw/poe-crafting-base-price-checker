@@ -250,3 +250,42 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 ## Resolved by story 2.8 (2026-09-27)
 
 - One entry is **closed**: the "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)" `[NOTE FOR UX]` entry saying that the empty Unrankable appendix has no treatment. DESIGN.md `unrankable-appendix.emptyState` (memlog 214) rules it, and `packages/web/src/list/UnrankableAppendix.tsx` builds it: the title alone, the count in `ink`, no lead or row, 16px bottom padding, above the key block. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
+
+## Deferred from: epic 2 retrospective (2026-09-27)
+
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Before Epic 3, decide whether `catalogue/stats.json` and `catalogue/static.json` stay required page fetches, whether the denomination text comes from `static.json` (the Story 2.1 AC at `docs/epics.md:1022` says so, but `Divine` is a literal in `PayoutThreshold.tsx`, `format.ts`, `list-statement.ts` and `Masthead.tsx`), and whether the large files use `no-cache` revalidation instead of `no-store`. Owner: architect.
+  evidence: Retro F6. `packages/web/src/load/artifacts.ts` fetches and validates both catalogue files on every load, and no web source reads them. The weights and catalogue files together are several MB per reload under `cache: 'no-store'` (`load/load-artifacts.ts:75`).
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Once a git remote exists, harden the Pages deploy. Add a test job that excludes the committed-data suites and that the deploy `needs:`. Parse the eight kept artifacts with their `@poe/contracts` envelopes during `pnpm build`. Pin the actions in `deploy.yml` to commit SHAs, as `openwiki-update.yml` does.
+  evidence: Retro F16 (review A5, A17, V4). `deploy.yml` gates only on `pnpm check`. `tools/prune-pages.mjs` checks that a required artifact exists, not that it is valid. The job holds `pages: write` and `id-token: write` with tag-pinned actions.
+  retry_when: A git remote is configured and `deploy.yml` has run once.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Layout claims are proven by arithmetic only. Record one agent-browser measurement of each committed-chrome block against `tokens.ts` `committedChrome` and the 1920 budget, and of `[data-cell]` text fit (`scrollWidth <= clientWidth`) for the "an open question", "no figure yet" and "never attempted" phrases. Add a committed browser fixture set with more than 20 rows and every Price State, so grow/collapse, stale marks and unpriced rows can be seen in a browser.
+  evidence: Retro F17 and P3 (review V5, V6). `tokens.test.ts:131-168` and `ranked-list.test.tsx:114-121` sum style strings. No test in the repo measures a rendered box. The committed data gives 2 raw rows, so stories 2.3 and 2.5 could not check grow/collapse in a browser (deferred-work.md story 2.5 entry on grow/collapse).
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Before Epic 3 adds crafted rows, consolidate the duplicated web helpers and module homes. This covers three age formatters and two `HOUR_MS` constants, four Divine/2dp spellings, two `NBSP` constants, three fixed-cell style helpers, and one pluralize helper for the "1 rows" and "1 entries" bugs. In tests it covers `rgb()` in 6 files, `mountList`/`rowsIn` in 2, and `NOW` in 7. Also move `DEFAULT_THRESHOLD`/`TOP_ROWS` out of `list/format.ts` and the list and threshold styles out of `frame/frame.css`. Keep `App.test.tsx` to composition tests.
+  evidence: Retro F22, F23, F24 and P5. Sources: `list/format.ts:31,55,167`, `frame/trust-facts.ts:14,52-61`, `list/CombinationRow.tsx:45,55`, `list/ColumnHeader.tsx:25`, `list/UnrankableAppendix.tsx:23`, `threshold/threshold-storage.ts:8`. `App.test.tsx` is 1181 lines, and some of its tests repeat unit tests (`:1025`/`rank.test.ts:365`, `:1038`/`:387`, `:847`,`:878`/`list-statement.test.ts`).
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Before the Epic 3 specs are written, run a UX pass that reconciles the mockups with DESIGN.md and with the fields that are actually published. Give the review layers the Accessibility Floor ruling (EXPERIENCE.md:1057-1082) and the one-owner rule, so a reviewer neither adds ARIA the floor rules out nor edits a UX-owned document.
+  evidence: Retro P1 and P2, from the session logs. User rulings were needed in 6 of 7 spec sessions. The mockup against DESIGN.md conflict recurred in 2.3, 2.5, 2.7 and 2.8. The 2.7 build-auto review added `role="status"`, and the 2.7 code review removed it. The 2.7 build-auto review also patched the DESIGN.md budget.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Add an AGENTS.md known pitfall: a background `pnpm dev` can keep listening after TaskStop, so check the port and kill the PID after use.
+  evidence: Retro P4, from the session logs. Port 5183 in 2.3 and port 5173 in 2.8 answered after TaskStop, and `taskkill` was needed. A port collision on 5191 in 2.4 served stale code.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Lower-severity seam findings from the epic 2 diff review. None is reached by today's data:
+    - no error boundary, so a render throw gives a blank page (`App.tsx:122-135`)
+    - no fetch timeout, so a hung request keeps the skeleton indefinitely (`load/load-artifacts.ts:68-89`)
+    - an empty list with no statement when every entry is unresolvable or crafted (`list/list-statement.ts`)
+    - the threshold draft shows "3.50" while the page prints "3.00", and the unrounded price is compared with the 2dp threshold (`threshold/PayoutThreshold.tsx:138-146`)
+    - an aborted run's `runStartedAt` prints as a completed sync, and a future stamp reads "< 1 minute ago" (`frame/trust-facts.ts:61-81`)
+    - a `data/` path that collides with a bundle output (`index.html`, `assets/`) is pruned from `dist` (`tools/prune-pages.mjs`)
+    - the pending `TrustStripSlot` reserves no absence or health lines (`frame/TrustStrip.tsx:140-155`)
+    - the recipes-absent line claims "no crafted rows can be ranked" although `rank` never reads recipes (`frame/AbsenceLines.tsx:44-48`)
+  evidence: Retro F18. `docs/reviews/review-epic-2-diff.md` items A8, A9, A10, A13, A14, A15, A18, E7, E10 and E12.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: `.github/workflows/openwiki-update.yml` lets an unattended model stage `AGENTS.md`, `CLAUDE.md` and its own workflow file into an auto-PR. Narrow `add-paths`.
+  evidence: Retro F20 (review A16), `openwiki-update.yml:60-64`.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Update the "cache-busted" wording at `docs/epics.md:96` and `:995` to the ruled `no-store` fetch. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
+  evidence: Retro F8, F9 and F19.
