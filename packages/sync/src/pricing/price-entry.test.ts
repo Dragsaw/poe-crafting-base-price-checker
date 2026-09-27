@@ -376,17 +376,26 @@ describe('createPricingStep: unanswered and refused requests', () => {
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
+    // No search was answered, so the error carries no entry to publish.
+    expect((error as UnexpectedTradeResponseError).entry).toBeUndefined();
     expect(http.requests).toHaveLength(1);
   });
 
-  it('a fetch answered 200 with {} throws UnexpectedTradeResponseError naming the fetch', async () => {
-    const { run } = setup({ results: ids(1), fetch: ok({}) });
+  it('a fetch answered 200 with {} throws UnexpectedTradeResponseError with the answered search fields and the price state kept', async () => {
+    const { run } = setup({ results: ids(1), fetch: ok({}), dataset: [PREVIOUS] });
     const error = await run().then(
       () => undefined,
       (thrown: unknown) => thrown,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch' });
+    // The answered search sets its two fields whatever the fetch returns (AD-9).
+    expect((error as UnexpectedTradeResponseError).entry).toStrictEqual({
+      ...PREVIOUS,
+      lastAttemptedAt: NOW,
+      lastSearchId: SEARCH_ID,
+      lastSearchLeague: LEAGUE,
+    });
   });
 
   const MISSPELT: TrackedEntry = {

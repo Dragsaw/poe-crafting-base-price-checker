@@ -35,7 +35,7 @@ import {
 } from '../league/league-gate.ts';
 import { DataFileError } from '../load-data-file.ts';
 import { PinnedCapExceededError, pinnedStarvationRecord } from '../pinned-cap.ts';
-import { MalformedRequestError } from '../pricing/price-entry.ts';
+import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
 import { createRequestCounter } from '../request-counter.ts';
 import { createTradeClient } from '../trade/client.ts';
 import { TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
@@ -1354,6 +1354,85 @@ describe('runChunk: the Sync Report', () => {
       ],
       schemaVersion: '1.1.0',
     });
+    expect(report !== undefined && 'runFinishedAt' in report).toBe(false);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('unparseable fetch body: entries 1–2 published, entry 3 keeps the answered search fields, an unrecoverable-error record, no notBefore, lock released, rethrown', async () => {
+    const { fs, ports } = harness([A, B, C, D, E]);
+    const searched: DatasetEntry = {
+      entryKey: key(C),
+      price: { state: 'no-listings' },
+      lastAttemptedAt: NOW,
+      lastSearchId: 'Ab3dE',
+      lastSearchLeague: 'Standard',
+    };
+    const failure = new UnexpectedTradeResponseError(key(C), 'fetch', 'no top-level `result` array', searched);
+    const done = (entry: TrackedEntry): DatasetEntry => ({
+      entryKey: key(entry),
+      price: { state: 'no-listings' },
+      lastAttemptedAt: NOW,
+    });
+
+    await expect(
+      run(ports, (entry) =>
+        key(entry) === key(C)
+          ? Promise.reject(failure)
+          : Promise.resolve({ kind: 'completed', entry: done(entry) }),
+      ),
+    ).rejects.toBe(failure);
+
+    const dataset = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
+    const byKey = new Map(dataset.entries.map((entry) => [entry.entryKey, entry]));
+    expect(byKey.get(key(A))).toEqual(done(A));
+    expect(byKey.get(key(B))).toEqual(done(B));
+    expect(byKey.get(key(C))).toEqual(searched);
+    expect(byKey.get(key(D))).toEqual({
+      entryKey: key(D),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+    });
+    // Only a MalformedRequestError writes the abort notBefore.
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+
+    const report = await reportOf(fs);
+    expect(report?.records).toEqual([
+      { kind: 'run-failure', reason: 'unrecoverable-error', entryKey: key(C), message: failure.message },
+    ]);
+    expect(report !== undefined && 'runFinishedAt' in report).toBe(false);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('unparseable search body: entries 1–2 published, entry 3 unchanged, an unrecoverable-error record, no notBefore, lock released, rethrown', async () => {
+    const { fs, ports } = harness([A, B, C, D, E]);
+    const failure = new UnexpectedTradeResponseError(key(C), 'search', 'no top-level `id` and `result`');
+    const done = (entry: TrackedEntry): DatasetEntry => ({
+      entryKey: key(entry),
+      price: { state: 'no-listings' },
+      lastAttemptedAt: NOW,
+    });
+
+    await expect(
+      run(ports, (entry) =>
+        key(entry) === key(C)
+          ? Promise.reject(failure)
+          : Promise.resolve({ kind: 'completed', entry: done(entry) }),
+      ),
+    ).rejects.toBe(failure);
+
+    const dataset = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
+    const byKey = new Map(dataset.entries.map((entry) => [entry.entryKey, entry]));
+    expect(byKey.get(key(A))).toEqual(done(A));
+    expect(byKey.get(key(B))).toEqual(done(B));
+    expect(byKey.get(key(C))).toEqual({
+      entryKey: key(C),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+    });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+
+    const report = await reportOf(fs);
+    expect(report?.records).toEqual([
+      { kind: 'run-failure', reason: 'unrecoverable-error', entryKey: key(C), message: failure.message },
+    ]);
     expect(report !== undefined && 'runFinishedAt' in report).toBe(false);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });

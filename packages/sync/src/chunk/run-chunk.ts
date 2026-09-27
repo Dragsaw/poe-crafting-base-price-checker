@@ -77,10 +77,12 @@
  *   the weights records are discarded, since the next run that passes the
  *   gate recomputes them (AD-12);
  * - any other throw once the order exists: first the dataset and progress
- *   for the step entries so far and the marks, then the report. A
- *   `MalformedRequestError` (a non-429 4xx, AD-9) also publishes the failing
- *   entry as the step left it and writes the abort `notBefore`; every other
- *   throw clears `notBefore`.
+ *   for the step entries so far and the marks, then the report. The failing
+ *   entry, as the step left it, is published too for a `MalformedRequestError`
+ *   (a non-429 4xx, AD-9) and for an `UnexpectedTradeResponseError` that
+ *   carries one (a 2xx body of the wrong shape on the fetch). Only a
+ *   `MalformedRequestError` writes the abort `notBefore`; every other throw
+ *   clears it.
  *
  * A publish or report write that was already attempted on the normal path is
  * never attempted again on the failure path.
@@ -118,7 +120,7 @@ import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
 import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/league-gate.ts';
 import type { DataFileResult } from '../load-data-file.ts';
-import { MalformedRequestError } from '../pricing/price-entry.ts';
+import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
 import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
@@ -779,12 +781,16 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // Once the order exists a throw publishes what the chunk has: the
         // step entries so far and the marks. A rejected request also
         // publishes the failing entry as the step left it and remembers the
-        // abort as `notBefore` (AD-9, §5.3); every other throw clears it.
+        // abort as `notBefore` (AD-9, §5.3); every other throw clears it. An
+        // unexpected fetch body also publishes the failing entry, which keeps
+        // the answered search's fields (AD-9).
         const malformed = error instanceof MalformedRequestError;
+        const failing =
+          (malformed || error instanceof UnexpectedTradeResponseError) ? error.entry : undefined;
         try {
           await publish(
             setup.publication,
-            malformed ? [...stepEntries, error.entry] : stepEntries,
+            failing === undefined ? stepEntries : [...stepEntries, failing],
             malformed ? notBeforeAfterAbort(clock.now()) : undefined,
           );
         } catch (fault) {

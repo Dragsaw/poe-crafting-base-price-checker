@@ -15,6 +15,7 @@
  * | search answered | `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` set, whatever the fetch returns | — |
  * | 429, 5xx, timeout | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | yields |
  * | any other 4xx | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | `MalformedRequestError` thrown |
+ * | 2xx, body of the wrong shape | on the fetch: `lastAttemptedAt` and the search fields set, price state kept; on the search: nothing published | `UnexpectedTradeResponseError` thrown |
  * | none: the `jewel` arm derives a base type `items.json` lacks | `unresolvable`, nothing stamped, a `baseTypeId` record | continues |
  *
  * The league, the rates and the item types arrive as values; this module
@@ -71,17 +72,24 @@ export class MalformedRequestError extends Error {
 /**
  * A 2xx whose body is not the shape the trade site returns. It is not a
  * request fault and not a rate limit, so it is neither counted nor yielded:
- * the chunk aborts loudly and names the entry.
+ * the chunk aborts loudly and names the entry. On the fetch, `entry` is the
+ * dataset entry with the answered search's fields set and the price state
+ * unchanged, and the runner publishes it (AD-9). On the search there is no
+ * answered search to keep, so `entry` is absent.
  */
 export class UnexpectedTradeResponseError extends Error {
   readonly entryKey: string;
   readonly requestKind: RequestKind;
+  readonly entry?: DatasetEntry;
 
-  constructor(entryKey: string, requestKind: RequestKind, detail: string) {
+  constructor(entryKey: string, requestKind: RequestKind, detail: string, entry?: DatasetEntry) {
     super(`${entryKey}: the trade ${requestKind} answered an unexpected body: ${detail}`);
     this.name = 'UnexpectedTradeResponseError';
     this.entryKey = entryKey;
     this.requestKind = requestKind;
+    if (entry !== undefined) {
+      this.entry = entry;
+    }
   }
 }
 
@@ -338,7 +346,7 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
 
     const listings = parseListings(fetched.result.response.body);
     if (listings === undefined) {
-      throw new UnexpectedTradeResponseError(entryKey, 'fetch', 'no top-level `result` array');
+      throw new UnexpectedTradeResponseError(entryKey, 'fetch', 'no top-level `result` array', searched);
     }
     const fetchRemaining = fetched.result.remaining;
 
