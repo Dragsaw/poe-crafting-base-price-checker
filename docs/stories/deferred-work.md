@@ -170,9 +170,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `tools/dev-stop/dev-stop.ts`
   summary: `listenerScript` runs `Get-NetTCPConnection ... -ErrorAction SilentlyContinue`. A failed query, for example a missing NetTCPIP module or access denied, therefore returns `[]`, and dev:stop prints "port is free". `listenersPosix` explicitly refuses to read a failed `lsof` as a free port. The Windows path has no such guard.
   evidence: This was already true before the diff: `snapshotWindows` used the same `$l` line. The diff now also routes the stop poll through it (`listenersWindows`).
-- source_spec: `tools/dev-stop/dev-stop.ts`
-  summary: No automated check runs the stop poll's listener query (`listenerPids`, `listenersWindows`, `listenersPosix`). If the PowerShell output ever serialises one listener as a bare number and not an array, `.length` is undefined. The poll then reads the port as taken until the deadline, and dev:stop exits 1 after it has killed the server.
-  evidence: The verification-gap reviewer ran the query by hand: `[]` for a free port, `[1708]` for one listener. `dev-stop.test.ts` imports only `DEFAULT_PORT`, `ownAncestry`, `parsePort` and `planStop`. The entry guard keeps `main` out of tests, so this check needs a real listener or process stubbing.
 
 ## Deferred from: epic 2 retro item 12, UX reconciliation pass (2026-09-27)
 
@@ -278,3 +275,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
   summary: "The tracked-json SKILL (`.claude/skills/tracked-json/SKILL.md`) says `tracked:check` validates the five cross-file checks and tells the agent to loop until exit 0. It does not say that `cross-file: skipped` (weights file absent) also exits 0, or that a class absent from the weights file or with a `partial` slot gets no edge, containment or kind check. Add both caveats, so that the agent reads `checks` and not only the exit code."
   evidence: `packages/sync/src/curation/check.ts` pushes `skipped` with `ok: true` when the weights file is absent. `packages/core/src/cross-file.ts` skips pool checks when `poolOf` fails or a slot is `partial`. Review Triage Log row 5 defers this, because the fix edits an agent-context file.
+- source_spec: `docs/stories/spec-deferred-stop-poll-listener-query-untested.md`
+  summary: No test runs the Windows pre-kill snapshot reader (`snapshot` / `snapshotWindows`), so its `parseListenerJson` call on `listeners` can be removed with every test still passing.
+  evidence: `snapshot`, `snapshotWindows` and `main` are not exported, and no test file references them; the real-listener test runs only `listenerPids` -> `listenersWindows`. `snapshotWindows` serialises through `@{ listeners = $l } | ConvertTo-Json -Depth 3`, a different shape path from the `-InputObject` query. Pre-existing: the snapshot reader never had a test. Covering it needs `snapshot` exported and a real-listener test asserting `snapshot(port).listeners` contains `process.pid`.
