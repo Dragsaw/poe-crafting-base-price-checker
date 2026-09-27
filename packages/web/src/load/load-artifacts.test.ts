@@ -79,6 +79,22 @@ describe('loadArtifacts', () => {
     });
   });
 
+  it('refuses a dataset whose entries repeat an entryKey', async () => {
+    const twin = {
+      entryKey: '["raw","Advanced Dualstring Bow",82]',
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+    };
+    serveArtifacts(server, {
+      dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), entries: [twin, twin] } },
+    });
+    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+      kind: 'refused',
+      path: 'dataset.json',
+      declared: '1.0.0',
+      expected: '1.0.0',
+    });
+  });
+
   // Matrix: unknown major.
   it('refuses an unknown major with the declared version', async () => {
     serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: '2.0.0' } } });

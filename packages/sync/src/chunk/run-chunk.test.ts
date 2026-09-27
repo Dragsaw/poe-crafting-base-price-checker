@@ -885,6 +885,14 @@ describe('runChunk: the Refresh Rotation', () => {
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
+  it('a dataset that repeats an entryKey throws rather than healing, and still releases the lock', async () => {
+    const { fs, ports } = harness(undefined, {
+      [DATASET_PATH]: { contents: datasetText([{ key: key(A) }, { key: key(A) }]) },
+    });
+    await expect(run(ports, scriptedStep().step)).rejects.toThrow(/dataset\.json.*repeats entries\.0/);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
   it('starvation: 3 pinned, 2 active, R=2 after the first step keeps 1 more pinned, then active', async () => {
     const { fs, ports } = harness([P1, P2, P3, A, B]);
     let remaining = 3;

@@ -124,18 +124,41 @@ export const ConfigFileSchema = z.strictObject({
     ),
 });
 
-/** `data/dataset.json` — the published snapshot, latest observation per entry (AD-19). */
-export const DatasetFileSchema = z.strictObject({
-  schemaVersion: SchemaVersionSchema,
-  league: LeagueIdSchema.describe('The league the run was configured for.'),
-  generatedAt: IsoTimestampSchema,
-  entries: z.array(DatasetEntrySchema),
-  currencyRates: z
-    .array(CurrencyRateSchema)
-    .describe(
-      'The current rate set, carried here rather than in a ninth artifact so AD-24’s fetch set stays closed. `core` costs recipes from it (AD-20).',
-    ),
-});
+/**
+ * `data/dataset.json` — the published snapshot, latest observation per entry (AD-19).
+ *
+ * One file-level rule, the same shape as `TrackedFileSchema`'s: each `entryKey`
+ * appears once in `entries`, compared as an exact string, so entries with the
+ * same key are twins whatever else differs. Each repeat is one issue at its own
+ * index, naming the key and its first occurrence.
+ */
+export const DatasetFileSchema = z
+  .strictObject({
+    schemaVersion: SchemaVersionSchema,
+    league: LeagueIdSchema.describe('The league the run was configured for.'),
+    generatedAt: IsoTimestampSchema,
+    entries: z.array(DatasetEntrySchema),
+    currencyRates: z
+      .array(CurrencyRateSchema)
+      .describe(
+        'The current rate set, carried here rather than in a ninth artifact so AD-24’s fetch set stays closed. `core` costs recipes from it (AD-20).',
+      ),
+  })
+  .superRefine((file, ctx) => {
+    const firstIndexByEntryKey = new Map<string, number>();
+    file.entries.forEach((entry, index) => {
+      const first = firstIndexByEntryKey.get(entry.entryKey);
+      if (first === undefined) {
+        firstIndexByEntryKey.set(entry.entryKey, index);
+        return;
+      }
+      ctx.addIssue({
+        code: 'custom',
+        path: ['entries', index],
+        message: `entry key ${entry.entryKey} repeats entries.${String(first)}; a key may appear once in dataset.json`,
+      });
+    });
+  });
 
 /** `data/sync-report.json` — figures and records (FR-25). */
 export const SyncReportFileSchema = SyncRunReportSchema.extend({

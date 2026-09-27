@@ -229,6 +229,98 @@ describe('the sync-owned envelopes', () => {
     expect(DatasetFileSchema.parse(dataset)).toEqual(dataset);
   });
 
+  describe('DatasetFileSchema entryKey uniqueness', () => {
+    const key = '["raw","Advanced Dualstring Bow",82]';
+    const neverSynced = {
+      entryKey: key,
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+    } as const;
+
+    function fileOf(entries: readonly unknown[]) {
+      return {
+        schemaVersion: INITIAL_SCHEMA_VERSION,
+        league: 'Forbidden Rites',
+        generatedAt: '2026-09-20T09:02:00Z',
+        entries,
+        currencyRates: [],
+      };
+    }
+
+    function issuesOf(entries: readonly unknown[]) {
+      const result = parseEnvelope(DatasetFileSchema, fileOf(entries));
+      if (result.ok || result.reason !== 'invalid') {
+        throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+      }
+      return result.issues;
+    }
+
+    // I/O matrix: "Distinct keys".
+    it('accepts two entries with different entryKeys', () => {
+      const result = parseEnvelope(
+        DatasetFileSchema,
+        fileOf([neverSynced, { ...neverSynced, entryKey: '["raw","Advanced Dualstring Bow",84]' }]),
+      );
+      expect(result.ok).toBe(true);
+    });
+
+    // I/O matrix: "Exact twin".
+    it('refuses an exact twin with one issue at the repeat, naming the key and the first index', () => {
+      const issues = issuesOf([neverSynced, neverSynced]);
+      expect(issues).toHaveLength(1);
+      expect(issues[0]?.path).toEqual(['entries', 1]);
+      expect(issues[0]?.message).toContain(key);
+      expect(issues[0]?.message).toContain('entries.0');
+    });
+
+    // I/O matrix: "State twin".
+    it('refuses one key held priced and no-listings', () => {
+      const priced = {
+        entryKey: key,
+        price: {
+          state: 'priced',
+          observation: {
+            league: 'Forbidden Rites',
+            observedAt: '2026-09-20T09:30:00Z',
+            priceDivine: 12.5,
+            sampleSize: 10,
+            exchangeObservation: {
+              currencyId: 'exalted',
+              rate: 0.0042,
+              source: 'by hand',
+              league: 'Forbidden Rites',
+              asOf: '2026-09-19T08:00:00Z',
+            },
+          },
+        },
+        lastAttemptedAt: '2026-09-20T09:30:00Z',
+        lastSearchId: 'aBcDeF',
+        lastSearchLeague: 'Forbidden Rites',
+      };
+      const issues = issuesOf([priced, { entryKey: key, price: { state: 'no-listings' } }]);
+      expect(issues).toHaveLength(1);
+      expect(issues[0]?.path).toEqual(['entries', 1]);
+    });
+
+    // I/O matrix: "Triplet".
+    it('reports each repeat of a key at its own index, each naming the first occurrence', () => {
+      const other = { ...neverSynced, entryKey: '["raw","Advanced Dualstring Bow",84]' };
+      const issues = issuesOf([neverSynced, other, neverSynced, neverSynced]);
+      expect(issues.map((issue) => issue.path)).toEqual([
+        ['entries', 2],
+        ['entries', 3],
+      ]);
+      for (const issue of issues) {
+        expect(issue.message).toContain(key);
+        expect(issue.message).toContain('entries.0');
+      }
+    });
+
+    // I/O matrix: "Empty list".
+    it('accepts an empty list', () => {
+      expect(parseEnvelope(DatasetFileSchema, fileOf([])).ok).toBe(true);
+    });
+  });
+
   it('parses a catalogue file as the captured response plus a version', () => {
     const file = {
       schemaVersion: INITIAL_SCHEMA_VERSION,
