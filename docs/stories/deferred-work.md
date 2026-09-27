@@ -140,6 +140,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-2-the-raw-ranking-branch-league-scoped-and-computed-at-read-time.md`
   summary: (unverified, would be medium) `RankInput.threshold` is a bare `number`; a `NaN` threshold sends every priced entry to `ordering`, and a negative or infinite one misgroups silently.
   evidence: `rank` has no caller yet. Story 2.4 owns the Payout Threshold input: settle it there by validating the value (finite, ≥ 0, `DivineAmountSchema`) before it reaches `rank`, with a test.
+  auto_attempt: 2026-09-27 — attempt 1 — status blocked. Rebase and check (step 4.2): after the rebase onto master `fac14c9` ("chore(curation): update tracked.json entries and re-run sync"), `pnpm test` fails 205 tests in `packages/sync/src/pricing/price-entry.fixtures.test.ts` and `packages/sync/src/dry-run.test.ts`; the fix itself passed `pnpm check` and `pnpm test` on `c6b576c`. Branch `worktree-dw-rankinput-threshold-is-a-bare-number-2026-09-27-141338`, spec `docs/stories/spec-deferred-rankinput-threshold-is-a-bare-number.md`.
+  retry_when: master has moved past fac14c9f60aa22a9f9b4d46a9ecdfae86eda0b0e
+  integrate_branch: worktree-dw-rankinput-threshold-is-a-bare-number-2026-09-27-141338
 - source_spec: `docs/stories/spec-deferred-emitted-dts-carries-ts-specifiers.md`
   summary: The post-emit rewrite covers only `packages/contracts/dist`; `packages/core/dist` and `packages/sync/dist` emit the same `.d.ts` shape and still carry relative `.ts` specifiers.
   evidence: The spec's Never boundary excludes them because the closed entry named only contracts. A grep after `pnpm typecheck` on 2026-09-26 finds `.ts` specifiers in `packages/core/dist/index.d.ts` and `packages/sync/dist/dry-run.d.ts`. The fix is to add both directories to `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts`.
