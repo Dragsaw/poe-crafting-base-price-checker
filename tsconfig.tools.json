@@ -5,6 +5,7 @@
     "noEmit": true,
     "allowJs": true,
     "checkJs": false,
+    "allowImportingTsExtensions": true,
     "types": ["node"],
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tools.tsbuildinfo"
   },
@@ -12,6 +13,7 @@
   "include": [
     "test/**/*.ts",
     "tools/boundary-check/*.ts",
+    "tools/deferred-issues/*.ts",
     "tools/dev-stop/*.ts",
     "tools/dts-specifiers/*.ts",
     "tools/prune-pages.mjs",
