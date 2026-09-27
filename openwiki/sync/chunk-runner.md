@@ -21,7 +21,7 @@ sources:
 generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T13:11:02.100Z
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # The sync chunk runner

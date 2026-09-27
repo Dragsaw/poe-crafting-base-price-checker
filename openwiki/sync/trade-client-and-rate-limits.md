@@ -3,9 +3,6 @@ type: subsystem
 title: Governed trade client and rate limits
 description: The one governed trade client every sync request goes through — standing headers and the POE_SYNC_USER_AGENT contact, pacing from live X-Rate-Limit headers via a per-policy ledger, a serial queue, yields instead of retries on 429, the invalid-request threshold, transport-failure classification, per-source request counting, and the real fetch port's timeout.
 tags: [sync, trade-api, rate-limit, http, user-agent, backoff]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-760d02e851905e7ae55350ae
     resource: repo://packages/contracts/src/sync-run-report.ts
@@ -28,6 +25,9 @@ sources:
   - id: openwiki-source-6c1728bcce531bca96d02755
     resource: repo://test/no-hardcoded-rate-limits.test.ts
 generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Governed trade client and rate limits

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:83514f9b7712cf16657924a4cd0ec940e5cc2214031403ff25b51768ef38abac",
+  "pageVersion": "sha256:3cfc26cfb3bf3d7566ba060b8c858bf750ada49c314331b4719635f69743877f",
   "claims": [
     {
       "id": "claim_d01bf9fcaf58434f8e20c303607357f4",
@@ -93,10 +93,20 @@
           "version": "repo-lines-v1:sha256:06c9e94a243fa286ac94550bce1268b76b9adff2a5c490b56b28b2496a8371c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwODYxNWNjNGI0YmVkOWRiZjQwODgyYTQ1ZTE4MzkzNmRiMmEyMWJlOTNhZWYwMTYwOWY4YWI3ZTFkNmFiMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0ZWUxZGVlMmI2NTI1ZmJlOGRlZjAwOTA1OGRhMzI2NTQwMGViMjFiODE2ZDc4N2U4ZmI5MmIyZjE5ODhlYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_45e83e9570f548af92cbad03c07ed784",
+      "statement": "The web page fetches seven data artifacts (dataset, sync-report, weights, recipes, tracked, config and catalogue/stats) and never fetches catalogue/static.json.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/load/artifacts.ts#L14-L68",
+          "version": "repo-lines-v1:sha256:f1d210a37a8abee3f256ea593627e5e48a72f61f27c970d6c82c462f9729ae67:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDFiOGE5OGY1NDgwMDE3YWYyMzc4YTkyMGY5ZWJlZWYwNmY4NzVlYjgwNzFlMjQyY2RkZmY1ZmE4MGRhODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYmE5MzY2M2NmZjQxYmMxMWZkZmQzYzI5NTNmMGU1ODIxYjI5ZDUzM2I1ZWEyYTg1MGNkMDgxZjAzNjg1N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwYTZlZDQ1MGQxMjRlM2FkNTU3MzM4ZWU3YTQyNDRhMjk4NDBiYjAwODhiZjI4ODcyODBlMzBhYzNlZmI1YWEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T12:20:24.418Z"
+    "at": "2026-09-27T16:49:38.941Z"
   }
 }

@@ -1,16 +1,15 @@
 ---
 type: operations
 title: Build, typecheck and deploy
-description: How pnpm check, pnpm dev, pnpm build and the GitHub Pages workflow work — the tsc -b solution build with its .d.ts specifier rewrite, lint and dependency-cruiser gates, the Vite config that serves data/ as publicDir, the prune step that limits the published files to eight artifacts, and the commit-msg hook.
+description: How pnpm check, pnpm dev, pnpm build and the GitHub Pages workflow work — the tsc -b solution build with its .d.ts specifier rewrite, lint and dependency-cruiser gates, the Vite config that serves data/ as publicDir, the prune step that limits the published files to seven artifacts, the scheduled OpenWiki update workflow, and the commit-msg hook.
 tags: [build, typecheck, vite, github-pages, deploy, ci, git-hooks]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-6983d4a49fc6ae63a12ff946
     resource: repo://.githooks/commit-msg
   - id: openwiki-source-6766b7a0c14857435d2077c9
     resource: repo://.github/workflows/deploy.yml
+  - id: openwiki-source-6d4b4e707b8d60b6ccfa3425
+    resource: repo://.github/workflows/openwiki-update.yml
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
     resource: repo://package.json
   - id: openwiki-source-0195b32646fe8a72bfdd1842
@@ -25,7 +24,10 @@ sources:
     resource: repo://tools/prune-pages.mjs
   - id: openwiki-source-d9161b70d04aabec78253a6c
     resource: repo://tools/setup-git-hooks.mjs
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Build, typecheck and deploy
@@ -60,21 +62,21 @@ The post-emit step rewrites each relative `.ts`/`.tsx`/`.mts`/`.cts` specifier i
 
 The same file declares the `web` Vitest project: jsdom, `test/setup.ts` plus `src/test-setup.ts` (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)).
 
-`pnpm dev` runs until it is stopped. Start it in the background and stop it after use.
+`pnpm dev` runs until it is stopped. Start it in the background and stop it after use with `pnpm dev:stop` (`--port <n>` for another port). On Windows, stopping the background task kills only the top process and Vite keeps the port, so run `pnpm dev:stop` even after the task ends. The command kills the whole `pnpm dev` process tree of this checkout, refuses a listener that is not this checkout's Vite, and exits 1 when the port stays taken. [Operator commands and curation workflow](../workflows/operator-commands.md) describes how it finds that tree.
 
 ## pnpm build and the prune step
 
 `pnpm build` runs `vite build` and then `node tools/prune-pages.mjs`.
 
-Because `data/` is the `publicDir`, `vite build` copies **all** of it into `packages/web/dist`. That includes files the page never fetches, such as `sync-progress.json`, `currencies.json`, `catalogue/items.json` and `catalogue/filters.json`. `prunePages(distDir, dataDir)` works as follows:
+Because `data/` is the `publicDir`, `vite build` copies **all** of it into `packages/web/dist`. That includes files the page never fetches: `sync-progress.json`, `currencies.json`, `catalogue/items.json`, `catalogue/filters.json` and `catalogue/static.json`. `prunePages(distDir, dataDir)` works as follows:
 
 - It deletes each file that came from `data/` and is not on `ALLOWLIST`, and then removes any directory that the deletion left empty. It does not touch bundle output such as `index.html` and `assets/`.
-- It throws, naming each one, when a **required** artifact (`dataset.json`, `tracked.json`, `config.json`, `catalogue/stats.json`, `catalogue/static.json`) is missing from `dist`. The three tolerable artifacts (`sync-report.json`, `weights.json`, `recipes.json`) may be missing.
+- It throws, naming each one, when a **required** artifact (`dataset.json`, `tracked.json`, `config.json`, `catalogue/stats.json`) is missing from `dist`. The three tolerable artifacts (`sync-report.json`, `weights.json`, `recipes.json`) may be missing.
 - It throws when `dist` does not exist.
 
 The script runs only under `import.meta.main`, not a comparison with `process.argv[1]`. With a path comparison, a junction or a drive-letter case difference could skip the prune, so the build would publish all of `data/` and still exit 0.
 
-`ALLOWLIST` mirrors `ARTIFACTS` in `packages/web/src/load/artifacts.ts`. `packages/web/src/load/prune-allowlist.test.ts` asserts that both have the same eight paths, the same order and the same required set.
+`ALLOWLIST` mirrors `ARTIFACTS` in `packages/web/src/load/artifacts.ts`. `packages/web/src/load/prune-allowlist.test.ts` asserts that both have the same seven paths, the same order and the same required set.
 
 ## Deploy to GitHub Pages
 
@@ -83,6 +85,10 @@ The script runs only under `import.meta.main`, not a comparison with `process.ar
 The workflow does not run `pnpm test`. Tests over the committed data would block a data-only push, such as a new sync result or a tracked-list edit. `pnpm check` is the gate. The site uses the Actions-based Pages source, not branch publishing, because branch publishing runs Jekyll. The repository's Pages source must be set to "GitHub Actions" once.
 
 Because the data are committed files, publishing new prices is a git operation: run `pnpm sync`, commit `data/`, and push to `master`.
+
+## Scheduled OpenWiki update
+
+`.github/workflows/openwiki-update.yml` refreshes this wiki. It runs daily at 08:00 UTC and on manual dispatch. It checks out the full history (`fetch-depth: 0`), because `openwiki code --update` diffs `HEAD` against the last documented commit and a shallow clone hides that commit. It installs a pinned `openwiki` and runs `openwiki code --update --print` against an OpenAI-compatible provider from repository secrets. The run step is `continue-on-error`. The workflow then deletes `openwiki/.run.json` and opens or updates a pull request on the branch `openwiki/update`. The pull request covers `openwiki/`, `AGENTS.md`, `CLAUDE.md` and the workflow file. When the OpenWiki step fails, the pull request keeps only the pages completed before the failure, and a last step fails the job. Do not hand-edit generated wiki pages. Change the source or docs and let the workflow regenerate them.
 
 ## Git hooks and commit conventions
 
