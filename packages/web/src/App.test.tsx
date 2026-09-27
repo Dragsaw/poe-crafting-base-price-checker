@@ -823,7 +823,7 @@ describe('the list statement', () => {
   });
 
   // Matrix: mixed reset. A league reset mid-refill, where one entry already reads no-listings.
-  it('lists a mixed reset in canonical order across both unpriced groups, each row keeping its phrase', async () => {
+  it('lists a mixed reset in canonical order across both unpriced groups, no figure yet in every EV cell', async () => {
     const now = Date.now();
     const belt = rawEntry('Wide Belt');
     const ring = rawEntry('Coral Ring');
@@ -847,8 +847,17 @@ describe('the list statement', () => {
     // Canonical key order across the groups, not no-listings first.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(evCells()).toEqual(['no figure yet', 'an open question', 'no figure yet']);
+    expect(evCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
+
+    // The no-listings row's expansion keeps its own state and phrase.
+    const amuletRow = frame().querySelectorAll<HTMLElement>('[data-ranked-row]')[1];
+    act(() => {
+      amuletRow?.click();
+    });
+    const panel = frame().querySelector('[data-expansion-panel]');
+    expect(panel?.querySelector('[data-cell="state"]')?.textContent).toContain('no-listings');
+    expect(panel?.querySelector('[data-cell="figure"]')?.textContent).toBe('an open question');
   });
 
   // Matrix: partial refresh.

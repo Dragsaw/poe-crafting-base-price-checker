@@ -56,8 +56,10 @@ export function tierOf(position: number): Tier {
  * `notYetSynced` (decision 2026-09-26, option a), unnumbered and at tier 3.
  * The one exception is the honest-empty state (`isHonestEmpty`, EXPERIENCE
  * state 23): its statement claims canonical order, so the unpriced rows print
- * as one sequence by `compareCanonicalKeys` on `entryKey`, across both groups.
- * Each row keeps its own money phrase and Price State.
+ * as one sequence by `compareCanonicalKeys` on `entryKey`, across both groups,
+ * and every EV cell reads *no figure yet*, a `no-listings` row included
+ * (EXPERIENCE state 23, revision 8). Each row keeps its own Price State, so its
+ * expansion still prints its own money phrase.
  * `belowThreshold` leaves the list (FR-3); `unresolvable` is Story 2.6's health
  * line (FR-24). The age reads the row's dataset entry, joined by `entryKey`.
  * Each row also carries what its expansion prints (Story 2.5): the resolved
@@ -117,9 +119,15 @@ export function toDisplayRows(ranking: Ranking, dataset: readonly DatasetEntry[]
     ),
   ];
 
-  // State 23 prints "In canonical order": one sequence across both groups.
+  // State 23 prints "In canonical order": one sequence across both groups, one EV phrase.
   if (isHonestEmpty(ranking)) {
-    return [...ranked, ...trailing.toSorted((left, right) => compareCanonicalKeys(left.key, right.key))];
+    const phrase: EvCell = { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
+    return [
+      ...ranked,
+      ...trailing
+        .map((row) => ({ ...row, ev: phrase }))
+        .toSorted((left, right) => compareCanonicalKeys(left.key, right.key)),
+    ];
   }
   return [...ranked, ...trailing];
 }

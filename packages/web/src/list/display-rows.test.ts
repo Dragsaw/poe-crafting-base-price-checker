@@ -63,9 +63,9 @@ describe('toDisplayRows', () => {
     );
     expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.state.state])).toEqual([
       ['Coral Ring', undefined, 'no figure yet', 'not-yet-synced'],
-      ['Gold Amulet', undefined, 'an open question', 'no-listings'],
+      ['Gold Amulet', undefined, 'no figure yet', 'no-listings'],
       ['Wide Belt', undefined, 'no figure yet', 'not-yet-synced'],
-      ['amber Ring', undefined, 'an open question', 'no-listings'],
+      ['amber Ring', undefined, 'no figure yet', 'no-listings'],
     ]);
     const keys = rows.map((row) => row.key);
     expect(keys).toEqual(keys.toSorted(compareCanonicalKeys));
