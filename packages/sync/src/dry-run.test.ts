@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,11 +20,10 @@ import { DRY_RUN_INSTANT, dryRun, readRepositorySnapshot } from './dry-run.ts';
 import type { DryRunSnapshot } from './dry-run.ts';
 import { pinnedStarvationRecord } from './pinned-cap.ts';
 import { LeagueMismatchError } from './league/league-gate.ts';
-import { LEAGUES_FIXTURE_NAME, pricingFixtureName } from './pricing/fixture-names.ts';
+import { FIXTURE_WORKLOAD_PATH, LEAGUES_FIXTURE_NAME, searchFixtureName } from './pricing/fixture-names.ts';
 import { createRequestCounter } from './request-counter.ts';
-import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
+import { itemTypesOf } from './pricing/search-body.ts';
 import type * as TradeClientModule from './trade/client.ts';
-import { tradeSearchUrl } from './trade/endpoints.ts';
 
 /** Every option set the dry run built its trade clients with, in build order. */
 const tradeClientOptions = vi.hoisted((): unknown[] => []);
@@ -43,6 +42,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
 });
 
 const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
+const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 
 const LEAGUE = 'Test League';
@@ -81,11 +81,7 @@ function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
   return new Map([
     [LEAGUES_FIXTURE_NAME, LEAGUES_ANSWER],
     ...entries.map((entry, index) => [
-      pricingFixtureName({
-        method: 'POST',
-        url: tradeSearchUrl(LEAGUE),
-        body: JSON.stringify(buildSearchBody(entry, itemTypes)),
-      }),
+      searchFixtureName(entry, LEAGUE, itemTypes),
       JSON.stringify({ id: `S${String(index)}`, complexity: 1, result: [], total: 0 }),
     ] as const),
   ]);
@@ -270,17 +266,36 @@ describe('dryRun', () => {
     ]);
   });
 
-  it('fails loudly, naming the missing fixture, when a request has no recorded fixture', async () => {
-    const [active] = entries as [TrackedEntry];
-    const missing = pricingFixtureName({
-      method: 'POST',
-      url: tradeSearchUrl(LEAGUE),
-      body: JSON.stringify(buildSearchBody(active, itemTypesOf(ITEMS_CATALOGUE))),
-    });
+  it('skips an entry whose search has no recorded fixture: no request, listed as unrecorded', async () => {
+    const [active, pinned] = entries as [TrackedEntry, TrackedEntry];
     const fixtures = emptySearches(entries);
-    fixtures.delete(missing);
+    fixtures.delete(searchFixtureName(active, LEAGUE, itemTypesOf(ITEMS_CATALOGUE)));
 
-    await expect(dryRun(snapshotOf(entries, { fixtures }))).rejects.toThrow(missing);
+    const report = await dryRun(snapshotOf(entries, { fixtures }));
+
+    expect(report.outcome).toBe('completed');
+    expect(report.unrecorded).toEqual([canonicalKey(active)]);
+    expect(report.entries).toEqual([noListings(pinned, 1)]);
+    expect(report.report?.figures.requestsBySource['tracked-list']).toBe(1);
+    // The skipped entry keeps its dataset state: never attempted, as it was.
+    expect(report.dataset?.entries.find((entry) => entry.entryKey === canonicalKey(active))).not.toHaveProperty(
+      'lastAttemptedAt',
+    );
+  });
+
+  it('omits unrecorded when every search is recorded', async () => {
+    expect(await dryRun(snapshotOf(entries))).not.toHaveProperty('unrecorded');
+  });
+
+  it('fails loudly, naming the missing fixture, when a recorded search has no recorded fetch', async () => {
+    const [active] = entries as [TrackedEntry];
+    const fixtures = emptySearches(entries);
+    fixtures.set(
+      searchFixtureName(active, LEAGUE, itemTypesOf(ITEMS_CATALOGUE)),
+      JSON.stringify({ id: 'S0', complexity: 1, result: ['unrecorded-id'], total: 1 }),
+    );
+
+    await expect(dryRun(snapshotOf(entries, { fixtures }))).rejects.toThrow(/no recorded fixture trade-fetch-/);
   });
 });
 
@@ -428,10 +443,20 @@ describe('dryRun: notBefore', () => {
 });
 
 describe('dryRun: the repository snapshot and its recorded fixtures', () => {
-  it('prices every non-pruned tracked entry from the recorded captures', async () => {
-    const snapshot = await readRepositorySnapshot();
+  it('prices every non-pruned entry of the fixture workload from the recorded captures', async () => {
+    // The real inputs, with the fixture workload for the tracked list. The
+    // real dataset, report and progress describe the real list, so they are
+    // left out: every workload entry is never attempted.
+    const snapshot: DryRunSnapshot = {
+      ...(await readRepositorySnapshot()),
+      tracked: readFileSync(join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
+      dataset: undefined,
+      report: undefined,
+      progress: undefined,
+    };
     const tracked = JSON.parse(snapshot.tracked ?? '{"entries":[]}') as { entries: TrackedEntry[] };
     const active = tracked.entries.filter((entry) => entry.status !== 'pruned');
+    expect(active.length).toBeGreaterThan(0);
 
     const report = await dryRun(snapshot);
 
@@ -451,6 +476,17 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     expect(report.dataset?.entries.map((entry) => entry.entryKey)).toEqual(
       [...new Set(tracked.entries.map(canonicalKey))].toSorted(compareCanonicalKeys),
     );
+    expect(report).not.toHaveProperty('unrecorded');
+  });
+
+  it('runs the real tracked list to completion: each visited entry is priced or listed as unrecorded', async () => {
+    const report = await dryRun(await readRepositorySnapshot());
+
+    expect(report.outcome).toBe('completed');
+    const unrecorded = new Set(report.unrecorded ?? []);
+    const priced = report.entries.map((entry) => entry.entryKey);
+    expect(priced.filter((key) => unrecorded.has(key))).toEqual([]);
+    expect(new Set([...priced, ...unrecorded])).toEqual(new Set(report.completed));
   });
 });
 
@@ -503,6 +539,9 @@ describe('pnpm sync:dry', () => {
     expect(first.stderr).toBe('');
 
     const report = JSON.parse(first.stdout) as Record<string, unknown>;
+    // The optional keys depend on the real data: `unrecorded` on an entry the
+    // fixture workload does not cover, `notBefore` on a pending penalty in
+    // `data/sync-progress.json`.
     expect(Object.keys(report)).toEqual([
       'outcome',
       'completed',
@@ -511,6 +550,7 @@ describe('pnpm sync:dry', () => {
       'dataset',
       'records',
       'report',
+      ...['unrecorded', 'pinnedStarvation', 'notBefore'].filter((key) => key in report),
     ]);
     expect(report['outcome']).toBe('completed');
     // Printed as written: the schema accepts it and its keys are in declared order.
@@ -532,7 +572,6 @@ describe('pnpm sync:dry', () => {
       'league-validation',
       'tracked-list',
     ]);
-    expect(printed.figures.requestsBySource['tracked-list']).toBeGreaterThan(0);
     // The league gate ran once, against the recorded leagues fixture (Story 1.11).
     expect(printed.figures.requestsBySource['league-validation']).toBe(1);
     expect(printed.records.some((record) => record.kind === 'league-mismatch')).toBe(false);
@@ -547,10 +586,10 @@ describe('pnpm sync:dry', () => {
     const run = await runScript(['--at', at]);
 
     expect(run.code, run.stderr).toBe(0);
-    const report = JSON.parse(run.stdout) as { dataset: DatasetFile };
-    const attempted = report.dataset.entries.filter((entry) => entry.lastAttemptedAt !== undefined);
-    expect(attempted.length).toBeGreaterThan(0);
-    for (const entry of attempted) {
+    const report = JSON.parse(run.stdout) as { entries: DatasetEntry[]; dataset: DatasetFile };
+    // Only the entries this run priced are stamped; a skipped one keeps its stamp.
+    const stamped = new Set(report.entries.map((entry) => entry.entryKey));
+    for (const entry of report.dataset.entries.filter((published) => stamped.has(published.entryKey))) {
       expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
     }
     expect(snapshot(DATA_DIR)).toEqual(before);

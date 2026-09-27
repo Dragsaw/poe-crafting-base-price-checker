@@ -14,8 +14,10 @@
  *
  * **What it records**: the leagues endpoint and the four `data/*` endpoints,
  * whose URLs it takes from `trade/endpoints.ts` — the same declaration
- * `catalogue:refresh` reads — and, for every non-pruned entry of
- * `data/tracked.json`, the POST search and its fetch leg (Story 1.7). The
+ * `catalogue:refresh` reads — and, for every non-pruned entry of the fixture
+ * workload `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH`), the POST search
+ * and its fetch leg (Story 1.7). The workload is a small fixed list, not
+ * `data/tracked.json`, so the player's list can grow with no new recording. The
  * search body is built by `buildSearchBody`, the same builder the pricing
  * step sends, in the league `data/config.json` names. No request body is
  * hand-written here; a hand-written body records what the team believes the
@@ -32,7 +34,7 @@ import type { ClockPort, HttpPort, LeagueId, TrackedEntry } from '@poe/contracts
 
 import { loadActiveLeague } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
-import { pricingFixtureName } from './pricing/fixture-names.ts';
+import { FIXTURE_WORKLOAD_PATH, pricingFixtureName } from './pricing/fixture-names.ts';
 import { loadItemTypes } from './pricing/load-item-types.ts';
 import { FETCH_LIMIT } from './pricing/price-entry.ts';
 import { buildSearchBody } from './pricing/search-body.ts';
@@ -68,8 +70,6 @@ const PRICING_FIXTURE_FILE = /^trade-(search|fetch)-[0-9a-f]+\.json$/;
 /** The repository root, whose `data/` files the recorder reads and never writes. */
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
-/** The tracked list the pricing interactions are built from (read-only). */
-const TRACKED_PATH = 'data/tracked.json';
 
 /**
  * One recordable interaction. All five share a lane because they are the same
@@ -355,7 +355,7 @@ async function main(): Promise<void> {
   // Read-only: the recorder writes under `fixtures/` and nowhere under `data/`.
   const data = createNodeFilesystemPort(REPO_ROOT);
   const league = await loadActiveLeague(data);
-  const tracked = await loadDataFile(data, TRACKED_PATH, (value) =>
+  const tracked = await loadDataFile(data, FIXTURE_WORKLOAD_PATH, (value) =>
     parseEnvelope(TrackedFileSchema, value),
   );
   const itemTypes = await loadItemTypes(data);

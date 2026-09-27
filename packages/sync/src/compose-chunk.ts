@@ -19,11 +19,11 @@
  * `run-failure`.
  */
 
-import type { ClockPort, FilesystemPort, GitPort, HttpPort } from '@poe/contracts';
+import type { ClockPort, FilesystemPort, GitPort, HttpPort, LeagueId } from '@poe/contracts';
 
 import { loadCatalogueIds } from './catalogue/catalogue-ids.ts';
 import { runChunk } from './chunk/run-chunk.ts';
-import type { ChunkOutcome, ChunkPorts } from './chunk/run-chunk.ts';
+import type { ChunkOutcome, ChunkPorts, ChunkStep } from './chunk/run-chunk.ts';
 import { createLeagueGate } from './league/league-gate.ts';
 import { loadConfig } from './load-config.ts';
 import type { DataFileResult } from './load-data-file.ts';
@@ -32,6 +32,7 @@ import { loadCurrencies } from './pricing/load-currencies.ts';
 import { loadItemTypes } from './pricing/load-item-types.ts';
 import { outputRates } from './pricing/normalise.ts';
 import { createPricingStep } from './pricing/price-entry.ts';
+import type { ItemTypes } from './pricing/search-body.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { createTradeClients } from './trade/client.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
@@ -50,6 +51,17 @@ export interface ComposeChunkPorts {
   readonly pid: number;
   /** One line of operator output. Defaults to stderr inside `runChunk`. */
   readonly log?: (line: string) => void;
+  /**
+   * Wraps the pricing step the load builds. Only the dry run passes one, to
+   * skip an entry whose search has no recorded fixture (`dry-run.ts`).
+   */
+  readonly wrapStep?: (step: ChunkStep, context: StepContext) => ChunkStep;
+}
+
+/** The load-time values the pricing step was built on. */
+export interface StepContext {
+  readonly league: LeagueId;
+  readonly itemTypes: ItemTypes;
 }
 
 export interface ComposedChunk {
@@ -67,7 +79,7 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
 }
 
 export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
-  const { fs, clock, http, git, wait, userAgent, pid, log } = options;
+  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep } = options;
 
   const requests = createRequestCounter();
   const clients = createTradeClients({
@@ -97,18 +109,19 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
       const rates = valueOf(await loadCurrencies(fs));
       const itemTypes = valueOf(await loadItemTypes(fs));
       const { league } = config;
+      const step = createPricingStep({
+        client: clients['tracked-list'],
+        league,
+        rates,
+        itemTypes,
+        dataset,
+        clock,
+      });
       return {
         publication: { league, currencyRates: outputRates(rates) },
         starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
         gate: createLeagueGate({ client: clients['league-validation'], league }),
-        step: createPricingStep({
-          client: clients['tracked-list'],
-          league,
-          rates,
-          itemTypes,
-          dataset,
-          clock,
-        }),
+        step: wrapStep === undefined ? step : wrapStep(step, { league, itemTypes }),
       };
     },
     catalogue: () => loadCatalogueIds(fs),

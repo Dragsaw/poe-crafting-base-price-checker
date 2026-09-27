@@ -13,17 +13,17 @@ import type { CurrencyRate, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { createTradeClient } from '../trade/client.ts';
-import { tradeSearchUrl } from '../trade/endpoints.ts';
-import { pricingFixtureName } from './fixture-names.ts';
+import { FIXTURE_WORKLOAD_PATH, pricingFixtureName, searchFixtureName } from './fixture-names.ts';
 import { createFixtureHttpPort, readPricingFixtures } from './fixture-port.ts';
 import { createPricingStep, FETCH_LIMIT } from './price-entry.ts';
-import { buildSearchBody, itemTypesOf } from './search-body.ts';
+import { itemTypesOf } from './search-body.ts';
 
 /**
  * The parser against **real captured responses** (NFR-2): the searches and
- * fetches `pnpm fixtures:record` recorded for `data/tracked.json`. The config
- * and tracked files are read, never written, because the fixture digests
- * depend on them; the rates are pinned below.
+ * fetches `pnpm fixtures:record` recorded for the fixture workload
+ * (`FIXTURE_WORKLOAD_PATH`). The config file and the workload are read, never
+ * written, because the fixture digests depend on them; the rates are pinned
+ * below.
  */
 
 const ROOT = new URL('../../../../', import.meta.url);
@@ -47,7 +47,7 @@ const rates: CurrencyRate[] = [
   { currencyId: 'chaos', rate: 0.13078, source: 'measured', league, asOf: PINNED_AS_OF },
 ];
 const itemTypes = itemTypesOf(CatalogueItemsFileSchema.parse(readJson('data/catalogue/items.json')));
-const tracked = TrackedFileSchema.parse(readJson('data/tracked.json')).entries.filter(
+const tracked = TrackedFileSchema.parse(readJson(FIXTURE_WORKLOAD_PATH)).entries.filter(
   (entry) => entry.status !== 'pruned',
 );
 
@@ -72,15 +72,11 @@ async function priceWithCaptures(entry: TrackedEntry) {
 }
 
 describe('createPricingStep against the recorded captures', () => {
-  it('has a recorded search for every non-pruned tracked entry', async () => {
+  it('has a recorded search for every non-pruned workload entry', async () => {
     expect(tracked.length).toBeGreaterThan(0);
     const fixtures = await readPricingFixtures(FIXTURES_DIR);
     for (const entry of tracked) {
-      const name = pricingFixtureName({
-        method: 'POST',
-        url: tradeSearchUrl(league),
-        body: JSON.stringify(buildSearchBody(entry, itemTypes)),
-      });
+      const name = searchFixtureName(entry, league, itemTypes);
       expect(fixtures.has(name), `${canonicalKey(entry)} → ${name}`).toBe(true);
     }
   });

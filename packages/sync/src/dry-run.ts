@@ -12,10 +12,15 @@
  * gate's GET is served the recorded `fixtures/trade-data-leagues.json` and
  * counted as `league-validation`. The step's requests go to an offline port
  * that serves the recorded `fixtures/trade-{search,fetch}-*.json` back by
- * request digest; an unrecorded request fails loudly — the run rejects,
- * naming the missing fixture, and never yields. A league mismatch rejects
- * too. It prints `{outcome, completed, entries, progress, dataset, records,
- * report}` — plus `pinnedStarvation` when the chunk truncated the pinned
+ * request digest. The recorded searches cover a small fixed workload
+ * (`FIXTURE_WORKLOAD_PATH`), not the whole tracked list, so an entry whose
+ * search has no recorded fixture is skipped: it is visited with no request,
+ * keeps its dataset state and is listed in `unrecorded`. Every other
+ * unrecorded request, such as the fetch leg of a recorded search, fails
+ * loudly — the run rejects, naming the missing fixture, and never yields. A
+ * league mismatch rejects too. It prints `{outcome, completed, entries,
+ * progress, dataset, records, report}` — plus `unrecorded` when an entry was
+ * skipped, `pinnedStarvation` when the chunk truncated the pinned
  * set, and `notBefore` when the real `data/sync-progress.json` carries one —
  * as JSON to stdout and writes nothing to disk: the lock,
  * `sync-progress.json`, `dataset.json` and `sync-report.json` land in the
@@ -48,6 +53,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import {
+  canonicalKey,
   createFakeClockPort,
   createFakeFilesystemPort,
   createFakeGitPort,
@@ -64,6 +70,7 @@ import type {
   SyncProgressFile,
   SyncReportFile,
   SyncRunRecord,
+  TrackedEntry,
 } from '@poe/contracts';
 
 import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
@@ -71,13 +78,16 @@ import type { ChunkOutcomeKind, ChunkStarvation } from './chunk/run-chunk.ts';
 import { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH } from './catalogue/catalogue-ids.ts';
 import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
 import { composeChunk } from './compose-chunk.ts';
+import type { StepContext } from './compose-chunk.ts';
 import { CONFIG_PATH } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
 import type { DataFileResult } from './load-data-file.ts';
 import { createFixtureHttpPort, readPricingFixtures } from './pricing/fixture-port.ts';
 import type { PricingFixtures } from './pricing/fixture-port.ts';
 import { CURRENCIES_PATH } from './pricing/load-currencies.ts';
+import { searchFixtureName } from './pricing/fixture-names.ts';
 import { CATALOGUE_ITEMS_PATH } from './pricing/load-item-types.ts';
+import { UnknownClassBaseTypeError } from './pricing/search-body.ts';
 
 /**
  * The clock's fallback when the dataset snapshot carries no `lastAttemptedAt`
@@ -102,6 +112,11 @@ export interface DryRunReport {
   readonly records: readonly SyncRunRecord[];
   /** The Sync Report the chunk wrote into the fake, or `null` if none. */
   readonly report: SyncReportFile | null;
+  /**
+   * The entry keys the run skipped, in visiting order, because their search
+   * has no recorded fixture. Present only when there is at least one.
+   */
+  readonly unrecorded?: readonly string[];
   /** Present only when the chunk truncated the pinned set (AD-7). */
   readonly pinnedStarvation?: ChunkStarvation;
   /**
@@ -186,6 +201,24 @@ async function readWritten<T>(
 }
 
 /** Pure apart from the fakes it builds: the snapshot in, the report out. */
+/**
+ * Whether `entry`'s search has a recorded fixture. An entry whose body cannot
+ * be built counts as recorded, so the pricing step handles it as a live run
+ * does, with no request.
+ */
+function hasRecordedSearch(fixtures: PricingFixtures, entry: TrackedEntry, context: StepContext): boolean {
+  let name: string;
+  try {
+    name = searchFixtureName(entry, context.league, context.itemTypes);
+  } catch (error) {
+    if (error instanceof UnknownClassBaseTypeError) {
+      return true;
+    }
+    throw error;
+  }
+  return fixtures.has(name);
+}
+
 export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = {}): Promise<DryRunReport> {
   const files: [string, string | undefined][] = [
     [TRACKED_PATH, snapshot.tracked],
@@ -215,6 +248,7 @@ export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = 
 
   const clock = createFakeClockPort(options.at ?? latestAttemptedAt(previous) ?? DRY_RUN_INSTANT);
   const notBefore = readProgressNotBefore(snapshot.progress);
+  const unrecorded: string[] = [];
   // The same composition a live run uses, over the offline fixture port and
   // with no pacing wait (AD-8, AD-12).
   const outcome = await composeChunk({
@@ -225,6 +259,13 @@ export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = 
     wait: () => Promise.resolve(),
     userAgent: DRY_RUN_USER_AGENT,
     pid: DRY_RUN_PID,
+    wrapStep: (step, context) => (entry) => {
+      if (hasRecordedSearch(snapshot.fixtures, entry, context)) {
+        return step(entry);
+      }
+      unrecorded.push(canonicalKey(entry));
+      return Promise.resolve({ kind: 'completed' });
+    },
   }).run();
   // Each artifact was written in its schema's key order, so the parsed value
   // prints as written.
@@ -239,6 +280,7 @@ export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = 
     dataset,
     records: outcome.records,
     report,
+    ...(unrecorded.length === 0 ? {} : { unrecorded }),
     ...(outcome.pinnedStarvation === undefined ? {} : { pinnedStarvation: outcome.pinnedStarvation }),
     ...(notBefore === undefined ? {} : { notBefore }),
   };

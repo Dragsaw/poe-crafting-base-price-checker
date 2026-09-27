@@ -37,9 +37,17 @@ reviews, rather than as a production incident.
 
 The leagues endpoint and the four `data/*` endpoints, as `trade-data-*.json`.
 Since Story 1.7, also the POST search and its fetch leg for every non-pruned
-entry of `data/tracked.json`, in the league `data/config.json` names, as
-`trade-search-<digest>.json` and `trade-fetch-<digest>.json`. The search body
-is built by the same builder the pricing step sends, and each file is named for
-a digest of its own request (method, URL and body), so `pnpm sync:dry` serves
-back only the answer to exactly that request. A search that found nothing has
-no fetch file.
+entry of `tracked.json` in this directory, in the league `data/config.json`
+names, as `trade-search-<digest>.json` and `trade-fetch-<digest>.json`. The
+search body is built by the same builder the pricing step sends, and each file
+is named for a digest of its own request (method, URL and body), so
+`pnpm sync:dry` serves back only the answer to exactly that request. A search
+that found nothing has no fetch file.
+
+`tracked.json` is the one hand-edited file here. It is the recorder's input,
+not a capture: a small fixed workload, one entry per distinct search shape,
+that the fixture-backed tests own. It is deliberately not `data/tracked.json`,
+so the player's list can grow with no new recording. `pnpm sync:dry` skips a
+real tracked entry whose search this workload does not cover and lists it as
+`unrecorded`. An edit to `tracked.json` changes the digests, so it needs a new
+`pnpm fixtures:record`.
