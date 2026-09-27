@@ -112,6 +112,8 @@ deferred:
 
 Status: done
 
+Accepted by the human on 2026-09-27.
+
 **Summary:**
 - The loader's `refused` outcome now carries `cause: 'version' | 'content' | 'missing'`.
 - The refusal screen prints one body sentence per cause, so a content failure no longer reads "declares 1.0.0; the page expects 1.0.0" (retro F10).
