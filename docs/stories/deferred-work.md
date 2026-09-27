@@ -183,12 +183,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: A search answered 200 with an unparseable body throws `UnexpectedTradeResponseError` with no entry, so the entry's `lastAttemptedAt` is not published although `sync` issued a request, against AD-9 *Timestamps* ("present wherever `sync` issued a request").
   evidence: Pre-existing; this spec's Design Notes leave it out of scope because the closed entry named only the fetch leg. In `packages/sync/src/pricing/price-entry.ts` the search-leg throw (`new UnexpectedTradeResponseError(entryKey, 'search', …)`) passes no entry, so the `runChunk` failure path publishes nothing for that entry. The fix is to pass `stamped` on that throw and flip the runner test for the entry-less case (`packages/sync/src/chunk/run-chunk.test.ts`, "unparseable search body").
 
-## Deferred from: story 2.7 (2026-09-27)
-
-- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
-  summary: `.github/workflows/deploy.yml` has never run, because no remote is configured. A human must set the repository's Pages source to "GitHub Actions", push to `master` or run `workflow_dispatch`, and confirm that the published site serves the app and only the allowlisted AD-24 artifacts.
-  evidence: Spec 2.7, Verification, manual checks.
-
 ## Deferred from: code review of spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md (2026-09-27)
 
 - source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
