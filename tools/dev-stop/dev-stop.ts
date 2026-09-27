@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
  * it spawned. On Windows a parent's death does not reach its children, and
  * `pnpm dev` puts Vite five processes below that PID (sh → pnpm → cmd → pnpm →
  * cmd → node), so Vite keeps the port. This tool starts from the listener and
- * climbs to the top of the `pnpm dev` chain, then kills that tree.
+ * climbs to the `pnpm dev` process that runs it, then kills that tree.
  *
  * It refuses a listener that is not this checkout's Vite: another worktree's
  * server, or an unrelated program on the port.
@@ -58,9 +58,53 @@ function normalize(text: string): string {
   return text.replaceAll('\\', '/').replace(/\/+/g, '/').toLowerCase();
 }
 
-/** A process that belongs to a `pnpm dev` chain: a pnpm or Vite process, or the shell that runs one. */
-function isDevChainProcess(info: ProcessInfo): boolean {
-  return /\b(pnpm|vite)\b/i.test(info.commandLine);
+/** The arguments of a command line. Double quotes group, and backslashes are literal (Windows paths). */
+function tokenize(commandLine: string): string[] {
+  return [...commandLine.matchAll(/(?:"[^"]*"|[^\s"])+/g)].map((match) => match[0].replaceAll('"', ''));
+}
+
+/** The program name of a path: last segment, lowercase, no Windows executable extension. */
+function programName(token: string | undefined): string {
+  return (normalize(token ?? '').split('/').pop() ?? '').replace(/\.(exe|cmd|bat|ps1)$/, '');
+}
+
+/**
+ * Whether the process is `pnpm dev` or `pnpm run dev`: a pnpm executable, or
+ * node running pnpm's entry script, whose first argument is the `dev` script.
+ * An option before the script (`pnpm -r --parallel dev`, `pnpm --filter x dev`)
+ * makes it some other invocation.
+ */
+function isPnpmDev(info: ProcessInfo): boolean {
+  const tokens = tokenize(info.commandLine);
+  let args: string[];
+  if (programName(tokens[0]) === 'pnpm') {
+    args = tokens.slice(1);
+  } else if (programName(tokens[0]) === 'node') {
+    const entry = tokens.findIndex((token, i) => i > 0 && !token.startsWith('-'));
+    if (entry === -1 || !/^pnpm\.[cm]?js$/.test(programName(tokens[entry]))) return false;
+    args = tokens.slice(entry + 1);
+  } else {
+    return false;
+  }
+  return args[0] === 'dev' || ((args[0] === 'run' || args[0] === 'run-script') && args[1] === 'dev');
+}
+
+const SHELLS = new Set(['cmd', 'sh', 'bash', 'dash', 'zsh', 'powershell', 'pwsh']);
+
+/**
+ * Whether the process is the shell that pnpm starts to run the `dev` script: a
+ * shell whose `/c` or `-c` command is one `vite` command. A command separator
+ * or another command (`bash -c "pnpm dev & pnpm test"`) makes it some other
+ * shell, which can own other work.
+ */
+function isScriptShell(info: ProcessInfo): boolean {
+  const tokens = tokenize(info.commandLine);
+  if (!SHELLS.has(programName(tokens[0]))) return false;
+  const flag = tokens.findIndex((token) => /^[/-]c$/i.test(token));
+  if (flag === -1) return false;
+  // Test separators on the raw text: tokenize drops a newline between commands.
+  const command = /\s[/-]c\s([\s\S]*)$/i.exec(info.commandLine)?.[1] ?? '';
+  return programName(tokens[flag + 1]) === 'vite' && !/[&|;\n`]|\$\(/.test(command);
 }
 
 /**
@@ -76,9 +120,15 @@ function startedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
 /**
  * What to kill for the given listener PIDs. Each listener must be Vite run from
  * `repoRoot`'s `node_modules`. From each listener, climb while the parent is
- * alive, started before its child, is part of the `pnpm dev` chain, and is not
- * one of `protectedPids` (this tool's own ancestors). The highest process
- * reached is a root.
+ * alive, started before its child, is not one of `protectedPids` (this tool's
+ * own ancestors), and is pnpm's script shell for `vite` or `pnpm dev` itself.
+ * The climb ends at the first `pnpm dev`. The highest process reached is a root.
+ *
+ * The root is never above `pnpm dev`. The processes that started it (a
+ * runtime's shell, a pnpm shim, `pnpm -r --parallel dev`, `bash -c "pnpm dev &
+ * pnpm test"`) can own other work, and a tree kill there ends that work too.
+ * They exit on their own when their `pnpm dev` child ends. With no `pnpm dev`
+ * in the chain, the root is the listener or its script shell.
  */
 export function planStop(
   listeners: readonly number[],
@@ -111,13 +161,14 @@ export function planStop(
         parent === undefined ||
         seen.has(parent.pid) ||
         protectedPids.has(parent.pid) ||
-        !isDevChainProcess(parent) ||
+        !(isScriptShell(parent) || isPnpmDev(parent)) ||
         !startedBefore(parent, top)
       ) {
         break;
       }
       seen.add(parent.pid);
       top = parent;
+      if (isPnpmDev(top)) break;
     }
     roots.add(top.pid);
   }
@@ -129,18 +180,43 @@ interface Snapshot {
   readonly processes: readonly ProcessInfo[];
 }
 
-function snapshotWindows(port: number): Snapshot {
-  const script = [
-    `$l = @(Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction SilentlyContinue | ForEach-Object OwningProcess | Sort-Object -Unique)`,
-    '$p = @(Get-CimInstance Win32_Process | ForEach-Object { $i = @{ pid = [int]$_.ProcessId; ppid = [int]$_.ParentProcessId; commandLine = [string]$_.CommandLine }; if ($_.CreationDate) { $i.started = ([DateTimeOffset]$_.CreationDate).ToUnixTimeMilliseconds() }; $i })',
-    '@{ listeners = $l; processes = $p } | ConvertTo-Json -Compress -Depth 3',
-  ].join('; ');
-  const out = execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+function powershell(script: string): string {
+  return execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   });
-  const parsed = JSON.parse(out) as { listeners: number[] | null; processes: ProcessInfo[] };
+}
+
+/** PowerShell that sets `$l` to the PIDs that listen on the port. */
+function listenerScript(port: number): string {
+  return `$l = @(Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction SilentlyContinue | ForEach-Object OwningProcess | Sort-Object -Unique)`;
+}
+
+function listenersWindows(port: number): number[] {
+  const out = powershell(`${listenerScript(port)}; ConvertTo-Json -Compress -InputObject $l`);
+  return (JSON.parse(out) as number[] | null) ?? [];
+}
+
+function snapshotWindows(port: number): Snapshot {
+  const script = [
+    listenerScript(port),
+    '$p = @(Get-CimInstance Win32_Process | ForEach-Object { $i = @{ pid = [int]$_.ProcessId; ppid = [int]$_.ParentProcessId; commandLine = [string]$_.CommandLine }; if ($_.CreationDate) { $i.started = ([DateTimeOffset]$_.CreationDate).ToUnixTimeMilliseconds() }; $i })',
+    '@{ listeners = $l; processes = $p } | ConvertTo-Json -Compress -Depth 3',
+  ].join('; ');
+  const parsed = JSON.parse(powershell(script)) as { listeners: number[] | null; processes: ProcessInfo[] };
   return { listeners: parsed.listeners ?? [], processes: parsed.processes };
+}
+
+function listenersPosix(port: number): number[] {
+  try {
+    const out = execFileSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' });
+    return [...new Set(out.split('\n').filter(Boolean).map(Number))];
+  } catch (error) {
+    // lsof exits 1 when nothing matches. Any other failure, such as a missing
+    // lsof, must not read as a free port.
+    if ((error as { status?: unknown }).status !== 1) throw error;
+    return [];
+  }
 }
 
 /**
@@ -148,15 +224,7 @@ function snapshotWindows(port: number): Snapshot {
  * to init or a subreaper, so its `ppid` never names a dead, reusable PID.
  */
 function snapshotPosix(port: number): Snapshot {
-  let listeners: number[] = [];
-  try {
-    const out = execFileSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' });
-    listeners = [...new Set(out.split('\n').filter(Boolean).map(Number))];
-  } catch (error) {
-    // lsof exits 1 when nothing matches. Any other failure, such as a missing
-    // lsof, must not read as a free port.
-    if ((error as { status?: unknown }).status !== 1) throw error;
-  }
+  const listeners = listenersPosix(port);
   const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
   const processes = ps
     .split('\n')
@@ -168,6 +236,11 @@ function snapshotPosix(port: number): Snapshot {
 
 function snapshot(port: number): Snapshot {
   return process.platform === 'win32' ? snapshotWindows(port) : snapshotPosix(port);
+}
+
+/** Only the listener PIDs. The stop poll needs no process table. */
+function listenerPids(port: number): number[] {
+  return process.platform === 'win32' ? listenersWindows(port) : listenersPosix(port);
 }
 
 /** `selfPid` and every live ancestor. Killing one would kill the caller. */
@@ -216,11 +289,11 @@ async function main(): Promise<number> {
     return 1;
   }
   for (const root of plan.roots) killTree(root, before.processes);
-  // taskkill returns before the socket is released, so poll. Each snapshot
+  // taskkill returns before the socket is released, so poll. Each query
   // starts a shell and can take seconds, so bound the wait by time, not attempts.
   const deadline = Date.now() + STOP_TIMEOUT_MS;
   for (;;) {
-    if (snapshot(port).listeners.length === 0) {
+    if (listenerPids(port).length === 0) {
       process.stdout.write(`dev-stop: stopped PID ${plan.roots.join(', ')}; port ${port} is free.\n`);
       return 0;
     }

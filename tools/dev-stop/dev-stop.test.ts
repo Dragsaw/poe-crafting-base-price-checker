@@ -43,40 +43,103 @@ describe('planStop', () => {
     expect(planStop([], CHAIN, ROOT, NONE)).toEqual({ kind: 'idle' });
   });
 
-  it('climbs from Vite to the top of the pnpm dev chain and stops below the runtime', () => {
-    expect(planStop([16], CHAIN, ROOT, NONE)).toEqual({ kind: 'kill', roots: [10] });
+  it('climbs from Vite to pnpm dev and no higher', () => {
+    expect(planStop([16], CHAIN, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
   });
 
-  it('climbs from an orphaned chain whose launching shell is gone', () => {
-    const orphaned = CHAIN.filter((info) => info.pid !== 10);
-    expect(planStop([16], orphaned, ROOT, NONE)).toEqual({ kind: 'kill', roots: [11] });
+  it('stops at the script shell when pnpm dev is gone and its PID is free', () => {
+    const orphaned = CHAIN.filter((info) => info.pid !== 14);
+    expect(planStop([16], orphaned, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
   });
 
-  it('stops below a reused PID whose process started after the orphan', () => {
-    // Each process started in PID order; the launching shell 10 is gone, and
-    // Windows gave its PID to another agent's later `pnpm test`.
+  it('climbs a POSIX chain through sh -c vite to pnpm dev', () => {
+    // `ps -o args=` prints argv joined by spaces, with no quotes.
+    const posix: ProcessInfo[] = [
+      { pid: 50, ppid: 1, commandLine: 'node /home/me/.local/share/pnpm/pnpm.cjs dev' },
+      { pid: 51, ppid: 50, commandLine: 'sh -c vite --config packages/web/vite.config.ts' },
+      { pid: 52, ppid: 51, commandLine: 'node /home/me/poe/node_modules/.bin/../vite/bin/vite.js --config packages/web/vite.config.ts' },
+    ];
+    expect(planStop([52], posix, '/home/me/poe', NONE)).toEqual({ kind: 'kill', roots: [50] });
+  });
+
+  it('reads the real Windows forms: quoted cmd.exe path, extra cmd switches, pnpm store path', () => {
+    const real = CHAIN.map((info) => {
+      if (info.pid === 15) return { ...info, commandLine: '"C:\\WINDOWS\\system32\\cmd.exe" /d /s /c vite --config x' };
+      if (info.pid === 14) return { ...info, commandLine: '"C:\\pnpm\\bin\\\\..\\node_modules\\pnpm\\pnpm.exe"   dev --port 5199' };
+      return info;
+    });
+    expect(planStop([16], real, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
+  });
+
+  it('accepts pnpm run dev and node running pnpm.cjs dev as the root', () => {
+    for (const commandLine of ['pnpm run dev', 'node C:\\npm\\pnpm\\bin\\pnpm.cjs dev', 'node --no-warnings pnpm.mjs run dev']) {
+      const chain = CHAIN.map((info) => (info.pid === 14 ? { ...info, commandLine } : info));
+      expect(planStop([16], chain, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
+    }
+  });
+
+  it('stops at the first pnpm dev even when its parent also looks like pnpm dev', () => {
+    const nested = CHAIN.map((info) => (info.pid === 13 ? { ...info, commandLine: 'pnpm dev --port 5199' } : info));
+    expect(planStop([16], nested, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
+  });
+
+  it('never climbs into a shell that runs pnpm dev beside other commands', () => {
+    for (const commandLine of ['bash -c "pnpm dev & pnpm test"', 'cmd /c "pnpm dev && pnpm test"', 'cmd.exe /d /s /c vite & pnpm test']) {
+      // The shell is the script shell's parent: no pnpm dev between it and Vite.
+      const chain: ProcessInfo[] = [
+        { pid: 30, ppid: 1, commandLine },
+        { pid: 15, ppid: 30, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts' },
+        CHAIN.find((info) => info.pid === 16)!,
+      ];
+      expect(planStop([16], chain, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
+    }
+  });
+
+  it('never climbs into a shell whose vite command is followed by another on a new line', () => {
+    const chain: ProcessInfo[] = [
+      { pid: 30, ppid: 1, commandLine: 'sh -c vite --config packages/web/vite.config.ts\npnpm test' },
+      { ...CHAIN.find((info) => info.pid === 16)!, ppid: 30 },
+    ];
+    expect(planStop([16], chain, ROOT, NONE)).toEqual({ kind: 'kill', roots: [16] });
+  });
+
+  it('does not take a workspace runner such as pnpm -r --parallel dev as the root', () => {
+    const recursive: ProcessInfo[] = [
+      { pid: 40, ppid: 1, commandLine: 'bash -c "pnpm -r --parallel dev"' },
+      { pid: 41, ppid: 40, commandLine: 'C:\\pnpm\\pnpm.exe -r --parallel dev' },
+      { pid: 15, ppid: 41, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts' },
+      CHAIN.find((info) => info.pid === 16)!,
+    ];
+    expect(planStop([16], recursive, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
+    const filtered = recursive.map((info) =>
+      info.pid === 41 ? { ...info, commandLine: 'pnpm --filter @poe/web dev' } : info,
+    );
+    expect(planStop([16], filtered, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
+  });
+
+  it('stops below a reused PID whose process started after its child', () => {
+    // Each process started in PID order; pnpm 14 is gone, and Windows gave its
+    // PID to another checkout's later `pnpm dev`.
     const timed = CHAIN.map((info) => ({ ...info, started: info.pid * 1000 }));
     const reused = timed.map((info) =>
-      info.pid === 10 ? { pid: 10, ppid: 1, commandLine: 'bash -c "pnpm test"', started: 99_000 } : info,
+      info.pid === 14 ? { pid: 14, ppid: 1, commandLine: 'pnpm dev', started: 99_000 } : info,
     );
-    expect(planStop([16], reused, ROOT, NONE)).toEqual({ kind: 'kill', roots: [11] });
+    expect(planStop([16], reused, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
   });
 
   it('ends the climb on a ppid cycle', () => {
-    // A reused PID 10 that is a child of the listener closes the loop 16 → … → 11 → 10 → 16.
-    const cyclic = CHAIN.map((info) =>
-      info.pid === 10 ? { pid: 10, ppid: 16, commandLine: 'cmd.exe /c vite build' } : info,
-    );
-    expect(planStop([16], cyclic, ROOT, NONE)).toEqual({ kind: 'kill', roots: [10] });
+    // A reused PID 16 as the script shell's ppid closes the loop 16 → 15 → 16.
+    const cyclic = CHAIN.map((info) => (info.pid === 15 ? { ...info, ppid: 16 } : info));
+    expect(planStop([16], cyclic, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
   });
 
   it('stops at a parent that is not part of a pnpm dev chain', () => {
-    const interactive = CHAIN.map((info) => (info.pid === 11 ? { ...info, commandLine: 'bash --login -i' } : info));
-    expect(planStop([16], interactive, ROOT, NONE)).toEqual({ kind: 'kill', roots: [12] });
+    const interactive = CHAIN.map((info) => (info.pid === 14 ? { ...info, commandLine: 'bash --login -i' } : info));
+    expect(planStop([16], interactive, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
   });
 
   it('never climbs into a protected PID', () => {
-    expect(planStop([16], CHAIN, ROOT, new Set([13]))).toEqual({ kind: 'kill', roots: [14] });
+    expect(planStop([16], CHAIN, ROOT, new Set([14]))).toEqual({ kind: 'kill', roots: [15] });
   });
 
   it('matches the checkout path case- and separator-insensitively', () => {
