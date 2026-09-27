@@ -2,7 +2,7 @@
 title: 'Agent Development Workflow'
 status: final
 created: '2026-09-12'
-updated: '2026-09-26'
+updated: '2026-09-27'
 governed_by: [AD-1, AD-13]
 ---
 
@@ -151,6 +151,13 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 ## Commit conventions
 
 A commit subject is `type(scope): description` or `type: description`. A `feat`/`fix`/`test` commit scoped to a package (`contracts`, `core`, `sync`, `web`) names its story (`story 1.N`) or retro item (`retro item(s) N`) in the description — a `docs`/`chore` commit, or one with no package scope, does not need to. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`).
+
+## Review brief
+
+These two rules bind every review and every agent that triages or fixes review findings.
+
+1. **The Accessibility Floor is a ruling, not a gap.** `EXPERIENCE.md` § *Accessibility Floor* sets the product's accessibility scope. A finding that asks for work the floor rules out is conformant, and the triage rejects it with a citation of the floor. Do not add ARIA roles or live regions, keyboard paths, focus styling, contrast targets or reduced-motion handling on your own. What the floor does bind, for example the non-colour cue for each distinction, stays in review scope.
+2. **A reviewer never edits a planning document that another role owns.** The owners are listed in AGENTS.md ("Each planning fact has one owner"). UX owns `DESIGN.md`, `EXPERIENCE.md` and the mockups. The PM owns `prd.md` and `epics.md`. The architect owns this folder. When the code and an owner document disagree, fix the code to match the document, or record the conflict in `docs/stories/deferred-work.md` as a `[NOTE FOR UX]` (or a note for the owning role). Do not change the document so that it matches the code.
 
 ## Definition of done for an agent task
 

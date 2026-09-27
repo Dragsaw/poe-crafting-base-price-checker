@@ -1,5 +1,9 @@
 [workflow]
 
+persistent_facts = [
+  "Before you triage, reject or fix any review finding, read the Review brief section of {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md and apply it. It covers the Accessibility Floor ruling and the rule that a reviewer does not edit an owner document.",
+]
+
 # Reviews are project artifacts, not chat scrollback — always save the full
 # report to disk instead of only presenting it in chat. report_path is a
 # single fixed path so it can't route by artifact type; on_complete can,

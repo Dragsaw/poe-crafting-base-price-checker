@@ -1,5 +1,9 @@
 [workflow]
 
+persistent_facts = [
+  "Before you triage, reject or fix any review finding, read the Review brief section of {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md and apply it. It covers the Accessibility Floor ruling and the rule that a reviewer does not edit an owner document.",
+]
+
 activation_steps_prepend = [
   "Apply the MCP tool rule in AGENTS.md (Conventions that differ from defaults) for all code work.",
 ]
