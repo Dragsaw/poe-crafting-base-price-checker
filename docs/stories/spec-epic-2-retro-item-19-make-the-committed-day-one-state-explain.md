@@ -6,7 +6,7 @@ status: 'done'
 baseline_revision: '5fb836a30832812b83b0efbdbaf35dc2a428623b'
 route: 'dispatch'
 review_loop_iteration: 0
-followup_review_recommended: true
+followup_review_recommended: false
 context: []
 warnings: ['oversized']
 deferred: []
@@ -97,6 +97,10 @@ deferred: []
   - `[false]` `[reject]` Intent: the PRD and brief still say the view ranks Item Classes by payout — they describe the whole product, crafted ranking is Epic 3, and the intent forbids PRD edits.
   - `[false]` `[reject]` Intent: the Story 2.8 AC now joins two states in one Given — the intent asks the ACs to describe the committed state, and the joined Given keeps the absent-recipes state stated; no bad outcome.
   - `[medium]` `[patch]` Ledger: the owed Epic 3 dek rewrite has no deferred-work entry — group C; appended.
+
+### Follow-up review
+
+The recommended follow-up review is the code review of `78db4da..ec38dce` (2026-09-27). Its Acceptance Auditor checked this spec against the final `master` code and found it held in full. `MASTHEAD_DEK` is the decided literal, the committed-data test pins the full string, and the absent-recipes and absent-weights tests assert the dek. The docs chunk of that review found one gap: `fabd4c2` changed DESIGN.md and EXPERIENCE.md without a revision bump, so the dek change sits in DESIGN.md revision 7 and EXPERIENCE.md revision 8. The UX memlog now records that attribution.
 
 ## Verification
 

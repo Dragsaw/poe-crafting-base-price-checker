@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-27-2026 15:17
+last_updated: 09-27-2026 16:54
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -198,8 +198,8 @@ action_items:
       feed ranking.unresolvable.length into the health line when sync-report.json
       is absent; add a test consuming the story 2.3 -> 2.6 hand-off (retro F1, FR-9)"
     owner: "dev"
-    status: open
-    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+    status: done
+    ref: "docs/stories/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md"
   - id: "epic-2-retro-item-19-make-the-committed-day-one-state-explain"
     epic: 2
     action: "Make the committed day-one state explain itself: fix the masthead dek
@@ -207,8 +207,8 @@ action_items:
       epics.md:367-368 and the story 2.8 AC :1659-1661 with the story 2.7 recipes.json
       decision (retro F2)"
     owner: "UX (copy), PM (epics), dev"
-    status: open
-    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+    status: done
+    ref: "docs/stories/spec-epic-2-retro-item-19-make-the-committed-day-one-state-explain.md"
   - id: "epic-2-retro-item-20-order-the-honest-empty-rows-canonically"
     epic: 2
     action: "Order the honest-empty rows canonically across the no-listings and not-yet-synced
@@ -229,7 +229,7 @@ action_items:
       and print per-cause copy instead of 'declares X; expects X' (retro F10)"
     owner: "dev"
     status: done
-    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+    ref: "docs/stories/spec-epic-2-retro-item-22-refusal-cause.md"
   - id: "epic-2-retro-item-23-small-fixes-floor-clamp-coverage-trust-f"
     epic: 2
     action: "Small fixes: floor/clamp coverage % (trust-facts.ts:190), reset RankedList
@@ -237,7 +237,7 @@ action_items:
       fixture, assert the frame is a flex column (retro F11, F12, F14, F17)"
     owner: "dev"
     status: done
-    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+    ref: "docs/stories/spec-epic-2-retro-item-23-small-fixes.md"
   - id: "epic-2-retro-item-24-ux-rulings-pinned-starvation-count-on-th"
     epic: 2
     action: "UX rulings: pinned-starvation count on the health line, one age clock
