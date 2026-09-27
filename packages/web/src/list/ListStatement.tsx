@@ -17,8 +17,6 @@ export function ListStatement({ statement }: { readonly statement: Statement }):
   return (
     <p
       data-list-statement={statement.kind}
-      // Nothing-clears comes and goes as the player types a threshold: announce it.
-      role="status"
       style={{
         ...typeStyle('trust-strip'),
         height: px(spacing.frameReserveListStatement),

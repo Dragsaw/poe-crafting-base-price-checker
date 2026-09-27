@@ -227,3 +227,19 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
   summary: The `docs/epics.md` Story 2.7 AC still reads "Story 2.1's absence line names the missing `recipes.json`". The epics AC edit is owed.
   evidence: The 2026-09-27 human decision in spec 2.7 (Decisions) keeps `data/recipes.json` committed as an empty list, so the day-one page prints no such line.
+
+## Deferred from: code review of spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md (2026-09-27)
+
+- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
+  summary: Once Epic 3 ranks crafted rows, `listStatement` never returns nothing-clears, because the crafted rows stay in `ordering`. "Rank numerals stay" in EXPERIENCE.md state 25 goes untested.
+  evidence: The spec's frontmatter `deferred` recorded this, and it was never appended here. EXPERIENCE.md state 25 keeps every crafted Item Class ranked at minus its Craft Cost, with rank numerals. `packages/web/src/list/list-statement.ts` returns `none` whenever `ordering.length > 0`. Today `KIND_ORDER` in `packages/core/src/rank.ts` is `{ raw: 0 }`, so the bad outcome cannot occur yet. Settled when Epic 3 defines how a crafted row relates to the threshold in `Ranking`, and a crafted-plus-threshold test is written. Severity: medium (unverified).
+- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
+  summary: EXPERIENCE.md state 35 (active recipe uncostable) adds a third plain declarative "in state 25's register". The single slot built for two exclusive statements will then need a third kind and a ruling on which statements can co-occur.
+  evidence: The spec's frontmatter `deferred` recorded this, and it was never appended here. The `ListStatement` union in `packages/web/src/list/list-statement.ts` and `spacing.frameReserveListStatement` both assume exactly two exclusive statements. Settled when the Epic 3 story for state 35 decides whether state 35 can co-occur with state 23 or state 25. Severity: medium (unverified).
+- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
+  summary: The literal copy of the two list statements is owed to its owner document. The copy is `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (state 23) and `Nothing clears your Payout Threshold of <x.xx> Divine.` (state 25).
+  evidence: The 2026-09-27 human decision in spec 2.7 (Decisions) fixed the copy. Only that spec and `packages/web/src/list/list-statement.ts` (`honestEmptyCopy`, `nothingClearsCopy`) carry it. EXPERIENCE.md states 23 and 25 describe the declaratives, and revision 4 closed the nothing-clears copy (memlog 204), but neither state holds the literal text. A later UX revision of either state can drift from the code without a signal. The UX owner decides where the text lives.
+
+## Resolved by story 2.7 (2026-09-27)
+
+- One entry is **closed**: the "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)" entry saying that `publicDir` publishes all of `data/` on Pages. `pnpm build` now runs `tools/prune-pages.mjs` after `vite build`. The prune deletes every `data/` file in `packages/web/dist` that is not on the eight-artifact AD-24 allowlist, and `packages/web/src/load/prune-allowlist.test.ts` asserts that the allowlist equals `ARTIFACTS`. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.

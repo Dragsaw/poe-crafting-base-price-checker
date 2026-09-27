@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-26-2026 23:59
+last_updated: 09-27-2026 14:10
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -56,7 +56,7 @@ development_status:
   2-4-the-payout-threshold-and-what-survives-a-reload: done
   2-5-row-expansion-the-evidence-behind-a-row-its-tombstones-and-i: done
   2-6-the-trust-strip-its-health-line-and-the-sync-report-panel: done
-  2-7-day-one-deployed-the-honest-empty-league-reset-and-the-publi: review
+  2-7-day-one-deployed-the-honest-empty-league-reset-and-the-publi: done
   2-8-the-unrankable-appendix-and-the-day-one-page-it-completes: backlog
   epic-2-retrospective: optional
 

@@ -98,6 +98,38 @@ deferred:
 - Given `pnpm check` and `pnpm test`, when they run, then both pass.
 - Given the built site served statically, when agent-browser (named `--session`) opens it, then the committed page renders the raw list, no `recipes.json` absence line prints and the crafted branch is empty, and no request goes outside the eight artifacts.
 
+### Review Findings
+
+Code review 2026-09-27 (follow-up pass; blind, edge-case, verification-gap and acceptance layers over `ad45325...057129e`).
+
+- [x] [Review][Patch] `role="status"` specifies a screen-reader behaviour the accessibility floor excludes, and is probably silent anyway: remove it and its comment. EXPERIENCE.md L1082 and UX-DR45 (epics.md L1609) say no screen-reader behaviour is specified. The region also mounts together with its text, which screen readers often skip, and no test asserts the role (verification-gap). A deletion closes all three [packages/web/src/list/ListStatement.tsx:21]
+- [x] [Review][Patch] Append two ledger entries for the Epic 3 deferrals in this spec's frontmatter `deferred:` block (crafted rows in `ordering` suppress nothing-clears; state 35's third statement). They live only in frontmatter, so the Epic 3 author will not find them in `deferred-work.md` [docs/stories/deferred-work.md]
+- [x] [Review][Patch] Append a ledger entry that the two statement strings are owed to their owner document. They exist only in `list-statement.ts` and this spec's Decisions. EXPERIENCE.md states 23 and 25 describe the declaratives but carry no literal text, so a UX revision of either state will drift from the code without a signal [docs/stories/deferred-work.md]
+- [x] [Review][Patch] Append a closure note for the story 2.1 `data/` trim entry (deferred-work.md L120), which this story's prune closes, so `deferred-work-sweep` gets the signal. Follow the precedent of the notes at L87 and L97 [docs/stories/deferred-work.md:120]
+- [x] [Review][Patch] Add `<link rel="icon" href="data:,">` so the built page sends no `favicon.ico` request. As verified, AC 3 ("no request goes outside the eight artifacts") recorded that request, which answered 404 [packages/web/index.html:6]
+
+**Rejected** (20):
+- `false` DESIGN.md's 116px worst case wrongly adds the list statement to the banner (blind, acceptance). EXPERIENCE.md state 25 keeps crafted rows ranked beside the declarative, so the two co-occur once Epic 3 ranks crafted rows. The present predicate is the one already deferred, not the budget.
+- `false` Honest-empty also fires on no-listings rows (acceptance, info). The spec's Always predicate is exactly that, and the text is true.
+- `false` The workflow targets `master` (acceptance, info). That is the default branch, the one AGENTS.md names.
+- `false` `import.meta.main` is undefined below Node 24.2 (edge). `engines` requires `>=24.21.0`, and CI installs the latest 24.x.
+- `false` The prune misses a stray `dist` file with no counterpart in `data/` (blind). `vite build` empties `outDir` first. Only a `publicDir` change reaches it, and `vite.config.ts` is under the Never list.
+- `low` Spec `status: done` versus sprint `review` (acceptance, blind). The fix edits the spec under review, and this is the expected hand-off state.
+- `low` The triage summary counts disagree with the log (blind). The fix edits the spec under review.
+- `low` Execution tasks are left unticked (blind). The fix edits the spec under review.
+- `low` "Numerals stay" in state 25 is untested (acceptance). It is already deferred in frontmatter, and the ledger patch above carries it.
+- `low` The guard does not cover the epic's full interaction list (acceptance). This was rejected in the prior triage: the other features have no code to guard.
+- `low` The guard misses hover-only tooltips and storage writes that bypass `setItem` (blind). Catching them adds hover and IndexedDB machinery against features nobody is writing.
+- `low` The guard clicks only the header's direct children (edge, two entries). The same kind of guard hardening, for a sort nobody is writing.
+- `low` The storage guard ignores `removeItem` and `clear` (edge). The same kind of guard hardening.
+- `low` The allowlist copies `ARTIFACTS` instead of importing it (blind). The drift test covers it, and the fix restructures the tool.
+- `low` The allowlist drift test never runs in CI (blind). A change to `ARTIFACTS` is a code change, which runs `pnpm test` locally. A CI test job is new scope, and the Never list keeps `pnpm test` out of the deploy.
+- `low` `checkJs: false` leaves the prune untyped (blind). The include exists so that the tests get inferred types. Typing the tool would add JSDoc across it.
+- `low` The prune lacks a final sweep of non-bundle files in `dist` (blind). The case is unreachable, as in the `false` entry above.
+- `low` No test renders the statement together with other chrome (blind). The spec asks for a budget assertion, and `tokens.test.ts` has it.
+- `low` The committed-data recipes test serves fixture config, not `data/config.json` (edge). The existing committed-data tests at App.test.tsx L353 and L368 follow the same pattern.
+- `low` A symlinked directory in `data/` (edge). This was rejected in the prior triage: `data/` has none.
+
 ## Implementation Notes
 
 ## Spec Change Log
