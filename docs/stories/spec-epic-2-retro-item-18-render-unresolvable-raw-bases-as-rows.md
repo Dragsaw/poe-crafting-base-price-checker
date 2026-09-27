@@ -2,7 +2,7 @@
 title: 'Epic 2 retro item 18: render unresolvable Raw Bases as rows'
 type: 'bugfix'
 created: '2026-09-27'
-status: 'done'
+status: 'in-progress'
 baseline_revision: '5fb836a30832812b83b0efbdbaf35dc2a428623b'
 review_loop_iteration: 0
 followup_review_recommended: false
@@ -107,7 +107,7 @@ deferred: []
 
 Code review 2026-09-27 of `78db4da..ec38dce`, chunk `packages/web`. It covers every web stream that branched from `5fb836a` and landed in series. A merge-integrity pass found no conflict markers. Each line that commits in the range added and HEAD lacks has a deliberate successor. `pnpm check` is clean, and `pnpm test` passes 1187/1187.
 
-- [ ] [Review][Decision] Honest-empty unresolvable row prints *no figure yet* in rust — This comes from the item 18 rebase onto item 20. `toDisplayRows` (`packages/web/src/list/display-rows.ts`, the `isHonestEmpty` branch) gives every unpriced row *no figure yet* but keeps `state: 'unresolvable'`. `RankedRow.tsx:108` takes the EV colour from the state, so the phrase paints rust. EXPERIENCE *Money slots* gives rust to *not valued* only. An all-unresolvable list, which is the AC1 fixture, therefore no longer shows *not valued*. The tests assert only the text, never the colour. The ledger `[NOTE FOR UX]` ("item 18 rebase onto retro item 20", `deferred-work.md:332`) is still open. Options: (a) an unresolvable row keeps *not valued* in rust while honest-empty; (b) keep *no figure yet* and take the colour from the phrase shown, so it prints in ink; (c) wait for UX to rule and defer.
+- [ ] [Review][Patch] Honest-empty unresolvable row prints *no figure yet* in rust. Resolved 2026-09-27 as option (b): the row keeps *no figure yet*, and `RankedRow` takes the EV colour from the phrase shown, so rust goes only to *not valued*. Add a colour assertion for the honest-empty case. [packages/web/src/list/RankedRow.tsx:108] — Decision detail: this comes from the item 18 rebase onto item 20. `toDisplayRows` (`packages/web/src/list/display-rows.ts`, the `isHonestEmpty` branch) gives every unpriced row *no figure yet* but keeps `state: 'unresolvable'`. `RankedRow.tsx:108` takes the EV colour from the state, so the phrase paints rust. EXPERIENCE *Money slots* gives rust to *not valued* only. An all-unresolvable list, which is the AC1 fixture, therefore no longer shows *not valued*. The tests assert only the text, never the colour. The ledger `[NOTE FOR UX]` ("item 18 rebase onto retro item 20", `deferred-work.md:332`) is still open. Options: (a) an unresolvable row keeps *not valued* in rust while honest-empty; (b) keep *no figure yet* and take the colour from the phrase shown, so it prints in ink; (c) wait for UX to rule and defer.
 - [ ] [Review][Patch] EXPERIENCE revision 9 code owed was never implemented, because `a8d4842` landed its ruling after `997f7f6`. `honestEmptyCopy` still ends in "yet" for an all-unresolvable list, which needs the one branch plus a test (`deferred-work.md:327`). The `STATE_NOTES` doc comment still says the note waits for a UX ruling (`deferred-work.md:326`). [packages/web/src/list/list-statement.ts:17, packages/web/src/list/format.ts:97]
 - Rejected:
   - `low` (blind) With the report absent, an all-unresolvable list shows no unresolvable signal at rest. The health line depends on the Sync Report by design (state 23), and the expansion carries the state.
