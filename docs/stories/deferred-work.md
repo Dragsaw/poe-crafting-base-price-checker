@@ -327,11 +327,11 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: "`BandedModifierRefSchema` does not refuse `valueMin > valueMax`. An inverted band contains no tier, so `affixProbability` and `combinationProbability` return `ok` with `p = 0` and no reason. Add a `valueMin <= valueMax` refine in `contracts`, or name the check that owns it."
   evidence: Story 3.2 review, triage row 16. `packages/contracts/src/modifier-ref.ts` has no order refine. `IMPLEMENTATION-NOTES.md` §2.5 checks only whether the `statId` is absent, so a curator typo in `tracked.json` would rank an entry at P = 0 without a signal.
 
-## Deferred from: spine revision 23 (2026-09-27)
+## Deferred from: UX revision, DESIGN.md 13 and EXPERIENCE.md 16 (2026-09-27)
 
-- source_spec: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md` (AD-10, revision 23)
-  summary: "PM. AD-10 now folds Provenance over the recipe's eligible set of both slots for each `(itemClass, recipe)` pair, so two recipes on one Item Class may carry different labels. PRD FR-10 (the \"pool-wide ... every probability on that Item Class\" consequence) and FR-11 (\"discriminates between Item Classes\") misstate it. This is a PRD trigger (player-visible behaviour). Sweep `docs/epics.md` Story 3.6 (the scoped-pool AC and \"one label per Item Class\") and the `6.0.0` citations at `:367` and `:1704-1705` to `6.1.0`. Story 3.6's \"from the Weights File's own `weightSource`, and from nothing else\" (and the same line at `:98`) should cite AD-10's table, because a `partial` pool is a second source. Cite AD-10; do not restate it."
-  evidence: Spine memlog, revision 23 [USER] fold-domain ruling. `docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md` FR-10, FR-11. `reviews/review-rev23-adversarial.md` F1, `reviews/review-rev23-verification.md` F4.
+- source_spec: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/EXPERIENCE.md` (Epistemics, the uniform-prior banner, state 34)
+  summary: "PM. Sweep `docs/epics.md` Story 3.6 to UX memlog 238. The banner AC (\"no probability in the loaded set carrying `measured`\") should cite the EXPERIENCE.md rule that the banner counts only the active recipe's pairs, so a recipe switch can raise or lower it. The per-row mark AC (\"a recipe switch may change a class's mark\") should cite state 34, where the mark swaps silently. Cite, do not restate."
+  evidence: UX memlog 238. `docs/epics.md` Story 3.6 banner and per-row mark ACs. This closes the PRD revision 23 `[NOTE FOR UX]` on the per-pair mark.
 
 ## Deferred from: spec-deferred-rev23-weight-zero-containment-and-empty-pools (2026-09-27)
 

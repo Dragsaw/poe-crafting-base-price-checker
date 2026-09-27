@@ -3,7 +3,7 @@ stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step
 storiesWrittenForEpics: [1, 2, 3]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -95,7 +95,7 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
 - **The trade catalogue is four committed artifacts under `data/catalogue/`.** An explicit command refreshes them at GGG patch cadence. That command never runs on the chunk path. The catalogue is an identity and validation authority only. It contributes nothing to the Eligible Pool (AD-25).
 - **`web` fetches exactly eight artifacts at runtime.** Each one is a separate cache-busted request. None is bundled into the JS. Five are required for a render and three are absent-tolerable. A ninth artifact needs an amendment (AD-24).
 - **Currency rates are hand-maintained committed data.** `sync` copies each rate's own `league` and `asOf` through unchanged and must not stamp them. `sync` always writes divine's own rate as exactly `1` (AD-20).
-- **Provenance is a three-value total order.** It derives from `weightSource` and from nothing else. `"absent"` maps to `uniform-prior`. It never maps to provenance `absent` (AD-10).
+- **Provenance is a three-value total order.** It derives only from the sources AD-10's table names. `"absent"` maps to `uniform-prior`. It never maps to provenance `absent` (AD-10).
 - **The Consistency Conventions bind:**
   - Entity keys serialise in field order.
   - Keys compare by UTF-8 code unit, never by locale collation.
@@ -364,7 +364,7 @@ The player opens a page on the second monitor before a session. The page renders
 
 **Standalone:** yes. This is a complete and useful product that never reads `weights.json`. Crafted Item Classes are Unrankable for a reason the page states, exactly as AD-24 and AD-27 require — and that is FR-30's world, which UX-DR53 now specifies rather than defers. **Epic 2 therefore builds the appendix itself**, at UX-DR8's four-cell 970px budget, pinned to the foot, its count readable without expanding anything, its rows non-interactive, holding on the order of 29 rows untruncated while the document scrolls beneath it. Where `weights.json` is absent, every row there carries FR-4's second string, `class absent from weights file`, because in that world the string is true of every crafted class. FR-4's acceptance still belongs to Epic 3, which adds the other two strings and the Provenance `absent` case to an appendix that already exists.
 
-**Two day-one worlds, and the committed data sits in the second.** The Epic was written against an absent `weights.json`, but a 6.0.0 file is committed, and `data/recipes.json` is committed with an empty recipe list (Story 2.7 Decisions). Epic 2 builds no weights-fed valuation, so the page does not read the file's `bases` and cannot say which classes it publishes. On the committed data no `(itemClass, recipe)` pair exists, the crafted branch is empty, and raw bases rank. No absence line prints, because every file is published. The masthead dek says why no crafted Item Class is ranked (EXPERIENCE.md, *The Epic 2 masthead dek* and state 37). An absent `recipes.json` gives the same empty crafted branch, and there Story 2.1's absence line names why. In both the committed and the absent-recipes worlds, no class is Unrankable in FR-4's sense, so the appendix is empty. The absent-weights world stays a real, tested state, because the file is absent-tolerable and a player can remove it. Stories 2.6 to 2.8 state both.
+**Two day-one worlds, and the committed data sits in the second.** The Epic was written against an absent `weights.json`, but a 6.1.0 file is committed, and `data/recipes.json` is committed with an empty recipe list (Story 2.7 Decisions). Epic 2 builds no weights-fed valuation, so the page does not read the file's `bases` and cannot say which classes it publishes. On the committed data no `(itemClass, recipe)` pair exists, the crafted branch is empty, and raw bases rank. No absence line prints, because every file is published. The masthead dek says why no crafted Item Class is ranked (EXPERIENCE.md, *The Epic 2 masthead dek* and state 37). An absent `recipes.json` gives the same empty crafted branch, and there Story 2.1's absence line names why. In both the committed and the absent-recipes worlds, no class is Unrankable in FR-4's sense, so the appendix is empty. The absent-weights world stays a real, tested state, because the file is absent-tolerable and a player can remove it. Stories 2.6 to 2.8 state both.
 
 ### Epic 3: The Crafted Ranking, on a Real Weights File
 
@@ -1701,8 +1701,8 @@ So that the ranking rests on a file somebody else produced and this app never in
 
 **Given** `data/weights.json`
 **When** `core` loads it
-**Then** it accepts a file conforming to `WEIGHTS-FILE-SCHEMA.md` `6.0.0`
-**And** it refuses a file declaring any `5.x` as an unknown **major**, because `6.0.0` adds the required `modGroup` that exclusion reads (FR-27, AD-11, NFR-8).
+**Then** it accepts a file conforming to `WEIGHTS-FILE-SCHEMA.md` `6.1.0`
+**And** it refuses a file declaring any `5.x` as an unknown **major**, because the `6.x` major adds the required `modGroup` that exclusion reads (FR-27, AD-11, NFR-8).
 
 **Given** a file that trips any hard error in `WEIGHTS-FILE-SCHEMA.md` *Validation*, an unknown schema major among them
 **When** `core` loads it
@@ -2330,20 +2330,21 @@ So that I discount a row rather than acting on it, and a placeholder never keeps
 
 **Given** Provenance
 **When** `core` derives it
-**Then** it comes from the Weights File's own `weightSource`, and from nothing else
+**Then** it comes only from the sources AD-10's table names
 **And** `"absent"` maps to `uniform-prior`, and never to Provenance `absent`
 **And** `web` never prints that marker's own words on screen (FR-10, AD-10, UX-DR38).
 
 **Given** a probability's inputs
 **When** `core` propagates Provenance
-**Then** the inputs are every entry in the scoped pool, numerator and denominator alike
-**And** one invented tier anywhere therefore makes **every** probability on that Item Class read `uniform-prior`
+**Then** the inputs are the ones AD-10 scopes to each `(itemClass, recipe)` pair, numerator and denominator alike
+**And** one invented tier among them therefore makes **every** probability of that pair read `uniform-prior`
 **And** that consequence is deliberate, rather than a defect (FR-10, AD-10, state 12).
 
 **Given** the per-row mark
 **When** it renders
-**Then** it carries one label per Item Class, and it belongs to the ranked row
-**And** it discriminates **between** Item Classes, and never within one (FR-10, FR-11, AD-10).
+**Then** it carries one label per `(itemClass, recipe)` pair, and it belongs to the ranked row
+**And** it discriminates **between** ranked rows, and never within one
+**And** two recipes on one Item Class may carry different labels, so a recipe switch may change a class's mark (FR-10, FR-11, AD-10).
 
 **Given** two render treatments, and not three
 **When** a figure renders

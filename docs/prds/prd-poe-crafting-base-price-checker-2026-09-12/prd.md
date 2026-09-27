@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 22
+revision: 23
 created: 2026-09-12
 updated: 2026-09-27
 sources:
@@ -243,8 +243,8 @@ Every displayed derived figure states what it rests on. Realises UJ-4.
 
 **Consequences (testable):**
 - Each derived figure carries the weakest Provenance and the oldest timestamp of every input, with no exception; the three-value order is §3 *Provenance*'s (AD-10).
-- Provenance is derived from the Weights File's own per-tier source marker and from nothing else, and the view never prints that marker's words on screen (AD-10).
-- A probability's inputs are pool-wide, so one invented tier anywhere in a scoped pool makes every probability on that Item Class read `uniform-prior`. That is the consequence FR-11 turns on, and it is deliberate (AD-10).
+- Provenance is derived only from the sources AD-10's table names, and the view never prints the words of the Weights File's per-tier source marker on screen (AD-10).
+- Provenance belongs to an Item Class under one Craft Recipe. One invented tier among the tiers that a recipe can roll on an Item Class makes every probability of that class under that recipe read `uniform-prior`. Two recipes on one Item Class can therefore carry different labels, and a recipe switch can change the mark on a class's row. That is the consequence FR-11 turns on, and it is deliberate (AD-10).
 - Two render treatments, not three: a `measured` figure is plain, and a figure resting on anything weaker is visibly degraded, with `absent` rendered as an unknown rather than a number (AD-10, AD-17; treatment `EXPERIENCE.md`). Colour alone carries neither distinction (NFR-10).
 - The view shows the Weights File's declared producer, generation time and game patch beside any figure they influenced, so a file left behind by a patch is visible as such (AD-11).
 - The exchange observation that normalised a price participates in Provenance like any other input (AD-20).
@@ -257,9 +257,9 @@ A Provenance badge identical on every row conveys nothing, and the view must not
 - The condition is read from the loaded data, never assumed of v1 (FR-30, AD-10).
 - While no probability in the loaded set carries `measured`, the view shows a persistent banner, dismissible per session, stating that the ranking rests on a uniform prior and that ordering between rows is not evidence-backed *(PRD-owned; treatment `EXPERIENCE.md`)*.
 - The banner lowers itself once any `measured` figure is present; it is never a build constant.
-- The per-row badge is required regardless (FR-10). It discriminates between Item Classes, never within one (AD-10).
+- The per-row badge is required regardless (FR-10). It discriminates between ranked rows, never within one (AD-10).
 - A `uniform-prior` badge means something in this pool was invented; it does not mean the pool is invented throughout (AD-10).
-- Where the badge cannot yet discriminate, freshness (FR-12) gets the visual weight (`EXPERIENCE.md`). `[ASSUMPTION: a per-Item-Class Provenance badge is enough for the player to judge trust by; no mixed-Provenance indicator is required for v1.]`
+- Where the badge cannot yet discriminate, freshness (FR-12) gets the visual weight (`EXPERIENCE.md`). `[ASSUMPTION: a per-row Provenance badge is enough for the player to judge trust by; no mixed-Provenance indicator is required for v1.]`
 
 #### FR-12: Show per-row freshness, and say which clock it is reading
 
@@ -656,7 +656,7 @@ Every inline `[ASSUMPTION]` tag in this document, in document order. An entry is
 - **§4.1 / FR-3** — 82 is the effective item level cap for these bases, so a floor of 82 and "exactly 82" are the same filter. If bases above 82 exist, this needs a ceiling, not a floor.
 - **§4.1 / FR-5** — no source names a count. 20 is roughly a screen and comfortably exceeds the "top five" the player acts on.
 - **§4.2 / FR-7** — 0.25 Divine, the brief's early-endgame figure, is the least-surprising cold start.
-- **§4.4 / FR-11** — a per-Item-Class Provenance badge is enough for the player to judge trust by; no mixed-Provenance indicator is required for v1.
+- **§4.4 / FR-11** — a per-row Provenance badge is enough for the player to judge trust by; no mixed-Provenance indicator is required for v1.
 - **§4.7 / FR-26** — larger currency quantities and partial-craft abandonment are not modelled.
 - **§4.8 / FR-29** — the understatement stays acceptable in practice for v1 — an operating bet, not a bound; OQ-21 is the measurement that would settle it.
 - **§5 / NFR-10** — the extension beyond AD-24's literal scope is this PRD's, not the spine's.

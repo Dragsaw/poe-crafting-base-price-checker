@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 12
+revision: 13
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -1811,24 +1811,18 @@ never empty — every row carries exactly one of the two. This is not a licence 
 drop the word from any other glyph. See `EXPERIENCE.md`, Component Patterns, for
 the full argument.
 
-*A Provenance mark is one label per Item Class, and it belongs to the ranked
-row* `[decision — memlog 180, re-deriving memlog 175]`. Provenance propagates
-**pool-wide** — a probability's inputs are every entry in its scoped pool,
-numerator and denominator alike — so one invented tier anywhere makes every
-probability on that Item Class carry the same label (PRD FR-10, FR-11; AD-10).
-The mark therefore discriminates **between** Item Classes and never within one.
+*A Provenance mark is one label per `(Item Class, recipe)` pair, and it
+belongs to the ranked row* `[decision — memlog 238, superseding memlog 180]`. A
+probability's inputs are the recipe's eligible set, numerator and denominator
+alike, so one invented tier in that set makes every probability of the pair
+carry the same label (PRD FR-10, FR-11; AD-10). Two recipes on one Item Class
+can carry different labels. The mark therefore discriminates **between** ranked
+rows and never within one.
 
-**The argument was made on the wrong noun at revision 2 and survives the
-correction strengthened.** Memlog 175 reasoned that a ranked row *is* a Base
-Type, so the Provenance column marked exactly the unit it could speak about.
-PRD revision 18 made the crafted branch rank Item Classes (FR-3), which would
-break that reasoning if the mark's granularity and the row's had come apart —
-and they have not. **A modifier pool belongs to a class** (AD-11, PRD §3 *Item
-Class*), so a Provenance label was always a per-class fact, and at revision 2 it
-was being carried on a finer unit than it described. At revision 18 the two
-units coincide: the mark speaks about a class and the crafted row *is* a class.
-The column does not merely still earn its place — it earns it on the unit the
-propagation rule actually has, rather than on one a level below.
+*A recipe switch swaps the mark silently.* The row's Provenance cell re-renders
+for the new pair in the same pass as its rank, EV and chase cells. No transition,
+highlight or note marks the change, because the mark always describes the figure
+on screen (`EXPERIENCE.md` state 34).
 
 *Where the mark may not go, unchanged.* Every combination row inside one
 expansion necessarily carries that same label, so a Provenance mark is never
@@ -2523,7 +2517,7 @@ conformance claims.
 | Print FR-4's reasons verbatim as `pool partial`, `class absent from weights file` and `class disagrees with weights file` | Carry `base absent from weights file`, the revision-16 spelling; carry a two-member enum, the pre-D-2 set; or print the failing check's name beside the third string. **Standing check:** this enum is PRD-owned and has moved in three consecutive PRD revisions, so re-read FR-4 on every absorption rather than trusting the copy here |
 | Pair every semantic ink with its glyph and its word | Distinguish anything by hue alone |
 | Keep to the two semantic inks | Introduce a third colour, a success colour, or a severity ramp |
-| Mark Provenance once, on the ranked row — one label per **Item Class** | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
+| Mark Provenance once, on the ranked row — one label per **`(Item Class, recipe)` pair** | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
 | Reach for a non-colour cue for `pinned` and for the fallback — both have now taken one | Spend the retired slate on something that is not a statement about a figure's footing |
 | Set text quoted verbatim out of a file in the mono verbatim register — the fallback and the cross-file diagnosis, and nothing else | Let a third stack spread to text the page wrote itself, or give verbatim text an ink, a mark or a size of its own |
 | Use `{colors.sepia}` decoratively — eyebrow, threshold fill, affordances, the active recipe's rule, both unit glyphs | Let sepia start meaning a state |
