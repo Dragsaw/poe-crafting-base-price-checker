@@ -102,6 +102,20 @@ deferred:
   - `low` `patch` (blind) `sprint-status.yaml` still reads `open`, there is no browser check, and the spec cites line numbers. — `sprint-status.yaml` is set to `done` at finalize. The browser check is rejected as in the intent-alignment row. The line anchors would be a spec edit, which the review rules reject.
   - `low` `patch` (blind) `DESIGN.md` `bodyByCause` restates the loader's classification predicate. — Deleted the three "Cause: …" clauses. The predicate now lives only in the `RefusalCause` docblock.
 
+### Review Findings
+
+Code review 2026-09-27 of `78db4da..ec38dce`, chunk `packages/web` (see the item 18 spec for the merge-integrity result).
+
+- [ ] [Review][Patch] The version/content split tests `result.reason !== 'invalid'`. A reason added to `EnvelopeResult` later becomes `cause: 'version'` with no compiler signal. Switch on `result.reason` with a `never` default, as `envelopes.ts` does. [packages/web/src/load/load-artifacts.ts:116]
+- Rejected:
+  - `low` (edge+verification-gap+blind) A literal `schemaVersion: "none"` prints "declares no schema version". It is rare, and the first review rejected it. The fix re-types the sentinel through `LoadOutcome` and the screen.
+  - `low` (verification-gap+blind) A non-object JSON body (`[]`, `42`) gets the version cause. "It declares no schema version" is true of it, and the first review rejected it.
+  - `low` (blind) A non-string `schemaVersion` reads "declares no schema version". It is rare, and it needs a new UX sentence.
+  - `low` (blind) Make `refused` a union keyed on `cause`. This is type churn across the loader and the screen, and no caller shows a wrong value.
+  - `low` (blind) The title says "required" for an invalid optional file. UX memlog 220 ruled the title cause-neutral for every refusal, and an optional file that is present but invalid still blocks the render.
+  - `low` (blind) `refusalBody` reads the first `section p`. The first review rejected it.
+  - `false` (blind) The test title "declares none … non-string one" is stale. The test still asserts `declared: 'none'`, which is what its title names.
+
 ## Verification
 
 **Commands:**
