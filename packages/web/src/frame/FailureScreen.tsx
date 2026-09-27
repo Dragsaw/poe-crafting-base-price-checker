@@ -2,6 +2,7 @@ import '../shared/affordance.css';
 
 import type { JSX } from 'react';
 
+import { NO_DECLARED_VERSION, type RefusalCause } from '../load/load-artifacts';
 import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
 
 /** DESIGN.md `components.refusal-screen` / `components.fetch-failure-screen` copy. */
@@ -15,8 +16,25 @@ export const FETCH_FAILURE_RECOVERY =
   'The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.';
 export const TRY_AGAIN = `${glyphs.open} Try again`;
 
+/**
+ * The fixed parts of the refusal body sentence, one per cause (DESIGN.md
+ * `components.refusal-screen.bodyByCause`). Each follows "`<path>` × unresolvable.".
+ */
+export const REFUSAL_VERSION_DECLARES = 'It declares schema version';
+export const REFUSAL_NO_VERSION_DECLARED = 'It declares no schema version';
+export const REFUSAL_VERSION_EXPECTS = 'the page expects';
+export const REFUSAL_CONTENT = 'Its content does not match the schema the page expects, version';
+export const REFUSAL_MISSING = 'It was not published, and the page cannot render without it.';
+
 export type FailureScreenProps =
-  | { readonly variant: 'refused'; readonly path: string; readonly declared: string; readonly expected: string }
+  | {
+      readonly variant: 'refused';
+      readonly path: string;
+      readonly cause: RefusalCause;
+      /** The declared `schemaVersion`, or `NO_DECLARED_VERSION`. */
+      readonly declared: string;
+      readonly expected: string;
+    }
   | { readonly variant: 'failed'; readonly path: string; readonly onRetry: () => void };
 
 const bodyStyle = {
@@ -25,6 +43,45 @@ const bodyStyle = {
   maxWidth: px(spacing.dekMaxWidth),
   margin: `${px(spacing.s4)} 0 0`,
 };
+
+/**
+ * The refusal body sentence for one cause. A version fault names both
+ * versions; a content fault names only the expected one, since the declared
+ * version is not what is wrong; a missing file names neither.
+ */
+function RefusalCauseSentence({
+  cause,
+  declared,
+  expected,
+}: {
+  readonly cause: RefusalCause;
+  readonly declared: string;
+  readonly expected: string;
+}): JSX.Element {
+  switch (cause) {
+    case 'version':
+      return (
+        <>
+          {declared === NO_DECLARED_VERSION ? (
+            REFUSAL_NO_VERSION_DECLARED
+          ) : (
+            <>
+              {REFUSAL_VERSION_DECLARES} <span data-declared="">{declared}</span>
+            </>
+          )}
+          ; {REFUSAL_VERSION_EXPECTS} <span data-expected="">{expected}</span>.
+        </>
+      );
+    case 'content':
+      return (
+        <>
+          {REFUSAL_CONTENT} <span data-expected="">{expected}</span>.
+        </>
+      );
+    case 'missing':
+      return <>{REFUSAL_MISSING}</>;
+  }
+}
 
 /**
  * The two full-page failure screens. Same shape, different fact. Each replaces
@@ -50,8 +107,7 @@ export function FailureScreen(props: FailureScreenProps): JSX.Element {
             <span style={{ ...typeStyle('row-mark'), fontSize: 'inherit', lineHeight: 'inherit', fontWeight: 700, color: colors.rust }}>
               {glyphs.unresolvable} unresolvable
             </span>
-            . It declares schema version <span data-declared="">{props.declared}</span>; the page expects{' '}
-            <span data-expected="">{props.expected}</span>.
+            . <RefusalCauseSentence cause={props.cause} declared={props.declared} expected={props.expected} />
           </p>
           <p style={bodyStyle}>{REFUSAL_RECOVERY}</p>
         </>

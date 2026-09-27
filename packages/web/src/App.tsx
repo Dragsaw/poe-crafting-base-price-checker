@@ -91,7 +91,13 @@ export function App(): JSX.Element {
     case 'refused':
       return (
         <Frame state="refused">
-          <FailureScreen variant="refused" path={view.path} declared={view.declared} expected={view.expected} />
+          <FailureScreen
+            variant="refused"
+            path={view.path}
+            cause={view.cause}
+            declared={view.declared}
+            expected={view.expected}
+          />
         </Frame>
       );
     case 'failed':

@@ -9,8 +9,14 @@ import { absenceLine } from './frame/AbsenceLines';
 import {
   FETCH_FAILURE_EYEBROW,
   FETCH_FAILURE_TITLE,
+  REFUSAL_CONTENT,
   REFUSAL_EYEBROW,
+  REFUSAL_MISSING,
+  REFUSAL_NO_VERSION_DECLARED,
+  REFUSAL_RECOVERY,
   REFUSAL_TITLE,
+  REFUSAL_VERSION_DECLARES,
+  REFUSAL_VERSION_EXPECTS,
   TRY_AGAIN,
 } from './frame/FailureScreen';
 import { CONTROL_GROUP_WIDTH, MASTHEAD_DEK, MASTHEAD_TITLE } from './frame/Masthead';
@@ -95,6 +101,25 @@ async function settleTo(state: string): Promise<void> {
   throw new Error(`frame never reached ${state}; it is ${String(frame().dataset['state'])}`);
 }
 
+/**
+ * The refusal body sentence, after checking the parts every cause shares: the
+ * eyebrow, the title, the named artifact beside `× unresolvable`, the recovery
+ * sentence, and no retry.
+ */
+function refusalBody(path: string): string {
+  const text = frame().textContent;
+  expect(text).toContain(REFUSAL_EYEBROW);
+  expect(text).toContain(REFUSAL_TITLE);
+  expect(text).toContain(REFUSAL_RECOVERY);
+  expect(text).not.toContain(TRY_AGAIN);
+  expect(frame().querySelector('button')).toBeNull();
+  expect(frame().querySelector('[data-artifact]')?.textContent).toBe(path);
+  const body = frame().querySelector('section p')?.textContent ?? '';
+  const lead = `${path} × unresolvable. `;
+  expect(body.startsWith(lead)).toBe(true);
+  return body.slice(lead.length);
+}
+
 describe('the pending state', () => {
   it('paints the masthead and twenty skeleton slots in the final layout', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
@@ -157,21 +182,33 @@ describe('the outcomes', () => {
   });
 
   // Matrix: invalid shape.
-  it('refuses an invalid tracked.json, naming it and both versions, with no retry', async () => {
+  it('refuses an invalid tracked.json as a content fault, with no retry', async () => {
     serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '1.0.0', entries: 42 } } });
     mount();
     await settleTo('refused');
-    const text = frame().textContent;
     expect(frame().querySelector('section')?.getAttribute('role')).toBe('alert');
     expect(frame().hasAttribute('aria-busy')).toBe(false);
-    expect(text).toContain(REFUSAL_EYEBROW);
-    expect(text).toContain(REFUSAL_TITLE);
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('tracked.json');
-    expect(frame().querySelector('[data-declared]')?.textContent).toBe('1.0.0');
+    const sentence = refusalBody('tracked.json');
+    expect(sentence).toBe(`${REFUSAL_CONTENT} 1.0.0.`);
+    expect(sentence).not.toContain('declares');
+    expect(frame().querySelector('[data-declared]')).toBeNull();
     expect(frame().querySelector('[data-expected]')?.textContent).toBe('1.0.0');
-    expect(text).toContain('× unresolvable');
-    expect(text).not.toContain(TRY_AGAIN);
-    expect(text).not.toContain(MASTHEAD_TITLE);
+    expect(frame().textContent).not.toContain(MASTHEAD_TITLE);
+  });
+
+  it('refuses a dataset with a repeated entryKey as a content fault', async () => {
+    const twin = {
+      entryKey: '["raw","Advanced Dualstring Bow",82]',
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+    };
+    serveArtifacts(server, {
+      dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), entries: [twin, twin] } },
+    });
+    mount();
+    await settleTo('refused');
+    const sentence = refusalBody('dataset.json');
+    expect(sentence).toBe(`${REFUSAL_CONTENT} 1.0.0.`);
+    expect(sentence).not.toContain('declares');
   });
 
   // Matrix: unknown major.
@@ -179,18 +216,32 @@ describe('the outcomes', () => {
     serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: '2.0.0' } } });
     mount();
     await settleTo('refused');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('dataset.json');
+    const sentence = refusalBody('dataset.json');
+    expect(sentence).toBe(`${REFUSAL_VERSION_DECLARES} 2.0.0; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
+    // The version sentence is unchanged by the per-cause split.
+    expect(sentence).toBe('It declares schema version 2.0.0; the page expects 1.0.0.');
     expect(frame().querySelector('[data-declared]')?.textContent).toBe('2.0.0');
     expect(frame().querySelector('[data-expected]')?.textContent).toBe('1.0.0');
   });
 
+  // Matrix: malformed version string.
+  it('refuses dataset.json declaring a malformed version', async () => {
+    serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: 'abc' } } });
+    mount();
+    await settleTo('refused');
+    expect(refusalBody('dataset.json')).toBe(`${REFUSAL_VERSION_DECLARES} abc; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
+  });
+
   // Matrix: missing version.
-  it('refuses config.json with no schemaVersion, declaring none', async () => {
+  it('refuses config.json with no schemaVersion, declaring no schema version', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });
     mount();
     await settleTo('refused');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('config.json');
-    expect(frame().querySelector('[data-declared]')?.textContent).toBe('none');
+    const sentence = refusalBody('config.json');
+    expect(sentence).toBe(`${REFUSAL_NO_VERSION_DECLARED}; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
+    expect(sentence).toContain('declares no schema version');
+    expect(frame().querySelector('[data-declared]')).toBeNull();
+    expect(frame().querySelector('[data-expected]')?.textContent).toBe('1.0.0');
   });
 
   // Matrix: network error / 5xx, and the retry.
@@ -223,12 +274,15 @@ describe('the outcomes', () => {
   });
 
   // Matrix: required absent.
-  it('refuses a missing tracked.json, declaring none', async () => {
+  it('refuses a missing tracked.json as not published', async () => {
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
     mount();
     await settleTo('refused');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('tracked.json');
-    expect(frame().querySelector('[data-declared]')?.textContent).toBe('none');
+    const sentence = refusalBody('tracked.json');
+    expect(sentence).toBe(REFUSAL_MISSING);
+    expect(sentence).not.toContain('schema version');
+    expect(frame().querySelector('[data-declared]')).toBeNull();
+    expect(frame().querySelector('[data-expected]')).toBeNull();
   });
 
   // Matrix: mixed failure.
@@ -256,12 +310,13 @@ describe('the outcomes', () => {
   });
 
   // Matrix: non-JSON body.
-  it('refuses a 200 carrying HTML, declaring none', async () => {
+  it('refuses a 200 carrying HTML as a content fault', async () => {
     serveArtifacts(server, { dataset: { kind: 'text', body: '<!doctype html><title>x</title>' } });
     mount();
     await settleTo('refused');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('dataset.json');
-    expect(frame().querySelector('[data-declared]')?.textContent).toBe('none');
+    const sentence = refusalBody('dataset.json');
+    expect(sentence).toBe(`${REFUSAL_CONTENT} 1.0.0.`);
+    expect(sentence).not.toContain('declares');
   });
 });
 

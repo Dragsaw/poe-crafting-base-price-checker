@@ -74,6 +74,7 @@ describe('loadArtifacts', () => {
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'tracked.json',
+      cause: 'content',
       declared: '1.0.0',
       expected: '1.0.0',
     });
@@ -90,6 +91,7 @@ describe('loadArtifacts', () => {
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'dataset.json',
+      cause: 'content',
       declared: '1.0.0',
       expected: '1.0.0',
     });
@@ -101,6 +103,7 @@ describe('loadArtifacts', () => {
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'dataset.json',
+      cause: 'version',
       declared: '2.0.0',
       expected: '1.0.0',
     });
@@ -109,10 +112,32 @@ describe('loadArtifacts', () => {
   // Matrix: missing version.
   it('declares none when the file carries no schemaVersion, or a non-string one', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({ kind: 'refused', path: 'config.json', declared: NO_DECLARED_VERSION });
+    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+      kind: 'refused',
+      path: 'config.json',
+      cause: 'version',
+      declared: NO_DECLARED_VERSION,
+    });
 
     serveArtifacts(server, { config: { kind: 'json', body: { schemaVersion: 1 } } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({ kind: 'refused', path: 'config.json', declared: NO_DECLARED_VERSION });
+    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+      kind: 'refused',
+      path: 'config.json',
+      cause: 'version',
+      declared: NO_DECLARED_VERSION,
+    });
+  });
+
+  // Matrix: malformed version string.
+  it('refuses a malformed version string as a version fault', async () => {
+    serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: 'abc' } } });
+    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+      kind: 'refused',
+      path: 'dataset.json',
+      cause: 'version',
+      declared: 'abc',
+      expected: '1.0.0',
+    });
   });
 
   it('refuses a weights file of another major', async () => {
@@ -120,6 +145,7 @@ describe('loadArtifacts', () => {
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'weights.json',
+      cause: 'version',
       declared: '5.1.0',
       expected: '6.0.0',
     });
@@ -142,6 +168,7 @@ describe('loadArtifacts', () => {
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'tracked.json',
+      cause: 'missing',
       declared: NO_DECLARED_VERSION,
       expected: '1.0.0',
     });
@@ -161,7 +188,7 @@ describe('loadArtifacts', () => {
       config: { kind: 'status', status: 404 },
       tracked: { kind: 'json', body: {} },
     });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({ kind: 'refused', path: 'tracked.json' });
+    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({ kind: 'refused', path: 'tracked.json', cause: 'version' });
   });
 
   // Matrix: tolerable absent.
@@ -184,6 +211,7 @@ describe('loadArtifacts', () => {
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'weights.json',
+      cause: 'content',
       declared: NO_DECLARED_VERSION,
       expected: '6.0.0',
     });

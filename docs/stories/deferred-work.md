@@ -286,6 +286,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Update the "cache-busted" wording at `docs/epics.md:96` and `:995` to the ruled `no-store` fetch. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
   evidence: Retro F8, F9 and F19.
+- source_spec: `docs/stories/spec-epic-2-retro-item-22-refusal-cause.md`
+  summary: For a required 404 the refusal screen's title still reads "A published file does not match its schema." while the per-cause body now says "It was not published, and the page cannot render without it." UX rules the title (and the EXPERIENCE.md state 26 label "Schema-invalid artifact") for the `missing` cause.
+  evidence: Pre-existing since spec 2.1 triage #9 (a required 404 gets the refusal screen). Made visible by retro item 22's per-cause body. Title copy is UX-owned (DESIGN.md `components.refusal-screen.titleText`; `FailureScreen.tsx` `REFUSAL_TITLE`).
 
 ## Deferred from: epic 2 retro item 20 (2026-09-27)
 

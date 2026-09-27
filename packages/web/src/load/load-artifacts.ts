@@ -18,6 +18,16 @@ import {
 /** What a refusal prints for a file whose `schemaVersion` is missing or not a string. */
 export const NO_DECLARED_VERSION = 'none';
 
+/**
+ * Why a file was refused, so the refusal screen blames the right thing:
+ * - `version`: the file declares an unknown major, a malformed version, or no
+ *   string `schemaVersion` at all.
+ * - `content`: the body is not JSON, or it declares the expected major but its
+ *   shape fails the schema.
+ * - `missing`: a required file returned 404.
+ */
+export type RefusalCause = 'version' | 'content' | 'missing';
+
 export type LoadOutcome =
   | {
       readonly kind: 'ready';
@@ -28,6 +38,8 @@ export type LoadOutcome =
   | {
       readonly kind: 'refused';
       readonly path: string;
+      readonly cause: RefusalCause;
+      /** The declared `schemaVersion`, or `NO_DECLARED_VERSION`. */
       readonly declared: string;
       readonly expected: string;
     }
@@ -38,7 +50,7 @@ type Fetched =
   | { readonly kind: 'valid'; readonly value: unknown }
   | { readonly kind: 'absent' }
   | { readonly kind: 'not-arrived' }
-  | { readonly kind: 'invalid'; readonly declared: string };
+  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string };
 
 export type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
@@ -92,21 +104,30 @@ async function fetchOne(
   try {
     data = JSON.parse(body);
   } catch {
-    return { kind: 'invalid', declared: NO_DECLARED_VERSION };
+    // Not JSON at all: nothing declared, and the fault is the content.
+    return { kind: 'invalid', cause: 'content', declared: NO_DECLARED_VERSION };
   }
 
   const result = parseEnvelope(descriptor.schema, data, descriptor.expected);
   if (result.ok) {
     return { kind: 'valid', value: result.value };
   }
-  return { kind: 'invalid', declared: declaredVersion(data) };
+  const declared = declaredVersion(data);
+  if (result.reason !== 'invalid') {
+    // An unknown major or a malformed version string.
+    return { kind: 'invalid', cause: 'version', declared };
+  }
+  // `invalid` covers both a failed version probe (no string version declared)
+  // and a failed shape parse at the expected major.
+  return { kind: 'invalid', cause: declared === NO_DECLARED_VERSION ? 'version' : 'content', declared };
 }
 
 /**
  * Precedence across the eight: any artifact that did not arrive gives the
  * fetch-failure screen; otherwise any invalid (or required-and-absent)
  * artifact gives the refusal screen; otherwise the set is ready. Each screen
- * names the first failing artifact in AD-24 order.
+ * names the first failing artifact in AD-24 order. A refusal carries its
+ * cause: the invalid file's own cause, or `missing` for a required 404.
  */
 function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome {
   for (const key of ARTIFACT_ORDER) {
@@ -119,10 +140,22 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
     const result = results[key];
     const descriptor = ARTIFACTS[key];
     if (result.kind === 'invalid') {
-      return { kind: 'refused', path: descriptor.path, declared: result.declared, expected: descriptor.expected };
+      return {
+        kind: 'refused',
+        path: descriptor.path,
+        cause: result.cause,
+        declared: result.declared,
+        expected: descriptor.expected,
+      };
     }
     if (result.kind === 'absent' && descriptor.class === 'required') {
-      return { kind: 'refused', path: descriptor.path, declared: NO_DECLARED_VERSION, expected: descriptor.expected };
+      return {
+        kind: 'refused',
+        path: descriptor.path,
+        cause: 'missing',
+        declared: NO_DECLARED_VERSION,
+        expected: descriptor.expected,
+      };
     }
   }
 

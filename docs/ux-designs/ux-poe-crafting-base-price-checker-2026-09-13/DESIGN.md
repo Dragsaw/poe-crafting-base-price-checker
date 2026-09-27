@@ -781,7 +781,12 @@ components:
     bodyColor: '{colors.ink-secondary}'
     bodyMaxWidth: '{spacing.dek-max-width}'
     mark: '{components.trust-mark-unresolvable} glyph and word beside the artifact name'
-    names: 'which artifact, which schema version it declared, which the page expects'
+    names: 'which artifact, always, beside the mark; then one body sentence chosen by the refusal cause (`bodyByCause`). Only a version fault names the declared version.'
+    bodyByCause:
+      version: '"It declares schema version {declared}; the page expects {expected}." When the file declares no string version: "It declares no schema version; the page expects {expected}."'
+      content: '"Its content does not match the schema the page expects, version {expected}."'
+      missing: '"It was not published, and the page cannot render without it."'
+    bodyLead: 'every cause sentence follows "{artifact} × unresolvable." in the same paragraph'
     recovery: 'one sentence. The page renders again as soon as a valid set is published. The page serves nothing old in the meantime.'
   fetch-failure-screen:
     background: '{colors.paper}'
@@ -2370,9 +2375,13 @@ pinning happen in `data/tracked.json` followed by a commit.
 nothing stale served. A rust eyebrow reading `THE PAGE WILL NOT RENDER THIS`, a
 `{typography.masthead-title}` line saying plainly that a published file does not
 match its schema, then `{typography.failure-body}` at
-`{spacing.dek-max-width}` naming **which** artifact, which schema version it
-declared and which the page expects, with the artifact named beside a
-`{components.trust-mark-unresolvable}` glyph and word. It closes with one
+`{spacing.dek-max-width}` naming **which** artifact, beside a
+`{components.trust-mark-unresolvable}` glyph and word, then saying **why** in
+one sentence chosen by the refusal cause (`refusal-screen.bodyByCause`). A
+version fault names the version the file declared and the one the page
+expects. A content fault names only the expected version, because the declared
+version is not what is wrong. A missing required file names no version, because
+there is no file to declare one. It closes with one
 sentence: the page renders again as soon as a valid set is published, and
 nothing old is served in the meantime. No card, no icon, no illustration — the
 failure is set like the rest of the page, because it is the same page telling
