@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 21
+revision: 22
 created: '2026-09-12'
-updated: '2026-09-26'
+updated: '2026-09-27'
 binds: []
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -313,7 +313,7 @@ never import each other.
   | `data/currencies.json` | the player, by hand | `sync` **only** (AD-24 does not fetch it) |
   | `data/recipes.json` | the player, by hand | `web` |
   | `data/weights.json` | an external producer | **`sync` in full** — id validation (AD-9), the cross-file gate (AD-17) and the coverage figure (AD-27) — and `core` via `web` |
-  | `data/catalogue/*.json` | `sync`, on an explicit refresh command (AD-25) | `sync`, `core` via `web` |
+  | `data/catalogue/*.json` | `sync`, on an explicit refresh command (AD-25) | `sync`; `core` via `web` for `stats.json` only (AD-24) |
   | `data/dataset.json`, `data/sync-report.json` | `sync` only | `web` |
   | `data/sync-progress.json` | `sync` only | `sync` only — internal |
 
@@ -733,7 +733,7 @@ never import each other.
   **This AD binds that a cut-off exists, which clock it reads, and what it may not do. The
   number itself is a view-layer constant whose home is the PRD** — 48 hours, chosen
   against the ~15-hour partial refresh cycle. It is deliberately not a `data/config.json`
-  field (AD-19) and not a ninth fetched artifact (AD-24): nothing but `web` reads it and
+  field (AD-19) and not an eighth fetched artifact (AD-24): nothing but `web` reads it and
   no artifact carries it across a boundary, so changing it is a view change and a redeploy.
 
 ### AD-11 — Weights are a consumed file of raw tiers, and containment resolves the overlap
@@ -1502,7 +1502,7 @@ never import each other.
   rates (AD-3), and a crafting currency may never appear in any listing, so a rate reachable
   only through a priced observation would leave `craftCost` uncomputable for exactly the
   orbs the recipe spends. The rates ride in the artifact `web` already fetches rather than in
-  a ninth one, so AD-24's set stays closed. A recipe naming a currency with no current rate
+  an eighth one, so AD-24's set stays closed. A recipe naming a currency with no current rate
   makes that recipe's `craftCost` unavailable, and `core` reports the recipe as uncostable
   rather than substituting zero — a zero craft cost inflates every `EV` on that recipe.
 
@@ -1512,34 +1512,34 @@ never import each other.
 - **Prevents:** two builders choosing differently between bundling and fetching the
   dataset, which changes cache behaviour, staleness and deploy semantics. Also prevents a
   read-time ranking that AD-4 mandates but nobody sized.
-- **Rule:** `web` **fetches** exactly **eight** artifacts at runtime, as separate
-  requests, each with `cache: 'no-store'` and **no query token**: `dataset.json`,
-  `sync-report.json`, `weights.json`, `recipes.json`, `tracked.json`, `config.json`,
-  `catalogue/stats.json` and `catalogue/static.json`. `no-store` bypasses the browser cache
-  only; the Pages CDN still serves with `max-age=600`, so a published artifact can be up to
-  10 minutes stale, and a set fetched across a data commit can rarely mix old and new files.
-  Both costs are accepted. It
-  never fetches `sync-progress.json` (internal to `sync`), `catalogue/items.json` or
-  `catalogue/filters.json` (only `sync` needs them), or `data/currencies.json` (a sync-side
-  workload declaration, whose absence is what makes AD-7's cap a `sync`-side check). **A
-  ninth artifact requires an amendment to this AD.**
+- **Rule:** `web` **fetches** exactly **seven** artifacts at runtime, as separate
+  requests, each with `cache: 'no-cache'` and **no query token**: `dataset.json`,
+  `sync-report.json`, `weights.json`, `recipes.json`, `tracked.json`, `config.json` and
+  `catalogue/stats.json`. `no-cache` makes the browser revalidate every load and reuse its
+  copy only on a `304`, so it is exactly as fresh as a full download; the Pages CDN still
+  serves with `max-age=600`, so a published artifact can be up to 10 minutes stale, and a
+  set fetched across a data commit can rarely mix old and new files. Both costs are
+  accepted. It
+  never fetches `sync-progress.json` (internal to `sync`), `catalogue/items.json`,
+  `catalogue/filters.json` or `catalogue/static.json` (only `sync` needs them), or
+  `data/currencies.json` (a sync-side workload declaration, whose absence is what makes
+  AD-7's cap a `sync`-side check). **An eighth artifact requires an amendment to this AD.**
 
-  The two catalogue files are what let `web` render a stat id and a currency as human text
-  **without a runtime call to pathofexile.com**, and they carry different halves of that
-  job: **`catalogue/stats.json` supplies a `statId`'s display text**, and
-  **`catalogue/static.json` supplies a currency's label**. v1 denominates currency as text
-  and defines no icon — AD-20 leaves at most one denomination on screen, so an icon would
-  distinguish nothing; `static.json`'s icons stay fetched but unconsumed, so a future
-  multi-denomination view needs no new artifact.
+  **`catalogue/stats.json` is what lets `web` render a `statId` as its display text
+  without a runtime call to pathofexile.com.** The denomination is **not** catalogue text:
+  AD-20 leaves exactly one denomination on screen, and its word `Divine` is the PRD's own
+  literal (PRD §3), printed from one `web` constant and never read from `static.json`,
+  whose label for it is `Divine Orb`. v1 denominates currency as text and defines no icon.
+  A multi-denomination view would re-add `static.json` by amending this AD.
 
-  **An absent artifact is not an invalid one, and the eight split in two.** AD-3 makes `web`
+  **An absent artifact is not an invalid one, and the seven split in two.** AD-3 makes `web`
   refuse to render an artifact that fails validation; this AD decides what an artifact that
   is simply **not there** does, because the two have different causes and the product ships
   through one of them.
 
   | Class | Artifacts | Absent behaviour |
   | --- | --- | --- |
-  | **Required for a render** | `dataset.json`, `tracked.json`, `config.json`, `catalogue/stats.json`, `catalogue/static.json` | refuse to render, exactly as for an invalid artifact — without them there is no list, no league and no display text |
+  | **Required for a render** | `dataset.json`, `tracked.json`, `config.json`, `catalogue/stats.json` | refuse to render, exactly as for an invalid artifact — without them there is no list, no league and no stat text |
   | **Absent-tolerable** | `weights.json`, `recipes.json`, `sync-report.json` | render, and name the absence on screen |
 
   An absent `weights.json` makes **every crafted item class unrankable with that reason**
@@ -1554,7 +1554,7 @@ never import each other.
   report surfaces alone. **A degraded render always names what is missing**, and never
   presents a diminished list as a whole one.
 
-  The build never bundles the eight artifacts into the JS, so a data commit updates data
+  The build never bundles the seven artifacts into the JS, so a data commit updates data
   without rebuilding the app. Each carries `schemaVersion` and is validated on load (AD-3).
   `web` renders from a single consistent set and does not mix artifacts across a refresh.
   **Ranking the full tracked list must complete under 100 ms** on a mid-range machine and
@@ -1596,7 +1596,7 @@ never import each other.
   | --- | --- | --- | --- |
   | `items.json` | `/api/trade2/data/items` | base types by category | `baseTypeId` validation (AD-9), curation; **and validation of the base type AD-16's `jewel` discriminator derives from a `className`** (§10) — the one derived value in the system that is checked against the catalogue before it is sent, rather than after |
   | `stats.json` | `/api/trade2/data/stats` | stat ids + display text | `statId` validation (AD-9), modifier text in `web` |
-  | `static.json` | `/api/trade2/data/static` | currency ids + labels + icons | `data/currencies.json` id validation in `sync`; currency display text in `web` (icons unconsumed in v1) |
+  | `static.json` | `/api/trade2/data/static` | currency ids + labels + icons | `data/currencies.json` id validation in `sync`; **not fetched by `web`** (AD-24) |
   | `filters.json` | `/api/trade2/data/filters` | filter ids + options, including the category filter's option list | search construction (AD-16); **`categoryId` validation (AD-5, AD-9)**, curation |
 
   The refresh is an **explicit command at GGG patch cadence**, never part of a chunk and
