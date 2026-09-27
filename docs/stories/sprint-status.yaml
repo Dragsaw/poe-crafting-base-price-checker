@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-27-2026 16:54
+last_updated: 09-27-2026 18:24
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -221,7 +221,8 @@ action_items:
     action: "Configure a git remote, set Pages source to GitHub Actions, run deploy.yml
       once and record the URL (retro F4)"
     owner: "player"
-    status: open
+    status: done
+    url: "https://dragsaw.github.io/poe-crafting-base-price-checker/"
     ref: "docs/stories/epic-2-retro-2026-09-27.md"
   - id: "epic-2-retro-item-22-carry-a-refusal-cause-version-content-mi"
     epic: 2
