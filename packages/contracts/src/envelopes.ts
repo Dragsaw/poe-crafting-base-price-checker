@@ -85,23 +85,6 @@ export const RecipesFileSchema = z
     });
   });
 
-/**
- * `data/weights.json` — the **envelope and header only**: `schemaVersion`, the
- * `producer` block's `id` and `generatedAt`, and `gamePatch`, plus a loose
- * passthrough of everything else. It lets `web` refuse an unknown weights major
- * (NFR-8) and print the trust strip's line one (FR-10) without owning the
- * weights contract, which is `WEIGHTS-FILE-SCHEMA.md`'s and which Story 3.1
- * tightens this schema to. It does not type `bases`.
- */
-export const WeightsFileEnvelopeSchema = z.looseObject({
-  schemaVersion: SchemaVersionSchema,
-  producer: z.looseObject({
-    id: z.string().min(1),
-    generatedAt: IsoTimestampSchema,
-  }),
-  gamePatch: z.string().min(1),
-});
-
 /** `data/currencies.json` — hand-maintained rates, read and never fetched (AD-20). */
 export const CurrenciesFileSchema = z.strictObject({
   schemaVersion: SchemaVersionSchema,
@@ -193,7 +176,6 @@ export const CatalogueFiltersFileSchema = catalogueFileEnvelope(FilterCatalogueS
 
 export type TrackedFile = z.infer<typeof TrackedFileSchema>;
 export type RecipesFile = z.infer<typeof RecipesFileSchema>;
-export type WeightsFileEnvelope = z.infer<typeof WeightsFileEnvelopeSchema>;
 export type CurrenciesFile = z.infer<typeof CurrenciesFileSchema>;
 export type ConfigFile = z.infer<typeof ConfigFileSchema>;
 export type DatasetFile = z.infer<typeof DatasetFileSchema>;

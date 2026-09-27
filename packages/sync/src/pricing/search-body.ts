@@ -13,9 +13,10 @@
  * produce one byte string — which is what the recorded fixtures are keyed on.
  */
 
-import { canonicalKey } from '@poe/contracts';
+import { canonicalKey, defenceLettersOf } from '@poe/contracts';
 import type {
   CraftedTrackedEntry,
+  DefenceLetter,
   ItemCatalogue,
   ModifierRef,
   TrackedEntry,
@@ -106,34 +107,6 @@ export interface SearchBody {
     };
   };
   readonly sort: { readonly price: 'asc' };
-}
-
-/** `str` → armour, `dex` → evasion, `int` → energy shield (WEIGHTS-FILE-SCHEMA.md `5.1.0`). */
-const DEFENCE_OF_LETTER = { str: 'ar', dex: 'ev', int: 'es' } as const;
-type DefenceLetter = keyof typeof DEFENCE_OF_LETTER;
-
-function isDefenceLetter(token: string): token is DefenceLetter {
-  return Object.hasOwn(DEFENCE_OF_LETTER, token);
-}
-
-/**
- * Arm 1's split: the **maximal trailing run** of `str` / `dex` / `int` tokens,
- * greedy from the right and without repetition, with a non-empty family before
- * it. `undefined` means the class is plain.
- */
-export function defenceLettersOf(className: string): ReadonlySet<DefenceLetter> | undefined {
-  const tokens = className.split('_');
-  const letters = new Set<DefenceLetter>();
-  let index = tokens.length - 1;
-  while (index > 0) {
-    const token = tokens[index];
-    if (token === undefined || !isDefenceLetter(token) || letters.has(token)) {
-      break;
-    }
-    letters.add(token);
-    index -= 1;
-  }
-  return letters.size === 0 ? undefined : letters;
 }
 
 type Discriminator =

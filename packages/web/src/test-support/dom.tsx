@@ -66,7 +66,7 @@ export function rerender(node: ReactNode): void {
 
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), dataset, NOW);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: null }), dataset, NOW);
   return <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />;
 }
 

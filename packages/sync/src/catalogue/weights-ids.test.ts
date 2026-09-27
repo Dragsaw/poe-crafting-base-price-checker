@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 import { createFakeFilesystemPort } from '@poe/contracts';
 import type { TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
@@ -11,12 +14,19 @@ function line(statId: string | null): unknown {
 }
 
 function pool(...lines: unknown[]): unknown {
-  return { poolCoverage: 'complete', entries: [{ sourceModifierId: 'x', lines }] };
+  return {
+    poolCoverage: 'complete',
+    entries:
+      lines.length === 0
+        ? []
+        : [{ sourceModifierId: 'x', modGroup: 'X', itemLevelMin: 1, weight: 1, weightSource: 'published', lines }],
+  };
 }
 
 const WEIGHTS = {
   schemaVersion: '6.1.0',
   gamePatch: '0.5.5',
+  producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
   bases: {
     'weapon.bow': { Bows: { prefix: pool(line('explicit.a'), line(null)), suffix: pool(line('explicit.b')) } },
     jewel: {
@@ -52,20 +62,34 @@ describe('readWeightsIds', () => {
     ['an unknown major', JSON.stringify({ ...WEIGHTS, schemaVersion: '5.1.0' }), 'unknown-major'],
     ['a malformed version', JSON.stringify({ ...WEIGHTS, schemaVersion: 'six' }), 'malformed-version'],
     ['no version', JSON.stringify({ bases: {} }), 'invalid'],
-    ['no bases', JSON.stringify({ schemaVersion: '6.0.0' }), 'invalid'],
+    ['no bases', JSON.stringify({ ...WEIGHTS, schemaVersion: '6.0.0', bases: undefined }), 'invalid'],
   ])('refuses %s loudly, naming the file', async (_label, contents, reason) => {
     const read = readWeightsIds(fsWith(contents));
     await expect(read).rejects.toBeInstanceOf(DataFileError);
     await expect(read).rejects.toMatchObject({ path: WEIGHTS_PATH, reason });
   });
 
-  it('leaves the rest of the shape to the weights schema: odd members are not read', async () => {
-    const odd = { schemaVersion: '6.0.0', bases: { jewel: { Emerald: { prefix: 'nonsense', suffix: pool(7) } } } };
-    expect(await readWeightsIds(fsWith(JSON.stringify(odd)))).toEqual({
-      kind: 'present',
-      statIds: new Set(),
-      categoryIds: new Set(['jewel']),
-    });
+  it('refuses a hard error as a whole, naming the first issue path and its rule', async () => {
+    const bad = { ...WEIGHTS, bases: { jewel: { Emerald: { prefix: 'nonsense', suffix: pool(line('explicit.a')) } } } };
+    const read = readWeightsIds(fsWith(JSON.stringify(bad)));
+    await expect(read).rejects.toMatchObject({ path: WEIGHTS_PATH, reason: 'invalid' });
+    await expect(read).rejects.toThrow(/^data\/weights\.json: invalid: bases\.jewel\.Emerald\.prefix: /);
+  });
+
+  it('names the failing rule of a within-file hard error', async () => {
+    const twice = { ...WEIGHTS, bases: { 'weapon.bow': { Bows: { prefix: { poolCoverage: 'complete', entries: [
+      { sourceModifierId: 'x', modGroup: 'X', itemLevelMin: 1, weight: 1, weightSource: 'published', lines: [line('explicit.a')] },
+      { sourceModifierId: 'x', modGroup: 'X', itemLevelMin: 2, weight: 1, weightSource: 'published', lines: [line('explicit.a')] },
+    ] }, suffix: pool() } } } };
+    await expect(readWeightsIds(fsWith(JSON.stringify(twice)))).rejects.toThrow(
+      'data/weights.json: invalid: bases.weapon.bow.Bows.prefix.entries.1.sourceModifierId: sourceModifierId repeats entries.0; a sourceModifierId may appear once per slot',
+    );
+  });
+
+  it('reads the committed data/weights.json', async () => {
+    const committed = readFileSync(fileURLToPath(new URL('../../../../data/weights.json', import.meta.url)), 'utf8');
+    const ids = await readWeightsIds(fsWith(committed));
+    expect(ids.kind).toBe('present');
   });
 });
 

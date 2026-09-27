@@ -5,6 +5,7 @@ import type {
   RankedRow,
   RawTrackedEntry,
   TrackedEntry,
+  WeightsFile,
 } from '@poe/contracts';
 
 /**
@@ -33,10 +34,13 @@ import type {
  *   published reason kept.
  *
  * `pruned` entries appear in no group. `crafted` entries never rank here (the
- * crafted branch is Epic 3's). With no weights envelope loaded, each distinct
- * non-pruned crafted `(categoryId, className)` is one `unrankable` class,
- * reason `class absent from weights file` (AD-24); with one loaded, none is,
- * since `bases` is not read. Dataset entries no tracked entry names are ignored.
+ * crafted EV is Story 3.4's). Each distinct non-pruned crafted
+ * `(categoryId, className)` is looked up directly in the parsed weights file,
+ * by `categoryId`, then `className`, and never through a sibling `className`:
+ * with no file, or no such pair, it is one `unrankable` class, reason `class
+ * absent from weights file` (AD-24); with either slot declaring `poolCoverage: "partial"`, reason
+ * `pool partial`. A complete pair makes no claim. `poolCoverage` is trusted as
+ * declared (AD-11). Dataset entries no tracked entry names are ignored.
  * `core` never reads `lastSearchId` or `lastSearchLeague` (AD-9).
  */
 
@@ -52,18 +56,20 @@ export interface RankInput {
    */
   readonly threshold: number;
   /**
-   * Whether a weights envelope is loaded (AD-24). `false` makes every crafted
-   * Item Class Unrankable as `class absent from weights file`; `true` makes no
-   * claim, because Epic 2 does not read `bases` (FR-4, FR-9).
+   * The parsed weights file, or `null` when it is absent (AD-24). A crafted
+   * Item Class whose pair is missing from it, or with no file at all, is
+   * Unrankable as `class absent from weights file`; one with a `partial` slot
+   * is Unrankable as `pool partial` (FR-4).
    */
-  readonly weightsLoaded: boolean;
+  readonly weights: WeightsFile | null;
 }
 
 /**
- * FR-4's reasons, verbatim (PRD-owned). Epic 2 produces the one it can check;
- * `pool partial` and `class disagrees with weights file` are Story 3.6's.
+ * FR-4's reasons, verbatim (PRD-owned). Both come from the direct lookup of
+ * the crafted pair in the weights file; `class disagrees with weights file`
+ * is Story 3.3's cross-file checks.
  */
-export type UnrankableReason = 'class absent from weights file';
+export type UnrankableReason = 'class absent from weights file' | 'pool partial';
 
 /** One Unrankable Item Class: the `(categoryId, className)` pair and its reason. Never a Base Type. */
 export interface UnrankableClass {
@@ -97,8 +103,8 @@ export interface Ranking {
   readonly unresolvable: readonly UnrankedEntry[];
   /**
    * One per distinct non-pruned crafted `(categoryId, className)`, by
-   * `className` in UTF-8 code-unit order, then `categoryId`. Empty whenever
-   * `weightsLoaded` is true.
+   * `className` in UTF-8 code-unit order, then `categoryId`, whose pair is
+   * absent from the weights file or declares a `partial` slot.
    */
   readonly unrankable: readonly UnrankableClass[];
 }
@@ -135,6 +141,27 @@ const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): nu
 const byItemClass = (left: UnrankableClass, right: UnrankableClass): number =>
   compareCanonicalKeys(left.className, right.className) || compareCanonicalKeys(left.categoryId, right.categoryId);
 
+/**
+ * The direct lookup `bases[categoryId][className]`, by `categoryId`, then
+ * `className`, never falling back to a sibling class (WEIGHTS-FILE-SCHEMA.md, *`bases` key*).
+ * Own keys only, so a pair never resolves through the object prototype.
+ */
+function unrankableReasonOf(
+  weights: WeightsFile | null,
+  categoryId: string,
+  className: string,
+): UnrankableReason | undefined {
+  const classes = weights !== null && Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
+  const pools = classes !== undefined && Object.hasOwn(classes, className) ? classes[className] : undefined;
+  if (pools === undefined) {
+    return 'class absent from weights file';
+  }
+  if (pools.prefix.poolCoverage === 'partial' || pools.suffix.poolCoverage === 'partial') {
+    return 'pool partial';
+  }
+  return undefined;
+}
+
 function unranked(
   entry: RawTrackedEntry,
   entryKey: string,
@@ -166,13 +193,10 @@ export function rank(input: RankInput): Ranking {
       continue;
     }
     if (entry.kind === 'crafted') {
-      if (!input.weightsLoaded) {
-        const { categoryId, className } = entry;
-        unrankable.set(JSON.stringify([categoryId, className]), {
-          categoryId,
-          className,
-          reason: 'class absent from weights file',
-        });
+      const { categoryId, className } = entry;
+      const reason = unrankableReasonOf(input.weights, categoryId, className);
+      if (reason !== undefined) {
+        unrankable.set(JSON.stringify([categoryId, className]), { categoryId, className, reason });
       }
       continue;
     }

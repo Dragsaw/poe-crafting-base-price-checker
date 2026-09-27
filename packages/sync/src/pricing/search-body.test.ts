@@ -1,9 +1,9 @@
+import { defenceLettersOf } from '@poe/contracts';
 import type { TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
   buildSearchBody,
-  defenceLettersOf,
   itemTypesOf,
   UnknownClassBaseTypeError,
 } from './search-body.ts';

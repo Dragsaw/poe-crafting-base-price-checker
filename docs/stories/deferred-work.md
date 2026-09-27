@@ -96,9 +96,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: story 2.1 (2026-09-26)
 
 - source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: `WeightsFileEnvelopeSchema` in `packages/contracts/src/envelopes.ts` is a stopgap: it checks `schemaVersion` against major 6 and passes the rest of `weights.json` through unvalidated. When Story 3.1 tightens the weights schema, `packages/web/src/load/artifacts.ts` `ARTIFACTS.weights` must switch to it.
-  evidence: Spec decision 2026-09-26 *Weights envelope*: "Story 3.1 tightens it." `docs/epics.md` has Story 2.6 widen only three header fields. Nothing tracks the loader's switch to the full schema.
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
   summary: (unverified, would be medium) `CraftRecipeSchema` in `packages/contracts/src/craft-recipe.ts` accepts `currencies: []` and a `currencyId` repeated within one recipe. A zero-cost recipe may make the per-craft EV degenerate once a story reads recipes for valuation.
   evidence: The spec fixes the shape but says nothing on an empty or repeated currency list. Settle it by checking AD-20 and the FR-1 EV formula when the first story costs a recipe: if a recipe must spend something, add `.min(1)` and a per-recipe `currencyId` uniqueness refinement.
 
@@ -314,3 +311,12 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-no-test-checks-scripts-coverage.md`
   summary: No test checks that the hand-listed `tools/` entries in `tsconfig.tools.json`, `vitest.config.ts` and `eslint.config.mjs` (`tools/boundary-check`, `tools/dev-stop`, `tools/dts-specifiers`, `tools/prune-pages.mjs`) still cover their files; only `.claude/skills/tracked-json/scripts/` has a wiring guard.
   evidence: The closed entry's evidence says `tools/boundary-check` has no wiring guard either and that the fix belongs to a general "every .ts file is covered" guard. This change built only the tracked-json guard (`test/tracked-json-scripts-coverage.test.ts`), whose checkers are per directory. Dropping, for example, `tools/dev-stop/*.ts` from `tsconfig.tools.json` still fails neither `pnpm check` nor `pnpm test`. Extending the same checkers over each hand-listed directory would close it.
+
+## Deferred from: story 3.1 (2026-09-27)
+
+- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
+  summary: "[NOTE FOR ARCHITECT] `WeightsFileSchema` refuses a few values that *Validation* in `WEIGHTS-FILE-SCHEMA.md` does not list as hard errors: an empty `producer.id`, a `producer.generatedAt` that is not ISO-8601 UTC, and an empty `categoryId`, `className` or `statId`. The trust strip needs the first two (`utcDate` throws on a non-ISO instant). The reused id schemas carry the rest. Either list them in *Validation*, or say that *Validation* covers only the rules beyond the typed Shape."
+  evidence: Story 3.1 review, triage row 2. `packages/contracts/src/weights-file.ts`, `packages/web/src/frame/trust-facts.ts` `utcDate`.
+- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
+  summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
+  evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.

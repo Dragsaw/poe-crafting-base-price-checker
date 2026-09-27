@@ -1,16 +1,16 @@
 /**
  * The weights ids against the catalogue (AD-9, AD-12, AD-25).
  *
- * `sync` does not validate `data/weights.json`: its schema and the cross-file
- * gate are Story 3.3's. This reader is deliberately narrow. It reads the
- * `schemaVersion` major, the outer `bases` keys (each a `categoryId`) and every
- * `bases[categoryId][className].{prefix,suffix}.entries[].lines[].statId`.
- * Anything else in the file is not read, so a shape fault this reader does not
- * need is left to 3.3's schema.
+ * `data/weights.json` loads through `parseEnvelope` with the `contracts`
+ * `WeightsFileSchema`, the one definition of the weights contract
+ * (WEIGHTS-FILE-SCHEMA.md). The ids are then collected from the typed value:
+ * the outer `bases` keys (each a `categoryId`) and every line's `statId`.
  *
  * - An absent file is `absent`. The run records it and goes on (AD-12).
- * - A file that does not parse, or declares a major this build does not know,
- *   is refused with a typed `DataFileError` naming the file (NFR-8).
+ * - A file that does not parse, declares a major this build does not know, or
+ *   breaks any hard error of the contract is refused as a whole with a typed
+ *   `DataFileError` naming the file, before any request (NFR-8). An `invalid`
+ *   refusal names the first issue's path and message.
  * - A `null` `statId` is the producer's own unresolved marker: it is skipped,
  *   never reported.
  *
@@ -18,7 +18,7 @@
  * rewritten, and a miss never refuses it.
  */
 
-import { checkSchemaVersion, compareCanonicalKeys } from '@poe/contracts';
+import { compareCanonicalKeys, parseEnvelope, WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from '@poe/contracts';
 import type {
   FilesystemPort,
   TrackedEntry,
@@ -31,9 +31,6 @@ import type { CatalogueIds } from './catalogue-ids.ts';
 
 export const WEIGHTS_PATH = 'data/weights.json';
 
-/** The weights contract this build reads (WEIGHTS-FILE-SCHEMA.md). Only the major is compared. */
-export const WEIGHTS_SCHEMA_VERSION = '6.0.0';
-
 export type WeightsIds =
   | { readonly kind: 'absent' }
   | {
@@ -44,37 +41,9 @@ export type WeightsIds =
       readonly categoryIds: ReadonlySet<string>;
     };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function arrayAt(value: unknown, key: string): readonly unknown[] {
-  if (!isRecord(value)) {
-    return [];
-  }
-  const found = value[key];
-  return Array.isArray(found) ? found : [];
-}
-
-/** The `statId` of every line under one class's two slots. Nothing else is read. */
-function collectStatIds(pools: unknown, into: Set<string>): void {
-  if (!isRecord(pools)) {
-    return;
-  }
-  for (const slot of ['prefix', 'suffix']) {
-    for (const entry of arrayAt(pools[slot], 'entries')) {
-      for (const line of arrayAt(entry, 'lines')) {
-        if (isRecord(line) && typeof line['statId'] === 'string') {
-          into.add(line['statId']);
-        }
-      }
-    }
-  }
-}
-
 /**
- * Reads the weights ids. Absent is a value; an unreadable file or an unknown
- * major throws a `DataFileError`.
+ * Reads the weights ids. Absent is a value; an unreadable, unknown-major or
+ * non-conforming file throws a `DataFileError`.
  */
 export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   const text = await fs.readTextFile(WEIGHTS_PATH);
@@ -87,27 +56,33 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   } catch (error) {
     throw new DataFileError(WEIGHTS_PATH, 'not-json', `not valid JSON: ${String(error)}`);
   }
-  if (!isRecord(data) || typeof data['schemaVersion'] !== 'string') {
-    throw new DataFileError(WEIGHTS_PATH, 'invalid', 'invalid: schemaVersion: expected a string');
+  const result = parseEnvelope(WeightsFileSchema, data, WEIGHTS_SCHEMA_VERSION);
+  if (!result.ok) {
+    switch (result.reason) {
+      case 'unknown-major':
+      case 'malformed-version':
+        throw new DataFileError(
+          WEIGHTS_PATH,
+          result.reason,
+          `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
+        );
+      case 'invalid': {
+        const [first] = result.issues;
+        const where = first === undefined ? '(root)' : first.path.join('.') || '(root)';
+        throw new DataFileError(WEIGHTS_PATH, 'invalid', `invalid: ${where}: ${first?.message ?? 'refused'}`);
+      }
+    }
   }
-  const version = checkSchemaVersion(data['schemaVersion'], WEIGHTS_SCHEMA_VERSION);
-  if (!version.ok) {
-    const reason = version.reason === 'unknown-major' ? 'unknown-major' : 'malformed-version';
-    throw new DataFileError(
-      WEIGHTS_PATH,
-      reason,
-      `schemaVersion ${version.found} refused (${reason}; this build reads ${version.expected})`,
-    );
-  }
-  const bases = data['bases'];
-  if (!isRecord(bases)) {
-    throw new DataFileError(WEIGHTS_PATH, 'invalid', 'invalid: bases: expected an object');
-  }
+  const { bases } = result.value;
   const statIds = new Set<string>();
   for (const classes of Object.values(bases)) {
-    if (isRecord(classes)) {
-      for (const pools of Object.values(classes)) {
-        collectStatIds(pools, statIds);
+    for (const pools of Object.values(classes)) {
+      for (const entry of [...pools.prefix.entries, ...pools.suffix.entries]) {
+        for (const line of entry.lines) {
+          if (line.statId !== null) {
+            statIds.add(line.statId);
+          }
+        }
       }
     }
   }

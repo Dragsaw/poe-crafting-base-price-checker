@@ -37,6 +37,9 @@ export type { BaseType, BaseTypeId } from './base-type.ts';
 export { CategoryIdSchema, ClassNameSchema, ItemClassSchema } from './item-class.ts';
 export type { CategoryId, ClassName, ItemClass } from './item-class.ts';
 
+export { DEFENCE_OF_LETTER, defenceLettersOf } from './class-name.ts';
+export type { DefenceLetter } from './class-name.ts';
+
 export {
   AcceptedTierSchema,
   BandedModifierRefSchema,
@@ -199,7 +202,6 @@ export {
   SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
-  WeightsFileEnvelopeSchema,
 } from './envelopes.ts';
 export type {
   CatalogueFiltersFile,
@@ -218,8 +220,23 @@ export type {
   SyncProgressFile,
   SyncReportFile,
   TrackedFile,
-  WeightsFileEnvelope,
 } from './envelopes.ts';
+
+export {
+  ModifierWeightSchema,
+  WEIGHTS_SCHEMA_VERSION,
+  WeightsClassPoolsSchema,
+  WeightsFileSchema,
+  WeightsLineSchema,
+  WeightsPoolSchema,
+} from './weights-file.ts';
+export type {
+  ModifierWeight,
+  WeightsClassPools,
+  WeightsFile,
+  WeightsLine,
+  WeightsPool,
+} from './weights-file.ts';
 
 export type { HttpPort, HttpRequest, HttpResponse } from './ports/http.ts';
 export type { FilesystemPort } from './ports/filesystem.ts';
