@@ -28,6 +28,32 @@ const COMMITTED_REPORT: SyncReport = {
   records: [],
 };
 
+/**
+ * A loaded curation of 5 pinned entries and `minChunkSearches: 8`, which the
+ * 5/8 starvation fixtures describe. Two active entries prove only pinned
+ * entries count toward M.
+ */
+const CURATION_5_OF_8: Partial<ArtifactSet> = {
+  tracked: {
+    ...BASE_SET.tracked,
+    entries: [
+      ...['Gold Amulet', 'Solar Amulet', 'Coral Ring', 'Wide Belt', 'Leather Belt'].map((baseTypeId) => ({
+        kind: 'raw' as const,
+        baseTypeId,
+        itemLevelMin: 82,
+        status: 'pinned' as const,
+      })),
+      ...['Iron Ring', 'Jade Amulet'].map((baseTypeId) => ({
+        kind: 'raw' as const,
+        baseTypeId,
+        itemLevelMin: 82,
+        status: 'active' as const,
+      })),
+    ],
+  },
+  config: { ...BASE_SET.config, minChunkSearches: 8 },
+};
+
 let container: HTMLDivElement | undefined;
 let root: Root | undefined;
 
@@ -179,10 +205,10 @@ describe('the resting strip', () => {
         activeRefreshed: 0,
       },
     ];
-    mountStrip({ syncReport: { ...COMMITTED_REPORT, records } }, ['recipes']);
+    mountStrip({ syncReport: { ...COMMITTED_REPORT, records }, ...CURATION_5_OF_8 }, ['recipes']);
     const health = strip().querySelector<HTMLElement>('[data-health-line]');
     expect(health?.style.height).toBe(px(spacing.frameReserveHealthLine));
-    expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe('× 12 unresolvable|× pinned entries starved this run');
+    expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe('× 12 unresolvable|× 3 of 5 pinned entries starved');
     const signals = health?.querySelectorAll<HTMLElement>('[data-health-signal]') ?? [];
     expect(signals).toHaveLength(2);
     for (const signal of signals) {
@@ -196,6 +222,26 @@ describe('the resting strip', () => {
     expect(children.indexOf(health as HTMLElement)).toBe(absenceIndex + 1);
     // The five facts are unaffected.
     expect(line('weights')).toContain('producer poe-mod-weights-producer');
+  });
+
+  // Matrix: only a non-matching record, no unresolvable.
+  it('raises no health line for a starvation record of another curation, and the panel still lists it', () => {
+    const records: SyncReport['records'] = [
+      {
+        kind: 'pinned-starvation' as const,
+        discoveredAllowance: 4,
+        declaredMinChunkSearches: 8,
+        pinnedCount: 8,
+        pinnedRefreshed: 2,
+        activeRefreshed: 0,
+      },
+    ];
+    mountStrip({ syncReport: { ...COMMITTED_REPORT, records }, ...CURATION_5_OF_8 });
+    expect(strip().querySelector('[data-health-line]')).toBeNull();
+    click(strip());
+    const text = panel()?.textContent ?? '';
+    expect(text).toContain('1 pinned-starvation record.');
+    expect(text).toContain('2 of 8 pinned entries refreshed');
   });
 });
 

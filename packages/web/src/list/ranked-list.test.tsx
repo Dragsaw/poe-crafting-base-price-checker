@@ -197,6 +197,32 @@ describe('the unpriced trail', () => {
       expect(text).not.toMatch(/^(0|0\.00|—|)$/);
     }
   });
+
+  // Matrix: mismatched observation, old attempt / recent attempt; priced in the active league.
+  it('reads a league-mismatched row by its attempted clock, never as priced', () => {
+    const active = rawEntry('Gold Amulet');
+    const oldTry = rawEntry('Coral Ring');
+    const recentTry = rawEntry('Wide Belt');
+    const rows = rowsIn(
+      mountList(
+        [active, oldTry, recentTry],
+        [
+          { ...priced(active, 1, hoursBefore(NOW, 72)), lastAttemptedAt: hoursBefore(NOW, 1) },
+          priced(oldTry, 0.9, hoursBefore(NOW, 96), 'Standard'),
+          { ...priced(recentTry, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'), lastAttemptedAt: hoursBefore(NOW, 2) },
+        ],
+      ),
+    );
+    expect(rows).toHaveLength(3);
+    const byName = (name: string): HTMLElement | undefined =>
+      rows.find((r) => r.querySelector('[data-unit-name]')?.textContent === name);
+    expect(cell(byName('Gold Amulet'), 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}priced 3d ago`);
+    expect(cell(byName('Coral Ring'), 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}tried 4d ago`);
+    expect(cell(byName('Wide Belt'), 'age').textContent).toBe('');
+    for (const name of ['Coral Ring', 'Wide Belt']) {
+      expect(cell(byName(name), 'age').textContent).not.toContain('priced');
+    }
+  });
 });
 
 describe('the top-20 bound', () => {

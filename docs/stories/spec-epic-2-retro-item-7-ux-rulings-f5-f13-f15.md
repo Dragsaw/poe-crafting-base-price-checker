@@ -2,13 +2,20 @@
 title: 'Epic 2 retro action 7: the web code meets UX rulings F5, F13, F15'
 type: 'bugfix'
 created: '2026-09-27'
-status: 'ready-for-dev'
-baseline_revision: '685980532b1b1fd75ad323e6250fd77e3b825550'
+status: 'done'
+baseline_revision: '64043e8b64298e80bc9dc196c35ba7196fbb183c'
 review_loop_iteration: 0
 followup_review_recommended: false
 context: []
 warnings: ['oversized']
-deferred: []
+deferred:
+  - summary: >-
+      A never-synced entry that has a lastAttemptedAt prints `tried Nd ago` in its Age cell, but its expansion shows no ages.
+    evidence: |-
+      Reachable: packages/sync/src/pricing/price-entry.ts:299-302 stamps lastAttemptedAt and keeps the never-synced price on a 429, 5xx or timeout at the first attempt. ageMark reads lastAttemptedAt for every non-priced state, and combinationAges (packages/web/src/list/format.ts, the never-synced branch) returns no ages. This predates this change: the baseline ageMark read entry.lastAttemptedAt for the same state. The owner is UX EXPERIENCE.md (does a never-synced row with an attempt show `tried`?).
+    location: >-
+      packages/web/src/list/format.ts ageMark / combinationAges
+    severity: low
 ---
 
 <intent-contract>
@@ -105,6 +112,26 @@ deferred: []
   - `[low]` `[reject]` (intent) `EXPERIENCE.md:90` still says "ranked at their own asking price" — it is a component-role description of the list, not the printed note that memlog 218 rules on. UX documents are outside this build.
   - `[false]` `[reject]` (intent) The ledger entry `deferred-work.md:293` is still present — AGENTS.md: only `deferred-work-sweep` removes it, as the last commit of the closing branch.
 
+### 2026-09-27 — Review pass
+- verdicts: 16 findings — high 0, medium 1, low 7, false 5, maybe-false 0
+- findings:
+  - `[medium]` `[patch]` (verification-gap) No strip test shows that only `status: 'pinned'` entries count toward M, because `CURATION_5_OF_8` held only pinned entries. Dropping the filter in `TrustStrip.tsx` would keep every test green and would hide the signal in production. Fixed: the fixture now has two `status: 'active'` entries as well, and the rendered `× 3 of 5` assertion now fails without the filter.
+  - `[low]` `[reject]` (blind) The spec body still describes the blocked run. The fix edits this build's spec, and Finalize rewrites the Auto Run Result.
+  - `[low]` `[reject]` (blind) The old `.patch` file is still in `docs/stories`. This spec's earlier triage log and Auto Run Result cite it as the record of the blocked run, so deleting it would break that evidence. Nothing applies it automatically.
+  - `[low]` `[patch]` (blind) Two `healthSignals` tests had the same body (`pinnedCount: 8` against `CURATION`). Fixed: deleted the duplicate. The matrix row "only a non-matching record" stays covered by the unit test for the changed pinned set and the rendered no-health-line test.
+  - `[medium]` `[patch]` (blind) No rendered test checks the pinned-status filter. This is the same root cause as the verification-gap row. Fixed by the same fixture change.
+  - `[false]` `[reject]` (blind) No rendered test shows that `minChunkSearches` passes through. `BASE_SET.config.minChunkSearches` is 1, the fixture overrides it to 8 and the record declares 8, so a wrong or unwired value fails the positive rendered assertion.
+  - `[low]` `[reject]` (blind) No rendered test covers the N = 0 wording or the absence of `this run`. The strip prints each `healthSignals` string with the same `×` join as the covered case, and unit tests pin both strings. A new rendered case would add a test for no defect that has been shown.
+  - `[low]` `[reject]` (blind) The re-narrowing on `starvation?.kind` after `find` is redundant. It is cosmetic, TypeScript needs it without a type-guard predicate, and no harm is named.
+  - `[low]` `[patch]` (blind) The `ageMark` docblock says "a league-mismatched observation included", which is ambiguous. Fixed: reworded to "A league-mismatched observation resolves to `not-yet-synced`, so it reads `lastAttemptedAt`".
+  - `[false]` `[reject]` (blind) The docblock claims "no trigger ever prints a zero" and the code does not enforce it for a negative N. A zero is guarded by the `pinnedCount > 0` check and the N = 0 wording. A negative N is not a zero, and the carried row below covers it.
+  - `[false]` `[reject]` (intent) The `pinnedCount > 0` guard goes beyond the matrix. It implements the contract's Always rule "No signal ever prints a zero", so it does not diverge from the intent.
+  - `[low]` `[defer]` (intent) A never-synced entry with `lastAttemptedAt` prints `tried …` in its Age cell while its expansion shows no ages. This is reachable (`price-entry.ts:299-302` stamps the attempt and keeps never-synced on a 429 at the first attempt), and it predates this change: the baseline `ageMark` read `lastAttemptedAt` for the same state. Deferred to the UX owner.
+  - `[false]` `[reject]` (intent) A yardstick mismatch is never rendered. This is the same claim as the blind `minChunkSearches` row, with the same refutation.
+  - `[low]` `[reject]` (intent) The N = 0 wording is never rendered. This is the same claim and the same reasoning as the blind N = 0 row.
+  - `[false]` `[reject]` (intent) The rendered row note compares against `rawNote(82)` and so is circular. `format.test.ts` pins the literal "valued at" string, and any wording change fails there.
+  - `[low]` `[reject]` (edge-case) `pinnedRefreshed > pinnedCount` prints a negative N. carried: this matches the 2026-09-27 row "`pinnedRefreshed > pinnedCount` prints a negative N", and `trust-facts.ts` still computes `pinnedCount − pinnedRefreshed` unguarded. The producer never writes that state.
+
 ## Verification
 
 **Commands:**
@@ -114,13 +141,43 @@ deferred: []
 
 ## Auto Run Result
 
-Status: blocked (previous run). The retry condition was met on 2026-09-27: see the Spec Change Log. The rest of this section is kept as the record of that run.
-Blocking condition: intent gap. A pinned-starvation record with `pinnedRefreshed === pinnedCount` (N = 0) is reachable (`packages/sync/src/chunk/run-chunk.ts:720-723`, "even when nothing is left to cut"). UX memlog 216 does not say what the health line prints for it.
+Status: done
 
-Unanswered questions (for the UX owner, EXPERIENCE.md `{components.trust-strip}`):
-1. For N = 0, does the line print `× 0 of M pinned entries starved`, which breaks "no counts of nothing" and `healthSignals`'s "no trigger ever prints a zero"? Or does it raise no starvation signal, which breaks "a pinned-starvation record is present" as the trigger and hides a starved rotation? Or does it print a third wording?
-2. Is "the last pinned-starvation record in report order" meant to be the most recent chunk's record? `carryRecords` replaces a repeat in place at its earlier index, so the last record by position can be an older chunk's. When several records with different subjects coexist, should the line print only one of them?
+**Summary:** The health line now takes its starvation signal from the one `pinned-starvation` record that matches the loaded curation: the pinned-set size and `minChunkSearches`. It prints `N of M pinned entries starved`, or `M pinned entries left the rotation no search` when N = 0, and nothing when no record matches (F5). The Age cell takes its clock from the row's resolved Price State, so a league-mismatched row reads `tried Nd ago` (F13). The Raw Base note and the panel sub-line say "valued at" (F15). F13 and F15 come from the saved patch without changes. F5 is re-derived to the amended ruling.
 
-Attempted change: `docs/stories/spec-epic-2-retro-item-7-ux-rulings-f5-f13-f15.patch` (9 files under `packages/web/src`; `git apply --check` passes against 685980532b1b1fd75ad323e6250fd77e3b825550). The code is reverted. With it applied, `pnpm test` (1160 tests), `pnpm check` and the verification grep all passed. Apart from the N = 0 question, review found no defect that needed a patch. F13 and F15 are complete in the patch and can ship unchanged once F5 is ruled on.
+**Files changed:**
+- `packages/web/src/frame/trust-facts.ts`: adds the `Curation` type and `healthSignals(report, curation)` with the match rule and both wordings. Removes `HEALTH_STARVED`.
+- `packages/web/src/frame/TrustStrip.tsx`: passes the pinned count from `set.tracked.entries` and `set.config.minChunkSearches`.
+- `packages/web/src/frame/trust-facts.test.ts`: covers every F5 matrix row, the en-US grouping, the empty-pinned-set guard and the absence of `this run`.
+- `packages/web/src/frame/trust-strip.test.tsx`: adds the `CURATION_5_OF_8` fixture (5 pinned and 2 active entries), the rendered `× 3 of 5` line, and a rendered no-match case in which the panel still lists the record.
+- `packages/web/src/list/format.ts`: `ageMark(state, lastAttemptedAt, now)` with a new docblock, and "valued at" in `rawNote` and `rawPanelSubLine`.
+- `packages/web/src/list/display-rows.ts`: passes the resolved `state` to `ageMark`.
+- `packages/web/src/list/format.test.ts`, `display-rows.test.ts`, `expansion.test.tsx`: updated to the new signature and strings, with the mismatch unit cases.
+- `packages/web/src/list/ranked-list.test.tsx`: a rendered Age-cell test covering priced in the active league, a mismatch with an old attempt, and a mismatch with a recent attempt.
 
-Retry condition: record the N = 0 ruling (and, if the answer changes, the one-record ruling) in EXPERIENCE.md, then set this spec's status to `ready-for-dev` with the ruling added to the intent contract. Apply the patch and add the N = 0 case.
+**Review findings:**
+- 16 findings in total.
+- 4 patched. The medium entry is the pinned-status coverage gap, reported by two layers. The two low patches are the deleted duplicate test and the `ageMark` docblock rewording.
+- 1 deferred (low): a never-synced entry that has an attempt clock prints `tried …` while its expansion shows no ages. This predates the change.
+- 11 rejected:
+  - The spec-body finding edits this build's spec.
+  - The stale `.patch` file is cited as evidence.
+  - The rendered-only coverage gaps (the yardstick and N = 0) are covered by the unit tests plus the shared render path, or refuted by the positive rendered assertion.
+  - The redundant narrowing is cosmetic.
+  - The docblock "zero" claim is refuted.
+  - The M = 0 guard implements the Always rule.
+  - The circular render check is covered by the literal in the unit test.
+  - The negative N is carried from the prior pass: the producer never writes it.
+
+**Follow-up review recommended:** false. This pass patched 0 high, 1 medium and 2 low entries.
+
+**Verification:**
+- `pnpm test`: 88 files, 1165 tests pass.
+- `pnpm check`: exit 0 (typecheck, eslint, depcruise).
+- `git grep -n "ranked at its own\|starved this run" -- packages`: no output.
+- Matrix audit: each of the 10 matrix rows has a covering test that ran and passed.
+
+**Residual risks:**
+- There is no browser check. The rendered DOM tests cover the strings.
+- The `.patch` file from the earlier run stays in `docs/stories` as a record.
+- The deferred never-synced Age-cell question is open.

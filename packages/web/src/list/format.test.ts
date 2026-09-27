@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { NOW } from '../test-support/dom';
-import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
+import { hoursBefore } from '../test-support/list-fixtures';
 import {
   ageMark,
   combinationAges,
@@ -20,8 +20,6 @@ import {
   unitLabel,
   type CombinationState,
 } from './format';
-
-const BELT = rawEntry('Wide Belt');
 
 describe('the view constants', () => {
   it('cuts freshness at 48h', () => {
@@ -43,43 +41,48 @@ describe('the view constants', () => {
 });
 
 describe('ageMark', () => {
+  const pricedAt = (observedAt: string): CombinationState => ({ state: 'priced', priceDivine: 0.5, sampleSize: 10, observedAt });
+  const NO_LISTINGS: CombinationState = { state: 'no-listings' };
+  const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
+  const NEVER: CombinationState = { state: 'not-yet-synced', reason: 'never-synced' };
+
   it('is silent under the cut-off', () => {
-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 3)), NOW)).toBeUndefined();
-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 47.99)), NOW)).toBeUndefined();
+    expect(ageMark(pricedAt(hoursBefore(NOW, 3)), hoursBefore(NOW, 3), NOW)).toBeUndefined();
+    expect(ageMark(pricedAt(hoursBefore(NOW, 47.99)), hoursBefore(NOW, 47.99), NOW)).toBeUndefined();
   });
 
-  it('reads the observation clock for a priced entry, from exactly 48h', () => {
-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 48)), NOW)).toEqual({ kind: 'stale', word: 'priced 2d ago' });
-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 5 * 24 + 4)), NOW)).toEqual({
+  it('reads the observation clock for a priced row, from exactly 48h', () => {
+    expect(ageMark(pricedAt(hoursBefore(NOW, 48)), hoursBefore(NOW, 48), NOW)).toEqual({
+      kind: 'stale',
+      word: 'priced 2d ago',
+    });
+    expect(ageMark(pricedAt(hoursBefore(NOW, 5 * 24 + 4)), hoursBefore(NOW, 5 * 24 + 4), NOW)).toEqual({
       kind: 'stale',
       word: 'priced 5d ago',
     });
   });
 
-  it('reads observedAt, not lastAttemptedAt, where the price is priced', () => {
-    const entry = { ...priced(BELT, 0.5, hoursBefore(NOW, 72)), lastAttemptedAt: hoursBefore(NOW, 1) };
-    expect(ageMark(entry, NOW)).toEqual({ kind: 'stale', word: 'priced 3d ago' });
+  it('reads observedAt, not lastAttemptedAt, where the row prints priced', () => {
+    expect(ageMark(pricedAt(hoursBefore(NOW, 72)), hoursBefore(NOW, 1), NOW)).toEqual({
+      kind: 'stale',
+      word: 'priced 3d ago',
+    });
   });
 
-  it('reads a league-mismatched observation as priced too', () => {
-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 96), 'Standard'), NOW)).toEqual({
-      kind: 'stale',
-      word: 'priced 4d ago',
-    });
+  it('reads a league-mismatched row by its attempted clock, never as priced', () => {
+    expect(ageMark(MISMATCH, hoursBefore(NOW, 96), NOW)).toEqual({ kind: 'stale', word: 'tried 4d ago' });
+    expect(ageMark(MISMATCH, hoursBefore(NOW, 2), NOW)).toBeUndefined();
   });
 
   it('reads lastAttemptedAt where there is no observation', () => {
-    expect(ageMark(unpriced(BELT, { state: 'no-listings' }, hoursBefore(NOW, 9 * 24 + 1)), NOW)).toEqual({
-      kind: 'stale',
-      word: 'tried 9d ago',
-    });
-    expect(ageMark(unpriced(BELT, { state: 'no-listings' }, hoursBefore(NOW, 2)), NOW)).toBeUndefined();
+    expect(ageMark(NO_LISTINGS, hoursBefore(NOW, 9 * 24 + 1), NOW)).toEqual({ kind: 'stale', word: 'tried 9d ago' });
+    expect(ageMark(NO_LISTINGS, hoursBefore(NOW, 2), NOW)).toBeUndefined();
   });
 
   it('reads never attempted where neither clock exists', () => {
     const never = { kind: 'never', word: 'never attempted' };
-    expect(ageMark(undefined, NOW)).toEqual(never);
-    expect(ageMark(unpriced(BELT, { state: 'not-yet-synced', reason: 'never-synced' }), NOW)).toEqual(never);
+    expect(ageMark(NEVER, undefined, NOW)).toEqual(never);
+    expect(ageMark(NO_LISTINGS, undefined, NOW)).toEqual(never);
   });
 });
 
@@ -92,7 +95,7 @@ describe('labels', () => {
 
   it('spells the Item Level Floor in the raw note', () => {
     expect(rawNote(82)).toBe(
-      'uncrafted at Item Level 82 — ranked at its own current asking price, not at a craft outcome',
+      'uncrafted at Item Level 82 — valued at its own current asking price, not at a craft outcome',
     );
   });
 });
@@ -161,7 +164,7 @@ describe('the expansion copy', () => {
   it('repeats the Item Level, the threshold at 2dp and the asking-price sentence, with no Craft Recipe sentence', () => {
     const line = rawPanelSubLine(82, 0.5);
     expect(line).toBe(
-      'Uncrafted at Item Level 82, ranked at its own current asking price and not at a craft outcome. ' +
+      'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
         'One Combination is tracked here: the degenerate Combination of no affixes. ' +
         'Payout Threshold 0.50 Divine. ' +
         'Every price here is a current asking price from a live instant-buyout listing.',

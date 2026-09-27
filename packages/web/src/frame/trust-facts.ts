@@ -26,8 +26,6 @@ export const AFFORDANCE_OPEN = '− the full sync report';
 
 export const PANEL_HEADINGS = ['The sync run', 'What is broken', 'What the weights cover'] as const;
 
-export const HEALTH_STARVED = 'pinned entries starved this run';
-
 /** An ISO-8601 instant as its UTC calendar date, `YYYY-MM-DD`. */
 export function utcDate(iso: string): string {
   return new Date(iso).toISOString().slice(0, 10);
@@ -75,11 +73,28 @@ function countOf(report: SyncReport, kind: SyncReport['records'][number]['kind']
   return report.records.filter((record) => record.kind === kind).length;
 }
 
+/** The loaded curation that a `pinned-starvation` record must describe to count on the health line. */
+export interface Curation {
+  /** The number of Tracked List entries with `status: 'pinned'`. */
+  readonly pinnedCount: number;
+  /** The loaded `config.minChunkSearches`. */
+  readonly minChunkSearches: number;
+}
+
 /**
  * The health line's words, in order (UX-DR21). Exactly two triggers; a healthy
  * run or an absent report raises none, and no trigger ever prints a zero.
+ *
+ * The starvation trigger reads only the `pinned-starvation` record whose
+ * subject matches the loaded curation: its `pinnedCount` equals the pinned-set
+ * size and its `declaredMinChunkSearches` equals `minChunkSearches`. The
+ * subject is unique, so at most one record matches, whatever its position in
+ * the report. No match, or an empty pinned set, raises no starvation signal.
+ * With M = `pinnedCount` and N = M − `pinnedRefreshed`, the words are
+ * `N of M pinned entries starved`, or
+ * `M pinned entries left the rotation no search` when N is 0.
  */
-export function healthSignals(report: SyncReport | null): readonly string[] {
+export function healthSignals(report: SyncReport | null, curation: Curation): readonly string[] {
   if (report === null) {
     return [];
   }
@@ -88,8 +103,21 @@ export function healthSignals(report: SyncReport | null): readonly string[] {
   if (unresolvable > 0) {
     signals.push(`${unresolvable.toLocaleString('en-US')} unresolvable`);
   }
-  if (report.records.some((record) => record.kind === 'pinned-starvation')) {
-    signals.push(HEALTH_STARVED);
+  const starvation = report.records.find(
+    (record) =>
+      record.kind === 'pinned-starvation' &&
+      record.pinnedCount === curation.pinnedCount &&
+      record.declaredMinChunkSearches === curation.minChunkSearches,
+  );
+  // M = 0 has nothing pinned to starve, and would print a zero.
+  if (starvation?.kind === 'pinned-starvation' && starvation.pinnedCount > 0) {
+    const total = starvation.pinnedCount.toLocaleString('en-US');
+    const starved = starvation.pinnedCount - starvation.pinnedRefreshed;
+    signals.push(
+      starved === 0
+        ? `${total} pinned entries left the rotation no search`
+        : `${starved.toLocaleString('en-US')} of ${total} pinned entries starved`,
+    );
   }
   return signals;
 }

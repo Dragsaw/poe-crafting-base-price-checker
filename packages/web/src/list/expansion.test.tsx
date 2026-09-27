@@ -92,7 +92,7 @@ describe('the expansion panel', () => {
     expect(title?.style.fontSize).toBe('20px');
     const sub = panel?.querySelector<HTMLElement>('[data-panel-sub]');
     expect(sub?.textContent).toBe(
-      'Uncrafted at Item Level 82, ranked at its own current asking price and not at a craft outcome. ' +
+      'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
         'One Combination is tracked here: the degenerate Combination of no affixes. ' +
         `Payout Threshold 0.50 Divine. ${PANEL_ASKING_SENTENCE}`,
     );

@@ -63,7 +63,10 @@ export function TrustStrip({
   const [open, setOpen] = useState(false);
   const report = set.syncReport;
   const edit = trackedListEdit(report);
-  const signals = healthSignals(report);
+  const signals = healthSignals(report, {
+    pinnedCount: set.tracked.entries.filter((entry) => entry.status === 'pinned').length,
+    minChunkSearches: set.config.minChunkSearches,
+  });
   const [producer, generatedAt, gamePatch] = weightsFacts(set.weights);
 
   return (

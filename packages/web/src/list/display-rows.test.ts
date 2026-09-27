@@ -168,7 +168,7 @@ describe('toDisplayRows', () => {
     expect(rows[4]?.ages).toEqual({ observed: undefined, attempted: 'tried 1h ago' });
   });
 
-  it('drops below-threshold entries, and gives a league mismatch its observation age', () => {
+  it('drops below-threshold entries, and gives a league mismatch its attempted age', () => {
     const cheap = rawEntry('Iron Ring');
     const old = rawEntry('Jade Amulet');
     const rows = rowsFor(
@@ -176,7 +176,7 @@ describe('toDisplayRows', () => {
       [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), 'Standard')],
     );
     expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.age?.word])).toEqual([
-      ['Jade Amulet', undefined, 'no figure yet', 'priced 3d ago'],
+      ['Jade Amulet', undefined, 'no figure yet', 'tried 3d ago'],
     ]);
   });
 

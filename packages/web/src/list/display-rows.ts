@@ -76,7 +76,7 @@ export function toDisplayRows(ranking: Ranking, dataset: readonly DatasetEntry[]
   ): Pick<DisplayRow, 'age' | 'state' | 'entry' | 'ages'> => {
     const entry = byKey.get(entryKey);
     return {
-      age: ageMark(entry, now),
+      age: ageMark(state, entry?.lastAttemptedAt, now),
       state,
       entry,
       ages: combinationAges(state, entry?.lastAttemptedAt, now),

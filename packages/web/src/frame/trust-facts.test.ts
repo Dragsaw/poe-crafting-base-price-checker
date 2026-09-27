@@ -94,23 +94,71 @@ describe('line two', () => {
 });
 
 describe('the health line', () => {
+  // The loaded curation that the `starvation` fixture describes: 5 pinned, yardstick 8.
+  const CURATION = { pinnedCount: 5, minChunkSearches: 8 };
+
   it('raises nothing on a healthy run or an absent report', () => {
-    expect(healthSignals(report())).toEqual([]);
-    expect(healthSignals(null)).toEqual([]);
+    expect(healthSignals(report(), CURATION)).toEqual([]);
+    expect(healthSignals(null, CURATION)).toEqual([]);
   });
 
-  it('counts unresolvable records, and names pinned starvation without a count', () => {
-    expect(healthSignals(report({ records: unresolvable(12) }))).toEqual(['12 unresolvable']);
-    expect(healthSignals(report({ records: [starvation] }))).toEqual(['pinned entries starved this run']);
-    expect(healthSignals(report({ records: [...unresolvable(12), starvation] }))).toEqual([
-      '12 unresolvable',
-      'pinned entries starved this run',
+  it('counts unresolvable records', () => {
+    expect(healthSignals(report({ records: unresolvable(12) }), CURATION)).toEqual(['12 unresolvable']);
+  });
+
+  it('counts starved pinned entries as N of M from the record that matches the curation', () => {
+    expect(healthSignals(report({ records: [starvation] }), CURATION)).toEqual(['3 of 5 pinned entries starved']);
+  });
+
+  it('words N = 0 as the pinned entries that left the rotation no search', () => {
+    const none = { ...starvation, pinnedRefreshed: 5 };
+    expect(healthSignals(report({ records: [none] }), CURATION)).toEqual([
+      '5 pinned entries left the rotation no search',
     ]);
+  });
+
+  it('raises no starvation signal when the pinned set changed since the record', () => {
+    const older = { ...starvation, pinnedCount: 8 };
+    expect(healthSignals(report({ records: [older] }), CURATION)).toEqual([]);
+  });
+
+  it('raises no starvation signal when the yardstick changed since the record', () => {
+    expect(healthSignals(report({ records: [starvation] }), { pinnedCount: 5, minChunkSearches: 10 })).toEqual([]);
+  });
+
+  it('reads the matching record, not the last by position', () => {
+    const matching = { ...starvation, pinnedCount: 8, pinnedRefreshed: 2 };
+    const older = { ...starvation, pinnedCount: 5, pinnedRefreshed: 4 };
+    expect(
+      healthSignals(report({ records: [matching, older] }), { pinnedCount: 8, minChunkSearches: 8 }),
+    ).toEqual(['6 of 8 pinned entries starved']);
+  });
+
+  it('raises no starvation signal for an empty pinned set, which would print a zero', () => {
+    const empty = { ...starvation, pinnedCount: 0, pinnedRefreshed: 0 };
+    expect(healthSignals(report({ records: [empty] }), { pinnedCount: 0, minChunkSearches: 8 })).toEqual([]);
+  });
+
+  it('formats the starvation counts with en-US grouping', () => {
+    const large = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 500 };
+    expect(healthSignals(report({ records: [large] }), { pinnedCount: 12_000, minChunkSearches: 8 })).toEqual([
+      '11,500 of 12,000 pinned entries starved',
+    ]);
+    const none = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 12_000 };
+    expect(healthSignals(report({ records: [none] }), { pinnedCount: 12_000, minChunkSearches: 8 })).toEqual([
+      '12,000 pinned entries left the rotation no search',
+    ]);
+  });
+
+  it('raises both triggers in order, and never prints "this run"', () => {
+    const signals = healthSignals(report({ records: [...unresolvable(12), starvation] }), CURATION);
+    expect(signals).toEqual(['12 unresolvable', '3 of 5 pinned entries starved']);
+    expect(signals.join(' ')).not.toContain('this run');
   });
 
   it('ignores records of other kinds', () => {
     const other = { kind: 'stale-lock-broken' as const, pid: 1, startedAt: '2026-09-26T10:00:00Z' };
-    expect(healthSignals(report({ records: [other] }))).toEqual([]);
+    expect(healthSignals(report({ records: [other] }), CURATION)).toEqual([]);
   });
 });
 

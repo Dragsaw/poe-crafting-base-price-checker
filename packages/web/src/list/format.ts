@@ -1,4 +1,4 @@
-import type { DatasetEntry, NotYetSyncedReason } from '@poe/contracts';
+import type { NotYetSyncedReason } from '@poe/contracts';
 
 import { formatDivine, formatThreshold } from '../shared/money';
 import { plural } from '../shared/text';
@@ -30,15 +30,21 @@ export type AgeMark =
 export const NEVER_ATTEMPTED = 'never attempted';
 
 /**
- * The Age cell (FR-12, AD-9, AD-10). The clock is `observedAt` where the entry's
- * price is `priced` — a league-mismatched observation included — and
- * `lastAttemptedAt` otherwise. Neither clock: *never attempted*. Younger than
- * the cut-off: no mark at all. At or past it: `priced Nd ago` / `tried Nd ago`,
- * N = floor(hours / 24).
+ * The Age cell (FR-12, AD-9, AD-10). The clock follows the row's resolved
+ * Price State, not the stored one: `observedAt` only where the row prints
+ * `priced`, and `lastAttemptedAt` otherwise. A league-mismatched observation
+ * resolves to `not-yet-synced`, so it reads `lastAttemptedAt`, the same clock
+ * as the expansion's `tried …` age. Neither clock: *never attempted*.
+ * Younger than the cut-off: no mark at all. At or past it: `priced Nd ago` /
+ * `tried Nd ago`, N = floor(hours / 24).
  */
-export function ageMark(entry: DatasetEntry | undefined, now: number): AgeMark | undefined {
-  const priced = entry?.price.state === 'priced' ? entry.price.observation.observedAt : undefined;
-  const clock = priced === undefined ? entry?.lastAttemptedAt : priced;
+export function ageMark(
+  state: CombinationState,
+  lastAttemptedAt: string | undefined,
+  now: number,
+): AgeMark | undefined {
+  const priced = state.state === 'priced' ? state.observedAt : undefined;
+  const clock = priced ?? lastAttemptedAt;
   if (clock === undefined) {
     return { kind: 'never', word: NEVER_ATTEMPTED };
   }
@@ -61,7 +67,7 @@ export function unitLabel(className: string): string {
 
 /** The Raw Base row's note, spelling the Item Level Floor (DESIGN.md `raw-base-row`). */
 export function rawNote(itemLevelMin: number): string {
-  return `uncrafted at Item Level ${String(itemLevelMin)} — ranked at its own current asking price, not at a craft outcome`;
+  return `uncrafted at Item Level ${String(itemLevelMin)} — valued at its own current asking price, not at a craft outcome`;
 }
 
 // --- the expansion panel ---------------------------------------------------
@@ -190,7 +196,7 @@ export const PANEL_ASKING_SENTENCE = 'Every price here is a current asking price
  */
 export function rawPanelSubLine(itemLevelMin: number, threshold: number): string {
   return [
-    `Uncrafted at Item Level ${String(itemLevelMin)}, ranked at its own current asking price and not at a craft outcome.`,
+    `Uncrafted at Item Level ${String(itemLevelMin)}, valued at its own current asking price and not at a craft outcome.`,
     'One Combination is tracked here: the degenerate Combination of no affixes.',
     `Payout Threshold ${formatThreshold(threshold)} Divine.`,
     PANEL_ASKING_SENTENCE,
