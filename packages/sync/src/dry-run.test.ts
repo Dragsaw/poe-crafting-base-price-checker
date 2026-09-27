@@ -66,7 +66,7 @@ const ITEMS = JSON.stringify({ schemaVersion: '1.0.0', ...ITEMS_CATALOGUE });
 const STATS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
 const FILTERS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
 /** A present weights file with no ids, so no weights record arises. */
-const WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', bases: {} });
+const WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} });
 
 /** The league gate's answer: the synthetic league is one the API carries. */
 const LEAGUES_ANSWER = JSON.stringify({ result: [{ id: 'Standard' }, { id: LEAGUE }] });

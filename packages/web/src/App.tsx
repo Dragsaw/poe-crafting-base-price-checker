@@ -131,7 +131,7 @@ function ReadyBody({
       dataset: set.dataset.entries,
       activeLeague: set.config.league,
       threshold,
-      weightsLoaded: set.weights !== null,
+      weights: set.weights,
     });
     return {
       rows: toDisplayRows(ranking, set.dataset.entries, now),

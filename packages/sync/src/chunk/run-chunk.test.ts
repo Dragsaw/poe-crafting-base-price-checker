@@ -145,7 +145,7 @@ function shellPorts(): Pick<TestPorts, 'git' | 'requests' | 'starvationRecord' |
 }
 
 /** A present weights file with no ids: no weights record arises. */
-const EMPTY_WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', bases: {} });
+const EMPTY_WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} });
 
 interface Harness {
   readonly fs: FakeFilesystemPort;
@@ -1818,16 +1818,25 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
 
   it('weights miss: one record per distinct uncatalogued id, nulls skipped, and the run continues', async () => {
     const lineOf = (statId: string | null): unknown => ({ statId, ranges: [] });
+    const entryOf = (id: string, ...lines: unknown[]): unknown => ({
+      sourceModifierId: id,
+      modGroup: id,
+      itemLevelMin: 1,
+      weight: 1,
+      weightSource: 'published',
+      lines,
+    });
+    const poolOf = (...entries: unknown[]): unknown => ({ poolCoverage: 'complete', entries });
     const weights = JSON.stringify({
-      schemaVersion: '6.0.0',
+      schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
       bases: {
         'weapon.bow': {
           Bows: {
-            prefix: { entries: [{ lines: [lineOf('explicit.w1'), lineOf(null)] }] },
-            suffix: { entries: [{ lines: [lineOf('explicit.w1')] }, { lines: [lineOf('explicit.ok')] }] },
+            prefix: poolOf(entryOf('p1', lineOf('explicit.w1'), lineOf(null))),
+            suffix: poolOf(entryOf('s1', lineOf('explicit.w1')), entryOf('s2', lineOf('explicit.ok'))),
           },
         },
-        'weapon.gone': { Gone: { prefix: { entries: [] }, suffix: { entries: [] } } },
+        'weapon.gone': { Gone: { prefix: poolOf(), suffix: poolOf() } },
       },
     });
     const { fs, ports } = harness(
@@ -1870,6 +1879,25 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
       expect.objectContaining({ kind: 'run-failure', reason: 'unrecoverable-error' }),
     ]);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('weights hard error: a DataFileError naming the file and the rule, nothing searched, nothing published', async () => {
+    const weights = JSON.stringify({
+      schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
+      bases: { 'weapon.bow': { Bows: { prefix: { entries: [] }, suffix: { poolCoverage: 'complete', entries: [] } } } },
+    });
+    const { fs, ports } = harness([A], { [WEIGHTS_PATH]: { contents: weights } });
+    const { visited, step } = scriptedStep();
+
+    const failure = run(ports, step);
+    await expect(failure).rejects.toBeInstanceOf(DataFileError);
+    await expect(failure).rejects.toMatchObject({ path: WEIGHTS_PATH, reason: 'invalid' });
+    await expect(failure).rejects.toThrow(/data\/weights\.json: invalid: bases\.weapon\.bow\.Bows\.prefix\.poolCoverage: /);
+
+    expect(visited).toEqual([]);
+    expect(Object.values(ports.requests.snapshot()).every((count) => count === 0)).toBe(true);
+    expect(await fs.exists(DATASET_PATH)).toBe(false);
+    expect(await fs.exists(PROGRESS_PATH)).toBe(false);
   });
 
   it('a catalogue that cannot be loaded aborts before any request, with a run-failure record', async () => {

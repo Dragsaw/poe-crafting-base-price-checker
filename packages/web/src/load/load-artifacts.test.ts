@@ -165,6 +165,24 @@ describe('loadArtifacts', () => {
     });
   });
 
+  it('refuses a weights file that breaks a hard error of the contract, as content', async () => {
+    const weights = VALID_BODIES.weights as Record<string, unknown>;
+    const pool = { poolCoverage: 'complete', entries: [] };
+    serveArtifacts(server, {
+      weights: {
+        kind: 'json',
+        body: { ...weights, bases: { 'armour.gloves': { Gloves_str: { prefix: pool, suffix: pool }, Gloves: { prefix: pool, suffix: pool } } } },
+      },
+    });
+    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+      kind: 'refused',
+      path: 'weights.json',
+      cause: 'content',
+      declared: '6.0.0',
+      expected: '6.0.0',
+    });
+  });
+
   // Matrix: network error / 5xx.
   it('fails on a rejected fetch, naming the artifact', async () => {
     serveArtifacts(server, { catalogueStats: { kind: 'network-error' } });

@@ -14,7 +14,6 @@ import {
   SyncProgressFileSchema,
   SyncReportFileSchema,
   TrackedFileSchema,
-  WeightsFileEnvelopeSchema,
 } from './envelopes';
 import { INITIAL_SCHEMA_VERSION } from './schema-version';
 import { without } from './test-support';
@@ -433,52 +432,5 @@ describe('RecipesFileSchema', () => {
 
   it('accepts an empty list', () => {
     expect(parseEnvelope(RecipesFileSchema, fileOf([])).ok).toBe(true);
-  });
-});
-
-describe('WeightsFileEnvelopeSchema', () => {
-  const header = {
-    schemaVersion: '6.0.0',
-    gamePatch: '0.5.5',
-    producer: { id: 'poe-mod-weights-producer', version: '6.0.0', generatedAt: '2026-09-26T10:52:22.504Z' },
-  };
-
-  it('reads the version and the header, and passes every other key through untouched', () => {
-    const file = { ...header, bases: { anything: [1, 'untyped'] } };
-    const result = parseEnvelope(WeightsFileEnvelopeSchema, file, '6.0.0');
-    expect(result).toEqual({ ok: true, value: file });
-  });
-
-  it('refuses any major but the expected one', () => {
-    const result = parseEnvelope(WeightsFileEnvelopeSchema, { ...header, schemaVersion: '5.2.0' }, '6.0.0');
-    expect(result).toEqual({ ok: false, reason: 'unknown-major', expected: '6.0.0', found: '5.2.0' });
-  });
-
-  it('refuses a file with no version', () => {
-    expect(parseEnvelope(WeightsFileEnvelopeSchema, { bases: {} }, '6.0.0').ok).toBe(false);
-  });
-
-  it('refuses a missing or empty gamePatch', () => {
-    const noPatch: Partial<typeof header> = { ...header };
-    delete noPatch.gamePatch;
-    expect(parseEnvelope(WeightsFileEnvelopeSchema, noPatch, '6.0.0').ok).toBe(false);
-    expect(parseEnvelope(WeightsFileEnvelopeSchema, { ...header, gamePatch: '' }, '6.0.0').ok).toBe(false);
-  });
-
-  it('refuses a producer block without an id or a UTC generatedAt', () => {
-    const { producer } = header;
-    for (const bad of [
-      { ...producer, id: '' },
-      { version: '6.0.0', generatedAt: producer.generatedAt },
-      { ...producer, generatedAt: '2026-09-26' },
-      { ...producer, generatedAt: '2026-09-26T10:52:22+02:00' },
-    ]) {
-      expect(parseEnvelope(WeightsFileEnvelopeSchema, { ...header, producer: bad }, '6.0.0').ok).toBe(false);
-    }
-  });
-
-  it('does not type bases', () => {
-    expect(parseEnvelope(WeightsFileEnvelopeSchema, header, '6.0.0').ok).toBe(true);
-    expect(Object.keys(WeightsFileEnvelopeSchema.shape)).toEqual(['schemaVersion', 'producer', 'gamePatch']);
   });
 });

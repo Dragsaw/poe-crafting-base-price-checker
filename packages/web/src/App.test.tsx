@@ -1127,7 +1127,7 @@ describe('the Unrankable appendix', () => {
   }
 
   // Matrix: committed.
-  it('is the title alone on the committed data/, count in ink, above the key block and the foot', async () => {
+  it('lists the two partial classes on the committed data/, and neither complete one, above the key block and the foot', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights}.json', {
       eager: true,
       import: 'default',
@@ -1140,10 +1140,16 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.style.color).toBe(rgb(colors.ink));
-    expect(appendixRows()).toHaveLength(0);
-    expect(frame().textContent).not.toContain(APPENDIX_LEAD);
+    // Emerald and Crossbows each declare one `partial` slot; Amulets and Bows are complete (Story 3.1).
+    const rows = appendixRows();
+    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Crossbows', 'Emerald']);
+    for (const row of rows) {
+      expect(row.querySelector('[data-cell="reason"]')?.textContent).toBe('pool partial');
+    }
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('2 Item Classes');
+    expect(appendix().textContent).not.toContain('Amulets');
+    expect(appendix().textContent).not.toMatch(/\bBows\b/);
+    expect(frame().textContent).toContain(APPENDIX_LEAD);
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.

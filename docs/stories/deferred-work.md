@@ -96,9 +96,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: story 2.1 (2026-09-26)
 
 - source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: `WeightsFileEnvelopeSchema` in `packages/contracts/src/envelopes.ts` is a stopgap: it checks `schemaVersion` against major 6 and passes the rest of `weights.json` through unvalidated. When Story 3.1 tightens the weights schema, `packages/web/src/load/artifacts.ts` `ARTIFACTS.weights` must switch to it.
-  evidence: Spec decision 2026-09-26 *Weights envelope*: "Story 3.1 tightens it." `docs/epics.md` has Story 2.6 widen only three header fields. Nothing tracks the loader's switch to the full schema.
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
   summary: (unverified, would be medium) `CraftRecipeSchema` in `packages/contracts/src/craft-recipe.ts` accepts `currencies: []` and a `currencyId` repeated within one recipe. A zero-cost recipe may make the per-craft EV degenerate once a story reads recipes for valuation.
   evidence: The spec fixes the shape but says nothing on an empty or repeated currency list. Settle it by checking AD-20 and the FR-1 EV formula when the first story costs a recipe: if a recipe must spend something, add `.min(1)` and a per-recipe `currencyId` uniqueness refinement.
 
@@ -317,3 +314,18 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
   summary: "Note. The epic 2 retrospective entry \"Parse the eight kept artifacts … during `pnpm build`\" predates this change. Its \"eight\" now means the seven AD-24 artifacts (`ALLOWLIST` in `tools/prune-pages.mjs`); `catalogue/static.json` is no longer kept in the Pages build."
   evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`. `pnpm build` logs `prune-pages: removed … catalogue/static.json …`.
+
+## Deferred from: story 3.1 (2026-09-27)
+
+- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
+  summary: "Producer request (`poe-mod-weights-producer`). Declare `poolCoverage: \"complete\"` for a pool whose only missing rows are data-mined mods that cannot roll. Today the Emerald suffix and the Crossbows suffix declare `partial` only for that reason, so the page lists Emerald and Crossbows in the appendix as `pool partial`. They rank once the producer regenerates `data/weights.json` with those pools declared `complete`. The app does not change: it trusts `poolCoverage` as declared (AD-11). `packages/contracts/src/weights-file.test.ts` (8,437 entries, 17 `null` statIds, 11 partial pools) and `packages/web/src/App.test.tsx` (the committed-data appendix test) assert the current file's counts and rows, so those tests change in the same commit as the regenerated `data/weights.json`."
+  evidence: Spec decision (human, 2026-09-27). `data/weights.json` of 2026-09-26 has 11 partial pools; `jewel/Emerald` suffix and `weapon.crossbow/Crossbows` suffix are the only partial slots of a tracked class. `packages/web/src/App.test.tsx`, the committed-data appendix test, asserts the two rows.
+- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
+  summary: "[NOTE FOR ARCHITECT] Reword the *placeholder row* bullet of *The pool-completeness rule* in `WEIGHTS-FILE-SCHEMA.md` to match the producer request above: a dropped row that names a data-mined mod that cannot roll does not count as missing, so it does not make the pool `partial`. The bullet today says only that an unnamed placeholder row counts as missing."
+  evidence: Spec decision (human, 2026-09-27). `WEIGHTS-FILE-SCHEMA.md`, *The pool-completeness rule*, third bullet.
+- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
+  summary: "[NOTE FOR ARCHITECT] `WeightsFileSchema` refuses a few values that *Validation* in `WEIGHTS-FILE-SCHEMA.md` does not list as hard errors: an empty `producer.id`, a `producer.generatedAt` that is not ISO-8601 UTC, and an empty `categoryId`, `className` or `statId`. The trust strip needs the first two (`utcDate` throws on a non-ISO instant). The reused id schemas carry the rest. Either list them in *Validation*, or say that *Validation* covers only the rules beyond the typed Shape."
+  evidence: Story 3.1 review, triage row 2. `packages/contracts/src/weights-file.ts`, `packages/web/src/frame/trust-facts.ts` `utcDate`.
+- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
+  summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
+  evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.

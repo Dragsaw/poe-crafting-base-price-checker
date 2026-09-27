@@ -7,7 +7,8 @@ import {
   SYNC_REPORT_SCHEMA_VERSION,
   SyncReportFileSchema,
   TrackedFileSchema,
-  WeightsFileEnvelopeSchema,
+  WEIGHTS_SCHEMA_VERSION,
+  WeightsFileSchema,
 } from '@poe/contracts';
 import type { parseEnvelope } from '@poe/contracts';
 
@@ -18,8 +19,8 @@ import type { parseEnvelope } from '@poe/contracts';
  * `tolerable` ones let the page render and name the absence.
  */
 
-/** The weights contract major the page reads (WEIGHTS-FILE-SCHEMA.md); only the major is compared. */
-export const WEIGHTS_EXPECTED_VERSION = '6.0.0';
+/** The weights contract major the page reads (WEIGHTS-FILE-SCHEMA.md), defined once in `contracts`; only the major is compared. */
+export const WEIGHTS_EXPECTED_VERSION = WEIGHTS_SCHEMA_VERSION;
 
 /** Whatever `parseEnvelope` accepts; `web` takes no direct `zod` dependency. */
 export type EnvelopeSchema = Parameters<typeof parseEnvelope>[0];
@@ -47,7 +48,7 @@ function artifact<S extends EnvelopeSchema, C extends ArtifactClass>(
 export const ARTIFACTS = {
   dataset: artifact('dataset.json', 'required', DatasetFileSchema, SUPPORTED_SCHEMA_VERSION),
   syncReport: artifact('sync-report.json', 'tolerable', SyncReportFileSchema, SYNC_REPORT_SCHEMA_VERSION),
-  weights: artifact('weights.json', 'tolerable', WeightsFileEnvelopeSchema, WEIGHTS_EXPECTED_VERSION),
+  weights: artifact('weights.json', 'tolerable', WeightsFileSchema, WEIGHTS_EXPECTED_VERSION),
   recipes: artifact('recipes.json', 'tolerable', RecipesFileSchema, SUPPORTED_SCHEMA_VERSION),
   tracked: artifact('tracked.json', 'required', TrackedFileSchema, SUPPORTED_SCHEMA_VERSION),
   config: artifact('config.json', 'required', ConfigFileSchema, SUPPORTED_SCHEMA_VERSION),
