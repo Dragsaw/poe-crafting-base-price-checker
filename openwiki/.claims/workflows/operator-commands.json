@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:fd8caa5dbc35f3ee2514f1a2245cf5efc81c4433cb6fee66324701f678f37a20",
+  "pageVersion": "sha256:180819794aa74a4c83fffce3806b74edad41f31e25e74bcdc17822f9101e6e3e",
   "claims": [
     {
       "id": "claim_8f81244d624f4708bbbf267b4e41d4ac",
@@ -24,15 +24,15 @@
     },
     {
       "id": "claim_7cd4125eb46941ef97137213295932f3",
-      "statement": "pnpm sync:dry runs the same composition over an in-memory snapshot and the recorded-fixture port, rejects on an unrecorded request, defaults its clock to the latest lastAttemptedAt or DRY_RUN_INSTANT with a --at override, never lets the real notBefore defer it, and writes nothing to disk.",
+      "statement": "pnpm sync:dry runs the same composition over an in-memory snapshot and the recorded-fixture port, skips (and lists as unrecorded) an entry whose search has no recorded fixture, rejects on any other unrecorded request, defaults its clock to the latest lastAttemptedAt or DRY_RUN_INSTANT with a --at override, never lets the real notBefore defer it, and writes nothing to disk.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/dry-run.ts#L1-L88",
-          "version": "repo-lines-v1:sha256:9ce9a15215a5dfd2b32158258584655447a50237ef039578ee210fac928a4d12:eyJzZWxlY3RlZExpbmVDb3VudCI6ODgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNGUwMjlkZTYxMGQzNDI5OTM0NTQ4OGMzODM1N2E2M2M1NzAzYWUwMGViYTVhMWE0MjQyOGRlYjhlZWY1M2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1NDQyMDYyYmRhNDA4ZDBkOThkNWFjOWM3NGVjODhlM2ViMTUzMTI4NjVjOWZiZjg2ODk1ZDUxOTVjODU1NGIifQ"
+          "resource": "repo://packages/sync/src/dry-run.ts#L1-L98",
+          "version": "repo-lines-v1:sha256:502080f26b913c14812da39e01ed3994c453c82920f1bd198f45c24d6a8b53df:eyJzZWxlY3RlZExpbmVDb3VudCI6OTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNGUwMjlkZTYxMGQzNDI5OTM0NTQ4OGMzODM1N2E2M2M1NzAzYWUwMGViYTVhMWE0MjQyOGRlYjhlZWY1M2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1NDQyMDYyYmRhNDA4ZDBkOThkNWFjOWM3NGVjODhlM2ViMTUzMTI4NjVjOWZiZjg2ODk1ZDUxOTVjODU1NGIifQ"
         },
         {
-          "resource": "repo://packages/sync/src/dry-run.ts#L280-L290",
-          "version": "repo-lines-v1:sha256:9d2c4320689caa1b450a0470ce9adc56b909ae5248448a7146c4cfaa1a4f9554:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlNjJiMTU4Y2I5NmE5ZmQ3YmRjN2EzNzA5MDZkYjliYjk5MDNjMDkyOWUxY2EzYzI4ZDhhYzk4ZDc0YjU2N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiYjZiZDY1NTgwNTlmZGMwMTViODZiY2RkOTZlZmY2NGUzMDZiYTE3ZDFjMTI2MzJmYTZlZTlmNDgwOTY5ZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyYTYwNDc0N2M0N2MxZGQ2YzkwY2YwY2I5ZGU3Njg0Njc1YjYwYzQ4YjRlZTEzNzc0Njg2NmEzY2Q1MjJlYjgifQ"
+          "resource": "repo://packages/sync/src/dry-run.ts#L204-L287",
+          "version": "repo-lines-v1:sha256:d836ae01534bac65dc9dd01c725a66c9981907c5a9a0e81e63a3cbfa2fa0be4d:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0NjhkMjE0ODZjZDBlMmRlNTJmNTc0ZmRjMzI1ZWJlM2ZmOTE2OWRlNThlYTUyZjFkNTM0Y2I4YzU3ZDE3MzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4NDQwODgxNmM5YzZiMGE2NzNhZDQ4OTJlNGMwNzk1MzYzNjkzYzUwNzEzYzRiYWIxOTlhYWE1NDJkODM4NzYifQ"
         }
       ]
     },
@@ -52,15 +52,19 @@
     },
     {
       "id": "claim_f02f1b608eaf426581382c29a7d7c3f4",
-      "statement": "pnpm fixtures:record records the leagues and four data endpoints plus the search and fetch for every non-pruned tracked entry using the production search body builder, and redacts personal identifier values while keeping their keys.",
+      "statement": "pnpm fixtures:record records the leagues and four data endpoints plus the search and fetch for every non-pruned entry of the fixture workload fixtures/tracked.json (not data/tracked.json) using the production search body builder, and redacts personal identifier values while keeping their keys.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/fixtures-record.ts#L1-L24",
-          "version": "repo-lines-v1:sha256:37df9c88280a87ff0a6456ad9f3e60d6404e8682cc44da1c9b9067bde5db838d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzNzdhZThkYTg1YmQ3OTZhMmUwYjFhOTFmZGNmNTdlNGZmYmEzMmM5M2YzZTI1NTA5Nzg5MjA3NGQ5YTQzOTcifQ"
+          "resource": "repo://packages/sync/src/fixtures-record.ts#L1-L26",
+          "version": "repo-lines-v1:sha256:176392ee3c7560920d48afe7e12a3795c5a5d3816d7691d8b9d4ea9c750ff88b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMjE1MjQwNzMyZWRiNWZkOWJlMDVlM2Q4YTMzNDgzYzY3ZmU2M2U2MTY3YzJhNTkyMDA3ZDMxOTVmNGE2NmYifQ"
         },
         {
           "resource": "repo://packages/sync/src/fixtures-record.ts#L133-L168",
-          "version": "repo-lines-v1:sha256:7a61d98a025197afe8cb3092c6add16caafa172d01b9859bfbf3cdd8d384ac02:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkYzJlMzQzMTU5OWQxM2U5MzBhYWRlYWE1OTIzMzc0YTBhYzMxOTBkZmE4ODMxYmExZjcwYmE1MTEzZTFmNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkYThmYTZhOTc4YmQxZjFkYWI0MmMzYWI1ZDA4MWFlOWQ1ZGJkNzViZGRlMmZmZWI3MTRjNTI5ZjQ2MDFjZWUifQ"
+          "version": "repo-lines-v1:sha256:566ee944512593c0548e02e674f37c57176cafe178e9295847c25c534b68adce:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkYTQyOTMwZTBmYzIxNjE1M2Y2MGUyMTk4N2MwYWU3OTYwZDMwM2JmMTAwNzUyZjc4Y2UzMDc3MGU2N2ViNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NjQwZTFhZDMyYTRkMzc5ZGVmNmM0NGUxN2Q4MTg5NjU4MTc2MjE0ODUyZmQ0ZTYyZWM1NDZhY2JlYzk2ZjcifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/fixtures-record.ts#L355-L362",
+          "version": "repo-lines-v1:sha256:b73987df27e7f1d8413f00c44fe43a36d472437b948b24de57567c1dfd66ef22:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2I4NTExMGNiMDk3OWY2NzlmNDZlMzg2OTE3ZDQyZmMwOTU0Y2NlNjRiNGQ2ZGYyYTUxNzdkZTA2NGRjMzA0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRkMTI2MDA1OWZjN2MwOTdiOWQ1NGJmZWY3MzJhZTdmNDY5MzFkOTBhYWVhNWZjOTU1YjcyMTQ1YTBlYTdiYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzZlNTFlMGQwMDhmMTZjN2EyYjcwMDJlOGJjNDY1NDg3YWUyZjVhMzNiMDhmNzNmNTM1ZDAwYmYyOGI4N2ZlMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzUwNjA0NWE1OWY1Y2ZhNjE3NTY1ZTE0MzAwODkxYmIwYzNkMmZmNzhjNTg5M2Y0NTYxNTg3NTg3ZGIzZWJjZCJ9"
         }
       ]
     },
@@ -91,6 +95,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T12:20:24.418Z"
+    "at": "2026-09-27T13:11:02.100Z"
   }
 }

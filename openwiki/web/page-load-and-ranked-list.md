@@ -3,9 +3,6 @@ type: subsystem
 title: "Web page: artifact load and ranked list"
 description: How the static React 19 + Mantine page loads its eight artifacts into one ready, refused or failed outcome, ranks them through core at the player's Payout Threshold kept in localStorage, turns the ranking into display rows, list statements and trade links, shows sync health in the trust strip, and themes Mantine from the DESIGN.md token set.
 tags: [web, react, mantine, artifacts, ranking, threshold, ui]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-d952717f7ba616148cf6047b
     resource: repo://packages/web/src/App.tsx
@@ -21,6 +18,8 @@ sources:
     resource: repo://packages/web/src/list/RankedList.tsx
   - id: openwiki-source-35db1d8c09ed97e59222c4b5
     resource: repo://packages/web/src/list/trade-link.ts
+  - id: openwiki-source-b44e23befe2ec1806e6feaf9
+    resource: repo://packages/web/src/list/UnrankableAppendix.tsx
   - id: openwiki-source-f20f60e1ecaf073e364173ca
     resource: repo://packages/web/src/load/artifacts.ts
   - id: openwiki-source-48083b7e06b93884229c0b35
@@ -31,7 +30,10 @@ sources:
     resource: repo://packages/web/src/theme/tokens.ts
   - id: openwiki-source-7f1c49c9ea79c77f6775aee2
     resource: repo://packages/web/src/threshold/threshold-storage.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T13:11:02.100Z
 ---
 
 # Web page: artifact load and ranked list
@@ -72,7 +74,7 @@ Then the precedence across all eight applies, and each screen names the **first*
 
 ## Ranking at the Payout Threshold
 
-`ReadyList` calls `rank({ tracked, dataset, activeLeague: config.league, threshold })` from `@poe/core` and memoises the result on the set, now and the threshold. `web` computes no ranking term itself (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
+`ReadyBody` calls `rank({ tracked, dataset, activeLeague: config.league, threshold, weightsLoaded: set.weights !== null })` from `@poe/core` and memoises the result on the set, now and the threshold. From that one ranking it renders the list statement, the ranked list, and the page tail led by the Unrankable appendix. `web` computes no ranking term itself (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
 
 The **Payout Threshold** (`threshold/threshold-storage.ts`) is the only value the page writes to browser storage (key `poe-cbpc.payoutThreshold`). Its range is 0 to 3 Divine, in steps of 0.05, at 2 decimal places, with a default of 0.25 (`DEFAULT_THRESHOLD`). Reading happens once at mount. It accepts only a plain decimal string in range, and anything else, including a storage that throws, gives the default. A write is clamped, and a blocked write is ignored. Changing the threshold re-runs `rank`.
 
@@ -96,6 +98,17 @@ The **list statement** (`list/list-statement.ts`) is a pure check over the ranki
 
 **Row expansion** shows the evidence behind a row: the price state, the sample size, both exact ages, and a **trade link**. `tradeSearchHref` (`list/trade-link.ts`) builds `https://www.pathofexile.com/trade2/search/poe2/{league}/{lastSearchId}` only when the entry has a stored search, `lastSearchLeague` equals the active league, and the entry is not pruned. Only the league segment is percent-encoded.
 
+## Page tail and the Unrankable appendix
+
+`PageTail` closes every state except the two failure screens. It is pushed to the frame's foot by `margin-top: auto` and holds, in order, the Unrankable appendix, the key block and the running foot. The appendix renders only in `ready`: while `pending` no count is known, so the tail holds only the key block and the running foot.
+
+`UnrankableAppendix` (`list/UnrankableAppendix.tsx`) renders `ranking.unrankable`. Every row is an Item Class, never a Base Type. The title is "Appendix: Unrankable — " followed by the count (`1 Item Class`, `N Item Classes`), in rust when there are rows and in ink when there are none.
+
+- With rows, the lead line "Tracked, but kept out of the ordering." follows, then one row per class: a class glyph and the class name, an `unknown` trust mark, the reason, and an empty note cell.
+- With no rows, the panel is the title alone, with the bottom padding equal to the top padding and no text that says why.
+
+The appendix has one arrangement: every row renders and the document grows. Nothing switches on a count or a measurement. Rows are not interactive: they have no handler, hover tone, role or title. The panel spacing (`appendixPad*`, `appendixLead*`) comes from `theme/tokens.ts`.
+
 ## Trust strip and sync report panel
 
 `frame/trust-facts.ts` holds pure formatters over the published `sync-report.json` and the `weights.json` envelope. It counts records and derives nothing else. The trust strip prints the weights file's producer and patch, "Last synced" (from the report's run times), and "Tracked List last edited" (from the report's `trackedListEditedAt`). It also prints a **health line** with exactly two triggers: a count of `unresolvable` records, and "pinned entries starved this run" when a `pinned-starvation` record exists. An absent report raises no health signal, and a missing value prints as italic *unknown*. The "+ the full sync report" panel shows three columns of published figures: the sync run, what is broken, and what the weights cover.
@@ -106,4 +119,4 @@ The **list statement** (`list/list-statement.ts`) is a pure check over the ranki
 
 ## Tests
 
-Web tests run under jsdom. `test-support/artifact-server.ts` registers MSW handlers for all eight artifacts (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)). The main suites are `load-artifacts.test.ts`, `App.test.tsx`, `ranked-list.test.tsx`, `expansion.test.tsx`, `display-rows.test.ts`, `list-statement.test.ts`, `trade-link.test.ts`, `payout-threshold.test.tsx`, `threshold-storage.test.ts`, `trust-strip.test.tsx`, `trust-facts.test.ts`, and `theme.test.ts` / `tokens.test.ts`.
+Web tests run under jsdom. `test-support/artifact-server.ts` registers MSW handlers for all eight artifacts (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)). The main suites are `load-artifacts.test.ts`, `App.test.tsx`, `ranked-list.test.tsx`, `expansion.test.tsx`, `display-rows.test.ts`, `list-statement.test.ts`, `unrankable-appendix.test.tsx`, `trade-link.test.ts`, `payout-threshold.test.tsx`, `threshold-storage.test.ts`, `trust-strip.test.tsx`, `trust-facts.test.ts`, and `theme.test.ts` / `tokens.test.ts`.

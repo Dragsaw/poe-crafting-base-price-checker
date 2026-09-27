@@ -3,12 +3,11 @@ type: quickstart
 title: Quickstart
 description: Orientation for the Path of Exile 2 crafting base price checker — what the sync CLI and the static ranked page do, how the four workspace packages fit together, the everyday commands, and which wiki page to read for each kind of task.
 tags: [quickstart, overview, orientation, commands]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
     resource: repo://package.json
+  - id: openwiki-source-04c5c6716d7633c4e68e2d4e
+    resource: repo://packages/core/src/rank.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
   - id: openwiki-source-f003d449d6194f288151c79f
@@ -17,7 +16,10 @@ sources:
     resource: repo://packages/web/src/App.tsx
   - id: openwiki-source-40275cb92c3610938f16ade3
     resource: repo://pnpm-workspace.yaml
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T13:11:02.100Z
 ---
 
 # Quickstart
@@ -29,7 +31,7 @@ A single-operator **Path of Exile 2 crafting base price checker**. It has two ha
 1. **`sync`**, a Node CLI. It prices a hand-curated list of bases, `data/tracked.json`, against the official PoE2 trade API (`/api/trade2`, realm `poe2`). Each run of `pnpm sync` prices one rate-limited chunk and writes `data/dataset.json` (the latest price per entry), `data/sync-progress.json` and `data/sync-report.json`.
 2. **`web`**, a static React 19 + Mantine 9.6.1 page on GitHub Pages. It fetches those files at runtime, validates them, and ranks the entries in the browser above a player-set **Payout Threshold** in Divine.
 
-A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` or `unresolvable`. It is never shown as zero when missing. Today only the **raw** branch is ranked: raw base types, with EV equal to the observed price and a Craft Cost of 0. The crafted branch (item classes with recipes and weights) is planned but not implemented in `core` yet. The planning documents (PRD, architecture spine, UX, stories) are under `docs/`.
+A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` or `unresolvable`. It is never shown as zero when missing. Today only the **raw** branch is ranked: raw base types, with EV equal to the observed price and a Craft Cost of 0. The crafted branch (item classes with recipes and weights) is planned but not implemented in `core` yet. Until it is, the page lists each crafted Item Class in an **Unrankable appendix** when no weights file is loaded. The planning documents (PRD, architecture spine, UX, stories) are under `docs/`.
 
 ## The four packages
 
@@ -41,7 +43,7 @@ A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` 
 - **contracts**: Zod schemas for every shared shape, versioned file envelopes, the canonical entry key, and the four effect ports with in-memory fakes.
 - **core**: pure functions: `rank` (read-time ranking) and `chunkOrder`/`pinnedToKeep` (the sync refresh rotation).
 - **sync**: the imperative shell. It has the governed trade client, the chunk runner, the pricing step, the league gate and the operator commands.
-- **web**: the page. It loads eight artifacts, ranks them with `core`, and renders the list, the trust strip and row expansions.
+- **web**: the page. It loads eight artifacts, ranks them with `core`, and renders the list, the trust strip, row expansions and the Unrankable appendix.
 
 The direction is enforced by manifests, dependency-cruiser, ESLint purity rules and tests.
 
@@ -55,9 +57,9 @@ The direction is enforced by manifests, dependency-cruiser, ESLint purity rules 
 | `pnpm dev` | Starts the Vite dev server on port 5173 with `strictPort`. Use `--port <n>` for another port. |
 | `pnpm build` | Runs `vite build` and prunes `dist` to the eight artifacts. |
 | `pnpm sync` | Runs one live chunk. Needs `POE_SYNC_USER_AGENT`. |
-| `pnpm sync:dry` | Predicts the next chunk offline against `fixtures/`. |
+| `pnpm sync:dry` | Predicts the next chunk offline against `fixtures/`. It skips entries outside the recorded workload and lists them as `unrecorded`. |
 | `pnpm catalogue:refresh` | Re-fetches the four trade catalogue files. |
-| `pnpm fixtures:record` | Re-records API fixtures. A human runs it. |
+| `pnpm fixtures:record` | Re-records API fixtures for the fixed workload `fixtures/tracked.json`. A human runs it. |
 | `pnpm tracked:lookup` / `pnpm tracked:check` | Curate and validate `data/tracked.json`. |
 
 To publish new prices: run `pnpm sync` (repeatedly, until the pass is covered), commit `data/`, and push to `master`. The Pages workflow runs `pnpm check` and `pnpm build`, then deploys.

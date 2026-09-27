@@ -3,9 +3,6 @@ type: testing
 title: Test strategy and network guards
 description: How the Vitest suite is organised into per-package projects plus a root project of workspace guards, how the shared MSW setup blocks and attributes every escaped network request, how the guard itself is tested in child Vitest runs, and how port fakes, recorded fixtures and the web artifact server replace live effects.
 tags: [testing, vitest, msw, no-network, fixtures, fakes, jsdom]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-c0f6629587ebf863c9fd5ce3
     resource: repo://fixtures/README.md
@@ -13,8 +10,12 @@ sources:
     resource: repo://packages/contracts/src/ports/fakes/http.ts
   - id: openwiki-source-1ab71563450d38af3980fb7d
     resource: repo://packages/sync/src/catalogue-refresh.test.ts
+  - id: openwiki-source-3ad5b08a28698fe7aa526cb0
+    resource: repo://packages/sync/src/pricing/fixture-names.ts
   - id: openwiki-source-d6250e3c0048c6be07b92adf
     resource: repo://packages/sync/src/pricing/fixture-port.ts
+  - id: openwiki-source-b461097e85ad1a703b98fdfe
+    resource: repo://packages/sync/src/pricing/price-entry.fixtures.test.ts
   - id: openwiki-source-3041748540f59eec928d359e
     resource: repo://packages/sync/vitest.config.ts
   - id: openwiki-source-c560b764fea9e1d479552dbb
@@ -35,7 +36,10 @@ sources:
     resource: repo://test/setup.ts
   - id: openwiki-source-fbadcd8591b65031efaaedce
     resource: repo://vitest.config.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T13:11:02.100Z
 ---
 
 # Test strategy and network guards
@@ -102,6 +106,7 @@ See [Package graph, ports and purity boundaries](../architecture/package-graph-a
 
 - **Port fakes.** `createFakeHttpPort(fixtures)` answers requests keyed `"METHOD url"`, records every request it received, and **rejects** an unfixtured request instead of returning a default 404. Filesystem, git and clock fakes work the same way. Units take ports as values, so `sync` tests build a chunk entirely in memory. `run-chunk.test.ts` is the largest suite.
 - **Recorded fixtures.** `fixtures/` holds real trade-API responses captured by `pnpm fixtures:record`, a command that only a human runs. Nobody writes a fixture by hand. Personal identifiers are redacted when the fixture is recorded. The pricing fixture port (`packages/sync/src/pricing/fixture-port.ts`) serves `trade-search-*`/`trade-fetch-*` files by a digest of method, URL and body. It serves `trade-data-leagues.json` for the league gate. It rejects any other request with a message that names the missing fixture. `price-entry.fixtures.test.ts` and `pnpm sync:dry` use it.
+- **The fixture workload.** `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH` in `packages/sync/src/pricing/fixture-names.ts`) is the one hand-edited file in `fixtures/`. It is the recorder's input, not a capture: a small fixed list with one entry per distinct search shape, owned by the fixture-backed tests. It is deliberately not `data/tracked.json`, so the player's list can grow with no new recording. `price-entry.fixtures.test.ts` checks that every non-pruned workload entry has a recorded search. An edit to the workload changes the digests and needs a new `pnpm fixtures:record`.
 - **Web artifact server.** `packages/web/src/test-support/artifact-server.ts` registers MSW handlers for all eight artifacts on the shared server, with minimal valid bodies. Every web fetch test registers all eight. Loopback URLs pass through the guard, so a missing handler would reach a real socket instead of failing.
 
 ## Commands no test runs

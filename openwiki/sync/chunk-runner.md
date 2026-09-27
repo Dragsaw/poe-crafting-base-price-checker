@@ -3,9 +3,6 @@ type: subsystem
 title: The sync chunk runner
 description: How one pnpm sync invocation runs one bounded, resumable, single-instance chunk — the shared composition, the on-disk lock and stale-lock breaking, the run-start cost order, the stop conditions and pinned cap, and the ordered writes of dataset.json, sync-progress.json and sync-report.json on success and on failure.
 tags: [sync, chunk, lock, rotation, sync-report, dataset, resumable]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-dbf0a5200ba812db3f3b5319
     resource: repo://packages/sync/src/chunk/lock.ts
@@ -21,7 +18,10 @@ sources:
     resource: repo://packages/sync/src/pinned-cap.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T13:11:02.100Z
 ---
 
 # The sync chunk runner
@@ -36,7 +36,9 @@ generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
 - the runner's `load` hook. The runner calls it under the lock. It reads `data/config.json`, checks the load-time pinned cap, reads `data/currencies.json` and the committed item types, and returns the publication (league plus output rate set), the starvation-record builder, the league gate and the pricing step. The step is built on the dataset the runner loaded.
 - the `catalogue` hook, which loads the committed catalogue id sets.
 
-The live command passes the real filesystem, clock, `fetch` port and read-only git port. The dry run passes in-memory fakes and a fixture-backed HTTP port. See [Operator commands and curation workflow](../workflows/operator-commands.md).
+`ComposeChunkPorts` has one optional seam, `wrapStep(step, context)`. When it is given, the load hook passes the pricing step it built through it, with a `StepContext` of the load-time `league` and `itemTypes`, and the runner uses the wrapped step. When it is absent, the runner uses the step unchanged. Only the dry run passes `wrapStep`: it skips an entry whose search has no recorded fixture.
+
+The live command passes the real filesystem, clock, `fetch` port and read-only git port. The dry run passes in-memory fakes, a fixture-backed HTTP port and `wrapStep`. See [Operator commands and curation workflow](../workflows/operator-commands.md).
 
 ## The lock
 

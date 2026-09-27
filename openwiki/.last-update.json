@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-27T12:33:28.359Z",
-  "command": "init",
+  "updatedAt": "2026-09-27T13:14:06.484Z",
+  "command": "update",
   "model": "host-agent/claude",
   "status": "interrupted",
   "language": "en"

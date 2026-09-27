@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:fd2639eb76ffc79d3eb9f97b5e158ab564cd9e362c6f08426927e1694777f120",
+  "pageVersion": "sha256:66bf8cd79db3d5d817972729f8126b1bcd540fc79bdec295851fb8670c76b8f4",
   "claims": [
     {
       "id": "claim_d1a342264ab8403a889d58264af5ba8a",
@@ -102,7 +102,7 @@
       "evidence": [
         {
           "resource": "repo://fixtures/README.md",
-          "version": "repo-file-v1:sha256:fee523477047b89e525466ddf377110a7b51711e9d138955855548e17678e72c"
+          "version": "repo-file-v1:sha256:f62dbb153b82b26218eabbd661e12e6d555de7b523053ef4931c3102b77658a5"
         }
       ]
     },
@@ -125,10 +125,28 @@
           "version": "repo-lines-v1:sha256:0c9bf648c5217406f7d1ee3b5b78b72d25608ab52a5e4f52524d5b80ebff32aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTU2M2ZhMGRiMGU5ODQzYjY3ZjNlYjE0NjIwZmYyMTBhYWZkNThjZWFiNTg1Y2IyZWYzMmJjYzYyM2M2ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiNjgwZTFhNDIyZGRkMGI4ODQ2NDAwM2UxNzAyNDc1YjE3NjM4MDAyNzA4NThlZWUyNDEzZjRhY2UzZmQ1YTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwODAwN2NjNGY3N2Q2ZTA1MTg3YTY1ODMwYzBiNmE1NjJjZjY0MDc5NWFhNjYwY2RlNGRkMGRiMjMxZjczZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1ZDVhZjcxNmFkMDg5YjZjZGE5ZWE1ZDExNTEzMDlmZTk3ODJjNjE5ZTI2NDhmYjY0MzY0MDE0ZDllNDBiNzEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_e5b32b69dc03468fa2522e8b8178863f",
+      "statement": "fixtures/tracked.json is the one hand-edited file in fixtures/: the recorder's fixed input workload, one entry per distinct search shape, deliberately separate from data/tracked.json; price-entry.fixtures.test.ts asserts every non-pruned workload entry has a recorded search.",
+      "evidence": [
+        {
+          "resource": "repo://fixtures/README.md#L36-L53",
+          "version": "repo-lines-v1:sha256:817a2696989ab7eb9662ac5e4704501cba231f69d49d883d632c7470414ae10a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhOWE5NjA2ZWNmMzViYzM5NzlmNTliMDUwMTUyZjdjYjc2NjI2ZmM5NjljYjUxMWU3OTRjODZkYjkxN2M4NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNzUxMjcyNmM0MDNiYzc4Yzc1MzVjZjEzNTI2ZDU2ZjY3ZTg0YmZkYjI1YzQzMGYwZmZlNjdmY2VlMjI0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5N2UyZDQ1ZjIyNTQzYzdiZGI4M2MwZDhmMTUzNTExYmRjYThmMjk1YzFmOGZiM2RhYjQ2NzUwYzJmNzBmMGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/fixture-names.ts#L57-L74",
+          "version": "repo-lines-v1:sha256:d4531296918ecdec38f9f80ccb1c32f2d3d19aa754481593339e98e2e3cf6003:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlNWNiMzc4MjUwNTk2ZTIzNGYxYTg4ZTYxMGJhNmVmYjlkZDM4ZjE0YjA0NWM5NDA4YmE3ZDk0ZTA1OThmOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/price-entry.fixtures.test.ts#L50-L82",
+          "version": "repo-lines-v1:sha256:f6b2ba37e2118db843e3782cb8930db38867e6aa46e7c0f467960340d4c48381:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwZGZmZWY5Zjg5ZTA5MDk0MDJmNTI1NDI5NjFjZmZkNDhmNGQ2Y2IwNThmMWYwZmE1MGZlZjRiMGRmMGRlOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmNjc3ZGY4ZDU2OTFmZmE1OWI5MzA3ODU4ZDEwN2FmNzRiNzYyMmUwYzJkYTFlZTFjMDhjYWZlZWNiOGYwYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmZjRiNWYxZjdhMzE5NzFkZTU5ZDUyYTA0M2ZjZjQ0Zjk1ODljNDkxZDNjZGExZDFjY2YzOTQ3MGIzZGM2MWUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T12:20:24.418Z"
+    "at": "2026-09-27T13:11:02.100Z"
   }
 }

@@ -3,9 +3,6 @@ type: workflow
 title: Operator commands and curation workflow
 description: The human-invoked pnpm commands — sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check — what each reads, writes and sends, their exit codes, the POE_SYNC_USER_AGENT requirement, and the lookup-edit-check loop for curating data/tracked.json.
 tags: [workflow, cli, sync, dry-run, fixtures, catalogue, curation]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-92f333db8794b007cec6ef03
     resource: repo://.claude/skills/tracked-json/scripts/lookup.ts
@@ -21,7 +18,10 @@ sources:
     resource: repo://packages/sync/src/fixtures-record.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T13:11:02.100Z
 ---
 
 # Operator commands and curation workflow
@@ -58,11 +58,13 @@ To cover the whole tracked list, run `pnpm sync` repeatedly, for example on a sc
 `packages/sync/src/dry-run.ts` runs **the same composition** as a live run, fully in memory:
 
 - It takes read-only snapshots of `data/tracked.json`, `dataset.json`, `config.json`, `currencies.json`, `catalogue/{items,stats,filters}.json`, `weights.json` and `sync-report.json` into a fake filesystem.
-- HTTP goes to the offline fixture port. The league gate is served `fixtures/trade-data-leagues.json`. Searches and fetches are served `fixtures/trade-{search,fetch}-<digest>.json` by a digest of the request. An unrecorded request **rejects** and names the missing fixture. It never yields.
+- HTTP goes to the offline fixture port. The league gate is served `fixtures/trade-data-leagues.json`. Searches and fetches are served `fixtures/trade-{search,fetch}-<digest>.json` by a digest of the request.
+- **Unrecorded entries are skipped.** The recorded searches cover only the fixed fixture workload (`fixtures/tracked.json`), not the whole tracked list. Through the `wrapStep` seam of `composeChunk`, the dry run checks each entry for a recorded search fixture before it prices the entry. An entry with no recorded search is visited with no request, keeps its dataset state, and is listed in `unrecorded`. An entry whose search body cannot be built counts as recorded, so the pricing step handles it as a live run does.
+- Any other unrecorded request, such as the fetch leg of a recorded search, **rejects** and names the missing fixture. The run never yields.
 - The pid is fixed, there is no pacing wait, and the git port is a fake with no history.
 - **Clock**: the latest `lastAttemptedAt` in the dataset snapshot, so the run predicts the live run that follows the last one. If there is none, the fixed `DRY_RUN_INSTANT` is used. `--at <iso>` overrides the clock. The real `notBefore` is reported but never fed into the simulation, so it cannot defer the dry run.
 
-It prints `{outcome, completed, entries, progress, dataset, records, report}`, plus `pinnedStarvation` and `notBefore` where relevant, as JSON to stdout, and writes nothing to disk. An absent config, currencies or catalogue file is a typed refusal that names the file, with exit 1.
+It prints `{outcome, completed, entries, progress, dataset, records, report}`, plus `unrecorded` (the skipped entry keys, in visiting order), `pinnedStarvation` and `notBefore` where relevant, as JSON to stdout, and writes nothing to disk. An absent config, currencies or catalogue file is a typed refusal that names the file, with exit 1.
 
 ## pnpm catalogue:refresh
 
@@ -76,7 +78,7 @@ The output is a git diff to review. A game patch that renames a stat id shows up
 
 ## pnpm fixtures:record
 
-`packages/sync/src/fixtures-record.ts` is only for a human to run. It records the leagues endpoint and the four data endpoints, with URLs from `trade/endpoints.ts`. For every non-pruned tracked entry it also records the POST search and its fetch. The search bodies come from `buildSearchBody`, the same builder the pricing step uses, in the configured league. It sends through the same governed client, reads `data/` without writing it, and writes `fixtures/`. `stripPersonalIdentifiers` replaces account and character names with a redaction marker and keeps the keys, so the shape survives. The rules for fixtures are in `fixtures/README.md`: never hand-written, one fixture per interaction shape, remove bulk but never structure.
+`packages/sync/src/fixtures-record.ts` is only for a human to run. It records the leagues endpoint and the four data endpoints, with URLs from `trade/endpoints.ts`. For every non-pruned entry of the fixture workload `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH`) it also records the POST search and its fetch. The workload is a small fixed list with one entry per search shape, not `data/tracked.json`, so the player's list can grow with no new recording. An edit to the workload changes the digests and needs a new recording. The search bodies come from `buildSearchBody`, the same builder the pricing step uses, in the configured league. It sends through the same governed client, reads `data/` and the workload without writing them, and writes `fixtures/`. `stripPersonalIdentifiers` replaces account and character names with a redaction marker and keeps the keys, so the shape survives. The rules for fixtures are in `fixtures/README.md`: never hand-written, one fixture per interaction shape, remove bulk but never structure.
 
 ## Curating data/tracked.json
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:333d6c9330a635e5b4b15e56c4d64553bff47becea2ac455202c0768b939741b",
+  "pageVersion": "sha256:22941dfbdc94247473e0e0866173509bcfcaf80c42be0c83946b15bbda3b1d23",
   "claims": [
     {
       "id": "claim_ba64aecd97fe455695cd8df0115876cc",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://packages/sync/src/compose-chunk.ts",
-          "version": "repo-file-v1:sha256:17dfa2102e6c052c10d6487b739153b17ff8468ea0e005e8ccd70ff4510b9636"
+          "version": "repo-file-v1:sha256:cf036d84f73837a34658707c8991235afee84bb11db846bb7a5adf47600138cb"
         },
         {
           "resource": "repo://packages/sync/src/sync.ts#L44-L51",
@@ -129,10 +129,24 @@
           "version": "repo-lines-v1:sha256:32466b41823bd631bd90caf6eddb7e33082d63b128b3bfee16eb04fba3f235c8:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_bddb57565ca84695a318ab2e514df4bd",
+      "statement": "composeChunk accepts an optional wrapStep(step, context) that receives the built pricing step and a StepContext of league and itemTypes; the runner uses the wrapped step when given and the plain step otherwise, and only the dry run passes it.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L109-L125",
+          "version": "repo-lines-v1:sha256:6f129dd4dd986169569eefdf86fdead14ac7039149eb6285fe2fa81e5ba58e0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkZTEzZTY0M2VkNDNlODUyZTM2MDdkZTU5OGVhMmM5MTBmYWFmNmVhYzhhZmI1ZTYyODY1MGE2OTFlMWZhZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzNkYzczMWU3ZDA3YjFmMGMwNWNmZWJkN2UxOTIyMDIzZTYwNzdiYzBhZTdiYTMwMTQ4ZjUwODMzYTI1YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1MGY5NTNhYjAwNGU5N2M1ZmVjODMxYThmNTRiOTU0MTRiZDI3MmYxZTg3MWMxM2M4YTc1MDM5NWM2YTgyNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlYmFhOGQyMjE4MDFkZGI2OTgxOGQwZWY1ZjdkMmNlODZiNmQ0NjIwNGZkZjU5YjRjMjI2YTYyZmY0YmUxNjEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L54-L65",
+          "version": "repo-lines-v1:sha256:e3300ee61a3f4c0ba9a0795e0677d5f5e9e6d9afd335c5f27c36490d5e3f0a0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2MGQ4ZGY1NmE5MzEwYzhlYTMxODVmY2YyYTc5ZTU3MWUyZGU3YmE1ZTRjY2JkZDE3ZWI3NjBmODkxZTZlYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxNTEzMTE2MDM5MDQyNmM4NjA2ODRhYWVkMDQwNDYxOGNmOTVmZTFjNGU5Y2M4YjNmMjJhMmRjNzVhMzVhMzIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T12:20:24.418Z"
+    "at": "2026-09-27T13:11:02.100Z"
   }
 }
