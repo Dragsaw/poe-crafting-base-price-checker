@@ -5,5 +5,6 @@ export default defineConfig({
     name: 'sync',
     include: ['src/**/*.test.ts'],
     setupFiles: ['../../test/setup.ts'],
+    globalSetup: ['../../test/global-setup.ts'],
   },
 });

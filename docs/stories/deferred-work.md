@@ -21,9 +21,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: story 1.11 (2026-09-26)
 
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
-  summary: The live `pnpm sync` runs on the in-memory fake git port, so the tracked-list edit date never comes from the `git-author-date` clock of AD-12. A real read-only git adapter is owed.
-  evidence: The spec's human decision *Scope* defers the adapter. `packages/sync/src/sync.ts` passes `createFakeGitPort()`, so `resolveTrackedListAge` always falls to `file-modified`. The adapter needs a process spawn, and `packages/sync/src/no-git-write.test.ts` forbids `child_process` in every non-test source under `packages/sync/src`. The design pass must decide where a read-only spawn may live (a separate module the scan exempts, or a narrower rule that forbids only write subcommands) without weakening the no-git-write guarantee of AD-3.
-- source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
   summary: A 429's `retryAfterMs` is not kept across processes, so the next scheduled `pnpm sync` may send inside the penalty window. Unverified.
   evidence: The ledger is per process by AD-8's design (`packages/sync/src/trade/client.ts`), and both the pricing step's yield and the league gate's yield (`packages/sync/src/league/league-gate.ts`) drop the delay. To settle it, compare the player's scheduler interval with the `Retry-After` windows the trade API actually returns.
 
@@ -53,9 +50,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-2-3-the-ranked-list-at-rest-rows-units-freshness-and-the-key-block.md`
   summary: [NOTE FOR UX] With exactly 21 rows the list affordance prints `+ Read the remaining 1 rows`. DESIGN.md `listCopyClosed` is `+ Read the remaining {N} rows` and gives no singular form.
   evidence: `expandCopy` in `packages/web/src/list/RankedList.tsx` prints DESIGN.md's copy verbatim for every N. Settle it with a DESIGN.md singular form, then a one-branch change and a test.
-- source_spec: `docs/stories/spec-deferred-request-after-afterall-reaches-network.md`
-  summary: A request that a test starts but does not await, and that fires after the last file's afterAll in a worker, is blocked by the process-wide guard but reported by nothing, so the run passes.
-  evidence: Pre-existing in kind: before this change the same request passed silently and also escaped. Now it is blocked, because the interceptor stays installed. The file-level check in afterAll reports a late request only when a later file's afterAll runs in the same worker. The 2026-09-26 probe found that a 4000 ms timer never fired, because the worker ended first, so whether such a request can happen at all is unverified. A fix needs a hook that runs in the worker after its last file and before the worker ends, and that can fail the run. A globalSetup teardown runs in the main process and cannot see the worker's record. First settle whether Vitest offers such a hook.
 
 ## Deferred from: story 2.5 (2026-09-26)
 
@@ -89,9 +83,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
   summary: `modText` in `.claude/skills/tracked-json/scripts/lookup.ts` gets the mod text by parsing `sourceModifierId`, and `WEIGHTS-FILE-SCHEMA.md` (the `sourceModifierId` row) calls that field "Opaque to the app".
   evidence: The spec's Always list authorizes the parse. So the spec and the weights contract disagree. The owner of the weights contract decides between two options: allow this curation-only consumer to depend on the layout, or make the producer emit the mod text as its own field. Until that decision, a test over the committed weights detects a change of the layout.
-- source_spec: `docs/stories/spec-deferred-unparseable-fetch-loses-search-fields.md`
-  summary: A search answered 200 with an unparseable body throws `UnexpectedTradeResponseError` with no entry, so the entry's `lastAttemptedAt` is not published although `sync` issued a request, against AD-9 *Timestamps* ("present wherever `sync` issued a request").
-  evidence: Pre-existing; this spec's Design Notes leave it out of scope because the closed entry named only the fetch leg. In `packages/sync/src/pricing/price-entry.ts` the search-leg throw (`new UnexpectedTradeResponseError(entryKey, 'search', …)`) passes no entry, so the `runChunk` failure path publishes nothing for that entry. The fix is to pass `stamped` on that throw and flip the runner test for the entry-less case (`packages/sync/src/chunk/run-chunk.test.ts`, "unparseable search body").
 
 ## Deferred from: code review of spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md (2026-09-27)
 
@@ -138,9 +129,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
     - the recipes-absent line claims "no crafted rows can be ranked" although `rank` never reads recipes (`frame/AbsenceLines.tsx:44-48`)
   evidence: Retro F18. `docs/reviews/review-epic-2-diff.md` items A8, A9, A10, A13, A14, A15, A18, E7, E10 and E12.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: `.github/workflows/openwiki-update.yml` lets an unattended model stage `AGENTS.md`, `CLAUDE.md` and its own workflow file into an auto-PR. Narrow `add-paths`.
-  evidence: Retro F20 (review A16), `openwiki-update.yml:60-64`.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Sweep `docs/epics.md` to AD-24 as amended in spine revision 22 (retro action 8, 2026-09-27): web fetches **seven** artifacts, each with `cache: 'no-cache'` and no query token, and `catalogue/static.json` is not one of them. The lines are `:96` ("eight", "cache-busted", "Five are required", "A ninth"), `:995` and `:997` (eight cache-busted requests, a ninth artifact), `:1001`, `:1010` and `:1619` ("the eight artifacts"), and the Story 2.1 AC at `:1022`, where stat text comes from `catalogue/stats.json` and the denomination `Divine` is a product literal, not `static.json` text. This is a citation sweep, not a PRD revision. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
   evidence: Retro F8, F9 and F19.
 
@@ -179,9 +167,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: code review of the uncommitted `declared: null` and dev:stop climb diff (2026-09-27)
 
-- source_spec: `docs/reviews/review-changes-since-78db4da.md`
-  summary: The `NO_DECLARED_VERSION = 'none'` sentinel is replaced by `declared: null`, but the item 22 spec still describes the old design. Its Code Map says "Split these with `declaredVersion(data) === NO_DECLARED_VERSION`", and its triage rows still record the `"none"` collision as `reject`. Neither says the fix has now landed. Add a Spec Change Log note to `spec-epic-2-retro-item-22-refusal-cause.md`, and mark the sentinel finding in the review as closed.
-  evidence: `docs/stories/spec-epic-2-retro-item-22-refusal-cause.md:51`, `:83`, `:101`, `:111`, `:151`. `docs/reviews/review-changes-since-78db4da.md:13`, `:56`, `:105`, `:136`. The diff deletes `NO_DECLARED_VERSION` from `packages/web/src/load/load-artifacts.ts`.
 - source_spec: `tools/dev-stop/dev-stop.ts`
   summary: `listenerScript` runs `Get-NetTCPConnection ... -ErrorAction SilentlyContinue`. A failed query, for example a missing NetTCPIP module or access denied, therefore returns `[]`, and dev:stop prints "port is free". `listenersPosix` explicitly refuses to read a failed `lsof` as a free port. The Windows path has no such guard.
   evidence: This was already true before the diff: `snapshotWindows` used the same `$l` line. The diff now also routes the stop poll through it (`listenersWindows`).
@@ -269,6 +254,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-sync-continuous.md`
   summary: "[NOTE FOR ARCHITECT] Two owner-document sentences no longer match the code. First, `IMPLEMENTATION-NOTES.md` §5.3 *Penalty memory across processes* says \"Two chunk endings write a `notBefore` … and nothing else does\", and spine AD-8 names only the 429 and the malformed-request abort. But the gate's non-429 4xx (`LeagueRequestRejectedError`) now writes the abort `notBefore` (`now + staleLockAfter`) in both `pnpm sync` and `pnpm sync:batch`. Second, spine AD-7 says the session's lock \"is never held across a wait\", but the in-chunk spread waits between fetches do hold it. The sentence means a session wait."
   evidence: Review Triage Log row 33. `packages/sync/src/chunk/run-chunk.ts` failure path (`rejected ? notBeforeAfterAbort(...)`), and the run-chunk test that expects `notBefore: '2026-09-26T18:00:00.000Z'` after a gate 4xx. The Review brief (`AGENT-WORKFLOW.md`) forbids a triager to edit the owner document.
+- source_spec: `docs/stories/spec-deferred-unawaited-request-reported-by-nothing.md`
+  summary: The `web` project does not load `test/global-setup.ts`, so a request that a web test starts but does not await, and that fires after the last file of a worker closed, is blocked but reported by nothing, and the run passes.
+  evidence: AGENTS.md forbids edits to `packages/web/vite.config.ts`, where the `web` test project is configured. Without that global setup, `inject('noNetworkRecordDir')` returns `undefined` in `test/setup.ts`, and the guard keeps only its in-memory record. The root, contracts, core and sync projects load the global setup and fail the run.
+- source_spec: `docs/stories/spec-deferred-unawaited-request-reported-by-nothing.md`
+  summary: The `web` gap could be closed without editing `packages/web/vite.config.ts`, by declaring the `web` project inline in the root `vitest.config.ts` `projects` with `extends: './packages/web/vite.config.ts'` and `globalSetup`, and excluding `packages/web` from the `packages/*` glob; nobody has decided whether that change to how `web` is loaded is acceptable.
+  evidence: Review of the deferred-unawaited-request-reported-by-nothing change (blind layer). The root `projects` array loads every `packages/*` config as is, so an inline `web` entry would run `web` twice unless the glob excludes it. The owner of the `web` test config decides.
+- source_spec: `docs/stories/spec-deferred-openwiki-update-lets-model-stage-agents.md`
+  summary: `peter-evans/create-pull-request` carries commits already made on the checked-out HEAD into the PR branch, and `add-paths` filters only uncommitted changes, so if `openwiki code --update` commits locally it can still put `AGENTS.md`, `CLAUDE.md` or the workflow file into the auto-PR.
+  evidence: Unverified. `add-paths` in `.github/workflows/openwiki-update.yml` now lists only `openwiki`, but nothing in the workflow checks that HEAD still equals `github.sha` before the `create-pr` step. To settle it, find out whether `openwiki@0.6.0` (`openwiki code --update --print`) or its model can run `git commit`. If it can, add a step before `create-pr` that refuses or soft-resets any commit on top of `github.sha`.
 
 ## Deferred from: story 3.3 (2026-09-27)
 

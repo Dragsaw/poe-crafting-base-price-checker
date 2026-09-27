@@ -1,7 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { appendFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { setupServer } from 'msw/node';
-import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, inject } from 'vitest';
 
 /**
  * NFR-1: no test at any level makes a network call.
@@ -53,6 +55,13 @@ interface NoNetworkGuard {
    */
   readonly currentTest: AsyncLocalStorage<TestIdentity>;
   listening: boolean;
+  /**
+   * True from the start of the setup file's `beforeAll` to the end of its
+   * `afterAll`. A request that arrives while it is false came after its file
+   * closed. In the last file of a worker no later hook can report it, so
+   * `recordAfterFileClosed` writes it to disk.
+   */
+  fileOpen: boolean;
 }
 
 const GUARD_KEY = Symbol.for('poe-crafting-base-price-checker/no-network-guard');
@@ -68,6 +77,7 @@ function processGuard(): NoNetworkGuard {
     escapedRequests: [],
     currentTest: new AsyncLocalStorage<TestIdentity>(),
     listening: false,
+    fileOpen: false,
   };
   holder[GUARD_KEY] = created;
   return created;
@@ -75,6 +85,28 @@ function processGuard(): NoNetworkGuard {
 
 const guard = processGuard();
 const { server, escapedRequests, currentTest } = guard;
+
+/**
+ * Provided by `test/global-setup.ts`, which fails the run in the main process
+ * when this directory holds a record. `undefined` in a project that does not
+ * load that global setup: such a project keeps only the in-memory record.
+ */
+const recordDir = inject('noNetworkRecordDir');
+
+/**
+ * Writes a request that arrived while no file of this worker was open to the
+ * run's record. Synchronous, because the worker can end at any moment after
+ * the request.
+ */
+function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undefined): void {
+  if (guard.fileOpen || recordDir === undefined) {
+    return;
+  }
+  appendFileSync(
+    join(recordDir, `${String(process.pid)}.log`),
+    `${described} (${describeIssuer(issuedBy)})\n`,
+  );
+}
 
 /**
  * The only exemption is by **origin**, never by file extension. A callback that
@@ -90,6 +122,8 @@ function isNonRemote(url: URL): boolean {
 }
 
 beforeAll(() => {
+  // Before the early return below: every file of a reused worker opens.
+  guard.fileOpen = true;
   // Once per worker. A later file of a reused worker finds the interceptor
   // already installed, and its closure writes to the same shared record.
   if (guard.listening) {
@@ -101,7 +135,9 @@ beforeAll(() => {
         return;
       }
       const described = `${request.method} ${request.url}`;
-      escapedRequests.push({ described, issuedBy: currentTest.getStore() });
+      const issuedBy = currentTest.getStore();
+      escapedRequests.push({ described, issuedBy });
+      recordAfterFileClosed(described, issuedBy);
       throw new Error(`[no-network] unhandled request escaped the fixture set: ${described}`);
     },
   });
@@ -128,10 +164,14 @@ afterAll(() => {
   // the file here instead of passing silently. So does a late request from an
   // earlier file of a reused worker. The server is never closed (see
   // `NoNetworkGuard`), so a request that fires after this hook is still blocked.
+  // After the last file of a worker no hook runs to report it, so
+  // `recordAfterFileClosed` writes it to disk and `test/global-setup.ts` fails
+  // the run.
   try {
     assertNoEscapedRequests();
   } finally {
     server.resetHandlers();
+    guard.fileOpen = false;
   }
 });
 
