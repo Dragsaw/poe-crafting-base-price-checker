@@ -1,12 +1,12 @@
 {
-  "runStartedAt": "2026-09-27T13:17:48.716Z",
-  "runFinishedAt": "2026-09-27T13:17:51.155Z",
+  "runStartedAt": "2026-09-27T19:17:47.355Z",
+  "runFinishedAt": "2026-09-27T19:17:47.954Z",
   "figures": {
     "requestsBySource": {
-      "tracked-list": 9,
+      "tracked-list": 10,
       "league-validation": 1
     },
-    "notReachedCount": 171,
+    "notReachedCount": 167,
     "trackedListEditedAt": {
       "source": "git-author-date",
       "at": "2026-09-27T12:17:17.000Z"
