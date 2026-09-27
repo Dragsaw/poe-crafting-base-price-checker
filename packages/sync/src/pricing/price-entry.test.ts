@@ -368,7 +368,24 @@ describe('createPricingStep: unanswered and refused requests', () => {
     await expect(step(ENTRY)).rejects.toBe(failure);
   });
 
-  it('a search answered 200 with {} throws UnexpectedTradeResponseError and sends no fetch', async () => {
+  it('a search answered 200 with {} throws UnexpectedTradeResponseError with lastAttemptedAt stamped, the search fields and the price state kept, and sends no fetch', async () => {
+    const { http, run } = setup({ search: ok({}), dataset: [PREVIOUS] });
+    const error = await run().then(
+      () => undefined,
+      (thrown: unknown) => thrown,
+    );
+    expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
+    expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
+    // A request was issued, so lastAttemptedAt is stamped (AD-9); no search
+    // was answered, so the previous search fields stay (AD-16).
+    expect((error as UnexpectedTradeResponseError).entry).toStrictEqual({
+      ...PREVIOUS,
+      lastAttemptedAt: NOW,
+    });
+    expect(http.requests).toHaveLength(1);
+  });
+
+  it('a search answered 200 with {} for a never-published entry carries a stamped never-synced entry', async () => {
     const { http, run } = setup({ search: ok({}) });
     const error = await run().then(
       () => undefined,
@@ -376,8 +393,11 @@ describe('createPricingStep: unanswered and refused requests', () => {
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
-    // No search was answered, so the error carries no entry to publish.
-    expect((error as UnexpectedTradeResponseError).entry).toBeUndefined();
+    expect((error as UnexpectedTradeResponseError).entry).toStrictEqual({
+      entryKey: KEY,
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    });
     expect(http.requests).toHaveLength(1);
   });
 
