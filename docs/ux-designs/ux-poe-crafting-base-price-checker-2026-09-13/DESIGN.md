@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 11
+revision: 12
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -791,8 +791,8 @@ components:
     paddingTop: '{spacing.gutter}'
     eyebrow: '{typography.eyebrow} in {colors.rust}, reading "THE PAGE COULD NOT LOAD ITS DATA"'
     title: '{typography.masthead-title}'
-    titleText: 'A required file did not arrive.'
-    titleRule: 'names no count. AD-24 owns which artifacts the page fetches, so the title stays true whatever that set is. The body names the file [decision — memlog 229].'
+    titleText: 'One of the data files did not arrive.'
+    titleRule: 'names no count and does not say required. AD-24 owns which artifacts the page fetches, so the title stays true whatever that set is, and a tolerable file that fails to arrive shows this screen too. The body names the file [decision — memlog 237].'
     body: '{typography.failure-body}'
     bodyColor: '{colors.ink-secondary}'
     bodyMaxWidth: '{spacing.dek-max-width}'
@@ -2405,9 +2405,9 @@ failure is set like the rest of the page, because it is the same page telling
 the truth about itself.
 
 **Fetch failure screen** (`fetch-failure-screen`) — same shape, different fact:
-a required artifact did not arrive (AD-24 owns which artifacts the page
-fetches). Rust eyebrow reading `THE PAGE COULD NOT LOAD ITS DATA`, a title
-reading `A required file did not arrive.` `[decision — memlog 229]`, a body
+one of the artifacts the page fetches did not arrive (AD-24 owns which
+artifacts those are). Rust eyebrow reading `THE PAGE COULD NOT LOAD ITS DATA`, a title
+reading `One of the data files did not arrive.` `[decision — memlog 237]`, a body
 naming which, and an `{components.expand-affordance}` reading `+ Try again`.
 One sentence explains that the page shows nothing rather than a partial set,
 because FR-33 requires a single consistent set and half a ranking is worse than

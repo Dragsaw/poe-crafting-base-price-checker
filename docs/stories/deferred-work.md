@@ -312,9 +312,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: epic 2 retro item 8 (2026-09-27)
 
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
-  summary: "[NOTE FOR UX] `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx`) now prints `One of the data files did not arrive.` (user decision 2026-09-27): no count, so a change to the AD-24 set needs no copy sweep, and not \"required\", because a tolerable file's 5xx also shows this screen. DESIGN.md `fetch-failure-screen.titleText` (:794) still reads `A required file did not arrive.`, and the same old title with the \"a required artifact did not arrive\" framing also prints in DESIGN.md prose *Fetch failure screen* (:2408–2410), EXPERIENCE.md `{components.fetch-failure-screen}` component table row (:565) and EXPERIENCE.md state 28 (:903); UX to update all four to match. This decision supersedes the wording in the epic 2 retrospective entry that names `A required file did not arrive.` (UX memlog 229)."
-  evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`, Decision. `App.test.tsx` asserts the new literal.
-- source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
   summary: "Note. `packages/web/vite.config.ts` still has a comment that says \"eight\" artifacts. The spec forbids edits to that file, so the comment stays until a change that is allowed to edit it."
   evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`, Never. `grep -n eight packages/web/vite.config.ts`.
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
