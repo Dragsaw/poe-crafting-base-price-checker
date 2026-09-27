@@ -308,3 +308,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: "[NOTE FOR UX] Styles and rules the spines leave open, each needed before an Epic 3 spec quotes it: the separator and size between a Price State and its reason or glyph (XS-31); whether an age inside the expansion past 48h gets the rust mark (XS-32); the italic and colour of line-two notes and the sample cell (XS-33); whether the Raw Base panel title is italic (XS-34); whether `Item Level 82` in a degenerate Combination's line one is a literal or the entry's own level (XS-36); the note on a non-priced Raw Base combination, which today lives only in code (XS-37); and the gloss for the `unknown` mark on a `class absent from weights file` row (HR-14)."
   evidence: Findings XS-31 to XS-34, XS-36, XS-37 and HR-14 (retro item 12 audit). HR-13 (state 16 class membership) and HR-18 (tier 2 against tier 3 by colour alone) are already ledgered and are not repeated here.
+
+## Deferred from: epic 2 retro item 8 (2026-09-27)
+
+- source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
+  summary: "[NOTE FOR UX] `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx`) now prints `One of the data files did not arrive.` (user decision 2026-09-27): no count, so a change to the AD-24 set needs no copy sweep, and not \"required\", because a tolerable file's 5xx also shows this screen. DESIGN.md `fetch-failure-screen.titleText` (:794) still reads `A required file did not arrive.`, and the same old title with the \"a required artifact did not arrive\" framing also prints in DESIGN.md prose *Fetch failure screen* (:2408–2410), EXPERIENCE.md `{components.fetch-failure-screen}` component table row (:565) and EXPERIENCE.md state 28 (:903); UX to update all four to match. This decision supersedes the wording in the epic 2 retrospective entry that names `A required file did not arrive.` (UX memlog 229)."
+  evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`, Decision. `App.test.tsx` asserts the new literal.
+- source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
+  summary: "Note. `packages/web/vite.config.ts` still has a comment that says \"eight\" artifacts. The spec forbids edits to that file, so the comment stays until a change that is allowed to edit it."
+  evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`, Never. `grep -n eight packages/web/vite.config.ts`.
+- source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
+  summary: "Note. The epic 2 retrospective entry \"Parse the eight kept artifacts … during `pnpm build`\" predates this change. Its \"eight\" now means the seven AD-24 artifacts (`ALLOWLIST` in `tools/prune-pages.mjs`); `catalogue/static.json` is no longer kept in the Pages build."
+  evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`. `pnpm build` logs `prune-pages: removed … catalogue/static.json …`.

@@ -21,7 +21,7 @@ beforeAll(async () => {
 });
 
 /** What `pnpm build` keeps of `data/` is exactly what the page fetches (AD-24). */
-it('prunes the Pages copy to exactly ARTIFACTS: the same eight paths in AD-24 order, the same required set', () => {
+it('prunes the Pages copy to exactly ARTIFACTS: the same seven paths in AD-24 order, the same required set', () => {
   expect(allowlist.map((entry) => entry.path)).toEqual(ARTIFACT_ORDER.map((key) => ARTIFACTS[key].path));
   expect(allowlist.map((entry) => entry.required)).toEqual(
     ARTIFACT_ORDER.map((key) => ARTIFACTS[key].class === 'required'),

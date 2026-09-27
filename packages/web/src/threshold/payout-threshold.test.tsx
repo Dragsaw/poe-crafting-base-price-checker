@@ -127,6 +127,8 @@ describe('the panel at rest', () => {
     const range = Array.from(part('data-threshold-range').children, (node) => node.textContent);
     expect(range).toEqual([RANGE_LOW, RANGE_HIGH]);
     expect(range).toEqual(['0 Divine', '3 Divine']);
+    expect(RANGE_LOW).toBe('0 Divine');
+    expect(RANGE_HIGH).toBe('3 Divine');
   });
 });
 

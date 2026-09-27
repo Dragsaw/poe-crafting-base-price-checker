@@ -1,6 +1,7 @@
 import type { Ranking } from '@poe/core';
 
 import { formatThreshold } from '../shared/money';
+import { DENOMINATION } from '../shared/product';
 
 /**
  * The one statement the list makes about itself, above the column header
@@ -23,7 +24,7 @@ export function honestEmptyCopy(league: string, onlyUnresolvable = false): strin
 
 /** State 25's copy (Story 2.7 decision, 2026-09-27): the live threshold at the page's 2dp. */
 export function nothingClearsCopy(threshold: number): string {
-  return `Nothing clears your Payout Threshold of ${formatThreshold(threshold)} Divine.`;
+  return `Nothing clears your Payout Threshold of ${formatThreshold(threshold)} ${DENOMINATION}.`;
 }
 
 /**

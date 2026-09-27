@@ -30,7 +30,7 @@ type ViewState =
  * The page's substrate. It paints the masthead and twenty skeleton slots at
  * once, then moves to exactly one outcome in a single state transition — a
  * whole set, the refusal screen or the fetch-failure screen — never row by row
- * (AD-24, FR-33). `+ Try again` re-runs all eight fetches.
+ * (AD-24, FR-33). `+ Try again` re-runs all seven fetches.
  *
  * The resting chrome, in order: masthead, trust strip, asking-price line, the
  * list statement when the ranking makes one (states 23 and 25), column header,

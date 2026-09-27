@@ -11,7 +11,13 @@ export const REFUSAL_TITLE = 'A required file cannot be used.';
 export const REFUSAL_RECOVERY =
   'The page renders again as soon as a valid set is published, and serves nothing old in the meantime.';
 export const FETCH_FAILURE_EYEBROW = 'THE PAGE COULD NOT LOAD ITS DATA';
-export const FETCH_FAILURE_TITLE = 'One of the eight files did not arrive.';
+/**
+ * No count, so a change to the AD-24 set needs no copy sweep; not "required",
+ * because a tolerable file's 5xx shows this screen too (user decision
+ * 2026-09-27). DESIGN.md `fetch-failure-screen.titleText` still reads
+ * `A required file did not arrive.` until UX reconciles it (deferred-work.md).
+ */
+export const FETCH_FAILURE_TITLE = 'One of the data files did not arrive.';
 export const FETCH_FAILURE_RECOVERY =
   'The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.';
 export const TRY_AGAIN = `${glyphs.open} Try again`;

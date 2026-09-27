@@ -5,6 +5,7 @@ import { useDebouncedCallback } from '@mantine/hooks';
 import { useId, useRef, useState, type JSX } from 'react';
 
 import { formatThreshold } from '../shared/money';
+import { DENOMINATION } from '../shared/product';
 import { colors, px, spacing, typeStyle } from '../theme/tokens';
 import {
   clampThreshold,
@@ -15,9 +16,10 @@ import {
 } from './threshold-storage';
 
 export const THRESHOLD_LABEL = 'Payout Threshold';
-export const THRESHOLD_UNIT = ' Divine';
-export const RANGE_LOW = `${String(THRESHOLD_MIN)} Divine`;
-export const RANGE_HIGH = `${String(THRESHOLD_MAX)} Divine`;
+/** A no-break space joins the figure and the unit. */
+export const THRESHOLD_UNIT = `\u00a0${DENOMINATION}`;
+export const RANGE_LOW = `${String(THRESHOLD_MIN)} ${DENOMINATION}`;
+export const RANGE_HIGH = `${String(THRESHOLD_MAX)} ${DENOMINATION}`;
 /** About 150ms between a valid parse and the re-rank (UX-DR18). */
 export const COMMIT_DEBOUNCE_MS = 150;
 

@@ -1,5 +1,4 @@
 import {
-  CatalogueStaticFileSchema,
   CatalogueStatsFileSchema,
   ConfigFileSchema,
   DatasetFileSchema,
@@ -13,9 +12,10 @@ import {
 import type { parseEnvelope } from '@poe/contracts';
 
 /**
- * The eight artifacts `web` fetches (AD-24), in AD-24 order. A ninth needs an
- * AD amendment. `required` artifacts refuse the render when absent, exactly as
- * when invalid; `tolerable` ones let the page render and name the absence.
+ * The seven artifacts `web` fetches (AD-24), in AD-24 order. An eighth needs
+ * an AD-24 amendment. `web` never fetches `catalogue/static.json`. `required`
+ * artifacts refuse the render when absent, exactly as when invalid;
+ * `tolerable` ones let the page render and name the absence.
  */
 
 /** The weights contract major the page reads (WEIGHTS-FILE-SCHEMA.md); only the major is compared. */
@@ -52,7 +52,6 @@ export const ARTIFACTS = {
   tracked: artifact('tracked.json', 'required', TrackedFileSchema, SUPPORTED_SCHEMA_VERSION),
   config: artifact('config.json', 'required', ConfigFileSchema, SUPPORTED_SCHEMA_VERSION),
   catalogueStats: artifact('catalogue/stats.json', 'required', CatalogueStatsFileSchema, SUPPORTED_SCHEMA_VERSION),
-  catalogueStatic: artifact('catalogue/static.json', 'required', CatalogueStaticFileSchema, SUPPORTED_SCHEMA_VERSION),
 } as const;
 
 export type ArtifactKey = keyof typeof ARTIFACTS;
@@ -66,7 +65,6 @@ export const ARTIFACT_ORDER = [
   'tracked',
   'config',
   'catalogueStats',
-  'catalogueStatic',
 ] as const satisfies readonly ArtifactKey[];
 
 /** A schema's parsed type — what `z.infer` reads — without a direct `zod` import. */

@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 
+import { DENOMINATION } from '../shared/product';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { PayoutThreshold } from '../threshold/PayoutThreshold';
 
@@ -9,8 +10,7 @@ import { PayoutThreshold } from '../threshold/PayoutThreshold';
  * the dek says so. Epic 3 rewrites it when it ranks crafted rows.
  */
 export const MASTHEAD_TITLE = 'What is worth picking up';
-export const MASTHEAD_DEK =
-  'The Base Types worth selling raw, ranked by price. Crafted Item Classes are not ranked yet. Every figure is in Divine.';
+export const MASTHEAD_DEK = `The Base Types worth selling raw, ranked by price. Crafted Item Classes are not ranked yet. Every figure is in ${DENOMINATION}.`;
 
 export function eyebrowText(league: string): string {
   return `League ${league}`;

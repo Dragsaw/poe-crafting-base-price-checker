@@ -1,6 +1,7 @@
 import type { CSSProperties, JSX } from 'react';
 
 import { fixedCell } from '../shared/cell';
+import { DENOMINATION } from '../shared/product';
 import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/tokens';
 
 type ColumnName = (typeof rankedRowColumns)[number]['name'];
@@ -13,7 +14,7 @@ type ColumnName = (typeof rankedRowColumns)[number]['name'];
 export const COLUMN_LABELS: Readonly<Record<ColumnName, string>> = {
   rank: '',
   unit: 'Item Class / Base Type',
-  ev: 'EV (Divine)',
+  ev: `EV (${DENOMINATION})`,
   provenance: 'Provenance',
   age: 'Age',
   chase: 'Chase Combinations, by contribution to EV',

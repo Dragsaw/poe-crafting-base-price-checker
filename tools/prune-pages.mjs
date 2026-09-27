@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// Trims the Pages copy of `data/` to the eight AD-24 artifacts.
+// Trims the Pages copy of `data/` to the seven AD-24 artifacts.
 //
 // `vite build` copies all of `data/` into `packages/web/dist` (it is the web
 // package's `publicDir`), including files the page never fetches:
-// `sync-progress.json`, `currencies.json`, `catalogue/items.json` and
-// `catalogue/filters.json`. This step deletes every file that came from `data/`
-// and is not on the allowlist, then removes any directory that leaves empty.
+// `sync-progress.json`, `currencies.json`, `catalogue/items.json`,
+// `catalogue/filters.json` and `catalogue/static.json`. This step deletes
+// every file that came from `data/` and is not on the allowlist, then removes
+// any directory that leaves empty.
 // It touches nothing the bundle emitted (`index.html`, `assets/`).
 //
 // A required artifact missing from `dist` fails the build loudly. The three
@@ -17,7 +18,7 @@
 import { existsSync, readdirSync, rmdirSync, rmSync, statSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 
-/** The eight artifacts, by published path, in AD-24 order. */
+/** The seven artifacts, by published path, in AD-24 order. */
 export const ALLOWLIST = [
   { path: 'dataset.json', required: true },
   { path: 'sync-report.json', required: false },
@@ -26,7 +27,6 @@ export const ALLOWLIST = [
   { path: 'tracked.json', required: true },
   { path: 'config.json', required: true },
   { path: 'catalogue/stats.json', required: true },
-  { path: 'catalogue/static.json', required: true },
 ];
 
 /** Every file under `dir`, as a `/`-separated path relative to `dir`. */

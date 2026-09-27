@@ -2,6 +2,7 @@ import type { SetupServerApi } from 'msw/node';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
+  NEVER_FETCHED_PATH,
   sharedServer,
   serveArtifacts,
   TEST_LEAGUE,
@@ -17,8 +18,8 @@ beforeAll(async () => {
   server = await sharedServer();
 });
 
-describe('the eight artifacts', () => {
-  it('lists AD-24’s eight paths in AD-24 order, five required and three tolerable', () => {
+describe('the seven artifacts', () => {
+  it('lists AD-24’s seven paths in AD-24 order, four required and three tolerable', () => {
     expect(ARTIFACT_ORDER.map((key) => ARTIFACTS[key].path)).toEqual([
       'dataset.json',
       'sync-report.json',
@@ -27,7 +28,6 @@ describe('the eight artifacts', () => {
       'tracked.json',
       'config.json',
       'catalogue/stats.json',
-      'catalogue/static.json',
     ]);
     const tolerable = ARTIFACT_ORDER.filter((key) => ARTIFACTS[key].class === 'tolerable');
     expect(tolerable.map((key) => ARTIFACTS[key].path)).toEqual([
@@ -44,20 +44,22 @@ describe('the eight artifacts', () => {
 });
 
 describe('loadArtifacts', () => {
-  it('sends exactly eight requests, one per path, each no-store with no query string', async () => {
+  it('sends exactly seven requests, one per path, each no-cache with no query string', async () => {
     const requests = serveArtifacts(server);
     await loadArtifacts({ baseUrl: '/' });
-    expect(requests).toHaveLength(8);
+    expect(requests).toHaveLength(7);
+    // The server publishes `catalogue/static.json` as a trap; the page never fetches it.
+    expect(requests.map((request) => request.url.pathname)).not.toContain(`/${NEVER_FETCHED_PATH}`);
     expect(requests.map((request) => request.url.pathname).sort()).toEqual(
       ARTIFACT_ORDER.map((key) => `/${ARTIFACTS[key].path}`).sort(),
     );
     for (const request of requests) {
-      expect(request.cache).toBe('no-store');
+      expect(request.cache).toBe('no-cache');
       expect(request.url.search).toBe('');
     }
   });
 
-  // Matrix: all eight valid.
+  // Matrix: all seven valid.
   it('resolves a whole valid set as ready, with no absence', async () => {
     serveArtifacts(server);
     const outcome = await loadArtifacts({ baseUrl: '/' });
@@ -190,9 +192,9 @@ describe('loadArtifacts', () => {
   it('lets a fetch failure win over an invalid artifact', async () => {
     serveArtifacts(server, {
       dataset: { kind: 'json', body: { schemaVersion: '9.0.0' } },
-      catalogueStatic: { kind: 'status', status: 500 },
+      catalogueStats: { kind: 'status', status: 500 },
     });
-    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({ kind: 'failed', path: 'catalogue/static.json' });
+    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({ kind: 'failed', path: 'catalogue/stats.json' });
   });
 
   it('names the first failing artifact in AD-24 order when several fail alike', async () => {

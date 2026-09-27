@@ -1,9 +1,10 @@
 /**
- * Test scaffolding for the eight AD-24 artifacts. Never imported by the app.
+ * Test scaffolding for the seven AD-24 artifacts. Never imported by the app.
  *
- * Every web fetch test registers all eight handlers: loopback URLs pass through
- * the shared MSW guard unhandled, so a missing handler would reach a real
- * socket rather than fail loudly.
+ * Every web fetch test registers all seven handlers, plus a trap for a path
+ * the page never fetches: loopback URLs pass through the shared MSW guard
+ * unhandled, so a missing handler would reach a real socket rather than fail
+ * loudly.
  */
 
 import { http, HttpResponse } from 'msw';
@@ -26,6 +27,12 @@ export async function sharedServer(): Promise<SetupServerApi> {
 }
 
 export const TEST_LEAGUE = 'Forbidden Rites';
+
+/**
+ * A file the site publishes that `web` never fetches (AD-24). `serveArtifacts`
+ * serves it as a trap, so a request to it lands in the log and a test fails on it.
+ */
+export const NEVER_FETCHED_PATH = 'catalogue/static.json';
 
 /** A minimal valid body for each artifact. */
 export const VALID_BODIES: Readonly<Record<ArtifactKey, unknown>> = {
@@ -56,7 +63,6 @@ export const VALID_BODIES: Readonly<Record<ArtifactKey, unknown>> = {
   tracked: { schemaVersion: '1.0.0', entries: [] },
   config: { schemaVersion: '1.0.0', league: TEST_LEAGUE, minChunkSearches: 1 },
   catalogueStats: { schemaVersion: '1.0.0', result: [] },
-  catalogueStatic: { schemaVersion: '1.0.0', result: [] },
 };
 
 /** How one artifact answers. Anything not overridden answers 200 with its valid body. */
@@ -92,8 +98,9 @@ function respond(answer: ArtifactAnswer): Response | Promise<Response> {
 }
 
 /**
- * Registers a handler for every artifact and returns the log of requests they
- * received. `answers` overrides individual artifacts.
+ * Registers a handler for every artifact, and a trap for `NEVER_FETCHED_PATH`,
+ * and returns the log of requests they received. `answers` overrides
+ * individual artifacts.
  */
 export function serveArtifacts(
   server: SetupServerApi,
@@ -112,6 +119,10 @@ export function serveArtifacts(
         return respond(resolved);
       }),
     ),
+    http.get(artifactUrl('/', NEVER_FETCHED_PATH), ({ request }) => {
+      requests.push({ url: new URL(request.url), cache: request.cache });
+      return respond({ kind: 'json', body: { schemaVersion: '1.0.0', result: [] } });
+    }),
   );
   return requests;
 }

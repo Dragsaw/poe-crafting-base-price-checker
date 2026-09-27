@@ -20,12 +20,14 @@ import {
   TRY_AGAIN,
 } from './frame/FailureScreen';
 import { CONTROL_GROUP_WIDTH, MASTHEAD_DEK, MASTHEAD_TITLE } from './frame/Masthead';
+import { DENOMINATION } from './shared/product';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
 import { ASKING_PRICE_COPY } from './list/AskingPriceLine';
 import { APPENDIX_LEAD } from './list/UnrankableAppendix';
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry, unpriced } from './test-support/list-fixtures';
 import {
   gate,
+  NEVER_FETCHED_PATH,
   serveArtifacts,
   sharedServer,
   TEST_LEAGUE,
@@ -152,31 +154,33 @@ describe('the pending state', () => {
     mount();
     const pending = frame().outerHTML;
 
-    // Seven of the eight arrive, one at a time; the page does not move.
-    for (const key of ARTIFACT_ORDER.slice(0, 7)) {
+    // Six of the seven arrive, one at a time; the page does not move.
+    for (const key of ARTIFACT_ORDER.slice(0, 6)) {
       gates.get(key)?.open();
       await flush();
       expect(container?.innerHTML).toContain(pending);
       expect(frame().outerHTML).toBe(pending);
     }
 
-    gates.get('catalogueStatic')?.open();
+    gates.get('catalogueStats')?.open();
     await settleTo('ready');
     expect(frame().querySelectorAll('[data-row-slot]')).toHaveLength(0);
   });
 });
 
 describe('the outcomes', () => {
-  // Matrix: all eight valid.
-  it('shows ready with the league in the eyebrow when all eight are valid', async () => {
+  // Matrix: all seven valid.
+  it('shows ready with the league in the eyebrow when all seven are valid', async () => {
     const requests = serveArtifacts(server);
     mount();
     await settleTo('ready');
     expect(frame().textContent).toContain(`League ${TEST_LEAGUE}`);
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
+    // The server publishes `catalogue/static.json` as a trap; the page never fetches it.
+    expect(requests.map((request) => request.url.pathname)).not.toContain(`/${NEVER_FETCHED_PATH}`);
     for (const request of requests) {
-      expect(request.cache).toBe('no-store');
+      expect(request.cache).toBe('no-cache');
       expect(request.url.search).toBe('');
     }
   });
@@ -256,12 +260,13 @@ describe('the outcomes', () => {
   });
 
   // Matrix: network error / 5xx, and the retry.
-  it('shows the fetch-failure screen and re-fetches all eight on + Try again', async () => {
+  it('shows the fetch-failure screen and re-fetches all seven on + Try again', async () => {
     const requests = serveArtifacts(server, { catalogueStats: { kind: 'status', status: 503 } });
     mount();
     await settleTo('failed');
     expect(frame().textContent).toContain(FETCH_FAILURE_EYEBROW);
     expect(frame().textContent).toContain(FETCH_FAILURE_TITLE);
+    expect(FETCH_FAILURE_TITLE).toBe('One of the data files did not arrive.');
     expect(frame().querySelector('[data-artifact]')?.textContent).toBe('catalogue/stats.json');
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
 
@@ -482,7 +487,9 @@ describe('the copy', () => {
     });
     expect(Object.keys(sources).length).toBeGreaterThan(10);
     for (const [path, text] of Object.entries(sources)) {
-      const scanned = text.replaceAll(MASTHEAD_TITLE, '').replaceAll(MASTHEAD_DEK, '');
+      // The dek is a template in source: strip its source spelling, with the `DENOMINATION` placeholder.
+      const dekSource = MASTHEAD_DEK.replace(DENOMINATION, '${DENOMINATION}');
+      const scanned = text.replaceAll(MASTHEAD_TITLE, '').replaceAll(dekSource, '');
       expect(scanned, path).not.toMatch(/sells for|worth|market value/i);
     }
   });

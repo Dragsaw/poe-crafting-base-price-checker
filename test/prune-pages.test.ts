@@ -49,13 +49,20 @@ function filesUnder(dir: string): string[] {
   return out.sort();
 }
 
-const EIGHT: string[] = ALLOWLIST.map((entry: { readonly path: string }) => entry.path);
-const UNFETCHED = ['sync-progress.json', 'currencies.json', 'catalogue/items.json', 'catalogue/filters.json'];
+const SEVEN: string[] = ALLOWLIST.map((entry: { readonly path: string }) => entry.path);
+const UNFETCHED = [
+  'sync-progress.json',
+  'currencies.json',
+  'catalogue/items.json',
+  'catalogue/filters.json',
+  'catalogue/static.json',
+];
 const BUNDLE = ['index.html', 'assets/index-abc123.js', 'assets/index-abc123.css'];
 
 describe('the allowlist', () => {
-  it('holds eight paths, five required and three tolerable', () => {
-    expect(EIGHT).toHaveLength(8);
+  it('holds seven paths, four required and three tolerable, and never catalogue/static.json', () => {
+    expect(SEVEN).toHaveLength(7);
+    expect(SEVEN).not.toContain('catalogue/static.json');
     expect(ALLOWLIST.filter((entry: { readonly required: boolean }) => !entry.required).map((entry: { readonly path: string }) => entry.path)).toEqual(
       ['sync-report.json', 'weights.json', 'recipes.json'],
     );
@@ -63,33 +70,33 @@ describe('the allowlist', () => {
 });
 
 describe('prunePages', () => {
-  it('keeps the bundle and the eight artifacts, and deletes every other data/ file', () => {
-    const data = tree([...EIGHT, ...UNFETCHED]);
-    const dist = tree([...BUNDLE, ...EIGHT, ...UNFETCHED]);
+  it('keeps the bundle and the seven artifacts, and deletes every other data/ file', () => {
+    const data = tree([...SEVEN, ...UNFETCHED]);
+    const dist = tree([...BUNDLE, ...SEVEN, ...UNFETCHED]);
     const result = prunePages(dist, data);
-    expect(filesUnder(dist)).toEqual([...BUNDLE, ...EIGHT].sort());
+    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].sort());
     expect(result.removed.sort()).toEqual([...UNFETCHED].sort());
-    expect(result.kept).toEqual(EIGHT);
+    expect(result.kept).toEqual(SEVEN);
   });
 
   it('removes a directory the prune leaves empty', () => {
-    const data = tree([...EIGHT, 'extra/deep/file.json']);
-    const dist = tree([...BUNDLE, ...EIGHT, 'extra/deep/file.json']);
+    const data = tree([...SEVEN, 'extra/deep/file.json']);
+    const dist = tree([...BUNDLE, ...SEVEN, 'extra/deep/file.json']);
     prunePages(dist, data);
-    expect(readdirSync(dist).sort()).toEqual(['assets', 'catalogue', 'index.html', ...EIGHT.filter((p) => !p.includes('/'))].sort());
+    expect(readdirSync(dist).sort()).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].sort());
   });
 
   it('tolerates the three absent-tolerable artifacts being missing', () => {
-    const present = EIGHT.filter((path) => !['sync-report.json', 'weights.json', 'recipes.json'].includes(path));
+    const present = SEVEN.filter((path) => !['sync-report.json', 'weights.json', 'recipes.json'].includes(path));
     const data = tree(present);
     const dist = tree([...BUNDLE, ...present]);
     expect(prunePages(dist, data).kept).toEqual(present);
   });
 
-  it.each(['dataset.json', 'tracked.json', 'config.json', 'catalogue/stats.json', 'catalogue/static.json'])(
+  it.each(['dataset.json', 'tracked.json', 'config.json', 'catalogue/stats.json'])(
     'fails loudly, naming it, when required %s is missing',
     (missing) => {
-      const present = EIGHT.filter((path) => path !== missing);
+      const present = SEVEN.filter((path) => path !== missing);
       const data = tree(present);
       const dist = tree([...BUNDLE, ...present]);
       expect(() => prunePages(dist, data)).toThrow(missing);
@@ -97,7 +104,7 @@ describe('prunePages', () => {
   );
 
   it('fails when there is no build output', () => {
-    const data = tree(EIGHT);
+    const data = tree(SEVEN);
     expect(() => prunePages(join(data, 'no-such-dist'), data)).toThrow(/no build output/);
   });
 });
@@ -120,14 +127,14 @@ describe('the CLI and the build script', () => {
   }
 
   it('prunes packages/web/dist when run directly', () => {
-    const { script, dist } = repo([...EIGHT, 'sync-progress.json']);
+    const { script, dist } = repo([...SEVEN, 'sync-progress.json']);
     execFileSync(process.execPath, [script], { stdio: 'pipe' });
     expect(existsSync(join(dist, 'sync-progress.json'))).toBe(false);
-    expect(filesUnder(dist)).toEqual([...BUNDLE, ...EIGHT].sort());
+    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].sort());
   });
 
   it('exits non-zero when a required artifact is missing', () => {
-    const { script } = repo([...EIGHT.filter((path) => path !== 'tracked.json'), 'sync-progress.json']);
+    const { script } = repo([...SEVEN.filter((path) => path !== 'tracked.json'), 'sync-progress.json']);
     expect(() => execFileSync(process.execPath, [script], { stdio: 'pipe' })).toThrow(/tracked\.json/);
   });
 

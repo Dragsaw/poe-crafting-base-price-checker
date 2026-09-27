@@ -18,7 +18,7 @@ it('binds one explicit port and fails rather than moving', () => {
 });
 
 /**
- * The eight AD-24 artifacts are copied static files, never bundle contents
+ * The seven AD-24 artifacts are copied static files, never bundle contents
  * (AD-24). `publicDir` is what serves and copies them, and `base: './'` keeps
  * every URL relative so the built site works under any Pages path.
  */

@@ -1,6 +1,7 @@
 import type { NotYetSyncedReason } from '@poe/contracts';
 
 import { formatDivine, formatThreshold } from '../shared/money';
+import { DENOMINATION } from '../shared/product';
 import { plural } from '../shared/text';
 import { exactAge, HOUR_MS } from '../shared/time';
 import { glyphs } from '../theme/tokens';
@@ -198,7 +199,7 @@ export function rawPanelSubLine(itemLevelMin: number, threshold: number): string
   return [
     `Uncrafted at Item Level ${String(itemLevelMin)}, valued at its own current asking price and not at a craft outcome.`,
     'One Combination is tracked here: the degenerate Combination of no affixes.',
-    `Payout Threshold ${formatThreshold(threshold)} Divine.`,
+    `Payout Threshold ${formatThreshold(threshold)} ${DENOMINATION}.`,
     PANEL_ASKING_SENTENCE,
   ].join(' ');
 }

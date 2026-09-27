@@ -9,10 +9,13 @@ import {
 } from './artifacts';
 
 /**
- * One load of the eight artifacts, resolved to exactly one outcome (AD-24,
- * FR-33). Each artifact is one plain `fetch` with `cache: 'no-store'` and no
- * query token (decision 2026-09-26): the Pages CDN's `max-age=600` staleness is
- * accepted. The loader never rejects — every failure is a typed outcome.
+ * One load of the seven artifacts, resolved to exactly one outcome (AD-24,
+ * FR-33). Each artifact is one plain `fetch` with `cache: 'no-cache'` and no
+ * query token: the browser revalidates every load and reuses its copy only on
+ * a `304`, so each load is as fresh as a full download. The Pages CDN's
+ * `max-age=600` staleness, and a rare set that mixes files across a data
+ * commit, are accepted costs (AD-24). The loader never rejects — every failure
+ * is a typed outcome.
  */
 
 /**
@@ -45,7 +48,7 @@ export type LoadOutcome =
     }
   | { readonly kind: 'failed'; readonly path: string };
 
-/** One artifact's result, before precedence across the eight is applied. */
+/** One artifact's result, before precedence across the seven is applied. */
 type Fetched =
   | { readonly kind: 'valid'; readonly value: unknown }
   | { readonly kind: 'absent' }
@@ -85,7 +88,7 @@ async function fetchOne(
   signal: AbortSignal | undefined,
 ): Promise<Fetched> {
   const descriptor = ARTIFACTS[key];
-  const init: RequestInit = signal === undefined ? { cache: 'no-store' } : { cache: 'no-store', signal };
+  const init: RequestInit = signal === undefined ? { cache: 'no-cache' } : { cache: 'no-cache', signal };
   let body: string;
   try {
     const response = await fetchImpl(artifactUrl(baseUrl, descriptor.path), init);
@@ -131,7 +134,7 @@ async function fetchOne(
 }
 
 /**
- * Precedence across the eight: any artifact that did not arrive gives the
+ * Precedence across the seven: any artifact that did not arrive gives the
  * fetch-failure screen; otherwise any invalid (or required-and-absent)
  * artifact gives the refusal screen; otherwise the set is ready. Each screen
  * names the first failing artifact in AD-24 order. A refusal carries its
