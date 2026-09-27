@@ -75,6 +75,18 @@ deferred:
 
 ## Spec Change Log
 
+### 2026-09-27 — sentinel replaced by declared: null
+
+- Commit `8a47e24` replaced the `NO_DECLARED_VERSION = 'none'` sentinel with `declared: string | null` in `Fetched.invalid` and the `refused` outcome of `LoadOutcome`, and in `FailureScreenProps`. `declaredVersion` returns `null` where the file declares no string version. A declared string, `"none"` included, is kept as declared.
+- The loader now splits a `reason: 'invalid'` result with `declared === null`: `null` gives `cause: 'version'`, and a string gives `cause: 'content'`.
+- These passages describe the superseded design. They stay as written, and this entry is the record of the change:
+  - The Code Map `load-artifacts.ts` predicate "Split these with `declaredVersion(data) === NO_DECLARED_VERSION`".
+  - The sentinel `reject` rows of the first triage pass (the verification-gap row, the edge-case "Same sentinel collision" row and the blind "Sentinel collision" row) and its blind "loader tests leave gaps" row, which names `"none"`.
+  - The sentinel rows of the second triage pass: the `schemaVersion: "none"` `low` row and the `false` "declares none … non-string one" test-title row.
+  - The Auto Run Result's "sentinel \"none\" (3 rows)".
+- The review of `78db4da..ec38dce` reopened the collision, and `8a47e24` fixed it, so the sentinel reject verdicts above no longer hold for `"none"`. The second pass's rejection of the non-string `schemaVersion` row still stands.
+- Regression tests: `load-artifacts.test.ts` "keeps a declared \"none\" as a declared malformed version" and `App.test.tsx` "refuses dataset.json declaring \"none\" by naming it, not as declaring no version".
+
 ## Review Triage Log
 
 ### 2026-09-27 — Review pass

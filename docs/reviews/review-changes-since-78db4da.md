@@ -10,7 +10,7 @@ Several lenses report the same defect. Most of these defects come from two branc
 
 - **Item 18 × item 20: rust "no figure yet".** All three lenses found this. `display-rows.ts` (item 20) changes every EV phrase in an honest-empty list to "no figure yet". `RankedRow.tsx:108` (item 18) colours the phrase rust when `state === 'unresolvable'`. So an unresolvable row in state 23 shows a waiting phrase in the broken-state colour. No test checks the colour.
 - **Item 18 × EXPERIENCE rev 9: "yet" in an all-unresolvable list.** The adversarial and edge-case lenses found this. The rebase made `isHonestEmpty` count unresolvable rows. `honestEmptyCopy` (`list-statement.ts:17`) still always ends with "yet". Rev 9 rules that this copy drops "yet", and the ledger records the code as owed.
-- **Item 22 `NO_DECLARED_VERSION = 'none'` sentinel.** All three lenses found this.
+- **Item 22 `NO_DECLARED_VERSION = 'none'` sentinel.** All three lenses found this. The declared `"none"` collision is **closed** by `8a47e24`: `declared` is now `string | null`. A non-string `schemaVersion` still reads as no version, as rejected in the item 22 spec's second review pass.
 - **`STATE_NOTES` doc comment still says "until UX rules".** The adversarial and edge-case lenses found this.
 - **`dev:stop` climb and `taskkill` robustness.** The adversarial and edge-case lenses found this.
 
@@ -56,6 +56,7 @@ Several lenses report the same defect. Most of these defects come from two branc
    - Problem: `"schemaVersion": "none"` renders "It declares no schema version". A non-string version such as `1` renders the same sentence.
    - Fix: Carry `declared: string | null`, or a tagged union, through `Fetched`, `LoadOutcome` and `FailureScreenProps`.
    - Consequence: The screen gives the publisher the wrong fix, which is the F10 defect again.
+   - Status: The declared `"none"` collision is **closed** by `8a47e24`. `declared` is now `string | null` through `Fetched`, `LoadOutcome` and `FailureScreenProps`. A non-string `schemaVersion` such as `1` still reads as no version, as rejected in the item 22 spec's second review pass.
 9. **Duplicated test helpers came back after the consolidation**
    - Location: `App.test.tsx:440,771,979`, `trust-strip.test.tsx:51`, `unrankable-appendix.test.tsx:35`, `payout-threshold.test.tsx:35`
    - Problem: Three files still define their own `createRoot` mount. App.test inlines `[data-ranked-row]` three times, and the item 18 branch added line 771 after `rowsIn` existed. App.test grew from 1181 to 1311 lines. Item 22 added a per-cause copy matrix at page level.
@@ -102,7 +103,7 @@ Several lenses report the same defect. Most of these defects come from two branc
    - Problem: When `requestsBySource['league-validation'] === 1`, the fixed text prints "1 league validation requests this pass.".
    - Fix: `text(\` league validation ${plural(n, 'request', 'requests')} this pass.\`)`
    - Consequence: This is the "1 rows" bug class that the consolidation claimed to close. Claim check: 9e5f57b says "Every count-plus-noun goes through plural".
-4. **`schemaVersion: "none"` sentinel** — `load-artifacts.ts:65-73,115-122`, `FailureScreen.tsx:65`. Same as adversarial 8.
+4. **`schemaVersion: "none"` sentinel** — `load-artifacts.ts:65-73,115-122`, `FailureScreen.tsx:65`. Same as adversarial 8. **Closed** by `8a47e24`: `declared` is now `string | null`.
 5. **`taskkill` throws on a PID that is already gone**
    - Location: `tools/dev-stop/dev-stop.ts:155-158,181`
    - Problem: A root exits between the snapshot and the kill, or the first root's `/T` already killed a second root.
@@ -137,6 +138,7 @@ Several lenses report the same defect. Most of these defects come from two branc
    - Location: `FailureScreen.tsx:65`, `load-artifacts.ts:115-122`
    - Gap: The tests cover only `'abc'` (`App.test.tsx:228`, `load-artifacts.test.ts:132`).
    - Fix: Serve `{ ...dataset, schemaVersion: 'none' }` and assert "declares schema version none".
+   - Status: **Closed** by `8a47e24`. `declared` is now `string | null`. Regression tests: `load-artifacts.test.ts` "keeps a declared \"none\" as a declared malformed version" and `App.test.tsx` "refuses dataset.json declaring \"none\" by naming it, not as declaring no version".
 3. **No test runs the self-protection and exit codes of `dev-stop`**
    - Location: `tools/dev-stop/dev-stop.ts:141-153` (`ownAncestry`), `:167-190` (`main`)
    - Gap: regression-gap. The tests import only `DEFAULT_PORT`, `parsePort` and `planStop`, and give `protectedPids` by hand.
