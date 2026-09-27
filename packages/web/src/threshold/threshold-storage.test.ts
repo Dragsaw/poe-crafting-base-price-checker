@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { DEFAULT_THRESHOLD } from '../list/format';
+import { DEFAULT_THRESHOLD } from '../shared/product';
 import {
   clampThreshold,
   readStoredThreshold,

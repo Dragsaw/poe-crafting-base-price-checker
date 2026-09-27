@@ -1,4 +1,4 @@
-import './frame.css';
+import '../shared/affordance.css';
 
 import type { JSX } from 'react';
 

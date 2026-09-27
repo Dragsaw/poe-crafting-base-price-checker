@@ -1,5 +1,6 @@
 import type { CSSProperties, JSX } from 'react';
 
+import { fixedCell } from '../shared/cell';
 import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/tokens';
 
 type ColumnName = (typeof rankedRowColumns)[number]['name'];
@@ -24,11 +25,7 @@ export const RIGHT_ALIGNED: ReadonlySet<ColumnName> = new Set(['rank', 'ev']);
 /** One fixed-width flex cell of the six-column contract, shared by the header, the rows and the skeleton. */
 export function cellStyle(column: (typeof rankedRowColumns)[number]): CSSProperties {
   return {
-    flex: `0 0 ${px(column.width)}`,
-    width: px(column.width),
-    minWidth: 0,
-    boxSizing: 'border-box',
-    paddingRight: px(column.padRight),
+    ...fixedCell(column),
     textAlign: RIGHT_ALIGNED.has(column.name) ? 'right' : undefined,
   };
 }

@@ -1,58 +1,21 @@
-import { rank } from '@poe/core';
 import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
+import { cellIn as cell, mountList, NOW, rgb, rowsIn, unmount } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
-import { toDisplayRows } from './display-rows';
-import { DEFAULT_THRESHOLD, PANEL_ASKING_SENTENCE } from './format';
-import { RankedList } from './RankedList';
+import { PANEL_ASKING_SENTENCE } from './format';
 
-const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 const SEARCH = { id: 'H4sIabc', league: TEST_LEAGUE } as const;
 const HREF = `https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/${SEARCH.id}`;
 
-const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
-
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
-
 afterEach(() => {
-  const mounted = root;
-  if (mounted !== undefined) {
-    act(() => {
-      mounted.unmount();
-    });
-  }
-  root = undefined;
-  container?.remove();
-  container = undefined;
+  unmount();
   vi.restoreAllMocks();
 });
-
-function mountList(
-  tracked: readonly RawTrackedEntry[],
-  dataset: readonly DatasetEntry[],
-  threshold = DEFAULT_THRESHOLD,
-): HTMLDivElement {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), dataset, NOW);
-  container = document.createElement('div');
-  document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
-  act(() => {
-    mounted.render(<RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />);
-  });
-  return container;
-}
-
-function rowsIn(within: HTMLElement): HTMLElement[] {
-  return Array.from(within.querySelectorAll<HTMLElement>('[data-ranked-row]'));
-}
 
 function panelsIn(within: HTMLElement): HTMLElement[] {
   return Array.from(within.querySelectorAll<HTMLElement>('[data-expansion-panel]'));
@@ -62,14 +25,6 @@ function click(target: HTMLElement | null | undefined): void {
   act(() => {
     target?.click();
   });
-}
-
-function cell(within: HTMLElement | undefined, name: string): HTMLElement {
-  const found = within?.querySelector<HTMLElement>(`[data-cell="${name}"]`);
-  if (found === null || found === undefined) {
-    throw new Error(`no ${name} cell`);
-  }
-  return found;
 }
 
 /** Mounts one row, opens it, and returns its only combination row. */
@@ -305,11 +260,7 @@ describe('the Raw Base combination row', () => {
     const ring = { ...rawEntry('Coral Ring'), status: 'pinned' as const };
     const noListings = openOne(ring, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 3)));
     expect(cell(noListings, 'combination').textContent).toBe('* pinned no affixes');
-    act(() => {
-      root?.unmount();
-    });
-    root = undefined;
-    container?.remove();
+    unmount();
 
     const belt = { ...rawEntry('Wide Belt'), status: 'pinned' as const };
     const never = openOne(belt, undefined);

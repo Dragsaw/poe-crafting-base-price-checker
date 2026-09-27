@@ -3,13 +3,10 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { rgb } from '../test-support/dom';
 import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
 import { HAIR_SPACE } from './TrustMark';
 import { APPENDIX_LEAD, appendixCount, UnrankableAppendix } from './UnrankableAppendix';
-
-/** A token hex as the `rgb(...)` jsdom reports for an inline colour. */
-const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
 
 const REASON = 'class absent from weights file';
 

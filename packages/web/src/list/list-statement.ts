@@ -1,5 +1,7 @@
 import type { Ranking } from '@poe/core';
 
+import { formatThreshold } from '../shared/money';
+
 /**
  * The one statement the list makes about itself, above the column header
  * (EXPERIENCE.md states 23 and 25). The two are mutually exclusive, so one
@@ -17,7 +19,7 @@ export function honestEmptyCopy(league: string): string {
 
 /** State 25's copy (Story 2.7 decision, 2026-09-27): the live threshold at the page's 2dp. */
 export function nothingClearsCopy(threshold: number): string {
-  return `Nothing clears your Payout Threshold of ${threshold.toFixed(2)} Divine.`;
+  return `Nothing clears your Payout Threshold of ${formatThreshold(threshold)} Divine.`;
 }
 
 /**

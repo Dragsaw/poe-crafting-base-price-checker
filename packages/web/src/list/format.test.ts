@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { NOW } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import {
   ageMark,
   combinationAges,
   combinationFigure,
-  DEFAULT_THRESHOLD,
-  exactAge,
-  formatDivine,
   FRESHNESS_CUTOFF_HOURS,
   MONEY_PHRASES,
   PANEL_ASKING_SENTENCE,
@@ -19,19 +17,15 @@ import {
   sampleText,
   STATE_NOTES,
   stateWord,
-  TOP_ROWS,
   unitLabel,
   type CombinationState,
 } from './format';
 
-const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 const BELT = rawEntry('Wide Belt');
 
 describe('the view constants', () => {
-  it('cuts freshness at 48h, shows the top 20 and starts at 0.25 Divine', () => {
+  it('cuts freshness at 48h', () => {
     expect(FRESHNESS_CUTOFF_HOURS).toBe(48);
-    expect(TOP_ROWS).toBe(20);
-    expect(DEFAULT_THRESHOLD).toBe(0.25);
   });
 
   it('holds the five money-slot phrases, none of them number-shaped', () => {
@@ -45,21 +39,6 @@ describe('the view constants', () => {
     for (const phrase of Object.values(MONEY_PHRASES)) {
       expect(phrase).not.toMatch(/\d|—|-/);
     }
-  });
-});
-
-describe('formatDivine', () => {
-  it('prints 2dp', () => {
-    expect(formatDivine(0.5)).toBe('0.50');
-    expect(formatDivine(1)).toBe('1.00');
-    expect(formatDivine(2.4249)).toBe('2.42');
-    expect(formatDivine(0.005)).toBe('0.01');
-  });
-
-  it('prints a present figure too small for 2dp as < 0.01, never 0.00', () => {
-    expect(formatDivine(0.0031)).toBe('< 0.01');
-    expect(formatDivine(0.0049)).toBe('< 0.01');
-    expect(formatDivine(0.0001)).toBe('< 0.01');
   });
 });
 
@@ -125,17 +104,6 @@ describe('the expansion copy', () => {
   const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
   const NO_RATE: CombinationState = { state: 'not-yet-synced', reason: 'no-exchange-rate' };
   const UNRESOLVABLE: CombinationState = { state: 'unresolvable' };
-
-  it('prints exact ages with no 48h cut-off: < 1h, whole hours under a day, then whole days', () => {
-    expect(exactAge(hoursBefore(NOW, 0), NOW)).toBe('< 1h');
-    expect(exactAge(hoursBefore(NOW, 0.99), NOW)).toBe('< 1h');
-    expect(exactAge(hoursBefore(NOW, -2), NOW)).toBe('< 1h');
-    expect(exactAge(hoursBefore(NOW, 1), NOW)).toBe('1h');
-    expect(exactAge(hoursBefore(NOW, 11.5), NOW)).toBe('11h');
-    expect(exactAge(hoursBefore(NOW, 23.99), NOW)).toBe('23h');
-    expect(exactAge(hoursBefore(NOW, 24), NOW)).toBe('1d');
-    expect(exactAge(hoursBefore(NOW, 5 * 24 + 23), NOW)).toBe('5d');
-  });
 
   it('labels both clocks, shows priced only on a priced row, and leaves a missing clock empty', () => {
     expect(combinationAges(PRICED, hoursBefore(NOW, 3), NOW)).toEqual({ observed: 'priced 11h ago', attempted: 'tried 3h ago' });

@@ -1,6 +1,8 @@
-import type { CSSProperties, JSX } from 'react';
+import type { JSX } from 'react';
 
 import { TradeGlyph } from '../frame/TradeGlyph';
+import { fixedCell } from '../shared/cell';
+import { NBSP } from '../shared/text';
 import {
   colors,
   combinationLine1Columns,
@@ -42,18 +44,6 @@ export interface Combination {
 const [combination, state, figure, sample, tradeLink] = combinationLine1Columns;
 const [note, observed, attempted] = combinationLine2Columns;
 
-function cell(column: { readonly width: number; readonly padRight: number }): CSSProperties {
-  return {
-    flex: '0 0 auto',
-    width: px(column.width),
-    paddingRight: column.padRight === 0 ? undefined : px(column.padRight),
-    boxSizing: 'border-box',
-  };
-}
-
-/** A no-break space: a Price State glyph never parts from its word (mockup `.ps-*::before`). */
-const NBSP = '\u00a0';
-
 /**
  * `{components.combination-row}`: two lines under one hairline, each summing
  * to 966px. Line one — the figure — is the Combination, the Price State glyph
@@ -91,7 +81,7 @@ export function CombinationRow({
           color: colors.ink,
         }}
       >
-        <div data-cell="combination" style={cell(combination)}>
+        <div data-cell="combination" style={fixedCell(combination)}>
           {row.pinned ? (
             <>
               <span data-curation-pinned="" style={{ fontWeight: 600, fontStyle: 'normal', color: colors['ink-tertiary'] }}>
@@ -101,7 +91,7 @@ export function CombinationRow({
           ) : null}
           {row.text}
         </div>
-        <div data-cell="state" style={{ ...cell(state), ...typeStyle('detail-meta') }}>
+        <div data-cell="state" style={{ ...fixedCell(state), ...typeStyle('detail-meta') }}>
           <span
             data-state-glyph=""
             aria-hidden="true"
@@ -112,7 +102,7 @@ export function CombinationRow({
           </span>
           <span data-state-word="">{stateWord(row.state)}</span>
         </div>
-        <div data-cell="figure" style={{ ...cell(figure), textAlign: 'right' }}>
+        <div data-cell="figure" style={{ ...fixedCell(figure), textAlign: 'right' }}>
           {shown.kind === 'figure' ? (
             <span data-figure="" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {shown.text}
@@ -130,13 +120,13 @@ export function CombinationRow({
             </span>
           )}
         </div>
-        <div data-cell="sample" style={{ ...cell(sample), ...typeStyle('detail-meta'), color: colors['ink-secondary'] }}>
+        <div data-cell="sample" style={{ ...fixedCell(sample), ...typeStyle('detail-meta'), color: colors['ink-secondary'] }}>
           {sampleText(row.state)}
         </div>
         <div
           data-cell="trade-link"
           // The glyph alone is the click target; the cell only places it.
-          style={{ ...cell(tradeLink), ...typeStyle('detail-meta'), textAlign: 'right' }}
+          style={{ ...fixedCell(tradeLink), ...typeStyle('detail-meta'), textAlign: 'right' }}
         >
           {row.tradeHref === undefined ? null : <TradeGlyph href={row.tradeHref} label={row.tradeLabel} />}
         </div>
@@ -153,13 +143,13 @@ export function CombinationRow({
           color: colors['ink-tertiary'],
         }}
       >
-        <div data-cell="note" style={{ ...cell(note), fontStyle: 'italic' }}>
+        <div data-cell="note" style={{ ...fixedCell(note), fontStyle: 'italic' }}>
           {row.note}
         </div>
-        <div data-cell="observed" style={cell(observed)}>
+        <div data-cell="observed" style={fixedCell(observed)}>
           {row.ages.observed ?? null}
         </div>
-        <div data-cell="attempted" style={cell(attempted)}>
+        <div data-cell="attempted" style={fixedCell(attempted)}>
           {row.ages.attempted ?? null}
         </div>
       </div>

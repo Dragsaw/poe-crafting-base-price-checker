@@ -3,15 +3,18 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ArtifactSet, Parsed, TolerableKey } from '../load/artifacts';
+import { NBSP } from '../shared/text';
 import { VALID_BODIES } from '../test-support/artifact-server';
+import { rgb } from '../test-support/dom';
 import { colors, px, spacing } from '../theme/tokens';
 import { absenceLine } from './AbsenceLines';
-import { AFFORDANCE_CLOSED, AFFORDANCE_OPEN, NBSP, PANEL_HEADINGS } from './trust-facts';
+import { AFFORDANCE_CLOSED, AFFORDANCE_OPEN, PANEL_HEADINGS } from './trust-facts';
 import { TrustStrip } from './TrustStrip';
 
 type SyncReport = Parsed<'syncReport'>;
 
-const NOW = Date.parse('2026-09-26T21:32:00.000Z');
+/** Not the shared `NOW`: this clock mirrors the committed report's run, so Last synced reads the committed copy. */
+const REPORT_CLOCK = Date.parse('2026-09-26T21:32:00.000Z');
 const BASE_SET = VALID_BODIES as unknown as ArtifactSet;
 const COMMITTED_REPORT: SyncReport = {
   schemaVersion: '1.1.0',
@@ -24,9 +27,6 @@ const COMMITTED_REPORT: SyncReport = {
   },
   records: [],
 };
-
-const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
 
 let container: HTMLDivElement | undefined;
 let root: Root | undefined;
@@ -51,7 +51,7 @@ function mountStrip(overrides: Partial<ArtifactSet> = {}, absent: readonly Toler
   const mounted = createRoot(container);
   root = mounted;
   act(() => {
-    mounted.render(<TrustStrip set={set} absent={absent} now={NOW} />);
+    mounted.render(<TrustStrip set={set} absent={absent} now={REPORT_CLOCK} />);
   });
   return container;
 }

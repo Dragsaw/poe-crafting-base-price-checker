@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Parsed } from '../load/artifacts';
 import { VALID_BODIES } from '../test-support/artifact-server';
+import { NOW } from '../test-support/dom';
 import {
   AFFORDANCE_CLOSED,
   AFFORDANCE_OPEN,
@@ -10,11 +11,11 @@ import {
   lastSynced,
   NOT_MEASURED,
   panelColumns,
-  relativeAge,
   trackedListEdit,
   UNKNOWN,
   utcDate,
   weightsFacts,
+  type FigureGroup,
 } from './trust-facts';
 
 type SyncReport = Parsed<'syncReport'>;
@@ -22,8 +23,6 @@ type Weights = Parsed<'weights'>;
 
 const WEIGHTS = VALID_BODIES.weights as Weights;
 const BASE_REPORT = VALID_BODIES.syncReport as SyncReport;
-const NOW = Date.parse('2026-09-26T15:00:00.000Z');
-const MINUTE = 60_000;
 
 function report(overrides: Partial<SyncReport> = {}, figures: Partial<SyncReport['figures']> = {}): SyncReport {
   return { ...BASE_REPORT, ...overrides, figures: { ...BASE_REPORT.figures, ...figures } };
@@ -84,26 +83,13 @@ describe('line two', () => {
   });
 
   it('reads Last synced from runFinishedAt, else runStartedAt, and unknown with no report', () => {
-    const at = (iso: string) => Date.parse(iso);
-    expect(lastSynced(report({ runStartedAt: '2026-09-26T13:00:00Z', runFinishedAt: '2026-09-26T14:19:00Z' }), NOW)).toBe(
+    expect(lastSynced(report({ runStartedAt: '2026-09-26T10:00:00Z', runFinishedAt: '2026-09-26T11:19:00Z' }), NOW)).toBe(
       '41 minutes ago',
     );
-    const started = report({ runStartedAt: '2026-09-26T13:00:00Z' });
+    const started = report({ runStartedAt: '2026-09-26T10:00:00Z' });
     delete started.runFinishedAt;
     expect(lastSynced(started, NOW)).toBe('2 hours ago');
-    expect(lastSynced(null, at('2026-09-26T15:00:00Z'))).toBeUndefined();
-  });
-
-  it('steps the relative age through minutes, hours and days, singular at one', () => {
-    expect(relativeAge(0)).toBe('< 1 minute ago');
-    expect(relativeAge(59_999)).toBe('< 1 minute ago');
-    expect(relativeAge(-5 * MINUTE)).toBe('< 1 minute ago');
-    expect(relativeAge(MINUTE)).toBe('1 minute ago');
-    expect(relativeAge(59 * MINUTE)).toBe('59 minutes ago');
-    expect(relativeAge(60 * MINUTE)).toBe('1 hour ago');
-    expect(relativeAge(23 * 60 * MINUTE + 59 * MINUTE)).toBe('23 hours ago');
-    expect(relativeAge(24 * 60 * MINUTE)).toBe('1 day ago');
-    expect(relativeAge(9 * 24 * 60 * MINUTE)).toBe('9 days ago');
+    expect(lastSynced(null, NOW)).toBeUndefined();
   });
 });
 
@@ -141,9 +127,38 @@ describe('the panel copy', () => {
     ]);
     expect(broken.map(groupText)).toEqual([
       '12 entries are unresolvable.',
-      '1 pinned-starvation records.\n2 of 5 pinned entries refreshed',
+      '1 pinned-starvation record.\n2 of 5 pinned entries refreshed',
     ]);
     expect(cover.map(groupText)).toEqual(['86% of 29 tracked Item Classes.']);
+  });
+
+  // Matrix: one not reached, one unresolvable, one starvation record; zero and many unchanged.
+  it('agrees each count with its noun and verb: singular at one, plural at zero and many', () => {
+    const first = (group: FigureGroup): string => groupText(group).split('\n')[0] ?? '';
+
+    const [oneRun, oneBroken] = panelColumns(report({ records: [...unresolvable(1), starvation] }, { notReachedCount: 1 }), true);
+    expect(oneRun.map(first)[1]).toBe('1 tracked entry was not reached in the last sync pass.');
+    expect(oneBroken.map(first)).toEqual(['1 entry is unresolvable.', '1 pinned-starvation record.']);
+
+    const [manyRun, manyBroken] = panelColumns(
+      report({ records: [...unresolvable(3), starvation, starvation] }, { notReachedCount: 3 }),
+      true,
+    );
+    expect(manyRun.map(first)[1]).toBe('3 tracked entries were not reached in the last sync pass.');
+    expect(manyBroken.map(first)).toEqual(['3 entries are unresolvable.', '2 pinned-starvation records.']);
+
+    const onePinned = { ...starvation, pinnedCount: 1, pinnedRefreshed: 1 };
+    const [, pinnedBroken, oneCover] = panelColumns(
+      report({ records: [onePinned] }, { coverage: 1, rankableClassCount: 1 }),
+      true,
+    );
+    expect(groupText(pinnedBroken[1] ?? [])).toBe('1 pinned-starvation record.\n1 of 1 pinned entry refreshed');
+    expect(oneCover.map(groupText)).toEqual(['100% of 1 tracked Item Class.']);
+    const [, , unknownCover] = panelColumns(report({}, { coverage: 0.5 }), true);
+    expect(unknownCover.map(groupText)).toEqual(['50% of unknown tracked Item Classes.']);
+
+    const [zeroRun] = panelColumns(report({}, { notReachedCount: 0 }), true);
+    expect(zeroRun.map(first)[1]).toBe('0 tracked entries were not reached in the last sync pass.');
   });
 
   it('prints zero unresolvable and zero pinned-starvation records on a healthy run', () => {

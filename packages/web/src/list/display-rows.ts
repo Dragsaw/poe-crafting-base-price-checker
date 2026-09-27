@@ -1,10 +1,10 @@
 import { compareCanonicalKeys, type CurationStatus, type DatasetEntry } from '@poe/contracts';
 import type { Ranking, UnrankedEntry } from '@poe/core';
 
+import { formatDivine } from '../shared/money';
 import {
   ageMark,
   combinationAges,
-  formatDivine,
   MONEY_PHRASES,
   type AgeMark,
   type CombinationAges,

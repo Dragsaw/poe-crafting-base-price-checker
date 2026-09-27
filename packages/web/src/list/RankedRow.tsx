@@ -1,4 +1,4 @@
-import '../frame/frame.css';
+import './list.css';
 
 import type { CSSProperties, JSX } from 'react';
 
@@ -20,7 +20,7 @@ const COLUMNS = { rank, unit, ev, provenance, age, chase } as const;
 /**
  * One 28px ranked row in the six-cell contract. The whole row is one toggle
  * target: no per-row control, no tooltip. Hover and pointer-down tones live in
- * `frame.css`, so the background is never inline. An open row takes the 3px
+ * `list.css`, so the background is never inline. An open row takes the 3px
  * sepia `openMarker`, bled into the gutter on a negative left margin so no
  * column moves, and promotes its bottom rule to `rule-strong`.
  *

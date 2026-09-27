@@ -2,13 +2,12 @@ import { rank } from '@poe/core';
 import { compareCanonicalKeys, type DatasetEntry, type RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
+import { NOW } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { tierOf, toDisplayRows } from './display-rows';
-import { DEFAULT_THRESHOLD } from './format';
 import { isHonestEmpty } from './list-statement';
-
-const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): ReturnType<typeof toDisplayRows> {
   const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weightsLoaded: true });

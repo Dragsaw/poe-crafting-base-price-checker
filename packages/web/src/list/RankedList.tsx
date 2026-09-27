@@ -1,16 +1,17 @@
-import '../frame/frame.css';
+import '../shared/affordance.css';
 
 import { Fragment, useCallback, useState, type JSX } from 'react';
 
+import { TOP_ROWS } from '../shared/product';
+import { plural } from '../shared/text';
 import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
 import { ColumnHeader } from './ColumnHeader';
 import type { DisplayRow } from './display-rows';
 import { RawExpansionPanel } from './ExpansionPanel';
-import { TOP_ROWS } from './format';
 import { RankedRow } from './RankedRow';
 
 export function expandCopy(remaining: number): string {
-  return `${glyphs.open} Read the remaining ${String(remaining)} rows`;
+  return `${glyphs.open} Read the remaining ${String(remaining)} ${plural(remaining, 'row', 'rows')}`;
 }
 
 export const COLLAPSE_COPY = `${glyphs.close} Show only the top ${String(TOP_ROWS)}`;

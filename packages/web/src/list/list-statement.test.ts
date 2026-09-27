@@ -3,10 +3,9 @@ import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { TEST_LEAGUE } from '../test-support/artifact-server';
+import { NOW } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { honestEmptyCopy, isHonestEmpty, listStatement, nothingClearsCopy } from './list-statement';
-
-const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
 function statementFor(
   tracked: readonly RawTrackedEntry[],

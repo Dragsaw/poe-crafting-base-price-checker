@@ -5,12 +5,13 @@
  * blocked or throwing gives the default, and the page renders the same.
  */
 
-import { DEFAULT_THRESHOLD } from '../list/format';
+import { MONEY_DECIMALS } from '../shared/money';
+import { DEFAULT_THRESHOLD } from '../shared/product';
 
 export const THRESHOLD_MIN = 0;
 export const THRESHOLD_MAX = 3;
 export const THRESHOLD_STEP = 0.05;
-export const THRESHOLD_DECIMALS = 2;
+export const THRESHOLD_DECIMALS = MONEY_DECIMALS;
 
 export const THRESHOLD_STORAGE_KEY = 'poe-cbpc.payoutThreshold';
 

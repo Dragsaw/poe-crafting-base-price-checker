@@ -1,0 +1,28 @@
+import { describe, expect, it } from 'vitest';
+
+import { BELOW_PRINTABLE, formatDivine, formatThreshold } from './money';
+
+describe('formatDivine', () => {
+  it('prints 2dp', () => {
+    expect(formatDivine(0.5)).toBe('0.50');
+    expect(formatDivine(1)).toBe('1.00');
+    expect(formatDivine(2.4249)).toBe('2.42');
+    expect(formatDivine(0.005)).toBe('0.01');
+  });
+
+  it('prints a present figure too small for 2dp as < 0.01, never 0.00', () => {
+    expect(BELOW_PRINTABLE).toBe('< 0.01');
+    expect(formatDivine(0.0031)).toBe('< 0.01');
+    expect(formatDivine(0.0049)).toBe('< 0.01');
+    expect(formatDivine(0.0001)).toBe('< 0.01');
+  });
+});
+
+describe('formatThreshold', () => {
+  it('always prints two decimals, zero included', () => {
+    expect(formatThreshold(0.25)).toBe('0.25');
+    expect(formatThreshold(3)).toBe('3.00');
+    expect(formatThreshold(0.6)).toBe('0.60');
+    expect(formatThreshold(0)).toBe('0.00');
+  });
+});

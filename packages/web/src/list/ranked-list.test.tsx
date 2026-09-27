@@ -1,72 +1,18 @@
-import { rank } from '@poe/core';
 import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { TEST_LEAGUE } from '../test-support/artifact-server';
+import { cellIn as cell, mount, mountList, NOW, rerenderList, rgb, rowsIn, unmount } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { colors, glyphs, rankedRowColumns, spacing } from '../theme/tokens';
 import { COLUMN_LABELS } from './ColumnHeader';
-import { toDisplayRows } from './display-rows';
-import { DEFAULT_THRESHOLD, rawNote } from './format';
+import { rawNote } from './format';
 import { KEY_TITLES, KeyBlock } from './KeyBlock';
-import { COLLAPSE_COPY, expandCopy, RankedList } from './RankedList';
+import { COLLAPSE_COPY, expandCopy } from './RankedList';
 import { HAIR_SPACE } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
-const NOW = Date.parse('2026-09-26T12:00:00.000Z');
-
-/** A token hex as the `rgb(...)` jsdom reports for an inline colour. */
-const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
-
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
-
-afterEach(() => {
-  const mounted = root;
-  if (mounted !== undefined) {
-    act(() => {
-      mounted.unmount();
-    });
-  }
-  root = undefined;
-  container?.remove();
-  container = undefined;
-});
-
-function mountList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold = DEFAULT_THRESHOLD): HTMLDivElement {
-  container = document.createElement('div');
-  document.body.append(container);
-  root = createRoot(container);
-  rerenderList(tracked, dataset, threshold);
-  return container;
-}
-
-/** Renders new rows into the kept root, so RankedList keeps its state. */
-function rerenderList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold = DEFAULT_THRESHOLD): void {
-  const mounted = root;
-  if (mounted === undefined) {
-    throw new Error('no mounted root');
-  }
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), dataset, NOW);
-  act(() => {
-    mounted.render(<RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />);
-  });
-}
-
-function rowsIn(within: HTMLElement): HTMLElement[] {
-  return Array.from(within.querySelectorAll<HTMLElement>('[data-ranked-row]'));
-}
-
-function cell(row: HTMLElement | undefined, name: string): HTMLElement {
-  const found = row?.querySelector<HTMLElement>(`[data-cell="${name}"]`);
-  if (found === null || found === undefined) {
-    throw new Error(`no ${name} cell`);
-  }
-  return found;
-}
+afterEach(unmount);
 
 function many(count: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntry[] } {
   const tracked = Array.from({ length: count }, (_, i) => rawEntry(`Base ${String(i).padStart(2, '0')}`));
@@ -115,7 +61,7 @@ describe('a ranked row', () => {
     expect(cell(row, 'chase').style.width).toBe('492px');
     expect(row?.hasAttribute('data-raw')).toBe(true);
     expect(row?.className).toBe('fg-row');
-    // The tone is frame.css's, so hover can move it.
+    // The tone is list.css's, so hover can move it.
     expect(row?.style.background).toBe('');
   });
 
@@ -306,6 +252,19 @@ describe('the top-20 bound', () => {
     expect(view.querySelector('[data-expand-affordance]')?.textContent).toBe(expandCopy(2));
   });
 
+  // Matrix: one hidden row, many hidden rows.
+  it('names one hidden row in the singular and two in the plural', () => {
+    const one = many(21);
+    expect(mountList(one.tracked, one.dataset).querySelector('[data-expand-affordance]')?.textContent).toBe(
+      '+ Read the remaining 1 row',
+    );
+    unmount();
+    const two = many(22);
+    expect(mountList(two.tracked, two.dataset).querySelector('[data-expand-affordance]')?.textContent).toBe(
+      '+ Read the remaining 2 rows',
+    );
+  });
+
   it('prints no affordance at 20 rows or fewer', () => {
     const { tracked, dataset } = many(20);
     expect(mountList(tracked, dataset).querySelector('[data-expand-affordance]')).toBeNull();
@@ -318,13 +277,7 @@ describe('the trust mark and the unit glyphs', () => {
   });
 
   it('renders the class glyph ≡ in sepia', () => {
-    container = document.createElement('div');
-    document.body.append(container);
-    const mounted = createRoot(container);
-    root = mounted;
-    act(() => {
-      mounted.render(<UnitGlyph unit="class" />);
-    });
+    const container = mount(<UnitGlyph unit="class" />);
     const glyph = container.querySelector<HTMLElement>('[data-unit-glyph="class"]');
     expect(glyph?.textContent).toBe(glyphs.unitClass);
     expect(glyph?.style.color).toBe(rgb(colors.sepia));
@@ -333,13 +286,7 @@ describe('the trust mark and the unit glyphs', () => {
 
 describe('the key block', () => {
   it('holds three columns, the first being Silence means healthy, and no curation marks', () => {
-    container = document.createElement('div');
-    document.body.append(container);
-    const mounted = createRoot(container);
-    root = mounted;
-    act(() => {
-      mounted.render(<KeyBlock />);
-    });
+    const container = mount(<KeyBlock />);
     const columns = Array.from(container.querySelectorAll('[data-key-column]'));
     expect(columns).toHaveLength(3);
     expect(columns.map((c) => c.firstElementChild?.textContent)).toEqual([...KEY_TITLES]);

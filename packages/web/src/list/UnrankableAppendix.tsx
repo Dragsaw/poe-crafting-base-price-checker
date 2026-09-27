@@ -1,6 +1,8 @@
 import type { UnrankableClass } from '@poe/core';
-import type { CSSProperties, JSX } from 'react';
+import type { JSX } from 'react';
 
+import { fixedCell } from '../shared/cell';
+import { plural } from '../shared/text';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { unitLabel } from './format';
 import { TrustMark } from './TrustMark';
@@ -16,14 +18,10 @@ export const APPENDIX_MARK_WORD = 'unknown';
 
 /** `1 Item Class`, `N Item Classes`. */
 export function appendixCount(count: number): string {
-  return `${String(count)} ${count === 1 ? 'Item Class' : 'Item Classes'}`;
+  return `${String(count)} ${plural(count, 'Item Class', 'Item Classes')}`;
 }
 
 const [baseWidth, markWidth, reasonWidth, noteWidth] = columnSums.appendix;
-
-function cell(width: number): CSSProperties {
-  return { flex: `0 0 ${px(width)}`, width: px(width), minWidth: 0, boxSizing: 'border-box' };
-}
 
 /**
  * `{components.unrankable-appendix}` (DESIGN.md; `mockups/key-hero-resting.html`).
@@ -96,19 +94,19 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
         color: colors.ink,
       }}
     >
-      <div data-cell="class" style={{ ...cell(baseWidth), display: 'flex', alignItems: 'baseline' }}>
+      <div data-cell="class" style={{ ...fixedCell({ width: baseWidth }), display: 'flex', alignItems: 'baseline' }}>
         <UnitGlyph unit="class" />
         <span data-appendix-class="" style={{ flex: '1 1 auto', minWidth: 0 }}>
           {unitLabel(item.className)}
         </span>
       </div>
-      <div data-cell="mark" style={cell(markWidth)}>
+      <div data-cell="mark" style={fixedCell({ width: markWidth })}>
         <TrustMark kind="unknown" word={APPENDIX_MARK_WORD} />
       </div>
       <div
         data-cell="reason"
         style={{
-          ...cell(reasonWidth),
+          ...fixedCell({ width: reasonWidth }),
           color: colors['ink-secondary'],
         }}
       >
@@ -117,7 +115,7 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
       <div
         data-cell="note"
         style={{
-          ...cell(noteWidth),
+          ...fixedCell({ width: noteWidth }),
           fontStyle: 'italic',
           color: colors['ink-tertiary'],
         }}

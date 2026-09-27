@@ -27,6 +27,7 @@ import {
   type ArtifactAnswer,
 } from './test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from './load/artifacts';
+import { rgb } from './test-support/dom';
 import { blur, pastDebounce, typeInto } from './test-support/threshold-input';
 import { PageProvider } from './theme/PageProvider';
 import { colors } from './theme/tokens';
@@ -981,15 +982,6 @@ describe('the list statement', () => {
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
   });
 
-  // Matrix: empty Tracked List.
-  it('makes neither statement for an empty Tracked List', async () => {
-    serveArtifacts(server);
-    mount();
-    await settleTo('ready');
-    expect(statement()).toBeNull();
-    expectChromeAround();
-  });
-
   it('prints no recipes.json absence line on the committed data/, whose recipes list is empty', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes}.json', {
       eager: true,
@@ -1054,9 +1046,6 @@ describe('the Unrankable appendix', () => {
     const tail = frame().querySelector<HTMLElement>('[data-page-tail]');
     return Array.from(tail?.children ?? [], (node) => Object.keys((node as HTMLElement).dataset)[0] ?? '');
   }
-
-  const rgb = (hex: string): string =>
-    `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
 
   // Matrix: committed.
   it('is the title alone on the committed data/, count in ink, above the key block and the foot', async () => {
@@ -1133,33 +1122,6 @@ describe('the Unrankable appendix', () => {
     await settleTo('ready');
     expect(appendixRows()).toHaveLength(29);
     expect(appendix().querySelector('[data-appendix-count]')?.textContent).toBe('29 Item Classes');
-  });
-
-  it('never prints the reason while a weights envelope is loaded, crafted classes tracked or not', async () => {
-    const bodies = bodiesWith(twentyNineClasses(), []);
-    serveArtifacts(server, {
-      tracked: { kind: 'json', body: bodies.tracked },
-      dataset: { kind: 'json', body: bodies.dataset },
-    });
-    mount();
-    await settleTo('ready');
-    expect(frame().textContent).not.toContain(ABSENT_REASON);
-    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
-  });
-
-  // Matrix: duplicate class, pruned only.
-  it('makes one row of a duplicated class and none of an all-pruned class', async () => {
-    const pruned = { ...craftedEntry('Pruned Class', 'fixture.pruned'), status: 'pruned' as const, prunedReason: 'no market' };
-    const bodies = bodiesWith([craftedEntry('Bows', 'weapon.bow', 54), craftedEntry('Bows', 'weapon.bow', 82), pruned], []);
-    serveArtifacts(server, {
-      tracked: { kind: 'json', body: bodies.tracked },
-      dataset: { kind: 'json', body: bodies.dataset },
-      weights: { kind: 'status', status: 404 },
-    });
-    mount();
-    await settleTo('ready');
-    expect(appendixRows().map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Bows']);
-    expect(appendix().querySelector('h2')?.textContent).toBe('Appendix: Unrankable — 1 Item Class');
   });
 
   // Matrix: no crafted entries.

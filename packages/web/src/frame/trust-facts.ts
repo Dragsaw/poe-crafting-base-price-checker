@@ -1,4 +1,6 @@
 import type { Parsed } from '../load/artifacts';
+import { plural } from '../shared/text';
+import { relativeAge } from '../shared/time';
 
 /**
  * Pure formatters for `{components.trust-strip}` and
@@ -9,9 +11,6 @@ import type { Parsed } from '../load/artifacts';
 
 type WeightsEnvelope = Parsed<'weights'>;
 type SyncReport = Parsed<'syncReport'>;
-
-/** The no-break space that joins a strip label to its value and a glyph to its word. */
-export const NBSP = String.fromCodePoint(0xa0);
 
 export const UNKNOWN = 'unknown';
 export const NOT_MEASURED = 'not measured';
@@ -47,28 +46,6 @@ export function weightsFacts(weights: WeightsEnvelope | null): readonly [Weights
     { name: 'generatedAt', value: weights === null ? undefined : utcDate(weights.producer.generatedAt) },
     { name: 'gamePatch', value: weights?.gamePatch },
   ];
-}
-
-const MINUTE_MS = 60_000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
-
-function unitAgo(count: number, unit: string): string {
-  return `${String(count)} ${unit}${count === 1 ? '' : 's'} ago`;
-}
-
-/** A relative age: `< 1 minute ago`, then whole minutes under 1h, hours under 24h, then days. */
-export function relativeAge(ageMs: number): string {
-  if (ageMs < MINUTE_MS) {
-    return '< 1 minute ago';
-  }
-  if (ageMs < HOUR_MS) {
-    return unitAgo(Math.floor(ageMs / MINUTE_MS), 'minute');
-  }
-  if (ageMs < DAY_MS) {
-    return unitAgo(Math.floor(ageMs / HOUR_MS), 'hour');
-  }
-  return unitAgo(Math.floor(ageMs / DAY_MS), 'day');
 }
 
 /** `Last synced`: the run's finish, or its start on an aborted run, against the load's `now`. */
@@ -164,18 +141,30 @@ export function panelColumns(report: SyncReport | null, weightsLoaded: boolean):
       text(' league validation requests this pass.'),
     ],
   ];
+  const notReachedCount = figures.notReachedCount;
   const notReached: FigureGroup = [
-    [figure(figures.notReachedCount), text(' tracked entries were not reached in the last sync pass.')],
+    [
+      figure(notReachedCount),
+      text(
+        ` tracked ${plural(notReachedCount, 'entry', 'entries')} ${plural(notReachedCount, 'was', 'were')} not reached in the last sync pass.`,
+      ),
+    ],
   ];
-  const unresolvable: FigureGroup = [[figure(countOf(report, 'unresolvable')), text(' entries are unresolvable.')]];
+  const unresolvableCount = countOf(report, 'unresolvable');
+  const unresolvable: FigureGroup = [
+    [
+      figure(unresolvableCount),
+      text(` ${plural(unresolvableCount, 'entry is', 'entries are')} unresolvable.`),
+    ],
+  ];
   const starvation = report.records.flatMap((record) => (record.kind === 'pinned-starvation' ? [record] : []));
   const starved: FigureGroup = [
-    [figure(starvation.length), text(' pinned-starvation records.')],
+    [figure(starvation.length), text(` pinned-starvation ${plural(starvation.length, 'record', 'records')}.`)],
     ...starvation.map((record) => [
       figure(record.pinnedRefreshed),
       text(' of '),
       figure(record.pinnedCount),
-      text(' pinned entries refreshed'),
+      text(` ${plural(record.pinnedCount, 'pinned entry', 'pinned entries')} refreshed`),
     ]),
   ];
   return [[requests, notReached], [unresolvable, starved], [coverageGroup(figures, weightsLoaded)]];
@@ -187,7 +176,9 @@ function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): 
   }
   const denominator =
     figures.rankableClassCount === undefined ? missing(UNKNOWN) : figure(figures.rankableClassCount);
-  return [[figure(`${String(coveragePercent(figures.coverage))}%`), text(' of '), denominator, text(' tracked Item Classes.')]];
+  // An unknown denominator keeps the plural.
+  const classes = plural(figures.rankableClassCount ?? 0, 'tracked Item Class', 'tracked Item Classes');
+  return [[figure(`${String(coveragePercent(figures.coverage))}%`), text(' of '), denominator, text(` ${classes}.`)]];
 }
 
 /**

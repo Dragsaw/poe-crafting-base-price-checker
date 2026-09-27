@@ -2,6 +2,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { rgb } from '../test-support/dom';
 import { blur, pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
 import { colors, spacing } from '../theme/tokens';
@@ -12,10 +13,6 @@ import {
   THRESHOLD_LABEL,
   THRESHOLD_UNIT,
 } from './PayoutThreshold';
-
-/** A token hex as the `rgb(...)` jsdom reports for an inline colour. */
-const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
 
 let container: HTMLDivElement | undefined;
 let root: Root | undefined;

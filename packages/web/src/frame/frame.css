@@ -2,21 +2,10 @@
  * The few rules inline styles cannot express: hover states. Every value is a
  * token custom property (`--fg-color-*`, set by theme.ts from tokens.ts), so
  * this file holds no colour of its own. No transition, no shadow, no radius.
+ * The shared affordance, the ranked row and the Payout Threshold figure keep
+ * their rules next to their components (`shared/affordance.css`,
+ * `list/list.css`, `threshold/threshold.css`).
  */
-
-.fg-affordance {
-  background: none;
-  border: 0;
-  border-bottom: 1px dotted var(--fg-color-sepia);
-  border-radius: 0;
-  padding: 0;
-  color: var(--fg-color-sepia);
-  cursor: pointer;
-}
-
-.fg-affordance:hover {
-  border-bottom-style: solid;
-}
 
 .fg-trade-glyph {
   color: var(--fg-color-ink-tertiary);
@@ -26,71 +15,6 @@
 
 .fg-trade-glyph:hover {
   color: var(--fg-color-sepia);
-}
-
-/*
- * The ranked row. Its tone lives here, never inline, so hover can move it:
- * paper at rest, paper-inset under the pointer, paper-deep on pointer-down. A
- * Raw Base row keeps its own tint family, so a hovered raw row still reads raw.
- * Instantaneous — no transition on a 28px row.
- */
-.fg-row {
-  background: var(--fg-color-paper);
-  cursor: pointer;
-  transition: none;
-}
-
-.fg-row:hover {
-  background: var(--fg-color-paper-inset);
-}
-
-.fg-row[data-raw] {
-  background: var(--fg-color-paper-raw);
-}
-
-.fg-row[data-raw]:hover {
-  background: var(--fg-color-paper-raw-hover);
-}
-
-.fg-row:active,
-.fg-row[data-raw]:active {
-  background: var(--fg-color-paper-deep);
-}
-
-/*
- * The Payout Threshold figure. The figure IS the input: no border, no
- * background, no padding, no form chrome. The rule sits under the figure only
- * (the unit is outside the input): dotted sepia at rest, solid sepia under the
- * pointer, solid rule-strong while the player edits. Caret ink, selection
- * paper-deep.
- */
-.fg-threshold input {
-  display: block;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  border-bottom: 1px dotted var(--fg-color-sepia);
-  background: none;
-  box-shadow: none;
-  outline: none;
-  color: var(--fg-color-ink);
-  caret-color: var(--fg-color-ink);
-  transition: none;
-}
-
-.fg-threshold input:hover {
-  border-bottom-style: solid;
-}
-
-.fg-threshold input:focus {
-  border-bottom: 1px solid var(--fg-color-rule-strong);
-}
-
-.fg-threshold input::selection {
-  background: var(--fg-color-paper-deep);
-  color: var(--fg-color-ink);
 }
 
 /*

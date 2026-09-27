@@ -1,6 +1,7 @@
 import { useState, type JSX, type ReactNode } from 'react';
 
 import type { ArtifactSet, TolerableKey } from '../load/artifacts';
+import { NBSP } from '../shared/text';
 import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
 import { AbsenceLines } from './AbsenceLines';
 import { SyncReportPanel } from './SyncReportPanel';
@@ -10,7 +11,6 @@ import {
   healthSignals,
   LAST_SYNCED_LABEL,
   lastSynced,
-  NBSP,
   panelColumns,
   TRACKED_LIST_EDITED_LABEL,
   trackedListEdit,
