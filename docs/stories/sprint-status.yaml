@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 09-27-2026 21:05
+last_updated: 09-27-2026 21:15
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -62,7 +62,7 @@ development_status:
 
   epic-3: in-progress
   3-1-consuming-a-schema-conformant-weights-file-and-its-pool-comp: review
-  3-2-the-probability-term-a-tier-s-interval-containment-and-the-e: review
+  3-2-the-probability-term-a-tier-s-interval-containment-and-the-e: done
   3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shel: backlog
   3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control: backlog
   3-5-chase-combinations-on-the-collapsed-crafted-row: backlog
