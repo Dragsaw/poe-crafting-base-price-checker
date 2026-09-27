@@ -260,6 +260,38 @@ describe('rank: the I/O matrix', () => {
   });
 });
 
+describe('rank: the threshold domain', () => {
+  it('threshold 0 is valid: a priced entry is in the ordering', () => {
+    const A = raw('A');
+    const result = ranked({ tracked: [A], dataset: [published(A, priced(0.01))], threshold: 0 });
+    expect(keysOf(result.ordering)).toEqual([canonicalKey(A)]);
+    expect(result.belowThreshold).toEqual([]);
+  });
+
+  it('a NaN threshold throws a RangeError that names the threshold and the value', () => {
+    const A = raw('A');
+    const call = (): Ranking => ranked({ tracked: [A], dataset: [published(A, priced(0.5))], threshold: Number.NaN });
+    expect(call).toThrow(RangeError);
+    expect(call).toThrow(/threshold.*NaN/);
+  });
+
+  it.each([-0.01, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+    'threshold %s throws a RangeError and returns no Ranking',
+    (threshold) => {
+      const A = raw('A');
+      let result: Ranking | undefined;
+      expect(() => {
+        result = ranked({ tracked: [A], dataset: [published(A, priced(0.5))], threshold });
+      }).toThrow(RangeError);
+      expect(result).toBeUndefined();
+    },
+  );
+
+  it('throws even when there is nothing to group', () => {
+    expect(() => ranked({ tracked: [], threshold: -1 })).toThrow(RangeError);
+  });
+});
+
 /** A mixed input covering every matrix row. */
 function matrixInput(): RankInput {
   const entries = {

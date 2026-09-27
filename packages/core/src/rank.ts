@@ -13,8 +13,10 @@ import type {
  *
  * Pure (AD-1, AD-4). The tracked entries, the published dataset entries, the
  * active league and the Payout Threshold go in as values; a typed `Ranking`
- * comes out. Nothing is read from anywhere else, no clock is consulted, and
- * nothing is thrown: every expected condition is a group of the result.
+ * comes out. Nothing is read from anywhere else and no clock is consulted.
+ * Every expected data condition is a group of the result. One caller error
+ * throws: a threshold that is not a finite number ≥ 0 is a `RangeError`,
+ * before anything is grouped. `rank` never clamps or coerces it.
  *
  * Per non-pruned `raw` tracked entry, joined to its dataset entry by canonical
  * key:
@@ -41,7 +43,10 @@ export interface RankInput {
   readonly dataset: readonly DatasetEntry[];
   /** The active league, verbatim from `data/config.json` (AD-19). */
   readonly activeLeague: string;
-  /** The Payout Threshold in divine (FR-7). An entry survives at `price ≥ threshold`. */
+  /**
+   * The Payout Threshold in divine (FR-7). An entry survives at `price ≥ threshold`.
+   * Must be finite and ≥ 0 (0 is valid); any other value makes `rank` throw a `RangeError`.
+   */
   readonly threshold: number;
 }
 
@@ -109,6 +114,11 @@ function unranked(
 }
 
 export function rank(input: RankInput): Ranking {
+  if (!Number.isFinite(input.threshold) || input.threshold < 0) {
+    throw new RangeError(
+      `rank: threshold must be a finite number >= 0, got ${String(input.threshold)}`,
+    );
+  }
   const byKey = new Map(input.dataset.map((published) => [published.entryKey, published]));
 
   const surviving: RankedRow[] = [];
