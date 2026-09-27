@@ -82,6 +82,11 @@ Three rules ride with it:
   error**. It still counts in the denominator.
 - **A line whose `statId` is `null` can never be contained**, but its entry still enters the
   denominator like any other.
+- **An entry whose `weight` is `0` is never contained**, whatever its `weightSource` and
+  whatever its lines carry. It still enters the denominator (it adds nothing) and the
+  Provenance fold (AD-10). Because §2.3 to §2.5 read `contained(ref)`, a weight-0 tier
+  moves no kind, edge or empty-containment verdict, and a band that covers only weight-0
+  tiers fails §2.5 instead of ranking at `P = 0`.
 
 ---
 
@@ -261,7 +266,7 @@ rankable(cat) = cat carries at least one tracked entry that is
 
 covered(cat)  = weights.json has bases[cat.categoryId][cat.className]
                 ∧ both slots declare poolCoverage "complete"
-                ∧ neither slot's pool is empty
+                ∧ neither slot's pool is empty      -- total weight 0
 
 coverage = |{ cat ∈ tracked.json : rankable ∧ covered }|
            ──────────────────────────────────────────────
@@ -283,6 +288,12 @@ ambiguous:
   `weights.json` entirely, because it has no slots to fail.
 - A class declaring `complete` over an **empty** pool passes a naive reading, while AD-17
   excludes it from the ordering anyway.
+
+**A pool is empty when its total weight is `0`**, not only when it has no entries. A slot of
+only weight-0 tiers (for example, only `not-in-game` tiers) can roll nothing, so it is not
+covered here, it is AD-17's third cause, and §9's `W = 0` is the same test after the
+recipe's floor. One definition in all three places keeps the report and the appendix in
+agreement.
 
 **The `pruned` exclusion is the only survivor of the old denominator carve-out.** That
 carve-out also *counted only bases that need a pool*, excluding a base tracked solely as a
