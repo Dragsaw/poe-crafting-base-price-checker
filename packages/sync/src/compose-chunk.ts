@@ -1,13 +1,15 @@
 /**
- * The one chunk composition `pnpm sync` and `pnpm sync:dry` share (AD-7,
- * AD-8, AD-12).
+ * The one chunk composition `pnpm sync`, `pnpm sync:batch` and `pnpm sync:dry`
+ * share (AD-7, AD-8, AD-12).
  *
  * From the shell's ports it builds **one governor** of two sibling trade
- * clients (`createTradeClients`) over one `HttpPort` counted twice — as
+ * clients (`createTradeGovernor`) over one `HttpPort` counted twice — as
  * `league-validation` for the gate and `tracked-list` for the step — the
  * committed catalogue loader, and the runner's `load` hook. The shells differ
- * only in the ports they pass: the live command a real filesystem, clock and
- * `fetch`; the dry run in-memory fakes and the recorded fixture port.
+ * only in the ports they pass: the live commands a real filesystem, clock and
+ * `fetch`; the dry run in-memory fakes and the recorded fixture port. Only
+ * the `pnpm sync` session passes `pacing`, `spread`, `requests` and
+ * `session`, so the batch and dry chunks are unchanged.
  *
  * **Every file load runs under the lock**, inside `runChunk`, after AD-8's
  * `notBefore` check. `load` reads `data/config.json`, evaluates
@@ -23,7 +25,7 @@ import type { ClockPort, FilesystemPort, GitPort, HttpPort, LeagueId } from '@po
 
 import { loadCatalogueIds } from './catalogue/catalogue-ids.ts';
 import { runChunk } from './chunk/run-chunk.ts';
-import type { ChunkOutcome, ChunkPorts, ChunkStep } from './chunk/run-chunk.ts';
+import type { ChunkOutcome, ChunkPorts, ChunkSession, ChunkStep } from './chunk/run-chunk.ts';
 import { createLeagueGate } from './league/league-gate.ts';
 import { loadConfig } from './load-config.ts';
 import type { DataFileResult } from './load-data-file.ts';
@@ -34,7 +36,9 @@ import { outputRates } from './pricing/normalise.ts';
 import { createPricingStep } from './pricing/price-entry.ts';
 import type { ItemTypes } from './pricing/search-body.ts';
 import { createRequestCounter } from './request-counter.ts';
-import { createTradeClients } from './trade/client.ts';
+import type { RequestCounter } from './request-counter.ts';
+import { createTradeGovernor } from './trade/client.ts';
+import type { PacingState } from './trade/client.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
 export interface ComposeChunkPorts {
@@ -56,6 +60,23 @@ export interface ComposeChunkPorts {
    * skip an entry whose search has no recorded fixture (`dry-run.ts`).
    */
   readonly wrapStep?: (step: ChunkStep, context: StepContext) => ChunkStep;
+  /**
+   * The `pnpm sync` session only (`./sync.ts`). The pacing memory every chunk
+   * of the session shares: this chunk's fresh governor starts from it rather
+   * than cold (AD-8). Omitted, the governor starts cold, as the batch and dry
+   * compositions do.
+   */
+  readonly pacing?: PacingState;
+  /** The session only: pace with the even spread (`spreadBeforeNext`). */
+  readonly spread?: boolean;
+  /**
+   * The session only: the request counter every chunk of the session counts
+   * through, so the report's figure can cover the pass. Omitted, the chunk
+   * builds its own.
+   */
+  readonly requests?: RequestCounter;
+  /** The session only: the chunk's session options (`ChunkSession`). */
+  readonly session?: ChunkSession;
 }
 
 /** The load-time values the pricing step was built on. */
@@ -79,10 +100,12 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
 }
 
 export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
-  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep } = options;
+  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session } = options;
 
-  const requests = createRequestCounter();
-  const clients = createTradeClients({
+  const requests = options.requests ?? createRequestCounter();
+  // A fresh governor per chunk: its invalid-request counts stay per chunk,
+  // while a session's pacing memory carries across (AD-8).
+  const { clients } = createTradeGovernor({
     http: {
       'league-validation': requests.counted(http, 'league-validation'),
       'tracked-list': requests.counted(http, 'tracked-list'),
@@ -91,6 +114,8 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     wait,
     userAgent,
     invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
+    ...(pacing === undefined ? {} : { pacing }),
+    ...(spread === undefined ? {} : { spread }),
   });
 
   const ports: ChunkPorts = {
@@ -126,6 +151,7 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     },
     catalogue: () => loadCatalogueIds(fs),
     ...(log === undefined ? {} : { log }),
+    ...(session === undefined ? {} : { session }),
   };
 
   return { ports, run: () => runChunk(ports) };

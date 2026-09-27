@@ -10,7 +10,9 @@ import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
  *
  * Rows, in order:
  *
- * 1. `pinned` entries whose dataset price state is not `unresolvable`.
+ * 1. `pinned` entries whose dataset price state is not `unresolvable` — with
+ *    `pinnedMaxAgeMs`, only the stale ones (no `lastAttemptedAt`, or one older
+ *    than the maximum age).
  * 2. `active` entries whose dataset price state is not `unresolvable`, less
  *    the pass's completed keys.
  * 3. every non-pruned entry whose dataset price state is `unresolvable` and
@@ -37,6 +39,12 @@ export interface ChunkOrderInput {
   readonly completed: readonly string[];
   /** The current instant, ISO-8601 UTC. */
   readonly now: string;
+  /**
+   * The `pnpm sync` session's stale-pinned rule (AD-7): row 1 keeps only the
+   * pinned entries whose `lastAttemptedAt` is absent or more than this many
+   * milliseconds before `now`. Absent, row 1 keeps every pinned entry.
+   */
+  readonly pinnedMaxAgeMs?: number;
 }
 
 export interface ChunkOrder {
@@ -77,6 +85,11 @@ function compareOldestFirst(left: Placed, right: Placed): number {
 const entriesOf = (placed: readonly Placed[]): TrackedEntry[] =>
   placed.toSorted(compareOldestFirst).map((item) => item.entry);
 
+/** Row 1's filter: every pinned entry, or only the stale ones when a maximum age is given. */
+function isStalePinned(attemptedAt: number | undefined, now: number, maxAgeMs: number | undefined): boolean {
+  return maxAgeMs === undefined || attemptedAt === undefined || now - attemptedAt > maxAgeMs;
+}
+
 export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
   const now = Date.parse(input.now);
   const byKey = new Map(input.dataset.map((entry) => [entry.entryKey, entry]));
@@ -103,7 +116,9 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
         unresolvable.push(placed);
       }
     } else if (entry.status === 'pinned') {
-      pinned.push(placed);
+      if (isStalePinned(attemptedAt, now, input.pinnedMaxAgeMs)) {
+        pinned.push(placed);
+      }
     } else {
       rotationKeys.add(key);
       active.push(placed);

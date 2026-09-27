@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 22
+revision: 23
 created: '2026-09-12'
 updated: '2026-09-27'
 binds: []
@@ -495,18 +495,43 @@ never import each other.
   entries does this chunk refresh?" differently — one round-robin, one oldest-first —
   which would silently change how stale any given row is while every artifact stayed
   schema-valid.
-- **Rule:** The syncer is a CLI that performs **one chunk, then exits**. Whichever of
+- **Rule:** **The chunk is the unit of sync work, and two invokers run it unchanged.**
+  `pnpm sync:batch` performs **one chunk, then exits**, for an external scheduler.
+  `pnpm sync` is a long-running **session** that runs one chunk per entry: each of its
+  chunks is bounded to one entry and takes, uses and releases the lock itself, so the lock
+  is never held across a wait and §7 is unchanged. Whichever of
   three bounds runs out first bounds the chunk: the remaining search allowance, the
-  remaining fetch allowance, or the unprocessed remainder of the workload. Progress lives
+  remaining fetch allowance, or the unprocessed remainder of the workload — and, under the
+  session, a fourth: one entry. Progress lives
   in a schema-pinned `sync-progress.json`, written alongside the dataset and tracked in git
   like it (AD-3). A run
-  acquires an exclusive on-disk lock; if another **live** run holds it, the new run logs that
-  fact and **exits 0**, because a busy lock is a normal outcome for a repeatedly-invoked job.
+  acquires an exclusive on-disk lock; if another **live** run holds it, a batch run logs that
+  fact and **exits 0**, because a busy lock is a normal outcome for a repeatedly-invoked job,
+  and the session waits, polling the lock file locally, until it is free or stale by §7.
   **A run inside a trade penalty is the same outcome:** `sync-progress.json` also carries
   AD-8's `notBefore` instant, and a run that takes the lock before that instant releases it,
   sends nothing and exits 0, writing nothing except a `stale-lock-broken` record if it broke
   a lock to get there (`IMPLEMENTATION-NOTES.md` §5.3).
-  The syncer makes no assumption about what invokes it, how often, or where it runs.
+  The batch command makes no assumption about what invokes it, how often, or where it runs.
+
+  **The session waits on local state only, and never on a guessed cadence.** One pacing state
+  lives for the process (AD-8), and before each chunk the session pre-waits the spread delay
+  of the lanes the next entry spends on — the league gate's when the gate is due — outside
+  the lock. There is no startup wait: the first request goes out cold. After each chunk it
+  waits by the outcome: until AD-8's `notBefore` after a 429, a penalty, a malformed request
+  or a gate `4xx` (a malformed request's wait also ends on an input change); until an input
+  file under `data/` changes after a refusal or a league mismatch, with no time bound;
+  for the lock after a busy or dispossessed chunk; and until an input change, at most row 3's
+  24h interval, when nothing is due. **A request that got no answer backs off**: a yield that
+  wrote no `notBefore` and brought no State reading waits a backoff, and a throw that is none
+  of the above and wrote no `notBefore` waits for an input change or the backoff, whichever
+  ends first. The backoff starts at the tightest known bucket's even interval, doubles per
+  consecutive such wait, is capped at §7's staleness threshold, and a State reading resets
+  it (formula in `IMPLEMENTATION-NOTES.md` §5.3). A throw never stops the session; the first
+  SIGINT or SIGTERM ends a wait at once, or lets the running entry finish, and exits 0.
+  The league gate runs on the session's first chunk, on every new pass, and whenever the
+  configured league changes. The report's requests-per-source figure covers the session's
+  current pass, and its not-reached figure is then the entries left in that pass.
 
   **The lock is recoverable, and a crash may not wedge the product.** The lock file carries
   the holder's **pid** and its **ISO-8601 start time**, and nothing else. A run that finds a
@@ -535,7 +560,10 @@ never import each other.
   bound is reached:
 
   1. every `pinned` entry (AD-12), **oldest `lastAttemptedAt` first**, subject to the
-     cap below;
+     cap below. **Under the session, only a stale one**: its `lastAttemptedAt` is absent or
+     older than the session's pinned maximum age (`--pinned-max-age <hours>`, default 4), so
+     a pinned entry refreshes on that cadence rather than before every entry. The batch
+     command keeps every pinned entry in row 1;
   2. then `active` entries by **oldest `lastAttemptedAt` first**, treating an entry that
      **carries no `lastAttemptedAt` at all** as infinitely old. The key is the field's
      absence, and never the `not-yet-synced` price state;
@@ -596,7 +624,7 @@ never import each other.
   distinguishes the search bucket from the fetch bucket, and the adapter paces against
   the tightest unsatisfied bucket. **No rate is hardcoded.** On a 429 the adapter honours
   `Retry-After` and yields the chunk rather than retrying tightly. **`Retry-After` binds
-  across processes, not only within one.** A chunk runs once and exits, so a process sees at
+  across processes, not only within one.** A batch chunk runs once and exits, so a process sees at
   most one refused request on the chunk path, and an in-memory backoff protects nothing: the
   next invocation would spend a request inside the same penalty, and GGG counts every `4xx`
   toward an Invalid Requests Threshold past which a client is restricted from further
@@ -607,7 +635,19 @@ never import each other.
   will be refused again on the next tick. Both are capped at that threshold, so a malformed
   header cannot wedge syncing (formula in §5.3). The
   in-process threshold is a `sync`-side constant (§5.3), never a `data/config.json` field
-  (AD-19). The adapter sends a
+  (AD-19). The session honours the same `notBefore` by waiting until it (AD-7).
+
+  **Spread pacing, under the session.** The session paces every request with the **even
+  spread**: before a request on a policy it waits the larger of the batch pacer's delay (a
+  restriction, or a full bucket's remaining window) and each bucket's remaining capacity
+  spread evenly over that bucket's period, so no bucket fills in normal use (formula in
+  `IMPLEMENTATION-NOTES.md` §5.3). One pacing state — the ledger and the lane memo — lives
+  for the whole process, and every State reading, other traffic on the IP included, replaces
+  its values. Each chunk gets a fresh governor seeded with that state; **invalid-request
+  counts stay per chunk**, because a shared count would refuse a policy for the rest of the
+  session after one `4xx`. The batch command keeps the batch pacer and a cold ledger.
+
+  The adapter sends a
   descriptive `User-Agent` naming the tool and a contact address, as GGG asks of
   third-party tools. Header-parsing detail and the measured 2026-09-12 buckets are in
   `IMPLEMENTATION-NOTES.md` §5.3, binding under AD-0.
@@ -1763,7 +1803,7 @@ Everything in this section is true at cold-start and owned by the code once it e
 | ESLint + typescript-eslint | 10.11.0 + 8.70.0 |
 | dependency-cruiser | 18.4.0 |
 | Hosting | GitHub Pages via Actions build workflow |
-| Sync invoker | Windows Task Scheduler (host-agnostic per AD-7) |
+| Sync invoker | `pnpm sync`, a long-running session; or `pnpm sync:batch` under Windows Task Scheduler (host-agnostic per AD-7) |
 
 **Upgrade trigger — TypeScript 7.** TS 7.0.2 is current, but two dependencies block the
 upgrade and both must clear (re-verified 2026-09-20): `typescript-eslint` 8.70.0 peers
@@ -1870,9 +1910,11 @@ and contributes nothing to the eligible pool (AD-25).
 
 ### Deployment & environments
 
-There is one environment. The syncer runs on the player's machine under Task Scheduler,
-invoked repeatedly; each run takes the lock, does one bounded chunk, **writes the files it owns,
-and exits — it touches git not at all** (AD-3). **Publishing is a separate, human act:** the
+There is one environment. The syncer runs on the player's machine, either as the long-running
+`pnpm sync` session, which runs one chunk per entry and paces itself (AD-7, AD-8), or as
+`pnpm sync:batch` under Task Scheduler, invoked repeatedly. Each chunk takes the lock, does its
+bounded work, **writes the files it owns, and releases the lock — it touches git not at all**
+(AD-3). **Publishing is a separate, human act:** the
 player commits the sync-owned files and pushes them to the default branch, and *that* push
 triggers a **GitHub Actions workflow** that builds the Vite bundle and deploys to Pages —
 branch-published Pages runs Jekyll and cannot build this app, so the workflow is required, not

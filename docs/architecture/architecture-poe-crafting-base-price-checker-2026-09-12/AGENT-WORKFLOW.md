@@ -25,7 +25,7 @@ pnpm install
 pnpm check          # typecheck + lint + dependency-cruiser, all packages
 pnpm test           # vitest, all packages, zero network
 pnpm dev            # web against the committed dataset + fixtures
-pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere
+pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere (never pnpm sync or pnpm sync:batch)
 ```
 
 `pnpm check` is the point that enforces the package boundaries. `dependency-cruiser` fails the build on an import in the wrong direction (AD-1). An agent that imports from `core` into `sync` therefore learns about the fault in seconds, and no reviewer is necessary.
@@ -64,7 +64,7 @@ Rules for the division of work across worktrees:
 - **Give a task the scope of one package where possible.** A task that spans packages is a signal that a contract is missing. Such a task is not a signal that the boundary is wrong.
 - **Make `contracts` changes one at a time.** Every other package depends on `contracts`. A change to `contracts` is therefore a wide rebuild and a probable conflict. Land a `contracts` change alone and first. Then rebase the dependent work onto that change.
 - **Each file in `data/` has one writer (AD-3), and that writer is never app code.** The player owns the hand-edited inputs `tracked.json`, `currencies.json`, `recipes.json` and `config.json`. "Hand-edited" means no component of the app maintains them. It does not mean an agent may not touch them. **During development an agent edits a hand-edited input directly when its task calls for the change.** The agent names each changed file, the change and the reason in its report, so the player knows. The agent does not stop and hand a known edit back to the player. The external scraper project owns `weights.json` (AD-11). The syncer owns the sync outputs `catalogue/*.json`, `dataset.json`, `sync-report.json` and `sync-progress.json`. A tool produces each of these files, so an agent does not hand-edit or regenerate them: a hand edit fakes data that the tool did not observe. **A test that needs different data uses a fixture**, never an edit to a file in `data/`.
-- **No worktree runs `pnpm sync` or `pnpm catalogue:refresh` against the live API.** Only the scheduled invoker on the player's machine runs a sync (AD-7, AD-8). The scheduled invoker holds an exclusive lock. A second run on any machine therefore exits immediately, and that behaviour is the intended design. An agent that must check sync behaviour runs `pnpm sync:dry`. A human refreshes the catalogue when GGG releases a patch. An agent that needs a different catalogue uses a fixture.
+- **No worktree runs `pnpm sync`, `pnpm sync:batch` or `pnpm catalogue:refresh` against the live API.** Only the player's own invoker runs a sync: the long-running `pnpm sync` session, or `pnpm sync:batch` under a scheduler (AD-7, AD-8). A chunk holds an exclusive lock. A second batch run on any machine therefore exits immediately, and a second session waits for the lock, and that behaviour is the intended design. An agent that must check sync behaviour runs `pnpm sync:dry`. A human refreshes the catalogue when GGG releases a patch. An agent that needs a different catalogue uses a fixture.
 - **Sync-related code contains no git write.** AD-3 forbids the syncer to add, commit, push or pull. The syncer writes the files it owns by explicit path and exits. The git port is read-only, and its one operation is the author date of the last commit touching a path (AD-12). An agent that reaches for a git write in `sync` has found a spine amendment, not a task detail.
 
 ## Determinism
@@ -82,7 +82,7 @@ An agent debugs badly when tests are unreliable. The design therefore excludes n
 | --- | --- | --- |
 | `contracts` | Zod schemas, derived types, port interfaces | Types are `z.infer`red from schemas, never declared in parallel |
 | `core` | Pure valuation, probability, provenance | No I/O, no clock, no randomness, no env — ever (AD-1) |
-| `sync` | Trade client, rate-limit governor, chunk runner, catalogue refresher, dataset writer | One governed HTTP client only (AD-8); bounded work then exit and rotation order comes from `core`, not from `sync` (AD-7); a stat filter's shape follows the reference's **kind** — a `banded` reference carries both `min` and `max`, a `valueless` one carries the stat id and **no edges at all**, and emitting a sentinel pair for a valueless stat silently prices the wrong population rather than erroring (AD-16, AD-5) |
+| `sync` | Trade client, rate-limit governor, chunk runner, catalogue refresher, dataset writer | One governed HTTP client only (AD-8); the chunk is bounded work, and each invoker (the session or the batch run) runs it unchanged, and rotation order comes from `core`, not from `sync` (AD-7); a stat filter's shape follows the reference's **kind** — a `banded` reference carries both `min` and `max`, a `valueless` one carries the stat id and **no edges at all**, and emitting a sentinel pair for a valueless stat silently prices the wrong population rather than erroring (AD-16, AD-5) |
 | `web` | Static view, read-time ranking | No backend, no write path, no authenticated request (AD-15) |
 
 ## Build order

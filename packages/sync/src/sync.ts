@@ -1,94 +1,630 @@
 /**
- * `pnpm sync` — the live background sync: one bounded chunk per invocation
- * (FR-19, AD-7), behind the run-start league gate (FR-32, AD-19).
+ * `pnpm sync` — the long-running sync session (FR-19, AD-7, AD-8).
  *
- * The composition is `composeChunk` (`./compose-chunk.ts`), the one
- * `pnpm sync:dry` shares: this command passes the real filesystem at the
- * repository root, the real clock and the `fetch` http port. `runChunk` does
- * the rest under the lock, in AD-12's cost order: the `notBefore` check, the
- * loads, the catalogue check, the order, the league gate, the rotation and
- * the writes.
+ * One process prices **one entry per iteration**. Each iteration is the same
+ * chunk `pnpm sync:batch` runs (`./compose-chunk.ts`, `./chunk/run-chunk.ts`),
+ * bounded to one entry: it takes the lock, loads, prices, publishes and
+ * releases. The lock is taken per entry and never held across a wait, so
+ * IMPLEMENTATION-NOTES.md §7 and its 6 h stale rule are unchanged.
  *
- * **The git port is the real read-only one** (`./git/read-only-git-port.ts`),
- * reading the repository at the same root. The tracked-list edit date is
- * therefore the author date of `data/tracked.json`'s last commit, tagged
- * `git-author-date` — AD-12's first clock. Where the repository yields no date
- * (no commit yet, no repository, no `git` binary is found) the resolver falls
- * back to the `file-modified` clock. `pnpm sync:dry` keeps the history-less
- * fake: its report is a prediction over a fake filesystem.
+ * **One pacing state lives for the whole process** (`PacingState`: the bucket
+ * ledger and the lane memo). Each chunk gets a fresh governor seeded with it,
+ * paced with the even spread (`spreadBeforeNext`, §5.3), and its own
+ * invalid-request counts. Before each chunk the session pre-waits the spread
+ * delay of the lanes the next entry spends on — `DATA_LANE` when the league
+ * gate is due, `SEARCH_LANE` and `FETCH_LANE` — **outside** the lock, so the
+ * waits inside a chunk are only the fetch lane's small gaps. There is no
+ * startup wait: the first request goes out cold and its response seeds the
+ * ledger.
  *
- * The config, the rates, the item types and the published dataset are loaded
- * under the lock, and a refusal names its file before any request, in a
- * `run-failure` record. A pinned set over IMPLEMENTATION-NOTES.md §6's cap is
- * refused the same way. A throw from the chunk — a league mismatch included —
- * has already written `sync-report.json` and released the lock by the time it
- * reaches here; the command reports it on stderr and exits `1`.
+ * After each chunk, `nextWait` (pure) decides the wait from the outcome or the
+ * throw, the `notBefore` the chunk left in `sync-progress.json`, and whether
+ * the chunk brought a fresh State reading (the ledger changed). `runWait`
+ * spends it: a timed wait, a local poll of the input files' `modifiedAt`, or a
+ * local poll of the lock file. Nothing idle sends a request.
  *
- * **No test runs `main`.** `sync.test.ts` drives `syncCommand` with injected
- * ports; the entry guard at the bottom means importing the module runs nothing.
+ * The first SIGINT or SIGTERM cancels a wait at once, or lets the running
+ * entry finish, and the command exits 0. A throw never stops the session: it
+ * is printed and waited out.
+ *
+ * **No test runs `main`.** `sync.test.ts` drives `syncSessionCommand` with
+ * injected ports; the entry guard at the bottom means importing the module
+ * runs nothing.
  */
 
 import { realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { parseEnvelope, SyncProgressFileSchema } from '@poe/contracts';
+import type { FilesystemPort, ClockPort } from '@poe/contracts';
+import { UNRESOLVABLE_RETRY_MS } from '@poe/core';
+
+import { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH } from './catalogue/catalogue-ids.ts';
+import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
+import { isStaleState, LOCK_PATH, readLock, STALE_LOCK_AFTER_MS } from './chunk/lock.ts';
+import { PROGRESS_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
 import { composeChunk } from './compose-chunk.ts';
 import type { ComposeChunkPorts } from './compose-chunk.ts';
 import { createReadOnlyGitPort } from './git/read-only-git-port.ts';
-import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
+import { LeagueMismatchError } from './league/league-gate.ts';
+import { CONFIG_PATH } from './load-config.ts';
+import { DataFileError } from './load-data-file.ts';
+import { PinnedCapExceededError } from './pinned-cap.ts';
+import { CURRENCIES_PATH } from './pricing/load-currencies.ts';
+import { CATALOGUE_ITEMS_PATH } from './pricing/load-item-types.ts';
+import { MalformedRequestError } from './pricing/price-entry.ts';
+import { UnknownClassBaseTypeError } from './pricing/search-body.ts';
+import { createRequestCounter } from './request-counter.ts';
+import type { RequestsBySource } from './request-counter.ts';
+import {
+  abortableSleep,
+  createFetchHttpPort,
+  createNodeFilesystemPort,
+  sleep,
+  systemClock,
+} from './shell.ts';
+import { createPacingState, laneDelayMs } from './trade/client.ts';
+import type { PacingState } from './trade/client.ts';
+import { DATA_LANE, FETCH_LANE, SEARCH_LANE } from './trade/endpoints.ts';
+import { evenIntervalMs } from './trade/ledger.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
-/**
- * The live command's ports. The live command passes the read-only git port at
- * the repository root (see above).
- */
-export type SyncPorts = ComposeChunkPorts;
+const PREFIX = 'pnpm sync:';
+const MS_PER_HOUR = 60 * 60 * 1000;
 
-/** Composes one live chunk from its ports and runs it. Throws what the chunk throws. */
-export function runSync(ports: SyncPorts): Promise<ChunkOutcome> {
-  return composeChunk(ports).run();
+/** `--pinned-max-age <hours>`'s default (AD-7): a pinned entry is due once it is older. */
+export const DEFAULT_PINNED_MAX_AGE_HOURS = 4;
+
+/**
+ * The first backoff on a lane whose policy the session has not read yet: the
+ * even interval of the measured search bucket `600:21600` (21 600 s / 600
+ * hits = 36 s, IMPLEMENTATION-NOTES.md §5.3, which owns the figure).
+ */
+export const COLD_EVEN_INTERVAL_MS = 36_000;
+
+/**
+ * How often a wait polls the local input files or the lock file. A local
+ * read, never a request: an idle wait sends nothing.
+ */
+export const LOCAL_POLL_MS = 5_000;
+
+/**
+ * The hand-owned inputs under `data/` a chunk reads and never writes. A change
+ * to any of them — its presence or its `modifiedAt` — ends a wait for an input
+ * change, and makes the league gate due again.
+ */
+export const INPUT_PATHS: readonly string[] = [
+  TRACKED_PATH,
+  CONFIG_PATH,
+  CURRENCIES_PATH,
+  WEIGHTS_PATH,
+  CATALOGUE_ITEMS_PATH,
+  CATALOGUE_STATS_PATH,
+  CATALOGUE_FILTERS_PATH,
+];
+
+// ---------------------------------------------------------------------------
+// Arguments
+
+export interface SessionOptions {
+  readonly pinnedMaxAgeMs: number;
 }
 
-export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent'> {
+export type ParsedArgs =
+  | { readonly ok: true; readonly options: SessionOptions }
+  | { readonly ok: false; readonly message: string };
+
+/** `--pinned-max-age <hours>` (a positive number) and a literal `--`, which is skipped. */
+export function parseArgs(argv: readonly string[]): ParsedArgs {
+  let hours = DEFAULT_PINNED_MAX_AGE_HOURS;
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--') {
+      continue;
+    }
+    if (arg === '--pinned-max-age') {
+      const value = argv[index + 1];
+      const parsed = value === undefined ? Number.NaN : Number(value);
+      if (value === undefined || value.trim() === '' || !Number.isFinite(parsed) || parsed <= 0) {
+        return { ok: false, message: '--pinned-max-age needs a positive number of hours' };
+      }
+      hours = parsed;
+      index += 1;
+      continue;
+    }
+    return { ok: false, message: `unknown argument ${JSON.stringify(arg)}` };
+  }
+  return { ok: true, options: { pinnedMaxAgeMs: hours * MS_PER_HOUR } };
+}
+
+// ---------------------------------------------------------------------------
+// State and the pure decisions
+
+/** What one iteration's chunk ended with. */
+export type ChunkResult =
+  | { readonly kind: 'outcome'; readonly outcome: ChunkOutcome }
+  | { readonly kind: 'error'; readonly error: unknown };
+
+export interface SessionState {
+  /** The league the last chunk confirmed; absent until one does, and after a throw or a gate yield. */
+  readonly confirmedLeague?: string;
+  /** The input signature at the chunk that last confirmed the league. */
+  readonly confirmedSignature?: string;
+  /** The request counter's snapshot at the start of the current pass. */
+  readonly passStart?: RequestsBySource;
+  /** `true` after a `completed` chunk: the next chunk starts a new pass. */
+  readonly passEnded: boolean;
+  /** Consecutive backoff waits (decisions 5 and 6); `0` after a State reading. */
+  readonly backoffCount: number;
+}
+
+export const INITIAL_SESSION_STATE: SessionState = { passEnded: false, backoffCount: 0 };
+
+/** What the session knew around one chunk. */
+export interface ChunkContext {
+  /** The instant the chunk ended. */
+  readonly now: string;
+  /** The `notBefore` in `sync-progress.json` after the chunk, where it is still in the future. */
+  readonly notBefore?: string;
+  /** `true` when the chunk's responses brought a State reading (the ledger changed). */
+  readonly freshReading: boolean;
+  /** The tightest even interval of the lanes the entry spent on (`sessionEvenIntervalMs`). */
+  readonly evenIntervalMs: number;
+}
+
+export type SessionWait =
+  | { readonly kind: 'none' }
+  /** Until an instant; with `orInputChange`, or until an input file changes if that is sooner. */
+  | { readonly kind: 'until'; readonly until: string; readonly reason: string; readonly orInputChange: boolean }
+  /** Until an input file changes; with `until`, at most until then. */
+  | { readonly kind: 'input-change'; readonly reason: string; readonly until?: string }
+  /** Until the lock file is absent or stale (§7). */
+  | { readonly kind: 'lock'; readonly reason: string };
+
+const NO_WAIT: SessionWait = { kind: 'none' };
+
+/**
+ * A throw only an edit to an input file clears. A `DataFileError` counts only
+ * for a watched input: a refused sync-owned file (the dataset, progress or the
+ * report) is not in `INPUT_PATHS`, so a wait for an input change would never
+ * end, and it takes the backoff instead.
+ */
+function isRefusal(error: unknown): boolean {
+  return (
+    (error instanceof DataFileError && INPUT_PATHS.includes(error.path)) ||
+    error instanceof PinnedCapExceededError ||
+    error instanceof UnknownClassBaseTypeError ||
+    error instanceof LeagueMismatchError
+  );
+}
+
+/**
+ * Whether the result earns a backoff (decisions 5 and 6): a yield that wrote
+ * no `notBefore` and brought no State reading (no answer), or a throw that is
+ * not a refusal, a league mismatch or a malformed request and wrote no
+ * `notBefore`.
+ */
+function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
+  if (context.notBefore !== undefined) {
+    return false;
+  }
+  if (result.kind === 'outcome') {
+    return result.outcome.kind === 'yielded' && !context.freshReading;
+  }
+  return !isRefusal(result.error);
+}
+
+/** The count this result's backoff runs at: `1` after a State reading, one more than the last otherwise. */
+function backoffCountFor(state: SessionState, context: ChunkContext): number {
+  return context.freshReading ? 1 : state.backoffCount + 1;
+}
+
+/**
+ * The `count`-th consecutive backoff: the even interval, doubled per
+ * consecutive backoff, capped at the 6 h stale threshold (`STALE_LOCK_AFTER_MS`).
+ */
+export function backoffMs(evenInterval: number, count: number): number {
+  const doubled = evenInterval * 2 ** Math.max(0, count - 1);
+  return Math.min(doubled, STALE_LOCK_AFTER_MS);
+}
+
+function plus(now: string, ms: number): string {
+  return new Date(Date.parse(now) + ms).toISOString();
+}
+
+/**
+ * The wait after one chunk (the I/O matrix of the session). Pure: the result,
+ * the state before it and what the session read around the chunk go in.
+ */
+export function nextWait(result: ChunkResult, state: SessionState, context: ChunkContext): SessionWait {
+  const { now, notBefore } = context;
+  const backoffUntil = (): string =>
+    plus(now, backoffMs(context.evenIntervalMs, backoffCountFor(state, context)));
+
+  if (result.kind === 'error') {
+    const { error } = result;
+    if (notBefore !== undefined) {
+      // A malformed request, or the gate's 4xx: the abort `notBefore` (§5.3).
+      // An edit may fix a request `sync` built wrong, so that wait also ends on one.
+      return {
+        kind: 'until',
+        until: notBefore,
+        reason: 'a rejected request',
+        orInputChange: error instanceof MalformedRequestError,
+      };
+    }
+    if (isRefusal(error)) {
+      return { kind: 'input-change', reason: 'a refused input or a league mismatch' };
+    }
+    return { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
+  }
+
+  const { outcome } = result;
+  switch (outcome.kind) {
+    case 'busy':
+      return { kind: 'lock', reason: 'another run holds the lock' };
+    case 'dispossessed':
+      return { kind: 'lock', reason: 'the lock was taken over' };
+    case 'deferred':
+      return { kind: 'until', until: outcome.notBefore, reason: 'a trade penalty', orInputChange: false };
+    case 'yielded':
+      if (notBefore !== undefined) {
+        return { kind: 'until', until: notBefore, reason: 'a 429', orInputChange: false };
+      }
+      if (context.freshReading) {
+        // A 5xx or a timeout that still carried headers: the spread paces the retry.
+        return NO_WAIT;
+      }
+      return { kind: 'until', until: backoffUntil(), reason: 'no answer', orInputChange: false };
+    case 'completed':
+      if (outcome.completed.length === 0 && outcome.entries.length === 0) {
+        return {
+          kind: 'input-change',
+          reason: 'nothing due',
+          until: plus(now, UNRESOLVABLE_RETRY_MS),
+        };
+      }
+      return NO_WAIT;
+    case 'bounded':
+      return NO_WAIT;
+  }
+}
+
+/** The state with no confirmed league: the next chunk runs the gate. */
+function withoutLeague(state: SessionState): SessionState {
+  return {
+    passEnded: state.passEnded,
+    backoffCount: state.backoffCount,
+    ...(state.passStart === undefined ? {} : { passStart: state.passStart }),
+  };
+}
+
+/** The state after one chunk. `signature` and `before` are the iteration's, read before the chunk. */
+export function nextState(
+  state: SessionState,
+  result: ChunkResult,
+  context: ChunkContext,
+  iteration: { readonly signature: string; readonly before: RequestsBySource },
+): SessionState {
+  const backoffCount = isBackoff(result, context)
+    ? backoffCountFor(state, context)
+    : 0;
+
+  if (result.kind === 'error') {
+    // Only a league mismatch unconfirms the league; a transient fault keeps it,
+    // so the retry does not spend an extra gate request.
+    return result.error instanceof LeagueMismatchError
+      ? { ...withoutLeague(state), backoffCount }
+      : { ...state, backoffCount };
+  }
+
+  const { outcome } = result;
+  if (outcome.newPass === undefined) {
+    // Busy, deferred, or a throw-free ending before the order: nothing about the pass changed.
+    return { ...state, backoffCount };
+  }
+  const passStart =
+    outcome.newPass || state.passStart === undefined ? iteration.before : state.passStart;
+  const passEnded = outcome.kind === 'completed';
+  if (outcome.confirmedLeague === undefined) {
+    return { ...withoutLeague(state), passStart, passEnded, backoffCount };
+  }
+  return {
+    confirmedLeague: outcome.confirmedLeague,
+    confirmedSignature: iteration.signature,
+    passStart,
+    passEnded,
+    backoffCount,
+  };
+}
+
+/** The gate is due when no league is confirmed, a new pass starts, or an input changed since it was. */
+export function gateDue(state: SessionState, signature: string): boolean {
+  return (
+    state.confirmedLeague === undefined || state.passEnded || signature !== state.confirmedSignature
+  );
+}
+
+function entryLanes(withGate: boolean): readonly string[] {
+  return withGate ? [DATA_LANE, SEARCH_LANE, FETCH_LANE] : [SEARCH_LANE, FETCH_LANE];
+}
+
+/** The pre-wait before the next chunk: the largest spread delay over the lanes it will spend on. */
+export function preWaitMs(pacing: PacingState, now: string, withGate: boolean): number {
+  return Math.max(0, ...entryLanes(withGate).map((lane) => laneDelayMs(pacing, lane, now, true)));
+}
+
+/**
+ * The tightest even interval over the lanes an entry spends on; a lane whose
+ * policy is unread counts as `COLD_EVEN_INTERVAL_MS`.
+ */
+export function sessionEvenIntervalMs(pacing: PacingState, withGate: boolean): number {
+  return Math.max(
+    ...entryLanes(withGate).map(
+      (lane) => evenIntervalMs(pacing.ledger, pacing.lanePolicies.get(lane)) ?? COLD_EVEN_INTERVAL_MS,
+    ),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Local reads
+
+/**
+ * The presence and `modifiedAt` of every input file, as one comparable string.
+ * It never throws: a transient fs fault (`EBUSY`, `EPERM`) on one path records
+ * an error marker in that path's part, so it cannot end the session.
+ */
+export async function inputSignature(fs: FilesystemPort): Promise<string> {
+  const parts = await Promise.all(
+    INPUT_PATHS.map(async (path) => {
+      try {
+        return [path, await fs.exists(path), (await fs.lastModifiedAt(path)) ?? null];
+      } catch {
+        return [path, 'error'];
+      }
+    }),
+  );
+  return JSON.stringify(parts);
+}
+
+/**
+ * `true` when the lock file is absent, or stale by §7's rule (`isStaleState`).
+ * A read that throws answers `false`, so the poll continues.
+ */
+export async function lockIsFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
+  try {
+    const found = await readLock(fs);
+    if (found.state === 'absent') {
+      return true;
+    }
+    return await isStaleState(fs, found, clock.now(), LOCK_PATH);
+  } catch {
+    return false;
+  }
+}
+
+/** The `notBefore` in `sync-progress.json`, where it is readable and still after `now`. */
+async function pendingNotBefore(fs: FilesystemPort, now: string): Promise<string | undefined> {
+  try {
+    const text = await fs.readTextFile(PROGRESS_PATH);
+    if (text === undefined) {
+      return undefined;
+    }
+    const parsed = parseEnvelope(SyncProgressFileSchema, JSON.parse(text));
+    const notBefore = parsed.ok ? parsed.value.notBefore : undefined;
+    return notBefore !== undefined && Date.parse(notBefore) > Date.parse(now) ? notBefore : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The waits
+
+export interface WaitPorts {
+  readonly fs: FilesystemPort;
+  readonly clock: ClockPort;
+  /** A delay that an abort ends at once, resolving (`abortableSleep`). */
+  readonly sleep: (ms: number, signal: AbortSignal) => Promise<void>;
+  readonly signal: AbortSignal;
+}
+
+function remainingMs(until: string, clock: ClockPort): number {
+  return Date.parse(until) - Date.parse(clock.now());
+}
+
+/** Spends one wait. Returns early on an abort. `signature` is the input signature the wait compares against. */
+export async function runWait(wait: SessionWait, ports: WaitPorts, signature: string): Promise<void> {
+  const { fs, clock, sleep: pause, signal } = ports;
+  switch (wait.kind) {
+    case 'none':
+      return;
+    case 'until':
+      for (;;) {
+        const left = remainingMs(wait.until, clock);
+        if (left <= 0 || signal.aborted) {
+          return;
+        }
+        await pause(wait.orInputChange ? Math.min(left, LOCAL_POLL_MS) : left, signal);
+        if (signal.aborted) {
+          return;
+        }
+        if (wait.orInputChange && (await inputSignature(fs)) !== signature) {
+          return;
+        }
+      }
+    case 'input-change':
+      for (;;) {
+        const left = wait.until === undefined ? LOCAL_POLL_MS : remainingMs(wait.until, clock);
+        if (left <= 0 || signal.aborted) {
+          return;
+        }
+        await pause(Math.min(left, LOCAL_POLL_MS), signal);
+        if (signal.aborted || (await inputSignature(fs)) !== signature) {
+          return;
+        }
+      }
+    case 'lock':
+      for (;;) {
+        if (signal.aborted || (await lockIsFree(fs, clock))) {
+          return;
+        }
+        await pause(LOCAL_POLL_MS, signal);
+      }
+  }
+}
+
+function describeWait(wait: Exclude<SessionWait, { kind: 'none' }>): string {
+  switch (wait.kind) {
+    case 'until':
+      return `waiting until ${wait.until} (${wait.reason}${wait.orInputChange ? ', or an input file change' : ''})`;
+    case 'input-change':
+      return `waiting for an input file under data/ to change (${wait.reason}${
+        wait.until === undefined ? '' : `, at most until ${wait.until}`
+      })`;
+    case 'lock':
+      return `waiting for the lock to be free (${wait.reason})`;
+  }
+}
+
+function describeOutcome(outcome: ChunkOutcome): string {
+  const kind: string =
+    outcome.kind === 'deferred'
+      ? `deferred until ${outcome.notBefore}`
+      : outcome.kind === 'bounded'
+        ? `bounded by ${outcome.bound}`
+        : outcome.kind;
+  const keys = outcome.completed.length === 0 ? '' : `: ${outcome.completed.join(', ')}`;
+  return `${kind}, ${String(outcome.completed.length)} completed${keys}`;
+}
+
+// ---------------------------------------------------------------------------
+// The command
+
+/** The session's ports: `composeChunk`'s, less what the session itself supplies. */
+export type SyncSessionPorts = Omit<
+  ComposeChunkPorts,
+  'userAgent' | 'pacing' | 'spread' | 'requests' | 'session' | 'wrapStep'
+>;
+
+export interface SyncSessionDeps extends SyncSessionPorts {
   /** Where the contact `User-Agent` is read from (`POE_SYNC_USER_AGENT`). */
   readonly env: Readonly<Record<string, string | undefined>>;
+  /** The command's arguments, after the script name. */
+  readonly argv: readonly string[];
   readonly stdout: (line: string) => void;
   readonly stderr: (line: string) => void;
+  /** Aborted by the first SIGINT or SIGTERM. */
+  readonly signal: AbortSignal;
+  /** The session's waits, cut short by `signal` (`abortableSleep`). The in-chunk waits use `wait`. */
+  readonly sleep: (ms: number, signal: AbortSignal) => Promise<void>;
 }
 
-/** The command: the exit code it should end with. `0` on any outcome, `1` on a refusal or a throw. */
-export async function syncCommand(deps: SyncCommandDeps): Promise<number> {
-  const { env, stdout, stderr, ...ports } = deps;
+/** The session: runs until `signal` aborts, then exits `0`. `1` only on a refusal before any request. */
+export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number> {
+  const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = deps;
+  const { fs, clock } = ports;
+
+  const args = parseArgs(argv);
+  if (!args.ok) {
+    stderr(`${PREFIX} ${args.message}`);
+    return 1;
+  }
   const contact = resolveUserAgent(env);
   if (!contact.ok) {
     // Refused before anything is issued (NFR-9).
-    stderr(`pnpm sync: ${contact.message}`);
+    stderr(`${PREFIX} ${contact.message}`);
     return 1;
   }
-  try {
-    const outcome = await runSync({ ...ports, userAgent: contact.userAgent });
-    const kind = outcome.kind === 'deferred' ? `deferred until ${outcome.notBefore}` : outcome.kind;
-    stdout(`pnpm sync: ${kind}, ${String(outcome.completed.length)} completed`);
-    return 0;
-  } catch (error) {
-    stderr(`pnpm sync: ${error instanceof Error ? error.message : String(error)}`);
-    return 1;
+
+  const pacing = createPacingState();
+  const requests = createRequestCounter();
+  const waitPorts: WaitPorts = { fs, clock, sleep: pause, signal };
+  let state = INITIAL_SESSION_STATE;
+
+  while (!signal.aborted) {
+    const signature = await inputSignature(fs);
+    const withGate = gateDue(state, signature);
+
+    const delayMs = preWaitMs(pacing, clock.now(), withGate);
+    if (delayMs > 0) {
+      stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
+      await pause(delayMs, signal);
+      if (signal.aborted) {
+        break;
+      }
+    }
+
+    const before = requests.snapshot();
+    const ledgerBefore = pacing.ledger;
+    let result: ChunkResult;
+    try {
+      const outcome = await composeChunk({
+        ...ports,
+        userAgent: contact.userAgent,
+        pacing,
+        spread: true,
+        requests,
+        session: {
+          maxEntries: 1,
+          pinnedMaxAgeMs: args.options.pinnedMaxAgeMs,
+          ...(state.passStart === undefined ? {} : { requestsSince: state.passStart }),
+          ...(state.confirmedLeague === undefined ? {} : { confirmedLeague: state.confirmedLeague }),
+        },
+      }).run();
+      result = { kind: 'outcome', outcome };
+      stdout(`${PREFIX} ${describeOutcome(outcome)}`);
+    } catch (error) {
+      result = { kind: 'error', error };
+      stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    const now = clock.now();
+    const notBefore = await pendingNotBefore(fs, now);
+    const context: ChunkContext = {
+      now,
+      ...(notBefore === undefined ? {} : { notBefore }),
+      freshReading: pacing.ledger !== ledgerBefore,
+      evenIntervalMs: sessionEvenIntervalMs(pacing, withGate),
+    };
+    const wait = nextWait(result, state, context);
+    state = nextState(state, result, context, { signature, before });
+
+    if (wait.kind !== 'none' && !signal.aborted) {
+      stdout(`${PREFIX} ${describeWait(wait)}`);
+      await runWait(wait, waitPorts, signature);
+    }
   }
+
+  stdout(`${PREFIX} stopped`);
+  return 0;
 }
 
 /** `packages/sync/src/` → the repository root, whose `data/` the chunk owns. */
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
 async function main(): Promise<void> {
-  process.exitCode = await syncCommand({
+  const controller = new AbortController();
+  const stop = (): void => {
+    controller.abort();
+  };
+  // `once`: the first signal stops the session gracefully; a second one gets
+  // Node's default handling and ends the process.
+  process.once('SIGINT', stop);
+  process.once('SIGTERM', stop);
+  process.exitCode = await syncSessionCommand({
     fs: createNodeFilesystemPort(REPO_ROOT),
     clock: systemClock,
     http: createFetchHttpPort(),
     git: createReadOnlyGitPort(REPO_ROOT),
     wait: sleep,
+    sleep: abortableSleep,
     pid: process.pid,
     env: process.env,
+    argv: process.argv.slice(2),
+    signal: controller.signal,
     stdout: (line) => process.stdout.write(`${line}\n`),
     stderr: (line) => process.stderr.write(`${line}\n`),
   });
@@ -109,7 +645,7 @@ function isInvokedDirectly(): boolean {
 
 if (isInvokedDirectly()) {
   main().catch((error: unknown) => {
-    process.stderr.write(`pnpm sync: ${String(error)}\n`);
+    process.stderr.write(`${PREFIX} ${String(error)}\n`);
     // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a piped stderr write.
     process.exitCode = 1;
   });

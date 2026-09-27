@@ -267,3 +267,46 @@ describe('pinnedToKeep', () => {
     expect(pinnedToKeep(2, 0, false)).toBe(2);
   });
 });
+
+describe('chunkOrder: the stale-pinned rule (pinnedMaxAgeMs)', () => {
+  const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
+
+  it('keeps only stale pinned entries, oldest first, then the rotation', () => {
+    const fresh = raw('Fresh', 'pinned');
+    const old = raw('Old', 'pinned');
+    const older = raw('Older', 'pinned');
+    const never = raw('Never', 'pinned');
+    const A = raw('A');
+    const result = order({
+      tracked: [fresh, old, older, never, A],
+      dataset: [
+        published(fresh, HOURS_AGO(1)),
+        published(old, HOURS_AGO(5)),
+        published(older, HOURS_AGO(9)),
+        published(A, HOURS_AGO(2)),
+      ],
+      pinnedMaxAgeMs: FOUR_HOURS_MS,
+    });
+
+    expect(keysOf(result.pinned)).toEqual(keysOf([never, older, old]));
+    expect(keysOf(result.rotation)).toEqual(keysOf([A]));
+  });
+
+  it('treats an entry exactly at the maximum age as fresh', () => {
+    const P = raw('P', 'pinned');
+    const result = order({
+      tracked: [P],
+      dataset: [published(P, HOURS_AGO(4))],
+      pinnedMaxAgeMs: FOUR_HOURS_MS,
+    });
+
+    expect(result.pinned).toEqual([]);
+  });
+
+  it('keeps every pinned entry when no maximum age is given', () => {
+    const P = raw('P', 'pinned');
+    const result = order({ tracked: [P], dataset: [published(P, HOURS_AGO(1))] });
+
+    expect(keysOf(result.pinned)).toEqual(keysOf([P]));
+  });
+});
