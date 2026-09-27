@@ -1,0 +1,331 @@
+diff --git a/packages/web/src/frame/trust-facts.test.ts b/packages/web/src/frame/trust-facts.test.ts
+index 552eea0..9b9ce06 100644
+--- a/packages/web/src/frame/trust-facts.test.ts
++++ b/packages/web/src/frame/trust-facts.test.ts
+@@ -113,13 +113,29 @@ describe('the health line', () => {
+     expect(healthSignals(null)).toEqual([]);
+   });
+ 
+-  it('counts unresolvable records, and names pinned starvation without a count', () => {
++  it('counts unresolvable records', () => {
+     expect(healthSignals(report({ records: unresolvable(12) }))).toEqual(['12 unresolvable']);
+-    expect(healthSignals(report({ records: [starvation] }))).toEqual(['pinned entries starved this run']);
+-    expect(healthSignals(report({ records: [...unresolvable(12), starvation] }))).toEqual([
+-      '12 unresolvable',
+-      'pinned entries starved this run',
+-    ]);
++  });
++
++  it('counts starved pinned entries as N of M from the starvation record', () => {
++    expect(healthSignals(report({ records: [starvation] }))).toEqual(['3 of 5 pinned entries starved']);
++  });
++
++  it('reads the starvation count from the last starvation record only', () => {
++    const first = { ...starvation, pinnedCount: 8, pinnedRefreshed: 2 };
++    const last = { ...starvation, pinnedCount: 5, pinnedRefreshed: 4 };
++    expect(healthSignals(report({ records: [first, last] }))).toEqual(['1 of 5 pinned entries starved']);
++  });
++
++  it('formats the starvation counts with en-US grouping', () => {
++    const large = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 500 };
++    expect(healthSignals(report({ records: [large] }))).toEqual(['11,500 of 12,000 pinned entries starved']);
++  });
++
++  it('raises both triggers in order, and never prints "this run"', () => {
++    const signals = healthSignals(report({ records: [...unresolvable(12), starvation] }));
++    expect(signals).toEqual(['12 unresolvable', '3 of 5 pinned entries starved']);
++    expect(signals.join(' ')).not.toContain('this run');
+   });
+ 
+   it('ignores records of other kinds', () => {
+diff --git a/packages/web/src/frame/trust-facts.ts b/packages/web/src/frame/trust-facts.ts
+index eef2ade..33d409f 100644
+--- a/packages/web/src/frame/trust-facts.ts
++++ b/packages/web/src/frame/trust-facts.ts
+@@ -27,8 +27,6 @@ export const AFFORDANCE_OPEN = '− the full sync report';
+ 
+ export const PANEL_HEADINGS = ['The sync run', 'What is broken', 'What the weights cover'] as const;
+ 
+-export const HEALTH_STARVED = 'pinned entries starved this run';
+-
+ /** An ISO-8601 instant as its UTC calendar date, `YYYY-MM-DD`. */
+ export function utcDate(iso: string): string {
+   return new Date(iso).toISOString().slice(0, 10);
+@@ -111,8 +109,12 @@ export function healthSignals(report: SyncReport | null): readonly string[] {
+   if (unresolvable > 0) {
+     signals.push(`${unresolvable.toLocaleString('en-US')} unresolvable`);
+   }
+-  if (report.records.some((record) => record.kind === 'pinned-starvation')) {
+-    signals.push(HEALTH_STARVED);
++  const starvation = report.records.findLast((record) => record.kind === 'pinned-starvation');
++  if (starvation !== undefined) {
++    const starved = starvation.pinnedCount - starvation.pinnedRefreshed;
++    signals.push(
++      `${starved.toLocaleString('en-US')} of ${starvation.pinnedCount.toLocaleString('en-US')} pinned entries starved`,
++    );
+   }
+   return signals;
+ }
+diff --git a/packages/web/src/frame/trust-strip.test.tsx b/packages/web/src/frame/trust-strip.test.tsx
+index ba8a392..d7db9b7 100644
+--- a/packages/web/src/frame/trust-strip.test.tsx
++++ b/packages/web/src/frame/trust-strip.test.tsx
+@@ -182,7 +182,7 @@ describe('the resting strip', () => {
+     mountStrip({ syncReport: { ...COMMITTED_REPORT, records } }, ['recipes']);
+     const health = strip().querySelector<HTMLElement>('[data-health-line]');
+     expect(health?.style.height).toBe(px(spacing.frameReserveHealthLine));
+-    expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe('× 12 unresolvable|× pinned entries starved this run');
++    expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe('× 12 unresolvable|× 3 of 5 pinned entries starved');
+     const signals = health?.querySelectorAll<HTMLElement>('[data-health-signal]') ?? [];
+     expect(signals).toHaveLength(2);
+     for (const signal of signals) {
+diff --git a/packages/web/src/list/display-rows.test.ts b/packages/web/src/list/display-rows.test.ts
+index 43be64f..795e49d 100644
+--- a/packages/web/src/list/display-rows.test.ts
++++ b/packages/web/src/list/display-rows.test.ts
+@@ -44,7 +44,7 @@ describe('toDisplayRows', () => {
+     expect(rows.every((row) => row.unit === 'raw' && row.itemLevel === 82)).toBe(true);
+   });
+ 
+-  it('drops unresolvable and below-threshold entries, and gives a league mismatch its observation age', () => {
++  it('drops unresolvable and below-threshold entries, and gives a league mismatch its attempted age', () => {
+     const lost = rawEntry('Lost Ring');
+     const cheap = rawEntry('Iron Ring');
+     const old = rawEntry('Jade Amulet');
+@@ -57,7 +57,7 @@ describe('toDisplayRows', () => {
+       ],
+     );
+     expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.age?.word])).toEqual([
+-      ['Jade Amulet', undefined, 'no figure yet', 'priced 3d ago'],
++      ['Jade Amulet', undefined, 'no figure yet', 'tried 3d ago'],
+     ]);
+   });
+ 
+diff --git a/packages/web/src/list/display-rows.ts b/packages/web/src/list/display-rows.ts
+index 7207efb..f64cc99 100644
+--- a/packages/web/src/list/display-rows.ts
++++ b/packages/web/src/list/display-rows.ts
+@@ -67,7 +67,7 @@ export function toDisplayRows(ranking: Ranking, dataset: readonly DatasetEntry[]
+   ): Pick<DisplayRow, 'age' | 'state' | 'entry' | 'ages'> => {
+     const entry = byKey.get(entryKey);
+     return {
+-      age: ageMark(entry, now),
++      age: ageMark(state, entry?.lastAttemptedAt, now),
+       state,
+       entry,
+       ages: combinationAges(state, entry?.lastAttemptedAt, now),
+diff --git a/packages/web/src/list/expansion.test.tsx b/packages/web/src/list/expansion.test.tsx
+index 31d4576..e13a72c 100644
+--- a/packages/web/src/list/expansion.test.tsx
++++ b/packages/web/src/list/expansion.test.tsx
+@@ -137,7 +137,7 @@ describe('the expansion panel', () => {
+     expect(title?.style.fontSize).toBe('20px');
+     const sub = panel?.querySelector<HTMLElement>('[data-panel-sub]');
+     expect(sub?.textContent).toBe(
+-      'Uncrafted at Item Level 82, ranked at its own current asking price and not at a craft outcome. ' +
++      'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
+         'One Combination is tracked here: the degenerate Combination of no affixes. ' +
+         `Payout Threshold 0.50 Divine. ${PANEL_ASKING_SENTENCE}`,
+     );
+diff --git a/packages/web/src/list/format.test.ts b/packages/web/src/list/format.test.ts
+index 545b8e4..48b3485 100644
+--- a/packages/web/src/list/format.test.ts
++++ b/packages/web/src/list/format.test.ts
+@@ -1,6 +1,6 @@
+ import { describe, expect, it } from 'vitest';
+ 
+-import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
++import { hoursBefore } from '../test-support/list-fixtures';
+ import {
+   ageMark,
+   combinationAges,
+@@ -25,7 +25,6 @@ import {
+ } from './format';
+ 
+ const NOW = Date.parse('2026-09-26T12:00:00.000Z');
+-const BELT = rawEntry('Wide Belt');
+ 
+ describe('the view constants', () => {
+   it('cuts freshness at 48h, shows the top 20 and starts at 0.25 Divine', () => {
+@@ -64,43 +63,48 @@ describe('formatDivine', () => {
+ });
+ 
+ describe('ageMark', () => {
++  const pricedAt = (observedAt: string): CombinationState => ({ state: 'priced', priceDivine: 0.5, sampleSize: 10, observedAt });
++  const NO_LISTINGS: CombinationState = { state: 'no-listings' };
++  const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
++  const NEVER: CombinationState = { state: 'not-yet-synced', reason: 'never-synced' };
++
+   it('is silent under the cut-off', () => {
+-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 3)), NOW)).toBeUndefined();
+-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 47.99)), NOW)).toBeUndefined();
++    expect(ageMark(pricedAt(hoursBefore(NOW, 3)), hoursBefore(NOW, 3), NOW)).toBeUndefined();
++    expect(ageMark(pricedAt(hoursBefore(NOW, 47.99)), hoursBefore(NOW, 47.99), NOW)).toBeUndefined();
+   });
+ 
+-  it('reads the observation clock for a priced entry, from exactly 48h', () => {
+-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 48)), NOW)).toEqual({ kind: 'stale', word: 'priced 2d ago' });
+-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 5 * 24 + 4)), NOW)).toEqual({
++  it('reads the observation clock for a priced row, from exactly 48h', () => {
++    expect(ageMark(pricedAt(hoursBefore(NOW, 48)), hoursBefore(NOW, 48), NOW)).toEqual({
++      kind: 'stale',
++      word: 'priced 2d ago',
++    });
++    expect(ageMark(pricedAt(hoursBefore(NOW, 5 * 24 + 4)), hoursBefore(NOW, 5 * 24 + 4), NOW)).toEqual({
+       kind: 'stale',
+       word: 'priced 5d ago',
+     });
+   });
+ 
+-  it('reads observedAt, not lastAttemptedAt, where the price is priced', () => {
+-    const entry = { ...priced(BELT, 0.5, hoursBefore(NOW, 72)), lastAttemptedAt: hoursBefore(NOW, 1) };
+-    expect(ageMark(entry, NOW)).toEqual({ kind: 'stale', word: 'priced 3d ago' });
+-  });
+-
+-  it('reads a league-mismatched observation as priced too', () => {
+-    expect(ageMark(priced(BELT, 0.5, hoursBefore(NOW, 96), 'Standard'), NOW)).toEqual({
++  it('reads observedAt, not lastAttemptedAt, where the row prints priced', () => {
++    expect(ageMark(pricedAt(hoursBefore(NOW, 72)), hoursBefore(NOW, 1), NOW)).toEqual({
+       kind: 'stale',
+-      word: 'priced 4d ago',
++      word: 'priced 3d ago',
+     });
+   });
+ 
++  it('reads a league-mismatched row by its attempted clock, never as priced', () => {
++    expect(ageMark(MISMATCH, hoursBefore(NOW, 96), NOW)).toEqual({ kind: 'stale', word: 'tried 4d ago' });
++    expect(ageMark(MISMATCH, hoursBefore(NOW, 2), NOW)).toBeUndefined();
++  });
++
+   it('reads lastAttemptedAt where there is no observation', () => {
+-    expect(ageMark(unpriced(BELT, { state: 'no-listings' }, hoursBefore(NOW, 9 * 24 + 1)), NOW)).toEqual({
+-      kind: 'stale',
+-      word: 'tried 9d ago',
+-    });
+-    expect(ageMark(unpriced(BELT, { state: 'no-listings' }, hoursBefore(NOW, 2)), NOW)).toBeUndefined();
++    expect(ageMark(NO_LISTINGS, hoursBefore(NOW, 9 * 24 + 1), NOW)).toEqual({ kind: 'stale', word: 'tried 9d ago' });
++    expect(ageMark(NO_LISTINGS, hoursBefore(NOW, 2), NOW)).toBeUndefined();
+   });
+ 
+   it('reads never attempted where neither clock exists', () => {
+     const never = { kind: 'never', word: 'never attempted' };
+-    expect(ageMark(undefined, NOW)).toEqual(never);
+-    expect(ageMark(unpriced(BELT, { state: 'not-yet-synced', reason: 'never-synced' }), NOW)).toEqual(never);
++    expect(ageMark(NEVER, undefined, NOW)).toEqual(never);
++    expect(ageMark(NO_LISTINGS, undefined, NOW)).toEqual(never);
+   });
+ });
+ 
+@@ -113,7 +117,7 @@ describe('labels', () => {
+ 
+   it('spells the Item Level Floor in the raw note', () => {
+     expect(rawNote(82)).toBe(
+-      'uncrafted at Item Level 82 — ranked at its own current asking price, not at a craft outcome',
++      'uncrafted at Item Level 82 — valued at its own current asking price, not at a craft outcome',
+     );
+   });
+ });
+@@ -187,7 +191,7 @@ describe('the expansion copy', () => {
+   it('repeats the Item Level, the threshold at 2dp and the asking-price sentence, with no Craft Recipe sentence', () => {
+     const line = rawPanelSubLine(82, 0.5);
+     expect(line).toBe(
+-      'Uncrafted at Item Level 82, ranked at its own current asking price and not at a craft outcome. ' +
++      'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
+         'One Combination is tracked here: the degenerate Combination of no affixes. ' +
+         'Payout Threshold 0.50 Divine. ' +
+         'Every price here is a current asking price from a live instant-buyout listing.',
+diff --git a/packages/web/src/list/format.ts b/packages/web/src/list/format.ts
+index e07b02d..fc15f80 100644
+--- a/packages/web/src/list/format.ts
++++ b/packages/web/src/list/format.ts
+@@ -1,4 +1,4 @@
+-import type { DatasetEntry, NotYetSyncedReason } from '@poe/contracts';
++import type { NotYetSyncedReason } from '@poe/contracts';
+ 
+ import { glyphs } from '../theme/tokens';
+ 
+@@ -46,15 +46,21 @@ export type AgeMark =
+ export const NEVER_ATTEMPTED = 'never attempted';
+ 
+ /**
+- * The Age cell (FR-12, AD-9, AD-10). The clock is `observedAt` where the entry's
+- * price is `priced` — a league-mismatched observation included — and
+- * `lastAttemptedAt` otherwise. Neither clock: *never attempted*. Younger than
+- * the cut-off: no mark at all. At or past it: `priced Nd ago` / `tried Nd ago`,
+- * N = floor(hours / 24).
++ * The Age cell (FR-12, AD-9, AD-10). The clock follows the row's resolved
++ * Price State, not the stored one: `observedAt` only where the row prints
++ * `priced`, and `lastAttemptedAt` otherwise — a league-mismatched observation
++ * included, which prints `not-yet-synced` and so reads the attempted clock, the
++ * same clock as the expansion's `tried …` age. Neither clock: *never attempted*.
++ * Younger than the cut-off: no mark at all. At or past it: `priced Nd ago` /
++ * `tried Nd ago`, N = floor(hours / 24).
+  */
+-export function ageMark(entry: DatasetEntry | undefined, now: number): AgeMark | undefined {
+-  const priced = entry?.price.state === 'priced' ? entry.price.observation.observedAt : undefined;
+-  const clock = priced === undefined ? entry?.lastAttemptedAt : priced;
++export function ageMark(
++  state: CombinationState,
++  lastAttemptedAt: string | undefined,
++  now: number,
++): AgeMark | undefined {
++  const priced = state.state === 'priced' ? state.observedAt : undefined;
++  const clock = priced ?? lastAttemptedAt;
+   if (clock === undefined) {
+     return { kind: 'never', word: NEVER_ATTEMPTED };
+   }
+@@ -77,7 +83,7 @@ export function unitLabel(className: string): string {
+ 
+ /** The Raw Base row's note, spelling the Item Level Floor (DESIGN.md `raw-base-row`). */
+ export function rawNote(itemLevelMin: number): string {
+-  return `uncrafted at Item Level ${String(itemLevelMin)} — ranked at its own current asking price, not at a craft outcome`;
++  return `uncrafted at Item Level ${String(itemLevelMin)} — valued at its own current asking price, not at a craft outcome`;
+ }
+ 
+ // --- the expansion panel ---------------------------------------------------
+@@ -210,7 +216,7 @@ export const PANEL_ASKING_SENTENCE = 'Every price here is a current asking price
+  */
+ export function rawPanelSubLine(itemLevelMin: number, threshold: number): string {
+   return [
+-    `Uncrafted at Item Level ${String(itemLevelMin)}, ranked at its own current asking price and not at a craft outcome.`,
++    `Uncrafted at Item Level ${String(itemLevelMin)}, valued at its own current asking price and not at a craft outcome.`,
+     'One Combination is tracked here: the degenerate Combination of no affixes.',
+     `Payout Threshold ${threshold.toFixed(2)} Divine.`,
+     PANEL_ASKING_SENTENCE,
+diff --git a/packages/web/src/list/ranked-list.test.tsx b/packages/web/src/list/ranked-list.test.tsx
+index cf3266c..cd78528 100644
+--- a/packages/web/src/list/ranked-list.test.tsx
++++ b/packages/web/src/list/ranked-list.test.tsx
+@@ -224,6 +224,32 @@ describe('the unpriced trail', () => {
+       expect(text).not.toMatch(/^(0|0\.00|—|)$/);
+     }
+   });
++
++  // Matrix: mismatched observation, old attempt / recent attempt; priced in the active league.
++  it('reads a league-mismatched row by its attempted clock, never as priced', () => {
++    const active = rawEntry('Gold Amulet');
++    const oldTry = rawEntry('Coral Ring');
++    const recentTry = rawEntry('Wide Belt');
++    const rows = rowsIn(
++      mountList(
++        [active, oldTry, recentTry],
++        [
++          { ...priced(active, 1, hoursBefore(NOW, 72)), lastAttemptedAt: hoursBefore(NOW, 1) },
++          priced(oldTry, 0.9, hoursBefore(NOW, 96), 'Standard'),
++          { ...priced(recentTry, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'), lastAttemptedAt: hoursBefore(NOW, 2) },
++        ],
++      ),
++    );
++    expect(rows).toHaveLength(3);
++    const byName = (name: string): HTMLElement | undefined =>
++      rows.find((r) => r.querySelector('[data-unit-name]')?.textContent === name);
++    expect(cell(byName('Gold Amulet'), 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}priced 3d ago`);
++    expect(cell(byName('Coral Ring'), 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}tried 4d ago`);
++    expect(cell(byName('Wide Belt'), 'age').textContent).toBe('');
++    for (const name of ['Coral Ring', 'Wide Belt']) {
++      expect(cell(byName(name), 'age').textContent).not.toContain('priced');
++    }
++  });
+ });
+ 
+ describe('the top-20 bound', () => {

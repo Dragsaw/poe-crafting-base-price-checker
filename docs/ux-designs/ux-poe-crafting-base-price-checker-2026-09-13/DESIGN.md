@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 9
+revision: 10
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -627,7 +627,7 @@ components:
     restingFacts: 'line 1 lead "Weights File", then "producer", "generatedAt", "gamePatch" — line 2 "Last synced", then "Tracked List last edited"'
     restingFactsRule: 'five plain facts, unconditional, no mark and no colour on any of them. They are attribution, not health signals.'
     healthLine: 'a third line, raised only when a health figure is bad. Each signal is a rust mark with its glyph, its word and its count.'
-    healthSignals: 'unresolvable entries exist ("× N unresolvable") · pinned entries starved ("× N of M pinned entries starved"; EXPERIENCE.md owns what N and M count) [decision — memlog 216]'
+    healthSignals: 'unresolvable entries exist ("× N unresolvable") · pinned entries starved ("× N of M pinned entries starved", or "× M pinned entries left the rotation no search" when N is 0; EXPERIENCE.md owns what N and M count and which record) [decision — memlog 216/222/223]'
     healthLineHeight: '{spacing.frame-reserve-health-line}'
     absenceLines: 'one line per absent tolerable artifact (AD-24), inside the strip, after line 2 and before the health line. Lead "Not published" in the label style, then the file and its consequence in the value style. Plain: no mark, no colour. Attribution, not a health signal [decision — memlog 213].'
     absenceLineCopy: '"Not published" · "weights.json — every crafted class is unrankable." | "recipes.json — no crafted rows can be ranked." | "sync-report.json — the sync report is unavailable." In that order.'
@@ -2007,10 +2007,13 @@ something actually broke:
 | Trigger | Line reads |
 |---|---|
 | any `unresolvable` entries exist (FR-24) | `× 12 unresolvable` |
-| a pinned-starvation record is present (FR-17, FR-25) | `× 3 of 8 pinned entries starved` |
+| the current curation's pinned-starvation record is present (FR-17, FR-25) | `× 3 of 8 pinned entries starved` |
+| the same, when it starved no pinned entry | `× 8 pinned entries left the rotation no search` |
 
-The starvation count reads *N of M* `[decision — memlog 216]`. `EXPERIENCE.md`
-(`{components.trust-strip}`) owns what N and M count.
+The starvation count reads *N of M* `[decision — memlog 216]`. The second
+wording replaces `0 of M` `[decision — memlog 223]`. `EXPERIENCE.md`
+(`{components.trust-strip}`) owns what N and M count and which record the line
+reads `[decision — memlog 222]`.
 
 Both triggers share the one line. A healthy sync raises no third line at all —
 no counts of nothing, no green tick, no "0 unresolvable" — but a broken one is
