@@ -106,7 +106,7 @@ deferred:
 
 Code review 2026-09-27 of `78db4da..ec38dce`, chunk `packages/web` (see the item 18 spec for the merge-integrity result).
 
-- [ ] [Review][Patch] The version/content split tests `result.reason !== 'invalid'`. A reason added to `EnvelopeResult` later becomes `cause: 'version'` with no compiler signal. Switch on `result.reason` with a `never` default, as `envelopes.ts` does. [packages/web/src/load/load-artifacts.ts:116]
+- [x] [Review][Patch] The version/content split tests `result.reason !== 'invalid'`. A reason added to `EnvelopeResult` later becomes `cause: 'version'` with no compiler signal. Switch on `result.reason` with a `never` default, as `envelopes.ts` does. [packages/web/src/load/load-artifacts.ts:116]
 - Rejected:
   - `low` (edge+verification-gap+blind) A literal `schemaVersion: "none"` prints "declares no schema version". It is rare, and the first review rejected it. The fix re-types the sentinel through `LoadOutcome` and the screen.
   - `low` (verification-gap+blind) A non-object JSON body (`[]`, `42`) gets the version cause. "It declares no schema version" is true of it, and the first review rejected it.
