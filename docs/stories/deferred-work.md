@@ -1,6 +1,6 @@
 # Deferred work
 
-Each entry names work carved out of a spec so it is not lost. Stories and reviews append; they do not rewrite. The `deferred-work-sweep` skill (`.claude/skills/deferred-work-sweep/SKILL.md`) removes an entry in the last commit of the branch that closes it, so the removal reaches `master` with the work, and adds `auto_attempt:` / `retry_when:` lines to an entry it could not close.
+Each entry names work carved out of a spec. Append new entries. Do not rewrite other entries. Remove an entry in the last commit of the branch that lands its work, or in a commit that names the decision to cancel it. The `deferred-work-sweep` skill also adds `auto_attempt:` / `retry_when:` lines to an entry it could not close.
 
 ## Deferred from: epic 1 retro item 15 (2026-09-26)
 

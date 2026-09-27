@@ -12,7 +12,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 ## Where things are
 
 - Architecture spine, which holds the canonical stack versions: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md`
-- Story specs, their reviews, `sprint-status.yaml` and `deferred-work.md`: `docs/stories/`. A story or review appends to `deferred-work.md` and does not rewrite it. Only the `deferred-work-sweep` skill removes an entry, as the last commit of the branch that closes it, so the removal lands on `master` in the same fast-forward as the work.
+- Story specs, their reviews, `sprint-status.yaml` and `deferred-work.md`: `docs/stories/`. A story or review appends to `deferred-work.md` and does not rewrite other entries. Remove an entry in the last commit of the branch that lands its work, or in a commit that names the decision to cancel it.
 - Mantine documentation for agents: https://mantine.dev/llms.txt
 - UX design system: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md`. impeccable finds only `PROJECT_ROOT/DESIGN.md`. Give `--target <path>` to use this file.
 
