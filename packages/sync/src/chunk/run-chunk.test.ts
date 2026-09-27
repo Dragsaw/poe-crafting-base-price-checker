@@ -36,7 +36,7 @@ import {
 import { DataFileError } from '../load-data-file.ts';
 import { PinnedCapExceededError, pinnedStarvationRecord } from '../pinned-cap.ts';
 import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
-import { createRequestCounter } from '../request-counter.ts';
+import { createRequestCounter, zeroRequests } from '../request-counter.ts';
 import { createTradeClient } from '../trade/client.ts';
 import { TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
 import { InvalidArtifactError } from '../write-artifact.ts';
@@ -807,12 +807,13 @@ describe('runChunk: the lock', () => {
 
   it('an invalid tracked list throws and still releases the lock', async () => {
     const fs = createFakeFilesystemPort({ [TRACKED_PATH]: { contents: '{not json' } });
-    await expect(
-      run(
-        { fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION },
-        scriptedStep().step,
-      ),
-    ).rejects.toThrow(/tracked\.json/);
+    const failure = run(
+      { fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION },
+      scriptedStep().step,
+    );
+    await expect(failure).rejects.toThrow(/tracked\.json/);
+    await expect(failure).rejects.toBeInstanceOf(DataFileError);
+    await expect(failure).rejects.toMatchObject({ path: TRACKED_PATH, reason: 'not-json' });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -881,7 +882,10 @@ describe('runChunk: the Refresh Rotation', () => {
 
   it('an invalid dataset throws and still releases the lock', async () => {
     const { fs, ports } = harness(undefined, { [DATASET_PATH]: { contents: '{"schemaVersion":"2.0.0"}' } });
-    await expect(run(ports, scriptedStep().step)).rejects.toThrow(/dataset\.json/);
+    const failure = run(ports, scriptedStep().step);
+    await expect(failure).rejects.toThrow(/dataset\.json/);
+    await expect(failure).rejects.toBeInstanceOf(DataFileError);
+    await expect(failure).rejects.toMatchObject({ path: DATASET_PATH, reason: 'unknown-major' });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -2124,11 +2128,16 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     await expect(run(ports, step)).rejects.toBeInstanceOf(LeagueRequestRejectedError);
 
     expect(visited).toEqual([]);
-    // The order exists, so the throw publishes the marks and clears notBefore.
+    // The order exists, so the throw publishes the marks. A gate 4xx would be
+    // refused again on the next tick, so it writes the abort notBefore (§5.3).
     // With no previous dataset there is no earlier label, so the configured one is written.
     const published = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
     expect(published.league).toBe('Standard');
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [],
+      notBefore: '2026-09-26T18:00:00.000Z',
+    });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
     expect((await reportOf(fs))?.records).toEqual([
       {
@@ -2844,5 +2853,165 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
     expect((await reportOf(fs))?.records).toEqual([
       { kind: 'run-failure', reason: 'unrecoverable-error', message: 'disk full' },
     ]);
+  });
+});
+
+describe('runChunk: under a session (ChunkPorts.session)', () => {
+  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
+    const text = await fs.readTextFile(REPORT_PATH);
+    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
+  }
+
+  /** A gate that passes and counts its calls. */
+  function countingGate(): { readonly calls: number[]; readonly gate: NonNullable<ChunkSetup['gate']> } {
+    const calls: number[] = [];
+    return {
+      calls,
+      gate: () => {
+        calls.push(1);
+        return Promise.resolve({ kind: 'pass' });
+      },
+    };
+  }
+
+  it('maxEntries 1 with an entry left ends bounded by entries, and names the pass and the league', async () => {
+    const { fs, ports } = harness([A, B]);
+    const { visited, step } = scriptedStep();
+    const { calls, gate } = countingGate();
+
+    const outcome = await run({ ...ports, gate, session: { maxEntries: 1 } }, step);
+
+    expect(outcome).toEqual({
+      kind: 'bounded',
+      bound: 'entries',
+      completed: [key(A)],
+      entries: [],
+      records: [],
+      newPass: false,
+      confirmedLeague: 'Standard',
+    });
+    expect(visited).toEqual([key(A)]);
+    expect(calls).toHaveLength(1);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+  });
+
+  it('maxEntries 1 on the last entry of the pass is completed', async () => {
+    const { ports } = harness([A, B], { [PROGRESS_PATH]: { contents: progressText([key(A)]) } });
+    const { visited, step } = scriptedStep();
+
+    const outcome = await run({ ...ports, session: { maxEntries: 1 } }, step);
+
+    expect(outcome).toMatchObject({ kind: 'completed', completed: [key(B)], newPass: false });
+    expect(visited).toEqual([key(B)]);
+  });
+
+  it('skips the gate while the confirmed league holds in the same pass', async () => {
+    const { ports } = harness([A, B], { [PROGRESS_PATH]: { contents: progressText([key(A)]) } });
+    const { step } = scriptedStep();
+    const { calls, gate } = countingGate();
+
+    const outcome = await run(
+      { ...ports, gate, session: { maxEntries: 1, confirmedLeague: 'Standard' } },
+      step,
+    );
+
+    expect(calls).toEqual([]);
+    expect(outcome).toMatchObject({ confirmedLeague: 'Standard', newPass: false });
+  });
+
+  it('runs the gate on a new pass, even with a confirmed league', async () => {
+    const { ports } = harness([A, B], { [PROGRESS_PATH]: { contents: progressText([key(A), key(B)]) } });
+    const { step } = scriptedStep();
+    const { calls, gate } = countingGate();
+
+    const outcome = await run(
+      { ...ports, gate, session: { maxEntries: 1, confirmedLeague: 'Standard' } },
+      step,
+    );
+
+    expect(calls).toHaveLength(1);
+    expect(outcome).toMatchObject({ kind: 'bounded', bound: 'entries', newPass: true });
+  });
+
+  it('runs the gate when the configured league differs from the confirmed one', async () => {
+    const { ports } = harness([A, B]);
+    const { step } = scriptedStep();
+    const { calls, gate } = countingGate();
+
+    const outcome = await run(
+      { ...ports, gate, session: { maxEntries: 1, confirmedLeague: 'Old League' } },
+      step,
+    );
+
+    expect(calls).toHaveLength(1);
+    expect(outcome).toMatchObject({ confirmedLeague: 'Standard' });
+  });
+
+  it('a gate yield names no confirmed league', async () => {
+    const { ports } = harness([A, B]);
+    const { step } = scriptedStep();
+
+    const outcome = await run(
+      { ...ports, gate: () => Promise.resolve({ kind: 'yield' }), session: { maxEntries: 1 } },
+      step,
+    );
+
+    expect(outcome).toEqual({ kind: 'yielded', completed: [], entries: [], records: [], newPass: false });
+  });
+
+  it('counts the report figure from the pass start, and from its own start on a new pass', async () => {
+    const passStart = { ...zeroRequests(), 'league-validation': 1, 'tracked-list': 1 };
+    const counts = [
+      { ...zeroRequests(), 'league-validation': 1, 'tracked-list': 3 },
+      { ...zeroRequests(), 'league-validation': 1, 'tracked-list': 4 },
+    ];
+    let reads = 0;
+    const requests = {
+      snapshot: () => counts[Math.min(reads++, counts.length - 1)] ?? zeroRequests(),
+    };
+
+    const within = harness([A, B], {}, { requests });
+    await run({ ...within.ports, session: { maxEntries: 1, requestsSince: passStart } }, scriptedStep().step);
+    // 4 − 1 searches since the pass started, not 4 − 3 since this chunk did.
+    expect((await reportOf(within.fs))?.figures.requestsBySource).toEqual({
+      'league-validation': 0,
+      'tracked-list': 3,
+    });
+
+    reads = 0;
+    const fresh = harness([A, B], { [PROGRESS_PATH]: { contents: progressText([key(A), key(B)]) } }, { requests });
+    await run({ ...fresh.ports, session: { maxEntries: 1, requestsSince: passStart } }, scriptedStep().step);
+    expect((await reportOf(fresh.fs))?.figures.requestsBySource).toEqual({
+      'league-validation': 0,
+      'tracked-list': 1,
+    });
+  });
+
+  it('keeps only stale pinned entries under pinnedMaxAgeMs', async () => {
+    const pinned = raw('Pinned', 'pinned');
+    const dataset: DatasetFile = {
+      schemaVersion: '1.0.0',
+      league: 'Standard',
+      generatedAt: NOW,
+      entries: [
+        { entryKey: key(pinned), price: { state: 'no-listings' }, lastAttemptedAt: '2026-09-26T11:00:00.000Z' },
+      ],
+      currencyRates: [],
+    };
+    const { ports } = harness([pinned, A], { [DATASET_PATH]: { contents: JSON.stringify(dataset) } });
+    const { visited, step } = scriptedStep();
+
+    await run({ ...ports, session: { maxEntries: 1, pinnedMaxAgeMs: 4 * 60 * 60 * 1000 } }, step);
+
+    expect(visited).toEqual([key(A)]);
+  });
+
+  it('a batch chunk carries neither session field', async () => {
+    const { ports } = harness([A]);
+
+    const outcome = await run(ports, scriptedStep().step);
+
+    expect(outcome).not.toHaveProperty('newPass');
+    expect(outcome).not.toHaveProperty('confirmedLeague');
   });
 });

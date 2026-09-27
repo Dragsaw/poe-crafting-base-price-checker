@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  abortableSleep,
   createNodeFilesystemPort,
   REQUEST_TIMEOUT_MS,
   serialiseJsonArtifact,
@@ -144,5 +145,28 @@ describe('createNodeFilesystemPort', () => {
 
     await expect(filesystem.createExclusive('data/sync.lock', 'mine')).resolves.toBe(false);
     expect(await readFile(join(root, 'data', 'sync.lock'), 'utf8')).toBe('held');
+  });
+});
+
+describe('abortableSleep', () => {
+  it('ends at once on an abort, and resolves rather than rejects', async () => {
+    const controller = new AbortController();
+    const started = Date.now();
+    const waiting = abortableSleep(60_000, controller.signal);
+    controller.abort();
+
+    await expect(waiting).resolves.toBeUndefined();
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+
+  it('returns at once when the signal is already aborted', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(abortableSleep(60_000, controller.signal)).resolves.toBeUndefined();
+  });
+
+  it('waits the whole delay when nothing aborts it', async () => {
+    await expect(abortableSleep(1, new AbortController().signal)).resolves.toBeUndefined();
   });
 });

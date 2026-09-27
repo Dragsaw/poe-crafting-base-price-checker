@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:5ba2d7c8ededf1cebd0f8cfa76b8b2b6dc3dcbd15601b9ff2cd0bfb0aa6b8706",
+  "pageVersion": "sha256:1f21072b570f748c258d8c7079bad9f0a877e2f8b69d1eda1c0b06b52419f5ba",
   "claims": [
     {
       "id": "claim_ad8c9e97dfd54e3696e4d68856f64390",
-      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, dev, dev:stop, build, sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check.",
+      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, dev, dev:stop, deferred:issues, build, sync, sync:batch, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L26",
-          "version": "repo-lines-v1:sha256:70054449175165960c448b426e83124c4a439ad9d6c7763f21d93d78c98b903b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
+          "resource": "repo://package.json#L10-L28",
+          "version": "repo-lines-v1:sha256:1340de856ec94966c40ca26f2f480db04a74bd1f04c4cd5cef13221971b07f70:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
         },
         {
           "resource": "repo://pnpm-workspace.yaml",
@@ -17,26 +17,12 @@
       ]
     },
     {
-      "id": "claim_3b63043b3cda449f849ec7e61c6c35d0",
-      "statement": "pnpm sync runs one chunk per invocation against the live trade API, using the real filesystem at the repository root, the system clock, the fetch port and the read-only git port.",
-      "evidence": [
-        {
-          "resource": "repo://packages/sync/src/sync.ts#L1-L29",
-          "version": "repo-lines-v1:sha256:3ed3a169eaa192207a8d40ebde41a0b731fa12f793cd0e9cabcb714529380919:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/sync.ts#L80-L96",
-          "version": "repo-lines-v1:sha256:2f9639afe54523922f9e568eb8408af574c336940f6a3433f327d1d13e661de9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMWQxYmVjYWFjMWZiYzViZDU4ZDE2YzFlMzk0YjU4OWE4Y2ZlNjA0NDlhMTZiYTM3ZDFmYmFmNmJmNmIxZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NWJjYTExNDljMDUyNWM4NGQ1MWM2MjNjZTQ4MzU1ZTdiYzYxZDFjZTFhNTJkM2Q1M2ZiY2RiMmEyYTRhNjUifQ"
-        }
-      ]
-    },
-    {
       "id": "claim_92bf17c270844defa3bfa87751d7b749",
-      "statement": "The web App loads the artifacts once and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold.",
+      "statement": "The web App loads the artifacts once and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold, passing the loaded weights file.",
       "evidence": [
         {
           "resource": "repo://packages/web/src/App.tsx#L40-L149",
-          "version": "repo-lines-v1:sha256:9fe288dbf22ec0ca69c3a6948ec9b5c8c7f1a6c7e2ce98f66b873f22fc1803f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NGRlMjAyMDFmOTZjZjVkNDI0NTQwZmVmMDdhZDEzNDU0YjI4MzdhNjI4ZjZlMmMzNjA4NmU1NDc0ODUxMzU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwMGIzZjMxODhhOWVkNDExMjczYmVlYTg2YmY0Y2QyYWVlZWY5OGVlMDNmZmRkZTI1MDZjMGU0ZTcwZjI0ZmRiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MzIxN2Q1NGY4NzZmMmMwYmIyMDZmM2IxYzU4ZGUwMGIxNDA2ZTU2Mjg1OTYwMmFhZWU4MzU0ZjBlZmY2MjNkIn0"
+          "version": "repo-lines-v1:sha256:85903c3388b5dd6c8214c3aed2e472558a7e2a6baed2589b3215ab5fc7f284d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NGRlMjAyMDFmOTZjZjVkNDI0NTQwZmVmMDdhZDEzNDU0YjI4MzdhNjI4ZjZlMmMzNjA4NmU1NDc0ODUxMzU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwMGIzZjMxODhhOWVkNDExMjczYmVlYTg2YmY0Y2QyYWVlZWY5OGVlMDNmZmRkZTI1MDZjMGU0ZTcwZjI0ZmRiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MzIxN2Q1NGY4NzZmMmMwYmIyMDZmM2IxYzU4ZGUwMGIxNDA2ZTU2Mjg1OTYwMmFhZWU4MzU0ZjBlZmY2MjNkIn0"
         }
       ]
     },
@@ -52,21 +38,47 @@
     },
     {
       "id": "claim_1eb68a08412e4e97a4d9f199c55e4ccd",
-      "statement": "While the crafted branch is unimplemented, the page lists each crafted Item Class in an Unrankable appendix when no weights file is loaded.",
+      "statement": "While the crafted EV branch is unimplemented, the page lists a crafted Item Class in an Unrankable appendix when no weights file is loaded, when its class is absent from the weights file, or when one of its pools is partial.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L164-L177",
-          "version": "repo-lines-v1:sha256:75ecfbce7286d05a4fbd9566359b704af0daafc0c4bf2da15217a2062b0f70db:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzYjU0YTRlYmMzMDRhNTM2ZTM5MGZlNDFkMWMxYTliODk5ODVmNzg3YzFhYjI3YTZkOTliMWRlMDQ4OTZlMjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMzI3MDQ3N2Y3YmEzMmM3MTc4YWQ0MTZmNGM0M2YyYjFiYTIzNTVjNDZlMzRjZGY5NzlmMWUzNDQ0MzE1YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4YjYxYzA3OWZkNmVkNWEyMjk1NTAzMzgwYWI2OTllOGI4MGQ0MDI5MWY1NzUxMWExYTU5Yjk2NmRmZmU5Y2IifQ"
+          "resource": "repo://packages/core/src/rank.ts#L141-L163",
+          "version": "repo-lines-v1:sha256:a9b83b82605ae7f95489b7b8367a25181a767b7409942613cdcd49da15772f45:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMmIzMDliNWE1ZDdiZjc2NDIyZTYwNzZjMWRlMDZhZjJmOTZhNWZjMjhmNWE4ZGEwNmQ4YTRmMzcyN2Q0M2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzMzJhNjA1ZjU4NDc5Y2IzZDA1MjBkOTczY2JkOGYwNDc4ZTk3NmM3N2UzMjQwOGQ4Nzg5OTRhYmIxY2YyNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
         },
         {
-          "resource": "repo://packages/web/src/App.tsx#L106-L143",
-          "version": "repo-lines-v1:sha256:6ad80518e686ac729a249a40d34196c964c2974cfba19d3c5f1d13e6b0f1b143:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMjE3ZDU0Zjg3NmYyYzBiYjIwNmYzYjFjNThkZTAwYjE0MDZlNTYyODU5NjAyYWFlZTgzNTRmMGVmZjYyM2QifQ"
+          "resource": "repo://packages/core/src/rank.ts#L191-L202",
+          "version": "repo-lines-v1:sha256:3a5f6ae9eb38c4c13699ea875291432326dbc79c142758802785bfb4443f3847:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMzI3MDQ3N2Y3YmEzMmM3MTc4YWQ0MTZmNGM0M2YyYjFiYTIzNTVjNDZlMzRjZGY5NzlmMWUzNDQ0MzE1YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NWRkNWNhYzZhN2Y0NTMxZmZjNDE3YTUzMjdhZWQyMGZmMDIxMmVlNTE0ZDJlZTNmYjJiOGY5OGMyODFiYTEifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/App.tsx#L119-L141",
+          "version": "repo-lines-v1:sha256:e29acc15d51d11a910c25c18d5515ff62b9c344656f73e8ba8b9b1ba5c20d0b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NGFhZjU1ZGFhNGVkMDZkMzlmYzIxMzMwMzExYmQxNjU5NjVhOGZhZDQ1MzA5MjA1ODYwZmQ3YTRmYzZlNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyZGUyYTdkODI1ZjM2MWYzOTdhZDVlYmUyZmU2ZDZmN2FkYmJhOThhZWU4Yjg2ODc0NjI3YzNkMDA3ZjBhYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOTY3ZjE3ODMzMjJmZTBkNDE5NzE3Y2RlZGU4ZTZiOTI0NGU5MWMzNzI4MGU2M2MwZDczNzIxY2U2MDZhNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzM2VkZDEyNTVjZjdiNGEyOWRiZmVmODQ2ODgxMjNhMjg0MDMyNTZjZjdiMDQwYzg1NTdjZDVhNjgyNDI2NDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_978f9e12aaf745828bf1da60560033a3",
+      "statement": "pnpm sync is a long-running session pricing one entry per locked chunk with even request spreading, while pnpm sync:batch runs one bounded chunk per invocation; both use the real filesystem, system clock, fetch port and read-only git port.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync-batch.ts#L1-L31",
+          "version": "repo-lines-v1:sha256:e03ed7032f93699a385f2bbd4ba682000f04227f39c45d209c711d89cd13a813:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync-batch.ts#L86-L98",
+          "version": "repo-lines-v1:sha256:e5338e8b1bec0721ce586be292d11d3f16f9e62354cf970d8f3aea192441fa07:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxODQ0NjU1OThkZTI4ZTU3ZTVmMmFhNjNhYTg2YzYwZDVlMWZmZTFjZDAzMDY3ZDlhMTE5YzYzZTBiYmIwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMzRjYzNkYjUyYjllODdiM2NlMTg2NDE4MzYzOTAzNDgyYmJiZTU0MDUwNWIzNzMzYWI4ZmU4YTNlMWM0MzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L1-L33",
+          "version": "repo-lines-v1:sha256:cf16ee9d375437a2669adbb3c261d493f0a735fa6a308915cb87ad8c85b3f001:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L608-L631",
+          "version": "repo-lines-v1:sha256:b77317a5aacc7187ae3bb07de7badfa71dfcb89e43f9f83f934680594d2f2150:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxODQ0NjU1OThkZTI4ZTU3ZTVmMmFhNjNhYTg2YzYwZDVlMWZmZTFjZDAzMDY3ZDlhMTE5YzYzZTBiYmIwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMzRjYzNkYjUyYjllODdiM2NlMTg2NDE4MzYzOTAzNDgyYmJiZTU0MDUwNWIzNzMzYWI4ZmU4YTNlMWM0MzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

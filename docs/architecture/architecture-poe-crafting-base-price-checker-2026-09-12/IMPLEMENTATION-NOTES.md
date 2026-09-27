@@ -4,7 +4,7 @@ type: architecture-companion
 status: final
 binding: true
 created: '2026-09-19'
-updated: '2026-09-26'
+updated: '2026-09-27'
 governed_by: ARCHITECTURE-SPINE.md
 ---
 
@@ -643,6 +643,37 @@ stale one per §7 — and then reads `notBefore` before it loads anything else. 
 `now < notBefore`, the run releases the lock, sends nothing and exits 0. It writes nothing,
 with one exception: a run that broke a stale lock to get here writes `sync-report.json` alone,
 carrying the `stale-lock-broken` record, because that record is the only trace of the crash.
+
+**The even spread, under the `pnpm sync` session (AD-7, AD-8).** Before a request on a policy,
+the session waits
+
+```
+wait  =  max( paceBeforeNext,
+              max over buckets with used < hits of  seconds × 1000 / (hits − used) − elapsed )
+```
+
+where `paceBeforeNext` is the batch pacer above (a restriction, or a full bucket's remaining
+window), `used` is the bucket's consumption in the last State reading, and `elapsed` is the time
+since that reading. A policy with no reading waits `0`. The spread never spends more than the
+capacity the last reading left in any bucket's period, so it is safe under a rolling and a fixed
+window alike, and it corrects itself because each response replaces the reading. Its steady state
+is the sustained rate of the tightest bucket: about 36 s per search at `600:21600`. Worked example:
+a search policy last read at `20 of 30:300` and `100 of 600:21600` waits
+`max(300000 / 10, 21600000 / 500) = 43200 ms`, less the time elapsed.
+
+**The session's backoff (AD-7).** A yield that wrote no `notBefore` and brought no fresh State
+reading, and a throw that is not a refusal, a league mismatch or a malformed request and wrote no
+`notBefore`, wait
+
+```
+backoff(n)  =  min( evenInterval × 2^(n − 1),  staleLockAfter )
+evenInterval  =  max over the entry's lanes of  max over the lane's buckets of  seconds × 1000 / hits
+```
+
+measured from the end of the chunk, where `n` counts consecutive such waits and a State reading
+resets it to `0`. A lane whose policy has not been read counts as the measured search bucket
+`600:21600` above: **36 s**. The throw's wait also ends when an input file changes, if that is
+sooner.
 
 ### 5.4 The outbound link URL (AD-24)
 

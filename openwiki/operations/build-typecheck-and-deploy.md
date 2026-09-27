@@ -12,8 +12,6 @@ sources:
     resource: repo://.github/workflows/openwiki-update.yml
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
     resource: repo://package.json
-  - id: openwiki-source-0195b32646fe8a72bfdd1842
-    resource: repo://packages/contracts/tsconfig.json
   - id: openwiki-source-612c328aa24af174eea2d601
     resource: repo://packages/web/src/load/prune-allowlist.test.ts
   - id: openwiki-source-ccecd3ec2865b64b4ea6f780
@@ -24,10 +22,12 @@ sources:
     resource: repo://tools/prune-pages.mjs
   - id: openwiki-source-d9161b70d04aabec78253a6c
     resource: repo://tools/setup-git-hooks.mjs
-generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
+  - id: openwiki-source-d67c063568992560840377ea
+    resource: repo://tsconfig.tools.json
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Build, typecheck and deploy
@@ -44,11 +44,13 @@ The product ships as a static site on GitHub Pages. The page is built by Vite fr
 
 ### Why the .d.ts rewrite exists
 
-`packages/contracts` is `emitDeclarationOnly` with `allowImportingTsExtensions`. Its `exports` point at `./src/index.ts`, so commands run by bare `node` with type stripping, such as `pnpm sync`, load the TypeScript source directly. Node's type stripping does no extension resolution, so every relative specifier in the source carries `.ts`. TypeScript's own rewrite changes only `.js` output, so the emitted `.d.ts` files keep `./x.ts` specifiers. A consumer of `dist` cannot follow those.
+`packages/contracts`, `packages/core` and `packages/sync` are `emitDeclarationOnly` with `allowImportingTsExtensions`. `packages/web` emits no declarations. Their `exports` point at `./src/index.ts`, so commands run by bare `node` with type stripping, such as `pnpm sync`, load the TypeScript source directly. Node's type stripping does no extension resolution, so every relative specifier in the source carries `.ts`. TypeScript's own rewrite changes only `.js` output, so the emitted `.d.ts` files keep `./x.ts` specifiers. A consumer of `dist` cannot follow those.
 
-The post-emit step rewrites each relative `.ts`/`.tsx`/`.mts`/`.cts` specifier in declaration files to `.js`/`.mjs`/`.cjs`. It leaves `.d.ts` specifiers as written, and it writes only the files that change. Only `pnpm typecheck` runs it. A bare `tsc -b`, a watch build or an IDE rebuild writes the `.ts` specifiers back.
+The post-emit step walks the `dist` of each of those three packages. It rewrites each relative `.ts`/`.tsx`/`.mts`/`.cts` specifier in declaration files to `.js`/`.mjs`/`.cjs`. It leaves `.d.ts` specifiers as written, and it writes only the files that change. Only `pnpm typecheck` runs it. A bare `tsc -b`, a watch build or an IDE rebuild writes the `.ts` specifiers back.
 
 `tsconfig.base.json` is strict and also enables `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, `noUnusedLocals`/`Parameters` and `moduleResolution: bundler`. Do not pass a global `--noEmit` to the solution build. That forces `noEmit` onto referenced projects and fails with TS6310.
+
+`tsconfig.tools.json` is the `noEmit` project for code outside `packages/`: `test/**/*.ts`, the `tools/` scripts (including `tools/deferred-issues/`) and the `tracked-json` skill scripts. It sets `allowImportingTsExtensions`, because these scripts also run under bare `node` and import their siblings with `.ts` specifiers. `test/tracked-json-scripts-coverage.test.ts` checks that this file, `vitest.config.ts` and `eslint.config.mjs` still cover the skill scripts (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)).
 
 ## pnpm dev
 

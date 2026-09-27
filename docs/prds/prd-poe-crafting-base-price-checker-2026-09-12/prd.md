@@ -82,7 +82,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Tracked List** — the complete curated set of Tracked Entries, held in `data/tracked.json`. It is at once what the tool watches and the tool's entire request budget (AD-12).
 - **Item Level Floor** — the minimum item level a Tracked Entry's search accepts, declared per entry by the curator from the tier worth chasing (FR-22). Crafted entries on one Item Class share one floor; a Raw Base at 82 is exempt (AD-17).
 - **Accepted Tier** — for a modifier, the tier or run of adjacent tiers worth chasing, expressed as the Modifier Reference's band and labelled beside it as a string such as `T1` or `T1–T2` (AD-5, AD-11). The label is display-only: nothing derives it, validates it, joins it to the Weights File, or keys on it (FR-22).
-- **Curation Status** — exactly one of `active`, `pinned` or `pruned` (AD-12). A `pinned` entry is refreshed first whenever a Chunk can afford it, within the cap `IMPLEMENTATION-NOTES.md` §6 states; a `pruned` entry is a tombstone carrying its reason, excluded from sync and from the ranking (AD-7, FR-15).
+- **Curation Status** — exactly one of `active`, `pinned` or `pruned` (AD-12). A `pinned` entry is refreshed ahead of the rotation as AD-7 orders it, within the cap `IMPLEMENTATION-NOTES.md` §6 states; a `pruned` entry is a tombstone carrying its reason, excluded from sync and from the ranking (AD-7, FR-15).
 - **Refresh Rotation** — the deterministic order in which Chunks refresh the Tracked List over many runs (AD-7, FR-17).
 - **Price Observation** — an observed price for a Tracked Entry, normalised to Divine and stamped with its observation time, league and exchange observation (AD-16, AD-19, AD-20). It exists only where there is an observation; attempt-scoped facts live on the Dataset entry instead (AD-9).
 - **Price State** — exactly one of `priced`, `no-listings`, `not-yet-synced` or `unresolvable`; absence is never zero, null or a missing key (AD-9). `not-yet-synced` carries a reason: `never-synced`, `league-mismatch` or `no-exchange-rate` *(PRD-owned; FR-9)*.
@@ -302,7 +302,7 @@ Exactly three declared sources may generate a trade API request, and nothing els
 `active`, `pinned` and `pruned` are schema members with defined effects, not conventions (AD-12). Realises UJ-5.
 
 **Consequences (testable):**
-- A `pinned` entry is selected first in every Chunk and never waits its turn behind `active` entries. The number of `pinned` entries is capped, and a Chunk that cannot fund the pinned set plus at least one `active` entry truncates the pinned set and records that in the Sync Report (AD-7; `IMPLEMENTATION-NOTES.md` §6; FR-25).
+- A `pinned` entry is selected ahead of `active` entries whenever AD-7 makes it due, and never waits its turn behind them. The number of `pinned` entries is capped, and a Chunk that cannot fund the pinned set plus at least one `active` entry truncates the pinned set and records that in the Sync Report (AD-7; `IMPLEMENTATION-NOTES.md` §6; FR-25).
 - A `pruned` entry leaves both the sync workload and the ranking sum; its last-good price never contributes (AD-12, AD-17).
 - A `pruned` entry carries its reason, and the view shows that reason, so a curator does not re-add a dead Combination and relearn the same lesson each league *(PRD-owned)* (FR-8).
 
@@ -343,16 +343,16 @@ The player can see how long it has been since anyone last edited the Tracked Lis
 
 ### 4.6 Background Price Sync
 
-**Description.** A CLI does one bounded Chunk of work and exits; the player's own scheduler starts it again. No figure the player sees is computed on a user-facing path, so a slow full refresh is acceptable. This section fixes what a price *is*, because every downstream number inherits the estimate method (AD-16).
+**Description.** Sync works in bounded Chunks, run either by a long-running sync session the player starts once or by a one-Chunk command the player's own scheduler starts again (AD-7). No figure the player sees is computed on a user-facing path, so a slow full refresh is acceptable. This section fixes what a price *is*, because every downstream number inherits the estimate method (AD-16).
 
 **Functional Requirements:**
 
 #### FR-19: Run as a bounded, resumable, single-instance Chunk runner
 
-*Architecture-owned.* The sync process is a CLI that performs one Chunk and exits; the player's own scheduler invokes it repeatedly (AD-7; `IMPLEMENTATION-NOTES.md` §6, §7).
+*Architecture-owned.* The sync process performs one Chunk at a time, invoked by the long-running sync session or by the player's own scheduler (AD-7; `IMPLEMENTATION-NOTES.md` §6, §7).
 
 **Consequences (testable):**
-- A second invocation while a live run holds the lock exits quietly, and a lock left by a crashed run is recovered and reported rather than wedging the product (AD-7; `IMPLEMENTATION-NOTES.md` §7).
+- A batch run exits quietly while another run holds the lock, and the session waits for the lock (AD-7); a lock left by a crashed run is recovered and reported rather than wedging the product (AD-7; `IMPLEMENTATION-NOTES.md` §7).
 - An unattended run that fails is visible in the Sync Report rather than only in an exit code (AD-7, FR-25).
 
 #### FR-20: Route all outbound trade traffic through one rate-limit-adaptive client

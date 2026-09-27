@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:2576346cc0500ab7730e880858021b9b46779093d6fb9b8ff562d218f5822f13",
+  "pageVersion": "sha256:25ee3edf85840748784618504ccd0d495e1222af81b3fc799f2e22f24bf4560d",
   "claims": [
     {
       "id": "claim_37ae47639de84db3be7b936fdbd65fdb",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://packages/core/src/rank.ts#L148-L224",
-          "version": "repo-lines-v1:sha256:2a158c0c597af9c607ea4b5347bc5d8fd4ae8ba2de8e1620f507e4989c4198e2:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMzBmM2MzNzdmZDI5MjAyZjQ4MWNmNmIyOTc4ZDgyZDYwNzYzN2E0NmYwZmI0MmNjZmMxZmFmMGEzMTk4ZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmMGJhYWQxNzkyMzU2NzEyMmYyODZjMjJmNmE1NDFjODY5YzA1ZWQ2NmIzZDM4NGVkYmMxYTQ4MjhlMTI1NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhMGQwZTg0NjEwNDQyYzRjYTQzZDAzNzY2MWMwNmNjZGRjZTA4MGQ5ZTM3ZWNiODE0NTNiZTY5MzdiYTc0OTUifQ"
+          "version": "repo-lines-v1:sha256:5e0df83b3b301257b275d6072fddacc8684e2fd573eb5ad267b7fc5e42e40238:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMzBmM2MzNzdmZDI5MjAyZjQ4MWNmNmIyOTc4ZDgyZDYwNzYzN2E0NmYwZmI0MmNjZmMxZmFmMGEzMTk4ZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmMGJhYWQxNzkyMzU2NzEyMmYyODZjMjJmNmE1NDFjODY5YzA1ZWQ2NmIzZDM4NGVkYmMxYTQ4MjhlMTI1NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhMGQwZTg0NjEwNDQyYzRjYTQzZDAzNzY2MWMwNmNjZGRjZTA4MGQ5ZTM3ZWNiODE0NTNiZTY5MzdiYTc0OTUifQ"
         }
       ]
     },
@@ -42,15 +42,15 @@
     },
     {
       "id": "claim_1c0f82bc03594e19b693940a735e6ffa",
-      "statement": "chunkOrder places non-pruned entries in three rows: pinned non-unresolvable, active non-unresolvable less completed keys, and unresolvable entries due after 24 hours or never attempted less completed keys; within a row entries sort oldest lastAttemptedAt first with absent first and canonical-key ties.",
+      "statement": "chunkOrder places non-pruned entries in three rows: pinned non-unresolvable entries (only stale ones when pinnedMaxAgeMs is given), active non-unresolvable entries less completed keys, and unresolvable entries due after 24 hours or never attempted less completed keys; within a row entries sort oldest lastAttemptedAt first with absent first and canonical-key ties.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L29-L30",
-          "version": "repo-lines-v1:sha256:9e945d4ee475074b2cda9a8c951a567ee2eebf069602d2cd78a7007b9847e4ce:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmFlYjBiMDQwMWUxNTkxZTUxMzc5MmIxZTA3Nzk4YmMyYTdlNzZhMDFjNjM3ZmY4YjYzMGUzOTE5ZTUzYjg2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNhM2MwYmRjMTRiMDBhOWIzY2Q1Y2JhYmJjNzE2MGNhYjllODMxM2E0NDY5MGJiMWY4NjczMmZkMGVlMjgxYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNlYjNlMjg5ODJhYjFlMjBkOTgxOGNmYWQ5YzRjMGMwZjI5OGFkMzY3ODUyNDk0YmZhNDQxMTAzMjY2MmJmOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2E1ODY5OTFkZmJiMWIyODFlNDU3OGVjYjliYmRjNGM4MTc0ZDQzYWM3NzJjYzU2NjRlOTZmZmVhYmNmNjBmZiJ9"
+          "resource": "repo://packages/core/src/chunk-order.ts#L31-L47",
+          "version": "repo-lines-v1:sha256:9b167f66f8cc4d0e97e20989af38d32017632725658d97ba35967d5627a1396c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYTkyNDdhNWFiZmM1YTJmYTkzYjdjMDFlOWE1NTc4NzE4MzA2Y2Y0YjMzZTYwMWQzNzJiN2I2NjQ5MGQ4OTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxZWVlZDZjOGMzNDU3ZDIyZmM2MzBhMDA5NmVlY2FhYTg0NDQxMWI0MzQ0YjYzN2JkOTU0OThhYTUyOWY5YmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzODFiOTQyNGMxNTI4MGM3OGExMjRmYTQxZjA5NjM1YjI4Njg2YjE1NzU0Y2NkYzk0MzJkYmEzZTI3MmNjZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3NzEzZmRkZWMwYTRhZjEwMjU0M2JjZDliMmU0MTQwZjZhNzRkOGM2OGY1NjhhYzZiN2ZkYTI4ZTE3MmY5NTAifQ"
         },
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L64-L125",
-          "version": "repo-lines-v1:sha256:6895ea40e5f74aba105ed00fbedcf0f7842f48257e8faffcf1d7af45138204bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmZDkxMDZlYjEwNzYyMDdmMzQ5ODI4M2IwOTY5NDNmZDU2NzgwOWUwYTc4ODBhMDQ3YzhjYTY0N2UxMWZlNTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlMjZkYTUyNTk5NTJiNmYwMmFjMjA4M2FkYjVlYzczNjNjZDIxZWQ3MmM0MWFmMzM4MTMwZDBkNWNmZjcxODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4MGQyNjgwMTFlNDg5NzJmMDhhMzM4N2Y1MTQ2MTg5NWM3YjJjNGJlNGYxNGJhZjJiOWEwZTZhYjQ0ZWRmZWEifQ"
+          "resource": "repo://packages/core/src/chunk-order.ts#L72-L126",
+          "version": "repo-lines-v1:sha256:d5813cc7fa2af63d6fd389f60c9c776dfaf163f8977c73a12503755895e6ba3d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNTgyNWEyNThjMzljMDI5MWZhODViODA1NjU1NWM4NGIxNDliNDU0Yjk3ZjdmNWU0NTEzNjNjOGNiNDAzZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlZmJhNGQ5YWUwODJkYTZlZjc2NTI3YWNiYmVjYjc3ZGQ1ZjJmNmE2MWI2ZmJjZThiOTM4ZmE4NTdiZTA5ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjNTNmNTAzMmVlY2FlN2Y5YWE5ZGEwODgzZWM1MGM1MGE1NjRkOTJhMGVjOTM4YTA4YTA3YjQ4NTBhZGQyMWIifQ"
         }
       ]
     },
@@ -59,8 +59,8 @@
       "statement": "When every due rotation entry is already completed, chunkOrder starts a new pass: newPass is true, the completed set resets to empty and all due entries reopen.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L113-L124",
-          "version": "repo-lines-v1:sha256:575e8f01c41403b883b1fad8bb1507c86b897e726383af9a84e7beff2313b513:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMTI4MWZlNjM3MzZlNjk4YTM2YWQ4ZGY0MjAxYjRmNmRmMmQxNThlZTVjNjMxOGI4MGU0ZjEyZTY4Yzc5NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmI5M2VjY2ZhYzExNmZjN2Q4OGQ3OTk1ZGRkOTJiOTdiMmEyZDQ5YjMxZDM5NmU2ZWEyYjFhZmFlOGQ4MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4NTA4YjZjYjA1ODlhYmE3NTAzMjAyZGUyYzhmODdlZDliMTljZDU4NjUzZmQwMWEzZTY3NWUzYWI3YjU5NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzYzYjkzODlkNGM2OTQ1NTU2YjdjMGU0Y2YxNjljN2ZhYjFlZGU5OTNlZmJlMTZlMjNiZGM5ZTExY2NhODYifQ"
+          "resource": "repo://packages/core/src/chunk-order.ts#L128-L139",
+          "version": "repo-lines-v1:sha256:d75fdb3c9b1817d40aad1576a2e6171137e0d960f25a5cd27d6b956fb7554c84:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzZmI1NDJlNGVmZmRmMWM2M2NjM2IwMjIxMmNlMWVhNGZhNDdiNTY5NGVjMmU4YWIzNWI4YWY1YTcxODc1M2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
         }
       ]
     },
@@ -69,8 +69,8 @@
       "statement": "pinnedToKeep keeps all remaining pinned entries unless rotation work is waiting and remaining searches are fewer than left+1, in which case it keeps max(remaining-1, 0) to reserve a search for the rotation.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/chunk-order.ts#L127-L139",
-          "version": "repo-lines-v1:sha256:60253a6e75a0342fee55295837cece8e6e5daf7532013b2e3fa7e99ef9f50840:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmZDE0NjE4MTZjM2M0MjcwNjNlM2Y4YWRjZjM0ODdiOWMzMzc4ZjdmNTU0MTc1YmIzNDMzYzliMmQyYTVhMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/core/src/chunk-order.ts#L142-L154",
+          "version": "repo-lines-v1:sha256:4214fd998a8b33a41492a827af2d5c666768534e04554e728b7c24bc5a557c00:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -90,25 +90,25 @@
     },
     {
       "id": "claim_f937a2accae04976922c652c2efded15",
-      "statement": "When weightsLoaded is false, rank emits one unrankable entry per distinct non-pruned crafted (categoryId, className) with reason 'class absent from weights file'; when true the unrankable group is empty. The group sorts by className then categoryId.",
+      "statement": "rank takes the parsed weights file or null and, for each distinct non-pruned crafted (categoryId, className), looks the pair up directly by own keys in weights.bases: no file or a missing pair gives reason 'class absent from weights file', a partial prefix or suffix pool gives 'pool partial', and a complete pair gives no Unrankable entry. The group sorts by className then categoryId.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L134-L136",
-          "version": "repo-lines-v1:sha256:7ccd9127f881ce1c957127fd6570e1108bc8f7b883424e3d55f817e843e30a36:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJmOTcwYzkwM2QxZTNhZGVkOTM2ZjBhNzJhZWE3ZTI2YzA5ODQ4MWM2MzFlZDQ5NWQzZWEwZTk2NWM0YzAwZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWExYmY2MTQ1MWE2MTkzNDY0OTM0NWVjNmI0MTljMWU4NjJjYTBhZWMxYzNlYzQ5NDJiMDI5ZjkwY2U4ZWVjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTdjYTU2NmZlNDM2YTE1ZmNlYzg0OTZhNzQ5YTdlNWRmZjZlNDQwODYwNjc4N2ViZTYyZjFiYmRjOWM5NzkwOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGZiMGRlOGZjMTkwYjRhZWZjNGRkMGNiNzU5N2U2ZGYwZmFjMGQxNWQxNzNiNzllNGVjYjFhYThlZDEwYjQwZCJ9"
+          "resource": "repo://packages/core/src/rank.ts#L141-L163",
+          "version": "repo-lines-v1:sha256:a9b83b82605ae7f95489b7b8367a25181a767b7409942613cdcd49da15772f45:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMmIzMDliNWE1ZDdiZjc2NDIyZTYwNzZjMWRlMDZhZjJmOTZhNWZjMjhmNWE4ZGEwNmQ4YTRmMzcyN2Q0M2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzMzJhNjA1ZjU4NDc5Y2IzZDA1MjBkOTczY2JkOGYwNDc4ZTk3NmM3N2UzMjQwOGQ4Nzg5OTRhYmIxY2YyNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L161-L177",
-          "version": "repo-lines-v1:sha256:02cbe3a95ccf9b16542ae617123d49e6be3a9ac4706ed9e59a478ba5b0f1d1f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhODYzZDJhMzBjZmE2NDE2MjcxYjQwZmEzOTcxMzY4YTk4YjlkY2VlMTVlY2Y5NmFkOTgzMjdjZWJmNmYyZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzYjU0YTRlYmMzMDRhNTM2ZTM5MGZlNDFkMWMxYTliODk5ODVmNzg3YzFhYjI3YTZkOTliMWRlMDQ4OTZlMjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjODRjOWViNzhlYTU0N2JhNWQ3YjNhZGQwYjVjZjY2ZGQyMjMwNjZiNWI5NzQzYWI1MjYwZWFiMzRjZDFiMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4YjYxYzA3OWZkNmVkNWEyMjk1NTAzMzgwYWI2OTllOGI4MGQ0MDI5MWY1NzUxMWExYTU5Yjk2NmRmZmU5Y2IifQ"
+          "resource": "repo://packages/core/src/rank.ts#L191-L202",
+          "version": "repo-lines-v1:sha256:3a5f6ae9eb38c4c13699ea875291432326dbc79c142758802785bfb4443f3847:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMzI3MDQ3N2Y3YmEzMmM3MTc4YWQ0MTZmNGM0M2YyYjFiYTIzNTVjNDZlMzRjZGY5NzlmMWUzNDQ0MzE1YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NWRkNWNhYzZhN2Y0NTMxZmZjNDE3YTUzMjdhZWQyMGZmMDIxMmVlNTE0ZDJlZTNmYjJiOGY5OGMyODFiYTEifQ"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L62-L73",
-          "version": "repo-lines-v1:sha256:eac3d01f06cdbaf972275d847379ad73ce0fb6766d9b1b00c6db6fa311342018:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhYTMyNjI1NDlhMDNkZmRjZTY2NzBiNzczMDE2OWJmOGY4NDI2YzhkZGRlMTk4MGVjZTY2MTUyNTUxMTE3YjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkM2RiOWI5MWI0MDkxZTFiOGY1NGMxMjUxMjZhY2M0MzBiMzMyZDY5YjcwZTM3ZGI1YzcwYzRjNDRkNzY0YWQifQ"
+          "resource": "repo://packages/core/src/rank.ts#L58-L72",
+          "version": "repo-lines-v1:sha256:cf0e013832c7299852d88291c5e0919a6446db74dc8a1e2688a1299ef61c60a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0YWI1ZWM3M2VmODdjOTlhNDFmODAwYjU4NmYxNDhlNzE2OGM4NWVhMTNhZjZiNTk2NTBjZWFkZjE2N2U2ZTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlMTdkNjcyYjE1NDgyNjRkZDQyNjk2YjQ5Mjc0ODIzYWUyZGE3MzFlZDMxODAwNjU0NTc3MGYxYmE1OGJlOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5NDM0ZjExOTgzNTAyNDkzN2M0ZTBkNmVmNzBkMjU2NGJkZjQ4YjljMTBhMDQ0YzhmNjcxMWE1YWRhYTI5YTMifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

@@ -93,7 +93,8 @@ const TARGET_DIRS = ['contracts', 'core', 'sync'].map((pkg) =>
 /**
  * The entry guard. `node tools/dts-specifiers/rewrite-dts-specifiers.ts` runs
  * the rewrite; importing the module — which the co-located test does — runs
- * nothing. Realpaths both sides, as `packages/sync/src/sync.ts` does, so a
+ * nothing. Realpaths both sides, as `packages/sync/src/sync.ts` and
+ * `packages/sync/src/sync-batch.ts` do, so a
  * junction, symlink or drive-letter case mismatch still runs.
  */
 function isInvokedDirectly(): boolean {

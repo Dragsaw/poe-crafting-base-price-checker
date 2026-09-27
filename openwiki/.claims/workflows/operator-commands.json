@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:9f471d4887e2ea62f2acb80df3a1ea50dfc0f5d6549af9bff9e6f5a9d54b51cc",
+  "pageVersion": "sha256:d66cc5cf50325d16d2b8f039f3b35306f20f9ed80426345ed2e1cccd518f1e0f",
   "claims": [
     {
       "id": "claim_8f81244d624f4708bbbf267b4e41d4ac",
-      "statement": "The live and human-invoked commands are package.json scripts run under bare node, with sync, fixtures:record and catalogue:refresh loading .env via --env-file-if-exists.",
+      "statement": "The live and human-invoked commands are package.json scripts run under bare node, with sync, sync:batch, fixtures:record and catalogue:refresh loading .env via --env-file-if-exists; deferred:issues runs tools/deferred-issues/deferred-issues.ts.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L26",
-          "version": "repo-lines-v1:sha256:70054449175165960c448b426e83124c4a439ad9d6c7763f21d93d78c98b903b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
+          "resource": "repo://package.json#L10-L28",
+          "version": "repo-lines-v1:sha256:1340de856ec94966c40ca26f2f480db04a74bd1f04c4cd5cef13221971b07f70:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
         }
       ]
     },
     {
       "id": "claim_e1e5dde28b284c2e860bb6f3b5a04f85",
-      "statement": "pnpm sync refuses with exit 1 before any request when the User-Agent is missing, otherwise runs one chunk with the real filesystem, clock, fetch port and read-only git port, prints the outcome kind and completed count, exits 0 on any outcome and 1 on a throw.",
+      "statement": "pnpm sync:batch refuses with exit 1 before any request when the User-Agent is missing, otherwise runs one chunk with the real filesystem, clock, fetch port and read-only git port, prints the outcome kind and completed count, exits 0 on any outcome and 1 on a throw.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L53-L96",
-          "version": "repo-lines-v1:sha256:ef2c846842244989cd0e1ec35decb483254a57c22af76e04ea27787cb3a6908b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzMDRhNWFhOTc2ZmQ2ZjI3OGQzZTQ4YWQ1NzBmMzc5NjE3OTYzOTQzYjk4OTcyMTFhZTNhOTY1ZjQzMjQ2MmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmYjAzYTE1OTNjNjA2YWE4ZmE3NmY2ZDcxMDVlYmI2MTNjOTlhNGMyNTRmODg3YjZkZmYzODU2YTdjZDgxY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NWJjYTExNDljMDUyNWM4NGQ1MWM2MjNjZTQ4MzU1ZTdiYzYxZDFjZTFhNTJkM2Q1M2ZiY2RiMmEyYTRhNjUifQ"
+          "resource": "repo://packages/sync/src/sync-batch.ts#L63-L98",
+          "version": "repo-lines-v1:sha256:b7d596715ae8a690c5969ab4c7398f9b7571967e618111f444e6360b17360683:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3Y2M1NWVhYjhjOTI2NmJlN2EyYjI0YmFmY2JlYTgwMWIwMWE3M2Y5ZmYwYjczZDFiYzdhYmRmN2Y4ZDUwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhY2MwMzRkN2RjM2E1M2QyNmVkZmFiM2I2Y2YzNmE3N2Y3MzVlMDQ3NGQxYTMzNjBmMzFjZGFmMDI5ZmZlMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
         }
       ]
     },
@@ -105,10 +105,20 @@
           "version": "repo-lines-v1:sha256:f800182a50a5929299808ee9300df7582c1c2249b8ebc1ff4f0a69f0d7971eb7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllNTJiMWMxMDQ2YThhYzY3NzgzMWE4ZmY0MWQyODVlMjUwOGJmYWQ1N2JiZTNkMzFjMzA3MTAxMzQxNzczYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiZjc1NTUyOTczZDRkZTU0YzVkYjkzMzZmN2YwZWEyMDYxYmM4OWNjMTcwODU0NGM2YzdlYjk2MjQ0NTdmMzEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_951ccfa9d9024c3caf406be632999db3",
+      "statement": "pnpm sync runs until the first SIGINT or SIGTERM and exits 0 after a stop; it exits 1 only for a bad --pinned-max-age argument or a missing User-Agent, and a throw inside a chunk is printed and waited out.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L525-L603",
+          "version": "repo-lines-v1:sha256:fc9184ba395dd52573a70067e8876f3fbbbd0f180200030600e27642c0a864bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxN2MxMzI4NjA5NjY4NWE3Yjc2NWEyMWY2MzJjYTYxNjQ3NjBjMWZjODE0ZjI2MjZkNzdhZGFmYTg3YjRhMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkYzExZmNiYjAwYWMyZTUwMDI4M2UwY2MyN2JjMjJhMjg1ZGU0ZjliYjUwNWY1MWE5ZTZmYTBhYTVhNjFkY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

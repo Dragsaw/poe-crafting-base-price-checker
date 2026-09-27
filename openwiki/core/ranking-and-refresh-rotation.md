@@ -10,10 +10,10 @@ sources:
     resource: repo://packages/core/src/chunk-order.ts
   - id: openwiki-source-04c5c6716d7633c4e68e2d4e
     resource: repo://packages/core/src/rank.ts
-generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Core: ranking and refresh rotation
@@ -27,7 +27,7 @@ The same inputs always give the same outputs. There is no clock, no randomness a
 
 ## rank: the ranking (raw branch)
 
-`rank({ tracked, dataset, activeLeague, threshold, weightsLoaded })` joins each tracked entry to its dataset entry by canonical key and returns a `Ranking` of six groups. Every expected data condition becomes a group.
+`rank({ tracked, dataset, activeLeague, threshold, weights })` joins each tracked entry to its dataset entry by canonical key and returns a `Ranking` of six groups. Every expected data condition becomes a group.
 
 One caller error throws. Before anything is grouped, a `threshold` that is not a finite number ≥ 0 (for example `NaN`, `Infinity` or `-1`) raises a `RangeError`. `0` is valid. `rank` never clamps or coerces the threshold.
 
@@ -43,18 +43,23 @@ For each non-pruned `raw` tracked entry:
 | `unresolvable` | `unresolvable` |
 | `not-yet-synced` | `notYetSynced`, with the published reason |
 
-`pruned` entries appear in no group. `crafted` entries never rank here: the crafted branch is planned for Epic 3. Dataset entries that no tracked entry names are ignored. Only the observation's league is compared with the active league. `core` never reads `lastSearchId` or `lastSearchLeague`.
+`pruned` entries appear in no group. `crafted` entries never rank here: the crafted EV is planned for Story 3.4. They only feed the Unrankable group below. Dataset entries that no tracked entry names are ignored. Only the observation's league is compared with the active league. `core` never reads `lastSearchId` or `lastSearchLeague`.
 
 A raw row (`RankedRow`, defined in `packages/contracts/src/ranked-row.ts`) has `ev` equal to the observed `priceDivine` exactly, with no rounding, and `craftCost` equal to `0`. It carries the observation and, where present, `lastAttemptedAt` for the view's freshness display. Rows are never persisted. The page computes them whenever its inputs change.
 
 ### Unrankable Item Classes
 
-The sixth group, `unrankable`, lists crafted Item Classes, never Base Types. Each item is an `UnrankableClass` of `categoryId`, `className` and `reason`.
+The sixth group, `unrankable`, lists crafted Item Classes, never Base Types. Each item is an `UnrankableClass` of `categoryId`, `className` and `reason`. The `weights` input is the parsed weights file (`WeightsFile` from `contracts`), or `null` when it is absent. The web page passes `set.weights`.
 
-- When `weightsLoaded` is `false`, each distinct non-pruned crafted `(categoryId, className)` pair appears once, with reason `class absent from weights file`. Several crafted entries of one class give one row.
-- When `weightsLoaded` is `true`, the group is empty. Epic 2 does not read the weights file's `bases`, so it makes no claim about a loaded file.
+For each distinct non-pruned crafted `(categoryId, className)` pair, `rank` looks the pair up **directly** in `weights.bases[categoryId][className]`. It checks own keys only (`Object.hasOwn`), so a pair never resolves through the object prototype. It never falls back to a sibling class name.
 
-`UnrankableReason` has only this one value for now. The other reasons of FR-4 (`pool partial`, `class disagrees with weights file`) are planned for Story 3.6. The web page passes `weightsLoaded: set.weights !== null` and renders the group as the Unrankable appendix.
+| Lookup result | Unrankable reason |
+| --- | --- |
+| no weights file, or the pair is missing | `class absent from weights file` |
+| the `prefix` or `suffix` pool declares `poolCoverage: "partial"` | `pool partial` |
+| both pools `complete` | none: the class makes no Unrankable claim |
+
+`poolCoverage` is trusted as declared. Several crafted entries of one class give one row. The third reason of FR-4, `class disagrees with weights file`, belongs to the cross-file checks planned for Story 3.3. The page renders the group as the Unrankable appendix.
 
 ### Ordering and tie-breaks
 
@@ -66,11 +71,11 @@ The web page re-runs `rank` when the player changes the Payout Threshold. The th
 
 ## chunkOrder: the Refresh Rotation
 
-`chunkOrder({ tracked, dataset, completed, now })` returns the order in which the next sync chunk visits entries. The runner recomputes it on every run, so a resumed chunk never replays an outdated plan.
+`chunkOrder({ tracked, dataset, completed, now })` returns the order in which the next sync chunk visits entries. The runner recomputes it on every run, so a resumed chunk never replays an outdated plan. The optional `pinnedMaxAgeMs` is set only by the `pnpm sync` session (see [The pnpm sync session](../sync/sync-session.md)).
 
 Every non-pruned entry is placed in one of three rows:
 
-1. **Row 1, pinned**: `pinned` entries whose dataset state is not `unresolvable`. They are refreshed every chunk and are exempt from the pass.
+1. **Row 1, pinned**: `pinned` entries whose dataset state is not `unresolvable`. They are exempt from the pass. Without `pinnedMaxAgeMs` every such entry is refreshed every chunk. With it, row 1 keeps only the stale ones: no `lastAttemptedAt`, or one more than `pinnedMaxAgeMs` before `now`. A fresh pinned entry is left out of every row.
 2. **Row 2, active**: `active` entries whose state is not `unresolvable`, minus the pass's completed keys.
 3. **Row 3, unresolvable and due**: any non-pruned entry whose state is `unresolvable` and that has no `lastAttemptedAt`, or whose last attempt was at least 24 hours ago (`UNRESOLVABLE_RETRY_MS`), minus the completed keys. A pinned entry that is unresolvable moves here.
 
@@ -94,5 +99,5 @@ The runner reports a shortfall as `pinnedStarvation`. The load-time half of the 
 
 ## Tests
 
-- `packages/core/src/rank.test.ts` and `chunk-order.test.ts` cover the grouping, the ordering, the threshold `RangeError`, the Unrankable group and the rotation rows.
+- `packages/core/src/rank.test.ts` and `chunk-order.test.ts` cover the grouping, the ordering, the threshold `RangeError`, the Unrankable lookup (absent, partial, complete, prototype keys) and the rotation rows, including the stale-pinned filter.
 - `test/core-rank-purity.test.ts` checks that `rank.ts` names no `Date`, `Math.random`, `process` or `import.meta`.

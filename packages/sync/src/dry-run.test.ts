@@ -34,9 +34,9 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof TradeClientModule>();
   return {
     ...actual,
-    createTradeClients: (options: Parameters<typeof actual.createTradeClients>[0]) => {
+    createTradeGovernor: (options: Parameters<typeof actual.createTradeGovernor>[0]) => {
       tradeClientOptions.push(options);
-      return actual.createTradeClients(options);
+      return actual.createTradeGovernor(options);
     },
   };
 });
@@ -170,6 +170,9 @@ describe('dryRun', () => {
     await dryRun(snapshotOf(entries));
 
     expect(tradeClientOptions).toEqual([expect.objectContaining({ invalidRequestThreshold: 1 })]);
+    // The batch pacer, cold: no even spread and no shared pacing state (AD-8).
+    expect(tradeClientOptions[0]).not.toHaveProperty('spread');
+    expect(tradeClientOptions[0]).not.toHaveProperty('pacing');
   });
 
   it('treats an absent tracked file as an empty workload', async () => {

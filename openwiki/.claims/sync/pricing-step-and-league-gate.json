@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:eb65868061bca194c08eb3ab7e918695e538c114867fae76e52f6cfda050618e",
+  "pageVersion": "sha256:90ff0e4da645cbb67dd54d8253523eb841bfdc557527db8484f2105fc6f4f774",
   "claims": [
     {
       "id": "claim_784eac0f3ce64d41999cc0d37c1d7742",
@@ -14,15 +14,15 @@
     },
     {
       "id": "claim_e233352fb5b4454c930b593ade40efcf",
-      "statement": "A crafted class discriminator is chosen in order: a trailing str/dex/int run sends all three defence filters as min 1 or max 0, a categoryId naming an items.json group sends the underscore-to-space class as query.type and throws UnknownClassBaseTypeError before any request when that base type is absent, and otherwise nothing more is sent.",
+      "statement": "A crafted class discriminator is chosen in order: a trailing str/dex/int run (split by defenceLettersOf from contracts) sends all three defence filters as min 1 or max 0, a categoryId naming an items.json group sends the underscore-to-space class as query.type and throws UnknownClassBaseTypeError before any request when that base type is absent, and otherwise nothing more is sent.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L111-L170",
-          "version": "repo-lines-v1:sha256:e18833562cda62dc8d3cb0cc5b5e31d3b1500f1a7037e1b25c17197605da26aa:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYzUxN2FjMzdjZDlhZDFlMzAwZGRmYzBhMmUxZDU2NTRiOGViOGRkYjU4OGQzMmRjMTRhNDU1Y2FhY2I0MjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwMzNjNjUxMTdmMDRmZDUxZmIxMGVhODZlNTI4MzJiZmRlY2M2NmEyYTNmNjRiNGI5ZTIxNGVjMzNkY2JhY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3MmExMWYyMjY2MjRhMjYzMWQwNTkxODBiYjEzZmM5ZDQ4ZjkzOGM1MWY2Njk3NDQxYTMzYmYyZTE1ODZkNzQifQ"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L112-L160",
+          "version": "repo-lines-v1:sha256:e8823b8888de973fa8ea0de5a949073eeb294bf4fa75993c8138ba7eb9049b9c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiMTViYjQ0MTBkYWFmMzI5YjZmM2U3NGNkMjhmYzZhMzcyMzQyN2QxYjBmMzdmM2YzMDIxN2MzZWM2YWNkODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3YmNjNDU4NWRmOGYwNWE2NjhmZmI3OGNhNmI4MWE1ZTE4YjA5ZDViNDdhZGU4ZTM4NGI3NzMzNGM4Y2JhYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwMzNjNjUxMTdmMDRmZDUxZmIxMGVhODZlNTI4MzJiZmRlY2M2NmEyYTNmNjRiNGI5ZTIxNGVjMzNkY2JhY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0YzQzYjM4NTQwYmVjNjZlYmZmZmEzMmQ5ZWJkYTVhYmJmN2NhNDI1YTA0Y2QyZjVmMWI2MTg0ZGI5MWVmOWEifQ"
         },
         {
-          "resource": "repo://packages/sync/src/pricing/search-body.ts#L46-L67",
-          "version": "repo-lines-v1:sha256:6d2f420085210c1daf6f85241517a5bf793a7fd95a5417c60b09df5e27f40da7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkNjBjZWE3MGI0ODljOTQyZWFhNzYwZmFkNTYzY2MwNzllODk4OGY3Yjk1NTUwNjkzZWZhNTllNWYxNjA5YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1YjMxYjM5MGJlOWQ5NDhlNGI3ZjZiY2IwM2U4Njg2MTZkYzJmNzk2ZjczNTg4ZDRhNTlhZDM5ZjdmYzA5MWUifQ"
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L47-L67",
+          "version": "repo-lines-v1:sha256:6bfbb18a1b41f5432ed24f300340944bc87a3d36ba5d3e37eb07258259b71a80:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkNjBjZWE3MGI0ODljOTQyZWFhNzYwZmFkNTYzY2MwNzllODk4OGY3Yjk1NTUwNjkzZWZhNTllNWYxNjA5YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxMzBhMmJkMDNlOTFmNzY2NTdjZDlkOGRiMjFlMDc4ZmMzNmNiZWRiMWM5NWZlZDY1ZjQ0NGI4ZTYzZGUyN2UifQ"
         }
       ]
     },
@@ -97,10 +97,34 @@
           "version": "repo-lines-v1:sha256:1d16324ef52029500bdba60c9d32d8f7f82383efa6f0f682cd520434c2f9a415:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczMDM1OGRjNDBmNTkyMDNkMzM2NzVlN2MzMTYzZmFmMDJlMWIzZjQwMDkzYmM5NzFmMTViMTVmNzc5ZTA5MWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhZGQ4MGZhNzlkN2MzZTIxYmJmY2IyYzdhYTNjZTc5MDI5MGU3N2U0ODg1ZDYxYWQ3N2M0YWFhODcxZjViYmIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_11b3284518fd4d2cbc9faa5fc26a0316",
+      "statement": "readWeightsIds parses data/weights.json with the contracts WeightsFileSchema via parseEnvelope, refuses a non-JSON, unknown-major, malformed-version or non-conforming file as a whole with a DataFileError naming the file (an invalid refusal names the first issue), and otherwise collects the bases categoryIds and every non-null line statId.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/catalogue/weights-ids.ts#L1-L90",
+          "version": "repo-lines-v1:sha256:c4c0957cfcfb5152798f4e021b4a2098b4d9d448ec7fd81a859ebfbfa3936a7d:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwZGIzMmQ4MjQ3MDIyYjc1MzhmMzQ0MjZhMjZjYjk4OTNmNjFhMTdmNTRhOTVjY2VmMzA1ZDY2YWQxNjI4NTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d12c41fdda5742e2be651acb8b13568b",
+      "statement": "runChunk raises DataFileError (with path and reason) for envelope refusals it reads under the lock, the same typed error the shell loaders raise, so the sync session can distinguish file refusals from transient faults.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L377-L417",
+          "version": "repo-lines-v1:sha256:f4d9fd609954d88a6672553eaaac407cead057c2ae05669ae874091f7531f943:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ZjlmZjgzNjE1OWU0YTk3NTQzZWVhOTgxYmI5NzNhOTg0MDA5NmYzZjRiNDljZGViMjUyMWU2MjM0YWNlMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjNjUzMWM5ZWZjMmVlYjAzYzYxYjIwMDg5M2U4MDU5YmYzM2Q5NmQ2MDNhNjk3MTk3ZTEzYzg4OTk4M2MxM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4MzFlZTI4Y2M4YWY5ZTgwNTk1MzgwNzY5OTU4Mjk0NDNjNzhmYTM2ZTY4NjhiZTMyNDBlYTQ0NWE5MGMwYjkifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/load-data-file.ts#L1-L31",
+          "version": "repo-lines-v1:sha256:8587ccba2362e7ae35f88b2a63ff51cdc8c5272df321c66e814fa25fc3614e28:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5ZTY4YTZmNTIyMDczNjg1Nzg5OGVhY2U4YTM2OTk5NzVmMzJmYThiZTJmMzRiM2E0OTM4ZjY1YjIyMjMzZGUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:3cfc26cfb3bf3d7566ba060b8c858bf750ada49c314331b4719635f69743877f",
+  "pageVersion": "sha256:b2ca505d16eb2801d6e7b5fca3349739252e4ac847d98af2c257bfd9de1dda32",
   "claims": [
     {
       "id": "claim_d01bf9fcaf58434f8e20c303607357f4",
@@ -100,13 +100,79 @@
       "evidence": [
         {
           "resource": "repo://packages/web/src/load/artifacts.ts#L14-L68",
-          "version": "repo-lines-v1:sha256:f1d210a37a8abee3f256ea593627e5e48a72f61f27c970d6c82c462f9729ae67:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDFiOGE5OGY1NDgwMDE3YWYyMzc4YTkyMGY5ZWJlZWYwNmY4NzVlYjgwNzFlMjQyY2RkZmY1ZmE4MGRhODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYmE5MzY2M2NmZjQxYmMxMWZkZmQzYzI5NTNmMGU1ODIxYjI5ZDUzM2I1ZWEyYTg1MGNkMDgxZjAzNjg1N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwYTZlZDQ1MGQxMjRlM2FkNTU3MzM4ZWU3YTQyNDRhMjk4NDBiYjAwODhiZjI4ODcyODBlMzBhYzNlZmI1YWEifQ"
+          "version": "repo-lines-v1:sha256:ec23a325719946e6e6e273ffacabd797d4a106910fb66144addc89e9a62d8459:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDFiOGE5OGY1NDgwMDE3YWYyMzc4YTkyMGY5ZWJlZWYwNmY4NzVlYjgwNzFlMjQyY2RkZmY1ZmE4MGRhODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYmE5MzY2M2NmZjQxYmMxMWZkZmQzYzI5NTNmMGU1ODIxYjI5ZDUzM2I1ZWEyYTg1MGNkMDgxZjAzNjg1N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwYTZlZDQ1MGQxMjRlM2FkNTU3MzM4ZWU3YTQyNDRhMjk4NDBiYjAwODhiZjI4ODcyODBlMzBhYzNlZmI1YWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_788fe383a477424fba01e91f69299622",
+      "statement": "WeightsFileSchema types the full weights contract (gamePatch, producer, and bases mapping categoryId to className to prefix/suffix pools) with loose objects, and WEIGHTS_SCHEMA_VERSION is 6.1.0 with only the major compared.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/weights-file.ts#L172-L184",
+          "version": "repo-lines-v1:sha256:653d96ec145e81ae6a14b866feed0aa942385b328c28dbf5beaf86e8c53c4dff:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlYjI4YWU2YTU4YmMzMWU3NWI0MGFmYTNjODA2MmViZDYxMmFiZDg1NzUxN2E2MTJhNzJjZGFkYjk1YmM1ZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyMGZjOWU2N2RiMDdlZDIzOWJiM2FkMjMxMmVhYWI5YTcwZTFmNmZiYTAxMjg4YjBiYTZlNjFkN2Y4ZWU3ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjZmUyYWI5OGY4ZmNmMjlkMTA1NGQzM2FkNTAwMTY5MWZkZTNlNDMxZjc0ODVkN2JmYWZlOTM1NTdiOGRhZGQifQ"
+        },
+        {
+          "resource": "repo://packages/contracts/src/weights-file.ts#L9-L24",
+          "version": "repo-lines-v1:sha256:7fe68b07225905b688599f49657cde5657c57e6116353bbb1a576c166f05e253:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3NTAzZWM5NDM1ZWE5NTRjMDRlZTA3YjdiMDA5YTc1MjA2ODQzYmZhNjkwMDhiYmQ1MTM2YWQ5OTA2YjE5NDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhZDRhMTkyM2E4MTg2YWMyZjZlN2EwNTY2Y2IyZmYzMmM3OWU1ZDFmM2E1MDkwMDBkNzg3YTc3ZWYxOGI1Y2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1Y2JmZDVjYWE3ZGE1ZmUzZmViMGVkODU4ZmI2ZWY3ZjQzMDg2ZDNhNDFhZmQ2Yzk2MTliODY3NDZkZDg3NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da4adbebf3fa4a6784fa916c00043db7",
+      "statement": "The weights schema refuses a not-in-game entry with non-zero weight, a statId repeated among one entry's lines, a line with more than two range pairs or min > max, and a sourceModifierId repeated within one slot pool.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/weights-file.ts#L26-L109",
+          "version": "repo-lines-v1:sha256:239ac227cb442cd3db18528fde459c72d25ad493c71157e8efbdbc408080453d:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1NzhlMjE4NzkyZDliMGE5NWZhYzNjM2JhOWNkMjlmNGJjODRjMTNiNGM0MGZiOWEzYWRlMDY5MjVmOTJkMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkYWJiOGJmZjExYzY2NzE0ZmY0MGVlZDAwZmY4OGIxMDRjMDJkOTU5MWMzNGRmYWIzODA5NzI0Yzk0M2ViYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxODg2ZjBkZmQxYjg0YjhmZjNjY2FjNzEwMDQ5Y2Y0MjEwMGYxNTdmZmM1MmM1ZWUwMzgyYzQ0ZDZkZjIyNGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6a091c9f1f234dd3972c65148ce638eb",
+      "statement": "Within one categoryId, the weights schema requires defence-suffixed class keys to have a non-empty family and distinct letter sets, and refuses mixing defence-suffixed and plain class keys.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/weights-file.ts#L117-L170",
+          "version": "repo-lines-v1:sha256:b6445b5412835401ebd527789867a0bc67541b46735c02746a195922538bd68a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzYwOGEwMjYwMmU2Y2VhMDZiZmU2OTcwMjk2MzEzZDM3NjlkMDFhYjQxM2I4MDM1OTllNzYzNDljMmU0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzNmQ5MmJjMjRhNGFiMGE3MTkwOGMzMzFhOTAwNzJjNGM0MjcxODk3NGEyNjI5MGFlZWJhZGM5MzllZTM5Y2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllMmJjZGZlNTI1MDBlODA2OTkyMjhlMDc3OTFmYjUyNGIxNjMwMGE2NTk2ZWRkODc4YjI1NTBmNTAxMzdiMGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_423a89a40fd64211974b89fce377d2a3",
+      "statement": "defenceLettersOf in class-name.ts is the single definition of the defence-suffix grammar (maximal trailing run of distinct str/dex/int tokens with at least one token before it), and sync's search-body builder imports it from contracts.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/class-name.ts#L1-L34",
+          "version": "repo-lines-v1:sha256:1b321fcbe5a548f26f9cdc686ed6f6f9ada5a4673e82286e7b1d2f199d22e7bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L130-L130",
+          "version": "repo-lines-v1:sha256:2eeef6a0ce53c388cdaa76ae2d9ee0655238b47703e9ffe0f407752eecbcd8c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVlZWY2YTBjZTUzYzM4OGNkYWE3NmFlMmQ5ZWUwNjU1MjM4YjQ3NzAzZTlmZmUwZjQwNzc1MmVlY2JjZDhjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVlZWY2YTBjZTUzYzM4OGNkYWE3NmFlMmQ5ZWUwNjU1MjM4YjQ3NzAzZTlmZmUwZjQwNzc1MmVlY2JjZDhjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjM4YTA5ZmU5Mjk0ZjRmZGVmMzM0MTIyMzIyMjk3N2M1NzczZDY3MjBhZTNmOGQ5Njk0MWRkNDdhN2NiMDFmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGY5NDZmNjk5Zjk0OTAxNmNkMmJjOTMzMTY3NDg0N2Y0YzkyNDcwZDg0YWNiY2VhMGQ1N2ZkOTk0MWE0ZWU3YyJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/pricing/search-body.ts#L16-L16",
+          "version": "repo-lines-v1:sha256:04d3870ecb3b5f758e51570505eea8bbfef99e79a9fe758397ba89b9f51a2663:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDRkMzg3MGVjYjNiNWY3NThlNTE1NzA1MDVlZWE4YmJmZWY5OWU3OWE5ZmU3NTgzOTdiYTg5YjlmNTFhMjY2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDRkMzg3MGVjYjNiNWY3NThlNTE1NzA1MDVlZWE4YmJmZWY5OWU3OWE5ZmU3NTgzOTdiYTg5YjlmNTFhMjY2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTU4NmVjMzQwNjNhNGU3ODM5NjhlNzE5Zjk0ZjkzZjIwZGVjODc2MTgzYWMxYmJiMGE2YTZiYzg4MzYyNzFkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTJlZDgzN2NhMmJmMTExYmYzY2JmZjk3OTlhYTM0N2RiYmEyMTgxNmNlNjExMjg4YjY0MGUyYTlhNzIyMGRiYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5b01b374952d488f972abd146fd444ff",
+      "statement": "The web page's expected weights version is the WEIGHTS_SCHEMA_VERSION constant imported from contracts, and the weights artifact is parsed with WeightsFileSchema as a tolerable artifact.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/load/artifacts.ts#L22-L23",
+          "version": "repo-lines-v1:sha256:b84f40f8fe3755e9ebeda22c552c394fc29917c075e0df923c44697e3af8f17d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZjVhZDdlMjQ2YTQzNmZlM2JmZDA1MmI5OTgxZGRiZmFhNTQxZjVhMWE4NWQ5ZGFkMmFkMDUzOTUzNzRlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE4YTI0ZDhhMjJhZmI5M2I2YzE4MzgxMzZkMDY2NGFlMWZmMDNmZjhjMzBiNzM2Y2ZhYjQ3YzdjMTY0ZTI1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI0YzFlOTFkNTQzNWU1MDQxNGE0MTQzNjg5M2RjODY5YzM0YTE5YTk4YjlkYzRjZWRhMzcyMDllNTliNzI1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2M2NiZGUxYTMwYjkzMjk0MGEyMzkzY2ZkMGE1MDY5ZGQ3YjdkN2Y4ZmMxNGNlNzdiNTAxYzk3NDI5ZTBmMSJ9"
+        },
+        {
+          "resource": "repo://packages/web/src/load/artifacts.ts#L51-L51",
+          "version": "repo-lines-v1:sha256:7cdaf49b73d2231787b7796beb80b7feba35cbf0f22cd76f0ffcbc83fe9e723e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjRhNTk2NDU0ZDBiMzYyNzZhMWI1MTVmNjg1NGQwOGY1NzMzNWNjN2I1ZmJjYzJjNTlmOTY2MmY4MWFlYjRjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmE5YWYzN2VkNmZmNWQ2M2Y0YzJkOWZhZjZlMGViMGY5NDM4MzY0YzFjYzYwOTM2MWI1YjY0OTExZDc5NmE3OCJ9"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

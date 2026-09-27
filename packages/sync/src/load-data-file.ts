@@ -3,6 +3,10 @@
  * never writes (`data/config.json`, `data/currencies.json`,
  * `data/catalogue/items.json`). Every refusal is a typed `DataFileError` that
  * names the file, and it is raised before any request is issued.
+ *
+ * `runChunk` raises the same error for the envelopes it reads under the lock
+ * (`../chunk/run-chunk.ts`), so the `pnpm sync` session can tell a file
+ * refusal, which only an edit clears, from a transient fault (`../sync.ts`).
  */
 
 import type { EnvelopeResult, FilesystemPort } from '@poe/contracts';
@@ -18,8 +22,8 @@ export class DataFileError extends Error {
   readonly path: string;
   readonly reason: DataFileRefusal;
 
-  constructor(path: string, reason: DataFileRefusal, detail: string) {
-    super(`${path}: ${detail}`);
+  constructor(path: string, reason: DataFileRefusal, detail: string, options?: ErrorOptions) {
+    super(`${path}: ${detail}`, options);
     this.name = 'DataFileError';
     this.path = path;
     this.reason = reason;

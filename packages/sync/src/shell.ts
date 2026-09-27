@@ -21,6 +21,7 @@
 
 import { mkdir, open, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 
 import type { ClockPort, FilesystemPort, HttpPort } from '@poe/contracts';
 
@@ -76,6 +77,25 @@ export const sleep = (ms: number): Promise<void> =>
   new Promise((done) => {
     setTimeout(done, ms);
   });
+
+/**
+ * A real delay that an abort ends at once. It resolves — never rejects — on
+ * the abort, so the `pnpm sync` session reads `signal.aborted` afterwards and
+ * exits 0 on the first SIGINT or SIGTERM rather than handling an error.
+ */
+export async function abortableSleep(ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) {
+    return;
+  }
+  try {
+    await delay(Math.max(0, ms), undefined, { signal });
+  } catch (error) {
+    if (signal.aborted) {
+      return;
+    }
+    throw error;
+  }
+}
 
 /**
  * Writes one UTF-8 file, creating its directory. `data/catalogue/` does not

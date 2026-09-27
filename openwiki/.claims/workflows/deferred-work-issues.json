@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:5dead54f92fad25cfc89098e578d7519e8894d21c853b91d5911fec644ee8150",
+  "claims": [
+    {
+      "id": "claim_3e1c1428661441fc88fcea1e03f4b8ff",
+      "statement": "A deferred-work ledger entry is a top-level '- source_spec:' bullet with summary and evidence fields, and its id is 'dw-' plus the first 10 hex characters of sha256(source_spec + newline + summary); other bullets are notes without ids.",
+      "evidence": [
+        {
+          "resource": "repo://tools/deferred-issues/ledger.ts#L1-L37",
+          "version": "repo-lines-v1:sha256:b24aba58684024fe9ba26f6113c4b67ef856741e3028bf5411ace85e8939298f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5OWEyNDVkZDZhNDM4YmNhZWIwMTJlZDkxMGFhN2Y1ODViYjFmZjc1NzEwOTc4MmVhZjI5ZjgyYWM0NzhhOGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5ZWMyNTc2NmFlNTM1N2VmNWYyY2E2MTZiYzY0MDczZWM5MjQ4OTQ3NDM1Mjk2OTFjYzhhYTYxOGQ2ZDUwNzIifQ"
+        },
+        {
+          "resource": "repo://tools/deferred-issues/ledger.ts#L101-L124",
+          "version": "repo-lines-v1:sha256:8e641b2e8575f0bbaaf97a12000c6f6be43bf7c7fed607ab6f1cf05008953972:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjMGM3MmE5ZmZlNjkwNmIwMDI5NzVmNTRlMDZjOWMzNWU0Nzc4ODMyY2VmOWYxOTE1NTEyMjgxNTdkYzA0OGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3YThmZDBkMTQ3ODg5NzgyMWQwZTA4MDhlZTE4ZmQ2ZDljZDQ5Yjg0ZDczNzk3NTM5ZDFkZmExODk0MGJhMGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c5ce6d8358a4badbae7e56e295b02e7",
+      "statement": "pnpm deferred:issues reads the ledger from origin/master with git show and all issues labelled deferred with gh issue list, and refuses when the ledger yields zero entries or the list reaches its 2000-issue limit.",
+      "evidence": [
+        {
+          "resource": "repo://tools/deferred-issues/deferred-issues.ts#L78-L119",
+          "version": "repo-lines-v1:sha256:349dfac488d0df64f9093bfda6a37c2d964b0416c555a57df06473501499095b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNGU2MWIxMWM3ZjQxYWQ5OGIyYmM2NTJjMjVhY2E1NDIyM2U1ODZiYWY4MzZkM2RiOTIyMDVmMmQ3Mzg1YWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhMTNlY2Y2YzgwMGYxMDBhYTVjNjkzZjVhYzE5NDBjNDBiYWI1NWQ0MmUzNDg0NzgxYjBjNDA3YTc2NGQ4ZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiNDdjM2UyZDhlMTU0OGM2MDY2YjFhZTM0ZjZhMWQ3YTUzMzc5YTI5ZGVlNDkxNjFiMTgwYmZkNGVhMjNhNDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b94a57a0da54beaa1363b8eeaffb327",
+      "statement": "The sync plan creates an issue for each ledger id without one, closes only duplicate open issues for one id while keeping the lowest-numbered open issue, and only reports duplicate ledger ids, marker-less issues, closed-but-listed entries and open issues whose entry is gone.",
+      "evidence": [
+        {
+          "resource": "repo://tools/deferred-issues/plan.ts#L83-L153",
+          "version": "repo-lines-v1:sha256:adefa6392f459940f7d2140328985279df5cc23d14502c57e99ec9c453f28de5:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZmU5YjdkY2QxNDkwMjY0NDIwOGFiNzdhMmE3ODIzOWRkNmFmMTQ0YTRkNGM1ZDc5Nzc1NzVhYWVlMmI1MDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_80da568b4946408ba3059e169be86934",
+      "statement": "An issue belongs to an entry when the first line of its body is exactly 'Deferred entry: dw-<10 hex>', and a new issue body starts with that marker line.",
+      "evidence": [
+        {
+          "resource": "repo://tools/deferred-issues/plan.ts#L38-L63",
+          "version": "repo-lines-v1:sha256:219f16c19142feadd725029cbdff076aa67ebb933e0b64133b16c1661b2497eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5YzIwMGI3Y2VjODA5ZGZkN2NkOTMxZmRiM2I3MDc5YmYwMjEwNWViYWFiNDk4ZThmMDI2Yzc5Nzg5YTBkZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MjU3MWFiMTZiMTJjYjgwMmMxMDkzYmRhNWRkNmFkNzc5MGM2YjgyMDQ2NDUwOGRiNmU5Y2JhY2QyNzgwMzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d35282e60ae34337ba812661895966ed",
+      "statement": "pnpm deferred:issues exits 0 on success, 1 on bad arguments, unreadable ledger or issue list, a failed label create or a failed re-list after creates, and 2 when a create or close failed or the ledger has a duplicate id; --dry-run and --list write nothing.",
+      "evidence": [
+        {
+          "resource": "repo://tools/deferred-issues/deferred-issues.ts#L10-L32",
+          "version": "repo-lines-v1:sha256:cb409becd17f55dde93e947b2573caabd57e2869295d66ab7132da45dcdb9b36:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwODY2MmY5MjJjNDUxNzcyZWI4ZTNiNzFhYmNjNDYwZTEzN2FkMTkzYmQ1NzE0ZmFhMjg4ZDFmYmI2YTY1YzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzZjZjZjQ1NDgzODRlYmJkYTRiOWJkNzJjZGQ5YWU1Mzk0YWFjNGMzM2FmZjUwYjQ4NTIwMjlkYTExOWRmOGIifQ"
+        },
+        {
+          "resource": "repo://tools/deferred-issues/deferred-issues.ts#L167-L290",
+          "version": "repo-lines-v1:sha256:dd80fe96dfe6767204713ab6d30c40cb0ae11fa152ab2d82664af7f2969786e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkODRjNjNlODM5ZGUxODgxMWU2MGZjODgzMzAzY2FjNDRmNjVhNTFiMDZkNGMyMDA4MWQ2MzBjNTUxNTNmNGU4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1Njg0Nzk3ZDE0NzBhOGJmZjdiZDVhNmEwMjE0ZTk1YjlmMzMzMDc4ODFlNjZjMzVmZjcwMDU4MWM3MjA4YmRmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2MmUzMGIzYjEwYWU3YTI5ZDI5YjQ2MGZhNTU1YjFjOTgxNWUzNGQ0YjhiOWY2OGY3YzQ5ZTdiOTk4MDQ1NDgyIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_f1d578a23b7e47d78cc19b58e9c97eb2",
+      "statement": "The deferred-work-sweep skill claims an issue by pushing a fresh commit-tree commit unforced to refs/heads/deferred-claim/<id>, so a second claimant's push is rejected, and a claim never expires until released or deleted by a human.",
+      "evidence": [
+        {
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L112-L120",
+          "version": "repo-lines-v1:sha256:be8cd63ba8f5442c011d6ab309a6facb94f73fa42c6b423d5c45b955b4e39488:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjgyMTgyMDdkYzVmNDZmZGJhNDEyYWZlMmVlZDcwZjBkOTcxYzkyZmI3MDA5MWQ5YjA1M2Y4NzFlZGE3NGYzNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhjYmE3ZTYwZThlNTYyZDNjODU4ZDc5MGE5Y2ZhNTExZjQyODRjYWE5Y2I5MzFiY2ZjOWUzMzYzMGQ1N2JlYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzg0YjdhODRlNDgzNDdlMjQ1MDFjNTIzNGM4YmJmMDdkZGNmYzY1ZWUxZDVmYmFiZGExMTZiMmQ0ZDkxZDNlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2FiZTIzYjNiOWJjODUzYmNlOTUwOTk0MTg3NzBhNDZlMTU5ZTNmMDM4ZDI4ZGJlYzUwZjAzZmU3YTFkOTk2OSJ9"
+        },
+        {
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L43-L43",
+          "version": "repo-lines-v1:sha256:29ee0dd97bc10813a8c95ca06c96f696f9ba9cd70acc478bf6ca7af2dc194fcd:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjllZTBkZDk3YmMxMDgxM2E4Yzk1Y2EwNmM5NmY2OTZmOWJhOWNkNzBhY2M0NzhiZjZjYTdhZjJkYzE5NGZjZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjllZTBkZDk3YmMxMDgxM2E4Yzk1Y2EwNmM5NmY2OTZmOWJhOWNkNzBhY2M0NzhiZjZjYTdhZjJkYzE5NGZjZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ0MzVmMWEwN2ZiODE1Y2Y0ZWE0YTQxZDU3MDc5YTk3ZGE3ZjA0NDVhMTY3ZDEyMmNlZTU2ODhkODEzZmJiNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWU0ZWMxMjdjMGJjY2RkOTYzZTQ3ZWFiN2RhYjA1MjdmYmM4Y2Y3MjI5ZTcwMzUwOTM5YjRlMDY4ZWRlNGU3NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6d2eefd49dc04be8a4e4410d7a065156",
+      "statement": "A successful sweep opens a PR whose body starts with 'Deferred entry: <id>' and 'Closes #<issue>' and whose last commit removes the ledger entry; a blocked sweep posts a sweep-attempt comment and adds the sweep:blocked label without pushing.",
+      "evidence": [
+        {
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L249-L283",
+          "version": "repo-lines-v1:sha256:c4477746cc7e753fb0359bfdf60cabf66737ba10cf47ebcf2bc83e0b83461d24:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhZjBkZGFjODBiNzg2MzJlZjE4OGRlZDU2Mjg1NTAxZjA3YzZmZDY2ODk0NTdkNjY0ODRkMDZiM2Y1YTczN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0YWE5NjcxZDE2ZTBjOWJmNGU2OGVkYzI5MDg5MzNjMzY5MDhhMjAwNDJlMTI4ZWMwNDk4OTJkNjhlZTkyNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzYmZiOTY5ODE0N2FjNWJhYTY5ZDk4NmZhNDIyZTQ5YTkzY2Y5OTU0NWYxYjVjNmY1YzhlN2QxNDFlMWFhYWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhYzY3NGQ5MTg4NTZlMWNmN2U4MzZlYTJhNzE5YzI2MzcyMjU4YTE2NjFmMTAyMDRjZmMzZDExODQ1OTlkYmMifQ"
+        },
+        {
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L56-L58",
+          "version": "repo-lines-v1:sha256:63072663eb19e4a8032587468d890cae1f545cbc1bd6947a517bdb3661dfccd5:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM5OGRlOGJlMWVhZmY4N2IxMTZhZWY5MjU0ODY3OGYyOWNjMjI3MzMyOTVlMThjNzRlZjM3YzY4YzY1NjkxOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTVmZjY0YmYzMzgzYzgxOTExOWE1NzFmMzU2NWY4YjM4NGJhMWM4MjU1N2RiOTM3NzJkYzMwZTcxMmI5ZmM4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjkxNTVhODAzY2MxYzlkOTFmOTJkNzNjMjI2ZTMyNzNhM2M4NGVkMzZjMzk2N2I1NzY2MmM4YWE0NjRiYmU4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjJhZjE3NDg3MTEyYTdlMzE0MTUxMWI3ZDNjOGQ3NTNlOGE5NTQzNWQzMTdmMDU2NmRhZmMzM2E2ZTdlNjFkOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8e256445726a472f99f8502fd3ebb84e",
+      "statement": "test/deferred-ledger.test.ts fails when a source_spec bullet does not parse as an entry, when two entries share an id, or when an auto_attempt or integrate_branch line appears in the ledger.",
+      "evidence": [
+        {
+          "resource": "repo://test/deferred-ledger.test.ts",
+          "version": "repo-file-v1:sha256:523ddf8aa87e3ff6239b84c18dce9e058ec4dee80055da2588f1fb9265884033"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:26:28.611Z"
+  }
+}
