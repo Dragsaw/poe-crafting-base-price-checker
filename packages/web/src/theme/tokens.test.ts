@@ -6,6 +6,7 @@ import {
   combinationLine1Columns,
   combinationLine2Columns,
   committedChrome,
+  coOccurringReserve,
   glyphs,
   INKS,
   PAPER_TONES,
@@ -138,7 +139,8 @@ describe('the vertical budget', () => {
     expect(sumPx(committedChrome) + sumPx(reservedChrome)).toBeLessThanOrEqual(spacing.frameHeight);
   });
 
-  it('gives each absence line its own 21px entry, the same as the health line', () => {
+  it('gives each absence line its own 21px frameReserveAbsenceLine entry', () => {
+    expect(spacing.frameReserveAbsenceLine).toBe(21);
     const absence = reservedChrome.filter((line) => line.block.startsWith('absence line'));
     expect(absence.map((line) => line.block)).toEqual([
       'absence line: weights.json',
@@ -146,8 +148,31 @@ describe('the vertical budget', () => {
       'absence line: sync-report.json',
     ]);
     for (const line of absence) {
-      expect(line.px).toBe(spacing.frameReserveHealthLine);
+      expect(line.px).toBe(spacing.frameReserveAbsenceLine);
     }
+  });
+
+  it('counts a 95px co-occurring worst case, and caps the sync report inside what it leaves', () => {
+    expect(coOccurringReserve).toBe(95);
+    expect(sumPx(committedChrome) + coOccurringReserve).toBe(1485);
+    expect(spacing.syncReportMaxHeight).toBe(400);
+    expect(spacing.syncReportMaxHeight).toBeLessThanOrEqual(spacing.frameSlack - coOccurringReserve);
+  });
+});
+
+describe('the trust strip and the sync report panel', () => {
+  it('rests at 68px: two 11.5px × 1.85 lines inside 11/12 padding and two hairlines', () => {
+    const line = parseFloat(typeRoles['trust-strip'].fontSize) * parseFloat(typeRoles['trust-strip'].lineHeight);
+    const height = 2 * spacing.hairline + spacing.trustStripPadTop + spacing.trustStripPadBottom + 2 * line;
+    expect(Math.round(height)).toBe(68);
+    expect(committedChrome.find((block) => block.block === 'trust strip')?.px).toBe(68);
+    expect(spacing.trustSeparatorPadX).toBe(9);
+  });
+
+  it('pads the panel 14/16/12, gaps its columns 22px and its groups 8px', () => {
+    expect([spacing.syncReportPadTop, spacing.syncReportPadX, spacing.syncReportPadBottom]).toEqual([14, 16, 12]);
+    expect(spacing.syncReportColumnGap).toBe(22);
+    expect(spacing.syncReportGroupGap).toBe(spacing.s2);
   });
 });
 

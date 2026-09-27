@@ -70,7 +70,27 @@ export const spacing = {
   frameSlack: 530,
   frameReserveBanner: 74,
   frameReserveHealthLine: 21,
+  /** One per absent tolerable artifact, inside the trust strip (DESIGN.md memlog 213). */
+  frameReserveAbsenceLine: 21,
   syncReportMaxHeight: 400,
+  /**
+   * `{components.trust-strip}`: padding 11/12 between a rule-strong top and a
+   * hairline bottom, so two 11.5px × 1.85 lines rest at 68px; the `|` field
+   * separator pads 9px each side (`mockups/key-hero-resting.html`).
+   */
+  trustStripPadTop: 11,
+  trustStripPadBottom: 12,
+  trustSeparatorPadX: 9,
+  /**
+   * `{components.sync-report-panel}`: padding `14px 16px 12px`, three equal
+   * columns with 22px right padding on all but the last, groups 8px apart
+   * (`mockups/key-expanded-states.html`).
+   */
+  syncReportPadTop: 14,
+  syncReportPadX: 16,
+  syncReportPadBottom: 12,
+  syncReportColumnGap: 22,
+  syncReportGroupGap: 8,
   dekMaxWidth: 480,
   recipePanelWidth: 216,
   mastheadControlGap: 16,
@@ -309,16 +329,25 @@ export const committedChrome: readonly BudgetLine[] = [
 
 /**
  * Chrome charged against the slack by data, not by a click. Each absence line
- * takes a budget line of its own at the health line's 21px (Story 2.1
- * decision 2026-09-26) — new resting chrome is admissible only that way.
+ * takes a budget line of its own at `frameReserveAbsenceLine` (DESIGN.md
+ * memlog 213) — new resting chrome is admissible only that way.
  */
 export const reservedChrome: readonly BudgetLine[] = [
   { block: 'uniform-prior banner', px: spacing.frameReserveBanner },
   { block: 'health line', px: spacing.frameReserveHealthLine },
-  { block: 'absence line: weights.json', px: spacing.frameReserveHealthLine },
-  { block: 'absence line: recipes.json', px: spacing.frameReserveHealthLine },
-  { block: 'absence line: sync-report.json', px: spacing.frameReserveHealthLine },
+  { block: 'absence line: weights.json', px: spacing.frameReserveAbsenceLine },
+  { block: 'absence line: recipes.json', px: spacing.frameReserveAbsenceLine },
+  { block: 'absence line: sync-report.json', px: spacing.frameReserveAbsenceLine },
 ];
+
+/**
+ * The reserves that can co-occur (DESIGN.md, Layout & Spacing): the banner
+ * needs weights and recipes loaded, the health line needs the sync report
+ * loaded, so the largest set is the banner with either the health line or the
+ * `sync-report.json` absence line — 95px.
+ */
+export const coOccurringReserve: number =
+  spacing.frameReserveBanner + Math.max(spacing.frameReserveHealthLine, spacing.frameReserveAbsenceLine);
 
 export function sumPx(lines: readonly BudgetLine[]): number {
   return lines.reduce((total, line) => total + line.px, 0);

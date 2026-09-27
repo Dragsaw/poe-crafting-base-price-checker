@@ -105,6 +105,12 @@ describe('the pending state', () => {
     const slots = frame().querySelectorAll('[data-row-slot]');
     expect(slots).toHaveLength(ROW_SLOT_COUNT);
     expect(slots[0]?.querySelectorAll('[data-cell]')).toHaveLength(6);
+    // The strip's slot holds its place, blank, so the page never jumps.
+    const stripSlot = frame().querySelector<HTMLElement>('[data-trust-strip-slot]');
+    expect(stripSlot?.previousElementSibling?.hasAttribute('data-masthead')).toBe(true);
+    expect(stripSlot?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(stripSlot?.textContent).toBe('');
+    expect(frame().querySelector('[data-trust-strip]')).toBeNull();
     for (const g of gates) g.open();
   });
 
@@ -237,7 +243,7 @@ describe('the outcomes', () => {
     serveArtifacts(server, { recipes: { kind: 'status', status: 404 } });
     mount();
     await settleTo('ready');
-    const lines = frame().querySelectorAll('[data-absence-lines] p');
+    const lines = frame().querySelectorAll('[data-trust-strip] [data-absence-lines] p');
     expect(Array.from(lines, (line) => line.textContent)).toEqual([absenceLine('recipes')]);
     expect(absenceLine('recipes')).toBe('Not published: recipes.json — no crafted rows can be ranked.');
     expect(absenceLine('weights')).toBe('Not published: weights.json — every crafted class is unrankable.');
@@ -307,10 +313,21 @@ describe('the resting chrome', () => {
     await settleTo('ready');
     expect(chrome()).toEqual(ALL);
     const order = Array.from(
-      frame().querySelectorAll('[data-masthead], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-key-block], [data-running-foot]'),
+      frame().querySelectorAll(
+        '[data-masthead], [data-trust-strip], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-key-block], [data-running-foot]',
+      ),
       (node) => Object.keys((node as HTMLElement).dataset)[0],
     );
-    expect(order).toEqual(['masthead', 'askingPriceLine', 'columnHeader', 'rankedRow', 'rankedRow', 'keyBlock', 'runningFoot']);
+    expect(order).toEqual([
+      'masthead',
+      'trustStrip',
+      'askingPriceLine',
+      'columnHeader',
+      'rankedRow',
+      'rankedRow',
+      'keyBlock',
+      'runningFoot',
+    ]);
     const rows = frame().querySelectorAll('[data-ranked-row]');
     expect(rows[0]?.textContent).toContain('0.50');
     expect(rows[1]?.textContent).toContain('an open question');
@@ -680,5 +697,38 @@ describe('the payout threshold', () => {
     // React's generated ids differ per mount; everything else must match byte for byte.
     const strip = (html: string): string => html.replace(/\s(id|for|aria-describedby)="[^"]*"/g, '');
     expect(strip(frame().outerHTML)).toBe(strip(atRest));
+  });
+});
+
+describe('the trust strip', () => {
+  it('sits between the masthead and the asking-price line, closed on load, and toggles with no request', async () => {
+    const requests = serveArtifacts(server);
+    mount();
+    await settleTo('ready');
+    const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
+    expect(strip?.previousElementSibling?.hasAttribute('data-masthead')).toBe(true);
+    expect(strip?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(frame().querySelector('[data-sync-report-panel]')).toBeNull();
+    expect(strip?.textContent).toContain('producer poe-mod-weights-producer');
+    // A healthy run: no third line, no count of nothing.
+    expect(strip?.querySelector('[data-health-line]')).toBeNull();
+    expect(strip?.textContent).not.toContain('0 unresolvable');
+    const fetched = requests.length;
+
+    act(() => {
+      strip?.click();
+    });
+    await flush();
+    const panel = frame().querySelector('[data-sync-report-panel]');
+    expect(panel).not.toBeNull();
+    expect(strip?.nextElementSibling).toBe(panel);
+    expect(panel?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+
+    act(() => {
+      strip?.click();
+    });
+    await flush();
+    expect(frame().querySelector('[data-sync-report-panel]')).toBeNull();
+    expect(requests).toHaveLength(fetched);
   });
 });

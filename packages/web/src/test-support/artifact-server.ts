@@ -39,10 +39,19 @@ export const VALID_BODIES: Readonly<Record<ArtifactKey, unknown>> = {
   syncReport: {
     schemaVersion: '1.1.0',
     runStartedAt: '2026-09-26T14:34:18.729Z',
-    figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0 }, notReachedCount: 0 },
+    figures: {
+      requestsBySource: { 'tracked-list': 0, 'league-validation': 0 },
+      notReachedCount: 0,
+      trackedListEditedAt: { source: 'git-author-date', at: '2026-09-25T09:00:00.000Z' },
+    },
     records: [],
   },
-  weights: { schemaVersion: '6.0.0', gamePatch: '0.5.5', bases: {} },
+  weights: {
+    schemaVersion: '6.0.0',
+    gamePatch: '0.5.5',
+    producer: { id: 'poe-mod-weights-producer', version: '6.0.0', generatedAt: '2026-09-26T10:52:22.504Z' },
+    bases: {},
+  },
   recipes: { schemaVersion: '1.0.0', recipes: [] },
   tracked: { schemaVersion: '1.0.0', entries: [] },
   config: { schemaVersion: '1.0.0', league: TEST_LEAGUE, minChunkSearches: 1 },

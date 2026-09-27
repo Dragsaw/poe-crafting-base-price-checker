@@ -1,11 +1,11 @@
 import { rank } from '@poe/core';
 import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 
-import { AbsenceLines } from './frame/AbsenceLines';
 import { FailureScreen } from './frame/FailureScreen';
 import { Frame } from './frame/Frame';
 import { Masthead } from './frame/Masthead';
 import { RowSlots } from './frame/RowSlots';
+import { TrustStrip, TrustStripSlot } from './frame/TrustStrip';
 import { AskingPriceLine } from './list/AskingPriceLine';
 import { toDisplayRows } from './list/display-rows';
 import { KeyBlock } from './list/KeyBlock';
@@ -29,9 +29,9 @@ type ViewState =
  * whole set, the refusal screen or the fetch-failure screen — never row by row
  * (AD-24, FR-33). `+ Try again` re-runs all eight fetches.
  *
- * The resting chrome, in order: masthead, asking-price line, column header,
+ * The resting chrome, in order: masthead, trust strip, asking-price line, column header,
  * list, then the key block and the running foot. The skeleton paints the same
- * chrome around its slots; the two failure screens paint none of it.
+ * chrome around its slots, with a blank trust-strip slot of the strip's height; the two failure screens paint none of it.
  */
 export function App(): JSX.Element {
   const [attempt, setAttempt] = useState(0);
@@ -69,6 +69,7 @@ export function App(): JSX.Element {
       return (
         <Frame state="pending">
           <Masthead league={undefined} threshold={threshold} onThresholdChange={changeThreshold} />
+          <TrustStripSlot />
           <AskingPriceLine />
           <RowSlots />
           <PageTail />
@@ -78,7 +79,7 @@ export function App(): JSX.Element {
       return (
         <Frame state="ready">
           <Masthead league={view.set.config.league} threshold={threshold} onThresholdChange={changeThreshold} />
-          <AbsenceLines absent={view.absent} />
+          <TrustStrip set={view.set} absent={view.absent} now={view.now} />
           <AskingPriceLine />
           <ReadyList set={view.set} now={view.now} threshold={threshold} />
           <PageTail />

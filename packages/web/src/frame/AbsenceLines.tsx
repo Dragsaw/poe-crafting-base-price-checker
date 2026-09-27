@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 
 import { ARTIFACTS, type TolerableKey } from '../load/artifacts';
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, spacing } from '../theme/tokens';
 
 /** What each absence costs the page (Story 2.1 decision 2026-09-26; final copy is UX's). */
 const CONSEQUENCE: Readonly<Record<TolerableKey, string>> = {
@@ -10,32 +10,45 @@ const CONSEQUENCE: Readonly<Record<TolerableKey, string>> = {
   recipes: 'no crafted rows can be ranked.',
 };
 
+/** DESIGN.md `trust-strip.absenceLineCopy`: the lines appear in this order, and only for absent files. */
+export const ABSENCE_ORDER = ['weights', 'recipes', 'syncReport'] as const satisfies readonly TolerableKey[];
+
+export const ABSENCE_LEAD = 'Not published:';
+
+export function absenceBody(key: TolerableKey): string {
+  return `${ARTIFACTS[key].path} — ${CONSEQUENCE[key]}`;
+}
+
 export function absenceLine(key: TolerableKey): string {
-  return `Not published: ${ARTIFACTS[key].path} — ${CONSEQUENCE[key]}`;
+  return `${ABSENCE_LEAD} ${absenceBody(key)}`;
 }
 
 /**
- * One plain sans line per absent tolerable artifact, under the masthead, in
- * `ink-secondary`. Each is budgeted at the health line's 21px. A degraded
- * render always names what is missing (AD-24).
+ * One plain line per absent tolerable artifact, inside the trust strip after
+ * line two and before the health line (DESIGN.md memlog 213). The lead takes
+ * the strip's label style (ink, 600), the file and its consequence the value
+ * style (ink-secondary). No mark and no colour: absence is a declared state,
+ * not a break. Each line is budgeted at `frameReserveAbsenceLine`.
  */
 export function AbsenceLines({ absent }: { readonly absent: readonly TolerableKey[] }): JSX.Element | null {
-  if (absent.length === 0) {
+  const shown = ABSENCE_ORDER.filter((key) => absent.includes(key));
+  if (shown.length === 0) {
     return null;
   }
   return (
     <div data-absence-lines="">
-      {absent.map((key) => (
+      {shown.map((key) => (
         <p
           key={key}
+          data-absence-line={key}
           style={{
-            ...typeStyle('trust-strip'),
-            lineHeight: px(spacing.frameReserveHealthLine),
+            height: px(spacing.frameReserveAbsenceLine),
+            lineHeight: px(spacing.frameReserveAbsenceLine),
             color: colors['ink-secondary'],
             margin: 0,
           }}
         >
-          {absenceLine(key)}
+          <span style={{ color: colors.ink, fontWeight: 600 }}>{ABSENCE_LEAD}</span> {absenceBody(key)}
         </p>
       ))}
     </div>
