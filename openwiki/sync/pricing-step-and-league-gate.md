@@ -4,8 +4,14 @@ title: Pricing step and league gate
 description: How sync prices one tracked entry against the Path of Exile 2 trade API — the deterministic search body, one search and at most one fetch of the ten cheapest results, Divine normalisation from data/currencies.json, the lower median, the outcome per response class — and how the run-start league gate validates the configured league.
 tags: [sync, pricing, trade-api, search-body, divine, median, league]
 sources:
+  - id: openwiki-source-296818e62a60a3d8c9064ad5
+    resource: repo://packages/sync/src/catalogue/weights-ids.ts
+  - id: openwiki-source-674c962be00b9b26529f4d45
+    resource: repo://packages/sync/src/chunk/run-chunk.ts
   - id: openwiki-source-1586f13640754a9ac798c146
     resource: repo://packages/sync/src/league/league-gate.ts
+  - id: openwiki-source-e1ea73778672f5f776de6c82
+    resource: repo://packages/sync/src/load-data-file.ts
   - id: openwiki-source-96fe542c9b978e4fb23f0314
     resource: repo://packages/sync/src/pricing/normalise.ts
   - id: openwiki-source-b293525c0b4d3d93a18fe376
@@ -14,10 +20,10 @@ sources:
     resource: repo://packages/sync/src/pricing/search-body.ts
   - id: openwiki-source-f003d449d6194f288151c79f
     resource: repo://packages/sync/src/trade/endpoints.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Pricing step and league gate
@@ -34,11 +40,21 @@ Every body has `status: securable`, the price filter `exalted_divine`, `sort: { 
 
 - **Raw entry**: `query.type` is the `baseTypeId`, with no category, rarity `normal`, and no stat filters.
 - **Crafted entry**: `type_filters.category` is the `categoryId` and rarity is `magic`. There is one stat filter per affix. A banded affix sends `{min: valueMin, max: valueMax}` exactly as declared, never rounded. A valueless affix sends `{}`. Every filter has `disabled: false`. The `className` then chooses one of three arms, tried in order:
-  1. **Defence arm**: the class ends in a run of `str`/`dex`/`int` tokens, such as `body_armour_str_int`. All three `equipment_filters` are sent. A letter that is present gives `{min: 1}` for its defence (`ar`/`ev`/`es`), and a letter that is absent gives `{max: 0}`.
+  1. **Defence arm**: the class ends in a run of `str`/`dex`/`int` tokens, such as `body_armour_str_int`. All three `equipment_filters` are sent. A letter that is present gives `{min: 1}` for its defence (`ar`/`ev`/`es`), and a letter that is absent gives `{max: 0}`. The split is `defenceLettersOf` from `@poe/contracts` (`class-name.ts`), the same grammar the weights schema validates class keys with, so the two cannot drift (see [Contracts, envelopes and the data/ files](../architecture/contracts-and-data-files.md)).
   2. **Type arm**: the `categoryId` names a whole group in `data/catalogue/items.json`, for example jewels. The class, with `_` replaced by spaces, must be one of that group's base types, and it is sent as `query.type`. If the base type is not in the catalogue, the builder throws `UnknownClassBaseTypeError` **before any request exists**.
   3. **No discriminator**: the category filter is already exact.
 
 `acceptedTier` is display-only and never read. No `sale_type` is sent.
+
+## The weights ids check
+
+`readWeightsIds` (`packages/sync/src/catalogue/weights-ids.ts`) is the run-start reader of `data/weights.json`. It loads the file through `parseEnvelope` with the full `contracts` `WeightsFileSchema` (version `WEIGHTS_SCHEMA_VERSION`). It then collects the outer `bases` keys (`categoryId`s) and every line's `statId`, skipping a `null` `statId`, which is the producer's own unresolved marker.
+
+- An absent file is `absent`: the chunk records `weights-absent` and goes on.
+- Invalid JSON, an unknown or malformed major, or any hard error of the contract refuses the **whole file** with a `DataFileError` naming `data/weights.json`, before any request. An `invalid` refusal names only the first issue's path and message.
+- Ids that the catalogue does not know become `uncatalogued-weights-id` report records. A miss never refuses the file or rewrites it.
+
+`DataFileError` (`load-data-file.ts`) carries the path and a reason. `runChunk` raises the same error for the envelopes it reads under the lock, so the `pnpm sync` session can tell a file refusal, which only an edit clears, from a transient fault (see [The pnpm sync session](sync-session.md)).
 
 ## One entry, step by step
 

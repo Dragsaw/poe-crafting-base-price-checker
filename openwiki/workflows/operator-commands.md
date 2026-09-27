@@ -16,49 +16,64 @@ sources:
     resource: repo://packages/sync/src/dry-run.ts
   - id: openwiki-source-54de0b684b6ea392e59b40f0
     resource: repo://packages/sync/src/fixtures-record.ts
+  - id: openwiki-source-999659a0385fcbff008d129d
+    resource: repo://packages/sync/src/sync-batch.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
   - id: openwiki-source-391c3262b7014fb5ca5796f2
     resource: repo://tools/dev-stop/dev-stop.ts
-generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Operator commands and curation workflow
 
-The product runs as a set of `pnpm` commands run from the repository root, plus the static page. None of the commands runs unattended by default, and no test runs a live command. Each command's module has an entry guard, so importing it runs nothing (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)). The commands run under bare `node` with TypeScript type stripping. The live commands load `.env` with `--env-file-if-exists=.env`.
+The product runs as a set of `pnpm` commands run from the repository root, plus the static page. `pnpm sync` is the one long-running command: it runs until it is stopped. The others run once and exit. No test runs a live command. Each command's module has an entry guard, so importing it runs nothing (see [Test strategy and network guards](../testing/test-strategy-and-guards.md)). The commands run under bare `node` with TypeScript type stripping. The live commands load `.env` with `--env-file-if-exists=.env`.
 
 | Command | Network | Writes | Purpose |
 | --- | --- | --- | --- |
-| `pnpm sync` | yes | `data/dataset.json`, `data/sync-progress.json`, `data/sync-report.json` | Run one live chunk |
+| `pnpm sync` | yes | `data/dataset.json`, `data/sync-progress.json`, `data/sync-report.json` | Run the paced sync session, one entry per chunk, until stopped |
+| `pnpm sync:batch` | yes | the same three files | Run one live batch chunk, for an external scheduler |
 | `pnpm sync:dry` | no | nothing | Predict the next chunk against recorded fixtures |
 | `pnpm catalogue:refresh` | 4 GETs | `data/catalogue/*.json` | Refresh the trade catalogue |
 | `pnpm fixtures:record` | yes | `fixtures/*.json` | Re-record the API fixtures |
 | `pnpm tracked:lookup` | no | nothing | Find ids for tracked entries |
 | `pnpm tracked:check` | no | nothing | Validate `data/tracked.json` |
 | `pnpm dev:stop` | no | nothing | Stop this checkout's `pnpm dev` server and free its port |
+| `pnpm deferred:issues` | `git`, `gh` | GitHub issues and labels | Sync `docs/stories/deferred-work.md` to one issue per entry (see [Deferred work as GitHub issues](deferred-work-issues.md)) |
 
 ## Configuration
 
-- **`POE_SYNC_USER_AGENT`** (environment or `.env`) holds the whole `User-Agent` value: the tool name and a contact address. `pnpm sync`, `pnpm catalogue:refresh` and `pnpm fixtures:record` refuse and exit 1 before any request when it is unset or blank (see [Governed trade client and rate limits](../sync/trade-client-and-rate-limits.md)).
+- **`POE_SYNC_USER_AGENT`** (environment or `.env`) holds the whole `User-Agent` value: the tool name and a contact address. `pnpm sync`, `pnpm sync:batch`, `pnpm catalogue:refresh` and `pnpm fixtures:record` refuse and exit 1 before any request when it is unset or blank (see [Governed trade client and rate limits](../sync/trade-client-and-rate-limits.md)).
 - **`data/config.json`**: the active `league` and `minChunkSearches`.
 - **`data/currencies.json`**: hand-maintained exchange rates per league.
 - **`data/tracked.json`**: the curated workload.
 
 ## pnpm sync
 
-`packages/sync/src/sync.ts`. `syncCommand` resolves the User-Agent, then composes one chunk with the real filesystem at the repository root, the system clock, the `fetch` port, the real `sleep`, the process pid, and the **read-only git port**. The git port supplies the author date of the last commit to `data/tracked.json`, and falls back to the file modification time. It runs one chunk and prints one line, such as `pnpm sync: bounded, 12 completed` or `pnpm sync: deferred until <iso>`.
+`packages/sync/src/sync.ts`. `syncSessionCommand` parses `--pinned-max-age <hours>` (default 4) and resolves the User-Agent. It then runs a loop until the first SIGINT or SIGTERM. Each iteration runs one chunk bounded to **one entry**, with the real filesystem at the repository root, the system clock, the `fetch` port and the read-only git port. Between chunks it waits: a spread delay before each request, a `notBefore` penalty, a backoff, or a local poll for an input-file change or a free lock. An idle wait sends no request. Every chunk and wait prints one line, for example `pnpm sync: bounded by entries, 1 completed: <key>` or `pnpm sync: waiting for the lock to be free (another run holds the lock)`.
+
+- Exit **0** after a stop. A throw inside a chunk is printed and waited out, never fatal.
+- Exit **1** only for a bad argument or a missing User-Agent, before any request.
+
+Leave it running to keep the whole tracked list fresh. The pass, pinned-entry and gate rules are in [The pnpm sync session](../sync/sync-session.md).
+
+## pnpm sync:batch
+
+`packages/sync/src/sync-batch.ts`. `syncCommand` resolves the User-Agent, then composes **one batch chunk** with the same real ports and exits. The git port supplies the author date of the last commit to `data/tracked.json`, and falls back to the file modification time. It prints one line, such as `pnpm sync:batch: bounded, 12 completed` or `pnpm sync:batch: deferred until <iso>`.
 
 - Exit **0** for any outcome: `completed`, `bounded`, `yielded`, `busy`, `deferred` or `dispossessed`.
 - Exit **1** for a missing User-Agent or any throw: a load refusal, a league mismatch, a malformed request, or an unexpected response. By the time the throw reaches the command, the chunk has already written its report and released the lock.
 
-To cover the whole tracked list, run `pnpm sync` repeatedly, for example on a schedule. Each run continues the pass. To publish, commit `data/` and push (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)). Chunk internals are in [The sync chunk runner](../sync/chunk-runner.md).
+Run it repeatedly, for example on a schedule, to cover the list. Each run continues the pass. Both commands share the lock, so a batch run and a session never run a chunk at once.
+
+To publish from either command, commit `data/` and push (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)). Chunk internals are in [The sync chunk runner](../sync/chunk-runner.md).
 
 ## pnpm sync:dry
 
-`packages/sync/src/dry-run.ts` runs **the same composition** as a live run, fully in memory:
+`packages/sync/src/dry-run.ts` runs **the same composition** as a batch run (the cold batch pacer, no session options), fully in memory:
 
 - It takes read-only snapshots of `data/tracked.json`, `dataset.json`, `config.json`, `currencies.json`, `catalogue/{items,stats,filters}.json`, `weights.json` and `sync-report.json` into a fake filesystem.
 - HTTP goes to the offline fixture port. The league gate is served `fixtures/trade-data-leagues.json`. Searches and fetches are served `fixtures/trade-{search,fetch}-<digest>.json` by a digest of the request.
@@ -77,7 +92,7 @@ It prints `{outcome, completed, entries, progress, dataset, records, report}`, p
 - The write loop is not transactional. A filesystem error part way through reports how many files were written and which path failed.
 - It prints the request count on success and on failure. This is the only place that source's spend is visible, because no chunk report includes it.
 
-The output is a git diff to review. A game patch that renames a stat id shows up as one changed line. After a refresh, the next `pnpm sync` catalogue check marks any tracked entry whose ids no longer resolve as `unresolvable`.
+The output is a git diff to review. A game patch that renames a stat id shows up as one changed line. After a refresh, the next chunk's catalogue check marks any tracked entry whose ids no longer resolve as `unresolvable`.
 
 ## pnpm fixtures:record
 

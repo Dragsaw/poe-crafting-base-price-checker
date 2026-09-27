@@ -24,10 +24,10 @@ sources:
     resource: repo://tools/boundary-check/boundary.test.ts
   - id: openwiki-source-98d5ddb014a0fd4d678f6f2a
     resource: repo://tsconfig.json
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Package graph, ports and purity boundaries
@@ -67,7 +67,7 @@ Each port has a pure in-memory fake in `packages/contracts/src/ports/fakes/` (`c
 
 The real effects are concentrated in the shell:
 
-- `shell.ts` is the only `sync` module with `fetch`, the system clock, a real delay and real file writes. `createNodeFilesystemPort` resolves every path against the repository root, so code below it names `data/...` exactly as the fakes do. `createExclusive` opens with `wx` (O_CREAT|O_EXCL), so of two concurrent takers exactly one succeeds. The chunk lock depends on this.
+- `shell.ts` is the only `sync` module with `fetch`, the system clock, a real delay and real file writes. It has two delays: `sleep`, used inside a chunk, and `abortableSleep(ms, signal)`, which the long-running `pnpm sync` session uses for its waits. `abortableSleep` resolves (never rejects) when the signal aborts, so the session reads `signal.aborted` afterwards and exits 0 on the first SIGINT or SIGTERM (see [The pnpm sync session](../sync/sync-session.md)). `createNodeFilesystemPort` resolves every path against the repository root, so code below it names `data/...` exactly as the fakes do. `createExclusive` opens with `wx` (O_CREAT|O_EXCL), so of two concurrent takers exactly one succeeds. The chunk lock depends on this.
 - `read-only-git-port.ts` is the only module in `sync` that starts a child process. It runs one fixed `git --no-optional-locks log --no-show-signature -1 --format=%at -- <path>` through `execFile`, with no shell. It returns `undefined` when there is no history, no repository or no `git` binary. `no-git-write.test.ts` bans the child-process module everywhere else in `sync`.
 
 ## How the boundaries are enforced

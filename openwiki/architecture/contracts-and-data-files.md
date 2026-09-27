@@ -5,10 +5,12 @@ description: How @poe/contracts defines every cross-package concept as a Zod sch
 tags: [contracts, zod, schema-versioning, data-files, canonical-key, dataset]
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 sources:
   - id: openwiki-source-91bd8d7e3af778926d4b2592
     resource: repo://packages/contracts/src/canonical-key.ts
+  - id: openwiki-source-8c407ff378bab85ada4b33bf
+    resource: repo://packages/contracts/src/class-name.ts
   - id: openwiki-source-0e80138456af752cd4b08741
     resource: repo://packages/contracts/src/dataset.ts
   - id: openwiki-source-f665aa4d4823a299e4515493
@@ -19,13 +21,17 @@ sources:
     resource: repo://packages/contracts/src/sync-progress.ts
   - id: openwiki-source-fc8e6504126345a5411a22ce
     resource: repo://packages/contracts/src/tracked-entry.ts
+  - id: openwiki-source-222fe4a37391165498b5d8d1
+    resource: repo://packages/contracts/src/weights-file.ts
+  - id: openwiki-source-6463c78c974805557d576aa0
+    resource: repo://packages/sync/src/pricing/search-body.ts
   - id: openwiki-source-869e9d6242b1ef866e244695
     resource: repo://packages/sync/src/shell.ts
   - id: openwiki-source-64f4b9e1de8f9b00250b3775
     resource: repo://packages/sync/src/write-artifact.ts
   - id: openwiki-source-f20f60e1ecaf073e364173ca
     resource: repo://packages/web/src/load/artifacts.ts
-generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 ---
 
 # Contracts, envelopes and the data/ files
@@ -44,7 +50,7 @@ The repository is its own database. `sync` writes JSON files under `data/`, the 
 | `data/dataset.json` | `sync` chunk | `web` (required) | The published snapshot: latest price state per tracked entry. |
 | `data/sync-report.json` | `sync` chunk | `web` (tolerable) | Figures for the last chunk and records that persist until the player deletes them. |
 | `data/sync-progress.json` | `sync` chunk | `sync` only | Completed keys of the current pass and the `notBefore` penalty. |
-| `data/weights.json` | External producer | `sync` (report-only checks), `web` (tolerable) | Only the envelope and header are typed here. |
+| `data/weights.json` | External producer | `sync` (report-only checks), `web` (tolerable) | The full weights contract `6.1.0` is typed here (see below). The app never writes it. |
 | `data/recipes.json` | The player | `web` (tolerable) | Craft recipes. Ids must be unique. |
 | `data/catalogue/{items,stats,filters,static}.json` | `pnpm catalogue:refresh` | `sync`, `web` (`stats.json` only) | Captured trade-API catalogue payloads. |
 
@@ -62,7 +68,7 @@ Every file has an envelope schema in `packages/contracts/src/envelopes.ts`. Each
 
 The version is checked before the body, so a file from a newer major is refused as one version mismatch. It is not reported as many shape errors. The result is a typed value (`ok: true | false`), and the function does not throw for an expected condition.
 
-Most files use `SUPPORTED_SCHEMA_VERSION` (`1.0.0`). Two contracts have their own version constants: `SYNC_REPORT_SCHEMA_VERSION` and `SYNC_PROGRESS_SCHEMA_VERSION` (both `1.1.0`). 1.1.0 of progress added the optional `notBefore`.
+Most files use `SUPPORTED_SCHEMA_VERSION` (`1.0.0`). Three contracts have their own version constants: `SYNC_REPORT_SCHEMA_VERSION` and `SYNC_PROGRESS_SCHEMA_VERSION` (both `1.1.0`; 1.1.0 of progress added the optional `notBefore`), and `WEIGHTS_SCHEMA_VERSION` (`6.1.0`, in `weights-file.ts`). The page imports the weights constant from `contracts` rather than declaring its own, so the reader and the schema cannot drift.
 
 ### File-level rules
 
@@ -70,8 +76,22 @@ Most files use `SUPPORTED_SCHEMA_VERSION` (`1.0.0`). Two contracts have their ow
 - `DatasetFileSchema` refuses a repeated `entryKey`, compared as an exact string, with the same issue shape.
 - `RecipesFileSchema` refuses a repeated recipe `id`.
 - `ConfigFileSchema` is a `strictObject` with only `schemaVersion`, `league` and `minChunkSearches` (an integer ≥ 1). It is not a general settings file.
-- `WeightsFileEnvelopeSchema` is a loose object. It types only `schemaVersion`, `producer.id`, `producer.generatedAt` and `gamePatch`, and it lets everything else pass through.
 - The four catalogue files share `catalogueFileEnvelope`: the trade API's `result` payload with `schemaVersion` beside it, so a refresh diff stays a diff of the API's own response.
+
+## The weights file
+
+`packages/contracts/src/weights-file.ts` is the *Validation* section of `WEIGHTS-FILE-SCHEMA.md` in code. It replaced the earlier header-only `WeightsFileEnvelopeSchema` (Story 3.1). Every object is a `looseObject`, so a later additive `6.x` file still loads; only the major is compared.
+
+Shape: `{schemaVersion, gamePatch, producer: {id, version?, generatedAt, sourceUrl?}, bases}`. `bases` maps `categoryId` → `className` → `{prefix, suffix}` pools. Each pool declares `poolCoverage` (`complete` or `partial`, no default) and a list of entries. An entry is one poe2db tier of one modifier: `sourceModifierId`, `modGroup`, `itemLevelMin`, optional `tierLabel`, `weight` (≥ 0), `weightSource` (`published`, `absent` or `not-in-game`) and nested `lines` of `{statId | null, ranges}`. The lines stay nested because a hybrid tier's co-occurrence cannot be rebuilt once flattened.
+
+Hard errors enforced by refinements, each with a message that names the rule:
+
+- a `not-in-game` entry must have weight 0;
+- a `statId` appears once among one entry's lines, and a line has at most two `[min, max]` pairs with `min ≤ max`;
+- a `sourceModifierId` appears once per slot pool;
+- within one `categoryId`, every `className` matches one of two grammars. A defence-suffixed key is `<family>_<letters>` with a non-empty family. Defence-suffixed classes carry distinct letter sets, and defence-suffixed and plain classes never share a `categoryId`.
+
+The defence-suffix grammar lives once in `class-name.ts`: `defenceLettersOf` takes the maximal trailing run of distinct `str` / `dex` / `int` tokens, with at least one token before it, and `DEFENCE_OF_LETTER` maps them to `ar` / `ev` / `es`. Both the weights schema and `sync`'s search-body discriminator read it from there (see [Pricing step and league gate](../sync/pricing-step-and-league-gate.md)).
 
 ## Tracked entries
 

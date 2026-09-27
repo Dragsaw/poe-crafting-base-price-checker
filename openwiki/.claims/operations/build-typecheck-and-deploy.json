@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:64b1c332c71ee1ca0e0a034a6f83a451edc5879af65597994c6741b272095772",
+  "pageVersion": "sha256:d2e39b15b260b2d2ac753c66ca0f8a9e955d5a1cfd09deb4724ed82653ef8000",
   "claims": [
     {
       "id": "claim_3ec8252b68e54c9db1d5c588cee0a121",
       "statement": "pnpm check runs typecheck (tsc -b followed by the .d.ts specifier rewrite), eslint with zero warnings allowed, and dependency-cruiser over packages; pnpm build runs vite build followed by tools/prune-pages.mjs.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L20",
-          "version": "repo-lines-v1:sha256:fee53f59feff2969c4e7cc6710d89b4c68479b83afef1248ae39ddc0df0ef5c2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiMmNmMWFhYjRmODJjNWM4ZDU2NGE1ZjkzNmRmYjAyMjRkOWQ3Mjk1ZGJiMzZkOGE4NzkwMzRhNDZmNWYzOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNmRiMDg1NTk0ZjhhMjA2YjQwMDBkMjY5YzY5ODg2N2NjZGEyMGY2ODRkOTQ5YWQxY2E3NmRmNTNmYTFkYzkifQ"
+          "resource": "repo://package.json#L10-L22",
+          "version": "repo-lines-v1:sha256:4b7c1f2e694d04926606c968d419bf212b05a1d022d35e91a24653f3c7e90a38:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0OWVhMDFhZmM5NDc1M2VkY2JhMzdlNjU3ODg1ODlmZmNjODIzNzQ4MjIyMjgxNmM2NGM0MDlhZTJkM2NhNGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNmRiMDg1NTk0ZjhhMjA2YjQwMDBkMjY5YzY5ODg2N2NjZGEyMGY2ODRkOTQ5YWQxY2E3NmRmNTNmYTFkYzkifQ"
         }
       ]
     },
@@ -24,15 +24,15 @@
     },
     {
       "id": "claim_79131dc7e6a242539d268eee69a051fd",
-      "statement": "The dts rewrite converts relative .ts/.tsx/.mts/.cts specifiers in emitted declaration files to .js/.mjs/.cjs, leaves .d.ts specifiers untouched, and writes only changed files, because contracts is emitDeclarationOnly with allowImportingTsExtensions.",
+      "statement": "The dts rewrite walks the dist of contracts, core and sync, converting relative .ts/.tsx/.mts/.cts specifiers in emitted declaration files to .js/.mjs/.cjs, leaving .d.ts specifiers untouched and writing only changed files, because those packages are emitDeclarationOnly with allowImportingTsExtensions.",
       "evidence": [
         {
-          "resource": "repo://packages/contracts/tsconfig.json",
-          "version": "repo-file-v1:sha256:6a2462ae9a98d1e43070e640ab849ace219ad8268fd58729fa42d3fe11740c86"
+          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L12-L40",
+          "version": "repo-lines-v1:sha256:ca679ea716a468e07b9dfc227a1ec5b1272b2542b5af17a92bab784d6758047d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhY2ExNmNlYjI3MmViYThkNGNlZWU4NTZlNjU3NGJiZDc4ZmVlYTgwMmY1NjdmZjBiZjU1NWU1NThmYTQwNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3MmY2OGFiMDc0OTMwZmM5MzM5YjRjMzExZjdmYzY3OGQ3YmM1ZTU3NWM1NjY3YmViMTJiYTU5MjgyM2UwNmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhYTczMGQyNGNmZjgwNWVmYjUzYzA3NmE4ODIxN2JhNWVjNDY4ZWQwNTJlNjNkM2U3MjBjNWRmZDFkOTUxYmMifQ"
         },
         {
-          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L1-L112",
-          "version": "repo-lines-v1:sha256:9b35f6e13a43a858bc33971138941f784a6333b13730f7b87469442ed9a5db43:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlODIwMDk2NGE5Nzg2MzU1MjJiMmFiMDkwYzY1MDY1ZDhlZjhlODVjNDczMGJiMmViMDQ2MGQzNGM2NzdkZGJiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L84-L92",
+          "version": "repo-lines-v1:sha256:4e518052ac346ccd06103881f3b540194b37bb6e6f7f39fe04f14610254ea0d1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTFhNjFmYzM1ZjU0YTk3NGQzN2U5MjI2ODJiYjQyZTBhNDcyNTYyZjBiOTg3NDgxOTM4OGNjNDNmNWYxNGJiYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjJkNDE3NGM5YzRlODgxOGUxZWQ4ZjE1MDZhZjIzYTcwYzcwNjhjM2FmMDI1NTE3YTMzMDRkZTFjODQyNWIwOCJ9"
         }
       ]
     },
@@ -95,10 +95,20 @@
           "version": "repo-lines-v1:sha256:932aaad5f2e1438c56b85bd906bc264f76f5458cdb531e468722acfdddb1214b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_1681b3968fab485e8b4d8eefca6741b1",
+      "statement": "tsconfig.tools.json is a noEmit project with allowImportingTsExtensions that includes test/, the tools/ scripts (among them tools/deferred-issues) and the tracked-json skill scripts, so pnpm check typechecks code outside the packages.",
+      "evidence": [
+        {
+          "resource": "repo://tsconfig.tools.json",
+          "version": "repo-file-v1:sha256:22b5f297b974f6de398df472a75b8aa4e8b9edeebd456658ec48709f171fd0c0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

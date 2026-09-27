@@ -1,18 +1,22 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:56e0e164f4b0646da944ac5cd8e98ebc86c8ca3c56e7dc4417eefb42c219f842",
+  "pageVersion": "sha256:96eff51a59a07c1d216c13b2033f07be3c22dc395ca21d6e5074b7db8cbf74b1",
   "claims": [
     {
       "id": "claim_2071974f4eb6410fa635601e4e9e08e4",
-      "statement": "Each exchange first refuses with an invalid-request-threshold yield when the lane's known policy has reached the threshold, then waits once for the ledger's tightest delay, sends with standing User-Agent, X-Requested-With and POST JSON content-type headers applied last, folds the rate-limit headers into the ledger and remembers the lane's policy.",
+      "statement": "Each exchange first refuses with an invalid-request-threshold yield when the lane's known policy has reached the threshold, then waits once for laneDelayMs (the batch pacer, or the even spread when spread is on), sends with standing User-Agent, X-Requested-With and POST JSON content-type headers applied last, folds the rate-limit headers into the pacing ledger and remembers the lane's policy.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L207-L222",
-          "version": "repo-lines-v1:sha256:5dc8b0bd6958fe7ecedacc5a407888a7054d637f0230788b265e0ca91a4a80c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzNjE0YzRlN2YyYzRmNGNiMGY5ZTU2N2Y1OWNiNDVjYjE4MWRhNmIyYjFiYWU0YmYzOWRiOWE1NGNjNjVhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MDk3YTk5NTQ0OTA1NjExZmNkMWU5YTUxMWYzY2M2Y2ZlZjNiNGFlYzQwZjY3ZGI2YTFkZWRiNDAyYjg1NjcifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L212-L223",
+          "version": "repo-lines-v1:sha256:62971a73d4cc70c91f890631fe222de00edcd614da17afedda2f6e310bd05ea7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmNzIwNDQ3MTA2ZmQ5OTk2OGRkMWNmNmJhZjg4OWExZGM0OGVkMjA1OTJkYzAxZGJiOWMwNDBhZWNkOTVlODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5N2U1MzM4NzM3N2RmM2I0NTFiOTdmODMzODE2ZDAzN2NmYTRlZmI1M2NiNWYyOTNkNmM1MjNlNzgyNmU5OTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhYmViNzcxMTRhYzUwNTQ5ODg5NmUyZjNhNjVkODQ3NjBiOGU1NjMyNmU2ZmM0NWRjNGQ5NTU4NTA3NjRkNGMifQ"
         },
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L349-L399",
-          "version": "repo-lines-v1:sha256:c91e52ba62bd4763a4b973eb3273885728cc3b0197211b8a6a914e0165214801:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczZTY1YmI0MTMxYjRjMjZkM2Q2M2JlMDBkZTkyNjk2MGY5NDg0YzVhNjFhNDY1YmM4ZjIwZGFlNjAzYzZkNzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzYWFmNDg2NTQyYjI3NWU2NjgyOTg2ODMxYmFhYTQ3OWMxYzgyODUyNWQ2ZDBmYzg4NjM4YzE4Y2IxNjgxMDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjNWU4ZGRlYjAxNWE2MzFjMTRmY2Y4ZWEyZmJhOWE1YWNhNTI3YzE3MDMwYmNmOTMwYWEyOTdkMDk0OTU1Y2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0ZjZjNDI5OGM3MjU2ZjYwYjEzMTU3OGI5YjJlMzY2OGE1NmMyMjEyODc1NjkyNWZkNTdkMGM0NDIwYWNjMTIifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L343-L351",
+          "version": "repo-lines-v1:sha256:76b2102bfce875cd8b3d1549f3a570a6a4360ac9042bb0ab774f1cb77e297fee:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGYzZWM1YTBkY2NjZjA1YjhkNDQxNzRiNGFmYTAyZWQzZWVlMDc4ZWRiMDczNTI1ZjI2MTcxMzQ0YmJkN2JkNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGJhNWI1ZmUwOTYwOTRhMmRjOWI5YWFmMzJkYTA2ZGQ2NTBkYzQ0OGJlNWM2NWZmMTk0ZDY3MWI3MDEyY2EyOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGRiNDA2Y2Y5MzM0MmViMjY2MTc0OTdmYzllMDA2MjhlZjE0MmJmZjc3NTFlNmI2Yzc4ZjAyYzU4YjhmMTMxNiJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/client.ts#L415-L465",
+          "version": "repo-lines-v1:sha256:70ce1af8524cf6bb5de90ace2b0d97027bb0be6b5acd253f75523a07a456566b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwYWUxYTM1MDk4NTU4YTVkN2VjZWE5YTRmMDhjZTRkMTJkMWE2Mjg1YzliYTdmM2M3Yjg2MzVhMjFlYjhlNGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljMzQ1MzNkODU3ZTBjMTYzOGFhODA0M2U2YzFjMzRjMmJlNTBiZTY4NzY2ZjhjMDk3MDM5NDBkYWNiZGE4OTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxNzgyYzc4YmEwNTcyNTA1ZjNkYmI3ZWNmMThjYzhmZmE5MzFmYTcwZGZjNzA5NTkxNWU5OGRkMjA3NDczNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5OGY1OWUxY2M1M2MwMjQ0MDU0ZTFjYzYxNGYzNjhiYjhjMjIwZjk2YjAzMmNlZTYzNmI1NDE3MDU0N2RlZDMifQ"
         }
       ]
     },
@@ -21,22 +25,30 @@
       "statement": "A 429 is returned as a yield whose retryAfterMs is the integer-seconds Retry-After header, or else the ledger-derived penalty, or else a floor from the response's declared windows and penalties with a 1 s minimum; the client never retries, and every other status is returned unchanged.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L224-L282",
-          "version": "repo-lines-v1:sha256:76afbc1f590dbf3ea8b6d023724b028c5dbaf3de22e03117a4aa49b7fa6ebd23:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmYTNkNmMyZDAwYzI4M2JkOTAwMTI3NjNmNmU2YjYxYmViOTA4NTYyNGNjOTkzMDE5MzU4YzM0YTc0N2JkMTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3MmYyM2I0OWRjMDY4NDk2NDZmN2RhYjJlNDY1YzhiYWI5YmMzYmViNWNjMmE5ODhkYTkwNjZjOTBiMGUzZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2ZjEyYTgzNDBmN2RlZTM0OTM5NWIxMDEwMTliZDc3YTlkOGVhNDM4MjRiN2JiYzcyZjg0YzI2YjA5NDY4MWEifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L225-L287",
+          "version": "repo-lines-v1:sha256:657da296784172491470a4a49550be09edd23bbae40efc188bfc9ff7db40a5fb:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1MjMwNWE3OWVhNjBkZDAyNTQ2ZDdhZmI4MzI0ZDQyNzJlYzMxNTI3MmYxYzY3YTBhNzFkY2E3MWZmYWVkZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyZTc2NjU5OGFjYmE1MDEwMDE4MjY2Yjk4N2E3ZmRkNTAyMGEzOGJhZmZmNjYwMGRjZTBlNDY3NzgzN2E5NzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmOTE5MzI1NDEyMzBiYzI4Y2E5ZjRiZjQ4ZDRjNzIxMDAzZGFhNzBmYjhkZWExM2JkMDVmYmM0MWU3ZGFlNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmODExN2E3ZjA4MDE0ODA4ZjdhMzc5NDRjMjMyNDYxYzE0ZjkyYTI3OTI2ZmQxYjU3NGQxOWE3M2VhMGJmZGYifQ"
         },
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L401-L431",
-          "version": "repo-lines-v1:sha256:e87047d01cd5aab1acfd1f4bcea6f6f7a9e8b7bc9792e33722421c7a3cfffaf9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZjIxMjU1ODBiZjU0MTlkZTZhOWIxODkxY2ZlODUxZGRiMTdhMzBjMWMwN2NiYzEzNDlhYjExMTg4NWJiYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjYjg4MWYzY2Y3Y2IyNDU3M2JmNjMxNWE4YWUxNzkwMGM3OTIzMWIyZTdiMjNlNDA3MDcyOTdiMjEzYjUwZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmNThhY2VkNWJhMzFhYjkzYjQ2NjE3NTVkYmZiZmE2MzQzMzY1NTBiNTI2ODFjZGUzNTAwZjRlYTUyYjIwNmEifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L465-L497",
+          "version": "repo-lines-v1:sha256:4381387740f1ed687d233aee74041958d37a2619169a3f14aadc03c9d498c0d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljMzQ1MzNkODU3ZTBjMTYzOGFhODA0M2U2YzFjMzRjMmJlNTBiZTY4NzY2ZjhjMDk3MDM5NDBkYWNiZGE4OTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNzU5NjQ1YzJjZWY1ZjliYWNiNGUyNmFkMGU3NDk1YjhkNmMyZjkwNDlmMTAxMjQ1MWE3ZDBjMWNhYTJhYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiMGJjOGM5NmEzNjczNjBjMzZmNjYyN2ViNjA0NzEyNDFkMmU0ZGVlYWNmYWQ5ZDViNWM0ZTdmNDc0MmVhODMifQ"
         }
       ]
     },
     {
       "id": "claim_a0deffed0f664081b3b5a645cc900f4a",
-      "statement": "Sibling clients from createTradeClients share one ledger, invalid-request counts, lane memo and a serial request queue that survives rejections, and refuse construction on a blank User-Agent.",
+      "statement": "Sibling clients from createTradeGovernor (and createTradeClients, which wraps it) share one pacing state, invalid-request counts and a serial request queue that survives rejections, and refuse construction on a blank User-Agent.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L299-L452",
-          "version": "repo-lines-v1:sha256:cdf4b84900a3c4d22de4af2b75e87bb9be2aae2b19cc3caf1f2318402f269faa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTU0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0NWQ1YWJhY2EyMjY4MGFlOTUzMzY3MDBkZjc2NjM2MTk3YTdjYjZjMDA0ZjRjZDc5YWMxYjFmZDJmMGFjNGE1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlMjJmYWE1MzViZDJlYTNkNTJlNzQxZWQ0NTQ0MzViN2ZlNDllODM1ODZlOTQzZDk4ZDgyYmJmYjI0ZDFmNWM1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZjY0MTY3NTg4YTY1NmZiMTA3YzJkYzE5YjMwMjU1MDdmNzM2MTMwODJkYjVlNTIwYTdjMDcwMzM3ZWQ5NWNlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/sync/src/trade/client.ts#L312-L316",
+          "version": "repo-lines-v1:sha256:5652e517edd3a7403ff3e64e09137943076e53a19a0eb1c7e389631f31dc5c1f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGVjZWFjMTk1NDBhYWJkNjFjYjI2NzE4NjhjMzMwNzUwZWY1MWNjODUzYTU4YmRiNTY0N2E3MzhmN2JiOGI4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzIyMmZlNzUwNGZkYWMzZDVjNWNiZjc0NmQ1NWMzZjJhMWNmYWQ3MjBkZjVlYmY3MmQyOWJlYWNkYTI0MjQ1NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmE5MmQ4OTg4ZWEwNzEzY2U1NDc2NGM0ZjEzYzZkZmQyOGI3NTNjMzMzNzM1Y2Q5YWU1Y2ExZWMzMWMxMjVjNyJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/client.ts#L377-L389",
+          "version": "repo-lines-v1:sha256:7d100f6e74a83ad614e1a4112afd3b2851d96012802bb3290f4f7c23002c59d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ZGQzODkzNTBmMGE5NWNkMzIzNGM4ZTE4N2Y4NDgxZWZkMzIyMGI4YTkyZTk4NjIyNWIwNzhkMDY2ZDJmMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMzlmYzc1OWQ5MmRkN2IzMjM1MDM1ZjlhZmMyNDI2NWE1ZDU2YTJlZGM4ZTVkOGM0YjM3NzZkZTM3MDllYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMDU4NjcyNzdhNzllODg5Yjk5MmNmNmJhY2NhOWYxODU2NzNhMjAwMzU3NTM5MDBiZGRiYWQwNGRmMTRlMjQifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/client.ts#L499-L524",
+          "version": "repo-lines-v1:sha256:2d5c12fc5c3e909b405423549807e397cb1affbd5c0e1980ed4d8d23f0f4cddb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjOGQxZGRhMWNkOWI3MTA2ZWNkNzBiY2VlNzc1OGIxYzc3MDNjY2Y0MjA2NzRmZWQzY2QwM2Y3ODRkOGUzMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlZWVmZGQ1MTEzZDk5MDU2ZjFlMTlkZTFiN2Q1YmVkZTZlMGEzMDFmOWU4ZjdiZTRlYWQzZjhmOGRhODY2YzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -45,8 +57,8 @@
       "statement": "The remaining allowance on a result is the minimum of hits minus state hits across every declared bucket, floored at zero.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L257-L272",
-          "version": "repo-lines-v1:sha256:60b4e90bbccb1b5f3b3918f214369f8badc10c1f7f7c4ecf467a21c0a1d8c2ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4ZGNkZWEzZGMzZTAyN2RkZGZjMDQ3MTdmMjU3ZDQ5ZWUzMGE0OWY3NmJkNTFmOWM3MTViOWI3Y2Q2YTE3ZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NDg5MjQ4ODUxMWVjZDhjMTU4ZWI1NWFkOGViZDE5MzY3ZDExYTZhZWU3YzkxYzIzOWU2NjhjODExYTg2OWMifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L263-L273",
+          "version": "repo-lines-v1:sha256:778c9405f9182d689d3bab8b108baa05e60db832c7e4041a2004b38a41104bea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3ZDUyZTk5NzlmZDllZjM0MDc5N2Q5OTNiOTIxYjQzYjRkMWQ2Y2FiOTYzY2Q2OGVmYzAwNmIyZDYyOTY2ZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxY2QwMjY4MTE4ZDVlNmY0YjViM2U2MjRiMzYyNGQ4NjA0Y2U2MTZlMGEyNTk2MGRkYjdmYWFlOTdhNmQwYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1MWQ5ODY0MThhMThjOTI5ZTdiNDNlMGUyZGU2ZjAxZDEwMTNkMmUxZmM0NDkyOTY1NjFmZWVjNWE1OGRkNGMifQ"
         }
       ]
     },
@@ -55,12 +67,12 @@
       "statement": "Rate-limit rules are read at runtime from X-Rate-Limit-Rules with positional hits:seconds:penalty triples, skipping malformed rules, and the pure ledger is keyed by the X-Rate-Limit-Policy value, delaying for active penalties or full-bucket windows.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/ledger.ts#L1-L17",
-          "version": "repo-lines-v1:sha256:275adb5f2f7a5d2a74ca608dac26571e60c7fdc35a8267dfef9002d3f1f7bed0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyMzZhMWY5YzQ3NDQ1OTJkZTZlZWQyZTExZjMwYWRkOGEyYmMyNzQyMDk4NTc3NzJkMjFkZmU4MzJjMWI5NDgifQ"
+          "resource": "repo://packages/sync/src/trade/ledger.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:534ee8ab76dfa414ac88845925ffa1256c46655171678239bffb544ec86b26ec:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJlNjhkMmJhOTM0YzI0Njg2MzliNWYyNTM2NzA4MzRiYzEyYjJkMzhlNTE0MWJiZjhjMDMwZTZmODRiYTY3YjcifQ"
         },
         {
-          "resource": "repo://packages/sync/src/trade/ledger.ts#L125-L166",
-          "version": "repo-lines-v1:sha256:22b843b4151d0a98cf7d35ce8c943b50f25ecf2682b3b10234654cfbe65a2332:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5MTlkZTAzNTZlNzJiZjY4ZTYwZDE5NWU1MDAyOWI2Y2YxZDhiOTgzYmIwMzc2NGNmN2FkYzg4M2JhNWM4YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiZjFhMTI2ZGU5YjQwMTJiY2U4ZDQ5Y2FkZDgyMTMyMTFiOTk3ZjViNmU1OTRkODA2M2IxYzdjYmRkMTc2YzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkY2M3Y2YwYTk3N2M2MjRkYWY1MDI5MzY0OWFiYTQ5MWVhMjNlNzk0YTg0M2Q2MzM0NTQ2MWY3MjFkMTZkMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzYzYjkzODlkNGM2OTQ1NTU2YjdjMGU0Y2YxNjljN2ZhYjFlZGU5OTNlZmJlMTZlMjNiZGM5ZTExY2NhODYifQ"
+          "resource": "repo://packages/sync/src/trade/ledger.ts#L130-L172",
+          "version": "repo-lines-v1:sha256:ca8020404a3c5e3af3b020260f91f85dad57c20a8f0509ce25af98c364252a23:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhZmQ3MjcyMTBiM2QwNGE5MjZiNmQ4NDMwYTRkMGE2NGU3ZWFhMGNmNjExY2IwY2Y2YjFiODhjYWMzY2I0NWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyYWEzZTM1M2JmOGIxNTYzNjIyYTcxM2I2ODgxNjhiMjM2NzgzYmQ0MDFlY2U1ZjE0YWQ1MjJmNTk4YjBjNDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1Mzg1YzllNWI4OTI3NjRmYmI3NWQ2MDAxYTUzMGQ5MzM0NDY3OWExZGU3MmVlNjExZDkyNGFkNmVjYTQ0Y2MifQ"
         },
         {
           "resource": "repo://packages/sync/src/trade/rate-limit-headers.ts#L1-L20",
@@ -131,10 +143,30 @@
           "version": "repo-lines-v1:sha256:6006f3329aa9cc768f8d21fb15bcaadff723151f461665a4a644c8e92f18e6ee:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_36c517e747a344ebbaf18ca97413138f",
+      "statement": "PacingState holds the mutable ledger and lane memo so the pnpm sync session can share it across the fresh governor of every chunk, while invalid-request counts stay per governor.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/client.ts#L318-L335",
+          "version": "repo-lines-v1:sha256:ae1e73b8fc59c97565a7b0f5ed2ff5d1495577e2918efb91bf8c0d59610dc6cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzMDQxZTNhNGEwM2UyYWJkNDI1YzJhMTkwOTQxYmFmNmQ5NzkzZGFiNzQ2ZmQ0OTVmYTljNmVkMWYzYTk2ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4MTIxNTI3OWU5Mzc1NThiZjM5NzYwNmY2MGQ1ZGJlNjQ0ZmE4YzdkNzc2MjkzZmRkMDMxN2UyMDQwYjU4MjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7cb9977a8bbb4fa0afa437cde169f515",
+      "statement": "spreadBeforeNext returns the larger of paceBeforeNext and the even spread, the largest seconds*1000/(hits-used) minus elapsed over buckets below their limit, and asks no delay for a policy with no reading; evenIntervalMs is the largest seconds*1000/hits over a policy's buckets.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/ledger.ts#L174-L246",
+          "version": "repo-lines-v1:sha256:20bbe88b91b7139ccf79ebadaa874c0026712ced2bf473206d3972f4642f9be0:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViNzY4ZGY4OTdiMTZhYTVmNWY4MTJmODExNTFiMjdhZTY5ZTJhNGQzNjVkNmQ1M2NkMWMwNTc4N2YxYTdmODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjYmU4MzZhNjAyYTliMWNlMTQ1YWZhNDViODEyMDA5ZTA2ZmJlNWUwMTFmNzRhMjcwMGY4MDMxYmMxMzFlZDIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

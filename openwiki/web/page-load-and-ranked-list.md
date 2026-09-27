@@ -24,6 +24,8 @@ sources:
     resource: repo://packages/web/src/list/UnrankableAppendix.tsx
   - id: openwiki-source-f20f60e1ecaf073e364173ca
     resource: repo://packages/web/src/load/artifacts.ts
+  - id: openwiki-source-81a09436ea8ca32facbe19cd
+    resource: repo://packages/web/src/load/load-artifacts.test.ts
   - id: openwiki-source-48083b7e06b93884229c0b35
     resource: repo://packages/web/src/load/load-artifacts.ts
   - id: openwiki-source-814633b3012ba5d3ee46edcd
@@ -40,10 +42,10 @@ sources:
     resource: repo://packages/web/src/theme/tokens.ts
   - id: openwiki-source-7f1c49c9ea79c77f6775aee2
     resource: repo://packages/web/src/threshold/threshold-storage.ts
-generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Web page: artifact load and ranked list
@@ -58,11 +60,13 @@ verified:
 | --- | --- | --- | --- |
 | `dataset` | `dataset.json` | required | `SUPPORTED_SCHEMA_VERSION` |
 | `syncReport` | `sync-report.json` | tolerable | `SYNC_REPORT_SCHEMA_VERSION` |
-| `weights` | `weights.json` | tolerable | `6.0.0` |
+| `weights` | `weights.json` | tolerable | `WEIGHTS_SCHEMA_VERSION` (`6.1.0`) |
 | `recipes` | `recipes.json` | tolerable | `SUPPORTED_SCHEMA_VERSION` |
 | `tracked` | `tracked.json` | required | `SUPPORTED_SCHEMA_VERSION` |
 | `config` | `config.json` | required | `SUPPORTED_SCHEMA_VERSION` |
 | `catalogueStats` | `catalogue/stats.json` | required | `SUPPORTED_SCHEMA_VERSION` |
+
+The weights artifact is parsed with the full `WeightsFileSchema` from `contracts`, so a weights file that breaks any hard error of the contract (for example plain and defence-suffixed classes in one `categoryId`) refuses the render as a `content` refusal, just like a malformed body. The expected version is the `contracts` constant, not a copy.
 
 A required artifact that is absent refuses the render, the same as an invalid one. A tolerable artifact that is absent becomes `null` in the set, never a stand-in value, and the trust strip prints one line per absent tolerable artifact. The page **never fetches `catalogue/static.json`**. The one denomination word it prints, `Divine`, is the constant `DENOMINATION` in `shared/product.ts`, not the catalogue label. Adding an eighth artifact needs an AD-24 amendment. The build's prune allowlist mirrors this table (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)). Schemas and envelopes are described in [Contracts, envelopes and the data/ files](../architecture/contracts-and-data-files.md).
 
@@ -92,7 +96,7 @@ Then the precedence across all seven applies, and each screen names the **first*
 
 ## Ranking at the Payout Threshold
 
-`ReadyBody` calls `rank({ tracked, dataset, activeLeague: config.league, threshold, weightsLoaded: set.weights !== null })` from `@poe/core` and memoises the result on the set, now and the threshold. From that one ranking it renders the list statement, the ranked list, and the page tail led by the Unrankable appendix. `web` computes no ranking term itself (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
+`ReadyBody` calls `rank({ tracked, dataset, activeLeague: config.league, threshold, weights: set.weights })` from `@poe/core` and memoises the result on the set, now and the threshold. From that one ranking it renders the list statement, the ranked list, and the page tail led by the Unrankable appendix. The appendix lists crafted classes that are absent from the weights file or declare a partial pool. `web` computes no ranking term itself (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
 
 The **Payout Threshold** (`threshold/threshold-storage.ts`) is the only value the page writes to browser storage (key `poe-cbpc.payoutThreshold`). Its range is 0 to 3 Divine, in steps of 0.05, at 2 decimal places (`MONEY_DECIMALS`). The default is 0.25 (`DEFAULT_THRESHOLD` in `shared/product.ts`). Reading happens once at mount. It accepts only a plain decimal string in range. Anything else, including a storage that throws, gives the default. A write is clamped, and a blocked write is ignored. Changing the threshold re-runs `rank`.
 

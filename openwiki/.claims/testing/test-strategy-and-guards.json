@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:174a51dc965aa8303b36b9c10d9a348297b656f4d28ca16b11f46f01ef020cf0",
+  "pageVersion": "sha256:bc9275278cea816cdcce5d5b9c606fded46b2c2d3c93dbdc86d11acac108272b",
   "claims": [
     {
       "id": "claim_d1a342264ab8403a889d58264af5ba8a",
-      "statement": "The root Vitest config declares each packages/* project plus a root project running test/, boundary-check, dev-stop, dts-specifiers and tracked-json skill script tests, all with test/setup.ts as a setup file.",
+      "statement": "The root Vitest config declares each packages/* project plus a root project running test/, boundary-check, deferred-issues, dev-stop, dts-specifiers and tracked-json skill script tests, all with test/setup.ts as a setup file.",
       "evidence": [
         {
           "resource": "repo://packages/sync/vitest.config.ts",
@@ -12,7 +12,7 @@
         },
         {
           "resource": "repo://vitest.config.ts",
-          "version": "repo-file-v1:sha256:36e7aeeefc2364e1030318b13018d74a20fd6103b6986654e7a87c4b5b0a2a9a"
+          "version": "repo-file-v1:sha256:f0bc9c5cdc428bedbda1508a9b06ede0fff5edf2fb52e7b6e12a02b78f59166d"
         }
       ]
     },
@@ -146,17 +146,37 @@
     },
     {
       "id": "claim_4fd01a1af0b24a5b9ea328d5362edbd2",
-      "statement": "The shared web DOM helpers provide a fixed test clock, a jsdom rgb() colour spelling, a single mounted React root per test, and mountList, which ranks a raw workload through core and mounts RankedList.",
+      "statement": "The shared web DOM helpers provide a fixed test clock, a jsdom rgb() colour spelling, a single mounted React root per test, and mountList, which ranks a raw workload through core with no weights file and mounts RankedList.",
       "evidence": [
         {
           "resource": "repo://packages/web/src/test-support/dom.tsx#L1-L103",
-          "version": "repo-lines-v1:sha256:13dcb0e3304735eacdf6169c8d0bcc91f446432cddb630b9b45e84b6275f71e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "version": "repo-lines-v1:sha256:be59857c7590f810d81463801eb41c10273ff9d6dc8866e9faa7f0431a52a210:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_fe53d8c29d344012a82ec5ae8c34d673",
+      "statement": "test/tracked-json-scripts-coverage.test.ts asks TypeScript, Vitest and ESLint whether tsconfig.tools.json, the root Vitest project and eslint.config.mjs still cover every tracked-json skill script, and reruns each check against a config with the scripts entry removed to prove it is not vacuous.",
+      "evidence": [
+        {
+          "resource": "repo://test/tracked-json-scripts-coverage.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:aceb7113ff8e9f4c9dcf941067129bbe2f96b17da8bc8fc54d03d91fd63d05b0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmNjYWIwZWFhNTZkOWNhZmM0ZTM0ZjhiZWQwNGMwYmYwYTExOGNjZTgxODdlODBkZWM1NDQwMmYwNzZjMWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmNDQ3NDIyMmVlNTBiNGVlOWU4YmU4MTE3YzM5YzBkMjhmMzcyMWZkOTliOGNjYzkxYWU1NzIwZGQ5Nzg5MjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlN2EyNjdjY2FmZDc1NDEwYzZkYWE1M2U3NTM2MzZhMWY0YTU5YTUyYzNjMDY3NzNhYjNmMTAyOTk2MTJlOTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dacf13e095e646bf90262a0990d03299",
+      "statement": "test/deferred-ledger.test.ts fails pnpm test when the deferred-work ledger drops a source_spec bullet from parsing, has a duplicate entry id, or carries old sweep run-state markers.",
+      "evidence": [
+        {
+          "resource": "repo://test/deferred-ledger.test.ts",
+          "version": "repo-file-v1:sha256:523ddf8aa87e3ff6239b84c18dce9e058ec4dee80055da2588f1fb9265884033"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

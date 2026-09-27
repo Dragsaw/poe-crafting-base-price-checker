@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:d94bdbdc7d538fb9fe7cb2c6610fb5f4f9c91823a61854e71d2b0b602cb0bf4c",
+  "claims": [
+    {
+      "id": "claim_0b10e01bef33463ea93a8dc2336b622e",
+      "statement": "pnpm sync is a long-running session that runs one chunk per iteration with maxEntries 1, sharing one PacingState and one request counter across all chunks and passing spread: true, so the lock is taken per entry and never held across a wait.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L1-L33",
+          "version": "repo-lines-v1:sha256:cf16ee9d375437a2669adbb3c261d493f0a735fa6a308915cb87ad8c85b3f001:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L542-L582",
+          "version": "repo-lines-v1:sha256:8291772abe5bcbd3829cddd9fbf8ad352eea42d796017b53afc5e2291f2f4e8f:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwMDY3MDEyN2I5NWE4YThjMjEyN2M0MzI3NTlhZGIyZGJiOTc5MjUzOGNiNmEyMGExOGQ2NTRiNDhiZjMwNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3ZmY2YTE5OWExYWIxMjE0ZGRiNDQyYTIxNTI2MDA5Nzk1NjgwYzFlN2ZhOWI1Mzk5NjAwNjlmNWNmZmEwNjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzYzk4NzY0YTY2ODUzM2Y0ZmM1ZmMzZThmOWIxNWRiMDdkNGIwMzNhNTgzZTVmYTVhN2VlYWZmOGY3ODEwN2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6c87cfe8d4704572a5ca67ee2e8ee96b",
+      "statement": "pnpm sync:batch runs one batch chunk per invocation through composeChunk without the session-only options, exits 0 on any outcome and 1 on a missing User-Agent or a throw.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync-batch.ts#L44-L81",
+          "version": "repo-lines-v1:sha256:d46859ac2d3b3a06ff497d60d52600dfd5b36e798b5b41f3734c35920829b10f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5NTNhMTVkNGVhYzdjYjFmMzJlODE3ZWY5NjY3YjU0OTUzZmY1MzE5OWZmMGFjYTVhZWExZjc3YjEwMjliYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMWNhZGU1NWNlYWRiYzNhN2ZjZTg2YTdlNjVhMDBlMmU1MTIyZTY0ZWM0NGVjMWM1Y2Q3OWU1MzU4YWI5ZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6a69e6221dfa4d5294b21745971c031e",
+      "statement": "Before each chunk the session pre-waits, outside the lock, the largest spread delay over the search and fetch lanes plus the data lane when the league gate is due; the gate is due when no league is confirmed, the previous chunk ended a pass, or the input-file signature changed since confirmation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L343-L357",
+          "version": "repo-lines-v1:sha256:a2a7a536b1a1e09f81fe683d2e37bacab4422cbeea26a0d598c5926d8b905c81:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxNjk5OWFkZjAyMTdkNzUwODg2M2ExZWQzYmVjZjQ3MmYwYmUyOTczZWRkNjYzZGExNDI3ODNjMzk0MzdmMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwMmQyZDk4MzU4NTA2NzkzODkwNDRmYzMzMjllN2ZhMzRjNTcwMTIxZThhNjFmYWYyYmYxNzVmMzE0ZThjMDIifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L547-L558",
+          "version": "repo-lines-v1:sha256:fecc5b7db161c07d4e201997e44d819921b507bb059a652d537f826945ab4d44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkYWZhZjE2ZGU4YTJhMmJlMWQyMmE2YTg1NzlmYjYyYmZlNzNlNjkyNzcyYWQzZTk2MmEzNWE5ZTNkMWFmMjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiY2Q3NjExYjI4ZTg1YzU3MTRjMjY0MGM1ZGY1ZTMyMzA4YTBhYzJkZTNjMmQ5N2RhNmM2ZjY4ZDU2MzVkNjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllODE4YmEwMDMwNTlkZTJkM2JiYzdkZjA4NjZkYTU4ZjQyODU0NzMyZTg2YTU3Nzg3MmU1ZTdiNDA4ZDc1M2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_91e2e65cc08248cd92a23593694bf846",
+      "statement": "nextWait maps chunk results to waits: busy or dispossessed wait for the lock to be free or stale, deferred and 429 yields wait until notBefore, a no-answer yield backs off, a refusal waits for an input-file change, other throws wait for an input change at most until the backoff, and a completed chunk with nothing due waits for an input change at most 24 hours.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L188-L293",
+          "version": "repo-lines-v1:sha256:ab8d63f4f564e174744ab3321130833f1028d556ba3ef86a1c96185d41a280fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMmIxNDM4NzBjMGQ1NDFiNWUwNWQxYzkwYzQ5YTA3NDlhYzE0ODQzMjBmNGYxYzY4MzI5MDY0MTZjNjkzZjRhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNDAxZTAzZjk5YWI4NzdkYTE2ODZlNTg4YzI5NjZlMDM2NGJkMTI2NTVkNGY4OWM1ZWY2MDA2MzUzYTE2ZmNiIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_548e93fa08e44bf1af75af23cea52557",
+      "statement": "The session backoff is the tightest even interval doubled per consecutive backoff and capped at the six-hour stale-lock threshold; a lane with no read policy counts as a 36-second cold even interval.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L219-L231",
+          "version": "repo-lines-v1:sha256:5f0235df4619d086e334ea660385e3b5ede3fc6c3b262ea638518892f2fd2b13:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1NGQxMzU4MGNmZTY0NDY3ODdkNTg3N2JlYzE4Mjc0ZjQwZjY1OGUyNjE1ZjdlMzczZWZlNjcyNzIwNzljOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyZDgyYTE5YTQ2ODEyNTdiMzg5OGEyNGJlZDM4ZTE2ZGUyN2UyYjM3OGM3ZmM2YWQxNWJlNzhjYWMyOTgxYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczNzRjZWRmNTU2NGQ4NTIxNTlmZWFlYzQwNDUzMzcxMjgwYzhhYjNhZDhhYzJlZmNkNDQ5ZDc1NWUwNTk2NGQifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L359-L369",
+          "version": "repo-lines-v1:sha256:684c4d339c9bc15441fe536717175e3bd4064fce0bfb08e6258920705a600448:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzNmM2ZTFmODJmZTk2YTFiOWI3ZjhjNDAzNGI5ZTE4YjhlZjI0YzU4NWQ2ZTg5MDlkMGIzYmZiZjljYzIwZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1ZThiZWM0OGRkMGNlNTc5ZTNkMTgwNTkzYzFhNjMzYzI4Yjk1NDBiODc2OTUzMTYzMjI5YWI5OGQ0YzkwYzIifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L80-L85",
+          "version": "repo-lines-v1:sha256:1bda864122a622d0fcaeae4c234e4838f4b40f54c02178b5bb1487fbca42a44a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRhN2I4ZjU2ZmJlNGRkYTRmNjVhN2RjMGJkNzUzYjIwMTBkYmRhMjA5NzFkMzA3YjkwYzk0YmYwN2I2MjEwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzFlOTI5Y2VlZDA2ODljMWJhMWQyZmRiMjU0ZTQwYzNjOGFmZmEzMmU2MzgxNjJjYWI5ZGZmZjdjYzA5MTUxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjFmNTU4NjBhMmE1YjhkYjUzNjBjMGNiYWRlOTY4YjI4NmQ4ODBiMWQxYzVmZmMzYjNjOGMwYWZmMDRmNjQ1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e6a07955e95a436f8ed8fac119946df2",
+      "statement": "nextState clears the confirmed league only on a LeagueMismatchError, resets the pass-start request snapshot when a chunk starts a new pass, and passes it back as requestsSince so the report's request figure covers the whole pass.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L304-L341",
+          "version": "repo-lines-v1:sha256:4899e7d760bd1f18516f87aa8a017879d088a8c8098f5eceff8b147e6ae7578c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3OGE3NjFiN2UyZmFmNGVjZjcwYTI1ZTY5YmRhNGEyM2ViNWUyYzA1NjMyYjRhODUxNjhlNTU2OGEzNzFkYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5MjVlMTlkOWNhMTRjYWFlOTEzNGY0M2RmNzBhNmU3MzFkOWUzZWYzNTkyNTdhMWM5NWU4ODkxOGU3ODU2YmQifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L570-L575",
+          "version": "repo-lines-v1:sha256:82516d12d9e3bcda400c720fb58f251e927a62cb34ce5ec6e2c2ec17c7f080b7:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWVkZTQ5YTFkODk5YWMxYjY5YjI2ODBjMDg3YzdjYWI3MGNhMzM0Yzc2OGIwZWRlYTE1NWU5Y2NkNDY0YmJmNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWU2NzNhYmQ0NTdhOTdlZWExN2E2MDA2MmViMGZhZWE2YmRmMDk0ODY4Y2M2YjhmOGMwZWJkYTJmNjFlZDQyZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmJiMjljZDZmOGRjYmRhYzNmNDVmOGVhYWQ3YzM0OGI5ZWMzMzkyZjhmMzUxM2Y3MjQ0YWJmNTg5NzkxNzRkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmJiNTQ1ZjMyOWY3Mjc3YmIxZmMzZDk1NzIxMzNkYzExMjFiYjZhNDdiZmYwMzQ2NWE0ZDZkNmMwYmFkYWY1OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4ed6c9c9df044ea29317ffe54c3cee61",
+      "statement": "Session waits send no requests: they sleep, poll the input files' presence and modifiedAt, or poll the lock file every 5 seconds, and a failing local read never ends the session.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L374-L477",
+          "version": "repo-lines-v1:sha256:0b2a180d2ffd93630598bf6b9f3bcaadba14fc0ce96a2211f9d55ebacb577b54:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMDQ1NDdjOTEyZDFlNWI4YmIxYTU4NmI1NGVlZTgzZmIwNzhlZWFlODUwYjYyM2FiYmUzMGNjNGMzNDkzM2NmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhOGJlYzBjNWIzNjFmOGJlOWQyMTUzZGY3MGMzOGYzYjhiMzgyMDkwNGIyMzExNjQ0ZmI4Y2RlZWVhNDNlMzUxIn0"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L87-L106",
+          "version": "repo-lines-v1:sha256:723e413623e6398dc94ea5bec80a42a2620dbd8f9a4bcbc6a6318ca621413e73:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0M2I2OTYyMzM1MTk4YWU3OTk5MTI5ZTY1NzU0NGU3YTZhMzEzMDM5NjJiYzZhZjI0NWM2MThiOTRmNTk2YzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiYjRjM2MyOTBmNzUyZjNjOTQwNDBmNGQ1MjE4MzU1NzZlNWY5NGZiMzJkZWVkYmE4MjA2ZGQxNGZkNWIxNTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_909ecf5645e646e685769cb35e322b50",
+      "statement": "The first SIGINT or SIGTERM aborts the session's signal; abortable waits end at once or the running entry finishes, and the command prints stopped and exits 0, while a second signal gets Node's default handling.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/shell.ts#L81-L98",
+          "version": "repo-lines-v1:sha256:c3ec53bfef27c340a7d2c386ab9952d36136143227ed071cd688ce2edf4f3f5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjM2ZlMTMxM2Y2YzdmNjkzNzdhOWIwMTY2NzFhODNmYWRmMTUwN2YzZmMwODg4ZDA2YTU5ODE3ZjM0YWIwMWQifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L595-L631",
+          "version": "repo-lines-v1:sha256:95b53ace656855556a654777a1450faea7f8db0922804b0d8ba41489f5b8712c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlYmNmMzhmMjFhOGM1NjllZDFiYjY2NzRjNGY2NjBkN2MxMWVmODY1MjAyNzhiNzI4YWQ0ODIzMTUzYTU1N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkZjQ5MmMzNzFhNTU3ODg5MDY2ZWJmNzNiYTAzNzRlYzNlZTU4NzlkYmU1ZDI3MWRjODY5NTQ3M2E4ZjZkMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3M2ZkY2VjMWIzNjY3ZGUzYmM1Njg2Mzg0MzIzNjg2ZjllMmZkOTExYjhlZDNiNzJhNDViMzk0NDIyZmU1ZDYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T19:26:28.611Z"
+  }
+}

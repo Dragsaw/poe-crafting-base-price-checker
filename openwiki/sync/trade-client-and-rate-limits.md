@@ -24,10 +24,10 @@ sources:
     resource: repo://packages/sync/src/trade/user-agent.ts
   - id: openwiki-source-6c1728bcce531bca96d02755
     resource: repo://test/no-hardcoded-rate-limits.test.ts
-generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T16:49:38.941Z
+    at: 2026-09-27T19:26:28.611Z
 ---
 
 # Governed trade client and rate limits
@@ -41,7 +41,7 @@ The client transports and nothing more. It does not build search bodies, parse r
 For each `TradeRequest` (`method`, `url`, optional `body` and `headers`, and an opaque `lane` label), the exchange does this:
 
 1. **Threshold check.** If the policy this lane last used has reached the invalid-request threshold, the client refuses without sending. It returns a `yield` with reason `invalid-request-threshold` and `retryAfterMs: 0`, because waiting does not fix this condition.
-2. **Pace.** `paceBeforeNext(ledger, policy, now)` computes the tightest unsatisfied delay: an active penalty, or a full bucket's remaining window, aged by the time since each rule was observed. The client waits that long **once**, using the injected `wait`.
+2. **Pace.** `laneDelayMs(pacing, lane, now, spread)` computes the delay for the lane's known policy, rounded up to whole milliseconds. The batch pacer, `paceBeforeNext`, gives the tightest unsatisfied delay: an active penalty, or a full bucket's remaining window, aged by the time since each rule was observed. With `spread` the governor uses `spreadBeforeNext` instead (see below). A lane with no known policy waits nothing. The client waits that long **once**, using the injected `wait`.
 3. **Send** through `HttpPort` with the **standing headers**, which are applied last so a caller cannot remove them: `User-Agent` (the configured contact string), `X-Requested-With: XMLHttpRequest`, and `Content-Type: application/json` on POST.
 4. **Fold** the response's `X-Rate-Limit-*` headers back into the ledger and remember the lane's policy (`X-Rate-Limit-Policy`). The lane memo is capped at 64 lanes, and the least recently used lane is evicted first.
 5. **Count** every 4xx against the policy. A response that names no policy counts under `(no policy named)`.
@@ -55,13 +55,21 @@ Every result carries `invalidRequests` (the running 4xx count on the policy) and
 
 ### One governor, several sources
 
-`createTradeClients({ http: { sourceA: port, sourceB: port }, ... })` builds sibling clients that share one ledger, one set of invalid-request counts, one lane memo and **one serial queue**. Requests are chained one at a time. The pacing logic assumes the ledger is at most one response out of date, and that holds only when nothing else is in flight. The queue survives a rejected exchange. `composeChunk` uses this to count `league-validation` and `tracked-list` requests separately while pacing them together.
+`createTradeGovernor({ http: { sourceA: port, sourceB: port }, ... })` builds sibling clients that share one ledger, one set of invalid-request counts, one lane memo and **one serial queue**. It returns `{clients, pacing, delayBeforeMs(lane)}`. `createTradeClients` is the same governor returning only `clients`. Requests are chained one at a time. The pacing logic assumes the ledger is at most one response out of date, and that holds only when nothing else is in flight. The queue survives a rejected exchange. `composeChunk` uses this to count `league-validation` and `tracked-list` requests separately while pacing them together.
+
+### Shared pacing memory and the even spread
+
+The ledger and the lane memo live in a mutable **`PacingState`** (`createPacingState()`). A governor built without one starts cold with its own. The `pnpm sync` session builds one per process and passes it to the fresh governor of every chunk, so each chunk starts from what the previous one read (see [The pnpm sync session](sync-session.md)). The invalid-request counts are **not** part of it: they stay per governor, because a shared count would refuse a policy for the rest of the session after one 4xx.
+
+With `spread: true` the governor paces with `spreadBeforeNext` (`ledger.ts`). This is the larger of `paceBeforeNext` and the **even spread**: over every bucket still below its limit, the largest `seconds × 1000 / (hits − used) − elapsed`. The spread never spends more than the capacity the last State reading left in any bucket's period, so no bucket fills in normal use. Each response replaces the reading, so the spread corrects itself. A policy with no reading asks for no delay. `PaceCause` gains `spread` for this case.
+
+`evenIntervalMs(ledger, policy)` is the tightest bucket's sustained gap on a policy, the largest `seconds × 1000 / hits`, or `undefined` when nothing has been read. The session uses it as the base of its backoff.
 
 ## Rate limits are learned, never compiled in
 
 `rate-limit-headers.ts` reads the rule names from `X-Rate-Limit-Rules` **at runtime**. For each rule it reads `X-Rate-Limit-<Name>` (the limits) and `X-Rate-Limit-<Name>-State` (the consumption). Both are comma-separated `hits:seconds:penalty` triples paired by position. A rule whose headers are missing or malformed is skipped and recorded as a skip. It never throws and never becomes `NaN`. Pacing continues on the rules that did arrive.
 
-`ledger.ts` is pure: it takes no clock and has no `wait`. It is keyed on the policy name the response carried, not on an operation. So the search and fetch buckets separate by themselves, and a new policy from the API is handled without code changes. The ledger is in memory and per governor. Nothing persists across processes, except the `notBefore` penalty that the chunk runner writes to `data/sync-progress.json`.
+`ledger.ts` is pure: it takes no clock and has no `wait`. It is keyed on the policy name the response carried, not on an operation. So the search and fetch buckets separate by themselves, and a new policy from the API is handled without code changes. The ledger is in memory and per governor, or shared across a session's chunks through a `PacingState`. Nothing persists across processes, except the `notBefore` penalty that the chunk runner writes to `data/sync-progress.json`.
 
 `test/no-hardcoded-rate-limits.test.ts` scans non-test source under `packages/` and fails on any trade-API policy name, rule name or rate constant. Tests may name the measured buckets, but production code may not.
 

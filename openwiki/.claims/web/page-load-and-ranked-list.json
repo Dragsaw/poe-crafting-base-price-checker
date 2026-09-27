@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:06dd3668d4762d50c579ef34a3fc1ffc977449a43707cfef27201c96f28866cd",
+  "pageVersion": "sha256:42ec2333d76584e041405894b82dd9849e69b164c3e6eb6b49521d9700139c9f",
   "claims": [
     {
       "id": "claim_dd00cbda501d4d93b7a0ce547c0ae51c",
       "statement": "The page fetches exactly seven artifacts in a fixed order, of which dataset, tracked, config and catalogue/stats are required and sync-report, weights and recipes are tolerable; an absent tolerable artifact is null in the set.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/load/artifacts.ts#L47-L84",
-          "version": "repo-lines-v1:sha256:9a562cefc2237fe4198214ec5c4566ff448080538d6b5d3725957873c84f3955:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZTY2ZDBkMzA5YzM3NmIxMjZmZjlmNjFkNTQxMTQ4ZmRiZjZlNmUwZGY4YzBkN2YwMWI1ZjJhZTU5NjVlOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2NjFiNGVkMDg0YWJjZDhjNjZmMWI5ZTE0MjQxNDMzYmQwOGVlOTQ2ZTdmOGE5Yzc5NzAwNWE3NDljNGUxOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/load/artifacts.ts#L48-L85",
+          "version": "repo-lines-v1:sha256:78dc29da43a0800eff3b77993db13536c07c042bd7d75f726cd986b1d5b9178b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZTY2ZDBkMzA5YzM3NmIxMjZmZjlmNjFkNTQxMTQ4ZmRiZjZlNmUwZGY4YzBkN2YwMWI1ZjJhZTU5NjVlOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2NjFiNGVkMDg0YWJjZDhjNjZmMWI5ZTE0MjQxNDMzYmQwOGVlOTQ2ZTdmOGE5Yzc5NzAwNWE3NDljNGUxOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -34,11 +34,11 @@
     },
     {
       "id": "claim_23b42750386642e2a6c9922173a11041",
-      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold, passing weightsLoaded as whether weights.json loaded, memoised on the set, now and the threshold.",
+      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold, passing the parsed weights file (or null) as weights, memoised on the set, now and the threshold.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L106-L143",
-          "version": "repo-lines-v1:sha256:6ad80518e686ac729a249a40d34196c964c2974cfba19d3c5f1d13e6b0f1b143:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMjE3ZDU0Zjg3NmYyYzBiYjIwNmYzYjFjNThkZTAwYjE0MDZlNTYyODU5NjAyYWFlZTgzNTRmMGVmZjYyM2QifQ"
+          "resource": "repo://packages/web/src/App.tsx#L119-L141",
+          "version": "repo-lines-v1:sha256:e29acc15d51d11a910c25c18d5515ff62b9c344656f73e8ba8b9b1ba5c20d0b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NGFhZjU1ZGFhNGVkMDZkMzlmYzIxMzMwMzExYmQxNjU5NjVhOGZhZDQ1MzA5MjA1ODYwZmQ3YTRmYzZlNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyZGUyYTdkODI1ZjM2MWYzOTdhZDVlYmUyZmU2ZDZmN2FkYmJhOThhZWU4Yjg2ODc0NjI3YzNkMDA3ZjBhYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOTY3ZjE3ODMzMjJmZTBkNDE5NzE3Y2RlZGU4ZTZiOTI0NGU5MWMzNzI4MGU2M2MwZDczNzIxY2U2MDZhNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzM2VkZDEyNTVjZjdiNGEyOWRiZmVmODQ2ODgxMjNhMjg0MDMyNTZjZjdiMDQwYzg1NTdjZDVhNjgyNDI2NDkifQ"
         }
       ]
     },
@@ -183,10 +183,28 @@
           "version": "repo-file-v1:sha256:60d636a7ea4bfa0d5085066a117241c4abf5bd9a428c8af6cfb1eacebdcc8390"
         }
       ]
+    },
+    {
+      "id": "claim_254af73602a74e879f1b803e7321330d",
+      "statement": "The web page parses weights.json with the full contracts WeightsFileSchema at WEIGHTS_SCHEMA_VERSION, so a file breaking a hard error of the weights contract is refused as a content refusal.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/load/artifacts.ts#L22-L23",
+          "version": "repo-lines-v1:sha256:b84f40f8fe3755e9ebeda22c552c394fc29917c075e0df923c44697e3af8f17d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZjVhZDdlMjQ2YTQzNmZlM2JmZDA1MmI5OTgxZGRiZmFhNTQxZjVhMWE4NWQ5ZGFkMmFkMDUzOTUzNzRlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE4YTI0ZDhhMjJhZmI5M2I2YzE4MzgxMzZkMDY2NGFlMWZmMDNmZjhjMzBiNzM2Y2ZhYjQ3YzdjMTY0ZTI1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI0YzFlOTFkNTQzNWU1MDQxNGE0MTQzNjg5M2RjODY5YzM0YTE5YTk4YjlkYzRjZWRhMzcyMDllNTliNzI1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2M2NiZGUxYTMwYjkzMjk0MGEyMzkzY2ZkMGE1MDY5ZGQ3YjdkN2Y4ZmMxNGNlNzdiNTAxYzk3NDI5ZTBmMSJ9"
+        },
+        {
+          "resource": "repo://packages/web/src/load/artifacts.ts#L51-L51",
+          "version": "repo-lines-v1:sha256:7cdaf49b73d2231787b7796beb80b7feba35cbf0f22cd76f0ffcbc83fe9e723e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NkYWY0OWI3M2QyMjMxNzg3Yjc3OTZiZWI4MGI3ZmViYTM1Y2JmMGYyMmNkNzZmMGZmY2JjODNmZTllNzIzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjRhNTk2NDU0ZDBiMzYyNzZhMWI1MTVmNjg1NGQwOGY1NzMzNWNjN2I1ZmJjYzJjNTlmOTY2MmY4MWFlYjRjOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmE5YWYzN2VkNmZmNWQ2M2Y0YzJkOWZhZjZlMGViMGY5NDM4MzY0YzFjYzYwOTM2MWI1YjY0OTExZDc5NmE3OCJ9"
+        },
+        {
+          "resource": "repo://packages/web/src/load/load-artifacts.test.ts#L168-L184",
+          "version": "repo-lines-v1:sha256:0d233b190ce1750b65aedcba9b5574e9fb62ffa70d93b05233890f9e311afbfc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NTA2MjZhZTcyYmZhNTU3ZTA3YTM1ZTdhZGMzZGMyZWVmMDkyZmVhYWI4NWEwNTE0YzRjYmMyNTYxZTJhN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNjQ4YmMyYWEyODlkNmM2YzcwZmQ2ZjIxMmY1OGQwMDU5YmYzMjUzMWU0YTQ1M2RlNzc2NjMyOTZmZDE1MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwMTQ2ZDZlZjE3YTczM2I3YzY1ZTBlZjc1YTYzMmU5OGJiMGQyY2IyYjNmODQ3ZjUyY2Q1ZjU3YzkyY2JiYWUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

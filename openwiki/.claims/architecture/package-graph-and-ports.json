@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:65e4cd4b669010d1ddad2b0f1da55b430b6893b1283372d88bca391561817649",
+  "pageVersion": "sha256:29bc8b517806e5b4b8207553b84bc50d719af42e65f70c9d9a89fed212c9c891",
   "claims": [
     {
       "id": "claim_9dc10a77881f4ebfb83dbb267d87a397",
@@ -91,10 +91,20 @@
           "version": "repo-file-v1:sha256:08b0c711b9d31fd43a9d21719b17eb842657e71658e85318848acfb54d1ecd46"
         }
       ]
+    },
+    {
+      "id": "claim_ca0c8e26bd2442f0a24daf15fc94540e",
+      "statement": "abortableSleep in the sync shell resolves rather than rejects when its AbortSignal aborts, so the pnpm sync session can check signal.aborted and exit cleanly.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/shell.ts#L81-L98",
+          "version": "repo-lines-v1:sha256:c3ec53bfef27c340a7d2c386ab9952d36136143227ed071cd688ce2edf4f3f5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjM2ZlMTMxM2Y2YzdmNjkzNzdhOWIwMTY2NzFhODNmYWRmMTUwN2YzZmMwODg4ZDA2YTU5ODE3ZjM0YWIwMWQifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }

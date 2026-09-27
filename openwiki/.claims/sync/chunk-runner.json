@@ -1,18 +1,22 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:9243a4a7e5ed97e9dce21fc2579ea550392f84ffc2183ca5f6a06bc9a4a97081",
+  "pageVersion": "sha256:64e613d82f8bf641ab29137dba5ca91f333aeb01634fa5244b6d95bdd614af2e",
   "claims": [
     {
       "id": "claim_ba64aecd97fe455695cd8df0115876cc",
-      "statement": "composeChunk builds one request counter and two sibling trade clients over one HttpPort, counted as league-validation and tracked-list, and a load hook that reads config, checks the pinned cap, reads currencies and item types, and returns the publication, starvation record, league gate and pricing step; both pnpm sync and pnpm sync:dry use it.",
+      "statement": "composeChunk builds a request counter (or uses the session's shared one) and a fresh trade governor of two sibling clients over one HttpPort, counted as league-validation and tracked-list, plus a load hook that reads config, checks the pinned cap, reads currencies and item types, and returns the publication, starvation record, league gate and pricing step; pnpm sync, pnpm sync:batch and pnpm sync:dry all use it.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/compose-chunk.ts",
-          "version": "repo-file-v1:sha256:cf036d84f73837a34658707c8991235afee84bb11db846bb7a5adf47600138cb"
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:55fc2f9ba59e6fd03056f42a85cc86ec66e26ea14eeff1c4063af5c42ea3667b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2MTZkYjAzN2IxMzJmYzY5N2Q5YjMxMmMxZWY3YmRjNzY3ZTczNjAyYmQyN2EwMDVhOWMyNTViOGZlZGUzZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiNzAwZGQwNzZkYWUxNjViZTJmZmJjYjFkZTI1OWU4ZjcxYzVmOGU2NWQwNThiNzBiMGVkZmI5YzQ3NmIxYTEifQ"
         },
         {
-          "resource": "repo://packages/sync/src/sync.ts#L44-L51",
-          "version": "repo-lines-v1:sha256:3264fa80b61211f3c2e0b9422fd582c28dfb3f3777e843c866d4704d4f9bd294:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmNjNjBmNTkxYTAxZWU0ODU5YTFhMTZiOTNkNmVjNThjMzQwZTc2NTA3YzU1NmFhMmE1MzhkYmVlZjg2MDY0NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGE4MDVhZjVkODgzNmEwMDM3NThiYWQxNDNlOGMyMDc0ODIzNGE3MTM5YWZlOTE1YjNlMzBmMjQ0N2YxMjRmOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE3OWZiNjhiMzNkZWYzYWE4MGI1ZTlkYmVmZjQ1ODQwMDEwMzBlMjM4MzA3NDNlYmFhOTdhNzZkNGVmMWU1MyJ9"
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L102-L155",
+          "version": "repo-lines-v1:sha256:73d74454f29383f9aef7125a6cdcd335530c2b1b831939174621ff3b89528be5:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyOWFmM2RhY2Y2NWY4NDBiNDk3NmVhNWVhYWYxNjlkMTdhNTMzOWI2OWZlNDkzYTM1ODgzNmZkMmViMmZhZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwZmE0NWVkNDhmMjNhNWIyMDgxNDI5M2U1MGNlZmFjZDE1YjU4ZTU1OTM4YmY4ODQ3MzFkMjk5NzM0ODAwNzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2MmFlMjM1MDEwMGZjNWMzZGUzYmY2ZDA4MGIyODdlYWIyNDg4NWNkNGE4YzdhNTU1YWJkYjVhMmYxYjkwM2QifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync-batch.ts#L51-L54",
+          "version": "repo-lines-v1:sha256:31c351fbfc4f26f03a54ead126037648ca0d9279eba2b5af53a97a5d5a44249d:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjEzOTQxYWNlYjI4YmVlN2FiMmQzOGI2MmUxOWVhMGUwMDBkYzkxMjY1OWRkNjRlNzZiM2M5M2RmMGRkZjE1NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTM0ZTI0NWI5NWY0YTdiNzliOWZjZjg5NmUzNzZlZWQxOGFmNDIyMzU0MGMwNzUxNjZmYjA1YWRlMThlM2U1MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE3OWZiNjhiMzNkZWYzYWE4MGI1ZTlkYmVmZjQ1ODQwMDEwMzBlMjM4MzA3NDNlYmFhOTdhNzZkNGVmMWU1MyJ9"
         }
       ]
     },
@@ -21,16 +25,16 @@
       "statement": "The chunk lock is data/sync.lock holding {pid, startedAt}, taken by an exclusive create; it is stale after six hours judged by time alone, an unparseable lock counts as held with its modification time used for staleness, and breaking is serialised by an exclusive data/sync.break.lock marker that deletes the lock only if its text is still the judged stale text.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/chunk/lock.ts#L136-L173",
-          "version": "repo-lines-v1:sha256:71a00b90205165216e970aa914e2174447ee6b664a809fd36c60d0167cf3b038:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MmY1NTEyODlhMDRhZGMxYzNkY2E2MjgxYmNjODlhYmUwYThkYTMzZDUwMDBhZTdiM2MzNWJmMDlmYWNlYWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwOTI5NWNiNGY1NGIyOGRmMzk2ZjBlNzg3NmMyOTFmZGFhOWU3Nzg2ZTQ0Y2E3YWI0MTkxZWY5MWEyMmE4ZGQifQ"
+          "resource": "repo://packages/sync/src/chunk/lock.ts#L125-L176",
+          "version": "repo-lines-v1:sha256:8edeccc2651af10b313035b0937f08ff4f2241a4538119b41a8c4e5c00d5bb56:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmMGQxMzk5Mjg4YmY2ODVhZTgzOWJkNzhmYjhhNGMyYWVmZWRiM2U5MmVjMjRkNDQ1MjE3MGUyODFjODg1OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwOTI5NWNiNGY1NGIyOGRmMzk2ZjBlNzg3NmMyOTFmZGFhOWU3Nzg2ZTQ0Y2E3YWI0MTkxZWY5MWEyMmE4ZGQifQ"
         },
         {
           "resource": "repo://packages/sync/src/chunk/lock.ts#L31-L40",
           "version": "repo-lines-v1:sha256:86a1c59938072341467208f8566f543d3fd4204e3397f87f914e1713a5ffab6f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0N2ZiOTE0NGEzOTQ1NjJhNmE3MzU5ZjQzOTQxNTBkNTEyOTFlZmFkZTEzMmUyNDJjNTBmMDUxMjg5ODQwZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ZjI0NDJhYzliNjY0MmU3NjIxOGYxY2JmOGIyNjc5MGUwZjQxMmI3ZGI0ZGE1YzUxYzQ5MTgyMzAxMDY1MzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkYzJhMjBhNjcxNTUwOWJlZGEyYTQwYjEyOTQzN2EzNzc2OTU3OGFiOGZiYjNiYzY1ZTFlZDAwZWY5Zjk5ZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxYmFjNjljZjlkMDIwMDdjOTJkNGMyOTc3N2JmNDQxMzQwY2U1NDMzMjQ3YjE4YmQxMmEzN2JhM2M2MDEwNjYifQ"
         },
         {
-          "resource": "repo://packages/sync/src/chunk/lock.ts#L83-L107",
-          "version": "repo-lines-v1:sha256:b3a1013e62a0b57253bcf8a6b0318df3681db17b48f5f0875429ddb69e6f4cfa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjRhNGMyNzhlYmNkNzJmNzQ3ODA0OTllMzNkOGNlYzdjZTQyNTc1NzY0Y2I5YTg5YmU3NTQ2NjFlZGEwMmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5MGZlZWI4OWY2YTlhOTkyNzA4NWQ5NTg5MzEyMzQwNTBlNGIzNzkxNWZiZmEwYjdkNWZlMGI0MzliMWMyNTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmOWU1M2NiNGE4Yzc2ODhmZTFiMzMyZmM0MTQyNTk0MjBjYTQ2YjdhMmQyOGY1ZWY4MGU0NWUxNWI0MWI5YmEifQ"
+          "resource": "repo://packages/sync/src/chunk/lock.ts#L86-L115",
+          "version": "repo-lines-v1:sha256:1eb3d3414601f3df76fa70bb4ab565f16a9d72b1ef3195dacaccfb83664d1919:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQxNWI4NDBlMTU3MTYzMzYzMDM0YjFlZmE3MTBlMzc3ZWU4NjVjYWI2NWQyZTEzYmZkZWE3YzZhZjgwMzM0ZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmNjlmMGViY2VkNDJiNDY5YjBkZDA5ODE2NTE1YzU3NmI5ZmY3MDZkMWZmMDQ1NWQ5NDllY2JlMGQxYWFjZmIifQ"
         }
       ]
     },
@@ -39,26 +43,26 @@
       "statement": "Under the lock, runChunk checks the sync-progress notBefore first and returns deferred without sending or writing (except a stale-lock report) while the clock is before it, then loads the previous report, tracked list, dataset, the shell load hook, catalogue and weights, runs the weights and catalogue checks, computes the order with chunkOrder, runs the league gate, and then the rotation.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L445-L484",
-          "version": "repo-lines-v1:sha256:4b9d81b4d89cb2de25612ea69749541f8e5ad2edde2d8a496c11f1ea759ef4e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2NTZjMDNlYjk2MjFhMmJiYTE4MjZkMzA1MWM1MTQ1NjZmMTI3YWRjOTJjOTRmNTM0Nzc3Y2Y5MGE4MDY3MjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmNDY4MmZhNDdjYTdiYmNhYTNkYzU4N2Q1YTEwOGI0NDBhNjZmN2IzZWQyMWRhNzJhMWUwNTI3MzY5N2NmMDAifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L500-L540",
+          "version": "repo-lines-v1:sha256:71842b17c1a17131e232b9c776438643c5a41600857abd6ae1e8ed7391d322ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2NTZjMDNlYjk2MjFhMmJiYTE4MjZkMzA1MWM1MTQ1NjZmMTI3YWRjOTJjOTRmNTM0Nzc3Y2Y5MGE4MDY3MjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhMjJhMjkwMmNkOTQyNmRmMGY0YWIyMzNjM2M3NmI2MWQzY2M5NWI0NzViZDVjZTNiYWZhYjE2MDI3ZjY5MzAifQ"
         },
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L611-L675",
-          "version": "repo-lines-v1:sha256:5f08617fe63af591b4c5465c1dd19cf0d0c87cd3521b4c089fe7e44c98b56f29:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhM2MxNDE3YmFiZGI4ODI2OGEzNGEzMjEzODM5YWQwMDM2MjY0NTNhYjYxMWM2MTdmNzhjYjEzNzA2ZDhlNTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExZWIxYzhmMzQ5ZWVmYzdjMTI5M2IzNThjMDQxOTkzMDgyZjY0ZTQ4ZjhkZTg1OGE2MTVhYjk0ZjdjZWJjNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZGYyMDZmMDk3YzNmYTJkM2QwMzc0ZGMxMjQ0M2E3MGJjODM4MDkwODg3NjI0ZDU5OWU5ZDJkZGRmNjQ3MjQifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L690-L760",
+          "version": "repo-lines-v1:sha256:0e37d0e067169e97762ae6171f94fdd39e238c664cf906b39b9812e461563778:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1ODJjYTJiMWE5Yzk0ZmYwZTdkZTcwOGNlNDI2ZmZlZjZhMWYzYTk3ODlhY2QxODVmNGYxZDZlZGYxMTA0MzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmN2FiMDc1Yjc4N2RjMjdkYzBkYzk3NjMwNzE2OTdiMGFkMjdlMWU1Y2E2ZTM1ZmMyZTBkYzhjZGJjYzc2YTMifQ"
         }
       ]
     },
     {
       "id": "claim_6967d2258e624f538f4d2dfef7175fd0",
-      "statement": "The rotation loop stops as bounded when a completed step reports a search or fetch allowance below 1 with work remaining, as yielded when a step yields, and as completed when the order runs out; pinned steps reporting an allowance may truncate the pinned row via pinnedToKeep and flag pinned starvation.",
+      "statement": "The rotation loop stops as bounded when a completed step reports a search or fetch allowance below 1 with work remaining, as bounded by 'entries' when a session's maxEntries is reached with work remaining, as yielded when a step yields, and as completed when the order runs out; pinned steps reporting an allowance may truncate the pinned row via pinnedToKeep and flag pinned starvation.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L377-L385",
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L432-L440",
           "version": "repo-lines-v1:sha256:e40288d667de691bb08a85619a1194b4511778b752b1b8aaa5b9d9e56afe62df:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE1Yzg2ODM5N2NiMmM1MDZiNTQzYWY0YjYwN2EwM2RmZTAzNzNjOWVkZDEwMDEzYjNmZGE3MzBjMjUwY2E2MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWIzYTM4NmJiZTMyN2UyZDU4NGRmNGFlOTczNjAwYzIyYzA0MGU5NDE3NGNiM2I4Nzc5ZThhZTU3OWI4NTI2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQ3MTVkMDIzNWM4ODJjMTEwNzExNDMxM2RlMThhYjdkMTAzYjk0NzI5ODBiZmE5MWZmMjg4NjhkZWJiYWE4NiJ9"
         },
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L684-L738",
-          "version": "repo-lines-v1:sha256:d54db4e24288a822eb271d28c9b5873e0efb9bcae5cbf89c255883a4e1bd3436:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0YzdkZDg0NmFjNDFhNGI2ZjgxMzY4Nzk1YzhhYzVlMWQ5NzYzZDFmYTYwNjM3MTk1NGQyMDdlNjRjOTM4NmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2MGYxYmI3MTRkY2U1MmI0NGVkZGFhMWY4OGQyYThlZGJkOWQyYjViOGQ2MDdjZDAzN2QwYzVmOTNkMTI2ZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMDE1ZjIxNmMxZmU5NTg4MDRmNWE2YTExYWQ5OTNjMWM4ZDZlMTQ1MDI3OGQ3MDhmYWQ1OTY2MmEyM2M5YjUifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L761-L826",
+          "version": "repo-lines-v1:sha256:891faef77d5c20fee7cc88c1d4ff89071925537cb67b435619700e5c5c3d1201:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwN2UyY2RlNDg1MmE2MTU5MTMwZGUyYTRhNDdlNzU2NmFhM2E3ZDA3NjE4MzYyYmE0ODVlY2Q4ZmQ4NmFlNTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmMWM5MTEwY2RiMjVmOTk0ZjdjNDZkYTBhNTMzNjE3NWMzMGVmNTU2NWViOTRiZWE1N2MyNzU2Y2Q4YmU1OTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMDE1ZjIxNmMxZmU5NTg4MDRmNWE2YTExYWQ5OTNjMWM4ZDZlMTQ1MDI3OGQ3MDhmYWQ1OTY2MmEyM2M5YjUifQ"
         }
       ]
     },
@@ -77,16 +81,16 @@
       "statement": "A successful chunk writes dataset.json, then sync-progress.json with sorted rotation completed keys and notBefore set after a 429 to now plus min(retryAfter, staleLockAfter) or cleared, then sync-report.json, all via writeArtifact, after re-verifying it still holds the lock.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L364-L375",
-          "version": "repo-lines-v1:sha256:97d41253d31db8385e6720850784c6b76681694c7ad046d1016ecf1c5a80631a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5NTRhMDU3NGFjMjYzOGVhYWY1OTkwZGUwM2FiMDY3NGE0YTRlMTVmYzlkYzRiMjMyMjlkYWZkZmJiMzc5ZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwYjBmM2Q2NDIxZWI5MWJkMjRkNjE5MzQ0N2Q4MWYxMzE1YTU4NjczNjVhOGJhZmM2YzAxZmE2YjY3YWVmODIifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L424-L430",
+          "version": "repo-lines-v1:sha256:7e1434dca5782f669f8059bf308ecb7703da9b65a6ef1489079f5a1c7d7f70bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODRmNDY2NWUyZjg3YWQ2MGQ0YzgwYjg5MjljZjBhYWUxZDIwMTdmZDNmYzE1YzJhOGVjZGU4YjFmOGMwZWFlYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODJmNDczOTMyZjc1ZGFjYTFlYTU5MDAyOWMyNzMzNjA3Njg1ZjY2N2NlYzBjNTA5ODlmYzFhZjgwYjJjNjllZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDBiMGYzZDY0MjFlYjkxYmQyNGQ2MTkzNDQ3ZDgxZjEzMTVhNTg2NzM2NWE4YmFmYzZjMDFmYTZiNjdhZWY4MiJ9"
         },
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L548-L609",
-          "version": "repo-lines-v1:sha256:5c909ebffeb163ae36fa910016f9dd32d6efb89f7dd788f50433c891098952c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5Y2JiYzY1NDY5ZGIxY2EyODQyZWZkOTdkZjdlZTJjZTZjYzE1NzE0ODJkMDFhMThiNzkwYTEwYzdjNTEwZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDhjZTliYzU5MjVlZjNmNTdlMDlkMjczYzU3YzNhZTEyNmE1ZjIyMjI2MDJkYWQzNTZjMjhhNzFmODk2OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkY2M5ZGJiZmMwNTZlNTdjZDcyODc2OWZlMjhhMWQ2ZjFkODBlMWUxOTBhYjA1ZDU1YTM3MDBmYTM5YjJiYjUifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L629-L690",
+          "version": "repo-lines-v1:sha256:5a7cf72a7596d3df925647520c37a4663764bbe4b2dc16a4d84d6bb210a0bb7c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwNTcyY2I2M2VmMTNmYTYyM2Y1YzhiYWQ3N2M0NzIxYzFhNjU5YmE2MDdiZGQ4NjMwYTgxZjEwNTFmNGRiYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhZDQ4ZGJjMTc4YmE0NzUwYmUzYjJhYWUwYmE1NWJjZjQ3MDQyMjYwN2YyNDE4OGNmZjkwZGI5MGQ0ODAyM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1NDJmMDlkMWIxOWEwODMxOWRhOGNmNTEzMmIwMjE0NzE2NzY0MGExNmFlZTMxOTJkNDhlNDdiYmVhZWI2MTUifQ"
         },
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L740-L753",
-          "version": "repo-lines-v1:sha256:cc3af3f2d628585814acb2d8a13085df0c0e20c263183e2844a03eeb7c21c4f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxZGM3MmE0MGExNTVmODI1MjRkODQ0ZjA1YzdmNTY4ZGM0ZmZjYzk5NWQwZTYwODAyNDNkNTk4ZWJiYmFkMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyM2M4YThhNTQ4N2NmMjAyOTE0ODMyZjNmMzIzYjI3ZDc1ZmI1Mzc5OWE3ZThlNDNjYjRkNDczMzZjOTM1YWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxMzQxZDBjNTg4MmU5MWE2NmM2MGNiODYwMjBiMjQ3ZjBhZmMzMzZjZGY3NmMwYWUxOGJjZDIwYWM4ZmUxZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjNzZjOWMyOTgxMzYxNGVkZWMwMmIzNjBiMWNhZGJiY2U3NDg3YjU3OGUwZmVlODI1OTYyODhkMmE1Y2FjNzUifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L828-L848",
+          "version": "repo-lines-v1:sha256:79e42fd331f2329725917352a68ec5d66fab6886fd2cfebd16b1b40a23ac5ec4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxZGM3MmE0MGExNTVmODI1MjRkODQ0ZjA1YzdmNTY4ZGM0ZmZjYzk5NWQwZTYwODAyNDNkNTk4ZWJiYmFkMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMDQ0NmE4NDJiNTZjOTY4ZTM5NzcwNDMwYTUyY2M3NmJiMWRhOWQ1ZjY3YjEzMTE3Yjk5MTgzNzNlY2Q1NTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxMzQxZDBjNTg4MmU5MWE2NmM2MGNiODYwMjBiMjQ3ZjBhZmMzMzZjZGY3NmMwYWUxOGJjZDIwYWM4ZmUxZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjNzZjOWMyOTgxMzYxNGVkZWMwMmIzNjBiMWNhZGJiY2U3NDg3YjU3OGUwZmVlODI1OTYyODhkMmE1Y2FjNzUifQ"
         }
       ]
     },
@@ -112,11 +116,11 @@
     },
     {
       "id": "claim_6b4a245542a94b89a9b781cf8754f79d",
-      "statement": "On a throw the runner writes the report with a failure record and rethrows; a league mismatch writes the report only, while other throws after the order exists first publish the dataset and progress (including the failing entry for malformed-request or unexpected-response errors, with an abort notBefore only for MalformedRequestError); the lock is released in a finally.",
+      "statement": "On a throw the runner writes the report with a failure record and rethrows; a league mismatch writes the report only, while other throws after the order exists first publish the dataset and progress (including the failing entry for malformed-request or unexpected-response errors), writing the abort notBefore only for MalformedRequestError or the gate's LeagueRequestRejectedError; the lock is released in a finally.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L754-L810",
-          "version": "repo-lines-v1:sha256:f3a9f0a53ec603a819e6650241435d89d55a6e36911e678e0b09d00eb77cf143:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ZGI3NDYwODE4MmNiN2NhNGQ5ZmJhNDlhMzk0OTlhN2YzOTA3YjRlYTAzM2IxNDkyYWQ1Y2YwYmVlZWVjZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExZjIzY2U5NDljOTUyZTNkYjkyZGI0YTJhMzA2MzliYzZjZjY0M2FlNjk3N2U4OTQ1NTNmZWEzNTdiN2YxZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L849-L908",
+          "version": "repo-lines-v1:sha256:bf099471be7ec89d4f3745c7ee71657ba234b2e88e37193c2d69d6698242e406:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ZGI3NDYwODE4MmNiN2NhNGQ5ZmJhNDlhMzk0OTlhN2YzOTA3YjRlYTAzM2IxNDkyYWQ1Y2YwYmVlZWVjZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmMzdkMzVjZTg4ODhkZGYxMDUxYTYwYmE5M2E2M2RkNWI5MWMyMDVhYjc4MGVhMmM5ZDU1NDc0N2ViODM4ZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -135,18 +139,40 @@
       "statement": "composeChunk accepts an optional wrapStep(step, context) that receives the built pricing step and a StepContext of league and itemTypes; the runner uses the wrapped step when given and the plain step otherwise, and only the dry run passes it.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/compose-chunk.ts#L109-L125",
-          "version": "repo-lines-v1:sha256:6f129dd4dd986169569eefdf86fdead14ac7039149eb6285fe2fa81e5ba58e0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkZTEzZTY0M2VkNDNlODUyZTM2MDdkZTU5OGVhMmM5MTBmYWFmNmVhYzhhZmI1ZTYyODY1MGE2OTFlMWZhZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzNkYzczMWU3ZDA3YjFmMGMwNWNmZWJkN2UxOTIyMDIzZTYwNzdiYzBhZTdiYTMwMTQ4ZjUwODMzYTI1YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1MGY5NTNhYjAwNGU5N2M1ZmVjODMxYThmNTRiOTU0MTRiZDI3MmYxZTg3MWMxM2M4YTc1MDM5NWM2YTgyNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlYmFhOGQyMjE4MDFkZGI2OTgxOGQwZWY1ZjdkMmNlODZiNmQ0NjIwNGZkZjU5YjRjMjI2YTYyZmY0YmUxNjEifQ"
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L149-L149",
+          "version": "repo-lines-v1:sha256:583af0914e2cd0545862d1a5606c12fa0767a99cf7613b66e8537ca24cefe505:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTgzYWYwOTE0ZTJjZDA1NDU4NjJkMWE1NjA2YzEyZmEwNzY3YTk5Y2Y3NjEzYjY2ZTg1MzdjYTI0Y2VmZTUwNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTgzYWYwOTE0ZTJjZDA1NDU4NjJkMWE1NjA2YzEyZmEwNzY3YTk5Y2Y3NjEzYjY2ZTg1MzdjYTI0Y2VmZTUwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTNmYjIyYjJmYmMzZGI3ZDYwZmJhZWM0OGY2ODUyODcxMmQzYjhiM2I4NjMyNDI3YzM2Mjg4OGE4MzhhYzFhZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjU0NmMxZGM2NGEyNWMwOTNkNzg5MzBiYzdiZTM3OWY5NTUxMjgyNzAyNWZmYzQ1N2EyN2RkNTc0OThjNDVmNyJ9"
         },
         {
-          "resource": "repo://packages/sync/src/compose-chunk.ts#L54-L65",
-          "version": "repo-lines-v1:sha256:e3300ee61a3f4c0ba9a0795e0677d5f5e9e6d9afd335c5f27c36490d5e3f0a0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2MGQ4ZGY1NmE5MzEwYzhlYTMxODVmY2YyYTc5ZTU3MWUyZGU3YmE1ZTRjY2JkZDE3ZWI3NjBmODkxZTZlYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxNTEzMTE2MDM5MDQyNmM4NjA2ODRhYWVkMDQwNDYxOGNmOTVmZTFjNGU5Y2M4YjNmMjJhMmRjNzVhMzVhMzIifQ"
+          "resource": "repo://packages/sync/src/compose-chunk.ts#L55-L62",
+          "version": "repo-lines-v1:sha256:9216a8afd43f1494fc979539b52932bdd0c130f4fd5b7eed97248cc5f70626db:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFhODI0ZGM5NTE5NmFkOWE5ZWVlZjljM2JiZGIxYWJkODhmMWRlN2IxYWU1ODFjMmI3MDRhYzM3OGIwNjk5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDhiMjE0MDQwNzgzOGQ4YjE4YWJkM2FlNWJhMTBkYjkwYTRkMDc1MjI0Zjg4Y2UxNWQ2MWVjYmQ2NmEwZWY1ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2ZlZmViMDVlNTc1NjNmMjU1MDFjY2E1NDE5MzRkYjg3ZWU1ZTVlOWMwOGNjNmI1NTM5YTEzMzY1ZmQxMmNhZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmM2MzNiOTFlOWZhMTgwNjgyNjVkMTJhMmRkZTY4MTVlMTkzYTRlOWE5NWEwNDRhNGRmOTJkOGQwNmZkYTUzMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_142bc84ef9004ef7ac0afd8c543c234b",
+      "statement": "Under a ChunkSession the chunk attempts at most maxEntries entries, passes pinnedMaxAgeMs to chunkOrder, skips the league gate while the session's confirmedLeague equals the configured league and the order is not a new pass, counts the report's requestsBySource from the pass start, and returns newPass and confirmedLeague on its outcome.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L275-L306",
+          "version": "repo-lines-v1:sha256:a2c72a082235da945a245c734b869faec4eb45016303122efa90dbaf86ede8f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MWQzNGI2MzZjZDZiZGIwMmNkZmQ1OWQxOWJhYTQ2NzQzNWUxZmMzY2M4ZjQ4MWI1ODQzNTBhNTIxZjJjNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVmNGYxYmM0Y2ZlY2E0ZWE5MGJhMjYzM2IwNTMyNjFlYjliNmM5OTUxZmVjY2M0ZjVmMjZhOWRjZjhiM2MzMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmYzE4MjlhZTY5OTQ3YTBlZmQzYmJhZWY1N2VmOGUyNjc4NzUzODcxZmI5MDg4YjQxODY4MDEzZDhlMzAyYmMifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L570-L592",
+          "version": "repo-lines-v1:sha256:9b5dc0eca1a99b1c5b93407e3deded22ea545d3d15bf2f3d4867bc03852589ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4NWJiZWUwMjMwNGJlMDdlZWRmZmY1NTMzZmE2ZGVhZDQzZDg3M2U4YjAxZmY4NzdkMjFkOTdmZjkwNWJhNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyOTQwYThiOGM0ZDFhNWY1NTY5YmNjOWFkOGZmYWFjODkxNTZjZTE2MWM3YTBlNTY2NWRhNDIyYzVkMjY4MDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4YWM5YmQ5YTk3NDdlYmZlNTdhNjIwZmE0YWM2Njk3NGMxYTAyOTM1MjMxZTFkZTEwMWFkY2UwMmE1YTdkYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzZWNiMjg4ZmI4NTBjZTJlYWNkMjUyMzRlMzMzMjAyZWJmMWUyYjRkYWMxOTM5NmVjODU0YjczMDllZmNiN2QifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L724-L742",
+          "version": "repo-lines-v1:sha256:bc74f1a8d3907d5e2eff62a8d04a532257889b9461e5924c60d72e3d9f71ae75:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmNDY5MDM2N2VkNmE0YzE1ODRmMTk2ZjAyMDJmMmIxZDgzNjNlZTg4NGFiYzJhMzg2NDJmOTg5NjQ0NjQwNmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5MmYwYTQ3NmRjZmM0NzIxMDhkMTM3MmI1MGMzM2FkM2Q1ZGE2YzQ4NzRiOTE5OGVlMmU4NTY4ZWY5MDA5NDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIwMGY3NjUyM2EwMzBiY2M0NDE2ZmNkNmMzNjBlMjZmNmZjM2UyNTM0N2NiMDI2Y2ZiY2UzMWI2YjIxYWUzYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwY2IyYjBlNjAwMGQyYmVmYmVlZDMzYjBkMWM2YmI1OGY1NTkzOTFmYjZkMjk4ZGFjNTU2OTk2YjVjYmNlMzAifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L822-L825",
+          "version": "repo-lines-v1:sha256:d47177d0909557ab6005efc048c48192c4bd924fd31e2339f89ed8ce786a421e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQxMmJiNmMxMmMyNDFiNjM4ZmM3YWEyMjU0ZGI1NTAzODdkM2Q0NzE3NzM4ZTA1MGY0ZGNhZWUyM2I3MjQwMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjA2NDcxZDExMWY1ZjM3NjUyOWI0YTBmN2Y2OTI4OTZjZWIxY2I2MWM5MjlmOWQzZDIxZDM3MDJhOTEwODViYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjVmNjMwYWYyYmI3Y2JmZWU3ZGNlNmNmZWM2NTliZjE0OTE3OWZjYzUzNDAzMzYyN2JiMjZiODlhY2E4Mzk3MiJ9"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T16:49:38.941Z"
+    "at": "2026-09-27T19:26:28.611Z"
   }
 }
