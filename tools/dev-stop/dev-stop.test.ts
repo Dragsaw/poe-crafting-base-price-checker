@@ -1,6 +1,34 @@
-import { describe, expect, it } from 'vitest';
+import { type AddressInfo, createServer, type Server } from 'node:net';
 
-import { DEFAULT_PORT, ownAncestry, parsePort, planStop, type ProcessInfo } from './dev-stop';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import {
+  DEFAULT_PORT,
+  listenersWindows,
+  ownAncestry,
+  parsePort,
+  planStop,
+  type ProcessInfo,
+} from './dev-stop';
+
+/** While set, the mocked execFileSync runs the listener query against a cmdlet that does not exist. */
+const MISSING_CMDLET = 'Get-NoSuchNetTCPConnection';
+const failure = vi.hoisted(() => ({ inject: false }));
+
+vi.mock('node:child_process', async (importOriginal) => {
+  const real = await importOriginal<typeof import('node:child_process')>();
+  const execFileSync = ((file: string, args: readonly string[] = [], options?: object) =>
+    real.execFileSync(
+      file,
+      failure.inject ? args.map((arg) => arg.replaceAll('Get-NetTCPConnection', MISSING_CMDLET)) : args,
+      options,
+    )) as typeof real.execFileSync;
+  return { ...real, execFileSync };
+});
+
+afterEach(() => {
+  failure.inject = false;
+});
 
 const ROOT = 'E:\\Projects\\poe';
 const NONE = new Set<number>();
@@ -184,4 +212,66 @@ describe('ownAncestry', () => {
     const inside = [...CHAIN, { pid: 20, ppid: 14, commandLine: 'node tools/dev-stop/dev-stop.ts' }];
     expect(planStop([16], inside, ROOT, ownAncestry(inside, 20))).toEqual({ kind: 'kill', roots: [15] });
   });
+});
+
+/** A loopback server on a free port the OS picks. */
+async function listen(): Promise<Server> {
+  const server = createServer();
+  await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
+  return server;
+}
+
+function portOf(server: Server): number {
+  return (server.address() as AddressInfo).port;
+}
+
+async function close(server: Server): Promise<void> {
+  await new Promise<void>((done, fail) => server.close((error) => (error ? fail(error) : done())));
+}
+
+// Each query starts powershell.exe, which can take seconds.
+const POWERSHELL_TIMEOUT_MS = 30_000;
+
+describe.runIf(process.platform === 'win32')('listenersWindows', () => {
+  it(
+    'reads a free port as no listener',
+    async () => {
+      const server = await listen();
+      const port = portOf(server);
+      await close(server);
+      expect(listenersWindows(port)).toEqual([]);
+    },
+    POWERSHELL_TIMEOUT_MS,
+  );
+
+  it(
+    'reads a listening port as the PID of its process',
+    async () => {
+      const server = await listen();
+      try {
+        expect(listenersWindows(portOf(server))).toContain(process.pid);
+      } finally {
+        await close(server);
+      }
+    },
+    POWERSHELL_TIMEOUT_MS,
+  );
+
+  it(
+    'fails loudly when the listener query fails, and does not read it as a free port',
+    () => {
+      failure.inject = true;
+      let thrown: unknown;
+      try {
+        listenersWindows(DEFAULT_PORT);
+      } catch (error) {
+        thrown = error;
+      }
+      // stderr, not the message: the message quotes the script, which names the cmdlet even on a parse error.
+      const stderr = String((thrown as { stderr?: unknown } | undefined)?.stderr);
+      expect(stderr).toContain(MISSING_CMDLET);
+      expect(stderr).toContain('CommandNotFoundException');
+    },
+    POWERSHELL_TIMEOUT_MS,
+  );
 });
