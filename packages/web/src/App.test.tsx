@@ -250,6 +250,7 @@ describe('the outcomes', () => {
     expect(absenceLine('recipes')).toBe('Not published: recipes.json — no crafted rows can be ranked.');
     expect(absenceLine('weights')).toBe('Not published: weights.json — every crafted class is unrankable.');
     expect(absenceLine('syncReport')).toBe('Not published: sync-report.json — the sync report is unavailable.');
+    expect(frame().querySelector('[data-masthead] p')?.textContent).toBe(MASTHEAD_DEK);
   });
 
   // Matrix: non-JSON body.
@@ -403,7 +404,7 @@ describe('the resting chrome', () => {
 });
 
 describe('the copy', () => {
-  it('never says sells for, worth or market value in web source, outside the masthead copy DESIGN.md owns', () => {
+  it('never says sells for, worth or market value in web source, outside the masthead copy the UX docs own', () => {
     const sources = import.meta.glob<string>(['./**/*.{ts,tsx}', '!./**/*.test.{ts,tsx}'], {
       eager: true,
       query: '?raw',
@@ -938,6 +939,9 @@ describe('the list statement', () => {
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(frame().textContent).not.toContain('recipes.json');
     expect(statement()).toBeNull();
+    expect(frame().querySelector('[data-masthead] p')?.textContent).toBe(
+      'The Base Types worth selling raw, ranked by price. Crafted Item Classes are not ranked yet. Every figure is in Divine.',
+    );
   });
 });
 
@@ -1045,6 +1049,7 @@ describe('the Unrankable appendix', () => {
     expect(order).toEqual(['rankedRow', ...rows.map(() => 'appendixRow'), 'keyBlock', 'runningFoot']);
     // No appendix row is a Base Type.
     expect(appendix().textContent).not.toContain('Wide Belt');
+    expect(frame().querySelector('[data-masthead] p')?.textContent).toBe(MASTHEAD_DEK);
   });
 
   // Matrix: absent weights and absent recipes.

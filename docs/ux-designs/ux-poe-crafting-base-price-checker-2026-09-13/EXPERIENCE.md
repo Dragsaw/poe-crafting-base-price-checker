@@ -276,10 +276,15 @@ verbatim:
 
 The lines carry no mark and no colour, like the five facts above them. AD-24
 makes each file absent-tolerable, so its absence is attribution and not a health
-signal. The committed deploy has no `recipes.json`, so a marked line would sit
-on the page every day. The line gives the reason once, and nothing else on the
-page repeats it: not the appendix (state 37) and not the *unknown* fields.
-`DESIGN.md`, Components, owns the treatment and the budget line.
+signal, and a marked line would read as a fault in a state the page is built to
+tolerate. The line gives the reason once, and nothing else on the page repeats
+it: not the appendix (state 37) and not the *unknown* fields. The committed
+deploy publishes `recipes.json` with no recipe in it (story 2.7 Decisions), so
+no absence line prints there. The masthead dek says why no crafted Item Class is
+ranked in that state. When `recipes.json` is absent, the absence line says why.
+The dek and an absence line do not repeat one fact: the dek states what Epic 2
+ranks (a capability), and the absence line states which file is missing (a
+cause). `DESIGN.md`, Components, owns the treatment and the budget line.
 
 **The masthead eyebrow** reads `League {activeLeague}` and nothing else. **The
 Craft Recipe left it at revision 3** `[decision — memlog 181]`, and the open item
@@ -292,6 +297,17 @@ is **attribution** — the line that states what the page was built from. The sa
 argument that keeps the tracked-list edit date out of the health signals keeps a
 control out of the eyebrow: a thing the player turns does not belong in a line
 that describes what he was given.
+
+**The Epic 2 masthead dek** reads `The Base Types worth selling raw, ranked by
+price. Crafted Item Classes are not ranked yet. Every figure is in Divine.` This
+document owns that text `[decision — human, 2026-09-27,
+spec-epic-2-retro-item-19, Decision]`. The copy states what the page ranks, not
+which files are published, so it is true in every Epic 2 state: Epic 2 ranks no
+crafted row even when recipes are present. *Yet* carries the reason, because the
+crafted ranking is Epic 3's. In the committed state (a published `recipes.json`
+with no recipe) the dek is the one place that says why no crafted Item Class is
+on the page. The dek never names a file. Epic 3 rewrites the dek when it ranks
+crafted rows.
 
 **What `{components.craft-recipe}` prints, and why nothing is invented.** Memlog
 107's problem was real — `recipes.json` declares no display string — and it turns
@@ -695,10 +711,13 @@ remember to take it down. The per-row mark is required either way (FR-11), and a
 
 **It needs a ranking to speak about** `[decision — memlog 213]`. The condition
 above is vacuously true when no crafted row is ranked, which happens when
-`weights.json` or `recipes.json` is absent. The banner is not raised then. Its
+`weights.json` or `recipes.json` is absent, and in the committed state, where
+`recipes.json` is published with no recipe. The banner is not raised then. Its
 sentence would be false, because no ranking rests on a prior when no crafted
-ranking exists. The trust strip's absence line already says why. This also sets
-the co-occurrence bound in `DESIGN.md`'s vertical budget.
+ranking exists. When a file is absent, the trust strip's absence line already
+says why. In the committed state, the masthead dek says why. The banner stays
+down in every case. This also sets the co-occurrence bound in `DESIGN.md`'s
+vertical budget.
 
 **What lowers it is one wholly published pool, and the page claims nothing about
 how likely that is.** Because Provenance propagates pool-wide, an Item Class reads
@@ -864,7 +883,7 @@ dataset in one state at one moment.
 | 34 | Craft Recipe switched | Whole list + `{components.craft-recipe}` | `[decision — memlog 181]` The clicked word becomes solid and takes the sepia rule; the other goes tertiary. The list **re-ranks synchronously** against loaded artifacts — no network, no sync (FR-1, AD-24) — and it is **not debounced**, because a click is one deliberate act where a keystroke is one of several. Ranks, EV figures **and Chase Combination sets** all change, since a recipe changes which outcomes are reachable and not only what an attempt costs (FR-26). The Craft Cost line updates with it. Open panels stay open and re-render against the new recipe; nothing closes. Raw Base rows keep their own prices — they have no Craft Cost — but their **ranks** can move as crafted rows reorder around them |
 | 35 | Active recipe uncostable | `{components.craft-recipe}` + ranked list | A recipe naming a currency with no current rate for the active league is **uncostable**, never costed at zero (FR-26, AD-20). The Craft Cost line holds the money-slot phrase *no figure yet*. **The note that stood here is closed** `[decision — memlog 205]`, and PRD revision 19 now carries the player-visible half of it (FR-26, FR-5). **Every row stays.** No row leaves the list and no Item Class becomes Unrankable — the appendix would print an FR-4 reason that is false of a class whose pool is complete and agrees with the Weights File. **Each branch keeps its own order and neither is ordered against the other.** Craft Cost is one figure subtracted equally from every crafted row, so the crafted order and the Chase Combination sets are exactly what they would have been — the Payout Threshold compares against a Combination's gross price and never touches the cost (FR-1). What is unavailable is the *distance* between a crafted row and a Raw Base row, which is the missing figure itself. **So no rank numeral spans the two.** Numerals are suppressed, as in state 23 and for the same reason — a numeral is an explicit claim about position and the line below cannot retract it, where vertical adjacency under a stated limit is not a claim. `{components.ranked-row-tier-1/2/3}` run **per branch**, so two tier-1 rows is the correct render and is the only thing left saying *this is the strong end of its order*. A plain declarative sits above the list in state 25's register, naming the active recipe and stating that the two branches are not comparable while it holds. Every EV cell on a crafted row holds *no figure yet*, never `0.00`. **FR-5's bound applies per branch** — up to 20 rows of each, one `{components.expand-affordance}` under each, still naming no unit. The resting page can therefore hold 40 rows and scroll; `DESIGN.md`, Layout & Spacing carries that as an accepted overrun rather than a rule breach. Per PRD addendum revision 19 this state fires disproportionately on the costlier recipe, so it is a routine state and not a defensive one |
 | 36 | An Item Class unrankable under one recipe only | Appendix or list | AD-17 truncates the Eligible Pool below a recipe's `modifierLevelMin`, and an empty surviving pool makes that `(Item Class, recipe)` pair unrankable. Under the one-recipe-at-a-time reading (see *A note on the recipe axis* below), the class is simply Unrankable while that recipe is active and ranks normally under the other. **FR-4's reason enum is not extended** — PRD memlog 151 declines a third string on the ground that no base is tracked below item level 70, so the case is defensive rather than live. `[NOTE FOR UX]` If it ever does fire, neither existing string describes it and the enum is the PRD's to extend, not this document's |
-| 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | `[decision — memlog 214]` The committed state: `weights.json` present and `recipes.json` absent, so no class is Unrankable in FR-4's sense (AD-24). The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with the count in ink rather than rust. No lead and no rows. **It does not say why it is empty.** State 38's absence line already says so, and the empty appendix must not say it again or contradict it. It never prints `class absent from weights file` while a weights envelope is loaded |
+| 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | `[decision — memlog 214]` The committed state: `weights.json` present and `recipes.json` published with no recipe (story 2.7 Decisions), so no `(itemClass, recipe)` pair exists and no class is Unrankable in FR-4's sense (AD-24). The same holds when `recipes.json` is absent. The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with the count in ink rather than rust. No lead and no rows. **It does not say why it is empty.** In the committed state no absence line prints, and the masthead dek already says that crafted Item Classes are not ranked yet. When `recipes.json` is absent, state 38's absence line says so. The empty appendix must not say it again or contradict either. It never prints `class absent from weights file` while a weights envelope is loaded |
 | 38 | A tolerable artifact absent | `{components.trust-strip}` | `[decision — memlog 213]` One plain `Not published` line per absent file, inside the strip after line two, with no mark and no colour. The strings are verbatim under Domain Vocabulary. Each line is budgeted at `{spacing.frame-reserve-absence-line}`. An absent `weights.json` also turns the strip's three line-one fields to *unknown*. An absent `weights.json` or `recipes.json` holds the uniform-prior banner down, because there is no crafted ranking for it to describe |
 
 `{components.asking-price-line}`, `{components.key-block}` and

@@ -3,7 +3,7 @@ stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step
 storiesWrittenForEpics: [1, 2, 3]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-09-26 of Epic 2 and Stories 2.6 to 2.8 for the committed weights.json 6.0.0 with recipes.json absent. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -364,7 +364,7 @@ The player opens a page on the second monitor before a session. The page renders
 
 **Standalone:** yes. This is a complete and useful product that never reads `weights.json`. Crafted Item Classes are Unrankable for a reason the page states, exactly as AD-24 and AD-27 require — and that is FR-30's world, which UX-DR53 now specifies rather than defers. **Epic 2 therefore builds the appendix itself**, at UX-DR8's four-cell 970px budget, pinned to the foot, its count readable without expanding anything, its rows non-interactive, holding on the order of 29 rows untruncated while the document scrolls beneath it. Where `weights.json` is absent, every row there carries FR-4's second string, `class absent from weights file`, because in that world the string is true of every crafted class. FR-4's acceptance still belongs to Epic 3, which adds the other two strings and the Provenance `absent` case to an appendix that already exists.
 
-**Two day-one worlds, and the committed data sits in the second.** The Epic was written against an absent `weights.json`, but a 6.0.0 file is committed, and `data/recipes.json` is not. Epic 2 builds no weights-fed valuation, so the page does not read the file's `bases` and cannot say which classes it publishes. The day-one state on the committed data is therefore AD-24's **absent `recipes.json`**: no `(itemClass, recipe)` pair exists, the crafted branch is empty, raw bases rank, and Story 2.1's absence line names why. No class is Unrankable in FR-4's sense there, so the appendix is empty. The absent-weights world stays a real, tested state, because the file is absent-tolerable and a player can remove it. Stories 2.6 to 2.8 state both.
+**Two day-one worlds, and the committed data sits in the second.** The Epic was written against an absent `weights.json`, but a 6.0.0 file is committed, and `data/recipes.json` is committed with an empty recipe list (Story 2.7 Decisions). Epic 2 builds no weights-fed valuation, so the page does not read the file's `bases` and cannot say which classes it publishes. On the committed data no `(itemClass, recipe)` pair exists, the crafted branch is empty, and raw bases rank. No absence line prints, because every file is published. The masthead dek says why no crafted Item Class is ranked (EXPERIENCE.md, *The Epic 2 masthead dek* and state 37). An absent `recipes.json` gives the same empty crafted branch, and there Story 2.1's absence line names why. In both the committed and the absent-recipes worlds, no class is Unrankable in FR-4's sense, so the appendix is empty. The absent-weights world stays a real, tested state, because the file is absent-tolerable and a player can remove it. Stories 2.6 to 2.8 state both.
 
 ### Epic 3: The Crafted Ranking, on a Real Weights File
 
@@ -1618,10 +1618,10 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Then** it is a static bundle, with no server, no secret material and no expiring credential
 **And** a data commit updates the data without rebuilding the app. The page fetches the eight artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
 
-**Given** the deployed page on the committed artifact set, where `weights.json` is published and `recipes.json` is not
+**Given** the deployed page on the committed artifact set, where `weights.json` is published and `recipes.json` is published with no recipe (Story 2.7 Decisions)
 **When** a player opens it
-**Then** the Raw Base price list is the day-one content, and Story 2.1's absence line names the missing `recipes.json`
-**And** the crafted branch is empty because no `(itemClass, recipe)` pair exists, which is AD-24's absent-recipes state and not a failure
+**Then** the Raw Base price list is the day-one content, no absence line prints, and the masthead dek says that crafted Item Classes are not ranked yet (EXPERIENCE.md, *The Epic 2 masthead dek* and state 37)
+**And** the crafted branch is empty because no `(itemClass, recipe)` pair exists, which is not a failure. An absent `recipes.json` gives the same empty branch, and there Story 2.1's absence line names the missing file
 **And** that is the launch experience this epic deploys, rather than an edge case (AD-24, FR-30).
 
 **Given** the deployed page with no `weights.json` published
@@ -1656,11 +1656,11 @@ So that the launch page states what it is not showing me instead of quietly show
 **Then** every crafted Item Class sits in it, carrying FR-4's second reason string verbatim — `class absent from weights file`
 **And** that is the only string this epic renders, because in that world it is true of every crafted class. Story 3.6 adds the other two (FR-4, FR-30, AD-24, state 15).
 
-**Given** `weights.json` present and `recipes.json` absent, which is the committed state this epic deploys
+**Given** `weights.json` present and `recipes.json` published with no recipe, which is the committed state this epic deploys (Story 2.7 Decisions), or `recipes.json` absent
 **When** the appendix renders
-**Then** it holds no row, because no `(itemClass, recipe)` pair exists and no class is Unrankable in FR-4's sense. Story 2.1's absence line names why the crafted branch is empty (AD-24)
+**Then** it holds no row, because no `(itemClass, recipe)` pair exists and no class is Unrankable in FR-4's sense. In the committed state the masthead dek says why the crafted branch is empty; with `recipes.json` absent, Story 2.1's absence line says why (AD-24, EXPERIENCE.md state 37)
 **And** the page never prints `class absent from weights file` while it holds a loaded weights envelope. Epic 2 does not read `bases`, so the string would be a claim it cannot check (FR-4, FR-9)
-**And** the empty appendix still renders in its place, with its count readable. The empty treatment is UX's, and a `[NOTE FOR UX]` in `deferred-work.md` holds it open. This story builds the empty case to whatever UX rules and does not invent copy for it (UX-DR29, FR-4).
+**And** the empty appendix still renders in its place, with its count readable. The empty treatment is UX's, and EXPERIENCE.md state 37 rules it. This story builds the empty case to that ruling and does not invent copy for it (UX-DR29, FR-4).
 
 **Given** the absent-weights world's row count — on the order of 29 rows against a committed budget of 7
 **When** the page rests

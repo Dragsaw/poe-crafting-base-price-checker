@@ -3,10 +3,14 @@ import type { JSX } from 'react';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { PayoutThreshold } from '../threshold/PayoutThreshold';
 
-/** The DESIGN mockup strings (`mockups/key-hero-resting.html`). */
+/**
+ * The title is the DESIGN mockup string (`mockups/key-hero-resting.html`). The
+ * dek is EXPERIENCE.md's Epic 2 masthead copy: Epic 2 ranks no crafted row, so
+ * the dek says so. Epic 3 rewrites it when it ranks crafted rows.
+ */
 export const MASTHEAD_TITLE = 'What is worth picking up';
 export const MASTHEAD_DEK =
-  'Item Classes ranked by expected payout per craft, beside the Base Types worth selling raw. Every figure is in Divine.';
+  'The Base Types worth selling raw, ranked by price. Crafted Item Classes are not ranked yet. Every figure is in Divine.';
 
 export function eyebrowText(league: string): string {
   return `League ${league}`;

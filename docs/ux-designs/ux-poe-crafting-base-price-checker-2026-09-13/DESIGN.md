@@ -418,7 +418,7 @@ components:
     controlPanelsEqualHeight: 'both panels take the height of the taller, so their top and bottom rules line up. A ragged pair of boxes in a masthead reads as two accidents rather than as one control group.'
     copyEyebrow: 'League {activeLeague} — the league alone. The Craft Recipe left the eyebrow at revision 3, because a recipe the player CHOOSES cannot be printed as an attribution fact. It is now {components.craft-recipe}.'
     copyTitle: 'the question the page answers, as a phrase — not a product name'
-    copyDek: 'one sentence naming what the ordering is and that every figure is in Divine'
+    copyDek: 'capped at {spacing.dek-max-width} and two lines. EXPERIENCE.md, The Epic 2 masthead dek, owns the text'
   ranked-row:
     height: '{spacing.row-height}'
     background: '{colors.paper}'
@@ -1664,9 +1664,9 @@ report panel.
 top padding, `{spacing.5}` beneath, and three lines with `{spacing.2}` between
 each. The eyebrow is sepia tracked uppercase naming the active league. The title
 is the *question the page answers*, set as a phrase — never a product name and
-never a feature label. The dek is one sentence, capped at
-`{spacing.dek-max-width}`, naming what the ordering is and that every figure is
-in Divine. **Both controls float right inside the block as one group** —
+never a feature label. The dek is capped at `{spacing.dek-max-width}` and two
+lines. `EXPERIENCE.md`, *The Epic 2 masthead dek*, owns its text. **Both
+controls float right inside the block as one group** —
 `{components.craft-recipe}` at `{spacing.recipe-panel-width}`, then
 `{spacing.masthead-control-gap}`, then `{components.payout-threshold}` at
 `{spacing.threshold-panel-width}` — top-aligned with the eyebrow and cleared by
@@ -2030,9 +2030,9 @@ split that one statement across two places. The line gives the reason once, so
 the appendix and the strip's *unknown* fields do not repeat it.
 
 *Why no mark.* AD-24 makes these files absent-tolerable. Absence is a declared
-state, not a break. The committed deploy has no `recipes.json`, so that line
-appears on every load. A rust or ochre mark there would sit on the page every
-day and teach the player to read past the inks that mean something is wrong.
+state, not a break. A rust or ochre mark on a state the page is built to
+tolerate would read as a fault, and it would teach the player to read past the
+inks that mean something is wrong.
 Rust stays for the health line's two triggers.
 
 *The affordance.* The whole strip is the click target — the player is mouse-only
@@ -2122,9 +2122,10 @@ file` — in `{spacing.col-appendix-reason}`; and a quiet italic note in
 rust, because rust says something is broken and nothing here is. There is no
 lead and there are no rows, and the bottom padding matches the top, 16px. The
 panel keeps its place above the key block, so the page's order does not change
-with the data. It says nothing about why it is empty: when `recipes.json` is
-absent, the trust strip's absence line already says so, and repeating it here
-would state one fact in two places.
+with the data. It says nothing about why it is empty. In the committed state,
+where `recipes.json` is published with no recipe, the masthead dek already says
+so (`EXPERIENCE.md`, state 37). When `recipes.json` is absent, the trust strip's
+absence line says so. Repeating either here would state one fact in two places.
 
 *Every row here is an Item Class, and that is a rule rather than an
 observation.* Unrankability governs the crafted branch only — a Raw Base needs
