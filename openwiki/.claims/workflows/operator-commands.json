@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:180819794aa74a4c83fffce3806b74edad41f31e25e74bcdc17822f9101e6e3e",
+  "pageVersion": "sha256:9f471d4887e2ea62f2acb80df3a1ea50dfc0f5d6549af9bff9e6f5a9d54b51cc",
   "claims": [
     {
       "id": "claim_8f81244d624f4708bbbf267b4e41d4ac",
       "statement": "The live and human-invoked commands are package.json scripts run under bare node, with sync, fixtures:record and catalogue:refresh loading .env via --env-file-if-exists.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L24",
-          "version": "repo-lines-v1:sha256:dbde2daa93f1ed6f966556f8ca6c3c624d35547e0e53fb8c28b58ec34d4bd89f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NTJjZGNkMTk0NzM1MTJjNGJlZTc2M2ZlY2JkOGNlMjkwNjBlODZmYTBiMDY3MzEzNDFmMDZkZDg5M2VlOTIifQ"
+          "resource": "repo://package.json#L10-L26",
+          "version": "repo-lines-v1:sha256:70054449175165960c448b426e83124c4a439ad9d6c7763f21d93d78c98b903b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
         }
       ]
     },
@@ -91,10 +91,24 @@
           "version": "repo-lines-v1:sha256:eeccb65960e3bdaba681fff0c782ba7650f53a0bdf84bca174899bea1311fb11:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlYzgxNDMyNmRlY2MxNzlmN2JhMWE1ZmRkZTMzMmY5YTQ4NjliZGUzNWNkNDg0NGU4Y2Q4MWIxMmIwNDAzOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwMzEwNDEzOTI3MzA3Yzc4OGNiN2Y3NDgxZTczMDZmNGY0ODU1MjgyOWY3ZTE5YThkYTMzYTBlZGI0YzBkZWQifQ"
         }
       ]
+    },
+    {
+      "id": "claim_1b122b1a55824de3a3744caca86042a3",
+      "statement": "pnpm dev:stop refuses a port listener that is not Vite from this checkout's node_modules, climbs from the listener through script shells to the first pnpm dev without passing its own ancestors or a parent started after its child, kills those trees, and exits 1 if the port stays taken.",
+      "evidence": [
+        {
+          "resource": "repo://tools/dev-stop/dev-stop.ts#L120-L175",
+          "version": "repo-lines-v1:sha256:45b71de073393aed4f31bc30992cca98b919aa3dd4b2b897e01333cdf6ccdca4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NWY4ODUxMGRiOWJiNTc3N2M5N2E3OWIwZGQxNDk5OTczOGJjODYxMzcyZmM1NTMwYWU0YjZhY2MxZTEyNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3YTBmMzRlZTM1YzY2ZGFhYmMzNjZjMzJjM2Q4MTkwYjgyNzBkOTk0YzQwY2E4OWRhOTAyZGEyNTBiOTk5NzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMmE2Y2VhNGQyZGJjZjI2ZjY4YTg4MTBlN2Y5ODMxNTdkZTcyMDQwODg4OTZjM2I4MDU5MDFjNWFiMWMyMDgifQ"
+        },
+        {
+          "resource": "repo://tools/dev-stop/dev-stop.ts#L276-L302",
+          "version": "repo-lines-v1:sha256:f800182a50a5929299808ee9300df7582c1c2249b8ebc1ff4f0a69f0d7971eb7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllNTJiMWMxMDQ2YThhYzY3NzgzMWE4ZmY0MWQyODVlMjUwOGJmYWQ1N2JiZTNkMzFjMzA3MTAxMzQxNzczYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiZjc1NTUyOTczZDRkZTU0YzVkYjkzMzZmN2YwZWEyMDYxYmM4OWNjMTcwODU0NGM2YzdlYjk2MjQ0NTdmMzEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T13:11:02.100Z"
+    "at": "2026-09-27T16:49:38.941Z"
   }
 }

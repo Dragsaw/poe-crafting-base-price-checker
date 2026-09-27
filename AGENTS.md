@@ -12,9 +12,10 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 ## Where things are
 
 - Architecture spine, which holds the canonical stack versions: `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md`
-- Story specs, their reviews, `sprint-status.yaml` and `deferred-work.md`: `docs/stories/`. A story or review appends to `deferred-work.md` and does not rewrite other entries. Remove an entry in the last commit of the branch that lands its work, or in a commit that names the decision to cancel it.
+- Story specs, their reviews, `sprint-status.yaml` and `deferred-work.md`: `docs/stories/`. A story or review appends to `deferred-work.md` and does not rewrite other entries. Remove an entry in the last commit of the branch that lands its work, or in a commit that names the decision to cancel it. The run state of `deferred-work-sweep` lives in the GitHub issues, one for each entry, and `pnpm deferred:issues` creates them.
 - Mantine documentation for agents: https://mantine.dev/llms.txt
 - UX design system: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md`. impeccable finds only `PROJECT_ROOT/DESIGN.md`. Give `--target <path>` to use this file.
+- Tools for `data/tracked.json`: `pnpm tracked:lookup` and `pnpm tracked:check`. The `tracked-json` skill (`.claude/skills/tracked-json/SKILL.md`) uses both. The rule for their use is in *Parallel worktrees* of `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md`.
 
 ## Running and verifying
 

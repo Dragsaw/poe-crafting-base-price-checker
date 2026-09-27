@@ -48,7 +48,7 @@ describe('the contracts barrel', () => {
       'CatalogueStaticFileSchema',
       'CatalogueFiltersFileSchema',
       'RecipesFileSchema',
-      'WeightsFileEnvelopeSchema',
+      'WeightsFileSchema',
       'parseEnvelope',
     ] as const) {
       expect(contracts[name], `${name} is not re-exported from the barrel`).toBeDefined();

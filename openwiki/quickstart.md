@@ -16,10 +16,10 @@ sources:
     resource: repo://packages/web/src/App.tsx
   - id: openwiki-source-40275cb92c3610938f16ade3
     resource: repo://pnpm-workspace.yaml
-generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T13:11:02.100Z
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Quickstart
@@ -43,7 +43,7 @@ A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` 
 - **contracts**: Zod schemas for every shared shape, versioned file envelopes, the canonical entry key, and the four effect ports with in-memory fakes.
 - **core**: pure functions: `rank` (read-time ranking) and `chunkOrder`/`pinnedToKeep` (the sync refresh rotation).
 - **sync**: the imperative shell. It has the governed trade client, the chunk runner, the pricing step, the league gate and the operator commands.
-- **web**: the page. It loads eight artifacts, ranks them with `core`, and renders the list, the trust strip, row expansions and the Unrankable appendix.
+- **web**: the page. It loads seven artifacts, ranks them with `core`, and renders the list, the trust strip, row expansions and the Unrankable appendix.
 
 The direction is enforced by manifests, dependency-cruiser, ESLint purity rules and tests.
 
@@ -55,7 +55,8 @@ The direction is enforced by manifests, dependency-cruiser, ESLint purity rules 
 | `pnpm check` | Runs typecheck (`tsc -b` plus the `.d.ts` rewrite), eslint and dependency-cruiser. This is the CI gate. |
 | `pnpm test` | Runs Vitest across all projects. No test touches the network. |
 | `pnpm dev` | Starts the Vite dev server on port 5173 with `strictPort`. Use `--port <n>` for another port. |
-| `pnpm build` | Runs `vite build` and prunes `dist` to the eight artifacts. |
+| `pnpm dev:stop` | Stops this checkout's `pnpm dev` process tree and checks that the port is free. Run it even after a background task stop, because on Windows Vite keeps the port. |
+| `pnpm build` | Runs `vite build` and prunes `dist` to the seven artifacts. |
 | `pnpm sync` | Runs one live chunk. Needs `POE_SYNC_USER_AGENT`. |
 | `pnpm sync:dry` | Predicts the next chunk offline against `fixtures/`. It skips entries outside the recorded workload and lists them as `unrecorded`. |
 | `pnpm catalogue:refresh` | Re-fetches the four trade catalogue files. |
@@ -74,9 +75,9 @@ To publish new prices: run `pnpm sync` (repeatedly, until the pass is covered), 
 | debug a sync run, the lock, progress, or the sync report | [The sync chunk runner](sync/chunk-runner.md) |
 | change how an entry is searched or priced, or the league check | [Pricing step and league gate](sync/pricing-step-and-league-gate.md) |
 | touch HTTP, rate limits, 429 handling or the User-Agent | [Governed trade client and rate limits](sync/trade-client-and-rate-limits.md) |
-| run or change a CLI command, fixtures, or tracked-list curation | [Operator commands and curation workflow](workflows/operator-commands.md) |
-| change what the page loads, shows, or stores | [Web page: artifact load and ranked list](web/page-load-and-ranked-list.md) |
-| change the build, dev server, Pages deploy or commit hook | [Build, typecheck and deploy](operations/build-typecheck-and-deploy.md) |
+| run or change a CLI command, `dev:stop`, fixtures, or tracked-list curation | [Operator commands and curation workflow](workflows/operator-commands.md) |
+| change what the page loads, shows, or stores, or the web `shared/` helpers | [Web page: artifact load and ranked list](web/page-load-and-ranked-list.md) |
+| change the build, dev server, Pages deploy, the OpenWiki update workflow or the commit hook | [Build, typecheck and deploy](operations/build-typecheck-and-deploy.md) |
 | write tests, or understand the no-network guard | [Test strategy and network guards](testing/test-strategy-and-guards.md) |
 
 ## Rules worth knowing up front

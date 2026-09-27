@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:66bf8cd79db3d5d817972729f8126b1bcd540fc79bdec295851fb8670c76b8f4",
+  "pageVersion": "sha256:174a51dc965aa8303b36b9c10d9a348297b656f4d28ca16b11f46f01ef020cf0",
   "claims": [
     {
       "id": "claim_d1a342264ab8403a889d58264af5ba8a",
-      "statement": "The root Vitest config declares each packages/* project plus a root project running test/, boundary-check, dts-specifiers and tracked-json skill script tests, all with test/setup.ts as a setup file.",
+      "statement": "The root Vitest config declares each packages/* project plus a root project running test/, boundary-check, dev-stop, dts-specifiers and tracked-json skill script tests, all with test/setup.ts as a setup file.",
       "evidence": [
         {
           "resource": "repo://packages/sync/vitest.config.ts",
@@ -12,7 +12,7 @@
         },
         {
           "resource": "repo://vitest.config.ts",
-          "version": "repo-file-v1:sha256:5b342e98422e04b7bbbd61c8db9b94fab4cf4071cb93dce579e1708d14613951"
+          "version": "repo-file-v1:sha256:36e7aeeefc2364e1030318b13018d74a20fd6103b6986654e7a87c4b5b0a2a9a"
         }
       ]
     },
@@ -108,11 +108,11 @@
     },
     {
       "id": "claim_952aa23c2a224377a0f3eb75874a312e",
-      "statement": "The web artifact server registers MSW handlers with minimal valid bodies for all eight artifacts on the shared setup server.",
+      "statement": "The web artifact server registers MSW handlers with minimal valid bodies for all seven artifacts on the shared setup server, plus a trap for the never-fetched catalogue/static.json, and logs each request's URL and cache mode.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/test-support/artifact-server.ts#L1-L50",
-          "version": "repo-lines-v1:sha256:043dc6295be28d2d2ad3d4b3e4967427d28488f68d54108882cb792589af43d8:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4ODI3YTYwN2YyNGIxOTRmZWUyODU2YTIxNzJjMzY0YmM3YTY3MmIxOTNjZTU1ODk2N2U0ZTQ4YTAyMWNjNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNGI5MTM2MTM2NTExNWNlYjIxNWZkNDEzYjdmNzlmNWRhNDM5MjE0MjNiNWExODZiNGU4ZjY5OTdkZmY1NzMifQ"
+          "resource": "repo://packages/web/src/test-support/artifact-server.ts#L1-L128",
+          "version": "repo-lines-v1:sha256:41e3073525133772788088a49f5a9e5e3df044aae37e28c2a26c076fb87f5fa6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkMTM3NmMyNTgxNDU3OGI0MjEyOWRhNGY4NDZlMWFiYjQyZDIwYjZkMzk5ZTQ3NDMxN2MzMzEyNWY3MWEzMGY4In0"
         }
       ]
     },
@@ -143,10 +143,20 @@
           "version": "repo-lines-v1:sha256:f6b2ba37e2118db843e3782cb8930db38867e6aa46e7c0f467960340d4c48381:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwZGZmZWY5Zjg5ZTA5MDk0MDJmNTI1NDI5NjFjZmZkNDhmNGQ2Y2IwNThmMWYwZmE1MGZlZjRiMGRmMGRlOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmNjc3ZGY4ZDU2OTFmZmE1OWI5MzA3ODU4ZDEwN2FmNzRiNzYyMmUwYzJkYTFlZTFjMDhjYWZlZWNiOGYwYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmZjRiNWYxZjdhMzE5NzFkZTU5ZDUyYTA0M2ZjZjQ0Zjk1ODljNDkxZDNjZGExZDFjY2YzOTQ3MGIzZGM2MWUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_4fd01a1af0b24a5b9ea328d5362edbd2",
+      "statement": "The shared web DOM helpers provide a fixed test clock, a jsdom rgb() colour spelling, a single mounted React root per test, and mountList, which ranks a raw workload through core and mounts RankedList.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/test-support/dom.tsx#L1-L103",
+          "version": "repo-lines-v1:sha256:13dcb0e3304735eacdf6169c8d0bcc91f446432cddb630b9b45e84b6275f71e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T13:11:02.100Z"
+    "at": "2026-09-27T16:49:38.941Z"
   }
 }

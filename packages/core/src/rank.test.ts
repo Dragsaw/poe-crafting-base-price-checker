@@ -5,6 +5,8 @@ import type {
   PriceState,
   RankedRow,
   TrackedEntry,
+  WeightsFile,
+  WeightsPool,
 } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
@@ -21,6 +23,28 @@ function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): Tra
     ? { kind: 'raw', baseTypeId, itemLevelMin: 82, status, prunedReason: 'no market' }
     : { kind: 'raw', baseTypeId, itemLevelMin: 82, status };
 }
+
+type Coverage = WeightsPool['poolCoverage'];
+
+/** A parsed weights file carrying exactly `classes`, each `[categoryId, className, prefix, suffix]` coverage. */
+function weightsWith(...classes: readonly (readonly [string, string, Coverage?, Coverage?])[]): WeightsFile {
+  const bases: Record<string, WeightsFile['bases'][string]> = {};
+  for (const [categoryId, className, prefix = 'complete', suffix = 'complete'] of classes) {
+    bases[categoryId] = {
+      ...bases[categoryId],
+      [className]: { prefix: { poolCoverage: prefix, entries: [] }, suffix: { poolCoverage: suffix, entries: [] } },
+    };
+  }
+  return {
+    schemaVersion: '6.0.0',
+    gamePatch: '0.5.5',
+    producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
+    bases,
+  };
+}
+
+/** Every crafted class these tests name by default, both slots `complete`. */
+const WEIGHTS = weightsWith(['accessory.amulet', 'Amulets'], ['weapon.bow', 'Bows']);
 
 const crafted: TrackedEntry = {
   kind: 'crafted',
@@ -64,7 +88,7 @@ function published(
 }
 
 function ranked(input: Partial<RankInput> & Pick<RankInput, 'tracked'>): Ranking {
-  return rank({ dataset: [], activeLeague: LEAGUE, threshold: THRESHOLD, weightsLoaded: true, ...input });
+  return rank({ dataset: [], activeLeague: LEAGUE, threshold: THRESHOLD, weights: WEIGHTS, ...input });
 }
 
 const keysOf = (items: readonly { entryKey: string }[]): string[] => items.map((item) => item.entryKey);
@@ -328,7 +352,7 @@ function matrixInput(): RankInput {
     ],
     activeLeague: LEAGUE,
     threshold: THRESHOLD,
-    weightsLoaded: true,
+    weights: WEIGHTS,
   };
 }
 
@@ -349,12 +373,13 @@ function craftedOf(
 }
 
 const ABSENT = 'class absent from weights file';
+const PARTIAL = 'pool partial';
 
 describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('names every crafted class, reason verbatim, when no weights envelope is loaded', () => {
     const result = ranked({
       tracked: [craftedOf('weapon.bow', 'Bows'), craftedOf('accessory.amulet', 'Amulets'), raw('A')],
-      weightsLoaded: false,
+      weights: null,
     });
     expect(result.unrankable).toEqual([
       { categoryId: 'accessory.amulet', className: 'Amulets', reason: ABSENT },
@@ -362,8 +387,44 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
     ]);
   });
 
+  it('names a class absent from the file, and never falls back to a sibling className', () => {
+    const result = ranked({
+      tracked: [craftedOf('jewel', 'Sapphire'), craftedOf('weapon.crossbow', 'Crossbows')],
+      weights: weightsWith(['jewel', 'Emerald'], ['weapon.bow', 'Crossbows']),
+    });
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.crossbow', className: 'Crossbows', reason: ABSENT },
+      { categoryId: 'jewel', className: 'Sapphire', reason: ABSENT },
+    ]);
+  });
+
+  it('never resolves a pair through the object prototype', () => {
+    const result = ranked({ tracked: [craftedOf('toString', 'constructor')], weights: WEIGHTS });
+    expect(result.unrankable).toEqual([{ categoryId: 'toString', className: 'constructor', reason: ABSENT }]);
+  });
+
+  it.each([
+    ['the prefix', 'partial', 'complete'],
+    ['the suffix', 'complete', 'partial'],
+    ['both slots', 'partial', 'partial'],
+  ] as const)('names a class whose %s declares partial as pool partial, once', (_label, prefix, suffix) => {
+    const result = ranked({
+      tracked: [craftedOf('jewel', 'Emerald'), craftedOf('jewel', 'Emerald', 'pinned', 82), craftedOf('weapon.bow', 'Bows')],
+      weights: weightsWith(['jewel', 'Emerald', prefix, suffix], ['weapon.bow', 'Bows']),
+    });
+    expect(result.unrankable).toEqual([{ categoryId: 'jewel', className: 'Emerald', reason: PARTIAL }]);
+    expect(result.ordering).toEqual([]);
+  });
+
+  it('makes no claim for a complete class: no appendix row, and no ranked row', () => {
+    const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weights: WEIGHTS });
+    expect(result.unrankable).toEqual([]);
+    expect(result.ordering).toEqual([]);
+    expect(result.belowThreshold).toEqual([]);
+  });
+
   it('holds no class, and never the string, while a weights envelope is loaded', () => {
-    const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weightsLoaded: true });
+    const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weights: WEIGHTS });
     expect(result.unrankable).toEqual([]);
     expect(JSON.stringify(result)).not.toContain(ABSENT);
   });
@@ -371,7 +432,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('makes one class of two crafted entries on one (categoryId, className)', () => {
     const result = ranked({
       tracked: [craftedOf('weapon.bow', 'Bows', 'active', 54), craftedOf('weapon.bow', 'Bows', 'pinned', 82)],
-      weightsLoaded: false,
+      weights: null,
     });
     expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: ABSENT }]);
   });
@@ -379,7 +440,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('keeps two classes that share a className but not a categoryId, breaking on categoryId', () => {
     const result = ranked({
       tracked: [craftedOf('armour.chest', 'Body Armours'), craftedOf('armour.chest.alt', 'Body Armours')],
-      weightsLoaded: false,
+      weights: null,
     });
     expect(result.unrankable.map((item) => item.categoryId)).toEqual(['armour.chest', 'armour.chest.alt']);
   });
@@ -391,7 +452,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
         craftedOf('weapon.staff', 'Staves', 'pruned'),
         craftedOf('weapon.staff', 'Staves', 'active'),
       ],
-      weightsLoaded: false,
+      weights: null,
     });
     expect(result.unrankable.map((item) => item.className)).toEqual(['Staves']);
   });
@@ -399,15 +460,15 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('holds no class for a raw-only Tracked List, and leaves the raw branch unchanged', () => {
     const A = raw('A');
     const input = { tracked: [A], dataset: [published(A, priced(0.5))] };
-    const absent = ranked({ ...input, weightsLoaded: false });
+    const absent = ranked({ ...input, weights: null });
     expect(absent.unrankable).toEqual([]);
-    expect(absent).toEqual(ranked({ ...input, weightsLoaded: true }));
+    expect(absent).toEqual(ranked({ ...input, weights: WEIGHTS }));
   });
 
   it('sorts by className in UTF-8 code-unit order, not locale order', () => {
     const result = ranked({
       tracked: [craftedOf('c.b', 'bows'), craftedOf('c.a', 'Wands'), craftedOf('c.c', 'Amulets')],
-      weightsLoaded: false,
+      weights: null,
     });
     expect(result.unrankable.map((item) => item.className)).toEqual(['Amulets', 'Wands', 'bows']);
   });
@@ -420,9 +481,9 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       craftedOf('weapon.staff', 'Staves', 'pruned'),
       raw('A'),
     ];
-    const expected = ranked({ tracked, weightsLoaded: false });
+    const expected = ranked({ tracked, weights: null });
     for (const seed of [1, 7, 42]) {
-      expect(ranked({ tracked: permute(tracked, seed), weightsLoaded: false })).toEqual(expected);
+      expect(ranked({ tracked: permute(tracked, seed), weights: null })).toEqual(expected);
     }
   });
 });
@@ -483,7 +544,7 @@ describe('compareRankedRows', () => {
       dataset: [published(raw('A'), priced(0.3)), published(raw('B'), priced(3))],
       activeLeague: LEAGUE,
       threshold: THRESHOLD,
-      weightsLoaded: true,
+      weights: WEIGHTS,
     }).ordering.toSorted(compareRankedRows);
     expect(a?.baseTypeId).toBe('A');
     expect(b?.baseTypeId).toBe('B');
@@ -494,7 +555,7 @@ describe('rank: the read-time budget (NFR-6)', () => {
   it('ranks 5,000 raw entries in under 100 ms', () => {
     const tracked = Array.from({ length: 5000 }, (_, index) => raw(`Base ${String(index).padStart(4, '0')}`));
     const dataset = tracked.map((entry, index) => published(entry, priced(((index * 37) % 500) / 100 + 0.01)));
-    const input: RankInput = { tracked, dataset, activeLeague: LEAGUE, threshold: THRESHOLD, weightsLoaded: true };
+    const input: RankInput = { tracked, dataset, activeLeague: LEAGUE, threshold: THRESHOLD, weights: WEIGHTS };
     const result = rank(input); // warm up
     const samples: number[] = [];
     for (let run = 0; run < 5; run += 1) {

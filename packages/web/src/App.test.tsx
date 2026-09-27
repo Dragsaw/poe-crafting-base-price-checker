@@ -1127,7 +1127,7 @@ describe('the Unrankable appendix', () => {
   }
 
   // Matrix: committed.
-  it('is the title alone on the committed data/, count in ink, above the key block and the foot', async () => {
+  it('renders the empty appendix on the committed data/, whose pools are all complete, above the key block and the foot', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights}.json', {
       eager: true,
       import: 'default',
@@ -1140,9 +1140,10 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.style.color).toBe(rgb(colors.ink));
-    expect(appendixRows()).toHaveLength(0);
+    // Producer 6.1.0 declares every pool `complete` (the not-in-game tiers no longer make a pool partial).
+    expect(appendixRows()).toEqual([]);
+    expect(appendix().dataset['unrankableAppendix']).toBe('empty');
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('0 Item Classes');
     expect(frame().textContent).not.toContain(APPENDIX_LEAD);
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');

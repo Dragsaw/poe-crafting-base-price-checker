@@ -12,7 +12,7 @@ function statementFor(
   dataset: readonly DatasetEntry[],
   threshold = 0.25,
 ): ReturnType<typeof listStatement> {
-  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), threshold, TEST_LEAGUE);
+  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: null }), threshold, TEST_LEAGUE);
 }
 
 const belt = rawEntry('Wide Belt');
@@ -61,7 +61,7 @@ describe('listStatement', () => {
       priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
       unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
     ];
-    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weightsLoaded: true });
+    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weights: null });
     expect(ranking.noListings).toHaveLength(1);
     expect(ranking.notYetSynced).toHaveLength(2);
     expect(isHonestEmpty(ranking)).toBe(true);

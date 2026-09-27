@@ -147,20 +147,17 @@ export type { DataFileRefusal, DataFileResult } from './load-data-file';
 /**
  * The run-start catalogue check (FR-24, AD-9, AD-25): the committed
  * catalogue's id sets, the pure check `runChunk` runs under the lock before
- * any request, and the narrow `weights.json` reader whose ids are checked
- * report-only. `className` is never checked against the catalogue.
+ * any request, and the `weights.json` reader, which refuses a file that breaks
+ * the weights contract and whose ids are checked report-only. `className` is
+ * never checked against the catalogue.
  */
 export { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH, loadCatalogueIds } from './catalogue/catalogue-ids';
 export type { CatalogueIds } from './catalogue/catalogue-ids';
 export { checkCatalogue, markUnresolvable } from './chunk/catalogue-check';
 export type { CatalogueCheck } from './chunk/catalogue-check';
-export {
-  checkWeightsIds,
-  readWeightsIds,
-  WEIGHTS_PATH,
-  WEIGHTS_SCHEMA_VERSION,
-  weightsAbsentRecord,
-} from './catalogue/weights-ids';
+export { checkWeightsIds, readWeightsIds, WEIGHTS_PATH, weightsAbsentRecord } from './catalogue/weights-ids';
+/** The weights contract this build reads, defined once in `contracts`. */
+export { WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
 export type { WeightsIds } from './catalogue/weights-ids';
 
 /**

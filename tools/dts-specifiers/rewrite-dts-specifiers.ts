@@ -10,15 +10,16 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Post-emit step of `pnpm typecheck`. `packages/contracts` is
- * `emitDeclarationOnly` with `allowImportingTsExtensions`, so its emitted
- * `.d.ts` files keep the source's `./x.ts` specifiers: TypeScript 6.0.3's
- * `rewriteRelativeImportExtensions` rewrites `.js` output only. A non-TypeScript
- * consumer of `dist` cannot follow `./x.ts`; `./x.js` resolves to the sibling
- * `x.d.ts` under every TypeScript module resolution mode.
+ * Post-emit step of `pnpm typecheck`. `packages/contracts`, `packages/core` and
+ * `packages/sync` are `emitDeclarationOnly` with `allowImportingTsExtensions`,
+ * so their emitted `.d.ts` files keep the source's `./x.ts` specifiers:
+ * TypeScript 6.0.3's `rewriteRelativeImportExtensions` rewrites `.js` output
+ * only. A non-TypeScript consumer of `dist` cannot follow `./x.ts`; `./x.js`
+ * resolves to the sibling `x.d.ts` under every TypeScript module resolution
+ * mode.
  *
  * Only `pnpm typecheck` runs this rewrite: a bare `tsc -b`, watch mode or an
- * IDE build that re-emits contracts writes the `.ts` specifiers back.
+ * IDE build that re-emits one of these packages writes the `.ts` specifiers back.
  *
  * Run by bare `node` (type stripping), so this module imports only builtins.
  */
@@ -81,10 +82,13 @@ export function rewriteDtsSpecifiersIn(dir: string): string[] {
 }
 
 /**
- * The directories the post-emit step rewrites. Only the contracts output: the
- * `@poe/contracts` `exports["."].types` surface.
+ * The directories the post-emit step rewrites: the `dist` of each
+ * `emitDeclarationOnly` package, which its `exports["."].types` names.
+ * `packages/web` emits no declarations.
  */
-const TARGET_DIRS = [fileURLToPath(new URL('../../packages/contracts/dist', import.meta.url))];
+const TARGET_DIRS = ['contracts', 'core', 'sync'].map((pkg) =>
+  fileURLToPath(new URL(`../../packages/${pkg}/dist`, import.meta.url)),
+);
 
 /**
  * The entry guard. `node tools/dts-specifiers/rewrite-dts-specifiers.ts` runs

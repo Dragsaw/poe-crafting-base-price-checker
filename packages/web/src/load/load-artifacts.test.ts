@@ -38,7 +38,7 @@ describe('the seven artifacts', () => {
   });
 
   it('expects weights major 6 and version 1 elsewhere', () => {
-    expect(ARTIFACTS.weights.expected).toBe('6.0.0');
+    expect(ARTIFACTS.weights.expected).toBe('6.1.0');
     expect(ARTIFACTS.dataset.expected).toBe('1.0.0');
   });
 });
@@ -161,7 +161,25 @@ describe('loadArtifacts', () => {
       path: 'weights.json',
       cause: 'version',
       declared: '5.1.0',
-      expected: '6.0.0',
+      expected: '6.1.0',
+    });
+  });
+
+  it('refuses a weights file that breaks a hard error of the contract, as content', async () => {
+    const weights = VALID_BODIES.weights as Record<string, unknown>;
+    const pool = { poolCoverage: 'complete', entries: [] };
+    serveArtifacts(server, {
+      weights: {
+        kind: 'json',
+        body: { ...weights, bases: { 'armour.gloves': { Gloves_str: { prefix: pool, suffix: pool }, Gloves: { prefix: pool, suffix: pool } } } },
+      },
+    });
+    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+      kind: 'refused',
+      path: 'weights.json',
+      cause: 'content',
+      declared: '6.0.0',
+      expected: '6.1.0',
     });
   });
 
@@ -227,7 +245,7 @@ describe('loadArtifacts', () => {
       path: 'weights.json',
       cause: 'content',
       declared: null,
-      expected: '6.0.0',
+      expected: '6.1.0',
     });
   });
 

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:e393ab9ca1c79d442b0ac8362ad7c4823174f64070e6f9fd08efcbef4a8d8d28",
+  "pageVersion": "sha256:5ba2d7c8ededf1cebd0f8cfa76b8b2b6dc3dcbd15601b9ff2cd0bfb0aa6b8706",
   "claims": [
     {
       "id": "claim_ad8c9e97dfd54e3696e4d68856f64390",
-      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, dev, build, sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check.",
+      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, dev, dev:stop, build, sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check.",
       "evidence": [
         {
-          "resource": "repo://package.json#L10-L24",
-          "version": "repo-lines-v1:sha256:dbde2daa93f1ed6f966556f8ca6c3c624d35547e0e53fb8c28b58ec34d4bd89f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NTJjZGNkMTk0NzM1MTJjNGJlZTc2M2ZlY2JkOGNlMjkwNjBlODZmYTBiMDY3MzEzNDFmMDZkZDg5M2VlOTIifQ"
+          "resource": "repo://package.json#L10-L26",
+          "version": "repo-lines-v1:sha256:70054449175165960c448b426e83124c4a439ad9d6c7763f21d93d78c98b903b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZTZlNWI0Y2U1N2U4NTM4OWU5MzRiNmRmNjM5OWI2MTE4N2M1ZTVhMmExYjNlMzA5ZmUwN2FmOTU3MDVhOGEifQ"
         },
         {
           "resource": "repo://pnpm-workspace.yaml",
@@ -35,8 +35,8 @@
       "statement": "The web App loads the artifacts once and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L40-L143",
-          "version": "repo-lines-v1:sha256:ce5ab1afe8da94e6171a0f864b1ac09bd8b7f26493431249523015cda78f6363:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NGRlMjAyMDFmOTZjZjVkNDI0NTQwZmVmMDdhZDEzNDU0YjI4MzdhNjI4ZjZlMmMzNjA4NmU1NDc0ODUxMzU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwMGIzZjMxODhhOWVkNDExMjczYmVlYTg2YmY0Y2QyYWVlZWY5OGVlMDNmZmRkZTI1MDZjMGU0ZTcwZjI0ZmRiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MzIxN2Q1NGY4NzZmMmMwYmIyMDZmM2IxYzU4ZGUwMGIxNDA2ZTU2Mjg1OTYwMmFhZWU4MzU0ZjBlZmY2MjNkIn0"
+          "resource": "repo://packages/web/src/App.tsx#L40-L149",
+          "version": "repo-lines-v1:sha256:9fe288dbf22ec0ca69c3a6948ec9b5c8c7f1a6c7e2ce98f66b873f22fc1803f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NGRlMjAyMDFmOTZjZjVkNDI0NTQwZmVmMDdhZDEzNDU0YjI4MzdhNjI4ZjZlMmMzNjA4NmU1NDc0ODUxMzU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwMGIzZjMxODhhOWVkNDExMjczYmVlYTg2YmY0Y2QyYWVlZWY5OGVlMDNmZmRkZTI1MDZjMGU0ZTcwZjI0ZmRiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MzIxN2Q1NGY4NzZmMmMwYmIyMDZmM2IxYzU4ZGUwMGIxNDA2ZTU2Mjg1OTYwMmFhZWU4MzU0ZjBlZmY2MjNkIn0"
         }
       ]
     },
@@ -67,6 +67,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T13:11:02.100Z"
+    "at": "2026-09-27T16:49:38.941Z"
   }
 }

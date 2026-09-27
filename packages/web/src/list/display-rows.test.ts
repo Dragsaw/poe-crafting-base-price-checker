@@ -10,7 +10,7 @@ import { tierOf, toDisplayRows } from './display-rows';
 import { isHonestEmpty } from './list-statement';
 
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): ReturnType<typeof toDisplayRows> {
-  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weightsLoaded: true });
+  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: null });
   return toDisplayRows(ranking, dataset, NOW);
 }
 
@@ -131,7 +131,7 @@ describe('toDisplayRows', () => {
       dataset,
       activeLeague: TEST_LEAGUE,
       threshold: DEFAULT_THRESHOLD,
-      weightsLoaded: true,
+      weights: null,
     });
     expect(ranking.belowThreshold.length).toBeGreaterThan(0);
     expect(isHonestEmpty(ranking)).toBe(false);
@@ -188,7 +188,7 @@ describe('toDisplayRows', () => {
         dataset: entries.map((entry, i) => priced(entry, 30 - i, hoursBefore(NOW, 1))),
         activeLeague: TEST_LEAGUE,
         threshold: 0,
-        weightsLoaded: true,
+        weights: null,
       }),
       [],
       NOW,
@@ -199,7 +199,7 @@ describe('toDisplayRows', () => {
 
     const tiny = rawEntry('Tiny');
     const [only] = toDisplayRows(
-      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weightsLoaded: true }),
+      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weights: null }),
       [],
       NOW,
     );

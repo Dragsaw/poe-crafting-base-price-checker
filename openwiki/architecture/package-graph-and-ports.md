@@ -3,9 +3,6 @@ type: architecture
 title: Package graph, ports and purity boundaries
 description: The four-package pnpm workspace (contracts -> core -> sync/web), the functional-core and imperative-shell split with Port interfaces and fakes, and the manifest, dependency-cruiser, ESLint and tsconfig guards that enforce it.
 tags: [architecture, workspace, ports, dependency-cruiser, purity, monorepo]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T12:20:24.418Z
 sources:
   - id: openwiki-source-4847b2bf0de7cf8ae11d4e52
     resource: repo://depcruise.rules.mjs
@@ -28,6 +25,9 @@ sources:
   - id: openwiki-source-98d5ddb014a0fd4d678f6f2a
     resource: repo://tsconfig.json
 generated: { by: "claude-code", at: "2026-09-27T12:20:24.418Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Package graph, ports and purity boundaries

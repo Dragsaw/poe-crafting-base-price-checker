@@ -1,7 +1,7 @@
 ---
 type: workflow
 title: Operator commands and curation workflow
-description: The human-invoked pnpm commands — sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check — what each reads, writes and sends, their exit codes, the POE_SYNC_USER_AGENT requirement, and the lookup-edit-check loop for curating data/tracked.json.
+description: The human-invoked pnpm commands — sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup, tracked:check and dev:stop — what each reads, writes and sends, their exit codes, the POE_SYNC_USER_AGENT requirement, and the lookup-edit-check loop for curating data/tracked.json.
 tags: [workflow, cli, sync, dry-run, fixtures, catalogue, curation]
 sources:
   - id: openwiki-source-92f333db8794b007cec6ef03
@@ -18,10 +18,12 @@ sources:
     resource: repo://packages/sync/src/fixtures-record.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
-generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+  - id: openwiki-source-391c3262b7014fb5ca5796f2
+    resource: repo://tools/dev-stop/dev-stop.ts
+generated: { by: "claude-code", at: "2026-09-27T16:49:38.941Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T13:11:02.100Z
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Operator commands and curation workflow
@@ -36,6 +38,7 @@ The product runs as a set of `pnpm` commands run from the repository root, plus 
 | `pnpm fixtures:record` | yes | `fixtures/*.json` | Re-record the API fixtures |
 | `pnpm tracked:lookup` | no | nothing | Find ids for tracked entries |
 | `pnpm tracked:check` | no | nothing | Validate `data/tracked.json` |
+| `pnpm dev:stop` | no | nothing | Stop this checkout's `pnpm dev` server and free its port |
 
 ## Configuration
 
@@ -79,6 +82,19 @@ The output is a git diff to review. A game patch that renames a stat id shows up
 ## pnpm fixtures:record
 
 `packages/sync/src/fixtures-record.ts` is only for a human to run. It records the leagues endpoint and the four data endpoints, with URLs from `trade/endpoints.ts`. For every non-pruned entry of the fixture workload `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH`) it also records the POST search and its fetch. The workload is a small fixed list with one entry per search shape, not `data/tracked.json`, so the player's list can grow with no new recording. An edit to the workload changes the digests and needs a new recording. The search bodies come from `buildSearchBody`, the same builder the pricing step uses, in the configured league. It sends through the same governed client, reads `data/` and the workload without writing them, and writes `fixtures/`. `stripPersonalIdentifiers` replaces account and character names with a redaction marker and keeps the keys, so the shape survives. The rules for fixtures are in `fixtures/README.md`: never hand-written, one fixture per interaction shape, remove bulk but never structure.
+
+## pnpm dev:stop
+
+`tools/dev-stop/dev-stop.ts` stops the `pnpm dev` server that listens on a port (default 5173, or `--port <n>` / `--port=<n>`). It then checks that the port is free. It exists because a runtime's "stop background task" kills only the PID it started. On Windows, the death of a parent does not reach its children. `pnpm dev` puts Vite five processes below that PID (sh → pnpm → cmd → pnpm → cmd → node), so Vite keeps the port.
+
+The command works from the listener upward:
+
+1. It takes a snapshot of the listener PIDs and the process table. On Windows it uses `Get-NetTCPConnection` and `Win32_Process` through PowerShell, including creation times. On POSIX it uses `lsof` and `ps`. An `lsof` failure other than "no match" is an error. It never reads as a free port.
+2. `planStop` refuses a listener that is not **this checkout's** Vite, which means a command line that contains `vite` and `<repoRoot>/node_modules/`. Another worktree's server and unrelated programs are left running, with exit 1.
+3. From each listener it climbs through parents while each parent is pnpm's script shell for one `vite` command or `pnpm dev` itself. The climb stops at the first `pnpm dev`. It never goes above that process, because the shells and shims above `pnpm dev` (for example `bash -c "pnpm dev & pnpm test"`) can own other work. The climb also stops at the tool's own ancestors and at a PID cycle. On Windows it stops at a parent that started after its child, because Windows reuses the PID of a dead parent.
+4. It kills each root's tree (`taskkill /T /F` on Windows, children first with `SIGTERM` on POSIX). It then polls the listener for up to 5 seconds.
+
+It exits 0 when nothing listens or the port becomes free. It exits 1 on a refusal or when the port is still taken. Run it after stopping a background `pnpm dev`, even when the task already reports stopped (see [Build, typecheck and deploy](../operations/build-typecheck-and-deploy.md)). `tools/dev-stop/dev-stop.test.ts` tests `parsePort`, `ownAncestry` and `planStop` over recorded process chains, and kills nothing.
 
 ## Curating data/tracked.json
 

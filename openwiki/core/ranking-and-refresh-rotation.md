@@ -3,9 +3,6 @@ type: subsystem
 title: "Core: ranking and refresh rotation"
 description: The pure @poe/core package — rank, which groups tracked raw bases into ordering, below-threshold and unranked groups and lists crafted Item Classes as Unrankable for the page, and chunkOrder/pinnedToKeep, which decide which entries a sync chunk visits and in what order.
 tags: [core, ranking, rotation, pure-functions, ev, threshold, unrankable]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T13:11:02.100Z
 sources:
   - id: openwiki-source-004d71a620eb2ebfe8d87ae5
     resource: repo://packages/contracts/src/ranked-row.ts
@@ -14,6 +11,9 @@ sources:
   - id: openwiki-source-04c5c6716d7633c4e68e2d4e
     resource: repo://packages/core/src/rank.ts
 generated: { by: "claude-code", at: "2026-09-27T13:11:02.100Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-09-27T16:49:38.941Z
 ---
 
 # Core: ranking and refresh rotation

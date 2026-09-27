@@ -120,7 +120,7 @@ function inputs(
     },
     'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
     'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/weights.json': { contents: JSON.stringify({ schemaVersion: '6.0.0', bases: {} }) },
+    'data/weights.json': { contents: JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
   };
 }
 
