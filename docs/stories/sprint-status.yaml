@@ -236,7 +236,7 @@ action_items:
       grown when remaining <= 0, unitLabel in the Unrankable appendix with an underscore
       fixture, assert the frame is a flex column (retro F11, F12, F14, F17)"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-2-retro-2026-09-27.md"
   - id: "epic-2-retro-item-24-ux-rulings-pinned-starvation-count-on-th"
     epic: 2
