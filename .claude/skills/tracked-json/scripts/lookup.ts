@@ -286,7 +286,7 @@ export interface ModRow {
   readonly slot: Slot;
   readonly modGroup: string;
   readonly text: string;
-  /** Every distinct `statId` across the group's lines, in first-seen order; `null` kept verbatim. */
+  /** The distinct `statId`s of one tier's lines, in line order; `null` kept verbatim. More than one means a hybrid. */
   readonly statIds: (string | null)[];
   readonly tierCount: number;
   readonly itemLevelMin: { readonly min: number; readonly max: number };
@@ -294,7 +294,7 @@ export interface ModRow {
   readonly tierLabels: unknown[];
 }
 
-/** One row per modGroup of the class and slot (both slots when `slot` is absent). */
+/** One row per mod family (a modGroup and one statId set) of the class and slot (both slots when `slot` is absent). */
 export function lookupMods(
   weights: unknown,
   selector: ClassSelector & { readonly slot?: Slot | undefined },
@@ -302,33 +302,28 @@ export function lookupMods(
   const resolved = resolveClass(weights, selector);
   const mods: ModRow[] = [];
   for (const slot of selector.slot === undefined ? SLOTS : [selector.slot]) {
-    const groups = new Map<string, WeightsEntry[]>();
+    // A modGroup can hold several mod families (one statId set each), so a row is a
+    // modGroup and one statId set: a hybrid is one row, two families are two rows.
+    const families = new Map<string, { modGroup: string; statIds: (string | null)[]; tiers: WeightsEntry[] }>();
     for (const entry of entriesOf(resolved.pools, slot)) {
-      const group = groups.get(entry.modGroup);
-      if (group === undefined) {
-        groups.set(entry.modGroup, [entry]);
+      const statIds = [...new Set(entry.lines.filter(isRecord).map(statIdOf))];
+      const key = JSON.stringify([entry.modGroup, statIds]);
+      const family = families.get(key);
+      if (family === undefined) {
+        families.set(key, { modGroup: entry.modGroup, statIds, tiers: [entry] });
       } else {
-        group.push(entry);
+        family.tiers.push(entry);
       }
     }
-    for (const [modGroup, group] of groups) {
-      const tiers = group.toSorted(byItemLevel);
-      const statIds = new Set<string | null>();
-      for (const entry of tiers) {
-        for (const line of entry.lines) {
-          if (isRecord(line)) {
-            const statId = line['statId'];
-            statIds.add(typeof statId === 'string' ? statId : null);
-          }
-        }
-      }
+    for (const { modGroup, statIds, tiers: unsorted } of families.values()) {
+      const tiers = unsorted.toSorted(byItemLevel);
       const first = tiers[0];
       const last = tiers.at(-1);
       mods.push({
         slot,
         modGroup,
         text: modText(first?.sourceModifierId ?? ''),
-        statIds: [...statIds],
+        statIds,
         tierCount: tiers.length,
         itemLevelMin: { min: first?.itemLevelMin ?? 0, max: last?.itemLevelMin ?? 0 },
         tierLabels: tiers.map((entry) => entry.tierLabel),
@@ -336,6 +331,11 @@ export function lookupMods(
     }
   }
   return { categoryId: resolved.categoryId, className: resolved.className, mods };
+}
+
+function statIdOf(line: Record<string, unknown>): string | null {
+  const statId = line['statId'];
+  return typeof statId === 'string' ? statId : null;
 }
 
 export interface TierRow {

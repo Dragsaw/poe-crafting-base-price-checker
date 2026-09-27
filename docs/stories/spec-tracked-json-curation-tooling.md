@@ -102,6 +102,38 @@ context:
 - Given an agent asked to add a tracked entry, when it loads the skill, then it runs lookup and then check, and does not open `data/catalogue/*.json` or `data/weights.json` directly.
 - Given a player who asks which mods are possible, when the agent follows the skill, then it offers classes, prefixes and suffixes as choices in that order, asks the pairing question when a slot has more than one pick, and edits `data/tracked.json` only after the player confirms the draft.
 
+### Review Findings
+
+Follow-up code review of `8f5b580`, 2026-09-27. The review layers were Blind Hunter, Edge Case Hunter, Verification Gap and Acceptance Auditor.
+
+- [x] [Review][Patch] (medium) `mods` merges the separate mod families of one modGroup into one row. 53 of the 1758 modGroups in the committed weights have tiers with different stat sets, for example Amulets `IncreaseSocketedGemLevel`, which covers Spell, Melee, Minion and Projectile skills. The row shows only the first tier's `text`, mixes the tiers and statIds of all the families, and the skill then reads that row as a hybrid [.claude/skills/tracked-json/scripts/lookup.ts:297]
+- [x] [Review][Patch] (medium) The skill has no path for a `valueless` reference. The weights hold lines with `ranges: []`, which AD-5 and §8 treat as `valueless`, but loop steps 4 and 6 always write a band [.claude/skills/tracked-json/SKILL.md:31]
+- [x] [Review][Patch] Interactive mode offers `mods` rows with a `null` statId, and such a row cannot become an entry. The committed weights hold 17 such lines [.claude/skills/tracked-json/SKILL.md:49]
+- [x] [Review][Patch] The step 3 check of an unknown id uses the substring match of `stat`, so a truncated id looks resolved. For example, `stat_39` matches `stat_3981240776`. The skill must require a match whose `id` is exactly the statId [.claude/skills/tracked-json/SKILL.md:30]
+- [x] [Review][Patch] Step 5 applies §8 to a raw entry. §8 excludes raw entries, and the raw item level is owned by FR-3 (the Raw Base in the glossary) [.claude/skills/tracked-json/SKILL.md:32]
+- [x] [Review][Patch] The skill never says which `status` a new entry gets. `status` is required by `TrackedEntrySchema` [.claude/skills/tracked-json/SKILL.md:28]
+- [x] [Review][Patch] For a hybrid pick, the skill does not say which line of a tier gives the band [.claude/skills/tracked-json/SKILL.md:52]
+- [x] [Review][Patch] The step 9 report does not say that the five cross-file checks did not run [.claude/skills/tracked-json/SKILL.md:36]
+- [x] [Review][Patch] Steps 4 to 6 restate FR-22, §8 and AD-5 text, and the skill's own Rules forbid that [.claude/skills/tracked-json/SKILL.md:31]
+- [x] [Review][Patch] Interactive step 4 does not cover picks in one slot only, 1+0 or 0+1 [.claude/skills/tracked-json/SKILL.md:51]
+- [x] [Review][Patch] No test asserts the `mods` row `text` from the committed weights. Only a fixture pins the `sourceModifierId` layout [.claude/skills/tracked-json/scripts/lookup.test.ts]
+- [x] [Review][Patch] No test covers the `not readable` and `not valid JSON` `LookupError` paths of `readJsonAt` [.claude/skills/tracked-json/scripts/lookup.test.ts]
+- [x] [Review][Defer] Nothing guards the tsconfig, vitest and eslint wiring of the tracked-json scripts [eslint.config.mjs:25] — deferred: the item is in the spec frontmatter but was never appended to `deferred-work.md`
+- [x] [Review][Defer] `modText` parses `sourceModifierId`, and `WEIGHTS-FILE-SCHEMA.md:258` calls that field "Opaque to the app" [.claude/skills/tracked-json/scripts/lookup.ts:279] — deferred: the spec authorizes the parse, so this is a conflict between the spec and the weights contract for the owner of that contract to settle
+- [x] [Review][Defer] `pnpm tracked:lookup` and `pnpm tracked:check` are not named in `AGENT-WORKFLOW.md` or `AGENTS.md` — deferred: the fix edits agent-context files
+
+**Rejected:**
+- `false` — The `acceptedTier` en dash has no owner. `AcceptedTierSchema` is a free label, and nothing validates its spelling (`modifier-ref.ts:29`).
+- `false` — `followup_review_recommended` is not tracked. This review is that follow-up.
+- `low` — The tests pinned to live data break on a data refresh. That failure is loud and costs one line to fix, and the ACs name those values.
+- `low` — `class ""` fails through PowerShell before 7.3. Agents run the commands through Git Bash, and the risk is already recorded under Residual risks.
+- `low` — `class` fails when `filters.json` is absent. The file is committed, and the fix adds a guard.
+- `low` — The CLI no-write spawn covers only `tiers`. No subcommand has a write path, and the fix adds tests.
+- `low` — The renumber instruction in the deferred-work entry does not list the citing steps. The fix rewrites an existing entry, and `deferred-work.md` is append-only.
+- `low` — `tracked:check` writes plain stderr and no JSON when a read fails with an error other than ENOENT. EACCES or EISDIR on a committed file is unlikely, and the fix adds a guard.
+- `low` — For a repeated `--class`, the last value wins without a signal. This is unlikely, and the fix adds a guard.
+- `low` — `tracked:check` refuses an absent `tracked.json` that sync accepts. The file is committed, and a loud failure is acceptable.
+
 ## Design Notes
 
 Commit subjects use scope `curation`, for example `feat(curation): tracked lookup and check scripts`. The commit-msg hook requires a story id only for package scopes, and this work belongs to no story.

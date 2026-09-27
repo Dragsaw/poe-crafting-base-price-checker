@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -100,6 +101,8 @@ function tier(
 const SPIRIT = 'explicit.stat_spirit';
 const EVASION = 'explicit.stat_evasion';
 const LIFE = 'explicit.stat_life';
+const SPELL = 'explicit.stat_spell';
+const MELEE = 'explicit.stat_melee';
 
 const WEIGHTS = {
   schemaVersion: '6.0.0',
@@ -120,6 +123,10 @@ const WEIGHTS = {
           poolCoverage: 'complete',
           entries: [
             tier('suffix', 'SpiritSuffix', 40, 'T1', '+# to Spirit', [{ statId: SPIRIT, ranges: [[5, 6]] }]),
+            // One modGroup, two mod families: two rows, not one hybrid.
+            tier('suffix', 'GemLevel', 41, 'T1', '+# to Level of all Melee Skills', [{ statId: MELEE, ranges: [[2, 2]] }]),
+            tier('suffix', 'GemLevel', 5, 'T2', '+# to Level of all Spell Skills', [{ statId: SPELL, ranges: [[1, 1]] }]),
+            tier('suffix', 'GemLevel', 41, 'T1', '+# to Level of all Spell Skills', [{ statId: SPELL, ranges: [[2, 2]] }]),
           ],
         },
       },
@@ -225,6 +232,20 @@ describe('lookupClass', () => {
     ]);
   });
 
+  it('refuses an unreadable or non-JSON weights file, naming it', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tracked-lookup-'));
+    try {
+      mkdirSync(join(root, WEIGHTS_PATH), { recursive: true });
+      expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(`${WEIGHTS_PATH}: not readable`);
+      rmSync(join(root, WEIGHTS_PATH), { recursive: true });
+      writeFileSync(join(root, WEIGHTS_PATH), '{ not json');
+      expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(LookupError);
+      expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(`${WEIGHTS_PATH}: not valid JSON`);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it('refuses an absent weights file, naming it', () => {
     const read = createJsonReader(join(REPO_ROOT, 'no-such-directory'));
 
@@ -272,6 +293,19 @@ describe('lookupMods', () => {
       ['suffix', 'Thorns'],
     ]);
     expect(found.mods[2]?.statIds).toEqual([null]);
+  });
+
+  it('prints one row per mod family when a modGroup holds several', () => {
+    const found = lookupMods(WEIGHTS, { className: 'Amulets', slot: 'suffix' });
+
+    expect(
+      found.mods
+        .filter((row) => row.modGroup === 'GemLevel')
+        .map((row) => [row.text, row.statIds, row.tierLabels]),
+    ).toEqual([
+      ['+# to Level of all Melee Skills', [MELEE], ['T1']],
+      ['+# to Level of all Spell Skills', [SPELL], ['T2', 'T1']],
+    ]);
   });
 
   it('refuses an unknown class', () => {
@@ -386,6 +420,17 @@ describe('the committed data/', () => {
     const hybrid = found.mods.filter((row) => row.modGroup === 'BaseLocalDefencesAndLife');
     expect(hybrid).toHaveLength(1);
     expect(hybrid[0]?.statIds).toHaveLength(2);
+    // The text comes from the sourceModifierId layout, so pin it on the committed file.
+    expect(hybrid[0]?.text).toBe('#% increased Evasion Rating\n+# to maximum Life');
+    expect(found.mods.filter((row) => row.text.includes('\u0000'))).toEqual([]);
+  });
+
+  it('splits the Amulets gem-level suffix modGroup into its four mod families', () => {
+    const found = lookupMods(read(WEIGHTS_PATH), { className: 'Amulets', slot: 'suffix' });
+    const families = found.mods.filter((row) => row.modGroup === 'IncreaseSocketedGemLevel');
+
+    expect(families.map((row) => row.statIds.length)).toEqual([1, 1, 1, 1]);
+    expect(families.map((row) => row.text)).toContain('+# to Level of all Spell Skills');
   });
 });
 

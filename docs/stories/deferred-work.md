@@ -206,3 +206,15 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
   summary: When `checkTracked` calls the five cross-file checks, remove the "Open weak point" section and the hand-check step 8 of the loop from `.claude/skills/tracked-json/SKILL.md`, and renumber the steps that cite it.
   evidence: The spec's Always list makes the skill state the weak point until Story 3.3. The hand check exists only because `tracked:check` cannot yet see `data/weights.json`.
+
+## Deferred from: code review of spec-tracked-json-curation-tooling.md (2026-09-27)
+
+- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
+  summary: No test checks that `tsconfig.tools.json`, `vitest.config.ts` and `eslint.config.mjs` still cover `.claude/skills/tracked-json/scripts/*.ts`.
+  evidence: If the vitest include line or one negation in the eslint ignore chain (`eslint.config.mjs:25`) is dropped, `lookup.ts` silently loses type, lint or test coverage, and `pnpm check` and `pnpm test` still pass. `tools/boundary-check` has no wiring guard either, so this belongs to a general "every .ts file is covered" guard. The spec frontmatter recorded this item but did not append it here.
+- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
+  summary: `modText` in `.claude/skills/tracked-json/scripts/lookup.ts` gets the mod text by parsing `sourceModifierId`, and `WEIGHTS-FILE-SCHEMA.md` (the `sourceModifierId` row) calls that field "Opaque to the app".
+  evidence: The spec's Always list authorizes the parse. So the spec and the weights contract disagree. The owner of the weights contract decides between two options: allow this curation-only consumer to depend on the layout, or make the producer emit the mod text as its own field. Until that decision, a test over the committed weights detects a change of the layout.
+- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
+  summary: `pnpm tracked:lookup` and `pnpm tracked:check` are named neither in `AGENT-WORKFLOW.md`, which owns command-level rules, nor in the "Where things are" section of `AGENTS.md`.
+  evidence: Only the description of the tracked-json skill makes the tools discoverable. An agent that edits `data/tracked.json` without triggering the skill does not find the check.
