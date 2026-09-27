@@ -6,13 +6,22 @@
 <style>
 /* ===========================================================================
    KEY SCREEN 1 — THE RESTING PAGE, 1060 x 1920, RENDERED 1:1.
-   Mockup rev 5, rendered against DESIGN.md / EXPERIENCE.md REVISION 3.
+   Mockup rev 6, reconciled against DESIGN.md revision 11, EXPERIENCE.md
+   revision 14, memlog 235 (retro item 12 pass, findings HR-1 to HR-18). It was first drawn against revision 3; the
+   numbered list below records what revision 3 changed, and stays as history.
+
+   ITEM CLASS LABELS follow memlog 230: the source className, underscores
+   trimmed, a defence suffix spelled as defence words (`Gloves_dex_int` ->
+   `Gloves (Dex/Int)`), plural kept. Every class printed here exists in
+   data/weights.json, except the two `class absent from weights file` rows,
+   which are real trade categories (flask.charm, map.tablet) that the
+   committed weights file does not carry.
 
    WHAT REVISION 3 CHANGED HERE (memlog 179-186), because this file was two
    PRD revisions stale before it:
 
    1. THE CRAFTED BRANCH RANKS ITEM CLASSES, NOT BASE TYPES (PRD FR-3).
-      A crafted row now reads `Bow`, not `Advanced Dualstring Bow`. The raw
+      A crafted row now reads `Bows`, not `Advanced Dualstring Bow`. The raw
       branch still ranks Base Types. The list is genuinely MIXED-UNIT, and
       every row says which it is.
    2. UNIT GLYPHS. Every row opens with a sepia glyph — the crafted
@@ -28,6 +37,8 @@
       the masthead eyebrow — that line is attribution, and a thing the player
       turns is not. Each recipe prints the ONE WORD that distinguishes its
       composition. No display name is invented; recipes.json declares none.
+      The word is derived from the grade prefix its currency ids share
+      (memlog 233): `greater`, `perfect`, or `regular` when none carries one.
    4. CRAFT COST prints ONCE, on that control. It is a property of the recipe,
       subtracted once per Item Class, identical down every crafted row — so a
       seventh column would repeat one invariant figure twenty times.
@@ -90,7 +101,10 @@
                                      raw-base-row, column-header
      · §Epistemics ................. the Provenance mark is one label per ITEM
                                      CLASS; a Raw Base carries none at all
-     · §State Patterns ............. 11, 12, 12a, 14, 15, 16, 17, 18, 30, 31
+     · §State Patterns ............. 11, 12, 17, 30, 31 on the page; 13-16
+                                     in the appendix; 18 in the key block
+                                     only (memlog 232: a crafted row with a
+                                     figure cannot read never attempted)
      · §Key Flows .................. UJ-1, UJ-4 — both read off this screen
 
    NOT governed by .working/direction-fieldguide-v2.html.
@@ -175,9 +189,10 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 .thr .v small { font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
                 font-size: 13px; font-weight: 400; line-height: 1.2; color: #55503F; }
 .thr .track { position: relative; margin-top: 10px; height: 4px; background: #E0DAC6; }
-.thr .track i { position: absolute; left: 0; top: 0; height: 4px; width: 16.667%;
+/* 0.25 of a 0-3 track = 8.333%: the cold-start default (HR-4). */
+.thr .track i { position: absolute; left: 0; top: 0; height: 4px; width: 8.333%;
                 background: #6B4A22; }
-.thr .track b { position: absolute; left: 16.667%; top: -5px; margin-left: -5px;
+.thr .track b { position: absolute; left: 8.333%; top: -5px; margin-left: -5px;
                 width: 11px; height: 14px; background: #211E17; }
 .thr .rng { display: flex; justify-content: space-between; margin-top: 7px;
             font-family: -apple-system,"Segoe UI",system-ui,"Helvetica Neue",sans-serif;
@@ -264,6 +279,8 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 .tier1 .bs, .tier1 .ev { font-weight: 700; }
 .tier1 .rk { color: #6B4A22; font-weight: 700; }
 .tier1 .cb span { color: #3E3A2C; }
+/* Spine gap (HR-18) — see deferred-work.md [NOTE FOR UX]; do not lift this
+   copy/style as specified. Tier 2 and tier 3 differ by rank colour alone. */
 .tier2 .rk { color: #55503F; }
 .tier3 .rk { color: #8B8470; }
 
@@ -277,17 +294,19 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 
 /* ---- trust marks: colour + weight + glyph + word. FIVE, and no sixth. ----
    `split by model` / the slate ink retired with Provenance modelled-split at
-   weights contract 5.0.0. Two semantic inks: ochre and rust. */
+   weights contract 5.0.0. Two semantic inks: ochre and rust.
+   A trust mark is glyph, HAIR SPACE (U+200A), word, and the glyph takes the
+   type size of the line it sits in: no per-glyph font-size (HR-5). */
 .m-prior { color: #8A5A12; font-weight: 600; }
-.m-prior::before { content: "\25CA\00a0"; font-size: 9px; }
+.m-prior::before { content: "\25CA\200A"; }
 .m-unknown { color: #8A5A12; font-weight: 600; }
-.m-unknown::before { content: "?\00a0"; }
+.m-unknown::before { content: "?\200A"; }
 .m-stale { color: #8E3B1E; font-weight: 700; }
-.m-stale::before { content: "\00BB\00a0"; }
+.m-stale::before { content: "\00BB\200A"; }
 .m-never { color: #8E3B1E; font-weight: 700; font-style: italic; }
-.m-never::before { content: "\00BB\00a0"; font-style: normal; }
+.m-never::before { content: "\00BB\200A"; font-style: normal; }
 .m-unres { color: #8E3B1E; font-weight: 700; }
-.m-unres::before { content: "\00D7\00a0"; font-size: 9px; }
+.m-unres::before { content: "\00D7\200A"; }
 
 /* ---- list expand affordance ----------------------------------------------
    It names NO unit: the remainder holds Item Classes and Base Types together,
@@ -366,8 +385,9 @@ body { margin: 0; background: #E8E3D4; color: #211E17;
 <body>
 
 <p class="caption"><b>Key screen 1 — the resting page.</b> 1060 &times; 1920, rendered 1:1,
-against spines <b>revision 3</b>. The default state: nothing clicked, nothing opened, no banner
-raised. The list is <b>mixed-unit</b> — a crafted row names an Item Class, a raw row names a Base
+reconciled against <b>DESIGN.md revision 11, EXPERIENCE.md revision 14, memlog 235</b>. The
+default state: nothing clicked, nothing opened, no banner raised, the Payout Threshold at its
+cold-start <b>0.25</b> Divine. The list is <b>mixed-unit</b> — a crafted row names an Item Class, a raw row names a Base
 Type — and every row says which by its glyph.</p>
 
 <div class="frame">
@@ -377,7 +397,13 @@ Type — and every row says which by its glyph.</p>
     <div class="controls">
 
       <!-- craft recipe: the second ranking dial. The active word is not a
-           click target — there is nothing to switch to. -->
+           click target — there is nothing to switch to. The option words are
+           derived from the grade prefix the recipe's currency ids share
+           (memlog 233). -->
+      <!-- Epic 3 (Story 3.4): the Craft Recipe control and its Craft Cost line. Not built
+           in Epic 2, which renders an empty inboard slot here (Masthead.tsx) because the
+           committed recipes.json holds no recipe. Do not reconcile the code to this, and
+           do not read it as drift. -->
       <div class="panel rec">
         <div class="k">Craft Recipe</div>
         <div class="opts"><span class="off">greater</span><span class="sep">|</span><span class="on">perfect</span></div>
@@ -386,7 +412,7 @@ Type — and every row says which by its glyph.</p>
 
       <div class="panel thr">
         <div class="k">Payout Threshold</div>
-        <div class="v"><u>0.50</u><small>&nbsp;Divine</small></div>
+        <div class="v"><u>0.25</u><small>&nbsp;Divine</small></div>
         <div class="track"><i></i><b></b></div>
         <div class="rng"><span>0 Divine</span><span>3 Divine</span></div>
       </div>
@@ -397,6 +423,8 @@ Type — and every row says which by its glyph.</p>
          revision 3: that line is attribution, and a thing the player turns
          is not attribution. -->
     <div class="eyebrow">League Forbidden Rites</div>
+    <!-- Spine gap (HR-16) — see deferred-work.md [NOTE FOR UX]; do not lift this
+         copy/style as specified. The title string has no verbatim owner. -->
     <h1>What is worth picking up</h1>
     <!-- This dek is the full-product wording, which is true once Epic 3 ranks crafted rows.
          Until then the page prints the Epic 2 dek that EXPERIENCE.md owns (retro item 19,
@@ -418,6 +446,8 @@ Type — and every row says which by its glyph.</p>
   </div>
 
   <!-- ================= asking-price line (FR-13) ========================= -->
+  <!-- Spine gap (HR-16) — see deferred-work.md [NOTE FOR UX]; do not lift this
+       copy/style as specified. EXPERIENCE.md quotes the first sentence only. -->
   <div class="asking">Every price here is a current asking price from a live instant-buyout
     listing. Nothing on this page is an observed sale.</div>
 
@@ -432,77 +462,118 @@ Type — and every row says which by its glyph.</p>
   </div>
 
   <!-- ================= twenty ranked rows ================================
-       Fourteen are silent. Six carry a mark. That ratio is the whole design.
+       Sixteen are silent. Four carry a mark. That ratio is the whole design.
        Crafted rows name an ITEM CLASS and never prefix it with the word
-       `class`: `Bow`, not `Bow class`. Raw rows name a Base Type.
+       `class`: `Bows`, not `Bows class`. Raw rows name a Base Type.
+       Class labels follow memlog 230 (source name, underscores trimmed,
+       defence suffix as defence words); `Body Armours (Str/Dex/Int)` at rank
+       13 is the longest label, to be measured against the 214px unit cell.
        Every Combination is tier + short form, inside 27 characters.     -->
+  <!-- Epic 3 (Stories 3.4, 3.5, 3.6): the crafted rows — class EV, chase cells and
+       Provenance marks. Not built in Epic 2 (RankedRowSchema has the raw arm only). The
+       Raw Base rows (4, 10, 16) are Epic 2 and built. Do not reconcile the code to this,
+       and do not read it as drift. -->
+  <!-- The chase-cell short forms are ILLUSTRATIVE until coined in the web short-form
+       table (memlog 231: a product constant in web, keyed by statId, Story 3.5). Do not
+       lift them as coined. -->
+  <!-- Age cells follow memlog 232: a crafted row prints `priced Nd ago` from the oldest
+       priced entry its EV rests on, and only at 48h or beyond. `tried Nd ago` (nothing
+       priced) and `never attempted` (every entry never-synced) cannot appear on a row
+       that carries a figure and chase cells, so no top-20 crafted row shows them here;
+       the key block keeps both marks in its legend. -->
 
-  <div class="r tier1"><div class="rk">1</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Amulet</span></div><div class="ev">2.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Spell Skills &middot; T1 Life</span><span>T1 Spirit &middot; T3 Cast Spd</span><span>T1 Spirit &middot; T1 Life</span></div></div>
+  <div class="r tier1"><div class="rk">1</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Amulets</span></div><div class="ev">2.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Spell Skills &middot; T1 Life</span><span>T1 Spirit &middot; T3 Cast Spd</span><span>T1 Spirit &middot; T1 Life</span></div></div>
 
-  <div class="r tier1"><div class="rk">2</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Ring</span></div><div class="ev">1.86</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Cold Res &middot; T1 Mana</span><span>T1 Cold Res &middot; T2 Life</span><span>T2 Crit Dmg &middot; T1 Mana</span></div></div>
+  <div class="r tier1"><div class="rk">2</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Rings</span></div><div class="ev">1.86</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Cold Res &middot; T1 Mana</span><span>T1 Cold Res &middot; T2 Life</span><span>T3 ES &middot; T1 Mana</span></div></div>
 
-  <div class="r tier1"><div class="rk">3</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Wand</span></div><div class="ev">1.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Chaos Skills &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 Cast Spd &middot; T1 Mana</span></div></div>
+  <div class="r tier1"><div class="rk">3</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Wands</span></div><div class="ev">1.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Chaos Skills &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 Cast Spd &middot; T1 Mana</span></div></div>
 
   <!-- A Raw Base can hold a top-band rank. The tier is a function of RANK,
        never of branch. Its Provenance cell is empty: no Eligible Pool. -->
   <div class="r tier1 raw"><div class="rk">4</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Stellar Amulet</span></div><div class="ev">1.27</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; valued at its own current asking price, not at a craft outcome</span></div></div>
 
-  <div class="r tier1"><div class="rk">5</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Belt</span></div><div class="ev">1.10</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Life &middot; T1 Fire Res</span><span>T2 Life &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Fire Res</span></div></div>
+  <div class="r tier1"><div class="rk">5</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Belts</span></div><div class="ev">1.10</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Life &middot; T1 Fire Res</span><span>T2 Life &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Fire Res</span></div></div>
 
-  <div class="r tier2"><div class="rk">6</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Sceptre</span></div><div class="ev">0.94</div><div class="pv"></div><div class="ag"><span class="m-stale">priced 5d ago</span></div><div class="cb"><span>T3 Spirit &middot; T2 Chaos Res</span><span>T3 Spirit &middot; T1 Fire Res</span><span></span></div></div>
+  <!-- memlog 232: the oldest priced entry behind this EV is 5 days old. -->
+  <div class="r tier2"><div class="rk">6</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Sceptres</span></div><div class="ev">0.94</div><div class="pv"></div><div class="ag"><span class="m-stale">priced 5d ago</span></div><div class="cb"><span>T3 Spirit &middot; T2 Chaos Res</span><span>T3 Spirit &middot; T1 Fire Res</span><span></span></div></div>
 
-  <div class="r tier2"><div class="rk">7</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Bow</span></div><div class="ev">0.87</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Bow Skills &middot; T1 Life</span><span>T2 Phys Dmg &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier2"><div class="rk">7</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Bows</span></div><div class="ev">0.87</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Bow Skills &middot; T1 Life</span><span>T2 Phys Dmg &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier2"><div class="rk">8</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Quarterstaff</span></div><div class="ev">0.80</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Atk Spd</span><span>T2 Crit Chance &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier2"><div class="rk">8</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Quarterstaves</span></div><div class="ev">0.80</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Atk Spd</span><span>T2 Crit Chance &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier2"><div class="rk">9</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Focus</span></div><div class="ev">0.74</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 ES &middot; T2 Chaos Res</span></div></div>
+  <div class="r tier2"><div class="rk">9</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Foci</span></div><div class="ev">0.74</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T1 Mana</span><span>T1 Spell Dmg &middot; T1 Mana</span><span>T1 ES &middot; T2 Chaos Res</span></div></div>
 
   <div class="r tier2 raw"><div class="rk">10</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Sapphire Ring</span></div><div class="ev">0.69</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; valued at its own current asking price, not at a craft outcome</span></div></div>
 
-  <div class="r tier3"><div class="rk">11</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Gloves</span></div><div class="ev">0.65</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Life &middot; T1 Atk Spd</span><span>T1 Life &middot; T1 Accuracy</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">11</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Gloves (Dex/Int)</span></div><div class="ev">0.65</div><div class="pv"><span class="m-prior">prior only</span></div><div class="ag"></div><div class="cb"><span>T1 Life &middot; T1 Atk Spd</span><span>T1 Life &middot; T1 Accuracy</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">12</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Crossbow</span></div><div class="ev">0.60</div><div class="pv"></div><div class="ag"><span class="m-stale">tried 9d ago</span></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Life</span><span></span><span></span></div></div>
+  <!-- memlog 232: priced, not tried. This row carries a figure, so an entry is priced;
+       its oldest EV input is 9 days old. -->
+  <div class="r tier3"><div class="rk">12</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Two Hand Maces</span></div><div class="ev">0.60</div><div class="pv"></div><div class="ag"><span class="m-stale">priced 9d ago</span></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Life</span><span></span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">13</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Body Armour</span></div><div class="ev">0.54</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 ES &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">13</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Body Armours (Str/Dex/Int)</span></div><div class="ev">0.54</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 ES &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">14</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Boots</span></div><div class="ev">0.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Move Spd &middot; T2 Life</span><span>T1 Move Spd &middot; T1 Mana</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">14</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Boots (Dex)</span></div><div class="ev">0.51</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Move Spd &middot; T2 Life</span><span>T1 Move Spd &middot; T1 Mana</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">15</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Quiver</span></div><div class="ev">0.49</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Phys Dmg &middot; T1 Atk Spd</span><span>T1 Crit Dmg &middot; T1 Life</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">15</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Quivers</span></div><div class="ev">0.49</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Phys Dmg &middot; T1 Atk Spd</span><span>T1 Crit Dmg &middot; T1 Life</span><span></span></div></div>
 
-  <div class="r tier3 raw"><div class="rk">16</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Emerald Ring</span></div><div class="ev">0.46</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; valued at its own current asking price, not at a craft outcome</span></div></div>
+  <!-- A Crossbows Base Type ranks raw while the Crossbows Item Class sits in the
+       appendix (state 16). -->
+  <div class="r tier3 raw"><div class="rk">16</div><div class="bs"><span class="g">&#9642;</span><span class="nm">Bombard Crossbow</span></div><div class="ev">0.46</div><div class="pv"></div><div class="ag"></div><div class="cb"><span class="rawnote">uncrafted at Item Level 82 &mdash; valued at its own current asking price, not at a craft outcome</span></div></div>
 
-  <div class="r tier3"><div class="rk">17</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Helmet</span></div><div class="ev">0.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Cold Res</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">17</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Helmets (Int)</span></div><div class="ev">0.42</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 ES &middot; T2 Chaos Res</span><span>T1 Life &middot; T1 Cold Res</span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">18</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Spear</span></div><div class="ev">0.39</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Atk Spd</span><span></span><span></span></div></div>
+  <div class="r tier3"><div class="rk">18</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Spears</span></div><div class="ev">0.39</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 Phys Dmg &middot; T1 Atk Spd</span><span></span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">19</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Shield</span></div><div class="ev">0.36</div><div class="pv"></div><div class="ag"><span class="m-never">never attempted</span></div><div class="cb"><span>T2 ES &middot; T1 Cold Res</span><span></span><span></span></div></div>
+  <!-- memlog 232: the Age cell is empty. The row carries a figure and a chase cell, so
+       its EV rests on priced entries younger than 48h; any never-synced sibling shows
+       in the expansion only. -->
+  <div class="r tier3"><div class="rk">19</div><div class="bs"><span class="g">&#8801;</span><span class="nm">Shields (Str/Int)</span></div><div class="ev">0.36</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T2 ES &middot; T1 Cold Res</span><span></span><span></span></div></div>
 
-  <div class="r tier3"><div class="rk">20</div><div class="bs"><span class="g">&#8801;</span><span class="nm">One Hand Mace</span></div><div class="ev">0.34</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Phys Dmg &middot; T2 Life</span><span>T1 Atk Spd &middot; T1 Mana</span><span></span></div></div>
+  <div class="r tier3"><div class="rk">20</div><div class="bs"><span class="g">&#8801;</span><span class="nm">One Hand Maces</span></div><div class="ev">0.34</div><div class="pv"></div><div class="ag"></div><div class="cb"><span>T1 Phys Dmg &middot; T2 Life</span><span>T1 Atk Spd &middot; T1 Mana</span><span></span></div></div>
 
   <div class="expand">+&nbsp;Read the remaining 24 rows</div>
 
   <!-- ================= unrankable appendix ===============================
-       Every row is an ITEM CLASS. The `Ring` row shows the FR-4 case where a
-       class is Unrankable while Base Types belonging to it still rank on the
-       raw branch — and the note names THAT FACT, not a rank, because a class
-       holds several Base Types and they do not rank together.          -->
+       Every row is an ITEM CLASS. The `Crossbows` row shows the FR-4 case where
+       a class is Unrankable while Base Types belonging to it still rank on the
+       raw branch (Bombard Crossbow, rank 16) — and the note names THAT FACT,
+       not a rank, because a class holds several Base Types and they do not
+       rank together. The `pool partial` classes are the ones data/weights.json
+       really marks partial (Crossbows suffix; Diamond, Ruby, Time-Lost Diamond).
+       `Charms` and `Tablets` are real trade categories the weights file does
+       not carry.                                                        -->
+  <!-- Epic 3 (Story 3.6): the populated appendix — `pool partial` rows, their notes and
+       the full count. Not built in Epic 2, which shows state 37 (`Appendix: Unrankable —
+       0 Item Classes`) with the committed data. Do not reconcile the code to this, and do
+       not read it as drift. -->
   <div class="unr">
-    <h2>Appendix: Unrankable &mdash; <em>7 Item Classes</em></h2>
+    <h2>Appendix: Unrankable &mdash; <em>6 Item Classes</em></h2>
+    <!-- Spine gap (HR-15) — see deferred-work.md [NOTE FOR UX]; do not lift this
+         copy/style as specified. No owner holds the lead verbatim. -->
     <p>Tracked, but kept out of the ordering. A probability taken from a partial pool is an upper
       bound and not an estimate, so it prints as <span class="m-unknown"
       style="font-family:inherit">unknown</span> and never as a number.</p>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Sceptre</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">prefix pool has no entry for one tracked stat</div></div>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Buckler</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">suffix pool has no entry for one tracked stat</div></div>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Flail</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un"></div></div>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Two Hand Mace</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un"></div></div>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Trap</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un">freshly scraped; may return next weights run</div></div>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Staff</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un"></div></div>
-    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Rune Dagger</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">some of its Base Types rank on the raw branch</div></div>
+    <!-- Spine gap (HR-13) — see deferred-work.md [NOTE FOR UX]; do not lift this
+         copy/style as specified. No published field relates a Base Type to its
+         Item Class, so the state 16 note has no source. -->
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Crossbows</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">some of its Base Types rank on the raw branch</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Diamond</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">suffix pool has no entry for one tracked stat</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Ruby</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un">prefix pool has no entry for one tracked stat</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Time-Lost Diamond</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">pool partial</div><div class="un"></div></div>
+    <!-- Spine gap (HR-14) — see deferred-work.md [NOTE FOR UX]; do not lift this
+         copy/style as specified. The `unknown` mark on a `class absent from weights
+         file` row has no accurate gloss: there is no pool to be partial. -->
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Charms</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un">freshly scraped; may return next weights run</div></div>
+    <div class="ur"><div class="ub"><span class="g">&#8801;</span><span class="nm">Tablets</span></div><div class="uu"><span class="m-unknown">unknown</span></div><div class="us">class absent from weights file</div><div class="un"></div></div>
   </div>
 
   <!-- ================= key block =========================================
        Provenance marks are TWO, not three: modelled-split withdrew at
        weights contract 5.0.0. The unit glyphs take no entry here.      -->
+  <!-- Spine gap (HR-16) — see deferred-work.md [NOTE FOR UX]; do not lift this
+       copy/style as specified. The key-block bodies have no verbatim owner. The
+       `unknown` gloss covers a partial pool only (HR-14, same note). -->
   <div class="key">
     <div class="kcol"><span class="kt">Silence means healthy</span>
       An empty Provenance cell and an empty Age cell mean the same thing every time: nothing here
@@ -518,6 +589,9 @@ Type — and every row says which by its glyph.</p>
   </div>
 
   <!-- ================= running foot ====================================== -->
+  <!-- Spine gap (HR-16) — see deferred-work.md [NOTE FOR UX]; do not lift this
+       copy/style as specified. The foot copy and its data/tracked.json emphasis
+       have no verbatim owner. -->
   <div class="foot">Read-only while you play. Every row&rsquo;s exact age and every tracked
     Combination sit one click down, in the expansion. Pruning and pinning happen in
     <b>data/tracked.json</b>, then a commit; the next sync run reflects the edit.</div>
@@ -554,6 +628,8 @@ Type — and every row says which by its glyph.</p>
     it costs <b>frame-reserve-health-line</b> (21px) against the resting budget.</p>
 
   <h3>Specimen &mdash; the Craft Recipe control, both states</h3>
+  <!-- Epic 3 (Story 3.4): both Craft Recipe specimens. Not built in Epic 2. Do not
+       reconcile the code to this, and do not read it as drift. -->
 
   <div class="spec" style="padding-top:18px; padding-bottom:18px;">
     <div style="display:flex; gap:16px;">
@@ -565,7 +641,9 @@ Type — and every row says which by its glyph.</p>
       <div class="panel rec">
         <div class="k">Craft Recipe</div>
         <div class="opts"><span class="off">greater</span><span class="sep">|</span><span class="on">perfect</span></div>
-        <div class="cost" style="font-style:italic; color:#211E17;">no figure yet</div>
+        <!-- The uncostable phrase is a money slot: typography.money-phrase, 10.5px
+             sans italic ink (HR-6), not the cost line's 9.5px. -->
+        <div class="cost" style="font-size:10.5px; font-style:italic; color:#211E17;">no figure yet</div>
       </div>
     </div>
   </div>
@@ -573,8 +651,9 @@ Type — and every row says which by its glyph.</p>
   <p class="gloss"><b>Left: <code>greater</code> active.</b> The word is the control &mdash; no
     select, no segmented control, no pill, no chevron, the same argument that made the threshold
     figure its own input. The active word is <b>ink at 700 on a solid sepia rule</b>; the inactive
-    word is tertiary and is the only click target, because there is nothing to switch to on the
-    active one. Switching <b>reorders the list and rewrites every crafted row's Chase
+    word is <b>ink-secondary</b> (memlog 191), carries the dotted sepia rule at rest, and is the
+    only click target, because there is nothing to switch to on the active one. Each word is
+    derived from the grade prefix the recipe's currency ids share (memlog 233). Switching <b>reorders the list and rewrites every crafted row's Chase
     Combinations</b>, since a recipe changes which outcomes are <i>reachable</i> and not only what
     an attempt costs (FR-26). It is not debounced: a click is one deliberate act.</p>
 
@@ -583,10 +662,9 @@ Type — and every row says which by its glyph.</p>
     so the cost line holds the money-slot phrase <b>no figure yet</b>. A zero here would be the
     worst lie the money slot exists to prevent &mdash; it would not look missing, it would look
     <i>free</i>, and it would inflate every EV on the page by the cost of the craft.
-    <b>What the crafted rows do in that state is deliberately unspecified</b> and must not be
-    invented from this render: an EV needs a Craft Cost, and whether those rows carry a money
-    phrase, leave the ordering, or move to the appendix is a question about the <i>ranking</i>,
-    which is <code>core</code>'s and which the PRD does not answer.</p>
+    <b>What the crafted rows do in that state is ruled by EXPERIENCE.md state 35</b> (memlog 205;
+    PRD revision 19 carries the player-visible half). This render does not draw it; read the
+    state, not this specimen.</p>
 
   <p class="gloss"><b>Contracts verified on this render.</b> Frame:
     1060 &minus; (2 &times; 24) = <b>1012</b> = content-width, with the edge as a 1px
@@ -597,7 +675,9 @@ Type — and every row says which by its glyph.</p>
     <b>480</b> = dek-max-width. Chase budget: 164 &minus; 10 = 154px, about <b>27 characters</b>;
     the longest Combination here is <code>T2 Crit Chance &middot; T1 Life</code> at 26.
     <b>No column contract moved at revision 3</b> &mdash; the unit glyph is paid for out of the
-    retired <code>RAW BASE</code> tag, and the second control panel out of dek-max-width.</p>
+    retired <code>RAW BASE</code> tag, and the second control panel out of dek-max-width.
+    The longest unit label, <code>Body Armours (Str/Dex/Int)</code> at 700 (memlog 230), is still
+    to be measured against the 214px unit cell.</p>
 
   <p class="gloss"><b>The unit glyphs.</b> <span style="color:#6B4A22">&#8801;</span> an Item
     Class, <span style="color:#6B4A22">&#9642;</span> a Base Type. They are in

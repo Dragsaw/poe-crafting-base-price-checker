@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 10
+revision: 11
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -352,8 +352,6 @@ spacing:
   col-combination-note: '560px'
   col-combination-age-observed: '200px'
   col-combination-age-attempted: '206px'
-  # a tombstone's line two: the two age cells are replaced by one date cell
-  col-tombstone-removed: '406px'
   pad-combination-cell-right: '12px'
   # row metrics — exact
   row-height: '28px'
@@ -573,7 +571,7 @@ components:
     cursor: 'pointer on an inactive option only. The active option is not a click target — there is nothing to switch to.'
     # WHAT THE OPTIONS SAY. This resolves the open item memlog 107 recorded.
     optionText: 'each recipe reads as the ONE WORD that distinguishes its composition — `greater` and `perfect` — never as an invented display name and never as the full composition. v1''s two recipes are one greater transmute + one greater augment and one perfect transmute + one perfect augment (PRD FR-26), so the orb grade is the whole difference and the whole word.'
-    optionTextLimit: 'this rule holds while every recipe in `recipes.json` reduces to a distinct single word. A recipe that does not is a copy decision nobody has taken, and it must NOT be resolved by inventing a name — `recipes.json` declares no display string, which is the fact memlog 107 recorded and revision 3 did not change.'
+    optionTextSource: 'the word is the grade prefix shared by the recipe''s currency ids. No grade prefix reads `regular`. Mixed grades, or two recipes that derive the same word, make the recipe set invalid, and it takes the existing refusal treatment [decision — memlog 233]. It is never an invented name — `recipes.json` declares no display string, which is the fact memlog 107 recorded.'
     optionTextWhyNotComposition: 'the full composition ran in the masthead eyebrow at revision 2, when there was one recipe and it was attribution. Printing two full compositions side by side is ~60 characters in a 216px panel, and the words they share carry none of the choice.'
     costFigure: '{typography.recipe-cost-figure} in {colors.ink}, tabular-nums — the figure alone'
     cost: '{typography.recipe-cost}'
@@ -641,14 +639,14 @@ components:
     overflowY: 'auto'
     columnHeading: '{typography.key-heading}'
     columnHeadingColor: '{colors.ink-tertiary}'
-    columnHeadingRule: 'ONE heading per column, never per group. A column that holds two groups prints its heading once. It separates the two groups by {spacing.2} of vertical space. No second heading, no rule, no bullet.'
+    columnHeadingRule: 'ONE heading per column, never per group. A column that holds more than one group prints its heading once. It separates its groups by {spacing.2} of vertical space. No second heading, no rule, no bullet.'
     body: '{typography.key-body}'
     bodyColor: '{colors.ink-secondary}'
     figureColor: '{colors.ink}'
     figureFeature: 'tabular-nums'
-    columns: '3 equal, matching {components.key-block}, carrying five figure groups'
+    columns: '3 equal, matching {components.key-block}, carrying six groups: five figure groups and the cross-file diagnosis [decision — memlog 206]'
     column1: 'THE SYNC RUN — requests per source · entries not reached in the last sync pass'
-    column2: 'WHAT IS BROKEN — unresolvable count · pinned-starvation records'
+    column2: 'WHAT IS BROKEN — unresolvable count · pinned-starvation records · the cross-file diagnosis, in {typography.stack-mono.fontFamily} [decision — memlog 206, 208]'
     column3: 'WHAT THE WEIGHTS COVER — pool coverage, as a fraction with its denominator. The tracked-list edit date is NOT repeated here. It is a resting fact on the strip two lines above.'
     column3Missing: 'weights.json loaded but sync-report.json carries no coverage figure: *not measured*. weights.json absent: *unknown*. Both in the missing-figure italic sans, no mark, never `0` [decision — memlog 212].'
   asking-price-line:
@@ -755,8 +753,7 @@ components:
     toggleGlyphWhy: 'was ▸ / ▾ until revision 3 [decision — memlog 196]. Both fall out of Segoe UI into Segoe UI Symbol, and this document already says the expand affordance is one vocabulary everywhere it appears. Unifying on + / − fixes the fallback and the inconsistency in one move: every openable thing on the page now opens with the same sign.'
     lastRowRule: 'none'
     rowShape: 'the two-line {components.combination-row}, with line two re-cut'
-    line2Columns: 'prune reason {spacing.col-combination-note} · removal date {spacing.col-tombstone-removed}'
-    removalDateCopy: 'removed YYYY-MM-DD — a calendar date, never a clock reading'
+    line2Columns: 'prune reason alone, one cell across the full line-two width (966px, the same sum). It never borrows the two age cells, and it carries no removal date [decision — memlog 234].'
   expand-affordance:
     typography: '{typography.expand-affordance}'
     color: '{colors.sepia}'
@@ -794,7 +791,8 @@ components:
     paddingTop: '{spacing.gutter}'
     eyebrow: '{typography.eyebrow} in {colors.rust}, reading "THE PAGE COULD NOT LOAD ITS DATA"'
     title: '{typography.masthead-title}'
-    titleText: 'One of the eight files did not arrive.'
+    titleText: 'A required file did not arrive.'
+    titleRule: 'names no count. AD-24 owns which artifacts the page fetches, so the title stays true whatever that set is. The body names the file [decision — memlog 229].'
     body: '{typography.failure-body}'
     bodyColor: '{colors.ink-secondary}'
     bodyMaxWidth: '{spacing.dek-max-width}'
@@ -887,14 +885,16 @@ affordance, both unit glyphs. Ochre and rust carry the second, and nothing else
 may.
 
 *This is what stops the next component reaching for it.* Two live `[NOTE FOR UX]`
-items wanted a colour — the `pinned` Curation Status and the curation fallback —
+items wanted a colour — the `pinned` Curation Status and the fallback —
 and memlog 173 refused them the retired slate on the ground that neither says
 anything about the figure. Sepia is not a semantic ink, so that refusal did not
 reach it, and after the active recipe's rule sepia was the obvious next home for
 both. It is now closed to them on a stated test rather than by precedent:
 `pinned` is a **Curation Status**, a fact about the Tracked List that the player
-did not choose on this page, and the fallback is a **curation gap**. Neither is
-an operator choice. Both wanted a non-colour cue, and both have since taken one —
+did not choose on this page, and the fallback is a **gap** — a curation gap when
+the Accepted Tier is missing, a product gap when the short form is missing
+`[decision — memlog 231]`. Neither is an operator choice. Both wanted a
+non-colour cue, and both have since taken one —
 `pinned` a mark, the fallback the mono verbatim register (Typography).
 
 **`pinned` has since taken one and is closed** `[decision — memlog 199]`. It is
@@ -903,8 +903,8 @@ an operator choice. Both wanted a non-colour cue, and both have since taken one 
 `{components.combination-row}`. The double refusal above is what made it
 findable rather than pretty: denied both registers, the mark had to earn its
 legibility from position and weight, which is the right answer here anyway
-because the mark's job is to be *found*. **The curation fallback is still
-open** and is a different problem — see Components.
+because the mark's job is to be *found*. **The fallback is also closed** `[decision — memlog 208]`, as a different
+problem: it takes the mono verbatim register — see Components.
 
 *The unit glyphs are the load-bearing case of the sepia-means-nothing rule*
 `[decision — memlog 184]`. `{components.unit-glyph-class}` `≡` and `{components.unit-glyph-raw}` `▪`
@@ -912,7 +912,7 @@ say which of the two ranked units a row names (PRD FR-3). They are in the sepia
 register and **not** in the semantic one, because a unit is not a state: knowing
 that a row is an Item Class tells you nothing about whether its figure is sound.
 Letting them reach for ochre or rust would be the same mistake memlog 173
-refused for `pinned` and for the curation fallback, and it would cost more —
+refused for `pinned` and for the fallback, and it would cost more —
 these two glyphs appear on **every** row, so an ink admitted here would be an ink
 on twenty rows in twenty, which is the end of silence-means-healthy.
 
@@ -944,11 +944,12 @@ nerve.
 
 **The freed slot is not reserved, and that is a decision** `[decision — memlog
 173]`. Two live `[NOTE FOR UX]` items were blocked on wanting a colour — the
-`pinned` Curation Status, and the curation fallback for a modifier with no short
+`pinned` Curation Status, and the fallback for a modifier with no short
 form or no declared Accepted Tier. Neither may have the slate. A semantic ink on
 this page means **something is wrong with what a figure rests on**: ochre says
 the weight is degraded, rust says the data is broken or old. `pinned` is a
-curation *status* and the fallback is a curation *gap*; neither says anything
+curation *status* and the fallback is a *gap* (curation or product, memlog
+231); neither says anything
 about the figure, and admitting either would make the ink family mean "notice
 this", which is the meaning a page with twenty rows cannot afford. Both notes
 should reach for a non-colour cue instead — a weight, an italic, a glyph, a rule
@@ -963,7 +964,7 @@ adopted, a middle Provenance value returns in that same change (AD-10's revisit
 condition) and takes a fresh decision with it.
 
 *The refusal did its job on both* `[decision — memlog 199, 208]`. `pinned` took a
-non-colour cue and closed — `{components.curation-status-pinned}`. The curation
+non-colour cue and closed — `{components.curation-status-pinned}`. The
 fallback has since taken one too: the **mono verbatim register** (Typography),
 which it shares with the cross-file diagnosis because the two were one question.
 Neither note came back for a colour, and the ink family gained no member from
@@ -1000,7 +1001,7 @@ without reading either, and a unit marker is a note about a name.
 this text** `[decision — memlog 208]`. **Mono —
 `{typography.stack-mono.fontFamily}`.** It sets text quoted verbatim out of a
 file, and nothing else. Two surfaces use it and no third may without a decision:
-the **curation fallback** (Components), where a modifier with no short form or
+the **fallback** (Components), where a modifier with no short form or
 no declared Accepted Tier falls back to the Trade Catalogue's own stat name plus
 the value band; and the **cross-file diagnosis** inside
 `{components.sync-report-panel}` (`EXPERIENCE.md`, *Two registers in one
@@ -1242,12 +1243,17 @@ open-row marker already uses to bleed into the frame gutter. It was not applied
 because it changes visual alignment in a way that has to be *seen* to be judged,
 and no browser was available in the session that raised it.
 
-*Item Class names are shorter than Base Type names, and that is not load-bearing.*
-`Bow` and `Sapphire Ring` are the units now, where `Expert Bombard Crossbow` used
-to be. The column has slack it did not have. **It is not clawed back**, for the
-reason the Provenance column's 12px is not clawed back below: a column with
-headroom cannot clip, and reopening a verified sum to harvest width that no cell
-has asked for buys nothing a reader can see.
+*An Item Class prints as its source name, trimmed, with a defence-type suffix
+spelled as defence words* `[decision — memlog 230]`. Underscores become spaces
+and the plural stays, so `Bows` and `Gloves (Dex/Int)` sit beside a Base Type
+such as `Sapphire Ring`, where `Expert Bombard Crossbow` used to be. **The column
+is not clawed back**, for the reason the Provenance column's 12px is not clawed
+back below: a column with headroom cannot clip, and reopening a verified sum to
+harvest width that no cell has asked for buys nothing a reader can see. *The
+headroom is not yet measured for the longest label.* `Body Armours (Str/Dex/Int)`
+at tier-1 `700` must be measured against the unit cell's 214px
+(`{spacing.col-unit}` less `{spacing.pad-unit-right}`) in the retro item 10
+pass.
 
 *Provenance is 88px, and the 12px came out of the chase cells.* At 76px the
 column could not render its own widest mark. The width had to come from
@@ -1351,9 +1357,12 @@ never cut a word to fit.
 the short-form table, or no declared Accepted Tier — falls back to the Trade
 Catalogue stat name **plus the value band**, visually identifiable as a
 fallback, so the gap is noticed and filled `[ASSUMPTION — memlog 35]`. One
-treatment covers both, because both are the same failure: nobody finished
-curating that entry. In the fallback, and only there, numerals and units keep
-their full symbols — `+240`, `%`, `+35%` are never compressed. That makes the
+treatment covers both, because both read the same to the player: the entry has
+no short form to print. They are not the same gap `[decision — memlog 231]`. A
+missing Accepted Tier is a **curation gap**, filled in the Tracked List. A
+missing short form is a **product gap**, filled by a code change. In the
+fallback, and only there, numerals and units keep their full symbols — `+240`,
+`%`, `+35%` are never compressed. That makes the
 fallback the one place in the product where a numeral from modifier text
 survives, which is exactly what makes it recognisable at a glance.
 **The fallback is set in the mono verbatim register, and that is its treatment**
@@ -1361,8 +1370,8 @@ survives, which is exactly what makes it recognisable at a glance.
 line's own size, weight and line height — `{typography.row-chase}` in a chase
 cell, `{typography.detail-row}` in a combination row — and changes nothing else.
 It takes **no ink**: a semantic ink says something is wrong with what a figure
-rests on, and an uncurated entry is a gap in the Tracked List that says nothing
-about the figure (see Colors). The same register carries the cross-file
+rests on, and a fallback entry — whichever gap caused it — says nothing about
+the figure (see Colors). The same register carries the cross-file
 diagnosis in `{components.sync-report-panel}`, because the two were deliberately
 one open question and one cue answers both (`EXPERIENCE.md`, *Two registers in
 one panel*).
@@ -1380,7 +1389,7 @@ collides with the stale mark `»`. A tone step would have reused
 roughly 24 to 26 monospace characters against the sans's 27 (Typography). The
 budget is unchanged and no column sum reopens; only fallback rows lose a
 character or two, they ellipsise like any other cell, and the expansion holds the
-text in full. An uncurated entry running short in a scan is not a cost worth
+text in full. A fallback entry running short in a scan is not a cost worth
 buying off — it is the gap making itself noticed, which is what the fallback is
 for.
 
@@ -1431,7 +1440,7 @@ A reader scans down a column on both, exactly as on the ranked list:
 | `{components.unrankable-appendix}` | `{spacing.col-appendix-base}` · `{spacing.col-appendix-mark}` · `{spacing.col-appendix-reason}` · `{spacing.col-appendix-note}` | 970px = 1012 − 2 border − 40 padding |
 | `{components.combination-row}` line 1 | `{spacing.col-combination}` 460 · `{spacing.col-combination-state}` 250 · `{spacing.col-combination-figure}` 116 · `{spacing.col-combination-sample}` 116 · `{spacing.col-combination-trade-link}` 24 | 966px = 1012 − 2 border − 44 padding |
 | `{components.combination-row}` line 2 | `{spacing.col-combination-note}` 560 · `{spacing.col-combination-age-observed}` 200 · `{spacing.col-combination-age-attempted}` 206 | 966px |
-| `{components.tombstone-band}` row, line 2 | `{spacing.col-combination-note}` 560 · `{spacing.col-tombstone-removed}` 406 | 966px |
+| `{components.tombstone-band}` row, line 2 | prune reason, one cell, 966 `[decision — memlog 234]` | 966px |
 
 Nothing on any of these surfaces flexes. The last column is a fixed width, not
 a remainder. Every combination-row cell takes
@@ -1695,11 +1704,10 @@ is no need for one. v1's two recipes are *one greater transmute + one greater
 augment* and *one perfect transmute + one perfect augment*, so the orb grade is
 the entire difference between them, and `{components.craft-recipe}` prints that
 one distinguishing word — `greater · perfect` — with the active one set solid.
-Nothing is coined: the word is lifted from the composition the Glossary already
-words. **The limit is stated with the rule.** It holds while every recipe in
-`recipes.json` reduces to a distinct single word. A recipe that does not is a
-copy decision nobody has taken, and it must not be settled by inventing a display
-name that no contract declares.
+Nothing is coined: the word is the grade prefix the recipe's currency ids share,
+`regular` when they carry none, and a set with mixed grades or two recipes on
+one word is refused `[decision — memlog 233]`. It is never settled by inventing a
+display name that no contract declares.
 
 **Ranked row** (`ranked-row`) — `{spacing.row-height}`, six fixed columns, one
 `{colors.rule-hairline}` bottom rule, `white-space: nowrap` throughout. Three
@@ -2052,7 +2060,7 @@ Rust stays for the health line's two triggers.
 *The affordance.* The whole strip is the click target — the player is mouse-only
 (memlog 13) and there is no keyboard affordance to add. It is marked by
 `{typography.expand-affordance}` in `{colors.sepia}`, right-aligned on the first
-line, reading `+ the full sync report` closed and `— the full sync report` open,
+line, reading `+ the full sync report` closed and `− the full sync report` open,
 with the cursor as pointer and a `{spacing.hairline}` dotted sepia underline on
 hover. It reuses the `{components.expand-affordance}` vocabulary exactly: sepia
 text, a sign, no button chrome, no fill, no border. Nothing else about the
@@ -2066,20 +2074,22 @@ bottom, sitting directly beneath the resting strip and above the asking-price
 line, pushing the asking-price line, the column header, the list and the
 appendix down inside the frame `[ASSUMPTION — memlog 59]`. It is not a modal,
 not a drawer and not a second surface. **One heading per column, never per
-group** — two of the three columns hold two groups, and such a column prints its
-heading once and separates its two groups by `{spacing.2}` of vertical space,
+group** — the first column holds two groups and the second holds three, and
+such a column prints its heading once and separates its groups by `{spacing.2}`
+of vertical space,
 with no second heading, no rule and no bullet. Column headings take
 `{typography.key-heading}`. Figures take `{colors.ink}` with tabular numerals.
 Everything else takes `{typography.key-body}` in `{colors.ink-secondary}`. The
 tone step and the two hairlines are what separate it — no shadow, no radius, no
 indent. It is prose-with-figures, not a table, so it declares no row height.
 
-Its five figure groups are assigned to the three columns, in this order:
+Its six groups — five figure groups and the cross-file diagnosis `[decision —
+memlog 206]` — are assigned to the three columns, in this order:
 
 | Column | Heading | Carries |
 |---|---|---|
 | 1 | THE SYNC RUN | requests per source (FR-14) · entries not reached in the last sync pass (FR-25) |
-| 2 | WHAT IS BROKEN | the unresolvable count (FR-24) · the pinned-starvation records (FR-17, FR-25) |
+| 2 | WHAT IS BROKEN | the unresolvable count (FR-24) · the pinned-starvation records (FR-17, FR-25) · the cross-file diagnosis, in the mono verbatim register (see Skeleton rows below) |
 | 3 | WHAT THE WEIGHTS COVER | pool coverage as a fraction **with its denominator** (FR-4) |
 
 The first column is what the run did, the second is what broke, the third is how
@@ -2234,13 +2244,10 @@ wraps — the longest note is 68 characters in a 548px cell — so this is a lat
 defect being closed before it fires, not a visible one.
 
 *A tombstone's line two is cut differently*, because a tombstone does not carry
-clocks. Its note cell holds the **prune reason** at
-`{spacing.col-combination-note}`, and the two age cells are replaced by a single
-`{spacing.col-tombstone-removed}` cell reading `removed YYYY-MM-DD` — 560 + 406
-= 966, the same sum. The removal date must not sit in a cell whose whole
-contract is *say which clock this is*: a removal date is a calendar fact about a
-decision somebody made, not a reading of `observedAt` or `lastAttemptedAt`, and
-putting it under an age label would make it look like one. Line one of a
+clocks. Line two is **one cell**: the **prune reason**, across the full 966px,
+the same sum `[decision — memlog 234]`. It never borrows the two age cells, whose
+whole contract is *say which clock this is*, and it carries no removal date.
+Line one of a
 tombstone is unchanged in shape — struck-through Combination, `† pruned` marker,
 the phrase *not tracked* in the money slot, no sample.
 
@@ -2349,10 +2356,9 @@ tracked uppercase heading. Both the closed toggle and the open band are in
 take the two-line
 `{components.combination-row}` shape in `{colors.ink-tertiary}`: line one is the
 struck-through Combination, a `† pruned` marker and the phrase *not tracked* in
-the money slot. **Line two is re-cut** to `{spacing.col-combination-note}` of
-prune reason plus `{spacing.col-tombstone-removed}` of `removed YYYY-MM-DD`,
-because a tombstone has no clocks to read and a removal date is a calendar fact
-rather than an age. See the combination-row spec above for the arithmetic.
+the money slot. **Line two is re-cut** to one cell holding the prune reason
+alone, because a tombstone has no clocks to read `[decision — memlog 234]`. See
+the combination-row spec above for the arithmetic.
 
 **Expand affordance** (`expand-affordance`) — sepia sans text with a `+` closed
 and a `−` open (U+2212, not an em dash), on a dotted sepia underline where it is
@@ -2363,7 +2369,7 @@ which used a `▸`/`▾` disclosure triangle that fell out of the typeface. Ever
 openable thing on this page now opens with the same sign.
 
 *The list affordance below row 20* reads `+ Read the remaining N rows`
-closed and `— Show only the top 20` open, and it is reversible. **It names no
+closed and `− Show only the top 20` open, and it is reversible. **It names no
 unit**, because the remainder holds both — an Item Class and a Base Type rank in
 one list (PRD FR-3), so either noun would misdescribe half of what is behind the
 control. It read `N Base Types` until revision 3. Opening it grows
@@ -2399,8 +2405,9 @@ failure is set like the rest of the page, because it is the same page telling
 the truth about itself.
 
 **Fetch failure screen** (`fetch-failure-screen`) — same shape, different fact:
-one of the eight artifacts did not arrive. Rust eyebrow reading `THE PAGE COULD
-NOT LOAD ITS DATA`, a title saying one of the eight files did not arrive, a body
+a required artifact did not arrive (AD-24 owns which artifacts the page
+fetches). Rust eyebrow reading `THE PAGE COULD NOT LOAD ITS DATA`, a title
+reading `A required file did not arrive.` `[decision — memlog 229]`, a body
 naming which, and an `{components.expand-affordance}` reading `+ Try again`.
 One sentence explains that the page shows nothing rather than a partial set,
 because FR-33 requires a single consistent set and half a ranking is worse than
@@ -2432,15 +2439,16 @@ vocabulary boundary. **The non-colour cue that separates the two registers is
 settled** `[decision — memlog 208]`: the diagnosis alone takes the **mono
 verbatim register** (Typography), at the panel's own body size, weight and line
 height. Every figure group stays in the page's voice and its existing face. It is
-the same cue as the curation fallback's — one answer, as the merge required.
+the same cue as the fallback's — one answer, as the merge required.
 
 `[ASSUMPTION — memlog 35]` A tracked modifier with no entry in the canonical
 short-form table falls back to the Trade Catalogue stat name plus the value band,
 and *must be visually identifiable as a fallback* so the missing short form gets
-noticed and added. **It is identifiable by the mono verbatim register**
+noticed and added — a product gap, closed by a code change `[decision — memlog
+231]`. **It is identifiable by the mono verbatim register**
 `[decision — memlog 208]`, specified above under Combination text — which is a
 cue and not an ink, because an ink says a figure's footing is degraded or broken
-and an uncurated entry says nothing about the figure (see Colors).
+and a fallback entry says nothing about the figure (see Colors).
 
 `[ASSUMPTION — memlog 49]` In the honest-empty league-reset state the list
 renders every tracked unit — every Item Class on the crafted branch and every
@@ -2457,16 +2465,11 @@ behavior and its one exception to the money-slot table.
 
 **One denomination, no currency icon — and one other icon, for one job.** Every
 figure on the page is in Divine, and v1 renders the denomination as **text** —
-there is no currency-icon token, no currency-icon component. The two catalogue
-files carry different halves of the rendering job: `catalogue/stats.json` is
-what makes a `statId` render as its human text rather than as a raw id, and
-`catalogue/static.json` supplies the **denomination's own label**, which the
-page prints rather than hardcoding a name the catalogue already owns (PRD FR-33,
-AD-24, AD-25). An earlier version of this paragraph credited `static.json` with
-the stat-text path; a live fetch on 2026-09-13 found that file carries currency
-ids, labels and image paths and no stat text at all. The currency-**icon** half
-of FR-33 has nothing to do in a product with a single denomination, and the
-icons stay unread in a file the page already fetches.
+there is no currency-icon token, no currency-icon component.
+`catalogue/stats.json` is what makes a `statId` render as its human text rather
+than as a raw id (PRD FR-33, AD-25). AD-24 owns where the **denomination's own
+label** comes from `[decision — memlog 229]`. The currency-**icon** half of
+FR-33 has nothing to do in a product with a single denomination.
 
 `{components.trade-link}` is the one icon in the product, and it earns the
 exception because it is not a state or a decoration but a **functional link
@@ -2521,12 +2524,12 @@ conformance claims.
 | Pair every semantic ink with its glyph and its word | Distinguish anything by hue alone |
 | Keep to the two semantic inks | Introduce a third colour, a success colour, or a severity ramp |
 | Mark Provenance once, on the ranked row — one label per **Item Class** | Repeat a Provenance mark per combination row, where every row in the panel carries the same label |
-| Reach for a non-colour cue for `pinned` and for the curation fallback — both have now taken one | Spend the retired slate on something that is not a statement about a figure's footing |
-| Set text quoted verbatim out of a file in the mono verbatim register — the curation fallback and the cross-file diagnosis, and nothing else | Let a third stack spread to text the page wrote itself, or give verbatim text an ink, a mark or a size of its own |
+| Reach for a non-colour cue for `pinned` and for the fallback — both have now taken one | Spend the retired slate on something that is not a statement about a figure's footing |
+| Set text quoted verbatim out of a file in the mono verbatim register — the fallback and the cross-file diagnosis, and nothing else | Let a third stack spread to text the page wrote itself, or give verbatim text an ink, a mark or a size of its own |
 | Use `{colors.sepia}` decoratively — eyebrow, threshold fill, affordances, the active recipe's rule, both unit glyphs | Let sepia start meaning a state |
 | Open every ranked row with its unit glyph — `≡` an Item Class, `▪` a Raw Base | Leave a crafted row unmarked as the "default" kind, or carry the distinction on tint and italic alone (PRD FR-3, NFR-10) |
 | Keep both unit glyphs in `{colors.sepia}` | Give a unit glyph an ink — it appears on twenty rows in twenty, and an ink there ends silence-means-healthy |
-| Let sepia mark what the operator **chose** — the active recipe, the threshold fill, affordances, unit glyphs | Let sepia mark what the **data is**. That is ochre and rust, and `pinned` and the curation fallback do not get in this way either |
+| Let sepia mark what the operator **chose** — the active recipe, the threshold fill, affordances, unit glyphs | Let sepia mark what the **data is**. That is ochre and rust, and `pinned` and the fallback do not get in this way either |
 | Give the inactive recipe option its dotted sepia rule **at rest** | Put a clickable affordance on hover only, on a page read from across a desk with the pointer in the game |
 | Set the active recipe rule at **2px** | Reuse the threshold's 1px solid sepia, which already means *you are hovering this* 16px away |
 | Divide the recipe options with the trust strip's `\|` | Use `·`, which joins two affixes in every chase cell and would carry the opposite operator here |
