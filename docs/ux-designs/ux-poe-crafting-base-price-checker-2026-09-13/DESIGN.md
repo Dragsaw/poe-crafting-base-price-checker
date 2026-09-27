@@ -6,9 +6,9 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 6
+revision: 7
 created: 2026-09-13
-updated: 2026-09-26
+updated: 2026-09-27
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -2429,11 +2429,10 @@ ranked. Without that suppression the page asserts a ranking it does not have.
 
 *The EV column is not blank in that state.* Memlog 49's "empty rather than
 zero" was aimed at the zero, and blank is the other thing the money slot
-forbids. Every EV there is missing for exactly one reason — the observations
-belong to another league — so every EV cell holds the `not-yet-synced` phrase
-**no figure yet**, which is the vocabulary memlog 43 already built for this. The
-rule holds without an exemption: a missing figure is always a phrase naming
-which question is open, in the honest-empty state as everywhere else.
+forbids. Every EV cell holds the phrase **no figure yet**, from the vocabulary
+memlog 43 built. It does so whatever the row's own Price State, a row already
+`no-listings` in the new league included. EXPERIENCE.md state 23 owns that
+behavior and its one exception to the money-slot table.
 
 **One denomination, no currency icon — and one other icon, for one job.** Every
 figure on the page is in Divine, and v1 renders the denomination as **text** —

@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 7
+revision: 8
 created: 2026-09-13
-updated: 2026-09-26
+updated: 2026-09-27
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -732,6 +732,10 @@ satisfies FR-9 and FR-4 together.
 never implies a Combination is junk — listings cannot tell a jackpot from junk,
 and the page says exactly that.
 
+One exception: while the list is honest-empty (state 23), every list-row EV cell
+reads *no figure yet*, `no-listings` rows included. The expansion keeps the
+table's phrase.
+
 ### Sync health — quiet, but on the page
 
 `[decision — memlog 57, superseding 26]` Sync health is two states, not two
@@ -846,7 +850,7 @@ dataset in one state at one moment.
 | 20 | Below-threshold entry | Combination row | Note *below the threshold — adds nothing to EV*. Shown, never hidden, never greyed |
 | 21 | Item Class with no Chase Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and is shown as such, at 2dp, as a real quantity. A negative EV is never a money-slot phrase — the figure is known, and it is bad news rather than missing news. It is **ranked, not Unrankable** (FR-1): a threshold that excludes every outcome is an answer about that class, not an absence of data |
 | 22 | Cold load / skeleton | Whole page | Masthead and twenty row slots paint immediately as placeholders in the final layout. The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` All eight artifacts resolve in a **single transition** — never row by row, because a partly filled list would show a ranking computed from an incomplete dataset. `[decision — memlog 211]` Flat `{colors.paper-inset}` bars with no shimmer, and the column header painted with its final labels. `DESIGN.md`, Components, owns the treatment |
-| 23 | Honest empty — league reset | Whole list | `[decision — memlog 48]` Every tracked unit renders in **canonical order** — every Item Class and every Raw Base, each with its glyph — carrying Price State `not-yet-synced` reason `league-mismatch`, refilling over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed** and the list states that the order is canonical and not ranked. Without that the page asserts a ranking it does not have, which is the failure FR-31's honest-empty rule exists to prevent. `[decision — memlog 83]` **The EV cell is not blank**: every EV there is missing for exactly one reason, so every cell holds the `not-yet-synced` money phrase **no figure yet**. Assumption 49's "empty rather than zero" was aimed at the zero. Blank is the other thing the money slot forbids, and the vocabulary memlog 43 built already answers this without an exemption |
+| 23 | Honest empty — league reset | Whole list | `[decision — memlog 48]` Every tracked unit renders in **canonical order** — every Item Class and every Raw Base, each with its glyph — refilling over the following day. After a pure reset every unit carries Price State `not-yet-synced` reason `league-mismatch`. After a **mixed reset** some units already carry a new-league state, such as `no-listings`, and they sit among the others in the same canonical order. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed** and the list states that the order is canonical and not ranked. Without that the page asserts a ranking it does not have, which is the failure FR-31's honest-empty rule exists to prevent. `[decision — memlog 83]` **The EV cell is not blank.** `[decision — revision 8, 2026-09-27]` **Every EV cell holds *no figure yet*, whatever the row's own Price State.** This includes a row that already reads `no-listings` in the new league. In this state the EV column answers one question for the whole list: the ranking has no figure yet. The row's expansion keeps its own Price State and money phrase (state 2 for `no-listings`), so the observation is one click down and is never lost. This is the only exception to *Money slots*, and it holds only while the list is honest-empty. When one row ranks, every row reads its own phrase again. Assumption 49's "empty rather than zero" was aimed at the zero. Blank is the other thing the money slot forbids |
 | 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row freshness is what makes that honest. No global "stale" treatment |
 | 25 | Nothing clears the threshold | Whole list | Distinct from state 24 and from state 23, and **it is the one state in this table the player typed** `[decision — memlog 204]`. Every crafted Item Class is still ranked, at an EV of minus its Craft Cost (FR-1) — so this is not an empty list, it is twenty rows carrying the same figure. Raw Bases under the threshold leave the ranking altogether, so the raw branch may be empty while the crafted one is full. **Rank numerals stay.** State 23 suppresses them because its order is canonical rather than ranked; here the order *is* computed and the figures merely tie, and hiding a computed result because it is flat would be the page editing its own answer. A plain declarative sits above the list, under `{components.asking-price-line}`, naming the live Payout Threshold figure at the page's 2dp — the condition, not an instruction. It is not `{components.uniform-prior-banner}`, which is raised by a data condition; this is not one. It is not a `{components.money-slot}` phrase either, because no figure is missing. **A tie of this size needs a declared tiebreak** or the order shifts between loads; AD-17 declares it, so the printed order is fully determined and identical across loads (AD-17) |
 | 26 | Schema-invalid artifact | Whole page | `{components.refusal-screen}` replaces everything (FR-33, NFR-8). It names which artifact, which schema version it declared and which the page expects. The player can do nothing here and is not offered a retry — a schema mismatch is fixed by publishing a valid set. One sentence says the page renders again as soon as one exists, and that nothing old is served meanwhile |
