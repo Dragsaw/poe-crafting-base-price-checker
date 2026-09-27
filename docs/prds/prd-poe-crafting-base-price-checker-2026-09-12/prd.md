@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 21
+revision: 22
 created: 2026-09-12
-updated: 2026-09-26
+updated: 2026-09-27
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -527,7 +527,7 @@ The ranking treats a Price Observation from any league but the active one as abs
 - An invalid artifact is refused loudly: the page names it and serves nothing stale (AD-3, AD-24; treatment `EXPERIENCE.md`).
 - An absent artifact is not an invalid one. Where the set can still render without it, the page renders and names the absence on screen, never presenting a diminished list as whole; where it cannot, it says which file did not arrive (AD-24).
 - A cross-file policy failure between individually valid artifacts is reported at load and the page still renders, the affected Item Classes shown as Unrankable with that reason (AD-17).
-- Stat and currency text comes from the committed Trade Catalogue; the page makes no runtime call to the trade site (AD-15, AD-25).
+- Stat text comes from the committed Trade Catalogue; the page makes no runtime call to the trade site (AD-15, AD-25).
 - A Tracked Entry offers a trade-site link only when its stored search is valid for the active league, never on a `pruned` tombstone, never keyed on Price State. The link is the player's own act, in a new tab; URL form `IMPLEMENTATION-NOTES.md` §5.4 (AD-15, AD-24).
 
 
