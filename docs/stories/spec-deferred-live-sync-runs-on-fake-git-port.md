@@ -70,6 +70,55 @@ deferred: []
 - Given a new non-test file under `packages/sync/src` that imports `node:child_process`, when `pnpm test` runs, then `no-git-write.test.ts` still fails.
 - Given the exempted file, when the file gains a git write subcommand, `exec`, `spawn` or a shell option, then `no-git-write.test.ts` fails.
 
+### Review Findings
+
+Follow-up review, 2026-09-27. There were 27 raw findings: 2 decision-needed (both rejected by the user), 3 patch, 0 defer and 14 rejected, after grouping.
+
+- [x] [Review][Decision] The live `main()` wiring and the report tag are unverified (AC1) — Reverting `packages/sync/src/sync.ts:85` to `createFakeGitPort()`, or passing a wrong root, leaves the whole suite green. The composition test stops at `resolveTrackedListAge`, and nothing asserts that `git-author-date` reaches `sync-report.json`. There are three options. (a) Export a small live-ports factory from `sync.ts` and test that its `git` port dates a committed file. This adds public surface. (b) Add a `runSync` test with the real port on a temp repository. This covers the report field but not the `main()` line. (c) Accept the gap under the "no test runs `main`" policy. (verification-gap+acceptance-auditor+blind-hunter) — **Resolved 2026-09-27: rejected by user (option c).** The module keeps its "no test runs `main`" policy.
+- [x] [Review][Decision] The `log.showSignature` test cannot fail without `--no-show-signature` — The fixture commits are unsigned, so git prints no signature lines whether or not the flag is present. The pin regex locks the flag in source text only. A behavioural test needs a signed commit, such as SSH signing with a throwaway `ssh-keygen` key and `gpg.format=ssh`, which makes the suite depend on `ssh-keygen`. Otherwise, accept the source pin plus git's documented semantics. (verification-gap+blind-hunter) — **Resolved 2026-09-27: rejected by user.** The literal pin in `no-git-write.test.ts` plus git's documented `--no-show-signature` semantics are accepted.
+- [x] [Review][Patch] The pin does not cover the `execFile` options object, so a shorthand `shell`, an added `env` or a changed `cwd` passes AC3 [packages/sync/src/no-git-write.test.ts:85]. The fix is to extend the pin regex through the literal `{ cwd: root, encoding: 'utf8', windowsHide: true }`. (acceptance-auditor+blind-hunter) — Fixed: the pin runs through the exact options literal, so any added option fails. A bare `\bshell\b` ban was not used, because the module doc says "no shell".
+- [x] [Review][Patch] The git-subcommand rule misses a write subcommand after an option token, such as `['--no-optional-locks', 'push']`, so in the exempted file it is no second barrier (AC3) [packages/sync/src/no-git-write.test.ts:50]. The fix is to allow `-`-prefixed option tokens between `git` and the subcommand, and to add that case to the pattern test. (edge-case-hunter) — Fixed: an option token must end at a boundary, and the pattern test covers the option-prefixed push and commit cases and the port's own read-only line.
+- [x] [Review][Patch] Some new comment lines are longer than the lines around them [packages/sync/src/git/read-only-git-port.ts:6, packages/sync/src/sync.ts:16, packages/sync/src/sync.ts:42]. The fix is to reflow them. (blind-hunter) — Fixed.
+
+**Rejected:**
+- `low` (spec edit) The Always bullet and the Tasks pin still show the command without `--no-show-signature`. The fix edits the spec under review.
+- `low` (spec edit) The Spec Change Log is empty although the first pass changed the contract. The fix edits the spec under review.
+- `low` (spec edit) The Auto Run Result's patch counts do not match the triage log. The fix edits the spec under review.
+- `low` (spec edit) The Code Map cites line numbers that will go stale. The fix edits the spec under review.
+- `low` (spec edit) `sync:dry` keeps the fake, so its report predicts `file-modified`. Changing it contradicts the spec's Never rule on `dry-run.ts`.
+- `false` The negative example in the pattern test uses the old argument list. It tests that `log` is not a write subcommand, which still holds. No harm follows.
+- `false` The exemption key is not proven on Windows or against lookalike paths. The lookup is an exact map key, and on Windows the main scan would fail the port file if the key did not match.
+- `low` EACCES or EPERM rejects instead of falling back. The spec scopes the fallback to ENOENT. This is unlikely in use, and a loud failure is acceptable.
+- `low` A Windows `git.cmd` shim looks like "no git". Git for Windows ships `cmd\git.exe`, which is what `where git` shows here. This is unlikely.
+- `low` A "dubious ownership" exit 128 falls back silently. The spec allows a non-zero exit to become `undefined`, and the tag stays truthful. The fix adds a stderr branch.
+- `low` A pre-1970 author date makes `%at` negative and throws. This is unreachable for `data/tracked.json` in practice.
+- `low` An inherited `GIT_TRACE*` makes the call write a trace file. This needs user-level env, is unlikely, and the fix is env filtering.
+- `low` A comment-embedded pin, `execFile (` with a space, or a second call through `promisify(execFile)` evades the count. The first two need deliberate evasion. For the harmful form, a second call with a write subcommand, the subcommand-rule patch closes it.
+- `low` The claim that only ENOENT maps to `undefined` differs from "a binary that cannot start". This is the same root cause as the EACCES entry, and the spec names ENOENT.
+
+Second follow-up review, 2026-09-27, over `300f3f9` to the working tree. There were 29 raw findings: 0 decision-needed, 1 patch, 0 defer and 17 rejected, after grouping.
+
+- [x] [Review][Patch] Two port tests leave the shared fixture dirty: one leaves `tracked.json` edited and the other leaves `untracked.json` behind. Later tests are correct only because they read commit history. Restore both in `finally`, as the `log.showSignature` test does. [packages/sync/src/git/read-only-git-port.test.ts:87] (edge-case-hunter+blind-hunter) — Fixed: both tests restore the fixture in `finally`.
+
+**Rejected:**
+- `decided` The `main()` wiring and the report tag have no test (AC1). The user rejected this earlier on 2026-09-27 (option c). (acceptance-auditor+verification-gap)
+- `decided` The `log.showSignature` test cannot fail without the flag. The user accepted the source pin earlier on 2026-09-27. (acceptance-auditor+verification-gap)
+- `low` (spec edit) The Always bullet names the invocation without `--no-show-signature`. The fix edits the spec under review. (acceptance-auditor)
+- `low` (spec edit) "Cannot start" is broader than the ENOENT the code checks. The fix edits the spec under review, and the first pass rejected this too. (acceptance-auditor)
+- `low` The subcommand rule still misses an option that takes a separate value, such as `git -C dir push` or `['-c', 'k=v', 'commit']`. In the exempted file, the whole-literal pin and the `execFile(` count of 1 catch it. In every other file, the spawn ban catches it first. Widening the regex to take any token risks false matches in comments. (acceptance-auditor+edge-case-hunter+verification-gap+blind-hunter)
+- `low` A non-zero exit other than "not a repository", such as dubious ownership, falls back silently. The Always bullet allows it, and the first pass rejected it. (edge-case-hunter+blind-hunter)
+- `low` `execFile` has no `timeout`. `log -1` on one path of a local repository is fast. The fix adds an option, an error branch and a change to the pin. (edge-case-hunter+blind-hunter)
+- `low` An inherited `GIT_DIR` or `GIT_WORK_TREE`, for example from a git hook, redirects the read. `pnpm sync` is not run from hooks, and the fix is env filtering. (edge-case-hunter)
+- `false` The pathspec is not literal. The only caller passes the constant `TRACKED_PATH = 'data/tracked.json'` (`run-chunk.ts:130`), which has no glob or magic characters. (edge-case-hunter+blind-hunter)
+- `low` A shallow clone dates the file at the graft boundary. The repository has no CI workflow, and the sync runs in the curator's full clone. (edge-case-hunter+blind-hunter)
+- `low` An all-digit value that overflows `Date` throws a bare `RangeError`. git's `%at` output cannot reach that range. (edge-case-hunter+blind-hunter)
+- `low` An aliased or indirect `execFile` call evades the count. That takes deliberate evasion, and the first pass rejected it. (edge-case-hunter)
+- `false` The real port returns milliseconds (`.000Z`) and the fake returns seconds. Always bullet 2 requires the `systemClock` form, and `systemClock` is `new Date().toISOString()` (`shell.ts:72`). (edge-case-hunter)
+- `low` A spawn error other than ENOENT aborts the run. The catch in `run-chunk.ts` logs the failure of the second report write and rethrows the first error, so the failure is loud. EACCES and EPERM are unlikely. (blind-hunter)
+- `low` On Windows, a `git.exe` at the repository root runs before the one on `PATH`. That needs a planted binary in the curator's own checkout. (blind-hunter)
+- `low` No test covers a deleted-then-recreated or renamed `data/tracked.json`, or the real-port `file-modified` arm. Both cases are unlikely for the curated file, and `resolveTrackedListAge` tests its fallback against the fake. (blind-hunter)
+- `false` The docs are stale or the housekeeping is missing. `spec-1-11` and the epic-1 retro record their own time. `dist/` is ignored (`.gitignore:8`). The `deferred-work.md` entry is removed by the sweep, per `AGENTS.md`. (blind-hunter)
+
 ## Spec Change Log
 
 ## Review Triage Log

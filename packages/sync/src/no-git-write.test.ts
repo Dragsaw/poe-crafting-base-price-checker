@@ -48,7 +48,7 @@ const FORBIDDEN: readonly [string, RegExp][] = [
   ['a git library', /['"](?:simple-git|isomorphic-git|nodegit|execa)['"]/],
   [
     'a git subcommand',
-    /\bgit\b[\s'"`,[\]]*(?:add|commit|push|pull|fetch|merge|rebase|reset|checkout|switch|tag|stash|rm|mv|clone|init|restore|apply|am|cherry-pick|revert|branch|update-ref|config|worktree|notes|commit-tree|write-tree|update-index|gc)\b/,
+    /\bgit\b(?:[\s'"`,[\]]|-[-\w=%]*(?![-\w=%]))*(?:add|commit|push|pull|fetch|merge|rebase|reset|checkout|switch|tag|stash|rm|mv|clone|init|restore|apply|am|cherry-pick|revert|branch|update-ref|config|worktree|notes|commit-tree|write-tree|update-index|gc)\b/,
   ],
 ];
 
@@ -84,9 +84,10 @@ it('the exempted file makes only the read-only git log call', () => {
   expect(text).not.toMatch(/spawn/);
   expect(text).not.toMatch(/fork/);
   expect(text).not.toMatch(/shell\s*:/);
-  // The whole argument array, to its closing `]`: an added argument such as `--output=<file>` fails here.
+  // The whole argument array and the whole options literal: an added argument such as
+  // `--output=<file>`, or an added option such as `env`, `cwd` or a shorthand `shell`, fails here.
   expect(text).toMatch(
-    /execFile\(\s*'git',\s*\[\s*'--no-optional-locks',\s*'log',\s*'--no-show-signature',\s*'-1',\s*'--format=%at',\s*'--',\s*path\s*\]/,
+    /execFile\(\s*'git',\s*\[\s*'--no-optional-locks',\s*'log',\s*'--no-show-signature',\s*'-1',\s*'--format=%at',\s*'--',\s*path\s*\],\s*\{\s*cwd:\s*root,\s*encoding:\s*'utf8',\s*windowsHide:\s*true\s*\},/,
   );
   expect(text.match(/execFile\(/g)).toHaveLength(1);
 });
@@ -99,7 +100,10 @@ it('the patterns catch what they are meant to catch', () => {
   expect("spawn('git', ['push'])").toMatch(subcommand);
   expect('git update-ref refs/heads/main HEAD').toMatch(subcommand);
   expect("execFile('git', ['worktree', 'add'])").toMatch(subcommand);
+  expect("execFile('git', ['--no-optional-locks', 'push'])").toMatch(subcommand);
+  expect('git --no-pager commit -m x').toMatch(subcommand);
   expect("execFile('git', ['--no-optional-locks', 'log', '-1'])").not.toMatch(subcommand);
+  expect('git --no-optional-locks log --no-show-signature -1 --format=%at').not.toMatch(subcommand);
   expect('a git-tracked working tree').not.toMatch(subcommand);
   expect('no git write of any kind').not.toMatch(subcommand);
 });

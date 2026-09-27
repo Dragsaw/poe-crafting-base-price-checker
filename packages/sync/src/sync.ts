@@ -13,9 +13,9 @@
  * reading the repository at the same root. The tracked-list edit date is
  * therefore the author date of `data/tracked.json`'s last commit, tagged
  * `git-author-date` — AD-12's first clock. Where the repository yields no date
- * (no commit yet, no repository, no `git` binary is found) the resolver falls back to
- * the `file-modified` clock. `pnpm sync:dry` keeps the history-less fake: its
- * report is a prediction over a fake filesystem.
+ * (no commit yet, no repository, no `git` binary is found) the resolver falls
+ * back to the `file-modified` clock. `pnpm sync:dry` keeps the history-less
+ * fake: its report is a prediction over a fake filesystem.
  *
  * The config, the rates, the item types and the published dataset are loaded
  * under the lock, and a refusal names its file before any request, in a
@@ -39,7 +39,10 @@ import { createReadOnlyGitPort } from './git/read-only-git-port.ts';
 import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
-/** The live command's ports. The live command passes the read-only git port at the repository root (see above). */
+/**
+ * The live command's ports. The live command passes the read-only git port at
+ * the repository root (see above).
+ */
 export type SyncPorts = ComposeChunkPorts;
 
 /** Composes one live chunk from its ports and runs it. Throws what the chunk throws. */

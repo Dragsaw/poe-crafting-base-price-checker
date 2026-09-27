@@ -86,14 +86,22 @@ describe('createReadOnlyGitPort', () => {
 
   it('keeps the commit date when the working tree has an uncommitted edit (AD-12)', async () => {
     await writeFile(join(repo, 'tracked.json'), '{"v":2}\n');
-    await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('tracked.json')).resolves.toBe(
-      '2026-09-20T12:00:00.000Z',
-    );
+    try {
+      await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('tracked.json')).resolves.toBe(
+        '2026-09-20T12:00:00.000Z',
+      );
+    } finally {
+      await git(['checkout', '--', 'tracked.json']);
+    }
   });
 
   it('returns undefined for an untracked file', async () => {
     await writeFile(join(repo, 'untracked.json'), '{}\n');
-    await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('untracked.json')).resolves.toBeUndefined();
+    try {
+      await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('untracked.json')).resolves.toBeUndefined();
+    } finally {
+      await rm(join(repo, 'untracked.json'));
+    }
   });
 
   it('returns undefined when the root is not a repository', async () => {

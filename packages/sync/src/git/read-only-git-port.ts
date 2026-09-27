@@ -3,8 +3,9 @@
  *
  * This module is the one place in `sync` that starts a child process.
  * `no-git-write.test.ts` refuses the child-process module in every other
- * source file and lifts that one rule for this path alone; its other rules still apply
- * here, and a further test pins this file to the literal invocation below.
+ * source file and lifts that one rule for this path alone; its other rules
+ * still apply here, and a further test pins this file to the literal
+ * invocation below.
  * Keeping the call in its own module, and not in `shell.ts`, is what keeps the
  * exemption one file wide.
  *
