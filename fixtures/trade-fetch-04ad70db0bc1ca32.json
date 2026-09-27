@@ -1,6 +1,838 @@
 {
   "result": [
     {
+      "id": "758717d43863a96bf08b0df75edb5d6c3edf10330226249dab140f63989ea6a8",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-27T04:57:26Z",
+        "stash": {
+          "name": "Trade",
+          "x": 1,
+          "y": 3
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 25,
+          "currency": "exalted"
+        },
+        "fee": 3363,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "758717d43863a96bf08b0df75edb5d6c3edf10330226249dab140f63989ea6a8",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 25 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "2% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "12% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "cd84be179cb9ae0b10547045a6ae3e68bbff0fd54e445b6a4e2929b2965fd89f",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-26T23:09:53Z",
+        "stash": {
+          "name": "5",
+          "x": 9,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 25,
+          "currency": "exalted"
+        },
+        "fee": 3363,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "cd84be179cb9ae0b10547045a6ae3e68bbff0fd54e445b6a4e2929b2965fd89f",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 25 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "3% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "8% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "926f61a7380b9d6e4d522070de8cb24fffb72cb4c5b844834d9f831810c46531",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-21T18:36:21Z",
+        "stash": {
+          "name": "12",
+          "x": 0,
+          "y": 1
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 30,
+          "currency": "exalted"
+        },
+        "fee": 3363,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "926f61a7380b9d6e4d522070de8cb24fffb72cb4c5b844834d9f831810c46531",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 30 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "2% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "8% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  0
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  1
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "984d0ed5161e1017639183c051bf81d6f75ff98a0869eb4d0d7fb32a6ab30377",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-27T17:07:02Z",
+        "stash": {
+          "name": "15",
+          "x": 2,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 50,
+          "currency": "exalted"
+        },
+        "fee": 2451,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "en_US",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "984d0ed5161e1017639183c051bf81d6f75ff98a0869eb4d0d7fb32a6ab30377",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 58,
+        "identified": true,
+        "note": "~b/o 50 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "3% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "6% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "8176f3f0f7cfdd1df9af6a5b545a45068fb7e678e04b8f41ef02eb071b495f12",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-27T16:47:48Z",
+        "stash": {
+          "name": "$",
+          "x": 1,
+          "y": 7
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 60,
+          "currency": "exalted"
+        },
+        "fee": 3211,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "en_US",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "8176f3f0f7cfdd1df9af6a5b545a45068fb7e678e04b8f41ef02eb071b495f12",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 77,
+        "identified": true,
+        "note": "~b/o 60 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "3% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "11% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "8c434a540ce90bae7b4c4826413305693097eefabc65fdafe8aab29ea50ead54",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-20T14:56:26Z",
+        "stash": {
+          "name": "30",
+          "x": 0,
+          "y": 9
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 60,
+          "currency": "exalted"
+        },
+        "fee": 1975,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "8c434a540ce90bae7b4c4826413305693097eefabc65fdafe8aab29ea50ead54",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 22,
+        "identified": true,
+        "note": "~b/o 60 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "2% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "13% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  0
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  1
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "4cfb7aa6f7713ec59be5de8e4489b4224abda309b60ce7e6a3aa4ff54d43a322",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-16T20:52:43Z",
+        "stash": {
+          "name": "2",
+          "x": 1,
+          "y": 1
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 80,
+          "currency": "exalted"
+        },
+        "fee": 3020,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "4cfb7aa6f7713ec59be5de8e4489b4224abda309b60ce7e6a3aa4ff54d43a322",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 74,
+        "identified": true,
+        "note": "~b/o 80 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "3% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "8% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "c20819ffa06ee7f7928ef9abc6bc3975b77ebd2f7497e83b4abd65a7f6dc60cc",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-12T18:16:28Z",
+        "stash": {
+          "name": "Jew",
+          "x": 4,
+          "y": 4
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 100,
+          "currency": "exalted"
+        },
+        "fee": 2793,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
+        "league": "Forbidden Rites",
+        "id": "c20819ffa06ee7f7928ef9abc6bc3975b77ebd2f7497e83b4abd65a7f6dc60cc",
+        "name": "",
+        "typeLine": "Combat Emerald of Alacrity",
+        "baseType": "Emerald",
+        "rarity": "Magic",
+        "ilvl": 67,
+        "identified": true,
+        "note": "~b/o 100 exalted",
+        "properties": [
+          {
+            "name": "[Jewel]",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "3% increased [Attack] Speed",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_681332047",
+            "mods": [
+              {
+                "name": "of Alacrity",
+                "tier": "S1",
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "8% increased [Attack] Damage",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_2843214518",
+            "mods": [
+              {
+                "name": "Combat",
+                "tier": "P1",
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_681332047",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_2843214518",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
       "id": "90ce67a97560c416b5adb22ac8e721f6b910bc63402ffabb7606e5a68e9e8e0e",
       "listing": {
         "method": "psapi",
@@ -104,333 +936,20 @@
       }
     },
     {
-      "id": "d9c24cf9ec63903f07d24daa9d00ef7886b5a34ed25d743d6ac858343323cf1d",
+      "id": "282ce9f2cbc07d67fd033c5a54148dde8652cb331b1bfcba3139391dea14f7ad",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-25T14:30:23Z",
+        "indexed": "2026-09-27T15:57:54Z",
         "stash": {
-          "name": "5",
-          "x": 11,
-          "y": 11
+          "name": "200",
+          "x": 0,
+          "y": 3
         },
         "price": {
           "type": "~b/o",
-          "amount": 222,
+          "amount": 200,
           "currency": "exalted"
         },
-        "fee": 3363,
-        "account": {
-          "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "zh_TW",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "d9c24cf9ec63903f07d24daa9d00ef7886b5a34ed25d743d6ac858343323cf1d",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 81,
-        "identified": true,
-        "note": "~b/o 222 exalted",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "3% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "12% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  0
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  1
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "5a2a77733f188b9c5f7017d3facf935702cbbfbabf9f48e4ddd361fd60bf6952",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-07T17:34:54Z",
-        "stash": {
-          "name": "9",
-          "x": 11,
-          "y": 11
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 3363,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "5a2a77733f188b9c5f7017d3facf935702cbbfbabf9f48e4ddd361fd60bf6952",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 81,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "4% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "12% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  0
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  1
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "6200cb4d00bde6ccaf728934222a066417c27f6b540f225b694dfbb6a8caf844",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-06T10:09:47Z",
-        "stash": {
-          "name": "12",
-          "x": 9,
-          "y": 11
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 3457,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "6200cb4d00bde6ccaf728934222a066417c27f6b540f225b694dfbb6a8caf844",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "4% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "12% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  0
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  1
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "d6c2d755a95948b50705ac5d3eb85e30bd1af2d88823b27e7e9b19500c6f0af0",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-22T13:19:43Z",
-        "stash": {
-          "name": "10",
-          "x": 0,
-          "y": 5
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
         "fee": 3344,
         "account": {
           "name": "[redacted]",
@@ -444,14 +963,14 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
         "league": "Forbidden Rites",
-        "id": "d6c2d755a95948b50705ac5d3eb85e30bd1af2d88823b27e7e9b19500c6f0af0",
+        "id": "282ce9f2cbc07d67fd033c5a54148dde8652cb331b1bfcba3139391dea14f7ad",
         "name": "",
         "typeLine": "Combat Emerald of Alacrity",
         "baseType": "Emerald",
         "rarity": "Magic",
         "ilvl": 80,
         "identified": true,
-        "note": "~b/o 1 divine",
+        "note": "~b/o 200 exalted",
         "properties": [
           {
             "name": "[Jewel]",
@@ -462,419 +981,7 @@
         ],
         "explicitMods": [
           {
-            "description": "4% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "12% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  0
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  1
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "2833c8ea39ff00ccf4f17ccf9cc24173027ceee2ce52eb2ee5f28c054238a223",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-22T12:34:00Z",
-        "stash": {
-          "name": "12",
-          "x": 9,
-          "y": 10
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 3001,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "2833c8ea39ff00ccf4f17ccf9cc24173027ceee2ce52eb2ee5f28c054238a223",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 73,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "3% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "12% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  1
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "ef4a01d6634abdd268ec388836657d6654aa6a1fc70cee9c6c3897b162bf1f30",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-15T09:05:44Z",
-        "stash": {
-          "name": "7",
-          "x": 2,
-          "y": 0
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 3344,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "ef4a01d6634abdd268ec388836657d6654aa6a1fc70cee9c6c3897b162bf1f30",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 80,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "3% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "15% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  1
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "d5c7fd77811d7b200edff0ebcd187998b92e22baaa34ce386e354bfe0f9473b0",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-17T21:11:47Z",
-        "stash": {
-          "name": "vn",
-          "x": 0,
-          "y": 11
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 3363,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "d5c7fd77811d7b200edff0ebcd187998b92e22baaa34ce386e354bfe0f9473b0",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 81,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "3% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "15% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
-                  0
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  1
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "41a51c006bce62e78661c20940d81fac1ae087d3a8d49f907b852a859495338b",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-05T13:04:57Z",
-        "stash": {
-          "name": "3",
-          "x": 9,
-          "y": 1
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 2964,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "41a51c006bce62e78661c20940d81fac1ae087d3a8d49f907b852a859495338b",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 70,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "3% increased [Attack] Speed",
+            "description": "2% increased [Attack] Speed",
             "domain": "explicit",
             "hash": "stat.explicit.stat_681332047",
             "mods": [
@@ -917,116 +1024,13 @@
               [
                 "explicit.stat_681332047",
                 [
-                  1
+                  0
                 ]
               ],
               [
                 "explicit.stat_2843214518",
                 [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "c6fba040c92abd36851290eda49a031021c0328a19d0a4e1c91ea181b143ae14",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-15T06:21:21Z",
-        "stash": {
-          "name": "Autotrade",
-          "x": 7,
-          "y": 0
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 3192,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvSmV3ZWxzL0VtZXJhbGRKZXdlbCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/0df7b1d23b/EmeraldJewel.png",
-        "league": "Forbidden Rites",
-        "id": "c6fba040c92abd36851290eda49a031021c0328a19d0a4e1c91ea181b143ae14",
-        "name": "",
-        "typeLine": "Combat Emerald of Alacrity",
-        "baseType": "Emerald",
-        "rarity": "Magic",
-        "ilvl": 75,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "[Jewel]",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "3% increased [Attack] Speed",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_681332047",
-            "mods": [
-              {
-                "name": "of Alacrity",
-                "tier": "S1",
-                "magnitudes": [
-                  {
-                    "min": "2",
-                    "max": "4"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "13% increased [Attack] Damage",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_2843214518",
-            "mods": [
-              {
-                "name": "Combat",
-                "tier": "P1",
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "descrText": "Place into an allocated Jewel Socket on the Passive Skill Tree. Right click to remove from the Socket.",
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_681332047",
-                [
                   1
-                ]
-              ],
-              [
-                "explicit.stat_2843214518",
-                [
-                  0
                 ]
               ]
             ]

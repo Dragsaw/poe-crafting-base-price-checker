@@ -3,11 +3,13 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ConfigFileSchema, createFakeFilesystemPort } from '@poe/contracts';
+import { ConfigFileSchema, createFakeFilesystemPort, WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
+import type { ModifierWeight, WeightsFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
-import { checkTracked, loadTrackedCheckInputs, main, PENDING_CHECKS } from './check.ts';
+import { DataFileError } from '../load-data-file.ts';
+import { checkTracked, loadTrackedCheckInputs, main } from './check.ts';
 import type { TrackedCheckInputs } from './check.ts';
 
 const SCRIPT = fileURLToPath(new URL('./check.ts', import.meta.url));
@@ -35,6 +37,30 @@ const crafted = {
 const gold = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
 const solar = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' };
 
+const tier = (statId: string, min: number, max: number): ModifierWeight => ({
+  sourceModifierId: statId,
+  modGroup: statId,
+  itemLevelMin: 70,
+  weight: 100,
+  weightSource: 'published',
+  lines: [{ statId, ranges: [[min, max]] }],
+});
+
+/** A weights file on which `crafted` passes all five cross-file checks. */
+const WEIGHTS: WeightsFile = {
+  schemaVersion: WEIGHTS_SCHEMA_VERSION,
+  gamePatch: '0.5.5',
+  producer: { id: 'test', generatedAt: '2026-09-27T00:00:00Z' },
+  bases: {
+    'accessory.amulet': {
+      Amulets: {
+        prefix: { poolCoverage: 'complete', entries: [tier(PREFIX_STAT, 47, 50)] },
+        suffix: { poolCoverage: 'complete', entries: [tier(SUFFIX_STAT, 3, 3)] },
+      },
+    },
+  },
+};
+
 function trackedText(entries: readonly unknown[], schemaVersion = '1.0.0'): string {
   return JSON.stringify({ schemaVersion, entries });
 }
@@ -47,12 +73,13 @@ function inputsOf(entries: readonly unknown[], overrides: Partial<TrackedCheckIn
       value: ConfigFileSchema.parse({ schemaVersion: '1.0.0', league: 'Test League', minChunkSearches: 2 }),
     },
     catalogue: { ok: true, value: CATALOGUE },
+    weights: { ok: true, value: WEIGHTS },
     ...overrides,
   };
 }
 
 describe('checkTracked', () => {
-  it('passes a valid list: every check passed, the cross-file checks pending', () => {
+  it('passes a valid list: every check passed, the cross-file checks included', () => {
     const report = checkTracked(inputsOf([crafted, gold, solar]));
 
     expect(report).toEqual({
@@ -61,11 +88,34 @@ describe('checkTracked', () => {
         { check: 'schema', status: 'passed' },
         { check: 'pinned-cap', status: 'passed' },
         { check: 'catalogue', status: 'passed' },
+        { check: 'cross-file', status: 'passed' },
       ],
       issues: [],
-      pending: ['five cross-file checks (Story 3.3)'],
     });
-    expect(PENDING_CHECKS).toEqual(report.pending);
+  });
+
+  it('reports each cross-file failure as one issue at its entry, naming the check and the key', () => {
+    const sentinel = { ...crafted, prefix: { ...crafted.prefix, valueMin: 0, valueMax: 9999 } };
+    const report = checkTracked(inputsOf([gold, sentinel]));
+
+    expect(report.ok).toBe(false);
+    expect(report.checks).toContainEqual({ check: 'cross-file', status: 'failed' });
+    expect(report.issues).toHaveLength(1);
+    expect(report.issues[0]).toMatchObject({ check: 'cross-file', path: 'entries.1' });
+    expect(report.issues[0]?.message).toContain(`edge-alignment: prefix ${PREFIX_STAT} band [0, 9999] at floor 75`);
+    expect(report.issues[0]?.message).toContain('"crafted","accessory.amulet","Amulets",75');
+  });
+
+  it('skips the cross-file checks without a weights file, and reports a refused one', () => {
+    const absent = checkTracked(inputsOf([crafted], { weights: { ok: true, value: null } }));
+    expect(absent.ok).toBe(true);
+    expect(absent.checks).toContainEqual({ check: 'cross-file', status: 'skipped' });
+
+    const error = new DataFileError('data/weights.json', 'unknown-major', 'schemaVersion 9.0.0 refused');
+    const refused = checkTracked(inputsOf([crafted], { weights: { ok: false, error } }));
+    expect(refused.ok).toBe(false);
+    expect(refused.checks).toContainEqual({ check: 'cross-file', status: 'failed' });
+    expect(refused.issues).toContainEqual({ check: 'cross-file', message: error.message });
   });
 
   it('reports a schema issue at its path and skips the checks that need entries', () => {
@@ -77,6 +127,7 @@ describe('checkTracked', () => {
       { check: 'schema', status: 'failed' },
       { check: 'pinned-cap', status: 'skipped' },
       { check: 'catalogue', status: 'skipped' },
+      { check: 'cross-file', status: 'skipped' },
     ]);
     expect(report.issues.length).toBeGreaterThan(0);
     for (const issue of report.issues) {
@@ -152,6 +203,7 @@ describe('checkTracked', () => {
       { check: 'schema', status: 'failed' },
       { check: 'pinned-cap', status: 'failed' },
       { check: 'catalogue', status: 'failed' },
+      { check: 'cross-file', status: 'skipped' },
     ]);
     expect(report.issues.map((issue) => issue.message)).toEqual([
       'data/tracked.json: the file is absent',
@@ -203,6 +255,24 @@ describe('pnpm tracked:check', () => {
     expect(JSON.parse(stdout)).toMatchObject({ ok: false, issues: expect.arrayContaining([expect.objectContaining({ check: 'schema' })]) as unknown });
   });
 
+  it('exits 1 with a failed cross-file check naming an unparseable weights file', async () => {
+    let stdout = '';
+    let stderr = '';
+    const fs = createFakeFilesystemPort({
+      'data/tracked.json': { contents: trackedText([crafted]) },
+      'data/weights.json': { contents: '{ not json' },
+    });
+
+    const code = await main([], fs, { write: (text: string) => (stdout += text) }, { write: (text: string) => (stderr += text) });
+
+    expect(code).toBe(1);
+    expect(stderr).toBe('');
+    const report = JSON.parse(stdout) as { checks: unknown[]; issues: { check: string; message: string }[] };
+    expect(report.checks).toContainEqual({ check: 'cross-file', status: 'failed' });
+    const issue = report.issues.find((candidate) => candidate.check === 'cross-file');
+    expect(issue?.message).toMatch(/^data\/weights\.json: not valid JSON/);
+  });
+
   it('exits 0 over the committed data/ and writes nothing to disk', async () => {
     const before = snapshot(DATA_DIR);
 
@@ -210,7 +280,8 @@ describe('pnpm tracked:check', () => {
 
     expect(run.code, run.stderr).toBe(0);
     expect(run.stderr).toBe('');
-    expect(JSON.parse(run.stdout)).toMatchObject({ ok: true, issues: [], pending: PENDING_CHECKS });
+    expect(JSON.parse(run.stdout)).toMatchObject({ ok: true, issues: [] });
+    expect(JSON.parse(run.stdout)).toHaveProperty('checks', expect.arrayContaining([{ check: 'cross-file', status: 'passed' }]));
     expect(snapshot(DATA_DIR)).toEqual(before);
   });
 

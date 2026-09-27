@@ -30,14 +30,14 @@
       "prefix": {
         "kind": "banded",
         "statId": "explicit.stat_2843214518",
-        "valueMin": 12,
+        "valueMin": 5,
         "valueMax": 15,
         "acceptedTier": "T1"
       },
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_681332047",
-        "valueMin": 3,
+        "valueMin": 2,
         "valueMax": 4,
         "acceptedTier": "T1"
       },

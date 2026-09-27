@@ -45,11 +45,12 @@ const BMP_LAST = String.fromCodePoint(0xffff);
 const ASTRAL = String.fromCodePoint(0x10000);
 
 describe('readWeightsIds', () => {
-  it('reads the outer categoryIds and every non-null line statId', async () => {
+  it('reads the outer categoryIds and every non-null line statId, and carries the parsed file', async () => {
     expect(await readWeightsIds(fsWith(JSON.stringify(WEIGHTS)))).toEqual({
       kind: 'present',
       statIds: new Set(['explicit.a', 'explicit.b', 'explicit.c']),
       categoryIds: new Set(['weapon.bow', 'jewel']),
+      file: WEIGHTS,
     });
   });
 

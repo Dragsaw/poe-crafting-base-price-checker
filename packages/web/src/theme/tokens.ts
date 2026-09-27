@@ -274,6 +274,8 @@ export const typeRoles = {
   'appendix-row': role('serif', '13px', '400', '1.2'),
   'key-heading': role('sans', '9.5px', '600', '1.2', '0.18em'),
   'key-body': role('sans', '10.5px', '400', '1.85'),
+  /** The sync report panel's verbatim register: `key-body`'s size, weight and line height in the mono stack. */
+  'sync-report-verbatim': role('mono', '10.5px', '400', '1.85'),
   'running-foot': role('sans', '11px', '400', '1.5'),
   'panel-title': role('serif', '20px', '400', '1.2'),
   'panel-sub': role('sans', '11.5px', '400', '1.5'),

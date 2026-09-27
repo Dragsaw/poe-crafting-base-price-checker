@@ -2,12 +2,12 @@
  * `pnpm tracked:check` — the check half of the tracked-json skill's loop
  * (lookup → edit → check).
  *
- * Read-only. It reads `data/tracked.json`, `data/config.json` and the
- * committed catalogue, runs the production validators over them, and prints
- * `{ok, checks, issues, pending}` as JSON to stdout. It writes no file and
+ * Read-only. It reads `data/tracked.json`, `data/config.json`, the
+ * committed catalogue and `data/weights.json`, runs the production
+ * validators over them, and prints `{ok, checks, issues}` as JSON to stdout. It writes no file and
  * issues no request. Exit 0 when every check passes, 1 otherwise.
  *
- * Three checks, each the production code a sync run uses:
+ * Four checks, each the production code a sync run uses:
  *
  * - `schema`: `TrackedFileSchema` through `parseEnvelope`, which includes the
  *   canonical-key uniqueness rule. One issue per schema issue.
@@ -15,10 +15,13 @@
  *   (IMPLEMENTATION-NOTES.md §6).
  * - `catalogue`: AD-9 resolvability through `checkCatalogue` with an empty
  *   dataset. One issue per `records` entry.
+ * - `cross-file`: `core`'s five cross-file checks (AD-17) against
+ *   `data/weights.json`, the same call the sync run-start gate makes. One
+ *   issue per failure. `skipped` when the weights file is absent, since no
+ *   check runs without it (AD-24).
  *
- * The five cross-file checks against `data/weights.json` are `core`'s and land
- * with Story 3.3. They are listed in `pending` and are not run here, so a pass
- * does not confirm band edges or floors.
+ * A pass still does not confirm that a floor is the one IMPLEMENTATION-NOTES.md
+ * §8 derives: a floor declared too high passes every mechanical check (AD-5).
  */
 
 import { realpathSync } from 'node:fs';
@@ -27,18 +30,21 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { canonicalKey, parseEnvelope, TrackedFileSchema } from '@poe/contracts';
-import type { ConfigFile, FilesystemPort, TrackedEntry } from '@poe/contracts';
+import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
+import { crossFileChecks } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
+import { readWeightsIds } from '../catalogue/weights-ids.ts';
 import { checkCatalogue } from '../chunk/catalogue-check.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
+import { DataFileError } from '../load-data-file.ts';
 import type { DataFileResult } from '../load-data-file.ts';
 import { checkPinnedCap } from '../pinned-cap.ts';
 import { createNodeFilesystemPort } from '../shell.ts';
 
-export type CheckName = 'schema' | 'pinned-cap' | 'catalogue';
+export type CheckName = 'schema' | 'pinned-cap' | 'catalogue' | 'cross-file';
 
 export interface CheckIssue {
   readonly check: CheckName;
@@ -49,7 +55,7 @@ export interface CheckIssue {
 
 export interface CheckStatus {
   readonly check: CheckName;
-  /** `skipped` when the schema check failed, so there are no entries to check. */
+  /** `skipped` when the schema check failed, so there are no entries to check, or, for `cross-file`, when the weights file is absent. */
   readonly status: 'passed' | 'failed' | 'skipped';
 }
 
@@ -57,7 +63,6 @@ export interface TrackedCheckReport {
   readonly ok: boolean;
   readonly checks: readonly CheckStatus[];
   readonly issues: readonly CheckIssue[];
-  readonly pending: readonly string[];
 }
 
 /** The inputs of one check, as loaded. */
@@ -66,9 +71,9 @@ export interface TrackedCheckInputs {
   readonly tracked: string | undefined;
   readonly config: DataFileResult<ConfigFile>;
   readonly catalogue: DataFileResult<CatalogueIds>;
+  /** The parsed `data/weights.json`; `null` when the file is absent. */
+  readonly weights: DataFileResult<WeightsFile | null>;
 }
-
-export const PENDING_CHECKS: readonly string[] = ['five cross-file checks (Story 3.3)'];
 
 type SchemaResult =
   | { readonly ok: true; readonly entries: readonly TrackedEntry[] }
@@ -128,6 +133,14 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     issues.push(...schema.issues);
   }
   const entries = schema.ok ? schema.entries : undefined;
+  const indexByKey = new Map<string, number>();
+  entries?.forEach((entry, index) => {
+    indexByKey.set(canonicalKey(entry), index);
+  });
+  const pathOf = (entryKey: string): { readonly path?: string } => {
+    const index = indexByKey.get(entryKey);
+    return index === undefined ? {} : { path: `entries.${String(index)}` };
+  };
 
   if (!loaded.config.ok) {
     checks.push({ check: 'pinned-cap', status: 'failed' });
@@ -148,17 +161,12 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   } else if (entries === undefined) {
     checks.push({ check: 'catalogue', status: 'skipped' });
   } else {
-    const indexByKey = new Map<string, number>();
-    entries.forEach((entry, index) => {
-      indexByKey.set(canonicalKey(entry), index);
-    });
     const { records } = checkCatalogue(entries, [], loaded.catalogue.value);
     checks.push({ check: 'catalogue', status: records.length === 0 ? 'passed' : 'failed' });
     for (const record of records) {
-      const index = indexByKey.get(record.entryKey);
       issues.push({
         check: 'catalogue',
-        ...(index === undefined ? {} : { path: `entries.${String(index)}` }),
+        ...pathOf(record.entryKey),
         message:
           `${record.identifierKind} ${record.identifier} is absent from the committed catalogue ` +
           `(entry ${record.entryKey})`,
@@ -166,15 +174,46 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     }
   }
 
-  return { ok: issues.length === 0, checks, issues, pending: PENDING_CHECKS };
+  if (!loaded.weights.ok) {
+    checks.push({ check: 'cross-file', status: 'failed' });
+    issues.push({ check: 'cross-file', message: loaded.weights.error.message });
+  } else if (entries === undefined || loaded.weights.value === null) {
+    checks.push({ check: 'cross-file', status: 'skipped' });
+  } else {
+    const failures = crossFileChecks(entries, loaded.weights.value);
+    checks.push({ check: 'cross-file', status: failures.length === 0 ? 'passed' : 'failed' });
+    for (const failure of failures) {
+      issues.push({
+        check: 'cross-file',
+        ...pathOf(failure.entryKey),
+        message: `${failure.check}: ${failure.detail} (entry ${failure.entryKey})`,
+      });
+    }
+  }
+
+  return { ok: issues.length === 0, checks, issues };
 }
 
-/** Reads the three inputs through `fs`. Reads only; a refusal is carried as a value. */
+/** The weights file as a value: absent is `null`, a refusal is carried rather than thrown. */
+async function loadWeights(fs: FilesystemPort): Promise<DataFileResult<WeightsFile | null>> {
+  try {
+    const weights = await readWeightsIds(fs);
+    return { ok: true, value: weights.kind === 'present' ? weights.file : null };
+  } catch (error) {
+    if (error instanceof DataFileError) {
+      return { ok: false, error };
+    }
+    throw error;
+  }
+}
+
+/** Reads the four inputs through `fs`. Reads only; a refusal is carried as a value. */
 export async function loadTrackedCheckInputs(fs: FilesystemPort): Promise<TrackedCheckInputs> {
   return {
     tracked: await fs.readTextFile(TRACKED_PATH),
     config: await loadConfig(fs),
     catalogue: await loadCatalogueIds(fs),
+    weights: await loadWeights(fs),
   };
 }
 

@@ -17,6 +17,18 @@ function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
           {segment.text}
         </em>
       );
+    case 'verbatim':
+      // The panel's own size, weight and line height in the mono stack; the
+      // panel's ink, never a semantic colour. A canonical key has no spaces,
+      // so it may break anywhere.
+      return (
+        <span
+          data-verbatim=""
+          style={{ ...typeStyle('sync-report-verbatim'), fontStyle: 'normal', overflowWrap: 'anywhere' }}
+        >
+          {segment.text}
+        </span>
+      );
     case 'text':
       return <>{segment.text}</>;
   }
@@ -42,8 +54,8 @@ function Group({ group, first }: { readonly group: FigureGroup; readonly first: 
  * capped at `syncReportMaxHeight` and scrolling inside its own band past it —
  * the one capped band on the page. Three equal columns, **one heading per
  * column, never per group**; groups in a column are a vertical stack 8px
- * apart, so Epic 3's sixth group under *What is broken* needs vertical space
- * alone. No hover state.
+ * apart, so the sixth group under *What is broken*, the cross-file diagnosis,
+ * takes vertical space alone. No hover state.
  */
 export function SyncReportPanel({ columns }: { readonly columns: PanelColumns }): JSX.Element {
   return (

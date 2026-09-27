@@ -473,6 +473,32 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
     expect(result.unrankable.map((item) => item.className)).toEqual(['Amulets', 'Wands', 'bows']);
   });
 
+  it('names a class a cross-file failure names as class disagrees with weights file, and no other', () => {
+    const result = ranked({
+      tracked: [craftedOf('weapon.bow', 'Bows'), craftedOf('accessory.amulet', 'Amulets')],
+      weights: WEIGHTS,
+      crossFileFailures: [{ categoryId: 'weapon.bow', className: 'Bows' }, { categoryId: 'weapon.bow', className: 'Bows' }],
+    });
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'class disagrees with weights file' },
+    ]);
+  });
+
+  it('lets the lookup reasons take precedence over a cross-file failure', () => {
+    const result = ranked({
+      tracked: [craftedOf('jewel', 'Emerald'), craftedOf('jewel', 'Sapphire')],
+      weights: weightsWith(['jewel', 'Emerald', 'partial']),
+      crossFileFailures: [
+        { categoryId: 'jewel', className: 'Emerald' },
+        { categoryId: 'jewel', className: 'Sapphire' },
+      ],
+    });
+    expect(result.unrankable).toEqual([
+      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL },
+      { categoryId: 'jewel', className: 'Sapphire', reason: ABSENT },
+    ]);
+  });
+
   it('is identical under a shuffled Tracked List', () => {
     const tracked = [
       craftedOf('weapon.bow', 'Bows'),

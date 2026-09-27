@@ -1,4 +1,5 @@
-import { rank } from '@poe/core';
+import { crossFileChecks, rank } from '@poe/core';
+import type { CrossFileFailure } from '@poe/core';
 import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
 
 import { FailureScreen } from './frame/FailureScreen';
@@ -20,11 +21,14 @@ import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
 
-/** A ready outcome carries the "now" its ages are read against, taken once when the load resolved. */
+/**
+ * A ready outcome carries the "now" its ages are read against, taken once when
+ * the load resolved, and the cross-file failures, run once per load (AD-17).
+ */
 type ViewState =
   | { readonly kind: 'pending' }
   | Exclude<LoadOutcome, ReadyOutcome>
-  | (ReadyOutcome & { readonly now: number });
+  | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] });
 
 /**
  * The page's substrate. It paints the masthead and twenty skeleton slots at
@@ -47,7 +51,15 @@ export function App(): JSX.Element {
     void loadArtifacts({ signal: controller.signal }).then((outcome) => {
       if (live) {
         // "Now" is read once, as the set resolves, and held: ages never tick.
-        setView(outcome.kind === 'ready' ? { ...outcome, now: Date.now() } : outcome);
+        setView(
+          outcome.kind === 'ready'
+            ? {
+                ...outcome,
+                now: Date.now(),
+                crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights),
+              }
+            : outcome,
+        );
       }
     });
     return () => {
@@ -83,9 +95,14 @@ export function App(): JSX.Element {
       return (
         <Frame state="ready">
           <Masthead league={view.set.config.league} threshold={threshold} onThresholdChange={changeThreshold} />
-          <TrustStrip set={view.set} absent={view.absent} now={view.now} />
+          <TrustStrip set={view.set} absent={view.absent} now={view.now} crossFileFailures={view.crossFileFailures} />
           <AskingPriceLine />
-          <ReadyBody set={view.set} now={view.now} threshold={threshold} />
+          <ReadyBody
+            set={view.set}
+            now={view.now}
+            threshold={threshold}
+            crossFileFailures={view.crossFileFailures}
+          />
         </Frame>
       );
     case 'refused':
@@ -110,7 +127,8 @@ export function App(): JSX.Element {
 }
 
 /**
- * `core` ranks the whole loaded set at the player's threshold; `web` renders
+ * `core` ranks the whole loaded set at the player's threshold, with the
+ * load's cross-file failures excluding their classes (AD-17); `web` renders
  * what it returns and orders nothing itself (AD-4). Memoised on the set,
  * `now` and the threshold. Renders the ready body below the asking-price
  * line: the list statement, the ranked list, and the page tail led by the
@@ -120,10 +138,12 @@ function ReadyBody({
   set,
   now,
   threshold,
+  crossFileFailures,
 }: {
   readonly set: ArtifactSet;
   readonly now: number;
   readonly threshold: number;
+  readonly crossFileFailures: readonly CrossFileFailure[];
 }): JSX.Element {
   const { rows, statement, unrankable } = useMemo(() => {
     const ranking = rank({
@@ -132,13 +152,14 @@ function ReadyBody({
       activeLeague: set.config.league,
       threshold,
       weights: set.weights,
+      crossFileFailures,
     });
     return {
       rows: toDisplayRows(ranking, set.dataset.entries, now),
       statement: listStatement(ranking, threshold, set.config.league),
       unrankable: ranking.unrankable,
     };
-  }, [set, now, threshold]);
+  }, [set, now, threshold, crossFileFailures]);
   return (
     <>
       <ListStatement statement={statement} />

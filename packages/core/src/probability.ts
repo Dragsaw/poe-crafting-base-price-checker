@@ -18,8 +18,8 @@ import type {
  * **The two-`#` rule is the producer's inference, pending OQ-12** (§1). A line
  * with two range pairs derives the midpoint of each edge. `interval` is the
  * one place that division happens and the one place to change when OQ-12
- * resolves: `contains` calls it, and the edge-alignment check (Story 3.3) calls
- * it too.
+ * resolves: `contains` calls it, and the edge-alignment check (`cross-file.ts`)
+ * calls it too.
  *
  * **Exactness (AD-5, §1).** Edges compare with `>=` and `<=` and exact
  * equality. Two `#` is the most a stat line carries, and the game publishes
@@ -145,7 +145,7 @@ function totalWeight(entries: readonly ModifierWeight[]): number {
 }
 
 /** `C = contained(ref) ∩ E`; an absent affix contains its whole eligible set (§11). */
-function containedIn(ref: ModifierRef | undefined, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
+export function containedIn(ref: ModifierRef | undefined, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
   return ref === undefined ? eligibleSet : eligibleSet.filter((entry) => contains(ref, entry));
 }
 

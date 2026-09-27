@@ -8,7 +8,7 @@ description: Seed, add, change or remove entries in data/tracked.json, the curat
 You edit `data/tracked.json` in a loop: look up, edit, check. The two scripts print JSON to stdout. They only read.
 
 - `pnpm tracked:lookup stat|base|class|mods|tiers ...` finds the ids and the tiers. Run it with no arguments to see the usage.
-- `pnpm tracked:check` validates the file. It exits 0 when the file passes.
+- `pnpm tracked:check` validates the file: the contracts schema, the pinned cap, catalogue resolvability and the five cross-file checks against `data/weights.json` (AD-17). It exits 0 when the file passes.
 
 ## Rules for all steps
 
@@ -18,10 +18,6 @@ You edit `data/tracked.json` in a loop: look up, edit, check. The two scripts pr
 - The Accepted Tier rule, the band rule and the shared floor are FR-22 and AD-17. The floor derivation is IMPLEMENTATION-NOTES §8. How a tier's interval comes from its `ranges` is IMPLEMENTATION-NOTES §1. Apply those rules as they are written there. Do not restate them in the file or in your report.
 - A crafted entry has at most one prefix and at most one suffix (AD-5).
 - `tracked:lookup` derives nothing. `tiers` and `mods` print the weights data verbatim. You compute each band edge and the floor yourself, from the printed `ranges` and `itemLevelMin`, per §1 and §8.
-
-## Open weak point
-
-`tracked:check` runs the contracts schema (with canonical-key uniqueness), the pinned cap and catalogue resolvability. The five cross-file checks against `data/weights.json` land with Story 3.3, and `tracked:check` lists them under `pending`. The five checks are the list in `AGENT-WORKFLOW.md` (the five cross-file checks rule; AD-17). **Until Story 3.3 ships, no command runs any of them.** Step 8 of the loop is a hand check of the band edges and the floor only. The other checks of that list stay uncaught until Story 3.3. A clean `tracked:check` confirms none of the five. Re-check the file when Story 3.3 lands.
 
 ## The loop
 
@@ -33,14 +29,13 @@ You edit `data/tracked.json` in a loop: look up, edit, check. The two scripts pr
 5. **Write the floor.** Derive `itemLevelMin` per §8 and AD-17. Read every other crafted entry on the same class in `data/tracked.json` first, including any you are adding in this same batch. The floor is one number: the max over **every** crafted entry on the class, old and new, not a per-entry figure. When the derived floor changes, write it on all of them and say so in the report. A raw entry takes no part in §8: its `itemLevelMin` is the Raw Base item level of the PRD glossary (FR-3).
 6. **Write the label.** Set `acceptedTier` to the tier label of the band per AD-5, for example `T1` or `T1-T2`.
 7. **Check.** Run `pnpm tracked:check`. On `ok: false`, fix each item in `issues` (`check`, `path`, `message`) and run it again until it exits 0.
-8. **Check the edges by hand** until Story 3.3 ships. Compare each band's `valueMin` and `valueMax` with the `tiers` output again, against the band rule of FR-22 and the interval of §1. Compare each floor with §8.
-9. **Report.** Name the file, each change (which entries you added, changed or removed, with the band, the tier label and the floor), and the reason for each change. Until Story 3.3 ships, also state that the five cross-file checks did not run and that only step 8 checked the edges and the floor by hand.
+8. **Report.** Name the file, each change (which entries you added, changed or removed, with the band, the tier label and the floor), and the reason for each change. A pass does not confirm that a floor is the one §8 derives: a floor declared too high passes every check (AD-5), so state how you derived each floor.
 
 ## Changing or removing an entry
 
 - To remove an entry, set its `status` to the `pruned` tombstone that the spine defines (AD-12), with its reason. Do not delete the entry.
 - After you add, change or remove a crafted entry, re-derive the floor for every other crafted entry on that class (loop step 5). A change or a removal can move the class's shared floor (§8, AD-17).
-- Then do steps 7 to 9 of the loop.
+- Then do steps 7 to 8 of the loop.
 
 ## Interactive mode
 
@@ -52,4 +47,4 @@ Use this mode when the player asks which mods are possible ("show me which mods 
 4. **Ask the pairing question** when the player picked more than one prefix or more than one suffix. A crafted entry holds at most one prefix and one suffix (AD-5). Ask whether to write one entry for each prefix × suffix pair, or one single-affix entry for each pick. State the entry count of each answer, for example "2 prefixes × 3 suffixes: 6 pair entries, or 5 single-affix entries". Do not choose a default. When the player picked one prefix and one suffix, the draft is one pair entry. When the player picked one mod in total, the draft is one single-affix entry. When the player picked none, write nothing and say so.
 5. **Suggest the bands.** For each pick, run `pnpm tracked:lookup tiers <statId> --class <className>`. For a hybrid pick, use the statId that the player wants to chase, and ask when that is not clear. Suggest the reference and the floor per steps 4 to 5 (including 4b's collision check) of the loop, with the FR-22 Accepted Tier as the default suggestion for a band.
 6. **Show the draft.** Show each entry exactly as it will be written in `data/tracked.json`. Show the shared floor as one number derived across every drafted entry plus every existing entry on the class (loop step 5), and any existing entry whose floor changes. Wait for the player to confirm. If the player changes something, show the new draft and wait again. **Do not edit `data/tracked.json` before the player confirms.**
-7. **Edit, check and report.** Write the confirmed entries. Then do steps 7 to 9 of the loop.
+7. **Edit, check and report.** Write the confirmed entries. Then do steps 7 to 8 of the loop.

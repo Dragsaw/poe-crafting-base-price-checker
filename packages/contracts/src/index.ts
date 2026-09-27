@@ -82,6 +82,17 @@ export {
 } from './canonical-key.ts';
 export type { CanonicalAffix, CanonicalKeyElements } from './canonical-key.ts';
 
+export {
+  describeOverlap,
+  NEVER_CO_OCCUR,
+  overlap,
+  OVERLAP_SLOTS,
+  overlapBranches,
+  slotOverlap,
+  slotOverlapBranch,
+} from './overlap.ts';
+export type { CoOccur, OverlapAffixes, OverlapSlot, SlotOverlapBranch } from './overlap.ts';
+
 export { CraftRecipeSchema } from './craft-recipe.ts';
 export type { CraftRecipe } from './craft-recipe.ts';
 

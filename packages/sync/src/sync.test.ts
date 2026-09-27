@@ -21,6 +21,7 @@ import type {
 } from '@poe/contracts';
 import { describe, expect, it, vi } from 'vitest';
 
+import { CrossFileGateError } from './chunk/cross-file-gate.ts';
 import { LOCK_PATH, serialiseLock, STALE_LOCK_AFTER_MS } from './chunk/lock.ts';
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
 import { DATASET_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
@@ -334,7 +335,11 @@ describe('nextWait: the session matrix', () => {
   });
 
   it('refusal or league mismatch: until an input file changes, with no time bound', () => {
-    for (const error of [new DataFileError('data/config.json', 'absent', 'the file is absent'), new LeagueMismatchError('X', [])]) {
+    for (const error of [
+      new DataFileError('data/config.json', 'absent', 'the file is absent'),
+      new LeagueMismatchError('X', []),
+      new CrossFileGateError([]),
+    ]) {
       expect(nextWait(failure(error), INITIAL_SESSION_STATE, COLD)).toEqual({
         kind: 'input-change',
         reason: 'a refused input or a league mismatch',
