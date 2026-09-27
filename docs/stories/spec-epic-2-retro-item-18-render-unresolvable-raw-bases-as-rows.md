@@ -2,8 +2,9 @@
 title: 'Epic 2 retro item 18: render unresolvable Raw Bases as rows'
 type: 'bugfix'
 created: '2026-09-27'
-status: 'in-progress'
+status: 'done'
 baseline_revision: '5fb836a30832812b83b0efbdbaf35dc2a428623b'
+baseline_commit: '6a1b743290a7ddaa087566717483d88998ae313c'
 review_loop_iteration: 0
 followup_review_recommended: false
 context:
@@ -103,12 +104,33 @@ deferred: []
   - `[low]` `[patch]` (blind 10) A test name says "rows" over one row — renamed to "lists a lone unresolvable row under the honest-empty statement".
   - verification-gap layer: no gaps found.
 
+### 2026-09-27 — Review pass (fix of the `78db4da..ec38dce` findings, diff from `6a1b743`)
+- verdicts: 17 findings — high 0, medium 0, low 13, false 4, maybe-false 0
+- findings:
+  - `[low]` `[patch]` (ledger 1) The Never-list carve-out of crafted unresolvable rows (Epic 3) had no ledger entry — appended one to `deferred-work.md`.
+  - `[low]` `[patch]` (ledger 2) The skipped browser check had no ledger entry — appended one naming the checks for when a fixture set with an `unresolvable` entry exists (retro action 10).
+  - `[false]` `[reject]` (edge 1) Dropping "yet" while `ranking.unrankable` is non-empty — revision 9 speaks of "every row the list shows"; unrankable classes print in `UnrankableAppendix`, not as list rows, and `isHonestEmpty` does not count them.
+  - `[low]` `[reject]` (edge 2) The Execution task still says rust keys on the state — the fix edits this spec; review decision (b) in Review Findings records the change.
+  - `[low]` `[reject]` (edge 3) AC1's *not valued* cannot show on an all-unresolvable fixture — the fix edits this spec; decision (b) ruled the honest-empty phrase, and AC1 holds with a priced row present (`ranked-list.test.tsx` rust assertions).
+  - `[low]` `[patch]` (blind 1, blind 2) The copy clash of `deferred-work.md:332` is pinned by a test, and nothing records that decision (b) settled its colour half — appended a `[NOTE FOR UX]` entry: colour resolved as (b), copy half open for UX.
+  - `[low]` `[reject]` (blind 3) The rust colour matches display text — decision (b) says "take the colour from the phrase shown"; a tone field adds surface for no named divergence.
+  - `[low]` `[reject]` (blind 4) No test that an honest-empty row's expansion stays rust — `CombinationRow` builds its phrase from `combinationFigure(row.state)` and never sees the honest-empty swap in `display-rows.ts`; the existing expansion test covers it.
+  - `[false]` `[reject]` (blind 5) No test for rust outside honest-empty — `ranked-list.test.tsx:175-179` asserts *not valued* in `colors.rust` under the text rule.
+  - `[low]` `[reject]` (blind 6) `onlyUnresolvable` repeats the group list — no fourth unpriced group exists; a shared helper guards no demonstrated state.
+  - `[low]` `[reject]` (blind 7) The `onlyUnresolvable` boolean is unlabelled — one production call site names it in a local; cosmetic.
+  - `[low]` `[reject]` (blind 8) Spec body and Change Log not updated — the fix edits this spec.
+  - `[low]` `[reject]` (blind 9) Ticked review items name no closure — the fix edits this spec; this log and the commit trace them.
+  - `[low]` `[reject]` (blind 10) Two baselines — the fix edits this spec; `baseline_revision` is the original build, `baseline_commit` this fix pass.
+  - `[false]` `[reject]` (blind 11) `tools/dev-stop/` changes are not in the diff — they are another session's unrelated edits, excluded from the review and from this change's commit.
+  - `[low]` `[reject]` (blind 12) Missing statement cases (not-yet-synced from a Price State, only no-listings) — `listStatement` reads group lengths only; core's grouping owns which group an entry lands in, and the existing honest-empty tests keep "yet" for no-listings.
+  - verification-gap layer: no gaps found.
+
 ### Review Findings
 
 Code review 2026-09-27 of `78db4da..ec38dce`, chunk `packages/web`. It covers every web stream that branched from `5fb836a` and landed in series. A merge-integrity pass found no conflict markers. Each line that commits in the range added and HEAD lacks has a deliberate successor. `pnpm check` is clean, and `pnpm test` passes 1187/1187.
 
-- [ ] [Review][Patch] Honest-empty unresolvable row prints *no figure yet* in rust. Resolved 2026-09-27 as option (b): the row keeps *no figure yet*, and `RankedRow` takes the EV colour from the phrase shown, so rust goes only to *not valued*. Add a colour assertion for the honest-empty case. [packages/web/src/list/RankedRow.tsx:108] — Decision detail: this comes from the item 18 rebase onto item 20. `toDisplayRows` (`packages/web/src/list/display-rows.ts`, the `isHonestEmpty` branch) gives every unpriced row *no figure yet* but keeps `state: 'unresolvable'`. `RankedRow.tsx:108` takes the EV colour from the state, so the phrase paints rust. EXPERIENCE *Money slots* gives rust to *not valued* only. An all-unresolvable list, which is the AC1 fixture, therefore no longer shows *not valued*. The tests assert only the text, never the colour. The ledger `[NOTE FOR UX]` ("item 18 rebase onto retro item 20", `deferred-work.md:332`) is still open. Options: (a) an unresolvable row keeps *not valued* in rust while honest-empty; (b) keep *no figure yet* and take the colour from the phrase shown, so it prints in ink; (c) wait for UX to rule and defer.
-- [ ] [Review][Patch] EXPERIENCE revision 9 code owed was never implemented, because `a8d4842` landed its ruling after `997f7f6`. `honestEmptyCopy` still ends in "yet" for an all-unresolvable list, which needs the one branch plus a test (`deferred-work.md:327`). The `STATE_NOTES` doc comment still says the note waits for a UX ruling (`deferred-work.md:326`). [packages/web/src/list/list-statement.ts:17, packages/web/src/list/format.ts:97]
+- [x] [Review][Patch] Honest-empty unresolvable row prints *no figure yet* in rust. Resolved 2026-09-27 as option (b): the row keeps *no figure yet*, and `RankedRow` takes the EV colour from the phrase shown, so rust goes only to *not valued*. Add a colour assertion for the honest-empty case. [packages/web/src/list/RankedRow.tsx:108] — Decision detail: this comes from the item 18 rebase onto item 20. `toDisplayRows` (`packages/web/src/list/display-rows.ts`, the `isHonestEmpty` branch) gives every unpriced row *no figure yet* but keeps `state: 'unresolvable'`. `RankedRow.tsx:108` takes the EV colour from the state, so the phrase paints rust. EXPERIENCE *Money slots* gives rust to *not valued* only. An all-unresolvable list, which is the AC1 fixture, therefore no longer shows *not valued*. The tests assert only the text, never the colour. The ledger `[NOTE FOR UX]` ("item 18 rebase onto retro item 20", `deferred-work.md:332`) is still open. Options: (a) an unresolvable row keeps *not valued* in rust while honest-empty; (b) keep *no figure yet* and take the colour from the phrase shown, so it prints in ink; (c) wait for UX to rule and defer.
+- [x] [Review][Patch] EXPERIENCE revision 9 code owed was never implemented, because `a8d4842` landed its ruling after `997f7f6`. `honestEmptyCopy` still ends in "yet" for an all-unresolvable list, which needs the one branch plus a test (`deferred-work.md:327`). The `STATE_NOTES` doc comment still says the note waits for a UX ruling (`deferred-work.md:326`). [packages/web/src/list/list-statement.ts:17, packages/web/src/list/format.ts:97]
 - Rejected:
   - `low` (blind) With the report absent, an all-unresolvable list shows no unresolvable signal at rest. The health line depends on the Sync Report by design (state 23), and the expansion carries the state.
   - `false` (auditor) AC1 was changed to fit the code. The same root cause as the Decision row, which is where it is grouped.

@@ -24,6 +24,9 @@ describe('the copy', () => {
     expect(honestEmptyCopy('Forbidden Rites')).toBe(
       'In canonical order, not ranked: no tracked unit has a price from Forbidden Rites yet.',
     );
+    expect(honestEmptyCopy('Forbidden Rites', true)).toBe(
+      'In canonical order, not ranked: no tracked unit has a price from Forbidden Rites.',
+    );
     expect(nothingClearsCopy(3)).toBe('Nothing clears your Payout Threshold of 3.00 Divine.');
     expect(nothingClearsCopy(0.6)).toBe('Nothing clears your Payout Threshold of 0.60 Divine.');
   });
@@ -99,10 +102,20 @@ describe('listStatement', () => {
   });
 
   // Matrix: only unresolvable.
-  it('states honest-empty when every entry is unresolvable, since each still has a row', () => {
+  it('states honest-empty without "yet" when every entry is unresolvable, since no sync will bring a price', () => {
     expect(statementFor([belt], [unpriced(belt, { state: 'unresolvable' }, hoursBefore(NOW, 1))])).toEqual({
+      kind: 'honest-empty',
+      text: `In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE}.`,
+    });
+  });
+
+  // EXPERIENCE.md revision 9: one no-listings or not-yet-synced row keeps "yet".
+  it('keeps "yet" when an unresolvable row shares the list with a no-listings or not-yet-synced row', () => {
+    const lost = unpriced(belt, { state: 'unresolvable' }, hoursBefore(NOW, 1));
+    expect(statementFor([belt, ring], [lost, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 1))])).toEqual({
       kind: 'honest-empty',
       text: honestEmptyCopy(TEST_LEAGUE),
     });
+    expect(statementFor([belt, ring], [lost])).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
   });
 });

@@ -5,7 +5,7 @@ import type { CSSProperties, JSX } from 'react';
 import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/tokens';
 import { cellStyle } from './ColumnHeader';
 import type { DisplayRow } from './display-rows';
-import { rawNote } from './format';
+import { MONEY_PHRASES, rawNote } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
@@ -105,7 +105,8 @@ export function RankedRow({
             style={{
               ...typeStyle('money-phrase'),
               fontStyle: 'italic',
-              color: row.state.state === 'unresolvable' ? colors.rust : colors.ink,
+              // The colour follows the phrase shown: an honest-empty `unresolvable` row reads *no figure yet* in ink.
+              color: row.ev.text === MONEY_PHRASES.unresolvable ? colors.rust : colors.ink,
             }}
           >
             {row.ev.text}

@@ -98,9 +98,9 @@ export function stateWord(state: CombinationState): string {
 }
 
 /**
- * Line two's notes, from EXPERIENCE.md states 2, 5, 6 and 7 verbatim, and
- * state 4 adapted. State 4's note names a statId; a Raw Base misses on its
- * baseTypeId or categoryId, so its note names no id kind until UX rules (deferred-work.md, `[NOTE FOR UX]`).
+ * Line two's notes, from EXPERIENCE.md states 2, 4, 5, 6 and 7 verbatim. State
+ * 4's note names no id kind, so one wording serves every `unresolvable` row, a
+ * Raw Base or a Combination (EXPERIENCE.md revision 9).
  */
 export const STATE_NOTES = {
   'no-listings': 'nobody is listing this right now — a jackpot and junk look alike here',

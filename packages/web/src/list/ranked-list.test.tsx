@@ -188,6 +188,27 @@ describe('the unpriced trail', () => {
     }
   });
 
+  // Review decision (b): the EV colour follows the phrase shown, so rust goes only to *not valued*.
+  it('prints an honest-empty unresolvable row as no figure yet in ink, not rust', () => {
+    const lost = rawEntry('Lost Ring');
+    const tried = rawEntry('Coral Ring');
+    const rows = rowsIn(
+      mountList(
+        [lost, tried],
+        [
+          unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 1)),
+          unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
+        ],
+      ),
+    );
+    expect(rows).toHaveLength(2);
+    for (const r of rows) {
+      const phrase = cell(r, 'ev').querySelector<HTMLElement>('[data-money-phrase]');
+      expect(phrase?.textContent).toBe('no figure yet');
+      expect(phrase?.style.color).toBe(rgb(colors.ink));
+    }
+  });
+
   it('never prints 0, a blank or an em dash in an EV cell', () => {
     const tried = rawEntry('Coral Ring');
     const never = rawEntry('Wide Belt');

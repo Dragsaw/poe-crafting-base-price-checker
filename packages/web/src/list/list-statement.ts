@@ -12,9 +12,13 @@ export type ListStatement =
   | { readonly kind: 'nothing-clears'; readonly text: string }
   | { readonly kind: 'none' };
 
-/** State 23's copy (Story 2.7 decision, 2026-09-27). */
-export function honestEmptyCopy(league: string): string {
-  return `In canonical order, not ranked: no tracked unit has a price from ${league} yet.`;
+/**
+ * State 23's copy (Story 2.7 decision, 2026-09-27). A list of only
+ * `unresolvable` rows drops "yet", because no sync will bring a price
+ * (EXPERIENCE.md revision 9, the paragraph after the State Patterns table).
+ */
+export function honestEmptyCopy(league: string, onlyUnresolvable = false): string {
+  return `In canonical order, not ranked: no tracked unit has a price from ${league}${onlyUnresolvable ? '' : ' yet'}.`;
 }
 
 /** State 25's copy (Story 2.7 decision, 2026-09-27): the live threshold at the page's 2dp. */
@@ -49,7 +53,9 @@ export function isHonestEmpty(ranking: Ranking): boolean {
  */
 export function listStatement(ranking: Ranking, threshold: number, league: string): ListStatement {
   if (isHonestEmpty(ranking)) {
-    return { kind: 'honest-empty', text: honestEmptyCopy(league) };
+    // Every row the list shows is `unresolvable` when the other two unpriced groups are empty.
+    const onlyUnresolvable = ranking.noListings.length === 0 && ranking.notYetSynced.length === 0;
+    return { kind: 'honest-empty', text: honestEmptyCopy(league, onlyUnresolvable) };
   }
   if (ranking.ordering.length === 0 && ranking.belowThreshold.length > 0) {
     return { kind: 'nothing-clears', text: nothingClearsCopy(threshold) };
