@@ -72,6 +72,28 @@ describe('toDisplayRows', () => {
     expect(rows.every((row) => row.ev.kind === 'phrase' && row.tier === 3)).toBe(true);
   });
 
+  // Matrix: mixed reset with an unresolvable row. State 23's EV phrase holds whatever the Price State.
+  it('folds the unresolvable rows into the honest-empty canonical sequence, each reading no figure yet', () => {
+    const ring = rawEntry('Coral Ring');
+    const amulet = rawEntry('Gold Amulet');
+    const lost = rawEntry('Lost Ring');
+    const rows = rowsFor(
+      [lost, amulet, ring],
+      [
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+        unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
+      ],
+    );
+    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.state.state])).toEqual([
+      ['Coral Ring', undefined, 'no figure yet', 'not-yet-synced'],
+      ['Gold Amulet', undefined, 'no figure yet', 'no-listings'],
+      ['Lost Ring', undefined, 'no figure yet', 'unresolvable'],
+    ]);
+    const keys = rows.map((row) => row.key);
+    expect(keys).toEqual(keys.toSorted(compareCanonicalKeys));
+  });
+
   // Matrix: partial refresh. A ranked row prints, so the unpriced groups stay as option a.
   it('keeps the unpriced rows grouped, noListings then notYetSynced, on a partial refresh', () => {
     const solar = rawEntry('Solar Amulet');
@@ -122,17 +144,37 @@ describe('toDisplayRows', () => {
     ]);
   });
 
-  it('drops unresolvable and below-threshold entries, and gives a league mismatch its observation age', () => {
+  it('trails the unresolvable rows last, in canonical key order, after noListings and notYetSynced', () => {
+    const a = rawEntry('Gold Amulet');
+    const tried = rawEntry('Coral Ring');
+    const never = rawEntry('Wide Belt');
     const lost = rawEntry('Lost Ring');
+    const gone = rawEntry('Broken Ring');
+    const rows = rowsFor(
+      [lost, never, a, gone, tried],
+      [
+        unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
+        priced(a, 0.5, hoursBefore(NOW, 3)),
+        unpriced(gone, { state: 'unresolvable' }, hoursBefore(NOW, 3 * 24 + 1)),
+        unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+      ],
+    );
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.kind, row.ev.text, row.age?.word, row.state.state])).toEqual([
+      ['Gold Amulet', 1, 1, 'figure', '0.50', undefined, 'priced'],
+      ['Coral Ring', undefined, 3, 'phrase', 'an open question', undefined, 'no-listings'],
+      ['Wide Belt', undefined, 3, 'phrase', 'no figure yet', 'never attempted', 'not-yet-synced'],
+      ['Broken Ring', undefined, 3, 'phrase', 'not valued', 'tried 3d ago', 'unresolvable'],
+      ['Lost Ring', undefined, 3, 'phrase', 'not valued', undefined, 'unresolvable'],
+    ]);
+    expect(rows[4]?.ages).toEqual({ observed: undefined, attempted: 'tried 1h ago' });
+  });
+
+  it('drops below-threshold entries, and gives a league mismatch its observation age', () => {
     const cheap = rawEntry('Iron Ring');
     const old = rawEntry('Jade Amulet');
     const rows = rowsFor(
-      [lost, cheap, old],
-      [
-        unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
-        priced(cheap, 0.1, hoursBefore(NOW, 1)),
-        priced(old, 3, hoursBefore(NOW, 72), 'Standard'),
-      ],
+      [cheap, old],
+      [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), 'Standard')],
     );
     expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.age?.word])).toEqual([
       ['Jade Amulet', undefined, 'no figure yet', 'priced 3d ago'],

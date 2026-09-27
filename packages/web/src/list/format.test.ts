@@ -124,6 +124,7 @@ describe('the expansion copy', () => {
   const NEVER: CombinationState = { state: 'not-yet-synced', reason: 'never-synced' };
   const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
   const NO_RATE: CombinationState = { state: 'not-yet-synced', reason: 'no-exchange-rate' };
+  const UNRESOLVABLE: CombinationState = { state: 'unresolvable' };
 
   it('prints exact ages with no 48h cut-off: < 1h, whole hours under a day, then whole days', () => {
     expect(exactAge(hoursBefore(NOW, 0), NOW)).toBe('< 1h');
@@ -141,6 +142,7 @@ describe('the expansion copy', () => {
     expect(combinationAges(PRICED, undefined, NOW)).toEqual({ observed: 'priced 11h ago', attempted: undefined });
     expect(combinationAges(NO_LISTINGS, hoursBefore(NOW, 3), NOW)).toEqual({ observed: undefined, attempted: 'tried 3h ago' });
     expect(combinationAges(MISMATCH, hoursBefore(NOW, 50), NOW)).toEqual({ observed: undefined, attempted: 'tried 2d ago' });
+    expect(combinationAges(UNRESOLVABLE, hoursBefore(NOW, 5), NOW)).toEqual({ observed: undefined, attempted: 'tried 5h ago' });
   });
 
   it('leaves both age cells empty for a never-synced entry, even with a stamped clock', () => {
@@ -154,15 +156,17 @@ describe('the expansion copy', () => {
     expect(sampleText(NO_LISTINGS)).toBe('0 listings found');
     expect(sampleText(NEVER)).toBe('no sample');
     expect(sampleText(NO_RATE)).toBe('no sample');
+    expect(sampleText(UNRESOLVABLE)).toBe('no sample');
   });
 
   it('prints the state word, with the reason for not-yet-synced, and a glyph per state', () => {
-    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE].map(stateWord)).toEqual([
+    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE, UNRESOLVABLE].map(stateWord)).toEqual([
       'priced',
       'no-listings',
       'not-yet-synced · never-synced',
       'not-yet-synced · league-mismatch',
       'not-yet-synced · no-exchange-rate',
+      'unresolvable',
     ]);
     expect(PRICE_STATE_GLYPHS).toEqual({ priced: '●', 'no-listings': '○', 'not-yet-synced': '∆', unresolvable: '×' });
   });
@@ -172,6 +176,7 @@ describe('the expansion copy', () => {
     expect(combinationFigure({ ...PRICED, priceDivine: 0.003 })).toEqual({ kind: 'figure', text: '< 0.01' });
     expect(combinationFigure(NO_LISTINGS)).toEqual({ kind: 'phrase', text: 'an open question' });
     expect(combinationFigure(NEVER)).toEqual({ kind: 'phrase', text: 'no figure yet' });
+    expect(combinationFigure(UNRESOLVABLE)).toEqual({ kind: 'phrase', text: 'not valued' });
   });
 
   it('takes the raw note when priced and the state note verbatim otherwise', () => {
@@ -181,6 +186,7 @@ describe('the expansion copy', () => {
     expect(rawCombinationNote(NEVER, 82)).toBe('no request was ever issued for this entry');
     expect(rawCombinationNote(MISMATCH, 82)).toBe('the observation belongs to another league');
     expect(rawCombinationNote(NO_RATE, 82)).toBe('the listing currency had no rate at sync time');
+    expect(rawCombinationNote(UNRESOLVABLE, 82)).toBe('its id is gone from the trade API — a patch did this');
     expect(STATE_NOTES['no-listings']).not.toMatch(/worthless|no value/);
   });
 

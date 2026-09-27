@@ -102,7 +102,11 @@ export function CombinationRow({
           {row.text}
         </div>
         <div data-cell="state" style={{ ...cell(state), ...typeStyle('detail-meta') }}>
-          <span data-state-glyph="" aria-hidden="true" style={{ fontSize: '9px' }}>
+          <span
+            data-state-glyph=""
+            aria-hidden="true"
+            style={{ fontSize: '9px', color: row.state.state === 'unresolvable' ? colors.rust : undefined }}
+          >
             {PRICE_STATE_GLYPHS[row.state.state]}
             {NBSP}
           </span>
@@ -114,7 +118,14 @@ export function CombinationRow({
               {shown.text}
             </span>
           ) : (
-            <span data-money-phrase="" style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}>
+            <span
+              data-money-phrase=""
+              style={{
+                ...typeStyle('money-phrase'),
+                fontStyle: 'italic',
+                color: row.state.state === 'unresolvable' ? colors.rust : colors.ink,
+              }}
+            >
               {shown.text}
             </span>
           )}

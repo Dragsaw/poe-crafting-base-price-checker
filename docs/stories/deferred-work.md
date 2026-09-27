@@ -313,3 +313,12 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-epic-2-retro-item-19-make-the-committed-day-one-state-explain.md`
   summary: When Epic 3 ranks crafted rows, rewrite the Epic 2 dek in EXPERIENCE.md (its owner), `MASTHEAD_DEK` in `packages/web/src/frame/Masthead.tsx`, and the dek assertions in `packages/web/src/App.test.tsx` in the same change, because "Crafted Item Classes are not ranked yet" becomes false.
   evidence: The spec's frozen Decision ("Epic 3 rewrites the dek when it ranks crafted rows"). No Epic 3 AC carries it.
+
+## Deferred from: epic 2 retro item 18 (2026-09-27)
+
+- source_spec: `docs/stories/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md`
+  summary: [NOTE FOR UX] EXPERIENCE.md state 4's note names a statId, but a Raw Base goes unresolvable on its baseTypeId or categoryId. Until UX rules, the unresolvable Raw Base combination row prints the adapted note `its id is gone from the trade API — a patch did this` (`STATE_NOTES.unresolvable` in `packages/web/src/list/format.ts`). UX owns the final wording, and whether the note names the id kind.
+  evidence: Retro F1, action 1. The row ships with the money phrase *not valued* in rust, trailing `noListings` and `notYetSynced`. This also closes the "every entry is unresolvable" case of the retro F18 entry above (`list/list-statement.ts` now counts `unresolvable`, so that list prints the honest-empty statement); the "every entry is crafted" case stays open.
+- source_spec: `docs/stories/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md`
+  summary: The honest-empty statement's "In canonical order" claim (retro F3, action item 20) now also covers a third group. `toDisplayRows` trails `noListings`, then `notYetSynced`, then `unresolvable`, each in canonical key order, so item 20's fix and its mixed-group test must include the unresolvable group. [NOTE FOR UX] For a list of only unresolvable rows, the state-23 copy's "yet" promises a price that no sync will bring.
+  evidence: The item-18 spec's Never list defers F3. `packages/web/src/list/list-statement.ts` now counts `unresolvable`. `docs/stories/sprint-status.yaml` item 20 names only the no-listings and not-yet-synced groups.

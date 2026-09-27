@@ -31,7 +31,8 @@ export function isHonestEmpty(ranking: Ranking): boolean {
   return (
     ranking.ordering.length === 0 &&
     ranking.belowThreshold.length === 0 &&
-    ranking.noListings.length + ranking.notYetSynced.length > 0
+    // The rows the list prints when nothing is priced: `noListings`, `notYetSynced`, then `unresolvable`.
+    ranking.noListings.length + ranking.notYetSynced.length + ranking.unresolvable.length > 0
   );
 }
 

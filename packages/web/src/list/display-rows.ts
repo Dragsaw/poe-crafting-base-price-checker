@@ -53,15 +53,17 @@ export function tierOf(position: number): Tier {
 /**
  * The ranking as rows: `ordering` in `core`'s order, numbered by position; then
  * the unpriced Raw Bases trailing in canonical order, `noListings` then
- * `notYetSynced` (decision 2026-09-26, option a), unnumbered and at tier 3.
+ * `notYetSynced` (decision 2026-09-26, option a) then `unresolvable` (FR-24,
+ * EXPERIENCE state 4: shown, not merely omitted), unnumbered and at tier 3.
  * The one exception is the honest-empty state (`isHonestEmpty`, EXPERIENCE
  * state 23): its statement claims canonical order, so the unpriced rows print
- * as one sequence by `compareCanonicalKeys` on `entryKey`, across both groups,
- * and every EV cell reads *no figure yet*, a `no-listings` row included
- * (EXPERIENCE state 23, revision 8). Each row keeps its own Price State, so its
- * expansion still prints its own money phrase.
- * `belowThreshold` leaves the list (FR-3); `unresolvable` is Story 2.6's health
- * line (FR-24). The age reads the row's dataset entry, joined by `entryKey`.
+ * as one sequence by `compareCanonicalKeys` on `entryKey`, across all three
+ * groups, and every EV cell reads *no figure yet*, whatever the row's own Price
+ * State (EXPERIENCE state 23, revision 8). Each row keeps its own Price State,
+ * so its expansion still prints its own money phrase.
+ * `belowThreshold` leaves the list (FR-3). The health line counts the Sync
+ * Report's records, not these rows, so a row renders with the report absent.
+ * The age reads the row's dataset entry, joined by `entryKey`.
  * Each row also carries what its expansion prints (Story 2.5): the resolved
  * Price State, the Curation Status, the dataset entry and both exact ages.
  */
@@ -117,9 +119,10 @@ export function toDisplayRows(ranking: Ranking, dataset: readonly DatasetEntry[]
     ...ranking.notYetSynced.map((entry) =>
       unpriced(entry, MONEY_PHRASES.notYetSynced, { state: 'not-yet-synced', reason: entry.reason }),
     ),
+    ...ranking.unresolvable.map((entry) => unpriced(entry, MONEY_PHRASES.unresolvable, { state: 'unresolvable' })),
   ];
 
-  // State 23 prints "In canonical order": one sequence across both groups, one EV phrase.
+  // State 23 prints "In canonical order": one sequence across all three groups, one EV phrase.
   if (isHonestEmpty(ranking)) {
     const phrase: EvCell = { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
     return [

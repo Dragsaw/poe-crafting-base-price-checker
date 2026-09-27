@@ -100,7 +100,14 @@ export function RankedRow({
             {row.ev.text}
           </span>
         ) : (
-          <span data-money-phrase="" style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}>
+          <span
+            data-money-phrase=""
+            style={{
+              ...typeStyle('money-phrase'),
+              fontStyle: 'italic',
+              color: row.state.state === 'unresolvable' ? colors.rust : colors.ink,
+            }}
+          >
             {row.ev.text}
           </span>
         )}

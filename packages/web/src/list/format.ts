@@ -91,7 +91,8 @@ export function rawNote(itemLevelMin: number): string {
 export type CombinationState =
   | { readonly state: 'priced'; readonly priceDivine: number; readonly sampleSize: number; readonly observedAt: string }
   | { readonly state: 'no-listings' }
-  | { readonly state: 'not-yet-synced'; readonly reason: NotYetSyncedReason };
+  | { readonly state: 'not-yet-synced'; readonly reason: NotYetSyncedReason }
+  | { readonly state: 'unresolvable' };
 
 /** `{components.price-state-glyph}`. The glyph never prints without its word. */
 export const PRICE_STATE_GLYPHS = {
@@ -106,9 +107,14 @@ export function stateWord(state: CombinationState): string {
   return state.state === 'not-yet-synced' ? `${state.state} · ${state.reason}` : state.state;
 }
 
-/** Line two's notes, verbatim from EXPERIENCE.md states 2, 5, 6 and 7. */
+/**
+ * Line two's notes, from EXPERIENCE.md states 2, 5, 6 and 7 verbatim, and
+ * state 4 adapted. State 4's note names a statId; a Raw Base misses on its
+ * baseTypeId or categoryId, so its note names no id kind until UX rules (deferred-work.md, `[NOTE FOR UX]`).
+ */
 export const STATE_NOTES = {
   'no-listings': 'nobody is listing this right now — a jackpot and junk look alike here',
+  unresolvable: 'its id is gone from the trade API — a patch did this',
   'never-synced': 'no request was ever issued for this entry',
   'league-mismatch': 'the observation belongs to another league',
   'no-exchange-rate': 'the listing currency had no rate at sync time',
@@ -131,6 +137,8 @@ export function rawCombinationNote(state: CombinationState, itemLevelMin: number
       return STATE_NOTES['no-listings'];
     case 'not-yet-synced':
       return STATE_NOTES[state.reason];
+    case 'unresolvable':
+      return STATE_NOTES.unresolvable;
   }
 }
 
@@ -145,6 +153,8 @@ export function combinationFigure(
       return { kind: 'phrase', text: MONEY_PHRASES.noListings };
     case 'not-yet-synced':
       return { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
+    case 'unresolvable':
+      return { kind: 'phrase', text: MONEY_PHRASES.unresolvable };
   }
 }
 
@@ -156,6 +166,7 @@ export function sampleText(state: CombinationState): string {
     case 'no-listings':
       return '0 listings found';
     case 'not-yet-synced':
+    case 'unresolvable':
       return 'no sample';
   }
 }

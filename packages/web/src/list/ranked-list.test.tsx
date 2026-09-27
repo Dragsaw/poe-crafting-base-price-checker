@@ -188,26 +188,36 @@ describe('a ranked row', () => {
 });
 
 describe('the unpriced trail', () => {
-  // Matrix: unpriced trail, and unresolvable.
-  it('numbers the priced rows, then trails an open question and no figure yet with their age marks', () => {
+  // Matrix: unpriced trail, and unresolvable (trail order, row cells, stale unresolvable).
+  it('numbers the priced rows, then trails an open question, no figure yet and not valued with their age marks', () => {
     const a = rawEntry('Gold Amulet');
     const b = rawEntry('Solar Amulet');
     const tried = rawEntry('Coral Ring');
     const never = rawEntry('Wide Belt');
     const lost = rawEntry('Lost Ring');
+    const gone = rawEntry('Broken Ring');
     const rows = rowsIn(
       mountList(
-        [a, b, tried, never, lost],
+        [lost, a, b, gone, tried, never],
         [
           priced(a, 1, hoursBefore(NOW, 2)),
           priced(b, 0.8, hoursBefore(NOW, 2)),
           unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 9 * 24 + 3)),
           unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
+          unpriced(gone, { state: 'unresolvable' }, hoursBefore(NOW, 3 * 24 + 2)),
         ],
       ),
     );
-    expect(rows).toHaveLength(4);
-    expect(rows.map((r) => cell(r, 'rank').textContent)).toEqual(['1', '2', '', '']);
+    expect(rows).toHaveLength(6);
+    expect(rows.map((r) => cell(r, 'rank').textContent)).toEqual(['1', '2', '', '', '', '']);
+    expect(rows.map((r) => r.querySelector('[data-unit-name]')?.textContent)).toEqual([
+      'Gold Amulet',
+      'Solar Amulet',
+      'Coral Ring',
+      'Wide Belt',
+      'Broken Ring',
+      'Lost Ring',
+    ]);
     expect(cell(rows[2], 'ev').textContent).toBe('an open question');
     expect(cell(rows[2], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}tried 9d ago`);
     expect(cell(rows[3], 'ev').textContent).toBe('no figure yet');
@@ -215,12 +225,21 @@ describe('the unpriced trail', () => {
     expect(cell(rows[3], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}never attempted`);
     const never_ = cell(rows[3], 'age').querySelector<HTMLElement>('[data-trust-mark="never"]');
     expect(never_?.lastElementChild instanceof HTMLElement ? never_.lastElementChild.style.fontStyle : '').toBe('italic');
+    expect(cell(rows[3], 'ev').querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.ink));
+    for (const r of rows.slice(4)) {
+      const phrase = cell(r, 'ev').querySelector<HTMLElement>('[data-money-phrase]');
+      expect(phrase?.textContent).toBe('not valued');
+      expect(phrase?.style.fontStyle).toBe('italic');
+      expect(phrase?.style.color).toBe(rgb(colors.rust));
+      expect(cell(r, 'ev').querySelector('[data-ev-figure]')).toBeNull();
+    }
+    expect(cell(rows[4], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}tried 3d ago`);
+    expect(cell(rows[5], 'age').childNodes).toHaveLength(0);
     for (const r of rows.slice(2)) {
       expect(r.dataset['tier']).toBe('3');
       expect(r.hasAttribute('data-raw')).toBe(true);
       expect(r.querySelector('[data-raw-note]')).not.toBeNull();
     }
-    expect(rows.map((r) => r.querySelector('[data-unit-name]')?.textContent)).not.toContain('Lost Ring');
   });
 
   it('never prints 0, a blank or an em dash in an EV cell', () => {

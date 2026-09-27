@@ -1,3 +1,4 @@
+import { canonicalKey } from '@poe/contracts';
 import type { SetupServerApi } from 'msw/node';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -328,6 +329,7 @@ describe('the resting chrome', () => {
       'columnHeader',
       'rankedRow',
       'rankedRow',
+      'rankedRow',
       'unrankableAppendix',
       'keyBlock',
       'runningFoot',
@@ -336,8 +338,9 @@ describe('the resting chrome', () => {
     expect(rows[0]?.textContent).toContain('0.50');
     expect(rows[1]?.textContent).toContain('an open question');
     expect(rows[1]?.textContent).toContain('tried 9d ago');
-    // Matrix: unresolvable — no row.
-    expect(frame().textContent).not.toContain('Lost Ring');
+    // Matrix: unresolvable — a trailing row, not valued.
+    expect(rows[2]?.textContent).toContain('Lost Ring');
+    expect(rows[2]?.textContent).toContain('not valued');
   });
 
   it('paints none of it on the refusal screen', async () => {
@@ -701,6 +704,71 @@ describe('the payout threshold', () => {
     // React's generated ids differ per mount; everything else must match byte for byte.
     const strip = (html: string): string => html.replace(/\s(id|for|aria-describedby)="[^"]*"/g, '');
     expect(strip(frame().outerHTML)).toBe(strip(atRest));
+  });
+});
+
+describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
+  const lost = rawEntry('Lost Ring');
+  const bodies = bodiesWith([lost], [unpriced(lost, { state: 'unresolvable' }, hoursBefore(Date.now(), 1))]);
+
+  function lostRow(): HTMLElement {
+    const rows = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'));
+    expect(rows).toHaveLength(1);
+    const [row] = rows;
+    if (row === undefined) {
+      throw new Error('no row');
+    }
+    expect(row.querySelector('[data-unit-name]')?.textContent).toBe('Lost Ring');
+    return row;
+  }
+
+  // Matrix: report absent.
+  it('renders the unresolvable row with sync-report.json absent, and the strip raises no health line', async () => {
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      syncReport: { kind: 'status', status: 404 },
+    });
+    mount();
+    await settleTo('ready');
+    // A lone unresolvable row makes the list honest-empty, so its EV cell reads state 23's phrase.
+    expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
+    const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
+    const lines = strip?.querySelectorAll('[data-absence-lines] p') ?? [];
+    expect(Array.from(lines, (line) => line.textContent)).toEqual([absenceLine('syncReport')]);
+    expect(strip?.querySelector('[data-health-line]')).toBeNull();
+  });
+
+  it('renders the row, and the health line counts the report record as before', async () => {
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      syncReport: {
+        kind: 'json',
+        body: {
+          ...(VALID_BODIES.syncReport as object),
+          records: [{ kind: 'unresolvable', entryKey: canonicalKey(lost), identifier: 'Lost Ring', identifierKind: 'baseTypeId' }],
+        },
+      },
+    });
+    mount();
+    await settleTo('ready');
+    // A lone unresolvable row makes the list honest-empty, so its EV cell reads state 23's phrase.
+    expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
+    const health = frame().querySelector('[data-trust-strip] [data-health-line]');
+    expect(health?.textContent?.replaceAll('\u00a0', ' ')).toBe('× 1 unresolvable');
+  });
+
+  // Matrix: only unresolvable.
+  it('lists a lone unresolvable row under the honest-empty statement', async () => {
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+    });
+    mount();
+    await settleTo('ready');
+    expect(lostRow().querySelector('[data-cell="rank"]')?.textContent).toBe('');
+    expect(frame().querySelector<HTMLElement>('[data-list-statement]')?.dataset['listStatement']).toBe('honest-empty');
   });
 });
 

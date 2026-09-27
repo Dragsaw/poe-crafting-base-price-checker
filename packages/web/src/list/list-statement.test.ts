@@ -99,9 +99,11 @@ describe('listStatement', () => {
     expect(statementFor([], [])).toEqual({ kind: 'none' });
   });
 
-  it('makes neither statement when every entry is unresolvable, since the list has no row', () => {
+  // Matrix: only unresolvable.
+  it('states honest-empty when every entry is unresolvable, since each still has a row', () => {
     expect(statementFor([belt], [unpriced(belt, { state: 'unresolvable' }, hoursBefore(NOW, 1))])).toEqual({
-      kind: 'none',
+      kind: 'honest-empty',
+      text: honestEmptyCopy(TEST_LEAGUE),
     });
   });
 });
