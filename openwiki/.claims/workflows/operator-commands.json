@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:fd8caa5dbc35f3ee2514f1a2245cf5efc81c4433cb6fee66324701f678f37a20",
+  "claims": [
+    {
+      "id": "claim_8f81244d624f4708bbbf267b4e41d4ac",
+      "statement": "The live and human-invoked commands are package.json scripts run under bare node, with sync, fixtures:record and catalogue:refresh loading .env via --env-file-if-exists.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L10-L24",
+          "version": "repo-lines-v1:sha256:dbde2daa93f1ed6f966556f8ca6c3c624d35547e0e53fb8c28b58ec34d4bd89f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NTJjZGNkMTk0NzM1MTJjNGJlZTc2M2ZlY2JkOGNlMjkwNjBlODZmYTBiMDY3MzEzNDFmMDZkZDg5M2VlOTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e1e5dde28b284c2e860bb6f3b5a04f85",
+      "statement": "pnpm sync refuses with exit 1 before any request when the User-Agent is missing, otherwise runs one chunk with the real filesystem, clock, fetch port and read-only git port, prints the outcome kind and completed count, exits 0 on any outcome and 1 on a throw.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L53-L96",
+          "version": "repo-lines-v1:sha256:ef2c846842244989cd0e1ec35decb483254a57c22af76e04ea27787cb3a6908b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzMDRhNWFhOTc2ZmQ2ZjI3OGQzZTQ4YWQ1NzBmMzc5NjE3OTYzOTQzYjk4OTcyMTFhZTNhOTY1ZjQzMjQ2MmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmYjAzYTE1OTNjNjA2YWE4ZmE3NmY2ZDcxMDVlYmI2MTNjOTlhNGMyNTRmODg3YjZkZmYzODU2YTdjZDgxY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NWJjYTExNDljMDUyNWM4NGQ1MWM2MjNjZTQ4MzU1ZTdiYzYxZDFjZTFhNTJkM2Q1M2ZiY2RiMmEyYTRhNjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7cd4125eb46941ef97137213295932f3",
+      "statement": "pnpm sync:dry runs the same composition over an in-memory snapshot and the recorded-fixture port, rejects on an unrecorded request, defaults its clock to the latest lastAttemptedAt or DRY_RUN_INSTANT with a --at override, never lets the real notBefore defer it, and writes nothing to disk.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/dry-run.ts#L1-L88",
+          "version": "repo-lines-v1:sha256:9ce9a15215a5dfd2b32158258584655447a50237ef039578ee210fac928a4d12:eyJzZWxlY3RlZExpbmVDb3VudCI6ODgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNGUwMjlkZTYxMGQzNDI5OTM0NTQ4OGMzODM1N2E2M2M1NzAzYWUwMGViYTVhMWE0MjQyOGRlYjhlZWY1M2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1NDQyMDYyYmRhNDA4ZDBkOThkNWFjOWM3NGVjODhlM2ViMTUzMTI4NjVjOWZiZjg2ODk1ZDUxOTVjODU1NGIifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/dry-run.ts#L280-L290",
+          "version": "repo-lines-v1:sha256:9d2c4320689caa1b450a0470ce9adc56b909ae5248448a7146c4cfaa1a4f9554:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlNjJiMTU4Y2I5NmE5ZmQ3YmRjN2EzNzA5MDZkYjliYjk5MDNjMDkyOWUxY2EzYzI4ZDhhYzk4ZDc0YjU2N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiYjZiZDY1NTgwNTlmZGMwMTViODZiY2RkOTZlZmY2NGUzMDZiYTE3ZDFjMTI2MzJmYTZlZTlmNDgwOTY5ZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyYTYwNDc0N2M0N2MxZGQ2YzkwY2YwY2I5ZGU3Njg0Njc1YjYwYzQ4YjRlZTEzNzc0Njg2NmEzY2Q1MjJlYjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_67cf6f565415445f88e5e47e87e72d00",
+      "statement": "pnpm catalogue:refresh sends exactly four GETs in one lane counted as catalogue-refresh, validates all four before writing any file, and on a write failure reports how many files had already been written.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/catalogue-refresh.ts#L1-L28",
+          "version": "repo-lines-v1:sha256:eec885db78ada3887c6cbd2468859209e58aaa6b1bf345559bc73cdc5082292a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiMmI0MmIwZGM3M2Y3Njk2ZDUxN2IzOTdjY2ViNjU5M2U0M2I4ODE1MTM0MTM3MjkzNmRhNTA5NzcxYTI2NjAifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/catalogue-refresh.ts#L173-L296",
+          "version": "repo-lines-v1:sha256:e6dbfd7077e4e374d08ca5e395026a81b7b2e189bc0578b08dc355912348d605:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjI3N2Y3OWMyNjhjNjE4YjZhNjIxNGU0NzUzNzhhMDc2OTQ4Mjg1ZDk2ZmZlZjYwYmQyMGJkYTQyNDk0OGNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjNDE1MzM1OGM3NjNiODljYzc4NGYzMzhkYWQ5ZTBlOWQyMzRkYWQ3NzFkMDY1ZGVlZDQ4NDkzYWI4NWY5YTJlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxZWJlNTVjZmY0MzljYTk2NDJmYTQ1ZTQxNzRmM2M0YzkyNGRkNmRkNTUyMTcwYzhlYzlmYjBhNjc5YmJjNzlmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhNzMyZTAyNTYxNWI2MDc3ZjkzMmRlOWI3N2ZiYWIyMDI3ZTFhYjAwYzU2ZmVkYzFhOTFhZmY3ZTA4ODk4NzAwIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_f02f1b608eaf426581382c29a7d7c3f4",
+      "statement": "pnpm fixtures:record records the leagues and four data endpoints plus the search and fetch for every non-pruned tracked entry using the production search body builder, and redacts personal identifier values while keeping their keys.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/fixtures-record.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:37df9c88280a87ff0a6456ad9f3e60d6404e8682cc44da1c9b9067bde5db838d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzNzdhZThkYTg1YmQ3OTZhMmUwYjFhOTFmZGNmNTdlNGZmYmEzMmM5M2YzZTI1NTA5Nzg5MjA3NGQ5YTQzOTcifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/fixtures-record.ts#L133-L168",
+          "version": "repo-lines-v1:sha256:7a61d98a025197afe8cb3092c6add16caafa172d01b9859bfbf3cdd8d384ac02:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkYzJlMzQzMTU5OWQxM2U5MzBhYWRlYWE1OTIzMzc0YTBhYzMxOTBkZmE4ODMxYmExZjcwYmE1MTEzZTFmNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkYThmYTZhOTc4YmQxZjFkYWI0MmMzYWI1ZDA4MWFlOWQ1ZGJkNzViZGRlMmZmZWI3MTRjNTI5ZjQ2MDFjZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_37f8ca98b3534f3db20d42655b606357",
+      "statement": "pnpm tracked:check is read-only and runs the schema, pinned-cap and catalogue checks with production validators, printing ok, checks, issues and pending, with the weights cross-file checks listed as pending.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/curation/check.ts#L1-L22",
+          "version": "repo-lines-v1:sha256:82c2fd4ffb710b75fb6fcd01feb547ee954fdb992856d603aa45a269d4b85d70:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/curation/check.ts#L119-L170",
+          "version": "repo-lines-v1:sha256:f652568536773856458c607d3695eff520739a296dd427adcb293be17add8a83:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzZmQxZDdhZGZlOGVjZDY4ZjU2NTFjMzE2M2VjOTQwMjYzY2ZhZDVkODI4ZDkyNjQ4ZmVjMjdkMDEzOGEyNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMjMwYzZhYWE3YWJjNGVlMDhlNWM3YThlMWE2ODljN2YyYWNiODQ4NzdiNmJkOWExMGQzMzc1MmFkZjk3ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMzNiZDI0ODkxNjA4Y2Y1M2Y4ZTYyNDliMGViNzE3ZThhZmYwZjJmMDI4ZTcyZTQwNzFiZDRiNDg1NDNjMWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d85fa3b4c1094831b600e2abbcae7361",
+      "statement": "pnpm tracked:lookup reads the committed catalogue and weights file as plain JSON, prints JSON, caps stat and base matches at 50, derives nothing, and exits 1 with {error} on a lookup error.",
+      "evidence": [
+        {
+          "resource": "repo://.claude/skills/tracked-json/scripts/lookup.ts#L1-L32",
+          "version": "repo-lines-v1:sha256:eeccb65960e3bdaba681fff0c782ba7650f53a0bdf84bca174899bea1311fb11:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlYzgxNDMyNmRlY2MxNzlmN2JhMWE1ZmRkZTMzMmY5YTQ4NjliZGUzNWNkNDg0NGU4Y2Q4MWIxMmIwNDAzOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwMzEwNDEzOTI3MzA3Yzc4OGNiN2Y3NDgxZTczMDZmNGY0ODU1MjgyOWY3ZTE5YThkYTMzYTBlZGI0YzBkZWQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

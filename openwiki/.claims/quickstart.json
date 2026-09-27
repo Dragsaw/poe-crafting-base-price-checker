@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:db74bc297e0e6d21cfd9209b679b0bb2d858085fbdcc718a149a57741db8c82a",
+  "claims": [
+    {
+      "id": "claim_ad8c9e97dfd54e3696e4d68856f64390",
+      "statement": "The repository is a pnpm workspace over packages/* whose root scripts provide check, test, dev, build, sync, sync:dry, fixtures:record, catalogue:refresh, tracked:lookup and tracked:check.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L10-L24",
+          "version": "repo-lines-v1:sha256:dbde2daa93f1ed6f966556f8ca6c3c624d35547e0e53fb8c28b58ec34d4bd89f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmOGY4NjVlNjU4ODRjYTMyMzk1MzRjNGUzZTY1N2MxMThiZjViN2QzZjI3MDM3ZTI1OTNjNDUwMTY3ZDExODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YTc3YTQwOWU3N2QzYzJhMGRmOTc4YmUxY2M5ZjkzMmFjZWJmNmE1MTE4MTk2OTcxNWRmNDMyMzkwNDkxMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NTJjZGNkMTk0NzM1MTJjNGJlZTc2M2ZlY2JkOGNlMjkwNjBlODZmYTBiMDY3MzEzNDFmMDZkZDg5M2VlOTIifQ"
+        },
+        {
+          "resource": "repo://pnpm-workspace.yaml",
+          "version": "repo-file-v1:sha256:de3d59e274a93a24d84c069d7d31521584c145efd974797b2217099f817c1e42"
+        }
+      ]
+    },
+    {
+      "id": "claim_3b63043b3cda449f849ec7e61c6c35d0",
+      "statement": "pnpm sync runs one chunk per invocation against the live trade API, using the real filesystem at the repository root, the system clock, the fetch port and the read-only git port.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L1-L29",
+          "version": "repo-lines-v1:sha256:3ed3a169eaa192207a8d40ebde41a0b731fa12f793cd0e9cabcb714529380919:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L80-L96",
+          "version": "repo-lines-v1:sha256:2f9639afe54523922f9e568eb8408af574c336940f6a3433f327d1d13e661de9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMWQxYmVjYWFjMWZiYzViZDU4ZDE2YzFlMzk0YjU4OWE4Y2ZlNjA0NDlhMTZiYTM3ZDFmYmFmNmJmNmIxZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NWJjYTExNDljMDUyNWM4NGQ1MWM2MjNjZTQ4MzU1ZTdiYzYxZDFjZTFhNTJkM2Q1M2ZiY2RiMmEyYTRhNjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_92bf17c270844defa3bfa87751d7b749",
+      "statement": "The web App loads the artifacts once and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/App.tsx#L37-L136",
+          "version": "repo-lines-v1:sha256:e1135bfc0c3c5da8bfdbada0051204f48d036431213843727fe41bad72442990:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxMGNlYzg5NzZhYTk0NDllMTNmYTU3MGQwOGM4MDkyZTYzOWYyMjA0ZTU0NDgwMGE2YTJhZmUzZjljNGZmMWE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0NzM2OTU2ODM5YzYzNWJhZDc0ZmUzNzZmOTg4ZjNmNWVjYjkwMjJkZmZmNzM1MmU4ODM2ZDEwNzdkNTJlMjdiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmNmYyNTBhMzc4NGE5YmUwOGU3NWYxZDE4OTcxZTVmNmJhYjk4ZmQzZDcwOWMwZjRhZWRkYTkyN2VlYmZlOWJmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwOTRmYzBjMTczZDFlYzNmYzUwMWQ3ZGZhOTI4NTUwMWM1MjdjZmI0NzEyNTgzZGEzY2MzNjE4MDU2NmI0YmUzIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_113e644067ee4e93a7707a84346e5849",
+      "statement": "The sync CLI targets the Path of Exile 2 trade API at /api/trade2 with realm poe2.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/endpoints.ts#L13-L34",
+          "version": "repo-lines-v1:sha256:34fd52670be4caeda575465f7c915c930a25bb10da2008ef6ae4fcd24ebb3eef:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxYTRiOTA5Y2Q4OWE3YjVmMDIxNGFiYmI3YjBmYTc3MmI1NDRhZTQyMWE0YWI4OWM3MDdkMmI0OGM4YWE5MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNzlmMTBlYjYxNzgzNjU0NTgyMjM1ZjBhYjZhYWFmOTZiZjM4NmM4YWYzOGQzZWEzYTBjOGQ4NDA0NzgzZDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5ZTNkMWQ3MWRhNzUxZDE0YjllMzI2NGM4NzBiZGE3NGVhNDNjMzA3MDI1YjhiZTJmODE5NDY5YThjNzUxNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NzI2MDc5YThjOWYxY2MwNjlkNDI0NGZiNjVkZjE5MWE4ZTYzMWYyNDczZWI5MTAzMWZmMTdiY2FhOWE3NzYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

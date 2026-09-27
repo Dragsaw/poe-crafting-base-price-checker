@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:94bb0b46130a650a529de5bdf5bca2dfe60ff6443bdaacd6f874e351428be16d",
+  "claims": [
+    {
+      "id": "claim_9dc10a77881f4ebfb83dbb267d87a397",
+      "statement": "The declared workspace graph allows contracts no sibling dependency, core only contracts, and sync and web each only contracts and core; a package missing from ALLOWED_EDGES fails the isolation test.",
+      "evidence": [
+        {
+          "resource": "repo://test/contracts-isolation.test.ts#L16-L94",
+          "version": "repo-lines-v1:sha256:bbdb4214daddd5b45f6eb55a7e8db2f78fcf8c256311a272f2e5aa028e72864e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiY2M1MjA4YjVkOWY2NmUyMTJhMTJiNmJiYjlhNjBiOWIwZjAwNmFlMDgzZmE5N2ZkZjNjZDBjYTZkOTJhOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxODEzMzk3ZjljNzQ3OTIxYjI2ZWYwYzg3NWYyNjkyYzI1ODRlMDY2OWU2YmI5YWMyZDFjZTg4OWZiZDBiZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c780f91e359b48e5afce03d55510847e",
+      "statement": "dependency-cruiser rules forbid core->sync, core->web, sync->web, web->sync and contracts->sibling edges, and forbid non-test core modules from importing Node builtins or npm packages.",
+      "evidence": [
+        {
+          "resource": "repo://depcruise.rules.mjs#L20-L77",
+          "version": "repo-lines-v1:sha256:9d1f40e92945e1f9adea589b5923760930a8f57c87f83af70668da3d3b6d8d3d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkN2RkYTE4YjNkNTgxZjlkNDlmZWYwYTI5MWY4ZDFiZWI3OWMxYWEyYWIwYWE0YTQ5NjYwODUxYjdhZDNlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5YmM1YjY0ODRhOGYzMjRhNTI5YjZkMTQ2NzRjYzJjMTFmOTc5OWE1MzNlYWIyZjZhYTU1MmYxNzM5NTg4YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzMTUxOTNiZTNmNWFlOGJiZWE5Mzc1YzZmMDY0MjYxMzA2ZjU4MjlhZDc3ZDAzOGY3MjFmYmM2NTZhMDU5Y2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d95759a5754f44f3a20da72a85161d54",
+      "statement": "An ESLint block scoped to non-test core sources bans I/O globals, the global object, process, crypto, performance, Date.now, Math.random, Temporal.Now, argument-less new Date, Date() calls and import.meta.env.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L31-L51",
+          "version": "repo-lines-v1:sha256:35c81612c645851c5a58afd1a05aac1360f9bd200c5d54037bd286df7f4cda73:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3NTc4ZGRlZWJlNzJjYjM1NDM0ZmNjYjExMDBjMjdjNDJiYzJjMjU3MzYzNDViMDEzYzAyOTJkMzA3Y2U0NWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwYTU2MzQ3YzFlYzlmZDQ3N2Y1ODI1MTQ5NzgyZWRlM2NiZTA3YjcyNDFmZDY1OGFkYTdiNjhmOTI3NDk1YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ0NTY3MzZmZTE4ZjY1ODNkMWJlMGUwNTdhN2UwNDY2NGJlOWY5MDBjZWYxNzY2YjY4NTVhNmUwODg1NTUwNDIifQ"
+        },
+        {
+          "resource": "repo://eslint.config.mjs#L90-L112",
+          "version": "repo-lines-v1:sha256:7abcf2914887a75cc0068d7bdcc8cd11efda3454421176d1d40d4d0b331ede13:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxMTFmMjM5YWM2NWM5ZmVjZDRmNzk3NWQ0ZWUwYzY3N2I1OGE4ZWE2Nzg1MmVhMjVkMjc5MjM5MjUxOGQyZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljZGQxYWRjYTRkZGFlOWI2YWFmOGRkMDUyNzlkNTliYTk0NTQ0Zjg3MmE5OTg4YzAxNjVlMGRmNjFjYTU2MDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c926a111b6b849398ba8b60b9a9a948e",
+      "statement": "The boundary test cruises fixture trees with the shipped dependency-cruiser config rather than a local copy, so a disarmed shipped config fails the test.",
+      "evidence": [
+        {
+          "resource": "repo://tools/boundary-check/boundary.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:5657b70ea4822921ae2e0c975d23b7880a4d03a41320a7fa422e21a6c4307542:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyZDU2YjdjZTk4YTY1NDQyZTJhNTY1ZWEwN2QyNjljM2Q5ZGM4OWMxNDkwOGMxZGFiOTBiM2IyMWU0ZjVhZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiMjJmYWIwMzBiYWNlZmE2NWZiYTJmZTM4YWJmYjg2ODYxOTRiYjM4ZjVlNGZiOTg3ZWFhMTEwOTU5MzY0ZjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4M2YwOTc5OTQzZWNkMTY0NzVkNWIxZmZmMTE1YzMxMjBlZGYxNzhlZjM0M2JiOGVjM2MzOWE1Yjg2ZTFmOGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da5c3f5479f44114af55c3be1e401c1c",
+      "statement": "HttpPort, FilesystemPort, ClockPort and GitPort are interfaces in contracts; the real HTTP, filesystem and clock adapters live in sync's shell.ts, with the filesystem port resolving paths against a root and createExclusive using the wx flag so only one concurrent creator succeeds.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/ports/filesystem.ts#L6-L40",
+          "version": "repo-lines-v1:sha256:90ead87090e3398df1043578191ab97c5f529a93b509a8ca9e0401f9a14375d6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwZjg3ZjU4MTg4NTYxODcxYjVmYWM5Njg0ZWI0OTA5MmM2YWJhYTQwZGRiODY4OTA5MjRlMjhmZTFmODE5MTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4YmMxZWI3NmM2NzgzZTNlOTM1OTdlYTQyYTk2NDEyMjYyZTAyOTI3YzhhM2ZlZjg3MGJhNTBmOGVjOWZhNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/contracts/src/ports/http.ts#L12-L34",
+          "version": "repo-lines-v1:sha256:6849e2f8e3933f7225df6e3141450a8a80eec602add05daa8e499d9f25ed2b18:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MGE0NWMwNzZmZDc2OTUwMzM3Y2Y0NTRlZDk1NWQ3NzVkZDBkZDdiYTI2ZDQ2YjViNWNmNmRhY2IxYWRiMTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyYzQxMmE0MDgwYzJiYTgzYmRkNzY4NDM5ZjVjZjZiNmM0YmVlMTg1MWRkNzFhZDNkZmVhOTJkOGRlNDY2NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/shell.ts#L50-L79",
+          "version": "repo-lines-v1:sha256:516582af4f3e09734432056f217fb3fbf27e3216140cfe013379227ad5a55ede:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZGI3OGQ2ODYyZDdjOWRmNzNiNTY2NGM5YzQ4YjljODU1YzQwODY4NjRlMzU1OGY2YjA1YTQxZmFhZTM1MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmZDVjN2IxYTZhMTRlZGE0NTA3NWM1OTNmZWZlNTFkNGE5NmExNWFhODkzMWYyNzgzMjRjZmNkMDQ3YmY3ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlYWNmN2RiNDYwYzM0MGY5MDdjNjE3MWZiZGM1YTM1OTRlNjc0MWY0ZWJmNzgzNDUwY2NiOWE3ZDZlNDRmMjMifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/shell.ts#L99-L143",
+          "version": "repo-lines-v1:sha256:bb332e4fa82e1cd469dfe98daf896564579af2283b53f16aa8747b49def986d8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2YjRlY2FiNGQ1ZTNkMmZhZjk0ZGRmMGM5NWI0NDM3MDI3MTMwY2RiY2IwYjYzZmIzMWVlY2U4YmJlYmVjODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyN2IzOGFhNDE5YWY1ZTdiZTIyN2UwOWM0YTQ3NDFkMzRlMGU1ZDY4YmE2OWJlNDE5ODRkMWZhYTcwNTU1YWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1NjYyNmRjYjAyOTRmYTNkOTVmZWFlMmNhZDQwODU0NTU1NzM3ZTk3NmM0ZmIzYjZhY2Q3YTQ4YjhhMDc4OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwNjZmODhiYzI2NjIzNTExZTVkMGY3ZDk1YWE1MmFlNmYxY2Y1NGI0ZDY2MjAxYzZmNTdlMTQxY2M1NmExNDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_61532b87b9e04b558a5426ba942cb222",
+      "statement": "The real GitPort is the only sync module that starts a child process and runs a fixed read-only git log invocation for the author date of a path.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/git/read-only-git-port.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:87ab3dacdca697efc0b4dcb3cb40fdf0c555f6a2ee532cb310d3973b9220a00c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3ZWQ2OTI5YmZjMjViMTYyNzAwNDE5MWJhMjFjYjgwMWFkNWFiZjYwODdhMGM2MTlmMzdiMTc5OTdkNDQzNWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_58fb450629194c77a932ee5be5339e5f",
+      "statement": "The root tsconfig.json is a solution file referencing the four packages and tsconfig.tools.json, and package tsconfigs reference their workspace dependencies.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/tsconfig.json",
+          "version": "repo-file-v1:sha256:3142081502de57f79958247bd04cfb2168b062a0ab083d93c056dac3eb757d26"
+        },
+        {
+          "resource": "repo://tsconfig.json",
+          "version": "repo-file-v1:sha256:08b0c711b9d31fd43a9d21719b17eb842657e71658e85318848acfb54d1ecd46"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

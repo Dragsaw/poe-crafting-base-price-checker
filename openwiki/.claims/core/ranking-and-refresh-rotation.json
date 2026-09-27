@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:757a8002ef6f3f1aca6dd4747bf8d751f63ece110241739ea397abdc1c52ca03",
+  "claims": [
+    {
+      "id": "claim_37ae47639de84db3be7b936fdbd65fdb",
+      "statement": "rank groups each non-pruned raw tracked entry by its dataset entry: missing is not-yet-synced never-synced, priced in another league is not-yet-synced league-mismatch, priced below the threshold goes to belowThreshold, priced at or above goes to ordering, and no-listings, unresolvable and not-yet-synced keep their own groups; crafted and pruned entries appear in no group.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/rank.ts#L111-L169",
+          "version": "repo-lines-v1:sha256:2f715ed42ed0fa5c04ff0fe7924e2a62fe4ca8a61308935353f0077ca97b1b42:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMzBmM2MzNzdmZDI5MjAyZjQ4MWNmNmIyOTc4ZDgyZDYwNzYzN2E0NmYwZmI0MmNjZmMxZmFmMGEzMTk4ZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmMGJhYWQxNzkyMzU2NzEyMmYyODZjMjJmNmE1NDFjODY5YzA1ZWQ2NmIzZDM4NGVkYmMxYTQ4MjhlMTI1NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhMGQwZTg0NjEwNDQyYzRjYTQzZDAzNzY2MWMwNmNjZGRjZTA4MGQ5ZTM3ZWNiODE0NTNiZTY5MzdiYTc0OTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d8fb8f9fa9f64ab595420362c1918efb",
+      "statement": "A raw ranked row's EV equals the observation's priceDivine verbatim and its craftCost is the literal 0.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/ranked-row.ts#L22-L45",
+          "version": "repo-lines-v1:sha256:7eea0b51efc78c5aecffdf120860c33ffc3f301f0afb198ee8cfca68d64287be:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjYmI2N2QwYWMxOWNjMTlhYWE4N2M1MmJmNTJiOGZkY2UyNWMxYzc3ODU5MTA1MmZjMjQxYWJmMTU5Y2YyZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1OGMyZDJkZjA3MTQyNmM4ODIwZTdiMGVlODk0ZjNkZWUxMzM5MzVmYTFiNDIzMWUxZDkwNWMyYzIyYzgwMTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkYzg0ZGZlMGVjNjYxYTg0MTlkODc4MjExODI3YWIxNGMxNGIwOGQxYjkxOGZiODJmZTg4NzgyNzI4NDg1MjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyNDkxNGM0M2JhYWNiNGEzZDVkYTRjODE5MjY0MjhjZGViNmM1OWIzOTUxNjcxZGUxZTYxYTY1NGMyMjg2YjQifQ"
+        },
+        {
+          "resource": "repo://packages/core/src/rank.ts#L150-L160",
+          "version": "repo-lines-v1:sha256:d2f6e767b5eabefe301985d7cd710783e44a009accc8e013dd5ee1422d96f71d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyNWMzY2JmNTNlMWNlMmVlMWUzZWQxZGJlM2Q0OGJjMmYzYWIxYjViZWMyMmI1ZWRhNjNiYzYxODEzOGE0ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1Y2RlZjgwODVhZTc0YWI2MzZkNjQ1OWY1YzZkNWZiZmIwZGIyNjRmMWIwZDc1YmFjNTE5YzliM2Y2NzE3YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2ZTVkMTY4NjcwNzllNDgzOGFkOWExNGI3MmY4YzYxZDg4OTVlMzY3MjYzYWQzYzU2MjRhY2YzZTI1MzhlZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkODJlM2M4MzA5NTdkNTg3YzJjYjM1ZTNhNTJjNjE0ZGEyN2Q5ZWUwYTRlMGMyOWRkYzk5ODA3YWI0NTY4MzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9a7c1b563aa84b2bbde4ce68b06539fb",
+      "statement": "The ordering sorts by EV descending with ties broken raw-before-crafted then by canonical key, while the other ranking groups sort by canonical key.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/rank.ts#L171-L177",
+          "version": "repo-lines-v1:sha256:4d93f5c33eb4db0faf65b47a28c8487180acd0b669ae6792b239bd3bf9b2e466:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDk1ZmEwZjExMTdiNWVhNDA0MzQxNDBkZGUxYTM0MGM3MjBkZGJmMzI2MjEyZTE5MTgzOGQ0YjE1NmQzMTZiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDJhMmNiMjVhMTIyYjQ0MjIxYTYyMzRlYzY2MGE3YjVmYjdmOWJkZTdiM2I5ZTJiM2M1NTlhMGQ5NmZhYzczOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTdkODYzMmU1NGU5Mjk4YWJiOTU4NzI3ZTJkNTE0MDhhYmFmMTM2NjAzNTM3OTEwMTQwYWJmNjViMzBhYjYxMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://packages/core/src/rank.ts#L73-L99",
+          "version": "repo-lines-v1:sha256:9fc611c0e1b7f5bef48b962fc056224670453eac9b04e9eb9b1aaeb236e13b01:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2Mjg0YzI1ZTE2YjcwZTZmMDY4MWUxNjUxM2YzZmEyOTM3NGIyYzMxZmJhZmUyY2FhMzM4NjRjZTY5MTBkZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5ODc3NDkzZjczMmQxYTJjZGE1OTA0Y2IxZjg4NDI5OGRiNDFhMWMzOTBjZGEwNWUyZWVjMDMyZmUyOTc1NzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlZDFjODEzNTcyNjI5ZWY5MGNiNTdlNTFiZjM0MmY0MDcxYzE2OTFhMzkxYTY1MzgxZWIzZjQyZTViNTgxOWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c0f82bc03594e19b693940a735e6ffa",
+      "statement": "chunkOrder places non-pruned entries in three rows: pinned non-unresolvable, active non-unresolvable less completed keys, and unresolvable entries due after 24 hours or never attempted less completed keys; within a row entries sort oldest lastAttemptedAt first with absent first and canonical-key ties.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/chunk-order.ts#L29-L30",
+          "version": "repo-lines-v1:sha256:9e945d4ee475074b2cda9a8c951a567ee2eebf069602d2cd78a7007b9847e4ce:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmFlYjBiMDQwMWUxNTkxZTUxMzc5MmIxZTA3Nzk4YmMyYTdlNzZhMDFjNjM3ZmY4YjYzMGUzOTE5ZTUzYjg2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNhM2MwYmRjMTRiMDBhOWIzY2Q1Y2JhYmJjNzE2MGNhYjllODMxM2E0NDY5MGJiMWY4NjczMmZkMGVlMjgxYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNlYjNlMjg5ODJhYjFlMjBkOTgxOGNmYWQ5YzRjMGMwZjI5OGFkMzY3ODUyNDk0YmZhNDQxMTAzMjY2MmJmOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2E1ODY5OTFkZmJiMWIyODFlNDU3OGVjYjliYmRjNGM4MTc0ZDQzYWM3NzJjYzU2NjRlOTZmZmVhYmNmNjBmZiJ9"
+        },
+        {
+          "resource": "repo://packages/core/src/chunk-order.ts#L64-L125",
+          "version": "repo-lines-v1:sha256:6895ea40e5f74aba105ed00fbedcf0f7842f48257e8faffcf1d7af45138204bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmZDkxMDZlYjEwNzYyMDdmMzQ5ODI4M2IwOTY5NDNmZDU2NzgwOWUwYTc4ODBhMDQ3YzhjYTY0N2UxMWZlNTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlMjZkYTUyNTk5NTJiNmYwMmFjMjA4M2FkYjVlYzczNjNjZDIxZWQ3MmM0MWFmMzM4MTMwZDBkNWNmZjcxODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4MGQyNjgwMTFlNDg5NzJmMDhhMzM4N2Y1MTQ2MTg5NWM3YjJjNGJlNGYxNGJhZjJiOWEwZTZhYjQ0ZWRmZWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5793089190ef483a9081cbcf7950a3e8",
+      "statement": "When every due rotation entry is already completed, chunkOrder starts a new pass: newPass is true, the completed set resets to empty and all due entries reopen.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/chunk-order.ts#L113-L124",
+          "version": "repo-lines-v1:sha256:575e8f01c41403b883b1fad8bb1507c86b897e726383af9a84e7beff2313b513:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMTI4MWZlNjM3MzZlNjk4YTM2YWQ4ZGY0MjAxYjRmNmRmMmQxNThlZTVjNjMxOGI4MGU0ZjEyZTY4Yzc5NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmI5M2VjY2ZhYzExNmZjN2Q4OGQ3OTk1ZGRkOTJiOTdiMmEyZDQ5YjMxZDM5NmU2ZWEyYjFhZmFlOGQ4MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4NTA4YjZjYjA1ODlhYmE3NTAzMjAyZGUyYzhmODdlZDliMTljZDU4NjUzZmQwMWEzZTY3NWUzYWI3YjU5NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzYzYjkzODlkNGM2OTQ1NTU2YjdjMGU0Y2YxNjljN2ZhYjFlZGU5OTNlZmJlMTZlMjNiZGM5ZTExY2NhODYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eb4d2d3b9e9248539799a8f1be77ee58",
+      "statement": "pinnedToKeep keeps all remaining pinned entries unless rotation work is waiting and remaining searches are fewer than left+1, in which case it keeps max(remaining-1, 0) to reserve a search for the rotation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/chunk-order.ts#L127-L139",
+          "version": "repo-lines-v1:sha256:60253a6e75a0342fee55295837cece8e6e5daf7532013b2e3fa7e99ef9f50840:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmZDE0NjE4MTZjM2M0MjcwNjNlM2Y4YWRjZjM0ODdiOWMzMzc4ZjdmNTU0MTc1YmIzNDMzYzliMmQyYTVhMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

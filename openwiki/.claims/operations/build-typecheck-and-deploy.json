@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:dd061bc74dffba50a6cbefafcdb91f1f09dd5671a2515490ae67948c97631625",
+  "claims": [
+    {
+      "id": "claim_3ec8252b68e54c9db1d5c588cee0a121",
+      "statement": "pnpm check runs typecheck (tsc -b followed by the .d.ts specifier rewrite), eslint with zero warnings allowed, and dependency-cruiser over packages; pnpm build runs vite build followed by tools/prune-pages.mjs.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L10-L18",
+          "version": "repo-lines-v1:sha256:f7ce58459bd306488a26e508fca57bbac423011bd66c242a8dc618d3e6d27ce5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTRlM2ZiZDBjZWUyNjA2MjBjMmI4ZDUxOWRiMzc2MjMxNGI1NTA2NWM5M2JhOWQ2MGRhYjYzNTgzYjE3YmJkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDVhNzdhNDA5ZTc3ZDNjMmEwZGY5NzhiZTFjYzlmOTMyYWNlYmY2YTUxMTgxOTY5NzE1ZGY0MzIzOTA0OTEwOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQ3MGI2M2M1OGMyNWYzM2YzMWJjYThiYTczNzZiMmFlMjU0NDdjZmM4ODY2MmE4NjlmNTJkMWY5ZDgzNTI1YSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_09a3ee26a3ee4a4e9ddcff3ba61b780c",
+      "statement": "The Vite config uses the repository data/ folder as publicDir, a relative base, appType mpa with no SPA fallback, and port 5173 with strictPort so a taken port fails instead of moving.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/vite.config.ts#L16-L32",
+          "version": "repo-lines-v1:sha256:68129c7939f42dc6c13ae8b3f44f293661afd1f08d8b407b8e01def2296ccbf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyY2VjYjE0NGE0NmY1ZGNmMTJhNjE2OWZjZWVkNzY5NWU4Mjk0YjA5MGRlNzZmMzY2MWNkZDAyNDkzMDAxNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4Njg2MmFkMGIwMjM2MWM2ZjU2MWUwMmQzODg4ZjBjNDg4YmI5OGRjYzI3MDhjZDdiNjRlNWJiMGUyYzU1NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzMTcyMmU3YjZlM2U2MjQ5ZjYxOGExY2ViOTMyZjIzNzE2ZjhlNGVkYmY5Zjg3Y2Y3OWFmNDVjYjdmZTI2MTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_79131dc7e6a242539d268eee69a051fd",
+      "statement": "The dts rewrite converts relative .ts/.tsx/.mts/.cts specifiers in emitted declaration files to .js/.mjs/.cjs, leaves .d.ts specifiers untouched, and writes only changed files, because contracts is emitDeclarationOnly with allowImportingTsExtensions.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/tsconfig.json",
+          "version": "repo-file-v1:sha256:6a2462ae9a98d1e43070e640ab849ace219ad8268fd58729fa42d3fe11740c86"
+        },
+        {
+          "resource": "repo://tools/dts-specifiers/rewrite-dts-specifiers.ts#L1-L112",
+          "version": "repo-lines-v1:sha256:9b35f6e13a43a858bc33971138941f784a6333b13730f7b87469442ed9a5db43:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlODIwMDk2NGE5Nzg2MzU1MjJiMmFiMDkwYzY1MDY1ZDhlZjhlODVjNDczMGJiMmViMDQ2MGQzNGM2NzdkZGJiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_a7fbe8242f2d43c4a955070f86021203",
+      "statement": "prunePages deletes every file copied from data/ into dist that is not on the eight-entry allowlist, removes emptied directories, and throws naming any missing required artifact, while the three tolerable artifacts may be absent.",
+      "evidence": [
+        {
+          "resource": "repo://tools/prune-pages.mjs#L21-L88",
+          "version": "repo-lines-v1:sha256:f80a90f9ea7d16c8ff7cb81be8517f1a35f9b7c44dfe8f499c1831c15887bf5e:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwMzcwYTVlOWZmNjEzNmIxMmNmZmFkNDI1YzQ0MDI5MWJiMDA3Nzg4YzhkZjMyODgyZGIxOWQ1Yzk2MGNkMWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3ZGFmN2JkMDNkYjQ4NmE2N2NjOTcwNjg4M2M5NjhmMDZlNmE5MTc5NDc0ODhhZWUzYTEyOWM2MjMxNjk3ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkODQ1NGE3ZmUyZjAyNDVlZmZmNzNlMGM3YzEyOWIxZTFkNzIwYWEwZjEwZmJjMGY0MGE3OGU4M2EzYTc0ZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_db22ceb412874545b29cb998fd0cdc92",
+      "statement": "A web test asserts that the prune allowlist matches ARTIFACTS in the same paths, order and required set.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/load/prune-allowlist.test.ts#L24-L30",
+          "version": "repo-lines-v1:sha256:3673f7723a02fdb822e795100cbd34d45937a4095a8177694b4bff3b09f9867b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTI5YTlkOTAzNTIzOWI5YzBhMzJkMGIwNGE1MjdhMzFiNDg5YWUxNjE4M2Y1YTM2ODk5YmJkNGRiN2Q3OWYxZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTAwMzBiYjZiMjBlOWE4YTliYzY0YTFhMjgyZjI3MzkwZGVjNDFkNjYxYzZjZTdlZGMxNjYyNjg3YWE0YTY0OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b6efe4cb78b44cfbb4dfac9a5dc18266",
+      "statement": "The deploy workflow runs on pushes to master and manual dispatch, installs with a frozen lockfile, runs pnpm check and pnpm build, and deploys packages/web/dist to GitHub Pages without running pnpm test.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml",
+          "version": "repo-file-v1:sha256:11d640f5b0e590546c325f4d6176d42fa7a7df2e1222ca9f67a6ca69c1df579f"
+        }
+      ]
+    },
+    {
+      "id": "claim_9a2d11a26a9745d595c84636a7fc7648",
+      "statement": "The commit-msg hook requires a lowercase known type, forbids a trailing period except for the deferred scope, and requires feat/fix/test commits scoped to known packages to name a story or retro item.",
+      "evidence": [
+        {
+          "resource": "repo://.githooks/commit-msg#L8-L79",
+          "version": "repo-lines-v1:sha256:5cd9da44529fd45da50953b0ad4293787b60ea5135375d90872750183a0130a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMWQzMGU0NWRjMTEzMzFmZTIwMmQ2MWMwZjA3YTNmMzlkODQzOWQ1NjU0ZmUxN2VlMzllMTlkYWI4OWJhNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZTIxNWYwZGVjNDJkYTNmYzA2OTg5Mjg1NzgzZjJjMWQwOTM1Zjc0NmE4ODI1ODY5YWNiYTE0OTlmYjNkMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MTAyMTg5MDIyZWU5MTQ0MDA2MjUzYzZiOTEwNGFiOTk4ZGZiYTMyNTg1YjcyZGNkMGY2ODVjZTA0NGUyZTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5b7f04ea28bc4a50adad2247c86a3660",
+      "statement": "The prepare script points core.hooksPath at .githooks unless the checkout is not a git work tree or another hooks path is already configured.",
+      "evidence": [
+        {
+          "resource": "repo://tools/setup-git-hooks.mjs",
+          "version": "repo-file-v1:sha256:2100c4461575b56c84aaecbef9666d8c273708156f05ff3c284b0cd30ce331dd"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:b63245b066b726833f5525fe54c1820e4a1fdfbe8074e0676852ca727e168ad0",
+  "claims": [
+    {
+      "id": "claim_dd00cbda501d4d93b7a0ce547c0ae51c",
+      "statement": "The page fetches exactly eight artifacts in a fixed order, of which dataset, tracked, config, catalogue/stats and catalogue/static are required and sync-report, weights and recipes are tolerable; an absent tolerable artifact is null in the set.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/load/artifacts.ts#L47-L86",
+          "version": "repo-lines-v1:sha256:3dcd5e8d9f2d523cb02bad6bae539a78f13135bcad1419a6ae691303b2e7e09b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZTY2ZDBkMzA5YzM3NmIxMjZmZjlmNjFkNTQxMTQ4ZmRiZjZlNmUwZGY4YzBkN2YwMWI1ZjJhZTU5NjVlOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2NjFiNGVkMDg0YWJjZDhjNjZmMWI5ZTE0MjQxNDMzYmQwOGVlOTQ2ZTdmOGE5Yzc5NzAwNWE3NDljNGUxOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3e8ebf874a3a4d6594b1d7356a39e05d",
+      "statement": "loadArtifacts fetches each artifact with cache no-store and never rejects; a 404 is absent, other failures are not-arrived, bad JSON or a failed envelope parse is invalid, and precedence gives failed for any not-arrived, else refused for any invalid or required-absent artifact, else ready, naming the first failing artifact in order.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/load/load-artifacts.ts#L68-L152",
+          "version": "repo-lines-v1:sha256:e4622c040aa59a62208811a1bee5a35bbcf154c665880cb8914e35061b601afe:eyJzZWxlY3RlZExpbmVDb3VudCI6ODUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmZmVhNGM2YzU0ZmU1MjY1ZWU4MjM2NTZmZGE3MmZhZjdhMThhMjYwMDRmNjc4ZDI0YTQ0YzlkZTQyZjA2NmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlkODgwMzczNmEzNDVhNTc5ODA0M2I1NzM0ZDE2MmQ2YWMzYjc4ZGE5MDZhOWE2NzQ3YjFiM2QwNjFkMTQ4MmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_67fede0587404efc898fd12317cb7d52",
+      "statement": "App moves from pending to exactly one of ready, refused or failed in one transition, reads now once when the set resolves, and retrying re-runs all eight fetches.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/App.tsx#L27-L103",
+          "version": "repo-lines-v1:sha256:ef1f9408c404b88c9e45def18a00342d1750e896f3a2820abf0db802f77b8523:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmODJlOWNkNjE3MDEwM2FiMmVjMzU3ODU0MWMwNWNlNjU5MjI3NTFjMDFlOGIxYzFhNzc5YWQ5OWZmZmVjNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_23b42750386642e2a6c9922173a11041",
+      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold, memoised on the set, now and the threshold.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/App.tsx#L105-L136",
+          "version": "repo-lines-v1:sha256:ada6093bc781706f47758fb45b689abfc4e788359c37ae81a943e835ae5fa60d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3MzY5NTY4MzljNjM1YmFkNzRmZTM3NmY5ODhmM2Y1ZWNiOTAyMmRmZmY3MzUyZTg4MzZkMTA3N2Q1MmUyN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxNWY4MjZlNTUwNWE1N2ZmMWZhZmRjMWIxZjliNWQ0NGFlNTY3ZGVlYWZiZTZkMjQyYjQwMjk5Y2YyYWE5MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3b49061721d451f8d8b855298250785",
+      "statement": "The Payout Threshold is persisted in localStorage under poe-cbpc.payoutThreshold within 0 to 3 at 2 decimals, and any unreadable, out-of-range or throwing storage read returns the 0.25 default.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/format.ts#L17-L17",
+          "version": "repo-lines-v1:sha256:2d1546df598ab60b06421a4a996ec59f5eb3b9da439997b436a230180968b251:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQxNTQ2ZGY1OThhYjYwYjA2NDIxYTRhOTk2ZWM1OWY1ZWIzYjlkYTQzOTk5N2I0MzZhMjMwMTgwOTY4YjI1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQxNTQ2ZGY1OThhYjYwYjA2NDIxYTRhOTk2ZWM1OWY1ZWIzYjlkYTQzOTk5N2I0MzZhMjMwMTgwOTY4YjI1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWQ0MjI5MmUwODJmOTJjNzdkNDFlY2YyZjYzYzljZTRjMTI2YjdjNDdlNTlhYjU2ODUzMjNjMzkzMjM0YzBiMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjhkNGUxYjg4MzI4YzYxMDEzMDljMWFhZDA3MDNjMzNkY2UzMDY0ZDJlNmVhN2YwYWMyNTE5MzEwMzFhMWE3YiJ9"
+        },
+        {
+          "resource": "repo://packages/web/src/threshold/threshold-storage.ts#L10-L62",
+          "version": "repo-lines-v1:sha256:3772c2f80293af8612c837447d974a636fa77bf6abe4368196cefe712075ec60:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkMTY4MmZlNTc4MDgwMTRhZTg2OTQ3MTY1MTMzNzUxZWU2ZGZiMjBhZThiOTFmNWQ5OTkwNTBlMDY5ZjBlNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkZGJhZjAxNzJkZDdjZGE5NTQ3YzVmNzVmZGQwZGU4MGQ1MjQ2NDVlNGFjMTBjNWExODkxMTc2YjU3ZTMwMzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_27d70c68479044e0913c2dc49c797f07",
+      "statement": "Display rows list ordering rows numbered by position with tiers 1-5, 6-10 and 11+, then unnumbered no-listings and not-yet-synced rows at tier 3 with money-slot phrases instead of figures.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/display-rows.ts#L45-L115",
+          "version": "repo-lines-v1:sha256:e17f4fe84552b56febc071250487a64e1bff93280a6c7ed0b8bb265ea60bfaa2:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmNWYxMzljMTYyNjU5ZDAxNThjNDUwYzg5NWM3YzhmODhjODI1MDU1ZTlmNzI5Nzk5ZWE1ZjFmY2M5YjM0ZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkY2VmOTM1MTdiNDgzNTQ4NjU1OTU1NzU1ODFjY2Y1N2FjOWQyODhmOTViOWRiOGIxMjIwNTkwZmU4MjQ4ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/list/format.ts#L20-L27",
+          "version": "repo-lines-v1:sha256:2b331e89886d2e8a5ab67578bb98b1223b4005ce28bd450706dd007a6e08e341:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODc4ZGRjNzkxYmU4YmNkMjhjNWVhOWNhNDY4ZGU2MWU1OGM3MjhjNzNlOTE2Y2JjM2Y4NTQ4NDY4MjVhZDA2MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2EzMTA1MGFmYjE1N2MzNzk3ZmFkZDBiYzhhYmRmYmU5OWI1NDExZjNjMTJjZWRlYTI5YjZiZmY5ZDYyZjIzZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjc4MTRjMGM5NmZiYjYwYTU1MjQyMzlkNDQ3ZGZkMzk2Y2Y1YTI4NjgwOGRkMjkyZTJmYzg0ZjExYzM4MDIwNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bb9f04e5ae014221870293639d00eeb4",
+      "statement": "The list shows the top 20 rows with an affordance to reveal the rest, as a display slice only.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/RankedList.tsx#L51-L52",
+          "version": "repo-lines-v1:sha256:ef4c3bc8e814293fcec5a6593ef8e99d3b8a57dd5523c53905413869b9ec1854:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWYxNGI5N2EzMWNiYmJhODE5NjE4Mjk0YmQyMjliN2ViYzhlNGZiYWU5Mjc3OGY5MWViYjhmYmQ0NjRmOTAwZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTg1ZDRlYjFkZmFiN2NkNmQ0ZjhmNDg2MzJiMzg3NGRhODViZDI2MzNjOTA3MDkyMjZhYzc0YmY5OGFmY2JhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTVjZGM0M2IzYjQ2Y2MxMWI0MDFiZmJlYmY2YmZhNjUwMmZjYzU4M2ViYjk4ZTFmMzYyZmM2YWMxY2E1OWIwNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjE3YTEyNTcwMzk1ZDliOGU1YWM4MWM2YzA5NWNkNmVmYmI3YWFkOWI4MWQwYjZmYzc2NzgzOTdjZDA5MjdjYyJ9"
+        },
+        {
+          "resource": "repo://packages/web/src/list/format.ts#L13-L14",
+          "version": "repo-lines-v1:sha256:5d52f4fd0bd83c13c7be8e5a6790b45ce58cc336080dbfc646922847bcb77fac:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNThlMGQ3ZmQ2YTEwMGFmM2IyOTBiMDViZWNkMDhmODdhOTRiZDRmODMyNTk4ZDA5YjM1MDViNDlkMDU4N2I2OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYjJkYWRmODdlNmEzNmJlNjM2ZjM3NmE1MWJkNTA5OGU0OWFkYmIxZDZlZWFiMzlhNDg4ODAwZjU1OGIyNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjg3MTRmNTZkNzRiNzk5MTkxNmQ2NjFmYWI1ZGI4M2JmZDgzM2JmY2RkNTlkYTAyMWNlMTQxMDBjNTdjODhlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjdlODMwNmU3YzBiM2FmODc3YjA1ODM2Y2QwNzY3YmVmNGE4N2NhNTQ4YjAyNjQ5Mjg2MjMyMDczNWFhZTdiNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cf51cac5d1a541aabdb4c687b58ad10d",
+      "statement": "The list statement is nothing-clears when nothing is in the ordering but something is below threshold, honest-empty when nothing is priced but unpriced rows exist, and otherwise none.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/list-statement.ts#L33-L45",
+          "version": "repo-lines-v1:sha256:956fe2882eda2904b83b6b9d0f86ed2d331d9fee99f5a076b1cf5b997c4a8ce1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ZjU4NGYxYTAyYTBmNjM3MTRiNjFiYTc3ZDA5MjBkMGI3YzhkNWY0MTg4OWZmZTVkZWM2MjQ3NGVlYWFkMGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwMmVhYzQ5NTUxZjA2ZDExZDQxZDlkOGRjMzgxMzk4NTg0ZjM5OGNiYjRjNDZkOWQ1MDI0ZWNmMjNlYzg4YjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4786f954fa6e4be1a655d5a843ec74bb",
+      "statement": "The trade link renders only for a non-pruned entry whose stored lastSearchLeague equals the active league, as the trade2 poe2 search URL with the league percent-encoded and the search id verbatim.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/list/trade-link.ts#L1-L25",
+          "version": "repo-lines-v1:sha256:adbe421983e56cb68d262451e146b85272df65fb882e4a9633bfada15acda818:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExNGU5YzBjNjdhYmVmMzFkNTI1MWQxNDAwOTRhNDE4YzY5MWEyZjJkMzQxY2Q1NDZlNmQ5ZTBmMDgzYzc2MDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1259603e62b94b6fa040f31805ff31c9",
+      "statement": "The health line raises exactly two signals from the sync report: a count of unresolvable records and pinned starvation, and none for an absent report.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/frame/trust-facts.ts#L101-L117",
+          "version": "repo-lines-v1:sha256:1f149c832fa1d2d5186c954760bece73ed3ddfe4988766f386849904249a72b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2Yzc0OTUyZDBkNzFkNTJiOGM2Yzk0ODVkMTk1MjhkMWIwZDM3NTFjZjljYmJhNzZmY2ZiMjllYTJiZGQwODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2ZTVhMzNhYjE0NDNiZjU4YjM0YzY3ODU1NDE5NTNmZjg3MzVjYWI3YzlmZjk1NWQxMDg1NDQxNGZhYmY5YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhMzYyZTUyMzNjOGUxZTE4MmFhMTcxMzNhMDc3NTkxZTRiOWJkYjJkYjk1ZjhjYWM0NzIzOWY1MDNjZjNhYmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_933fc1db72ea4750a8bbd38a3f7658c7",
+      "statement": "The Mantine theme uses a sepia primary palette, ink and paper as black and white, zero radius and no shadows, with tokens transcribed from DESIGN.md.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/theme/theme.ts#L65-L100",
+          "version": "repo-lines-v1:sha256:84f397402279865671846ebf1a0f324a213f34cf9833e98bae43d354de830e9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5YmJiZTQxOTQyOTRkNWZjOGJjZGYzZTMzYjFkMDk5M2NhZjhkNzBiYmRhMzc1ODE4YWRkNGM3MmIzY2E5NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YWY0NTQ1ZGEyNTJjYjgzNzEyZWUxNjQwMzQ3OWI4YjgzOTg4OGIwY2I3MDI4OTM5ODM4YjhmZTZjMjk1NGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhMzhlZTljYzczYzlmMWYyYzhmOGM1NmQwMGJkMDBkZTViMDczNjlmMTJlMDgwYWJiZDc5YzhjNDM3NTZjMTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmM2ZmMjlmOTcyNGE5ZWQwYjU4MzBiZjA3YWM0YTFjMzI2NjRhNWRlMGQ2Y2IxZWM1ODE3MTY2NmE2NjhkZWMifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/theme/tokens.ts#L1-L7",
+          "version": "repo-lines-v1:sha256:976dd7ca8bba1f34302588f0212c1feb2832c0ba5b35044c3439014babf4dbec:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTI4ZmU1MjYzZTZjZTMyYWIzZmEyOWNiYzJiOTU4MGJiNjgwOTM1MWMyM2VlYzc1MjUwZWNlZjZjODQ5MWE0YiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

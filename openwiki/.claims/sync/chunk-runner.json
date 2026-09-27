@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:333d6c9330a635e5b4b15e56c4d64553bff47becea2ac455202c0768b939741b",
+  "claims": [
+    {
+      "id": "claim_ba64aecd97fe455695cd8df0115876cc",
+      "statement": "composeChunk builds one request counter and two sibling trade clients over one HttpPort, counted as league-validation and tracked-list, and a load hook that reads config, checks the pinned cap, reads currencies and item types, and returns the publication, starvation record, league gate and pricing step; both pnpm sync and pnpm sync:dry use it.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/compose-chunk.ts",
+          "version": "repo-file-v1:sha256:17dfa2102e6c052c10d6487b739153b17ff8468ea0e005e8ccd70ff4510b9636"
+        },
+        {
+          "resource": "repo://packages/sync/src/sync.ts#L44-L51",
+          "version": "repo-lines-v1:sha256:3264fa80b61211f3c2e0b9422fd582c28dfb3f3777e843c866d4704d4f9bd294:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmNjNjBmNTkxYTAxZWU0ODU5YTFhMTZiOTNkNmVjNThjMzQwZTc2NTA3YzU1NmFhMmE1MzhkYmVlZjg2MDY0NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGE4MDVhZjVkODgzNmEwMDM3NThiYWQxNDNlOGMyMDc0ODIzNGE3MTM5YWZlOTE1YjNlMzBmMjQ0N2YxMjRmOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE3OWZiNjhiMzNkZWYzYWE4MGI1ZTlkYmVmZjQ1ODQwMDEwMzBlMjM4MzA3NDNlYmFhOTdhNzZkNGVmMWU1MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f45bbafb1c8d434496ae142360f3643c",
+      "statement": "The chunk lock is data/sync.lock holding {pid, startedAt}, taken by an exclusive create; it is stale after six hours judged by time alone, an unparseable lock counts as held with its modification time used for staleness, and breaking is serialised by an exclusive data/sync.break.lock marker that deletes the lock only if its text is still the judged stale text.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/lock.ts#L136-L173",
+          "version": "repo-lines-v1:sha256:71a00b90205165216e970aa914e2174447ee6b664a809fd36c60d0167cf3b038:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MmY1NTEyODlhMDRhZGMxYzNkY2E2MjgxYmNjODlhYmUwYThkYTMzZDUwMDBhZTdiM2MzNWJmMDlmYWNlYWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwOTI5NWNiNGY1NGIyOGRmMzk2ZjBlNzg3NmMyOTFmZGFhOWU3Nzg2ZTQ0Y2E3YWI0MTkxZWY5MWEyMmE4ZGQifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/lock.ts#L31-L40",
+          "version": "repo-lines-v1:sha256:86a1c59938072341467208f8566f543d3fd4204e3397f87f914e1713a5ffab6f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0N2ZiOTE0NGEzOTQ1NjJhNmE3MzU5ZjQzOTQxNTBkNTEyOTFlZmFkZTEzMmUyNDJjNTBmMDUxMjg5ODQwZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ZjI0NDJhYzliNjY0MmU3NjIxOGYxY2JmOGIyNjc5MGUwZjQxMmI3ZGI0ZGE1YzUxYzQ5MTgyMzAxMDY1MzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkYzJhMjBhNjcxNTUwOWJlZGEyYTQwYjEyOTQzN2EzNzc2OTU3OGFiOGZiYjNiYzY1ZTFlZDAwZWY5Zjk5ZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxYmFjNjljZjlkMDIwMDdjOTJkNGMyOTc3N2JmNDQxMzQwY2U1NDMzMjQ3YjE4YmQxMmEzN2JhM2M2MDEwNjYifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/lock.ts#L83-L107",
+          "version": "repo-lines-v1:sha256:b3a1013e62a0b57253bcf8a6b0318df3681db17b48f5f0875429ddb69e6f4cfa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjRhNGMyNzhlYmNkNzJmNzQ3ODA0OTllMzNkOGNlYzdjZTQyNTc1NzY0Y2I5YTg5YmU3NTQ2NjFlZGEwMmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5MGZlZWI4OWY2YTlhOTkyNzA4NWQ5NTg5MzEyMzQwNTBlNGIzNzkxNWZiZmEwYjdkNWZlMGI0MzliMWMyNTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmOWU1M2NiNGE4Yzc2ODhmZTFiMzMyZmM0MTQyNTk0MjBjYTQ2YjdhMmQyOGY1ZWY4MGU0NWUxNWI0MWI5YmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7413191b39584e30bd4a0e017bb30369",
+      "statement": "Under the lock, runChunk checks the sync-progress notBefore first and returns deferred without sending or writing (except a stale-lock report) while the clock is before it, then loads the previous report, tracked list, dataset, the shell load hook, catalogue and weights, runs the weights and catalogue checks, computes the order with chunkOrder, runs the league gate, and then the rotation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L445-L484",
+          "version": "repo-lines-v1:sha256:4b9d81b4d89cb2de25612ea69749541f8e5ad2edde2d8a496c11f1ea759ef4e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2NTZjMDNlYjk2MjFhMmJiYTE4MjZkMzA1MWM1MTQ1NjZmMTI3YWRjOTJjOTRmNTM0Nzc3Y2Y5MGE4MDY3MjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmNDY4MmZhNDdjYTdiYmNhYTNkYzU4N2Q1YTEwOGI0NDBhNjZmN2IzZWQyMWRhNzJhMWUwNTI3MzY5N2NmMDAifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L611-L675",
+          "version": "repo-lines-v1:sha256:5f08617fe63af591b4c5465c1dd19cf0d0c87cd3521b4c089fe7e44c98b56f29:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhM2MxNDE3YmFiZGI4ODI2OGEzNGEzMjEzODM5YWQwMDM2MjY0NTNhYjYxMWM2MTdmNzhjYjEzNzA2ZDhlNTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExZWIxYzhmMzQ5ZWVmYzdjMTI5M2IzNThjMDQxOTkzMDgyZjY0ZTQ4ZjhkZTg1OGE2MTVhYjk0ZjdjZWJjNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZGYyMDZmMDk3YzNmYTJkM2QwMzc0ZGMxMjQ0M2E3MGJjODM4MDkwODg3NjI0ZDU5OWU5ZDJkZGRmNjQ3MjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6967d2258e624f538f4d2dfef7175fd0",
+      "statement": "The rotation loop stops as bounded when a completed step reports a search or fetch allowance below 1 with work remaining, as yielded when a step yields, and as completed when the order runs out; pinned steps reporting an allowance may truncate the pinned row via pinnedToKeep and flag pinned starvation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L377-L385",
+          "version": "repo-lines-v1:sha256:e40288d667de691bb08a85619a1194b4511778b752b1b8aaa5b9d9e56afe62df:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE1Yzg2ODM5N2NiMmM1MDZiNTQzYWY0YjYwN2EwM2RmZTAzNzNjOWVkZDEwMDEzYjNmZGE3MzBjMjUwY2E2MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWIzYTM4NmJiZTMyN2UyZDU4NGRmNGFlOTczNjAwYzIyYzA0MGU5NDE3NGNiM2I4Nzc5ZThhZTU3OWI4NTI2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQ3MTVkMDIzNWM4ODJjMTEwNzExNDMxM2RlMThhYjdkMTAzYjk0NzI5ODBiZmE5MWZmMjg4NjhkZWJiYWE4NiJ9"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L684-L738",
+          "version": "repo-lines-v1:sha256:d54db4e24288a822eb271d28c9b5873e0efb9bcae5cbf89c255883a4e1bd3436:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0YzdkZDg0NmFjNDFhNGI2ZjgxMzY4Nzk1YzhhYzVlMWQ5NzYzZDFmYTYwNjM3MTk1NGQyMDdlNjRjOTM4NmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2MGYxYmI3MTRkY2U1MmI0NGVkZGFhMWY4OGQyYThlZGJkOWQyYjViOGQ2MDdjZDAzN2QwYzVmOTNkMTI2ZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMDE1ZjIxNmMxZmU5NTg4MDRmNWE2YTExYWQ5OTNjMWM4ZDZlMTQ1MDI3OGQ3MDhmYWQ1OTY2MmEyM2M5YjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4e43759501ab404a8c78d55cfddd90c0",
+      "statement": "The load-time pinned cap refuses a tracked list whose pinned count exceeds 0.5 x minChunkSearches with PinnedCapExceededError naming data/tracked.json.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/pinned-cap.ts#L15-L68",
+          "version": "repo-lines-v1:sha256:6368a0a5da1076fa0502f3fe2adebcbdfc59ed046401c43b0a7c17d1c9486324:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmYjY1MGQyMDIzMzllODczNzdmZTJmM2EzNzMxNDYxNTk2MjU4NjgyODEzMjJhNzM5NmE4ZjY1Yjg3ZDY4MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzM2Q1NWQ0YmY2NWEwYjk5ZmRlZGE0ODYzMTM2Zjk2ZTA4NDY4ZWJkYmM4ZDlkYjJhZDg0MzliYTQwM2JjYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5Y2IxY2IyMjAxMDQwM2ZhZDIzZjBkYmQ4Nzc2NjgxOWU4NTkzYjBiYzZiYzIwNTY3ZGNkY2NjZDc3NzU1OWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b7054a9a36d4d06ba727783337abe17",
+      "statement": "A successful chunk writes dataset.json, then sync-progress.json with sorted rotation completed keys and notBefore set after a 429 to now plus min(retryAfter, staleLockAfter) or cleared, then sync-report.json, all via writeArtifact, after re-verifying it still holds the lock.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L364-L375",
+          "version": "repo-lines-v1:sha256:97d41253d31db8385e6720850784c6b76681694c7ad046d1016ecf1c5a80631a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5NTRhMDU3NGFjMjYzOGVhYWY1OTkwZGUwM2FiMDY3NGE0YTRlMTVmYzlkYzRiMjMyMjlkYWZkZmJiMzc5ZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwYjBmM2Q2NDIxZWI5MWJkMjRkNjE5MzQ0N2Q4MWYxMzE1YTU4NjczNjVhOGJhZmM2YzAxZmE2YjY3YWVmODIifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L548-L609",
+          "version": "repo-lines-v1:sha256:5c909ebffeb163ae36fa910016f9dd32d6efb89f7dd788f50433c891098952c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5Y2JiYzY1NDY5ZGIxY2EyODQyZWZkOTdkZjdlZTJjZTZjYzE1NzE0ODJkMDFhMThiNzkwYTEwYzdjNTEwZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDhjZTliYzU5MjVlZjNmNTdlMDlkMjczYzU3YzNhZTEyNmE1ZjIyMjI2MDJkYWQzNTZjMjhhNzFmODk2OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkY2M5ZGJiZmMwNTZlNTdjZDcyODc2OWZlMjhhMWQ2ZjFkODBlMWUxOTBhYjA1ZDU1YTM3MDBmYTM5YjJiYjUifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L740-L753",
+          "version": "repo-lines-v1:sha256:cc3af3f2d628585814acb2d8a13085df0c0e20c263183e2844a03eeb7c21c4f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxZGM3MmE0MGExNTVmODI1MjRkODQ0ZjA1YzdmNTY4ZGM0ZmZjYzk5NWQwZTYwODAyNDNkNTk4ZWJiYmFkMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyM2M4YThhNTQ4N2NmMjAyOTE0ODMyZjNmMzIzYjI3ZDc1ZmI1Mzc5OWE3ZThlNDNjYjRkNDczMzZjOTM1YWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxMzQxZDBjNTg4MmU5MWE2NmM2MGNiODYwMjBiMjQ3ZjBhZmMzMzZjZGY3NmMwYWUxOGJjZDIwYWM4ZmUxZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjNzZjOWMyOTgxMzYxNGVkZWMwMmIzNjBiMWNhZGJiY2U3NDg3YjU3OGUwZmVlODI1OTYyODhkMmE1Y2FjNzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_483aa4e8205447ffa1c04537a15af98f",
+      "statement": "Before the league gate passes, a published dataset keeps its previously published league label, falling back to the configured league only when no dataset exists.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L553-L574",
+          "version": "repo-lines-v1:sha256:47e48cc7611ff3c08b059d7a012ad11cde4915ffc211f696077d677ee6bd8bd7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwNTcyY2I2M2VmMTNmYTYyM2Y1YzhiYWQ3N2M0NzIxYzFhNjU5YmE2MDdiZGQ4NjMwYTgxZjEwNTFmNGRiYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZjY5MDA3YTdlNzVjY2RiMmMxOWVmYTlkOTVjNDNiZjc4N2YzM2EyYjljODI2NWM0YTVjZTY0MmZlNmRiZWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhZDQ4ZGJjMTc4YmE0NzUwYmUzYjJhYWUwYmE1NWJjZjQ3MDQyMjYwN2YyNDE4OGNmZjkwZGI5MGQ0ODAyM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMGFiNzQ0MmEzNTljMzA0YjE4YjRjZjk2NDA0NGUzZGU3ZDMyNDkwMjk3YTc0MWIxYzExNTMyNTQ1OThlNDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f90cb886301742ca936d78b1b648f538",
+      "statement": "buildDatasetFile emits exactly one entry per tracked key sorted by canonical key, preferring this chunk's step entry, then the previous entry, then a not-yet-synced never-synced entry, dropping previous entries no longer tracked.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/publish-dataset.ts#L34-L56",
+          "version": "repo-lines-v1:sha256:30375b186602beb1832db57102f08e6425f72923fb8435022c0a3b153c39be71:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwMGU4YmYzYTExNGFlZGM2YWVjOWRhMjc3YWVkZmM5YTQwNzllZDZmM2M1NWMyMDZkNGNmOGE2YzQ1NDZmMDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlkZTgyNTdlODYzMjM3N2JjNWYwNjRiZWNhOWFlNDIyNTdhYzcxMDE5MzI1YTAzODdjYWZhZTc2NzdiODUxZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b4a245542a94b89a9b781cf8754f79d",
+      "statement": "On a throw the runner writes the report with a failure record and rethrows; a league mismatch writes the report only, while other throws after the order exists first publish the dataset and progress (including the failing entry for malformed-request or unexpected-response errors, with an abort notBefore only for MalformedRequestError); the lock is released in a finally.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/run-chunk.ts#L754-L810",
+          "version": "repo-lines-v1:sha256:f3a9f0a53ec603a819e6650241435d89d55a6e36911e678e0b09d00eb77cf143:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ZGI3NDYwODE4MmNiN2NhNGQ5ZmJhNDlhMzk0OTlhN2YzOTA3YjRlYTAzM2IxNDkyYWQ1Y2YwYmVlZWVjZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExZjIzY2U5NDljOTUyZTNkYjkyZGI0YTJhMzA2MzliYzZjZjY0M2FlNjk3N2U4OTQ1NTNmZWEzNTdiN2YxZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_91972f75274e4f849a39a91038a19ff7",
+      "statement": "The sync report replaces figures each chunk but carries forward previous records in order, replacing a sameRecord match at its index and appending other new records.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/chunk/sync-report.ts#L1-L94",
+          "version": "repo-lines-v1:sha256:32466b41823bd631bd90caf6eddb7e33082d63b128b3bfee16eb04fba3f235c8:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}

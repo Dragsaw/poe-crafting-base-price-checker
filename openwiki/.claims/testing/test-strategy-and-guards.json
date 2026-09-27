@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:fd2639eb76ffc79d3eb9f97b5e158ab564cd9e362c6f08426927e1694777f120",
+  "claims": [
+    {
+      "id": "claim_d1a342264ab8403a889d58264af5ba8a",
+      "statement": "The root Vitest config declares each packages/* project plus a root project running test/, boundary-check, dts-specifiers and tracked-json skill script tests, all with test/setup.ts as a setup file.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/vitest.config.ts",
+          "version": "repo-file-v1:sha256:e0b2a258677efeec4c0ac5695141836f56a7de14197961832f7a815d22027f4a"
+        },
+        {
+          "resource": "repo://vitest.config.ts",
+          "version": "repo-file-v1:sha256:5b342e98422e04b7bbbd61c8db9b94fab4cf4071cb93dce579e1708d14613951"
+        }
+      ]
+    },
+    {
+      "id": "claim_d738d659df9f4889861593748607a891",
+      "statement": "The web project runs under jsdom with the shared test/setup.ts followed by src/test-setup.ts, which shims matchMedia, ResizeObserver and IS_REACT_ACT_ENVIRONMENT.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/test-setup.ts",
+          "version": "repo-file-v1:sha256:2d9b3befade9b3fefbc1b7039577210e8db0cb2cc2508066188f5c7f81abff2b"
+        },
+        {
+          "resource": "repo://packages/web/vite.config.ts#L33-L38",
+          "version": "repo-lines-v1:sha256:105b51a601e0cc93f59dac67f1eaa3a214f53cc137fb6596f7c305f1b9cd3451:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTkzNmRmN2E1YTNhYWYxODBjZmZkMWQ2NWM2NDZlZjZhZWEzNTJjYzI3Nzc0Njg2MTk5Y2Q4ZmIzZTg5OWM3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzEyZmY1MTA3ZDYxZjRlZDAzYTY2MjczZDNlZGRjZWI3YjVlN2MwMWRjYzhiMTA3M2I0YThkZGQ0MzE3NjQ3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_278398f75f974909ae0d43ba57266cb6",
+      "statement": "The shared setup installs one MSW server per worker whose onUnhandledRequest callback lets file: and loopback URLs pass, and otherwise records the request with the issuing test's identity and throws to block it.",
+      "evidence": [
+        {
+          "resource": "repo://test/setup.ts#L58-L111",
+          "version": "repo-lines-v1:sha256:5c37ecbb141f398c5ecfcea7c43e59018f4c6cb755d7a7d51e99bd4d4dc3ba55:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiMzVjZTExYzZiZDE5MWU1Y2ZhNzc2ZjkzMDhlNjI2MjVjNDZhOWIzNTdkZDYxZWJhNDFmZjAxYjFhN2MxNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiZDMwMGZlYmI3N2EzOWU4YjhkZTBlY2NkMTdmYzc5MTlkNTczNTVjMGFhZGM4ZmViNDU4NWVlZGFkYzc1YzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmZmIyNTk2N2NhOTRlMzAxNzdjZDEwY2I1NTk5NzRiZjQ0NWUzMTViNDcyYmE0ZjFjZmUxNzE3NDMxMGViNjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_97a693227c6d4f879690cef0d078d828",
+      "statement": "The running test's identity is stored with AsyncLocalStorage.enterWith in beforeEach; afterEach fails a test on its own escaped requests, and afterAll fails the file on any remaining ones, naming each issuer; the server is never closed.",
+      "evidence": [
+        {
+          "resource": "repo://test/setup.ts#L113-L136",
+          "version": "repo-lines-v1:sha256:c99381b79f3683f206490d6ab7a7b344fb4059bc2748bc5ee843db1ff00ca158:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1N2NjMTBiN2UxZGI0Zjg3ZTQyYmIyMTU0M2RlNjJmZGQxMWVhMjllNGI0ODRmNmU2MTg5Y2IwNTQ4YTQxMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3YWJiNWI3ZWQ3NWRmMTEwNzJmNDI2ZGEyNzAyN2M5ZjcwOGI1NGQ1OTE5MTM2OGRjMmE3MzdhZjc1YmE2ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM1OWVjYjYwMGI0Mjc1NzViOWFhM2FiZGRiNDc1MTc2MTkxNjhhOTcxY2JhNDczYmQyYmUyZDBhOGE2ZGI4NzUifQ"
+        },
+        {
+          "resource": "repo://test/setup.ts#L184-L205",
+          "version": "repo-lines-v1:sha256:3a52ed16b7621bed17d51328c23835178df16d2b152d107b7cdac9079423f3dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MmFlODVmZGE5MTkwMTA4OTc2ODU5ZjBjNWRmMDA2MjA0ODRhMTA2YmNlZDdmNGJkMGRmOTdkMjAwZTU0NDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZGI0MDFjMzQ2MjZlOGFiMTM1NTkzNWE0M2M2YWRmODkzNDY5ZGMxNDYwNGFlZmY4Mzg1N2E4NGZiNTQ1ZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDllNmZjYzM5ZGQ0ZGMzZjM1MTRiYzhhNjE5YWUwOTU4NmEyNmIyNmJiOWQ0ZWU5NTRjOWNjOTdmMjNhMTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da65b79949e44a1f9a9d77f2d02ad1ea",
+      "statement": "Guard tests run child Vitest processes over fixture directories to prove the real hooks attribute requests correctly under concurrency, in hooks outside tests, and in reused workers.",
+      "evidence": [
+        {
+          "resource": "repo://test/guard-concurrent.test.ts#L1-L25",
+          "version": "repo-lines-v1:sha256:5a6e382b2bc51a49475e383803817d920eb44bbb98922247d23c044954c37a37:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0ODU5YjRiZjc3MTZiZWE1YjNiODA1YjMwNzZmOTVjMDBlM2ZkYTI2ZTBlMjM3ZTIyMjk2ZGVkYTUyYzQ1ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxZGJlYTM1MDJiNDMyZTA1ZGNhZWNjNzgwMzQwODJmYmJkZjBkZTA5M2RkMjc1YTlkOGFhOTMxOWNkM2UzM2IifQ"
+        },
+        {
+          "resource": "repo://test/guard-hooks.test.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:8bdeef8aedf6fd8e37608eea273a4a4c81493f4fc0b96bfd395af13f93eb990b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiY2I5NzliMTE5ZDJlNGUzMDA1NTBmNDNhZjRhOWRhMWJmOGEyNmUzNTU0NmE5ODgzMTIyOGRlOTg0NDk4ZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlNzg2ZDM2YzQ4NjNhMTk1MzhhNDVjN2Q5YjBiODc5YTFhZDQyMGZjMzc4YWNlMjgxZjYwMjAyMzhmMDAwZjgifQ"
+        },
+        {
+          "resource": "repo://test/guard-linger.test.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:2a94bfb257596352dbbd6081327e5156617ea90757a0bd1633d8b596c782bf15:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3ZTVhYTZjNThhODMzMDhjYjAzZGU0ZjAwYTAzYTY3ODM5NmE3NmUzN2ZmY2Y1MjE3ZWI5OGRlNjViMmU2M2YifQ"
+        },
+        {
+          "resource": "repo://test/guard-reuse.test.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:10369ce9ad5c66180fb81b537a59acd854ec7f1cb7bc1de1769f6afa311b6d4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MDU4MzRhMGYxNTdhNDJjNDUzYmZmNWZkNWJkNDE5YTE1YjhiMWViYmExYjlmMmI2M2FiNzkzYTI0MDM3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4YzZiMTZlNDY3YTg2NDk2NDY2NWMwMzJiNWY5NzE5MzY5MDMxZDZiODk1NzYyOGFiNWVmM2RhYzVmMDg5MGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d44fe895d77f43669b1571495f77fab2",
+      "statement": "The fake HttpPort answers requests keyed by method and URL, records each request, and rejects an unfixtured request rather than returning a default.",
+      "evidence": [
+        {
+          "resource": "repo://packages/contracts/src/ports/fakes/http.ts#L1-L50",
+          "version": "repo-lines-v1:sha256:3b84d4ae5ccea9f70f3c428da6d896ac2e016948bdb84c76c61bcdbb58745fd5:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkNDZlZjUxNmZhZDkyZmQ0ZGJlMDIyMzA1ZTBmYzJmZDc3NWJmMzUyODUyMWRmYjQzMDg2YzQxYWQxNzc4YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c8d97706bd243149ddb9c362c6baea1",
+      "statement": "The pricing fixture port serves recorded trade-search, trade-fetch and trade-data-leagues fixtures by name derived from the request and rejects any unrecorded request naming the missing fixture.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/pricing/fixture-port.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:dfffbb6966eb67e0718b5e2af7a34d48ed08e5902a4296deb3a8b763d926ce67:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmMmU2Y2UyNGQ3Y2Y5NDk4ODRlNzA1MmI4ZTk2YjM4OWZhNWNhNTA5YjJhM2JlZjk2MjY0NDljMjQ3YmVkM2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a55121ec959545d2974a255b2de81be6",
+      "statement": "Fixtures are real trade-API responses recorded only by a human running pnpm fixtures:record, never hand-written, with personal identifiers redacted at record time.",
+      "evidence": [
+        {
+          "resource": "repo://fixtures/README.md",
+          "version": "repo-file-v1:sha256:fee523477047b89e525466ddf377110a7b51711e9d138955855548e17678e72c"
+        }
+      ]
+    },
+    {
+      "id": "claim_952aa23c2a224377a0f3eb75874a312e",
+      "statement": "The web artifact server registers MSW handlers with minimal valid bodies for all eight artifacts on the shared setup server.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/test-support/artifact-server.ts#L1-L50",
+          "version": "repo-lines-v1:sha256:043dc6295be28d2d2ad3d4b3e4967427d28488f68d54108882cb792589af43d8:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4ODI3YTYwN2YyNGIxOTRmZWUyODU2YTIxNzJjMzY0YmM3YTY3MmIxOTNjZTU1ODk2N2U0ZTQ4YTAyMWNjNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNGI5MTM2MTM2NTExNWNlYjIxNWZkNDEzYjdmNzlmNWRhNDM5MjE0MjNiNWExODZiNGU4ZjY5OTdkZmY1NzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d75609cd0ce430289d11f484a7ffb70",
+      "statement": "A catalogue-refresh test asserts that only shell-fetch.test.ts names createFetchHttpPort.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/catalogue-refresh.test.ts#L295-L320",
+          "version": "repo-lines-v1:sha256:0c9bf648c5217406f7d1ee3b5b78b72d25608ab52a5e4f52524d5b80ebff32aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTU2M2ZhMGRiMGU5ODQzYjY3ZjNlYjE0NjIwZmYyMTBhYWZkNThjZWFiNTg1Y2IyZWYzMmJjYzYyM2M2ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiNjgwZTFhNDIyZGRkMGI4ODQ2NDAwM2UxNzAyNDc1YjE3NjM4MDAyNzA4NThlZWUyNDEzZjRhY2UzZmQ1YTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwODAwN2NjNGY3N2Q2ZTA1MTg3YTY1ODMwYzBiNmE1NjJjZjY0MDc5NWFhNjYwY2RlNGRkMGRiMjMxZjczZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1ZDVhZjcxNmFkMDg5YjZjZGE5ZWE1ZDExNTEzMDlmZTk3ODJjNjE5ZTI2NDhmYjY0MzY0MDE0ZDllNDBiNzEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-09-27T12:20:24.418Z"
+  }
+}
