@@ -223,9 +223,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
   summary: Layout claims are proven by arithmetic only. Record one agent-browser measurement of each committed-chrome block against `tokens.ts` `committedChrome` and the 1920 budget, and of `[data-cell]` text fit (`scrollWidth <= clientWidth`) for the "an open question", "no figure yet" and "never attempted" phrases. Add a committed browser fixture set with more than 20 rows and every Price State, so grow/collapse, stale marks and unpriced rows can be seen in a browser.
   evidence: Retro F17 and P3 (review V5, V6). `tokens.test.ts:131-168` and `ranked-list.test.tsx:114-121` sum style strings. No test in the repo measures a rendered box. The committed data gives 2 raw rows, so stories 2.3 and 2.5 could not check grow/collapse in a browser (deferred-work.md story 2.5 entry on grow/collapse).
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Before the Epic 3 specs are written, run a UX pass that reconciles the mockups with DESIGN.md and with the fields that are actually published. Give the review layers the Accessibility Floor ruling (EXPERIENCE.md:1057-1082) and the one-owner rule, so a reviewer neither adds ARIA the floor rules out nor edits a UX-owned document.
-  evidence: Retro P1 and P2, from the session logs. User rulings were needed in 6 of 7 spec sessions. The mockup against DESIGN.md conflict recurred in 2.3, 2.5, 2.7 and 2.8. The 2.7 build-auto review added `role="status"`, and the 2.7 code review removed it. The 2.7 build-auto review also patched the DESIGN.md budget.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Lower-severity seam findings from the epic 2 diff review. None is reached by today's data:
     - no error boundary, so a render throw gives a blank page (`App.tsx:122-135`)
     - no fetch timeout, so a hung request keeps the skeleton indefinitely (`load/load-artifacts.ts:68-89`)
