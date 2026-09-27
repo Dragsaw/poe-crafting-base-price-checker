@@ -107,9 +107,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-2-2-the-raw-ranking-branch-league-scoped-and-computed-at-read-time.md`
   summary: A `no-listings` state recorded in a previous league stays `no-listings` after a league reset. The state carries no league, so `core` (`packages/core/src/rank.ts`) cannot restate it as `not-yet-synced` / `league-mismatch`. The only league-bearing field is the entry's `lastSearchLeague`, and AD-9 forbids `core` to read it.
   evidence: Spec 2.2 restates only a `priced` observation whose `observation.league` differs from the active league. `unresolvable` has the same shape, and so does a published `not-yet-synced` state such as `no-exchange-rate`: it carries no league either, so it outlives a reset under its old reason instead of `league-mismatch`. Settle it with an AD-9 or AD-19 ruling: either `sync` resets carried-over states on a league change, or `core` gains a sanctioned league input for non-`priced` states.
-- source_spec: `docs/stories/spec-deferred-emitted-dts-carries-ts-specifiers.md`
-  summary: The post-emit rewrite covers only `packages/contracts/dist`; `packages/core/dist` and `packages/sync/dist` emit the same `.d.ts` shape and still carry relative `.ts` specifiers.
-  evidence: The spec's Never boundary excludes them because the closed entry named only contracts. A grep after `pnpm typecheck` on 2026-09-26 finds `.ts` specifiers in `packages/core/dist/index.d.ts` and `packages/sync/dist/dry-run.d.ts`. The fix is to add both directories to `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts`.
 
 ## Deferred from: story 2.3 (2026-09-26)
 
@@ -317,3 +314,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
   summary: "Note. The epic 2 retrospective entry \"Parse the eight kept artifacts … during `pnpm build`\" predates this change. Its \"eight\" now means the seven AD-24 artifacts (`ALLOWLIST` in `tools/prune-pages.mjs`); `catalogue/static.json` is no longer kept in the Pages build."
   evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`. `pnpm build` logs `prune-pages: removed … catalogue/static.json …`.
+- source_spec: `docs/stories/spec-deferred-post-emit-rewrite-covers-only-contracts.md`
+  summary: `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts` is a hand-kept list of packages, and nothing checks it against the `emitDeclarationOnly` packages, so a new such package keeps its `.ts` specifiers in `dist` with no signal.
+  evidence: Review of this spec (blind and edge-case layers). The list was hand-kept before this change too (contracts only), which is how the closed entry arose. A test that reads each `packages/*/tsconfig.json` and compares the `emitDeclarationOnly` ones with `TARGET_DIRS`, or a fourth item in the AGENTS.md "A new package needs three edits" pitfall, would close it.
