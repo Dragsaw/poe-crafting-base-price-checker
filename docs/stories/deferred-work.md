@@ -237,3 +237,16 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 ## Resolved by story 2.7 (2026-09-27)
 
 - One entry is **closed**: the "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)" entry saying that `publicDir` publishes all of `data/` on Pages. `pnpm build` now runs `tools/prune-pages.mjs` after `vite build`. The prune deletes every `data/` file in `packages/web/dist` that is not on the eight-artifact AD-24 allowlist, and `packages/web/src/load/prune-allowlist.test.ts` asserts that the allowlist equals `ARTIFACTS`. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
+
+## Deferred from: story 2.8 (2026-09-27)
+
+- source_spec: `docs/stories/spec-2-8-the-unrankable-appendix-and-the-day-one-page-it-completes.md`
+  summary: The `docs/epics.md` Story 2.8 AC for state 16 still reads that, for an Unrankable Item Class some of whose Base Types still rank on the raw branch, "the note names that fact". Epic 2 prints no such note. The epics AC edit is owed. [NOTE FOR UX] DESIGN.md, *Where a class's Base Types still rank* (the `{spacing.col-appendix-note}` italic note, *some of its Base Types rank on the raw branch*), still prescribes that note and needs the same ruling.
+  evidence: The 2026-09-27 human decision in spec 2.8 (Decisions, "No state-16 note in Epic 2"): "Base Type name is enough for the player, no need to show class name." A raw row already names its Base Type, the page does not relate a raw base to its Item Class, and the appendix note cell stays empty. No class-membership source was built.
+- source_spec: `docs/stories/spec-2-8-the-unrankable-appendix-and-the-day-one-page-it-completes.md`
+  summary: [NOTE FOR UX] The key block's Provenance gloss `? unknown — absent: partial pool, upper bound only` does not describe the Unrankable appendix's `class absent from weights file` rows, which carry the same `? unknown` mark. The gloss, or the mark on those rows, needs a UX ruling.
+  evidence: The 2026-09-27 human decision in spec 2.8 (Decisions, "Mark cell") puts `TrustMark kind="unknown"` with the word `unknown` on every `class absent from weights file` row, as `mockups/key-hero-resting.html` shows. `packages/web/src/list/KeyBlock.tsx` glosses that mark only as a partial pool, which is not the fact these rows state.
+
+## Resolved by story 2.8 (2026-09-27)
+
+- One entry is **closed**: the "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)" `[NOTE FOR UX]` entry saying that the empty Unrankable appendix has no treatment. DESIGN.md `unrankable-appendix.emptyState` (memlog 214) rules it, and `packages/web/src/list/UnrankableAppendix.tsx` builds it: the title alone, the count in `ink`, no lead or row, 16px bottom padding, above the key block. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
