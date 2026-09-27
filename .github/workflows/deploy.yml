@@ -1,0 +1,57 @@
+# Builds the static page and deploys it to GitHub Pages (Story 2.7).
+#
+# A workflow, not branch-published Pages: branch publishing runs Jekyll. The
+# site has no server and no secrets; the eight AD-24 artifacts are fetched at
+# runtime from the same Pages copy, relative to `base: './'`.
+#
+# `pnpm test` is deliberately not run here: the committed-data tests would
+# block a player's data-only push. `pnpm check` gates the build instead.
+#
+# One-time setup: Settings > Pages > Source must be "GitHub Actions".
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the version from `packageManager` in package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      - run: pnpm build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/web/dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

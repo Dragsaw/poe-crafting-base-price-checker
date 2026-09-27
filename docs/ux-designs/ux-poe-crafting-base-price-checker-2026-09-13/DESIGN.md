@@ -376,6 +376,7 @@ spacing:
   frame-reserve-health-line: '21px'
   # one per absent tolerable artifact, at most three [memlog 213]
   frame-reserve-absence-line: '21px'
+  frame-reserve-list-statement: '21px'
   sync-report-max-height: '400px'
   # the general fallback scale, quantised from the mock at 4px. Used for any gap
   # not given an exact token above. Nothing here is dead.
@@ -1471,7 +1472,7 @@ last ranked row and the appendix:
 always summed to 1390; the 2px gap was the frame's old top and bottom border,
 which the box model below turned into a 1px `outline` that consumes no height.
 
-Three things are charged against that slack by **data**, not by a click, so they
+Four things are charged against that slack by **data**, not by a click, so they
 belong to the resting budget and not to the expansion budget:
 
 - `{spacing.frame-reserve-banner}` — 74px for `{components.uniform-prior-banner}`
@@ -1481,16 +1482,20 @@ belong to the resting budget and not to the expansion budget:
 - `{spacing.frame-reserve-absence-line}` — 21px for each absence line in the
   trust strip, one per absent tolerable artifact, at most three `[decision —
   memlog 213]`.
+- `{spacing.frame-reserve-list-statement}` — 21px for the list statement under
+  the asking-price line (`EXPERIENCE.md` states 23 and 25). One slot, because
+  the two statements are exclusive.
 
 **They do not all co-occur, and the worst case counts only those that can.** The
 banner needs at least one ranked crafted row, so it needs both `weights.json`
 and `recipes.json` loaded (`EXPERIENCE.md`, *The uniform-prior banner*,
 `[decision — memlog 213]`). The health line reads its counts from
 `sync-report.json`, so it needs that file loaded. The largest set that can
-appear together is therefore 95px: the banner with either the health line or
-the `sync-report.json` absence line. Without the banner, the most is 63px.
-Worst-case resting height is 1390 + 95 = **1485px**, leaving **435px**. Summing
-all five reservations (179px) would describe a page no data state can produce.
+appear together is therefore 116px: the banner with either the health line or
+the `sync-report.json` absence line, plus the list statement, which reads the
+ranking and not the artifact set. Without the banner, the most is 84px.
+Worst-case resting height is 1390 + 116 = **1506px**, leaving **414px**. Summing
+all six reservations (200px) would describe a page no data state can produce.
 `{spacing.sync-report-max-height}` is set at **400px** — an independent cap
 chosen to sit inside that worst case, not a restatement of the slack. The panel
 scrolls inside its own band past 400px.
@@ -1499,7 +1504,7 @@ scrolls inside its own band past 400px.
 
 1. **`{components.sync-report-panel}` opens against the slack**, capped at
    `{spacing.sync-report-max-height}`. The regions below move down into the
-   space the appendix gives back. Because 400 ≤ 435, the strip alone never makes
+   space the appendix gives back. Because 400 ≤ 414, the strip alone never makes
    the page scroll, in any data state.
 2. **A ranked row's expansion is uncapped.** It holds every tracked Combination
    on that Item Class — or the one degenerate Combination of a Raw Base — plus

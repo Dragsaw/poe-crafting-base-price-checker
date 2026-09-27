@@ -72,6 +72,11 @@ export const spacing = {
   frameReserveHealthLine: 21,
   /** One per absent tolerable artifact, inside the trust strip (DESIGN.md memlog 213). */
   frameReserveAbsenceLine: 21,
+  /**
+   * The list's one statement under the asking-price line: honest-empty (state
+   * 23) or nothing-clears (state 25). The two are exclusive, so one slot.
+   */
+  frameReserveListStatement: 21,
   syncReportMaxHeight: 400,
   /**
    * `{components.trust-strip}`: padding 11/12 between a rule-strong top and a
@@ -338,16 +343,20 @@ export const reservedChrome: readonly BudgetLine[] = [
   { block: 'absence line: weights.json', px: spacing.frameReserveAbsenceLine },
   { block: 'absence line: recipes.json', px: spacing.frameReserveAbsenceLine },
   { block: 'absence line: sync-report.json', px: spacing.frameReserveAbsenceLine },
+  { block: 'list statement', px: spacing.frameReserveListStatement },
 ];
 
 /**
  * The reserves that can co-occur (DESIGN.md, Layout & Spacing): the banner
  * needs weights and recipes loaded, the health line needs the sync report
  * loaded, so the largest set is the banner with either the health line or the
- * `sync-report.json` absence line — 95px.
+ * `sync-report.json` absence line — 95px. The list statement can join any of
+ * them (its predicates read the ranking, not the artifact set): 116px.
  */
 export const coOccurringReserve: number =
-  spacing.frameReserveBanner + Math.max(spacing.frameReserveHealthLine, spacing.frameReserveAbsenceLine);
+  spacing.frameReserveBanner +
+  Math.max(spacing.frameReserveHealthLine, spacing.frameReserveAbsenceLine) +
+  spacing.frameReserveListStatement;
 
 export function sumPx(lines: readonly BudgetLine[]): number {
   return lines.reduce((total, line) => total + line.px, 0);

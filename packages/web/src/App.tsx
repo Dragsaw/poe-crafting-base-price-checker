@@ -9,6 +9,8 @@ import { TrustStrip, TrustStripSlot } from './frame/TrustStrip';
 import { AskingPriceLine } from './list/AskingPriceLine';
 import { toDisplayRows } from './list/display-rows';
 import { KeyBlock } from './list/KeyBlock';
+import { listStatement } from './list/list-statement';
+import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
 import type { ArtifactSet } from './load/artifacts';
@@ -29,7 +31,8 @@ type ViewState =
  * whole set, the refusal screen or the fetch-failure screen — never row by row
  * (AD-24, FR-33). `+ Try again` re-runs all eight fetches.
  *
- * The resting chrome, in order: masthead, trust strip, asking-price line, column header,
+ * The resting chrome, in order: masthead, trust strip, asking-price line, the
+ * list statement when the ranking makes one (states 23 and 25), column header,
  * list, then the key block and the running foot. The skeleton paints the same
  * chrome around its slots, with a blank trust-strip slot of the strip's height; the two failure screens paint none of it.
  */
@@ -114,16 +117,24 @@ function ReadyList({
   readonly now: number;
   readonly threshold: number;
 }): JSX.Element {
-  const rows = useMemo(() => {
+  const { rows, statement } = useMemo(() => {
     const ranking = rank({
       tracked: set.tracked.entries,
       dataset: set.dataset.entries,
       activeLeague: set.config.league,
       threshold,
     });
-    return toDisplayRows(ranking, set.dataset.entries, now);
+    return {
+      rows: toDisplayRows(ranking, set.dataset.entries, now),
+      statement: listStatement(ranking, threshold, set.config.league),
+    };
   }, [set, now, threshold]);
-  return <RankedList rows={rows} threshold={threshold} activeLeague={set.config.league} />;
+  return (
+    <>
+      <ListStatement statement={statement} />
+      <RankedList rows={rows} threshold={threshold} activeLeague={set.config.league} />
+    </>
+  );
 }
 
 /**

@@ -13,6 +13,7 @@
     "test/**/*.ts",
     "tools/boundary-check/*.ts",
     "tools/dts-specifiers/*.ts",
+    "tools/prune-pages.mjs",
     ".claude/skills/tracked-json/scripts/*.ts",
     "depcruise.rules.mjs",
     ".dependency-cruiser.mjs",

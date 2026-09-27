@@ -15,6 +15,7 @@
     "check": "pnpm run typecheck && pnpm run lint && pnpm run depcruise",
     "test": "vitest run",
     "dev": "vite --config packages/web/vite.config.ts",
+    "build": "vite build --config packages/web/vite.config.ts && node tools/prune-pages.mjs",
     "sync": "node --env-file-if-exists=.env packages/sync/src/sync.ts",
     "sync:dry": "node packages/sync/src/dry-run.ts",
     "fixtures:record": "node --env-file-if-exists=.env packages/sync/src/fixtures-record.ts",

@@ -152,9 +152,16 @@ describe('the vertical budget', () => {
     }
   });
 
-  it('counts a 95px co-occurring worst case, and caps the sync report inside what it leaves', () => {
-    expect(coOccurringReserve).toBe(95);
-    expect(sumPx(committedChrome) + coOccurringReserve).toBe(1485);
+  it('gives the list statement one 21px frameReserveListStatement slot, shared by its two exclusive states', () => {
+    expect(spacing.frameReserveListStatement).toBe(21);
+    const slots = reservedChrome.filter((line) => line.block === 'list statement');
+    expect(slots).toEqual([{ block: 'list statement', px: spacing.frameReserveListStatement }]);
+  });
+
+  it('counts a 116px co-occurring worst case, and caps the sync report inside what it leaves', () => {
+    // Banner 74 + max(health line, sync-report absence line) 21 + list statement 21.
+    expect(coOccurringReserve).toBe(116);
+    expect(sumPx(committedChrome) + coOccurringReserve).toBe(1506);
     expect(spacing.syncReportMaxHeight).toBe(400);
     expect(spacing.syncReportMaxHeight).toBeLessThanOrEqual(spacing.frameSlack - coOccurringReserve);
   });

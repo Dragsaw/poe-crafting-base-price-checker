@@ -732,3 +732,233 @@ describe('the trust strip', () => {
     expect(requests).toHaveLength(fetched);
   });
 });
+
+/** The threshold field, for the statement and interaction-surface tests. */
+function payoutField(): HTMLInputElement {
+  const found = frame().querySelector<HTMLInputElement>('[data-payout-threshold] input');
+  if (found === null) {
+    throw new Error('no threshold input rendered');
+  }
+  return found;
+}
+
+function unitNames(): (string | null)[] {
+  return Array.from(frame().querySelectorAll('[data-ranked-row] [data-unit-name]'), (node) => node.textContent);
+}
+
+function serveBodies(bodies: ReturnType<typeof bodiesWith>): ReturnType<typeof serveArtifacts> {
+  return serveArtifacts(server, {
+    tracked: { kind: 'json', body: bodies.tracked },
+    dataset: { kind: 'json', body: bodies.dataset },
+  });
+}
+
+describe('the list statement', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  function statement(): HTMLElement | null {
+    return frame().querySelector<HTMLElement>('[data-list-statement]');
+  }
+
+  function numerals(): string[] {
+    return Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="rank"]'), (node) => node.textContent ?? '');
+  }
+
+  function evCells(): string[] {
+    return Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="ev"]'), (node) => node.textContent ?? '');
+  }
+
+  function expectChromeAround(): void {
+    for (const attr of ['data-asking-price-line', 'data-key-block', 'data-running-foot']) {
+      expect(frame().querySelector(`[${attr}]`), attr).not.toBeNull();
+    }
+  }
+
+  // Matrix: league reset.
+  it('lists a league reset in canonical order, with no numerals, no figure yet in every EV cell and the canonical statement', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const ring = rawEntry('Coral Ring');
+    const amulet = rawEntry('Gold Amulet');
+    serveBodies(
+      bodiesWith(
+        [belt, ring, amulet],
+        [
+          priced(belt, 1.5, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(ring, 0.8, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(amulet, 2, hoursBefore(now, 30 * 24), 'Standard'),
+        ],
+      ),
+    );
+    mount();
+    await settleTo('ready');
+    expect(statement()?.dataset['listStatement']).toBe('honest-empty');
+    expect(statement()?.textContent).toBe(
+      `In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE} yet.`,
+    );
+    // Under the asking-price line, above the column header.
+    expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(statement()?.nextElementSibling?.querySelector('[data-column-header]')).not.toBeNull();
+    expect(statement()?.style.height).toBe('21px');
+    // Canonical key order: for three iLvl-82 raw bases, the base type ids in order.
+    expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
+    expect(numerals()).toEqual(['', '', '']);
+    expect(evCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    // None of last league's figures, anywhere on the list.
+    expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
+
+    const first = frame().querySelector<HTMLElement>('[data-ranked-row]');
+    act(() => {
+      first?.click();
+    });
+    expect(frame().querySelector('[data-expansion-panel] [data-cell="state"]')?.textContent).toBe(
+      '∆ not-yet-synced · league-mismatch',
+    );
+    expectChromeAround();
+  });
+
+  // Matrix: partial refresh.
+  it('ranks a partial refresh normally, with no statement', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const ring = rawEntry('Coral Ring');
+    serveBodies(
+      bodiesWith(
+        [belt, ring],
+        [priced(belt, 1.5, hoursBefore(now, 1)), priced(ring, 0.8, hoursBefore(now, 30 * 24), 'Standard')],
+      ),
+    );
+    mount();
+    await settleTo('ready');
+    expect(statement()).toBeNull();
+    expect(unitNames()).toEqual(['Wide Belt', 'Coral Ring']);
+    expect(numerals()).toEqual(['1', '']);
+    expect(evCells()).toEqual(['1.50', 'no figure yet']);
+    expect(frame().textContent).not.toMatch(/stale/i);
+    expectChromeAround();
+  });
+
+  // Matrix: nothing clears, then threshold lowered.
+  it('states that nothing clears 3.00, keeps the trail rows, and drops the statement once a row clears', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const ring = rawEntry('Coral Ring');
+    const never = rawEntry('Lost Belt');
+    const requests = serveBodies(
+      bodiesWith([belt, ring, never], [priced(belt, 1.5, hoursBefore(now, 1)), priced(ring, 0.8, hoursBefore(now, 1))]),
+    );
+    mount();
+    await settleTo('ready');
+    expect(statement()).toBeNull();
+
+    typeInto(payoutField(), '3');
+    await pastDebounce();
+    expect(statement()?.dataset['listStatement']).toBe('nothing-clears');
+    expect(statement()?.textContent).toBe('Nothing clears your Payout Threshold of 3.00 Divine.');
+    expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    // Not a money-slot phrase: the trail row keeps its own phrase, as it was.
+    expect(unitNames()).toEqual(['Lost Belt']);
+    expect(evCells()).toEqual(['no figure yet']);
+    expectChromeAround();
+
+    typeInto(payoutField(), '1');
+    await pastDebounce();
+    expect(statement()).toBeNull();
+    expect(unitNames()).toEqual(['Wide Belt', 'Lost Belt']);
+    expect(numerals()).toEqual(['1', '']);
+    expect(requests).toHaveLength(ARTIFACT_ORDER.length);
+  });
+
+  // Matrix: empty Tracked List.
+  it('makes neither statement for an empty Tracked List', async () => {
+    serveArtifacts(server);
+    mount();
+    await settleTo('ready');
+    expect(statement()).toBeNull();
+    expectChromeAround();
+  });
+
+  it('prints no recipes.json absence line on the committed data/, whose recipes list is empty', async () => {
+    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes}.json', {
+      eager: true,
+      import: 'default',
+    });
+    const recipes = committed['../../../data/recipes.json'];
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
+      recipes: { kind: 'json', body: recipes },
+    });
+    mount();
+    await settleTo('ready');
+    expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toEqual([]);
+    expect(frame().querySelector('[data-absence-lines]')).toBeNull();
+    expect(frame().textContent).not.toContain('recipes.json');
+    expect(statement()).toBeNull();
+  });
+});
+
+describe('the interaction surface', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it('has no tooltip, dialog, sort or clickable header, and writes nothing to storage but the threshold', async () => {
+    const writes: string[] = [];
+    const setItem = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (this: Storage, key: string, value: string) {
+      writes.push(key);
+      setItem.call(this, key, value);
+    });
+    const now = Date.now();
+    const filler = Array.from({ length: 22 }, (_, i) => rawEntry(`Filler Ring ${String(i + 1).padStart(2, '0')}`));
+    const requests = serveBodies(
+      bodiesWith(
+        filler,
+        filler.map((entry, i) =>
+          priced(entry, 1 + i / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(i)}`, league: TEST_LEAGUE }),
+        ),
+      ),
+    );
+    mount();
+    await settleTo('ready');
+
+    // Every interaction Epic 2 builds: the strip, a row, the list growth and the threshold.
+    act(() => {
+      frame().querySelector<HTMLElement>('[data-trust-strip]')?.click();
+    });
+    act(() => {
+      frame().querySelector<HTMLElement>('[data-ranked-row]')?.click();
+    });
+    act(() => {
+      frame().querySelector<HTMLElement>('[data-expand-affordance]')?.click();
+    });
+    typeInto(payoutField(), '2');
+    await pastDebounce();
+    blur(payoutField());
+    await flush();
+
+    // A header click sorts nothing, and the header holds nothing clickable.
+    const header = frame().querySelector<HTMLElement>('[data-column-header]');
+    const before = unitNames();
+    for (const label of Array.from(header?.children ?? []) as HTMLElement[]) {
+      act(() => {
+        label.click();
+      });
+    }
+    await flush();
+    expect(unitNames()).toEqual(before);
+    expect(header?.querySelectorAll('button, a, input, [role="button"], [tabindex]')).toHaveLength(0);
+
+    expect(document.querySelectorAll('[title]')).toHaveLength(0);
+    expect(document.querySelectorAll('[role="dialog"], [role="tooltip"], [aria-sort]')).toHaveLength(0);
+    expect(new Set(writes)).toEqual(new Set([THRESHOLD_STORAGE_KEY]));
+    expect(Object.keys(localStorage)).toEqual([THRESHOLD_STORAGE_KEY]);
+    expect(sessionStorage).toHaveLength(0);
+    expect(requests).toHaveLength(ARTIFACT_ORDER.length);
+  });
+});
