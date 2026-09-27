@@ -344,3 +344,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-review-fix-consolidate-web-helpers-findings.md`
   summary: [NOTE FOR UX] The Sync Report requests line now prints `10 tracked list · 1 league validation request this pass.`, and its noun agrees only with the league-validation figure, so the tracked-list figure has no noun of its own; UX should rule the wording (for example one agreeing noun per figure).
   evidence: The review of `78db4da..ec38dce` found `1 league validation requests`. The fix routes the one trailing noun through `plural` on the league-validation count (`panelColumns` in `packages/web/src/frame/trust-facts.ts`). The story 2.6 panel-copy `[NOTE FOR UX]` entry still quotes the old plural string.
+
+## Deferred from: epic 2 retro action 7, UX rulings F5, F13, F15 (2026-09-27)
+
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Bring the web code to the three UX rulings. (1) The health line prints `× N of M pinned entries starved`. M is `pinnedCount` and N is `pinnedCount − pinnedRefreshed`, from the last pinned-starvation record in report order. Replace `HEALTH_STARVED` (`frame/trust-facts.ts:30`, `:114-116`) and the "without a count" test (`trust-facts.test.ts:116`). (2) `ageMark` (`list/format.ts:50-66`) reads `lastAttemptedAt` for a league-mismatched observation, so the row prints `tried Nd ago` and never `priced Nd ago`. Update its docblock and add a mismatch test. (3) `rawNote` and `rawPanelSubLine` (`list/format.ts:80`, `:213`) say "valued at its own current asking price" in place of "ranked at …".
+  evidence: UX memlog 216, 217, 218. EXPERIENCE.md revision 11 (trust strip, Freshness, states 6, 23, 31). DESIGN.md revision 9 (health-line table, raw-base-row). Retro F5, F13, F15.

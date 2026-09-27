@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 8
+revision: 9
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -627,7 +627,7 @@ components:
     restingFacts: 'line 1 lead "Weights File", then "producer", "generatedAt", "gamePatch" — line 2 "Last synced", then "Tracked List last edited"'
     restingFactsRule: 'five plain facts, unconditional, no mark and no colour on any of them. They are attribution, not health signals.'
     healthLine: 'a third line, raised only when a health figure is bad. Each signal is a rust mark with its glyph, its word and its count.'
-    healthSignals: 'unresolvable entries exist · pinned entries starved'
+    healthSignals: 'unresolvable entries exist ("× N unresolvable") · pinned entries starved ("× N of M pinned entries starved"; EXPERIENCE.md owns what N and M count) [decision — memlog 216]'
     healthLineHeight: '{spacing.frame-reserve-health-line}'
     absenceLines: 'one line per absent tolerable artifact (AD-24), inside the strip, after line 2 and before the health line. Lead "Not published" in the label style, then the file and its consequence in the value style. Plain: no mark, no colour. Attribution, not a health signal [decision — memlog 213].'
     absenceLineCopy: '"Not published" · "weights.json — every crafted class is unrankable." | "recipes.json — no crafted rows can be ranked." | "sync-report.json — the sync report is unavailable." In that order.'
@@ -727,7 +727,7 @@ components:
   # `pruned` is marked by {components.tombstone-band}'s `† pruned`; this is its
   # sibling on a row that is still tracked. It is NOT a trust mark and NOT a badge.
   # WHY IT IS LOUD RATHER THAN TASTEFUL: {components.trust-strip}'s third line reads
-  # `× pinned entries starved this run` (FR-17, FR-25) and NAMES NO ENTRIES, so this
+  # `× N of M pinned entries starved` (FR-17, FR-25) and NAMES NO ENTRIES, so this
   # mark is the LOOKUP KEY a player scans open expansions for once that line fires.
   # Findability is the mark's whole job. Do not quiet it down to 400 or to a
   # trailing position — that reads as good taste and is a functional regression.
@@ -1731,9 +1731,11 @@ the cell, and an italic Base Type name after it. **The glyph is a sibling of the
 name, not part of it**: the glyph is `flex: 0 0 auto` and never truncates, the
 name flexes and ellipsises after it, so a long Base Type can never strip away
 one of the three redundant cues. The item level lives in the row's note, spelled
-— *uncrafted at Item Level 82 — ranked at its own current asking price, not at a
+— *uncrafted at Item Level 82 — valued at its own current asking price, not at a
 craft outcome* — which replaces the three chase cells as one full-width italic
-note in `{colors.ink-tertiary}`. Three cues — tint, italic, glyph — so no one of
+note in `{colors.ink-tertiary}`. The note says *valued*, not *ranked*
+`[decision — memlog 218]`: the same row is unranked under the honest-empty state
+(`EXPERIENCE.md` state 23), and the note is true in both states. Three cues — tint, italic, glyph — so no one of
 them is load-bearing.
 
 *The `RAW BASE` word retired at revision 3, and the third cue is now a glyph*
@@ -2005,7 +2007,10 @@ something actually broke:
 | Trigger | Line reads |
 |---|---|
 | any `unresolvable` entries exist (FR-24) | `× 12 unresolvable` |
-| a pinned-starvation record is present (FR-17, FR-25) | `× pinned entries starved this run` |
+| a pinned-starvation record is present (FR-17, FR-25) | `× 3 of 8 pinned entries starved` |
+
+The starvation count reads *N of M* `[decision — memlog 216]`. `EXPERIENCE.md`
+(`{components.trust-strip}`) owns what N and M count.
 
 Both triggers share the one line. A healthy sync raises no third line at all —
 no counts of nothing, no green tick, no "0 unresolvable" — but a broken one is
@@ -2291,7 +2296,7 @@ line one of `{components.combination-row}`, ahead of tier plus short form. The
 `† pruned` below.
 
 *It is a lookup key, not a badge, and that is the whole specification.*
-`{components.trust-strip}` raises `× pinned entries starved this run` (FR-17,
+`{components.trust-strip}` raises `× N of M pinned entries starved` (FR-17,
 FR-25) and **names no entries**. The player is then looking for *which ones*,
 across however many expansions he opens. So this mark is the answer to a question
 the page asked three regions further up, and its job is to be **found in a scan** —

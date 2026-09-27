@@ -1410,7 +1410,7 @@ So that a rank stops being a claim and becomes an argument I can check.
 
 **Given** that mark's loudness
 **When** a developer implements it
-**Then** the loudness is deliberate rather than untidy. `{components.trust-strip}`'s third line reads `× pinned entries starved this run` and **names no entries**, so this mark is what the player scans open expansions for after that line fires. Being findable in a scan *is* the requirement
+**Then** the loudness is deliberate rather than untidy. `{components.trust-strip}`'s third line reads `× N of M pinned entries starved` and **names no entries**, so this mark is what the player scans open expansions for after that line fires. Being findable in a scan *is* the requirement
 **And** a quiet tertiary decoration would therefore be a failure rather than good taste (FR-15, FR-17, FR-25, UX-DR48, state 31).
 
 **Given** the mark's ink
@@ -1491,7 +1491,7 @@ So that a list that is not doing what I think is visible without my going to loo
 **Then** it raises no third line
 **And** it carries no count of nothing, no "0 unresolvable" and no success mark (UX-DR21, state 30).
 
-**Given** exactly two data triggers — unresolvable entries exist, or pinned entries starved this run
+**Given** exactly two data triggers — unresolvable entries exist, or pinned entries starved
 **When** either trigger holds
 **Then** the strip raises one rust third line, carrying a glyph, a word **and** a count for each trigger
 **And** that line costs `{spacing.frame-reserve-health-line}`, charged to the resting budget, because data raises it and no click does

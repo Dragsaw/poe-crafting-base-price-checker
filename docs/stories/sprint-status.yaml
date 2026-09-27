@@ -244,5 +244,5 @@ action_items:
       for a league-mismatched price (ageMark vs panel), and the raw row note under
       the honest-empty state (retro F5, F13, F15)"
     owner: "UX"
-    status: open
+    status: done
     ref: "docs/stories/epic-2-retro-2026-09-27.md"
