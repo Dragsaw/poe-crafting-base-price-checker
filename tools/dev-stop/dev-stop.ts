@@ -21,10 +21,15 @@ import { fileURLToPath } from 'node:url';
 
 export const DEFAULT_PORT = 5173;
 
+/** How long to wait for the port to free after the kill. */
+const STOP_TIMEOUT_MS = 5000;
+
 export interface ProcessInfo {
   readonly pid: number;
   readonly ppid: number;
   readonly commandLine: string;
+  /** Creation time in epoch ms, where the platform reports it (Windows). */
+  readonly started?: number;
 }
 
 export type StopPlan =
@@ -59,10 +64,21 @@ function isDevChainProcess(info: ProcessInfo): boolean {
 }
 
 /**
+ * Whether `parent` can be the process that started `child`. Windows keeps a
+ * dead parent's PID in `ppid` and reuses PIDs, so the process that now holds
+ * an orphan's `ppid` may be unrelated. It started after the child, which the
+ * real parent cannot have. Without both creation times, trust the `ppid`.
+ */
+function startedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
+  return parent.started === undefined || child.started === undefined || parent.started <= child.started;
+}
+
+/**
  * What to kill for the given listener PIDs. Each listener must be Vite run from
  * `repoRoot`'s `node_modules`. From each listener, climb while the parent is
- * alive, is part of the `pnpm dev` chain, and is not one of `protectedPids`
- * (this tool's own ancestors). The highest process reached is a root.
+ * alive, started before its child, is part of the `pnpm dev` chain, and is not
+ * one of `protectedPids` (this tool's own ancestors). The highest process
+ * reached is a root.
  */
 export function planStop(
   listeners: readonly number[],
@@ -87,9 +103,20 @@ export function planStop(
       };
     }
     let top = listener;
+    // A reused PID can close a `ppid` cycle; the seen set ends the climb there.
+    const seen = new Set<number>([top.pid]);
     for (;;) {
       const parent = byPid.get(top.ppid);
-      if (parent === undefined || protectedPids.has(parent.pid) || !isDevChainProcess(parent)) break;
+      if (
+        parent === undefined ||
+        seen.has(parent.pid) ||
+        protectedPids.has(parent.pid) ||
+        !isDevChainProcess(parent) ||
+        !startedBefore(parent, top)
+      ) {
+        break;
+      }
+      seen.add(parent.pid);
       top = parent;
     }
     roots.add(top.pid);
@@ -105,7 +132,7 @@ interface Snapshot {
 function snapshotWindows(port: number): Snapshot {
   const script = [
     `$l = @(Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction SilentlyContinue | ForEach-Object OwningProcess | Sort-Object -Unique)`,
-    '$p = @(Get-CimInstance Win32_Process | ForEach-Object { @{ pid = [int]$_.ProcessId; ppid = [int]$_.ParentProcessId; commandLine = [string]$_.CommandLine } })',
+    '$p = @(Get-CimInstance Win32_Process | ForEach-Object { $i = @{ pid = [int]$_.ProcessId; ppid = [int]$_.ParentProcessId; commandLine = [string]$_.CommandLine }; if ($_.CreationDate) { $i.started = ([DateTimeOffset]$_.CreationDate).ToUnixTimeMilliseconds() }; $i })',
     '@{ listeners = $l; processes = $p } | ConvertTo-Json -Compress -Depth 3',
   ].join('; ');
   const out = execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
@@ -116,13 +143,19 @@ function snapshotWindows(port: number): Snapshot {
   return { listeners: parsed.listeners ?? [], processes: parsed.processes };
 }
 
+/**
+ * POSIX reports no creation time here. It needs none: an orphan is reparented
+ * to init or a subreaper, so its `ppid` never names a dead, reusable PID.
+ */
 function snapshotPosix(port: number): Snapshot {
   let listeners: number[] = [];
   try {
     const out = execFileSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' });
     listeners = [...new Set(out.split('\n').filter(Boolean).map(Number))];
-  } catch {
-    // lsof exits 1 when nothing matches.
+  } catch (error) {
+    // lsof exits 1 when nothing matches. Any other failure, such as a missing
+    // lsof, must not read as a free port.
+    if ((error as { status?: unknown }).status !== 1) throw error;
   }
   const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
   const processes = ps
@@ -137,11 +170,11 @@ function snapshot(port: number): Snapshot {
   return process.platform === 'win32' ? snapshotWindows(port) : snapshotPosix(port);
 }
 
-/** This process and every live ancestor. Killing one would kill the caller. */
-function ownAncestry(processes: readonly ProcessInfo[]): Set<number> {
+/** `selfPid` and every live ancestor. Killing one would kill the caller. */
+export function ownAncestry(processes: readonly ProcessInfo[], selfPid: number): Set<number> {
   const byPid = new Map(processes.map((info) => [info.pid, info]));
-  const out = new Set<number>([process.pid]);
-  let pid: number | undefined = process.pid;
+  const out = new Set<number>([selfPid]);
+  let pid: number | undefined = selfPid;
   while (pid !== undefined) {
     const next: number | undefined = byPid.get(pid)?.ppid;
     if (next === undefined || out.has(next)) break;
@@ -154,7 +187,11 @@ function ownAncestry(processes: readonly ProcessInfo[]): Set<number> {
 /** Kills `pid` and every descendant, children first on POSIX. */
 function killTree(pid: number, processes: readonly ProcessInfo[]): void {
   if (process.platform === 'win32') {
-    execFileSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' });
+    try {
+      execFileSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' });
+    } catch {
+      // The root already exited, or one descendant would not end. The port poll decides.
+    }
     return;
   }
   for (const child of processes.filter((info) => info.ppid === pid)) killTree(child.pid, processes);
@@ -169,7 +206,7 @@ async function main(): Promise<number> {
   const port = parsePort(process.argv.slice(2));
   const repoRoot = resolve(import.meta.dirname, '../..');
   const before = snapshot(port);
-  const plan = planStop(before.listeners, before.processes, repoRoot, ownAncestry(before.processes));
+  const plan = planStop(before.listeners, before.processes, repoRoot, ownAncestry(before.processes, process.pid));
   if (plan.kind === 'idle') {
     process.stdout.write(`dev-stop: nothing listens on port ${port}.\n`);
     return 0;
@@ -179,12 +216,15 @@ async function main(): Promise<number> {
     return 1;
   }
   for (const root of plan.roots) killTree(root, before.processes);
-  // taskkill returns before the socket is released; poll for up to 5 s.
-  for (let attempt = 0; attempt < 20; attempt++) {
+  // taskkill returns before the socket is released, so poll. Each snapshot
+  // starts a shell and can take seconds, so bound the wait by time, not attempts.
+  const deadline = Date.now() + STOP_TIMEOUT_MS;
+  for (;;) {
     if (snapshot(port).listeners.length === 0) {
       process.stdout.write(`dev-stop: stopped PID ${plan.roots.join(', ')}; port ${port} is free.\n`);
       return 0;
     }
+    if (Date.now() >= deadline) break;
     await new Promise((done) => setTimeout(done, 250));
   }
   process.stderr.write(`dev-stop: port ${port} is still taken after killing PID ${plan.roots.join(', ')}.\n`);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_PORT, parsePort, planStop, type ProcessInfo } from './dev-stop';
+import { DEFAULT_PORT, ownAncestry, parsePort, planStop, type ProcessInfo } from './dev-stop';
 
 const ROOT = 'E:\\Projects\\poe';
 const NONE = new Set<number>();
@@ -52,6 +52,24 @@ describe('planStop', () => {
     expect(planStop([16], orphaned, ROOT, NONE)).toEqual({ kind: 'kill', roots: [11] });
   });
 
+  it('stops below a reused PID whose process started after the orphan', () => {
+    // Each process started in PID order; the launching shell 10 is gone, and
+    // Windows gave its PID to another agent's later `pnpm test`.
+    const timed = CHAIN.map((info) => ({ ...info, started: info.pid * 1000 }));
+    const reused = timed.map((info) =>
+      info.pid === 10 ? { pid: 10, ppid: 1, commandLine: 'bash -c "pnpm test"', started: 99_000 } : info,
+    );
+    expect(planStop([16], reused, ROOT, NONE)).toEqual({ kind: 'kill', roots: [11] });
+  });
+
+  it('ends the climb on a ppid cycle', () => {
+    // A reused PID 10 that is a child of the listener closes the loop 16 → … → 11 → 10 → 16.
+    const cyclic = CHAIN.map((info) =>
+      info.pid === 10 ? { pid: 10, ppid: 16, commandLine: 'cmd.exe /c vite build' } : info,
+    );
+    expect(planStop([16], cyclic, ROOT, NONE)).toEqual({ kind: 'kill', roots: [10] });
+  });
+
   it('stops at a parent that is not part of a pnpm dev chain', () => {
     const interactive = CHAIN.map((info) => (info.pid === 11 ? { ...info, commandLine: 'bash --login -i' } : info));
     expect(planStop([16], interactive, ROOT, NONE)).toEqual({ kind: 'kill', roots: [12] });
@@ -82,5 +100,25 @@ describe('planStop', () => {
       kind: 'refuse',
       reason: expect.stringContaining('PID 99'),
     });
+  });
+});
+
+describe('ownAncestry', () => {
+  it('protects the caller and every live ancestor', () => {
+    expect(ownAncestry(CHAIN, 13)).toEqual(new Set([13, 12, 11, 10, 1, 0]));
+  });
+
+  it('ends on a ppid cycle', () => {
+    const cyclic = [
+      { pid: 5, ppid: 6, commandLine: 'a' },
+      { pid: 6, ppid: 5, commandLine: 'b' },
+    ];
+    expect(ownAncestry(cyclic, 5)).toEqual(new Set([5, 6]));
+  });
+
+  it('keeps a dev:stop run from inside the chain from killing its caller', () => {
+    // dev:stop runs as a child of the pnpm at 14, so the climb stops below it.
+    const inside = [...CHAIN, { pid: 20, ppid: 14, commandLine: 'node tools/dev-stop/dev-stop.ts' }];
+    expect(planStop([16], inside, ROOT, ownAncestry(inside, 20))).toEqual({ kind: 'kill', roots: [15] });
   });
 });
