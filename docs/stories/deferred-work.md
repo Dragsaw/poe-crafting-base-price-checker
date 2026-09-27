@@ -287,3 +287,33 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `tools/dev-stop/dev-stop.ts`
   summary: No automated check runs the stop poll's listener query (`listenerPids`, `listenersWindows`, `listenersPosix`). If the PowerShell output ever serialises one listener as a bare number and not an array, `.length` is undefined. The poll then reads the port as taken until the deadline, and dev:stop exits 1 after it has killed the server.
   evidence: The verification-gap reviewer ran the query by hand: `[]` for a free port, `[1708]` for one listener. `dev-stop.test.ts` imports only `DEFAULT_PORT`, `ownAncestry`, `parsePort` and `planStop`. The entry guard keeps `main` out of tests, so this check needs a real listener or process stubbing.
+
+## Deferred from: epic 2 retro item 12, UX reconciliation pass (2026-09-27)
+
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Architect. AD-5 says `web` replaces each underscore with a space and uses "no display mapping". UX memlog 230 rules that a trailing defence-type suffix prints as defence words (`Gloves_dex_int` → `Gloves (Dex/Int)`, `Body_Armours_str_dex_int` → `Body Armours (Str/Dex/Int)`). Amend AD-5 to admit that one rule. After that, `unitLabel` (`packages/web/src/list/format.ts`) implements it with a test for each suffix form. Today's tracked classes (`Amulets`, `Bows`, `Crossbows`, `Emerald`) carry no suffix, so nothing on the page is wrong yet.
+  evidence: Finding HR-8. UX memlog 230. `ARCHITECTURE-SPINE.md` AD-5. `docs/epics.md:1125-1132` repeats "no display mapping" and the `Bow` example, so the PM sweeps it after the AD changes.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Architect. Confirm that the Chase Combination short-form table is a `web` product constant keyed by `statId` (UX memlog 231), and name its module, before the Story 3.5 spec. No contract or artifact holds it today.
+  evidence: Finding HR-9. UX memlog 231. EXPERIENCE.md short-form section.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Architect. UX memlog 232 rules that a crafted row's Age cell is the age of its figure: its inputs are the priced entries the EV rests on. Confirm that AD-10's "oldest timestamp of every input" means those EV-contributing entries, and that `core` publishes the fallback reading (the oldest attempted entry when nothing is priced, *never attempted* when every entry is `never-synced`). Do this before the Story 3.5 and 3.6 specs.
+  evidence: Findings HR-17 and XS-35. UX memlog 232. `ARCHITECTURE-SPINE.md` AD-10.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Architect. UX memlog 233 derives a recipe's option word from the grade prefix its currency ids share (`greater-…`, `perfect-…`; none reads `regular`), and a set with mixed grades or duplicate words is refused. Name the prefixes that count as grades, the layer that derives the word, and the cross-file validity predicate (IMPLEMENTATION-NOTES) before the Story 3.4 spec. No contract change.
+  evidence: Finding HR-10. UX memlog 233. `CraftRecipeSchema` (`packages/contracts/src/craft-recipe.ts`) carries no display string. `catalogue/static.json` spells `greater-orb-of-transmutation` and `perfect-orb-of-augmentation`.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: PM. Sweep `docs/epics.md` to follow the UX rulings of this pass. UX-DR28 (:192) and the story AC at :1439 drop `removed YYYY-MM-DD`, and the tombstone line two becomes one cell (UX memlog 234). UX-DR9 (:146) drops the two-cell re-cut. UX-DR40 (:230) names a missing short form as a product gap and a missing Accepted Tier as a curation gap (memlog 231). :2136 cites the grade-prefix rule instead of "lifted from the composition" (memlog 233). The AD-24 lines are covered by the retro item 14 sweep entry, except UX-DR43 at :242 ("All eight artifacts"), which follows the same sweep. Cite, do not restate.
+  evidence: UX memlog 229, 231, 233 and 234. The epics text was checked on 2026-09-27.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Dev. `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx:14`) becomes `A required file did not arrive.` (UX memlog 229, DESIGN.md `fetch-failure-screen.titleText`). Update the tests that assert the old title, and the `App.tsx:33` docblock that says "all eight fetches".
+  evidence: UX memlog 229. The old title restated AD-24's count, and the pending AD-24 amendment makes it seven.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: Dev, with the retro item 10 measurement pass. Measure the longest Item Class label under UX memlog 230, `Body Armours (Str/Dex/Int)` at tier-1 weight 700, against the space the name really has: the 214px unit cell (`{spacing.col-unit}` less `{spacing.pad-unit-right}`) less the 14px unit-glyph box and its 4px gap. Raise a `[NOTE FOR UX]` if it overruns.
+  evidence: UX memlog 230. The unit-cell budget is a verified sum in DESIGN.md, and no rendered box is measured today (retro F17).
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: "[NOTE FOR UX] Copy with no owner: the mockups are the only source for this printed text. The masthead title, the asking-price line's second sentence and the appendix lead (HR-15, HR-16). The tombstone band heading (XS-28). The expansion panel sub-lines (XS-29). The Sync Report panel prose (XS-30). Write each into DESIGN.md or EXPERIENCE.md, or rule that the shipped code's wording is the owner text. The key block and the foot are already ledgered (the entry citing retro F2 copy)."
+  evidence: Findings HR-15, HR-16, XS-28, XS-29 and XS-30 (retro item 12 audit). The mockups carry "spine gap" markers at each site.
+- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
+  summary: "[NOTE FOR UX] Styles and rules the spines leave open, each needed before an Epic 3 spec quotes it: the separator and size between a Price State and its reason or glyph (XS-31); whether an age inside the expansion past 48h gets the rust mark (XS-32); the italic and colour of line-two notes and the sample cell (XS-33); whether the Raw Base panel title is italic (XS-34); whether `Item Level 82` in a degenerate Combination's line one is a literal or the entry's own level (XS-36); the note on a non-priced Raw Base combination, which today lives only in code (XS-37); and the gloss for the `unknown` mark on a `class absent from weights file` row (HR-14)."
+  evidence: Findings XS-31 to XS-34, XS-36, XS-37 and HR-14 (retro item 12 audit). HR-13 (state 16 class membership) and HR-18 (tier 2 against tier 3 by colour alone) are already ledgered and are not repeated here.
