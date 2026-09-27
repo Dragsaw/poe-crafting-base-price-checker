@@ -445,53 +445,13 @@ describe('dryRun: notBefore', () => {
   });
 });
 
-/**
- * The fixture workload's Emerald entry still carries the bands `[12, 15]` and
- * `[3, 4]` that the recorded search captures were made for, while the
- * committed weights file publishes Emerald's T1 tiers as `[5, 15]` and
- * `[2, 4]`, so the run-start cross-file gate refuses the pair. A new band
- * changes the search digest and needs a live `pnpm fixtures:record`, which
- * only the player runs. Until then this test narrows the committed Emerald
- * tiers to the workload's bands in memory, so the gate passes and the recorded
- * jewel search shape stays covered. Nothing on disk changes.
- */
-function alignFixtureEmerald(weights: string | undefined): string | undefined {
-  if (weights === undefined) {
-    return undefined;
-  }
-  const file = JSON.parse(weights) as {
-    bases: Record<string, Record<string, Record<'prefix' | 'suffix', { entries: { lines: { statId: string | null; ranges: number[][] }[] }[] }>>>;
-  };
-  const emerald = file.bases.jewel?.Emerald;
-  if (emerald === undefined) {
-    return weights;
-  }
-  const narrowed: Record<string, number[]> = {
-    'explicit.stat_2843214518': [12, 15],
-    'explicit.stat_681332047': [3, 4],
-  };
-  for (const pool of [emerald.prefix, emerald.suffix]) {
-    for (const entry of pool.entries) {
-      for (const line of entry.lines) {
-        const band = line.statId === null ? undefined : narrowed[line.statId];
-        if (band !== undefined) {
-          line.ranges = [band];
-        }
-      }
-    }
-  }
-  return JSON.stringify(file);
-}
-
 describe('dryRun: the repository snapshot and its recorded fixtures', () => {
   it('prices every non-pruned entry of the fixture workload from the recorded captures', async () => {
     // The real inputs, with the fixture workload for the tracked list. The
     // real dataset, report and progress describe the real list, so they are
     // left out: every workload entry is never attempted.
-    const repository = await readRepositorySnapshot();
     const snapshot: DryRunSnapshot = {
-      ...repository,
-      weights: alignFixtureEmerald(repository.weights),
+      ...(await readRepositorySnapshot()),
       tracked: readFileSync(join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
       dataset: undefined,
       report: undefined,

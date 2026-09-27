@@ -279,9 +279,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: "[NOTE FOR UX] The cross-file diagnosis line format (`check · canonical key · detail`, one verbatim line per failure) and the empty-group behaviour (no failure renders no group, not a zero line) are provisional. Rule on both in EXPERIENCE.md."
   evidence: `packages/web/src/frame/trust-facts.ts` `diagnosisLine` and `diagnosisGroups`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert them.
 - source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "`fixtures/tracked.json` still carries the old Emerald bands `[12, 15]` and `[3, 4]`, which the committed weights file fails at the cross-file gate. The dry-run fixture test (`packages/sync/src/dry-run.test.ts`, `alignFixtureEmerald`) narrows the committed Emerald tiers to those bands in memory so the recorded jewel search stays covered. Move the fixture workload to `[5, 15]` and `[2, 4]`, run a live `pnpm fixtures:record` (the player runs it), and delete `alignFixtureEmerald`."
-  evidence: A new band changes the search digest, so the recorded captures no longer match (fixtures/README.md). The spec requires the player's approval before a live record.
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
   summary: "[NOTE FOR ARCHITECT] `AGENT-WORKFLOW.md` *Parallel worktrees* says \"A pass does not cover the checks that `pnpm tracked:check` lists under `pending`.\" `tracked:check` now runs the five cross-file checks and has no `pending` field. Retire the sentence, or state what a pass still does not confirm (a floor declared too high, AD-5)."
   evidence: `packages/sync/src/curation/check.ts`. The spec forbids an edit to an owner document in this story.
 - source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`

@@ -1,43 +1,39 @@
 {
   "result": [
     {
-      "id": "d6df497f3d27288cddfabcf74df5342307682c2e1e08965eed4348be7631c1ed",
+      "id": "45ddb82d559d71f927af75dc8b1f5faa62c7f62dd6fce69fdb79b324c272573c",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-26T08:48:44Z",
+        "indexed": "2026-09-27T18:10:33Z",
         "stash": {
-          "name": "~price 1div~",
-          "x": 11,
-          "y": 11
+          "name": "L",
+          "x": 8,
+          "y": 7
         },
         "price": {
           "type": "~b/o",
           "amount": 80,
           "currency": "divine"
         },
-        "fee": 7209,
+        "fee": 7412,
         "account": {
           "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "ko_KR",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
+          "online": null
+        }
       },
       "item": {
         "realm": "poe2",
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTGFwaXNBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/572eeaf30b/LapisAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQXp1cmVBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e49b170ba2/AzureAmulet.png",
         "league": "Forbidden Rites",
-        "id": "d6df497f3d27288cddfabcf74df5342307682c2e1e08965eed4348be7631c1ed",
+        "id": "45ddb82d559d71f927af75dc8b1f5faa62c7f62dd6fce69fdb79b324c272573c",
         "name": "",
-        "typeLine": "Countess' Lapis Amulet of the Sorcerer",
-        "baseType": "Lapis Amulet",
+        "typeLine": "Countess' Azure Amulet of the Sorcerer",
+        "baseType": "Azure Amulet",
         "rarity": "Magic",
-        "ilvl": 81,
+        "ilvl": 82,
         "identified": true,
         "note": "~b/o 80 divine",
         "properties": [
@@ -63,16 +59,15 @@
         ],
         "implicitMods": [
           {
-            "description": "+15 to [Intelligence|Intelligence]",
+            "description": "21% increased Mana Regeneration Rate",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_328541901",
+            "hash": "stat.implicit.stat_789117908",
             "mods": [
               {
-                "level": 10,
                 "magnitudes": [
                   {
-                    "min": "10",
-                    "max": "15"
+                    "min": "20",
+                    "max": "30"
                   }
                 ]
               }
@@ -137,7 +132,7 @@
             ],
             "implicit": [
               [
-                "implicit.stat_328541901",
+                "implicit.stat_789117908",
                 [
                   0
                 ]
@@ -148,18 +143,18 @@
       }
     },
     {
-      "id": "3841c8516ec589b646d6d036a017c1925ba88ad6d64007360f2b88a4022f7ca1",
+      "id": "0a48b9881a3375937fbe5b125329b457942d6e91824437dec3089472c482b2cc",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-26T02:35:32Z",
+        "indexed": "2026-09-27T16:12:43Z",
         "stash": {
-          "name": "5",
-          "x": 4,
+          "name": "$ex",
+          "x": 7,
           "y": 0
         },
         "price": {
           "type": "~b/o",
-          "amount": 90,
+          "amount": 80,
           "currency": "divine"
         },
         "fee": 7412,
@@ -175,14 +170,14 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTGFwaXNBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/572eeaf30b/LapisAmulet.png",
         "league": "Forbidden Rites",
-        "id": "3841c8516ec589b646d6d036a017c1925ba88ad6d64007360f2b88a4022f7ca1",
+        "id": "0a48b9881a3375937fbe5b125329b457942d6e91824437dec3089472c482b2cc",
         "name": "",
         "typeLine": "Countess' Lapis Amulet of the Sorcerer",
         "baseType": "Lapis Amulet",
         "rarity": "Magic",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 90 divine",
+        "note": "~b/o 80 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -206,7 +201,7 @@
         ],
         "implicitMods": [
           {
-            "description": "+15 to [Intelligence|Intelligence]",
+            "description": "+10 to [Intelligence|Intelligence]",
             "domain": "implicit",
             "hash": "stat.implicit.stat_328541901",
             "mods": [
@@ -224,7 +219,7 @@
         ],
         "explicitMods": [
           {
-            "description": "+47 to [Spirit|Spirit]",
+            "description": "+48 to [Spirit|Spirit]",
             "domain": "explicit",
             "hash": "stat.explicit.stat_3981240776",
             "mods": [
@@ -291,29 +286,167 @@
       }
     },
     {
-      "id": "c077165cf2510d3e4b64d55573e4b523e84167d502a7130c3f69eeb5c4fdb561",
+      "id": "a6a8066df5fb2b44a2004cbd93be0030202bd3f635b87a3b56ecbde16803417a",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-26T10:09:39Z",
+        "indexed": "2026-09-27T06:32:50Z",
         "stash": {
-          "name": "4",
-          "x": 5,
-          "y": 10
+          "name": "6",
+          "x": 10,
+          "y": 1
         },
         "price": {
           "type": "~b/o",
-          "amount": 99,
+          "amount": 80,
           "currency": "divine"
         },
-        "fee": 6924,
+        "fee": 6964,
         "account": {
           "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "en_US",
-          "realm": "poe2"
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQ3JpbXNvbkFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/6306715ae7/CrimsonAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "a6a8066df5fb2b44a2004cbd93be0030202bd3f635b87a3b56ecbde16803417a",
+        "name": "",
+        "typeLine": "Countess' Crimson Amulet of the Sorcerer",
+        "baseType": "Crimson Amulet",
+        "rarity": "Magic",
+        "ilvl": 79,
+        "identified": true,
+        "note": "~b/o 80 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "2.6 Life Regeneration per second",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3325883026",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+47 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3325883026",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "98a0427c61b35b1485cab729fc981eea9dac770160336ad4b4d0b7bf8ff72d3a",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-27T15:48:06Z",
+        "stash": {
+          "name": "2",
+          "x": 8,
+          "y": 8
         },
-        "whisper": "[redacted]"
+        "price": {
+          "type": "~b/o",
+          "amount": 100,
+          "currency": "divine"
+        },
+        "fee": 7209,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
       },
       "item": {
         "realm": "poe2",
@@ -322,14 +455,14 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU3RlbGxhckFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/a44db4cd4a/StellarAmulet.png",
         "league": "Forbidden Rites",
-        "id": "c077165cf2510d3e4b64d55573e4b523e84167d502a7130c3f69eeb5c4fdb561",
+        "id": "98a0427c61b35b1485cab729fc981eea9dac770160336ad4b4d0b7bf8ff72d3a",
         "name": "",
         "typeLine": "Countess' Stellar Amulet of the Sorcerer",
         "baseType": "Stellar Amulet",
         "rarity": "Magic",
-        "ilvl": 78,
+        "ilvl": 81,
         "identified": true,
-        "note": "~b/o 99 divine",
+        "note": "~b/o 100 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -371,7 +504,7 @@
         ],
         "explicitMods": [
           {
-            "description": "+48 to [Spirit|Spirit]",
+            "description": "+49 to [Spirit|Spirit]",
             "domain": "explicit",
             "hash": "stat.explicit.stat_3981240776",
             "mods": [
@@ -428,6 +561,149 @@
             "implicit": [
               [
                 "implicit.stat_1379411836",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "3f799339c2b12be8f0a74eda3de3403fba589c8db305cb503c4762d2b7aea01a",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-27T09:30:18Z",
+        "stash": {
+          "name": "5",
+          "x": 11,
+          "y": 11
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 100,
+          "currency": "divine"
+        },
+        "fee": 7209,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTGFwaXNBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/572eeaf30b/LapisAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "3f799339c2b12be8f0a74eda3de3403fba589c8db305cb503c4762d2b7aea01a",
+        "name": "",
+        "typeLine": "Countess' Lapis Amulet of the Sorcerer",
+        "baseType": "Lapis Amulet",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 100 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+12 to [Intelligence|Intelligence]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_328541901",
+            "mods": [
+              {
+                "level": 10,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+49 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_328541901",
                 [
                   0
                 ]
@@ -581,149 +857,6 @@
       }
     },
     {
-      "id": "0c7580f03323c7100ea4cb6a18e048c255c301d334562c359fbdec8b454858a0",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-26T06:35:10Z",
-        "stash": {
-          "name": "6",
-          "x": 10,
-          "y": 0
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 110,
-          "currency": "divine"
-        },
-        "fee": 7209,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "0c7580f03323c7100ea4cb6a18e048c255c301d334562c359fbdec8b454858a0",
-        "name": "",
-        "typeLine": "Countess' Bloodstone Amulet of the Sorcerer",
-        "baseType": "Bloodstone Amulet",
-        "rarity": "Magic",
-        "ilvl": 81,
-        "identified": true,
-        "note": "~b/o 110 divine",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "60",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+38 to maximum Life",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3299347043",
-            "mods": [
-              {
-                "level": 23,
-                "magnitudes": [
-                  {
-                    "min": "30",
-                    "max": "40"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "+47 to [Spirit|Spirit]",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3981240776",
-            "mods": [
-              {
-                "name": "Countess'",
-                "tier": "P1",
-                "level": 54,
-                "magnitudes": [
-                  {
-                    "min": "47",
-                    "max": "50"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "+3 to Level of all [Spell|Spell] Skills",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_124131830",
-            "mods": [
-              {
-                "name": "of the Sorcerer",
-                "tier": "S1",
-                "level": 75,
-                "magnitudes": [
-                  {
-                    "min": "3",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3981240776",
-                [
-                  1
-                ]
-              ],
-              [
-                "explicit.stat_124131830",
-                [
-                  0
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_3299347043",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
       "id": "9813462407ad47f3219e2425e9596359106721fae368596e3ce7096e4a78a0cd",
       "listing": {
         "method": "psapi",
@@ -867,45 +1000,41 @@
       }
     },
     {
-      "id": "9d616abc5b06a535efbc599bccf5c40f245f18b3866fdc79575cbcf189be6ec7",
+      "id": "2eb96f28400813cc6ac6e493bac03bd52a3bd1bb30443f9358f990c5f979c169",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-25T10:59:16Z",
+        "indexed": "2026-09-27T16:36:46Z",
         "stash": {
-          "name": "Base item",
+          "name": "6",
           "x": 8,
-          "y": 11
+          "y": 4
         },
         "price": {
           "type": "~b/o",
-          "amount": 125,
+          "amount": 160,
           "currency": "divine"
         },
-        "fee": 7412,
+        "fee": 7168,
         "account": {
           "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "en_US",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
+          "online": null
+        }
       },
       "item": {
         "realm": "poe2",
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQXp1cmVBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e49b170ba2/AzureAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTHVuYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e0eef02a23/LunarAmulet.png",
         "league": "Forbidden Rites",
-        "id": "9d616abc5b06a535efbc599bccf5c40f245f18b3866fdc79575cbcf189be6ec7",
+        "id": "2eb96f28400813cc6ac6e493bac03bd52a3bd1bb30443f9358f990c5f979c169",
         "name": "",
-        "typeLine": "Countess' Azure Amulet of the Sorcerer",
-        "baseType": "Azure Amulet",
+        "typeLine": "Countess' Lunar Amulet of the Sorcerer",
+        "baseType": "Lunar Amulet",
         "rarity": "Magic",
-        "ilvl": 82,
+        "ilvl": 80,
         "identified": true,
-        "note": "~b/o 125 divine",
+        "note": "~b/o 160 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -929,11 +1058,12 @@
         ],
         "implicitMods": [
           {
-            "description": "26% increased Mana Regeneration Rate",
+            "description": "+28 to maximum [EnergyShield|Energy Shield]",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_789117908",
+            "hash": "stat.implicit.stat_3489782002",
             "mods": [
               {
+                "level": 18,
                 "magnitudes": [
                   {
                     "min": "20",
@@ -946,7 +1076,7 @@
         ],
         "explicitMods": [
           {
-            "description": "+50 to [Spirit|Spirit]",
+            "description": "+49 to [Spirit|Spirit]",
             "domain": "explicit",
             "hash": "stat.explicit.stat_3981240776",
             "mods": [
@@ -990,19 +1120,19 @@
               [
                 "explicit.stat_3981240776",
                 [
-                  1
+                  0
                 ]
               ],
               [
                 "explicit.stat_124131830",
                 [
-                  0
+                  1
                 ]
               ]
             ],
             "implicit": [
               [
-                "implicit.stat_789117908",
+                "implicit.stat_3489782002",
                 [
                   0
                 ]
@@ -1156,153 +1286,6 @@
       }
     },
     {
-      "id": "2eb96f28400813cc6ac6e493bac03bd52a3bd1bb30443f9358f990c5f979c169",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-26T08:46:00Z",
-        "stash": {
-          "name": "6",
-          "x": 8,
-          "y": 4
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 185,
-          "currency": "divine"
-        },
-        "fee": 7168,
-        "account": {
-          "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "zh_TW",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTHVuYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e0eef02a23/LunarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "2eb96f28400813cc6ac6e493bac03bd52a3bd1bb30443f9358f990c5f979c169",
-        "name": "",
-        "typeLine": "Countess' Lunar Amulet of the Sorcerer",
-        "baseType": "Lunar Amulet",
-        "rarity": "Magic",
-        "ilvl": 80,
-        "identified": true,
-        "note": "~b/o 185 divine",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "60",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+28 to maximum [EnergyShield|Energy Shield]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3489782002",
-            "mods": [
-              {
-                "level": 18,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "30"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "+49 to [Spirit|Spirit]",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3981240776",
-            "mods": [
-              {
-                "name": "Countess'",
-                "tier": "P1",
-                "level": 54,
-                "magnitudes": [
-                  {
-                    "min": "47",
-                    "max": "50"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "+3 to Level of all [Spell|Spell] Skills",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_124131830",
-            "mods": [
-              {
-                "name": "of the Sorcerer",
-                "tier": "S1",
-                "level": 75,
-                "magnitudes": [
-                  {
-                    "min": "3",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3981240776",
-                [
-                  0
-                ]
-              ],
-              [
-                "explicit.stat_124131830",
-                [
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_3489782002",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
       "id": "c99d8c66109f0062b115c5f228c6021a27aa6b2d71bd45e35d07b9ba1f564e97",
       "listing": {
         "method": "psapi",
@@ -1320,12 +1303,8 @@
         "fee": 7209,
         "account": {
           "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "en_US",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
+          "online": null
+        }
       },
       "item": {
         "realm": "poe2",

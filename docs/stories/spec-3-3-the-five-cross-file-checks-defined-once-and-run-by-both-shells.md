@@ -97,7 +97,7 @@ context:
 
 ## Implementation Notes
 
-- `fixtures/tracked.json` keeps the old Emerald bands. The live `pnpm fixtures:record` waits for the player's approval. Until then, `alignFixtureEmerald` in `dry-run.test.ts` narrows the Emerald tiers in memory. A deferred entry records the follow-up.
+- The player moved `fixtures/tracked.json` Emerald to `[5,15]`/`[2,4]` and re-recorded with a live `pnpm fixtures:record`. The interim `alignFixtureEmerald` shim is gone. The live market moved, so `price-entry.fixtures.test.ts` now pins `[0.1207, 0.2012, 0.3038, 1, 100]`, each value checked by hand from the recorded fetches.
 - Kind agreement skips weight-0 tiers (IN §1: a weight-0 tier moves no verdict). A banded ref and a valueless ref on one `statId` do not overlap within the file. That disagreement is what kind agreement reports.
 - `co-occur` gives one failure to each entry of the pair. Each failure names the other key. `CrossFileGateError` is a session refusal in `sync.ts`: the session waits for an input change and does not retry.
 - `pnpm sync:dry` stood in for `pnpm sync` (AGENT-WORKFLOW forbids a live sync from a worktree). The `pnpm sync:dry` subprocess test timed out once at 5 s while other worktrees loaded the CPU. The checks add about 20 ms to a run, so this is contention and not a regression.
