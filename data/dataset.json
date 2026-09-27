@@ -1,16 +1,310 @@
 {
   "schemaVersion": "1.0.0",
   "league": "Forbidden Rites",
-  "generatedAt": "2026-09-27T11:12:20.230Z",
+  "generatedAt": "2026-09-27T12:16:16.617Z",
   "entries": [
     {
-      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",75,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_124131830\",3,3]]",
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_1202301673\",3,3]]",
       "price": {
         "state": "priced",
         "observation": {
           "league": "Forbidden Rites",
-          "observedAt": "2026-09-27T11:12:17.452Z",
-          "priceDivine": 100,
+          "observedAt": "2026-09-27T12:14:40.211Z",
+          "priceDivine": 7,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:40.211Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoThxt3V9lVGCZqtF4PxgKyEl-N0nr2MkrLswyOdY35G1QhKUKcF5hWEUHno4QyI3RfwMBLn69tX-WEHuI6mLvYcKrhyE4sNgrzItY2DHcigNbW1ejJ6jPerbGcNEJaFjxdcnU0GHS6neNcBzKlnKuGJIlKvnwMY01tSvb_YP0P7g7BPYJV82sz7-0G7um9Kh0G2I990q0DlKSdUDdlMgKRvhMIff8FOjSsTIsm_s8MYOclZXIvr_QsfIjnaNtKC6vvU8c0-FkPMXdJSazqYBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:40.766Z",
+          "priceDivine": 60,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:40.766Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQXYrDMAyE76LnUJI6C2mvUkrQ2moROD_YSkgJvvvK22VJaPtgkGesb2StEAVlinBeYRiFhx7OEMlOAb89QSp-fbUvK8hjJHWxd1DAjb1QeBrsVKZl9GxZDrmhrcqvUk9tan07o58oJ3Ss-KopC-hwydVJAxzHnKWMG_pIqXgPPNaVqRpTvvDMH828YV3TdTPq8wvt5r4pLQrdh_DYbQKtpRhVPWA3eZK8EPaz_w9vjqoEDCz7xg7vbCEldSWg-xQ6Bra0a6QF1XWt45l7yoSUfgBg1uN_pQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:41.317Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:41.317Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ62rDMAyF30W_Q8ltXdpXGSWotloEzgVbCSnB7z65HSNh3Q-DfI71HVkrBEGZApxXGEbhoYczBDKTx6sjiNnTV_trBXmMpC72FjK4sRPyL4OtyrSMjg3LITW0Rf6R66mrWt_O6CZKCR0rvmjyDDpcUnXSAMshZSnjhi5QzN4Dq89TXRRNdfwDLKsfXlm_wV3iZTPt6xft5r4pDQrdB__YLQONoRBUPWA3OZK0E3az-41vSlU8epZ9Y4d3NhCjuuLR_hc6eja0a6QF1bWt5Zl7SoQYvwEFTGI0qAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:41.862Z",
+          "priceDivine": 5,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:41.862Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQW4rDMAxF96LvUPLqTNutlBI0tloEzgNbCSnBex95WkrCtB8G-V7rXFkLBEEZA5wW6AfhvoMTBDKjxx9HELM_X-3zAnIfSF3sLGRwZSfkHwZblWkeHBuWXWpoinyf66mrWt9O6EZKCS0rvjjkGbQ4p-qoAZZDylLGFV2gmL0FlsVXmR-_6335D1g9cdUb2CVeVrM-_tCs7qvSoNCt9_fNKtAYCkHVHbajI0kbYTe5V_ihVMWjZ9k2tnhjAzGqKx7tp9DBs6FNI82orm0sT9xRIsT4CyQqNk-mAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:42.439Z",
+          "priceDivine": 0.0563,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.002,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:42.439Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoSRZCk5fZZSg2moROD_YSkgJfvfJ6xgJ6y4M8jnWd2RtEAVljnDZYJyExwEuEMnOAW-eIBXfvtqfG8hzInVxcFDAnb1QeBnsVKZ18mxZTrmhq8pzqaf5aPTtgn6mnNCz4itTFtDjmqtWAxzHnKWMO_pIqXgLrE1bVaapW_MHWJ9_eLV5g7um627a1y-63X1XWhR6jOF5WAZaSzGqesJ-9iR5J-wX_xtvalUCBpZjY48PtpCSuhLQ_Rc6BbZ0aKQV1XWd44UHyoSUvgDcNkAOqAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:57.502Z",
+          "priceDivine": 0.0604,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.002,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:57.502Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQW4rDMAxF96LvUJxOH0m3MpSgsdUicB7YSkgJ3vvILZSE6XwY5Hutc2UtEAVljHBZoB-E-w4uEMmOAX88QSqevtrfC8hjIHWxc1DAjb1QeBnsVKZ58GxZdrmhKc3R6Dl8HfTthH6knNCy4svKFNDinKtaAxzHnKWMG_pIqfgI3NemrKvT-Wj-As9v3gfcNV1X075-0azuq9Ki0L0Pj80y0FqKUdUdtqMnyTthP_l3fLVXJWBg2Ta2eGcLKakrAd1_oUNgS5tGmlFd1zieuKNMSOkXqfnq1qgBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:58.105Z",
+          "priceDivine": 1,
+          "sampleSize": 5,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:58.105Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoaRuuiV9lVGCZqtF4PxgKyEl-N0nr2MkrLswyOdY35G1QhSUKcJlhWEUHnq4QCQ7Bfz0BKn49tX-WEEeI6mLvYMCbuyFwtNgpzIto2fLcsgN7bE8l3qqU6VvZ_QT5YSOFX-sywI6XHLVaIDjmLOUcUMfKRUvgaYxp6p-M-fmD9BUPzzz_gJ3TdfNtM9ftJv7prQodB_CY7cMtJZiVPWA3eRJ8k7Yz_43vjaqBAws-8YO72whJXUloPsvdAxsaddIC6rrWscz95QJKX0BsHhbU6gBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:58.651Z",
+          "priceDivine": 1,
+          "sampleSize": 4,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:58.651Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQXYrDMAyE76LnUOImhbRXWUrQ2moROD_YSkgJvvvKbVkStvtgkGesb2StEAVlinBZYRiFhx4uEMlOAb89QSqevtpfK8hjJHWxd1DAjb1QeBnsVKZl9GxZDrmhNeWp1FNXtb6d0U-UEzpWvGnKAjpccnXWAMcxZynjhj5SKj4Cq2Nzqs25NH94lXnjquoD7Zqum2Ffn2g3901pUeg-hMduF2gtxajqAbvJk-SVsJ_9b3xzVCVgYNk3dnhnCympKwHdf6FjYEu7RlpQXdc6nrmnTEjpB9mfa0ynAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:59.214Z",
+          "priceDivine": 5,
+          "sampleSize": 3,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:59.214Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoSRNMpK-yihBtdUicH6wlZAS_O6T1zES1l0Y5HOs78jaIAjKHOCywTgJjwNcIJCZPd4cQcy-fbU_N5DnROriYCGDOzsh_zLYqkzr5NiwnFJDV-R1rqcqK327oJspJfSs-KLJM-hxTVWrAZZDylLGHV2gmL0FlnX90Zyrtmj_AMv6h1e-w13jdTft6xfd7r4rDQo9Rv88LAONoRBUPWE_O5K0E3aL-41vzqp49CzHxh4fbCBGdcWj_S908mzo0Egrqms7ywsPlAgxfgHLnPgbqAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:14:59.759Z",
+          "priceDivine": 0.0201,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.002,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:14:59.759Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ76qDMAzF3yWfZejmuLpXuQzJ2mwE6h_aKIr03ZduMJS7-6GQntP8TpoVgqCMAS4r9INw38EFApnR480RxOzlq_27giwDqYudhQzu7IT822CrMs2DY8NySA1NkZ9zPeWp1LcTupFSQsuKL6o8gxbnVNUaYDmkLGXc0QWK2VfgqS5-yqouyuNf4PnD-4K7xutm2vcvms19UxoUevR-2S0DjaEQVD1gOzqStBN2k_vEV0dVPHqWfWOLDzYQo7ri0f4XOng2tGukGdW1jeWJO0qEGJ8obET7qAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      },
+      "lastAttemptedAt": "2026-09-27T12:15:03.869Z"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:16:14.126Z",
+          "priceDivine": 1,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:16:14.126Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoSRLsmZ9lVGCaqtF4PxgKyEl-N0nr6MktLswyOdY35G1QhCUKcBphWEUHno4QSAzebw4gpj9-mp_ryD3kdTF3kIGV3ZC_mGwVZmW0bFhOaSGtsjrXE9VVvp2RjdRSuhY8UWTZ9DhkqovDbAcUpYyrugCxewtsG6OVVl8HusXXln_4crmDe0cz5thH59oN_dNaVDoNvj7bhdoDIWg6gG7yZGklbCb3TO--VDFo2fZN3Z4YwMxqise7X-ho2dDu0ZaUF3bWp65p0SI8QcnYxcWpwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:16:14.667Z",
+          "priceDivine": 0.161,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.002,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:16:14.667Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ76rCMAzF3yWfh2zq1c1XERmxjRLo_tBmYzL67jdVvGxc_VBIz2l-J80MQVCGAKcZul64a-EEgczg8eoIYvb01T7PII-e1MXWQgY3dkL-ZbBVmabesWHZpIa6yH9yPfvdXt-O6AZKCQ0rvijzDBqcUlVpgOWQspRxQxcoZh-Bx7IqimOVl_94hzfu8Il2iZfFsK9P1Iv7ojQodO_8Y7ULNIZCUHWDzeBI0krYje4vvtyq4tGzrBsbvLOBGNUVj_ZbaO_Z0KqRJlTX1pZHbikRYvwFYjzAlKcBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:16:15.232Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-09-27T12:16:15.232Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQXYrDMAyE76LnUJImyya9SilBa6tF4PxgKyEl-O4rb5eS0PbBIM9Y38haIQjKFOC0wjAKDz2cIJCZPP44gpj9-WqfV5D7SOpibyGDKzsh_zDYqkzL6NiwHFJDW-RfuZ6qrPTtjG6ilNCx4os6z6DDJVWNBlgOKUsZV3SBYvYW2BT1d9UcX2jlP6t8Q7rEy2bQxwfazX1TGhS6Df6-2wMaQyGoesBuciRpHexm9wyvj6p49Cz7xg5vbCBGdcWj_RQ6eja0a6QF1bWt5Zl7SoQYfwE17-5gowEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-09-27T12:16:15.788Z",
+          "priceDivine": 8,
           "sampleSize": 8,
           "exchangeObservation": {
             "currencyId": "divine",
@@ -21,9 +315,887 @@
           }
         }
       },
-      "lastAttemptedAt": "2026-09-27T11:12:17.452Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoSRzu3R5lVGCaqtF4PxgKyEl-N0nr2MkrLuzz_H5jqwVoqBMEZoVhlF46KGBSHYKePUEqfj21f5cQR4jqYu9gwJu7IXC02CnMi2jZ8tyyIHWfJyrt2NZ1-_6dkY_UW7oWPHHuoAOF2hOpeIdx9ykhBv6SKl4iVNWZaqzKf_QzA_MvGBd0mUz6PMD7ea-OVoUug_hsdsDWksxqnrAbvIkeR3sZ_9bXp9UCRhY9sEO72whJXUloPuvdAxsaRekBdV1reOZe8qElL4Ax5V7I6MBAAA",
+      "lastAttemptedAt": "2026-09-27T12:16:15.788Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoSTxkpW8yihBs9UicH6wlZAS_O5T1lIS1t3Z5_h8R9YKUVCmCM0Kwyg89NBAJDsF_PYEKfv11f5aQe4jqYu9gwyu7IXCw2CnMi2jZ8ty2gJtWeS1qavKnPXtjH6iraFjxX9UGXS4QFPlincctyYlXNFHStlbXFHmpcmL-tP8wZknzbyBXdJlN-njB-3uvjtaFLoN4X5YBFpLMap6wm7yJNs-2M_-VX4uVQkYWI7BDm9sISV1JaD7r3QMbOkQpAXVda3jmXvaCCn9AKBEeHOkAQAA",
       "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      },
+      "lastAttemptedAt": "2026-09-27T12:16:16.332Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3YqDMBCF32WupaipRXyVpchsMi0D8YdkFIvk3Xdsy6Js9y45J-c7k1khCsoUoVlhGIWHHhqIZKeA354gZU9f7a8V5DGSutg7yODGXii8DHYq0zJ6tiynLdCWRX4xl6oytb6d0U-0NXSs-HOVQYcLNFWueMdxa1LCDX2klH3EFeW5MEVt8j8084aZD6xruu4GfX2g3d13R4tC9yE8DntAaylGVU_YTZ5kWwf72f-W16UqAQPLMdjhnS2kpK4EdP-VjoEtHYK0oLqudTxzTxshpR-QHsEgowEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2106365538\",45,50],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2482852589\",45,50],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2748665614\",7,8],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_2974417149\",27,30],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3299347043\",120,149],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3489782002\",80,89],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3917489142\",16,19],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_3981240776\",47,50],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_1202301673\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_124131830\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_1379411836\",23,24]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_2162097452\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_2891184298\",25,28]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_2901986750\",17,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_2923486259\",24,27]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_328541901\",31,33]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_3556824919\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_4220027924\",41,45]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_587431675\",35,38]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_983749596\",7,8],[\"explicit.stat_9187492\",3,3]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
     },
     {
       "entryKey": "[\"crafted\",\"jewel\",\"Emerald\",1,[\"explicit.stat_2843214518\",12,15],[\"explicit.stat_681332047\",3,4]]",
@@ -46,6 +1218,426 @@
       "lastAttemptedAt": "2026-09-27T11:12:18.001Z",
       "lastSearchId": "H4sIAAAAAAAAA3VQ22rDMAz9Fz2HsVy6hb73K0YJqq0WDeWC7aQpwf8-ed1Ywto3-ehc5LOADxhGD_sF-iFw38EePJnR4UkIYgbhNpBih5YcioXsW6D8j-V3hV2CzyyB3H3BVmGaB2HD4SUJmqKuyiKvdnmt3AllpBTZsublRQYtzjrsNM-yT9HqcEbxFLOHdm91XpbFa_X-z638MaseeB3jcXXo_QPN6r0aDQa69O62KeaTriSpFJZJ_u5XwKHjsCW3eGEDMaYOHdpnQYNjQxshzahb21ieuKPkEOMXIXwtEagBAAA",
       "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_1202301673\",5,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_1967051901\",null,null]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_1202301673\",5,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_1967051901\",null,null]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_1202301673\",5,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_1967051901\",null,null]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_1202301673\",5,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_1967051901\",null,null]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_1202301673\",5,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_1967051901\",null,null]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_1202301673\",5,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_1967051901\",null,null]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_681332047\",17,19]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
     },
     {
       "entryKey": "[\"raw\",\"Gold Amulet\",82]",
