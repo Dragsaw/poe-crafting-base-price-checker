@@ -7,7 +7,7 @@ import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
 
 /** DESIGN.md `components.refusal-screen` / `components.fetch-failure-screen` copy. */
 export const REFUSAL_EYEBROW = 'THE PAGE WILL NOT RENDER THIS';
-export const REFUSAL_TITLE = 'A published file does not match its schema.';
+export const REFUSAL_TITLE = 'A required file cannot be used.';
 export const REFUSAL_RECOVERY =
   'The page renders again as soon as a valid set is published, and serves nothing old in the meantime.';
 export const FETCH_FAILURE_EYEBROW = 'THE PAGE COULD NOT LOAD ITS DATA';

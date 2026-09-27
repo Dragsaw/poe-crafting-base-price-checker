@@ -6,7 +6,7 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 7
+revision: 8
 created: 2026-09-13
 updated: 2026-09-27
 sources:
@@ -776,7 +776,8 @@ components:
     paddingTop: '{spacing.gutter}'
     eyebrow: '{typography.eyebrow} in {colors.rust}, reading "THE PAGE WILL NOT RENDER THIS"'
     title: '{typography.masthead-title}'
-    titleText: 'A published file does not match its schema.'
+    titleText: 'A required file cannot be used.'
+    titleRule: 'one title for every refusal cause, so it names no cause; the body sentence says why. It read "A published file does not match its schema." until revision 8, which a required 404 made untrue. [decision — memlog 220]'
     body: '{typography.failure-body}'
     bodyColor: '{colors.ink-secondary}'
     bodyMaxWidth: '{spacing.dek-max-width}'
@@ -2370,11 +2371,13 @@ above a hairline, stating that the page is read-only while playing, that exact
 ages and the full Combination list sit one click down, and that pruning and
 pinning happen in `data/tracked.json` followed by a commit.
 
-**Refusal screen** (`refusal-screen`) — the page a schema-invalid artifact earns
-(FR-33, NFR-8). It replaces the whole page: paper ground, nothing of the list,
-nothing stale served. A rust eyebrow reading `THE PAGE WILL NOT RENDER THIS`, a
-`{typography.masthead-title}` line saying plainly that a published file does not
-match its schema, then `{typography.failure-body}` at
+**Refusal screen** (`refusal-screen`) — the page a refused artifact earns
+(FR-33, NFR-8): schema-invalid, at a version the page does not read, or
+required and not published. It replaces the whole page: paper ground, nothing
+of the list, nothing stale served. A rust eyebrow reading `THE PAGE WILL NOT
+RENDER THIS`, a `{typography.masthead-title}` line reading `A required file
+cannot be used.`, the same for every cause because only the body says which
+cause it is, then `{typography.failure-body}` at
 `{spacing.dek-max-width}` naming **which** artifact, beside a
 `{components.trust-mark-unresolvable}` glyph and word, then saying **why** in
 one sentence chosen by the refusal cause (`refusal-screen.bodyByCause`). A
