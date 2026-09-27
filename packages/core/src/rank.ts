@@ -32,8 +32,11 @@ import type {
  * - `no-listings`, `unresolvable`, `not-yet-synced`: their own group, the
  *   published reason kept.
  *
- * `pruned` entries appear in no group. `crafted` entries are Epic 3's and
- * appear in no group. Dataset entries no tracked entry names are ignored.
+ * `pruned` entries appear in no group. `crafted` entries never rank here (the
+ * crafted branch is Epic 3's). With no weights envelope loaded, each distinct
+ * non-pruned crafted `(categoryId, className)` is one `unrankable` class,
+ * reason `class absent from weights file` (AD-24); with one loaded, none is,
+ * since `bases` is not read. Dataset entries no tracked entry names are ignored.
  * `core` never reads `lastSearchId` or `lastSearchLeague` (AD-9).
  */
 
@@ -48,6 +51,25 @@ export interface RankInput {
    * Must be finite and ≥ 0 (0 is valid); any other value makes `rank` throw a `RangeError`.
    */
   readonly threshold: number;
+  /**
+   * Whether a weights envelope is loaded (AD-24). `false` makes every crafted
+   * Item Class Unrankable as `class absent from weights file`; `true` makes no
+   * claim, because Epic 2 does not read `bases` (FR-4, FR-9).
+   */
+  readonly weightsLoaded: boolean;
+}
+
+/**
+ * FR-4's reasons, verbatim (PRD-owned). Epic 2 produces the one it can check;
+ * `pool partial` and `class disagrees with weights file` are Story 3.6's.
+ */
+export type UnrankableReason = 'class absent from weights file';
+
+/** One Unrankable Item Class: the `(categoryId, className)` pair and its reason. Never a Base Type. */
+export interface UnrankableClass {
+  readonly categoryId: string;
+  readonly className: string;
+  readonly reason: UnrankableReason;
 }
 
 /** An entry that contributes nothing to the ordering — not zero, nothing (AD-9). */
@@ -73,6 +95,12 @@ export interface Ranking {
   readonly notYetSynced: readonly NotYetSyncedEntry[];
   /** In canonical key order. */
   readonly unresolvable: readonly UnrankedEntry[];
+  /**
+   * One per distinct non-pruned crafted `(categoryId, className)`, by
+   * `className` in UTF-8 code-unit order, then `categoryId`. Empty whenever
+   * `weightsLoaded` is true.
+   */
+  readonly unrankable: readonly UnrankableClass[];
 }
 
 /** Raw before crafted at an equal EV: a raw row has no recipe id (AD-17). */
@@ -103,6 +131,10 @@ function compareOrdering(left: RankedRow, right: RankedRow): number {
 const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): number =>
   compareCanonicalKeys(left.entryKey, right.entryKey);
 
+/** `className` by UTF-8 code unit, as the `weights-absent` record sorts; `categoryId` breaks a shared name. */
+const byItemClass = (left: UnrankableClass, right: UnrankableClass): number =>
+  compareCanonicalKeys(left.className, right.className) || compareCanonicalKeys(left.categoryId, right.categoryId);
+
 function unranked(
   entry: RawTrackedEntry,
   entryKey: string,
@@ -126,9 +158,22 @@ export function rank(input: RankInput): Ranking {
   const noListings: UnrankedEntry[] = [];
   const notYetSynced: NotYetSyncedEntry[] = [];
   const unresolvable: UnrankedEntry[] = [];
+  /** Keyed on the serialised pair, so one class with several entries is one row. */
+  const unrankable = new Map<string, UnrankableClass>();
 
   for (const entry of input.tracked) {
-    if (entry.kind !== 'raw' || entry.status === 'pruned') {
+    if (entry.status === 'pruned') {
+      continue;
+    }
+    if (entry.kind === 'crafted') {
+      if (!input.weightsLoaded) {
+        const { categoryId, className } = entry;
+        unrankable.set(JSON.stringify([categoryId, className]), {
+          categoryId,
+          className,
+          reason: 'class absent from weights file',
+        });
+      }
       continue;
     }
     const entryKey = canonicalKey(entry);
@@ -184,5 +229,6 @@ export function rank(input: RankInput): Ranking {
     noListings: noListings.toSorted(byEntryKey),
     notYetSynced: notYetSynced.toSorted(byEntryKey),
     unresolvable: unresolvable.toSorted(byEntryKey),
+    unrankable: [...unrankable.values()].toSorted(byItemClass),
   };
 }

@@ -15,7 +15,8 @@ import {
 import { CONTROL_GROUP_WIDTH, MASTHEAD_DEK, MASTHEAD_TITLE } from './frame/Masthead';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
 import { ASKING_PRICE_COPY } from './list/AskingPriceLine';
-import { bodiesWith, hoursBefore, priced, rawEntry, unpriced } from './test-support/list-fixtures';
+import { APPENDIX_LEAD } from './list/UnrankableAppendix';
+import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry, unpriced } from './test-support/list-fixtures';
 import {
   gate,
   serveArtifacts,
@@ -27,6 +28,7 @@ import {
 import { ARTIFACT_ORDER, type ArtifactKey } from './load/artifacts';
 import { blur, pastDebounce, typeInto } from './test-support/threshold-input';
 import { PageProvider } from './theme/PageProvider';
+import { colors } from './theme/tokens';
 import { THRESHOLD_STORAGE_KEY } from './threshold/threshold-storage';
 
 let server: SetupServerApi;
@@ -314,7 +316,7 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(ALL);
     const order = Array.from(
       frame().querySelectorAll(
-        '[data-masthead], [data-trust-strip], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-key-block], [data-running-foot]',
+        '[data-masthead], [data-trust-strip], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-key-block], [data-running-foot]',
       ),
       (node) => Object.keys((node as HTMLElement).dataset)[0],
     );
@@ -325,6 +327,7 @@ describe('the resting chrome', () => {
       'columnHeader',
       'rankedRow',
       'rankedRow',
+      'unrankableAppendix',
       'keyBlock',
       'runningFoot',
     ]);
@@ -771,7 +774,7 @@ describe('the list statement', () => {
   }
 
   function expectChromeAround(): void {
-    for (const attr of ['data-asking-price-line', 'data-key-block', 'data-running-foot']) {
+    for (const attr of ['data-asking-price-line', 'data-unrankable-appendix', 'data-key-block', 'data-running-foot']) {
       expect(frame().querySelector(`[${attr}]`), attr).not.toBeNull();
     }
   }
@@ -900,6 +903,199 @@ describe('the list statement', () => {
   });
 });
 
+/**
+ * Twenty-nine distinct crafted Item Classes, the absent-weights world's
+ * fixture, served out of order (a stride-7 walk) so the page's order can only
+ * come from `core`'s sort.
+ */
+function twentyNineClasses(): ReturnType<typeof craftedEntry>[] {
+  return Array.from({ length: 29 }, (_, i) => {
+    const n = String(((i * 7) % 29) + 1).padStart(2, '0');
+    return craftedEntry(`Class ${n}`, `fixture.class${n}`);
+  });
+}
+
+/** The fixture's class names in the order the page must show them. */
+function sortedClassNames(): string[] {
+  return Array.from({ length: 29 }, (_, i) => `Class ${String(i + 1).padStart(2, '0')}`);
+}
+
+const ABSENT_REASON = 'class absent from weights file';
+
+describe('the Unrankable appendix', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  function appendix(): HTMLElement {
+    const found = frame().querySelector<HTMLElement>('[data-unrankable-appendix]');
+    if (found === null) {
+      throw new Error('no appendix rendered');
+    }
+    return found;
+  }
+
+  function appendixRows(): HTMLElement[] {
+    return Array.from(frame().querySelectorAll<HTMLElement>('[data-appendix-row]'));
+  }
+
+  /** The page tail's children, by their first data attribute. */
+  function tailOrder(): string[] {
+    const tail = frame().querySelector<HTMLElement>('[data-page-tail]');
+    return Array.from(tail?.children ?? [], (node) => Object.keys((node as HTMLElement).dataset)[0] ?? '');
+  }
+
+  const rgb = (hex: string): string =>
+    `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
+
+  // Matrix: committed.
+  it('is the title alone on the committed data/, count in ink, above the key block and the foot', async () => {
+    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights}.json', {
+      eager: true,
+      import: 'default',
+    });
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
+      recipes: { kind: 'json', body: committed['../../../data/recipes.json'] },
+      weights: { kind: 'json', body: committed['../../../data/weights.json'] },
+    });
+    mount();
+    await settleTo('ready');
+    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.style.color).toBe(rgb(colors.ink));
+    expect(appendixRows()).toHaveLength(0);
+    expect(frame().textContent).not.toContain(APPENDIX_LEAD);
+    expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
+    expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
+    // The pin needs the tail to be a direct child of the flex frame.
+    expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
+  });
+
+  // Matrix: absent weights.
+  it('lists 29 crafted classes when weights.json is absent, every row whole, then the key block and the foot', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const classes = twentyNineClasses();
+    const bodies = bodiesWith([...classes, belt], [priced(belt, 0.5, hoursBefore(now, 1))]);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'status', status: 404 },
+    });
+    mount();
+    await settleTo('ready');
+    const rows = appendixRows();
+    expect(rows).toHaveLength(29);
+    expect(classes.map((entry) => entry.className)).not.toEqual(sortedClassNames());
+    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(sortedClassNames());
+    for (const row of rows) {
+      expect(row.querySelector('[data-cell="reason"]')?.textContent).toBe(ABSENT_REASON);
+    }
+    const count = appendix().querySelector<HTMLElement>('[data-appendix-count]');
+    expect(count?.textContent).toBe('29 Item Classes');
+    expect(count?.style.color).toBe(rgb(colors.rust));
+    // Readable with nothing expanded.
+    expect(frame().querySelectorAll('[data-expansion-panel]')).toHaveLength(0);
+    expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
+    const order = Array.from(
+      frame().querySelectorAll('[data-ranked-row], [data-appendix-row], [data-key-block], [data-running-foot]'),
+      (node) => Object.keys((node as HTMLElement).dataset)[0],
+    );
+    expect(order).toEqual(['rankedRow', ...rows.map(() => 'appendixRow'), 'keyBlock', 'runningFoot']);
+    // No appendix row is a Base Type.
+    expect(appendix().textContent).not.toContain('Wide Belt');
+  });
+
+  // Matrix: absent weights and absent recipes.
+  it('lists the same classes when weights.json and recipes.json are both absent', async () => {
+    const bodies = bodiesWith(twentyNineClasses(), []);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'status', status: 404 },
+      recipes: { kind: 'status', status: 404 },
+    });
+    mount();
+    await settleTo('ready');
+    expect(appendixRows()).toHaveLength(29);
+    expect(appendix().querySelector('[data-appendix-count]')?.textContent).toBe('29 Item Classes');
+  });
+
+  it('never prints the reason while a weights envelope is loaded, crafted classes tracked or not', async () => {
+    const bodies = bodiesWith(twentyNineClasses(), []);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+    });
+    mount();
+    await settleTo('ready');
+    expect(frame().textContent).not.toContain(ABSENT_REASON);
+    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
+  });
+
+  // Matrix: duplicate class, pruned only.
+  it('makes one row of a duplicated class and none of an all-pruned class', async () => {
+    const pruned = { ...craftedEntry('Pruned Class', 'fixture.pruned'), status: 'pruned' as const, prunedReason: 'no market' };
+    const bodies = bodiesWith([craftedEntry('Bows', 'weapon.bow', 54), craftedEntry('Bows', 'weapon.bow', 82), pruned], []);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'status', status: 404 },
+    });
+    mount();
+    await settleTo('ready');
+    expect(appendixRows().map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Bows']);
+    expect(appendix().querySelector('h2')?.textContent).toBe('Appendix: Unrankable — 1 Item Class');
+  });
+
+  // Matrix: no crafted entries.
+  it('is the empty treatment when weights.json is absent and every entry is raw', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const bodies = bodiesWith([belt], [priced(belt, 0.5, hoursBefore(now, 1))]);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'status', status: 404 },
+    });
+    mount();
+    await settleTo('ready');
+    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
+    expect(appendixRows()).toHaveLength(0);
+  });
+
+  // Matrix: loading.
+  it('is absent while pending, and the tail keeps the key block and the foot', async () => {
+    const gates = ARTIFACT_ORDER.map(() => gate());
+    serveArtifacts(
+      server,
+      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+    );
+    mount();
+    expect(frame().dataset['state']).toBe('pending');
+    expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
+    expect(tailOrder()).toEqual(['keyBlock', 'runningFoot']);
+    expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
+    for (const g of gates) g.open();
+    await settleTo('ready');
+  });
+
+  it('is absent from the refusal screen', async () => {
+    serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
+    mount();
+    await settleTo('refused');
+    expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
+  });
+
+  it('is absent from the fetch-failure screen', async () => {
+    serveArtifacts(server, { config: { kind: 'network-error' } });
+    mount();
+    await settleTo('failed');
+    expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
+  });
+});
+
 describe('the interaction surface', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -916,16 +1112,37 @@ describe('the interaction surface', () => {
     });
     const now = Date.now();
     const filler = Array.from({ length: 22 }, (_, i) => rawEntry(`Filler Ring ${String(i + 1).padStart(2, '0')}`));
-    const requests = serveBodies(
-      bodiesWith(
-        filler,
-        filler.map((entry, i) =>
-          priced(entry, 1 + i / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(i)}`, league: TEST_LEAGUE }),
-        ),
+    // weights.json absent, so the appendix holds rows the guard covers too.
+    const bodies = bodiesWith(
+      [...filler, craftedEntry('Bows', 'weapon.bow'), craftedEntry('Wands', 'weapon.wand')],
+      filler.map((entry, i) =>
+        priced(entry, 1 + i / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(i)}`, league: TEST_LEAGUE }),
       ),
     );
+    const requests = serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'status', status: 404 },
+    });
     mount();
     await settleTo('ready');
+
+    // An appendix row does nothing on a click: no expansion, no change to the page.
+    const appendixRows = Array.from(frame().querySelectorAll<HTMLElement>('[data-appendix-row]'));
+    expect(appendixRows).toHaveLength(2);
+    const beforeAppendix = frame().innerHTML;
+    for (const row of appendixRows) {
+      act(() => {
+        row.click();
+      });
+    }
+    await flush();
+    expect(frame().innerHTML).toBe(beforeAppendix);
+    const appendix = frame().querySelector<HTMLElement>('[data-unrankable-appendix]');
+    expect(appendix?.querySelectorAll('button, a, input, [role], [tabindex], [title], [class]')).toHaveLength(0);
+    for (const row of appendixRows) {
+      expect(row.style.cursor).toBe('');
+    }
 
     // Every interaction Epic 2 builds: the strip, a row, the list growth and the threshold.
     act(() => {

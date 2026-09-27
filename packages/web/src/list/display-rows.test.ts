@@ -10,7 +10,7 @@ import { DEFAULT_THRESHOLD } from './format';
 const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): ReturnType<typeof toDisplayRows> {
-  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD });
+  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weightsLoaded: true });
   return toDisplayRows(ranking, dataset, NOW);
 }
 
@@ -69,6 +69,7 @@ describe('toDisplayRows', () => {
         dataset: entries.map((entry, i) => priced(entry, 30 - i, hoursBefore(NOW, 1))),
         activeLeague: TEST_LEAGUE,
         threshold: 0,
+        weightsLoaded: true,
       }),
       [],
       NOW,
@@ -79,7 +80,7 @@ describe('toDisplayRows', () => {
 
     const tiny = rawEntry('Tiny');
     const [only] = toDisplayRows(
-      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0 }),
+      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weightsLoaded: true }),
       [],
       NOW,
     );

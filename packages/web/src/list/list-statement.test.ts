@@ -13,7 +13,7 @@ function statementFor(
   dataset: readonly DatasetEntry[],
   threshold = 0.25,
 ): ReturnType<typeof listStatement> {
-  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold }), threshold, TEST_LEAGUE);
+  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), threshold, TEST_LEAGUE);
 }
 
 const belt = rawEntry('Wide Belt');

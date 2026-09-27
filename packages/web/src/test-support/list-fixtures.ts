@@ -3,7 +3,14 @@
  * Never imported by the app.
  */
 
-import { canonicalKey, type DatasetEntry, type PriceState, type RawTrackedEntry } from '@poe/contracts';
+import {
+  canonicalKey,
+  type CraftedTrackedEntry,
+  type DatasetEntry,
+  type PriceState,
+  type RawTrackedEntry,
+  type TrackedEntry,
+} from '@poe/contracts';
 
 import { TEST_LEAGUE, VALID_BODIES } from './artifact-server';
 
@@ -11,6 +18,18 @@ export const HOUR = 3_600_000;
 
 export function rawEntry(baseTypeId: string, itemLevelMin = 82): RawTrackedEntry {
   return { kind: 'raw', baseTypeId, itemLevelMin, status: 'active' };
+}
+
+/** A crafted entry on one `(categoryId, className)`, carrying one valueless prefix. */
+export function craftedEntry(className: string, categoryId: string, itemLevelMin = 82): CraftedTrackedEntry {
+  return {
+    kind: 'crafted',
+    categoryId,
+    className,
+    itemLevelMin,
+    prefix: { kind: 'valueless', statId: 'explicit.stat_3299347043' },
+    status: 'active',
+  };
 }
 
 /** An ISO timestamp `hours` before `now`. */
@@ -64,7 +83,7 @@ export function unpriced(
 
 /** `VALID_BODIES` with the tracked list and the dataset's entries replaced. */
 export function bodiesWith(
-  tracked: readonly RawTrackedEntry[],
+  tracked: readonly TrackedEntry[],
   dataset: readonly DatasetEntry[],
 ): { readonly tracked: unknown; readonly dataset: unknown } {
   return {

@@ -66,6 +66,18 @@ export const spacing = {
   hairline: 1,
   rowHeight: 28,
   appendixRowHeight: 29,
+  /**
+   * `{components.unrankable-appendix}`: padding `16px 20px 10px` inside a
+   * hairline border, so the rows span 1012 − 2 − 40 = 970; the empty panel
+   * pads its bottom at the top's 16. The lead sits 5px under the title and
+   * 12px over the first row, capped at 760 (`mockups/key-hero-resting.html`).
+   */
+  appendixPadTop: 16,
+  appendixPadX: 20,
+  appendixPadBottom: 10,
+  appendixLeadMarginTop: 5,
+  appendixLeadMarginBottom: 12,
+  appendixLeadMaxWidth: 760,
   /** 1920 − 1390 committed = 530 (UX memlog 210; it read 528 through revision 5). */
   frameSlack: 530,
   frameReserveBanner: 74,

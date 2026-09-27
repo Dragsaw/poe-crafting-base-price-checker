@@ -75,6 +75,7 @@ describe('the frame and its column contracts', () => {
     expect(sum(columnSums.combinationLine2)).toBe(966);
     expect(sum(columnSums.tombstoneLine2)).toBe(966);
     expect(sum(columnSums.appendix)).toBe(970);
+    expect(spacing.contentWidth - 2 * spacing.hairline - 2 * spacing.appendixPadX).toBe(sum(columnSums.appendix));
   });
 });
 

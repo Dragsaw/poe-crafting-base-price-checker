@@ -37,7 +37,7 @@ afterEach(() => {
 });
 
 function mountList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold = DEFAULT_THRESHOLD): HTMLDivElement {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold }), dataset, NOW);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weightsLoaded: true }), dataset, NOW);
   container = document.createElement('div');
   document.body.append(container);
   const mounted = createRoot(container);

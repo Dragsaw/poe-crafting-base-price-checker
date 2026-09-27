@@ -1,5 +1,5 @@
 import { rank } from '@poe/core';
-import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
 
 import { FailureScreen } from './frame/FailureScreen';
 import { Frame } from './frame/Frame';
@@ -13,6 +13,7 @@ import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
+import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
 import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold-storage';
@@ -33,7 +34,7 @@ type ViewState =
  *
  * The resting chrome, in order: masthead, trust strip, asking-price line, the
  * list statement when the ranking makes one (states 23 and 25), column header,
- * list, then the key block and the running foot. The skeleton paints the same
+ * list, then the Unrankable appendix, the key block and the running foot. The skeleton paints the same
  * chrome around its slots, with a blank trust-strip slot of the strip's height; the two failure screens paint none of it.
  */
 export function App(): JSX.Element {
@@ -84,8 +85,7 @@ export function App(): JSX.Element {
           <Masthead league={view.set.config.league} threshold={threshold} onThresholdChange={changeThreshold} />
           <TrustStrip set={view.set} absent={view.absent} now={view.now} />
           <AskingPriceLine />
-          <ReadyList set={view.set} now={view.now} threshold={threshold} />
-          <PageTail />
+          <ReadyBody set={view.set} now={view.now} threshold={threshold} />
         </Frame>
       );
     case 'refused':
@@ -106,9 +106,11 @@ export function App(): JSX.Element {
 /**
  * `core` ranks the whole loaded set at the player's threshold; `web` renders
  * what it returns and orders nothing itself (AD-4). Memoised on the set,
- * `now` and the threshold.
+ * `now` and the threshold. Renders the ready body below the asking-price
+ * line: the list statement, the ranked list, and the page tail led by the
+ * Unrankable appendix — all from one ranking.
  */
-function ReadyList({
+function ReadyBody({
   set,
   now,
   threshold,
@@ -117,33 +119,39 @@ function ReadyList({
   readonly now: number;
   readonly threshold: number;
 }): JSX.Element {
-  const { rows, statement } = useMemo(() => {
+  const { rows, statement, unrankable } = useMemo(() => {
     const ranking = rank({
       tracked: set.tracked.entries,
       dataset: set.dataset.entries,
       activeLeague: set.config.league,
       threshold,
+      weightsLoaded: set.weights !== null,
     });
     return {
       rows: toDisplayRows(ranking, set.dataset.entries, now),
       statement: listStatement(ranking, threshold, set.config.league),
+      unrankable: ranking.unrankable,
     };
   }, [set, now, threshold]);
   return (
     <>
       <ListStatement statement={statement} />
       <RankedList rows={rows} threshold={threshold} activeLeague={set.config.league} />
+      <PageTail appendix={<UnrankableAppendix classes={unrankable} />} />
     </>
   );
 }
 
 /**
- * What closes every state but the two failure screens: the key block and the
- * running foot, pushed to the frame's foot. Story 2.8's appendix leads this group.
+ * What closes every state but the two failure screens, pushed to the frame's
+ * foot by `margin-top: auto`: the Unrankable appendix (ready only — while
+ * pending no count is known), then the key block and the running foot. One
+ * arrangement in every data state; more rows grow the document.
  */
-function PageTail(): JSX.Element {
+function PageTail({ appendix }: { readonly appendix?: ReactNode }): JSX.Element {
   return (
     <div data-page-tail="" style={{ marginTop: 'auto' }}>
+      {appendix}
       <KeyBlock />
       <RunningFoot />
     </div>
