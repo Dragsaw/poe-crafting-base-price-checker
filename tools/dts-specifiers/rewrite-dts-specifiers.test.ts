@@ -235,7 +235,7 @@ describe('the post-emit step', () => {
   /**
    * A copy of the tool at `<scratch>/tools/dts-specifiers/`: its target is
    * relative to `import.meta.url`, so it then rewrites
-   * `<scratch>/packages/contracts/dist`.
+   * `<scratch>/packages/{contracts,core,sync}/dist`.
    */
   function copyToolIntoScratch(): { root: string; script: string } {
     const root = makeScratch();
@@ -247,25 +247,44 @@ describe('the post-emit step', () => {
     return { root, script };
   }
 
-  it('rewrites the contracts dist when run by bare node', () => {
-    const { root, script } = copyToolIntoScratch();
-    const dist = join(root, 'packages', 'contracts', 'dist');
+  /** Creates `<root>/packages/<pkg>/dist/index.d.ts` holding a `./a.ts` re-export. */
+  function seedDist(root: string, pkg: string): string {
+    const dist = join(root, 'packages', pkg, 'dist');
     mkdirSync(dist, { recursive: true });
     const file = join(dist, 'index.d.ts');
     writeFileSync(file, "export { a } from './a.ts';\n");
+    return file;
+  }
+
+  it('rewrites the contracts, core and sync dists when run by bare node', () => {
+    const { root, script } = copyToolIntoScratch();
+    const files = ['contracts', 'core', 'sync'].map((pkg) => seedDist(root, pkg));
 
     const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
 
     expect(run.status).toBe(0);
-    expect(readFileSync(file, 'utf8')).toBe("export { a } from './a.js';\n");
+    for (const file of files) {
+      expect(readFileSync(file, 'utf8')).toBe("export { a } from './a.js';\n");
+    }
   });
 
-  it('exits non-zero and names the directory when dist is missing', () => {
+  it('exits non-zero and names the directory when the contracts dist is missing', () => {
     const { root, script } = copyToolIntoScratch();
 
     const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
 
     expect(run.status).not.toBe(0);
     expect(run.stderr).toContain(join(root, 'packages', 'contracts', 'dist'));
+  });
+
+  it('exits non-zero and names the directory when the core dist is missing', () => {
+    const { root, script } = copyToolIntoScratch();
+    seedDist(root, 'contracts');
+    seedDist(root, 'sync');
+
+    const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
+
+    expect(run.status).not.toBe(0);
+    expect(run.stderr).toContain(join(root, 'packages', 'core', 'dist'));
   });
 });
