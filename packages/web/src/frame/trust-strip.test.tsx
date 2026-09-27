@@ -237,7 +237,7 @@ describe('the toggle and the panel', () => {
     expect(columns.map((column) => column.style.paddingRight)).toEqual(['22px', '22px', '0px']);
     expect(columns.map((column) => column.querySelectorAll('[data-figure-group]').length)).toEqual([2, 2, 1]);
     const text = open?.textContent ?? '';
-    expect(text).toContain('10 tracked list · 1 league validation requests this pass.');
+    expect(text).toContain('10 tracked list · 1 league validation request this pass.');
     expect(text).toContain('0 tracked entries were not reached in the last sync pass.');
     expect(text).toContain('0 entries are unresolvable.');
     expect(text).toContain('0 pinned-starvation records.');

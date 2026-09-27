@@ -133,12 +133,13 @@ export function panelColumns(report: SyncReport | null, weightsLoaded: boolean):
     ];
   }
   const { figures } = report;
+  const leagueValidationCount = figures.requestsBySource['league-validation'];
   const requests: FigureGroup = [
     [
       figure(figures.requestsBySource['tracked-list']),
       text(' tracked list · '),
-      figure(figures.requestsBySource['league-validation']),
-      text(' league validation requests this pass.'),
+      figure(leagueValidationCount),
+      text(` league validation ${plural(leagueValidationCount, 'request', 'requests')} this pass.`),
     ],
   ];
   const notReachedCount = figures.notReachedCount;

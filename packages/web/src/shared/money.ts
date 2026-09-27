@@ -16,7 +16,7 @@ export function formatThreshold(value: number): string {
   return formatTwoDecimals(value);
 }
 
-/** EV, price and threshold at 2dp. A value `0 < v < 0.005` would print `0.00`, so it prints `< 0.01`. */
+/** EV and price at 2dp. A value `0 < v < 0.005` would print `0.00`, so it prints `< 0.01`. */
 export function formatDivine(value: number): string {
   if (value > 0 && value < 0.005) {
     return BELOW_PRINTABLE;

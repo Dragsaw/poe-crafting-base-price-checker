@@ -338,3 +338,9 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 ## Resolved by UX ruling, DESIGN.md revision 8 and EXPERIENCE.md revision 10 (2026-09-27)
 
 - The retro item 22 entry above, on the refusal title for a required 404, is **ruled and closed**. The title for every cause is now the cause-neutral `A required file cannot be used.` (UX memlog 220, DESIGN.md `refusal-screen.titleText` / `titleRule`). EXPERIENCE.md state 26 is renamed `Refused artifact` (memlog 221). `packages/web/src/frame/FailureScreen.tsx` `REFUSAL_TITLE` prints the new title, and the tests assert it through the constant. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
+
+## Deferred from: review fix of the web helpers consolidation (2026-09-27)
+
+- source_spec: `docs/stories/spec-review-fix-consolidate-web-helpers-findings.md`
+  summary: [NOTE FOR UX] The Sync Report requests line now prints `10 tracked list · 1 league validation request this pass.`, and its noun agrees only with the league-validation figure, so the tracked-list figure has no noun of its own; UX should rule the wording (for example one agreeing noun per figure).
+  evidence: The review of `78db4da..ec38dce` found `1 league validation requests`. The fix routes the one trailing noun through `plural` on the league-validation count (`panelColumns` in `packages/web/src/frame/trust-facts.ts`). The story 2.6 panel-copy `[NOTE FOR UX]` entry still quotes the old plural string.

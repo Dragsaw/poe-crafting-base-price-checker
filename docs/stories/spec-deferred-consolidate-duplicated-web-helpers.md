@@ -133,6 +133,19 @@ The singular copy follows the retro's human-accepted action item 11 (P5 calls "1
   - `maybe-false` `reject` (intent) Only the cited App tests were audited against "composition only" — settle by auditing the other ~40 App tests; if true it is low (a slower suite), so rejected.
   - `low` `reject` (intent) The deleted appendix tests asserted page DOM while `rank.test.ts` asserts core output — as above: the intent names them as repeats and the component tests cover the DOM.
 
+### Review Findings
+
+Code review 2026-09-27 of `78db4da..ec38dce`, chunk `packages/web` (see the item 18 spec for the merge-integrity result).
+
+- [x] [Review][Patch] The requests line prints "1 league validation requests" for a league gate that makes one request per pass. The noun is hard-coded and does not go through `plural`. [packages/web/src/frame/trust-facts.ts:141]
+- [x] [Review][Patch] The `formatDivine` docblock says "EV, price and threshold", but the threshold goes through `formatThreshold`, which has no `< 0.01` floor. [packages/web/src/shared/money.ts:19]
+- Rejected:
+  - `low` (auditor) Rendered output is not byte-identical, because the `fixedCell` flex basis and the omitted `padding-right: 0px` differ. The first review already accepted this as layout-equivalent.
+  - `false` (blind) The test-mount consolidation is incomplete in trust-strip, unrankable-appendix and payout-threshold. The intent names `mountList`/`rowsIn`, `rgb` and `NOW`, and the grep ACs hold.
+  - `low` (blind) `dom.tsx` relies on each file's `afterEach(unmount)` and on app code never importing it. No file shows the failure, and the fix adds a global hook.
+  - `low` (blind) Only `affordance.css` states the token-only CSS rule. It names no harm, and the rule lives in DESIGN.md.
+  - `low` (blind) The `coveragePercent` comment is unclear, and NaN or >1 coverage is untested. The comment is accurate, and the schema bounds the figure.
+
 ## Auto Run Result
 
 Status: done

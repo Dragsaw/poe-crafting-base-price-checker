@@ -25,4 +25,9 @@ describe('formatThreshold', () => {
     expect(formatThreshold(0.6)).toBe('0.60');
     expect(formatThreshold(0)).toBe('0.00');
   });
+
+  it('has no < 0.01 floor, unlike formatDivine', () => {
+    expect(formatThreshold(0.004)).toBe('0.00');
+    expect(formatDivine(0.004)).toBe(BELOW_PRINTABLE);
+  });
 });
