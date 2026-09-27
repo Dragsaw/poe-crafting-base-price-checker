@@ -93,44 +93,14 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 
 - Two entries are **closed** by `docs/stories/spec-epic-1-retro-items-6-7-1-2-3-run-start-sequence.md`. First, the "Deferred from: story 1.7 (2026-09-26)" entry on a step throw losing the chunk's progress: once the order exists, any throw other than a league mismatch now publishes the step entries so far and the catalogue marks, and writes progress for the completed rotation keys (`packages/sync/src/chunk/run-chunk.ts`). Second, the story 1.11 entry "The live `pnpm sync` does not call `checkPinnedCap`": `packages/sync/src/compose-chunk.ts`, which both `pnpm sync` and `pnpm sync:dry` use, evaluates the inequality under the lock and throws `PinnedCapExceededError`, reported as a `run-failure` that names `data/tracked.json` before any request. Both entries stay in place because this ledger is append-only; `deferred-work-sweep` owns removal. The retro item 17 entry on `UnexpectedTradeResponseError` stays open: the publish path now exists, but the error still carries no entry payload.
 
-## Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)
-
-- source_spec: `docs/epics.md` (Epic 2, Story 2.8)
-  summary: [NOTE FOR UX] The empty Unrankable appendix has no treatment. The committed data has `weights.json` 6.0.0 present and `recipes.json` absent. That is AD-24's absent-recipes state, so no class is Unrankable and the appendix holds no row. `EXPERIENCE.md` specifies the appendix only with rows in it: its copy, its count and its height at zero rows are undefined.
-  evidence: Story 2.8's revised criteria keep the region rendered and its count readable, and defer the copy to UX. Story 2.1's absence line (`Not published: recipes.json — no crafted rows can be ranked.`) already names the cause, so the empty appendix must not restate it or contradict it. Story 2.8 is blocked on this ruling for the empty case only; the absent-weights case is fully specified.
-- source_spec: `docs/epics.md` (Epic 2, Story 2.6)
-  summary: [NOTE FOR UX] Coverage wording when `weights.json` is present but `sync-report.json` omits the figure. `sync` does not measure coverage until Story 3.6, so on the committed data the figure is omitted while the file is present. AD-27 describes omission only for an absent file.
-  evidence: Story 2.6 renders the case as provisional *not measured*, never `0`, and never as file absence. The page tells the two cases apart by the weights envelope it loaded. UX owns the final copy and placement in the *what the weights cover* column. The case goes away once Story 3.6 ships the sync-side measurement.
-
 ## Deferred from: story 2.1 (2026-09-26)
 
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: [NOTE FOR UX] Skeleton rows (state 22) still have no designed treatment. Story 2.1 ships DESIGN.md's documented fallback: twenty 28px slots in the six-column layout, each cell a flat `paper-inset` bar 10px tall at its column width less its right padding, no shimmer, no animation, and no column header. The masthead eyebrow holds a blank line until the league is known.
-  evidence: DESIGN.md Components, the skeleton `[NOTE FOR UX]`, names the fallback but draws no fill, bar height or header. `packages/web/src/frame/RowSlots.tsx` holds the treatment in one place, so a ruling changes one file.
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: [NOTE FOR UX] Absence-line copy and placement. Each absent tolerable artifact prints one plain sans line under the masthead in `ink-secondary`, at 11.5px on a 21px line: `Not published: recipes.json — no crafted rows can be ranked.`, `Not published: weights.json — every crafted class is unrankable.`, `Not published: sync-report.json — the sync report is unavailable.` Each takes its own 21px entry in the chrome budget (`packages/web/src/theme/tokens.ts`, `reservedChrome`). UX owns the final wording, the position relative to the trust strip (Story 2.6), and whether a line carries a mark.
-  evidence: Story 2.1 decision 2026-09-26. EXPERIENCE.md has no treatment for a named absence; AD-24 requires only that a degraded render names what is missing.
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: [NOTE FOR UX] DESIGN.md's vertical budget does not add up. The table commits 1390px and says `frame-slack = 1920 − 1390 = 528`, but 1920 − 1390 is 530. The frontmatter token `spacing.frame-slack` is `528px`. Story 2.1 keeps the frontmatter value, which is 2px conservative, and the token test asserts the bound rather than equality.
-  evidence: Found while writing `packages/web/src/theme/tokens.test.ts`. Either a committed block is 2px taller than its row in the table, or the token is off by 2px; UX owns which.
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: `packages/web/vite.config.ts` sets `publicDir` to the whole repo `data/`, so `vite build` publishes files AD-24 never fetches (`sync-progress.json`, `currencies.json`, `catalogue/items.json`, `catalogue/filters.json`, about 375 KB) on Pages. Trim the copy to the eight AD-24 artifacts, for example with an allowlist derived from `packages/web/src/load/artifacts.ts` `ARTIFACTS`.
-  evidence: Spec decision 2026-09-26 *Serving* says "Story 2.7 may trim the files AD-24 never fetches", but Story 2.7's criteria in `docs/epics.md` do not mention it, so no story owns it. Verified by building to a scratch `dist/`: `sync-progress.json` and `currencies.json` are present. Review of story 2.1, blind, edge-case and ledger layers.
 - source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
   summary: `WeightsFileEnvelopeSchema` in `packages/contracts/src/envelopes.ts` is a stopgap: it checks `schemaVersion` against major 6 and passes the rest of `weights.json` through unvalidated. When Story 3.1 tightens the weights schema, `packages/web/src/load/artifacts.ts` `ARTIFACTS.weights` must switch to it.
   evidence: Spec decision 2026-09-26 *Weights envelope*: "Story 3.1 tightens it." `docs/epics.md` has Story 2.6 widen only three header fields. Nothing tracks the loader's switch to the full schema.
 - source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
   summary: (unverified, would be medium) `CraftRecipeSchema` in `packages/contracts/src/craft-recipe.ts` accepts `currencies: []` and a `currencyId` repeated within one recipe. A zero-cost recipe may make the per-craft EV degenerate once a story reads recipes for valuation.
   evidence: The spec fixes the shape but says nothing on an empty or repeated currency list. Settle it by checking AD-20 and the FR-1 EV formula when the first story costs a recipe: if a recipe must spend something, add `.min(1)` and a per-recipe `currencyId` uniqueness refinement.
-
-## Resolved by UX rulings, DESIGN.md revision 6 and EXPERIENCE.md revision 7 (2026-09-26)
-
-- The five `[NOTE FOR UX]` entries above are **ruled**. They stay in place because this ledger is append-only; `deferred-work-sweep` owns removal, and three of them still owe code.
-  - Story 2.8, the empty Unrankable appendix (UX memlog 214, EXPERIENCE state 37). The title alone, `Appendix: Unrankable — 0 Item Classes`, with the count in `ink` and not rust. No lead, no rows, bottom padding 16px, same place. It says nothing about why it is empty. Story 2.8 is unblocked.
-  - Story 2.6, a coverage figure the report omits (UX memlog 212). *not measured* while a weights envelope is loaded, *unknown* without one. Italic sans, no mark, never `0`. Story 2.6's provisional copy is final.
-  - Story 2.1, skeleton rows (UX memlog 211). The shipped flat-bar fallback is ratified. code_owed: `packages/web/src/frame/RowSlots.tsx` must paint the column header with its final labels.
-  - Story 2.1, absence-line copy and placement (UX memlog 213, EXPERIENCE state 38). The three bodies are kept verbatim under the lead `Not published`, now inside the trust strip after line two and before the health line, plain, with no mark. code_owed: move the lines out from under the masthead into the strip. Story 2.6 builds the strip, so the move lands there. Add the token `frame-reserve-absence-line` (21px) in place of reusing the health-line token in `reservedChrome`. The uniform-prior banner must stay down when `weights.json` or `recipes.json` is absent (EXPERIENCE *The uniform-prior banner*); that belongs to the story that builds the banner.
-  - Story 2.1, the vertical budget (UX memlog 210). `frame-slack` is 530; the 528 was the old 2px frame border. code_owed: `packages/web/src/theme/tokens.ts` `frameSlack` becomes 530. The worst case counts only reservations that can co-occur: 95px (the banner with the health line or the `sync-report.json` absence line), which leaves 435px, above the 400px Sync Report cap. A test that sums all five reservations (179px) would describe a state no data can produce.
 
 ## Deferred from: story 2.2 (2026-09-26)
 
@@ -218,9 +188,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
   summary: `.github/workflows/deploy.yml` has never run, because no remote is configured. A human must set the repository's Pages source to "GitHub Actions", push to `master` or run `workflow_dispatch`, and confirm that the published site serves the app and only the allowlisted AD-24 artifacts.
   evidence: Spec 2.7, Verification, manual checks.
-- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
-  summary: The `docs/epics.md` Story 2.7 AC still reads "Story 2.1's absence line names the missing `recipes.json`". The epics AC edit is owed.
-  evidence: The 2026-09-27 human decision in spec 2.7 (Decisions) keeps `data/recipes.json` committed as an empty list, so the day-one page prints no such line.
 
 ## Deferred from: code review of spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md (2026-09-27)
 
@@ -234,10 +201,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
   summary: The literal copy of the two list statements is owed to its owner document. The copy is `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (state 23) and `Nothing clears your Payout Threshold of <x.xx> Divine.` (state 25).
   evidence: The 2026-09-27 human decision in spec 2.7 (Decisions) fixed the copy. Only that spec and `packages/web/src/list/list-statement.ts` (`honestEmptyCopy`, `nothingClearsCopy`) carry it. EXPERIENCE.md states 23 and 25 describe the declaratives, and revision 4 closed the nothing-clears copy (memlog 204), but neither state holds the literal text. A later UX revision of either state can drift from the code without a signal. The UX owner decides where the text lives.
 
-## Resolved by story 2.7 (2026-09-27)
-
-- One entry is **closed**: the "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)" entry saying that `publicDir` publishes all of `data/` on Pages. `pnpm build` now runs `tools/prune-pages.mjs` after `vite build`. The prune deletes every `data/` file in `packages/web/dist` that is not on the eight-artifact AD-24 allowlist, and `packages/web/src/load/prune-allowlist.test.ts` asserts that the allowlist equals `ARTIFACTS`. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
-
 ## Deferred from: story 2.8 (2026-09-27)
 
 - source_spec: `docs/stories/spec-2-8-the-unrankable-appendix-and-the-day-one-page-it-completes.md`
@@ -246,10 +209,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/spec-2-8-the-unrankable-appendix-and-the-day-one-page-it-completes.md`
   summary: [NOTE FOR UX] The key block's Provenance gloss `? unknown — absent: partial pool, upper bound only` does not describe the Unrankable appendix's `class absent from weights file` rows, which carry the same `? unknown` mark. The gloss, or the mark on those rows, needs a UX ruling.
   evidence: The 2026-09-27 human decision in spec 2.8 (Decisions, "Mark cell") puts `TrustMark kind="unknown"` with the word `unknown` on every `class absent from weights file` row, as `mockups/key-hero-resting.html` shows. `packages/web/src/list/KeyBlock.tsx` glosses that mark only as a partial pool, which is not the fact these rows state.
-
-## Resolved by story 2.8 (2026-09-27)
-
-- One entry is **closed**: the "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)" `[NOTE FOR UX]` entry saying that the empty Unrankable appendix has no treatment. DESIGN.md `unrankable-appendix.emptyState` (memlog 214) rules it, and `packages/web/src/list/UnrankableAppendix.tsx` builds it: the title alone, the count in `ink`, no lead or row, 16px bottom padding, above the key block. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
 
 ## Deferred from: epic 2 retrospective (2026-09-27)
 
@@ -267,9 +226,6 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
   summary: Before the Epic 3 specs are written, run a UX pass that reconciles the mockups with DESIGN.md and with the fields that are actually published. Give the review layers the Accessibility Floor ruling (EXPERIENCE.md:1057-1082) and the one-owner rule, so a reviewer neither adds ARIA the floor rules out nor edits a UX-owned document.
   evidence: Retro P1 and P2, from the session logs. User rulings were needed in 6 of 7 spec sessions. The mockup against DESIGN.md conflict recurred in 2.3, 2.5, 2.7 and 2.8. The 2.7 build-auto review added `role="status"`, and the 2.7 code review removed it. The 2.7 build-auto review also patched the DESIGN.md budget.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Add an AGENTS.md known pitfall: a background `pnpm dev` can keep listening after TaskStop, so check the port and kill the PID after use.
-  evidence: Retro P4, from the session logs. Port 5183 in 2.3 and port 5173 in 2.8 answered after TaskStop, and `taskkill` was needed. A port collision on 5191 in 2.4 served stale code.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Lower-severity seam findings from the epic 2 diff review. None is reached by today's data:
     - no error boundary, so a render throw gives a blank page (`App.tsx:122-135`)
     - no fetch timeout, so a hung request keeps the skeleton indefinitely (`load/load-artifacts.ts:68-89`)
@@ -286,45 +242,12 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Update the "cache-busted" wording at `docs/epics.md:96` and `:995` to the ruled `no-store` fetch. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
   evidence: Retro F8, F9 and F19.
-- source_spec: `docs/stories/spec-epic-2-retro-item-22-refusal-cause.md`
-  summary: For a required 404 the refusal screen's title still reads "A published file does not match its schema." while the per-cause body now says "It was not published, and the page cannot render without it." UX rules the title (and the EXPERIENCE.md state 26 label "Schema-invalid artifact") for the `missing` cause.
-  evidence: Pre-existing since spec 2.1 triage #9 (a required 404 gets the refusal screen). Made visible by retro item 22's per-cause body. Title copy is UX-owned (DESIGN.md `components.refusal-screen.titleText`; `FailureScreen.tsx` `REFUSAL_TITLE`).
-
-## Deferred from: epic 2 retro item 20 (2026-09-27)
-
-- source_spec: `docs/stories/spec-epic-2-retro-item-20-order-the-honest-empty-rows-canonically.md`
-  summary: [NOTE FOR UX] EXPERIENCE.md state 23 says every EV cell in the honest-empty state holds *no figure yet*. That holds only for a pure league reset. In a mixed reset, where some entries already read `no-listings` in the new league, those rows keep the phrase *an open question* and now sit in canonical order among the *no figure yet* rows. State 23 needs a ruling on the mixed case: widen the wording, or state that a `no-listings` row keeps its own phrase.
-  evidence: Retro F3 names the wording (`docs/stories/epic-2-retro-2026-09-27.md:46`). Sprint item `epic-2-retro-item-24-…` and retro F15 cover only the raw row note, not the state 23 cell wording. The mixed-reset tests in `packages/web/src/list/display-rows.test.ts` and `packages/web/src/App.test.tsx` assert `no figure yet`, `an open question`, `no figure yet`, so a ruling that changes the phrase must update them.
-
-## Resolved by UX ruling, EXPERIENCE.md revision 8 and DESIGN.md revision 7 (2026-09-27)
-
-- The "Deferred from: epic 2 retro item 20 (2026-09-27)" `[NOTE FOR UX]` entry is **ruled**. While the list is honest-empty, every list-row EV cell reads *no figure yet*, whatever the row's own Price State. This includes a row that already reads `no-listings` in the new league. The row's expansion keeps its own Price State and money phrase (state 2, *an open question*). The exception ends when one row ranks. EXPERIENCE.md state 23 owns the rule, and *Money slots* names the exception. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
-  code_owed: In `packages/web/src/list/display-rows.ts` `toDisplayRows`, when `isHonestEmpty(ranking)` holds, give every unpriced row `MONEY_PHRASES.notYetSynced` as its `ev` phrase and keep its `detail` state unchanged. Flip the mixed-reset assertions in `packages/web/src/list/display-rows.test.ts` and `packages/web/src/App.test.tsx` from `no figure yet`, `an open question`, `no figure yet` to three times `no figure yet`. Add an assertion that the `no-listings` row's expansion still reads *an open question*. The nothing-clears and partial-refresh cases keep each row's own phrase.
-- resolved_by: The code owed above is paid (2026-09-27). `toDisplayRows` gives every unpriced row *no figure yet* while `isHonestEmpty` holds and keeps each row's Price State. The mixed-reset tests in `display-rows.test.ts` and `App.test.tsx` assert three times *no figure yet*, and the page test asserts that the `no-listings` row's expansion still reads `no-listings` and *an open question*.
 
 ## Deferred from: epic 2 retro item 19 (2026-09-27)
 
 - source_spec: `docs/stories/spec-epic-2-retro-item-19-make-the-committed-day-one-state-explain.md`
-  summary: Two entries are now closed and sweepable. (1) The `[NOTE FOR UX]` empty-appendix entry under "Deferred from: epics revision of Stories 2.6 to 2.8 (2026-09-26)", which claims `recipes.json` absent on the committed data. (2) The entry under "Deferred from: story 2.7 (2026-09-27)" whose summary begins "The `docs/epics.md` Story 2.7 AC still reads".
-  evidence: EXPERIENCE.md state 37 rules the empty appendix, and EXPERIENCE.md now owns the Epic 2 masthead dek that explains the committed state (`recipes.json` published with no recipe, no absence line). `docs/epics.md` "Two day-one worlds", the Story 2.7 AC and the Story 2.8 AC now describe that state. Only `deferred-work-sweep` removes the two entries.
-- source_spec: `docs/stories/spec-epic-2-retro-item-19-make-the-committed-day-one-state-explain.md`
   summary: When Epic 3 ranks crafted rows, rewrite the Epic 2 dek in EXPERIENCE.md (its owner), `MASTHEAD_DEK` in `packages/web/src/frame/Masthead.tsx`, and the dek assertions in `packages/web/src/App.test.tsx` in the same change, because "Crafted Item Classes are not ranked yet" becomes false.
   evidence: The spec's frozen Decision ("Epic 3 rewrites the dek when it ranks crafted rows"). No Epic 3 AC carries it.
-
-## Deferred from: epic 2 retro item 18 (2026-09-27)
-
-- source_spec: `docs/stories/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md`
-  summary: [NOTE FOR UX] EXPERIENCE.md state 4's note names a statId, but a Raw Base goes unresolvable on its baseTypeId or categoryId. Until UX rules, the unresolvable Raw Base combination row prints the adapted note `its id is gone from the trade API — a patch did this` (`STATE_NOTES.unresolvable` in `packages/web/src/list/format.ts`). UX owns the final wording, and whether the note names the id kind.
-  evidence: Retro F1, action 1. The row ships with the money phrase *not valued* in rust, trailing `noListings` and `notYetSynced`. This also closes the "every entry is unresolvable" case of the retro F18 entry above (`list/list-statement.ts` now counts `unresolvable`, so that list prints the honest-empty statement); the "every entry is crafted" case stays open.
-- source_spec: `docs/stories/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md`
-  summary: The honest-empty statement's "In canonical order" claim (retro F3, action item 20) now also covers a third group. `toDisplayRows` trails `noListings`, then `notYetSynced`, then `unresolvable`, each in canonical key order, so item 20's fix and its mixed-group test must include the unresolvable group. [NOTE FOR UX] For a list of only unresolvable rows, the state-23 copy's "yet" promises a price that no sync will bring.
-  evidence: The item-18 spec's Never list defers F3. `packages/web/src/list/list-statement.ts` now counts `unresolvable`. `docs/stories/sprint-status.yaml` item 20 names only the no-listings and not-yet-synced groups.
-
-## Resolved by UX rulings, EXPERIENCE.md revision 9 (2026-09-27)
-
-- The two `[NOTE FOR UX]` parts of the "Deferred from: epic 2 retro item 18 (2026-09-27)" entries are **ruled**. They stay in place because this ledger is append-only; `deferred-work-sweep` owns removal.
-  - State 4 note. Every `unresolvable` row, a Raw Base or a Combination, prints `its id is gone from the trade API — a patch did this`. The note does not name the id kind. EXPERIENCE.md state 4 and `mockups/key-expanded-states.html` now carry this string. No code is owed: `STATE_NOTES.unresolvable` in `packages/web/src/list/format.ts` already prints it. Update its doc comment, which says the wording waits for a UX ruling.
-  - The honest-empty statement over only `unresolvable` rows (EXPERIENCE.md, the paragraph after the State Patterns table). When every row the list shows is `unresolvable`, the statement ends without "yet": `In canonical order, not ranked: no tracked unit has a price from <league>.` A list with at least one `no-listings` or `not-yet-synced` row keeps "yet". code_owed: `listStatement` / `honestEmptyCopy` in `packages/web/src/list/list-statement.ts` needs the one branch, plus a test in `list-statement.test.ts`. The "In canonical order" half of that entry is still owned by retro item 20.
 
 ## Deferred from: epic 2 retro item 18 rebase onto retro item 20 (2026-09-27)
 
@@ -335,21 +258,11 @@ Each entry names work carved out of a spec so it is not lost. Stories and review
   summary: [NOTE FOR UX] DESIGN.md `listCopyClosed` (`+ Read the remaining {N} rows`) has no singular form, but the page now prints `+ Read the remaining 1 row` for one hidden row; DESIGN.md should spell the singular so the owner doc and the code agree.
   evidence: Epic 2 retro action item 11 (P5 calls "1 rows" a bug) ordered one pluralize helper. `expandCopy` in `packages/web/src/list/RankedList.tsx` now uses `plural` from `packages/web/src/shared/text.ts`, and `ranked-list.test.tsx` asserts the singular at 21 rows. The story 2.3 `[NOTE FOR UX]` entry on "1 rows" described the reverse drift (code verbatim from DESIGN.md) and can close with this one. The same applies to the provisional Sync Report panel singulars (`1 tracked entry was`, `1 entry is`, `1 pinned-starvation record`, `pinned entry`, `tracked Item Class`) under the story 2.6 panel-copy entry.
 
-## Resolved by UX ruling, DESIGN.md revision 8 and EXPERIENCE.md revision 10 (2026-09-27)
-
-- The retro item 22 entry above, on the refusal title for a required 404, is **ruled and closed**. The title for every cause is now the cause-neutral `A required file cannot be used.` (UX memlog 220, DESIGN.md `refusal-screen.titleText` / `titleRule`). EXPERIENCE.md state 26 is renamed `Refused artifact` (memlog 221). `packages/web/src/frame/FailureScreen.tsx` `REFUSAL_TITLE` prints the new title, and the tests assert it through the constant. The entry stays in place because this ledger is append-only; `deferred-work-sweep` owns removal.
-
 ## Deferred from: review fix of the web helpers consolidation (2026-09-27)
 
 - source_spec: `docs/stories/spec-review-fix-consolidate-web-helpers-findings.md`
   summary: [NOTE FOR UX] The Sync Report requests line now prints `10 tracked list · 1 league validation request this pass.`, and its noun agrees only with the league-validation figure, so the tracked-list figure has no noun of its own; UX should rule the wording (for example one agreeing noun per figure).
   evidence: The review of `78db4da..ec38dce` found `1 league validation requests`. The fix routes the one trailing noun through `plural` on the league-validation count (`panelColumns` in `packages/web/src/frame/trust-facts.ts`). The story 2.6 panel-copy `[NOTE FOR UX]` entry still quotes the old plural string.
-
-## Deferred from: epic 2 retro action 7, UX rulings F5, F13, F15 (2026-09-27)
-
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Bring the web code to the three UX rulings. (1) The health line prints `× N of M pinned entries starved`. M is `pinnedCount` and N is `pinnedCount − pinnedRefreshed`, from the one pinned-starvation record whose `pinnedCount` and `declaredMinChunkSearches` match the loaded Tracked List's pinned-set size and `config.minChunkSearches`. No matching record raises no starvation signal. When N is 0 the signal reads `M pinned entries left the rotation no search`. Replace `HEALTH_STARVED` (`frame/trust-facts.ts:30`, `:114-116`) and the "without a count" test (`trust-facts.test.ts:116`). (2) `ageMark` (`list/format.ts:50-66`) reads `lastAttemptedAt` for a league-mismatched observation, so the row prints `tried Nd ago` and never `priced Nd ago`. Update its docblock and add a mismatch test. (3) `rawNote` and `rawPanelSubLine` (`list/format.ts:80`, `:213`) say "valued at its own current asking price" in place of "ranked at …".
-  evidence: UX memlog 216, 217, 218, 222, 223. EXPERIENCE.md revision 12 (trust strip, Freshness, states 6, 23, 31). DESIGN.md revision 10 (health-line table, raw-base-row). Retro F5, F13, F15. The F13 and F15 parts and the N-of-M formatter are built in `docs/stories/spec-epic-2-retro-item-7-ux-rulings-f5-f13-f15.patch`, which still needs the curation match and the N = 0 wording.
 
 ## Deferred from: epic 2 retro item 18 review fix (2026-09-27)
 
