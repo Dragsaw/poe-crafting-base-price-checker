@@ -739,28 +739,47 @@ never import each other.
   | Rank | Provenance | Means | Arises from |
   | --- | --- | --- | --- |
   | 0 | `absent` | not an estimate at all — an upper bound | a `partial` pool (AD-17), and nowhere else |
-  | 1 | `uniform-prior` | the weight was invented | `weightSource: "absent"`, or a bootstrap file |
-  | 2 | `measured` | measured by someone (never ground truth) | `weightSource: "published"` |
+  | 1 | `uniform-prior` | the weight was invented | `weightSource: "absent"` |
+  | 2 | `measured` | measured by someone (never ground truth) | `weightSource: "published"` or `"not-in-game"` |
 
   **The `weightSource` mapping is stated here and in one place**, because
   `"absent"` → `uniform-prior` is correct and `"absent"` → provenance `absent` is the
   reading the shared word invites and is wrong. `absent` is a `core`-side value that must
   never appear in a file, and `web` must never print `weightSource`'s own words on screen.
 
+  **A `"not-in-game"` tier is an input and maps to `measured`.** Its `weight` of `0` is the
+  producer's deliberate override from a hand-kept list (`WEIGHTS-FILE-SCHEMA.md` `6.1.0`),
+  not a filler, so the weight is known and not invented. Wherever the eligible set holds
+  the tier, it is an input like any other entry, so it enters the Provenance fold below and
+  never weakens it. The fold must not
+  skip it as a non-input, and must not map it to `uniform-prior`. This binds the fold only:
+  a formula that skips a weight-0 draw (`IMPLEMENTATION-NOTES.md` §11) is unaffected.
+
   `core` propagates the **weakest provenance and the oldest timestamp** of every input
   into each derived figure, **with no exception** — the numerator-only exception retired
   with `modelled-split`, whose only source was the withdrawn decomposition.
 
-  **A probability's inputs are every entry in its scoped pool, numerator and denominator
-  alike**, and the scope is stated here because "every input" has two readings that give
-  different labels. Under `5.0.0` a `weightSource: "absent"` tier weakens the denominator
-  **in fact** and not merely in label, so the containment-set-only reading would understate
-  what the figure rests on. **The consequence is deliberate and is not a defect:** one
-  invented tier anywhere in a scoped pool makes every probability on that base read
-  `uniform-prior`, so the provenance badge discriminates **between ranked rows** rather than
-  within one — which is what PRD FR-11 now states (raise-back closed by PRD rev 11). `web` must
-  render a figure resting on anything below `measured` visibly differently from one
-  resting on `measured`. **Two render treatments, not three.**
+  **A probability's inputs are exactly the entries its formula sums, numerator and
+  denominator alike:** the recipe's eligible set of both slots, `E_P ∪ E_S`
+  (`IMPLEMENTATION-NOTES.md` §9, §11), for each tracked entry of the `(itemClass, recipe)`
+  pair. The scope is stated here because "every input" has several readings that give
+  different labels. A tier below the recipe's floor is not an input, because the figure
+  does not rest on it. A `weightSource: "absent"` tier inside the eligible set weakens the
+  denominator **in fact** and not merely in label, so the containment-set-only reading
+  would understate what the figure rests on. **The consequence is deliberate and is not a
+  defect:** one invented tier anywhere in the eligible set makes every probability of that
+  pair read `uniform-prior`, so the provenance badge discriminates **between ranked rows**
+  rather than within one. The label belongs to the pair, so **two recipes on one Item Class
+  may carry different labels**, and a recipe switch may change the mark on a class's row.
+  The `absent` rank is not scoped this way: a `partial` pool gives `absent` under every
+  recipe, because coverage is read on the unrestricted pool (§9). `web` must render a
+  figure resting on anything below `measured` visibly differently from one resting on
+  `measured`. **Two render treatments, not three.**
+
+  **An unrankable `(itemClass, recipe)` pair carries no Provenance**, because it has no
+  figure to label. The one exception is a `partial` pool, whose probabilities carry
+  `absent` (AD-17). Whatever mark the appendix shows beside a reason is a view treatment
+  of that reason, owned by UX, and not a Provenance that `core` derives.
 
   `web` must surface per-row age rather than a single dataset-level timestamp, because
   AD-7 guarantees rows refresh at different times. **The obligation is discharged per row,
@@ -784,9 +803,11 @@ never import each other.
   producer can satisfy; a pool denominator that double-counts a multi-stat modifier; and
   the permanent loss of the fact that two stats always roll together, which nobody can
   reconstruct once the source row is split.
-- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`6.0.0`**,
-  and never produces one. Any producer that satisfies the contract is acceptable, and the
-  app does not depend on which one wrote the file.
+- **Rule:** The app consumes a file conforming to `WEIGHTS-FILE-SCHEMA.md` **`6.1.0`**,
+  and never produces one. `6.1.0` is additive over `6.0.0`, but a `6.0.0`-only reader
+  refuses its `weightSource: "not-in-game"`, so `core` implements `6.1.0`. Any producer
+  that satisfies the contract is acceptable, and the app does not depend on which one
+  wrote the file.
 
   **`6.0.0` is breaking, and `core` refuses a `5.x` file as an unknown major** (Consistency
   Conventions). It adds a required **`modGroup`** on every entry — the game's
@@ -794,7 +815,8 @@ never import each other.
   renumbers the display-only `tierLabel` per stat, T1 = highest item level. **The normative
   `className` grammar that `5.1.0` introduced carries forward unchanged**, because AD-16
   derives a class discriminator from that key (`IMPLEMENTATION-NOTES.md` §10). The
-  producer-6.0.0 file of 2026-09-26 satisfies the contract, verified across all 59 classes.
+  producer-6.1.0 file of 2026-09-27 satisfies the contract (`WEIGHTS-FILE-SCHEMA.md`
+  `6.1.0`).
 
   **One entry is one tier of one modifier, and an entry and a source row are the same
   thing.** An entry carries `sourceModifierId`, `modGroup`, `itemLevelMin`, `weight`, `weightSource`,
@@ -802,8 +824,9 @@ never import each other.
   `statId` (or **`null`**, where the producer resolved none) and its `ranges` **verbatim**,
   exactly as the source published them. The tier's weight is carried **once**, on the
   entry. **The producer performs no split, no aggregation, no normalisation and no value
-  derivation.** A `null` `statId` is data, never a file error, and never a reason to
-  declare a pool `partial`.
+  derivation.** A `null` `statId` is data and never a file error. The producer declares a
+  pool's completeness under its own rule (`WEIGHTS-FILE-SCHEMA.md` `6.1.0`), and `core`
+  never infers `partial` from a `null` line.
 
   **All of one entry's lines roll together as a single draw**, because the game draws the
   modifier rather than the line. That fact is the only thing `core` cannot reconstruct
@@ -1402,7 +1425,8 @@ never import each other.
   is either present in `bases` or it is not, which separates *absent from the weights file*
   from *the producer declared a pool it could not guarantee* on a direct lookup with nothing
   inferred. **A third cause exists and the spine does not invent a string for it**: a pool
-  present and declaring `complete` over **no entries at all** is excluded by this AD while
+  present and declaring `complete` whose **total weight is `0`** (no entries, or only
+  weight-0 tiers such as `not-in-game`) is excluded by this AD while
   matching neither published reason. `core` reports the cause it observed and `web` maps it
   to FR-4's enum; if that enum has no member for the empty pool, that is a finding for the
   PRD and not a licence for `core` to relabel it as `partial`.
@@ -1860,7 +1884,7 @@ graph TB
   sync --> dataset
   sync --> report
   sync --> progress
-  producer -.->|schema-conformant 6.0.0<br/>tiers + lines + modGroup + itemLevelMin| weights
+  producer -.->|schema-conformant 6.1.0<br/>tiers + lines + modGroup + itemLevelMin| weights
   dataset -->|player commits + pushes| pages
   pages --> web
   weights --> web
@@ -1947,7 +1971,7 @@ poe-crafting-base-price-checker/
     currencies.json # hand-maintained rates in divine, each with league + asOf (AD-20)
     recipes.json    # CraftRecipe definitions (AD-3)
     config.json     # active league (AD-19) + minChunkSearches (AD-7) + schemaVersion
-    weights.json    # consumed weights file, contract 6.0.0 — external producer (AD-11)
+    weights.json    # consumed weights file, contract 6.1.0 — external producer (AD-11)
     catalogue/      # sync-owned trade catalogue, patch cadence (AD-25)
       items.json
       stats.json

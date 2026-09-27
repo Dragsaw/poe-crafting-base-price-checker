@@ -258,6 +258,24 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
   evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.
 
+## Deferred from: story 3.2 (2026-09-27)
+
+- source_spec: `docs/stories/spec-3-2-the-probability-term-a-tier-s-interval-containment-and-the-entry-s-floor.md`
+  summary: "`BandedModifierRefSchema` does not refuse `valueMin > valueMax`. An inverted band contains no tier, so `affixProbability` and `combinationProbability` return `ok` with `p = 0` and no reason. Add a `valueMin <= valueMax` refine in `contracts`, or name the check that owns it."
+  evidence: Story 3.2 review, triage row 16. `packages/contracts/src/modifier-ref.ts` has no order refine. `IMPLEMENTATION-NOTES.md` §2.5 checks only whether the `statId` is absent, so a curator typo in `tracked.json` would rank an entry at P = 0 without a signal.
+
+## Deferred from: UX revision, DESIGN.md 13 and EXPERIENCE.md 16 (2026-09-27)
+
+- source_spec: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/EXPERIENCE.md` (Epistemics, the uniform-prior banner, state 34)
+  summary: "PM. Sweep `docs/epics.md` Story 3.6 to UX memlog 238. The banner AC (\"no probability in the loaded set carrying `measured`\") should cite the EXPERIENCE.md rule that the banner counts only the active recipe's pairs, so a recipe switch can raise or lower it. The per-row mark AC (\"a recipe switch may change a class's mark\") should cite state 34, where the mark swaps silently. Cite, do not restate."
+  evidence: UX memlog 238. `docs/epics.md` Story 3.6 banner and per-row mark ACs. This closes the PRD revision 23 `[NOTE FOR UX]` on the per-pair mark.
+
+## Deferred from: spec-deferred-rev23-weight-zero-containment-and-empty-pools (2026-09-27)
+
+- source_spec: `docs/stories/spec-deferred-rev23-weight-zero-containment-and-empty-pools.md`
+  summary: "[NOTE FOR PM] `docs/epics.md` (\"a pool present, declaring `complete`, over no entries at all\") should cite AD-17's total-weight reading of an empty pool (IN §3), not an entry count. The stories that build AD-17's third cause and `sync`'s coverage figure owe IN §3's `W = 0` test: a slot of only weight-0 tiers is empty."
+  evidence: This change guarded `contains` on `weight === 0` (IN §1) in `packages/core/src/probability.ts`. `rank.ts` tests no pool emptiness today and `sync` does not build the coverage figure yet, so no emptiness code changed there. `probability.ts` already keys `empty-eligible-pool` on total weight `0`.
+
 ## Deferred from: spec-sync-continuous (2026-09-27)
 
 - source_spec: `docs/stories/spec-sync-continuous.md`

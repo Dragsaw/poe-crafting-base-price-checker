@@ -203,6 +203,67 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
   });
 });
 
+describe('TrackedFileSchema shared floor (AD-17, FR-22)', () => {
+  const amulet = (itemLevelMin: number, statId: string, status = 'active') => ({
+    kind: 'crafted',
+    categoryId: 'accessory.amulet',
+    className: 'Amulets',
+    itemLevelMin,
+    prefix: { kind: 'valueless', statId },
+    status,
+    ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
+  });
+
+  const parse = (entries: readonly unknown[]) =>
+    parseEnvelope(TrackedFileSchema, { schemaVersion: INITIAL_SCHEMA_VERSION, entries });
+
+  // I/O matrix: "Shared floor".
+  it('refuses two non-pruned crafted entries on one class at 82 and 75, with the issue at the second', () => {
+    const result = parse([amulet(82, 'explicit.a'), amulet(75, 'explicit.b')]);
+    if (result.ok || result.reason !== 'invalid') {
+      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+    }
+    expect(result.issues).toHaveLength(1);
+    const [issue] = result.issues;
+    expect(issue?.path).toEqual(['entries', 1, 'itemLevelMin']);
+    expect(issue?.message).toContain('accessory.amulet/Amulets');
+    expect(issue?.message).toContain('82');
+    expect(issue?.message).toContain('75');
+    expect(issue?.message).toContain('entries.0');
+  });
+
+  it('reports one issue per breaching entry', () => {
+    const result = parse([amulet(82, 'explicit.a'), amulet(75, 'explicit.b'), amulet(70, 'explicit.c')]);
+    if (result.ok || result.reason !== 'invalid') {
+      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+    }
+    expect(result.issues.map((issue) => issue.path)).toEqual([
+      ['entries', 1, 'itemLevelMin'],
+      ['entries', 2, 'itemLevelMin'],
+    ]);
+  });
+
+  // I/O matrix: "Shared floor, exempt".
+  it('loads a pruned entry at 75 beside 82', () => {
+    expect(parse([amulet(82, 'explicit.a'), amulet(75, 'explicit.b', 'pruned')]).ok).toBe(true);
+  });
+
+  it('never lets a pruned entry set the class floor', () => {
+    expect(
+      parse([amulet(75, 'explicit.a', 'pruned'), amulet(82, 'explicit.b'), amulet(82, 'explicit.c')]).ok,
+    ).toBe(true);
+  });
+
+  it('loads a raw entry at 75 beside a crafted entry at 82', () => {
+    const raw = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 75, status: 'active' };
+    expect(parse([amulet(82, 'explicit.a'), raw]).ok).toBe(true);
+  });
+
+  it('keeps separate floors for separate classes', () => {
+    expect(parse([amulet(82, 'explicit.a'), { ...amulet(1, 'explicit.b'), className: 'Rings' }]).ok).toBe(true);
+  });
+});
+
 describe('the sync-owned envelopes', () => {
   it('parses a dataset file carrying its entries and the current rate set', () => {
     const dataset = {

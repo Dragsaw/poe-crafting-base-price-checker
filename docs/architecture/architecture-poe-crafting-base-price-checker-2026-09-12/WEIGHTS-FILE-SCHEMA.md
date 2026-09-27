@@ -11,7 +11,7 @@ updated: '2026-09-27'
 
 > **This is the authoritative contract**, owned by this repo (`poe-crafting-base-price-checker`)
 > and binding under the spine's AD-0 ("the weights contract itself"). `6.0.0` is adopted, as
-> of spine revision 19: `modGroup`, the per-stat `tierLabel` rule, the exclusivity rule and
+> of spine revision 19, and `6.1.0` (the `not-in-game` value) as of spine revision 23: `modGroup`, the per-stat `tierLabel` rule, the exclusivity rule and
 > the `className` grammar below are normative, enforced rules, not pending proposals. A
 > separate working copy may still exist inside the external `poe-mod-weights-producer` scraper
 > project for that project's own iteration, but that copy
