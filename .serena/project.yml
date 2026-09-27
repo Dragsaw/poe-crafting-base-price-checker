@@ -170,3 +170,4 @@ language_servers:
 - html
 - json
 - yaml
+- markdown
