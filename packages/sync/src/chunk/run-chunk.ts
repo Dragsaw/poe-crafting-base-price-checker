@@ -26,6 +26,13 @@
  *    miss is marked `unresolvable`, reported, published with the step
  *    entries and kept out of the order; nothing is stamped. The report lists
  *    the `unresolvable` records before the weights records;
+ * 3b. the cross-file gate (`./cross-file-gate.ts`, AD-17): `core`'s five
+ *    checks over the tracked list and a present weights file. Any failure
+ *    throws `CrossFileGateError` before the order exists, so the run
+ *    publishes nothing, leaves `sync-progress.json` untouched and writes the
+ *    report alone, with one `cross-file-gate-failure` record per failure
+ *    after the run-start records, then exits non-zero. An absent file skips
+ *    the gate;
  * 4. the order, from `core` (the Refresh Rotation, AD-7), recomputed on every
  *    run from the tracked list, the dataset, the completed keys and the
  *    clock, so a resumed chunk never replays a frozen plan;
@@ -133,6 +140,7 @@ import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
 import { checkCatalogue } from './catalogue-check.ts';
+import { CrossFileGateError, crossFileGate, crossFileGateRecords } from './cross-file-gate.ts';
 import { acquireLock, holdsLock, releaseLockIfOwn, STALE_LOCK_AFTER_MS } from './lock.ts';
 import { buildDatasetFile } from './publish-dataset.ts';
 import { buildSyncReport } from './sync-report.ts';
@@ -440,16 +448,22 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
 }
 
 /**
- * The record a throw leaves in the report. A league mismatch is its own
+ * The records a throw leaves in the report. A cross-file gate failure leaves
+ * one `cross-file-gate-failure` record per failing (check, entry); every
+ * other throw leaves one record. A league mismatch is its own
  * record, with the list the player corrects the configured league from
  * (AD-19). A non-429 4xx names its status, and its entry where it was on one:
  * the league gate's request names none. Any other throw names the entry the
  * step was on, where it was on one.
  */
-function failureRecord(
-  error: unknown,
-  current: TrackedEntry | undefined,
-): LeagueMismatchRecord | RunFailureRecord {
+function failureRecords(error: unknown, current: TrackedEntry | undefined): SyncRunRecord[] {
+  if (error instanceof CrossFileGateError) {
+    return crossFileGateRecords(error);
+  }
+  return [failureRecord(error, current)];
+}
+
+function failureRecord(error: unknown, current: TrackedEntry | undefined): LeagueMismatchRecord | RunFailureRecord {
   if (error instanceof LeagueMismatchError) {
     return {
       kind: 'league-mismatch',
@@ -607,7 +621,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
      * This chunk's records: the broken lock, the run-start check, the steps,
      * then the starvation, then any failure.
      */
-    const newRecords = (failure?: LeagueMismatchRecord | RunFailureRecord): SyncRunRecord[] => {
+    const newRecords = (failure: readonly SyncRunRecord[] = []): SyncRunRecord[] => {
       const { pinnedStarvation } = starvationNow();
       return [
         ...records,
@@ -617,7 +631,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         ...(pinnedStarvation === undefined || setup === undefined
           ? []
           : [setup.starvationRecord(pinnedStarvation)]),
-        ...(failure === undefined ? [] : [failure]),
+        ...failure,
       ];
     };
 
@@ -720,6 +734,10 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           ? [weightsAbsentRecord(entries)]
           : checkWeightsIds(weights, catalogue.value)),
       );
+      // The cross-file gate (AD-12, AD-17): `core`'s five checks, before the
+      // order exists. A failure throws, so nothing is published and progress
+      // is untouched; the report carries one record per failure.
+      crossFileGate(entries, weights.kind === 'present' ? weights.file : null);
 
       const plan = chunkOrder({
         tracked: entries.filter((entry) => !check.excludedKeys.has(canonicalKey(entry))),
@@ -866,7 +884,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // record and the mismatch; the check's marks and records are discarded
         // with the dataset write (AD-12).
         try {
-          await writeReport([...records, failureRecord(error, current)]);
+          await writeReport([...records, ...failureRecords(error, current)]);
         } catch (fault) {
           secondary('writing the report', fault);
         }
@@ -896,7 +914,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         }
       }
       try {
-        await writeReport(newRecords(failureRecord(error, current)));
+        await writeReport(newRecords(failureRecords(error, current)));
       } catch (fault) {
         secondary('writing the report', fault);
       }

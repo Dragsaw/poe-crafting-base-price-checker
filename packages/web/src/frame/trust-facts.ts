@@ -1,3 +1,5 @@
+import type { CrossFileFailure } from '@poe/core';
+
 import type { Parsed } from '../load/artifacts';
 import { plural } from '../shared/text';
 import { relativeAge } from '../shared/time';
@@ -124,16 +126,21 @@ export function healthSignals(report: SyncReport | null, curation: Curation): re
 
 // --- the panel ------------------------------------------------------------
 
-/** A run of panel prose: plain body text, a figure in ink, or a missing figure in italic. */
+/**
+ * A run of panel prose: plain body text, a figure in ink, a missing figure in
+ * italic, or verbatim text in the mono stack with no semantic ink (the
+ * cross-file diagnosis).
+ */
 export type Segment =
   | { readonly kind: 'text'; readonly text: string }
   | { readonly kind: 'figure'; readonly text: string }
-  | { readonly kind: 'missing'; readonly text: string };
+  | { readonly kind: 'missing'; readonly text: string }
+  | { readonly kind: 'verbatim'; readonly text: string };
 
 /** One figure group: one or more lines of segments. */
 export type FigureGroup = readonly (readonly Segment[])[];
 
-/** The three columns, in order, each a vertical stack of groups (Epic 3 adds a group to the second). */
+/** The three columns, in order, each a vertical stack of groups. The second may carry a third group, the cross-file diagnosis. */
 export type PanelColumns = readonly [readonly FigureGroup[], readonly FigureGroup[], readonly FigureGroup[]];
 
 const text = (value: string): Segment => ({ kind: 'text', text: value });
@@ -145,18 +152,41 @@ const missing = (value: string): Segment => ({ kind: 'missing', text: value });
 
 const UNKNOWN_GROUP: FigureGroup = [[missing(UNKNOWN)]];
 
+/** What one diagnosis line prints: the check, the canonical key and the detail. */
+export type DiagnosisFailure = Pick<CrossFileFailure, 'check' | 'entryKey' | 'detail'>;
+
+/** One diagnosis line, verbatim: `check · canonical key · detail`. */
+export function diagnosisLine(failure: DiagnosisFailure): string {
+  return `${failure.check} · ${failure.entryKey} · ${failure.detail}`;
+}
+
 /**
- * The five figure groups, from `sync-report.json` as published. The panel
+ * The sixth group, under *What is broken* after the pinned-starvation group:
+ * one verbatim line per cross-file failure, in `core`'s order. No failure,
+ * no group — nothing renders, not even a zero.
+ */
+function diagnosisGroups(failures: readonly DiagnosisFailure[]): FigureGroup[] {
+  return failures.length === 0 ? [] : [failures.map((failure) => [{ kind: 'verbatim', text: diagnosisLine(failure) }])];
+}
+
+/**
+ * The five figure groups, from `sync-report.json` as published, and the
+ * sixth, the cross-file diagnosis `web` ran at load (AD-17). The panel
  * prints only published figures: no sum, no numerator. Zeros print here; the
  * strip's no-zero rule is the strip's. An absent report leaves every group
  * *unknown*. Omitted coverage reads *not measured* when the page loaded a
  * weights envelope and *unknown* when it did not, never `0` (AD-27).
  */
-export function panelColumns(report: SyncReport | null, weightsLoaded: boolean): PanelColumns {
+export function panelColumns(
+  report: SyncReport | null,
+  weightsLoaded: boolean,
+  crossFileFailures: readonly DiagnosisFailure[] = [],
+): PanelColumns {
+  const diagnosis = diagnosisGroups(crossFileFailures);
   if (report === null) {
     return [
       [UNKNOWN_GROUP, UNKNOWN_GROUP],
-      [UNKNOWN_GROUP, UNKNOWN_GROUP],
+      [UNKNOWN_GROUP, UNKNOWN_GROUP, ...diagnosis],
       [UNKNOWN_GROUP],
     ];
   }
@@ -196,7 +226,7 @@ export function panelColumns(report: SyncReport | null, weightsLoaded: boolean):
       text(` ${plural(record.pinnedCount, 'pinned entry', 'pinned entries')} refreshed`),
     ]),
   ];
-  return [[requests, notReached], [unresolvable, starved], [coverageGroup(figures, weightsLoaded)]];
+  return [[requests, notReached], [unresolvable, starved, ...diagnosis], [coverageGroup(figures, weightsLoaded)]];
 }
 
 function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): FigureGroup {

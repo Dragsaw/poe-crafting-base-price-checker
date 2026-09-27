@@ -268,6 +268,32 @@ describe('the panel copy', () => {
   });
 });
 
+describe('the cross-file diagnosis group', () => {
+  const failure = {
+    check: 'empty-containment-set',
+    entryKey: '["crafted","jewel","Emerald",1,["explicit.stat_1",12,15],null]',
+    detail: 'prefix explicit.stat_1 band [12, 15] at floor 1: no scoped entry contains it (1 scoped entry carries that statId)',
+  } as const;
+
+  it('sits after the pinned-starvation group, one verbatim line per failure: check, key, detail', () => {
+    const [, broken] = panelColumns(report(), true, [failure, { ...failure, check: 'kind-agreement' }]);
+    expect(broken).toHaveLength(3);
+    expect(broken[2]).toEqual([
+      [{ kind: 'verbatim', text: `empty-containment-set · ${failure.entryKey} · ${failure.detail}` }],
+      [{ kind: 'verbatim', text: `kind-agreement · ${failure.entryKey} · ${failure.detail}` }],
+    ]);
+  });
+
+  it('shows beside an absent report too, since web ran the checks itself', () => {
+    const [, broken] = panelColumns(null, true, [failure]);
+    expect(broken).toHaveLength(3);
+  });
+
+  it('renders nothing with no failure', () => {
+    expect(panelColumns(report(), true, []).map((groups) => groups.length)).toEqual([2, 2, 1]);
+  });
+});
+
 describe('the affordance', () => {
   it('reads + closed and U+2212 open', () => {
     expect(AFFORDANCE_CLOSED).toBe('+ the full sync report');

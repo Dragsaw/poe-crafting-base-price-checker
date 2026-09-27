@@ -18,12 +18,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: No mechanical check enforces the AC "every installed version matches the Stack table exactly".
   evidence: `save-exact=true` governs only future `pnpm add`; a `^` range edited into a manifest later fails nothing. The obstacle is that the spine's Stack table is prose, so any test would pin a hand-copied second source of truth that can drift from the table it claims to enforce — worth solving only alongside a machine-readable Stack table.
 
-## Deferred from: sprint change proposal 2026-09-26 (weights contract 6.0.0)
-
-- source_spec: `docs/sprint-change-proposal-2026-09-26.md`
-  summary: The Emerald crafted entry's prefix band `[12, 15]` does not contain its only tier `[5, 15]`, and its suffix band `[3, 4]` does not contain its only tier `[2, 4]`, so Story 3.3's empty-containment check will reject both bands.
-  evidence: `data/tracked.json`, `jewel`/`Emerald` prefix `explicit.stat_2843214518` `[12, 15]`; `data/weights.json` 6.0.0 carries one tier of that stat on that pool, `T1` at item level 1 with ranges `[[5, 15]]`. Whole-tier containment (IN §1) admits no tier, so §2.5 fires. It predates the 6.0.0 change and is the player's data to fix (AGENT-WORKFLOW: agents do not edit `data/`). The player wants mid-to-high rolls of one tier only, because the full tier prices quite differently. Whole-tier containment (AD-11) cannot express a band inside one tier, so Story 3.3's empty-containment check (IN §2.5) will reject both Emerald bands once it is built. This is a live case for the pro-rating alternative that AD-11 rejected and carries under Deferred; revisit it when Story 3.3 lands. The player briefly applied `[5, 15]` and reverted it: `[5, 15]` also broke the recorded pricing fixtures (a new search body needs `pnpm fixtures:record`), so the revert keeps them valid.
-
 ## Deferred from: story 1.11 (2026-09-26)
 
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
@@ -89,15 +83,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-2-6-the-trust-strip-its-health-line-and-the-sync-report-panel.md`
   summary: [NOTE FOR UX] The Sync Report panel copy is provisional. It prints only figures `sync-report.json` publishes, with no sum and no numerator: `10 tracked list · 1 league validation requests this pass.` · `N tracked entries were not reached in the last sync pass.` · `N entries are unresolvable.` · `N pinned-starvation records.` with one `pinnedRefreshed of pinnedCount pinned entries refreshed` line per record · `86% of 29 tracked Item Classes.` Zeros print in the panel. With `sync-report.json` absent, each of the five groups reads italic *unknown*. The mockup's prose (a request total, a measured daily ceiling, `N of M tracked entries`, `across N Item Classes`, a record date, a coverage numerator, explanatory sentences) needs figures the report does not publish. UX owns the final wording, including singular forms (`1 entries`, `1 pinned-starvation records` read as written) and whether the panel explains any figure.
   evidence: Spec 2.6 decision 2026-09-27. The copy lives in `panelColumns` in `packages/web/src/frame/trust-facts.ts`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert it, so a ruling changes those three files.
-
-## Deferred from: tracked.json curation tooling (2026-09-27)
-
-- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
-  summary: When Story 3.3 builds the five cross-file checks in `core`, `checkTracked` in `packages/sync/src/curation/check.ts` must call them over `data/tracked.json` and `data/weights.json` and drop its `pending` item "five cross-file checks (Story 3.3)".
-  evidence: The spec's Never list forbids a local implementation of the five checks, so `pnpm tracked:check` runs only the schema, the pinned cap and catalogue resolvability, and it lists the rest under `pending`. The five checks are named in `AGENT-WORKFLOW.md` (the five cross-file checks rule; AD-17).
-- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
-  summary: When `checkTracked` calls the five cross-file checks, remove the "Open weak point" section and the hand-check step 8 of the loop from `.claude/skills/tracked-json/SKILL.md`, and renumber the steps that cite it.
-  evidence: The spec's Always list makes the skill state the weak point until Story 3.3. The hand check exists only because `tracked:check` cannot yet see `data/weights.json`.
 
 ## Deferred from: code review of spec-tracked-json-curation-tooling.md (2026-09-27)
 
@@ -284,3 +269,24 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-sync-continuous.md`
   summary: "[NOTE FOR ARCHITECT] Two owner-document sentences no longer match the code. First, `IMPLEMENTATION-NOTES.md` §5.3 *Penalty memory across processes* says \"Two chunk endings write a `notBefore` … and nothing else does\", and spine AD-8 names only the 429 and the malformed-request abort. But the gate's non-429 4xx (`LeagueRequestRejectedError`) now writes the abort `notBefore` (`now + staleLockAfter`) in both `pnpm sync` and `pnpm sync:batch`. Second, spine AD-7 says the session's lock \"is never held across a wait\", but the in-chunk spread waits between fetches do hold it. The sentence means a session wait."
   evidence: Review Triage Log row 33. `packages/sync/src/chunk/run-chunk.ts` failure path (`rejected ? notBeforeAfterAbort(...)`), and the run-chunk test that expects `notBefore: '2026-09-26T18:00:00.000Z'` after a gate 4xx. The Review brief (`AGENT-WORKFLOW.md`) forbids a triager to edit the owner document.
+
+## Deferred from: story 3.3 (2026-09-27)
+
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "[NOTE FOR ARCHITECT] A real `statId` rolls both kinds, which contradicts AD-17's premise for kind agreement (\"a `statId` either rolls a value or it does not\"). On `weapon.crossbow`/`Crossbows` the suffix `explicit.stat_1967051901` has a valueless T1 tier at item level 55 and a banded `[2, 2]` T1 tier at 82, so no reference on that `statId` can pass the universal quantifier at a floor of 82. The six Crossbows entries on it are now `pruned`. Decide whether the quantifier stays universal, or reads only the lines of the reference's own kind."
+  evidence: `pnpm tracked:lookup tiers explicit.stat_1967051901 --class Crossbows`. `packages/core/src/cross-file.ts` `kindAgreement` implements IN §2.3 and AD-17 as written.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "[NOTE FOR UX] The cross-file diagnosis line format (`check · canonical key · detail`, one verbatim line per failure) and the empty-group behaviour (no failure renders no group, not a zero line) are provisional. Rule on both in EXPERIENCE.md."
+  evidence: `packages/web/src/frame/trust-facts.ts` `diagnosisLine` and `diagnosisGroups`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert them.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "`fixtures/tracked.json` still carries the old Emerald bands `[12, 15]` and `[3, 4]`, which the committed weights file fails at the cross-file gate. The dry-run fixture test (`packages/sync/src/dry-run.test.ts`, `alignFixtureEmerald`) narrows the committed Emerald tiers to those bands in memory so the recorded jewel search stays covered. Move the fixture workload to `[5, 15]` and `[2, 4]`, run a live `pnpm fixtures:record` (the player runs it), and delete `alignFixtureEmerald`."
+  evidence: A new band changes the search digest, so the recorded captures no longer match (fixtures/README.md). The spec requires the player's approval before a live record.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "[NOTE FOR ARCHITECT] `AGENT-WORKFLOW.md` *Parallel worktrees* says \"A pass does not cover the checks that `pnpm tracked:check` lists under `pending`.\" `tracked:check` now runs the five cross-file checks and has no `pending` field. Retire the sentence, or state what a pass still does not confirm (a floor declared too high, AD-5)."
+  evidence: `packages/sync/src/curation/check.ts`. The spec forbids an edit to an owner document in this story.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "No live `pnpm sync` has confirmed that the run-start cross-file gate passes on the committed `data/tracked.json` and `data/weights.json`, as the spec's Decision requires. Once the branch lands, run `pnpm sync` from the main checkout, and confirm that it throws no `CrossFileGateError` and that `sync-report.json` has no `cross-file-gate-failure` record."
+  evidence: Spec 3.3 Implementation Notes. `pnpm sync:dry` stood in, because AGENT-WORKFLOW forbids a live sync from a worktree. The gate is in `packages/sync/src/chunk/cross-file-gate.ts` and runs from `run-chunk.ts`.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "The tracked-json SKILL (`.claude/skills/tracked-json/SKILL.md`) says `tracked:check` validates the five cross-file checks and tells the agent to loop until exit 0. It does not say that `cross-file: skipped` (weights file absent) also exits 0, or that a class absent from the weights file or with a `partial` slot gets no edge, containment or kind check. Add both caveats, so that the agent reads `checks` and not only the exit code."
+  evidence: `packages/sync/src/curation/check.ts` pushes `skipped` with `ok: true` when the weights file is absent. `packages/core/src/cross-file.ts` skips pool checks when `poolOf` fails or a slot is `partial`. Review Triage Log row 5 defers this, because the fix edits an agent-context file.

@@ -161,6 +161,13 @@ export { WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
 export type { WeightsIds } from './catalogue/weights-ids';
 
 /**
+ * The run-start cross-file gate (AD-12, AD-17): `core`'s five checks, run
+ * before the order. A failure throws `CrossFileGateError`, which `runChunk`
+ * reports as one `cross-file-gate-failure` record per failure.
+ */
+export { CrossFileGateError, crossFileGate, crossFileGateRecords } from './chunk/cross-file-gate';
+
+/**
  * The run-start league gate (FR-32, AD-19): one `league-validation` GET under
  * the lock, before any search. A mismatch throws `LeagueMismatchError`, which
  * `runChunk` reports as a `league-mismatch` record; an unanswered request

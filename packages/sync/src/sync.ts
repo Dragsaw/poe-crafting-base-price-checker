@@ -42,6 +42,7 @@ import { UNRESOLVABLE_RETRY_MS } from '@poe/core';
 
 import { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH } from './catalogue/catalogue-ids.ts';
 import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
+import { CrossFileGateError } from './chunk/cross-file-gate.ts';
 import { isStaleState, LOCK_PATH, readLock, STALE_LOCK_AFTER_MS } from './chunk/lock.ts';
 import { PROGRESS_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
@@ -196,7 +197,8 @@ function isRefusal(error: unknown): boolean {
     (error instanceof DataFileError && INPUT_PATHS.includes(error.path)) ||
     error instanceof PinnedCapExceededError ||
     error instanceof UnknownClassBaseTypeError ||
-    error instanceof LeagueMismatchError
+    error instanceof LeagueMismatchError ||
+    error instanceof CrossFileGateError
   );
 }
 
