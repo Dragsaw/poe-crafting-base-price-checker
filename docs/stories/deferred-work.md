@@ -194,10 +194,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: story 3.2 (2026-09-27)
 
-- source_spec: `docs/stories/spec-3-2-the-probability-term-a-tier-s-interval-containment-and-the-entry-s-floor.md`
-  summary: "`BandedModifierRefSchema` does not refuse `valueMin > valueMax`. An inverted band contains no tier, so `affixProbability` and `combinationProbability` return `ok` with `p = 0` and no reason. Add a `valueMin <= valueMax` refine in `contracts`, or name the check that owns it."
-  evidence: Story 3.2 review, triage row 16. `packages/contracts/src/modifier-ref.ts` has no order refine. `IMPLEMENTATION-NOTES.md` §2.5 checks only whether the `statId` is absent, so a curator typo in `tracked.json` would rank an entry at P = 0 without a signal.
-
 ## Deferred from: UX revision, DESIGN.md 13 and EXPERIENCE.md 16 (2026-09-27)
 
 - source_spec: `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/EXPERIENCE.md` (Epistemics, the uniform-prior banner, state 34)
