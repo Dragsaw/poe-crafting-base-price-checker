@@ -56,9 +56,10 @@ export const RawTrackedEntrySchema = z.strictObject({
 });
 
 /**
- * The two shape rules the I/O matrix fixes, and no others. The five cross-file
- * checks and FR-16's overlap rejection are `core`'s, in Epic 3; `contracts`
- * sees one file at a time.
+ * The two shape rules the I/O matrix fixes, and no others. FR-16's
+ * within-file overlap rejection is a rule of the whole list, so it lives in
+ * `TrackedFileSchema` (`./overlap.ts`); the five cross-file checks are
+ * `core`'s (`cross-file.ts`), because `contracts` sees one file at a time.
  */
 export const TrackedEntrySchema = z
   .discriminatedUnion('kind', [CraftedTrackedEntrySchema, RawTrackedEntrySchema])

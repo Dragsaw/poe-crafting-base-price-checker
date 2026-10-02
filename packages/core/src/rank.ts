@@ -8,6 +8,8 @@ import type {
   WeightsFile,
 } from '@poe/contracts';
 
+import type { CrossFileFailure } from './cross-file.ts';
+
 /**
  * The ranking, raw branch (AD-17, AD-9, AD-19, IMPLEMENTATION-NOTES.md §4.1,
  * §4.2).
@@ -39,7 +41,9 @@ import type {
  * by `categoryId`, then `className`, and never through a sibling `className`:
  * with no file, or no such pair, it is one `unrankable` class, reason `class
  * absent from weights file` (AD-24); with either slot declaring `poolCoverage: "partial"`, reason
- * `pool partial`. A complete pair makes no claim. `poolCoverage` is trusted as
+ * `pool partial`. A complete pair named by a cross-file failure is reason
+ * `class disagrees with weights file` (AD-17); the other two reasons take
+ * precedence. Otherwise a complete pair makes no claim. `poolCoverage` is trusted as
  * declared (AD-11). Dataset entries no tracked entry names are ignored.
  * `core` never reads `lastSearchId` or `lastSearchLeague` (AD-9).
  */
@@ -62,14 +66,26 @@ export interface RankInput {
    * is Unrankable as `pool partial` (FR-4).
    */
   readonly weights: WeightsFile | null;
+  /**
+   * The cross-file failures of this tracked list against `weights`, from
+   * `crossFileChecks`, computed once per load by the caller. Each failure's
+   * `(categoryId, className)` is Unrankable as `class disagrees with weights
+   * file`, unless the lookup already gave it one of the other two reasons,
+   * which take precedence. Absent means none.
+   */
+  readonly crossFileFailures?: readonly Pick<CrossFileFailure, 'categoryId' | 'className'>[];
 }
 
 /**
- * FR-4's reasons, verbatim (PRD-owned). Both come from the direct lookup of
- * the crafted pair in the weights file; `class disagrees with weights file`
- * is Story 3.3's cross-file checks.
+ * FR-4's reasons, verbatim (PRD-owned). The first two come from the direct
+ * lookup of the crafted pair in the weights file; `class disagrees with
+ * weights file` is any of the five cross-file checks (`cross-file.ts`), one
+ * string for all five.
  */
-export type UnrankableReason = 'class absent from weights file' | 'pool partial';
+export type UnrankableReason =
+  | 'class absent from weights file'
+  | 'pool partial'
+  | 'class disagrees with weights file';
 
 /** One Unrankable Item Class: the `(categoryId, className)` pair and its reason. Never a Base Type. */
 export interface UnrankableClass {
@@ -187,6 +203,9 @@ export function rank(input: RankInput): Ranking {
   const unresolvable: UnrankedEntry[] = [];
   /** Keyed on the serialised pair, so one class with several entries is one row. */
   const unrankable = new Map<string, UnrankableClass>();
+  const disagreeing = new Set(
+    (input.crossFileFailures ?? []).map((failure) => JSON.stringify([failure.categoryId, failure.className])),
+  );
 
   for (const entry of input.tracked) {
     if (entry.status === 'pruned') {
@@ -194,9 +213,12 @@ export function rank(input: RankInput): Ranking {
     }
     if (entry.kind === 'crafted') {
       const { categoryId, className } = entry;
-      const reason = unrankableReasonOf(input.weights, categoryId, className);
+      const classKey = JSON.stringify([categoryId, className]);
+      const reason =
+        unrankableReasonOf(input.weights, categoryId, className) ??
+        (disagreeing.has(classKey) ? 'class disagrees with weights file' : undefined);
       if (reason !== undefined) {
-        unrankable.set(JSON.stringify([categoryId, className]), { categoryId, className, reason });
+        unrankable.set(classKey, { categoryId, className, reason });
       }
       continue;
     }

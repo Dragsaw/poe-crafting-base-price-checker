@@ -12,7 +12,9 @@ import {
 } from './schema-version.ts';
 import { SyncProgressSchema } from './sync-progress.ts';
 import { SyncRunReportSchema } from './sync-run-report.ts';
+import { describeOverlap, NEVER_CO_OCCUR, overlapBranches } from './overlap.ts';
 import { TrackedEntrySchema } from './tracked-entry.ts';
+import type { CraftedTrackedEntry } from './tracked-entry.ts';
 import {
   FilterCatalogueSchema,
   ItemCatalogueSchema,
@@ -33,7 +35,6 @@ import {
  * One file-level rule: each `canonicalKey` (§4.1) appears once in `entries`,
  * so entries equal under it are twins whatever else differs. Each repeat is
  * one issue at its own index, naming the key and its first occurrence.
- * FR-16's overlap rejection of *distinct* keys stays `core`'s, in Epic 3.
  *
  * A second rule, the shared floor (AD-17, FR-22): every non-`pruned` crafted
  * entry of one `(categoryId, className)` declares the same `itemLevelMin`. The
@@ -42,6 +43,13 @@ import {
  * first entry's index. `pruned` tombstones are exempt — they are never
  * summands — and a `raw` entry names no class, so it takes no part. The floor
  * is declared, never derived here (AD-5, IMPLEMENTATION-NOTES.md §8).
+ *
+ * A third rule, within-file overlap (FR-16, AD-17, IMPLEMENTATION-NOTES.md
+ * §2.1): no two non-`pruned` crafted entries of one class overlap under
+ * `overlap` with `NEVER_CO_OCCUR` — intersecting bands, both valueless, or an
+ * absent affix on either side of each slot. Each pair is one issue at the
+ * later entry's index, naming both canonical keys and each slot's branch. The
+ * `coOccur` branch needs the weights file and is `core`'s cross-file check.
  */
 export const TrackedFileSchema = z
   .strictObject({
@@ -82,6 +90,32 @@ export const TrackedFileSchema = z
         path: ['entries', index, 'itemLevelMin'],
         message: `item class ${entry.categoryId}/${entry.className} declares itemLevelMin ${String(entry.itemLevelMin)} here and ${String(first.floor)} at entries.${String(first.index)}; the crafted entries of one item class share one floor (AD-17)`,
       });
+    });
+    const earlierByClass = new Map<string, { readonly index: number; readonly key: string; readonly entry: CraftedTrackedEntry }[]>();
+    file.entries.forEach((entry, index) => {
+      if (entry.kind !== 'crafted' || entry.status === 'pruned') {
+        return;
+      }
+      const classKey = JSON.stringify([entry.categoryId, entry.className]);
+      const earlier = earlierByClass.get(classKey) ?? [];
+      const key = canonicalKey(entry);
+      for (const other of earlier) {
+        // A twin is the uniqueness rule's issue, not a second one here.
+        if (other.key === key) {
+          continue;
+        }
+        const branches = overlapBranches(other.entry, entry, NEVER_CO_OCCUR);
+        if (branches === undefined) {
+          continue;
+        }
+        ctx.addIssue({
+          code: 'custom',
+          path: ['entries', index],
+          message: `entries ${other.key} (entries.${String(other.index)}) and ${key} overlap on ${describeOverlap(branches)}; one item satisfies both and would be counted twice (AD-17)`,
+        });
+      }
+      earlier.push({ index, key, entry });
+      earlierByClass.set(classKey, earlier);
     });
   });
 

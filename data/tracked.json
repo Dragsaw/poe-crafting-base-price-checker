@@ -30,14 +30,14 @@
       "prefix": {
         "kind": "banded",
         "statId": "explicit.stat_2843214518",
-        "valueMin": 12,
+        "valueMin": 5,
         "valueMax": 15,
         "acceptedTier": "T1"
       },
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_681332047",
-        "valueMin": 3,
+        "valueMin": 2,
         "valueMax": 4,
         "acceptedTier": "T1"
       },
@@ -714,7 +714,8 @@
         "kind": "valueless",
         "statId": "explicit.stat_1967051901"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
     },
     {
       "kind": "crafted",
@@ -816,7 +817,8 @@
         "kind": "valueless",
         "statId": "explicit.stat_1967051901"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
     },
     {
       "kind": "crafted",
@@ -918,7 +920,8 @@
         "kind": "valueless",
         "statId": "explicit.stat_1967051901"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
     },
     {
       "kind": "crafted",
@@ -1020,7 +1023,8 @@
         "kind": "valueless",
         "statId": "explicit.stat_1967051901"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
     },
     {
       "kind": "crafted",
@@ -1122,7 +1126,8 @@
         "kind": "valueless",
         "statId": "explicit.stat_1967051901"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
     },
     {
       "kind": "crafted",
@@ -1224,7 +1229,8 @@
         "kind": "valueless",
         "statId": "explicit.stat_1967051901"
       },
-      "status": "active"
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
     },
     {
       "kind": "crafted",

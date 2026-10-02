@@ -28,6 +28,18 @@ export type {
   UnrankedEntry,
 } from './rank.ts';
 
+/** The five cross-file checks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.6), defined once. */
+export {
+  classDiscriminability,
+  coOccur,
+  crossFileChecks,
+  edgeAlignment,
+  emptyContainment,
+  kindAgreement,
+  scopedPools,
+} from './cross-file.ts';
+export type { CrossFileFailure, ScopedPools } from './cross-file.ts';
+
 /** The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11). */
 export {
   affixProbability,

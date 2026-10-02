@@ -17,6 +17,7 @@ import {
   UNKNOWN,
   WEIGHTS_FILE_LABEL,
   weightsFacts,
+  type DiagnosisFailure,
 } from './trust-facts';
 
 function Label({ children }: { readonly children: ReactNode }): JSX.Element {
@@ -48,17 +49,21 @@ function Value({ value }: { readonly value: string | undefined }): JSX.Element {
  * data only for unresolvable entries or pinned starvation (FR-24, FR-25).
  *
  * The whole strip is the click target for `{components.sync-report-panel}`,
- * which opens in place beneath it and is closed on every load. The request
+ * which opens in place beneath it and is closed on every load. A cross-file
+ * failure changes nothing here: its diagnosis is the panel's sixth group. The request
  * log is untouched: toggling reads what the load already holds.
  */
 export function TrustStrip({
   set,
   absent,
   now,
+  crossFileFailures = [],
 }: {
   readonly set: ArtifactSet;
   readonly absent: readonly TolerableKey[];
   readonly now: number;
+  /** The load's cross-file failures (AD-17): the panel's diagnosis, never a strip line. */
+  readonly crossFileFailures?: readonly DiagnosisFailure[];
 }): JSX.Element {
   const [open, setOpen] = useState(false);
   const report = set.syncReport;
@@ -130,7 +135,7 @@ export function TrustStrip({
           </div>
         ) : null}
       </div>
-      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== null)} /> : null}
+      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== null, crossFileFailures)} /> : null}
     </>
   );
 }

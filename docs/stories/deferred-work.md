@@ -18,12 +18,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: No mechanical check enforces the AC "every installed version matches the Stack table exactly".
   evidence: `save-exact=true` governs only future `pnpm add`; a `^` range edited into a manifest later fails nothing. The obstacle is that the spine's Stack table is prose, so any test would pin a hand-copied second source of truth that can drift from the table it claims to enforce — worth solving only alongside a machine-readable Stack table.
 
-## Deferred from: sprint change proposal 2026-09-26 (weights contract 6.0.0)
-
-- source_spec: `docs/sprint-change-proposal-2026-09-26.md`
-  summary: The Emerald crafted entry's prefix band `[12, 15]` does not contain its only tier `[5, 15]`, and its suffix band `[3, 4]` does not contain its only tier `[2, 4]`, so Story 3.3's empty-containment check will reject both bands.
-  evidence: `data/tracked.json`, `jewel`/`Emerald` prefix `explicit.stat_2843214518` `[12, 15]`; `data/weights.json` 6.0.0 carries one tier of that stat on that pool, `T1` at item level 1 with ranges `[[5, 15]]`. Whole-tier containment (IN §1) admits no tier, so §2.5 fires. It predates the 6.0.0 change and is the player's data to fix (AGENT-WORKFLOW: agents do not edit `data/`). The player wants mid-to-high rolls of one tier only, because the full tier prices quite differently. Whole-tier containment (AD-11) cannot express a band inside one tier, so Story 3.3's empty-containment check (IN §2.5) will reject both Emerald bands once it is built. This is a live case for the pro-rating alternative that AD-11 rejected and carries under Deferred; revisit it when Story 3.3 lands. The player briefly applied `[5, 15]` and reverted it: `[5, 15]` also broke the recorded pricing fixtures (a new search body needs `pnpm fixtures:record`), so the revert keeps them valid.
-
 ## Deferred from: story 1.11 (2026-09-26)
 
 - source_spec: `docs/stories/spec-1-11-league-validation-as-a-run-start-gate.md`
@@ -83,15 +77,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-2-6-the-trust-strip-its-health-line-and-the-sync-report-panel.md`
   summary: [NOTE FOR UX] The Sync Report panel copy is provisional. It prints only figures `sync-report.json` publishes, with no sum and no numerator: `10 tracked list · 1 league validation requests this pass.` · `N tracked entries were not reached in the last sync pass.` · `N entries are unresolvable.` · `N pinned-starvation records.` with one `pinnedRefreshed of pinnedCount pinned entries refreshed` line per record · `86% of 29 tracked Item Classes.` Zeros print in the panel. With `sync-report.json` absent, each of the five groups reads italic *unknown*. The mockup's prose (a request total, a measured daily ceiling, `N of M tracked entries`, `across N Item Classes`, a record date, a coverage numerator, explanatory sentences) needs figures the report does not publish. UX owns the final wording, including singular forms (`1 entries`, `1 pinned-starvation records` read as written) and whether the panel explains any figure.
   evidence: Spec 2.6 decision 2026-09-27. The copy lives in `panelColumns` in `packages/web/src/frame/trust-facts.ts`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert it, so a ruling changes those three files.
-
-## Deferred from: tracked.json curation tooling (2026-09-27)
-
-- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
-  summary: When Story 3.3 builds the five cross-file checks in `core`, `checkTracked` in `packages/sync/src/curation/check.ts` must call them over `data/tracked.json` and `data/weights.json` and drop its `pending` item "five cross-file checks (Story 3.3)".
-  evidence: The spec's Never list forbids a local implementation of the five checks, so `pnpm tracked:check` runs only the schema, the pinned cap and catalogue resolvability, and it lists the rest under `pending`. The five checks are named in `AGENT-WORKFLOW.md` (the five cross-file checks rule; AD-17).
-- source_spec: `docs/stories/spec-tracked-json-curation-tooling.md`
-  summary: When `checkTracked` calls the five cross-file checks, remove the "Open weak point" section and the hand-check step 8 of the loop from `.claude/skills/tracked-json/SKILL.md`, and renumber the steps that cite it.
-  evidence: The spec's Always list makes the skill state the weak point until Story 3.3. The hand check exists only because `tracked:check` cannot yet see `data/weights.json`.
 
 ## Deferred from: code review of spec-tracked-json-curation-tooling.md (2026-09-27)
 
@@ -180,9 +165,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: code review of the uncommitted `declared: null` and dev:stop climb diff (2026-09-27)
 
 - source_spec: `tools/dev-stop/dev-stop.ts`
-  summary: `listenerScript` runs `Get-NetTCPConnection ... -ErrorAction SilentlyContinue`. A failed query, for example a missing NetTCPIP module or access denied, therefore returns `[]`, and dev:stop prints "port is free". `listenersPosix` explicitly refuses to read a failed `lsof` as a free port. The Windows path has no such guard.
-  evidence: This was already true before the diff: `snapshotWindows` used the same `$l` line. The diff now also routes the stop poll through it (`listenersWindows`).
-- source_spec: `tools/dev-stop/dev-stop.ts`
   summary: No automated check runs the stop poll's listener query (`listenerPids`, `listenersWindows`, `listenersPosix`). If the PowerShell output ever serialises one listener as a bare number and not an array, `.length` is undefined. The poll then reads the port as taken until the deadline, and dev:stop exits 1 after it has killed the server.
   evidence: The verification-gap reviewer ran the query by hand: `[]` for a free port, `[1708]` for one listener. `dev-stop.test.ts` imports only `DEFAULT_PORT`, `ownAncestry`, `parsePort` and `planStop`. The entry guard keeps `main` out of tests, so this check needs a real listener or process stubbing.
 
@@ -200,9 +182,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Architect. UX memlog 233 derives a recipe's option word from the grade prefix its currency ids share (`greater-…`, `perfect-…`; none reads `regular`), and a set with mixed grades or duplicate words is refused. Name the prefixes that count as grades, the layer that derives the word, and the cross-file validity predicate (IMPLEMENTATION-NOTES) before the Story 3.4 spec. No contract change.
   evidence: Finding HR-10. UX memlog 233. `CraftRecipeSchema` (`packages/contracts/src/craft-recipe.ts`) carries no display string. `catalogue/static.json` spells `greater-orb-of-transmutation` and `perfect-orb-of-augmentation`.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: PM. Sweep `docs/epics.md` to follow the UX rulings of this pass. UX-DR28 (:192) and the story AC at :1439 drop `removed YYYY-MM-DD`, and the tombstone line two becomes one cell (UX memlog 234). UX-DR9 (:146) drops the two-cell re-cut. UX-DR40 (:230) names a missing short form as a product gap and a missing Accepted Tier as a curation gap (memlog 231). :2136 cites the grade-prefix rule instead of "lifted from the composition" (memlog 233). The AD-24 lines are covered by the retro item 14 sweep entry, except UX-DR43 at :242 ("All eight artifacts"), which follows the same sweep. Cite, do not restate.
-  evidence: UX memlog 229, 231, 233 and 234. The epics text was checked on 2026-09-27.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Dev. `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx:14`) becomes `A required file did not arrive.` (UX memlog 229, DESIGN.md `fetch-failure-screen.titleText`). Update the tests that assert the old title, and the `App.tsx:33` docblock that says "all eight fetches".
   evidence: UX memlog 229. The old title restated AD-24's count, and the pending AD-24 amendment makes it seven.
@@ -275,3 +254,27 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-openwiki-update-lets-model-stage-agents.md`
   summary: `peter-evans/create-pull-request` carries commits already made on the checked-out HEAD into the PR branch, and `add-paths` filters only uncommitted changes, so if `openwiki code --update` commits locally it can still put `AGENTS.md`, `CLAUDE.md` or the workflow file into the auto-PR.
   evidence: Unverified. `add-paths` in `.github/workflows/openwiki-update.yml` now lists only `openwiki`, but nothing in the workflow checks that HEAD still equals `github.sha` before the `create-pr` step. To settle it, find out whether `openwiki@0.6.0` (`openwiki code --update --print`) or its model can run `git commit`. If it can, add a step before `create-pr` that refuses or soft-resets any commit on top of `github.sha`.
+
+## Deferred from: story 3.3 (2026-09-27)
+
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "[NOTE FOR ARCHITECT] A real `statId` rolls both kinds, which contradicts AD-17's premise for kind agreement (\"a `statId` either rolls a value or it does not\"). On `weapon.crossbow`/`Crossbows` the suffix `explicit.stat_1967051901` has a valueless T1 tier at item level 55 and a banded `[2, 2]` T1 tier at 82, so no reference on that `statId` can pass the universal quantifier at a floor of 82. The six Crossbows entries on it are now `pruned`. Decide whether the quantifier stays universal, or reads only the lines of the reference's own kind."
+  evidence: `pnpm tracked:lookup tiers explicit.stat_1967051901 --class Crossbows`. `packages/core/src/cross-file.ts` `kindAgreement` implements IN §2.3 and AD-17 as written.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "[NOTE FOR UX] The cross-file diagnosis line format (`check · canonical key · detail`, one verbatim line per failure) and the empty-group behaviour (no failure renders no group, not a zero line) are provisional. Rule on both in EXPERIENCE.md."
+  evidence: `packages/web/src/frame/trust-facts.ts` `diagnosisLine` and `diagnosisGroups`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert them.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "[NOTE FOR ARCHITECT] `AGENT-WORKFLOW.md` *Parallel worktrees* says \"A pass does not cover the checks that `pnpm tracked:check` lists under `pending`.\" `tracked:check` now runs the five cross-file checks and has no `pending` field. Retire the sentence, or state what a pass still does not confirm (a floor declared too high, AD-5)."
+  evidence: `packages/sync/src/curation/check.ts`. The spec forbids an edit to an owner document in this story.
+- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
+  summary: "The tracked-json SKILL (`.claude/skills/tracked-json/SKILL.md`) says `tracked:check` validates the five cross-file checks and tells the agent to loop until exit 0. It does not say that `cross-file: skipped` (weights file absent) also exits 0, or that a class absent from the weights file or with a `partial` slot gets no edge, containment or kind check. Add both caveats, so that the agent reads `checks` and not only the exit code."
+  evidence: `packages/sync/src/curation/check.ts` pushes `skipped` with `ok: true` when the weights file is absent. `packages/core/src/cross-file.ts` skips pool checks when `poolOf` fails or a slot is `partial`. Review Triage Log row 5 defers this, because the fix edits an agent-context file.
+- source_spec: `docs/stories/spec-deferred-listenerscript-runs-get-nettcpconnection.md`
+  summary: No test runs `snapshotWindows` with a failing listener query, so the first-snapshot path to "nothing listens on port N" is pinned only by reading the code.
+  evidence: `snapshotWindows` in `tools/dev-stop/dev-stop.ts` is not exported and no test calls it. It joins `listenerScript` into a larger script, and a hand run of that joined shape with a missing cmdlet exits 1 today. A later edit that inlines its own `SilentlyContinue` query, or wraps the joined script so the `throw` no longer ends it, would make `pnpm dev:stop` print "nothing listens" after a failed query with every test passing. Closing it needs a test seam into `snapshotWindows` (an export or the same `node:child_process` mock the `listenersWindows` failure test uses, reached through an exported caller).
+- source_spec: `docs/stories/spec-deferred-pm-sweep-epics-md-to-follow-ux.md`
+  summary: The open deferred-work entry that says the tombstone band is not built still describes the band as prune reason plus `removed YYYY-MM-DD` in 560 + 406, and says the removal date needs a contracts and owner-doc decision; UX memlog 234 (DESIGN.md `tombstone-band`, EXPERIENCE.md state 10) has since ruled that line two is the prune reason alone in one 966px cell with no removal date.
+  evidence: docs/stories/deferred-work.md, the Story 2.5 entry that begins "The tombstone band (`+ N pruned` toggle". The implementer who takes that entry reads the retired layout. The entry predates this sweep, and this sweep may not edit deferred-work.md.
+- source_spec: `docs/stories/spec-deferred-pm-sweep-epics-md-to-follow-ux.md`
+  summary: The craft-recipe AC in docs/epics.md (Story 3.4, `{components.craft-recipe}`) prints the two options as the fixed pair `greater | perfect`, but the grade-prefix rule it now cites also gives `regular` for a recipe with no grade prefix and refuses mixed grades or duplicate words; the AC has no Given/When/Then for either branch.
+  evidence: docs/epics.md, the `{components.craft-recipe}` AC just above the grade-prefix citation; EXPERIENCE.md `{components.craft-recipe}` and DESIGN.md `craft-recipe.optionTextSource` carry the `regular` and refusal branches. The pair predates this sweep. The architect's grade-prefix predicate is already ledgered before the Story 3.4 spec; the PM owes the AC wording once it lands.

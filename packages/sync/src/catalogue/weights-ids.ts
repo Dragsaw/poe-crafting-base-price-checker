@@ -24,6 +24,7 @@ import type {
   TrackedEntry,
   UncataloguedWeightsIdRecord,
   WeightsAbsentRecord,
+  WeightsFile,
 } from '@poe/contracts';
 
 import { DataFileError } from '../load-data-file.ts';
@@ -39,10 +40,12 @@ export type WeightsIds =
       readonly statIds: ReadonlySet<string>;
       /** Every outer `bases` key. */
       readonly categoryIds: ReadonlySet<string>;
+      /** The parsed file, which the run-start cross-file gate reads (AD-17). */
+      readonly file: WeightsFile;
     };
 
 /**
- * Reads the weights ids. Absent is a value; an unreadable, unknown-major or
+ * Reads the weights ids and the parsed file. Absent is a value; an unreadable, unknown-major or
  * non-conforming file throws a `DataFileError`.
  */
 export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
@@ -86,7 +89,7 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
       }
     }
   }
-  return { kind: 'present', statIds, categoryIds: new Set(Object.keys(bases)) };
+  return { kind: 'present', statIds, categoryIds: new Set(Object.keys(bases)), file: result.value };
 }
 
 /**
@@ -95,7 +98,7 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
  * `compareCanonicalKeys` (Consistency Conventions, *Entity keys*).
  */
 export function checkWeightsIds(
-  weights: Extract<WeightsIds, { kind: 'present' }>,
+  weights: Pick<Extract<WeightsIds, { kind: 'present' }>, 'kind' | 'statIds' | 'categoryIds'>,
   catalogue: CatalogueIds,
 ): UncataloguedWeightsIdRecord[] {
   const records: UncataloguedWeightsIdRecord[] = [

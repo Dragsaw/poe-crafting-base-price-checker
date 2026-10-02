@@ -1,4 +1,5 @@
 import { canonicalKey } from '@poe/contracts';
+import type { TrackedEntry } from '@poe/contracts';
 import type { SetupServerApi } from 'msw/node';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -1202,6 +1203,61 @@ describe('the Unrankable appendix', () => {
     await settleTo('ready');
     expect(appendixRows()).toHaveLength(29);
     expect(appendix().querySelector('[data-appendix-count]')?.textContent).toBe('29 Item Classes');
+  });
+
+  // Matrix: web, a cross-file failure on one class (AD-17).
+  it('excludes only the class a cross-file check fails, prints the reason alone, and lists the diagnosis in the panel', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const amulets = craftedEntry('Amulets', 'accessory.amulet');
+    const sentinel: TrackedEntry = {
+      ...craftedEntry('Bows', 'weapon.bow'),
+      prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 0, valueMax: 9999 },
+    };
+    const tierOf = (statId: string, ranges: number[][]) => ({
+      sourceModifierId: statId,
+      modGroup: statId,
+      itemLevelMin: 1,
+      weight: 100,
+      weightSource: 'published',
+      lines: [{ statId, ranges }],
+    });
+    const poolsOf = (statId: string, ranges: number[][]) => ({
+      prefix: { poolCoverage: 'complete', entries: [tierOf(statId, ranges)] },
+      suffix: { poolCoverage: 'complete', entries: [tierOf('explicit.stat_9', [[1, 2]])] },
+    });
+    const weights = {
+      ...(VALID_BODIES.weights as object),
+      bases: {
+        'accessory.amulet': { Amulets: poolsOf('explicit.stat_3299347043', []) },
+        'weapon.bow': { Bows: poolsOf('explicit.stat_1', [[43, 56.5]]) },
+      },
+    };
+    const bodies = bodiesWith([amulets, sentinel, belt], [priced(belt, 0.5, hoursBefore(now, 1))]);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'json', body: weights },
+    });
+    mount();
+    await settleTo('ready');
+
+    const rows = appendixRows();
+    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Bows']);
+    expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
+    expect(appendix().textContent).not.toContain('edge-alignment');
+    expect(frame().querySelectorAll('[data-ranked-row]')).toHaveLength(1);
+
+    const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
+    expect(strip?.textContent).not.toContain('edge-alignment');
+    expect(strip?.querySelector('[data-health-line]')).toBeNull();
+    act(() => {
+      strip?.click();
+    });
+    const broken = frame().querySelectorAll('[data-sync-report-panel] [data-panel-column]')[1];
+    const lines = Array.from(broken?.querySelectorAll('[data-verbatim]') ?? [], (node) => node.textContent);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatch(/^edge-alignment · \["crafted","weapon\.bow","Bows",82,/);
   });
 
   // Matrix: no crafted entries.
