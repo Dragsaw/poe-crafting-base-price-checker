@@ -175,7 +175,7 @@ export function planStop(
   return { kind: 'kill', roots: [...roots] };
 }
 
-interface Snapshot {
+export interface Snapshot {
   readonly listeners: readonly number[];
   readonly processes: readonly ProcessInfo[];
 }
@@ -254,7 +254,7 @@ function snapshotPosix(port: number): Snapshot {
   return { listeners, processes };
 }
 
-function snapshot(port: number): Snapshot {
+export function snapshot(port: number): Snapshot {
   return process.platform === 'win32' ? snapshotWindows(port) : snapshotPosix(port);
 }
 
