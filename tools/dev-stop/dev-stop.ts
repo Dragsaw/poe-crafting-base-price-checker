@@ -199,9 +199,22 @@ function listenerScript(port: number): string {
   return `$l = @(try { Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction Stop | ForEach-Object OwningProcess | Sort-Object -Unique } catch { if ($_.FullyQualifiedErrorId -notlike 'CmdletizationQuery_NotFound*') { throw } })`;
 }
 
+/**
+ * The listener PIDs from PowerShell's JSON. The real query prints `[]` or
+ * `[pid, …]`. `null` and a bare number are accepted defensively, for other
+ * invocations or PowerShell versions. Any other shape throws: an unreadable
+ * answer must never read as a free port.
+ */
+export function parseListenerJson(value: unknown): number[] {
+  if (value === null) return [];
+  if (Number.isInteger(value)) return [value as number];
+  if (Array.isArray(value) && value.every((item) => Number.isInteger(item))) return [...(value as number[])];
+  throw new Error(`unexpected listener query result: ${JSON.stringify(value)}`);
+}
+
 export function listenersWindows(port: number): number[] {
   const out = powershell(`${listenerScript(port)}; ConvertTo-Json -Compress -InputObject $l`);
-  return (JSON.parse(out) as number[] | null) ?? [];
+  return parseListenerJson(JSON.parse(out));
 }
 
 function snapshotWindows(port: number): Snapshot {
@@ -210,8 +223,8 @@ function snapshotWindows(port: number): Snapshot {
     '$p = @(Get-CimInstance Win32_Process | ForEach-Object { $i = @{ pid = [int]$_.ProcessId; ppid = [int]$_.ParentProcessId; commandLine = [string]$_.CommandLine }; if ($_.CreationDate) { $i.started = ([DateTimeOffset]$_.CreationDate).ToUnixTimeMilliseconds() }; $i })',
     '@{ listeners = $l; processes = $p } | ConvertTo-Json -Compress -Depth 3',
   ].join('; ');
-  const parsed = JSON.parse(powershell(script)) as { listeners: number[] | null; processes: ProcessInfo[] };
-  return { listeners: parsed.listeners ?? [], processes: parsed.processes };
+  const parsed = JSON.parse(powershell(script)) as { listeners: unknown; processes: ProcessInfo[] };
+  return { listeners: parseListenerJson(parsed.listeners), processes: parsed.processes };
 }
 
 function listenersPosix(port: number): number[] {
@@ -246,7 +259,7 @@ function snapshot(port: number): Snapshot {
 }
 
 /** Only the listener PIDs. The stop poll needs no process table. */
-function listenerPids(port: number): number[] {
+export function listenerPids(port: number): number[] {
   return process.platform === 'win32' ? listenersWindows(port) : listenersPosix(port);
 }
 

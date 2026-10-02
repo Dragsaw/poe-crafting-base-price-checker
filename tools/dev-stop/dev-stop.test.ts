@@ -1,11 +1,14 @@
+import { spawnSync } from 'node:child_process';
 import { type AddressInfo, createServer, type Server } from 'node:net';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   DEFAULT_PORT,
+  listenerPids,
   listenersWindows,
   ownAncestry,
+  parseListenerJson,
   parsePort,
   planStop,
   type ProcessInfo,
@@ -212,6 +215,61 @@ describe('ownAncestry', () => {
     const inside = [...CHAIN, { pid: 20, ppid: 14, commandLine: 'node tools/dev-stop/dev-stop.ts' }];
     expect(planStop([16], inside, ROOT, ownAncestry(inside, 20))).toEqual({ kind: 'kill', roots: [15] });
   });
+});
+
+describe('parseListenerJson', () => {
+  it('reads [], the real query\'s free-port answer, as no listener', () => {
+    expect(parseListenerJson(JSON.parse('[]'))).toEqual([]);
+  });
+
+  it('reads null as no listener', () => {
+    expect(parseListenerJson(JSON.parse('null'))).toEqual([]);
+  });
+
+  it('reads one listener as an array', () => {
+    expect(parseListenerJson(JSON.parse('[1708]'))).toEqual([1708]);
+  });
+
+  it('reads one listener as a bare number, which ConvertTo-Json can print', () => {
+    expect(parseListenerJson(JSON.parse('1708'))).toEqual([1708]);
+  });
+
+  it('reads several listeners', () => {
+    expect(parseListenerJson(JSON.parse('[1708,2210]'))).toEqual([1708, 2210]);
+  });
+
+  it.each(['"x"', '{}', '[1.5]', '["1708"]'])('throws on %s and names the value', (json) => {
+    expect(() => parseListenerJson(JSON.parse(json))).toThrow(json);
+  });
+});
+
+/** The POSIX reader needs lsof; Windows always has the PowerShell query. */
+const canQuery = process.platform === 'win32' || spawnSync('lsof', ['-v']).error === undefined;
+
+describe('listenerPids', () => {
+  let server: Server | undefined;
+
+  afterEach(async () => {
+    const open = server;
+    server = undefined;
+    if (open?.listening) await new Promise<void>((done) => open.close(() => done()));
+  });
+
+  it.skipIf(!canQuery)(
+    'lists this process on a real loopback listener, then nothing once it closes',
+    async () => {
+      const open = createServer();
+      server = open;
+      await new Promise<void>((done) => open.listen(0, '127.0.0.1', done));
+      const { port } = open.address() as AddressInfo;
+
+      expect(listenerPids(port)).toContain(process.pid);
+
+      await new Promise<void>((done, fail) => open.close((error) => (error ? fail(error) : done())));
+      expect(listenerPids(port)).toEqual([]);
+    },
+    30_000,
+  );
 });
 
 /** A loopback server on a free port the OS picks. */
