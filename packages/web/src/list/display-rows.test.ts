@@ -6,12 +6,13 @@ import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
-import { tierOf, toDisplayRows } from './display-rows';
+import { tierOf, toDisplayRows, type DisplayRow } from './display-rows';
 import { isHonestEmpty } from './list-statement';
 
-function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): ReturnType<typeof toDisplayRows> {
+/** A raw-only list, narrowed to Raw Base rows. */
+function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
   const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: null });
-  return toDisplayRows(ranking, dataset, NOW);
+  return toDisplayRows(ranking, dataset, NOW).flatMap((row) => (row.unit === 'raw' ? [row] : []));
 }
 
 describe('tierOf', () => {

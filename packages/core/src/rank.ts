@@ -1,18 +1,27 @@
 import { canonicalKey, compareCanonicalKeys } from '@poe/contracts';
 import type {
+  CraftedRankedRow,
+  CraftedSummand,
+  CraftedTrackedEntry,
+  CraftRecipe,
+  CurrencyRate,
   DatasetEntry,
   NotYetSyncedReason,
   RankedRow,
+  RawRankedRow,
   RawTrackedEntry,
   TrackedEntry,
+  WeightsClassPools,
   WeightsFile,
 } from '@poe/contracts';
 
+import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import type { CrossFileFailure } from './cross-file.ts';
+import { combinationProbability, poolOf } from './probability.ts';
 
 /**
- * The ranking, raw branch (AD-17, AD-9, AD-19, IMPLEMENTATION-NOTES.md §4.1,
- * §4.2).
+ * The ranking, both branches (AD-17, AD-9, AD-19, AD-20, IMPLEMENTATION-NOTES.md
+ * §4.1, §4.2, §9, §11).
  *
  * Pure (AD-1, AD-4). The tracked entries, the published dataset entries, the
  * active league and the Payout Threshold go in as values; a typed `Ranking`
@@ -35,8 +44,7 @@ import type { CrossFileFailure } from './cross-file.ts';
  * - `no-listings`, `unresolvable`, `not-yet-synced`: their own group, the
  *   published reason kept.
  *
- * `pruned` entries appear in no group. `crafted` entries never rank here (the
- * crafted EV is Story 3.4's). Each distinct non-pruned crafted
+ * `pruned` entries appear in no group. Each distinct non-pruned crafted
  * `(categoryId, className)` is looked up directly in the parsed weights file,
  * by `categoryId`, then `className`, and never through a sibling `className`:
  * with no file, or no such pair, it is one `unrankable` class, reason `class
@@ -46,6 +54,18 @@ import type { CrossFileFailure } from './cross-file.ts';
  * precedence. Otherwise a complete pair makes no claim. `poolCoverage` is trusted as
  * declared (AD-11). Dataset entries no tracked entry names are ignored.
  * `core` never reads `lastSearchId` or `lastSearchLeague` (AD-9).
+ *
+ * **The crafted branch (AD-17).** Every class that makes no claim above is
+ * ranked once per recipe: one `(Item Class, recipe)` pair per row, every pair
+ * in the one `ordering`. The pair's EV is `Σ P × price` over the entries priced
+ * in the active league whose gross price is `≥ threshold`, less the recipe's
+ * Craft Cost (`craftCost`, AD-20), subtracted once. P is
+ * `combinationProbability` and nothing else. A pair with no surviving summand
+ * ranks at `−craftCost` with `summands: []`. A pair the recipe cannot reach is
+ * Unrankable under that recipe only, as `recipe cannot reach this class`. An
+ * uncostable recipe still ranks its pairs, with EV `null`, after the
+ * comparable rows and by gross payout (EXPERIENCE.md state 35), and is named
+ * in `uncostableRecipes`.
  */
 
 export interface RankInput {
@@ -74,24 +94,41 @@ export interface RankInput {
    * which take precedence. Absent means none.
    */
   readonly crossFileFailures?: readonly Pick<CrossFileFailure, 'categoryId' | 'className'>[];
+  /**
+   * The Craft Recipes, in `recipes.json` file order (AD-3). Every rankable
+   * crafted Item Class is ranked once per recipe. Absent or empty: no crafted
+   * row exists.
+   */
+  readonly recipes?: readonly CraftRecipe[];
+  /** The rate set `core` costs recipes from: `dataset.json`'s `currencyRates` (AD-20). Absent means none. */
+  readonly currencyRates?: readonly CurrencyRate[];
 }
 
 /**
- * FR-4's reasons, verbatim (PRD-owned). The first two come from the direct
- * lookup of the crafted pair in the weights file; `class disagrees with
- * weights file` is any of the five cross-file checks (`cross-file.ts`), one
- * string for all five.
+ * FR-4's three reasons, verbatim (PRD-owned), and the provisional fourth. The
+ * first two come from the direct lookup of the crafted pair in the weights
+ * file; `class disagrees with weights file` is any of the five cross-file
+ * checks (`cross-file.ts`), one string for all five. `recipe cannot reach this
+ * class` is recipe-scoped and provisional (`RECIPE_UNREACHABLE`).
  */
 export type UnrankableReason =
   | 'class absent from weights file'
   | 'pool partial'
-  | 'class disagrees with weights file';
+  | 'class disagrees with weights file'
+  | typeof RECIPE_UNREACHABLE;
 
 /** One Unrankable Item Class: the `(categoryId, className)` pair and its reason. Never a Base Type. */
 export interface UnrankableClass {
   readonly categoryId: string;
   readonly className: string;
   readonly reason: UnrankableReason;
+  /**
+   * Present only on the recipe-scoped reason, `recipe cannot reach this
+   * class`: the one recipe whose pair is unrankable. The class may rank under
+   * another recipe (EXPERIENCE.md state 36). The other three reasons hold
+   * under every recipe and carry no recipe id.
+   */
+  readonly recipeId?: string;
 }
 
 /** An entry that contributes nothing to the ordering — not zero, nothing (AD-9). */
@@ -107,10 +144,17 @@ export interface NotYetSyncedEntry extends UnrankedEntry {
 }
 
 export interface Ranking {
-  /** The surviving rows: EV descending, then `compareRankedRows`. */
+  /**
+   * Every ranked row, raw and crafted, over every recipe, in one ordering
+   * (AD-17). First the comparable rows — raw rows and the crafted rows of a
+   * costable recipe — by EV descending, then `compareRankedRows`. Then the
+   * crafted rows of an uncostable recipe, whose EV is `null`: by gross payout
+   * descending, then `compareRankedRows` (EXPERIENCE.md state 35). They are
+   * ordered among themselves only, never against the comparable rows.
+   */
   readonly ordering: readonly RankedRow[];
-  /** Priced rows below the threshold, in canonical key order. Never in `ordering`. */
-  readonly belowThreshold: readonly RankedRow[];
+  /** Priced raw rows below the threshold, in canonical key order. Never in `ordering`. */
+  readonly belowThreshold: readonly RawRankedRow[];
   /** In canonical key order. */
   readonly noListings: readonly UnrankedEntry[];
   /** In canonical key order, each with its reason. */
@@ -118,36 +162,95 @@ export interface Ranking {
   /** In canonical key order. */
   readonly unresolvable: readonly UnrankedEntry[];
   /**
-   * One per distinct non-pruned crafted `(categoryId, className)`, by
-   * `className` in UTF-8 code-unit order, then `categoryId`, whose pair is
-   * absent from the weights file or declares a `partial` slot.
+   * One per distinct non-pruned crafted `(categoryId, className)` whose pair is
+   * absent from the weights file, declares a `partial` slot or fails a
+   * cross-file check; and one per `(class, recipe)` pair the recipe cannot
+   * reach. By `className` in UTF-8 code-unit order, then `categoryId`, then the
+   * recipe-free row first, then `recipeId`.
    */
   readonly unrankable: readonly UnrankableClass[];
+  /** The recipes `core` could not cost, in `recipes.json` file order, each naming its first unrated currency (AD-20). */
+  readonly uncostableRecipes: readonly UncostableRecipe[];
+  /**
+   * Some non-pruned tracked entry, raw or crafted, carries a `priced`
+   * observation in the active league, at any price. `false` after a league
+   * reset (EXPERIENCE.md state 23): a crafted pair still ranks at minus its
+   * Craft Cost, but nothing it rests on is priced.
+   */
+  readonly pricedInLeague: boolean;
 }
 
-/** Raw before crafted at an equal EV: a raw row has no recipe id (AD-17). */
-const KIND_ORDER: Readonly<Record<RankedRow['kind'], number>> = { raw: 0 };
+/** A recipe with no active-league rate for one of its currencies (AD-20, FR-26). */
+export interface UncostableRecipe {
+  readonly recipeId: string;
+  readonly currencyId: string;
+}
+
+/**
+ * The provisional reason for an `(Item Class, recipe)` pair whose eligible
+ * pool is empty after the recipe floor (`empty-eligible-pool`, IN §9), or
+ * whose augment has nothing left to add (`augment-exhausted`, IN §11). Story
+ * 3.4 Decision, 2026-10-02: FR-4 owns the string and may adopt or reword it.
+ */
+export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
+
+/** Raw before crafted at an equal EV (AD-17). */
+const KIND_ORDER: Readonly<Record<RankedRow['kind'], number>> = { raw: 0, crafted: 1 };
+
+/** The serialised key a row breaks ties on: a raw row's canonical key, a crafted row's class key. */
+function rowKey(row: RankedRow): string {
+  return row.kind === 'raw' ? row.entryKey : row.classKey;
+}
+
+/** The serialised Item Class key, `["crafted", categoryId, className]`: the class prefix of its entries' canonical keys (§4.1). */
+export function classKeyOf(categoryId: string, className: string): string {
+  return JSON.stringify(['crafted', categoryId, className]);
+}
 
 /**
  * The tie-break at an equal EV (AD-17, decision 2026-09-26): kind first, raw
- * before crafted; then the serialised canonical key of the entry's own AD-5 arm
- * by `compareCanonicalKeys`, within the kind. Epic 3's crafted arm adds the
- * recipe id as the last term. The canonical key's own leading kind tag sorts
- * `crafted` first, which is why the kind is compared explicitly before it.
+ * before crafted; then the serialised key by `compareCanonicalKeys`, within
+ * the kind — a raw row's canonical key, a crafted row's class key; then the
+ * recipe id, by the same comparison. The canonical key's own leading kind tag
+ * sorts `crafted` first, which is why the kind is compared explicitly before it.
  */
 export function compareRankedRows(left: RankedRow, right: RankedRow): number {
   const byKind = KIND_ORDER[left.kind] - KIND_ORDER[right.kind];
   if (byKind !== 0) {
     return byKind;
   }
-  return compareCanonicalKeys(left.entryKey, right.entryKey);
+  const byKey = compareCanonicalKeys(rowKey(left), rowKey(right));
+  if (byKey !== 0 || left.kind !== 'crafted' || right.kind !== 'crafted') {
+    return byKey;
+  }
+  return compareCanonicalKeys(left.recipeId, right.recipeId);
 }
 
+/**
+ * The one ordering (AD-17). Comparable rows first, by EV descending; then the
+ * rows of an uncostable recipe, whose EV is `null`, by gross payout descending
+ * (EXPERIENCE.md state 35). `compareRankedRows` breaks every tie.
+ */
 function compareOrdering(left: RankedRow, right: RankedRow): number {
-  if (left.ev !== right.ev) {
-    return right.ev - left.ev;
+  const leftEv = left.ev;
+  const rightEv = right.ev;
+  if ((leftEv === null) !== (rightEv === null)) {
+    return leftEv === null ? 1 : -1;
+  }
+  const leftFigure = leftEv ?? (left.kind === 'crafted' ? left.grossPayout : 0);
+  const rightFigure = rightEv ?? (right.kind === 'crafted' ? right.grossPayout : 0);
+  if (leftFigure !== rightFigure) {
+    return rightFigure - leftFigure;
   }
   return compareRankedRows(left, right);
+}
+
+/** Contribution descending, then the entry's canonical key (AD-17). */
+function compareSummands(left: CraftedSummand, right: CraftedSummand): number {
+  if (left.contribution !== right.contribution) {
+    return right.contribution - left.contribution;
+  }
+  return compareCanonicalKeys(left.entryKey, right.entryKey);
 }
 
 const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): number =>
@@ -155,7 +258,9 @@ const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): nu
 
 /** `className` by UTF-8 code unit, as the `weights-absent` record sorts; `categoryId` breaks a shared name. */
 const byItemClass = (left: UnrankableClass, right: UnrankableClass): number =>
-  compareCanonicalKeys(left.className, right.className) || compareCanonicalKeys(left.categoryId, right.categoryId);
+  compareCanonicalKeys(left.className, right.className) ||
+  compareCanonicalKeys(left.categoryId, right.categoryId) ||
+  compareCanonicalKeys(left.recipeId ?? '', right.recipeId ?? '');
 
 /**
  * The direct lookup `bases[categoryId][className]`, by `categoryId`, then
@@ -195,9 +300,11 @@ export function rank(input: RankInput): Ranking {
     );
   }
   const byKey = new Map(input.dataset.map((published) => [published.entryKey, published]));
+  const recipes = input.recipes ?? [];
+  const rates = input.currencyRates ?? [];
 
   const surviving: RankedRow[] = [];
-  const belowThreshold: RankedRow[] = [];
+  const belowThreshold: RawRankedRow[] = [];
   const noListings: UnrankedEntry[] = [];
   const notYetSynced: NotYetSyncedEntry[] = [];
   const unresolvable: UnrankedEntry[] = [];
@@ -206,6 +313,8 @@ export function rank(input: RankInput): Ranking {
   const disagreeing = new Set(
     (input.crossFileFailures ?? []).map((failure) => JSON.stringify([failure.categoryId, failure.className])),
   );
+  /** The non-pruned crafted entries of each rankable class, keyed on the serialised pair. */
+  const rankableClasses = new Map<string, { readonly pools: WeightsClassPools; readonly entries: CraftedTrackedEntry[] }>();
 
   for (const entry of input.tracked) {
     if (entry.status === 'pruned') {
@@ -219,6 +328,16 @@ export function rank(input: RankInput): Ranking {
         (disagreeing.has(classKey) ? 'class disagrees with weights file' : undefined);
       if (reason !== undefined) {
         unrankable.set(classKey, { categoryId, className, reason });
+        continue;
+      }
+      const known = rankableClasses.get(classKey);
+      if (known !== undefined) {
+        known.entries.push(entry);
+        continue;
+      }
+      const lookup = input.weights === null ? undefined : poolOf(input.weights, categoryId, className);
+      if (lookup?.ok === true) {
+        rankableClasses.set(classKey, { pools: lookup.pools, entries: [entry] });
       }
       continue;
     }
@@ -248,7 +367,7 @@ export function rank(input: RankInput): Ranking {
           notYetSynced.push({ ...base, reason: 'league-mismatch' });
           break;
         }
-        const row: RankedRow = {
+        const row: RawRankedRow = {
           kind: 'raw',
           entryKey,
           baseTypeId: entry.baseTypeId,
@@ -269,6 +388,43 @@ export function rank(input: RankInput): Ranking {
     }
   }
 
+  const costs = recipes.map((recipe) => craftCost(recipe, rates, input.activeLeague));
+  const uncostableRecipes: UncostableRecipe[] = [];
+  recipes.forEach((recipe, index) => {
+    const cost = costs[index];
+    if (cost !== undefined && !cost.ok) {
+      uncostableRecipes.push({ recipeId: recipe.id, currencyId: cost.reason.currencyId });
+    }
+  });
+
+  for (const { pools, entries } of rankableClasses.values()) {
+    // Canonical key order, so the summation order and so the figure never depend on the input order.
+    const keyed = entries
+      .map((entry) => ({ entry, entryKey: canonicalKey(entry) }))
+      .toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey));
+    const first = keyed[0]?.entry;
+    if (first === undefined) {
+      continue;
+    }
+    recipes.forEach((recipe, index) => {
+      const cost = costs[index];
+      if (cost === undefined) {
+        return;
+      }
+      const row = craftedRow(first, recipe, cost, pools, keyed, byKey, input);
+      if (row === undefined) {
+        unrankable.set(JSON.stringify([first.categoryId, first.className, recipe.id]), {
+          categoryId: first.categoryId,
+          className: first.className,
+          reason: RECIPE_UNREACHABLE,
+          recipeId: recipe.id,
+        });
+        return;
+      }
+      surviving.push(row);
+    });
+  }
+
   return {
     ordering: surviving.toSorted(compareOrdering),
     belowThreshold: belowThreshold.toSorted(byEntryKey),
@@ -276,5 +432,67 @@ export function rank(input: RankInput): Ranking {
     notYetSynced: notYetSynced.toSorted(byEntryKey),
     unresolvable: unresolvable.toSorted(byEntryKey),
     unrankable: [...unrankable.values()].toSorted(byItemClass),
+    uncostableRecipes,
+    pricedInLeague: input.tracked.some((entry) => {
+      if (entry.status === 'pruned') {
+        return false;
+      }
+      const price = byKey.get(canonicalKey(entry))?.price;
+      return price?.state === 'priced' && price.observation.league === input.activeLeague;
+    }),
+  };
+}
+
+/**
+ * One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe
+ * cannot reach it: an entry's `combinationProbability` came back
+ * `empty-eligible-pool` or `augment-exhausted` (IN §9, §11) — a reason, never
+ * `P = 0`. P is computed for every non-pruned entry, priced or not, so the
+ * verdict does not move with the threshold or the dataset.
+ *
+ * A summand is an entry priced in the active league whose **gross** price is
+ * at or above the threshold; its contribution is `P × price`. Nothing else is
+ * summed. EV is the gross payout less the Craft Cost, subtracted once; an
+ * uncostable recipe leaves EV `null`.
+ */
+function craftedRow(
+  first: CraftedTrackedEntry,
+  recipe: CraftRecipe,
+  cost: CraftCostResult,
+  pools: WeightsClassPools,
+  keyed: readonly { readonly entry: CraftedTrackedEntry; readonly entryKey: string }[],
+  byKey: ReadonlyMap<string, DatasetEntry>,
+  input: RankInput,
+): CraftedRankedRow | undefined {
+  const summands: CraftedSummand[] = [];
+  for (const { entry, entryKey } of keyed) {
+    const probability = combinationProbability(pools, entry, recipe.modifierLevelMin);
+    if (!probability.ok) {
+      return undefined;
+    }
+    const price = byKey.get(entryKey)?.price;
+    if (
+      price?.state !== 'priced' ||
+      price.observation.league !== input.activeLeague ||
+      price.observation.priceDivine < input.threshold
+    ) {
+      continue;
+    }
+    const priceDivine = price.observation.priceDivine;
+    summands.push({ entryKey, probability: probability.p, priceDivine, contribution: probability.p * priceDivine });
+  }
+  const ordered = summands.toSorted(compareSummands);
+  const grossPayout = ordered.reduce((sum, summand) => sum + summand.contribution, 0);
+  return {
+    kind: 'crafted',
+    classKey: classKeyOf(first.categoryId, first.className),
+    categoryId: first.categoryId,
+    className: first.className,
+    itemLevelMin: first.itemLevelMin,
+    recipeId: recipe.id,
+    grossPayout,
+    craftCost: cost.ok ? cost.divine : { kind: 'uncostable', currencyId: cost.reason.currencyId },
+    ev: cost.ok ? grossPayout - cost.divine : null,
+    summands: ordered,
   };
 }

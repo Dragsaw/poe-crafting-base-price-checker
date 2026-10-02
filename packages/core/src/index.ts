@@ -17,16 +17,21 @@ export const CORE_PLACEHOLDER = `contracts@${INITIAL_SCHEMA_VERSION}:core`;
 export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.ts';
 export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';
 
-/** The ranking, raw branch (AD-17): computed at read time, league-scoped. */
-export { compareRankedRows, rank } from './rank.ts';
+/** The ranking, both branches (AD-17): computed at read time, league-scoped, over every recipe. */
+export { classKeyOf, compareRankedRows, rank, RECIPE_UNREACHABLE } from './rank.ts';
 export type {
   NotYetSyncedEntry,
   RankInput,
   Ranking,
+  UncostableRecipe,
   UnrankableClass,
   UnrankableReason,
   UnrankedEntry,
 } from './rank.ts';
+
+/** The Craft Cost of a recipe (AD-20): costed from the dataset's rates, or uncostable, never `0`. */
+export { craftCost } from './craft-cost.ts';
+export type { CraftCostResult } from './craft-cost.ts';
 
 /** The five cross-file checks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.6), defined once. */
 export {

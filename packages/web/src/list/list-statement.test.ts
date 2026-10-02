@@ -1,11 +1,12 @@
-import { rank } from '@poe/core';
-import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
+import { rank, type Ranking } from '@poe/core';
+import type { CraftedRankedRow, DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
-import { honestEmptyCopy, isHonestEmpty, listStatement, nothingClearsCopy } from './list-statement';
+import { forRecipe } from './active-ranking';
+import { honestEmptyCopy, isHonestEmpty, listStatement, nothingClearsCopy, uncostableCopy } from './list-statement';
 
 function statementFor(
   tracked: readonly RawTrackedEntry[],
@@ -117,5 +118,94 @@ describe('listStatement', () => {
       text: honestEmptyCopy(TEST_LEAGUE),
     });
     expect(statementFor([belt, ring], [lost])).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
+  });
+});
+
+describe('listStatement with crafted rows (Story 3.4)', () => {
+  const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow => ({
+    kind: 'crafted',
+    classKey: '["crafted","weapon.bow","Bows"]',
+    categoryId: 'weapon.bow',
+    className: 'Bows',
+    itemLevelMin: 82,
+    recipeId,
+    grossPayout: summands,
+    craftCost: 0.03,
+    ev: summands - 0.03,
+    summands: Array.from({ length: summands }, (_, index) => ({
+      entryKey: `k${String(index)}`,
+      probability: 1,
+      priceDivine: 1,
+      contribution: 1,
+    })),
+  });
+  const empty: Ranking = {
+    ordering: [],
+    belowThreshold: [],
+    noListings: [],
+    notYetSynced: [],
+    unresolvable: [],
+    unrankable: [],
+    uncostableRecipes: [],
+    pricedInLeague: true,
+  };
+  const greater = { id: 'greater', word: 'greater' };
+
+  it('state 25: no summand on any crafted row and no raw row is nothing-clears, though the ordering holds rows', () => {
+    expect(listStatement({ ...empty, ordering: [craftedRow(0)] }, 0.5, TEST_LEAGUE)).toEqual({
+      kind: 'nothing-clears',
+      text: nothingClearsCopy(0.5),
+    });
+    expect(listStatement({ ...empty, ordering: [craftedRow(1)] }, 0.5, TEST_LEAGUE)).toEqual({ kind: 'none' });
+  });
+
+  it('state 35: an uncostable active recipe with a crafted row names the recipe, and takes precedence over state 25', () => {
+    const ranking = { ...empty, ordering: [craftedRow(0)], uncostableRecipes: [{ recipeId: 'greater', currencyId: 'x' }] };
+    const active = forRecipe(ranking, greater);
+    expect(active.split).toBe(true);
+    expect(listStatement(active, 0.5, TEST_LEAGUE)).toEqual({ kind: 'uncostable', text: uncostableCopy('greater') });
+    expect(uncostableCopy('greater')).toContain('greater Craft Recipe');
+  });
+
+  it('forRecipe keeps raw rows, the active recipe’s pairs, and the class-level and active-pair Unrankables', () => {
+    const ranking: Ranking = {
+      ...empty,
+      ordering: [craftedRow(1, 'perfect'), craftedRow(1, 'greater')],
+      unrankable: [
+        { categoryId: 'a', className: 'A', reason: 'pool partial' },
+        { categoryId: 'b', className: 'B', reason: 'recipe cannot reach this class', recipeId: 'perfect' },
+      ],
+    };
+    const active = forRecipe(ranking, greater);
+    expect(active.ordering.map((row) => (row.kind === 'crafted' ? row.recipeId : 'raw'))).toEqual(['greater']);
+    expect(active.unrankable.map((item) => item.className)).toEqual(['A']);
+    expect(active.split).toBe(false);
+    expect(forRecipe(ranking, undefined).ordering).toEqual([]);
+  });
+
+  it('state 23: a league reset with a rankable crafted class is honest-empty under a costable recipe, over state 25', () => {
+    const reset = forRecipe({ ...empty, pricedInLeague: false, ordering: [craftedRow(0)] }, greater);
+    expect(isHonestEmpty(reset)).toBe(true);
+    expect(listStatement(reset, 0.5, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
+  });
+
+  it('state 23: a league reset under an uncostable recipe is honest-empty, over state 35, and does not split', () => {
+    const reset = forRecipe(
+      {
+        ...empty,
+        pricedInLeague: false,
+        ordering: [{ ...craftedRow(0), craftCost: { kind: 'uncostable', currencyId: 'x' }, ev: null }],
+        uncostableRecipes: [{ recipeId: 'greater', currencyId: 'x' }],
+      },
+      greater,
+    );
+    expect(reset.uncostable).toBe(true);
+    expect(reset.split).toBe(false);
+    expect(listStatement(reset, 0.5, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
+  });
+
+  it('is not honest-empty while anything is priced in the league, nor with nothing to show', () => {
+    expect(isHonestEmpty({ ...empty, ordering: [craftedRow(0)] })).toBe(false);
+    expect(isHonestEmpty({ ...empty, pricedInLeague: false })).toBe(false);
   });
 });

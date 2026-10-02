@@ -7,7 +7,7 @@ import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { cellIn as cell, mountList, NOW, rgb, rowsIn, unmount } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
-import { PANEL_ASKING_SENTENCE } from './format';
+import { PANEL_ASKING_SENTENCE, RAW_NO_RECIPE_SENTENCE } from './format';
 
 const SEARCH = { id: 'H4sIabc', league: TEST_LEAGUE } as const;
 const HREF = `https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/${SEARCH.id}`;
@@ -94,10 +94,10 @@ describe('the expansion panel', () => {
     expect(sub?.textContent).toBe(
       'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
         'One Combination is tracked here: the degenerate Combination of no affixes. ' +
-        `Payout Threshold 0.50 Divine. ${PANEL_ASKING_SENTENCE}`,
+        `Payout Threshold 0.50 Divine. ${RAW_NO_RECIPE_SENTENCE} ${PANEL_ASKING_SENTENCE}`,
     );
     expect(sub?.style.margin).toBe('4px 0px 13px');
-    expect(sub?.textContent).not.toContain('Craft Recipe');
+    expect(sub?.textContent).toContain('No Craft Recipe applies');
   });
 
   it('cuts the combination row into 460 + 250 + 116 + 116 + 24 and 560 + 200 + 206, at 28 + 20 minimum', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CraftRecipeSchema } from './craft-recipe';
+import { CraftRecipeSchema, recipeWord } from './craft-recipe';
 import { without } from './test-support';
 
 const greater = {
@@ -44,5 +44,32 @@ describe('CraftRecipeSchema', () => {
 
   it('refuses an undeclared key', () => {
     expect(CraftRecipeSchema.safeParse({ ...greater, name: 'Greater' }).success).toBe(false);
+  });
+});
+
+describe('recipeWord', () => {
+  const recipeOf = (...currencyIds: string[]) => ({
+    currencies: currencyIds.map((currencyId) => ({ currencyId, quantity: 1 })),
+  });
+
+  it('reads the grade every currency id shares', () => {
+    expect(recipeWord(recipeOf('greater-orb-of-transmutation', 'greater-orb-of-augmentation'))).toBe('greater');
+    expect(recipeWord(recipeOf('perfect-orb-of-transmutation', 'perfect-orb-of-augmentation'))).toBe('perfect');
+  });
+
+  it('reads regular when no currency carries a grade prefix', () => {
+    expect(recipeWord(recipeOf('orb-of-transmutation', 'orb-of-augmentation'))).toBe('regular');
+    expect(recipeWord(recipeOf())).toBe('regular');
+  });
+
+  it('counts only greater- and perfect- as grades, as a prefix with its hyphen', () => {
+    expect(recipeWord(recipeOf('lesser-orb-of-transmutation'))).toBe('regular');
+    expect(recipeWord(recipeOf('greaterorb'))).toBe('regular');
+    expect(recipeWord(recipeOf('orb-greater-x'))).toBe('regular');
+  });
+
+  it('is undefined for mixed grades, or a grade beside an ungraded currency', () => {
+    expect(recipeWord(recipeOf('greater-orb-of-transmutation', 'perfect-orb-of-augmentation'))).toBeUndefined();
+    expect(recipeWord(recipeOf('greater-orb-of-transmutation', 'orb-of-augmentation'))).toBeUndefined();
   });
 });

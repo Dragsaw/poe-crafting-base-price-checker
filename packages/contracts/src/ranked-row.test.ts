@@ -53,3 +53,42 @@ describe('RankedRowSchema', () => {
     expect(RankedRowSchema.safeParse({ ...row, rank: 1 }).success).toBe(false);
   });
 });
+
+const craftedRow = {
+  kind: 'crafted',
+  classKey: '["crafted","weapon.bow","Bows"]',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
+  itemLevelMin: 82,
+  recipeId: 'greater',
+  grossPayout: 0.3,
+  craftCost: 0.05,
+  ev: 0.25,
+  summands: [{ entryKey: '["crafted","weapon.bow","Bows",82,null,null]', probability: 0.1, priceDivine: 3, contribution: 0.3 }],
+};
+
+describe('RankedRowSchema, the crafted arm', () => {
+  it('parses a costed pair, and a pair with no summand ranked at minus its cost', () => {
+    expect(RankedRowSchema.parse(craftedRow)).toEqual(craftedRow);
+    const empty = { ...craftedRow, grossPayout: 0, ev: -0.05, summands: [] };
+    expect(RankedRowSchema.parse(empty)).toEqual(empty);
+  });
+
+  it('parses an uncostable pair, whose ev is null, and names the currency', () => {
+    const uncostable = { ...craftedRow, craftCost: { kind: 'uncostable', currencyId: 'perfect-orb-of-augmentation' }, ev: null };
+    expect(RankedRowSchema.parse(uncostable)).toEqual(uncostable);
+  });
+
+  it('refuses a null ev on a costed pair and a figure on an uncostable one', () => {
+    expect(RankedRowSchema.safeParse({ ...craftedRow, ev: null }).success).toBe(false);
+    const figure = { ...craftedRow, craftCost: { kind: 'uncostable', currencyId: 'exalted' } };
+    expect(RankedRowSchema.safeParse(figure).success).toBe(false);
+  });
+
+  it('refuses a negative cost, a probability above 1, and a missing recipe id', () => {
+    expect(RankedRowSchema.safeParse({ ...craftedRow, craftCost: -1 }).success).toBe(false);
+    const summand = { ...craftedRow.summands[0], probability: 1.5 };
+    expect(RankedRowSchema.safeParse({ ...craftedRow, summands: [summand] }).success).toBe(false);
+    expect(RankedRowSchema.safeParse(without(craftedRow, 'recipeId')).success).toBe(false);
+  });
+});

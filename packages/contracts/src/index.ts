@@ -93,8 +93,8 @@ export {
 } from './overlap.ts';
 export type { CoOccur, OverlapAffixes, OverlapSlot, SlotOverlapBranch } from './overlap.ts';
 
-export { CraftRecipeSchema } from './craft-recipe.ts';
-export type { CraftRecipe } from './craft-recipe.ts';
+export { CraftRecipeSchema, RECIPE_GRADES, recipeWord, REGULAR_RECIPE_WORD } from './craft-recipe.ts';
+export type { CraftRecipe, RecipeGrade, RecipeWord } from './craft-recipe.ts';
 
 export { PriceObservationSchema } from './price-observation.ts';
 export type { PriceObservation } from './price-observation.ts';
@@ -109,8 +109,14 @@ export {
 } from './dataset.ts';
 export type { DatasetEntry, NotYetSyncedReason, PriceState } from './dataset.ts';
 
-export { RankedRowSchema } from './ranked-row.ts';
-export type { RankedRow, RawRankedRow } from './ranked-row.ts';
+export {
+  CraftedRankedRowSchema,
+  CraftedSummandSchema,
+  RankedRowSchema,
+  RawRankedRowSchema,
+  UncostableSchema,
+} from './ranked-row.ts';
+export type { CraftedRankedRow, CraftedSummand, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
 
 export {
   filterOptionIds,

@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 
 import { colors, px, spacing, typeStyle } from '../theme/tokens';
 import { CombinationRow, type Combination } from './CombinationRow';
-import type { DisplayRow } from './display-rows';
-import { NO_AFFIXES, rawCombinationNote, rawPanelSubLine } from './format';
+import type { ClassDisplayRow, DisplayRow } from './display-rows';
+import { classPanelSubLine, NO_AFFIXES, rawCombinationNote, rawPanelSubLine } from './format';
 import { tradeSearchHref } from './trade-link';
 import { UnitGlyph, type Unit } from './UnitGlyph';
 
@@ -100,6 +100,30 @@ export function RawExpansionPanel({
       label={row.label}
       subLine={rawPanelSubLine(row.itemLevel, threshold)}
       combinations={[rawCombination(row, activeLeague)]}
+    />
+  );
+}
+
+/**
+ * The panel under an open crafted Item Class row: its glyph and name, and the
+ * sub-line that repeats the threshold and the active Craft Recipe. The
+ * Combination rows are Story 3.5's.
+ */
+export function ClassExpansionPanel({
+  row,
+  threshold,
+  recipeWord,
+}: {
+  readonly row: ClassDisplayRow;
+  readonly threshold: number;
+  readonly recipeWord: string;
+}): JSX.Element {
+  return (
+    <ExpansionPanel
+      unit={row.unit}
+      label={row.label}
+      subLine={classPanelSubLine(threshold, recipeWord)}
+      combinations={[]}
     />
   );
 }

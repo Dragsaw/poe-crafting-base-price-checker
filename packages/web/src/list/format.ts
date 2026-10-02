@@ -60,7 +60,7 @@ export function ageMark(
 /**
  * An Item Class's printed label: each underscore becomes a space and nothing
  * else changes (AD-5). The stored `className` stays the identity; only the
- * label is trimmed. No crafted row exists until Epic 3.
+ * label is trimmed.
  */
 export function unitLabel(className: string): string {
   return className.replaceAll('_', ' ');
@@ -190,16 +190,31 @@ export function combinationAges(
 /** The asking-price framing, repeated so a panel read on its own cannot be misread (FR-13, UX-DR25). */
 export const PANEL_ASKING_SENTENCE = 'Every price here is a current asking price from a live instant-buyout listing.';
 
+/** The Raw Base panel's Craft Recipe sentence (mockup `key-expanded-states.html`, the Raw Base panel). */
+export const RAW_NO_RECIPE_SENTENCE = 'No Craft Recipe applies — a Raw Base is sold, not crafted, so it carries no Craft Cost.';
+
 /**
  * A Raw Base panel's context sub-line (mockup `key-expanded-states.html`, the
- * Raw Base panel), less its Craft Recipe sentence: Story 3.4 extends this line
- * with the recipe when that control ships, and does not rewrite it.
+ * Raw Base panel), with its Craft Recipe sentence after the threshold.
  */
 export function rawPanelSubLine(itemLevelMin: number, threshold: number): string {
   return [
     `Uncrafted at Item Level ${String(itemLevelMin)}, valued at its own current asking price and not at a craft outcome.`,
     'One Combination is tracked here: the degenerate Combination of no affixes.',
     `Payout Threshold ${formatThreshold(threshold)} ${DENOMINATION}.`,
+    RAW_NO_RECIPE_SENTENCE,
     PANEL_ASKING_SENTENCE,
   ].join(' ');
+}
+
+/**
+ * A crafted Item Class panel's context sub-line: the two things its figures
+ * depend on, the threshold and the active Craft Recipe, then the asking-price
+ * framing (EXPERIENCE.md `{components.expansion-panel}`; mockup
+ * `key-expanded-states.html`, the Rings panel, whose lead sentence about the
+ * Combinations listed waits for Story 3.5's rows). Provisional: the crafted
+ * sub-line has no verbatim owner.
+ */
+export function classPanelSubLine(threshold: number, recipeWord: string): string {
+  return `Payout Threshold ${formatThreshold(threshold)} ${DENOMINATION} | Craft Recipe ${recipeWord}. ${PANEL_ASKING_SENTENCE}`;
 }

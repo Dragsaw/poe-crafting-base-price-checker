@@ -26,7 +26,7 @@
       "kind": "crafted",
       "categoryId": "jewel",
       "className": "Emerald",
-      "itemLevelMin": 1,
+      "itemLevelMin": 82,
       "prefix": {
         "kind": "banded",
         "statId": "explicit.stat_2843214518",

@@ -8,7 +8,8 @@ import { Masthead } from './frame/Masthead';
 import { RowSlots } from './frame/RowSlots';
 import { TrustStrip, TrustStripSlot } from './frame/TrustStrip';
 import { AskingPriceLine } from './list/AskingPriceLine';
-import { toDisplayRows } from './list/display-rows';
+import { forRecipe, type ListRecipe } from './list/active-ranking';
+import { toListBranches } from './list/display-rows';
 import { KeyBlock } from './list/KeyBlock';
 import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
@@ -17,6 +18,8 @@ import { RunningFoot } from './list/RunningFoot';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
+import { activeRecipe, readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
+import { recipeCostLine, recipeOptions } from './recipe/recipe-view';
 import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold-storage';
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
@@ -68,11 +71,18 @@ export function App(): JSX.Element {
     };
   }, [attempt]);
 
-  // The only value that survives a reload (FR-7): read once at mount, written on each change.
+  // The threshold survives a reload (FR-7): read once at mount, written on each change.
   const [threshold, setThreshold] = useState(() => readStoredThreshold());
   const changeThreshold = useCallback((value: number) => {
     setThreshold(value);
     writeStoredThreshold(value);
+  }, []);
+
+  // The active Craft Recipe survives a reload beside the threshold (EXPERIENCE.md): read once, written on each click.
+  const [storedRecipe, setStoredRecipe] = useState(() => readStoredRecipe());
+  const changeRecipe = useCallback((recipeId: string) => {
+    setStoredRecipe(recipeId);
+    writeStoredRecipe(recipeId);
   }, []);
 
   const retry = useCallback(() => {
@@ -91,10 +101,28 @@ export function App(): JSX.Element {
           <PageTail />
         </Frame>
       );
-    case 'ready':
+    case 'ready': {
+      const recipes = view.set.recipes?.recipes ?? [];
+      const recipe = activeRecipe(recipes, storedRecipe);
+      const options = recipeOptions(recipes);
+      const active = options.find((option) => option.id === recipe?.id);
       return (
         <Frame state="ready">
-          <Masthead league={view.set.config.league} threshold={threshold} onThresholdChange={changeThreshold} />
+          <Masthead
+            league={view.set.config.league}
+            threshold={threshold}
+            onThresholdChange={changeThreshold}
+            recipe={
+              recipe === undefined
+                ? undefined
+                : {
+                    options,
+                    activeId: recipe.id,
+                    cost: recipeCostLine(recipe, view.set.dataset.currencyRates, view.set.config.league),
+                    onChange: changeRecipe,
+                  }
+            }
+          />
           <TrustStrip set={view.set} absent={view.absent} now={view.now} crossFileFailures={view.crossFileFailures} />
           <AskingPriceLine />
           <ReadyBody
@@ -102,9 +130,11 @@ export function App(): JSX.Element {
             now={view.now}
             threshold={threshold}
             crossFileFailures={view.crossFileFailures}
+            recipe={active}
           />
         </Frame>
       );
+    }
     case 'refused':
       return (
         <Frame state="refused">
@@ -129,8 +159,9 @@ export function App(): JSX.Element {
 /**
  * `core` ranks the whole loaded set at the player's threshold, with the
  * load's cross-file failures excluding their classes (AD-17); `web` renders
- * what it returns and orders nothing itself (AD-4). Memoised on the set,
- * `now` and the threshold. Renders the ready body below the asking-price
+ * what it returns and orders nothing itself (AD-4). The ranking is memoised
+ * on the set and the threshold; the active recipe only narrows it, so a click
+ * re-renders in the same pass with no re-rank (state 34). Renders the ready body below the asking-price
  * line: the list statement, the ranked list, and the page tail led by the
  * Unrankable appendix — all from one ranking.
  */
@@ -139,31 +170,47 @@ function ReadyBody({
   now,
   threshold,
   crossFileFailures,
+  recipe,
 }: {
   readonly set: ArtifactSet;
   readonly now: number;
   readonly threshold: number;
   readonly crossFileFailures: readonly CrossFileFailure[];
+  /** The active Craft Recipe, or `undefined` when no recipe is loaded. */
+  readonly recipe: ListRecipe | undefined;
 }): JSX.Element {
-  const { rows, statement, unrankable } = useMemo(() => {
-    const ranking = rank({
-      tracked: set.tracked.entries,
-      dataset: set.dataset.entries,
-      activeLeague: set.config.league,
-      threshold,
-      weights: set.weights,
-      crossFileFailures,
-    });
+  // `core` ranks every (Item Class, recipe) pair at once, so a recipe switch re-filters and never re-ranks.
+  const ranking = useMemo(
+    () =>
+      rank({
+        tracked: set.tracked.entries,
+        dataset: set.dataset.entries,
+        activeLeague: set.config.league,
+        threshold,
+        weights: set.weights,
+        crossFileFailures,
+        recipes: set.recipes?.recipes ?? [],
+        currencyRates: set.dataset.currencyRates,
+      }),
+    [set, threshold, crossFileFailures],
+  );
+  const { branches, statement, unrankable } = useMemo(() => {
+    const active = forRecipe(ranking, recipe);
     return {
-      rows: toDisplayRows(ranking, set.dataset.entries, now),
-      statement: listStatement(ranking, threshold, set.config.league),
-      unrankable: ranking.unrankable,
+      branches: toListBranches(active, set.dataset.entries, now),
+      statement: listStatement(active, threshold, set.config.league),
+      unrankable: active.unrankable,
     };
-  }, [set, now, threshold, crossFileFailures]);
+  }, [ranking, recipe, set, now, threshold]);
   return (
     <>
       <ListStatement statement={statement} />
-      <RankedList rows={rows} threshold={threshold} activeLeague={set.config.league} />
+      <RankedList
+        branches={branches}
+        threshold={threshold}
+        activeLeague={set.config.league}
+        recipeWord={recipe?.word}
+      />
       <PageTail appendix={<UnrankableAppendix classes={unrankable} />} />
     </>
   );
