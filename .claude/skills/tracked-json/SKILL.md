@@ -8,7 +8,7 @@ description: Seed, add, change or remove entries in data/tracked.json, the curat
 You edit `data/tracked.json` in a loop: look up, edit, check. The two scripts print JSON to stdout. They only read.
 
 - `pnpm tracked:lookup stat|base|class|mods|tiers ...` finds the ids and the tiers. Run it with no arguments to see the usage.
-- `pnpm tracked:check` validates the file: the contracts schema, the pinned cap, catalogue resolvability and the five cross-file checks against `data/weights.json` (AD-17). It exits 0 when the file passes.
+- `pnpm tracked:check` validates the file: the contracts schema, the pinned cap, catalogue resolvability and the five cross-file checks against `data/weights.json` (AD-17). It exits 0 when the file passes. Exit 0 does not mean every check ran, so read `checks` and not only the exit code. `cross-file` is `skipped`, and the exit is still 0, when `data/weights.json` is absent. A class that is absent from the weights file, or that has a `partial` slot, gets no edge, containment or kind check.
 
 ## Rules for all steps
 
@@ -28,7 +28,7 @@ You edit `data/tracked.json` in a loop: look up, edit, check. The two scripts pr
 4b. **Check for a same-`statId` collision.** `ModifierRef` carries no `modGroup` (AD-5): a reference names a stat line, not a game modifier. Re-run `pnpm tracked:lookup tiers <statId> --class <className>` and scan every tier of every `modGroup` listed for that same `statId`. If any such tier's derived interval (§1) is not wholly outside your chosen band (i.e. it overlaps), tell the player before writing the entry: the trade search cannot tell the two modGroups apart, so listings from the other modGroup's tier will surface too. Let the player decide whether to proceed, narrow to a different pick, or drop it.
 5. **Write the floor.** Derive `itemLevelMin` per §8 and AD-17. Read every other crafted entry on the same class in `data/tracked.json` first, including any you are adding in this same batch. The floor is one number: the max over **every** crafted entry on the class, old and new, not a per-entry figure. When the derived floor changes, write it on all of them and say so in the report. A raw entry takes no part in §8: its `itemLevelMin` is the Raw Base item level of the PRD glossary (FR-3).
 6. **Write the label.** Set `acceptedTier` to the tier label of the band per AD-5, for example `T1` or `T1-T2`.
-7. **Check.** Run `pnpm tracked:check`. On `ok: false`, fix each item in `issues` (`check`, `path`, `message`) and run it again until it exits 0.
+7. **Check.** Run `pnpm tracked:check`. On `ok: false`, fix each item in `issues` (`check`, `path`, `message`) and run it again until it exits 0. Then read `checks`: a `skipped` `cross-file`, or a class with no pool check, is not confirmed. Say so in the report.
 8. **Report.** Name the file, each change (which entries you added, changed or removed, with the band, the tier label and the floor), and the reason for each change. A pass does not confirm that a floor is the one §8 derives: a floor declared too high passes every check (AD-5), so state how you derived each floor.
 
 ## Changing or removing an entry
