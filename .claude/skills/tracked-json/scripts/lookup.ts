@@ -3,17 +3,16 @@
  * of the tracked-json skill's loop (lookup → edit → check).
  *
  * Read-only convenience tooling. It reads `data/catalogue/{stats,items,filters}.json`
- * and `data/weights.json` as plain JSON, prints JSON to stdout, and never
- * writes a file or touches the network. It imports only `node:` built-ins, so
- * it walks each file with plain guards rather than the `@poe/contracts`
- * schemas.
+ * as plain JSON and parses `data/weights.json` with `WeightsFileSchema` from
+ * `@poe/contracts`, so the typed weights tree is the contract's own. It prints
+ * JSON to stdout, and never writes a file or touches the network.
  *
  * It derives nothing. `tiers` and `mods` print the weights data verbatim: no
  * interval, no floor. The interval derivation is `core`'s alone
  * (IMPLEMENTATION-NOTES.md §1), and a second copy here is forbidden.
  *
- * - A lookup error (an absent or unreadable file, an unknown or ambiguous
- *   class) prints `{error}` to stdout and exits 1.
+ * - A lookup error (an absent or unreadable file, a weights file that fails
+ *   the schema, an unknown or ambiguous class) prints `{error}` to stdout and exits 1.
  * - A usage error prints the usage text to stderr and exits 1.
  * - Zero matches is not an error.
  */
@@ -22,6 +21,8 @@ import { readFileSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+
+import { type ModifierWeight, type WeightsClassPools, type WeightsFile, WeightsFileSchema } from '@poe/contracts';
 
 export const STATS_PATH = 'data/catalogue/stats.json';
 export const ITEMS_PATH = 'data/catalogue/items.json';
@@ -151,12 +152,15 @@ export interface ClassMatch {
   readonly className: string;
 }
 
-function basesOf(weights: unknown): Record<string, unknown> {
-  const bases = isRecord(weights) ? weights['bases'] : undefined;
-  if (!isRecord(bases)) {
-    throw new LookupError(`${WEIGHTS_PATH}: bases: expected an object`);
+/** Parses the weights file with the contract schema. A failure throws `LookupError` naming the file and the first issue. */
+export function loadWeights(read: ReadJson): WeightsFile {
+  const parsed = WeightsFileSchema.safeParse(read(WEIGHTS_PATH));
+  if (parsed.success) {
+    return parsed.data;
   }
-  return bases;
+  const [issue] = parsed.error.issues;
+  const where = issue === undefined || issue.path.length === 0 ? '(root)' : issue.path.map(String).join('.');
+  throw new LookupError(`${WEIGHTS_PATH}: ${where}: ${issue?.message ?? 'invalid'}`);
 }
 
 function categoryTexts(filters: unknown): Map<string, string> {
@@ -181,13 +185,10 @@ function categoryTexts(filters: unknown): Map<string, string> {
 }
 
 /** The item classes of the weights `bases`, matched on className, categoryId or category text. */
-export function lookupClass(weights: unknown, filters: unknown, query: string): { matches: ClassMatch[] } {
+export function lookupClass(weights: WeightsFile, filters: unknown, query: string): { matches: ClassMatch[] } {
   const texts = categoryTexts(filters);
   const matches: ClassMatch[] = [];
-  for (const [categoryId, classes] of Object.entries(basesOf(weights))) {
-    if (!isRecord(classes)) {
-      continue;
-    }
+  for (const [categoryId, classes] of Object.entries(weights.bases)) {
     const categoryText = texts.get(categoryId) ?? null;
     for (const className of Object.keys(classes)) {
       if (contains(className, query) || contains(categoryId, query) || contains(categoryText ?? '', query)) {
@@ -208,18 +209,18 @@ export interface ClassSelector {
 interface ResolvedClass {
   readonly categoryId: string;
   readonly className: string;
-  readonly pools: Record<string, unknown>;
+  readonly pools: WeightsClassPools;
 }
 
 /** One class's pools. An unknown class, or one in several categories without `category`, throws. */
-export function resolveClass(weights: unknown, selector: ClassSelector): ResolvedClass {
+export function resolveClass(weights: WeightsFile, selector: ClassSelector): ResolvedClass {
   const found: ResolvedClass[] = [];
-  for (const [categoryId, classes] of Object.entries(basesOf(weights))) {
+  for (const [categoryId, classes] of Object.entries(weights.bases)) {
     if (selector.category !== undefined && categoryId !== selector.category) {
       continue;
     }
-    const pools = isRecord(classes) ? classes[selector.className] : undefined;
-    if (isRecord(pools)) {
+    const pools = Object.hasOwn(classes, selector.className) ? classes[selector.className] : undefined;
+    if (pools !== undefined) {
       found.push({ categoryId, className: selector.className, pools });
     }
   }
@@ -237,49 +238,8 @@ export function resolveClass(weights: unknown, selector: ClassSelector): Resolve
   return only;
 }
 
-/** A weights entry, read with guards. Fields are kept verbatim. */
-interface WeightsEntry {
-  readonly sourceModifierId: string;
-  readonly modGroup: string;
-  readonly itemLevelMin: number;
-  readonly tierLabel: unknown;
-  readonly weight: unknown;
-  readonly weightSource: unknown;
-  readonly lines: readonly unknown[];
-}
-
-function entriesOf(pools: Record<string, unknown>, slot: Slot): WeightsEntry[] {
-  const entries: WeightsEntry[] = [];
-  for (const entry of arrayAt(pools[slot], 'entries')) {
-    if (!isRecord(entry)) {
-      continue;
-    }
-    const modGroup = stringAt(entry, 'modGroup');
-    const itemLevelMin = entry['itemLevelMin'];
-    if (modGroup === undefined || typeof itemLevelMin !== 'number') {
-      continue;
-    }
-    entries.push({
-      sourceModifierId: stringAt(entry, 'sourceModifierId') ?? '',
-      modGroup,
-      itemLevelMin,
-      tierLabel: entry['tierLabel'] ?? null,
-      weight: entry['weight'] ?? null,
-      weightSource: entry['weightSource'] ?? null,
-      lines: arrayAt(entry, 'lines'),
-    });
-  }
-  return entries;
-}
-
-function byItemLevel(left: WeightsEntry, right: WeightsEntry): number {
+function byItemLevel(left: ModifierWeight, right: ModifierWeight): number {
   return left.itemLevelMin - right.itemLevelMin;
-}
-
-/** The text after the third NUL of `sourceModifierId` (`slot\0modGroup\0itemLevel\0text`). */
-export function modText(sourceModifierId: string): string {
-  const parts = sourceModifierId.split('\u0000');
-  return parts.length > 3 ? parts.slice(3).join('\u0000') : sourceModifierId;
 }
 
 export interface ModRow {
@@ -296,7 +256,7 @@ export interface ModRow {
 
 /** One row per mod family (a modGroup and one statId set) of the class and slot (both slots when `slot` is absent). */
 export function lookupMods(
-  weights: unknown,
+  weights: WeightsFile,
   selector: ClassSelector & { readonly slot?: Slot | undefined },
 ): { categoryId: string; className: string; mods: ModRow[] } {
   const resolved = resolveClass(weights, selector);
@@ -304,9 +264,9 @@ export function lookupMods(
   for (const slot of selector.slot === undefined ? SLOTS : [selector.slot]) {
     // A modGroup can hold several mod families (one statId set each), so a row is a
     // modGroup and one statId set: a hybrid is one row, two families are two rows.
-    const families = new Map<string, { modGroup: string; statIds: (string | null)[]; tiers: WeightsEntry[] }>();
-    for (const entry of entriesOf(resolved.pools, slot)) {
-      const statIds = [...new Set(entry.lines.filter(isRecord).map(statIdOf))];
+    const families = new Map<string, { modGroup: string; statIds: (string | null)[]; tiers: ModifierWeight[] }>();
+    for (const entry of resolved.pools[slot].entries) {
+      const statIds = [...new Set(entry.lines.map((line) => line.statId))];
       const key = JSON.stringify([entry.modGroup, statIds]);
       const family = families.get(key);
       if (family === undefined) {
@@ -322,20 +282,15 @@ export function lookupMods(
       mods.push({
         slot,
         modGroup,
-        text: modText(first?.sourceModifierId ?? ''),
+        text: first?.modGroup ?? '',
         statIds,
         tierCount: tiers.length,
         itemLevelMin: { min: first?.itemLevelMin ?? 0, max: last?.itemLevelMin ?? 0 },
-        tierLabels: tiers.map((entry) => entry.tierLabel),
+        tierLabels: tiers.map((entry) => entry.tierLabel ?? null),
       });
     }
   }
   return { categoryId: resolved.categoryId, className: resolved.className, mods };
-}
-
-function statIdOf(line: Record<string, unknown>): string | null {
-  const statId = line['statId'];
-  return typeof statId === 'string' ? statId : null;
 }
 
 export interface TierRow {
@@ -351,20 +306,20 @@ export interface TierRow {
 
 /** Per slot, every tier of the class with a line carrying `statId`, in ascending `itemLevelMin`. */
 export function lookupTiers(
-  weights: unknown,
+  weights: WeightsFile,
   statId: string,
   selector: ClassSelector,
 ): { categoryId: string; className: string; statId: string; tiers: TierRow[] } {
   const resolved = resolveClass(weights, selector);
   const tiers: TierRow[] = [];
   for (const slot of SLOTS) {
-    const carrying = entriesOf(resolved.pools, slot).filter((entry) =>
-      entry.lines.some((line) => isRecord(line) && line['statId'] === statId),
+    const carrying = resolved.pools[slot].entries.filter((entry) =>
+      entry.lines.some((line) => line.statId === statId),
     );
     for (const entry of carrying.toSorted(byItemLevel)) {
       tiers.push({
         slot,
-        tierLabel: entry.tierLabel,
+        tierLabel: entry.tierLabel ?? null,
         itemLevelMin: entry.itemLevelMin,
         weight: entry.weight,
         weightSource: entry.weightSource,
@@ -471,11 +426,11 @@ export function runCommand(command: Command, read: ReadJson): unknown {
     case 'base':
       return lookupBase(read(ITEMS_PATH), command.query);
     case 'class':
-      return lookupClass(read(WEIGHTS_PATH), read(FILTERS_PATH), command.query);
+      return lookupClass(loadWeights(read), read(FILTERS_PATH), command.query);
     case 'mods':
-      return lookupMods(read(WEIGHTS_PATH), command);
+      return lookupMods(loadWeights(read), command);
     case 'tiers':
-      return lookupTiers(read(WEIGHTS_PATH), command.statId, command);
+      return lookupTiers(loadWeights(read), command.statId, command);
   }
 }
 

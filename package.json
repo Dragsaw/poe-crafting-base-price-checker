@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@poe/contracts": "workspace:*",
     "@types/node": "24.10.1",
     "dependency-cruiser": "18.4.0",
     "eslint": "10.11.0",
