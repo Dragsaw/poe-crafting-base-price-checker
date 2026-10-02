@@ -200,9 +200,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
   summary: "[NOTE FOR ARCHITECT] `WeightsFileSchema` refuses a few values that *Validation* in `WEIGHTS-FILE-SCHEMA.md` does not list as hard errors: an empty `producer.id`, a `producer.generatedAt` that is not ISO-8601 UTC, and an empty `categoryId`, `className` or `statId`. The trust strip needs the first two (`utcDate` throws on a non-ISO instant). The reused id schemas carry the rest. Either list them in *Validation*, or say that *Validation* covers only the rules beyond the typed Shape."
   evidence: Story 3.1 review, triage row 2. `packages/contracts/src/weights-file.ts`, `packages/web/src/frame/trust-facts.ts` `utcDate`.
-- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
-  summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
-  evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.
 
 ## Deferred from: story 3.2 (2026-09-27)
 
@@ -275,3 +272,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-note-packages-web-vite-config-ts.md`
   summary: The comment at `.github/workflows/deploy.yml:4` still says "the eight AD-24 artifacts", but AD-24 fixes seven.
   evidence: `grep -n eight .github/workflows/deploy.yml` prints line 4. The entry this spec closes covered only `packages/web/vite.config.ts`; the same stale count sits in the workflow comment.
+- source_spec: `docs/stories/spec-deferred-load-lookup-ts-through-weightsfileschema.md`
+  summary: A `mods` row of `pnpm tracked:lookup` no longer carries the readable mod text; its `text` repeats `modGroup`, and the families of one `modGroup` differ only in `statIds`.
+  evidence: The weights contract has no field for the mod text (`sourceModifierId` is opaque), so the typed load cannot print it. The skill now names each stat with `pnpm tracked:lookup stat <statId>`. A `text` per row could be joined from `stats.json` by `statId`, or the producer could emit it, which is the decision of the open `modText` entry on `WEIGHTS-FILE-SCHEMA.md`.
