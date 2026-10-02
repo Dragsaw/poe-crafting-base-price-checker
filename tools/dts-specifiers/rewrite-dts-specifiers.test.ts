@@ -1,9 +1,11 @@
 import { spawnSync } from 'node:child_process';
 import {
   copyFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -15,10 +17,15 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { rewriteDtsSpecifiers, rewriteDtsSpecifiersIn } from './rewrite-dts-specifiers';
+import {
+  rewriteDtsSpecifiers,
+  rewriteDtsSpecifiersIn,
+  TARGET_PACKAGES,
+} from './rewrite-dts-specifiers';
 
 const TOOL = fileURLToPath(new URL('./rewrite-dts-specifiers.ts', import.meta.url));
 const ROOT_PACKAGE_JSON = fileURLToPath(new URL('../../package.json', import.meta.url));
+const PACKAGES_DIR = fileURLToPath(new URL('../../packages', import.meta.url));
 
 /** A full `ts.createProgram` with lib loading can pass the 5 s default on a cold Windows run. */
 const COMPILE_TIMEOUT = 30_000;
@@ -221,6 +228,32 @@ describe('rewriteDtsSpecifiersIn', () => {
   it('throws and names the directory when it is missing', () => {
     const missing = join(makeScratch(), 'dist');
     expect(() => rewriteDtsSpecifiersIn(missing)).toThrow(missing);
+  });
+});
+
+/**
+ * Resolves `<dir>/tsconfig.json` with the TypeScript config API, so JSONC
+ * comments and `extends` are honoured, and returns its compiler options.
+ */
+function resolveCompilerOptions(dir: string): ts.CompilerOptions {
+  const configPath = join(dir, 'tsconfig.json');
+  const read = ts.readConfigFile(configPath, ts.sys.readFile);
+  if (read.error !== undefined) throw new Error(messagesOf([read.error]).join('\n'));
+  const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, dir, undefined, configPath);
+  if (parsed.errors.length > 0) throw new Error(messagesOf(parsed.errors).join('\n'));
+  return parsed.options;
+}
+
+describe('TARGET_PACKAGES', () => {
+  it('lists every emitDeclarationOnly package', () => {
+    const emitDeclarationOnly = readdirSync(PACKAGES_DIR, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .filter((pkg) => existsSync(join(PACKAGES_DIR, pkg, 'tsconfig.json')))
+      .filter((pkg) => resolveCompilerOptions(join(PACKAGES_DIR, pkg)).emitDeclarationOnly === true)
+      .sort();
+
+    expect([...TARGET_PACKAGES].sort()).toEqual(emitDeclarationOnly);
   });
 });
 

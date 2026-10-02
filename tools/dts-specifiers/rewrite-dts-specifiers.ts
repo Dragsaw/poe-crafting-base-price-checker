@@ -10,13 +10,12 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Post-emit step of `pnpm typecheck`. `packages/contracts`, `packages/core` and
- * `packages/sync` are `emitDeclarationOnly` with `allowImportingTsExtensions`,
- * so their emitted `.d.ts` files keep the source's `./x.ts` specifiers:
- * TypeScript 6.0.3's `rewriteRelativeImportExtensions` rewrites `.js` output
- * only. A non-TypeScript consumer of `dist` cannot follow `./x.ts`; `./x.js`
- * resolves to the sibling `x.d.ts` under every TypeScript module resolution
- * mode.
+ * Post-emit step of `pnpm typecheck`. The packages that `TARGET_PACKAGES` lists
+ * are `emitDeclarationOnly` with `allowImportingTsExtensions`, so their
+ * emitted `.d.ts` files keep the source's `./x.ts` specifiers: TypeScript
+ * 6.0.3's `rewriteRelativeImportExtensions` rewrites `.js` output only. A
+ * non-TypeScript consumer of `dist` cannot follow `./x.ts`; `./x.js` resolves
+ * to the sibling `x.d.ts` under every TypeScript module resolution mode.
  *
  * Only `pnpm typecheck` runs this rewrite: a bare `tsc -b`, watch mode or an
  * IDE build that re-emits one of these packages writes the `.ts` specifiers back.
@@ -82,11 +81,18 @@ export function rewriteDtsSpecifiersIn(dir: string): string[] {
 }
 
 /**
- * The directories the post-emit step rewrites: the `dist` of each
- * `emitDeclarationOnly` package, which its `exports["."].types` names.
- * `packages/web` emits no declarations.
+ * The `emitDeclarationOnly` packages under `packages/`. `packages/web` emits
+ * no declarations. The `TARGET_PACKAGES` describe block in
+ * `rewrite-dts-specifiers.test.ts` compares this list with the packages whose
+ * resolved `tsconfig.json` sets `emitDeclarationOnly`.
  */
-const TARGET_DIRS = ['contracts', 'core', 'sync'].map((pkg) =>
+export const TARGET_PACKAGES: readonly string[] = ['contracts', 'core', 'sync'];
+
+/**
+ * The directories the post-emit step rewrites: the `dist` of each
+ * `TARGET_PACKAGES` entry, which its `exports["."].types` names.
+ */
+const TARGET_DIRS = TARGET_PACKAGES.map((pkg) =>
   fileURLToPath(new URL(`../../packages/${pkg}/dist`, import.meta.url)),
 );
 
