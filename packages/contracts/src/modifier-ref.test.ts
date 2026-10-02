@@ -55,6 +55,19 @@ describe('ModifierRefSchema', () => {
     ).toContain('valueMax');
   });
 
+  it('accepts an ordered band and a point band', () => {
+    const ordered = { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5 };
+    const point = { kind: 'banded', statId: 'explicit.stat_1', valueMin: 5, valueMax: 5 };
+    expect(issuePaths(ordered)).toEqual([]);
+    expect(issuePaths(point)).toEqual([]);
+  });
+
+  it('refuses an inverted band, with the issue on valueMax', () => {
+    expect(
+      issuePaths({ kind: 'banded', statId: 'explicit.stat_1', valueMin: 56.5, valueMax: 43 }),
+    ).toEqual(['valueMax']);
+  });
+
   it('accepts a valueless reference carrying no edges at all', () => {
     expect(ModifierRefSchema.parse({ kind: 'valueless', statId: 'explicit.stat_9' })).toEqual({
       kind: 'valueless',
