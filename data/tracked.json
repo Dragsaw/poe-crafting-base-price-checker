@@ -36,7 +36,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 2,
         "valueMax": 4,
         "acceptedTier": "T1"
@@ -82,7 +82,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -187,7 +187,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -292,7 +292,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -397,7 +397,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -502,7 +502,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -607,7 +607,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -794,7 +794,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -897,7 +897,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -1000,7 +1000,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -1103,7 +1103,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -1206,7 +1206,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
@@ -1309,7 +1309,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_681332047",
+        "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
