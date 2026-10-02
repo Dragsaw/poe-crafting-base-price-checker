@@ -31,6 +31,14 @@ describe('TrackedEntrySchema', () => {
     expect(TrackedEntrySchema.parse(rawEntry)).toEqual(rawEntry);
   });
 
+  it('refuses a crafted entry whose prefix is an inverted band, with the issue on prefix.valueMax', () => {
+    const inverted = {
+      ...craftedEntry,
+      prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 56.5, valueMax: 43 },
+    };
+    expect(issuesOf(inverted).map((issue) => issue.path.join('.'))).toEqual(['prefix.valueMax']);
+  });
+
   // I/O matrix: "Kind named, not inferred".
   it('refuses a crafted entry carrying neither prefix nor suffix', () => {
     const issues = issuesOf({

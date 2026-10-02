@@ -44,6 +44,10 @@ export const BandedModifierRefSchema = z
       .describe('The band ceiling, inclusive and **required**. There is no open-top form (AD-5).'),
     acceptedTier: AcceptedTierSchema.optional(),
   })
+  .refine((band) => band.valueMin <= band.valueMax, {
+    path: ['valueMax'],
+    message: 'valueMin must not exceed valueMax: an inverted band contains no tier.',
+  })
   .describe('An inclusive, closed band over the value the trade stat filter compares (AD-5).');
 
 export const ValuelessModifierRefSchema = z
