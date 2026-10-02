@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { canonicalKey } from './canonical-key.ts';
-import { CraftRecipeSchema } from './craft-recipe.ts';
+import { CraftRecipeSchema, RECIPE_GRADES, recipeWord } from './craft-recipe.ts';
 import { CurrencyRateSchema } from './currency-rate.ts';
 import { DatasetEntrySchema } from './dataset.ts';
 import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
@@ -122,9 +122,13 @@ export const TrackedFileSchema = z
 /**
  * `data/recipes.json` — the Craft Recipes (AD-20). Absent-tolerable (AD-24).
  *
- * One file-level rule, the same shape as `TrackedFileSchema`'s: each `id`
- * appears once. Each repeat is one issue at its own index, naming the id and
- * its first occurrence.
+ * Three file-level rules. Each `id` appears once, the same shape as
+ * `TrackedFileSchema`'s: each repeat is one issue at its own index, naming the
+ * id and its first occurrence. Each recipe derives one word (`recipeWord`): a
+ * recipe that mixes grades is one issue at its index. And no two recipes derive
+ * the same word: each repeat is one issue at its index, naming the word and its
+ * first recipe (Story 3.4 Decision, UX memlog 233; an AD-3 refusal). A repeated
+ * id is reported once, as a repeated id.
  */
 export const RecipesFileSchema = z
   .strictObject({
@@ -133,10 +137,30 @@ export const RecipesFileSchema = z
   })
   .superRefine((file, ctx) => {
     const firstIndexById = new Map<string, number>();
+    const firstIndexByWord = new Map<string, number>();
     file.recipes.forEach((recipe, index) => {
       const first = firstIndexById.get(recipe.id);
       if (first === undefined) {
         firstIndexById.set(recipe.id, index);
+        const word = recipeWord(recipe);
+        if (word === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['recipes', index],
+            message: `recipe ${recipe.id} mixes grades across its currencies; every currency id shares one grade prefix (${RECIPE_GRADES.map((grade) => `${grade}-`).join(', ')}) or none`,
+          });
+          return;
+        }
+        const firstWithWord = firstIndexByWord.get(word);
+        if (firstWithWord === undefined) {
+          firstIndexByWord.set(word, index);
+          return;
+        }
+        ctx.addIssue({
+          code: 'custom',
+          path: ['recipes', index],
+          message: `recipe ${recipe.id} reads ${word}, as recipes.${String(firstWithWord)} does; two recipes may not derive one word`,
+        });
         return;
       }
       ctx.addIssue({

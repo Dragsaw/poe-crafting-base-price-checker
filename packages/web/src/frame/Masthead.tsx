@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 
+import { CraftRecipe, type RecipeCost, type RecipeOption } from '../recipe/CraftRecipe';
 import { DENOMINATION } from '../shared/product';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { PayoutThreshold } from '../threshold/PayoutThreshold';
@@ -22,17 +23,20 @@ export const CONTROL_GROUP_WIDTH = columnSums.mastheadControls.reduce((a, b) => 
 /**
  * The 170px masthead: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42
  * + 20 pad. The eyebrow reads the league alone. The right-hand control group holds
- * the Payout Threshold at the outer edge and an empty inboard slot the Craft
- * Recipe fills in Epic 3.
+ * the Payout Threshold at the outer edge and the Craft Recipe in the inboard
+ * slot, which stays empty at its width while no recipe is loaded.
  */
 export function Masthead({
   league,
   threshold,
   onThresholdChange,
+  recipe,
 }: {
   readonly league: string | undefined;
   readonly threshold: number;
   readonly onThresholdChange: (value: number) => void;
+  /** The Craft Recipe control's inputs; absent while pending, or when `recipes.json` holds no recipe. */
+  readonly recipe?: MastheadRecipe;
 }): JSX.Element {
   return (
     <header
@@ -68,10 +72,31 @@ export function Masthead({
           flex: '0 0 auto',
         }}
       >
-        {/* The Craft Recipe's inboard slot, empty until Epic 3. */}
-        <div data-recipe-slot="" aria-hidden="true" style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto' }} />
+        {/* The Craft Recipe's inboard slot: the control, or an empty slot of its width. */}
+        <div
+          data-recipe-slot=""
+          aria-hidden={recipe === undefined ? 'true' : undefined}
+          style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto', display: 'flex' }}
+        >
+          {recipe === undefined ? null : (
+            <CraftRecipe
+              options={recipe.options}
+              activeId={recipe.activeId}
+              cost={recipe.cost}
+              onChange={recipe.onChange}
+            />
+          )}
+        </div>
         <PayoutThreshold value={threshold} onChange={onThresholdChange} />
       </div>
     </header>
   );
+}
+
+/** What the masthead's Craft Recipe control prints and calls. */
+export interface MastheadRecipe {
+  readonly options: readonly RecipeOption[];
+  readonly activeId: string;
+  readonly cost: RecipeCost;
+  readonly onChange: (recipeId: string) => void;
 }

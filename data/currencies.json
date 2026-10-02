@@ -3,6 +3,10 @@
   "rates": [
     { "currencyId": "divine", "rate": 1, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" },
     { "currencyId": "exalted", "rate": 0.002012, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" },
-    { "currencyId": "chaos", "rate": 0.13078, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" }
+    { "currencyId": "chaos", "rate": 0.13078, "source": "measured", "league": "Forbidden Rites", "asOf": "2026-09-26T00:00:00Z" },
+    { "currencyId": "greater-orb-of-transmutation", "rate": 0.002, "source": "dummy, not measured", "league": "Forbidden Rites", "asOf": "2026-10-02T00:00:00Z" },
+    { "currencyId": "greater-orb-of-augmentation", "rate": 0.004, "source": "dummy, not measured", "league": "Forbidden Rites", "asOf": "2026-10-02T00:00:00Z" },
+    { "currencyId": "perfect-orb-of-transmutation", "rate": 0.02, "source": "dummy, not measured", "league": "Forbidden Rites", "asOf": "2026-10-02T00:00:00Z" },
+    { "currencyId": "perfect-orb-of-augmentation", "rate": 0.04, "source": "dummy, not measured", "league": "Forbidden Rites", "asOf": "2026-10-02T00:00:00Z" }
   ]
 }

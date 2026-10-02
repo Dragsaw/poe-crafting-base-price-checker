@@ -48,7 +48,7 @@ function searchFields(search: StoredSearch | undefined): Pick<DatasetEntry, 'las
 }
 
 export function priced(
-  entry: RawTrackedEntry,
+  entry: TrackedEntry,
   priceDivine: number,
   observedAt: string,
   league: string = TEST_LEAGUE,
@@ -72,7 +72,7 @@ export function priced(
 }
 
 export function unpriced(
-  entry: RawTrackedEntry,
+  entry: TrackedEntry,
   price: PriceState,
   lastAttemptedAt?: string,
   search?: StoredSearch,

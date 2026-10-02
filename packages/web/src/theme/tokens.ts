@@ -123,6 +123,15 @@ export const spacing = {
   thresholdTrackGap: 10,
   thresholdRangeGap: 7,
   thresholdTrackHeight: 4,
+  /**
+   * `{components.craft-recipe}`: 9px between the label and the options, and
+   * the cost line held at the panel's foot by `margin-top: auto` over a 10px
+   * floor; the cost figure sits 4px before its unit
+   * (`mockups/key-hero-resting.html`, `.rec`).
+   */
+  recipeOptionsGap: 9,
+  recipeCostGap: 10,
+  recipeCostFigureGap: 4,
   thresholdMarkerWidth: 11,
   thresholdMarkerHeight: 14,
   /** The marker's rise above the track's top edge: (14 − 4) / 2. */

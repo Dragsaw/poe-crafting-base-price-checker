@@ -1,4 +1,21 @@
 {
   "schemaVersion": "1.0.0",
-  "recipes": []
+  "recipes": [
+    {
+      "id": "greater",
+      "currencies": [
+        { "currencyId": "greater-orb-of-transmutation", "quantity": 1 },
+        { "currencyId": "greater-orb-of-augmentation", "quantity": 1 }
+      ],
+      "modifierLevelMin": 44
+    },
+    {
+      "id": "perfect",
+      "currencies": [
+        { "currencyId": "perfect-orb-of-transmutation", "quantity": 1 },
+        { "currencyId": "perfect-orb-of-augmentation", "quantity": 1 }
+      ],
+      "modifierLevelMin": 70
+    }
+  ]
 }

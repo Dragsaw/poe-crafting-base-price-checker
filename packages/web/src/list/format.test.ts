@@ -4,12 +4,14 @@ import { NOW } from '../test-support/dom';
 import { hoursBefore } from '../test-support/list-fixtures';
 import {
   ageMark,
+  classPanelSubLine,
   combinationAges,
   combinationFigure,
   FRESHNESS_CUTOFF_HOURS,
   MONEY_PHRASES,
   PANEL_ASKING_SENTENCE,
   PRICE_STATE_GLYPHS,
+  RAW_NO_RECIPE_SENTENCE,
   rawCombinationNote,
   rawExpansionNote,
   rawNote,
@@ -161,17 +163,24 @@ describe('the expansion copy', () => {
     expect(STATE_NOTES['no-listings']).not.toMatch(/worthless|no value/);
   });
 
-  it('repeats the Item Level, the threshold at 2dp and the asking-price sentence, with no Craft Recipe sentence', () => {
+  it('repeats the Item Level, the threshold at 2dp, the no-recipe sentence and the asking-price sentence', () => {
     const line = rawPanelSubLine(82, 0.5);
     expect(line).toBe(
       'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
         'One Combination is tracked here: the degenerate Combination of no affixes. ' +
         'Payout Threshold 0.50 Divine. ' +
+        'No Craft Recipe applies — a Raw Base is sold, not crafted, so it carries no Craft Cost. ' +
         'Every price here is a current asking price from a live instant-buyout listing.',
     );
     expect(line.endsWith(PANEL_ASKING_SENTENCE)).toBe(true);
     expect(rawPanelSubLine(70, 0.25)).toContain('Item Level 70,');
     expect(rawPanelSubLine(70, 0.25)).toContain('Payout Threshold 0.25 Divine.');
-    expect(line).not.toMatch(/Craft Recipe|Craft Cost/);
+    expect(line).toContain(RAW_NO_RECIPE_SENTENCE);
+  });
+
+  it('names the threshold and the active Craft Recipe on a crafted panel', () => {
+    expect(classPanelSubLine(0.5, 'perfect')).toBe(
+      `Payout Threshold 0.50 Divine | Craft Recipe perfect. ${PANEL_ASKING_SENTENCE}`,
+    );
   });
 });

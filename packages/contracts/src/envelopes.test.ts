@@ -469,10 +469,53 @@ describe('RecipesFileSchema', () => {
     return { schemaVersion: INITIAL_SCHEMA_VERSION, recipes };
   }
 
+  const perfect = {
+    id: 'perfect',
+    currencies: [{ currencyId: 'perfect-transmute', quantity: 1 }],
+    modifierLevelMin: 70,
+  } as const;
+
+  function issuesOf(recipes: readonly unknown[]) {
+    const result = parseEnvelope(RecipesFileSchema, fileOf(recipes));
+    if (result.ok || result.reason !== 'invalid') {
+      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+    }
+    return result.issues;
+  }
+
   it('parses a versioned file of recipes', () => {
-    const result = parseEnvelope(RecipesFileSchema, fileOf([recipe, { ...recipe, id: 'perfect' }]));
+    const result = parseEnvelope(RecipesFileSchema, fileOf([recipe, perfect]));
     expect(result.ok).toBe(true);
     expect(result.ok === true && result.value.recipes).toHaveLength(2);
+  });
+
+  it('accepts one regular recipe beside graded ones', () => {
+    const regular = { id: 'regular', currencies: [{ currencyId: 'orb-of-transmutation', quantity: 1 }], modifierLevelMin: 0 };
+    expect(parseEnvelope(RecipesFileSchema, fileOf([recipe, perfect, regular])).ok).toBe(true);
+  });
+
+  it('refuses a recipe that mixes grades, with one issue at its index naming it', () => {
+    const mixed = {
+      id: 'mixed',
+      currencies: [
+        { currencyId: 'greater-transmute', quantity: 1 },
+        { currencyId: 'perfect-augment', quantity: 1 },
+      ],
+      modifierLevelMin: 44,
+    };
+    const issues = issuesOf([perfect, mixed]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['recipes', 1]);
+    expect(issues[0]?.message).toContain('mixed');
+    expect(issuesOf([{ ...mixed, currencies: [mixed.currencies[0], { currencyId: 'exalted', quantity: 1 }] }])).toHaveLength(1);
+  });
+
+  it('refuses two recipes that derive one word, naming the word and the first recipe', () => {
+    const issues = issuesOf([recipe, perfect, { ...recipe, id: 'greater-too' }]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['recipes', 2]);
+    expect(issues[0]?.message).toContain('greater');
+    expect(issues[0]?.message).toContain('recipes.0');
   });
 
   it('declares schemaVersion and refuses a file with none', () => {

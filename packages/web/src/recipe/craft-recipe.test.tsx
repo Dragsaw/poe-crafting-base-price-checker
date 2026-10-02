@@ -1,0 +1,503 @@
+import type { CraftedTrackedEntry, CraftRecipe, CurrencyRate, DatasetEntry, ModifierWeight, TrackedEntry } from '@poe/contracts';
+import type { SetupServerApi } from 'msw/node';
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+import { App } from '../App';
+import { uncostableCopy } from '../list/list-statement';
+import { expandCopy } from '../list/RankedList';
+import { serveArtifacts, sharedServer, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
+import { rgb } from '../test-support/dom';
+import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
+import { PageProvider } from '../theme/PageProvider';
+import { colors } from '../theme/tokens';
+import { RECIPE_STORAGE_KEY } from './recipe-storage';
+
+let server: SetupServerApi;
+let container: HTMLDivElement | undefined;
+let root: Root | undefined;
+
+beforeAll(async () => {
+  server = await sharedServer();
+});
+
+afterEach(() => {
+  if (root !== undefined) {
+    const mounted = root;
+    act(() => {
+      mounted.unmount();
+    });
+    root = undefined;
+  }
+  container?.remove();
+  container = undefined;
+  localStorage.clear();
+});
+
+function mount(): void {
+  container = document.createElement('div');
+  document.body.append(container);
+  const mounted = createRoot(container);
+  root = mounted;
+  act(() => {
+    mounted.render(
+      <PageProvider>
+        <App />
+      </PageProvider>,
+    );
+  });
+}
+
+function unmount(): void {
+  if (root !== undefined) {
+    const mounted = root;
+    act(() => {
+      mounted.unmount();
+    });
+    root = undefined;
+  }
+  container?.remove();
+  container = undefined;
+}
+
+function frame(): HTMLElement {
+  const found = container?.querySelector<HTMLElement>('[data-frame]');
+  if (found === null || found === undefined) {
+    throw new Error('no frame rendered');
+  }
+  return found;
+}
+
+async function settleTo(state: string): Promise<void> {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if (frame().dataset['state'] === state) {
+      return;
+    }
+    await act(async () => {
+      for (let turn = 0; turn < 5; turn += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+  }
+  throw new Error(`frame never reached ${state}; it is ${String(frame().dataset['state'])}`);
+}
+
+// --- the fixture world --------------------------------------------------------
+
+let serial = 0;
+
+function tier(statId: string, weight: number, itemLevelMin: number): ModifierWeight {
+  serial += 1;
+  return {
+    sourceModifierId: `m${String(serial)}`,
+    modGroup: `g${String(serial)}`,
+    itemLevelMin,
+    weight,
+    weightSource: 'published',
+    lines: [{ statId, ranges: [[1, 10]] }],
+  };
+}
+
+const TARGET = 'explicit.stat_1';
+const FILLER = 'explicit.stat_2';
+const LOW = 'explicit.stat_3';
+const SUFFIX = 'explicit.stat_4';
+
+type Pools = readonly [readonly ModifierWeight[], readonly ModifierWeight[]];
+
+/** At floor 44 the target is half the prefix pool; at floor 70 it is all of it. */
+const BOWS: Pools = [[tier(TARGET, 10, 75), tier(FILLER, 10, 50), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
+/** At floor 44 the target is half the prefix pool; at floor 70 it is out of reach (P = 0, not a reason). */
+const STAVES: Pools = [[tier(TARGET, 50, 50), tier(FILLER, 50, 75)], [tier(SUFFIX, 10, 80)]];
+/** Every tier below both floors: no recipe reaches it (state 36). */
+const WANDS: Pools = [[tier(TARGET, 10, 1)], [tier(SUFFIX, 10, 1)]];
+
+function chase(categoryId: string, className: string): CraftedTrackedEntry {
+  return {
+    kind: 'crafted',
+    categoryId,
+    className,
+    itemLevelMin: 82,
+    prefix: { kind: 'banded', statId: TARGET, valueMin: 1, valueMax: 10 },
+    status: 'active',
+  };
+}
+
+function recipe(id: string, modifierLevelMin: number, grade: string): CraftRecipe {
+  return {
+    id,
+    currencies: [
+      { currencyId: `${grade}-orb-of-transmutation`, quantity: 1 },
+      { currencyId: `${grade}-orb-of-augmentation`, quantity: 1 },
+    ],
+    modifierLevelMin,
+  };
+}
+
+function rate(currencyId: string, value: number): CurrencyRate {
+  return { currencyId, rate: value, source: 'measured', league: TEST_LEAGUE, asOf: '2026-09-26T00:00:00Z' };
+}
+
+const RECIPES = [recipe('greater', 44, 'greater'), recipe('perfect', 70, 'perfect')];
+const RATES = [
+  rate('greater-orb-of-transmutation', 0.01),
+  rate('greater-orb-of-augmentation', 0.02),
+  rate('perfect-orb-of-transmutation', 0.1),
+  rate('perfect-orb-of-augmentation', 0.2),
+];
+
+const bows = chase('weapon.bow', 'Bows');
+const staves = chase('weapon.staff', 'Staves');
+const belt = rawEntry('Wide Belt');
+const amulet = rawEntry('Gold Amulet');
+
+interface World {
+  readonly tracked: readonly TrackedEntry[];
+  readonly dataset: readonly DatasetEntry[];
+  readonly classes: readonly (readonly [string, string, Pools])[];
+  readonly recipes?: readonly unknown[];
+  readonly rates?: readonly CurrencyRate[];
+}
+
+function serveWorld(world: World): void {
+  const bases: Record<string, Record<string, unknown>> = {};
+  for (const [categoryId, className, [prefix, suffix]] of world.classes) {
+    bases[categoryId] = {
+      ...bases[categoryId],
+      [className]: {
+        prefix: { poolCoverage: 'complete', entries: prefix },
+        suffix: { poolCoverage: 'complete', entries: suffix },
+      },
+    };
+  }
+  serveArtifacts(server, {
+    tracked: { kind: 'json', body: { ...(VALID_BODIES.tracked as object), entries: world.tracked } },
+    dataset: {
+      kind: 'json',
+      body: { ...(VALID_BODIES.dataset as object), entries: world.dataset, currencyRates: world.rates ?? RATES },
+    },
+    weights: { kind: 'json', body: { ...(VALID_BODIES.weights as object), bases } },
+    recipes: { kind: 'json', body: { schemaVersion: '1.0.0', recipes: world.recipes ?? RECIPES } },
+  });
+}
+
+/**
+ * greater: Staves 0.5 × 2 − 0.03 = 0.97, Bows 0.5 × 1 − 0.03 = 0.47, Wide Belt 0.40, Gold Amulet 0.30.
+ * perfect: Bows 1 × 1 − 0.3 = 0.70, Wide Belt 0.40, Gold Amulet 0.30, Staves 0 − 0.3 = −0.30.
+ */
+function standardWorld(overrides: Partial<World> = {}): World {
+  const now = Date.now();
+  return {
+    tracked: [bows, staves, belt, amulet],
+    dataset: [
+      priced(bows, 1, hoursBefore(now, 1)),
+      priced(staves, 2, hoursBefore(now, 1)),
+      priced(belt, 0.4, hoursBefore(now, 1)),
+      priced(amulet, 0.3, hoursBefore(now, 1)),
+    ],
+    classes: [
+      ['weapon.bow', 'Bows', BOWS],
+      ['weapon.staff', 'Staves', STAVES],
+    ],
+    ...overrides,
+  };
+}
+
+// --- readers ---------------------------------------------------------------------
+
+function control(): HTMLElement {
+  const found = frame().querySelector<HTMLElement>('[data-craft-recipe]');
+  if (found === null) {
+    throw new Error('no Craft Recipe control rendered');
+  }
+  return found;
+}
+
+function option(id: string): HTMLElement {
+  const found = control().querySelector<HTMLElement>(`[data-recipe-option="${id}"]`);
+  if (found === null) {
+    throw new Error(`no option ${id}`);
+  }
+  return found;
+}
+
+function costLine(): string {
+  return control().querySelector('[data-recipe-cost]')?.textContent ?? '';
+}
+
+function names(scope: ParentNode = frame()): string[] {
+  return Array.from(scope.querySelectorAll('[data-ranked-row] [data-unit-name]'), (node) => node.textContent ?? '');
+}
+
+function cells(cell: string, scope: ParentNode = frame()): string[] {
+  return Array.from(scope.querySelectorAll(`[data-ranked-row] [data-cell="${cell}"]`), (node) => node.textContent ?? '');
+}
+
+function statement(): HTMLElement | null {
+  return frame().querySelector<HTMLElement>('[data-list-statement]');
+}
+
+function click(element: Element): void {
+  act(() => {
+    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
+}
+
+function rowNamed(name: string): HTMLElement {
+  const row = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]')).find(
+    (candidate) => candidate.querySelector('[data-unit-name]')?.textContent === name,
+  );
+  if (row === undefined) {
+    throw new Error(`no row ${name}`);
+  }
+  return row;
+}
+
+// --- the tests ---------------------------------------------------------------------
+
+describe('the Craft Recipe control', () => {
+  it('prints one word per recipe, divided by the pipe, the first recipe active, and the Craft Cost once', async () => {
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    expect(control().closest('[data-recipe-slot]')).not.toBeNull();
+    expect(control().querySelector('[data-recipe-label]')?.textContent).toBe('Craft Recipe');
+    expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
+    const separator = control().querySelector<HTMLElement>('[data-separator]');
+    expect(separator?.textContent).toBe('|');
+    expect(separator?.style.color).toBe(rgb(colors['ink-tertiary']));
+    // The active word is not a target; the inactive one is the only button.
+    expect(option('greater').tagName).toBe('SPAN');
+    expect(option('greater').getAttribute('aria-current')).toBe('true');
+    expect(option('perfect').tagName).toBe('BUTTON');
+    expect(control().querySelectorAll('button')).toHaveLength(1);
+    // No form control of any kind.
+    expect(control().querySelectorAll('input, select, [role="radio"], [role="switch"]')).toHaveLength(0);
+    expect(costLine()).toBe('0.03Divine / craft');
+    expect(control().querySelector('[data-recipe-cost-figure]')?.textContent).toBe('0.03');
+    // Craft Cost prints nowhere else.
+    expect(frame().textContent.split('/ craft')).toHaveLength(2);
+    expect(control().style.width).toBe('216px');
+  });
+
+  it('ranks crafted rows with the class glyph, the Item Class name and the EV, beside raw rows', async () => {
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    expect(names()).toEqual(['Staves', 'Bows', 'Wide Belt', 'Gold Amulet']);
+    expect(cells('ev')).toEqual(['0.97', '0.47', '0.40', '0.30']);
+    expect(cells('rank')).toEqual(['1', '2', '3', '4']);
+    const glyph = rowNamed('Bows').querySelector<HTMLElement>('[data-unit-glyph]');
+    expect(glyph?.dataset['unitGlyph']).toBe('class');
+    expect(rowNamed('Bows').hasAttribute('data-raw')).toBe(false);
+    expect(statement()).toBeNull();
+  });
+
+  it('a click re-ranks in the same pass, raw rows keep their relative order, and the choice survives a reload', async () => {
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    click(option('perfect'));
+    // No timer has run: the click is not debounced.
+    expect(option('perfect').tagName).toBe('SPAN');
+    expect(option('greater').tagName).toBe('BUTTON');
+    expect(names()).toEqual(['Bows', 'Wide Belt', 'Gold Amulet', 'Staves']);
+    expect(cells('ev')).toEqual(['0.70', '0.40', '0.30', '-0.30']);
+    expect(costLine()).toBe('0.30Divine / craft');
+    expect(localStorage.getItem(RECIPE_STORAGE_KEY)).toBe('perfect');
+    unmount();
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    expect(option('perfect').getAttribute('aria-current')).toBe('true');
+    expect(names()).toEqual(['Bows', 'Wide Belt', 'Gold Amulet', 'Staves']);
+  });
+
+  it('a click on the active word does nothing', async () => {
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    click(option('greater'));
+    expect(localStorage.getItem(RECIPE_STORAGE_KEY)).toBeNull();
+    expect(names()).toEqual(['Staves', 'Bows', 'Wide Belt', 'Gold Amulet']);
+  });
+
+  it('falls back to the first recipe in file order when the stored id is unknown', async () => {
+    localStorage.setItem(RECIPE_STORAGE_KEY, 'vanished');
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    expect(option('greater').getAttribute('aria-current')).toBe('true');
+    expect(names()[0]).toBe('Staves');
+  });
+
+  it('keeps an open panel open across a switch, and its sub-line names the new recipe', async () => {
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    click(rowNamed('Bows'));
+    const sub = (): string => frame().querySelector('[data-expansion-panel] [data-panel-sub]')?.textContent ?? '';
+    expect(sub()).toContain('Craft Recipe greater');
+    click(option('perfect'));
+    expect(frame().querySelectorAll('[data-expansion-panel]')).toHaveLength(1);
+    expect(rowNamed('Bows').hasAttribute('data-open')).toBe(true);
+    expect(sub()).toContain('Craft Recipe perfect');
+  });
+
+  it('keeps the slot empty, at its width, when recipes.json holds no recipe', async () => {
+    serveWorld(standardWorld({ recipes: [] }));
+    mount();
+    await settleTo('ready');
+    const slot = frame().querySelector<HTMLElement>('[data-recipe-slot]');
+    expect(slot?.children).toHaveLength(0);
+    expect(slot?.style.width).toBe('216px');
+    expect(names()).toEqual(['Wide Belt', 'Gold Amulet']);
+  });
+
+  it('takes the refusal screen when two recipes derive one word, or one mixes grades', async () => {
+    for (const recipes of [
+      [recipe('greater', 44, 'greater'), recipe('greater-too', 50, 'greater')],
+      [{ ...recipe('mixed', 44, 'greater'), currencies: [{ currencyId: 'greater-orb-of-transmutation', quantity: 1 }, { currencyId: 'perfect-orb-of-augmentation', quantity: 1 }] }],
+    ]) {
+      serveWorld(standardWorld({ recipes }));
+      mount();
+      await settleTo('refused');
+      expect(frame().querySelector('[data-artifact]')?.textContent).toBe('recipes.json');
+      unmount();
+    }
+  });
+});
+
+describe('the crafted states', () => {
+  it('state 25: nothing clears, every crafted pair ranks at minus its Craft Cost, numerals print', async () => {
+    const now = Date.now();
+    serveWorld(
+      standardWorld({
+        dataset: [priced(bows, 0.1, hoursBefore(now, 1)), priced(belt, 0.1, hoursBefore(now, 1))],
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    expect(statement()?.dataset['listStatement']).toBe('nothing-clears');
+    expect(names()).toEqual(['Bows', 'Staves', 'Gold Amulet']);
+    expect(cells('ev')).toEqual(['-0.03', '-0.03', 'no figure yet']);
+    expect(cells('rank')).toEqual(['1', '2', '']);
+  });
+
+  it('state 35: an uncostable recipe splits the list into two branches, with no numerals and a declarative', async () => {
+    serveWorld(standardWorld({ rates: RATES.slice(0, 2) }));
+    mount();
+    await settleTo('ready');
+    expect(statement()).toBeNull();
+    expect(costLine()).toBe('0.03Divine / craft');
+    click(option('perfect'));
+    expect(costLine()).toBe('no figure yet');
+    expect(control().querySelector('[data-recipe-cost-figure]')).toBeNull();
+    expect(statement()?.dataset['listStatement']).toBe('uncostable');
+    expect(statement()?.textContent).toBe(uncostableCopy('perfect'));
+    const [rawBranch, craftedBranch] = Array.from(frame().querySelectorAll<HTMLElement>('[data-list-branch]'));
+    expect(rawBranch?.dataset['listBranch']).toBe('raw');
+    expect(craftedBranch?.dataset['listBranch']).toBe('crafted');
+    expect(names(rawBranch)).toEqual(['Wide Belt', 'Gold Amulet']);
+    // The crafted branch keeps the gross-payout order: Bows 1 × 1, Staves 0.
+    expect(names(craftedBranch)).toEqual(['Bows', 'Staves']);
+    expect(cells('ev', craftedBranch)).toEqual(['no figure yet', 'no figure yet']);
+    expect(cells('rank')).toEqual(['', '', '', '']);
+    // Tiers run per branch: each branch opens at tier 1.
+    expect(Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'), (row) => row.dataset['tier'])).toEqual([
+      '1',
+      '1',
+      '1',
+      '1',
+    ]);
+    expect(frame().querySelector('[data-appendix-row]')).toBeNull();
+  });
+
+  it('state 35 bounds each branch at the top 20, with one affordance under each', async () => {
+    const now = Date.now();
+    const raws = Array.from({ length: 21 }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
+    const classes = Array.from({ length: 22 }, (_, index) => {
+      const n = String(index).padStart(2, '0');
+      return [`fixture.class${n}`, `Class_${n}`, BOWS] as const;
+    });
+    const crafted = classes.map(([categoryId, className]) => chase(categoryId, className));
+    serveWorld({
+      tracked: [...raws, ...crafted],
+      dataset: [
+        ...raws.map((entry, index) => priced(entry, 1 + index / 100, hoursBefore(now, 1))),
+        ...crafted.map((entry) => priced(entry, 1, hoursBefore(now, 1))),
+      ],
+      classes,
+      rates: [],
+    });
+    mount();
+    await settleTo('ready');
+    const branches = Array.from(frame().querySelectorAll<HTMLElement>('[data-list-branch]'));
+    expect(branches).toHaveLength(2);
+    expect(branches.map((branch) => branch.querySelectorAll('[data-ranked-row]').length)).toEqual([20, 20]);
+    expect(branches.map((branch) => branch.querySelector('[data-expand-affordance]')?.textContent)).toEqual([
+      expandCopy(1),
+      expandCopy(2),
+    ]);
+  });
+
+  it('state 23: a league reset lists crafted and raw rows in one canonical sequence, costable or uncostable', async () => {
+    const now = Date.now();
+    serveWorld(
+      standardWorld({
+        dataset: [
+          priced(bows, 1, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(staves, 2, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(belt, 0.4, hoursBefore(now, 30 * 24), 'Standard'),
+        ],
+        // greater costable, perfect uncostable.
+        rates: RATES.slice(0, 2),
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    for (const recipeId of ['greater', 'perfect']) {
+      if (recipeId === 'perfect') {
+        click(option('perfect'));
+        expect(costLine()).toBe('no figure yet');
+      }
+      expect(statement()?.dataset['listStatement'], recipeId).toBe('honest-empty');
+      expect(frame().querySelector('[data-list-branch="crafted"]'), recipeId).toBeNull();
+      // Canonical key order: every crafted class key sorts before every raw key.
+      expect(names(), recipeId).toEqual(['Bows', 'Staves', 'Gold Amulet', 'Wide Belt']);
+      expect(cells('rank'), recipeId).toEqual(['', '', '', '']);
+      expect(cells('ev'), recipeId).toEqual(['no figure yet', 'no figure yet', 'no figure yet', 'no figure yet']);
+    }
+  });
+
+  it('state 36: a pair the recipe cannot reach is Unrankable under that recipe only', async () => {
+    const now = Date.now();
+    const wands = chase('weapon.wand', 'Wands');
+    serveWorld(
+      standardWorld({
+        tracked: [bows, wands],
+        dataset: [priced(bows, 1, hoursBefore(now, 1)), priced(wands, 1, hoursBefore(now, 1))],
+        classes: [
+          ['weapon.bow', 'Bows', BOWS],
+          ['weapon.wand', 'Wands', WANDS],
+        ],
+        recipes: [{ id: 'regular', currencies: [{ currencyId: 'divine', quantity: 0.01 }], modifierLevelMin: 0 }, RECIPES[1]],
+        rates: [...RATES, rate('divine', 1)],
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('regular|perfect');
+    // At floor 0 every Wands tier is eligible and the target is all of its prefix pool.
+    expect(names()).toEqual(['Wands', 'Bows']);
+    expect(frame().querySelector('[data-appendix-row]')).toBeNull();
+    click(option('perfect'));
+    expect(names()).toEqual(['Bows']);
+    const rows = Array.from(frame().querySelectorAll('[data-appendix-row]'), (row) => [
+      row.querySelector('[data-appendix-class]')?.textContent,
+      row.querySelector('[data-cell="reason"]')?.textContent,
+    ]);
+    expect(rows).toEqual([['Wands', 'recipe cannot reach this class']]);
+  });
+});

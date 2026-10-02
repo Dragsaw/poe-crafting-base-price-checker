@@ -87,12 +87,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: code review of spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md (2026-09-27)
 
 - source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
-  summary: Once Epic 3 ranks crafted rows, `listStatement` never returns nothing-clears, because the crafted rows stay in `ordering`. "Rank numerals stay" in EXPERIENCE.md state 25 goes untested.
-  evidence: The spec's frontmatter `deferred` recorded this, and it was never appended here. EXPERIENCE.md state 25 keeps every crafted Item Class ranked at minus its Craft Cost, with rank numerals. `packages/web/src/list/list-statement.ts` returns `none` whenever `ordering.length > 0`. Today `KIND_ORDER` in `packages/core/src/rank.ts` is `{ raw: 0 }`, so the bad outcome cannot occur yet. Settled when Epic 3 defines how a crafted row relates to the threshold in `Ranking`, and a crafted-plus-threshold test is written. Severity: medium (unverified).
-- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
-  summary: EXPERIENCE.md state 35 (active recipe uncostable) adds a third plain declarative "in state 25's register". The single slot built for two exclusive statements will then need a third kind and a ruling on which statements can co-occur.
-  evidence: The spec's frontmatter `deferred` recorded this, and it was never appended here. The `ListStatement` union in `packages/web/src/list/list-statement.ts` and `spacing.frameReserveListStatement` both assume exactly two exclusive statements. Settled when the Epic 3 story for state 35 decides whether state 35 can co-occur with state 23 or state 25. Severity: medium (unverified).
-- source_spec: `docs/stories/spec-2-7-day-one-deployed-the-honest-empty-league-reset-and-the-published-site.md`
   summary: The literal copy of the two list statements is owed to its owner document. The copy is `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (state 23) and `Nothing clears your Payout Threshold of <x.xx> Divine.` (state 25).
   evidence: The 2026-09-27 human decision in spec 2.7 (Decisions) fixed the copy. Only that spec and `packages/web/src/list/list-statement.ts` (`honestEmptyCopy`, `nothingClearsCopy`) carry it. EXPERIENCE.md states 23 and 25 describe the declaratives, and revision 4 closed the nothing-clears copy (memlog 204), but neither state holds the literal text. A later UX revision of either state can drift from the code without a signal. The UX owner decides where the text lives.
 
@@ -275,3 +269,28 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-load-lookup-ts-through-weightsfileschema.md`
   summary: A `mods` row of `pnpm tracked:lookup` no longer carries the readable mod text; its `text` repeats `modGroup`, and the families of one `modGroup` differ only in `statIds`.
   evidence: The weights contract has no field for the mod text (`sourceModifierId` is opaque), so the typed load cannot print it. The skill now names each stat with `pnpm tracked:lookup stat <statId>`. A `text` per row could be joined from `stats.json` by `statId`, or the producer could emit it, which is the decision of the open `modText` entry on `WEIGHTS-FILE-SCHEMA.md`.
+
+## Deferred from: story 3.4 (2026-10-02)
+
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "[NOTE FOR ARCHITECT] Take ownership of the recipe-word predicate in IMPLEMENTATION-NOTES, so the grade-ruling entry above (UX memlog 233, finding HR-10) can close. Story 3.4 built the player's Decision: the grades are the currency-id prefixes `greater-` and `perfect-` only; a recipe whose currencies carry neither reads `regular`; `RecipesFileSchema` refuses a recipe that mixes grades (a grade beside an ungraded currency counts as mixed) and two recipes that derive one word (AD-3 refusal)."
+  evidence: "`packages/contracts/src/craft-recipe.ts` (`RECIPE_GRADES`, `recipeWord`), `packages/contracts/src/envelopes.ts` (`RecipesFileSchema` refine). The spec forbids an owner-document edit."
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "[NOTE FOR PM] FR-4 owes a ruling on the provisional reason `recipe cannot reach this class`. `core` gives it to an `(Item Class, recipe)` pair whose `combinationProbability` returns `empty-eligible-pool` or `augment-exhausted`; the appendix prints it for the active recipe only. Adopt or reword it. The case is live, not defensive: every `jewel/Emerald` tier in the committed `weights.json` has `itemLevelMin` 1, so both v1 floors (44 and 70) empty its prefix pool, and Emerald is in the appendix under both recipes. The Emerald re-floor to 82 does not change this, because the recipe floor reads the tier's level, not the entry's (IN §9)."
+  evidence: "`packages/core/src/rank.ts` `RECIPE_UNREACHABLE`; `packages/web/src/App.test.tsx`, the committed-data appendix test. Check with `pnpm tracked:lookup` on `jewel/Emerald`, or `combinationProbability` at floors 0, 44 and 70."
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "Player. Replace the four dummy orb rates in `data/currencies.json` (`greater-` and `perfect-orb-of-transmutation` / `-augmentation`, `source: \"dummy, not measured\"`) with measured values. Until the next sync copies them into `dataset.json`, both recipes are uncostable and the page renders state 35."
+  evidence: "`data/currencies.json`; `dataset.json` `currencyRates` holds only divine, exalted and chaos."
+  retry_when: The player has measured rates for the four orbs.
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "[NOTE FOR UX] Three provisional choices need an owner. (1) State 35's declarative copy: `The <word> Craft Recipe has no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.` (2) The one list-statement slot prints at most one statement, by the precedence honest-empty (23), then uncostable (35), then nothing-clears (25). (3) The crafted panel's sub-line `Payout Threshold N.NN Divine | Craft Recipe <word>. <asking-price sentence>` drops the mockup's lead sentence about the listed Combinations until Story 3.5 lists them."
+  evidence: "`packages/web/src/list/list-statement.ts` (`uncostableCopy`, `listStatement`), `packages/web/src/list/format.ts` (`classPanelSubLine`)."
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "Story 3.5. The crafted expansion panel shows only its title and sub-line; it lists no Combination row. Story 3.5 adds the rows, the chase cells and the crafted Age cell. A crafted row's Age and Provenance cells are empty until 3.5 and 3.6."
+  evidence: "`packages/web/src/list/ExpansionPanel.tsx` `ClassExpansionPanel` passes `combinations={[]}`; `ClassDisplayRow.age` is always `undefined`."
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "Review B3. The dummy orb rates in `data/currencies.json` reach `dataset.json` on the next sync. The published page then prints made-up Craft Costs and crafted EVs, and nothing flags them. No layer reads a rate's `source`."
+  evidence: "`data/currencies.json` (`source: \"dummy, not measured\"`). `craftCost` in `packages/core/src/craft-cost.ts` reads only `rate` and `league`. Settled when the player replaces the rates before a sync, or when a gate refuses a non-measured `source`. Severity: medium."
+- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
+  summary: "Review B4. Since Story 3.4 ranks crafted Item Classes, the masthead dek is false on the page. `MASTHEAD_DEK` in `packages/web/src/frame/Masthead.tsx` still says crafted Item Classes are not ranked yet. EXPERIENCE.md owns the copy, so this sharpens the open epic 2 retro item 19 entry."
+  evidence: "`packages/web/src/frame/Masthead.tsx` `MASTHEAD_DEK`. The review brief (AGENT-WORKFLOW) forbids a reviewer edit of EXPERIENCE.md. Severity: low."

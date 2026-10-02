@@ -1,0 +1,36 @@
+/*
+ * `{components.craft-recipe}`'s two words. The inactive word is the click
+ * target: ink-secondary at 400 on a dotted sepia rule AT REST, going solid and
+ * ink on hover. The active word is not a target: ink at 700 on a 2px solid
+ * sepia rule, with no hover state and no pointer. Token custom properties
+ * only, as frame.css states.
+ */
+
+.fg-recipe-option {
+  display: inline;
+  margin: 0;
+  padding: 0 0 1px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font: inherit;
+}
+
+.fg-recipe-option[data-active] {
+  color: var(--fg-color-ink);
+  font-weight: 700;
+  border-bottom: 2px solid var(--fg-color-sepia);
+  cursor: default;
+}
+
+.fg-recipe-option[data-inactive] {
+  color: var(--fg-color-ink-secondary);
+  font-weight: 400;
+  border-bottom: 1px dotted var(--fg-color-sepia);
+  cursor: pointer;
+}
+
+.fg-recipe-option[data-inactive]:hover {
+  color: var(--fg-color-ink);
+  border-bottom-style: solid;
+}

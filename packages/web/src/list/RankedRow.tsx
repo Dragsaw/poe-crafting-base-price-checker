@@ -4,7 +4,7 @@ import type { CSSProperties, JSX } from 'react';
 
 import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/tokens';
 import { cellStyle } from './ColumnHeader';
-import type { DisplayRow } from './display-rows';
+import type { ListRow } from './display-rows';
 import { MONEY_PHRASES, rawNote } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
@@ -33,7 +33,7 @@ export function RankedRow({
   open,
   onToggle,
 }: {
-  readonly row: DisplayRow;
+  readonly row: ListRow;
   readonly open: boolean;
   readonly onToggle: (key: string) => void;
 }): JSX.Element {

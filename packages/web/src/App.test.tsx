@@ -1062,7 +1062,7 @@ describe('the list statement', () => {
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
   });
 
-  it('prints no recipes.json absence line on the committed data/, whose recipes list is empty', async () => {
+  it('prints no recipes.json absence line on the committed data/, and the control prints its two recipes', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes}.json', {
       eager: true,
       import: 'default',
@@ -1075,7 +1075,10 @@ describe('the list statement', () => {
     });
     mount();
     await settleTo('ready');
-    expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toEqual([]);
+    expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toHaveLength(2);
+    expect(frame().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
+    // The committed dataset carries no orb rate until the next sync: the cost line is a money phrase.
+    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe('no figure yet');
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(frame().textContent).not.toContain('recipes.json');
     expect(statement()).toBeNull();
@@ -1128,7 +1131,7 @@ describe('the Unrankable appendix', () => {
   }
 
   // Matrix: committed.
-  it('renders the empty appendix on the committed data/, whose pools are all complete, above the key block and the foot', async () => {
+  it('renders the appendix on the committed data/, above the key block and the foot', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights}.json', {
       eager: true,
       import: 'default',
@@ -1141,11 +1144,17 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    // Producer 6.1.0 declares every pool `complete` (the not-in-game tiers no longer make a pool partial).
-    expect(appendixRows()).toEqual([]);
-    expect(appendix().dataset['unrankableAppendix']).toBe('empty');
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('0 Item Classes');
-    expect(frame().textContent).not.toContain(APPENDIX_LEAD);
+    // Producer 6.1.0 declares every pool `complete` (the not-in-game tiers no longer make a pool partial),
+    // so no class-level reason fires. Every `jewel/Emerald` tier sits at modifier level 1, below the greater
+    // recipe's floor of 44, so that pair alone is unrankable under the active recipe (state 36).
+    expect(
+      appendixRows().map((row) => [
+        row.querySelector('[data-appendix-class]')?.textContent,
+        row.querySelector('[data-cell="reason"]')?.textContent,
+      ]),
+    ).toEqual([['Emerald', 'recipe cannot reach this class']]);
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('1 Item Class');
+    expect(appendix().textContent).toContain(APPENDIX_LEAD);
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.
