@@ -12,18 +12,23 @@ import {
   parsePort,
   planStop,
   type ProcessInfo,
+  snapshot,
 } from './dev-stop';
 
 /** While set, the mocked execFileSync runs the listener query against a cmdlet that does not exist. */
 const MISSING_CMDLET = 'Get-NoSuchNetTCPConnection';
-const failure = vi.hoisted(() => ({ inject: false }));
+const failure = vi.hoisted(() => ({ inject: false, badShape: false }));
 
 vi.mock('node:child_process', async (importOriginal) => {
   const real = await importOriginal<typeof import('node:child_process')>();
   const execFileSync = ((file: string, args: readonly string[] = [], options?: object) =>
     real.execFileSync(
       file,
-      failure.inject ? args.map((arg) => arg.replaceAll('Get-NetTCPConnection', MISSING_CMDLET)) : args,
+      failure.inject
+        ? args.map((arg) => arg.replaceAll('Get-NetTCPConnection', MISSING_CMDLET))
+        : failure.badShape
+          ? args.map((arg) => arg.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
+          : args,
       options,
     )) as typeof real.execFileSync;
   return { ...real, execFileSync };
@@ -31,6 +36,7 @@ vi.mock('node:child_process', async (importOriginal) => {
 
 afterEach(() => {
   failure.inject = false;
+  failure.badShape = false;
 });
 
 const ROOT = 'E:\\Projects\\poe';
@@ -289,6 +295,42 @@ async function close(server: Server): Promise<void> {
 
 // Each query starts powershell.exe, which can take seconds.
 const POWERSHELL_TIMEOUT_MS = 30_000;
+
+describe.skipIf(!canQuery)('snapshot', () => {
+  it(
+    'reads this process as the listener of a real port, then no listener once it closes',
+    async () => {
+      const server = await listen();
+      const port = portOf(server);
+      try {
+        const open = snapshot(port);
+        expect(open.listeners).toContain(process.pid);
+        expect(open.processes.some((entry) => entry.pid === process.pid)).toBe(true);
+      } finally {
+        await close(server);
+      }
+      expect(snapshot(port).listeners).toEqual([]);
+    },
+    POWERSHELL_TIMEOUT_MS,
+  );
+});
+
+describe.runIf(process.platform === 'win32')('snapshot with an unreadable listener list', () => {
+  it(
+    'throws instead of passing a non-PID listener on',
+    async () => {
+      const server = await listen();
+      try {
+        failure.badShape = true;
+        expect(() => snapshot(portOf(server))).toThrow(/unexpected listener query result/);
+      } finally {
+        failure.badShape = false;
+        await close(server);
+      }
+    },
+    POWERSHELL_TIMEOUT_MS,
+  );
+});
 
 describe.runIf(process.platform === 'win32')('listenersWindows', () => {
   it(
