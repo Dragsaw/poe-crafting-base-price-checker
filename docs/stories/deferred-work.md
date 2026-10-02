@@ -186,26 +186,14 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: epic 2 retro item 8 (2026-09-27)
 
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
-  summary: "Note. `packages/web/vite.config.ts` still has a comment that says \"eight\" artifacts. The spec forbids edits to that file, so the comment stays until a change that is allowed to edit it."
-  evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`, Never. `grep -n eight packages/web/vite.config.ts`.
-- source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
   summary: "Note. The epic 2 retrospective entry \"Parse the eight kept artifacts … during `pnpm build`\" predates this change. Its \"eight\" now means the seven AD-24 artifacts (`ALLOWLIST` in `tools/prune-pages.mjs`); `catalogue/static.json` is no longer kept in the Pages build."
   evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`. `pnpm build` logs `prune-pages: removed … catalogue/static.json …`.
-- source_spec: `docs/stories/spec-deferred-post-emit-rewrite-covers-only-contracts.md`
-  summary: `TARGET_DIRS` in `tools/dts-specifiers/rewrite-dts-specifiers.ts` is a hand-kept list of packages, and nothing checks it against the `emitDeclarationOnly` packages, so a new such package keeps its `.ts` specifiers in `dist` with no signal.
-  evidence: Review of this spec (blind and edge-case layers). The list was hand-kept before this change too (contracts only), which is how the closed entry arose. A test that reads each `packages/*/tsconfig.json` and compares the `emitDeclarationOnly` ones with `TARGET_DIRS`, or a fourth item in the AGENTS.md "A new package needs three edits" pitfall, would close it.
-- source_spec: `docs/stories/spec-deferred-no-test-checks-scripts-coverage.md`
-  summary: No test checks that the hand-listed `tools/` entries in `tsconfig.tools.json`, `vitest.config.ts` and `eslint.config.mjs` (`tools/boundary-check`, `tools/dev-stop`, `tools/dts-specifiers`, `tools/prune-pages.mjs`) still cover their files; only `.claude/skills/tracked-json/scripts/` has a wiring guard.
-  evidence: The closed entry's evidence says `tools/boundary-check` has no wiring guard either and that the fix belongs to a general "every .ts file is covered" guard. This change built only the tracked-json guard (`test/tracked-json-scripts-coverage.test.ts`), whose checkers are per directory. Dropping, for example, `tools/dev-stop/*.ts` from `tsconfig.tools.json` still fails neither `pnpm check` nor `pnpm test`. Extending the same checkers over each hand-listed directory would close it.
 
 ## Deferred from: story 3.1 (2026-09-27)
 
 - source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
   summary: "[NOTE FOR ARCHITECT] `WeightsFileSchema` refuses a few values that *Validation* in `WEIGHTS-FILE-SCHEMA.md` does not list as hard errors: an empty `producer.id`, a `producer.generatedAt` that is not ISO-8601 UTC, and an empty `categoryId`, `className` or `statId`. The trust strip needs the first two (`utcDate` throws on a non-ISO instant). The reused id schemas carry the rest. Either list them in *Validation*, or say that *Validation* covers only the rules beyond the typed Shape."
   evidence: Story 3.1 review, triage row 2. `packages/contracts/src/weights-file.ts`, `packages/web/src/frame/trust-facts.ts` `utcDate`.
-- source_spec: `docs/stories/spec-3-1-consuming-a-schema-conformant-weights-file-and-its-pool-completeness-contract.md`
-  summary: "`.claude/skills/tracked-json/scripts/lookup.ts` still reads `data/weights.json` as untyped JSON with its own guards, and it splits `sourceModifierId` for display. Load it through `WeightsFileSchema` and use `modGroup` and `tierLabel`, so the curation skill cannot drift from the contract."
-  evidence: Story 3.1 review, triage row 16. The script predates the story and sits outside the product packages.
 
 ## Deferred from: story 3.2 (2026-09-27)
 
@@ -254,9 +242,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
   summary: "[NOTE FOR ARCHITECT] `AGENT-WORKFLOW.md` *Parallel worktrees* says \"A pass does not cover the checks that `pnpm tracked:check` lists under `pending`.\" `tracked:check` now runs the five cross-file checks and has no `pending` field. Retire the sentence, or state what a pass still does not confirm (a floor declared too high, AD-5)."
   evidence: `packages/sync/src/curation/check.ts`. The spec forbids an edit to an owner document in this story.
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "The tracked-json SKILL (`.claude/skills/tracked-json/SKILL.md`) says `tracked:check` validates the five cross-file checks and tells the agent to loop until exit 0. It does not say that `cross-file: skipped` (weights file absent) also exits 0, or that a class absent from the weights file or with a `partial` slot gets no edge, containment or kind check. Add both caveats, so that the agent reads `checks` and not only the exit code."
-  evidence: `packages/sync/src/curation/check.ts` pushes `skipped` with `ok: true` when the weights file is absent. `packages/core/src/cross-file.ts` skips pool checks when `poolOf` fails or a slot is `partial`. Review Triage Log row 5 defers this, because the fix edits an agent-context file.
 - source_spec: `docs/stories/spec-deferred-stop-poll-listener-query-untested.md`
   summary: No test runs the Windows pre-kill snapshot reader (`snapshot` / `snapshotWindows`), so its `parseListenerJson` call on `listeners` can be removed with every test still passing.
   evidence: `snapshot`, `snapshotWindows` and `main` are not exported, and no test file references them; the real-listener test runs only `listenerPids` -> `listenersWindows`. `snapshotWindows` serialises through `@{ listeners = $l } | ConvertTo-Json -Depth 3`, a different shape path from the `-InputObject` query. Pre-existing: the snapshot reader never had a test. Covering it needs `snapshot` exported and a real-listener test asserting `snapshot(port).listeners` contains `process.pid`.
@@ -269,6 +254,21 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-pm-sweep-epics-md-to-follow-ux.md`
   summary: The craft-recipe AC in docs/epics.md (Story 3.4, `{components.craft-recipe}`) prints the two options as the fixed pair `greater | perfect`, but the grade-prefix rule it now cites also gives `regular` for a recipe with no grade prefix and refuses mixed grades or duplicate words; the AC has no Given/When/Then for either branch.
   evidence: docs/epics.md, the `{components.craft-recipe}` AC just above the grade-prefix citation; EXPERIENCE.md `{components.craft-recipe}` and DESIGN.md `craft-recipe.optionTextSource` carry the `regular` and refusal branches. The pair predates this sweep. The architect's grade-prefix predicate is already ledgered before the Story 3.4 spec; the PM owes the AC wording once it lands.
+- source_spec: `docs/stories/spec-deferred-no-test-checks-hand-listed-tools.md`
+  summary: `tools/prune-pages.mjs` is in `tsconfig.tools.json` only, and that entry checks almost nothing: `checkJs` is `false`, so `tsc` reports no type errors for it, and no ESLint `files` glob names a `.mjs` under `tools/`, so only ESLint's default JS rules apply to it.
+  evidence: Pre-existing; the coverage guard (`test/hand-listed-coverage.test.ts`) pins only the include entry that exists. `eslint.config.mjs` `files` has `tools/**/*.ts` and the root-only `*.{ts,mts,cts,mjs}`. Settle it by deciding whether `tools/*.mjs` gets type-checking (`// @ts-check` or `checkJs`) and an ESLint glob, then extend the guard's `tools/prune-pages.mjs` row.
+- source_spec: `docs/stories/spec-deferred-no-test-checks-hand-listed-tools.md`
+  summary: `tools/setup-git-hooks.mjs` is in no config: `tsconfig.tools.json`, the Vitest `root` project and the ESLint `files` globs all leave it out, so nothing type-checks, lints or tests it.
+  evidence: Pre-existing. `tsconfig.tools.json` `include` lists `tools/prune-pages.mjs` but not `tools/setup-git-hooks.mjs`; the coverage guard covers only hand-listed entries, so it is silent about this file.
+- source_spec: `docs/stories/spec-deferred-no-test-checks-hand-listed-tools.md`
+  summary: The other hand-listed config entries outside `tools/` and `.claude/` have no wiring guard: `test/**/*.ts`, `vitest.config.ts`, `packages/*/vitest.config.ts`, `packages/web/vite.config.ts`, `packages/web/vite.config.test.ts`, `depcruise.rules.mjs` and `.dependency-cruiser.mjs` in `tsconfig.tools.json`, `test/**/*.test.ts` in the Vitest `root` project, and `test/**/*.ts` and `.dependency-cruiser.mjs` in the ESLint `files` glob.
+  evidence: Pre-existing. Dropping `test/**/*.ts` from `tsconfig.tools.json` stops the coverage guard itself from being type-checked, and `pnpm check` still passes. The guard's `TARGETS` table could take these rows the same way it takes the `tools/` rows.
+- source_spec: `docs/stories/spec-deferred-note-packages-web-vite-config-ts.md`
+  summary: The comment at `.github/workflows/deploy.yml:4` still says "the eight AD-24 artifacts", but AD-24 fixes seven.
+  evidence: `grep -n eight .github/workflows/deploy.yml` prints line 4. The entry this spec closes covered only `packages/web/vite.config.ts`; the same stale count sits in the workflow comment.
+- source_spec: `docs/stories/spec-deferred-load-lookup-ts-through-weightsfileschema.md`
+  summary: A `mods` row of `pnpm tracked:lookup` no longer carries the readable mod text; its `text` repeats `modGroup`, and the families of one `modGroup` differ only in `statIds`.
+  evidence: The weights contract has no field for the mod text (`sourceModifierId` is opaque), so the typed load cannot print it. The skill now names each stat with `pnpm tracked:lookup stat <statId>`. A `text` per row could be joined from `stats.json` by `statId`, or the producer could emit it, which is the decision of the open `modText` entry on `WEIGHTS-FILE-SCHEMA.md`.
 
 ## Deferred from: story 3.4 (2026-10-02)
 

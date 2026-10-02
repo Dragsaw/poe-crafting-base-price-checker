@@ -24,7 +24,7 @@
 import type { ClockPort, FilesystemPort, GitPort, HttpPort, LeagueId } from '@poe/contracts';
 
 import { loadCatalogueIds } from './catalogue/catalogue-ids.ts';
-import { runChunk } from './chunk/run-chunk.ts';
+import { runChunk, writeStderr } from './chunk/run-chunk.ts';
 import type { ChunkOutcome, ChunkPorts, ChunkSession, ChunkStep } from './chunk/run-chunk.ts';
 import { createLeagueGate } from './league/league-gate.ts';
 import { loadConfig } from './load-config.ts';
@@ -114,6 +114,8 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     wait,
     userAgent,
     invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
+    // A 429's diagnostic line goes where the chunk's own lines go.
+    log: log ?? writeStderr,
     ...(pacing === undefined ? {} : { pacing }),
     ...(spread === undefined ? {} : { spread }),
   });

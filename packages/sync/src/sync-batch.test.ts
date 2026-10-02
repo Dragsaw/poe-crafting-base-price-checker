@@ -313,6 +313,17 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
+  it("a 429's diagnostic line reaches the chunk's operator log", async () => {
+    const { deps } = depsFor(LEAGUE, { answers: { leagues: THROTTLED } });
+    const lines: string[] = [];
+
+    expect(await syncCommand({ ...deps, log: (line) => lines.push(line) })).toBe(0);
+
+    expect(lines.filter((line) => line.includes('answered 429'))).toEqual([
+      expect.stringContaining('response headers {"retry-after":"60"}; paced on no reading'),
+    ]);
+  });
+
   it('a gate 429 publishes the catalogue marks, and the not-reached count is every eligible entry', async () => {
     const ghost: TrackedEntry = { kind: 'raw', baseTypeId: 'Ghost Amulet', itemLevelMin: 82, status: 'active' };
     const others: TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }, { ...ENTRY, itemLevelMin: 84 }];

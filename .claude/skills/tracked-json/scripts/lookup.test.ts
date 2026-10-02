@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { WeightsFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -11,6 +12,7 @@ import {
   FILTERS_PATH,
   ITEMS_PATH,
   LookupError,
+  loadWeights,
   lookupBase,
   lookupClass,
   lookupMods,
@@ -104,8 +106,10 @@ const LIFE = 'explicit.stat_life';
 const SPELL = 'explicit.stat_spell';
 const MELEE = 'explicit.stat_melee';
 
-const WEIGHTS = {
+const WEIGHTS = WeightsFileSchema.parse({
   schemaVersion: '6.0.0',
+  gamePatch: '0.4.0',
+  producer: { id: 'test', generatedAt: '2026-10-02T00:00:00Z' },
   bases: {
     'accessory.amulet': {
       Amulets: {
@@ -154,9 +158,9 @@ const WEIGHTS = {
       },
     },
     // A second category with a class of the same name, for the ambiguity row.
-    'armour.shield': { Body_Armours_dex: { prefix: { entries: [] }, suffix: { entries: [] } } },
+    'armour.shield': { Body_Armours_dex: { prefix: { poolCoverage: 'complete', entries: [] }, suffix: { poolCoverage: 'complete', entries: [] } } },
   },
-};
+});
 
 describe('lookupStat', () => {
   it('matches case-insensitively over every group', () => {
@@ -254,6 +258,43 @@ describe('lookupClass', () => {
   });
 });
 
+describe('loadWeights', () => {
+  function readerOf(weights: unknown) {
+    return (path: string): unknown => {
+      expect(path).toBe(WEIGHTS_PATH);
+      return weights;
+    };
+  }
+
+  it('names the file, the path and the message of a schema-invalid weights file', () => {
+    const broken = structuredClone(WEIGHTS) as unknown as {
+      bases: Record<string, Record<string, { prefix: { entries: Record<string, unknown>[] } }>>;
+    };
+    const entry = broken.bases['accessory.amulet']?.['Amulets']?.prefix.entries[0];
+    expect(entry).toBeDefined();
+    delete entry?.['modGroup'];
+
+    expect(() => loadWeights(readerOf(broken))).toThrow(LookupError);
+    expect(() => loadWeights(readerOf(broken))).toThrow(
+      `${WEIGHTS_PATH}: bases.accessory.amulet.Amulets.prefix.entries.0.modGroup: modGroup is missing`,
+    );
+  });
+
+  it('refuses a negative weight', () => {
+    const broken = structuredClone(WEIGHTS) as unknown as {
+      bases: Record<string, Record<string, { prefix: { entries: Record<string, unknown>[] } }>>;
+    };
+    const entry = broken.bases['accessory.amulet']?.['Amulets']?.prefix.entries[0];
+    if (entry !== undefined) {
+      entry['weight'] = -1;
+    }
+
+    expect(() => runCommand({ kind: 'class', query: 'amul' }, (path) => (path === WEIGHTS_PATH ? broken : FILTERS))).toThrow(
+      `${WEIGHTS_PATH}: bases.accessory.amulet.Amulets.prefix.entries.0.weight: weight is negative`,
+    );
+  });
+});
+
 describe('lookupMods', () => {
   it('prints one row per modGroup, a hybrid with all its statIds, verbatim', () => {
     const found = lookupMods(WEIGHTS, { className: 'Body_Armours_dex', category: 'armour.chest', slot: 'prefix' });
@@ -265,7 +306,7 @@ describe('lookupMods', () => {
         {
           slot: 'prefix',
           modGroup: 'BaseLocalDefencesAndLife',
-          text: '#% increased Evasion Rating\n+# to maximum Life',
+          text: 'BaseLocalDefencesAndLife',
           statIds: [EVASION, LIFE],
           tierCount: 2,
           itemLevelMin: { min: 16, max: 33 },
@@ -274,7 +315,7 @@ describe('lookupMods', () => {
         {
           slot: 'prefix',
           modGroup: 'IncreasedLife',
-          text: '+# to maximum Life',
+          text: 'IncreasedLife',
           statIds: [LIFE],
           tierCount: 1,
           itemLevelMin: { min: 1, max: 1 },
@@ -303,8 +344,8 @@ describe('lookupMods', () => {
         .filter((row) => row.modGroup === 'GemLevel')
         .map((row) => [row.text, row.statIds, row.tierLabels]),
     ).toEqual([
-      ['+# to Level of all Melee Skills', [MELEE], ['T1']],
-      ['+# to Level of all Spell Skills', [SPELL], ['T2', 'T1']],
+      ['GemLevel', [MELEE], ['T1']],
+      ['GemLevel', [SPELL], ['T2', 'T1']],
     ]);
   });
 
@@ -407,30 +448,29 @@ describe('the committed data/', () => {
       'explicit.stat_3981240776',
     );
     expect(lookupBase(read(ITEMS_PATH), 'amulet').matches).toContainEqual({ type: 'Gold Amulet', group: 'accessory' });
-    const classes = lookupClass(read(WEIGHTS_PATH), read(FILTERS_PATH), 'body armour').matches;
+    const classes = lookupClass(loadWeights(read), read(FILTERS_PATH), 'body armour').matches;
     const dex = classes.find((match) => match.className === 'Body_Armours_dex');
     expect(dex).toBeDefined();
     expect(dex?.categoryText).not.toBeNull();
   });
 
   it('lists the Body_Armours_dex prefixes: 7 modGroups, the defences-and-life hybrid one row', () => {
-    const found = lookupMods(read(WEIGHTS_PATH), { className: 'Body_Armours_dex', slot: 'prefix' });
+    const found = lookupMods(loadWeights(read), { className: 'Body_Armours_dex', slot: 'prefix' });
 
     expect(found.mods).toHaveLength(7);
     const hybrid = found.mods.filter((row) => row.modGroup === 'BaseLocalDefencesAndLife');
     expect(hybrid).toHaveLength(1);
     expect(hybrid[0]?.statIds).toHaveLength(2);
-    // The text comes from the sourceModifierId layout, so pin it on the committed file.
-    expect(hybrid[0]?.text).toBe('#% increased Evasion Rating\n+# to maximum Life');
-    expect(found.mods.filter((row) => row.text.includes('\u0000'))).toEqual([]);
+    expect(hybrid[0]?.text).toBe('BaseLocalDefencesAndLife');
+    expect(found.mods.filter((row) => row.text === '')).toEqual([]);
   });
 
   it('splits the Amulets gem-level suffix modGroup into its four mod families', () => {
-    const found = lookupMods(read(WEIGHTS_PATH), { className: 'Amulets', slot: 'suffix' });
+    const found = lookupMods(loadWeights(read), { className: 'Amulets', slot: 'suffix' });
     const families = found.mods.filter((row) => row.modGroup === 'IncreaseSocketedGemLevel');
 
     expect(families.map((row) => row.statIds.length)).toEqual([1, 1, 1, 1]);
-    expect(families.map((row) => row.text)).toContain('+# to Level of all Spell Skills');
+    expect(families.map((row) => row.text)).toEqual(Array.from({ length: 4 }, () => 'IncreaseSocketedGemLevel'));
   });
 });
 
