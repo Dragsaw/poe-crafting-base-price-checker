@@ -144,6 +144,14 @@ function totalWeight(entries: readonly ModifierWeight[]): number {
   return total;
 }
 
+/**
+ * A pool is empty when its total weight is `0` (IMPLEMENTATION-NOTES.md §3,
+ * AD-17): the one definition of "empty" for the coverage figure.
+ */
+export function isEmptyPool(pool: WeightsPool): boolean {
+  return totalWeight(pool.entries) === 0;
+}
+
 /** `C = contained(ref) ∩ E`; an absent affix contains its whole eligible set (§11). */
 export function containedIn(ref: ModifierRef | undefined, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
   return ref === undefined ? eligibleSet : eligibleSet.filter((entry) => contains(ref, entry));

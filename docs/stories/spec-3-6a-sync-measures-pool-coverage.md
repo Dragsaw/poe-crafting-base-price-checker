@@ -2,7 +2,8 @@
 title: 'Story 3.6a: sync measures pool coverage (AD-27)'
 type: 'feature'
 created: '2026-10-02'
-status: 'draft'
+status: 'done'
+baseline_commit: '61436d7a2d4def7dba86a2ca2a449d958143564d'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -62,12 +63,12 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `packages/core/src/probability.ts` -- export an empty-pool predicate -- one definition of "empty" for the figure
-- [ ] `packages/core/src/coverage.ts` -- add pure `poolCoverage(entries, weights)` returning `{ coverage, rankableClassCount }` or `undefined` -- the single implementation of §3; export from the package index
-- [ ] `packages/core/src/coverage.test.ts` -- one case per matrix row
-- [ ] `packages/sync/src/chunk/run-chunk.ts` -- compute after the weights read; spread into `figures` in `writeReport`; carry the previous fields on the paused return -- every report write states the figure
-- [ ] `packages/sync/src/chunk/run-chunk.test.ts` -- present file writes both fields; absent omits both; paused keeps the previous pair
-- [ ] `packages/sync/src/dry-run.test.ts` -- update expectations if the fixture weights now yield a figure
+- [x] `packages/core/src/probability.ts` -- export an empty-pool predicate -- one definition of "empty" for the figure
+- [x] `packages/core/src/coverage.ts` -- add pure `poolCoverage(entries, weights)` returning `{ coverage, rankableClassCount }` or `undefined` -- the single implementation of §3; export from the package index
+- [x] `packages/core/src/coverage.test.ts` -- one case per matrix row
+- [x] `packages/sync/src/chunk/run-chunk.ts` -- compute after the weights read; spread into `figures` in `writeReport`; carry the previous fields on the paused return -- every report write states the figure
+- [x] `packages/sync/src/chunk/run-chunk.test.ts` -- present file writes both fields; absent omits both; paused keeps the previous pair
+- [x] `packages/sync/src/dry-run.test.ts` -- update expectations if the fixture weights now yield a figure
 
 **Acceptance Criteria:**
 - Given a present Weights File, when a chunk finishes, then `data/sync-report.json` carries `coverage` in `[0, 1]` and `rankableClassCount`, and both parse under `SyncReportFileSchema`.
@@ -81,3 +82,19 @@ context:
 - `pnpm check` -- expected: exit 0, no new dependency edge
 - `pnpm test` -- expected: all pass, no escaped network URL
 - `pnpm sync:dry` -- expected: `report.figures.coverage` present when `data/weights.json` exists
+
+## Review Triage Log
+
+| Finding | Verdict | Route | Evidence |
+|---|---|---|---|
+| Report writes before the weights read, or after `readWeightsIds` throws, carry no figure (edge-case, blind, claim on spec line 69) | low | rejected | The frozen Intent scopes the figure to "every report write that has read the weights file". The loss is transient: the next successful chunk recomputes it. A fix adds a carry-over branch to failure paths. |
+| `coverageFigures` type allows one field without the other | low | rejected | No code path sets one field alone. Developer-only typing nicety. |
+| Weights file removed leaves a stale figure | false | rejected | `buildSyncReport` spreads `figures` only and does not merge the previous figures (`sync-report.ts:87-89`). Absent gives `{}`. |
+| Empty or missing `className` counts as a class | false | rejected | The tracked-entry schema owns that shape. No input was shown that reaches this. |
+| Missing unit cases (class absent in empty bases, `entries: []`, empty suffix, one active and one pruned entry, direct `isEmptyPool`) | low | rejected | The matrix rows are covered (`coverage.test.ts:65-95`). The extra cases only repeat them. |
+| `dry-run.test.ts` task ticked without evidence; dry-run AC unproven | false | rejected | The fixture has `bases: {}`, so no figure. `pnpm sync:dry` printed both fields and left the tree unchanged. |
+| AC "parse under `SyncReportFileSchema`" untested | false | rejected | `reportOf` parses every report with `SyncReportFileSchema` (`run-chunk.test.ts:1119`). |
+| Paused-path test is thin (half-present pair, no pair) | low | rejected | The half-present case is not reachable under normal writes. Extra tests only. |
+| Fixture drift (`'6.0.0'`, `'1.1.0'` literals, `as` casts, declaration order) | low | rejected | Test-only hygiene. No wrong result today. |
+| Replaced-file test may pass on stale state | low | rejected | The first chunk writes figure A and the second reads a different file, so the figures differ. The assertion cannot pass on stale state. |
+| Spec bookkeeping (Dev Agent Record, loop count) | false | rejected | The fix is to edit this build's spec. |

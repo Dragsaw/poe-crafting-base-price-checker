@@ -55,6 +55,7 @@ export {
   contains,
   eligible,
   interval,
+  isEmptyPool,
   poolOf,
 } from './probability.ts';
 export type {
@@ -65,3 +66,7 @@ export type {
   ProbabilityResult,
   Slot,
 } from './probability.ts';
+
+/** Pool coverage (AD-27, IMPLEMENTATION-NOTES.md §3). */
+export { poolCoverage } from './coverage.ts';
+export type { PoolCoverage } from './coverage.ts';

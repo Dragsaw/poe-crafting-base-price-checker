@@ -127,7 +127,7 @@ import type {
   SyncRunRecord,
   TrackedEntry,
 } from '@poe/contracts';
-import { chunkOrder, pinnedToKeep } from '@poe/core';
+import { chunkOrder, pinnedToKeep, poolCoverage } from '@poe/core';
 import type { ChunkOrder } from '@poe/core';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -544,7 +544,18 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           buildSyncReport({
             previous,
             newRecords: records,
-            figures: { requestsBySource: {}, notReachedCount: 0 },
+            figures: {
+              requestsBySource: {},
+              notReachedCount: 0,
+              // The pause is no re-read of the weights file: the figure stays.
+              ...(previous?.figures.coverage === undefined ||
+              previous.figures.rankableClassCount === undefined
+                ? {}
+                : {
+                    coverage: previous.figures.coverage,
+                    rankableClassCount: previous.figures.rankableClassCount,
+                  }),
+            },
             runStartedAt,
             runFinishedAt: clock.now(),
           }),
@@ -565,6 +576,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
     let setup: ChunkSetup | undefined;
     let order: ChunkOrder | undefined;
     let entries: readonly TrackedEntry[] = [];
+    /** Both fields or neither (AD-27); set once the weights file is read. */
+    let coverageFigures: { coverage?: number; rankableClassCount?: number } = {};
     let current: TrackedEntry | undefined;
     let attempted = 0;
     let publishAttempted = false;
@@ -691,6 +704,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           requestsBySource: requestsBetween(countFrom(), requests.snapshot()),
           notReachedCount: Math.max(0, eligible - attempted),
           ...(trackedListEditedAt === undefined ? {} : { trackedListEditedAt }),
+          ...coverageFigures,
         },
         runStartedAt,
         runFinishedAt,
@@ -723,6 +737,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // An absent file is recorded and the run goes on (AD-12); a present one
       // has its ids checked, report-only (AD-9); an unknown major throws.
       const weights = await readWeightsIds(fs);
+      coverageFigures = (weights.kind === 'present' ? poolCoverage(entries, weights.file) : undefined) ?? {};
 
       // The run-start catalogue check (AD-9, AD-25): offline, before any
       // request, and never a stamp. A miss is marked, reported and kept out of
