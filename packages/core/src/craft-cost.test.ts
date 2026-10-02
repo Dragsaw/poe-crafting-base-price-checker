@@ -4,9 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { craftCost } from './craft-cost.ts';
 
 const LEAGUE = 'Forbidden Rites';
+const ASOF = '2026-09-26T00:00:00Z';
 
 function rate(currencyId: string, value: number, league = LEAGUE): CurrencyRate {
-  return { currencyId, rate: value, source: 'measured', league, asOf: '2026-09-26T00:00:00Z' };
+  return { currencyId, rate: value, source: 'measured', league, asOf: ASOF };
 }
 
 const greater = {
@@ -19,7 +20,7 @@ const greater = {
 describe('craftCost (AD-20)', () => {
   it('sums quantity × rate over the recipe currencies, in divine', () => {
     const rates = [rate('greater-orb-of-transmutation', 0.01), rate('greater-orb-of-augmentation', 0.02), rate('divine', 1)];
-    expect(craftCost(greater, rates, LEAGUE)).toEqual({ ok: true, divine: 0.01 + 2 * 0.02 });
+    expect(craftCost(greater, rates, LEAGUE)).toEqual({ ok: true, divine: 0.01 + 2 * 0.02, asOf: [ASOF, ASOF] });
   });
 
   it('is uncostable, never 0, when a currency has no rate, naming the first missing currency', () => {
@@ -47,11 +48,11 @@ describe('craftCost (AD-20)', () => {
       rate('greater-orb-of-transmutation', 0.01),
       rate('greater-orb-of-augmentation', 0.02),
     ];
-    expect(craftCost(greater, rates, LEAGUE)).toEqual({ ok: true, divine: 0.01 + 2 * 0.02 });
+    expect(craftCost(greater, rates, LEAGUE)).toEqual({ ok: true, divine: 0.01 + 2 * 0.02, asOf: [ASOF, ASOF] });
   });
 
   it('passes the sum on unrounded', () => {
     const rates = [rate('greater-orb-of-transmutation', 0.0001), rate('greater-orb-of-augmentation', 0.0001)];
-    expect(craftCost(greater, rates, LEAGUE)).toEqual({ ok: true, divine: 0.0001 + 2 * 0.0001 });
+    expect(craftCost(greater, rates, LEAGUE)).toEqual({ ok: true, divine: 0.0001 + 2 * 0.0001, asOf: [ASOF, ASOF] });
   });
 });

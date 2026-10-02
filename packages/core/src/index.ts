@@ -33,6 +33,9 @@ export type {
 export { craftCost } from './craft-cost.ts';
 export type { CraftCostResult } from './craft-cost.ts';
 
+/** Provenance of a crafted pair (AD-10). */
+export { foldPair, oldestOf, provenanceOfTier, weakest } from './provenance.ts';
+
 /** The five cross-file checks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.6), defined once. */
 export {
   classDiscriminability,

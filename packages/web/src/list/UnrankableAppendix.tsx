@@ -16,6 +16,13 @@ export const APPENDIX_LEAD = 'Tracked, but kept out of the ordering.';
 /** The mark every `class absent from weights file` row carries, as the mockup shows. */
 export const APPENDIX_MARK_WORD = 'unknown';
 
+/**
+ * The quiet note of `class disagrees with weights file`: the pool is published
+ * and complete, and the disagreement is in the player's Tracked List. It names
+ * no check, entry or key (those live in the sync report panel).
+ */
+export const DISAGREES_NOTE = 'The pool is published and complete; the disagreement is in your Tracked List.';
+
 /** `1 Item Class`, `N Item Classes`. */
 export function appendixCount(count: number): string {
   return `${String(count)} ${plural(count, 'Item Class', 'Item Classes')}`;
@@ -119,7 +126,9 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
           fontStyle: 'italic',
           color: colors['ink-tertiary'],
         }}
-      />
+      >
+        {item.reason === 'class disagrees with weights file' ? DISAGREES_NOTE : null}
+      </div>
     </div>
   );
 }

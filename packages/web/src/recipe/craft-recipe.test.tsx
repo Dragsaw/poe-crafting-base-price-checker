@@ -8,12 +8,13 @@ import { App } from '../App';
 import { BELOW_THRESHOLD_NOTE, STATE_NOTES } from '../list/format';
 import { uncostableCopy } from '../list/list-statement';
 import { expandCopy } from '../list/RankedList';
+import { HAIR_SPACE } from '../list/TrustMark';
 import { serveArtifacts, sharedServer, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb } from '../test-support/dom';
 import { banded, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
-import { colors, stacks } from '../theme/tokens';
+import { colors, glyphs, stacks } from '../theme/tokens';
 import { RECIPE_STORAGE_KEY } from './recipe-storage';
 
 let server: SetupServerApi;
@@ -787,5 +788,64 @@ describe('the crafted panel', () => {
       'not-yet-synced · never-synced',
     ]);
     expect(rows.map((row) => panelCell(row, 'note'))).toEqual(['', STATE_NOTES['league-mismatch'], STATE_NOTES['never-synced']]);
+  });
+});
+
+// --- Provenance marks and the uniform-prior banner (Story 3.6) -------------------
+
+describe('Provenance marks and the banner', () => {
+  const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSource: 'absent' });
+  /** An invented tier at floor 50 sits in the greater recipe's eligible set (floor 44) and under the perfect floor (70). */
+  const priorBows: Pools = [[tier(TARGET, 10, 75), invented(tier(FILLER, 10, 50)), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
+  const priorStaves: Pools = [[tier(TARGET, 50, 50), invented(tier(FILLER, 50, 50))], [tier(SUFFIX, 10, 80)]];
+
+  const banner = (): HTMLElement | null => frame().querySelector<HTMLElement>('[data-uniform-prior-banner]');
+  const priorMarks = (): string[] =>
+    Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="provenance"]'), (node) => node.textContent ?? '');
+
+  it('prints prior only on a pair with an invented tier, raises the banner, and follows a recipe switch', async () => {
+    serveWorld(standardWorld({ classes: [['weapon.bow', 'Bows', priorBows], ['weapon.staff', 'Staves', priorStaves]] }));
+    mount();
+    await settleTo('ready');
+    expect(banner()).not.toBeNull();
+    expect(banner()?.textContent).not.toMatch(/uniform-prior|absent|published/);
+    const marks = priorMarks().filter((text) => text !== '');
+    expect(marks).toHaveLength(2);
+    expect(marks.every((text) => text === `${glyphs.prior}${HAIR_SPACE}prior only`)).toBe(true);
+    // The raw rows stay silent, and no expansion repeats the mark.
+    click(rowNamed('Bows'));
+    expect(frame().querySelector('[data-expansion-panel] [data-trust-mark="prior"]')).toBeNull();
+    click(option('perfect'));
+    expect(banner()).toBeNull();
+    expect(priorMarks().filter((text) => text !== '')).toEqual([]);
+    click(option('greater'));
+    expect(banner()).not.toBeNull();
+  });
+
+  it('keeps the banner down for the session once dismissed, across a recipe switch', async () => {
+    serveWorld(standardWorld({ classes: [['weapon.bow', 'Bows', priorBows], ['weapon.staff', 'Staves', priorStaves]] }));
+    mount();
+    await settleTo('ready');
+    click(banner()?.querySelector('[data-banner-dismiss]') as Element);
+    expect(banner()).toBeNull();
+    click(option('perfect'));
+    click(option('greater'));
+    expect(banner()).toBeNull();
+    expect(priorMarks().filter((text) => text !== '')).toHaveLength(2);
+  });
+
+  it('lowers the banner while a measured crafted row is on the list, and prints no mark', async () => {
+    serveWorld(standardWorld({ classes: [['weapon.bow', 'Bows', priorBows], ['weapon.staff', 'Staves', STAVES]] }));
+    mount();
+    await settleTo('ready');
+    expect(banner()).toBeNull();
+    expect(priorMarks().filter((text) => text !== '')).toHaveLength(1);
+  });
+
+  it('raises no banner with no crafted row', async () => {
+    serveWorld(standardWorld({ tracked: [belt, amulet], dataset: [], classes: [] }));
+    mount();
+    await settleTo('ready');
+    expect(banner()).toBeNull();
   });
 });

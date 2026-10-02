@@ -11,6 +11,9 @@ import { MONEY_PHRASES, rawNote } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
+/** The row mark's word for `uniform-prior`: never the enum value, never a `weightSource` word. */
+export const PRIOR_ONLY = 'prior only';
+
 const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
 /** Rank-numeral colour per tier; tier 1 also sets the numeral, name and EV at 700 (DESIGN.md `ranked-row-tier-*`). */
@@ -120,7 +123,11 @@ export function RankedRow({
           </span>
         )}
       </div>
-      <div data-cell="provenance" style={{ ...cellStyle(COLUMNS.provenance), ...typeStyle('row-mark') }} />
+      <div data-cell="provenance" style={{ ...cellStyle(COLUMNS.provenance), ...typeStyle('row-mark') }}>
+        {row.unit === 'class' && row.provenance === 'uniform-prior' ? (
+          <TrustMark kind="prior" word={PRIOR_ONLY} />
+        ) : null}
+      </div>
       <div data-cell="age" style={{ ...cellStyle(COLUMNS.age), ...typeStyle('row-mark') }}>
         {row.age === undefined ? null : <TrustMark kind={row.age.kind} word={row.age.word} />}
       </div>

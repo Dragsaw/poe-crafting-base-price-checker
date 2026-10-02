@@ -112,11 +112,12 @@ export type { DatasetEntry, NotYetSyncedReason, PriceState } from './dataset.ts'
 export {
   CraftedRankedRowSchema,
   CraftedSummandSchema,
+  ProvenanceSchema,
   RankedRowSchema,
   RawRankedRowSchema,
   UncostableSchema,
 } from './ranked-row.ts';
-export type { CraftedRankedRow, CraftedSummand, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
+export type { CraftedRankedRow, CraftedSummand, Provenance, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
 
 export {
   filterOptionIds,

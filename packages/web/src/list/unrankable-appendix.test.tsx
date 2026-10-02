@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { rgb } from '../test-support/dom';
 import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
 import { HAIR_SPACE } from './TrustMark';
-import { APPENDIX_LEAD, appendixCount, UnrankableAppendix } from './UnrankableAppendix';
+import { APPENDIX_LEAD, appendixCount, DISAGREES_NOTE, UnrankableAppendix } from './UnrankableAppendix';
 
 const REASON = 'class absent from weights file';
 
@@ -151,5 +151,27 @@ describe('the non-empty appendix', () => {
       });
       expect(panel.innerHTML).toBe(before);
     }
+  });
+});
+
+describe('the note cell', () => {
+  const note = (item: UnrankableClass): string =>
+    mountAppendix([item]).querySelector('[data-cell="note"]')?.textContent ?? '';
+
+  it('says the pool is published and complete and the disagreement is in the Tracked List, naming no check', () => {
+    const text = note({ categoryId: 'c.bows', className: 'Bows', reason: 'class disagrees with weights file' });
+    expect(text).toBe(DISAGREES_NOTE);
+    expect(text).toMatch(/published and complete/);
+    expect(text).toMatch(/Tracked List/);
+    expect(text).not.toMatch(/edge|containment|coOccur|kind|discriminab|stat_|\[/i);
+  });
+
+  it('stays empty for the other reasons', () => {
+    expect(note({ categoryId: 'c.bows', className: 'Bows', reason: 'class absent from weights file' })).toBe('');
+  });
+
+  it('keeps the unknown mark on a pool partial row carrying provenance absent', () => {
+    const panel = mountAppendix([{ categoryId: 'c.bows', className: 'Bows', reason: 'pool partial', provenance: 'absent' }]);
+    expect(panel.querySelector('[data-cell="mark"]')?.textContent).toBe(`${glyphs.unknown}${HAIR_SPACE}unknown`);
   });
 });

@@ -430,7 +430,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       tracked: [craftedOf('jewel', 'Emerald'), craftedOf('jewel', 'Emerald', 'pinned', 82), craftedOf('weapon.bow', 'Bows')],
       weights: weightsWith(['jewel', 'Emerald', prefix, suffix], ['weapon.bow', 'Bows']),
     });
-    expect(result.unrankable).toEqual([{ categoryId: 'jewel', className: 'Emerald', reason: PARTIAL }]);
+    expect(result.unrankable).toEqual([{ categoryId: 'jewel', className: 'Emerald', reason: PARTIAL, provenance: 'absent' }]);
     expect(result.ordering).toEqual([]);
   });
 
@@ -512,7 +512,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       ],
     });
     expect(result.unrankable).toEqual([
-      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL },
+      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL, provenance: 'absent' },
       { categoryId: 'jewel', className: 'Sapphire', reason: ABSENT },
     ]);
   });
@@ -969,5 +969,80 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     }
     // The fastest of five runs, so one noisy sample on a loaded runner does not fail the budget.
     expect(Math.min(...samples)).toBeLessThan(100);
+  });
+});
+
+// --- Provenance (Story 3.6, AD-10) ---------------------------------------------
+
+const invented = (tier: ModifierWeight): ModifierWeight => ({ ...tier, weightSource: 'absent' });
+
+describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
+  const target = chase('Bows');
+  const priced1 = [published(target, priced(2))];
+
+  it('labels a pair measured when its eligible sets hold only published or not-in-game tiers', () => {
+    const notInGame: ModifierWeight = { ...tierOf('explicit.stat_none', 0, 75), weightSource: 'not-in-game' };
+    const weights = poolsFile(['weapon.bow', 'Bows', [[tierOf(TARGET, 10, 75), notInGame], [tierOf(SUFFIX_STAT, 10, 80)]]]);
+    const rows = craftedRows(rankCrafted({ tracked: [target], dataset: priced1, weights }).ordering);
+    expect(rows.map((row) => row.provenance)).toEqual(['measured', 'measured']);
+  });
+
+  it('labels every row of a pair uniform-prior when one tier in either eligible set is invented', () => {
+    for (const pools of [
+      [[invented(tierOf(TARGET, 10, 75))], [tierOf(SUFFIX_STAT, 10, 80)]],
+      [[tierOf(TARGET, 10, 75)], [invented(tierOf(SUFFIX_STAT, 10, 80))]],
+    ] as const) {
+      const weights = poolsFile(['weapon.bow', 'Bows', pools]);
+      const rows = craftedRows(rankCrafted({ tracked: [target], dataset: priced1, weights }).ordering);
+      expect(rows.map((row) => row.provenance)).toEqual(['uniform-prior', 'uniform-prior']);
+    }
+  });
+
+  it('does not count an invented tier below the recipe floor, and follows the recipe', () => {
+    const weights = poolsFile([
+      'weapon.bow',
+      'Bows',
+      [[tierOf(TARGET, 10, 75), invented(tierOf(FILLER, 10, 1))], [tierOf(SUFFIX_STAT, 10, 80)]],
+    ]);
+    const rows = craftedRows(rankCrafted({ tracked: [target], dataset: priced1, weights }).ordering);
+    expect(rows.map((row) => [row.recipeId, row.provenance]).toSorted()).toEqual([
+      ['greater', 'uniform-prior'],
+      ['perfect', 'measured'],
+    ]);
+  });
+
+  it('folds the oldest of each summand observedAt and each used rate asOf, and leaves it unset with none', () => {
+    const old = { ...priced(2), observation: { ...observation(2), observedAt: '2026-09-01T00:00:00Z' } } as PriceState;
+    const rates = RATES.map((rate) => ({ ...rate, asOf: '2026-09-10T00:00:00Z' }));
+    const [row] = craftedRows(
+      rankCrafted({ tracked: [target], dataset: [published(target, old)], recipes: [GREATER], currencyRates: rates }).ordering,
+    );
+    expect(row?.asOf).toBe('2026-09-01T00:00:00Z');
+    const [rated] = craftedRows(
+      rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: rates }).ordering,
+    );
+    expect(rated?.asOf).toBe('2026-09-10T00:00:00Z');
+    const [bare] = craftedRows(rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: [] }).ordering);
+    expect(bare?.asOf).toBeUndefined();
+    expect(bare !== undefined && RankedRowSchema.parse(bare)).toEqual(bare);
+  });
+
+  it('puts absent only on a partial pool class, never on a ranked row', () => {
+    const result = rankCrafted({
+      tracked: [target],
+      dataset: priced1,
+      weights: weightsWith(['weapon.bow', 'Bows', 'partial', 'complete']),
+    });
+    expect(result.ordering).toEqual([]);
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.bow', className: 'Bows', reason: PARTIAL, provenance: 'absent' },
+    ]);
+  });
+
+  it('reports a complete pool with no entries as unreachable, never pool partial', () => {
+    const weights = poolsFile(['weapon.bow', 'Bows', [[], []]]);
+    const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER] });
+    expect(result.unrankable.map((row) => row.reason)).toEqual(['recipe cannot reach this class']);
+    expect(result.unrankable[0]?.provenance).toBeUndefined();
   });
 });
