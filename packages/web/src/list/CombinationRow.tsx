@@ -1,4 +1,4 @@
-import type { JSX } from 'react';
+import { Fragment, type JSX } from 'react';
 
 import { TradeGlyph } from '../frame/TradeGlyph';
 import { fixedCell } from '../shared/cell';
@@ -10,8 +10,10 @@ import {
   glyphs,
   px,
   spacing,
+  stacks,
   typeStyle,
 } from '../theme/tokens';
+import { AFFIX_JOIN, type AffixPart } from './combination-text';
 import {
   combinationFigure,
   PRICE_STATE_GLYPHS,
@@ -23,13 +25,13 @@ import {
 
 /**
  * One Tracked Entry as its combination row prints it. Everything is already
- * text or a resolved state: the row lays it out and decides nothing. Epic 3's
- * crafted entries fill the same shape with a tier + short-form `text`.
+ * text or a resolved state: the row lays it out and decides nothing. A crafted
+ * entry fills the same shape with its tier + short-form parts.
  */
 export interface Combination {
   readonly key: string;
-  /** The Combination: `no affixes` for a Raw Base. */
-  readonly text: string;
+  /** The Combination, one part per affix (`combinationText`): `no affixes` for a Raw Base. */
+  readonly text: readonly AffixPart[];
   /** `{components.curation-status-pinned}` leads the combination cell. `active` is marked by nothing. */
   readonly pinned: boolean;
   readonly state: CombinationState;
@@ -39,6 +41,31 @@ export interface Combination {
   readonly tradeHref: string | undefined;
   /** The link's accessible name. */
   readonly tradeLabel: string;
+}
+
+/**
+ * A Combination's text, on either surface: its affixes joined by the middle
+ * dot. A fallback affix is set in the mono verbatim register and nothing
+ * else — it keeps the line's own size and weight, and takes no ink, mark or
+ * glyph (DESIGN.md, Typography; EXPERIENCE.md memlog 138, 208).
+ */
+export function CombinationText({ parts }: { readonly parts: readonly AffixPart[] }): JSX.Element {
+  return (
+    <>
+      {parts.map((part, index) => (
+        <Fragment key={index}>
+          {index === 0 ? null : AFFIX_JOIN}
+          {part.verbatim ? (
+            <span data-verbatim="" style={{ fontFamily: stacks.mono }}>
+              {part.text}
+            </span>
+          ) : (
+            <span data-affix="">{part.text}</span>
+          )}
+        </Fragment>
+      ))}
+    </>
+  );
 }
 
 const [combination, state, figure, sample, tradeLink] = combinationLine1Columns;
@@ -89,7 +116,7 @@ export function CombinationRow({
               </span>{' '}
             </>
           ) : null}
-          {row.text}
+          <CombinationText parts={row.text} />
         </div>
         <div data-cell="state" style={{ ...fixedCell(state), ...typeStyle('detail-meta') }}>
           <span

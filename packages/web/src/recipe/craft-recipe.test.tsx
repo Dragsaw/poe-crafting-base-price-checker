@@ -5,13 +5,15 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { App } from '../App';
+import { BELOW_THRESHOLD_NOTE, STATE_NOTES } from '../list/format';
 import { uncostableCopy } from '../list/list-statement';
 import { expandCopy } from '../list/RankedList';
 import { serveArtifacts, sharedServer, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb } from '../test-support/dom';
-import { hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
+import { banded, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
+import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
-import { colors } from '../theme/tokens';
+import { colors, stacks } from '../theme/tokens';
 import { RECIPE_STORAGE_KEY } from './recipe-storage';
 
 let server: SetupServerApi;
@@ -158,6 +160,8 @@ interface World {
   readonly classes: readonly (readonly [string, string, Pools])[];
   readonly recipes?: readonly unknown[];
   readonly rates?: readonly CurrencyRate[];
+  /** The catalogue's stat texts, one explicit group. Absent: the empty catalogue. */
+  readonly stats?: readonly { readonly id: string; readonly text: string }[];
 }
 
 function serveWorld(world: World): void {
@@ -179,6 +183,10 @@ function serveWorld(world: World): void {
     },
     weights: { kind: 'json', body: { ...(VALID_BODIES.weights as object), bases } },
     recipes: { kind: 'json', body: { schemaVersion: '1.0.0', recipes: world.recipes ?? RECIPES } },
+    catalogueStats: {
+      kind: 'json',
+      body: { schemaVersion: '1.0.0', result: [{ id: 'explicit', label: 'Explicit', entries: world.stats ?? [] }] },
+    },
   });
 }
 
@@ -499,5 +507,285 @@ describe('the crafted states', () => {
       row.querySelector('[data-cell="reason"]')?.textContent,
     ]);
     expect(rows).toEqual([['Wands', 'recipe cannot reach this class']]);
+  });
+});
+
+// --- Story 3.5: the chase cells and the crafted panel --------------------------------
+
+const ATK_DMG = 'explicit.stat_2843214518';
+const MANA = 'explicit.stat_1050105434';
+const LIFE = 'explicit.stat_3299347043';
+const ES = 'explicit.stat_3489782002';
+const RARITY = 'explicit.stat_3917489142';
+const COLD_RES = 'explicit.stat_4220027924';
+
+/** Five prefixes and one suffix. Life sits below the perfect floor (70), so the perfect recipe gives its entry P = 0. */
+const RINGS: Pools = [
+  [tier(ATK_DMG, 10, 75), tier(MANA, 10, 75), tier(LIFE, 10, 50), tier(ES, 10, 75), tier(RARITY, 10, 75)],
+  [tier(COLD_RES, 10, 80)],
+];
+
+function ring(prefix: string, suffix?: string, status: CraftedTrackedEntry['status'] = 'active'): CraftedTrackedEntry {
+  return {
+    kind: 'crafted',
+    categoryId: 'accessory.ring',
+    className: 'Rings',
+    itemLevelMin: 82,
+    prefix: banded(prefix, 1, 10, 'T1'),
+    ...(suffix === undefined ? {} : { suffix: banded(suffix, 1, 10, 'T1') }),
+    status,
+    ...(status === 'pruned' ? { prunedReason: 'never sells' } : {}),
+  };
+}
+
+const atkCold = ring(ATK_DMG, COLD_RES, 'pinned');
+const mana = ring(MANA);
+const life = ring(LIFE);
+const es = ring(ES);
+const rarity = ring(RARITY);
+const SEARCH = { id: 'AbC123', league: TEST_LEAGUE };
+
+/** Five summands under greater at the default threshold, ordered by price: 1000, 100, 1.5, 1.2, 0.5. */
+function ringsWorld(overrides: Partial<World> = {}): World {
+  const now = Date.now();
+  return {
+    tracked: [atkCold, mana, life, es, rarity],
+    dataset: [
+      priced(atkCold, 1000, hoursBefore(now, 1), TEST_LEAGUE, SEARCH),
+      priced(mana, 100, hoursBefore(now, 1)),
+      priced(life, 1.5, hoursBefore(now, 1)),
+      priced(es, 1.2, hoursBefore(now, 1)),
+      priced(rarity, 0.5, hoursBefore(now, 1)),
+    ],
+    classes: [['accessory.ring', 'Rings', RINGS]],
+    ...overrides,
+  };
+}
+
+function chaseCells(row: HTMLElement): HTMLElement[] {
+  return Array.from(row.querySelectorAll<HTMLElement>('[data-cell="chase"] [data-chase-cell]'));
+}
+
+function chaseTexts(row: HTMLElement): string[] {
+  return chaseCells(row).map((cell) => cell.textContent);
+}
+
+function panelRows(): HTMLElement[] {
+  return Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-combination-row]'));
+}
+
+function panelCell(row: HTMLElement, cell: string): string {
+  return row.querySelector(`[data-cell="${cell}"]`)?.textContent ?? '';
+}
+
+describe('the chase cells', () => {
+  it('prints the first three summands as three fixed 164px cells, tier plus short form, in chase emphasis on tier 1', async () => {
+    serveWorld(ringsWorld());
+    mount();
+    await settleTo('ready');
+    const row = rowNamed('Rings');
+    expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 Life']);
+    const column = row.querySelector<HTMLElement>('[data-cell="chase"]');
+    expect(column?.style.width).toBe('492px');
+    expect(column?.style.paddingRight).toBe('');
+    for (const cell of chaseCells(row)) {
+      expect(cell.style.width).toBe('164px');
+      expect(cell.style.flex).toBe('0 0 164px');
+      expect(cell.style.paddingRight).toBe('10px');
+      expect(cell.style.whiteSpace).toBe('nowrap');
+      expect(cell.style.textOverflow).toBe('ellipsis');
+      expect(cell.style.overflow).toBe('hidden');
+      expect(cell.style.color).toBe(rgb(colors['ink-chase-emphasis']));
+      // A curated cell prints no numeral but its tier.
+      expect(cell.textContent.replaceAll(/T\d+/g, '')).not.toMatch(/\d/);
+      expect(cell.querySelector('[data-verbatim]')).toBeNull();
+    }
+  });
+
+  it('keeps the raw rows’ italic note in place of chase cells, and leaves unused slots empty', async () => {
+    const now = Date.now();
+    serveWorld(
+      ringsWorld({
+        tracked: [atkCold, belt],
+        dataset: [priced(atkCold, 1000, hoursBefore(now, 1)), priced(belt, 0.4, hoursBefore(now, 1))],
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    const raw = rowNamed('Wide Belt');
+    expect(raw.querySelector('[data-raw-note]')).not.toBeNull();
+    expect(chaseCells(raw)).toHaveLength(0);
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', '', '']);
+  });
+
+  it('takes ink-secondary below tier 1', async () => {
+    const now = Date.now();
+    const raws = Array.from({ length: 5 }, (_, index) => rawEntry(`Base ${String(index)}`));
+    serveWorld(
+      ringsWorld({
+        tracked: [...raws, mana],
+        dataset: [...raws.map((entry) => priced(entry, 5000, hoursBefore(now, 1))), priced(mana, 100, hoursBefore(now, 1))],
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    const row = rowNamed('Rings');
+    expect(row.dataset['tier']).toBe('2');
+    for (const cell of chaseCells(row)) {
+      expect(cell.style.color).toBe(rgb(colors['ink-secondary']));
+    }
+  });
+
+  it('state 21: no summand leaves three empty cells, the EV at minus its Craft Cost, numerals printed', async () => {
+    serveWorld(ringsWorld({ tracked: [mana], dataset: [priced(mana, 0.1, hoursBefore(Date.now(), 1))] }));
+    mount();
+    await settleTo('ready');
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['', '', '']);
+    expect(cells('ev')).toEqual(['-0.03']);
+    expect(cells('rank')).toEqual(['1']);
+  });
+
+  it('falls back to the raw statId plus the band, in mono, for a stat with no short form and no catalogue text', async () => {
+    serveWorld(standardWorld());
+    mount();
+    await settleTo('ready');
+    const [first] = chaseCells(rowNamed('Bows'));
+    expect(first?.textContent).toBe('explicit.stat_1 1–10');
+    const verbatim = first?.querySelector<HTMLElement>('[data-verbatim]');
+    expect(verbatim?.style.fontFamily).toBe(stacks.mono);
+    // No ink, mark or glyph of its own, and the line's own size and weight.
+    expect(verbatim?.style.color).toBe('');
+    expect(verbatim?.style.fontSize).toBe('');
+    expect(verbatim?.style.fontWeight).toBe('');
+  });
+
+  it('falls back to the catalogue stat text with the band in place of its #', async () => {
+    serveWorld(standardWorld({ stats: [{ id: TARGET, text: '#% increased Target' }] }));
+    mount();
+    await settleTo('ready');
+    expect(chaseTexts(rowNamed('Bows'))).toEqual(['1–10% increased Target', '', '']);
+  });
+
+  it('rewrites the cells and the open panel in the same pass on a recipe switch, and after a raised threshold', async () => {
+    serveWorld(ringsWorld());
+    mount();
+    await settleTo('ready');
+    click(rowNamed('Rings'));
+    const notes = (): string[] => panelRows().map((row) => panelCell(row, 'note'));
+    expect(notes()).toEqual(['', '', '', '', '']);
+    click(option('perfect'));
+    // Life is out of reach under perfect: P = 0, so it sorts last among the summands.
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 ES']);
+    expect(panelRows().map((row) => panelCell(row, 'combination'))).toEqual([
+      '* pinned T1 Atk Dmg · T1 Cold Res',
+      'T1 Mana',
+      'T1 ES',
+      'T1 Rarity',
+      'T1 Life',
+    ]);
+    click(option('greater'));
+    const field = frame().querySelector<HTMLInputElement>('[data-payout-threshold] input');
+    if (field === null) {
+      throw new Error('no threshold input');
+    }
+    typeInto(field, '2');
+    await pastDebounce();
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', '']);
+    expect(notes()).toEqual(['', '', BELOW_THRESHOLD_NOTE, BELOW_THRESHOLD_NOTE, BELOW_THRESHOLD_NOTE]);
+  });
+
+  it('state 35: an uncostable recipe still prints the cells, because the threshold reads the gross price', async () => {
+    serveWorld(ringsWorld({ rates: RATES.slice(0, 2) }));
+    mount();
+    await settleTo('ready');
+    click(option('perfect'));
+    const row = rowNamed('Rings');
+    expect(row.querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
+    expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 ES']);
+  });
+});
+
+describe('the crafted panel', () => {
+  it('lists the summand, then the rest by canonical key, with their notes; the pruned entry has no row', async () => {
+    const now = Date.now();
+    const pruned = ring(RARITY, undefined, 'pruned');
+    serveWorld(
+      ringsWorld({
+        tracked: [atkCold, life, es, mana, pruned],
+        dataset: [
+          priced(atkCold, 1000, hoursBefore(now, 2), TEST_LEAGUE, SEARCH),
+          priced(mana, 0.1, hoursBefore(now, 3)),
+          unpriced(life, { state: 'no-listings' }, hoursBefore(now, 4)),
+          unpriced(es, { state: 'unresolvable' }, hoursBefore(now, 5)),
+          priced(pruned, 50, hoursBefore(now, 1)),
+        ],
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    click(rowNamed('Rings'));
+    const rows = panelRows();
+    expect(rows.map((row) => panelCell(row, 'combination'))).toEqual([
+      '* pinned T1 Atk Dmg · T1 Cold Res',
+      'T1 Mana',
+      'T1 Life',
+      'T1 ES',
+    ]);
+    expect(rows.map((row) => panelCell(row, 'note'))).toEqual([
+      '',
+      BELOW_THRESHOLD_NOTE,
+      STATE_NOTES['no-listings'],
+      STATE_NOTES.unresolvable,
+    ]);
+    expect(rows.map((row) => row.dataset['priceState'])).toEqual(['priced', 'priced', 'no-listings', 'unresolvable']);
+    expect(rows.map((row) => panelCell(row, 'figure'))).toEqual(['1000.00', '0.10', 'an open question', 'not valued']);
+    expect(rows.map((row) => panelCell(row, 'sample'))).toEqual(['10 listings', '10 listings', '0 listings found', 'no sample']);
+    expect(rows.map((row) => panelCell(row, 'observed'))).toEqual(['priced 2h ago', 'priced 3h ago', '', '']);
+    expect(rows.map((row) => panelCell(row, 'attempted'))).toEqual([
+      'tried 2h ago',
+      'tried 3h ago',
+      'tried 4h ago',
+      'tried 5h ago',
+    ]);
+    // State 4: the rust glyph and the rust money phrase.
+    const unresolvable = rows[3];
+    expect(unresolvable?.querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors.rust));
+    expect(unresolvable?.querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.rust));
+    // The trade link follows the raw path: only the summand carries a stored search.
+    const links = rows.map((row) => row.querySelector('[data-cell="trade-link"] a')?.getAttribute('href') ?? null);
+    expect(links).toEqual(['https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/AbC123', null, null, null]);
+    expect(rows[0]?.querySelector('[data-cell="trade-link"] a')?.getAttribute('aria-label')).toBe(
+      'Open the trade search for T1 Atk Dmg · T1 Cold Res on Rings',
+    );
+    // Nothing in the expansion is ellipsised.
+    for (const node of Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *'))) {
+      expect(node.style.textOverflow).toBe('');
+    }
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', '', '']);
+  });
+
+  it('prints never-synced and league-mismatch entries with their reasons and notes', async () => {
+    const now = Date.now();
+    serveWorld(
+      ringsWorld({
+        tracked: [atkCold, mana, life],
+        dataset: [priced(atkCold, 1000, hoursBefore(now, 1)), priced(mana, 9, hoursBefore(now, 1), 'Standard')],
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    click(rowNamed('Rings'));
+    const rows = panelRows();
+    expect(rows.map((row) => panelCell(row, 'combination'))).toEqual([
+      '* pinned T1 Atk Dmg · T1 Cold Res',
+      'T1 Mana',
+      'T1 Life',
+    ]);
+    expect(rows.map((row) => row.querySelector('[data-state-word]')?.textContent)).toEqual([
+      'priced',
+      'not-yet-synced · league-mismatch',
+      'not-yet-synced · never-synced',
+    ]);
+    expect(rows.map((row) => panelCell(row, 'note'))).toEqual(['', STATE_NOTES['league-mismatch'], STATE_NOTES['never-synced']]);
   });
 });

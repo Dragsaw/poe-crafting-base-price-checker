@@ -5,6 +5,7 @@
 
 import {
   canonicalKey,
+  type BandedModifierRef,
   type CraftedTrackedEntry,
   type DatasetEntry,
   type PriceState,
@@ -30,6 +31,12 @@ export function craftedEntry(className: string, categoryId: string, itemLevelMin
     prefix: { kind: 'valueless', statId: 'explicit.stat_3299347043' },
     status: 'active',
   };
+}
+
+/** A banded reference, with an Accepted Tier when one is given. */
+export function banded(statId: string, valueMin: number, valueMax: number, acceptedTier?: string): BandedModifierRef {
+  const ref = { kind: 'banded', statId, valueMin, valueMax } as const;
+  return acceptedTier === undefined ? ref : { ...ref, acceptedTier };
 }
 
 /** An ISO timestamp `hours` before `now`. */

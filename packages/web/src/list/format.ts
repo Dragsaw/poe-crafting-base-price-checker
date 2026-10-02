@@ -1,4 +1,4 @@
-import type { NotYetSyncedReason } from '@poe/contracts';
+import type { DatasetEntry, NotYetSyncedReason } from '@poe/contracts';
 
 import { formatDivine, formatThreshold } from '../shared/money';
 import { DENOMINATION } from '../shared/product';
@@ -131,6 +131,55 @@ export function rawCombinationNote(state: CombinationState, itemLevelMin: number
     case 'unresolvable':
       return STATE_NOTES.unresolvable;
   }
+}
+
+/** State 20: a priced entry below the threshold. Shown, never hidden, never greyed (EXPERIENCE.md). */
+export const BELOW_THRESHOLD_NOTE = 'below the threshold — adds nothing to EV';
+
+/**
+ * Line two's note for a crafted entry. A summand's note is empty. A priced
+ * entry that is not a summand is below the threshold (state 20), because
+ * `core` sums every entry priced in the active league at or above it. Every
+ * other state takes its own state note, as a Raw Base's does.
+ */
+export function craftedCombinationNote(state: CombinationState, summand: boolean): string {
+  switch (state.state) {
+    case 'priced':
+      return summand ? '' : BELOW_THRESHOLD_NOTE;
+    case 'no-listings':
+      return STATE_NOTES['no-listings'];
+    case 'not-yet-synced':
+      return STATE_NOTES[state.reason];
+    case 'unresolvable':
+      return STATE_NOTES.unresolvable;
+  }
+}
+
+/**
+ * The Price State a crafted entry's combination row prints, resolved as
+ * `core` resolves a Raw Base's: no dataset entry is `not-yet-synced ·
+ * never-synced`, and an observation from another league is `not-yet-synced ·
+ * league-mismatch` (AD-9, AD-19, FR-31). Every other stored state prints as
+ * stored. No threshold is read here.
+ */
+export function resolvedState(entry: DatasetEntry | undefined, activeLeague: string): CombinationState {
+  if (entry === undefined) {
+    return { state: 'not-yet-synced', reason: 'never-synced' };
+  }
+  const { price } = entry;
+  if (price.state !== 'priced') {
+    return price;
+  }
+  const { observation } = price;
+  if (observation.league !== activeLeague) {
+    return { state: 'not-yet-synced', reason: 'league-mismatch' };
+  }
+  return {
+    state: 'priced',
+    priceDivine: observation.priceDivine,
+    sampleSize: observation.sampleSize,
+    observedAt: observation.observedAt,
+  };
 }
 
 /** The figure cell: a figure at 2dp (or `< 0.01`), or the money-slot phrase naming the open question. */

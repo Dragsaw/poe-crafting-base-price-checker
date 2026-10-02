@@ -9,6 +9,7 @@ import { RowSlots } from './frame/RowSlots';
 import { TrustStrip, TrustStripSlot } from './frame/TrustStrip';
 import { AskingPriceLine } from './list/AskingPriceLine';
 import { forRecipe, type ListRecipe } from './list/active-ranking';
+import { statTexts } from './list/combination-text';
 import { toListBranches } from './list/display-rows';
 import { KeyBlock } from './list/KeyBlock';
 import { listStatement } from './list/list-statement';
@@ -194,14 +195,20 @@ function ReadyBody({
       }),
     [set, threshold, crossFileFailures],
   );
+  // The catalogue's stat texts, for the Combination fallback: built once per load.
+  const stats = useMemo(() => statTexts(set.catalogueStats), [set]);
   const { branches, statement, unrankable } = useMemo(() => {
     const active = forRecipe(ranking, recipe);
     return {
-      branches: toListBranches(active, set.dataset.entries, now),
+      branches: toListBranches(active, set.dataset.entries, now, {
+        tracked: set.tracked.entries,
+        stats,
+        activeLeague: set.config.league,
+      }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
     };
-  }, [ranking, recipe, set, now, threshold]);
+  }, [ranking, recipe, set, now, threshold, stats]);
   return (
     <>
       <ListStatement statement={statement} />

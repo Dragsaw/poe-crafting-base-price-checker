@@ -120,7 +120,12 @@ function Branch({
               row.unit === 'raw' ? (
                 <RawExpansionPanel row={row} threshold={threshold} activeLeague={activeLeague} />
               ) : (
-                <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord ?? ''} />
+                <ClassExpansionPanel
+                  row={row}
+                  threshold={threshold}
+                  recipeWord={recipeWord ?? ''}
+                  activeLeague={activeLeague}
+                />
               )
             ) : null}
           </Fragment>

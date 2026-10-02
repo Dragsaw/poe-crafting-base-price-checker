@@ -240,3 +240,32 @@ describe('the detail each row carries for its expansion', () => {
     expect(rows.every((row) => row.status === 'active')).toBe(true);
   });
 });
+
+describe('the summands in web', () => {
+  const sources = import.meta.glob<string>(['../**/*.{ts,tsx}', '!../**/*.test.{ts,tsx}', '!../test-support/**'], {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  });
+
+  it('only slices core’s summands to three and reads their keys: no reorder, no term computed', () => {
+    const uses = Object.entries(sources).flatMap(([path, text]) =>
+      Array.from(text.matchAll(/\bsummands\b[^\n]*/g), (match) => `${path}: ${match[0]}`),
+    );
+    expect(uses.length).toBeGreaterThan(0);
+    // Each code use of `summands` in web source, verbatim. Prose in comments starts with no `.` or `(`.
+    const allowed = new Set([
+      './display-rows.ts: summands.map((summand) => summand.entryKey));',
+      './display-rows.ts: summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),',
+      './display-rows.ts: summands.map((summand) => summand.entryKey), ...rest].flatMap(combination),',
+      // State 25 reads whether any summand survives (Story 3.4).
+      './list-statement.ts: summands.length > 0);',
+    ]);
+    const code = uses.filter((use) => /: summands[.)]/.test(use));
+    expect(code.length).toBeGreaterThan(0);
+    expect(code.filter((use) => !allowed.has(use))).toEqual([]);
+    for (const [path, text] of Object.entries(sources)) {
+      expect(text, path).not.toMatch(/\.(contribution|probability|grossPayout)\b/);
+    }
+  });
+});

@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { NOW } from '../test-support/dom';
-import { hoursBefore } from '../test-support/list-fixtures';
+import { TEST_LEAGUE } from '../test-support/artifact-server';
+import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import {
   ageMark,
   classPanelSubLine,
+  BELOW_THRESHOLD_NOTE,
   combinationAges,
   combinationFigure,
+  craftedCombinationNote,
   FRESHNESS_CUTOFF_HOURS,
   MONEY_PHRASES,
   PANEL_ASKING_SENTENCE,
@@ -16,6 +19,7 @@ import {
   rawExpansionNote,
   rawNote,
   rawPanelSubLine,
+  resolvedState,
   sampleText,
   STATE_NOTES,
   stateWord,
@@ -109,6 +113,26 @@ describe('the expansion copy', () => {
   const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
   const NO_RATE: CombinationState = { state: 'not-yet-synced', reason: 'no-exchange-rate' };
   const UNRESOLVABLE: CombinationState = { state: 'unresolvable' };
+
+  it('notes a crafted summand with nothing, a priced non-summand as below the threshold, and every other state as a Raw Base', () => {
+    expect(craftedCombinationNote(PRICED, true)).toBe('');
+    expect(craftedCombinationNote(PRICED, false)).toBe(BELOW_THRESHOLD_NOTE);
+    expect(BELOW_THRESHOLD_NOTE).toBe('below the threshold — adds nothing to EV');
+    expect(craftedCombinationNote(NO_LISTINGS, false)).toBe(STATE_NOTES['no-listings']);
+    expect(craftedCombinationNote(NEVER, false)).toBe(STATE_NOTES['never-synced']);
+    expect(craftedCombinationNote(MISMATCH, false)).toBe(STATE_NOTES['league-mismatch']);
+    expect(craftedCombinationNote(NO_RATE, false)).toBe(STATE_NOTES['no-exchange-rate']);
+    expect(craftedCombinationNote(UNRESOLVABLE, false)).toBe(STATE_NOTES.unresolvable);
+  });
+
+  it('resolves a stored Price State as core resolves a Raw Base: absent is never-synced, another league is a mismatch', () => {
+    const entry = rawEntry('Gold Amulet');
+    expect(resolvedState(undefined, TEST_LEAGUE)).toEqual(NEVER);
+    expect(resolvedState(priced(entry, 0.8, PRICED.observedAt, 'Standard'), TEST_LEAGUE)).toEqual(MISMATCH);
+    expect(resolvedState(priced(entry, 0.8, PRICED.observedAt), TEST_LEAGUE)).toEqual(PRICED);
+    expect(resolvedState(unpriced(entry, UNRESOLVABLE), TEST_LEAGUE)).toEqual(UNRESOLVABLE);
+    expect(resolvedState(unpriced(entry, NO_RATE), TEST_LEAGUE)).toEqual(NO_RATE);
+  });
 
   it('labels both clocks, shows priced only on a priced row, and leaves a missing clock empty', () => {
     expect(combinationAges(PRICED, hoursBefore(NOW, 3), NOW)).toEqual({ observed: 'priced 11h ago', attempted: 'tried 3h ago' });
