@@ -2,7 +2,8 @@ import type { JSX } from 'react';
 
 import { colors, px, spacing, typeStyle } from '../theme/tokens';
 import { CombinationRow, type Combination } from './CombinationRow';
-import type { ClassDisplayRow, DisplayRow } from './display-rows';
+import { combinationString } from './combination-text';
+import type { ClassDisplayRow, CraftedCombination, DisplayRow } from './display-rows';
 import { classPanelSubLine, NO_AFFIXES, rawCombinationNote, rawPanelSubLine } from './format';
 import { tradeSearchHref } from './trade-link';
 import { UnitGlyph, type Unit } from './UnitGlyph';
@@ -15,13 +16,31 @@ import { UnitGlyph, type Unit } from './UnitGlyph';
 export function rawCombination(row: DisplayRow, activeLeague: string): Combination {
   return {
     key: row.key,
-    text: NO_AFFIXES,
+    text: [{ text: NO_AFFIXES, verbatim: false }],
     pinned: row.status === 'pinned',
     state: row.state,
     note: rawCombinationNote(row.state, row.itemLevel),
     ages: row.ages,
     tradeHref: tradeSearchHref({ ...row.entry, status: row.status }, activeLeague),
     tradeLabel: `Open the trade search for ${row.label}`,
+  };
+}
+
+/**
+ * One crafted Tracked Entry's combination row. The note, the ages, the
+ * figure, the sample, the trade link and `* pinned` follow the raw path; the
+ * text is its tier + short form, or the verbatim fallback.
+ */
+export function craftedCombination(combination: CraftedCombination, className: string, activeLeague: string): Combination {
+  return {
+    key: combination.key,
+    text: combination.text,
+    pinned: combination.status === 'pinned',
+    state: combination.state,
+    note: combination.note,
+    ages: combination.ages,
+    tradeHref: tradeSearchHref({ ...combination.entry, status: combination.status }, activeLeague),
+    tradeLabel: `Open the trade search for ${combinationString(combination.text)} on ${className}`,
   };
 }
 
@@ -106,24 +125,27 @@ export function RawExpansionPanel({
 
 /**
  * The panel under an open crafted Item Class row: its glyph and name, and the
- * sub-line that repeats the threshold and the active Craft Recipe. The
- * Combination rows are Story 3.5's.
+ * sub-line that repeats the threshold and the active Craft Recipe, then one
+ * combination row per non-pruned Tracked Entry of the class: the summands in
+ * `core`'s order, then the rest by canonical key.
  */
 export function ClassExpansionPanel({
   row,
   threshold,
   recipeWord,
+  activeLeague,
 }: {
   readonly row: ClassDisplayRow;
   readonly threshold: number;
   readonly recipeWord: string;
+  readonly activeLeague: string;
 }): JSX.Element {
   return (
     <ExpansionPanel
       unit={row.unit}
       label={row.label}
       subLine={classPanelSubLine(threshold, recipeWord)}
-      combinations={[]}
+      combinations={row.combinations.map((combination) => craftedCombination(combination, row.label, activeLeague))}
     />
   );
 }

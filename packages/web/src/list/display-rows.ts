@@ -1,11 +1,22 @@
-import { compareCanonicalKeys, type CurationStatus, type DatasetEntry } from '@poe/contracts';
-import type { Ranking, UnrankedEntry } from '@poe/core';
+import {
+  canonicalKey,
+  compareCanonicalKeys,
+  type CraftedRankedRow,
+  type CraftedTrackedEntry,
+  type CurationStatus,
+  type DatasetEntry,
+  type TrackedEntry,
+} from '@poe/contracts';
+import { classKeyOf, type Ranking, type UnrankedEntry } from '@poe/core';
 
 import { formatDivine } from '../shared/money';
+import { combinationText, type AffixPart, type StatTexts } from './combination-text';
 import {
   ageMark,
   combinationAges,
+  craftedCombinationNote,
   MONEY_PHRASES,
+  resolvedState,
   type AgeMark,
   type CombinationAges,
   type CombinationState,
@@ -50,8 +61,9 @@ export interface DisplayRow {
 /**
  * One crafted `(Item Class, recipe)` row as the view prints it: the class
  * glyph, the Item Class name, its EV. The key is the class key, so a row keeps
- * its open panel across a recipe switch (state 34). No age, Provenance mark or
- * chase cell yet (Stories 3.5, 3.6).
+ * its open panel across a recipe switch (state 34). Its chase cells and its
+ * panel's rows come from `core`'s summands and the tracked list. No age or
+ * Provenance mark yet (the Age cell waits on AD-10; Provenance is Story 3.6).
  */
 export interface ClassDisplayRow {
   readonly key: string;
@@ -65,7 +77,38 @@ export interface ClassDisplayRow {
   /** The EV at 2dp — negative is a real figure — or *no figure yet* when the recipe is uncostable. */
   readonly ev: EvCell;
   readonly age: undefined;
+  /**
+   * The chase cells: the first three of `core`'s summands, in `core`'s order,
+   * each as its Combination's text. Fewer than three leave empty cells
+   * (state 21).
+   */
+  readonly chase: readonly (readonly AffixPart[])[];
+  /** The expansion's combination rows: the summands in `core`'s order, then every other non-pruned entry by canonical key. */
+  readonly combinations: readonly CraftedCombination[];
 }
+
+/** One crafted Tracked Entry as its combination row prints it. */
+export interface CraftedCombination {
+  /** The entry's canonical key. */
+  readonly key: string;
+  readonly text: readonly AffixPart[];
+  readonly status: CurationStatus;
+  readonly state: CombinationState;
+  readonly note: string;
+  /** The entry's dataset entry, for its stored search. `undefined` when never synced. */
+  readonly entry: DatasetEntry | undefined;
+  readonly ages: CombinationAges;
+}
+
+/** What a crafted row needs beyond `core`'s row: the tracked list, the catalogue's stat texts and the active league. */
+export interface CraftedContext {
+  readonly tracked: readonly TrackedEntry[];
+  readonly stats: StatTexts;
+  readonly activeLeague: string;
+}
+
+/** The chase column holds at most three cells (DESIGN.md `col-chase` 492 = 3 × 164). */
+export const CHASE_CELLS = 3;
 
 /** Any row of the list. */
 export type ListRow = DisplayRow | ClassDisplayRow;
@@ -78,6 +121,77 @@ export function tierOf(position: number): Tier {
     return 1;
   }
   return position <= 10 ? 2 : 3;
+}
+
+const NO_CRAFTED_CONTEXT: CraftedContext = { tracked: [], stats: new Map(), activeLeague: '' };
+
+interface KeyedEntry {
+  readonly entry: CraftedTrackedEntry;
+  readonly entryKey: string;
+}
+
+/** The non-pruned crafted entries, grouped by their class key, each with its canonical key. */
+function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, readonly KeyedEntry[]> {
+  const classes = new Map<string, KeyedEntry[]>();
+  for (const entry of tracked) {
+    if (entry.kind !== 'crafted' || entry.status === 'pruned') {
+      continue;
+    }
+    const classKey = classKeyOf(entry.categoryId, entry.className);
+    const group = classes.get(classKey) ?? [];
+    group.push({ entry, entryKey: canonicalKey(entry) });
+    classes.set(classKey, group);
+  }
+  return classes;
+}
+
+/**
+ * A crafted row's chase cells and panel rows. `web` computes no term here and
+ * reorders nothing: the chase cells are `core`'s first three summands, and the
+ * panel lists the summands in `core`'s order, then every other non-pruned
+ * entry of the class by canonical key. A summand joins its tracked entry by
+ * canonical key.
+ */
+function craftedDetail(
+  row: CraftedRankedRow,
+  entries: readonly KeyedEntry[],
+  byKey: ReadonlyMap<string, DatasetEntry>,
+  { stats, activeLeague }: CraftedContext,
+  now: number,
+): Pick<ClassDisplayRow, 'chase' | 'combinations'> {
+  const tracked = new Map(entries.map((keyed) => [keyed.entryKey, keyed.entry]));
+  const summandKeys = new Set(row.summands.map((summand) => summand.entryKey));
+  const text = (entryKey: string): readonly AffixPart[] => {
+    const entry = tracked.get(entryKey);
+    return entry === undefined ? [] : combinationText(entry, stats);
+  };
+  const combination = (entryKey: string): CraftedCombination[] => {
+    const entry = tracked.get(entryKey);
+    if (entry === undefined) {
+      return [];
+    }
+    const stored = byKey.get(entryKey);
+    const state = resolvedState(stored, activeLeague);
+    return [
+      {
+        key: entryKey,
+        text: combinationText(entry, stats),
+        status: entry.status,
+        state,
+        note: craftedCombinationNote(state, summandKeys.has(entryKey)),
+        entry: stored,
+        ages: combinationAges(state, stored?.lastAttemptedAt, now),
+      },
+    ];
+  };
+  const rest = entries
+    .map((keyed) => keyed.entryKey)
+    .filter((entryKey) => !summandKeys.has(entryKey))
+    .toSorted(compareCanonicalKeys);
+  return {
+    chase: row.summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),
+    combinations: [...row.summands.map((summand) => summand.entryKey), ...rest].flatMap(combination),
+  };
 }
 
 /**
@@ -104,9 +218,14 @@ export function toDisplayRows(
   ranking: Ranking,
   dataset: readonly DatasetEntry[],
   now: number,
-  { numbered = true, honestEmpty = isHonestEmpty(ranking) }: { readonly numbered?: boolean; readonly honestEmpty?: boolean } = {},
+  {
+    numbered = true,
+    honestEmpty = isHonestEmpty(ranking),
+    crafted = NO_CRAFTED_CONTEXT,
+  }: { readonly numbered?: boolean; readonly honestEmpty?: boolean; readonly crafted?: CraftedContext } = {},
 ): ListRow[] {
   const byKey = new Map(dataset.map((entry) => [entry.entryKey, entry]));
+  const classes = trackedByClass(crafted.tracked);
 
   const detail = (
     entryKey: string,
@@ -135,6 +254,7 @@ export function toDisplayRows(
             ? { kind: 'phrase', text: MONEY_PHRASES.notYetSynced }
             : { kind: 'figure', text: formatDivine(row.ev) },
         age: undefined,
+        ...craftedDetail(row, classes.get(row.classKey) ?? [], byKey, crafted, now),
       };
     }
     return {
@@ -192,9 +312,14 @@ export function toDisplayRows(
  * branch: each in `core`'s order, tiered by its own position, and no rank
  * numeral on either, because none can span the two (EXPERIENCE.md state 35).
  */
-export function toListBranches(active: ActiveRanking, dataset: readonly DatasetEntry[], now: number): ListBranches {
+export function toListBranches(
+  active: ActiveRanking,
+  dataset: readonly DatasetEntry[],
+  now: number,
+  crafted: CraftedContext,
+): ListBranches {
   if (!active.split) {
-    return [toDisplayRows(active, dataset, now)];
+    return [toDisplayRows(active, dataset, now, { crafted })];
   }
   const rawOnly = { ...active, ordering: active.ordering.filter((row) => row.kind === 'raw') };
   const craftedOnly = {
@@ -205,7 +330,7 @@ export function toListBranches(active: ActiveRanking, dataset: readonly DatasetE
     unresolvable: [],
   };
   return [
-    toDisplayRows(rawOnly, dataset, now, { numbered: false, honestEmpty: false }),
-    toDisplayRows(craftedOnly, dataset, now, { numbered: false, honestEmpty: false }),
+    toDisplayRows(rawOnly, dataset, now, { numbered: false, honestEmpty: false, crafted }),
+    toDisplayRows(craftedOnly, dataset, now, { numbered: false, honestEmpty: false, crafted }),
   ];
 }

@@ -3,8 +3,10 @@ import './list.css';
 import type { CSSProperties, JSX } from 'react';
 
 import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/tokens';
+import { fixedCell } from '../shared/cell';
 import { cellStyle } from './ColumnHeader';
-import type { ListRow } from './display-rows';
+import { CombinationText } from './CombinationRow';
+import { CHASE_CELLS, type ListRow } from './display-rows';
 import { MONEY_PHRASES, rawNote } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
@@ -17,6 +19,9 @@ const RANK_COLOR = { 1: colors.sepia, 2: colors['ink-secondary'], 3: colors['ink
 const [rank, unit, ev, provenance, age, chase] = rankedRowColumns;
 const COLUMNS = { rank, unit, ev, provenance, age, chase } as const;
 
+/** The three chase slots. An unused slot stays an empty cell (state 21). */
+const CHASE_SLOTS = Array.from({ length: CHASE_CELLS }, (_, slot) => slot);
+
 /**
  * One 28px ranked row in the six-cell contract. The whole row is one toggle
  * target: no per-row control, no tooltip. Hover and pointer-down tones live in
@@ -26,7 +31,9 @@ const COLUMNS = { rank, unit, ev, provenance, age, chase } as const;
  *
  * A Raw Base row carries three cues — the `paper-raw` tint, the italic name and
  * `▪` — and one full-width italic note in place of the chase cells. Its
- * Provenance cell is empty, as a healthy crafted row's is (state 12a).
+ * Provenance cell is empty, as a healthy crafted row's is (state 12a). A
+ * crafted row holds three fixed 164px chase cells, each ellipsising on one
+ * line in `ink-secondary`, `ink-chase-emphasis` on tier 1.
  */
 export function RankedRow({
   row,
@@ -117,7 +124,16 @@ export function RankedRow({
       <div data-cell="age" style={{ ...cellStyle(COLUMNS.age), ...typeStyle('row-mark') }}>
         {row.age === undefined ? null : <TrustMark kind={row.age.kind} word={row.age.word} />}
       </div>
-      <div data-cell="chase" style={{ ...cellStyle(COLUMNS.chase), ...typeStyle('row-chase'), overflow: 'hidden' }}>
+      <div
+        data-cell="chase"
+        style={{
+          ...cellStyle(COLUMNS.chase),
+          ...typeStyle('row-chase'),
+          overflow: 'hidden',
+          // A crafted row's three cells carry `pad-chase-cell-right` each, so the column pads nothing more.
+          ...(raw ? {} : { display: 'flex', paddingRight: undefined }),
+        }}
+      >
         {raw ? (
           <span
             data-raw-note=""
@@ -131,7 +147,26 @@ export function RankedRow({
           >
             {rawNote(row.itemLevel)}
           </span>
-        ) : null}
+        ) : (
+          CHASE_SLOTS.map((slot) => {
+            const parts = row.chase[slot];
+            return (
+              <div
+                key={slot}
+                data-chase-cell=""
+                style={{
+                  ...fixedCell({ width: spacing.chaseCell, padRight: spacing.padChaseCellRight }),
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  color: row.tier === 1 ? colors['ink-chase-emphasis'] : colors['ink-secondary'],
+                }}
+              >
+                {parts === undefined ? null : <CombinationText parts={parts} />}
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

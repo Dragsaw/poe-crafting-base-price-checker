@@ -146,6 +146,10 @@ export const spacing = {
   openRowMarker: 3,
   /** The fixed box both unit glyphs centre in, so every unit name starts at one x. */
   unitGlyphBox: 14,
+  /** `{spacing.chase-cell}`: `col-chase` 492 holds three fixed cells of 164. */
+  chaseCell: 164,
+  /** `{spacing.pad-chase-cell-right}`, on every chase cell. */
+  padChaseCellRight: 10,
   /**
    * The resting chrome's own gaps, from DESIGN.md's vertical budget and
    * `mockups/key-hero-resting.html`. Each block's committed height depends on them.
