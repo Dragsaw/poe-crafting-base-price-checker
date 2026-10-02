@@ -16,6 +16,7 @@ import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
+import { bannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
@@ -197,7 +198,9 @@ function ReadyBody({
   );
   // The catalogue's stat texts, for the Combination fallback: built once per load.
   const stats = useMemo(() => statTexts(set.catalogueStats), [set]);
-  const { branches, statement, unrankable } = useMemo(() => {
+  // The banner's dismissal lives in memory for the session only: a reload brings it back.
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const { branches, statement, unrankable, banner } = useMemo(() => {
     const active = forRecipe(ranking, recipe);
     return {
       branches: toListBranches(active, set.dataset.entries, now, {
@@ -207,10 +210,12 @@ function ReadyBody({
       }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
+      banner: bannerRaised(active),
     };
   }, [ranking, recipe, set, now, threshold, stats]);
   return (
     <>
+      {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : null}
       <ListStatement statement={statement} />
       <RankedList
         branches={branches}

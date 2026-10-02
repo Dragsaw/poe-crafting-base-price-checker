@@ -62,8 +62,8 @@ export interface DisplayRow {
  * One crafted `(Item Class, recipe)` row as the view prints it: the class
  * glyph, the Item Class name, its EV. The key is the class key, so a row keeps
  * its open panel across a recipe switch (state 34). Its chase cells and its
- * panel's rows come from `core`'s summands and the tracked list. No age or
- * Provenance mark yet (the Age cell waits on AD-10; Provenance is Story 3.6).
+ * panel's rows come from `core`'s summands and the tracked list. No age mark
+ * yet: the Age cell waits on the architect ruling on AD-10's oldest timestamp.
  */
 export interface ClassDisplayRow {
   readonly key: string;
@@ -77,6 +77,8 @@ export interface ClassDisplayRow {
   /** The EV at 2dp — negative is a real figure — or *no figure yet* when the recipe is uncostable. */
   readonly ev: EvCell;
   readonly age: undefined;
+  /** `core`'s label of the pair. Only `uniform-prior` prints a mark; `measured` is silence (FR-11). */
+  readonly provenance: CraftedRankedRow['provenance'];
   /**
    * The chase cells: the first three of `core`'s summands, in `core`'s order,
    * each as its Combination's text. Fewer than three leave empty cells
@@ -254,6 +256,7 @@ export function toDisplayRows(
             ? { kind: 'phrase', text: MONEY_PHRASES.notYetSynced }
             : { kind: 'figure', text: formatDivine(row.ev) },
         age: undefined,
+        provenance: row.provenance,
         ...craftedDetail(row, classes.get(row.classKey) ?? [], byKey, crafted, now),
       };
     }

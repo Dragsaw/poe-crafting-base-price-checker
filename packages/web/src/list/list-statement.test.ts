@@ -129,6 +129,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
     className: 'Bows',
     itemLevelMin: 82,
     recipeId,
+    provenance: 'measured',
     grossPayout: summands,
     craftCost: 0.03,
     ev: summands - 0.03,

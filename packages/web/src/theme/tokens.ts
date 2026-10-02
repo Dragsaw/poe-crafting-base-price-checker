@@ -81,6 +81,8 @@ export const spacing = {
   /** 1920 − 1390 committed = 530 (UX memlog 210; it read 528 through revision 5). */
   frameSlack: 530,
   frameReserveBanner: 74,
+  /** The ochre left edge of the uniform-prior banner (DESIGN.md `banner-marker`). */
+  bannerMarker: 5,
   frameReserveHealthLine: 21,
   /** One per absent tolerable artifact, inside the trust strip (DESIGN.md memlog 213). */
   frameReserveAbsenceLine: 21,

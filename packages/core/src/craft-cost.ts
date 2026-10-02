@@ -14,7 +14,12 @@ import type { CraftRecipe, CurrencyRate } from '@poe/contracts';
  * from `sync` and the sum is passed on as computed. `sync` never calls this.
  */
 export type CraftCostResult =
-  | { readonly ok: true; readonly divine: number }
+  | {
+      readonly ok: true;
+      readonly divine: number;
+      /** The `asOf` of each rate the cost used, in recipe order: an input of the pair's oldest timestamp (AD-10). */
+      readonly asOf: readonly string[];
+    }
   | { readonly ok: false; readonly reason: { readonly kind: 'uncostable'; readonly currencyId: string } };
 
 export function craftCost(
@@ -23,12 +28,14 @@ export function craftCost(
   league: string,
 ): CraftCostResult {
   let divine = 0;
+  const asOf: string[] = [];
   for (const line of recipe.currencies) {
     const rate = rates.find((candidate) => candidate.currencyId === line.currencyId && candidate.league === league);
     if (rate === undefined) {
       return { ok: false, reason: { kind: 'uncostable', currencyId: line.currencyId } };
     }
     divine += line.quantity * rate.rate;
+    asOf.push(rate.asOf);
   }
-  return { ok: true, divine };
+  return { ok: true, divine, asOf };
 }

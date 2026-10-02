@@ -7,6 +7,13 @@ import { DivineAmountSchema, IsoTimestampSchema, ItemLevelSchema } from './primi
 import { CurationStatusSchema } from './tracked-entry.ts';
 
 /**
+ * The three-value Provenance order (AD-10), weakest first: `absent` <
+ * `uniform-prior` < `measured`. `absent` comes only from a `partial` pool and
+ * never rides on a ranked row.
+ */
+export const ProvenanceSchema = z.enum(['absent', 'uniform-prior', 'measured']);
+
+/**
  * One row of the ranking `core` derives in the browser on every input change
  * (AD-4, AD-17). No artifact persists it: it is a read-time value, and `web`
  * renders it without computing any term of it.
@@ -96,6 +103,12 @@ export const CraftedRankedRowSchema = z
       .describe('Σ quantity × rate over the recipe’s currencies, in divine; or uncostable (AD-20).'),
     ev: z.number().nullable().describe('`grossPayout − craftCost`; `null` exactly when the recipe is uncostable.'),
     summands: z.array(CraftedSummandSchema).describe('By contribution descending, then canonical key.'),
+    provenance: ProvenanceSchema.exclude(['absent']).describe(
+      'The weakest Provenance over the pair’s inputs: the recipe’s eligible set over both slots (AD-10). A ranked row is never absent.',
+    ),
+    asOf: IsoTimestampSchema.optional().describe(
+      'The oldest timestamp of the pair’s inputs: each summand’s observedAt and each used rate’s asOf. Unset when there is none (AD-10).',
+    ),
   })
   .describe('A ranked `(Item Class, recipe)` pair (AD-17).');
 
@@ -112,6 +125,7 @@ export const RankedRowSchema = z
   })
   .describe('One ranked row, computed at read time by `core` (AD-4, AD-17).');
 
+export type Provenance = z.infer<typeof ProvenanceSchema>;
 export type RawRankedRow = z.infer<typeof RawRankedRowSchema>;
 export type CraftedRankedRow = z.infer<typeof CraftedRankedRowSchema>;
 export type CraftedSummand = z.infer<typeof CraftedSummandSchema>;

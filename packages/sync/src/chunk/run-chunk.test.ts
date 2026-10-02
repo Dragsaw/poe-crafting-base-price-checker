@@ -1826,6 +1826,64 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
     expect((await reportOf(present.fs))?.records).toEqual([]);
   });
 
+  describe('pool coverage (AD-27)', () => {
+    const coveredWeights = (suffixWeight: number): string =>
+      JSON.stringify({
+        schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
+        bases: {
+          'weapon.bow': {
+            Bows: {
+              prefix: { poolCoverage: 'complete', entries: [coverageTier('p1', 1)] },
+              suffix: { poolCoverage: 'complete', entries: [coverageTier('s1', suffixWeight)] },
+            },
+          },
+        },
+      });
+    const coverageTier = (id: string, weight: number): unknown => ({
+      sourceModifierId: id, modGroup: id, itemLevelMin: 1, weight,
+      weightSource: weight === 0 ? 'not-in-game' : 'published',
+      lines: [{ statId: 'explicit.ok', ranges: [] }],
+    });
+    const X = craftedEntry('weapon.bow', 'explicit.ok', 'Bows');
+    const Y = craftedEntry('armour.chest', 'explicit.ok', 'Body_Armours_str');
+
+    it('a present file writes both fields, and a replaced file gives the new figure on the next chunk', async () => {
+      const { fs, ports } = harness([X, Y], { [WEIGHTS_PATH]: { contents: coveredWeights(1) } });
+
+      await run(ports, scriptedStep().step);
+      const first = await reportOf(fs);
+      expect(first?.figures.coverage).toBe(0.5);
+      expect(first?.figures.rankableClassCount).toBe(2);
+
+      await fs.writeTextFile(WEIGHTS_PATH, coveredWeights(0));
+      await run(ports, scriptedStep().step);
+      const second = await reportOf(fs);
+      expect(second?.figures.coverage).toBe(0);
+      expect(second?.figures.rankableClassCount).toBe(2);
+    });
+
+    it('an absent file omits both fields', async () => {
+      const { fs, ports } = harness([X]);
+      await fs.deleteFile(WEIGHTS_PATH);
+
+      await run(ports, scriptedStep().step);
+
+      const figures = (await reportOf(fs))?.figures;
+      expect(figures !== undefined && 'coverage' in figures).toBe(false);
+      expect(figures !== undefined && 'rankableClassCount' in figures).toBe(false);
+    });
+
+    it('a present file with no rankable class omits both fields', async () => {
+      const { fs, ports } = harness([A], { [WEIGHTS_PATH]: { contents: coveredWeights(1) } });
+
+      await run(ports, scriptedStep().step);
+
+      const figures = (await reportOf(fs))?.figures;
+      expect(figures !== undefined && 'coverage' in figures).toBe(false);
+      expect(figures !== undefined && 'rankableClassCount' in figures).toBe(false);
+    });
+  });
+
   it('weights miss: one record per distinct uncatalogued id, nulls skipped, and the run continues', async () => {
     const lineOf = (statId: string | null): unknown => ({ statId, ranges: [] });
     const entryOf = (id: string, ...lines: unknown[]): unknown => ({
@@ -2519,6 +2577,31 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
       schemaVersion: '1.1.0',
     });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('deferred after breaking a stale lock: the previous coverage pair is carried over unchanged', async () => {
+    const previousReport = JSON.stringify({
+      schemaVersion: '1.1.0',
+      runStartedAt: SEVEN_HOURS_AGO,
+      figures: {
+        requestsBySource: { 'tracked-list': 3, 'league-validation': 1 },
+        notReachedCount: 0,
+        coverage: 0.75,
+        rankableClassCount: 4,
+      },
+      records: [],
+    });
+    const built = harness([A], {
+      [LOCK_PATH]: { contents: serialiseLock({ pid: 7, startedAt: SEVEN_HOURS_AGO }) },
+      [PROGRESS_PATH]: { contents: progressWithNotBefore([], '2026-09-26T13:00:00.000Z') },
+      [REPORT_PATH]: { contents: previousReport },
+    });
+
+    expect((await run(built.ports, scriptedStep().step)).kind).toBe('deferred');
+
+    const figures = (await reportOf(built.fs))?.figures;
+    expect(figures?.coverage).toBe(0.75);
+    expect(figures?.rankableClassCount).toBe(4);
   });
 
   it('growth: two starving chunks leave one pinned-starvation record, at its first position, carrying the latest allowance', async () => {

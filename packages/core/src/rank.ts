@@ -18,6 +18,7 @@ import type {
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import type { CrossFileFailure } from './cross-file.ts';
 import { combinationProbability, poolOf } from './probability.ts';
+import { foldPair, oldestOf, weakest } from './provenance.ts';
 
 /**
  * The ranking, both branches (AD-17, AD-9, AD-19, AD-20, IMPLEMENTATION-NOTES.md
@@ -129,6 +130,11 @@ export interface UnrankableClass {
    * under every recipe and carry no recipe id.
    */
   readonly recipeId?: string;
+  /**
+   * `absent`, set only on the reason `pool partial` (AD-10): the pool is not
+   * fully known, under every recipe. No other reason carries a Provenance.
+   */
+  readonly provenance?: 'absent';
 }
 
 /** An entry that contributes nothing to the ordering — not zero, nothing (AD-9). */
@@ -327,7 +333,12 @@ export function rank(input: RankInput): Ranking {
         unrankableReasonOf(input.weights, categoryId, className) ??
         (disagreeing.has(classKey) ? 'class disagrees with weights file' : undefined);
       if (reason !== undefined) {
-        unrankable.set(classKey, { categoryId, className, reason });
+        unrankable.set(
+          classKey,
+          reason === 'pool partial'
+            ? { categoryId, className, reason, provenance: 'absent' }
+            : { categoryId, className, reason },
+        );
         continue;
       }
       const known = rankableClasses.get(classKey);
@@ -465,6 +476,7 @@ function craftedRow(
   input: RankInput,
 ): CraftedRankedRow | undefined {
   const summands: CraftedSummand[] = [];
+  const stamps: string[] = cost.ok ? [...cost.asOf] : [];
   for (const { entry, entryKey } of keyed) {
     const probability = combinationProbability(pools, entry, recipe.modifierLevelMin);
     if (!probability.ok) {
@@ -479,9 +491,11 @@ function craftedRow(
       continue;
     }
     const priceDivine = price.observation.priceDivine;
+    stamps.push(price.observation.observedAt);
     summands.push({ entryKey, probability: probability.p, priceDivine, contribution: probability.p * priceDivine });
   }
   const ordered = summands.toSorted(compareSummands);
+  const asOf = oldestOf(stamps);
   const grossPayout = ordered.reduce((sum, summand) => sum + summand.contribution, 0);
   return {
     kind: 'crafted',
@@ -494,5 +508,7 @@ function craftedRow(
     craftCost: cost.ok ? cost.divine : { kind: 'uncostable', currencyId: cost.reason.currencyId },
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
+    provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce(weakest),
+    ...(asOf === undefined ? {} : { asOf }),
   };
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { RankedRowSchema } from './ranked-row';
+import { ProvenanceSchema, RankedRowSchema } from './ranked-row';
 import { without } from './test-support';
 
 const observation = {
@@ -65,6 +65,8 @@ const craftedRow = {
   craftCost: 0.05,
   ev: 0.25,
   summands: [{ entryKey: '["crafted","weapon.bow","Bows",82,null,null]', probability: 0.1, priceDivine: 3, contribution: 0.3 }],
+  provenance: 'measured',
+  asOf: '2026-09-26T00:00:00Z',
 };
 
 describe('RankedRowSchema, the crafted arm', () => {
@@ -83,6 +85,14 @@ describe('RankedRowSchema, the crafted arm', () => {
     expect(RankedRowSchema.safeParse({ ...craftedRow, ev: null }).success).toBe(false);
     const figure = { ...craftedRow, craftCost: { kind: 'uncostable', currencyId: 'exalted' } };
     expect(RankedRowSchema.safeParse(figure).success).toBe(false);
+  });
+
+  it('refuses a ranked row labelled absent or with no provenance, and parses one with no asOf', () => {
+    expect(RankedRowSchema.safeParse({ ...craftedRow, provenance: 'absent' }).success).toBe(false);
+    expect(RankedRowSchema.safeParse(without(craftedRow, 'provenance')).success).toBe(false);
+    const prior = { ...without(craftedRow, 'asOf'), provenance: 'uniform-prior' };
+    expect(RankedRowSchema.parse(prior)).toEqual(prior);
+    expect(ProvenanceSchema.options).toEqual(['absent', 'uniform-prior', 'measured']);
   });
 
   it('refuses a negative cost, a probability above 1, and a missing recipe id', () => {
