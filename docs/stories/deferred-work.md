@@ -128,9 +128,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
     - the pending `TrustStripSlot` reserves no absence or health lines (`frame/TrustStrip.tsx:140-155`)
     - the recipes-absent line claims "no crafted rows can be ranked" although `rank` never reads recipes (`frame/AbsenceLines.tsx:44-48`)
   evidence: Retro F18. `docs/reviews/review-epic-2-diff.md` items A8, A9, A10, A13, A14, A15, A18, E7, E10 and E12.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Sweep `docs/epics.md` to AD-24 as amended in spine revision 22 (retro action 8, 2026-09-27): web fetches **seven** artifacts, each with `cache: 'no-cache'` and no query token, and `catalogue/static.json` is not one of them. The lines are `:96` ("eight", "cache-busted", "Five are required", "A ninth"), `:995` and `:997` (eight cache-busted requests, a ninth artifact), `:1001`, `:1010` and `:1619` ("the eight artifacts"), and the Story 2.1 AC at `:1022`, where stat text comes from `catalogue/stats.json` and the denomination `Divine` is a product literal, not `static.json` text. This is a citation sweep, not a PRD revision. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
-  evidence: Retro F8, F9 and F19.
 
 ## Deferred from: epic 2 retro item 19 (2026-09-27)
 

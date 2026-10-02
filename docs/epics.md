@@ -93,7 +93,7 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
 - **One writer per file**, per AD-3's table. The player owns `tracked.json`, `config.json`, `currencies.json` and `recipes.json`. The external producer owns `weights.json`. `sync` owns `catalogue/*.json`, `dataset.json`, `sync-report.json` and `sync-progress.json`.
 - **`sync` makes no git write.** It writes the files it owns by explicit path and exits. Those files are git-tracked and updated in place. The player commits and pushes them, and that push is what deploys. The git port is read-only and carries one operation: the author date of the last commit touching a path (AD-3, AD-12).
 - **The trade catalogue is four committed artifacts under `data/catalogue/`.** An explicit command refreshes them at GGG patch cadence. That command never runs on the chunk path. The catalogue is an identity and validation authority only. It contributes nothing to the Eligible Pool (AD-25).
-- **`web` fetches exactly eight artifacts at runtime.** Each one is a separate cache-busted request. None is bundled into the JS. Five are required for a render and three are absent-tolerable. A ninth artifact needs an amendment (AD-24).
+- **`web` fetches exactly seven artifacts at runtime.** Each one is a separate `no-cache` request with no query token. None is bundled into the JS. Four are required for a render and three are absent-tolerable. An eighth artifact needs an amendment (AD-24).
 - **Currency rates are hand-maintained committed data.** `sync` copies each rate's own `league` and `asOf` through unchanged and must not stamp them. `sync` always writes divine's own rate as exactly `1` (AD-20).
 - **Provenance is a three-value total order.** It derives only from the sources AD-10's table names. `"absent"` maps to `uniform-prior`. It never maps to provenance `absent` (AD-10).
 - **The Consistency Conventions bind:**
@@ -199,7 +199,7 @@ UX-DR31: `expand-affordance`. One `+` / `−` vocabulary governs everything that
 
 UX-DR32: `running-foot`. The foot is the only place where the page says where curation actually happens.
 
-UX-DR33: `refusal-screen` and `fetch-failure-screen`. These are two page-replacing screens with the same shape and different copy. The refusal screen names the artifact, the schema version the artifact declared and the version the page expects. It offers no retry. The fetch-failure screen names which of the eight files did not arrive. It offers `+ Try again`, which re-attempts the whole set. Neither screen serves a partial set.
+UX-DR33: `refusal-screen` and `fetch-failure-screen`. These are two page-replacing screens with the same shape and different copy. The refusal screen names the artifact, the schema version the artifact declared and the version the page expects. It offers no retry. The fetch-failure screen names which of the seven files did not arrive. It offers `+ Try again`, which re-attempts the whole set. Neither screen serves a partial set.
 
 **Behaviour, content and state**
 
@@ -992,13 +992,13 @@ So that I never read half a ranking and never mistake a partial set for the list
 
 **Given** a load
 **When** `web` fetches its data
-**Then** it issues exactly eight separate cache-busted requests for the artifacts AD-24 names, and it bundles none of them into the JS
+**Then** it issues exactly seven separate `no-cache` requests with no query token for the artifacts AD-24 names, and it bundles none of them into the JS
 **And** it validates each artifact on load
-**And** a ninth artifact would require an amendment to AD-24 (FR-33, AD-24, AD-3).
+**And** an eighth artifact would require an amendment to AD-24 (FR-33, AD-24, AD-3).
 
 **Given** the masthead and twenty row slots
 **When** the page first renders
-**Then** they render immediately in the final layout, and all eight artifacts resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset
+**Then** they render immediately in the final layout, and all seven artifacts resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset
 **And** the skeleton's own fill tone and placeholder shape are an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than inventing an answer (UX-DR43, state 22).
 
 **Given** an artifact that fails validation
@@ -1007,9 +1007,10 @@ So that I never read half a ranking and never mistake a partial set for the list
 **And** that screen names the artifact, the schema version the artifact declared, and the version the page expects
 **And** it offers no retry (FR-33, NFR-8, UX-DR33, state 26).
 
-**Given** one of the eight artifacts that does not arrive
+**Given** one of the seven artifacts that does not arrive
 **When** the page loads
 **Then** `{components.fetch-failure-screen}` replaces the whole page, names which file did not arrive, and offers `+ Try again`, which re-attempts the whole set
+**And** an artifact that answers 404 is *absent*, not *did not arrive*: a required one gets `{components.refusal-screen}` instead, and a tolerable one renders as the absent-tolerable AC below says. This is an accepted deviation; do not re-flag it (AD-24, spec 2.1 Decisions *What absent means* and triage #9)
 **And** neither screen ever serves a partial set (FR-33, AD-24, UX-DR33, state 28).
 
 **Given** an absent but tolerable artifact — `weights.json`, `recipes.json` or `sync-report.json`
@@ -1019,8 +1020,8 @@ So that I never read half a ranking and never mistake a partial set for the list
 
 **Given** a `statId` or a currency denomination
 **When** the page prints it
-**Then** its text comes from `catalogue/stats.json` or from `catalogue/static.json`, rendered as text with no icon
-**And** the page makes no runtime call to pathofexile.com (FR-33, AD-15, AD-24, AD-25).
+**Then** a stat's text comes from `catalogue/stats.json`, and the denomination `Divine` is a product literal, not catalogue text, both rendered as text with no icon
+**And** the page makes no runtime call to pathofexile.com (FR-33, AD-15, AD-20, AD-24, AD-25).
 
 **Given** `recipes.json`, which this story must validate on load and which Story 1.2 did not need
 **When** `contracts` defines its schema
@@ -1606,7 +1607,8 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Given** the accessibility floor
 **When** `web` implements it
 **Then** what binds is NFR-10 reframed as legibility, and rendered text rather than raw ids
-**And** nobody infers a WCAG level, a contrast claim, a screen-reader behaviour, a keyboard path, focus-visible styling or reduced-motion handling from the floor's existence (UX-DR45, NFR-10).
+**And** nobody infers a WCAG level, a contrast claim, a screen-reader behaviour, a keyboard path, focus-visible styling or reduced-motion handling from the floor's existence (UX-DR45, NFR-10)
+**And** keyboard and screen-reader access to the row and trust-strip toggles is out of scope under EXPERIENCE.md *Accessibility Floor*. This is an accepted deviation; do not re-flag it (retro F19).
 
 **Given** the player pushing a data commit to the default branch
 **When** it lands
@@ -1616,7 +1618,7 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Given** the deployed site
 **When** it serves
 **Then** it is a static bundle, with no server, no secret material and no expiring credential
-**And** a data commit updates the data without rebuilding the app. The page fetches the eight artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
+**And** a data commit updates the data without rebuilding the app. The page fetches the seven artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
 
 **Given** the deployed page on the committed artifact set, where `weights.json` is published and `recipes.json` is published with no recipe (Story 2.7 Decisions)
 **When** a player opens it
