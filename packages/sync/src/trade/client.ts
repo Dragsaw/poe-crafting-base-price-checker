@@ -21,6 +21,7 @@ import {
   derivedYieldDelayMs,
   EMPTY_LEDGER,
   paceBeforeNext,
+  type PolicyObservation,
   recordObservation,
   spreadBeforeNext,
   type RateLimitLedger,
@@ -35,6 +36,7 @@ import {
 } from './invalid-requests.ts';
 import {
   parseRateLimitHeaders,
+  type RateLimitBucket,
   type RateLimitHeaders,
   type RateLimitSkip,
 } from './rate-limit-headers.ts';
@@ -84,6 +86,13 @@ export interface TradeClientOptions {
    * its own first failure, and the wrong one for a long chunk run.
    */
   readonly invalidRequestThreshold?: number;
+  /**
+   * One line of operator output, written once per `429` the server returns —
+   * never on a threshold refusal, which sends nothing. Omitted, nothing is
+   * written. The client never reaches for `process`
+   * itself: the shell decides where the line goes.
+   */
+  readonly log?: (line: string) => void;
 }
 
 export interface TradeRequest {
@@ -272,6 +281,56 @@ function remainingAllowance(parsed: RateLimitHeaders): number | undefined {
   return remaining;
 }
 
+const RATE_LIMIT_HEADER_PREFIX = 'x-rate-limit-';
+
+function tripletsOf(buckets: readonly RateLimitBucket[]): string {
+  return buckets
+    .map(({ hits, seconds, penalty }) => `${String(hits)}:${String(seconds)}:${String(penalty)}`)
+    .join(',');
+}
+
+/**
+ * The operator line for one `429`: the instant, the lane, the policy the
+ * response named, the wait the client spent, the response's raw `Retry-After`
+ * and `X-Rate-Limit-*` headers, and the reading the wait was paced on — keyed
+ * by the policy the lane had remembered, which is the one `laneDelayMs` read
+ * and which a 429 may not repeat. A 429 means that reading was wrong, and the
+ * response headers alone cannot say why — the pair can, and each rule's
+ * `observedAt` against the instant gives its age. Both halves are JSON,
+ * because the header values carry commas.
+ */
+function describe429(
+  exchange: {
+    readonly at: string;
+    readonly lane: string;
+    readonly policy: string | undefined;
+    readonly waitedMs: number;
+  },
+  headers: Readonly<Record<string, string>>,
+  pacedOn: PolicyObservation | undefined,
+): string {
+  const rateHeaders = Object.entries(headers)
+    .map(([name, value]): [string, string] => [name.toLowerCase(), value])
+    .filter(([name]) => name === RETRY_AFTER_HEADER || name.startsWith(RATE_LIMIT_HEADER_PREFIX))
+    .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0));
+  const reading =
+    pacedOn === undefined
+      ? 'no reading'
+      : `policy ${pacedOn.policy} ${JSON.stringify(
+          pacedOn.rules.map((rule) => ({
+            rule: rule.name,
+            observedAt: rule.observedAt,
+            policy: tripletsOf(rule.buckets),
+            state: tripletsOf(rule.state),
+          })),
+        )}`;
+  return (
+    `sync: the trade API answered 429 at ${exchange.at} on lane ${exchange.lane} ` +
+    `(policy ${exchange.policy ?? 'unknown'}) after waiting ${String(exchange.waitedMs)} ms; ` +
+    `response headers ${JSON.stringify(Object.fromEntries(rateHeaders))}; paced on ${reading}`
+  );
+}
+
 function declaredYieldFloorMs(parsed: RateLimitHeaders): number {
   let floor = 0;
   for (const rule of parsed.rules) {
@@ -377,7 +436,7 @@ export interface TradeGovernor<Source extends string> {
 export function createTradeGovernor<Source extends string>(
   options: TradeGovernorOptions<Source>,
 ): TradeGovernor<Source> {
-  const { clock, wait, userAgent, invalidRequestThreshold } = options;
+  const { clock, wait, userAgent, invalidRequestThreshold, log } = options;
   if (userAgent.trim() === '') {
     throw new MissingUserAgentError();
   }
@@ -443,6 +502,10 @@ export function createTradeGovernor<Source extends string>(
       await wait(delayMs);
     }
 
+    // The reading the wait above was paced on, kept for a 429's operator line
+    // before this response replaces it.
+    const pacedOn = knownPolicy === undefined ? undefined : pacing.ledger[knownPolicy];
+
     const response = await http.send({
       method: request.method,
       url: request.url,
@@ -451,7 +514,8 @@ export function createTradeGovernor<Source extends string>(
     });
 
     const parsed = parseRateLimitHeaders(response.headers);
-    pacing.ledger = recordObservation(pacing.ledger, parsed, clock.now());
+    const respondedAt = clock.now();
+    pacing.ledger = recordObservation(pacing.ledger, parsed, respondedAt);
     if (parsed.policy !== undefined) {
       rememberPolicy(lane, parsed.policy);
     }
@@ -465,6 +529,7 @@ export function createTradeGovernor<Source extends string>(
     const remaining = remainingAllowance(parsed);
 
     if (response.status === TOO_MANY_REQUESTS) {
+      log?.(describe429({ at: respondedAt, lane, policy, waitedMs }, response.headers, pacedOn));
       const fromHeader = retryAfterMsOf(response.headers);
       const derived = derivedYieldDelayMs(pacing.ledger, policy);
       return {
