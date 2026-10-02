@@ -1,15 +1,15 @@
 {
-  "runStartedAt": "2026-09-27T20:58:31.147Z",
-  "runFinishedAt": "2026-09-27T20:58:31.770Z",
+  "runStartedAt": "2026-10-02T21:34:46.090Z",
+  "runFinishedAt": "2026-10-02T21:34:46.699Z",
   "figures": {
     "requestsBySource": {
-      "tracked-list": 10,
+      "tracked-list": 20,
       "league-validation": 1
     },
-    "notReachedCount": 146,
+    "notReachedCount": 188,
     "trackedListEditedAt": {
       "source": "git-author-date",
-      "at": "2026-09-27T20:41:34.000Z"
+      "at": "2026-10-02T20:29:13.000Z"
     }
   },
   "records": [],
