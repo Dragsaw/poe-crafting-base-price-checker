@@ -378,7 +378,8 @@ export type ChunkOutcome =
 
 export type ChunkOutcomeKind = ChunkOutcome['kind'];
 
-const writeStderr = (line: string): void => {
+/** The operator log's default sink: one line on stderr. */
+export const writeStderr = (line: string): void => {
   process.stderr.write(`${line}\n`);
 };
 
