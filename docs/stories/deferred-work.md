@@ -128,9 +128,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
     - the pending `TrustStripSlot` reserves no absence or health lines (`frame/TrustStrip.tsx:140-155`)
     - the recipes-absent line claims "no crafted rows can be ranked" although `rank` never reads recipes (`frame/AbsenceLines.tsx:44-48`)
   evidence: Retro F18. `docs/reviews/review-epic-2-diff.md` items A8, A9, A10, A13, A14, A15, A18, E7, E10 and E12.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Sweep the entries that look closed: the epics-revision, story 2.1 and UX-ruling entries this ledger already marks closed or ruled (the "Resolved by story 2.7", "Resolved by story 2.8" and "Resolved by UX rulings" sections). Sweep `docs/epics.md` to AD-24 as amended in spine revision 22 (retro action 8, 2026-09-27): web fetches **seven** artifacts, each with `cache: 'no-cache'` and no query token, and `catalogue/static.json` is not one of them. The lines are `:96` ("eight", "cache-busted", "Five are required", "A ninth"), `:995` and `:997` (eight cache-busted requests, a ninth artifact), `:1001`, `:1010` and `:1619` ("the eight artifacts"), and the Story 2.1 AC at `:1022`, where stat text comes from `catalogue/stats.json` and the denomination `Divine` is a product literal, not `static.json` text. This is a citation sweep, not a PRD revision. Record the accepted deviations: a required 404 gets the refusal screen (spec 2.1 triage #9), and keyboard access to the row and trust-strip toggles is out of scope (EXPERIENCE.md:1057), so later reviews stop re-flagging it.
-  evidence: Retro F8, F9 and F19.
 
 ## Deferred from: epic 2 retro item 19 (2026-09-27)
 
@@ -165,12 +162,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: [NOTE FOR UX] The review of `78db4da..ec38dce` resolved the colour half of the "item 18 rebase onto retro item 20" entry as option (b): an honest-empty `unresolvable` row keeps *no figure yet*, and `RankedRow` takes the EV colour from the phrase shown, so the phrase prints in ink and rust goes only to *not valued*. The copy half stays open for UX: in a list of only `unresolvable` rows the statement now drops "yet" (revision 9), while each EV cell still reads *no figure yet*.
   evidence: `packages/web/src/list/RankedRow.tsx` (the money-phrase colour), `packages/web/src/list/list-statement.ts` (`honestEmptyCopy`). `ranked-list.test.tsx` "prints an honest-empty unresolvable row as no figure yet in ink, not rust" and the `App.test.tsx` lone-unresolvable hand-off test assert both halves together, so a UX ruling that changes the phrase must update them.
 
-## Deferred from: code review of the uncommitted `declared: null` and dev:stop climb diff (2026-09-27)
-
-- source_spec: `tools/dev-stop/dev-stop.ts`
-  summary: `listenerScript` runs `Get-NetTCPConnection ... -ErrorAction SilentlyContinue`. A failed query, for example a missing NetTCPIP module or access denied, therefore returns `[]`, and dev:stop prints "port is free". `listenersPosix` explicitly refuses to read a failed `lsof` as a free port. The Windows path has no such guard.
-  evidence: This was already true before the diff: `snapshotWindows` used the same `$l` line. The diff now also routes the stop poll through it (`listenersWindows`).
-
 ## Deferred from: epic 2 retro item 12, UX reconciliation pass (2026-09-27)
 
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
@@ -185,9 +176,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Architect. UX memlog 233 derives a recipe's option word from the grade prefix its currency ids share (`greater-…`, `perfect-…`; none reads `regular`), and a set with mixed grades or duplicate words is refused. Name the prefixes that count as grades, the layer that derives the word, and the cross-file validity predicate (IMPLEMENTATION-NOTES) before the Story 3.4 spec. No contract change.
   evidence: Finding HR-10. UX memlog 233. `CraftRecipeSchema` (`packages/contracts/src/craft-recipe.ts`) carries no display string. `catalogue/static.json` spells `greater-orb-of-transmutation` and `perfect-orb-of-augmentation`.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: PM. Sweep `docs/epics.md` to follow the UX rulings of this pass. UX-DR28 (:192) and the story AC at :1439 drop `removed YYYY-MM-DD`, and the tombstone line two becomes one cell (UX memlog 234). UX-DR9 (:146) drops the two-cell re-cut. UX-DR40 (:230) names a missing short form as a product gap and a missing Accepted Tier as a curation gap (memlog 231). :2136 cites the grade-prefix rule instead of "lifted from the composition" (memlog 233). The AD-24 lines are covered by the retro item 14 sweep entry, except UX-DR43 at :242 ("All eight artifacts"), which follows the same sweep. Cite, do not restate.
-  evidence: UX memlog 229, 231, 233 and 234. The epics text was checked on 2026-09-27.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Dev. `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx:14`) becomes `A required file did not arrive.` (UX memlog 229, DESIGN.md `fetch-failure-screen.titleText`). Update the tests that assert the old title, and the `App.tsx:33` docblock that says "all eight fetches".
   evidence: UX memlog 229. The old title restated AD-24's count, and the pending AD-24 amendment makes it seven.
@@ -278,3 +266,12 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-stop-poll-listener-query-untested.md`
   summary: No test runs the Windows pre-kill snapshot reader (`snapshot` / `snapshotWindows`), so its `parseListenerJson` call on `listeners` can be removed with every test still passing.
   evidence: `snapshot`, `snapshotWindows` and `main` are not exported, and no test file references them; the real-listener test runs only `listenerPids` -> `listenersWindows`. `snapshotWindows` serialises through `@{ listeners = $l } | ConvertTo-Json -Depth 3`, a different shape path from the `-InputObject` query. Pre-existing: the snapshot reader never had a test. Covering it needs `snapshot` exported and a real-listener test asserting `snapshot(port).listeners` contains `process.pid`.
+- source_spec: `docs/stories/spec-deferred-listenerscript-runs-get-nettcpconnection.md`
+  summary: No test runs `snapshotWindows` with a failing listener query, so the first-snapshot path to "nothing listens on port N" is pinned only by reading the code.
+  evidence: `snapshotWindows` in `tools/dev-stop/dev-stop.ts` is not exported and no test calls it. It joins `listenerScript` into a larger script, and a hand run of that joined shape with a missing cmdlet exits 1 today. A later edit that inlines its own `SilentlyContinue` query, or wraps the joined script so the `throw` no longer ends it, would make `pnpm dev:stop` print "nothing listens" after a failed query with every test passing. Closing it needs a test seam into `snapshotWindows` (an export or the same `node:child_process` mock the `listenersWindows` failure test uses, reached through an exported caller).
+- source_spec: `docs/stories/spec-deferred-pm-sweep-epics-md-to-follow-ux.md`
+  summary: The open deferred-work entry that says the tombstone band is not built still describes the band as prune reason plus `removed YYYY-MM-DD` in 560 + 406, and says the removal date needs a contracts and owner-doc decision; UX memlog 234 (DESIGN.md `tombstone-band`, EXPERIENCE.md state 10) has since ruled that line two is the prune reason alone in one 966px cell with no removal date.
+  evidence: docs/stories/deferred-work.md, the Story 2.5 entry that begins "The tombstone band (`+ N pruned` toggle". The implementer who takes that entry reads the retired layout. The entry predates this sweep, and this sweep may not edit deferred-work.md.
+- source_spec: `docs/stories/spec-deferred-pm-sweep-epics-md-to-follow-ux.md`
+  summary: The craft-recipe AC in docs/epics.md (Story 3.4, `{components.craft-recipe}`) prints the two options as the fixed pair `greater | perfect`, but the grade-prefix rule it now cites also gives `regular` for a recipe with no grade prefix and refuses mixed grades or duplicate words; the AC has no Given/When/Then for either branch.
+  evidence: docs/epics.md, the `{components.craft-recipe}` AC just above the grade-prefix citation; EXPERIENCE.md `{components.craft-recipe}` and DESIGN.md `craft-recipe.optionTextSource` carry the `regular` and refusal branches. The pair predates this sweep. The architect's grade-prefix predicate is already ledgered before the Story 3.4 spec; the PM owes the AC wording once it lands.

@@ -187,9 +187,16 @@ function powershell(script: string): string {
   });
 }
 
-/** PowerShell that sets `$l` to the PIDs that listen on the port. */
+/**
+ * PowerShell that sets `$l` to the PIDs that listen on the port. With no
+ * listener, `Get-NetTCPConnection` raises `CmdletizationQuery_NotFound`, which
+ * reads as an empty list. Every other error, such as a missing cmdlet or
+ * denied access, is rethrown: PowerShell exits non-zero and `execFileSync`
+ * throws, so a failed query never reads as a free port. Match on the error id,
+ * not the category: a missing cmdlet is also category `ObjectNotFound`.
+ */
 function listenerScript(port: number): string {
-  return `$l = @(Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction SilentlyContinue | ForEach-Object OwningProcess | Sort-Object -Unique)`;
+  return `$l = @(try { Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction Stop | ForEach-Object OwningProcess | Sort-Object -Unique } catch { if ($_.FullyQualifiedErrorId -notlike 'CmdletizationQuery_NotFound*') { throw } })`;
 }
 
 /**
@@ -205,7 +212,7 @@ export function parseListenerJson(value: unknown): number[] {
   throw new Error(`unexpected listener query result: ${JSON.stringify(value)}`);
 }
 
-function listenersWindows(port: number): number[] {
+export function listenersWindows(port: number): number[] {
   const out = powershell(`${listenerScript(port)}; ConvertTo-Json -Compress -InputObject $l`);
   return parseListenerJson(JSON.parse(out));
 }

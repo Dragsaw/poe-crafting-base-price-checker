@@ -93,7 +93,7 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
 - **One writer per file**, per AD-3's table. The player owns `tracked.json`, `config.json`, `currencies.json` and `recipes.json`. The external producer owns `weights.json`. `sync` owns `catalogue/*.json`, `dataset.json`, `sync-report.json` and `sync-progress.json`.
 - **`sync` makes no git write.** It writes the files it owns by explicit path and exits. Those files are git-tracked and updated in place. The player commits and pushes them, and that push is what deploys. The git port is read-only and carries one operation: the author date of the last commit touching a path (AD-3, AD-12).
 - **The trade catalogue is four committed artifacts under `data/catalogue/`.** An explicit command refreshes them at GGG patch cadence. That command never runs on the chunk path. The catalogue is an identity and validation authority only. It contributes nothing to the Eligible Pool (AD-25).
-- **`web` fetches exactly eight artifacts at runtime.** Each one is a separate cache-busted request. None is bundled into the JS. Five are required for a render and three are absent-tolerable. A ninth artifact needs an amendment (AD-24).
+- **`web` fetches exactly seven artifacts at runtime.** Each one is a separate `no-cache` request with no query token. None is bundled into the JS. Four are required for a render and three are absent-tolerable. An eighth artifact needs an amendment (AD-24).
 - **Currency rates are hand-maintained committed data.** `sync` copies each rate's own `league` and `asOf` through unchanged and must not stamp them. `sync` always writes divine's own rate as exactly `1` (AD-20).
 - **Provenance is a three-value total order.** It derives only from the sources AD-10's table names. `"absent"` maps to `uniform-prior`. It never maps to provenance `absent` (AD-10).
 - **The Consistency Conventions bind:**
@@ -143,7 +143,7 @@ UX-DR7: Ranked-row column budget. Six fixed cells sum to 1012px. Every column's 
 
 UX-DR8: Unrankable appendix column budget. Four cells sum to 970px.
 
-UX-DR9: Combination row column budgets. Line one is five cells and line two is three cells. Each line sums to 966px. The tombstone's line two is re-cut to two cells at the same sum.
+UX-DR9: Combination row column budgets. Line one is five cells and line two is three cells. Each line sums to 966px. The tombstone's line two is one cell at the same sum (DESIGN.md `components.tombstone-band.line2Columns`).
 
 UX-DR10: Masthead control group arithmetic. 216 + 16 + 276 = 508px of controls. That leaves a 480px dek cap, which must still set to two lines.
 
@@ -189,7 +189,7 @@ UX-DR26: `combination-row`. The row is two lines under one hairline. Line one ca
 
 UX-DR27: `trade-link`. The `↗` glyph alone is the click target, and it opens in a new tab. The page renders the link where the entry carries a stored `lastSearchId` **and** that search ran in the active league. The test reads the stored field, never the Price State. Otherwise the link is absent: not greyed, not disabled. It never appears inside the tombstone band.
 
-UX-DR28: `tombstone-band`. The band is collapsed behind a `+ N pruned` toggle, local to its own panel. Its line two carries the prune reason and `removed YYYY-MM-DD`, in place of the two age cells.
+UX-DR28: `tombstone-band`. The band is collapsed behind a `+ N pruned` toggle, local to its own panel. Its line two carries the prune reason alone, in place of the two age cells, and no removal date (EXPERIENCE.md `{components.tombstone-band}`, state 10).
 
 UX-DR29: `unrankable-appendix`. The appendix is pinned to the foot as a decision, not as a coverage band. The count is readable without expanding anything. The rows are not interactive. Every row is an Item Class, and a Base Type never appears. The page prints the reason strings verbatim from FR-4.
 
@@ -199,7 +199,7 @@ UX-DR31: `expand-affordance`. One `+` / `−` vocabulary governs everything that
 
 UX-DR32: `running-foot`. The foot is the only place where the page says where curation actually happens.
 
-UX-DR33: `refusal-screen` and `fetch-failure-screen`. These are two page-replacing screens with the same shape and different copy. The refusal screen names the artifact, the schema version the artifact declared and the version the page expects. It offers no retry. The fetch-failure screen names which of the eight files did not arrive. It offers `+ Try again`, which re-attempts the whole set. Neither screen serves a partial set.
+UX-DR33: `refusal-screen` and `fetch-failure-screen`. These are two page-replacing screens with the same shape and different copy. The refusal screen names the artifact, the schema version the artifact declared and the version the page expects. It offers no retry. The fetch-failure screen names which of the seven files did not arrive. It offers `+ Try again`, which re-attempts the whole set. Neither screen serves a partial set.
 
 **Behaviour, content and state**
 
@@ -227,7 +227,7 @@ UX-DR38: Domain vocabulary enforcement. The page prints twenty player-facing Glo
 
 UX-DR39: Combination text rule. The page prints the tier plus the canonical short form (`T1 Cold Res · T1 Mana`), and never the value, on **both** surfaces. A hand-maintained short-form table serves a chase-cell budget of about 27 characters. Five coining rules govern that table. Pruning is the escape valve, and a shorter coinage is not.
 
-UX-DR40: The curation fallback. A modifier missing either its short form or its declared Accepted Tier falls back to the catalogue stat name plus the value band. That is the one place in the product where a numeral from modifier text survives. The fallback must be identifiable as a fallback, and it must not borrow a semantic ink. **Its cue is settled and is shared with UX-DR50**: both surfaces print text the page did not write, so both take the **mono verbatim register** — a third type stack reserved to that one meaning. It is not an ink, not a mark and not a glyph, it has no size of its own and takes the line's, and it reopens no column budget. One cue, answered once, as the merged question required.
+UX-DR40: The fallback. A modifier missing either its short form (a product gap) or its declared Accepted Tier (a curation gap) falls back to the catalogue stat name plus the value band (EXPERIENCE.md *Domain Vocabulary*). That is the one place in the product where a numeral from modifier text survives. The fallback must be identifiable as a fallback, and it must not borrow a semantic ink. **Its cue is settled and is shared with UX-DR50**: both surfaces print text the page did not write, so both take the **mono verbatim register** — a third type stack reserved to that one meaning. It is not an ink, not a mark and not a glyph, it has no size of its own and takes the line's, and it reopens no column budget. One cue, answered once, as the merged question required.
 
 UX-DR41: Money display precision. EV, price and threshold take 2 decimal places. `core` persists 4dp, and the page never re-rounds what it passes on. A column header states the unit once, and no row repeats it.
 
@@ -239,7 +239,7 @@ UX-DR52: Uncostable-recipe presentation (state 35). **Every row stays.** No row 
 
 UX-DR53: FR-30's no-weights-file world needs **no treatment of its own**. Until a conforming Weights File exists, every Item Class is Unrankable and the page is a white-base price list with an appendix holding the crafted branch entire — about 29 rows against a committed budget of 7. The three rules read as colliding there do not: the footer pin and the no-truncation rule are mechanism and hold, and the third was the sentence UX-DR6 has now split. So the behaviour is the ordinary behaviour — the appendix sits at the foot, holds every row untruncated, and the document grows and scrolls beneath it. This closes **by ruling**. The earlier acceptance of designing it at implementation time is **discharged, not still standing**, and no story may re-defer it.
 
-UX-DR43: Cold load. The masthead and twenty row slots render immediately in the final layout. All eight artifacts resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset.
+UX-DR43: Cold load. The masthead and twenty row slots render immediately in the final layout. The artifacts AD-24 names resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset.
 
 UX-DR44: Hover and active states, tabulated per target. Nothing lifts, glows or rounds. Any colour change is instantaneous or a fast linear step. A 28px row takes no fade. A non-interactive surface takes no hover response.
 
@@ -992,13 +992,13 @@ So that I never read half a ranking and never mistake a partial set for the list
 
 **Given** a load
 **When** `web` fetches its data
-**Then** it issues exactly eight separate cache-busted requests for the artifacts AD-24 names, and it bundles none of them into the JS
+**Then** it issues exactly seven separate `no-cache` requests with no query token for the artifacts AD-24 names, and it bundles none of them into the JS
 **And** it validates each artifact on load
-**And** a ninth artifact would require an amendment to AD-24 (FR-33, AD-24, AD-3).
+**And** an eighth artifact would require an amendment to AD-24 (FR-33, AD-24, AD-3).
 
 **Given** the masthead and twenty row slots
 **When** the page first renders
-**Then** they render immediately in the final layout, and all eight artifacts resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset
+**Then** they render immediately in the final layout, and all seven artifacts resolve in a **single transition**, never row by row. A partly filled list would render a ranking computed from an incomplete dataset
 **And** the skeleton's own fill tone and placeholder shape are an unresolved `[NOTE FOR UX]`. This story surfaces that gap rather than inventing an answer (UX-DR43, state 22).
 
 **Given** an artifact that fails validation
@@ -1007,9 +1007,10 @@ So that I never read half a ranking and never mistake a partial set for the list
 **And** that screen names the artifact, the schema version the artifact declared, and the version the page expects
 **And** it offers no retry (FR-33, NFR-8, UX-DR33, state 26).
 
-**Given** one of the eight artifacts that does not arrive
+**Given** one of the seven artifacts that does not arrive
 **When** the page loads
 **Then** `{components.fetch-failure-screen}` replaces the whole page, names which file did not arrive, and offers `+ Try again`, which re-attempts the whole set
+**And** an artifact that answers 404 is *absent*, not *did not arrive*: a required one gets `{components.refusal-screen}` instead, and a tolerable one renders as the absent-tolerable AC below says. This is an accepted deviation; do not re-flag it (AD-24, spec 2.1 Decisions *What absent means* and triage #9)
 **And** neither screen ever serves a partial set (FR-33, AD-24, UX-DR33, state 28).
 
 **Given** an absent but tolerable artifact — `weights.json`, `recipes.json` or `sync-report.json`
@@ -1019,8 +1020,8 @@ So that I never read half a ranking and never mistake a partial set for the list
 
 **Given** a `statId` or a currency denomination
 **When** the page prints it
-**Then** its text comes from `catalogue/stats.json` or from `catalogue/static.json`, rendered as text with no icon
-**And** the page makes no runtime call to pathofexile.com (FR-33, AD-15, AD-24, AD-25).
+**Then** a stat's text comes from `catalogue/stats.json`, and the denomination `Divine` is a product literal, not catalogue text, both rendered as text with no icon
+**And** the page makes no runtime call to pathofexile.com (FR-33, AD-15, AD-20, AD-24, AD-25).
 
 **Given** `recipes.json`, which this story must validate on load and which Story 1.2 did not need
 **When** `contracts` defines its schema
@@ -1436,8 +1437,8 @@ So that a rank stops being a claim and becomes an argument I can check.
 **Given** an opened tombstone row
 **When** it renders
 **Then** line one is the Combination struck through, with `† pruned`, and *not tracked* in the money slot
-**And** line two is the prune reason plus `removed YYYY-MM-DD`, in two cells summing to 966px — 560 + 406
-**And** the row does not borrow the two age cells. A removal date is a calendar fact about a decision, and not a reading of either clock (FR-8, FR-15, UX-DR28, state 10).
+**And** line two is the prune reason alone, in one cell across the full 966px line-two width, with no removal date
+**And** the row does not borrow the two age cells. A prune is a decision, and not a reading of either clock (FR-8, FR-15, UX-DR28, state 10, EXPERIENCE.md `{components.tombstone-band}`).
 
 **Given** an entry whose `lastSearchId` is present, whose `lastSearchLeague` equals the active league, and which is not `pruned`
 **When** the row renders
@@ -1606,7 +1607,8 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Given** the accessibility floor
 **When** `web` implements it
 **Then** what binds is NFR-10 reframed as legibility, and rendered text rather than raw ids
-**And** nobody infers a WCAG level, a contrast claim, a screen-reader behaviour, a keyboard path, focus-visible styling or reduced-motion handling from the floor's existence (UX-DR45, NFR-10).
+**And** nobody infers a WCAG level, a contrast claim, a screen-reader behaviour, a keyboard path, focus-visible styling or reduced-motion handling from the floor's existence (UX-DR45, NFR-10)
+**And** keyboard and screen-reader access to the row and trust-strip toggles is out of scope under EXPERIENCE.md *Accessibility Floor*. This is an accepted deviation; do not re-flag it (retro F19).
 
 **Given** the player pushing a data commit to the default branch
 **When** it lands
@@ -1616,7 +1618,7 @@ So that I never read last league's numbers and never have to rebuild anything by
 **Given** the deployed site
 **When** it serves
 **Then** it is a static bundle, with no server, no secret material and no expiring credential
-**And** a data commit updates the data without rebuilding the app. The page fetches the eight artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
+**And** a data commit updates the data without rebuilding the app. The page fetches the seven artifacts at runtime rather than bundling them (NFR-7, AD-15, AD-24, FR-33).
 
 **Given** the deployed page on the committed artifact set, where `weights.json` is published and `recipes.json` is published with no recipe (Story 2.7 Decisions)
 **When** a player opens it
@@ -1933,7 +1935,7 @@ So that a double-counted Combination cannot hand an Item Class the top of the li
 **When** a developer reaches for one
 **Then** it may **not** be a semantic ink. An ink states that a *figure's* footing is degraded or broken, and a failing cross-file check says nothing about any figure on the page — the affected classes are already in the appendix carrying their reason
 **And** it is the **mono verbatim register**, at the panel's own size, weight and line height — the diagnosis alone, with every figure group left in the page's voice and its existing face
-**And** it is **the same cue** the curation fallback takes, because both print text the page did not write. This story invents no second cue, and a divergence from Story 2.5's rendering of it is a defect in whichever shipped later (UX-DR50, UX-DR40).
+**And** it is **the same cue** the UX-DR40 fallback takes, because both print text the page did not write. This story invents no second cue, and a divergence from Story 2.5's rendering of it is a defect in whichever shipped later (UX-DR50, UX-DR40).
 
 **Given** the diagnosis
 **When** someone proposes promoting it
@@ -2133,7 +2135,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 **Given** `{components.craft-recipe}`
 **When** it renders
 **Then** it prints the two options as the single word that distinguishes each composition, `greater | perfect`, divided by a pipe rather than the page's middle dot. The middle dot joins two affixes in every chase cell, and it would carry the opposite operator here
-**And** nobody invents a display name. The word is lifted from the composition the Glossary already words (FR-26, UX-DR19, UX-DR38).
+**And** nobody invents a display name. The word follows the grade-prefix rule of EXPERIENCE.md `{components.craft-recipe}` (FR-26, UX-DR19, UX-DR38).
 
 **Given** the inactive word
 **When** the page rests
