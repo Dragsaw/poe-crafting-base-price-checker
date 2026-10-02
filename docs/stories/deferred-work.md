@@ -26,9 +26,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: story 2.1 (2026-09-26)
 
-- source_spec: `docs/stories/spec-2-1-the-page-s-substrate-the-override-layer-the-fixed-frame-and-one-consistent-artifact-set.md`
-  summary: (unverified, would be medium) `CraftRecipeSchema` in `packages/contracts/src/craft-recipe.ts` accepts `currencies: []` and a `currencyId` repeated within one recipe. A zero-cost recipe may make the per-craft EV degenerate once a story reads recipes for valuation.
-  evidence: The spec fixes the shape but says nothing on an empty or repeated currency list. Settle it by checking AD-20 and the FR-1 EV formula when the first story costs a recipe: if a recipe must spend something, add `.min(1)` and a per-recipe `currencyId` uniqueness refinement.
 
 ## Deferred from: story 2.2 (2026-09-26)
 

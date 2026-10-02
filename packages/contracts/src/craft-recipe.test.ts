@@ -42,6 +42,29 @@ describe('CraftRecipeSchema', () => {
     expect(CraftRecipeSchema.safeParse(noCurrency).success).toBe(false);
   });
 
+  it('refuses an empty currency list, with an issue at currencies', () => {
+    const result = CraftRecipeSchema.safeParse({ ...greater, currencies: [] });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((issue) => issue.path)).toEqual([['currencies']]);
+  });
+
+  it('refuses a repeated currency id, naming the id and the first line', () => {
+    const recipe = {
+      ...greater,
+      currencies: [
+        { currencyId: 'exalted', quantity: 1 },
+        { currencyId: 'chaos', quantity: 1 },
+        { currencyId: 'exalted', quantity: 2 },
+      ],
+    };
+    const result = CraftRecipeSchema.safeParse(recipe);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues).toHaveLength(1);
+    expect(result.error?.issues[0]?.path).toEqual(['currencies', 2]);
+    expect(result.error?.issues[0]?.message).toContain('exalted');
+    expect(result.error?.issues[0]?.message).toContain('currencies.0');
+  });
+
   it('refuses an undeclared key', () => {
     expect(CraftRecipeSchema.safeParse({ ...greater, name: 'Greater' }).success).toBe(false);
   });
