@@ -192,9 +192,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: epic 2 retro item 8 (2026-09-27)
 
 - source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
-  summary: "Note. `packages/web/vite.config.ts` still has a comment that says \"eight\" artifacts. The spec forbids edits to that file, so the comment stays until a change that is allowed to edit it."
-  evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`, Never. `grep -n eight packages/web/vite.config.ts`.
-- source_spec: `docs/stories/spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`
   summary: "Note. The epic 2 retrospective entry \"Parse the eight kept artifacts … during `pnpm build`\" predates this change. Its \"eight\" now means the seven AD-24 artifacts (`ALLOWLIST` in `tools/prune-pages.mjs`); `catalogue/static.json` is no longer kept in the Pages build."
   evidence: Spec `spec-epic-2-retro-item-8-seven-artifacts-no-cache.md`. `pnpm build` logs `prune-pages: removed … catalogue/static.json …`.
 
@@ -278,3 +275,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-deferred-no-test-checks-hand-listed-tools.md`
   summary: The other hand-listed config entries outside `tools/` and `.claude/` have no wiring guard: `test/**/*.ts`, `vitest.config.ts`, `packages/*/vitest.config.ts`, `packages/web/vite.config.ts`, `packages/web/vite.config.test.ts`, `depcruise.rules.mjs` and `.dependency-cruiser.mjs` in `tsconfig.tools.json`, `test/**/*.test.ts` in the Vitest `root` project, and `test/**/*.ts` and `.dependency-cruiser.mjs` in the ESLint `files` glob.
   evidence: Pre-existing. Dropping `test/**/*.ts` from `tsconfig.tools.json` stops the coverage guard itself from being type-checked, and `pnpm check` still passes. The guard's `TARGETS` table could take these rows the same way it takes the `tools/` rows.
+- source_spec: `docs/stories/spec-deferred-note-packages-web-vite-config-ts.md`
+  summary: The comment at `.github/workflows/deploy.yml:4` still says "the eight AD-24 artifacts", but AD-24 fixes seven.
+  evidence: `grep -n eight .github/workflows/deploy.yml` prints line 4. The entry this spec closes covered only `packages/web/vite.config.ts`; the same stale count sits in the workflow comment.

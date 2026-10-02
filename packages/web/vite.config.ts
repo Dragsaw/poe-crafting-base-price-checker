@@ -17,7 +17,7 @@ export default defineConfig({
   // `import.meta.dirname`, not `fileURLToPath(import.meta.url)`: the config is
   // imported by its own test, where `import.meta.url` is not a `file:` URL.
   root: import.meta.dirname,
-  // The eight AD-24 artifacts are served, never bundled: `publicDir` is the repo
+  // The seven AD-24 artifacts are served, never bundled: `publicDir` is the repo
   // `data/` folder, copied verbatim into `dist/` by the build and fetched at
   // runtime. Source never imports `data/**`.
   publicDir: resolve(import.meta.dirname, '../../data'),
