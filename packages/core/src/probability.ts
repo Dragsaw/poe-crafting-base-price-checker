@@ -1,5 +1,7 @@
+import { compareByCodeUnit } from '@poe/contracts';
 import type {
   CraftedTrackedEntry,
+  HybridLine,
   ModifierRef,
   ModifierWeight,
   SingleLineModifierRef,
@@ -10,9 +12,9 @@ import type {
 } from '@poe/contracts';
 
 /**
- * The interim `hybrid` branch: `core` does not yet price or check a hybrid
- * reference. The committed data holds none, so this throw is unreachable
- * today. The named story replaces it.
+ * The interim `hybrid` branch of a check that does not yet handle a hybrid
+ * reference: the cross-file checks (`cross-file.ts`) call it. The named story
+ * replaces each call. The probability term itself takes every kind (§1, §11).
  */
 export function assertSingleLine(ref: ModifierRef, story: number): asserts ref is SingleLineModifierRef {
   if (ref.kind === 'hybrid') {
@@ -32,6 +34,12 @@ export function assertSingleLine(ref: ModifierRef, story: number): asserts ref i
  * one place that division happens and the one place to change when OQ-12
  * resolves: `contains` calls it, and the edge-alignment check (`cross-file.ts`)
  * calls it too.
+ *
+ * **Line sets, the null-line rule and containment** are §1's: `lineSet`,
+ * `untrackable`, `statIds`, `covers` and `contains` below are the one
+ * implementation that §1 has every caller share. A hybrid reference's
+ * containment set feeds §11 unchanged; a contained tier counts its whole
+ * weight once, and nothing multiplies across a hybrid's lines (AD-17).
  *
  * **Exactness (AD-5, §1).** Edges compare with `>=` and `<=` and exact
  * equality. Two `#` is the most a stat line carries, and the game publishes
@@ -99,29 +107,80 @@ export function interval(line: WeightsLine): Interval {
 }
 
 /**
- * Whole-tier containment (§1). A `banded` reference contains an entry when one
- * of its lines carries the reference's `statId` and a derived interval wholly
- * inside the band; a valueless line derives `[1, 1]` (§2.3). A `valueless`
- * reference contains an entry when one of its lines carries the `statId` with
- * empty `ranges`. A `null`-`statId` line never matches. An entry whose
- * `weight` is `0` is never contained, whatever its `weightSource` or lines
- * (§1). It still enters the denominator, where it adds nothing.
+ * `untrackable(entry)` (§1 *Line sets and the null-line rule*). It reads the
+ * weights file alone: the entry and its own pool's coverage.
+ */
+export function untrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'poolCoverage'>): boolean {
+  return (
+    entry.weightSource === 'not-in-game' ||
+    (pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null))
+  );
+}
+
+/**
+ * `lineSet(entry)` (§1): the entry's non-null line `statId`s, sorted by code
+ * unit. A `null` line is dropped here; `untrackable` decides what it means.
+ */
+export function lineSet(entry: ModifierWeight): readonly string[] {
+  return entry.lines.flatMap((line) => (line.statId === null ? [] : [line.statId])).sort(compareByCodeUnit);
+}
+
+/** `statIds(ref)` (§1): the `statId`s a reference names, sorted by code unit. */
+export function statIds(ref: ModifierRef): readonly string[] {
+  return ref.kind === 'hybrid' ? ref.lines.map((rl) => rl.statId).sort(compareByCodeUnit) : [ref.statId];
+}
+
+/** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */
+export type ReferenceLine = SingleLineModifierRef | HybridLine;
+
+/**
+ * `covers(rl, line)` (§1). A banded `rl` covers a line of its `statId` whose
+ * derived interval sits wholly inside the band; a valueless line derives
+ * `[1, 1]` (§2.3). A valueless `rl` covers a line of its `statId` with empty
+ * `ranges`. A `null`-`statId` line is never covered.
+ */
+export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
+  if (line.statId !== rl.statId) {
+    return false;
+  }
+  if (!('valueMin' in rl)) {
+    return line.ranges.length === 0;
+  }
+  const derived = interval(line);
+  return derived.min >= rl.valueMin && derived.max <= rl.valueMax;
+}
+
+function sameIds(a: readonly string[], b: readonly string[]): boolean {
+  return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
+/**
+ * Whole-tier containment (§1 *Containment*). A single-line reference contains
+ * an entry when one of its lines is covered. A hybrid reference contains an
+ * entry whose `lineSet` equals the reference's `statIds` and whose lines cover
+ * every reference line; an entry with a different line set is excluded even
+ * when every named line is covered. An entry whose `weight` is `0` is never
+ * contained, whatever its `weightSource` or lines (§1). It still enters the
+ * denominator, where it adds nothing.
+ *
+ * **Precondition: the entry's pool is `complete`.** §1 writes `¬untrackable`
+ * into containment; this function does not take the pool's coverage. The
+ * `not-in-game` half is already `weight > 0`, because the weights schema forces
+ * weight 0 on such a tier. The `partial` half never reaches here: a class with a
+ * `partial` slot gets no pool check (§1) and no probability (`rank.ts` reports
+ * it before it computes one). A new caller with a `partial` pool calls
+ * `untrackable` first.
  */
 export function contains(ref: ModifierRef, entry: ModifierWeight): boolean {
-  assertSingleLine(ref, 4);
   if (entry.weight === 0) {
     return false;
   }
-  return entry.lines.some((line) => {
-    if (line.statId !== ref.statId) {
-      return false;
-    }
-    if (ref.kind === 'valueless') {
-      return line.ranges.length === 0;
-    }
-    const derived = interval(line);
-    return derived.min >= ref.valueMin && derived.max <= ref.valueMax;
-  });
+  if (ref.kind === 'hybrid') {
+    return (
+      sameIds(lineSet(entry), statIds(ref)) && ref.lines.every((rl) => entry.lines.some((line) => covers(rl, line)))
+    );
+  }
+  return entry.lines.some((line) => covers(ref, line));
 }
 
 /**
@@ -170,7 +229,6 @@ export function isEmptyPool(pool: WeightsPool): boolean {
 
 /** `C = contained(ref) ∩ E` (§11). */
 export function containedIn(ref: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
-  assertSingleLine(ref, 4);
   return eligibleSet.filter((entry) => contains(ref, entry));
 }
 
@@ -186,7 +244,6 @@ export function affixProbability(
   itemLevelMin: number,
   modifierLevelMin: number,
 ): ProbabilityResult {
-  assertSingleLine(ref, 4);
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
   const total = totalWeight(eligibleSet);
   if (total === 0) {
@@ -257,8 +314,6 @@ export function combinationProbability(
   combination: CombinationInput,
   modifierLevelMin: number,
 ): ProbabilityResult {
-  assertSingleLine(combination.prefix, 4);
-  assertSingleLine(combination.suffix, 4);
   const setsOf = (slot: Slot, ref: ModifierRef): SlotSets => {
     const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
     return { slot, eligibleSet, contained: containedIn(ref, eligibleSet), total: totalWeight(eligibleSet) };

@@ -5,21 +5,33 @@ import {
   WEIGHTS_SCHEMA_VERSION,
   WeightsFileSchema,
 } from '@poe/contracts';
-import type { ModifierRef, ModifierWeight, WeightsClassPools, WeightsFile, WeightsLine } from '@poe/contracts';
+import type {
+  HybridLine,
+  ModifierRef,
+  ModifierWeight,
+  WeightsClassPools,
+  WeightsFile,
+  WeightsLine,
+} from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
   affixProbability,
   combinationProbability,
   contains,
+  covers,
   eligible,
   interval,
+  lineSet,
   poolOf,
+  statIds,
+  untrackable,
 } from './probability.ts';
 import type { ProbabilityResult } from './probability.ts';
 
 const STAT = 'explicit.stat_1';
 const OTHER = 'explicit.stat_2';
+const THIRD = 'explicit.stat_3';
 
 let serial = 0;
 
@@ -51,6 +63,11 @@ const band = (valueMin: number, valueMax: number, statId = STAT): ModifierRef =>
   valueMin,
   valueMax,
 });
+
+const lineBand = (valueMin: number, valueMax: number, statId = STAT): HybridLine => ({ statId, valueMin, valueMax });
+
+/** A hybrid reference, built in the test with its lines in the order given. */
+const hybrid = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
 
 function pools(prefix: readonly ModifierWeight[], suffix: readonly ModifierWeight[]): WeightsClassPools {
   return {
@@ -325,11 +342,94 @@ describe('combinationProbability (§11)', () => {
   });
 });
 
-describe('a hybrid reference (interim)', () => {
-  it('throws from contains, naming the story that computes it', () => {
-    const hybrid: ModifierRef = { kind: 'hybrid', lines: [{ statId: STAT }, { statId: OTHER }] };
-    expect(() => contains(hybrid, tier([{ statId: STAT, ranges: [] }], 1))).toThrow(
-      'hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 4)',
+describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
+  it('gives the hybrid tiers weight sum only when a pure family shares a statId', () => {
+    const h1 = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
+    const h2 = tier([line(OTHER, [7, 9]), line(STAT, [13, 15])], 50);
+    const pure1 = tier([line(STAT, [10, 12])], 300);
+    const pure2 = tier([line(STAT, [13, 15])], 200);
+    const rest = tier([line(THIRD, [1, 2])], 350);
+    const classPools = pools([h1, h2, pure1, pure2, rest], []);
+    const ref = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
+    expect(pOf(affixProbability(classPools, 'prefix', ref, 82, 0))).toBe(150 / 1000);
+    // The single-line band on the shared statId still admits both families (§1's existential test).
+    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), 82, 0))).toBe(650 / 1000);
+  });
+
+  it('does not contain a tier whose line set is a superset of the reference statIds', () => {
+    const superset = tier([line(STAT, [10, 12]), line(OTHER, [4, 6]), line(THIRD, [1, 2])], 100);
+    expect(contains(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), superset)).toBe(false);
+  });
+
+  it('gives each of two hybrid families in one slot only its own family', () => {
+    const ab = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
+    const ac = tier([line(STAT, [10, 12]), line(THIRD, [1, 2])], 300);
+    const rest = tier([line(OTHER, [20, 30])], 600);
+    const classPools = pools([ab, ac, rest], []);
+    const refAB = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
+    const refAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
+    expect(contains(refAB, ac)).toBe(false);
+    expect(contains(refAC, ab)).toBe(false);
+    expect(pOf(affixProbability(classPools, 'prefix', refAB, 82, 0))).toBe(100 / 1000);
+    expect(pOf(affixProbability(classPools, 'prefix', refAC, 82, 0))).toBe(300 / 1000);
+  });
+
+  it('computes the two-order sum by hand for a hybrid prefix and a suffix in its modGroup', () => {
+    const h = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100, { modGroup: 'H' });
+    const b = tier([line(STAT, [20, 30])], 300, { modGroup: 'B' });
+    const c = tier([line(THIRD, [1, 2])], 200, { modGroup: 'H' });
+    const d = tier([line(THIRD, [3, 4])], 200, { modGroup: 'D' });
+    const e = tier([line(THIRD, [5, 9])], 600, { modGroup: 'E' });
+    // Prefix first: h → 100 · 200 / 800 = 25. Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
+    const p = pOf(
+      combinationProbability(
+        pools([h, b], [c, d, e]),
+        { itemLevelMin: 82, prefix: hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), suffix: band(1, 4, THIRD) },
+        0,
+      ),
     );
+    expect(closeRelative(p, 75 / 1400)).toBe(true);
+    expect(closeRelative(p, (100 / 400) * (400 / 1000))).toBe(false);
+  });
+
+  it('contains a weight > 0 tier whose null line is an internal engine line in a complete pool', () => {
+    const engine = tier([line(STAT, [10, 12]), line(null), line(OTHER, [4, 6])], 100);
+    expect(lineSet(engine)).toEqual([STAT, OTHER]);
+    expect(untrackable(engine, { poolCoverage: 'complete' })).toBe(false);
+    expect(contains(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), engine)).toBe(true);
+  });
+
+  it('never covers a banded weights line with a valueless hybrid line', () => {
+    expect(covers({ statId: OTHER }, line(OTHER, [4, 6]))).toBe(false);
+    expect(covers({ statId: OTHER }, line(OTHER))).toBe(true);
+    const banded = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
+    expect(contains(hybrid(lineBand(10, 12), { statId: OTHER }), banded)).toBe(false);
+  });
+
+  it('never contains a weight-0 hybrid tier whose lines are covered, which stays in W', () => {
+    const zero = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 0);
+    const live = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
+    const rest = tier([line(THIRD, [1, 2])], 300);
+    const ref = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
+    expect(contains(ref, zero)).toBe(false);
+    const classPools = pools([zero, live, rest], []);
+    expect(eligible(classPools.prefix, 82, 0)).toContain(zero);
+    expect(pOf(affixProbability(classPools, 'prefix', ref, 82, 0))).toBe(100 / 400);
+  });
+
+  it('applies the null-line rule: untrackable reads the entry and its pool coverage alone', () => {
+    const notInGame = { ...tier([line(STAT, [10, 12])], 0), weightSource: 'not-in-game' as const };
+    const withNull = tier([line(STAT, [10, 12]), line(null, [1, 2])], 100);
+    const plain = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
+    expect(untrackable(notInGame, { poolCoverage: 'complete' })).toBe(true);
+    expect(untrackable(withNull, { poolCoverage: 'partial' })).toBe(true);
+    expect(untrackable(withNull, { poolCoverage: 'complete' })).toBe(false);
+    expect(untrackable(plain, { poolCoverage: 'partial' })).toBe(false);
+  });
+
+  it('sorts lineSet and statIds by code unit', () => {
+    expect(lineSet(tier([line(OTHER, [1, 2]), line(STAT, [1, 2])], 1))).toEqual([STAT, OTHER]);
+    expect(statIds(hybrid({ statId: OTHER }, { statId: STAT }))).toEqual([STAT, OTHER]);
+    expect(statIds(band(1, 2))).toEqual([STAT]);
   });
 });

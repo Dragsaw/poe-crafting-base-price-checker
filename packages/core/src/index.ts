@@ -54,10 +54,14 @@ export {
   affixProbability,
   combinationProbability,
   contains,
+  covers,
   eligible,
   interval,
   isEmptyPool,
+  lineSet,
   poolOf,
+  statIds,
+  untrackable,
 } from './probability.ts';
 export type {
   CombinationInput,
@@ -65,6 +69,7 @@ export type {
   PoolLookup,
   ProbabilityReason,
   ProbabilityResult,
+  ReferenceLine,
   Slot,
 } from './probability.ts';
 
