@@ -274,7 +274,7 @@ action_items:
     action: "Use one isEmptyPool definition in unrankableReasonOf and carry coverage
       through the run-chunk failure path"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-29-give-a-rankable-crafted-class-with-no-re"
     epic: 3
@@ -289,7 +289,7 @@ action_items:
       let tracked:check own the short-form and fit invariants, and run committed-data
       tests in CI before deploy"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-31-answer-the-open-owner-rulings-from-epic"
     epic: 3
