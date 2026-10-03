@@ -33,7 +33,8 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Capabilities and Constraints
 
-- Magic items only (at most one prefix, one suffix), tracked per Item Class, plus Raw (uncrafted) Bases at item level 82 — rare items are explicitly out of scope (PRD §2.2, §7.1).
+- Magic items only (at most one prefix, one suffix), tracked per Item Class, plus Raw (uncrafted) Bases at item level 82 — rare items are explicitly out of scope (PRD §2.2, §7.1). A tracked crafted entry always names both a prefix and a suffix (FR-34).
+- A Hybrid Modifier is tracked and priced as one modifier, and a stat that rolls in both affixes (for example % increased Rarity of Items) is priced on its summed value. Conjunctions of separate modifiers stay out of scope (FR-34, PRD §7.2).
 - Two Craft Recipes in v1 (greater transmute + greater augment; perfect transmute + perfect augment). The active recipe changes the ordering, not just the cost, so the ranking is read under one recipe at a time. An uncostable recipe shows each ranked unit in its own order and states that no order across them exists (FR-1, FR-26).
 - The ranked list is bounded to the top 20 rows by default, behind an expand control; collapsed crafted rows show at most three Chase Combinations (FR-2, FR-5).
 - No accounts, no backend, no server, no credentials that expire — static bundle delivery only (NFR-7). Any requirement that appears to need a backend is escalated, not implemented (PRD §6).
@@ -43,7 +44,7 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 - Four-state pricing model (`priced`, `no-listings`, `not-yet-synced`, `unresolvable`) must always render distinctly — never collapsed, never implied to be zero/worthless — and `not-yet-synced` always shows its reason (AD-9, FR-9).
 - An entry offers a link to its trade-site search when a valid one exists; following it is the player's own act (FR-21, FR-33).
 - Colour alone must never carry a product-meaningful distinction (Price State, crafted vs. Raw Base, Provenance) — NFR-10, extended by the PRD beyond AD-24's literal scope.
-- Domain terminology (Item Class, Base Type, Modifier Reference, Tracked Entry, Raw Base, Combination, Chase Combination, Tracked List, Item Level Floor, Accepted Tier, Curation Status, Price State, Payout Threshold, Craft Recipe, Craft Cost, Provenance, Eligible Pool, Unrankable, Sync Report, etc.) is fixed by the PRD Glossary (§3) and must be used verbatim, not re-synonymised, anywhere in product or design work. The view names an Item Class by its own name (*Bow*), never prefixed with the word *class*.
+- Domain terminology (Item Class, Base Type, Modifier Reference, Hybrid Modifier, Tracked Entry, Raw Base, Combination, Chase Combination, Tracked List, Item Level Floor, Accepted Tier, Curation Status, Price State, Payout Threshold, Craft Recipe, Craft Cost, Provenance, Eligible Pool, Unrankable, Sync Report, etc.) is fixed by the PRD Glossary (§3) and must be used verbatim, not re-synonymised, anywhere in product or design work. The view names an Item Class by its own name (*Bow*), never prefixed with the word *class*.
 
 ## Brand Commitments
 

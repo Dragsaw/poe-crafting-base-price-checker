@@ -6,11 +6,12 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 24
+revision: 25
 created: '2026-09-12'
 updated: '2026-10-03'
 binds: []
 sources:
+  - docs/specs/spec-tracked-hybrid-mods/SPEC.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
@@ -382,15 +383,22 @@ never import each other.
 - **Binds:** all
 - **Prevents:** the tracked list, the weights file and the trade query each carrying a
   different notion of "a modifier", which would mismatch silently instead of failing.
-- **Rule:** A modifier reference is one of exactly two kinds, discriminated by the schema:
+- **Rule:** A modifier reference is one of exactly three kinds, discriminated by the schema:
 
   | Kind | Shape | For |
   | --- | --- | --- |
-  | `banded` | `(statId, valueMin, valueMax)` — an **inclusive, closed band** over the value the trade filter compares | every modifier that rolls a number |
-  | `valueless` | `(statId)`, no edges at all | a modifier that rolls no number — *"Loads an additional bolt"* |
+  | `banded` | `(statId, valueMin, valueMax)` — an **inclusive, closed band** over the value the trade filter compares | every single-line modifier that rolls a number |
+  | `valueless` | `(statId)`, no edges at all | a single-line modifier that rolls no number — *"Loads an additional bolt"* |
+  | `hybrid` | `lines: [line, …]` — two or more lines, each line `banded` or `valueless` as above | one **hybrid modifier**: every stat line of one game modifier, priced as that modifier (`prd.md` FR-34) |
 
-  A valueless reference is **not** a degenerate band, and no component may give it
+  A valueless reference or line is **not** a degenerate band, and no component may give it
   sentinel edges. It still carries pool membership and still counts toward completeness.
+
+  **The `hybrid` arm is its own discriminant, never inferred.** No component reads a
+  reference as hybrid because an optional extra field is present, and no component reads a
+  `banded` reference as a one-line hybrid. The shape rules and the line order are in
+  `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0. Which tiers a hybrid reference
+  contains, and the completeness rule that ties its line set to theirs, are AD-17's.
 
   **`valueMax` is required, everywhere, with no open-top form.** An omitted ceiling is a
   floor, and a floor spans tiers: AD-17 would sum two tiers' weight while AD-16 prices
@@ -403,8 +411,17 @@ never import each other.
 
   | Kind | Key | For |
   | --- | --- | --- |
-  | `crafted` | `(categoryId, className, itemLevelMin, prefix?, suffix?)`, at least one affix present | the modifier combinations the product ranks |
+  | `crafted` | `(categoryId, className, itemLevelMin, prefix, suffix)`, **both affixes required** | the modifier combinations the product ranks |
   | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all | a white ilvl-82 base, priced as it comes |
+
+  **A crafted entry names both affixes, and no component handles an absent one.** The
+  same-`statId` sum of AD-16 assumes each slot contributes exactly one reference, and a
+  required affix makes that true by construction rather than by a check. An entry that
+  lacks either slot is a schema error. **This is a major version of the tracked schema**,
+  so a file of an earlier major is refused at load (message: `IMPLEMENTATION-NOTES.md`
+  §4.1). **The artifacts keyed by the canonical key do not bump**: the hybrid form adds
+  keys and changes none, so the committed dataset, progress and report stay valid
+  (`IMPLEMENTATION-NOTES.md` §12.1).
 
   Until revision 16 both kinds shared one key on `baseTypeId` and craftedness was read off
   *both affixes absent*. Two things were wrong with that. A crafted entry described a
@@ -459,14 +476,18 @@ never import each other.
   `WEIGHTS-FILE-SCHEMA.md` makes normative rather than by a guess at a foreign string's
   shape, and its `jewel` arm's output is checked against the catalogue before it is sent.
 
-  **A reference names a stat line, not a game modifier.** One modifier may publish
+  **A reference names stat lines, not a game modifier.** One modifier may publish
   several `statId`s that always roll together (AD-11). A `statId` identifies what the
-  trade filter can ask for; it does not identify the thing the game draws.
+  trade filter can ask for; it does not identify the thing the game draws. A `hybrid`
+  reference names **every** line of one modifier and still names it by its lines: it
+  carries no `sourceModifierId` and no `modGroup`, and the modifier it means is whatever
+  AD-17's containment set resolves.
 
-  **`itemLevelMin` and `acceptedTier` are declared, never inferred.** A present modifier
-  reference may carry an **`acceptedTier`** label beside its band — optional on both arms
-  of the union, and unused on the `valueless` arm. `contracts` types it as an **optional
-  free string**. The label is **display-only**, and four prohibitions ride with it:
+  **`itemLevelMin` and `acceptedTier` are declared, never inferred.** Each modifier
+  reference may carry an **`acceptedTier`** label beside its band — optional on every arm
+  of the union, and unused on the `valueless` arm. **On a `hybrid` reference the label
+  belongs to the reference as a whole**, never to one of its lines. `contracts` types it
+  as an **optional free string**. The label is **display-only**, and four prohibitions ride with it:
   `core` and `sync` never read it; no component validates it against a band; **no
   component validates its spelling**; and it is **never part of a tracked entry's
   canonical key**. A missing label is a curation gap that `web` renders as a marked
@@ -860,9 +881,10 @@ never import each other.
   **Containment is whole-tier.** A tier whose derived interval lies wholly inside a
   tracked band contributes its **whole weight, once**; a tier only **partly** covered
   contributes **nothing** to that band's numerator, and that is not an error. It still
-  enters the denominator like any other entry in scope. The `contains` predicate and the
-  three rules that ride with it are in `IMPLEMENTATION-NOTES.md` §1 *Containment*, binding
-  under AD-0.
+  enters the denominator like any other entry in scope. **A hybrid reference contains a tier
+  only when the tier's line set equals the reference's and every line is covered.** The
+  `contains` predicate and the rules that ride with it are in `IMPLEMENTATION-NOTES.md` §1
+  *Containment*, binding under AD-0.
 
   Two alternatives were rejected. **Pro-rating** — computing `P(value ∈ band | tier)` from
   raw `ranges` — is correct arithmetic, but it re-sites the producer's withdrawn model
@@ -954,7 +976,7 @@ never import each other.
   differ by design. `sync` validates every tracked id against the catalogue (AD-9) — a
   per-entry condition, so the entry is marked `unresolvable` and the run continues.
   `sync` runs `core`'s cross-file validation of `data/tracked.json` against the weights
-  file — **all five checks** (AD-17) — as one gate. `sync` validates the configured league
+  file — **all six checks** (AD-17) — as one gate. `sync` validates the configured league
   (AD-19). A league mismatch or a cross-file failure invalidates the run's premise, so the
   run **aborts**, and **a cross-file failure is recorded in `sync-report.json`** with the
   failing check's payload (AD-17), so the abort is visible on the surface `web` already
@@ -1076,7 +1098,7 @@ never import each other.
   | **the class discriminator** | **`crafted` entry only.** Derived from the entry's `className` (§10) and emitted as one of: an `equipment_filters` **defence signature**; `query.type` carrying the class's base type, for `jewel`; or **nothing at all**, where the entry's `categoryId` carries one class and the category filter is already exact |
   | `type_filters.rarity` | `magic` for a `crafted` entry, `normal` for a `raw` entry |
   | `type_filters.ilvl` | `min` = the entry's `itemLevelMin` |
-  | stat filters | one per modifier reference: a `banded` reference carries **both `min` and `max`**; a `valueless` reference carries the stat id and **no edges at all** |
+  | stat filters | **one per distinct `statId`** across both affixes, in one `and` group: a `banded` line carries **both `min` and `max`**; a `valueless` line carries the stat id and **no edges at all**. A `hybrid` reference contributes one filter per line, and a **summed `statId`** is **one** filter, below |
   | `query.status` | `{"option": "securable"}`, **always emitted** — the option `/api/trade2/data/filters` labels **"Instant Buyout"** |
   | `trade_filters.filters.price` | `{"option": "exalted_divine"}`, **always emitted** — see below |
   | `sort` | price **ascending** |
@@ -1109,6 +1131,19 @@ never import each other.
   `max` as well as its `min` is what keeps the priced population the one AD-17 weighed;
   and a multi-`#` stat filters on one derived value whose identity is a measurement, not
   a choice (OQ-12).
+
+  **A summed `statId` — one named by both affixes — is sent as one filter over the sum of
+  the two bands.** The trade site sums one `statId` across the item's mods, so two per-slot
+  filters on one id would each compare the summed value and match the wrong population.
+  The edges and the operand rules are in `IMPLEMENTATION-NOTES.md` §5.5, binding under
+  AD-0. **The premise that the trade site sums rests on a manual observation until the
+  capture in `IMPLEMENTATION-NOTES.md` §5.1d lands**. Until then every summed price is
+  provisional.
+
+  **Accepted effect: a summed filter prices a wider population than AD-17 weighs.** The
+  summed interval admits value splits, and even single-slot items, that per-slot
+  containment excludes. This is accepted with no mitigation (`IMPLEMENTATION-NOTES.md`
+  §5.5).
 
   **`sync` emits a band edge exactly as the derivation produces it, and may not round.**
   Rounding a half-integer to reach an integer filter would silently price a different
@@ -1279,11 +1314,14 @@ never import each other.
 
   **Summands must be mutually exclusive.** The sum is over a partition, not a list. Two
   tracked entries on one item class whose outcome sets overlap would double-count,
-  inflating that class's `ΣP` past 1 and handing it the top of the ranking. **Overlap is a validation error
-  on `data/tracked.json`, rejected at load**, and never a case `core` reconciles. A
+  inflating that class's `ΣP` past 1 and handing it the top of the ranking. **Overlap is
+  always rejected and never reconciled**; which unit rejects it, and with what consequence,
+  follows the pair (below). A
   **predicate** defines overlap, not an enumeration of shapes — an enumerated list has
-  twice been found to miss a case. The predicate, its branch ordering and its four
-  consequences are in `IMPLEMENTATION-NOTES.md` §2.1, binding under AD-0.
+  twice been found to miss a case. The predicate, its branch ordering and its
+  consequences are in `IMPLEMENTATION-NOTES.md` §2.1, binding under AD-0. **One predicate
+  covers all three reference kinds and summed `statId`s**; no kind gets its own overlap
+  rule.
 
   **Where the pool cannot answer `coOccur`, the answer is `false` and the tracked list still
   loads.** A class absent from `weights.json`, and a class whose pool is `partial`, have no
@@ -1330,7 +1368,9 @@ never import each other.
   weight**, so the first affix is a prefix with probability `W_prefix / (W_prefix +
   W_suffix)` over the eligible pools — a game fact, confirmed by the player 2026-09-26. The
   augment draws from the other slot's pool with every entry sharing the first affix's
-  `modGroup` removed, and renormalises the rest. `P = 1` for an absent affix. The formula,
+  `modGroup` removed, and renormalises the rest. **A hybrid reference is one modifier in
+  this formula**: its probability is the weight of the tiers it contains, never a product
+  across its lines. The formula,
   and its order after the recipe floor below (scope, truncate, exclude, renormalise), are in
   `IMPLEMENTATION-NOTES.md` §11, binding under AD-0.
 
@@ -1345,10 +1385,11 @@ never import each other.
   floor, while the `ilvl >=` search returns a superset. Accepted rather than corrected,
   because correcting it needs an exact-item-level filter the trade API does not offer.
 
-  **Five cross-file checks are defined once in `core`, and every shell holding both files
+  **Six cross-file checks are defined once in `core`, and every shell holding both files
   runs them** — `web` at load, and **`sync` as a run-start gate before any priced entry
   consumes budget** (AD-12), a failure aborting the run non-zero and leaving
-  `sync-progress.json` untouched. **The two shells differ in consequence by design.**
+  `sync-progress.json` untouched. The development tool `pnpm tracked:check` calls the same
+  `core` functions (`AGENT-WORKFLOW.md`). **The two shells differ in consequence by design.**
   `sync` aborts because a failed check means budget would be spent on a configuration
   that cannot be ranked. `web` **reports and still renders**: a cross-file failure is not
   an invalid artifact under AD-3 — each file is valid on its own — so `web` surfaces the
@@ -1357,37 +1398,50 @@ never import each other.
   the `coOccur` paragraph above gives for a pool that cannot answer — `[ADOPTED]` from PRD
   FR-33 and `EXPERIENCE.md`'s *Cross-file policy check failure* state. **The affected
   class is
-  well-defined for all five checks**: each evaluates something belonging to a `crafted`
-  tracked entry — a reference for four of them, the entry's own `className` for class
+  well-defined for all six checks**: each evaluates something belonging to a `crafted`
+  tracked entry — a reference for five of them, the entry's own `className` for class
   discriminability — and **every payload names that entry by its canonical key**, whose
-  first elements are the `(categoryId, className)` pair. **All five checks are crafted-only**
+  first elements are the `(categoryId, className)` pair. **All six checks are crafted-only**
   — a `raw` entry carries no reference to check, and needs no discriminator because
   `query.type` already names exactly one base type — which under AD-5's split is now a
   property of the key rather than a condition each check restates.
   **The overlap predicate straddles the two kinds of check**,
-  and its consequence follows the branch that fired: the within-file branches — bands
-  intersect, both valueless, an absent affix — need only `tracked.json`, are `contracts`'
-  per-file validation, and refuse the artifact under AD-3; the `coOccur` branch needs the
-  weights file, is the cross-file check in the table below, and takes the per-class
-  consequence. `sync` imports `core`,
-  so this adds no edge and no second
-  implementation; a check re-implemented in a shell would be the divergence this rule
-  prevents. The five:
+  and its consequence follows the **pair** of entries, not one branch. A pair whose four
+  references are all single-line never reaches `coOccur`, needs only `tracked.json`, is
+  `contracts`' per-file validation, and refuses the artifact under AD-3. **A pair in which
+  any of the four references is hybrid is evaluated whole by `core`**, because its verdict
+  can depend on the weights file; it is the cross-file check in the table below and takes
+  the per-class consequence. **`contracts` never refuses a pair that `core` would load.**
+  `sync` imports `core`, so this adds no edge and no second implementation; a check
+  re-implemented in a shell would be the divergence this rule prevents. The six:
 
   | Check | Fails when | Mechanics |
   | --- | --- | --- |
-  | **Edge alignment** | a `banded` reference's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | §2.4 |
+  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | §2.4 |
   | **Empty containment set** | a reference contains no entry under the scope — a validation error, never a `P = 0` | §2.5 |
-  | **`coOccur`** | two references in one slot name two lines of one entry, so a single item satisfies both and the partition is not a partition | §2.2 |
-  | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under §10's grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool**, and the only one whose subject is the search rather than the valuation | §2.6 |
-  | **Kind agreement** | **any** scoped line sharing the reference's `statId` disagrees with the reference's kind — a line's kind is read from **whether its `ranges` is empty**, since `5.0.0` has no `kind` field. The quantifier is **universal, not existential**: a `statId` either rolls a value or it does not, so one disagreeing line is a defect in the file however many lines agree. `contracts` separately owns the **within-file** half — two tracked entries naming one `statId` under different kinds — which a per-file schema sees on its own | §2.3 |
+  | **`coOccur`** | two entries overlap under §2.1 and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | §2.1, §2.2 |
+  | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | §2.7 |
+  | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under §10's grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | §2.6 |
+  | **Kind agreement** | **per line**: **any** scoped line sharing a reference line's `statId` disagrees with that line's kind — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. The quantifier is **universal, not existential**: a `statId` either rolls a value or it does not, so one disagreeing line is a defect in the file however many lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | §2.3 |
+
+  **One null-line rule, reading only the weights file, decides every `statId: null` line**,
+  and `tracked:lookup`, `core` and the `sync` gate all call the one `core` implementation,
+  so they reach one verdict. The rule is in `IMPLEMENTATION-NOTES.md` §1, binding under AD-0.
+
+  **Where the weights file cannot answer, `core` marks the entry unvalidated rather than
+  passing it**: with `weights.json` absent no check runs, and on a class that is absent from
+  it or has a `partial` slot only class discriminability runs. **An unvalidated mark is never
+  a failure** — the `sync` gate does not abort on it and `pnpm tracked:check` does not fail
+  on it — and it changes no ranking, because AD-17 and AD-24 already make that class
+  unrankable (`IMPLEMENTATION-NOTES.md` §2.8).
 
   **The named sections carry the full force of this AD (AD-0).** Each check's mechanics —
   the quantifiers, the scope, the error payload — live there and nowhere else, so a shell
   that re-derives one has diverged from this AD rather than from a style note.
 
   **Class discriminability is the one check whose `sync` abort saves the budget from being
-  spent wrongly rather than pointlessly.** The other four describe a configuration that
+  spent wrongly rather than pointlessly**, with line-set completeness sharing that property
+  in part. The other four describe a configuration that
   cannot be ranked, so the requests would buy nothing; this one describes a configuration
   that would be ranked on a price gathered across sibling classes, which is worse than no
   price because nothing downstream can tell it apart from a good one. **It is a cross-file
@@ -1875,8 +1929,8 @@ id resolves here.
 | Naming — files & modules | kebab-case files; one exported concept per file in `core`; adapters named `<port>-<impl>` (e.g. `trade-client-http`, `trade-client-fixture`). |
 | Naming — ports | Interface `<Thing>Port` in `contracts`; every port ships a fake alongside the real adapter. |
 | Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (§10). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (since `5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
-| Bands | A modifier reference is `banded` — `(statId, valueMin, valueMax)` with **inclusive, always-present** edges — or `valueless` — `(statId)` with no edges (AD-5). **Weights-file tiers overlap freely in value space; non-overlap is withdrawn at every scope** (AD-11). Edges sit on the lattice the trade filter compares against, which may be finer than the integers. |
-| Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms so an absent affix and a valueless affix can never collide (encoding in `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
+| Bands | A modifier reference is `banded` — `(statId, valueMin, valueMax)` with **inclusive, always-present** edges — `valueless` — `(statId)` with no edges — or `hybrid` — two or more such lines (AD-5). **Weights-file tiers overlap freely in value space; non-overlap is withdrawn at every scope** (AD-11). Edges sit on the lattice the trade filter compares against, which may be finer than the integers. |
+| Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms — banded, valueless, hybrid — so no two kinds can collide (encoding in `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
 | Item level | `itemLevelMin` is a declared floor, uniform across an item class's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per `IMPLEMENTATION-NOTES.md` §8 (AD-5). |
 | Dates & time | ISO-8601 UTC strings in all persisted data. Time enters `core` only as a passed-in value (AD-1). |
 | Units | Divine for all currency (AD-20). Band edges and item levels are raw game numbers. No field name implies a unit on its own — schemas name the unit. |
@@ -2003,7 +2057,7 @@ erDiagram
 
 `web` derives `RankedRow` in the browser and no component persists it (AD-4). **A
 `TrackedEntry` is `crafted` or `raw` by what it names, never by what it omits** — a
-`crafted` entry names an `ItemClass` and carries at least one affix, a `raw` entry names
+`crafted` entry names an `ItemClass` and carries both affixes, a `raw` entry names
 a `BaseType` and carries no affix members at all (AD-5). Every crafted entry on one
 `ItemClass` shares that class's `itemLevelMin` (AD-17). **An `ItemClass` is the
 pair `(categoryId, className)` and only its `categoryId` half is catalogue-validatable**;
@@ -2104,13 +2158,6 @@ poe-crafting-base-price-checker/
 - **A mechanical guard on a dropped tier or a dropped stat line.** `5.0.0` leaves both
   resting entirely on the producer's `poolCoverage` assertion, and the quiet case fires no
   error at all (AD-11). **Revisit if** a file is ever found to have dropped one in practice.
-- **Pricing a deliberate conjunction of co-occurring stats.** A `TrackedEntry` carries at
-  most one `ModifierRef` per slot, so a curator cannot express *"I want both lines of this
-  modifier"* as one outcome — AD-17 correctly rejects the two-entry spelling as an overlap.
-  The data exists from day one: the conjunction's probability is the one entry's weight, not
-  a product. Deferred because it widens `ModifierRef` from a field to a set and touches
-  AD-5, AD-16 and AD-17 at once. **Revisit if** a curator finds a hybrid whose two lines are
-  individually unremarkable and jointly a chase.
 - **A publish command.** `sync` makes no git write (AD-3) and the player commits by hand, so
   nothing in the product prevents a `git commit -a` from sweeping an unfinished `tracked.json`
   edit into a data commit — a separation AD-3's explicit-path commit used to enforce. A

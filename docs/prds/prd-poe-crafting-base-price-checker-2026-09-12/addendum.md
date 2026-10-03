@@ -286,3 +286,23 @@ No figure stands behind either side of that: nothing in this corpus states a Cra
 ### Why FR-5's count did not change
 
 Applying the bound per unit was chosen over halving it. 20 is a product-owned number (FR-5) and halving it in one state would make the top 20 sometimes a top 10, which is a capability change to buy back page height. The count is held and the thing it counts over is what varies. The consequence is that the default view can hold up to 40 rows in this state; where that lands on the page is `DESIGN.md`'s, and the player accepted it on 2026-09-20 on the ground that the page already scrolls.
+
+## Revision 25 rationale — Hybrid Modifiers and summed Stat Lines
+
+Revision 25 activates the deferral that §7.2 used to list as *pricing a deliberate conjunction of co-occurring stats*. `SPEC-tracked-hybrid-mods` holds the capabilities. The spine holds the decisions (AD-5, AD-16, AD-17). FR-34 holds the player-facing requirement.
+
+### Why a hybrid is priced as one modifier and not by one of its Stat Lines
+
+Before revision 25, a curator could track a Hybrid Modifier only through one of its Stat Lines. A pure modifier shares that line's stat id, so the search could not isolate the hybrid, and high-value bases went unpriced and unranked. The two-entry spelling, one entry for each line, was already refused because one item would count twice (FR-16). Pricing the modifier as itself is the only spelling that is true to how the game rolls it.
+
+### Why both affixes became required
+
+Every crafted entry in the committed Tracked List already named both affixes. The summed-stat rule assumes that each slot contributes at most one value, and an optional affix would reopen that assumption. The schema was free to break, so the rule holds by construction rather than by a check. Partial entries are deleted, not converted.
+
+### What a summed price costs
+
+A summed stat is searched on its total, so the priced population also admits splits outside the tracked tiers, for example a low prefix with a high suffix. AD-16 states this effect, and the change accepts it with no mitigation.
+
+### What did not move
+
+The Accepted Tier stays display-only and unvalidated (FR-22). The spec's rejection of a hybrid whose label names no contained tier conflicted with that rule. On 2026-10-03 the player ruled that the PRD stands and that the spec drops that rejection. The tier-scope rule, tier 1 or tiers 1 and 2, is a curation rule and not a check.
