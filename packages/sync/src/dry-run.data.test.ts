@@ -95,6 +95,7 @@ describe('pnpm sync:dry over the live data/', () => {
     expect(Object.keys(printed)).toEqual(['runStartedAt', 'runFinishedAt', 'figures', 'records', 'schemaVersion']);
     expect(Object.keys(printed.figures.requestsBySource).toSorted()).toEqual([
       'league-validation',
+      'session-probe',
       'tracked-list',
     ]);
     // The league gate ran once, against the recorded leagues fixture (Story 1.11).

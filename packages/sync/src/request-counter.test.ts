@@ -7,11 +7,12 @@ const URL_SEARCH = 'https://example.test/search';
 const OK = { status: 200, headers: {}, body: '{}' };
 
 describe('createRequestCounter', () => {
-  it('starts with all three sources present and zero', () => {
+  it('starts with every source present and zero', () => {
     expect(createRequestCounter().snapshot()).toEqual({
       'tracked-list': 0,
       'league-validation': 0,
       'catalogue-refresh': 0,
+      'session-probe': 0,
     });
   });
 
@@ -31,6 +32,7 @@ describe('createRequestCounter', () => {
       'tracked-list': 2,
       'league-validation': 1,
       'catalogue-refresh': 0,
+      'session-probe': 0,
     });
   });
 

@@ -53,6 +53,7 @@ import type * as TradeClientModule from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE, TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
 import { recordObservation } from './trade/ledger.ts';
 import { parseRateLimitHeaders } from './trade/rate-limit-headers.ts';
+import { SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 
 /** Every option set a chunk built its governor with, in build order. */
@@ -149,6 +150,7 @@ interface SessionSetup {
 }
 
 const OUTCOME_LINE = /^pnpm sync: (completed|bounded|yielded|busy|deferred|dispossessed)/;
+const AUTH_LINE = /^pnpm sync: (authenticated|unauthenticated \()/;
 
 function sessionFor(setup: SessionSetup = {}) {
   const fs = createFakeFilesystemPort({
@@ -165,6 +167,7 @@ function sessionFor(setup: SessionSetup = {}) {
   const controller = new AbortController();
   const out: { readonly line: string; readonly at: string }[] = [];
   const err: string[] = [];
+  const auth: { readonly line: string; readonly requestsBefore: number }[] = [];
   /** The session's waits, in order. Each advances the fake clock. */
   const sleeps: number[] = [];
   /** The in-chunk waits the governor asked for. */
@@ -208,11 +211,16 @@ function sessionFor(setup: SessionSetup = {}) {
       }
     },
     stderr: (line) => {
+      // A §13.5 auth line is not a chunk line: kept apart, with the requests sent before it.
+      if (AUTH_LINE.test(line)) {
+        auth.push({ line, requestsBefore: fake.requests.length });
+        return;
+      }
       err.push(line);
       countChunk();
     },
   };
-  return { deps, fs, clock, http: fake, out, err, sleeps, waits, controller };
+  return { deps, fs, clock, http: fake, out, err, auth, sleeps, waits, controller };
 }
 
 async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
@@ -581,7 +589,162 @@ describe('pnpm sync: the session with injected ports', () => {
     expect(await syncSessionCommand(deps)).toBe(0);
 
     expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST']);
-    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2 });
+    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2, 'session-probe': 0 });
+  });
+
+  it('an absent cookie over several chunks: exactly one unauthenticated (absent) line, before the first request', async () => {
+    const { deps, http, auth } = sessionFor({ tracked: [ENTRY, SECOND], stopAfter: 3 });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(http.requests.length).toBeGreaterThanOrEqual(3);
+    expect(auth).toEqual([{ line: 'pnpm sync: unauthenticated (absent)', requestsBefore: 0 }]);
+  });
+
+  it.each(['a b', 'a;b', 'a,b', '"x', 'café'])('a malformed cookie %j: one malformed line, exit 0', async (value) => {
+    const { deps, auth } = sessionFor({
+      env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: value },
+      stopAfter: 2,
+      tracked: [ENTRY, SECOND],
+    });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(auth).toEqual([{ line: 'pnpm sync: unauthenticated (malformed)', requestsBefore: 0 }]);
+  });
+
+  it('a blank contact is refused before the auth line is printed', async () => {
+    const { deps, auth } = sessionFor({ env: { [SESSION_COOKIE_ENV_VAR]: '   ' } });
+
+    expect(await syncSessionCommand(deps)).toBe(1);
+
+    expect(auth).toEqual([]);
+  });
+
+  describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () => {
+    const VALUE = `"${'Z'.repeat(32)}"`;
+    const COOKIE = `POESESSID=${VALUE}`;
+    const THIRD: TrackedEntry = { ...ENTRY, itemLevelMin: 84 };
+    const COOKIE_ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALUE };
+    /** One rule more than the fake's baseline answer, which names none. */
+    const LIVE: HttpResponse = {
+      status: 200,
+      headers: headers('search-policy', '30:300:60', '1:300:0'),
+      body: NO_RESULTS,
+    };
+
+    /**
+     * Answers each cookie-carrying search from `answers` in turn while any
+     * are left: those are the probes, because nothing else carries the cookie
+     * before an `authenticated` settle. The fake records every request.
+     */
+    function probing(...answers: (HttpResponse | Error)[]) {
+      return (fake: ReturnType<typeof createFakeHttpPort>): HttpPort => ({
+        send(request) {
+          const sent = fake.send(request);
+          const answer = request.method === 'POST' && request.headers['cookie'] !== undefined ? answers.shift() : undefined;
+          if (answer === undefined) {
+            return sent;
+          }
+          return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+        },
+      });
+    }
+
+    const cookies = (http: ReturnType<typeof createFakeHttpPort>) =>
+      http.requests.map((request) => [request.method, request.headers['cookie']]);
+
+    it('a live cookie over three chunks: one probe, one authenticated line, and session-probe 1 for the pass', async () => {
+      governorOptions.length = 0;
+      const { deps, auth, err, http, fs } = sessionFor({
+        env: COOKIE_ENV,
+        tracked: [ENTRY, SECOND, THIRD],
+        stopAfter: 3,
+        http: probing(LIVE),
+      });
+
+      expect(await syncSessionCommand(deps)).toBe(0);
+
+      // CAP-1: the baseline without the cookie, the probe with it, every later
+      // pricing search with it, and the league request never.
+      expect(cookies(http)).toEqual([
+        ['GET', undefined],
+        ['POST', undefined],
+        ['POST', COOKIE],
+        ['POST', COOKIE],
+        ['POST', COOKIE],
+      ]);
+      expect(auth).toEqual([{ line: 'pnpm sync: authenticated', requestsBefore: 3 }]);
+      expect(err).toEqual([]);
+      expect((await reportOf(fs))?.figures.requestsBySource).toEqual({
+        'league-validation': 1,
+        'tracked-list': 3,
+        'session-probe': 1,
+      });
+      // One holder for the process: every chunk's governor gets the same one.
+      expect(governorOptions).toHaveLength(3);
+      const holders = new Set(governorOptions.map((options) => (options['auth'] as { holder: unknown }).holder));
+      expect(holders.size).toBe(1);
+    });
+
+    it.each([
+      ['not-elevated', { status: 200, headers: {}, body: NO_RESULTS } as HttpResponse],
+      ['probe-rejected', { status: 403, headers: {}, body: 'forbidden' } as HttpResponse],
+      ['probe-failed', { status: 503, headers: {}, body: '' } as HttpResponse],
+      ['probe-failed', new TypeError('fetch failed')],
+    ])('%s: one line after the probe, no later request carries the cookie, exit 0', async (reason, answer) => {
+      const { deps, auth, err, http } = sessionFor({
+        env: COOKIE_ENV,
+        tracked: [ENTRY, SECOND, THIRD],
+        stopAfter: 2,
+        http: probing(answer),
+      });
+
+      expect(await syncSessionCommand(deps)).toBe(0);
+
+      expect(auth).toEqual([{ line: `pnpm sync: unauthenticated (${reason})`, requestsBefore: 3 }]);
+      expect(err).toEqual([]);
+      expect(cookies(http)).toEqual([
+        ['GET', undefined],
+        ['POST', undefined],
+        ['POST', COOKIE],
+        ['POST', undefined],
+      ]);
+    });
+
+    it('a probe 429: no line, notBefore persisted, and the next chunk probes again', async () => {
+      const { deps, auth, http } = sessionFor({
+        env: COOKIE_ENV,
+        tracked: [ENTRY, SECOND, THIRD],
+        stopAfter: 2,
+        http: probing({ status: 429, headers: { 'retry-after': '60' }, body: '' }, LIVE),
+      });
+
+      expect(await syncSessionCommand(deps)).toBe(0);
+
+      expect(cookies(http)).toEqual([
+        ['GET', undefined],
+        ['POST', undefined],
+        ['POST', COOKIE],
+        // The next chunk: a fresh governor, no latch, so its first 2xx search probes again.
+        ['POST', undefined],
+        ['POST', COOKIE],
+      ]);
+      expect(auth).toEqual([{ line: 'pnpm sync: authenticated', requestsBefore: 5 }]);
+    });
+
+    it('no 2xx pricing search: unauthenticated (not-probed) once, at the end of the session', async () => {
+      const { deps, auth, http, out } = sessionFor({
+        env: COOKIE_ENV,
+        fixtures: { [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 429, headers: { 'retry-after': '60' }, body: '' } },
+      });
+
+      expect(await syncSessionCommand(deps)).toBe(0);
+
+      expect(http.requests.every((request) => request.headers['cookie'] === undefined)).toBe(true);
+      expect(auth).toEqual([{ line: 'pnpm sync: unauthenticated (not-probed)', requestsBefore: http.requests.length }]);
+      expect(lines(out).at(-1)).toBe('pnpm sync: stopped');
+    });
   });
 
   it('a new pass restarts the pass-level requestsBySource', async () => {
@@ -592,7 +755,7 @@ describe('pnpm sync: the session with injected ports', () => {
 
     expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST', 'GET', 'POST', 'POST']);
     // The new pass only, not the six requests of both passes.
-    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2 });
+    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2, 'session-probe': 0 });
   });
 
   it('a transient fs fault on a local read does not end the session', async () => {

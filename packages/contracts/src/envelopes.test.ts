@@ -467,7 +467,11 @@ describe('the sync-owned envelopes', () => {
         { kind: 'stale-lock-broken', pid: 4242, startedAt: '2026-09-20T01:00:00Z' },
       ],
     };
-    expect(SyncReportFileSchema.parse(file)).toEqual(file);
+    // A 1.1.0 figure with no session-probe key reads it as 0 (§13.7).
+    expect(SyncReportFileSchema.parse(file)).toEqual({
+      ...file,
+      figures: { ...file.figures, requestsBySource: { ...file.figures.requestsBySource, 'session-probe': 0 } },
+    });
 
     // An incomplete per-source accounting must not reach disk (AD-12, FR-14).
     expect(

@@ -166,7 +166,7 @@ describe('the panel copy', () => {
   it('prints the five published figure groups, zeros included, in three columns', () => {
     const full = report(
       { records: [...unresolvable(12), starvation] },
-      { requestsBySource: { 'tracked-list': 10, 'league-validation': 1 }, notReachedCount: 0, coverage: 0.862, rankableClassCount: 29 },
+      { requestsBySource: { 'tracked-list': 10, 'league-validation': 1, 'session-probe': 0 }, notReachedCount: 0, coverage: 0.862, rankableClassCount: 29 },
     );
     const [run, broken, cover] = panelColumns(full, true);
     expect(run.map(groupText)).toEqual([
@@ -191,7 +191,7 @@ describe('the panel copy', () => {
     const [manyRun, manyBroken] = panelColumns(
       report(
         { records: [...unresolvable(3), starvation, starvation] },
-        { notReachedCount: 3, requestsBySource: { 'tracked-list': 10, 'league-validation': 2 } },
+        { notReachedCount: 3, requestsBySource: { 'tracked-list': 10, 'league-validation': 2, 'session-probe': 0 } },
       ),
       true,
     );
@@ -210,7 +210,7 @@ describe('the panel copy', () => {
     expect(unknownCover.map(groupText)).toEqual(['50% of unknown tracked Item Classes.']);
 
     const [zeroRun] = panelColumns(
-      report({}, { notReachedCount: 0, requestsBySource: { 'tracked-list': 0, 'league-validation': 0 } }),
+      report({}, { notReachedCount: 0, requestsBySource: { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 } }),
       true,
     );
     expect(zeroRun.map(first)[0]).toBe('0 tracked list · 0 league validation requests this pass.');

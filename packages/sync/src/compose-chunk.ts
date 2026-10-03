@@ -39,6 +39,7 @@ import { createRequestCounter } from './request-counter.ts';
 import type { RequestCounter } from './request-counter.ts';
 import { createTradeGovernor } from './trade/client.ts';
 import type { PacingState } from './trade/client.ts';
+import type { SessionAuth } from './trade/session-auth.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
 export interface ComposeChunkPorts {
@@ -77,6 +78,13 @@ export interface ComposeChunkPorts {
   readonly requests?: RequestCounter;
   /** The session only: the chunk's session options (`ChunkSession`). */
   readonly session?: ChunkSession;
+  /**
+   * The live shells only (`./sync.ts`, `./sync-batch.ts`): the process auth
+   * holder (AD-30). Each chunk's governor gets it, as it gets `pacing`, with a
+   * probe port counted as `session-probe`. The governor probes, settles and
+   * attaches through it, and redacts every error it passes on through it.
+   */
+  readonly auth?: SessionAuth;
 }
 
 /** The load-time values the pricing step was built on. */
@@ -100,12 +108,12 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
 }
 
 export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
-  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session } = options;
+  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session, auth } = options;
 
   const requests = options.requests ?? createRequestCounter();
   // A fresh governor per chunk: its invalid-request counts stay per chunk,
   // while a session's pacing memory carries across (AD-8).
-  const { clients } = createTradeGovernor({
+  const governor = createTradeGovernor({
     http: {
       'league-validation': requests.counted(http, 'league-validation'),
       'tracked-list': requests.counted(http, 'tracked-list'),
@@ -118,7 +126,13 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     log: log ?? writeStderr,
     ...(pacing === undefined ? {} : { pacing }),
     ...(spread === undefined ? {} : { spread }),
+    // The probe goes out on its own counted port, so the report's
+    // `session-probe` figure is its one trace (AD-12, AD-30).
+    ...(auth === undefined
+      ? {}
+      : { auth: { holder: auth, probe: requests.counted(http, 'session-probe') } }),
   });
+  const { clients } = governor;
 
   const ports: ChunkPorts = {
     fs,
@@ -152,6 +166,7 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
       };
     },
     catalogue: () => loadCatalogueIds(fs),
+    latchedRetryAfterMs: () => governor.latchedRetryAfterMs(),
     ...(log === undefined ? {} : { log }),
     ...(session === undefined ? {} : { session }),
   };

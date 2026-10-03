@@ -10,9 +10,9 @@
  * replaces it at its index, so a record that carries a live measurement keeps
  * its position and shows the latest one. Any other new record is appended.
  *
- * The figure keys on the two chunk sources only (AD-12): the counter tracks all
- * three declared sources, and this is where the report narrows to the two a
- * chunk can spend on.
+ * The figure keys on the chunk sources only (AD-12): the counter tracks every
+ * declared source, and this is where the report narrows to the ones a chunk
+ * can spend on, `session-probe` included and always written.
  *
  * Pure: the previous report, the records and the figures come in as values,
  * and the file comes out.

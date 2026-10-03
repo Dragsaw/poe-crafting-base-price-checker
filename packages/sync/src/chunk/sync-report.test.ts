@@ -25,7 +25,7 @@ function previousWith(records: readonly SyncRunRecord[]): SyncReportFile {
     runStartedAt: '2026-09-26T11:00:00.000Z',
     runFinishedAt: '2026-09-26T11:01:00.000Z',
     figures: {
-      requestsBySource: { 'tracked-list': 40, 'league-validation': 1 },
+      requestsBySource: { 'tracked-list': 40, 'league-validation': 1, 'session-probe': 0 },
       notReachedCount: 9,
     },
     records: [...records],
@@ -47,11 +47,11 @@ describe('buildSyncReport', () => {
       runStartedAt: STARTED,
       runFinishedAt: FINISHED,
       figures: {
-        requestsBySource: { 'tracked-list': 6, 'league-validation': 0 },
+        requestsBySource: { 'tracked-list': 6, 'league-validation': 0, 'session-probe': 0 },
         notReachedCount: 0,
       },
       records: [],
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
     });
     expect(SyncReportFileSchema.safeParse(report).success).toBe(true);
   });
@@ -65,7 +65,7 @@ describe('buildSyncReport', () => {
       runFinishedAt: FINISHED,
     });
     expect(report.figures).toEqual({
-      requestsBySource: { 'tracked-list': 2, 'league-validation': 0 },
+      requestsBySource: { 'tracked-list': 2, 'league-validation': 0, 'session-probe': 0 },
       notReachedCount: 3,
     });
   });
@@ -134,7 +134,7 @@ describe('buildSyncReport', () => {
       runStartedAt: STARTED,
       runFinishedAt: FINISHED,
     });
-    expect(report.figures.requestsBySource).toEqual({ 'tracked-list': 3, 'league-validation': 0 });
+    expect(report.figures.requestsBySource).toEqual({ 'tracked-list': 3, 'league-validation': 0, 'session-probe': 0 });
   });
 
   it('player cleared: a previous file with no records keeps only this chunk’s records', () => {
@@ -184,6 +184,7 @@ describe('the frozen sync-report.json fixture', () => {
     const parsed = SyncReportFileSchema.parse(JSON.parse(text));
     expect(Object.keys(parsed.figures.requestsBySource).sort()).toEqual([
       'league-validation',
+      'session-probe',
       'tracked-list',
     ]);
   });

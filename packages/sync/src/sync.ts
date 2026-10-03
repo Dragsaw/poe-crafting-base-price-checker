@@ -70,6 +70,7 @@ import { createPacingState, laneDelayMs } from './trade/client.ts';
 import type { PacingState } from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE } from './trade/endpoints.ts';
 import { evenIntervalMs } from './trade/ledger.ts';
+import { createSessionAuth } from './trade/session-auth.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 const PREFIX = 'pnpm sync:';
@@ -508,11 +509,14 @@ function describeOutcome(outcome: ChunkOutcome): string {
 /** The session's ports: `composeChunk`'s, less what the session itself supplies. */
 export type SyncSessionPorts = Omit<
   ComposeChunkPorts,
-  'userAgent' | 'pacing' | 'spread' | 'requests' | 'session' | 'wrapStep'
+  'userAgent' | 'pacing' | 'spread' | 'requests' | 'session' | 'wrapStep' | 'auth'
 >;
 
 export interface SyncSessionDeps extends SyncSessionPorts {
-  /** Where the contact `User-Agent` is read from (`POE_SYNC_USER_AGENT`). */
+  /**
+   * Where the contact `User-Agent` (`POE_SYNC_USER_AGENT`) and the optional
+   * session cookie (`POESESSID`, AD-30) are read from.
+   */
   readonly env: Readonly<Record<string, string | undefined>>;
   /** The command's arguments, after the script name. */
   readonly argv: readonly string[];
@@ -541,63 +545,78 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
     return 1;
   }
 
+  // One holder per process, beside the pacing state. Each settle prints one
+  // line, once per process, at the moment it settles: an edge state here,
+  // before the first request; a probe outcome from a chunk's governor
+  // (IMPLEMENTATION-NOTES.md §13.1–§13.3, §13.5).
+  const auth = createSessionAuth(env, { onSettle: (line) => stderr(`${PREFIX} ${line}`) });
   const pacing = createPacingState();
   const requests = createRequestCounter();
   const waitPorts: WaitPorts = { fs, clock, sleep: pause, signal };
   let state = INITIAL_SESSION_STATE;
 
-  while (!signal.aborted) {
-    const signature = await inputSignature(fs);
-    const withGate = gateDue(state, signature);
+  try {
+    while (!signal.aborted) {
+      const signature = await inputSignature(fs);
+      const withGate = gateDue(state, signature);
 
-    const delayMs = preWaitMs(pacing, clock.now(), withGate);
-    if (delayMs > 0) {
-      stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
-      await pause(delayMs, signal);
-      if (signal.aborted) {
-        break;
+      const delayMs = preWaitMs(pacing, clock.now(), withGate);
+      if (delayMs > 0) {
+        stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
+        await pause(delayMs, signal);
+        if (signal.aborted) {
+          break;
+        }
+      }
+
+      const before = requests.snapshot();
+      const ledgerBefore = pacing.ledger;
+      let result: ChunkResult;
+      try {
+        const outcome = await composeChunk({
+          ...ports,
+          userAgent: contact.userAgent,
+          pacing,
+          auth,
+          spread: true,
+          requests,
+          session: {
+            maxEntries: 1,
+            pinnedMaxAgeMs: args.options.pinnedMaxAgeMs,
+            ...(state.passStart === undefined ? {} : { requestsSince: state.passStart }),
+            ...(state.confirmedLeague === undefined ? {} : { confirmedLeague: state.confirmedLeague }),
+          },
+        }).run();
+        result = { kind: 'outcome', outcome };
+        stdout(`${PREFIX} ${describeOutcome(outcome)}`);
+      } catch (thrown) {
+        // The governor already redacted what it passed on; this covers the rest (§13.6).
+        const error = auth.redact(thrown);
+        result = { kind: 'error', error };
+        stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
+      }
+
+      const now = clock.now();
+      const notBefore = await pendingNotBefore(fs, now);
+      const context: ChunkContext = {
+        now,
+        ...(notBefore === undefined ? {} : { notBefore }),
+        freshReading: pacing.ledger !== ledgerBefore,
+        evenIntervalMs: sessionEvenIntervalMs(pacing, withGate),
+      };
+      const wait = nextWait(result, state, context);
+      state = nextState(state, result, context, { signature, before });
+
+      if (wait.kind !== 'none' && !signal.aborted) {
+        stdout(`${PREFIX} ${describeWait(wait)}`);
+        await runWait(wait, waitPorts, signature);
       }
     }
-
-    const before = requests.snapshot();
-    const ledgerBefore = pacing.ledger;
-    let result: ChunkResult;
-    try {
-      const outcome = await composeChunk({
-        ...ports,
-        userAgent: contact.userAgent,
-        pacing,
-        spread: true,
-        requests,
-        session: {
-          maxEntries: 1,
-          pinnedMaxAgeMs: args.options.pinnedMaxAgeMs,
-          ...(state.passStart === undefined ? {} : { requestsSince: state.passStart }),
-          ...(state.confirmedLeague === undefined ? {} : { confirmedLeague: state.confirmedLeague }),
-        },
-      }).run();
-      result = { kind: 'outcome', outcome };
-      stdout(`${PREFIX} ${describeOutcome(outcome)}`);
-    } catch (error) {
-      result = { kind: 'error', error };
-      stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
-    }
-
-    const now = clock.now();
-    const notBefore = await pendingNotBefore(fs, now);
-    const context: ChunkContext = {
-      now,
-      ...(notBefore === undefined ? {} : { notBefore }),
-      freshReading: pacing.ledger !== ledgerBefore,
-      evenIntervalMs: sessionEvenIntervalMs(pacing, withGate),
-    };
-    const wait = nextWait(result, state, context);
-    state = nextState(state, result, context, { signature, before });
-
-    if (wait.kind !== 'none' && !signal.aborted) {
-      stdout(`${PREFIX} ${describeWait(wait)}`);
-      await runWait(wait, waitPorts, signature);
-    }
+  } finally {
+    // Runs on a throw too, so the process never ends unsettled without its
+    // line. A holder still unsettled had no 2xx pricing search to probe on,
+    // or only probe 429s (§13.5).
+    auth.settle('not-probed');
   }
 
   stdout(`${PREFIX} stopped`);

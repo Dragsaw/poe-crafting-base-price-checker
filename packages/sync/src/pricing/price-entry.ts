@@ -303,7 +303,9 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
     const stamped: DatasetEntry = { ...before, lastAttemptedAt: attemptedAt };
 
     const search = await sendLeg(() =>
-      client.send({ method: 'POST', url: tradeSearchUrl(league), body, lane: SEARCH_LANE }),
+      // Cookie-eligible: the governor probes on the first answered search and
+      // attaches the session cookie once it is live (AD-30).
+      client.send({ method: 'POST', url: tradeSearchUrl(league), body, lane: SEARCH_LANE, cookieEligible: true }),
     );
     if (search.kind === 'yield') {
       return yieldedWith(search, stamped);
@@ -334,7 +336,7 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
 
     const ids = answer.result.slice(0, FETCH_LIMIT);
     const fetched = await sendLeg(() =>
-      client.send({ method: 'GET', url: tradeFetchUrl(ids, answer.id), lane: FETCH_LANE }),
+      client.send({ method: 'GET', url: tradeFetchUrl(ids, answer.id), lane: FETCH_LANE, cookieEligible: true }),
     );
     // The unit is the request (AD-9): a fetch that yields or answers 4xx keeps
     // the answered search's fields, and the price state stays as published.

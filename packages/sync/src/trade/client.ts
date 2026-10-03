@@ -31,6 +31,7 @@ import {
   type InvalidRequestCounts,
   invalidRequestsFor,
   isInvalidRequest,
+  isSuccess,
   NO_INVALID_REQUESTS,
   thresholdReached,
 } from './invalid-requests.ts';
@@ -39,7 +40,9 @@ import {
   type RateLimitBucket,
   type RateLimitHeaders,
   type RateLimitSkip,
+  ruleNameCount,
 } from './rate-limit-headers.ts';
+import type { SessionAuth } from './session-auth.ts';
 import { MissingUserAgentError } from './user-agent.ts';
 
 const USER_AGENT_HEADER = 'user-agent';
@@ -112,6 +115,14 @@ export interface TradeRequest {
    * Omitted, it defaults to the request's method and URL path.
    */
   readonly lane?: string;
+  /**
+   * `true` on a pricing search and a pricing fetch, and on nothing else
+   * (AD-30, IMPLEMENTATION-NOTES.md §13.2). The governor probes and attaches
+   * the session cookie only on a marked request; it never guesses from the
+   * method or the lane, because lanes are opaque (AD-8). The league request
+   * stays unmarked, so it never carries the cookie.
+   */
+  readonly cookieEligible?: boolean;
 }
 
 interface TradeExchange {
@@ -418,6 +429,28 @@ export interface TradeGovernorOptions<Source extends string> extends TradeClient
    * restriction or a full bucket.
    */
   readonly spread?: boolean;
+  /**
+   * The process auth holder and the port the session probe goes out on
+   * (AD-30, IMPLEMENTATION-NOTES.md §13). Omitted, nothing probes, nothing
+   * carries a cookie and errors pass on unchanged: the shells that cannot
+   * reach a holder have no value to send or remove.
+   */
+  readonly auth?: TradeGovernorAuth;
+}
+
+/** The session-cookie half of a governor (AD-30). */
+export interface TradeGovernorAuth {
+  /**
+   * The process auth holder. It owns the value and the state; the governor
+   * asks it to settle and to add the cookie header (§13.2, §13.3). Every
+   * error the governor passes on is redacted through it first (§13.6).
+   */
+  readonly holder: SessionAuth;
+  /**
+   * The port the one probe goes out on, counted as `session-probe` by the
+   * composition (AD-12). It shares this governor's pacing and serial queue.
+   */
+  readonly probe: HttpPort;
 }
 
 export interface TradeGovernor<Source extends string> {
@@ -426,6 +459,13 @@ export interface TradeGovernor<Source extends string> {
   readonly pacing: PacingState;
   /** The delay the next request on `lane` would wait now. */
   delayBeforeMs(lane: string): number;
+  /**
+   * The retry delay of a probe `429` this governor latched, or `undefined`.
+   * The chunk runner reads it before `publish`: a latched penalty makes the
+   * chunk a `429` yield, whatever bound ended it (IMPLEMENTATION-NOTES.md
+   * §13.3). A new governor starts with no latch.
+   */
+  latchedRetryAfterMs(): number | undefined;
 }
 
 /**
@@ -436,7 +476,7 @@ export interface TradeGovernor<Source extends string> {
 export function createTradeGovernor<Source extends string>(
   options: TradeGovernorOptions<Source>,
 ): TradeGovernor<Source> {
-  const { clock, wait, userAgent, invalidRequestThreshold, log } = options;
+  const { clock, wait, userAgent, invalidRequestThreshold, log, auth } = options;
   if (userAgent.trim() === '') {
     throw new MissingUserAgentError();
   }
@@ -445,6 +485,14 @@ export function createTradeGovernor<Source extends string>(
   const { lanePolicies } = pacing;
 
   let invalidRequests: InvalidRequestCounts = NO_INVALID_REQUESTS;
+
+  /**
+   * A probe `429`'s penalty (IMPLEMENTATION-NOTES.md §13.3). Once set, every
+   * later `send` of this governor returns a `429` yield with this delay and
+   * sends nothing, and the runner reads it before `publish`. Per governor, so
+   * the next chunk starts with none and may probe again.
+   */
+  let latched: { readonly retryAfterMs: number; readonly reason: TradeYieldReason } | undefined;
 
   function rememberPolicy(lane: string, policy: string): void {
     // Delete-then-set moves the lane to the end of the Map's insertion order,
@@ -462,6 +510,118 @@ export function createTradeGovernor<Source extends string>(
   }
 
   /**
+   * The standing headers, plus the cookie on a marked request once the holder
+   * settled `authenticated` (AD-30). The holder adds the header itself, so the
+   * value never passes through this module as a string it keeps.
+   */
+  function outboundHeaders(request: TradeRequest): Record<string, string> {
+    const headers = headersFor(request, userAgent);
+    return request.cookieEligible === true && auth?.holder.isAuthenticated === true
+      ? auth.holder.withCookie(headers)
+      : headers;
+  }
+
+  /**
+   * The pacing wait before a request on `lane`. Computed once and waited
+   * once: recomputing after the wait would not terminate under a fixed test
+   * clock, and the ledger cannot have changed in the meantime — `send`
+   * queues, so only this call's own responses move it.
+   */
+  async function paceLane(lane: string): Promise<number> {
+    const delayMs = laneDelayMs(pacing, lane, clock.now(), spread);
+    if (delayMs <= 0) {
+      return 0;
+    }
+    await wait(delayMs);
+    return delayMs;
+  }
+
+  /** Folds one response's headers into the ledger and the lane memo. */
+  function fold(
+    lane: string,
+    knownPolicy: string | undefined,
+    response: HttpResponse,
+  ): { readonly parsed: RateLimitHeaders; readonly respondedAt: string; readonly policy: string | undefined } {
+    const parsed = parseRateLimitHeaders(response.headers);
+    const respondedAt = clock.now();
+    pacing.ledger = recordObservation(pacing.ledger, parsed, respondedAt);
+    if (parsed.policy !== undefined) {
+      rememberPolicy(lane, parsed.policy);
+    }
+    return { parsed, respondedAt, policy: parsed.policy ?? knownPolicy };
+  }
+
+  /** The delay and the reason a `429` yields with (§5.3). */
+  function penaltyOf(
+    response: HttpResponse,
+    parsed: RateLimitHeaders,
+    policy: string | undefined,
+  ): { readonly retryAfterMs: number; readonly reason: TradeYieldReason } {
+    const fromHeader = retryAfterMsOf(response.headers);
+    const derived = derivedYieldDelayMs(pacing.ledger, policy);
+    return {
+      retryAfterMs: fromHeader ?? (derived > 0 ? derived : declaredYieldFloorMs(parsed)),
+      reason: fromHeader === undefined ? 'derived-penalty' : 'retry-after-header',
+    };
+  }
+
+  /**
+   * The one session probe (IMPLEMENTATION-NOTES.md §13.2, §13.3): the
+   * baseline's method, path and body, sent once with the cookie on the probe
+   * port, after the same pacing wait as any request and inside the same queue
+   * slot as the baseline. Its State reading folds into the ledger like any
+   * other. It never counts toward the invalid-request count, its answer is
+   * never returned, and its error is never passed on.
+   */
+  async function probe(
+    { holder, probe: port }: TradeGovernorAuth,
+    request: TradeRequest,
+    lane: string,
+    baseline: HttpResponse,
+  ): Promise<void> {
+    const knownPolicy = lanePolicies.get(lane);
+    const waitedMs = await paceLane(lane);
+    const pacedOn = knownPolicy === undefined ? undefined : pacing.ledger[knownPolicy];
+
+    let response: HttpResponse;
+    try {
+      response = await port.send({
+        method: request.method,
+        url: request.url,
+        headers: holder.withCookie(headersFor(request, userAgent)),
+        body: request.body,
+      });
+    } catch {
+      // A throw or a timeout: the error may quote the request, so it goes
+      // nowhere. Pricing continues unauthenticated (§13.3).
+      holder.settle('probe-failed');
+      return;
+    }
+
+    const { parsed, respondedAt, policy } = fold(lane, knownPolicy, response);
+    const { status } = response;
+
+    if (status === TOO_MANY_REQUESTS) {
+      // Settles nothing. The next `send` yields with this penalty (§13.3).
+      log?.(describe429({ at: respondedAt, lane, policy, waitedMs }, response.headers, pacedOn));
+      latched = penaltyOf(response, parsed, policy);
+      return;
+    }
+    if (isSuccess(status)) {
+      const live = ruleNameCount(response.headers) > ruleNameCount(baseline.headers);
+      holder.settle(live ? 'authenticated' : 'not-elevated');
+      return;
+    }
+    if (isInvalidRequest(status)) {
+      // Every 401 and 403 included, a Cloudflare 403 too (AD-30).
+      holder.settle('probe-rejected');
+      return;
+    }
+    // A 5xx, or any other answer that is neither 2xx nor 4xx.
+    holder.settle('probe-failed');
+  }
+
+  /**
    * Requests are issued **one at a time**, chained onto the previous call.
    *
    * The pacing logic assumes the ledger is at most one request out of date, and
@@ -474,6 +634,20 @@ export function createTradeGovernor<Source extends string>(
   async function exchange(http: HttpPort, request: TradeRequest): Promise<TradeResult> {
     const lane = laneOf(request);
     const knownPolicy = lanePolicies.get(lane);
+
+    // A latched probe 429: the chunk must stop spending, so nothing is sent.
+    if (latched !== undefined) {
+      return {
+        kind: 'yield',
+        lane,
+        policy: knownPolicy,
+        waitedMs: 0,
+        skips: [],
+        invalidRequests: invalidRequestsFor(invalidRequests, knownPolicy),
+        retryAfterMs: latched.retryAfterMs,
+        reason: latched.reason,
+      };
+    }
 
     // Checked before the wait and before the request, because the threshold is
     // the one limit that waiting does not clear: passing it revokes access.
@@ -491,16 +665,7 @@ export function createTradeGovernor<Source extends string>(
       };
     }
 
-    // Computed once and waited once. Recomputing after the wait would not
-    // terminate under a fixed test clock, and the ledger cannot have changed
-    // in the meantime — `send` queues, so only this call's own response moves
-    // it.
-    const delayMs = laneDelayMs(pacing, lane, clock.now(), spread);
-    let waitedMs = 0;
-    if (delayMs > 0) {
-      waitedMs = delayMs;
-      await wait(delayMs);
-    }
+    const waitedMs = await paceLane(lane);
 
     // The reading the wait above was paced on, kept for a 429's operator line
     // before this response replaces it.
@@ -509,17 +674,11 @@ export function createTradeGovernor<Source extends string>(
     const response = await http.send({
       method: request.method,
       url: request.url,
-      headers: headersFor(request, userAgent),
+      headers: outboundHeaders(request),
       body: request.body,
     });
 
-    const parsed = parseRateLimitHeaders(response.headers);
-    const respondedAt = clock.now();
-    pacing.ledger = recordObservation(pacing.ledger, parsed, respondedAt);
-    if (parsed.policy !== undefined) {
-      rememberPolicy(lane, parsed.policy);
-    }
-    const policy = parsed.policy ?? knownPolicy;
+    const { parsed, respondedAt, policy } = fold(lane, knownPolicy, response);
 
     // Every `4xx` counts, not only the three the documentation names.
     if (isInvalidRequest(response.status)) {
@@ -530,8 +689,6 @@ export function createTradeGovernor<Source extends string>(
 
     if (response.status === TOO_MANY_REQUESTS) {
       log?.(describe429({ at: respondedAt, lane, policy, waitedMs }, response.headers, pacedOn));
-      const fromHeader = retryAfterMsOf(response.headers);
-      const derived = derivedYieldDelayMs(pacing.ledger, policy);
       return {
         kind: 'yield',
         lane,
@@ -541,14 +698,20 @@ export function createTradeGovernor<Source extends string>(
         invalidRequests: counted,
         ...(remaining === undefined ? {} : { remaining }),
         response,
-        retryAfterMs: fromHeader ?? (derived > 0 ? derived : declaredYieldFloorMs(parsed)),
-        reason: fromHeader === undefined ? 'derived-penalty' : 'retry-after-header',
+        ...penaltyOf(response, parsed, policy),
       };
+    }
+
+    // The first 2xx marked request of the process, sent without the cookie,
+    // is the baseline: probe once, before the caller's next request (§13.2).
+    if (auth !== undefined && request.cookieEligible === true && auth.holder.canProbe && isSuccess(response.status)) {
+      await probe(auth, request, lane, response);
     }
 
     // Every other status — a `503` included, and a counted `403` — is the
     // caller's to decide on, returned unchanged. `HttpPort` is a value both
-    // ways and this client does not narrow that.
+    // ways and this client does not narrow that. The baseline's answer is
+    // the result whatever the probe got.
     return {
       kind: 'response',
       lane,
@@ -561,11 +724,20 @@ export function createTradeGovernor<Source extends string>(
     };
   }
 
+  // Redacted in place, then rethrown: the class, the `name` and the identity
+  // survive, so `isTransportFailure` still classifies the throw (§13.6).
+  const redacted = (http: HttpPort, request: TradeRequest): Promise<TradeResult> =>
+    auth === undefined
+      ? exchange(http, request)
+      : exchange(http, request).catch((error: unknown) => {
+          throw auth.holder.redact(error);
+        });
+
   const clientFor = (http: HttpPort): TradeClient => ({
     send(request) {
       const issued = tail.then(
-        () => exchange(http, request),
-        () => exchange(http, request),
+        () => redacted(http, request),
+        () => redacted(http, request),
       );
       // The queue must survive a rejected exchange, or one failure would wedge
       // every later request behind it.
@@ -585,5 +757,6 @@ export function createTradeGovernor<Source extends string>(
     clients,
     pacing,
     delayBeforeMs: (lane) => laneDelayMs(pacing, lane, clock.now(), spread),
+    latchedRetryAfterMs: () => latched?.retryAfterMs,
   };
 }

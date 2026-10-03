@@ -277,6 +277,14 @@ export interface ChunkPorts {
    * aborts the chunk with a `run-failure` record, before any request.
    */
   readonly catalogue: () => Promise<DataFileResult<CatalogueIds>>;
+  /**
+   * The retry delay of a probe `429` the chunk's governor latched, or
+   * `undefined` (IMPLEMENTATION-NOTES.md §13.3). Read after the step loop,
+   * just before `publish`: a latched penalty makes the chunk a `429` yield,
+   * whatever bound ended it, and writes `notBefore` by §5.3's after-a-429
+   * row. Omitted, nothing is latched.
+   */
+  readonly latchedRetryAfterMs?: () => number | undefined;
   /** One line of operator output. Defaults to stderr. */
   readonly log?: (line: string) => void;
   /**
@@ -801,7 +809,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         readonly kind: 'bounded';
         readonly bound: ChunkBound;
       } = { kind: 'completed' };
-      /** The `notBefore` this ending writes: set only by a step's 429 (§5.3). */
+      /** The `notBefore` this ending writes: set only by a step's 429 or a latched probe 429 (§5.3, §13.3). */
       let until: string | undefined;
 
       const rotationWaiting = plan.rotation.length > 0;
@@ -862,6 +870,14 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           ending = { kind: 'bounded', bound: 'entries' };
           break;
         }
+      }
+
+      // A probe 429 settles nothing and ends the chunk as a 429 yield, also
+      // when no further request followed it in this chunk (§13.3).
+      const latchedMs = ports.latchedRetryAfterMs?.();
+      if (latchedMs !== undefined) {
+        ending = { kind: 'yielded' };
+        until = notBeforeAfter429(clock.now(), latchedMs);
       }
 
       const starvation = starvationNow();
@@ -925,11 +941,17 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         const rejected = malformed || error instanceof LeagueRequestRejectedError;
         const failing =
           (malformed || error instanceof UnexpectedTradeResponseError) ? error.entry : undefined;
+        // A probe 429 latched before the throw still persists its penalty (§13.3).
+        const latchedMs = rejected ? undefined : ports.latchedRetryAfterMs?.();
         try {
           await publish(
             setup.publication,
             failing === undefined ? stepEntries : [...stepEntries, failing],
-            rejected ? notBeforeAfterAbort(clock.now()) : undefined,
+            rejected
+              ? notBeforeAfterAbort(clock.now())
+              : latchedMs === undefined
+                ? undefined
+                : notBeforeAfter429(clock.now(), latchedMs),
           );
         } catch (fault) {
           secondary('publishing the dataset and progress', fault);
