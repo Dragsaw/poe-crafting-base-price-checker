@@ -1208,38 +1208,73 @@ the session, that search is in a later chunk. Under `sync:batch`, it is in the n
 | --- | --- | --- | --- |
 | `live(probe)` | `authenticated` | — | cleared |
 | 2xx, not live | `unauthenticated (not-elevated)` | — | written |
-| `429` | unsettled. The next request yields with the penalty, and `notBefore` follows §5.3. | not counted | — |
-| any other non-2xx | `unauthenticated (probe-rejected)` | not counted | written |
-| throw, or the client's ordinary request timeout | `unauthenticated (probe-failed)` | — | — |
+| `429` | unsettled. The governor latches the penalty. `notBefore` follows §5.3's after-a-429 row (see below). | not counted | unchanged |
+| `4xx` other than `429`, every `401` and `403` included | `unauthenticated (probe-rejected)` | not counted | written |
+| `5xx`, a throw, or the client's ordinary request timeout | `unauthenticated (probe-failed)` | not counted | unchanged |
+
+**Every probe `401` and `403` is `probe-rejected`**, a Cloudflare `403` included. No rule
+reads the body or a `cf-mitigated` header (AD-30).
+
+**A probe `5xx` is not AD-9's request with no answer.** The baseline already answered the
+entry's search, and the baseline's answer stays the step's result (§13.2). So a probe `5xx`
+stamps nothing, ends no chunk, writes no `notBefore` and is not counted. Pricing continues
+unauthenticated. No `5xx` count or `5xx` abort exists elsewhere: AD-9 and AD-12 treat a
+`5xx` on a pricing or league request as a yield, and §5.3's threshold counts `4xx` only. A
+probe `5xx` therefore feeds no other rule.
+
+**Where a probe `429`'s `notBefore` is persisted.** The governor latches the probe's penalty
+and its retry delay. The next `send` of the chunk returns a `429` yield with that delay and
+sends nothing. When the chunk ends with no further `send`, the runner reads the latch before
+`publish`. A latched penalty makes the chunk's outcome a `429` yield, whatever bound ended
+the chunk, and `publish` writes `notBefore = now + min(retryAfter, staleLockAfter)` (§5.3,
+AD-7, AD-8). The entry that the baseline answered keeps its result. So §5.3's rule that a
+completed chunk clears `notBefore` never applies to a chunk with a latched probe `429`.
 
 After a probe `429`, the probe is eligible again on the next chunk's first answered pricing
 search. A probe `429` is the only reason a process sends another probe.
 
-"Written" sets `authHoldOffUntil = now + 24h`. "Cleared" removes the field. Sync writes both
-with the chunk's other `sync-progress.json` writes, under the lock (AD-7). The operator can
-remove the field to end a hold-off early.
+**The hold-off write.** "Written" sets `authHoldOffUntil = now + 24h`. "Cleared" removes the
+field. The holder records the action (`write` or `clear`) when the state changes. The runner
+reads the pending action and applies it in `publish`, in the same `sync-progress.json` write
+as the chunk's entries, under the lock (AD-7). No other unit writes the field.
+
+**Every other outcome leaves `authHoldOffUntil` unchanged.** Each progress write carries the
+loaded value forward unless the holder has a pending action. This covers a run with no
+cookie, an `absent` or `malformed` value, a `held-off` run, a `probe-failed` run, a run that
+ends on a probe `429`, and a run with no settle (`not-probed`). An ending that writes no
+`sync-progress.json` (a deferred, busy or dispossessed run, AD-7) applies no pending action.
+The next process then probes once. The operator can remove the field to end a hold-off early.
 
 ### 13.4 Downgrade
 
 A downgrade is one of these two responses to a request after the probe that carried the
 cookie:
 
-- a `401` or `403`.
+- a `401` or `403`, a Cloudflare `403` included. No rule reads the body or a `cf-mitigated`
+  header (AD-30).
 - a 2xx with `¬live(r)`.
 
 A probe `401` or `403` is `probe-rejected` and is not a downgrade. On a downgrade, the
-governor does these four things:
+governor does these four things, in this order:
 
 1. It drops the cookie for the rest of the process.
 2. It resets the process pacing state (ledger and lane memo) to cold, **in place**, so that
    the session does not take the reset for a fresh State reading.
-3. It writes the hold-off.
-4. It returns a `session-expired` yield.
+3. It reports the downgrade to the holder, which changes the state to `expired` and records
+   a pending hold-off `write` (§13.3).
+4. It returns a `session-expired` yield **with no response**. A 2xx downgrade discards its
+   answer here. The downgrading request is not counted toward the invalid-request count.
 
-The chunk ends `yielded`. The entry stamps `lastAttemptedAt`. An answered search keeps its two
-search fields (AD-9), and sync keeps the price state. The chunk writes no `notBefore` and no
-report record. The batch command exits 0. The session waits `backoff(1)` (§5.3) and then
-continues.
+The pricing step (`price-entry`) then reads the yield as AD-9's request that got no answer,
+the same row as a `429`, `5xx` or timeout. It stamps `lastAttemptedAt` and keeps the price
+state. It keeps the two search fields that the entry had before the downgrading request, so a
+search answered earlier in the same entry still sets them (AD-9: the unit is the request).
+After the step, the runner's `publish` writes the stamped entry and the pending hold-off in
+one `sync-progress.json` write (§13.3). So the order is: pacing reset, hold-off recorded,
+entry stamped, then one progress write.
+
+The chunk ends `yielded`. The chunk writes no `notBefore` and no report record. The batch
+command exits 0. The session waits `backoff(1)` (§5.3) and then continues.
 
 ### 13.5 The console line
 
@@ -1252,8 +1287,8 @@ warning `unauthenticated (<reason>)`.
 | `malformed` | the value is outside the `cookie-value` grammar |
 | `held-off` | `authHoldOffUntil` is in the future |
 | `not-elevated` | the probe got a 2xx answer that failed `live` |
-| `probe-rejected` | the probe got a non-2xx answer other than `429` |
-| `probe-failed` | the probe threw or timed out |
+| `probe-rejected` | the probe got a `4xx` other than `429`, every `401` and `403` included. Writes the hold-off. |
+| `probe-failed` | the probe got a `5xx`, threw or timed out. Writes no hold-off. |
 | `not-probed` | the process ended with no settle: no 2xx pricing search, or only probe `429`s |
 | `expired` | a downgrade (§13.4) |
 
@@ -1263,8 +1298,10 @@ No line, error message, thrown value or cause carries the cookie value or any pa
 holder refuses a `malformed` value, so no HTTP stack quotes the value in an error. The
 governor removes the value from each error it passes on, and from that error's cause chain.
 
-A canary test forces each throw path with a known value. The test then scans stdout, stderr
-and every written artifact for any part of that value.
+A canary test forces each throw path with a known canary value of at least 32 characters.
+The test fails on any substring of 8 or more characters of that value, in raw, URL-encoded
+or base64 form, in stdout, stderr or any file that the test writes (SPEC-poesessid-sync
+CAP-4).
 
 ### 13.7 Schema versions and the `User-Agent`
 
@@ -1272,6 +1309,8 @@ and every written artifact for any part of that value.
 source is additive, so `sync-report.json` also goes to `1.2.0`. A reader accepts a `1.1.0`
 report that has no `session-probe` key.
 
-For a cookie run, the operator puts a browser string in `POE_SYNC_USER_AGENT` (AD-30). All
+For a cookie run, the operator puts a browser string in `POE_SYNC_USER_AGENT` (AD-30). That
+the trade API needs a browser string on a cookie request is the operator's observation, and
+OQ-26 verifies it. All
 shells read the same variable, so `catalogue:refresh` and `fixtures:record` also send that
 browser string while the operator keeps it there.

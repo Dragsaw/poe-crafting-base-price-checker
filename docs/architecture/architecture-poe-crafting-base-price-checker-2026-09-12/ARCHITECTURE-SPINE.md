@@ -8,7 +8,7 @@ scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, p
 status: final
 revision: 24
 created: '2026-09-12'
-updated: '2026-10-02'
+updated: '2026-10-03'
 binds: []
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -1778,10 +1778,11 @@ never import each other.
 
 ### AD-30 — An optional session cookie rides inside the governed client, and only ever downgrades
 
-- **Binds:** `sync`, `contracts`
+- **Binds:** `sync`, `contracts`, `web`
 - **Prevents:**
   - the account credential leaking through a second call site, an error, a report record or
     a fixture.
+  - two builders classifying a probe `5xx` or a Cloudflare `403` differently.
   - two builders deciding liveness differently.
   - a per-chunk governor turning on again a cookie that the process dropped.
   - authenticated readings pacing unauthenticated requests.
@@ -1804,25 +1805,44 @@ never import each other.
   every response that carried the cookie. The test compares the rule count against an
   unauthenticated baseline and never compiles in a rule name (AD-8). The first answered
   pricing search is the baseline, and one probe search settles the state. A probe `429`
-  settles nothing and stays AD-8's `429`. A non-429 probe `4xx` is neither an invalid request
-  for the chunk nor AD-9's malformed-request abort.
+  settles nothing and stays AD-8's `429`: its `notBefore` persists through AD-8's path even
+  when the probe is the last request of the chunk (`IMPLEMENTATION-NOTES.md` §13.3). A probe
+  `5xx` settles `probe-failed` with no hold-off, like a throw or a timeout. A non-429 probe
+  `4xx` settles `probe-rejected`. Neither is an invalid request for the chunk, AD-9's
+  malformed-request abort, or AD-9's request with no answer.
+
+  **Every `401` or `403` on a cookie request means a dead cookie**, a Cloudflare `403`
+  included. On the probe it is `probe-rejected`, and after the probe it is `expired`. Both
+  write the hold-off. **Rejected:** a carve-out that reads a `403` with `cf-mitigated` or an
+  HTML body as `probe-failed`. The operator chose one rule for every `401` and `403` over a
+  second classifier on response shape. **Accepted cost:** a Cloudflare block can hold
+  off a live cookie for 24 hours (SPEC-poesessid-sync CAP-5).
 
   **Expiry is a downgrade, not a malformed request.** A cookie response that fails the test,
   or receives `401` or `403`, drops the cookie for the rest of the process. The downgrade
   resets the process pacing state to cold (AD-8). It ends the chunk as a yield that persists
-  no `notBefore`, and the batch command exits 0. **Accepted cost:** the next request can
-  receive a `429`. GGG counts authenticated and unauthenticated requests on one `Ip` counter,
-  so an authenticated run can already be over the unauthenticated limits.
+  no `notBefore`, and the batch command exits 0. A downgrade on a 2xx discards that response,
+  and the entry is AD-9's request that got no answer (SPEC-poesessid-sync CAP-3). **Accepted
+  cost:** the next request can receive a `429`. GGG counts authenticated and unauthenticated
+  requests on one `Ip` counter, so an authenticated run can already be over the
+  unauthenticated limits.
 
   **Sync holds off a cookie that failed, across processes.** `sync-progress.json` records when
-  a retry is due, never the value. Until then, sync sends no probe.
+  a retry is due, never the value. Until then, sync sends no probe. The holder records each
+  write or clear of the hold-off, and the runner applies it with the chunk's progress write
+  (AD-7). Every other outcome leaves the field unchanged.
 
   **The console carries the state, and the report does not** (SPEC-poesessid-sync CAP-2,
-  CAP-4). `SyncRunReport` has no auth field. Its one cookie trace is the `session-probe`
-  request count (AD-12).
+  CAP-4). `SyncRunReport` has no auth field. The report's one cookie trace is the
+  `session-probe` request count (AD-12). `sync-progress.json` carries a second trace, the
+  `authHoldOffUntil` instant. Both files are published (AD-3, AD-7), so both traces are
+  public, and the operator accepts them. **`web` shows no auth figure and never renders the
+  `session-probe` count** (UX `EXPERIENCE.md`, the sync report panel).
 
   **The `User-Agent` for a cookie run is the operator's.** It goes in `POE_SYNC_USER_AGENT`
-  with no code change, and it departs from NFR-9's contact rule (SPEC-poesessid-sync).
+  with no code change, and it departs from NFR-9's contact rule (SPEC-poesessid-sync). That
+  the trade API accepts only a browser string on a cookie request is an operator observation,
+  not a measured fact. OQ-26 verifies it.
 
   The sequence, the predicate, the hold-off interval, the yield, the reason identifiers and
   the value checks are in `IMPLEMENTATION-NOTES.md` §13, binding under AD-0. The premises
@@ -2277,7 +2297,10 @@ poe-crafting-base-price-checker/
   whether the cookie gives any gain. **Re-check by 2026-11-02**: record the rule names of the
   first live cookie run, sign out and record one cookie request, and capture the cookie and
   no-cookie requests with the contact `User-Agent` in
-  `digests/capture-trade2-headers.md`. **Owner: the operator.** *Not blocking for building.*
+  `digests/capture-trade2-headers.md`. That last capture verifies a third input, the
+  operator's observation that the trade API accepts only a browser `User-Agent` on a cookie
+  request. If a cookie request with the contact `User-Agent` is answered, AD-30's departure
+  from NFR-9 has no cause. **Owner: the operator.** *Not blocking for building.*
 - **~~The trade-site search response's identifier field.~~ Closed 2026-09-19: it is `id`.**
   A captured search response carries the search identifier in a top-level `id`; `tradeId` is
   not it. AD-9 persists that value as `lastSearchId` and AD-24 builds the outbound link from

@@ -1,0 +1,33 @@
+- id: "1"
+  title: The auth holder at the shell edge, and a value that never leaves it
+  description: >-
+    The sync and sync:batch shells read POESESSID, build the opaque process
+    auth holder, and settle absent and malformed values with one console line
+    (SPEC CAP-2, CAP-4, Constraints). The story also documents POESESSID in
+    the operator .env docs, removes the value from errors and their causes,
+    and adds the canary scan of all output and artifacts.
+  invoke_dev_with: >-
+    Binding mechanism: AD-30, IMPLEMENTATION-NOTES §13.1, §13.5 and §13.6.
+- id: "2"
+  title: Baseline, probe and settle in the governed client
+  description: >-
+    The first answered pricing search is the no-cookie baseline, and one
+    probe repeats it with the cookie. The governed client applies the
+    rule-count liveness test and the probe outcome table, and it attaches the
+    cookie to later pricing searches and fetches but never to the league
+    request (SPEC CAP-1, CAP-2, CAP-4). The probe counts under the
+    session-probe source, which takes sync-report.json to 1.2.0.
+  invoke_dev_with: >-
+    Binding mechanism: AD-30, AD-8, AD-12, IMPLEMENTATION-NOTES §13.2, §13.3,
+    §13.5 and §13.7. Story 3 owns the hold-off column of §13.3.
+- id: "3"
+  title: Mid-run downgrade and the hold-off across processes
+  description: >-
+    A 401, a 403 or a not-live 2xx on a cookie request after the probe causes
+    a downgrade. The downgrade drops the cookie, resets pacing to cold in
+    place and ends the chunk as a session-expired yield (SPEC CAP-3). The
+    story also writes and clears authHoldOffUntil in sync-progress.json
+    1.2.0, and settles held-off runs with no probe (SPEC CAP-5).
+  invoke_dev_with: >-
+    Binding mechanism: AD-30, AD-7, AD-8, IMPLEMENTATION-NOTES §13.1
+    (held-off), §13.3 (hold-off column), §13.4 and §13.7.
