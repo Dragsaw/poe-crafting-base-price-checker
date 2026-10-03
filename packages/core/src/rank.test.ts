@@ -24,6 +24,7 @@ import type {
 } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { poolCoverage } from './coverage.ts';
 import { compareRankedRows, rank } from './rank.ts';
 import type { RankInput, Ranking } from './rank.ts';
 
@@ -40,13 +41,27 @@ function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): Tra
 
 type Coverage = WeightsPool['poolCoverage'];
 
+const SLOT_FILLER: ModifierWeight = {
+  sourceModifierId: 'slot-filler',
+  modGroup: 'slot-filler',
+  itemLevelMin: 1,
+  weight: 1,
+  weightSource: 'published',
+  lines: [{ statId: 'explicit.stat_slot_filler', ranges: [[1, 10]] }],
+};
+
+function slotOf(coverage: Coverage): WeightsFile['bases'][string][string]['prefix'] {
+  return { poolCoverage: coverage, entries: coverage === 'complete' ? [SLOT_FILLER] : [] };
+}
+
 /** A parsed weights file carrying exactly `classes`, each `[categoryId, className, prefix, suffix]` coverage. */
 function weightsWith(...classes: readonly (readonly [string, string, Coverage?, Coverage?])[]): WeightsFile {
   const bases: Record<string, WeightsFile['bases'][string]> = {};
   for (const [categoryId, className, prefix = 'complete', suffix = 'complete'] of classes) {
     bases[categoryId] = {
       ...bases[categoryId],
-      [className]: { prefix: { poolCoverage: prefix, entries: [] }, suffix: { poolCoverage: suffix, entries: [] } },
+      // A complete slot holds one weighted tier: an empty one is unreachable (IN §3).
+      [className]: { prefix: slotOf(prefix), suffix: slotOf(suffix) },
     };
   }
   return {
@@ -1039,10 +1054,48 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     ]);
   });
 
-  it('reports a complete pool with no entries as unreachable, never pool partial', () => {
+  it('reports a complete pool with no entries as one recipe-free unreachable row, never pool partial', () => {
     const weights = poolsFile(['weapon.bow', 'Bows', [[], []]]);
+    const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER, PERFECT] });
+    expect(result.ordering).toEqual([]);
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+    ]);
+  });
+
+  it('reports a complete pool of only weight-0 tiers as one recipe-free unreachable row', () => {
+    const weights = poolsFile([
+      'weapon.bow',
+      'Bows',
+      [[tierOf(TARGET, 0)], [tierOf(SUFFIX_STAT, 80)]],
+    ]);
+    const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER, PERFECT] });
+    expect(result.ordering).toEqual([]);
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+    ]);
+  });
+
+  it.each([
+    ['empty suffix beside a populated prefix', [[tierOf(TARGET, 5)], []]],
+    ['weight-0 suffix beside a populated prefix', [[tierOf(TARGET, 5)], [tierOf(SUFFIX_STAT, 0)]]],
+    ['both slots empty', [[], []]],
+  ] as const)('reports %s as one recipe-free unreachable row, and poolCoverage agrees', (_label, pools) => {
+    const weights = poolsFile(['weapon.bow', 'Bows', pools]);
     const result = rankCrafted({ tracked: [target], dataset: priced1, weights, recipes: [GREATER] });
-    expect(result.unrankable.map((row) => row.reason)).toEqual(['recipe cannot reach this class']);
-    expect(result.unrankable[0]?.provenance).toBeUndefined();
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+    ]);
+    expect(poolCoverage([target], weights)?.coverage).toBe(0);
+  });
+
+  it('keeps pool partial when a partial slot sits beside an empty one', () => {
+    const weights = poolsFile(['weapon.bow', 'Bows', [[], [tierOf(SUFFIX_STAT, 5)]]]);
+    const bow = weights.bases['weapon.bow']?.['Bows'];
+    if (bow !== undefined) {
+      bow.prefix = { poolCoverage: 'partial', entries: [] };
+    }
+    const result = rankCrafted({ tracked: [target], dataset: priced1, weights });
+    expect(result.unrankable.map((row) => row.reason)).toEqual([PARTIAL]);
   });
 });
