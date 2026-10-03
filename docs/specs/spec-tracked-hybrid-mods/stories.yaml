@@ -1,0 +1,49 @@
+- id: "1"
+  title: Revise owner documents for hybrid modifiers
+  description: >-
+    Revise PRD FR-34 (with FR-16, FR-22, section 3, section 7), PRODUCT.md, spine AD-5, AD-16, AD-17,
+    IMPLEMENTATION-NOTES and EXPERIENCE.md as listed under Document changes in SPEC.md.
+    Each fact stays in its owner document.
+- id: "2"
+  title: Bump the tracked schema so crafted entries need both slots
+  description: >-
+    Implement CAP-8 and the breaking-change migration in Risks and migration. Reject old schema versions,
+    remove the absent-affix branches, and rewrite the committed data/tracked.json.
+- id: "3"
+  title: Add the hybrid reference arm to TrackedFileSchema
+  description: >-
+    Implement CAP-1. Add the hybrid discriminated kind, per-line bands, line validation
+    and the sorted canonical key.
+- id: "4"
+  title: Compute hybrid probability from the containment set
+  description: >-
+    Implement CAP-3 and the null-line rule, containment set and family definitions in core.
+    Fixture pools prove the three cases in CAP-3.
+- id: "5"
+  title: Check hybrid references at load, at the sync gate and in tracked:check
+  description: >-
+    Implement CAP-4 and the hybrid constraints on kind agreement, the shared floor, coOccur and overlap.
+    The line-set completeness check runs in core and in tracked:check.
+- id: "6"
+  title: Price a hybrid reference with one trade search
+  description: >-
+    Implement CAP-2. The search body has one stat filter per line under the same and group.
+- id: "7"
+  title: Price summed-statId entries with one summed filter
+  description: >-
+    Implement CAP-6. Sync sums mins and maxes per summed statId. Overlap compares the summed intervals.
+    Valueless lines and missing bounds are rejected.
+  invoke_dev_with: >-
+    Use MSW fixtures only. Make no live trade calls.
+- id: "8"
+  title: Render hybrid affix labels
+  description: >-
+    Implement CAP-7. The label is the tier followed by comma-separated line short forms,
+    with the catalog fallback and the overrun rule from EXPERIENCE.md.
+- id: "9"
+  title: Offer hybrids in tracked:lookup and the tracked-json skill, and commit hybrid entries
+  description: >-
+    Implement CAP-5 and the section 5.1d capture. Commit a data/tracked.json that passes tracked:check
+    and AD-17 and holds at least one hybrid entry and one summed-statId entry.
+  invoke_dev_with: >-
+    Use the tracked-json skill to draft the entries and run pnpm tracked:check on the result.

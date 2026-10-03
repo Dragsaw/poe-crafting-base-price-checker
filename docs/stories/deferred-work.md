@@ -299,3 +299,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
   summary: "Dev. `.claude/skills/tracked-json/SKILL.md` step 4 tells an agent to write a banded `[1, 1]` reference for a valueless tier on a mixed-kind stat, but does not warn that the tier may sit below a recipe floor. Under D5 (IN §9) that makes the `(Item Class, recipe)` pair unrankable. Add the warning to step 4."
   evidence: "Review of this spec (triage row 7). The Crossbows valueless tier sits at item level 55, below the perfect floor of 70 in `data/recipes.json`."
+- source_spec: `docs/specs/spec-tracked-hybrid-mods/stories/1-revise-owner-documents-for-hybrid-modifiers.md`
+  summary: "PM. `docs/specs/spec-tracked-hybrid-mods/stories.yaml` states no build order, but stories 4–8 need story 3's hybrid `kind` arm, stories 2 and 3 both change `TrackedFileSchema`, and story 9's success signal needs stories 2–8. Write the order into the story descriptions so an unattended or parallel builder cannot start a story before its prerequisite lands."
+  evidence: "Blind-hunter review of story 1. The `stories.yaml` format has no dependency field, and ids are the only implicit order. Not verified whether `bmad-build-auto` picks stories by id."
