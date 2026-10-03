@@ -1138,12 +1138,13 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
     expect(h.sent.every((entry) => entry.cookie === undefined)).toBe(true);
   });
 
-  it('a live probe records the clear action and keeps the baseline rule count', async () => {
+  it('a live probe records the clear action and keeps the baseline rule count and policy', async () => {
     const h = probeHarness();
 
     await h.search();
 
     expect(h.holder.baselineRuleCount).toBe(1);
+    expect(h.holder.baselinePolicy).toBe(SEARCH_POLICY);
     expect(h.holder.pendingHoldOff()).toBe('clear');
   });
 
@@ -1153,7 +1154,15 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
     it.each([
       ['a 401', response(401, CLEAR_SEARCH_HEADERS, 'nope')],
       ['a 403', response(403, { 'content-type': 'text/html', 'cf-mitigated': 'challenge' }, 'blocked')],
-      ['a 2xx that is not live', response(200, NOT_LIVE_HEADERS, '{"result":[]}')],
+      ['a 2xx under the baseline policy that is not live', response(200, NOT_LIVE_HEADERS, '{"result":[]}')],
+      [
+        'a not-live 2xx whose policy differs only in case and spaces',
+        response(
+          200,
+          { ...NOT_LIVE_HEADERS, 'x-rate-limit-policy': ` ${SEARCH_POLICY.toUpperCase()} ` },
+          '{"result":[]}',
+        ),
+      ],
     ])(
       '%s on a cookie fetch: one expired line, cold pacing in place, a session-expired yield with no response, no invalid count, no later cookie',
       async (_label, downgrading) => {
@@ -1217,6 +1226,51 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
       expect(fetched.kind === 'response' && fetched.response.status).toBe(200);
       expect(h.lines).toEqual(['authenticated']);
       expect(h.holder.state).toEqual({ kind: 'authenticated' });
+    });
+
+    it.each([
+      ['fewer rule names than the baseline', { 'x-rate-limit-policy': FETCH_POLICY }],
+      ['as many rule names as the baseline', { ...CLEAR_SEARCH_HEADERS, 'x-rate-limit-policy': FETCH_POLICY }],
+      ['no policy header', {}],
+    ])(
+      'a cookie fetch 2xx under another policy, %s: not tested, no downgrade, and the answer is used',
+      async (_label, headers) => {
+        const h = probeHarness({
+          cookieAnswer: (request) =>
+            request.method === 'GET'
+              ? response(200, headers, '{"result":[]}')
+              : response(200, LIVE_SEARCH_HEADERS, BASELINE_BODY),
+        });
+
+        await h.search();
+        const fetched = await h.fetch();
+
+        expect(fetched.kind === 'response' && fetched.response.status).toBe(200);
+        expect(h.lines).toEqual(['authenticated']);
+        expect(h.holder.state).toEqual({ kind: 'authenticated' });
+        expect(h.holder.pendingHoldOff()).toBe('clear');
+      },
+    );
+
+    it('a not-live cookie search after a fetch under another policy: the search downgrades', async () => {
+      let searches = 0;
+      const h = probeHarness({
+        cookieAnswer: (request) => {
+          if (request.method === 'GET') {
+            return response(200, { 'x-rate-limit-policy': FETCH_POLICY }, '{"result":[]}');
+          }
+          searches += 1;
+          return response(200, searches === 1 ? LIVE_SEARCH_HEADERS : NOT_LIVE_HEADERS, BASELINE_BODY);
+        },
+      });
+
+      await h.search();
+      await h.fetch();
+      await h.search();
+      const searched = await h.search();
+
+      expect(searched).toMatchObject({ kind: 'yield', reason: 'session-expired' });
+      expect(h.lines).toEqual(['authenticated', 'unauthenticated (expired)']);
     });
 
     it.each([

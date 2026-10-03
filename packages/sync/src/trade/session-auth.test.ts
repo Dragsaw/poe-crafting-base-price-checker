@@ -269,11 +269,13 @@ describe('the downgrade and the hold-off (IMPLEMENTATION-NOTES.md §13.1, §13.3
     expect(holder.pendingHoldOff()).toBe('write');
   });
 
-  it('keeps the baseline rule count for the process', () => {
+  it('keeps the baseline rule count and policy for the process', () => {
     const holder = withCookie(CANARY);
     expect(holder.baselineRuleCount).toBeUndefined();
-    holder.rememberBaseline(2);
+    expect(holder.baselinePolicy).toBeUndefined();
+    holder.rememberBaseline(2, 'search-policy');
     expect(holder.baselineRuleCount).toBe(2);
+    expect(holder.baselinePolicy).toBe('search-policy');
   });
 
   it('settleHeldOffIfDue: a due hold-off settles held-off with one line and no action', () => {
@@ -305,7 +307,7 @@ describe('the downgrade and the hold-off (IMPLEMENTATION-NOTES.md §13.1, §13.3
 
   it('the holder JSON still shows the state only', () => {
     const holder = withCookie(CANARY);
-    holder.rememberBaseline(1);
+    holder.rememberBaseline(1, 'search-policy');
     holder.settle('authenticated');
     expect(JSON.stringify(holder)).toBe('{"state":{"kind":"authenticated"}}');
   });

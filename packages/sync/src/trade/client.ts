@@ -40,6 +40,7 @@ import {
   type RateLimitBucket,
   type RateLimitHeaders,
   type RateLimitSkip,
+  rateLimitPolicyOf,
   ruleNameCount,
 } from './rate-limit-headers.ts';
 import type { SessionAuth } from './session-auth.ts';
@@ -563,16 +564,22 @@ export function createTradeGovernor<Source extends string>(
   /**
    * A downgrade (§13.4): the answer to a request that carried the cookie is a
    * `401` or a `403` (a Cloudflare `403` too; no rule reads the body or a
-   * header), or a 2xx whose rule-name count is not above the baseline's.
-   * Counts only, as the probe's test (§13.2). A `429`, a `5xx` and any other
-   * `4xx` are not.
+   * header), or a 2xx under the baseline's policy whose rule-name count is not
+   * above the baseline's. Counts only, as the probe's test (§13.2). A 2xx under
+   * another policy (a fetch) is not: the search baseline's count says nothing
+   * about it. A `429`, a `5xx` and any other `4xx` are not.
    */
   function isDowngrade(holder: SessionAuth, response: HttpResponse): boolean {
     if (response.status === UNAUTHORIZED || response.status === FORBIDDEN) {
       return true;
     }
     const baseline = holder.baselineRuleCount;
-    return isSuccess(response.status) && baseline !== undefined && ruleNameCount(response.headers) <= baseline;
+    return (
+      isSuccess(response.status) &&
+      baseline !== undefined &&
+      rateLimitPolicyOf(response.headers) === holder.baselinePolicy &&
+      ruleNameCount(response.headers) <= baseline
+    );
   }
 
   /**
@@ -662,9 +669,10 @@ export function createTradeGovernor<Source extends string>(
       return;
     }
     if (isSuccess(status)) {
-      // Kept by the holder: every later cookie answer is tested against it (§13.4).
+      // Kept by the holder: every later cookie answer under the baseline's
+      // policy is tested against it (§13.4).
       const baselineCount = ruleNameCount(baseline.headers);
-      holder.rememberBaseline(baselineCount);
+      holder.rememberBaseline(baselineCount, rateLimitPolicyOf(baseline.headers));
       const live = ruleNameCount(response.headers) > baselineCount;
       holder.settle(live ? 'authenticated' : 'not-elevated');
       return;

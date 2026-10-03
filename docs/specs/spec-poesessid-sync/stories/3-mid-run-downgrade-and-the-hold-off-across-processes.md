@@ -23,7 +23,7 @@ context:
 
 **Always:**
 - The state moves only from `unsettled`, and from `authenticated` to `expired`. No other transition exists. Each move prints exactly one §13.5 line through `onSettle`.
-- The liveness test after the probe uses the baseline's rule count. The holder keeps that count for the whole process, because a governor lives for one chunk. The test compares counts only.
+- The liveness test after the probe uses the baseline's rule count and policy. The holder keeps both for the whole process, because a governor lives for one chunk. The test applies only to a response under the baseline's policy (§13.2 `tested`), and it compares counts only.
 - Downgrade order (§13.4): drop the cookie, reset the pacing state, record the hold-off `write`, return the yield. The yield has no `retryAfterMs` and no response. The downgrading 401 or 403 does not add to the invalid-request count. A 429 or a 5xx on a cookie request stays an ordinary 429 or 5xx.
 - The pacing reset keeps the same `PacingState` object (the ledger and the lane memo). The `pnpm sync` session does not treat the reset as a fresh State reading. After a `session-expired` ending it waits `backoff(1)`.
 - A downgraded search stamps `lastAttemptedAt` and keeps the entry's earlier search fields. A downgraded fetch keeps the search fields from that entry's search. The price state does not change. The chunk ends `yielded` with no `notBefore`. `sync:batch` exits 0.

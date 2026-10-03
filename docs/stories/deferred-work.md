@@ -311,9 +311,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/specs/spec-tracked-hybrid-mods/stories/5-check-hybrid-references-at-load-at-the-sync-gate-and-in-tracked-check.md`
   summary: "Dev (story 9). `.claude/skills/tracked-json/SKILL.md:11` says `pnpm tracked:check` runs 'the five cross-file checks' and does not mention the new `unvalidated` list. Say six checks, and tell the agent that `unvalidated` lists each crafted entry that no pool check covered (`weights-absent` or `partial-pool`), and that this list never fails the run."
   evidence: "Review of this spec (triage row 18). `packages/sync/src/curation/check.ts` now prints `{ok, checks, issues, unvalidated}`. Story 5's frozen scope forbids touching `SKILL.md`."
-
-## Deferred from: spec-poesessid-sync story 3 (2026-10-03)
-
-- source_spec: `docs/specs/spec-poesessid-sync/stories/3-mid-run-downgrade-and-the-hold-off-across-processes.md`
-  summary: "[NOTE FOR ARCHITECT] Unverified, high if true. §13.4 tests every cookie 2xx after the probe, fetch answers included, against the one rule-name count of the search baseline (§13.2). If a live authenticated fetch answer carries fewer rule names than the authenticated search, or none, every live cookie fetch downgrades: the answer is discarded and a 24h hold-off is written. Decide whether the liveness test compares against a baseline of the same lane or policy, or record why one search count holds for fetch answers."
-  evidence: "Review of this spec (blind and edge-case layers). `packages/sync/src/trade/client.ts` `isDowngrade` follows §13.2 and §13.4 as written. The shell test harnesses had to add the live rule headers to every later cookie answer, fetches included, to keep the live cases live. To settle: record one authenticated search and one authenticated fetch on the live trade API and compare the rule-name counts of `X-Rate-Limit-Rules`."

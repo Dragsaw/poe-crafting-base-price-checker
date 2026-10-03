@@ -23,7 +23,7 @@
  *
  * The holder lives for the process; a governor lives for one chunk. So the
  * holder keeps what must outlive a chunk: the state, the baseline's rule count
- * (`rememberBaseline`, read by every later liveness test, §13.2) and the
+ * and policy (`rememberBaseline`, read by every later liveness test, §13.2) and the
  * pending hold-off action. A cookie response after the probe that fails the
  * test downgrades the holder through `expire`, the one move out of
  * `authenticated` (§13.4). Each move records the §13.3 hold-off action, and
@@ -155,6 +155,8 @@ export class SessionAuth {
   readonly #onSettle: ((line: string) => void) | undefined;
   /** The baseline's rule-name count, kept from the probe for the whole process (§13.2). */
   #baselineRuleCount: number | undefined;
+  /** The baseline's `policy(X-Rate-Limit-Policy)`, kept with the count (§13.2). */
+  #baselinePolicy: string | undefined;
   /** The hold-off action no progress write has applied yet (§13.3). */
   #pendingHoldOff: HoldOffAction | undefined;
 
@@ -205,12 +207,22 @@ export class SessionAuth {
   }
 
   /**
-   * Keeps the baseline's rule-name count for the rest of the process. The
-   * governor calls it once, at the probe, before it settles. Counts only:
-   * no rule name is kept (§13.2).
+   * The baseline's `policy(X-Rate-Limit-Policy)` (§13.2): only a later cookie
+   * answer under this policy is held to the rule-count test (§13.4).
+   * `undefined` before the probe, and when the baseline carried no policy.
    */
-  rememberBaseline(ruleCount: number): void {
+  get baselinePolicy(): string | undefined {
+    return this.#baselinePolicy;
+  }
+
+  /**
+   * Keeps the baseline's rule-name count and policy for the rest of the
+   * process. The governor calls it once, at the probe, before it settles.
+   * Counts only: no rule name is kept (§13.2).
+   */
+  rememberBaseline(ruleCount: number, policy: string | undefined): void {
     this.#baselineRuleCount = ruleCount;
+    this.#baselinePolicy = policy;
   }
 
   /**
