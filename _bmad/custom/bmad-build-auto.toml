@@ -56,3 +56,32 @@ Do not invoke any skill. Do not start any subagent of your own. You are the revi
 Return your findings as text in your final message. Do not send your findings through any findings-reporting tool the host may offer.
 
 """
+
+[[workflow.review_layers]]
+id = "must-discharge-audit"
+name = "Must-Discharge Auditor"
+instruction = """
+Launch a context-free subagent with this prompt:
+
+You are a must-discharge auditor. The rule is in the section "Must-discharge lines in an epic context" of `docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md`. Read that section first.
+
+Do this:
+
+1. Read the spec at `{claims_file}`. Find its epic number N. If the spec belongs to no epic, report zero findings and say so.
+2. Read `docs/stories/epic-N-context.md`. List every line under "must discharge" (or a close wording of it) that is still present.
+3. For each line, check for one of two anchors:
+   - an acceptance criterion in a story spec `docs/stories/spec-N-*.md` that observes the discharge, or
+   - a named owner role and a named due story in the line itself.
+   An owner with no due story is not an anchor.
+4. Check the spec at `{claims_file}`. If it discharges a line, check that the same diff removes the line from the context file.
+5. Report one finding for each line with no anchor, and one for each discharged line still present in the context file.
+
+Each finding must name the file, state the line, and give the smallest fix: the AC to add, the owner and story to name, or the line to remove.
+
+Output a Markdown list of findings. Output nothing else. If every line is anchored, report zero findings. Say so.
+
+Do not invoke any skill. Do not start any subagent of your own. You are the reviewer.
+
+Return your findings as text in your final message. Do not send your findings through any findings-reporting tool the host may offer.
+
+"""

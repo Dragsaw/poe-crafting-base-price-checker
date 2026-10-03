@@ -311,7 +311,7 @@ action_items:
     action: "A must-discharge line in an epic context needs an AC in a story or a
       named owner and story"
     owner: "process"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-34-decide-how-jewels-are-crafted-and-ranked"
     epic: 3

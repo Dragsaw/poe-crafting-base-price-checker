@@ -160,6 +160,17 @@ These two rules bind every review and every agent that triages or fixes review f
 1. **The Accessibility Floor is a ruling, not a gap.** `EXPERIENCE.md` § *Accessibility Floor* sets the product's accessibility scope. A finding that asks for work the floor rules out is conformant, and the triage rejects it with a citation of the floor. Do not add ARIA roles or live regions, keyboard paths, focus styling, contrast targets or reduced-motion handling on your own. What the floor does bind, for example the non-colour cue for each distinction, stays in review scope.
 2. **A reviewer never edits a planning document that another role owns.** The owners are listed in AGENTS.md ("Each planning fact has one owner"). UX owns `DESIGN.md`, `EXPERIENCE.md` and the mockups. The PM owns `prd.md` and `epics.md`. The architect owns this folder. When the code and an owner document disagree, fix the code to match the document, or record the conflict in `docs/stories/deferred-work.md` as a `[NOTE FOR UX]` (or a note for the owning role). Do not change the document so that it matches the code.
 
+## Must-discharge lines in an epic context
+
+An epic context (`docs/stories/epic-<N>-context.md`) can list deferred work that the epic "must discharge". A context line is not a work item: no story builds it, and no review reads it. In Epic 3, two such lines were listed and carried out unbuilt (the masthead dek and the crafted Age cell).
+
+Every must-discharge line therefore needs one of two anchors, written before the epic's stories start:
+
+1. **An AC.** A story spec of the epic holds an acceptance criterion that observes the discharge. The line names that story.
+2. **An owner and a due story.** The line names the role that owns it and the story before which it must be done. A line with an owner and no story is not anchored.
+
+The `must-discharge-audit` review layer (`_bmad/custom/bmad-build-auto.toml`) checks this for the epic of the spec under review. A story that closes a must-discharge line removes the line from the context in the same commit.
+
 ## Definition of done for an agent task
 
 1. `pnpm check` and `pnpm test` pass, and neither command makes a network call.
