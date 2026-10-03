@@ -17,7 +17,11 @@ export type CraftCostResult =
   | {
       readonly ok: true;
       readonly divine: number;
-      /** The `asOf` of each rate the cost used, in recipe order: an input of the pair's oldest timestamp (AD-10). */
+      /**
+       * The `asOf` of each rate the cost used, in recipe order. Not a
+       * timestamp input of the crafted row, whose age comes from its
+       * summands only (AD-10).
+       */
       readonly asOf: readonly string[];
     }
   | { readonly ok: false; readonly reason: { readonly kind: 'uncostable'; readonly currencyId: string } };

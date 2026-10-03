@@ -385,4 +385,16 @@ describe('the cross-file diagnosis (AD-17)', () => {
     expect(broken?.querySelectorAll('[data-figure-group]')).toHaveLength(2);
     expect(panel()?.querySelector('[data-verbatim]')).toBeNull();
   });
+
+  it('reads one italic unknown line with weights absent: the checks did not run', () => {
+    mountStrip({ weights: null }, ['weights']);
+    click(strip());
+    const broken = panel()?.querySelectorAll('[data-panel-column]')[1];
+    const groups = broken?.querySelectorAll<HTMLElement>('[data-figure-group]') ?? [];
+    expect(groups).toHaveLength(3);
+    const unknown = groups[2]?.querySelectorAll<HTMLElement>('[data-missing]') ?? [];
+    expect(Array.from(unknown, (node) => node.textContent)).toEqual(['unknown']);
+    expect(unknown[0]?.style.fontStyle).toBe('italic');
+    expect(groups[2]?.textContent).toBe('unknown');
+  });
 });

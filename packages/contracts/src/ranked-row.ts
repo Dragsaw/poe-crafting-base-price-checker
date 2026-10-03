@@ -107,7 +107,10 @@ export const CraftedRankedRowSchema = z
       'The weakest Provenance over the pair’s inputs: the recipe’s eligible set over both slots (AD-10). A ranked row is never absent.',
     ),
     asOf: IsoTimestampSchema.optional().describe(
-      'The oldest timestamp of the pair’s inputs: each summand’s observedAt and each used rate’s asOf. Unset when there is none (AD-10).',
+      'The oldest summand `observedAt` (AD-10). Unset when there is no summand.',
+    ),
+    lastAttemptedAt: IsoTimestampSchema.optional().describe(
+      'Set only when there is no summand: the oldest `lastAttemptedAt` among the class’s non-pruned entries that have one (AD-10). With `asOf` also unset, the class was never attempted.',
     ),
   })
   .describe('A ranked `(Item Class, recipe)` pair (AD-17).');

@@ -111,8 +111,12 @@ type Pools = readonly [readonly ModifierWeight[], readonly ModifierWeight[]];
 
 /** At floor 44 the target is half the prefix pool; at floor 70 it is all of it. */
 const BOWS: Pools = [[tier(TARGET, 10, 75), tier(FILLER, 10, 50), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
-/** At floor 44 the target is half the prefix pool; at floor 70 it is out of reach (P = 0, not a reason). */
-const STAVES: Pools = [[tier(TARGET, 50, 50), tier(FILLER, 50, 75)], [tier(SUFFIX, 10, 80)]];
+/**
+ * At floor 44 the target is half the prefix pool; at floor 70 only its small
+ * tier is in reach, a quarter of the pool. (A target with no tier in reach is
+ * a reason, not P = 0: IMPLEMENTATION-NOTES.md §9.)
+ */
+const STAVES: Pools = [[tier(TARGET, 50, 50), tier(TARGET, 25, 75), tier(FILLER, 75, 75)], [tier(SUFFIX, 10, 80)]];
 /** Every tier below both floors: no recipe reaches it (state 36). */
 const WANDS: Pools = [[tier(TARGET, 10, 1)], [tier(SUFFIX, 10, 1)]];
 
@@ -193,7 +197,7 @@ function serveWorld(world: World): void {
 
 /**
  * greater: Staves 0.5 × 2 − 0.03 = 0.97, Bows 0.5 × 1 − 0.03 = 0.47, Wide Belt 0.40, Gold Amulet 0.30.
- * perfect: Bows 1 × 1 − 0.3 = 0.70, Wide Belt 0.40, Gold Amulet 0.30, Staves 0 − 0.3 = −0.30.
+ * perfect: Bows 1 × 1 − 0.3 = 0.70, Wide Belt 0.40, Gold Amulet 0.30, Staves 0.25 × 2 − 0.3 = 0.20.
  */
 function standardWorld(overrides: Partial<World> = {}): World {
   const now = Date.now();
@@ -312,7 +316,7 @@ describe('the Craft Recipe control', () => {
     expect(option('perfect').tagName).toBe('SPAN');
     expect(option('greater').tagName).toBe('BUTTON');
     expect(names()).toEqual(['Bows', 'Wide Belt', 'Gold Amulet', 'Staves']);
-    expect(cells('ev')).toEqual(['0.70', '0.40', '0.30', '-0.30']);
+    expect(cells('ev')).toEqual(['0.70', '0.40', '0.30', '0.20']);
     expect(costLine()).toBe('0.30Divine / craft');
     expect(localStorage.getItem(RECIPE_STORAGE_KEY)).toBe('perfect');
     unmount();
@@ -409,7 +413,7 @@ describe('the crafted states', () => {
     expect(rawBranch?.dataset['listBranch']).toBe('raw');
     expect(craftedBranch?.dataset['listBranch']).toBe('crafted');
     expect(names(rawBranch)).toEqual(['Wide Belt', 'Gold Amulet']);
-    // The crafted branch keeps the gross-payout order: Bows 1 × 1, Staves 0.
+    // The crafted branch keeps the gross-payout order: Bows 1 × 1, Staves 0.25 × 2.
     expect(names(craftedBranch)).toEqual(['Bows', 'Staves']);
     expect(cells('ev', craftedBranch)).toEqual(['no figure yet', 'no figure yet']);
     expect(cells('rank')).toEqual(['', '', '', '']);
@@ -520,9 +524,9 @@ const ES = 'explicit.stat_3489782002';
 const RARITY = 'explicit.stat_3917489142';
 const COLD_RES = 'explicit.stat_4220027924';
 
-/** Five prefixes and one suffix. Life sits below the perfect floor (70), so the perfect recipe gives its entry P = 0. */
+/** Five prefixes and one suffix. Life's main tier sits below the perfect floor (70), so under perfect its entry's P is small. */
 const RINGS: Pools = [
-  [tier(ATK_DMG, 10, 75), tier(MANA, 10, 75), tier(LIFE, 10, 50), tier(ES, 10, 75), tier(RARITY, 10, 75)],
+  [tier(ATK_DMG, 10, 75), tier(MANA, 10, 75), tier(LIFE, 10, 50), tier(LIFE, 1, 75), tier(ES, 10, 75), tier(RARITY, 10, 75)],
   [tier(COLD_RES, 10, 80)],
 ];
 
@@ -675,7 +679,7 @@ describe('the chase cells', () => {
     const notes = (): string[] => panelRows().map((row) => panelCell(row, 'note'));
     expect(notes()).toEqual(['', '', '', '', '']);
     click(option('perfect'));
-    // Life is out of reach under perfect: P = 0, so it sorts last among the summands.
+    // Life is mostly out of reach under perfect: its P is small, so it sorts last among the summands.
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 ES']);
     expect(panelRows().map((row) => panelCell(row, 'combination'))).toEqual([
       '* pinned T1 Atk Dmg · T1 Cold Res',

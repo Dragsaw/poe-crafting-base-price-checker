@@ -68,8 +68,8 @@ function closeRelative(actual: number, expected: number, tolerance = 1e-12): boo
 }
 
 describe('interval (§1)', () => {
-  it('derives none for a valueless line, the pair for one #, and edge midpoints for two #', () => {
-    expect(interval(line(STAT))).toBeUndefined();
+  it('derives [1, 1] for a valueless line, the pair for one #, and edge midpoints for two #', () => {
+    expect(interval(line(STAT))).toEqual({ min: 1, max: 1 });
     expect(interval(line(STAT, [30, 33]))).toEqual({ min: 30, max: 33 });
     expect(interval(line(STAT, [34, 44], [52, 69]))).toEqual({ min: 43, max: 56.5 });
   });
@@ -100,7 +100,12 @@ describe('contains (§1)', () => {
     const ref: ModifierRef = { kind: 'valueless', statId: STAT };
     expect(contains(ref, tier([line(STAT)], 1))).toBe(true);
     expect(contains(ref, tier([line(STAT, [1, 2])], 1))).toBe(false);
-    expect(contains(band(0, 10), tier([line(STAT)], 1))).toBe(false);
+  });
+
+  it('contains a valueless line for a banded ref whose band holds [1, 1] (§2.3)', () => {
+    expect(contains(band(1, 1), tier([line(STAT)], 1))).toBe(true);
+    expect(contains(band(0, 10), tier([line(STAT)], 1))).toBe(true);
+    expect(contains(band(2, 2), tier([line(STAT)], 1))).toBe(false);
   });
 
   it('counts a hybrid entry once, however many of its lines match', () => {
@@ -202,6 +207,21 @@ describe('eligible (§9)', () => {
 });
 
 describe('combinationProbability (§11)', () => {
+  it('gives empty-contained, never 0, when the floor leaves a declared affix no contained tier (§9)', () => {
+    const low = tier([line(STAT, [10, 12])], 100, { itemLevelMin: 20 });
+    const high = tier([line(STAT, [20, 30])], 300, { itemLevelMin: 70 });
+    const suffix = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 70 });
+    const classPools = pools([low, high], [suffix]);
+    expect(pOf(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12) }, 0))).toBeGreaterThan(0);
+    expect(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12) }, 70)).toEqual({
+      ok: false,
+      reason: { kind: 'empty-contained', slot: 'prefix' },
+    });
+    expect(
+      combinationProbability(classPools, { itemLevelMin: 82, prefix: band(20, 30), suffix: band(5, 9, OTHER) }, 70),
+    ).toEqual({ ok: false, reason: { kind: 'empty-contained', slot: 'suffix' } });
+  });
+
   it('computes the two-order sum by hand for a modGroup in both slots', () => {
     const a = tier([line(STAT, [10, 12])], 100, { modGroup: 'A' });
     const b = tier([line(STAT, [20, 30])], 300, { modGroup: 'B' });

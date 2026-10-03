@@ -93,9 +93,6 @@ export function edgeAlignment(
         continue;
       }
       const derived = interval(line);
-      if (derived === undefined) {
-        continue;
-      }
       min = Math.min(min, derived.min);
       max = Math.max(max, derived.max);
     }
@@ -131,9 +128,10 @@ export function emptyContainment(
 }
 
 /**
- * §2.3, universal. The detail when **any** scoped line on the reference's
- * `statId` has the other kind: a line is valueless when its `ranges` is
- * empty. A weight-0 tier moves no kind verdict (§1).
+ * §2.3, universal. The detail when the reference is `valueless` and **any**
+ * scoped line on its `statId` is banded (non-empty `ranges`). A banded
+ * reference never disagrees: a valueless line reads as `[1, 1]` (§2.3). A
+ * weight-0 tier moves no kind verdict (§1).
  */
 export function kindAgreement(
   slot: Slot,
@@ -141,6 +139,9 @@ export function kindAgreement(
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
+  if (ref.kind !== 'valueless') {
+    return undefined;
+  }
   let disagreeing = 0;
   for (const entry of scoped) {
     if (entry.weight === 0) {
@@ -150,8 +151,7 @@ export function kindAgreement(
       if (line.statId !== ref.statId) {
         continue;
       }
-      const lineIsValueless = line.ranges.length === 0;
-      if (lineIsValueless !== (ref.kind === 'valueless')) {
+      if (line.ranges.length > 0) {
         disagreeing += 1;
       }
     }
@@ -159,8 +159,7 @@ export function kindAgreement(
   if (disagreeing === 0) {
     return undefined;
   }
-  const other = ref.kind === 'valueless' ? 'banded' : 'valueless';
-  return `${formatRef(slot, ref)} at floor ${String(floor)}: ${String(disagreeing)} scoped ${disagreeing === 1 ? 'line' : 'lines'} on that statId ${disagreeing === 1 ? 'is' : 'are'} ${other}`;
+  return `${formatRef(slot, ref)} at floor ${String(floor)}: ${String(disagreeing)} scoped ${disagreeing === 1 ? 'line' : 'lines'} on that statId ${disagreeing === 1 ? 'is' : 'are'} banded`;
 }
 
 /**

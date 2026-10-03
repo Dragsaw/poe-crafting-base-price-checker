@@ -29,8 +29,9 @@ import type {
  * reaches this module.
  *
  * **A missing figure is a typed reason, never `0`** (§9, §11). An absent
- * class, an empty eligible slot and an exhausted augment each come back as a
- * `ProbabilityReason`. The tags are machine tags; Story 3.4 maps them.
+ * class, an empty eligible slot, a reference that contains no eligible tier
+ * and an exhausted augment each come back as a `ProbabilityReason`. The tags
+ * are machine tags; Story 3.4 maps them.
  *
  * **Trust surface (AD-5, §8).** The entry's `itemLevelMin` is declared in
  * `data/tracked.json`, and no component derives it. This module scopes the
@@ -54,6 +55,7 @@ export interface Interval {
 export type ProbabilityReason =
   | { readonly kind: 'class-absent' }
   | { readonly kind: 'empty-eligible-pool'; readonly slot: Slot }
+  | { readonly kind: 'empty-contained'; readonly slot: Slot }
   | { readonly kind: 'augment-exhausted'; readonly firstDrawSlot: Slot; readonly modGroup: string };
 
 export type ProbabilityResult =
@@ -68,14 +70,15 @@ export type PoolLookup =
 export type CombinationInput = Pick<CraftedTrackedEntry, 'itemLevelMin' | 'prefix' | 'suffix'>;
 
 /**
- * A line's derived interval (§1). Empty `ranges` is a valueless line and has
- * none. One pair is the interval itself. Two pairs give the midpoint of each
- * edge — the producer's inference, pending OQ-12; change it here and only here.
+ * A line's derived interval (§1). Empty `ranges` is a valueless line and reads
+ * as `[1, 1]` (§2.3). One pair is the interval itself. Two pairs give the
+ * midpoint of each edge — the producer's inference, pending OQ-12; change it
+ * here and only here.
  */
-export function interval(line: WeightsLine): Interval | undefined {
+export function interval(line: WeightsLine): Interval {
   const [first, second] = line.ranges;
   if (first === undefined) {
-    return undefined;
+    return { min: 1, max: 1 };
   }
   if (second === undefined) {
     return { min: first[0], max: first[1] };
@@ -86,11 +89,11 @@ export function interval(line: WeightsLine): Interval | undefined {
 /**
  * Whole-tier containment (§1). A `banded` reference contains an entry when one
  * of its lines carries the reference's `statId` and a derived interval wholly
- * inside the band. A `valueless` reference contains an entry when one of its
- * lines carries the `statId` with empty `ranges`. A `null`-`statId` line never
- * matches. An entry whose `weight` is `0` is never contained, whatever its
- * `weightSource` or lines (§1). It still enters the denominator,
- * where it adds nothing.
+ * inside the band; a valueless line derives `[1, 1]` (§2.3). A `valueless`
+ * reference contains an entry when one of its lines carries the `statId` with
+ * empty `ranges`. A `null`-`statId` line never matches. An entry whose
+ * `weight` is `0` is never contained, whatever its `weightSource` or lines
+ * (§1). It still enters the denominator, where it adds nothing.
  */
 export function contains(ref: ModifierRef, entry: ModifierWeight): boolean {
   if (entry.weight === 0) {
@@ -100,11 +103,11 @@ export function contains(ref: ModifierRef, entry: ModifierWeight): boolean {
     if (line.statId !== ref.statId) {
       return false;
     }
-    const derived = interval(line);
     if (ref.kind === 'valueless') {
-      return derived === undefined;
+      return line.ranges.length === 0;
     }
-    return derived !== undefined && derived.min >= ref.valueMin && derived.max <= ref.valueMax;
+    const derived = interval(line);
+    return derived.min >= ref.valueMin && derived.max <= ref.valueMax;
   });
 }
 
@@ -234,7 +237,8 @@ function orderedTerm(
  * affix's `modGroup` removed. The order is scope, truncate, exclude,
  * renormalise. An absent affix contains its whole eligible set, so the one
  * formula covers it. Both slots are checked for `empty-eligible-pool` first,
- * then each draw order for `augment-exhausted`.
+ * then each declared affix for `empty-contained` (IN §9), then each draw order
+ * for `augment-exhausted`.
  */
 export function combinationProbability(
   pools: WeightsClassPools,
@@ -250,6 +254,14 @@ export function combinationProbability(
   for (const sets of [prefix, suffix]) {
     if (sets.total === 0) {
       return { ok: false, reason: { kind: 'empty-eligible-pool', slot: sets.slot } };
+    }
+  }
+  for (const [sets, ref] of [
+    [prefix, combination.prefix],
+    [suffix, combination.suffix],
+  ] as const) {
+    if (ref !== undefined && sets.contained.length === 0) {
+      return { ok: false, reason: { kind: 'empty-contained', slot: sets.slot } };
     }
   }
   const prefixFirst = orderedTerm(prefix, suffix);
