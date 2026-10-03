@@ -21,7 +21,7 @@ const COMMITTED_REPORT: SyncReport = {
   runStartedAt: '2026-09-26T20:51:10.620Z',
   runFinishedAt: '2026-09-26T20:51:13.533Z',
   figures: {
-    requestsBySource: { 'tracked-list': 10, 'league-validation': 1 },
+    requestsBySource: { 'tracked-list': 10, 'league-validation': 1, 'session-probe': 0 },
     notReachedCount: 0,
     trackedListEditedAt: { source: 'file-modified', at: '2026-09-26T11:23:42.140Z' },
   },

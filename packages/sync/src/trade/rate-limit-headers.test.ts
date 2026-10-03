@@ -1,6 +1,6 @@
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { parseRateLimitHeaders } from './rate-limit-headers.ts';
+import { parseRateLimitHeaders, ruleNameCount } from './rate-limit-headers.ts';
 
 /**
  * The rule names below appear **only here**. They are what a live response
@@ -141,4 +141,17 @@ it('matches the measured 2026-09-12 shape without compiling any of it in', () =>
 
   expect(parsed.rules[0]?.buckets).toHaveLength(4);
   expect(parsed.rules[0]?.buckets.at(-1)).toEqual({ hits: 600, seconds: 21600, penalty: 3600 });
+});
+
+describe('ruleNameCount (IMPLEMENTATION-NOTES.md §13.2)', () => {
+  it.each([
+    [{}, 0],
+    [{ 'x-rate-limit-rules': '' }, 0],
+    [{ 'x-rate-limit-rules': 'Ip' }, 1],
+    [{ 'X-Rate-Limit-Rules': 'Ip,Account' }, 2],
+    [{ 'x-rate-limit-rules': ' Ip , ip ,, IP,Account ' }, 2],
+    [{ 'x-rate-limit-rules': ' , ,' }, 0],
+  ])('%j names %i distinct rule(s)', (headers, count) => {
+    expect(ruleNameCount(headers)).toBe(count);
+  });
 });

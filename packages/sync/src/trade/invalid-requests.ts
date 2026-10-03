@@ -45,6 +45,14 @@ export function isInvalidRequest(status: number): boolean {
   return status >= CLIENT_ERROR_MIN && status <= CLIENT_ERROR_MAX;
 }
 
+const SUCCESS_MIN = 200;
+const SUCCESS_MAX = 299;
+
+/** Every `2xx`: an answered request, the only kind a session probe follows or reads as live (§13.2). */
+export function isSuccess(status: number): boolean {
+  return status >= SUCCESS_MIN && status <= SUCCESS_MAX;
+}
+
 export function policyKeyOf(policy: string | undefined): string {
   return policy ?? UNGOVERNED_POLICY_KEY;
 }

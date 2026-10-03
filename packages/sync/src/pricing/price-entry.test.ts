@@ -8,6 +8,7 @@ import type { CurrencyRate, DatasetEntry, HttpRequest, HttpResponse, TrackedEntr
 import { describe, expect, it } from 'vitest';
 
 import { createTradeClient } from '../trade/client.ts';
+import type { TradeRequest } from '../trade/client.ts';
 import { tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { createPricingStep, MalformedRequestError, UnexpectedTradeResponseError } from './price-entry.ts';
 import { itemTypesOf } from './search-body.ts';
@@ -501,5 +502,38 @@ describe('createPricingStep: unanswered and refused requests', () => {
     });
 
     await expect(step(MISSPELT)).rejects.toBeInstanceOf(RangeError);
+  });
+});
+
+describe('createPricingStep: the session cookie marker (AD-30)', () => {
+  it('marks the search and the fetch as cookie-eligible, so only the governor decides to probe or attach', async () => {
+    const results = ids(3);
+    const fake = createFakeHttpPort({
+      [`POST ${SEARCH_URL}`]: ok({ id: SEARCH_ID, complexity: 1, result: results, total: results.length }),
+      [`GET ${tradeFetchUrl(results, SEARCH_ID)}`]: ok(listings([[1, 'divine']]), FETCH_HEADERS),
+    });
+    const clock = createFakeClockPort(NOW);
+    const client = createTradeClient({ http: fake, clock, wait: () => Promise.resolve(), userAgent: 'test (x@y.test)' });
+    const sent: TradeRequest[] = [];
+    const step = createPricingStep({
+      client: {
+        send: (request) => {
+          sent.push(request);
+          return client.send(request);
+        },
+      },
+      league: LEAGUE,
+      rates: RATES,
+      itemTypes: itemTypesOf({ result: [] }),
+      dataset: [],
+      clock,
+    });
+
+    await step(ENTRY);
+
+    expect(sent.map((request) => [request.method, request.cookieEligible])).toEqual([
+      ['POST', true],
+      ['GET', true],
+    ]);
   });
 });

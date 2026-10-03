@@ -92,6 +92,6 @@ it('only the sync shells and the holder name the session cookie or import the ho
 it('the two shells do read the variable through the holder', () => {
   for (const shell of ['sync/src/sync.ts', 'sync/src/sync-batch.ts']) {
     const text = readFileSync(join(PACKAGES_DIR, shell), 'utf8');
-    expect(text, shell).toMatch(/createSessionAuth\(env\)/);
+    expect(text, shell).toMatch(/createSessionAuth\(env[,)]/);
   }
 });

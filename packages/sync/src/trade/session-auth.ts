@@ -13,9 +13,14 @@
  * place, so the error keeps its class and `name` and the classifiers
  * (`isTransportFailure`, `instanceof`) still read it.
  *
- * This module settles only the shell-edge states: `absent` and `malformed`. A
- * valid value builds an unsettled holder and prints no line. The probe, the
- * attach and the later settles belong to the next stories.
+ * `createSessionAuth` settles the shell-edge states, `absent` and `malformed`
+ * (§13.1). A valid value builds an unsettled holder and prints no line. The
+ * governor (`client.ts`) then probes once, on the first 2xx pricing search of
+ * the process, and settles the holder by the §13.3 rows through `settle`, which
+ * hands the §13.5 line to the shell's `onSettle` listener (§13.2, §13.3). After
+ * an `authenticated` settle the governor asks `withCookie` to add the header,
+ * so the value never leaves this module. The downgrade and the hold-off belong
+ * to the next story.
  */
 
 import { Buffer } from 'node:buffer';
@@ -56,6 +61,14 @@ export function isCookieValue(value: string): boolean {
 }
 
 const REDACTED = '[redacted]';
+
+/** The request header the cookie rides in, lower-case as `HttpPort` compares it. */
+const COOKIE_HEADER = 'cookie';
+
+export interface SessionAuthOptions {
+  /** Receives each §13.5 console line once, at the moment the holder settles. */
+  readonly onSettle?: (line: string) => void;
+}
 
 /**
  * The forms of the value that `redact` removes: raw, URL-encoded, and base64
@@ -109,18 +122,64 @@ function scrub(text: string, forms: readonly string[]): string {
 }
 
 export class SessionAuth {
+  /** The kept value; `undefined` when none is kept. Never read outside this class. */
+  readonly #value: string | undefined;
   /** The value and its encoded forms, longest first; empty when no value is kept. */
   readonly #forms: readonly string[];
-  readonly #state: SessionAuthState;
+  /** Changed only by `settle`, and only from `unsettled`. */
+  #state: SessionAuthState;
+  readonly #onSettle: ((line: string) => void) | undefined;
 
   /** Built by `createSessionAuth`; a valid value is the only one kept. */
-  constructor(value: string | undefined, state: SessionAuthState) {
+  constructor(
+    value: string | undefined,
+    state: SessionAuthState,
+    onSettle?: (line: string) => void,
+  ) {
+    this.#value = value;
     this.#forms = value === undefined ? [] : redactableForms(value);
     this.#state = state;
+    this.#onSettle = onSettle;
   }
 
   get state(): SessionAuthState {
     return this.#state;
+  }
+
+  /** The holder is unsettled and keeps a value: the governor may probe (§13.2). */
+  get canProbe(): boolean {
+    return this.#state.kind === 'unsettled' && this.#value !== undefined;
+  }
+
+  /** The probe was live: the governor attaches the cookie to pricing requests. */
+  get isAuthenticated(): boolean {
+    return this.#state.kind === 'authenticated' && this.#value !== undefined;
+  }
+
+  /**
+   * `headers` plus `cookie: POESESSID=<value>`, as a new record. With no value
+   * kept, a copy of `headers` unchanged. The governor calls this only on a
+   * probe and, after an `authenticated` settle, on a cookie-eligible request.
+   */
+  withCookie(headers: Readonly<Record<string, string>>): Record<string, string> {
+    if (this.#value === undefined) {
+      return { ...headers };
+    }
+    return { ...headers, [COOKIE_HEADER]: `${SESSION_COOKIE_ENV_VAR}=${this.#value}` };
+  }
+
+  /**
+   * Settles the holder by a §13.3 row and hands the §13.5 line to `onSettle`,
+   * once. A no-op unless the holder is `unsettled`: a settled state never
+   * moves here, and no line prints twice.
+   */
+  settle(outcome: SessionAuthReason | 'authenticated'): void {
+    if (this.#state.kind !== 'unsettled') {
+      return;
+    }
+    this.#state =
+      outcome === 'authenticated' ? { kind: 'authenticated' } : { kind: 'unauthenticated', reason: outcome };
+    this.#onSettle?.(describeState(this.#state));
   }
 
   /**
@@ -201,20 +260,24 @@ function describeState(state: SessionAuthState): string {
  * Reads the value once from the shell's `env` and settles the shell-edge
  * states (§13.1): blank after the trim is `absent`, outside the `cookie-value`
  * grammar is `malformed`. A valid value builds an unsettled holder.
+ *
+ * `onSettle` receives each §13.5 line once, at the moment the holder settles:
+ * here for an edge state, later from `settle`.
  */
-export function createSessionAuth(env: Readonly<Record<string, string | undefined>>): SessionAuth {
+export function createSessionAuth(
+  env: Readonly<Record<string, string | undefined>>,
+  options: SessionAuthOptions = {},
+): SessionAuth {
+  const { onSettle } = options;
   const value = (env[SESSION_COOKIE_ENV_VAR] ?? '').trim();
-  if (value === '') {
-    return new SessionAuth(undefined, { kind: 'unauthenticated', reason: 'absent' });
+  if (value === '' || !isCookieValue(value)) {
+    const state: SessionAuthState = {
+      kind: 'unauthenticated',
+      reason: value === '' ? 'absent' : 'malformed',
+    };
+    // Settled at the edge: the line prints now, before the first request.
+    onSettle?.(describeState(state));
+    return new SessionAuth(undefined, state, onSettle);
   }
-  if (!isCookieValue(value)) {
-    return new SessionAuth(undefined, { kind: 'unauthenticated', reason: 'malformed' });
-  }
-  return new SessionAuth(value, { kind: 'unsettled' });
-}
-
-/** The §13.5 console line for a settled state; `undefined` while unsettled. */
-export function authLine(holder: SessionAuth): string | undefined {
-  const { state } = holder;
-  return state.kind === 'unsettled' ? undefined : describeState(state);
+  return new SessionAuth(value, { kind: 'unsettled' }, onSettle);
 }

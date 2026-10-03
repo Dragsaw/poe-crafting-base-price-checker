@@ -201,3 +201,15 @@ export function parseRateLimitHeaders(
 
   return { policy, rules, skips };
 }
+
+/**
+ * `|names(X-Rate-Limit-Rules)|` of IMPLEMENTATION-NOTES.md §13.2: the number of
+ * distinct rule names the response declared, each trimmed and case-folded, an
+ * empty name dropped. The header name is matched case-insensitively. Pure.
+ *
+ * The session probe's liveness predicate compares **this count only**. It never
+ * compares names, and no name or count is compiled in (AD-8).
+ */
+export function ruleNameCount(headers: Readonly<Record<string, string>>): number {
+  return ruleNamesOf(lowerCaseHeaders(headers).get(RULES_HEADER)).length;
+}

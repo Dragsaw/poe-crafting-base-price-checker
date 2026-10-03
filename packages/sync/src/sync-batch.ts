@@ -39,7 +39,7 @@ import { composeChunk } from './compose-chunk.ts';
 import type { ComposeChunkPorts } from './compose-chunk.ts';
 import { createReadOnlyGitPort } from './git/read-only-git-port.ts';
 import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
-import { authLine, createSessionAuth } from './trade/session-auth.ts';
+import { createSessionAuth } from './trade/session-auth.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 /**
@@ -73,13 +73,10 @@ export async function syncCommand(deps: SyncCommandDeps): Promise<number> {
     stderr(`pnpm sync:batch: ${contact.message}`);
     return 1;
   }
-  // After the contact refusal, before the first request: one line per run
-  // when the value settles at the edge (IMPLEMENTATION-NOTES.md §13.1, §13.5).
-  const auth = createSessionAuth(env);
-  const line = authLine(auth);
-  if (line !== undefined) {
-    stderr(`pnpm sync:batch: ${line}`);
-  }
+  // After the contact refusal. Each settle prints one line, at the moment it
+  // settles: an edge state here, before the first request; a probe outcome
+  // from the governor (IMPLEMENTATION-NOTES.md §13.1–§13.3, §13.5).
+  const auth = createSessionAuth(env, { onSettle: (line) => stderr(`pnpm sync:batch: ${line}`) });
   try {
     const outcome = await runSync({ ...ports, userAgent: contact.userAgent, auth });
     const kind = outcome.kind === 'deferred' ? `deferred until ${outcome.notBefore}` : outcome.kind;
@@ -90,6 +87,10 @@ export async function syncCommand(deps: SyncCommandDeps): Promise<number> {
     const redacted = auth.redact(error);
     stderr(`pnpm sync:batch: ${redacted instanceof Error ? redacted.message : String(redacted)}`);
     return 1;
+  } finally {
+    // The process ends after this one chunk: a holder still unsettled had no
+    // 2xx pricing search to probe on, or only a probe 429 (§13.5).
+    auth.settle('not-probed');
   }
 }
 

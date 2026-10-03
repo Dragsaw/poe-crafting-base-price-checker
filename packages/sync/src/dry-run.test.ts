@@ -134,11 +134,11 @@ function reportOf(trackedListRequests: number, notReachedCount = 0): SyncReportF
     runStartedAt: DRY_RUN_INSTANT,
     runFinishedAt: DRY_RUN_INSTANT,
     figures: {
-      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 1 },
+      requestsBySource: { 'tracked-list': trackedListRequests, 'league-validation': 1, 'session-probe': 0 },
       notReachedCount,
     },
     records: [],
-    schemaVersion: '1.1.0',
+    schemaVersion: '1.2.0',
   };
 }
 
@@ -309,6 +309,7 @@ describe('dryRun: the league gate', () => {
     expect(report.report?.figures.requestsBySource).toEqual({
       'tracked-list': 2,
       'league-validation': 1,
+      'session-probe': 0,
     });
   });
 

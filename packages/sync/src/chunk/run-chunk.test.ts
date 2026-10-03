@@ -1146,7 +1146,7 @@ describe('runChunk: the Sync Report', () => {
   const P1 = raw('P1', 'pinned');
   const P2 = raw('P2', 'pinned');
   const P3 = raw('P3', 'pinned');
-  const ZERO = { 'tracked-list': 0, 'league-validation': 0 };
+  const ZERO = { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 };
   const STARVED: PinnedStarvationRecord = {
     kind: 'pinned-starvation',
     discoveredAllowance: 3,
@@ -1212,7 +1212,7 @@ describe('runChunk: the Sync Report', () => {
       runFinishedAt: NOW,
       figures: { requestsBySource: { ...ZERO, 'tracked-list': 6 }, notReachedCount: 0 },
       records: [],
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
     });
   });
 
@@ -1408,7 +1408,7 @@ describe('runChunk: the Sync Report', () => {
           message: failure.message,
         },
       ],
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
     });
     expect(report !== undefined && 'runFinishedAt' in report).toBe(false);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -1599,7 +1599,7 @@ describe('runChunk: the Sync Report', () => {
       schemaVersion: '1.1.0',
       runStartedAt: SEVEN_HOURS_AGO,
       figures: {
-        requestsBySource: { 'tracked-list': 0, 'league-validation': 0 },
+        requestsBySource: { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 },
         notReachedCount: 0,
         coverage: 0.75,
         rankableClassCount: 4,
@@ -2144,7 +2144,7 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
 });
 
 describe('runChunk: the league gate (Story 1.11)', () => {
-  const ZERO = { 'tracked-list': 0, 'league-validation': 0 };
+  const ZERO = { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 };
   const LEAGUES = {
     result: [
       { id: 'Forbidden Rites', realm: 'poe2', text: 'Forbidden Rites' },
@@ -2226,6 +2226,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
       ...ZERO,
       'tracked-list': 2,
       'league-validation': 1,
+      'session-probe': 0,
     });
     expect(report?.records).toEqual([]);
     expect(report?.runFinishedAt).toBe(NOW);
@@ -2666,9 +2667,9 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     expect(report).toEqual({
       runStartedAt: NOW,
       runFinishedAt: NOW,
-      figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0 }, notReachedCount: 0 },
+      figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 }, notReachedCount: 0 },
       records: [previousRecord, { kind: 'stale-lock-broken', pid: 7, startedAt: SEVEN_HOURS_AGO }],
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
     });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
@@ -2678,7 +2679,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
       schemaVersion: '1.1.0',
       runStartedAt: SEVEN_HOURS_AGO,
       figures: {
-        requestsBySource: { 'tracked-list': 3, 'league-validation': 1 },
+        requestsBySource: { 'tracked-list': 3, 'league-validation': 1, 'session-probe': 0 },
         notReachedCount: 0,
         coverage: 0.75,
         rankableClassCount: 4,
@@ -2711,7 +2712,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
         contents: JSON.stringify({
           schemaVersion: '1.1.0',
           runStartedAt: SEVEN_HOURS_AGO,
-          figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0 }, notReachedCount: 0 },
+          figures: { requestsBySource: { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 }, notReachedCount: 0 },
           records: [earlier],
         }),
       },
@@ -3158,6 +3159,7 @@ describe('runChunk: under a session (ChunkPorts.session)', () => {
     // 4 − 1 searches since the pass started, not 4 − 3 since this chunk did.
     expect((await reportOf(within.fs))?.figures.requestsBySource).toEqual({
       'league-validation': 0,
+      'session-probe': 0,
       'tracked-list': 3,
     });
 
@@ -3166,6 +3168,7 @@ describe('runChunk: under a session (ChunkPorts.session)', () => {
     await run({ ...fresh.ports, session: { maxEntries: 1, requestsSince: passStart } }, scriptedStep().step);
     expect((await reportOf(fresh.fs))?.figures.requestsBySource).toEqual({
       'league-validation': 0,
+      'session-probe': 0,
       'tracked-list': 1,
     });
   });
@@ -3314,5 +3317,85 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
 
     const records = (await reportOf(fs))?.records ?? [];
     expect(records.filter((record) => record.kind === 'cross-file-gate-failure')).toHaveLength(1);
+  });
+});
+
+describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () => {
+  /** A step that latches the governor's penalty while it completes, as a probe 429 does. */
+  function latching(result: StepResult): { readonly step: ChunkStep; readonly latched: () => number | undefined } {
+    let latchedMs: number | undefined;
+    const { step } = scriptedStep(() => {
+      latchedMs ??= 120_000;
+      return result;
+    });
+    return { step, latched: () => latchedMs };
+  }
+
+  it('the entry completes with no further request: the chunk yields and persists notBefore', async () => {
+    const { fs, ports } = harness([A]);
+    const { step, latched } = latching({ kind: 'completed' });
+
+    const outcome = await run({ ...ports, latchedRetryAfterMs: latched }, step);
+
+    expect(outcome.kind).toBe('yielded');
+    // The entry the baseline answered keeps its result.
+    expect(outcome.completed).toEqual([key(A)]);
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [key(A)],
+      notBefore: '2026-09-26T12:02:00.000Z',
+    });
+  });
+
+  it('a bound ended the chunk: the latch still makes it a 429 yield', async () => {
+    const { fs, ports } = harness([A, B]);
+    const { step, latched } = latching({ kind: 'completed', searchRemaining: 0 });
+
+    const outcome = await run({ ...ports, latchedRetryAfterMs: latched }, step);
+
+    expect(outcome.kind).toBe('yielded');
+    expect(await progressOf(fs)).toMatchObject({ completed: [key(A)], notBefore: '2026-09-26T12:02:00.000Z' });
+  });
+
+  it('a session entries bound: the latch still makes it a 429 yield', async () => {
+    const { fs, ports } = harness([A, B]);
+    const { step, latched } = latching({ kind: 'completed' });
+
+    const outcome = await run({ ...ports, latchedRetryAfterMs: latched, session: { maxEntries: 1 } }, step);
+
+    expect(outcome.kind).toBe('yielded');
+    expect(await progressOf(fs)).toMatchObject({ notBefore: '2026-09-26T12:02:00.000Z' });
+  });
+
+  it('no latch: the ending and the progress are unchanged', async () => {
+    const { fs, ports } = harness([A]);
+    const { step } = scriptedStep();
+
+    const outcome = await run({ ...ports, latchedRetryAfterMs: () => undefined }, step);
+
+    expect(outcome.kind).toBe('completed');
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+  });
+  it('the step throws after the latch (an unexpected baseline body): the failure path still persists notBefore', async () => {
+    const { fs, ports } = harness([A]);
+    let latchedMs: number | undefined;
+    const stamped: DatasetEntry = {
+      entryKey: key(A),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    };
+    const failure = new UnexpectedTradeResponseError(key(A), 'search', 'no top-level `id` and `result`', stamped);
+    const step: ChunkStep = () => {
+      latchedMs = 120_000;
+      return Promise.reject(failure);
+    };
+
+    await expect(run({ ...ports, latchedRetryAfterMs: () => latchedMs }, step)).rejects.toBe(failure);
+
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.1.0',
+      completed: [],
+      notBefore: '2026-09-26T12:02:00.000Z',
+    });
   });
 });

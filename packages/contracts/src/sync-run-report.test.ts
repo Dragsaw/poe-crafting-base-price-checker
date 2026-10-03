@@ -19,18 +19,20 @@ const figures = {
   requestsBySource: {
     'tracked-list': 8,
     'league-validation': 1,
+    'session-probe': 0,
   },
   notReachedCount: 41,
 };
 
 describe('RequestsBySourceSchema', () => {
-  it('keeps three declared request sources, and keys the figure on the two chunk sources (AD-12)', () => {
+  it('keeps four declared request sources, and keys the figure on the three chunk sources (AD-12, AD-30)', () => {
     expect(RequestSourceSchema.options).toEqual([
       'tracked-list',
       'league-validation',
       'catalogue-refresh',
+      'session-probe',
     ]);
-    expect(ChunkRequestSourceSchema.options).toEqual(['tracked-list', 'league-validation']);
+    expect(ChunkRequestSourceSchema.options).toEqual(['tracked-list', 'league-validation', 'session-probe']);
   });
 
   it('drops the legacy catalogue-refresh key of a 1.0.0 report', () => {
@@ -39,8 +41,31 @@ describe('RequestsBySourceSchema', () => {
       'league-validation': 1,
       'catalogue-refresh': 0,
     });
-    expect(parsed).toEqual({ 'tracked-list': 8, 'league-validation': 1 });
+    expect(parsed).toEqual({ 'tracked-list': 8, 'league-validation': 1, 'session-probe': 0 });
     expect('catalogue-refresh' in parsed).toBe(false);
+  });
+
+  it('reads a 1.1.0 figure with no session-probe key as 0 (IMPLEMENTATION-NOTES.md §13.7)', () => {
+    expect(RequestsBySourceSchema.parse({ 'tracked-list': 8, 'league-validation': 1 })).toEqual({
+      'tracked-list': 8,
+      'league-validation': 1,
+      'session-probe': 0,
+    });
+  });
+
+  it('keeps a written session-probe count', () => {
+    expect(
+      RequestsBySourceSchema.parse({ 'tracked-list': 8, 'league-validation': 1, 'session-probe': 1 }),
+    ).toEqual({ 'tracked-list': 8, 'league-validation': 1, 'session-probe': 1 });
+  });
+
+  it('refuses a negative or non-integer session-probe count', () => {
+    for (const count of [-1, 0.5]) {
+      expect(
+        RequestsBySourceSchema.safeParse({ 'tracked-list': 8, 'league-validation': 1, 'session-probe': count })
+          .success,
+      ).toBe(false);
+    }
   });
 
   it('refuses any other unknown key', () => {
@@ -56,8 +81,8 @@ describe('RequestsBySourceSchema', () => {
     );
   });
 
-  it('stamps a minor version, so a 1.0.0 report keeps its major', () => {
-    expect(SYNC_REPORT_SCHEMA_VERSION).toBe('1.1.0');
+  it('stamps a minor version, so a 1.0.0 or 1.1.0 report keeps its major', () => {
+    expect(SYNC_REPORT_SCHEMA_VERSION).toBe('1.2.0');
   });
 });
 
@@ -166,7 +191,7 @@ describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
 });
 
 describe('SyncRunFiguresSchema', () => {
-  it('accounts requests per chunk source, both of them', () => {
+  it('accounts requests per chunk source, each of them', () => {
     expect(SyncRunFiguresSchema.parse(figures)).toEqual(figures);
     expect(
       SyncRunFiguresSchema.safeParse({

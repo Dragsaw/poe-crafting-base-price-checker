@@ -19,11 +19,11 @@ export type RequestsBySource = Readonly<Record<RequestSource, number>>;
 export interface RequestCounter {
   /** An `HttpPort` that sends through `http` and counts each request against `source`. */
   counted(http: HttpPort, source: RequestSource): HttpPort;
-  /** The requests counted so far, all three sources present. */
+  /** The requests counted so far, every source present. */
   snapshot(): RequestsBySource;
 }
 
-/** All three sources, each `0`. */
+/** Every source, each `0`. */
 export function zeroRequests(): Record<RequestSource, number> {
   return Object.fromEntries(RequestSourceSchema.options.map((source) => [source, 0])) as Record<
     RequestSource,

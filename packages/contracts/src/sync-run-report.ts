@@ -18,41 +18,60 @@ import { TrackedListAgeSchema } from './tracked-list-age.ts';
  * write, so it cannot arise.
  */
 
-/** Exactly three sources generate a request, and nothing else does (AD-12). */
+/**
+ * Exactly four sources generate a request, and nothing else does (AD-12).
+ * `session-probe` is the one liveness probe of the optional session cookie
+ * (AD-30, IMPLEMENTATION-NOTES.md §13.2).
+ */
 export const RequestSourceSchema = z.enum([
   'tracked-list',
   'league-validation',
   'catalogue-refresh',
+  'session-probe',
 ]);
 
 export type RequestSource = z.infer<typeof RequestSourceSchema>;
 
 /**
- * The two sources a chunk spends requests on (AD-12). The report figure keys on
- * these alone: `catalogue-refresh` runs as its own command and never inside a
- * chunk, so a chunk report that carried it would always print 0.
+ * The three sources a chunk spends requests on (AD-12). The report figure keys
+ * on these alone: `catalogue-refresh` runs as its own command and never inside
+ * a chunk, so a chunk report that carried it would always print 0. The
+ * `session-probe` count is the report's one trace of the session cookie, and
+ * `web` does not render it (AD-30).
  */
-export const ChunkRequestSourceSchema = RequestSourceSchema.extract(['tracked-list', 'league-validation']);
+export const ChunkRequestSourceSchema = RequestSourceSchema.extract([
+  'tracked-list',
+  'league-validation',
+  'session-probe',
+]);
 
 export type ChunkRequestSource = z.infer<typeof ChunkRequestSourceSchema>;
 
 /** The key a report written before spine revision 21 still carries. */
 const LEGACY_REQUEST_SOURCE_KEY = 'catalogue-refresh';
 
+/** The key a report written before 1.2.0 lacks; it reads as `0`. */
+const SESSION_PROBE_SOURCE_KEY = 'session-probe';
+
 /**
- * Drops the legacy key and nothing else, so a report written at 1.0.0 still
- * parses while every other unknown key is still refused. The drop lives here
- * rather than in `sync`, so that every reader inherits it.
+ * Drops the legacy key and fills a missing `session-probe` key with `0`, and
+ * nothing else, so a report written at 1.0.0 or 1.1.0 still parses while every
+ * other unknown key is still refused. The tolerance lives here rather than in
+ * `sync`, so that every reader inherits it.
  */
-function dropLegacyRequestSource(value: unknown): unknown {
-  if (typeof value !== 'object' || value === null || Array.isArray(value) || !(LEGACY_REQUEST_SOURCE_KEY in value)) {
+function readLegacyRequestSources(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return value;
   }
-  return Object.fromEntries(Object.entries(value).filter(([key]) => key !== LEGACY_REQUEST_SOURCE_KEY));
+  const entries = Object.entries(value).filter(([key]) => key !== LEGACY_REQUEST_SOURCE_KEY);
+  if (!(SESSION_PROBE_SOURCE_KEY in value)) {
+    entries.push([SESSION_PROBE_SOURCE_KEY, 0]);
+  }
+  return Object.fromEntries(entries);
 }
 
 export const RequestsBySourceSchema = z
-  .preprocess(dropLegacyRequestSource, z.record(ChunkRequestSourceSchema, z.int().min(0)))
+  .preprocess(readLegacyRequestSources, z.record(ChunkRequestSourceSchema, z.int().min(0)))
   .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
 
 export type RequestsBySource = z.infer<typeof RequestsBySourceSchema>;
@@ -60,12 +79,15 @@ export type RequestsBySource = z.infer<typeof RequestsBySourceSchema>;
 /**
  * The `sync-report.json` contract version. 1.1.0 narrowed `requestsBySource`
  * to the chunk sources; the reader drops the legacy key, so a 1.0.0 file still
- * parses (the major is unchanged). A build older than 1.1.0 refuses a 1.1.0
- * report, because its figure required the third key; that is acceptable
- * because only `sync` writes and reads the report today, the same trade
- * IMPLEMENTATION-NOTES.md §5.3 accepts for progress.
+ * parses (the major is unchanged). 1.2.0 adds the `session-probe` source
+ * (IMPLEMENTATION-NOTES.md §13.7). The writer always writes the key; the
+ * reader reads a 1.1.0 file without it as `0`. A build older than a version
+ * refuses a report of that version, because its figure required a key set the
+ * file no longer matches; that is acceptable because only `sync` writes and
+ * reads the report's figure, the same trade IMPLEMENTATION-NOTES.md §5.3
+ * accepts for progress.
  */
-export const SYNC_REPORT_SCHEMA_VERSION = '1.1.0';
+export const SYNC_REPORT_SCHEMA_VERSION = '1.2.0';
 
 export const SyncRunFiguresSchema = z
   .strictObject({
