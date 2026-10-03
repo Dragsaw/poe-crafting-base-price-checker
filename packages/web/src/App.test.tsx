@@ -1244,8 +1244,10 @@ describe('the Unrankable appendix', () => {
     await settleTo('ready');
 
     const rows = appendixRows();
-    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Bows']);
-    expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
+    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Amulets', 'Bows']);
+    // Amulets is rankable but no recipe is served (retro item 29), so it takes the recipe-less reason.
+    expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('recipe cannot reach this class');
+    expect(rows[1]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
     expect(appendix().textContent).not.toContain('edge-alignment');
     expect(frame().querySelectorAll('[data-ranked-row]')).toHaveLength(1);
 

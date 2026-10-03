@@ -127,7 +127,8 @@ export interface UnrankableClass {
    * Present only on the recipe-scoped reason, `recipe cannot reach this
    * class`: the one recipe whose pair is unrankable. The class may rank under
    * another recipe (EXPERIENCE.md state 36). The other three reasons hold
-   * under every recipe and carry no recipe id.
+   * under every recipe and carry no recipe id. So does `recipe cannot reach
+   * this class` when no recipe exists at all (retro item 29).
    */
   readonly recipeId?: string;
   /**
@@ -415,6 +416,15 @@ export function rank(input: RankInput): Ranking {
       .toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey));
     const first = keyed[0]?.entry;
     if (first === undefined) {
+      continue;
+    }
+    if (recipes.length === 0) {
+      // No recipe exists to try, so the class would be in neither list nor appendix. Retro item 29.
+      unrankable.set(JSON.stringify([first.categoryId, first.className]), {
+        categoryId: first.categoryId,
+        className: first.className,
+        reason: RECIPE_UNREACHABLE,
+      });
       continue;
     }
     recipes.forEach((recipe, index) => {
