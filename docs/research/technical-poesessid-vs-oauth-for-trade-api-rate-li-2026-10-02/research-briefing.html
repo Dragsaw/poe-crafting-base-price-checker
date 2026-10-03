@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POESESSID vs OAuth Briefing</title>
+<style>
+:root{
+  --bg:#f7f7f5;--surface:#ffffff;--text:#1d1f23;--muted:#5d6370;--border:#dcdfe4;
+  --accent:#2f5d8a;--accent-soft:#e6eef6;--code-bg:#eef0f3;
+  --ok-bg:#e7f3ea;--ok-fg:#2c6a3c;--ok-bd:#b9dcc2;
+  --med-bg:#fff6dc;--med-fg:#7a5a00;--med-bd:#ead48a;
+  --low-bg:#fde9d9;--low-fg:#8a3d00;--low-bd:#efb98d;
+  --dis-bg:#b42318;--dis-fg:#ffffff;--dis-bd:#8c1b12;
+  --unv-bg:#5b2a86;--unv-fg:#ffffff;--unv-bd:#431f63;
+  --ovr-bg:#1d1f23;--ovr-fg:#ffffff;--ovr-bd:#000000;
+  --bar-a:#7c8fa6;--bar-c:#a9b4c2;--bar-d:#2f5d8a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171a;--surface:#1d2024;--text:#e6e8eb;--muted:#a0a6b0;--border:#33373d;
+    --accent:#8db7e0;--accent-soft:#22303d;--code-bg:#2a2e34;
+    --ok-bg:#1d3324;--ok-fg:#9fd6ae;--ok-bd:#2f5a3b;
+    --med-bg:#3a3115;--med-fg:#f0d27a;--med-bd:#5e4f1e;
+    --low-bg:#3d2616;--low-fg:#f3b382;--low-bd:#6a4024;
+    --dis-bg:#e5484d;--dis-fg:#ffffff;--dis-bd:#ff7b7f;
+    --unv-bg:#8e5bd0;--unv-fg:#ffffff;--unv-bd:#b78af0;
+    --ovr-bg:#e6e8eb;--ovr-fg:#15171a;--ovr-bd:#ffffff;
+    --bar-a:#6d7f95;--bar-c:#4f5b69;--bar-d:#8db7e0;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171a;--surface:#1d2024;--text:#e6e8eb;--muted:#a0a6b0;--border:#33373d;
+  --accent:#8db7e0;--accent-soft:#22303d;--code-bg:#2a2e34;
+  --ok-bg:#1d3324;--ok-fg:#9fd6ae;--ok-bd:#2f5a3b;
+  --med-bg:#3a3115;--med-fg:#f0d27a;--med-bd:#5e4f1e;
+  --low-bg:#3d2616;--low-fg:#f3b382;--low-bd:#6a4024;
+  --dis-bg:#e5484d;--dis-fg:#ffffff;--dis-bd:#ff7b7f;
+  --unv-bg:#8e5bd0;--unv-fg:#ffffff;--unv-bd:#b78af0;
+  --ovr-bg:#e6e8eb;--ovr-fg:#15171a;--ovr-bd:#ffffff;
+  --bar-a:#6d7f95;--bar-c:#4f5b69;--bar-d:#8db7e0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--accent)}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:.88em;background:var(--code-bg);padding:.1em .35em;border-radius:4px;overflow-wrap:anywhere}
+header.top{background:var(--surface);border-bottom:1px solid var(--border);padding:32px 16px 24px}
+.wrap{max-width:1200px;margin:0 auto}
+header.top h1{font-size:clamp(1.4rem,3vw,2rem);line-height:1.25;margin:0 0 12px}
+.kicker{text-transform:uppercase;letter-spacing:.08em;font-size:.75rem;color:var(--muted);margin:0 0 6px}
+dl.meta{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:16px 0 0;font-size:.92rem}
+dl.meta dt{color:var(--muted)}
+dl.meta dd{margin:0}
+.layout{max-width:1200px;margin:0 auto;padding:24px 16px 64px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px}
+nav.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:.9rem}
+nav.toc h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc li{margin:0}
+nav.toc a{display:block;padding:4px 10px;border-left:2px solid var(--border);color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--text)}
+nav.toc a.active{border-left-color:var(--accent);color:var(--text);font-weight:600}
+nav.toc ol ol a{padding-left:22px;font-size:.85rem}
+main{min-width:0}
+section{margin:0 0 48px}
+h2{font-size:1.4rem;margin:0 0 16px;line-height:1.3}
+h3{font-size:1.1rem;margin:32px 0 12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px}
+.summary{border-left:4px solid var(--accent)}
+.summary .lead{font-size:1.08rem}
+ul.claims{list-style:none;padding:0;margin:0}
+ul.claims>li{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:0 0 10px}
+ul.claims>li.flag-disputed{border-left:5px solid var(--dis-bg)}
+ul.claims>li.flag-overturned{border-left:5px solid var(--ovr-bg)}
+ul.claims>li.flag-low{border-left:5px solid var(--low-bd)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.badge{display:inline-block;font-size:.74rem;font-weight:600;line-height:1.4;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap}
+.b-verified{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-bd);font-weight:500}
+.b-high{background:transparent;color:var(--ok-fg);border-color:var(--ok-bd);font-weight:500}
+.b-medium{background:var(--med-bg);color:var(--med-fg);border-color:var(--med-bd)}
+.b-low{background:var(--low-bg);color:var(--low-fg);border-color:var(--low-bd)}
+.b-single{background:var(--med-bg);color:var(--med-fg);border-color:var(--med-bd)}
+.b-disputed{background:var(--dis-bg);color:var(--dis-fg);border-color:var(--dis-bd);font-size:.8rem;font-weight:800;padding:3px 10px;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 0 0 2px color-mix(in srgb,var(--dis-bg) 30%,transparent)}
+.b-unverified{background:var(--unv-bg);color:var(--unv-fg);border-color:var(--unv-bd);font-size:.8rem;font-weight:800;padding:3px 10px;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 0 0 2px color-mix(in srgb,var(--unv-bg) 30%,transparent)}
+.b-overturned{background:var(--ovr-bg);color:var(--ovr-fg);border-color:var(--ovr-bd);font-size:.8rem;font-weight:800;padding:3px 10px;text-transform:uppercase;letter-spacing:.04em}
+.legend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.85rem;color:var(--muted);margin:12px 0 0}
+a.cite{text-decoration:none;font-size:.85em;white-space:nowrap}
+a.cite:hover{text-decoration:underline}
+.tbl{overflow-x:auto;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--border)}
+thead th{background:var(--accent-soft);font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+table.matrix td:not(:first-child),table.matrix th:not(:first-child){text-align:center}
+table.matrix tr.total td{font-weight:700;background:var(--accent-soft)}
+.fail{color:var(--dis-bg);font-weight:700}
+.gate{display:inline-block;font-weight:700;border:1px solid var(--border);border-radius:4px;padding:0 6px;background:var(--code-bg)}
+.chart{margin:20px 0 0}
+.chart svg{width:100%;max-width:640px;height:auto;display:block}
+.chart svg text{fill:var(--text);font:13px system-ui,-apple-system,"Segoe UI",sans-serif}
+.chart svg .axis{stroke:var(--border)}
+.chart svg .tick{fill:var(--muted);font-size:11px}
+.chart figcaption{font-size:.85rem;color:var(--muted);margin-top:6px}
+ol.recs>li{margin:0 0 14px}
+.conf{display:block;margin-top:6px}
+details.appendix{background:var(--surface);border:1px solid var(--border);border-radius:8px}
+details.appendix>summary{cursor:pointer;padding:14px 16px;font-weight:600}
+details.appendix>summary:hover{background:var(--accent-soft)}
+details.appendix .inner{padding:0 0 8px;overflow-x:auto}
+table.sources td:first-child{white-space:nowrap;font-weight:600}
+table.sources tr:target td{background:var(--med-bg)}
+.stale-yes{font-weight:800;color:var(--dis-bg)}
+.note{color:var(--muted);font-size:.92rem}
+.theme-toggle{float:right;font:inherit;font-size:.82rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer}
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr;gap:16px}
+  nav.toc{position:sticky;top:0;z-index:5;max-height:none;background:var(--bg);border-bottom:1px solid var(--border);padding:8px 0;margin:0 -16px;padding-left:16px;padding-right:16px}
+  nav.toc>ol{display:flex;overflow-x:auto;gap:4px;white-space:nowrap}
+  nav.toc ol ol{display:none}
+  nav.toc a{border-left:0;border-bottom:2px solid transparent;padding:4px 8px}
+  nav.toc a.active{border-bottom-color:var(--accent)}
+  nav.toc h2{display:none}
+  html{scroll-padding-top:60px}
+  .card{padding:16px}
+}
+@media print{nav.toc,.theme-toggle{display:none}.layout{display:block}details.appendix{display:block}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <button class="theme-toggle" type="button" id="themeToggle" aria-label="Toggle light or dark theme">Theme</button>
+    <p class="kicker">Technical research briefing &middot; shape: select</p>
+    <h1>Technical research: POESESSID versus OAuth versus both for higher PoE trade API rate limits</h1>
+    <dl class="meta">
+      <dt>Topic</dt><dd>POESESSID vs OAuth vs both for higher PoE trade API rate limits in sync</dd>
+      <dt>Type</dt><dd>technical</dd>
+      <dt>Decision</dt><dd>Which auth route (A POESESSID, B official OAuth, C both, D none) sync supports for the trade API, and whether an interactive credential flow is feasible</dd>
+      <dt>Date</dt><dd>2026-10-02 (created and updated; Deepen pass the same day)</dd>
+      <dt>Depth</dt><dd>preset: standard</dd>
+      <dt>Verification</dt><dd>validation: normal &middot; claims tally (per ref): verified 9 (V1 V2 V3 V4 V6 V7 V8 V9 V10), overturned 1 (V5); V3 moved from disputed to verified by the Deepen capture</dd>
+      <dt>Source</dt><dd>Process of <code>imports/Path Of Exile API Auth.md</code> (Gemini Deep Research, inferred from export format, produced 2026-10-02, from <code>brief.md</code>), plus a native spot-check of the load-bearing claims on 2026-10-02 (<code>digests/verify-ggg.md</code>, <code>digests/verify-community.md</code>), plus a first-hand trade2 header capture with and without POESESSID on 2026-10-02 (<code>digests/capture-trade2-headers.md</code>, Deepen pass)</dd>
+      <dt>Status</dt><dd>complete</dd>
+    </dl>
+    <div class="legend" aria-label="Confidence badge legend">Badges:
+      <span class="badge b-verified">verified</span>
+      <span class="badge b-medium">medium</span>
+      <span class="badge b-low">low</span>
+      <span class="badge b-unverified">unverified</span>
+      <span class="badge b-disputed">disputed</span>
+      <span class="badge b-overturned">overturned</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Table of contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#summary">Executive summary</a></li>
+    <li><a href="#findings">Findings by dimension</a>
+      <ol>
+        <li><a href="#dim-integration">Auth routes</a></li>
+        <li><a href="#dim-policy">Policy and terms</a></li>
+        <li><a href="#dim-implementation">Rate limits and enforcement</a></li>
+        <li><a href="#dim-interactive">Interactive-flow feasibility</a></li>
+      </ol>
+    </li>
+    <li><a href="#matrix">Decision matrix</a></li>
+    <li><a href="#insights">Cross-dimension insights</a></li>
+    <li><a href="#recommendations">Recommendations</a></li>
+    <li><a href="#open-questions">Open questions</a></li>
+    <li><a href="#appendix">Source appendix</a></li>
+    <li><a href="#staleness">Staleness map</a></li>
+  </ol>
+</nav>
+
+<main>
+<p class="note"><strong>Decision this research serves:</strong> which auth route sync supports for the trade API (A POESESSID, B official OAuth, C both, D none), and whether an interactive credential flow is feasible.</p>
+
+<section id="summary">
+  <h2>Executive summary</h2>
+  <div class="card summary">
+    <p class="lead"><strong>Do this: keep D (unauthenticated) as the default. Eliminate B and C. Hold A as a gated, opt-in experiment.</strong> The gate opens only when both conditions are true: a header capture shows that a session cookie raises the PoE2 trade budget, and the unauthenticated budget no longer finishes a sync. <strong>The first condition is now met.</strong> The 2026-10-02 capture shows that a session cookie doubles the sustained PoE2 search and fetch budget, and does not raise the short burst <a class="cite" href="#src-30">[30]</a>. A now waits only on the second condition.</p>
+    <p>The imported report also picks D, but its reasons are wrong in three places. The verification pass corrected them:</p>
+    <ol>
+      <li><strong>Official OAuth cannot do the job.</strong> No OAuth scope or documented endpoint covers trade search or fetch, in PoE1 or PoE2 <a class="cite" href="#src-2">[2]</a><a class="cite" href="#src-3">[3]</a>. Grinding Gear Games (GGG) also says "We are currently unable to process new applications" <a class="cite" href="#src-1">[1]</a>. B fails both hard gates: it cannot reach trade, and it is closed to new projects. C gives nothing more than A.</li>
+      <li><strong>D is not "absolute compliance".</strong> The trade API is outside GGG's documentation, so A and D carry the same base policy risk. A adds credential-sharing and account-access risk <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-4">[4]</a><a class="cite" href="#src-5">[5]</a>. See <a href="#dim-policy"><em>Policy and terms</em></a>.</li>
+      <li><strong>The import did not measure the effect of a session cookie. The Deepen capture did, for PoE2 <a class="cite" href="#src-30">[30]</a>.</strong> With POESESSID, the trade2 response adds an <code>Account</code> rule, and the <code>Ip</code> limits double over the 5-minute and longest windows. The longest window goes from 6 h to 3 h for the same hit count. One client therefore gets about 2× the sustained throughput: 200 searches per hour instead of 100, and about 333 fetches per hour instead of about 167. The short burst does not improve, and the fetch burst halves (6 per 4 s instead of 12 per 4 s). The 2018 GGG statement <a class="cite" href="#src-6">[6]</a> holds in direction. The 2019 community figure <a class="cite" href="#src-8">[8]</a> does not match.</li>
+    </ol>
+    <p><strong>Biggest caveat:</strong> the capture is one sample, from one IP and one account, with a browser <code>User-Agent</code> <a class="cite" href="#src-30">[30]</a>. GGG says the limits "are dynamic and can change at any time" <a class="cite" href="#src-1">[1]</a>. The unauthenticated values are the same as in the project's 2026-09-12 capture <a class="cite" href="#src-30">[30]</a>: two captures 20 days apart gave the same values. Re-check the GGG OAuth and Terms of Use (ToS) facts and the trade2 limits by 2026-11-02. After 2027-04-02, refresh the whole report before anyone acts on it.</p>
+  </div>
+</section>
+
+<section id="findings">
+  <h2>Findings by dimension</h2>
+
+  <h3 id="dim-integration">Integration and interoperability: the auth routes</h3>
+  <ul class="claims">
+    <li><strong>OAuth scopes.</strong> The scopes are six <code>account:*</code> (profile, leagues, stashes, characters, league_accounts, item_filter) and six <code>service:*</code> (leagues, leagues:ladder, pvp_matches, pvp_matches:ladder, psapi, cxapi) <a class="cite" href="#src-2">[2]</a>. None covers trade.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li><strong>OAuth and PoE2.</strong> Only a few endpoints accept the <code>poe2</code> realm: item filters, leagues, characters, and the Currency Exchange API <a class="cite" href="#src-3">[3]</a>. The docs say "There are currently limited APIs that return PoE2 game information" <a class="cite" href="#src-3">[3]</a>. The public stash API is PoE1 only <a class="cite" href="#src-3">[3]</a>.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li><strong>OAuth clients.</strong> Public clients use authorization code with Proof Key for Code Exchange (PKCE) and a loopback redirect such as <code>http://127.0.0.1:8080/callback</code>. Their access tokens last 10 hours, and their refresh tokens last 7 days <a class="cite" href="#src-2">[2]</a>. Confidential clients need an HTTPS redirect on a registered domain, with no localhost. Their access tokens last 28 days, and their refresh tokens last 90 days <a class="cite" href="#src-2">[2]</a>.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div>
+      <p style="margin:10px 0 0"><code>client_credentials</code> gives only <code>service:*</code> scopes <a class="cite" href="#src-2">[2]</a>. Confidence for this sentence is medium, because the verifier did not find the exact sentence.</p>
+      <div class="badges"><span class="badge b-medium">Confidence: medium (this sentence)</span></div></li>
+    <li class="flag-overturned"><strong>OAuth registration.</strong> The docs say "We are currently unable to process new applications" <a class="cite" href="#src-1">[1]</a>. The import describes an approval process. The verification overturned this claim: registration is closed now. The <code>oauth@</code> email address appears only on a third-party wiki. It is not on the official page.
+      <div class="badges"><span class="badge b-overturned">Import claim: overturned</span><span class="badge b-verified">Registration closed: verified <a class="cite" href="#src-1">[1]</a></span></div></li>
+    <li><strong>The Currency Exchange API</strong> is documented, needs no auth, and accepts <code>poe2</code> <a class="cite" href="#src-3">[3]</a>. It gives hourly aggregate currency history, not item bases, so it does not replace trade search.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li><strong>POESESSID.</strong> It is the pathofexile.com website session cookie. GGG staff wrote in 2022: "This cookie value gives the recipient almost complete access to your Path of Exile account on the website", and "The secure way of granting tools access to your data is via OAuth" <a class="cite" href="#src-5">[5]</a>. Signing out and signing in again invalidates earlier cookie values <a class="cite" href="#src-5">[5]</a>. No source says whether a password change revokes the cookie.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span><span class="badge b-unverified">Password-change revocation: no source</span></div></li>
+    <li><strong>User-Agent.</strong> The docs give the format <code>OAuth {clientId}/{version} (contact: {contact})</code> for OAuth apps <a class="cite" href="#src-1">[1]</a>.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+  </ul>
+
+  <h3 id="dim-policy">Policy and terms</h3>
+  <ul class="claims">
+    <li><strong>Undocumented endpoints.</strong> GGG's docs say that it "is against our Terms of Use (section 7i) to reverse-engineer endpoints outside of this documentation" <a class="cite" href="#src-1">[1]</a>. The trade API is not in that documentation <a class="cite" href="#src-2">[2]</a><a class="cite" href="#src-3">[3]</a>.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li><strong>Bots and data extraction.</strong> Without prior written approval, the ToS bars "any automated software or 'bots'" (7c) and "any data gathering and extraction tools" (7f) <a class="cite" href="#src-4">[4]</a>. The ToS was last updated in October 2024.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li><strong>Credential sharing.</strong> ToS §16 forbids giving a third party access to the account without GGG's written consent <a class="cite" href="#src-4">[4]</a>. In 2022, GGG said that they "haven't yet proactively banned any users" for sharing POESESSID <a class="cite" href="#src-5">[5]</a>.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li class="flag-overturned"><strong>The import's claim that D gives "absolute compliance"</strong> is overturned by the three points above.
+      <div class="badges"><span class="badge b-overturned">Import claim: overturned</span></div></li>
+  </ul>
+
+  <h3 id="dim-implementation">Implementation reality: rate limits and enforcement</h3>
+  <ul class="claims">
+    <li><strong>Header contract.</strong> GGG documents <code>X-Rate-Limit-Policy</code>, <code>X-Rate-Limit-Rules</code> (rules such as <code>ip</code>, <code>account</code>, <code>client</code>), <code>X-Rate-Limit-{rule}</code>, <code>X-Rate-Limit-{rule}-State</code>, and <code>Retry-After</code>. The rule format is <code>hits:period:restriction</code> <a class="cite" href="#src-1">[1]</a>. "Exceeding these limits frequently will result in your application access being revoked" <a class="cite" href="#src-1">[1]</a>.
+      <div class="badges"><span class="badge b-verified">Status: verified</span><span class="badge b-high">Confidence: high</span></div></li>
+    <li><strong>Effect of a session cookie on the budget (PoE2, measured).</strong> The project captured one search and one fetch on <code>/api/trade2</code>, without a cookie and then with <code>Cookie: POESESSID=…</code>, on 2026-10-02 <a class="cite" href="#src-30">[30]</a>. All four requests returned 200. Rule format <code>hits:period:restriction</code>:<div class="tbl" style="margin:10px 0"><table><thead><tr><th>Policy</th><th>Rules, no cookie</th><th>Rules, POESESSID</th><th><code>Account</code></th><th><code>Ip</code>, no cookie</th><th><code>Ip</code>, POESESSID</th></tr></thead><tbody><tr><td><code>trade-search-request-limit</code></td><td><code>Ip</code></td><td><code>Account,Ip</code></td><td><code>3:5:60</code></td><td><code>5:10:60, 15:60:300, 30:300:1800, 600:21600:3600</code></td><td><code>8:10:60, 15:60:120, 60:300:1800, 600:10800:3600</code></td></tr><tr><td><code>trade-fetch-request-limit</code></td><td><code>Ip</code></td><td><code>Account,Ip</code></td><td><code>6:4:10</code></td><td><code>12:4:10, 16:12:300, 50:300:300, 1000:21600:1800</code></td><td><code>12:4:60, 16:12:60, 100:300:300, 1000:10800:1800</code></td></tr></tbody></table></div><p style="margin:0 0 10px">The session does three things <a class="cite" href="#src-30">[30]</a>. First, it raises the <code>Ip</code> limits over the 5-minute window (2×) and the longest window (the same hits in 3 h instead of 6 h, so 2×). Second, it adds an <code>Account</code> rule that has only one short window. That rule caps the burst at about the unauthenticated level for search (3 per 5 s), and at half of it for fetch (6 per 4 s against 12 per 4 s). Third, it changes three <code>Ip</code> lockouts and leaves five unchanged. Two get shorter: the search 60 s window (300 s to 120 s) and the fetch 12 s window (300 s to 60 s). One gets longer: the fetch 4 s window (10 s to 60 s). The <code>Ip</code> counter is shared: the cookie requests counted the earlier no-cookie requests from the same IP <a class="cite" href="#src-30">[30]</a>.</p><p style="margin:0">Older evidence, now superseded for PoE2: the 2018 GGG statement that the Ip rule "will allow double" <a class="cite" href="#src-6">[6]</a> holds in direction, but its "same limits" for the account does not match the measured <code>Account</code> rule. The 2019 figure of 4 fetches per 6 s <a class="cite" href="#src-8">[8]</a> does not match the measured 6 per 4 s. A 2025 README says accounts get a larger budget <a class="cite" href="#src-9">[9]</a>. That agrees, but it gives no numbers. Confidence is medium because the limits are dynamic <a class="cite" href="#src-1">[1]</a> and the capture used a browser <code>User-Agent</code>, not the contact <code>User-Agent</code> that sync sends <a class="cite" href="#src-30">[30]</a>.</p>
+      <div class="badges"><span class="badge b-verified">Status: verified (one sample)</span><span class="badge b-medium">Confidence: medium</span><span class="badge b-overturned">Earlier status: disputed</span></div></li>
+    <li><strong>Newest unauthenticated numbers.</strong> The 2026-10-02 capture <a class="cite" href="#src-30">[30]</a> gives the same Ip values as the project's own 2026-09-12 PoE2 capture (in <code>brief.md</code>): search <code>5:10:60, 15:60:300, 30:300:1800, 600:21600:3600</code>, fetch <code>12:4:10, 16:12:300, 50:300:300, 1000:21600:1800</code>. A player posted older PoE1 Ip state values in 2021 <a class="cite" href="#src-7">[7]</a>. They are history, not the current PoE2 budget.
+      <div class="badges"><span class="badge b-verified">Status: verified (two captures, 20 days apart)</span><span class="badge b-medium">Confidence: medium</span></div></li>
+    <li><strong>Header names have been wrong.</strong> In 2022 GGG staff confirmed a bug: the policy header said "Account", but the limiting was per IP <a class="cite" href="#src-10">[10]</a>. Pace from the <code>-State</code> values, not from the rule name alone. In the 2026-10-02 capture the rule names agreed with the header contents: <code>Account</code> appeared only with the cookie <a class="cite" href="#src-30">[30]</a>. No request reached a limit, so the capture did not test enforcement.
+      <div class="badges"><span class="badge b-single">Status: single source</span><span class="badge b-medium">Confidence: medium</span></div></li>
+    <li><strong>Shared budget.</strong> GGG staff in 2026: "rate-limiting will consider any third-party tools … and in-game search, and trade website utilisation. It all hits the same API" <a class="cite" href="#src-11">[11]</a>. Tool, in-game, and site traffic therefore share one budget. That thread is about PoE1. With a session cookie, trade2 applies both an <code>Account</code> and an <code>Ip</code> rule <a class="cite" href="#src-30">[30]</a>. Every machine that uses the same cookie therefore probably shares the <code>Account</code> burst cap (the import says this as well <a class="cite" href="#src-28">[28]</a>). Each IP keeps its own <code>Ip</code> counter.
+      <div class="badges"><span class="badge b-single">Status: single source</span><span class="badge b-medium">Confidence: medium</span></div></li>
+    <li><strong>Enforcement record.</strong> GGG blocked one version of Acquisition (v0.9.7) in 2023 for rate-limit violations. The fix was "dynamic rate limiting based on HTTP reply headers" <a class="cite" href="#src-12">[12]</a>. Acquisition uses the stash APIs, not trade. It moved to OAuth in v0.15.0 and kept POESESSID only for forum shops <a class="cite" href="#src-13">[13]</a>. The import says that GGG blocked every user of the tool because of poor Retry-After handling. The verification overturned that claim. In 2025 GGG refused access to a PoE2 tool user because of an IP "matching previously banned accounts" <a class="cite" href="#src-14">[14]</a>. Short rate-limit lockouts are common.
+      <div class="badges"><span class="badge b-verified">Status: verified with corrections</span><span class="badge b-medium">Confidence: medium</span><span class="badge b-overturned">Import claim (all users blocked): overturned</span></div></li>
+    <li><strong>Cloudflare.</strong> Cloudflare bot checks on pathofexile.com repeatedly break tools: in 2020 <a class="cite" href="#src-23">[23]</a> and in 2024 on PoE2 trade <a class="cite" href="#src-24">[24]</a>. In 2026 a player's browser also failed a Turnstile check on the trade site <a class="cite" href="#src-25">[25]</a>. No source records a fix. Awakened PoE Trade (APT) blames Cloudflare for "failed to load leagues". Its workaround is to solve a CAPTCHA about every 15 minutes or to change the IP address <a class="cite" href="#src-19">[19]</a>. One tool lists <code>cf_clearance</code> as optional next to POESESSID <a class="cite" href="#src-22">[22]</a>. No source says it is always required. The import's citation for this claim (PoB #8384) does not mention Cloudflare. In the 2026-10-02 capture, four plain Node <code>fetch</code> requests with a browser <code>User-Agent</code>, two of them with a pasted POESESSID, got no challenge <a class="cite" href="#src-30">[30]</a>. That sample lasted about 15 seconds. It does not show how Cloudflare treats a scheduled sync over a day.
+      <div class="badges"><span class="badge b-verified">Status: verified (blocks happen)</span><span class="badge b-medium">Confidence: medium</span></div></li>
+  </ul>
+
+  <h3 id="dim-interactive">Interactive-flow feasibility</h3>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Method</th><th>How it works</th><th>Precedent</th><th>Risk</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Paste the cookie by hand</td><td>The user copies POESESSID from DevTools into an environment variable or a secret</td><td>Path of Building asks for a session ID [the PoB #8384 workaround text, via verifier]</td><td>Full-account token in shell history and CI secrets <a class="cite" href="#src-5">[5]</a>; stops working when the user signs out <a class="cite" href="#src-5">[5]</a>; Cloudflare challenges hit tools repeatedly <a class="cite" href="#src-19">[19]</a><a class="cite" href="#src-20">[20]</a>, though a short plain-HTTP sample passed <a class="cite" href="#src-30">[30]</a></td><td><strong>Feasible.</strong> The only route that fits an unattended CLI</td></tr>
+      <tr><td>Read the cookie from the browser profile</td><td>Decrypt Chrome or Edge cookies on disk</td><td>Common before Chrome 127</td><td>App-Bound Encryption (ABE, Chrome and Edge 127+) stops same-user programs <a class="cite" href="#src-15">[15]</a><a class="cite" href="#src-16">[16]</a><a class="cite" href="#src-17">[17]</a>. A bypass needs SYSTEM privileges or code injected into the browser <a class="cite" href="#src-16">[16]</a><a class="cite" href="#src-26">[26]</a></td><td><strong class="fail">Not feasible.</strong> It needs malware techniques</td></tr>
+      <tr><td>Own login window (Electron, WebView, headed Playwright)</td><td>The tool hosts a browser, the user signs in, the tool keeps its own cookie jar</td><td>APT and Exiled Exchange 2 (EE2) route trade calls through an Electron session cookie jar and keep Cloudflare cookies <a class="cite" href="#src-20">[20]</a><a class="cite" href="#src-21">[21]</a></td><td>Chrome 136+ ignores remote debugging on the default profile <a class="cite" href="#src-18">[18]</a>, so the tool needs its own profile. Cloudflare can challenge an automated browser</td><td><strong>Feasible for a desktop app.</strong> Too much work for a CLI. The cookie must still reach CI by hand</td></tr>
+      <tr><td>OAuth PKCE with a loopback redirect</td><td>Standard public-client flow <a class="cite" href="#src-2">[2]</a></td><td>GGG's sanctioned route <a class="cite" href="#src-5">[5]</a></td><td>No risk of its own, but it gives no trade scope and registration is closed <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-2">[2]</a></td><td><strong class="fail">Not applicable</strong> to trade</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="matrix">
+  <h2>Decision matrix (re-scored from the verified evidence)</h2>
+  <p>The matrix scores the options against the findings above.</p>
+  <p>Hard gates: <span class="gate">G1</span> the option can reach trade search and fetch; <span class="gate">G2</span> the route is available to a new project today. B fails G1 <a class="cite" href="#src-2">[2]</a><a class="cite" href="#src-3">[3]</a> and G2 <a class="cite" href="#src-1">[1]</a>. C inherits B's failure and adds nothing over A.</p>
+  <p>Scores run from 1 to 5, and 5 is best. D is the baseline (3) for rate-limit gain. You can change the weights.</p>
+  <div class="tbl">
+  <table class="matrix">
+    <thead><tr><th>Criterion</th><th>Weight</th><th>A POESESSID</th><th>B OAuth</th><th>C Both</th><th>D None</th></tr></thead>
+    <tbody>
+      <tr><td>Measured rate-limit gain</td><td>3</td><td>4 (2× sustained, no burst gain <a class="cite" href="#src-30">[30]</a>)</td><td>–</td><td>4</td><td>3</td></tr>
+      <tr><td>Ban or policy risk (5 = safest)</td><td>3</td><td>2 (§7i + §16 <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-4">[4]</a>)</td><td>–</td><td>2</td><td>3 (§7i <a class="cite" href="#src-1">[1]</a>)</td></tr>
+      <tr><td>Credential-leak impact (5 = none)</td><td>2</td><td>1 <a class="cite" href="#src-5">[5]</a></td><td>–</td><td>1</td><td>5</td></tr>
+      <tr><td>Build effort (5 = least)</td><td>1</td><td>3</td><td>–</td><td>1</td><td>5</td></tr>
+      <tr><td>Unattended or CI fit</td><td>3</td><td>2 (sign-out, Cloudflare <a class="cite" href="#src-5">[5]</a><a class="cite" href="#src-19">[19]</a>)</td><td>–</td><td>2</td><td>5</td></tr>
+      <tr><td>Interactive-flow fit</td><td>1</td><td>3 (manual paste)</td><td>–</td><td>2</td><td>5 (none needed)</td></tr>
+      <tr class="total"><td>Weighted total</td><td></td><td>32</td><td><span class="fail">fails G1, G2</span></td><td>29</td><td>53</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <figure class="chart">
+    <svg viewBox="0 0 640 200" role="img" aria-labelledby="chartTitle chartDesc">
+      <title id="chartTitle">Weighted totals by option</title>
+      <desc id="chartDesc">A POESESSID 32, B OAuth fails gates G1 and G2 so it has no score, C Both 29, D None 53. Maximum possible total is 65.</desc>
+      <!-- x axis: 0..65 mapped to 130..610 (480px), so 1 point = 7.385px -->
+      <line class="axis" x1="130" y1="20" x2="130" y2="168"/>
+      <line class="axis" x1="130" y1="168" x2="610" y2="168"/>
+      <text class="tick" x="130" y="184" text-anchor="middle">0</text>
+      <text class="tick" x="278" y="184" text-anchor="middle">20</text>
+      <text class="tick" x="425" y="184" text-anchor="middle">40</text>
+      <text class="tick" x="610" y="184" text-anchor="middle">65 (max)</text>
+      <text class="tick" x="370" y="198" text-anchor="middle">Weighted total (higher is better)</text>
+      <text x="120" y="42" text-anchor="end">A POESESSID</text>
+      <rect x="130" y="28" width="236" height="22" rx="3" style="fill:var(--bar-a)"/>
+      <text x="372" y="44">32</text>
+      <text x="120" y="78" text-anchor="end">B OAuth</text>
+      <text x="138" y="78" style="fill:var(--dis-bg);font-weight:700">fails G1, G2 (no score)</text>
+      <text x="120" y="114" text-anchor="end">C Both</text>
+      <rect x="130" y="100" width="214" height="22" rx="3" style="fill:var(--bar-c)"/>
+      <text x="350" y="116">29</text>
+      <text x="120" y="150" text-anchor="end">D None</text>
+      <rect x="130" y="136" width="391" height="22" rx="3" style="fill:var(--bar-d)"/>
+      <text x="527" y="152" style="font-weight:700">53</text>
+    </svg>
+    <figcaption>Weighted totals from the matrix above. Maximum possible total is 65 (all criteria at 5).</figcaption>
+  </figure>
+  <p>The import's matrix had arithmetic and logic errors; see <a class="cite" href="#src-27">[27]</a>. The Deepen capture <a class="cite" href="#src-30">[30]</a> moved A's rate-limit score from 3 to 4. A gets 4 and not 5 because the gain is in sustained throughput only. Even a 5 would give A 35, so the ranking does not change. The measured gain matters only when the unauthenticated budget does not finish a sync.</p>
+</section>
+
+<section id="insights">
+  <h2>Cross-dimension insights</h2>
+  <ul class="claims">
+    <li><strong>Policy risk does not separate A from D. Credential risk does.</strong> Both call an undocumented endpoint (§7i <a class="cite" href="#src-1">[1]</a>). A adds an account-level credential <a class="cite" href="#src-5">[5]</a><a class="cite" href="#src-4">[4]</a>. In return it gives a measured 2× sustained budget, but no burst gain <a class="cite" href="#src-30">[30]</a>. A trades a full-account credential for throughput. That trade pays only when the throughput is the bottleneck.</li>
+    <li><strong>The gain is in duration, not speed.</strong> With a cookie, a sync of N searches does not run faster in its first minute: the 60 s search window stays at 15, and the <code>Account</code> rule caps the burst <a class="cite" href="#src-30">[30]</a>. It runs faster over the 5-minute window (60 against 30) and doubles the hourly ceiling. A sync that already finishes inside the unauthenticated windows gains little. Earlier text here said the cookie helps only a multi-account setup. That came from the 2018 PoE1 statement <a class="cite" href="#src-6">[6]</a>, and the PoE2 capture overturns it for one client <a class="cite" href="#src-30">[30]</a>.</li>
+    <li><strong>The cookie flow and Cloudflare can make each other worse.</strong> The only workable credential route for a CLI is a manual paste. Cloudflare challenges repeatedly hit tools <a class="cite" href="#src-19">[19]</a><a class="cite" href="#src-23">[23]</a><a class="cite" href="#src-24">[24]</a>, and the tools that work reliably embed a browser <a class="cite" href="#src-20">[20]</a><a class="cite" href="#src-21">[21]</a>. A short plain-HTTP sample with a pasted cookie passed <a class="cite" href="#src-30">[30]</a>. Whether a scheduled sync passes over a day is still open.</li>
+  </ul>
+</section>
+
+<section id="recommendations">
+  <h2>Recommendations</h2>
+  <ol class="recs card">
+    <li><strong>Architecture spine: record D as the trade-API auth decision, and record the reason.</strong> OAuth has no trade scope and is closed to new applications <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-2">[2]</a>. A session cookie doubles the sustained budget <a class="cite" href="#src-30">[30]</a>, but it costs a full-account credential <a class="cite" href="#src-5">[5]</a> and gives no burst gain <a class="cite" href="#src-30">[30]</a>.
+      <span class="conf"><em>Confidence: high for eliminating B and C. Medium for D over A, because the A-versus-D choice depends on whether the unauthenticated budget finishes a sync, and this research does not measure that.</em></span>
+      <span class="badges"><span class="badge b-high">Eliminate B and C: high</span><span class="badge b-medium">D over A: medium</span><span class="badge b-unverified">sync budget unmeasured</span></span></li>
+    <li><strong>Architecture spine: keep the auth seam behind the HTTP client.</strong> The rate-limit pacer must read <code>X-Rate-Limit-Rules</code> and pace every listed rule's <code>-State</code>, not only <code>Ip</code> <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-29">[29]</a>. The capture confirms that this matters: with a cookie, trade2 sends <code>Account,Ip</code>, and the <code>Account</code> rule is the tighter burst limit for fetch <a class="cite" href="#src-30">[30]</a>. A pacer that reads only <code>Ip</code> would overrun it. The 2022 header-name bug also shows why the pacer should trust the state values <a class="cite" href="#src-10">[10]</a>.
+      <span class="conf"><em>Confidence: high.</em></span>
+      <span class="badges"><span class="badge b-high">Confidence: high</span></span></li>
+    <li><strong>Roadmap risk: make A a spike, gated on the sync budget.</strong> The capture met the first gate condition: the PoE2 budget is higher with a cookie <a class="cite" href="#src-30">[30]</a>. Build A only when the tracked list also outgrows the unauthenticated budget. If it is built, keep it opt-in: environment variable only, never committed, never logged, and documented as a full-account token that signing out revokes <a class="cite" href="#src-5">[5]</a>. Treat a 401 or 403 as "the cookie expired, fall back to D".
+      <span class="conf"><em>Confidence: medium, because it rests on whether the unauthenticated budget finishes a sync, which nobody has measured yet.</em></span>
+      <span class="badges"><span class="badge b-medium">Confidence: medium</span></span></li>
+    <li><strong>Brief or PRD (feasibility): drop any "log in with your PoE account" or browser-capture flow for the CLI.</strong> Profile reading is blocked <a class="cite" href="#src-15">[15]</a><a class="cite" href="#src-17">[17]</a>. An embedded login is desktop-app scope <a class="cite" href="#src-20">[20]</a>.
+      <span class="conf"><em>Confidence: high.</em></span>
+      <span class="badges"><span class="badge b-high">Confidence: high</span></span></li>
+    <li><strong>Architecture spine: use a descriptive User-Agent that includes contact details.</strong> The project has no OAuth client id, so the documented format <a class="cite" href="#src-1">[1]</a> is good practice, not a requirement.
+      <span class="conf"><em>Confidence: medium.</em></span>
+      <span class="badges"><span class="badge b-medium">Confidence: medium</span></span></li>
+  </ol>
+</section>
+
+<section id="open-questions">
+  <h2>Open questions</h2>
+  <ul class="claims">
+    <li><s><strong>Does a session cookie raise the PoE2 trade2 budget?</strong></s> <strong>Answered on 2026-10-02 <a class="cite" href="#src-30">[30]</a>:</strong> yes, 2× sustained and no burst gain. See <em>Implementation reality</em>.
+      <div class="badges"><span class="badge b-verified">answered: measured</span></div></li>
+    <li><strong>Do the cookie limits hold with the contact <code>User-Agent</code> that sync sends?</strong> The capture used a browser <code>User-Agent</code> <a class="cite" href="#src-30">[30]</a>. <em>Cheap experiment:</em> repeat the four-request capture with <code>POE_SYNC_USER_AGENT</code> set to the contact string.
+      <div class="badges"><span class="badge b-unverified">open: unmeasured</span></div></li>
+    <li><strong>Do the <code>Account</code> numbers depend on the account?</strong> One account was measured <a class="cite" href="#src-30">[30]</a>. A second account, for example a newer one or one without supporter packs, would show whether the numbers are global.
+      <div class="badges"><span class="badge b-unverified">open: one account</span></div></li>
+    <li><strong>Do pasted-cookie requests from a plain Node HTTP client trip Cloudflare over a 24-hour sync window?</strong> A 15-second sample passed <a class="cite" href="#src-30">[30]</a>. Run the capture on a schedule for a day.
+      <div class="badges"><span class="badge b-unverified">open: unmeasured</span></div></li>
+    <li><strong>Does a password change revoke POESESSID?</strong> No source says.
+      <div class="badges"><span class="badge b-unverified">open: no source</span></div></li>
+    <li><s><strong>Is the 2019 "session fetch 4/6s" claim real</strong> <a class="cite" href="#src-8">[8]</a>?</s> <strong>Answered by the capture <a class="cite" href="#src-30">[30]</a>:</strong> no, not for PoE2 on 2026-10-02. The session fetch <code>Account</code> rule is 6 per 4 s.
+      <div class="badges"><span class="badge b-overturned">answered: does not match</span></div></li>
+  </ul>
+</section>
+
+<section id="appendix">
+  <h2>Source appendix</h2>
+  <details class="appendix" id="appendixDetails">
+    <summary>30 sources: # &middot; Supports &middot; Publisher &middot; Published &middot; Accessed &middot; Confidence (click to expand)</summary>
+    <div class="inner">
+<table class="sources"><tbody><tr id="src-1"><td>[1]</td><td>Rate-limit headers, dynamic limits, §7i statement, registration closed, User-Agent format</td><td><a href="https://www.pathofexile.com/developer/docs" target="_blank" rel="noopener">GGG — Developer Docs overview</a></td><td>not shown</td><td>2026-10-02</td><td>high</td></tr><tr id="src-2"><td>[2]</td><td>OAuth scopes, client types, token lifetimes, PKCE</td><td><a href="https://www.pathofexile.com/developer/docs/authorization" target="_blank" rel="noopener">GGG — Developer Docs: Authorization</a></td><td>not shown</td><td>2026-10-02</td><td>high</td></tr><tr id="src-3"><td>[3]</td><td>Endpoints, poe2 realm support, Currency Exchange API</td><td><a href="https://www.pathofexile.com/developer/docs/reference" target="_blank" rel="noopener">GGG — Developer Docs: Reference</a></td><td>not shown</td><td>2026-10-02</td><td>high</td></tr><tr id="src-4"><td>[4]</td><td>ToS §7(c), 7(f), 7(i), §16</td><td><a href="https://www.pathofexile.com/legal/terms-of-use-and-privacy-policy" target="_blank" rel="noopener">GGG — Terms of Use</a></td><td>2024-10</td><td>2026-10-02</td><td>high</td></tr><tr id="src-5"><td>[5]</td><td>What POESESSID grants, invalidation, no proactive bans, OAuth is the secure route</td><td><a href="https://www.pathofexile.com/forum/view-thread/3328601" target="_blank" rel="noopener">GGG Community_Team — Do not share POESESSID values</a></td><td>2022-12-14</td><td>2026-10-02</td><td>high</td></tr><tr id="src-6"><td>[6]</td><td>Session moves the limit to an Account rule with the same limits, and Ip doubles (PoE1 search)</td><td><a href="https://www.pathofexile.com/forum/view-thread/2079853" target="_blank" rel="noopener">GGG Novynn — PoE Trade API Questions</a></td><td>2018-01-29</td><td>2026-10-02</td><td>low (stale)</td></tr><tr id="src-7"><td>[7]</td><td>Unauthenticated Ip state values (PoE1)</td><td><a href="https://www.pathofexile.com/forum/view-thread/3056323" target="_blank" rel="noopener">Verdale, GGG forum — API rate limit for trade searches</a></td><td>2021-02-24</td><td>2026-10-02</td><td>low (stale)</td></tr><tr id="src-8"><td>[8]</td><td>Session fetch 4/6s vs Ip 12/6s (PoE1); via import, not fetched</td><td><a href="https://www.reddit.com/r/pathofexiledev/comments/e6h6o2/trade_api_request_limit/" target="_blank" rel="noopener">KoomZog / rChinnn, Reddit — Trade API request limit</a></td><td>2019-12</td><td>via import 2026-10-02</td><td>low (unverified)</td></tr><tr id="src-9"><td>[9]</td><td>Accounts get a larger allowance; via import</td><td><a href="https://github.com/yaredmax/poe-ninja-build-cost" target="_blank" rel="noopener">yaredmax — poe-ninja-build-cost</a></td><td>2025-05</td><td>via import 2026-10-02</td><td>low (unverified)</td></tr><tr id="src-10"><td>[10]</td><td>Header said Account while limiting was per IP (bug)</td><td><a href="https://www.pathofexile.com/forum/view-thread/3257587" target="_blank" rel="noopener">GGG Novynn — forum thread 3257587</a></td><td>2022-03-20</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-11"><td>[11]</td><td>Tools, in-game search, and trade site share one budget</td><td><a href="https://www.pathofexile.com/forum/view-thread/3996346" target="_blank" rel="noopener">GGG Sameer_GGG — Rate-limiting is active for your account</a></td><td>2026-08-12</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-12"><td>[12]</td><td>GGG blocked Acquisition v0.9.7 for rate-limit violations</td><td><a href="https://github.com/gerwaric/acquisition/releases/tag/v0.9.9" target="_blank" rel="noopener">gerwaric — Acquisition release v0.9.9</a></td><td>2023-10-27</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-13"><td>[13]</td><td>Acquisition moved to OAuth, kept POESESSID for forum shops</td><td><a href="https://github.com/gerwaric/acquisition/releases?page=3" target="_blank" rel="noopener">gerwaric — Acquisition releases</a></td><td>2024-12-22</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-14"><td>[14]</td><td>IP refused as &quot;matching previously banned accounts&quot; (PoE2 tool)</td><td><a href="https://github.com/Kvan7/Exiled-Exchange-2/issues/646" target="_blank" rel="noopener">Exiled Exchange 2 — issue #646</a></td><td>2025-09-08</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-15"><td>[15]</td><td>App-Bound Encryption from Chrome 127</td><td><a href="https://security.googleblog.com/2024/07/improving-security-of-chrome-cookies-on.html?m=1" target="_blank" rel="noopener">Google Online Security Blog — Improving the security of Chrome cookies on Windows</a></td><td>2024-07-30</td><td>2026-10-02</td><td>high</td></tr><tr id="src-16"><td>[16]</td><td>ABE bypass needs SYSTEM or injection</td><td><a href="https://www.bleepingcomputer.com/news/security/google-chrome-adds-app-bound-encryption-to-block-infostealer-malware/" target="_blank" rel="noopener">BleepingComputer — Chrome adds App-Bound Encryption</a></td><td>2024-07-30</td><td>2026-10-02</td><td>high</td></tr><tr id="src-17"><td>[17]</td><td>ABE state in 2026, Edge included, same-user tools fail</td><td><a href="https://blog.elcomsoft.com/2026/01/browser-forensics-in-2026-app-bound-encryption-and-live-triage/" target="_blank" rel="noopener">ElcomSoft — Browser forensics in 2026</a></td><td>2026-01-13</td><td>2026-10-02</td><td>high</td></tr><tr id="src-18"><td>[18]</td><td>Chrome 136 ignores remote debugging on the default profile (search result only)</td><td><a href="https://developer.chrome.com/blog/remote-debugging-port" target="_blank" rel="noopener">Chrome for Developers — Changes to remote debugging switches</a></td><td>2025-03-17</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-19"><td>[19]</td><td>Cloudflare flags tools; CAPTCHA every ~15 min workaround</td><td><a href="https://snosme.github.io/awakened-poe-trade/failed-load-leagues.html" target="_blank" rel="noopener">SnosMe — APT: Failed to load leagues</a></td><td>not shown</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-20"><td>[20]</td><td>APT routes requests through an Electron session cookie jar</td><td><a href="https://raw.githubusercontent.com/SnosMe/awakened-poe-trade/master/main/src/proxy.ts" target="_blank" rel="noopener">SnosMe — APT main/src/proxy.ts</a></td><td>master</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-21"><td>[21]</td><td>EE2 (PoE2) uses the same proxy design</td><td><a href="https://raw.githubusercontent.com/Kvan7/Exiled-Exchange-2/master/main/src/proxy.ts" target="_blank" rel="noopener">Kvan7 — EE2 main/src/proxy.ts</a></td><td>master</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-22"><td>[22]</td><td>cf_clearance listed as optional next to POESESSID</td><td><a href="https://github.com/POEFixer/FixerWiki/wiki/Trade-Cookies" target="_blank" rel="noopener">POEFixer — FixerWiki: Trade Cookies</a></td><td>2026-09-29</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-23"><td>[23]</td><td>Cloudflare on the /login page broke a tool (2020)</td><td><a href="https://github.com/Procurement-PoE/Procurement/issues/1113" target="_blank" rel="noopener">Procurement — issue #1113</a></td><td>2020-06-13</td><td>2026-10-02</td><td>low (stale)</td></tr><tr id="src-24"><td>[24]</td><td>Cloudflare broke PoE2 trade integration</td><td>[GGG forum — [Trade] Cloudflare broken integration](<a href="https://www.pathofexile.com/forum/view-thread/3647344" target="_blank" rel="noopener">https://www.pathofexile.com/forum/view-thread/3647344</a>)</td><td>2024-12-18</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-25"><td>[25]</td><td>Cloudflare Turnstile failure on the trade site in 2026</td><td><a href="https://www.pathofexile.com/forum/view-thread/3987579" target="_blank" rel="noopener">GGG forum — Unable to access trade site, cloudflare issue</a></td><td>2026-07-24</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-26"><td>[26]</td><td>Only in-browser injection still reads ABE cookies (Chrome 144)</td><td><a href="https://github.com/xaitax/Chrome-App-Bound-Encryption-Decryption" target="_blank" rel="noopener">xaitax — Chrome-App-Bound-Encryption-Decryption</a></td><td>2026</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-27"><td>[27]</td><td>The imported report (verdict, matrix, flags)</td><td>Gemini Deep Research — imports/Path Of Exile API Auth.md</td><td>2026-10-02</td><td>2026-10-02</td><td>low</td></tr><tr id="src-28"><td>[28]</td><td>A shared session draws on one Account bucket; via import, not fetched</td><td><a href="https://www.reddit.com/r/pathofexiledev/comments/1c3bff2/understanding_the_xratelimit_response_headers/" target="_blank" rel="noopener">gerwaric, Reddit — Understanding the X-Rate-Limit response headers</a></td><td>2024-04</td><td>via import 2026-10-02</td><td>low (unverified)</td></tr><tr id="src-29"><td>[29]</td><td>APT paces from every rule that `x-rate-limit-rules` names</td><td><a href="https://raw.githubusercontent.com/SnosMe/awakened-poe-trade/master/renderer/src/web/price-check/trade/common.ts" target="_blank" rel="noopener">SnosMe — APT trade/common.ts</a></td><td>master</td><td>2026-10-02</td><td>medium</td></tr><tr id="src-30"><td>[30]</td><td>PoE2 trade2 rate-limit headers with and without POESESSID; unauthenticated values unchanged since 2026-09-12; no Cloudflare challenge on 4 plain-HTTP requests</td><td>Project first-hand capture — digests/capture-trade2-headers.md (cf-ray `a446998b2d1b271b`, `a4469999aaf9271b`, `a44699cd8db3ff2d`, `a44699dbe872ff2d`)</td><td>2026-10-02</td><td>2026-10-02</td><td>medium (one sample)</td></tr></tbody></table>
+    </div>
+  </details>
+  <p class="note">Rows <a class="cite" href="#src-27">[27]</a> and <a class="cite" href="#src-30">[30]</a> link to local files (<code>imports/Path Of Exile API Auth.md</code>, <code>digests/capture-trade2-headers.md</code>) and so render as plain text. Every claim in the import that this summary does not use is listed, with its flags, in <code>digests/import-gemini.md</code> <a class="cite" href="#src-27">[27]</a>.</p>
+</section>
+
+<section id="staleness">
+  <h2>Staleness map</h2>
+  <p>Computed by <code>recon_kit.py staleness</code>. Re-check windows: 1 month for OAuth, policy, and rate-limit numbers. 6 months for auth effect, ban history, cookie mechanics, and interactive flow. Dates marked † are access dates, because those pages show no date. The ToS row uses the access date because the docs statement <a class="cite" href="#src-1">[1]</a> has no date. The ToS page itself was last updated 2024-10 <a class="cite" href="#src-4">[4]</a>.</p>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Claim</th><th>Class</th><th>Published</th><th>Re-check by</th><th>Stale now</th></tr></thead>
+    <tbody>
+      <tr><td>OAuth has no trade scope <a class="cite" href="#src-2">[2]</a></td><td>oauth-scopes</td><td>2026-10-02 †</td><td>2026-11-02</td><td>no</td></tr>
+      <tr><td>OAuth registration closed <a class="cite" href="#src-1">[1]</a></td><td>oauth-flow</td><td>2026-10-02 †</td><td>2026-11-02</td><td>no</td></tr>
+      <tr><td>ToS §7 and §16, docs §7i statement <a class="cite" href="#src-1">[1]</a><a class="cite" href="#src-4">[4]</a></td><td>policy-tos</td><td>2026-10-02 †</td><td>2026-11-02</td><td>no</td></tr>
+      <tr><td>Session adds an Account burst rule and doubles sustained Ip limits (PoE2) <a class="cite" href="#src-30">[30]</a></td><td>auth-effect-on-limits</td><td>2026-10-02</td><td>2027-04-02</td><td>no</td></tr>
+      <tr><td>Unauthenticated trade2 Ip numbers <a class="cite" href="#src-30">[30]</a></td><td>rate-limit-number</td><td>2026-10-02</td><td>2026-11-02</td><td>no</td></tr>
+      <tr><td>Session gives an Account rule with the same limits <a class="cite" href="#src-6">[6]</a> (superseded for PoE2 by <a class="cite" href="#src-30">[30]</a>)</td><td>auth-effect-on-limits</td><td>2018-01-29</td><td>2018-07-29</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>Session fetch 4/6s vs Ip 12/6s <a class="cite" href="#src-8">[8]</a> (superseded for PoE2 by <a class="cite" href="#src-30">[30]</a>)</td><td>rate-limit-number</td><td>2019-12</td><td>2020-01-01</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>Unauthenticated Ip numbers <a class="cite" href="#src-7">[7]</a> (superseded for PoE2 by <a class="cite" href="#src-30">[30]</a>)</td><td>rate-limit-number</td><td>2021-02-24</td><td>2021-03-24</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>One budget for tools and the trade site <a class="cite" href="#src-11">[11]</a></td><td>auth-effect-on-limits</td><td>2026-08-12</td><td>2027-02-12</td><td>no</td></tr>
+      <tr><td>POESESSID gives near-full access <a class="cite" href="#src-5">[5]</a></td><td>cookie-mechanics</td><td>2022-12-14</td><td>2023-06-14</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>Acquisition v0.9.7 blocked <a class="cite" href="#src-12">[12]</a></td><td>ban-history</td><td>2023-10-27</td><td>2024-04-27</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>IP refused, "matching previously banned accounts" <a class="cite" href="#src-14">[14]</a></td><td>ban-history</td><td>2025-09-08</td><td>2026-03-08</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>App-Bound Encryption blocks same-user reads <a class="cite" href="#src-17">[17]</a></td><td>interactive-flow</td><td>2026-01-13</td><td>2026-07-13</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>Cloudflare blocks on tools recur <a class="cite" href="#src-23">[23]</a><a class="cite" href="#src-24">[24]</a></td><td>cookie-mechanics</td><td>2024-12-18</td><td>2025-06-18</td><td class="stale-yes">yes (stale)</td></tr>
+      <tr><td>APT and EE2 Electron cookie-jar design <a class="cite" href="#src-20">[20]</a><a class="cite" href="#src-21">[21]</a></td><td>interactive-flow</td><td>2026-10-02 †</td><td>2027-04-02</td><td>no</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Eight of the fifteen rows are stale. For PoE2, the 2026-10-02 capture <a class="cite" href="#src-30">[30]</a> supersedes the three stale rate-limit rows, so the conclusions no longer rest on them. Repeat the capture by 2026-11-02 to keep the rate-limit numbers fresh. The re-check dates for the fresh GGG rows and for the whole report are in the <a href="#summary"><em>Biggest caveat</em></a> of the summary.</p>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var btn=document.getElementById('themeToggle');
+  try{var saved=localStorage.getItem('briefing-theme');if(saved){root.setAttribute('data-theme',saved);}}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('briefing-theme',next);}catch(e){}
+  });
+  var details=document.getElementById('appendixDetails');
+  function openForHash(){
+    var h=location.hash;
+    if(h&&h.indexOf('#src-')===0){details.open=true;var el=document.getElementById(h.slice(1));if(el){el.scrollIntoView({block:'center'});}}
+  }
+  window.addEventListener('hashchange',openForHash);
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest&&ev.target.closest('a.cite');
+    if(a){details.open=true;}
+  });
+  openForHash();
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var targets=links.map(function(l){return document.getElementById(l.getAttribute('href').slice(1));});
+  if('IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+en.target.id);});
+        }
+      });
+    },{rootMargin:'0px 0px -70% 0px'});
+    targets.forEach(function(t){if(t){obs.observe(t);}});
+  }
+})();
+</script>
+</body>
+</html>

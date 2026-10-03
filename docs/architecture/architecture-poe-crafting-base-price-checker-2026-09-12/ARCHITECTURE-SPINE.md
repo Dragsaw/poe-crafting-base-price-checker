@@ -6,15 +6,17 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 23
+revision: 24
 created: '2026-09-12'
-updated: '2026-09-27'
+updated: '2026-10-03'
 binds: []
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/curl-creater-trade-search.txt
+  - docs/specs/spec-poesessid-sync/SPEC.md
+  - docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/research.md
   - .memlog.md (revisions 2, 9, 10, 12 record the substance of the PM's Phase 1 handoff and
     both sprint-change proposals; the three source documents themselves are no longer in the
     repo, deleted in commit 55fe390)
@@ -522,7 +524,8 @@ never import each other.
   or a gate `4xx` (a malformed request's wait also ends on an input change); until an input
   file under `data/` changes after a refusal or a league mismatch, with no time bound;
   for the lock after a busy or dispossessed chunk; and until an input change, at most row 3's
-  24h interval, when nothing is due. **A request that got no answer backs off**: a yield that
+  24h interval, when nothing is due. After AD-30's `session-expired` yield, which writes no
+  `notBefore`, the session waits `backoff(1)`. **A request that got no answer backs off**: a yield that
   wrote no `notBefore` and brought no State reading waits a backoff, and a throw that is none
   of the above and wrote no `notBefore` waits for an input change or the backoff, whichever
   ends first. The backoff starts at the tightest known bucket's even interval, doubles per
@@ -645,11 +648,14 @@ never import each other.
   for the whole process, and every State reading, other traffic on the IP included, replaces
   its values. Each chunk gets a fresh governor seeded with that state; **invalid-request
   counts stay per chunk**, because a shared count would refuse a policy for the rest of the
-  session after one `4xx`. The batch command keeps the batch pacer and a cold ledger.
+  session after one `4xx`. The batch command keeps the batch pacer and a cold ledger. **AD-30's
+  downgrade is the one event that discards the pacing state:** it resets to cold in place and
+  re-learns from the next response.
 
-  The adapter sends a
-  descriptive `User-Agent` naming the tool and a contact address, as GGG asks of
-  third-party tools. Header-parsing detail and the measured 2026-09-12 buckets are in
+  The adapter sends the `User-Agent` string configured in `POE_SYNC_USER_AGENT` verbatim. By
+  default that string names the tool and a contact address, as GGG asks of third-party tools.
+  A cookie run uses a browser string instead (AD-30). The adapter also attaches AD-30's
+  optional session cookie, and no other component does. Header-parsing detail and the measured 2026-09-12 buckets are in
   `IMPLEMENTATION-NOTES.md` §5.3, binding under AD-0.
 
   **Recorded risk: `trade2` is undocumented.** GGG's developer documentation covers the
@@ -720,7 +726,9 @@ never import each other.
   `lastAttemptedAt`, which is harmless because AD-24 tests the identifier's league and not
   its age. **A 4xx other than 429 is not a market fact and is not a price state:** it means
   the request `sync` built is malformed — the `valueless` wire shape of OQ-12 is the live
-  candidate — and the same defect will fail every entry, so `sync` stamps `lastAttemptedAt`,
+  candidate — and the same defect will fail every entry. **Two exceptions belong to AD-30:** a
+  `401` or `403` on a request that carried the session cookie, and a non-429 `4xx` on the
+  session probe. Neither is a malformed request. For any other such `4xx`, `sync` stamps `lastAttemptedAt`,
   leaves the entry's **price state** as it was (an answered search still sets its two search
   fields), writes a record to `sync-report.json`, persists AD-8's `notBefore` and **aborts the
   run non-zero** (Consistency Conventions, *Error shape*) rather than spending the rest of
@@ -922,25 +930,27 @@ never import each other.
   second workload silently consuming the same bucket; and the addendum's named risk — *"a
   stale top five that the user trusts is worse than no tool"* — becoming the steady state
   because nothing ever prompts a review.
-- **Rule:** Exactly **three** sources generate a request, and nothing else does:
+- **Rule:** Exactly **four** sources generate a request, and nothing else does:
 
   | Source | Cadence | Cost |
   | --- | --- | --- |
   | `data/tracked.json` — combinations to price | every chunk | one search + one fetch per entry |
   | League validation against the live leagues endpoint (AD-19) | once per run | one request |
+  | Session probe (AD-30) | once per process, after the first 2xx pricing search, when a valid cookie is not held off. Each probe `429` allows one more. | one search |
   | Catalogue refresh (AD-25) | explicit command, patch cadence, never on the chunk path | four requests |
 
   **`data/currencies.json` is not a source.** It was one until revision 14, when AD-20 moved
   currency rates to a hand-maintained committed file; the file is now read, never fetched
-  against. A fourth source is an amendment to this AD, not an implementation detail.
+  against. A fifth source is an amendment to this AD, not an implementation detail.
   `sync-report.json` must report requests consumed **per source a chunk spends** — the
-  tracked list and league validation — so budget drift is observable per cause. **The
+  tracked list, league validation and the session probe (`session-probe`) — so budget drift
+  is observable per cause. **The
   catalogue refresh is not a figure there:** the report describes one chunk, the refresh
   never runs on the chunk path, and a count written by the refresh process would give the
   report a second writer (AD-3) and be overwritten by the next chunk. The refresh command
   prints its own request count when it finishes.
 
-  **Three run-start gates stand in front of the two sources a chunk spends**, and their consequences
+  **Three run-start gates stand in front of the sources a chunk spends**, and their consequences
   differ by design. `sync` validates every tracked id against the catalogue (AD-9) — a
   per-entry condition, so the entry is marked `unresolvable` and the run continues.
   `sync` runs `core`'s cross-file validation of `data/tracked.json` against the weights
@@ -1001,8 +1011,10 @@ never import each other.
 
   **The ceiling is denominated in searches, not in entries.** Against the measured 2,400
   searches per day, a full refresh is held to **~1,500 searches**; the remainder serves
-  retries, the catalogue refresh and the per-run leagues check — the only other two of
-  AD-12's three request sources. One tracked entry always costs one search. Currency rates
+  retries, the catalogue refresh, the per-run leagues check and the session probe — the only
+  other three of AD-12's four request sources. The ceiling stays denominated against the
+  unauthenticated budget: AD-30's cookie is opt-in and may drop mid-run, so a refresh must fit
+  without it. One tracked entry always costs one search. Currency rates
   (AD-20) and a recipe's ranking effect (AD-4, AD-17) cost nothing at sync time: rates are
   hand-maintained, never fetched, and a second recipe changes only what `core` computes at
   read time against prices already synced. **`pinned` entries spend from that
@@ -1764,6 +1776,78 @@ never import each other.
   regenerated file, and `sync-report.json` carries the figure `sync` computed. The rule is
   **source-agnostic** and survives a change of producer untouched.
 
+### AD-30 — An optional session cookie rides inside the governed client, and only ever downgrades
+
+- **Binds:** `sync`, `contracts`, `web`
+- **Prevents:**
+  - the account credential leaking through a second call site, an error, a report record or
+    a fixture.
+  - two builders classifying a probe `5xx` or a Cloudflare `403` differently.
+  - two builders deciding liveness differently.
+  - a per-chunk governor turning on again a cookie that the process dropped.
+  - authenticated readings pacing unauthenticated requests.
+  - a dead cookie spending a counted `4xx` on every scheduled run.
+- **Rule:** **By default, sync sends no credential.** The opt-in is a `POESESSID` value in the
+  operator's environment (SPEC-poesessid-sync CAP-1). Only the `pnpm sync` and
+  `pnpm sync:batch` shells read it, at the shell edge. Every other composition cannot accept
+  it, so no committed fixture or catalogue carries the headers of a session (AD-13, AD-25).
+
+  **One process-scoped auth holder owns the value and the state.** The shell builds it once
+  and passes it into each chunk's governor, as AD-8 does with the pacing state. The holder is
+  opaque. Only the governor attaches the cookie, and only the holder changes the state. The
+  governor removes the value from every error it passes on, so no output or artifact carries
+  any part of it.
+
+  **The cookie rides on pricing searches and fetches only**, never on the league request
+  (AD-12).
+
+  **The state settles once per process and only downgrades.** One liveness test applies to
+  every response that carried the cookie. The test compares the rule count against an
+  unauthenticated baseline and never compiles in a rule name (AD-8). The first answered
+  pricing search is the baseline, and one probe search settles the state. A probe `429`
+  settles nothing and stays AD-8's `429`: its `notBefore` persists through AD-8's path even
+  when the probe is the last request of the chunk (`IMPLEMENTATION-NOTES.md` §13.3). A probe
+  `5xx` settles `probe-failed` with no hold-off, like a throw or a timeout. A non-429 probe
+  `4xx` settles `probe-rejected`. Neither is an invalid request for the chunk, AD-9's
+  malformed-request abort, or AD-9's request with no answer.
+
+  **Every `401` or `403` on a cookie request means a dead cookie**, a Cloudflare `403`
+  included. On the probe it is `probe-rejected`, and after the probe it is `expired`. Both
+  write the hold-off. **Rejected:** a carve-out that reads a `403` with `cf-mitigated` or an
+  HTML body as `probe-failed`. The operator chose one rule for every `401` and `403` over a
+  second classifier on response shape. **Accepted cost:** a Cloudflare block can hold
+  off a live cookie for 24 hours (SPEC-poesessid-sync CAP-5).
+
+  **Expiry is a downgrade, not a malformed request.** A cookie response that fails the test,
+  or receives `401` or `403`, drops the cookie for the rest of the process. The downgrade
+  resets the process pacing state to cold (AD-8). It ends the chunk as a yield that persists
+  no `notBefore`, and the batch command exits 0. A downgrade on a 2xx discards that response,
+  and the entry is AD-9's request that got no answer (SPEC-poesessid-sync CAP-3). **Accepted
+  cost:** the next request can receive a `429`. GGG counts authenticated and unauthenticated
+  requests on one `Ip` counter, so an authenticated run can already be over the
+  unauthenticated limits.
+
+  **Sync holds off a cookie that failed, across processes.** `sync-progress.json` records when
+  a retry is due, never the value. Until then, sync sends no probe. The holder records each
+  write or clear of the hold-off, and the runner applies it with the chunk's progress write
+  (AD-7). Every other outcome leaves the field unchanged.
+
+  **The console carries the state, and the report does not** (SPEC-poesessid-sync CAP-2,
+  CAP-4). `SyncRunReport` has no auth field. The report's one cookie trace is the
+  `session-probe` request count (AD-12). `sync-progress.json` carries a second trace, the
+  `authHoldOffUntil` instant. Both files are published (AD-3, AD-7), so both traces are
+  public, and the operator accepts them. **`web` shows no auth figure and never renders the
+  `session-probe` count** (UX `EXPERIENCE.md`, the sync report panel).
+
+  **The `User-Agent` for a cookie run is the operator's.** It goes in `POE_SYNC_USER_AGENT`
+  with no code change, and it departs from NFR-9's contact rule (SPEC-poesessid-sync). That
+  the trade API accepts only a browser string on a cookie request is an operator observation,
+  not a measured fact. OQ-26 verifies it.
+
+  The sequence, the predicate, the hold-off interval, the yield, the reason identifiers and
+  the value checks are in `IMPLEMENTATION-NOTES.md` §13, binding under AD-0. The premises
+  this AD rests on are OQ-26's.
+
 ## Retired AD map
 
 Revision 10 merged **ten** decisions into their neighbours and retired their ids, taking the
@@ -1801,8 +1885,8 @@ id resolves here.
 | Error shape | `core` returns typed results and never throws for expected conditions such as no listings, a missing weight, or an unresolvable stat. `sync` throws only for unrecoverable run failures. Everything else lands in `sync-report.json`. |
 | Validation | Zod schemas in `contracts` are the single source of truth and types are `z.infer`red. Validate at every trust boundary: API response, before artifact write, and on artifact load. |
 | Schema versioning | Every published artifact and input file carries `schemaVersion`. A consumer refuses an unknown major version rather than guessing. |
-| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. **A repeat is the same record, not a new one:** a record's identity is its kind plus its subject fields, and a repeat replaces its observation fields in place and keeps its position — replacing is not clearing (per-kind fields in `IMPLEMENTATION-NOTES.md` §12, binding under AD-0). A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
-| Config | No runtime environment lookups in `core`. `sync` reads `data/config.json` plus a small env overlay for the contact `User-Agent`. |
+| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The one console-only fact is AD-30's auth state line**, and it never enters the report. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. **A repeat is the same record, not a new one:** a record's identity is its kind plus its subject fields, and a repeat replaces its observation fields in place and keeps its position — replacing is not clearing (per-kind fields in `IMPLEMENTATION-NOTES.md` §12, binding under AD-0). A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
+| Config | No runtime environment lookups in `core`. `sync` reads `data/config.json` plus a small env overlay: the required `User-Agent` and, for the `sync` and `sync:batch` shells only, the optional session cookie (AD-30). Both are read at the shell edge and passed in as values. |
 | Tests | Vitest everywhere. `core` is tested as pure functions with literal inputs, `sync` against recorded fixtures through ports, `web` with MSW-served artifacts. |
 
 ## Structural Seed
@@ -1850,7 +1934,7 @@ while making the tree read as upgraded.
 ```mermaid
 graph TB
   subgraph external[External]
-    trade[PoE2 Trade API<br/>unauthenticated, Ip rate-limited]
+    trade[PoE2 Trade API<br/>unauthenticated by default, header-paced<br/>optional session cookie — AD-30]
     producer[Weights scraper project<br/>SEPARATE PROJECT — prerequisite]
   end
 
@@ -1942,8 +2026,10 @@ bounded work, **writes the files it owns, and releases the lock — it touches g
 player commits the sync-owned files and pushes them to the default branch, and *that* push
 triggers a **GitHub Actions workflow** that builds the Vite bundle and deploys to Pages —
 branch-published Pages runs Jekyll and cannot build this app, so the workflow is required, not
-optional. There is no staging environment, no secret material (the trade API is used
-unauthenticated, as confirmed), and nothing to patch on a server. Local development is
+optional. There is no staging environment and nothing to patch on a server. The trade API works
+unauthenticated, as confirmed, so the product needs no secret. The one optional secret is
+the operator's `POESESSID` (AD-30). It lives only in the operator's local `.env`, never in
+git and never in CI, because only the operator's machine runs sync. Local development is
 `pnpm dev` against committed fixtures, with no network.
 
 The site's freshness is therefore bounded by the player's push cadence rather than the sync
@@ -1994,6 +2080,7 @@ poe-crafting-base-price-checker/
 | Player-set payout threshold | `web` + `core` | AD-17, AD-4, AD-15 |
 | Price estimation from listings | `sync` + `core` | AD-16, AD-20 |
 | Background sync, rate-limit aware | `sync` | AD-7, AD-8, AD-12 |
+| Optional session cookie for sync | `sync` | AD-30, AD-8, AD-12 |
 | Curation: prune, pin | `data/tracked.json` | AD-12, AD-3 |
 | Weights schema (the contract) | `contracts` | AD-11, AD-17 |
 | Weights file (the data) | external scraper project — **not this repo** | AD-11, AD-27 |
@@ -2057,9 +2144,13 @@ poe-crafting-base-price-checker/
 - **Mod-group conditional probability.** AD-17 assumes independent affix draws; group
   exclusion makes the second weakly conditional. **Revisit when** measured weights land and
   the error becomes estimable.
-- **Authenticated sync.** Would move the rate-limit rule off `Ip` to a higher bucket, and is
-  a quantified lever. **Revisit if** the tracked list must exceed ~1,500 entries. It
-  reintroduces a rotting credential.
+- **OAuth, and any credential flow beyond a pasted cookie.** AD-30 adopts the session cookie
+  as an opt-in. OAuth has no trade scope and is closed to new registrations. An interactive
+  login, a read of the cookie from a browser profile, and an embedded browser are each out of
+  scope for a CLI. **Revisit if** GGG publishes a trade scope.
+- **Cookie refresh, rotation or storage outside `.env`, and Cloudflare challenge solving.**
+  AD-30 drops a dead cookie and does not repair it. **Revisit if** Cloudflare challenges
+  start to block scheduled cookie runs.
 - **Migration to a hosted syncer.** AD-7 makes this config, not a rewrite. **Revisit if** a
   day-stale dataset becomes intolerable.
 - **Price history features.** Git carries the data (AD-19); no feature reads it in v1.
@@ -2197,6 +2288,19 @@ poe-crafting-base-price-checker/
   an absolute the old category-altitude search could not have satisfied. AD-16 owns the
   shape, `IMPLEMENTATION-NOTES.md` §10 the derivation, and AD-17's fifth cross-file check
   the guarantee that a class needing a discriminator always has one.
+- **OQ-26 — do AD-30's two premises hold beyond one sample?** The first premise is that a live
+  `POESESSID` adds a rule name to `X-Rate-Limit-Rules`, measured once (research [30]). The
+  second is that a dead cookie gets `401` or `403` on trade2, which is assumed. A capture of
+  the no-cookie response carried `set-cookie: POESESSID`, so a dead cookie may get a 200 with
+  fewer rules instead. AD-30 is safe either way, because every cookie response is held to the
+  rule-count test. What a re-check settles is whether the warnings name the right reason, and
+  whether the cookie gives any gain. **Re-check by 2026-11-02**: record the rule names of the
+  first live cookie run, sign out and record one cookie request, and capture the cookie and
+  no-cookie requests with the contact `User-Agent` in
+  `digests/capture-trade2-headers.md`. That last capture verifies a third input, the
+  operator's observation that the trade API accepts only a browser `User-Agent` on a cookie
+  request. If a cookie request with the contact `User-Agent` is answered, AD-30's departure
+  from NFR-9 has no cause. **Owner: the operator.** *Not blocking for building.*
 - **~~The trade-site search response's identifier field.~~ Closed 2026-09-19: it is `id`.**
   A captured search response carries the search identifier in a top-level `id`; `tradeId` is
   not it. AD-9 persists that value as `lastSearchId` and AD-24 builds the outbound link from

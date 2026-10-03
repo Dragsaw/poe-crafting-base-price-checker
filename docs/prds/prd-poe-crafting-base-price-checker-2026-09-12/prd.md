@@ -1,14 +1,15 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 23
+revision: 24
 created: 2026-09-12
-updated: 2026-09-27
+updated: 2026-10-03
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/sprint-change-proposal-2026-09-13.md
   - docs/sprint-change-proposal-2026-09-19.md
+  - docs/specs/spec-poesessid-sync/SPEC.md
 inherits:
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/WEIGHTS-FILE-SCHEMA.md
@@ -44,7 +45,7 @@ The ranking is not "most expensive base," and everything else in the system exis
 - **Stop paying the memorisation tax.** Emotional: the relief of not holding a top-five list in your head, and of not losing that list at every league start.
 - **Know when the answer has gone stale.** The player must be able to tell a figure resting on real measured weights from a figure resting on a uniform placeholder, and a row priced an hour ago from a row priced yesterday. If the tool does not tell the player, the player will trust the placeholder six months later.
 - **Spend time playing, not crafting.** Contextual: the binding constraint is the player's own time. Outcomes below the player's threshold are worth nothing to him, because that much currency turns up simply from playing. Such outcomes must therefore contribute nothing to the ranking.
-- **Keep a tool alive for a year without the tool becoming a second job.** The maintenance surface is a first-class concern: no credentials to rot, no server to patch, no account system.
+- **Keep a tool alive for a year without the tool becoming a second job.** The maintenance surface is a first-class concern: no credential the product requires, no server to patch, no account system. The one optional credential, a sync session cookie (FR-20), never gates a run and rots harmlessly.
 
 ### 2.2 Non-Users (v1)
 
@@ -363,6 +364,7 @@ The player can see how long it has been since anyone last edited the Tracked Lis
 - The tool's traffic is paced so that access is never lost; losing it ends the product (R-7).
 - No component but the governed client issues a trade request (AD-8, AD-25).
 - The mechanism is AD-8's single governed client (AD-8, NFR-9; `IMPLEMENTATION-NOTES.md` §5.3).
+- **Sync may use the operator's POESESSID session cookie, and never needs it** *(PRD-owned)*. The cookie is an opt-in that lets a long refresh finish in fewer hours. With no cookie, or with one that has stopped working, sync runs unauthenticated at no cost beyond one console warning, and the run's outcome is unchanged. The console says whether the run was authenticated, and no output or artifact carries the cookie value (AD-30; SPEC-poesessid-sync CAP-1 to CAP-5). The view stays free of credentials (AD-15).
 
 #### FR-21: Estimate a price from the cheapest live instant-buyout listings
 
@@ -539,9 +541,9 @@ The ranking treats a Price Observation from any league but the active one as abs
 - **NFR-4 — Parallel worktree development.** Packages own disjoint directories with a one-way dependency graph that CI enforces, so two agents in two packages touch no common file (AD-1). The working rules for contracts changes, live sync and dry runs are `AGENT-WORKFLOW.md`'s.
 - **NFR-5 — One writer per file.** Every shared file has exactly one writer, and no component of the product writes a file another owns (AD-3).
 - **NFR-6 — Read-time budget.** A full ranking pass completes in under 100 ms on a mid-range machine and re-runs synchronously on a threshold change; the remedy for a miss is memoisation, never precomputation (AD-4, AD-24).
-- **NFR-7 — Static delivery, zero upkeep.** The view is a static bundle that CI deploys: no server, no secret material, no expiring credential (AD-15).
+- **NFR-7 — Static delivery, zero upkeep.** The view is a static bundle that CI deploys: no server, no secret material, no expiring credential (AD-15). The operator's optional sync cookie lives only on the operator's machine and is not part of delivery (FR-20, AD-30).
 - **NFR-8 — Schema versioning at every trust boundary.** Every published artifact and input file carries a schema version, a consumer refuses an unknown major rather than guessing, and a producer validates before it writes (AD-3, Consistency Conventions).
-- **NFR-9 — Third-party citizenship.** Requests identify the tool and a contact address, pace from live rate-limit headers and honour `Retry-After` (AD-8). Keeping API access is a standing requirement, because the product depends on it entirely (R-7) *(PRD-owned)*.
+- **NFR-9 — Third-party citizenship.** Requests identify the tool and a contact address by default, pace from live rate-limit headers and honour `Retry-After` (AD-8). **One operator-chosen departure:** a run that uses the session cookie identifies itself with a browser string instead, because the operator observed that the trade API accepts nothing else for it; OQ-26 verifies that observation (AD-30). Keeping API access is a standing requirement, because the product depends on it entirely (R-7) *(PRD-owned)*.
 - **NFR-10 — Accessibility floor.** Colour alone never carries a product-meaningful distinction: Price State (FR-9), a crafted row versus a Raw Base row (FR-3) and Provenance (FR-10). AD-24 requires this for Provenance; this PRD extends it to the other two *(PRD-owned)*. `[ASSUMPTION: the extension beyond AD-24's literal scope is this PRD's, not the spine's.]`
 
 ## 6. Non-Goals (Explicit)
@@ -566,7 +568,7 @@ The ranking treats a Price Observation from any league but the active one as abs
 - Raw Bases at item level 82, threshold-truncated like any other outcome.
 - One ranked list of Item Classes and raw Base Types (FR-3), bounded for readability, with Chase Combinations, expandable to the full tracked Combination list including tombstones.
 - Player-set Payout Threshold, re-ranking at read time.
-- Background sync: unauthenticated, rate-limit adaptive, bounded, resumable, with a defined Refresh Rotation.
+- Background sync: unauthenticated by default, with an optional operator session cookie (FR-20), rate-limit adaptive, bounded, resumable, with a defined Refresh Rotation.
 - Four-state pricing with reasons on `not-yet-synced`, and unknowns segregated from the ranking.
 - Provenance and per-row freshness throughout, plus the global uniform-prior caveat.
 - Curation through hand-edited committed files, surfaced read-only in the view with tracked-list age.
@@ -585,7 +587,7 @@ The spine's *Deferred* section is the register of technical deferrals and their 
 - **Re-seeding the Tracked List from community sources.** The most promising answer to Risk R-2 and the single largest gap v1 leaves open.
 - **Pricing a deliberate conjunction of co-occurring stats.** A curator cannot yet express "both Stat Lines of this hybrid modifier" as one priced outcome, and FR-16 rejects the two-entry spelling. Deferred in the spine; recorded here because a curator will plausibly try it and the rejection is not a defect.
 - **Measuring how far whole-tier containment understates the ranking.** Open as §10 OQ-21, owned by the spine. Until it is answered, the ordering is trusted on an operating bet (§11), and the deferred pro-rating and dropped-line guards in the spine's *Deferred* section are only as safe as that answer.
-- **Authenticated sync, a hosted syncer, observability beyond the Sync Report, a repository split for the schema.** Spine-owned deferrals with stated revisit triggers; none changes what the player sees.
+- **A hosted syncer, observability beyond the Sync Report, a repository split for the schema.** Spine-owned deferrals with stated revisit triggers; none changes what the player sees. OAuth and any credential flow beyond the pasted cookie are deferred in the spine on the same terms.
 
 ### 7.3 Release Dependencies
 
@@ -608,7 +610,7 @@ Behavioural, not numeric. There is one user, and instrumenting the tool would be
 - **SM-4a: The ordering beats the naive one.** Once a season, the player compares the top five by EV against the top five by raw price. If the two lists agree, the product's central bet has not paid, whatever the other metrics say *(PRD-owned)*.
 
 **Secondary**
-- **SM-5: The tool is still running in a year.** No credential expired. No server needed a patch. No maintenance task was skipped until something broke. Validates NFR-7, FR-20.
+- **SM-5: The tool is still running in a year.** No credential the product needs expired. No server needed a patch. No maintenance task was skipped until something broke. Validates NFR-7, FR-20.
 - **SM-6: Agents ship without a human unblocking them.** Development proceeds with tests passing offline and no live API in the loop. Validates NFR-1, NFR-2, NFR-4.
 
 **Counter-metrics (do not optimise)**
