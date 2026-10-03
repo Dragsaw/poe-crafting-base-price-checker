@@ -199,14 +199,50 @@ describe('defenceLettersOf', () => {
   );
 });
 
-describe('buildSearchBody: a hybrid reference (interim)', () => {
-  it('throws, naming the story that builds its filters', () => {
+describe('buildSearchBody: a hybrid reference', () => {
+  it('sends one filter per line under the one and group: {min,max} banded, {} valueless', () => {
     const entry = crafted('weapon.bow', 'Bows', {
-      prefix: { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1' }, { statId: 'explicit.stat_3' }] },
+      prefix: {
+        kind: 'hybrid',
+        lines: [
+          { statId: 'explicit.stat_1', valueMin: 10, valueMax: 20.5 },
+          { statId: 'explicit.stat_3' },
+        ],
+      },
       suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     });
-    expect(() => buildSearchBody(entry, itemTypes)).toThrow(
-      'hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 6)',
-    );
+    const body = buildSearchBody(entry, itemTypes);
+
+    expect(body.query.stats).toEqual([
+      {
+        type: 'and',
+        filters: [
+          { id: 'explicit.stat_1', value: { min: 10, max: 20.5 }, disabled: false },
+          { id: 'explicit.stat_3', value: {}, disabled: false },
+          { id: 'explicit.stat_2', value: {}, disabled: false },
+        ],
+      },
+    ]);
+  });
+
+  it('expands a hybrid suffix after the prefix and leaves the rest of the body unchanged', () => {
+    const entry = crafted('weapon.bow', 'Bows', {
+      prefix: { kind: 'valueless', statId: 'explicit.stat_2' },
+      suffix: {
+        kind: 'hybrid',
+        lines: [
+          { statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 },
+          { statId: 'explicit.stat_3', valueMin: 3, valueMax: 4 },
+        ],
+      },
+    });
+    const body = buildSearchBody(entry, itemTypes);
+
+    expect(body.query.stats[0].filters.map((f) => f.id)).toEqual([
+      'explicit.stat_2',
+      'explicit.stat_1',
+      'explicit.stat_3',
+    ]);
+    expect(body.query.filters.type_filters.filters.rarity).toEqual({ option: 'magic' });
   });
 });

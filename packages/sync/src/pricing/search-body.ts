@@ -143,19 +143,24 @@ function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Disc
 }
 
 /**
- * One stat filter per modifier reference. A banded edge goes out **exactly**
- * as declared — never rounded to reach an integer (AD-16) — and
- * `disabled: false` is written on every filter (§5.1).
+ * The stat filters of one modifier reference: one for a single-line reference,
+ * one per line for a hybrid (AD-16, SPEC-tracked-hybrid-mods CAP-2). A banded
+ * edge goes out **exactly** as declared — never rounded to reach an integer —
+ * and `disabled: false` is written on every filter (§5.1). A valueless line
+ * carries `{}`. The schema already sorted a hybrid's lines by `statId`.
  */
-function statFilterOf(ref: ModifierRef): StatFilter {
+function statFiltersOfRef(ref: ModifierRef): StatFilter[] {
   switch (ref.kind) {
     case 'banded':
-      return { id: ref.statId, value: { min: ref.valueMin, max: ref.valueMax }, disabled: false };
+      return [{ id: ref.statId, value: { min: ref.valueMin, max: ref.valueMax }, disabled: false }];
     case 'valueless':
-      return { id: ref.statId, value: {}, disabled: false };
+      return [{ id: ref.statId, value: {}, disabled: false }];
     case 'hybrid':
-      // Interim: the committed data holds no hybrid. Story 6 builds its filters.
-      throw new Error('hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 6)');
+      return ref.lines.map((line) => ({
+        id: line.statId,
+        value: 'valueMin' in line ? { min: line.valueMin, max: line.valueMax } : {},
+        disabled: false,
+      }));
   }
 }
 
@@ -164,7 +169,7 @@ function statFiltersOf(entry: TrackedEntry): StatFilter[] {
     return [];
   }
   // Prefix and suffix share one `and` group.
-  return [statFilterOf(entry.prefix), statFilterOf(entry.suffix)];
+  return [...statFiltersOfRef(entry.prefix), ...statFiltersOfRef(entry.suffix)];
 }
 
 function edgeFor(letters: ReadonlySet<DefenceLetter>, letter: DefenceLetter): FilterEdge {
