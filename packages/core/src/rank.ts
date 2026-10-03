@@ -128,7 +128,8 @@ export interface UnrankableClass {
    * class`: the one recipe whose pair is unrankable. The class may rank under
    * another recipe (EXPERIENCE.md state 36). The same reason without a recipe
    * id holds under every recipe: a `complete` slot with total weight 0, the
-   * same test as `poolCoverage`. The other reasons carry no recipe id.
+   * same test as `poolCoverage`, or no recipe existing at all (retro item
+   * 29). The other reasons carry no recipe id.
    */
   readonly recipeId?: string;
   /**
@@ -420,6 +421,15 @@ export function rank(input: RankInput): Ranking {
       .toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey));
     const first = keyed[0]?.entry;
     if (first === undefined) {
+      continue;
+    }
+    if (recipes.length === 0) {
+      // No recipe exists to try, so the class would be in neither list nor appendix. Retro item 29.
+      unrankable.set(JSON.stringify([first.categoryId, first.className]), {
+        categoryId: first.categoryId,
+        className: first.className,
+        reason: RECIPE_UNREACHABLE,
+      });
       continue;
     }
     recipes.forEach((recipe, index) => {

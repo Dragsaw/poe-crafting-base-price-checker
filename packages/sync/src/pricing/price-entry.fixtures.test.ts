@@ -34,7 +34,11 @@ function readJson(path: string): unknown {
   return JSON.parse(readFileSync(new URL(path, ROOT), 'utf8'));
 }
 
-const league = ConfigFileSchema.parse(readJson('data/config.json')).league;
+function readFrozen(path: string): unknown {
+  return JSON.parse(readFileSync(new URL(`test/fixtures/frozen-data/${path}`, ROOT), 'utf8'));
+}
+
+const league = ConfigFileSchema.parse(readFrozen('config.json')).league;
 /**
  * Pinned here rather than read from the player-maintained
  * `data/currencies.json`, so a routine rate edit cannot turn the suite red.
@@ -46,7 +50,7 @@ const rates: CurrencyRate[] = [
   { currencyId: 'exalted', rate: 0.002012, source: 'measured', league, asOf: PINNED_AS_OF },
   { currencyId: 'chaos', rate: 0.13078, source: 'measured', league, asOf: PINNED_AS_OF },
 ];
-const itemTypes = itemTypesOf(CatalogueItemsFileSchema.parse(readJson('data/catalogue/items.json')));
+const itemTypes = itemTypesOf(CatalogueItemsFileSchema.parse(readFrozen('catalogue/items.json')));
 const tracked = TrackedFileSchema.parse(readJson(FIXTURE_WORKLOAD_PATH)).entries.filter(
   (entry) => entry.status !== 'pruned',
 );

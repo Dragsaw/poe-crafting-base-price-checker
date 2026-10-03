@@ -5,7 +5,8 @@ import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
 
 /**
- * The fit check over the committed data (the Story 2.5 AC, discharged here).
+ * The fit check over the frozen data fixture (the Story 2.5 AC, discharged here).
+ * The live data/ runs the same fit check in `tracked.data.test.ts`.
  * Line one of a combination row is `nowrap` in fixed cells, so an overlong
  * text would run into the state cell instead of wrapping. jsdom lays out no
  * text, so the width is an estimate, not a guarantee: every character is
@@ -14,12 +15,12 @@ import { combinationString, combinationText, statTexts } from './combination-tex
  * evidence is the agent-browser measurement recorded in the spec's
  * Implementation Notes.
  */
-const committed = import.meta.glob<unknown>('../../../../data/{tracked.json,catalogue/stats.json}', {
+const committed = import.meta.glob<unknown>('../../../../test/fixtures/frozen-data/{tracked.json,catalogue/stats.json}', {
   eager: true,
   import: 'default',
 });
-const tracked = TrackedFileSchema.parse(committed['../../../../data/tracked.json']);
-const stats = statTexts(CatalogueStatsFileSchema.parse(committed['../../../../data/catalogue/stats.json']));
+const tracked = TrackedFileSchema.parse(committed['../../../../test/fixtures/frozen-data/tracked.json']);
+const stats = statTexts(CatalogueStatsFileSchema.parse(committed['../../../../test/fixtures/frozen-data/catalogue/stats.json']));
 
 const live = tracked.entries.flatMap((entry) => (entry.kind === 'crafted' && entry.status !== 'pruned' ? [entry] : []));
 const texts = live.map((entry) => combinationText(entry, stats));
@@ -91,8 +92,8 @@ const PRUNING_CANDIDATES = [
   'T1-T2 Flat Lightning · T1-T2 Proj Skills',
 ];
 
-describe('the committed Combination texts', () => {
-  it('reads every committed crafted entry in its curated form: no fallback, and no numeral but the tier', () => {
+describe('the frozen Combination texts', () => {
+  it('reads every crafted entry of the fixture in its curated form: no fallback, and no numeral but the tier', () => {
     expect(live.length).toBeGreaterThan(0);
     for (const parts of texts) {
       for (const part of parts) {
