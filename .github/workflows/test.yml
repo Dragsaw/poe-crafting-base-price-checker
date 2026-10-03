@@ -1,0 +1,62 @@
+# Runs the checks and the test suite on a pull request that changes code or
+# the config that code builds with.
+#
+# The workflow starts on every pull request and the filter step skips the rest
+# when nothing relevant changed. A `paths:` trigger would skip the whole run, and
+# a required check that never reports leaves the pull request unmergeable.
+#
+# `pnpm test` reads a frozen fixture set, not `data/`, so it is the same gate
+# that `deploy.yml` runs before a build. `pnpm test:data` is not run here.
+name: Tests
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: tests-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.mts'
+              - '**/*.cts'
+              - '**/*.mjs'
+              - '**/package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '**/tsconfig*.json'
+              - '.github/workflows/test.yml'
+
+      # Reads the version from `packageManager` in package.json.
+      - if: steps.changes.outputs.code == 'true'
+        uses: pnpm/action-setup@v4
+
+      - if: steps.changes.outputs.code == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - if: steps.changes.outputs.code == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - if: steps.changes.outputs.code == 'true'
+        run: pnpm check
+
+      - if: steps.changes.outputs.code == 'true'
+        run: pnpm test
