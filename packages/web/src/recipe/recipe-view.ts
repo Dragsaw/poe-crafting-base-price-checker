@@ -23,10 +23,20 @@ export function recipeOptions(recipes: readonly CraftRecipe[]): RecipeOption[] {
 /**
  * The cost line: `core`'s Craft Cost at the page's 2dp, or *no figure yet*
  * when the recipe is uncostable (FR-26, AD-20). `web` formats; `core` costs.
+ * `uncostable` is the verdict of `Ranking.uncostableRecipes`, the one derivation.
  */
-export function recipeCostLine(recipe: CraftRecipe, rates: readonly CurrencyRate[], league: string): RecipeCost {
+export function recipeCostLine(
+  recipe: CraftRecipe,
+  rates: readonly CurrencyRate[],
+  league: string,
+  uncostable: boolean,
+): RecipeCost {
+  if (uncostable) {
+    return { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
+  }
   const cost = craftCost(recipe, rates, league);
-  return cost.ok
-    ? { kind: 'figure', text: formatDivine(cost.divine) }
-    : { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
+  if (!cost.ok) {
+    throw new Error(`recipe ${recipe.id} is costable per Ranking.uncostableRecipes but craftCost refused it`);
+  }
+  return { kind: 'figure', text: formatDivine(cost.divine) };
 }

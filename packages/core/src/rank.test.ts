@@ -449,7 +449,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
     });
     expect(result.unrankable).toEqual([
       { categoryId: 'weapon.bow', className: 'Bows', reason: NO_RECIPE },
-      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL, provenance: 'absent' },
+      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL },
     ]);
     expect(result.ordering).toEqual([]);
   });
@@ -533,7 +533,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       ],
     });
     expect(result.unrankable).toEqual([
-      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL, provenance: 'absent' },
+      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL },
       { categoryId: 'jewel', className: 'Sapphire', reason: ABSENT },
     ]);
   });
@@ -1061,7 +1061,7 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     });
     expect(result.ordering).toEqual([]);
     expect(result.unrankable).toEqual([
-      { categoryId: 'weapon.bow', className: 'Bows', reason: PARTIAL, provenance: 'absent' },
+      { categoryId: 'weapon.bow', className: 'Bows', reason: PARTIAL },
     ]);
   });
 

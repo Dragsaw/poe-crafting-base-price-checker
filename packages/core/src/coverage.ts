@@ -1,5 +1,6 @@
 import type { TrackedEntry, WeightsFile } from '@poe/contracts';
 
+import { craftedClassesOf } from './crafted-classes.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 
 /** The pool-coverage figure and its denominator (AD-27). */
@@ -20,17 +21,16 @@ export function poolCoverage(
   entries: readonly TrackedEntry[],
   weights: WeightsFile,
 ): PoolCoverage | undefined {
-  const classes = new Map<string, { readonly categoryId: string; readonly className: string }>();
-  for (const entry of entries) {
-    if (entry.kind === 'crafted' && entry.status !== 'pruned') {
-      classes.set(JSON.stringify([entry.categoryId, entry.className]), entry);
-    }
-  }
+  const classes = craftedClassesOf(entries);
   if (classes.size === 0) {
     return undefined;
   }
   let covered = 0;
-  for (const { categoryId, className } of classes.values()) {
+  for (const [first] of classes.values()) {
+    if (first === undefined) {
+      continue;
+    }
+    const { categoryId, className } = first;
     const lookup = poolOf(weights, categoryId, className);
     if (
       lookup.ok &&

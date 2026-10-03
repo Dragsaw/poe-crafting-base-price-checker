@@ -1,5 +1,5 @@
 import { crossFileChecks, rank } from '@poe/core';
-import type { CrossFileFailure } from '@poe/core';
+import type { CrossFileFailure, Ranking } from '@poe/core';
 import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
 
 import { FailureScreen } from './frame/FailureScreen';
@@ -87,6 +87,26 @@ export function App(): JSX.Element {
     writeStoredRecipe(recipeId);
   }, []);
 
+  // `core` ranks every (Item Class, recipe) pair at once, so a recipe switch re-filters and never re-ranks.
+  const readySet = view.kind === 'ready' ? view.set : undefined;
+  const readyFailures = view.kind === 'ready' ? view.crossFileFailures : undefined;
+  const ranking = useMemo(
+    () =>
+      readySet === undefined
+        ? undefined
+        : rank({
+            tracked: readySet.tracked.entries,
+            dataset: readySet.dataset.entries,
+            activeLeague: readySet.config.league,
+            threshold,
+            weights: readySet.weights,
+            crossFileFailures: readyFailures,
+            recipes: readySet.recipes?.recipes ?? [],
+            currencyRates: readySet.dataset.currencyRates,
+          }),
+    [readySet, readyFailures, threshold],
+  );
+
   const retry = useCallback(() => {
     setView({ kind: 'pending' });
     setAttempt((count) => count + 1);
@@ -104,6 +124,9 @@ export function App(): JSX.Element {
         </Frame>
       );
     case 'ready': {
+      if (ranking === undefined) {
+        throw new Error('a ready view always has a ranking');
+      }
       const recipes = view.set.recipes?.recipes ?? [];
       const recipe = activeRecipe(recipes, storedRecipe);
       const options = recipeOptions(recipes);
@@ -120,7 +143,12 @@ export function App(): JSX.Element {
                 : {
                     options,
                     activeId: recipe.id,
-                    cost: recipeCostLine(recipe, view.set.dataset.currencyRates, view.set.config.league),
+                    cost: recipeCostLine(
+                      recipe,
+                      view.set.dataset.currencyRates,
+                      view.set.config.league,
+                      ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
+                    ),
                     onChange: changeRecipe,
                   }
             }
@@ -131,7 +159,7 @@ export function App(): JSX.Element {
             set={view.set}
             now={view.now}
             threshold={threshold}
-            crossFileFailures={view.crossFileFailures}
+            ranking={ranking}
             recipe={active}
           />
         </Frame>
@@ -171,31 +199,16 @@ function ReadyBody({
   set,
   now,
   threshold,
-  crossFileFailures,
+  ranking,
   recipe,
 }: {
   readonly set: ArtifactSet;
   readonly now: number;
   readonly threshold: number;
-  readonly crossFileFailures: readonly CrossFileFailure[];
+  readonly ranking: Ranking;
   /** The active Craft Recipe, or `undefined` when no recipe is loaded. */
   readonly recipe: ListRecipe | undefined;
 }): JSX.Element {
-  // `core` ranks every (Item Class, recipe) pair at once, so a recipe switch re-filters and never re-ranks.
-  const ranking = useMemo(
-    () =>
-      rank({
-        tracked: set.tracked.entries,
-        dataset: set.dataset.entries,
-        activeLeague: set.config.league,
-        threshold,
-        weights: set.weights,
-        crossFileFailures,
-        recipes: set.recipes?.recipes ?? [],
-        currencyRates: set.dataset.currencyRates,
-      }),
-    [set, threshold, crossFileFailures],
-  );
   // The catalogue's stat texts, for the Combination fallback: built once per load.
   const stats = useMemo(() => statTexts(set.catalogueStats), [set]);
   // The banner's dismissal lives in memory for the session only: a reload brings it back.
