@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-02-2026 23:45
+last_updated: 10-03-2026 13:00
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -67,7 +67,7 @@ development_status:
   3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control: done
   3-5-chase-combinations-on-the-collapsed-crafted-row: done
   3-6-provenance-the-uniform-prior-banner-and-the-appendix-s-remai: done
-  epic-3-retrospective: optional
+  epic-3-retrospective: done
 action_items:
   - id: "epic-1-retro-item-1-rule-the-run-start-order-in-ad-7-offline"
     epic: 1
@@ -247,3 +247,84 @@ action_items:
     owner: "UX"
     status: done
     ref: "docs/stories/epic-2-retro-2026-09-27.md"
+  - id: "epic-3-retro-item-25-restore-a-green-master-resolve-the-0197d"
+    epic: 3
+    action: "Restore a green master: resolve the 0197df7 Emerald stat_210067635 edit
+      against weights.json and update the three stale App.test.tsx committed-data
+      tests"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-26-replace-the-four-dummy-orb-rates-in-data"
+    epic: 3
+    action: "Replace the four dummy orb rates in data/currencies.json with measured
+      values, or gate on a non-measured source"
+    owner: "player"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-27-rewrite-the-masthead-dek-in-experience-m"
+    epic: 3
+    action: "Rewrite the masthead dek in EXPERIENCE.md, Masthead.tsx and App.test.tsx
+      in one change"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-28-use-one-isemptypool-definition-in-unrank"
+    epic: 3
+    action: "Use one isEmptyPool definition in unrankableReasonOf and carry coverage
+      through the run-chunk failure path"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-29-give-a-rankable-crafted-class-with-no-re"
+    epic: 3
+    action: "Give a rankable crafted class with no recipe a row or reason, and stop
+      formatDivine printing -0.00"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-30-decouple-data-dependent-tests-from-live"
+    epic: 3
+    action: "Decouple data-dependent tests from live data/ with a frozen fixture,
+      let tracked:check own the short-form and fit invariants, and run committed-data
+      tests in CI before deploy"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-31-answer-the-open-owner-rulings-from-epic"
+    epic: 3
+    action: "Answer the open owner rulings from epic 3 (recipe-word predicate, AD-10
+      Age inputs, recipe floor vs cross-file floor, short-form table module, reason
+      wording, diagnosis format)"
+    owner: "architect/PM/UX"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-32-consolidate-the-four-crafted-class-group"
+    epic: 3
+    action: "Consolidate the four crafted-class grouping copies, the double uncostable
+      derivation and the unread UnrankableClass.provenance"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-33-a-must-discharge-line-in-an-epic-context"
+    epic: 3
+    action: "A must-discharge line in an epic context needs an AC in a story or a
+      named owner and story"
+    owner: "process"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-34-decide-how-jewels-are-crafted-and-ranked"
+    epic: 3
+    action: "Decide how jewels are crafted and ranked, since the recipe floor is item-level
+      based; keep Emerald out of the tracked list until then"
+    owner: "player/architect"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-35-make-the-weights-producer-emit-the-local"
+    epic: 3
+    action: "Make the weights producer emit the Local attack-speed id explicit.stat_210067635
+      for weapon classes, regenerate data/weights.json, re-run pnpm sync and pnpm
+      tracked:check"
+    owner: "player (weights producer)"
+    status: open
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
