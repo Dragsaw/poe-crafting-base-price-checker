@@ -23,6 +23,9 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # The suite takes under a minute. A test that spins on resolved promises
+    # starves Vitest's own timeout, so this is the only limit that stops it.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
