@@ -4,7 +4,7 @@ type: architecture-companion
 status: final
 binding: true
 created: '2026-09-19'
-updated: '2026-09-27'
+updated: '2026-10-02'
 governed_by: ARCHITECTURE-SPINE.md
 ---
 
@@ -1159,3 +1159,119 @@ An absent optional subject field is a value: two `run-failure` records that both
 record, because the player's correction is exactly a change to one of those two. **The
 function is defined once, in `contracts`, beside the record schemas**, so a new record kind
 cannot land without declaring its subject.
+
+## 13. The session probe and the auth state (AD-30, AD-8, AD-12)
+
+Only the `pnpm sync` and `pnpm sync:batch` shells run this sequence. `catalogue:refresh`,
+`fixtures:record` and `sync:dry` never read `POESESSID`.
+
+### 13.1 Settling before the first request
+
+The shell trims `POESESSID` and builds the process auth holder from it.
+
+- A blank value is `absent`.
+- A value outside the RFC 6265 `cookie-value` grammar is `malformed`.
+
+After the lock and the `notBefore` check (§5.3), the run reads `authHoldOffUntil` from
+`sync-progress.json`. When `now < authHoldOffUntil`, a valid value is `held-off`.
+
+In these three cases the state settles `unauthenticated` and sync sends no probe.
+
+### 13.2 Baseline, probe and the liveness predicate
+
+```
+1. baseline  =  the first pricing search of the process that gets an answer,
+                sent without the cookie
+2. when baseline.status is 2xx, before that entry's fetch:
+     probe   =  the same method, path and body as baseline, sent once with
+                Cookie: POESESSID=<value>
+3. live(r)  ⇔  r.status is 2xx
+              ∧  |names(r.X-Rate-Limit-Rules)|  >  |names(baseline.X-Rate-Limit-Rules)|
+```
+
+`names(h)` is the set of comma-separated rule names in the header, trimmed and case-folded.
+The predicate compares **counts only**. It never compares names, and no name or count is in
+the code (`test/no-hardcoded-rate-limits.test.ts` enforces this).
+
+The baseline's answer is the pricing step's result in every case. The probe's State reading
+replaces the pacing values like any other reading (§5.3). The probe's search `id` never
+becomes a `lastSearchId`. The probe's request counts under `session-probe` in
+`requestsBySource`.
+
+When the baseline gets an answer that is not 2xx, the chunk ends by the existing rules (AD-8,
+AD-9), and sync sends no probe. The baseline is then the next answered pricing search. Under
+the session, that search is in a later chunk. Under `sync:batch`, it is in the next process.
+
+### 13.3 Probe outcomes and the hold-off
+
+| Probe outcome | State | Invalid-request count | Hold-off |
+| --- | --- | --- | --- |
+| `live(probe)` | `authenticated` | — | cleared |
+| 2xx, not live | `unauthenticated (not-elevated)` | — | written |
+| `429` | unsettled. The next request yields with the penalty, and `notBefore` follows §5.3. | not counted | — |
+| any other non-2xx | `unauthenticated (probe-rejected)` | not counted | written |
+| throw, or the client's ordinary request timeout | `unauthenticated (probe-failed)` | — | — |
+
+After a probe `429`, the probe is eligible again on the next chunk's first answered pricing
+search. A probe `429` is the only reason a process sends another probe.
+
+"Written" sets `authHoldOffUntil = now + 24h`. "Cleared" removes the field. Sync writes both
+with the chunk's other `sync-progress.json` writes, under the lock (AD-7). The operator can
+remove the field to end a hold-off early.
+
+### 13.4 Downgrade
+
+A downgrade is one of these two responses to a request after the probe that carried the
+cookie:
+
+- a `401` or `403`.
+- a 2xx with `¬live(r)`.
+
+A probe `401` or `403` is `probe-rejected` and is not a downgrade. On a downgrade, the
+governor does these four things:
+
+1. It drops the cookie for the rest of the process.
+2. It resets the process pacing state (ledger and lane memo) to cold, **in place**, so that
+   the session does not take the reset for a fresh State reading.
+3. It writes the hold-off.
+4. It returns a `session-expired` yield.
+
+The chunk ends `yielded`. The entry stamps `lastAttemptedAt`. An answered search keeps its two
+search fields (AD-9), and sync keeps the price state. The chunk writes no `notBefore` and no
+report record. The batch command exits 0. The session waits `backoff(1)` (§5.3) and then
+continues.
+
+### 13.5 The console line
+
+Each settle and each downgrade prints exactly one line. The line is `authenticated`, or a
+warning `unauthenticated (<reason>)`.
+
+| Reason | When |
+| --- | --- |
+| `absent` | `POESESSID` is unset or blank. The line prints before the first request, on every run. |
+| `malformed` | the value is outside the `cookie-value` grammar |
+| `held-off` | `authHoldOffUntil` is in the future |
+| `not-elevated` | the probe got a 2xx answer that failed `live` |
+| `probe-rejected` | the probe got a non-2xx answer other than `429` |
+| `probe-failed` | the probe threw or timed out |
+| `not-probed` | the process ended with no settle: no 2xx pricing search, or only probe `429`s |
+| `expired` | a downgrade (§13.4) |
+
+### 13.6 The value never leaves the holder
+
+No line, error message, thrown value or cause carries the cookie value or any part of it. The
+holder refuses a `malformed` value, so no HTTP stack quotes the value in an error. The
+governor removes the value from each error it passes on, and from that error's cause chain.
+
+A canary test forces each throw path with a known value. The test then scans stdout, stderr
+and every written artifact for any part of that value.
+
+### 13.7 Schema versions and the `User-Agent`
+
+`authHoldOffUntil` is additive, so `sync-progress.json` goes to `1.2.0`. The `session-probe`
+source is additive, so `sync-report.json` also goes to `1.2.0`. A reader accepts a `1.1.0`
+report that has no `session-probe` key.
+
+For a cookie run, the operator puts a browser string in `POE_SYNC_USER_AGENT` (AD-30). All
+shells read the same variable, so `catalogue:refresh` and `fixtures:record` also send that
+browser string while the operator keeps it there.
