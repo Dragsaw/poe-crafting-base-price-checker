@@ -1,18 +1,18 @@
 {
   "result": [
     {
-      "id": "58be12844810d7bbe505fd40b0cc57915cb4cf170226be3200d8f38d2d045596",
+      "id": "29bc9dc1e33d9bdd73370af9e42a46f14d1e54a8daf4c49a327847cc741ec231",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-27T20:41:57Z",
+        "indexed": "2026-10-03T12:27:09Z",
         "stash": {
-          "name": "5",
-          "x": 2,
-          "y": 4
+          "name": "6",
+          "x": 5,
+          "y": 0
         },
         "price": {
           "type": "~b/o",
-          "amount": 53,
+          "amount": 28,
           "currency": "exalted"
         },
         "fee": 728,
@@ -32,14 +32,130 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
         "league": "Forbidden Rites",
-        "id": "58be12844810d7bbe505fd40b0cc57915cb4cf170226be3200d8f38d2d045596",
+        "id": "29bc9dc1e33d9bdd73370af9e42a46f14d1e54a8daf4c49a327847cc741ec231",
         "name": "",
         "typeLine": "Utility Belt",
         "baseType": "Utility Belt",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 53 exalted",
+        "note": "~b/o 28 exalted",
+        "properties": [
+          {
+            "name": "Belt",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "55",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "Has 2 [Charm] Slots",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1416292992",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "1",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "20% of [Flask|Flask] Recovery applied Instantly",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_462041840",
+            "mods": [
+              {
+                "level": 69,
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_1416292992",
+                [
+                  1
+                ]
+              ],
+              [
+                "implicit.stat_462041840",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "3e6b1394a2c8be599a854a971d006617ea2335d2c52acb5911fe45d121b976ca",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-03T12:24:37Z",
+        "stash": {
+          "name": "3",
+          "x": 2,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 30,
+          "currency": "exalted"
+        },
+        "fee": 728,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "ko_KR",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 2,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
+        "league": "Forbidden Rites",
+        "id": "3e6b1394a2c8be599a854a971d006617ea2335d2c52acb5911fe45d121b976ca",
+        "name": "",
+        "typeLine": "Utility Belt",
+        "baseType": "Utility Belt",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 30 exalted",
         "properties": [
           {
             "name": "Belt",
@@ -117,18 +233,18 @@
       }
     },
     {
-      "id": "51f535916e15c0223dc98ec32afcd2d851d7b2f142541265eb24ad54ac562ffb",
+      "id": "c265ff656bfa38bd4e32549f66bf047dace3802e0c8628f6a4ecfe2641876ac3",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-27T20:52:27Z",
+        "indexed": "2026-10-03T11:47:59Z",
         "stash": {
-          "name": "6",
-          "x": 1,
-          "y": 0
+          "name": "1",
+          "x": 7,
+          "y": 9
         },
         "price": {
           "type": "~b/o",
-          "amount": 54,
+          "amount": 30,
           "currency": "exalted"
         },
         "fee": 728,
@@ -136,7 +252,7 @@
           "name": "[redacted]",
           "online": null,
           "lastCharacterName": "[redacted]",
-          "language": "en_US",
+          "language": "ru_RU",
           "realm": "poe2"
         },
         "whisper": "[redacted]"
@@ -148,14 +264,14 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
         "league": "Forbidden Rites",
-        "id": "51f535916e15c0223dc98ec32afcd2d851d7b2f142541265eb24ad54ac562ffb",
+        "id": "c265ff656bfa38bd4e32549f66bf047dace3802e0c8628f6a4ecfe2641876ac3",
         "name": "",
         "typeLine": "Utility Belt",
         "baseType": "Utility Belt",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 54 exalted",
+        "note": "~b/o 30 exalted",
         "properties": [
           {
             "name": "Belt",
@@ -179,7 +295,7 @@
         ],
         "implicitMods": [
           {
-            "description": "Has 3 [Charm] Slots",
+            "description": "Has 2 [Charm] Slots",
             "domain": "implicit",
             "hash": "stat.implicit.stat_1416292992",
             "mods": [
@@ -233,18 +349,130 @@
       }
     },
     {
-      "id": "25e5a4176d6d36c2a7dc6304df535c1bd0ac1e066c5eb115e7cc7fa5be34d04d",
+      "id": "c9851cf9a799baad9f155d808bef52ac3da83faa1ab2fc7f63df8820b938d77c",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-27T20:50:43Z",
+        "indexed": "2026-10-03T11:25:45Z",
         "stash": {
-          "name": "11",
-          "x": 1,
+          "name": "9",
+          "x": 2,
           "y": 0
         },
         "price": {
           "type": "~b/o",
-          "amount": 60,
+          "amount": 48,
+          "currency": "exalted"
+        },
+        "fee": 728,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 2,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
+        "league": "Forbidden Rites",
+        "id": "c9851cf9a799baad9f155d808bef52ac3da83faa1ab2fc7f63df8820b938d77c",
+        "name": "",
+        "typeLine": "Utility Belt",
+        "baseType": "Utility Belt",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 48 exalted",
+        "properties": [
+          {
+            "name": "Belt",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "55",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "Has 1 [Charm] Slot",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1416292992",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "1",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "20% of [Flask|Flask] Recovery applied Instantly",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_462041840",
+            "mods": [
+              {
+                "level": 69,
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_1416292992",
+                [
+                  1
+                ]
+              ],
+              [
+                "implicit.stat_462041840",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "d1d5bbd7ed653b0e11ecf896d3be0b4a84ddd77ccce40f39d8f6d379735b8df4",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-03T12:27:13Z",
+        "stash": {
+          "name": "5",
+          "x": 4,
+          "y": 11
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 55,
           "currency": "exalted"
         },
         "fee": 728,
@@ -264,7 +492,123 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
         "league": "Forbidden Rites",
-        "id": "25e5a4176d6d36c2a7dc6304df535c1bd0ac1e066c5eb115e7cc7fa5be34d04d",
+        "id": "d1d5bbd7ed653b0e11ecf896d3be0b4a84ddd77ccce40f39d8f6d379735b8df4",
+        "name": "",
+        "typeLine": "Utility Belt",
+        "baseType": "Utility Belt",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 55 exalted",
+        "properties": [
+          {
+            "name": "Belt",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "55",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "Has 1 [Charm] Slot",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1416292992",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "1",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "20% of [Flask|Flask] Recovery applied Instantly",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_462041840",
+            "mods": [
+              {
+                "level": 69,
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_1416292992",
+                [
+                  1
+                ]
+              ],
+              [
+                "implicit.stat_462041840",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "6dc85d1adcfc21e3ea16423d3c8e867891aa42909d93a3d4f14a1ebc42887a8e",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-03T08:19:39Z",
+        "stash": {
+          "name": "6",
+          "x": 6,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 60,
+          "currency": "exalted"
+        },
+        "fee": 728,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "zh_TW",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 2,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
+        "league": "Forbidden Rites",
+        "id": "6dc85d1adcfc21e3ea16423d3c8e867891aa42909d93a3d4f14a1ebc42887a8e",
         "name": "",
         "typeLine": "Utility Belt",
         "baseType": "Utility Belt",
@@ -295,118 +639,6 @@
         ],
         "implicitMods": [
           {
-            "description": "Has 2 [Charm] Slots",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1416292992",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "1",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "20% of [Flask|Flask] Recovery applied Instantly",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_462041840",
-            "mods": [
-              {
-                "level": 69,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "20"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_1416292992",
-                [
-                  1
-                ]
-              ],
-              [
-                "implicit.stat_462041840",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "9248160e5db22ad82761a48be619432093a7783a1e89c3ff0ddaaaf16e06942f",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-27T18:05:45Z",
-        "stash": {
-          "name": "17",
-          "x": 2,
-          "y": 5
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 99,
-          "currency": "exalted"
-        },
-        "fee": 728,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 2,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
-        "league": "Forbidden Rites",
-        "id": "9248160e5db22ad82761a48be619432093a7783a1e89c3ff0ddaaaf16e06942f",
-        "name": "",
-        "typeLine": "Utility Belt",
-        "baseType": "Utility Belt",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 99 exalted",
-        "properties": [
-          {
-            "name": "Belt",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "55",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
             "description": "Has 3 [Charm] Slots",
             "domain": "implicit",
             "hash": "stat.implicit.stat_1416292992",
@@ -461,19 +693,247 @@
       }
     },
     {
-      "id": "57fdc05978c66caa57e5b77007c9102fe2f30248c30a56df471ab57828c517a6",
+      "id": "b2f46460d2b77639ca27a55fbffb2dc63129123715a5073f97a0a991a8d2201b",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-27T13:55:23Z",
+        "indexed": "2026-10-03T07:26:15Z",
         "stash": {
-          "name": "1",
+          "name": "8",
           "x": 2,
+          "y": 10
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 60,
+          "currency": "exalted"
+        },
+        "fee": 728,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "ko_KR",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 2,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
+        "league": "Forbidden Rites",
+        "id": "b2f46460d2b77639ca27a55fbffb2dc63129123715a5073f97a0a991a8d2201b",
+        "name": "",
+        "typeLine": "Utility Belt",
+        "baseType": "Utility Belt",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 60 exalted",
+        "properties": [
+          {
+            "name": "Belt",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "55",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "Has 1 [Charm] Slot",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1416292992",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "1",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "20% of [Flask|Flask] Recovery applied Instantly",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_462041840",
+            "mods": [
+              {
+                "level": 69,
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_1416292992",
+                [
+                  1
+                ]
+              ],
+              [
+                "implicit.stat_462041840",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "c0a1ccbb5d0071209f78ccf5fb05c1a059e79c0d09a1f3a8ad9182b8389c4566",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-03T10:56:53Z",
+        "stash": {
+          "name": "2",
+          "x": 4,
+          "y": 2
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 90,
+          "currency": "exalted"
+        },
+        "fee": 728,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 2,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
+        "league": "Forbidden Rites",
+        "id": "c0a1ccbb5d0071209f78ccf5fb05c1a059e79c0d09a1f3a8ad9182b8389c4566",
+        "name": "",
+        "typeLine": "Utility Belt",
+        "baseType": "Utility Belt",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 90 exalted",
+        "properties": [
+          {
+            "name": "Belt",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "55",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "Has 1 [Charm] Slot",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1416292992",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "1",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "20% of [Flask|Flask] Recovery applied Instantly",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_462041840",
+            "mods": [
+              {
+                "level": 69,
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_1416292992",
+                [
+                  1
+                ]
+              ],
+              [
+                "implicit.stat_462041840",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "22ae937a9bb823e8d9d3c13cc0c1fd9abd8035e6f17f4449557f5f6a87eb82fa",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-11T01:58:58Z",
+        "stash": {
+          "name": "ขายของ",
+          "x": 8,
           "y": 1
         },
         "price": {
           "type": "~b/o",
-          "amount": 100,
-          "currency": "exalted"
+          "amount": 10,
+          "currency": "divine"
         },
         "fee": 728,
         "account": {
@@ -488,14 +948,14 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
         "league": "Forbidden Rites",
-        "id": "57fdc05978c66caa57e5b77007c9102fe2f30248c30a56df471ab57828c517a6",
+        "id": "22ae937a9bb823e8d9d3c13cc0c1fd9abd8035e6f17f4449557f5f6a87eb82fa",
         "name": "",
         "typeLine": "Utility Belt",
         "baseType": "Utility Belt",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 100 exalted",
+        "note": "~b/o 10 divine",
         "properties": [
           {
             "name": "Belt",
@@ -520,566 +980,6 @@
         "implicitMods": [
           {
             "description": "Has 3 [Charm] Slots",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1416292992",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "1",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "20% of [Flask|Flask] Recovery applied Instantly",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_462041840",
-            "mods": [
-              {
-                "level": 69,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "20"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_1416292992",
-                [
-                  1
-                ]
-              ],
-              [
-                "implicit.stat_462041840",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "38c8506cdbc9a933246ae3ec0cd154236c55eb5f01c85e23c0fc5f744e6aadd7",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-27T20:23:30Z",
-        "stash": {
-          "name": "3",
-          "x": 1,
-          "y": 7
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 100,
-          "currency": "exalted"
-        },
-        "fee": 728,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 2,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
-        "league": "Forbidden Rites",
-        "id": "38c8506cdbc9a933246ae3ec0cd154236c55eb5f01c85e23c0fc5f744e6aadd7",
-        "name": "",
-        "typeLine": "Utility Belt",
-        "baseType": "Utility Belt",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 100 exalted",
-        "properties": [
-          {
-            "name": "Belt",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "55",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "Has 3 [Charm] Slots",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1416292992",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "1",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "20% of [Flask|Flask] Recovery applied Instantly",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_462041840",
-            "mods": [
-              {
-                "level": 69,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "20"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_1416292992",
-                [
-                  1
-                ]
-              ],
-              [
-                "implicit.stat_462041840",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "97ed1cb75d3d9c72d4f829228015a069670ff7ff16fd9c37a889c8eb263ee225",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-27T11:02:12Z",
-        "stash": {
-          "name": "11",
-          "x": 0,
-          "y": 2
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 728,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 2,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
-        "league": "Forbidden Rites",
-        "id": "97ed1cb75d3d9c72d4f829228015a069670ff7ff16fd9c37a889c8eb263ee225",
-        "name": "",
-        "typeLine": "Utility Belt",
-        "baseType": "Utility Belt",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "Belt",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "55",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "Has 2 [Charm] Slots",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1416292992",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "1",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "20% of [Flask|Flask] Recovery applied Instantly",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_462041840",
-            "mods": [
-              {
-                "level": 69,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "20"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_1416292992",
-                [
-                  1
-                ]
-              ],
-              [
-                "implicit.stat_462041840",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "d5f0983258fe993f41f8028c25b5832af4fbe42aaa875febd7dc04ee7109f0ca",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-20T00:33:13Z",
-        "stash": {
-          "name": "13",
-          "x": 6,
-          "y": 3
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 728,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 2,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
-        "league": "Forbidden Rites",
-        "id": "d5f0983258fe993f41f8028c25b5832af4fbe42aaa875febd7dc04ee7109f0ca",
-        "name": "",
-        "typeLine": "Utility Belt",
-        "baseType": "Utility Belt",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "Belt",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "55",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "Has 1 [Charm] Slot",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1416292992",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "1",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "20% of [Flask|Flask] Recovery applied Instantly",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_462041840",
-            "mods": [
-              {
-                "level": 69,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "20"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_1416292992",
-                [
-                  1
-                ]
-              ],
-              [
-                "implicit.stat_462041840",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "0f83419bae2a3e4902f909b283c01985cf8dd1ba6a0841cd4b0f407b3d39783f",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-16T13:27:12Z",
-        "stash": {
-          "name": "卓越",
-          "x": 0,
-          "y": 2
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 728,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 2,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
-        "league": "Forbidden Rites",
-        "id": "0f83419bae2a3e4902f909b283c01985cf8dd1ba6a0841cd4b0f407b3d39783f",
-        "name": "",
-        "typeLine": "Utility Belt",
-        "baseType": "Utility Belt",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "Belt",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "55",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "Has 3 [Charm] Slots",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1416292992",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "1",
-                    "max": "3"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "20% of [Flask|Flask] Recovery applied Instantly",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_462041840",
-            "mods": [
-              {
-                "level": 69,
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "20"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_1416292992",
-                [
-                  1
-                ]
-              ],
-              [
-                "implicit.stat_462041840",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "007635f4917d61e46f69a8dc3437de243a42c7e968bbcdb6b653236f38a71185",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-27T07:09:19Z",
-        "stash": {
-          "name": "卓越",
-          "x": 0,
-          "y": 3
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "divine"
-        },
-        "fee": 728,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 2,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQmVsdHMvQmFzZXR5cGVzL0JlbHQxMCIsInciOjIsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/d95952e174/Belt10.png",
-        "league": "Forbidden Rites",
-        "id": "007635f4917d61e46f69a8dc3437de243a42c7e968bbcdb6b653236f38a71185",
-        "name": "",
-        "typeLine": "Utility Belt",
-        "baseType": "Utility Belt",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 1 divine",
-        "properties": [
-          {
-            "name": "Belt",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "55",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "Has 1 [Charm] Slot",
             "domain": "implicit",
             "hash": "stat.implicit.stat_1416292992",
             "mods": [

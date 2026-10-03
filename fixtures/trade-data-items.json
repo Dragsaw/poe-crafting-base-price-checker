@@ -14562,8 +14562,8 @@
           }
         },
         {
-          "type": "Arched Greataxe",
-          "text": "INCOMPLETE Arched Greataxe",
+          "type": "Executioner Greataxe",
+          "text": "INCOMPLETE Executioner Greataxe",
           "name": "INCOMPLETE",
           "flags": {
             "unique": true
@@ -14572,6 +14572,14 @@
         {
           "type": "Skinning Knife",
           "text": "INCOMPLETE Skinning Knife",
+          "name": "INCOMPLETE",
+          "flags": {
+            "unique": true
+          }
+        },
+        {
+          "type": "Chain Flail",
+          "text": "INCOMPLETE Chain Flail",
           "name": "INCOMPLETE",
           "flags": {
             "unique": true
@@ -14594,16 +14602,8 @@
           }
         },
         {
-          "type": "Executioner Greataxe",
-          "text": "INCOMPLETE Executioner Greataxe",
-          "name": "INCOMPLETE",
-          "flags": {
-            "unique": true
-          }
-        },
-        {
-          "type": "Chain Flail",
-          "text": "INCOMPLETE Chain Flail",
+          "type": "Arched Greataxe",
+          "text": "INCOMPLETE Arched Greataxe",
           "name": "INCOMPLETE",
           "flags": {
             "unique": true
