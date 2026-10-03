@@ -7,9 +7,16 @@ const committed = import.meta.glob<unknown>('../../../../data/tracked.json', { e
 const tracked = TrackedFileSchema.parse(committed['../../../../data/tracked.json']);
 
 describe('the short-form table', () => {
-  it('gives no two modifiers one form (coinage rule 3)', () => {
-    const forms = Object.values(SHORT_FORMS);
+  it('gives no two modifiers one form (coinage rule 3), but for a Local variant that shares its global twin’s form', () => {
+    // A jewel or ring rolls the global modifier and a weapon the Local one; to the player they are one stat.
+    const LOCAL_VARIANTS = new Set(['explicit.stat_210067635']);
+    const forms = Object.entries(SHORT_FORMS)
+      .filter(([statId]) => !LOCAL_VARIANTS.has(statId))
+      .map(([, form]) => form);
     expect(new Set(forms).size).toBe(forms.length);
+    for (const statId of LOCAL_VARIANTS) {
+      expect(forms).toContain(SHORT_FORMS[statId]);
+    }
   });
 
   it('holds no value and no tier in a form, and no stray whitespace', () => {

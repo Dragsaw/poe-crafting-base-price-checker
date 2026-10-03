@@ -253,7 +253,7 @@ action_items:
       against weights.json and update the three stale App.test.tsx committed-data
       tests"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-26-replace-the-four-dummy-orb-rates-in-data"
     epic: 3

@@ -36,7 +36,7 @@
       },
       "suffix": {
         "kind": "banded",
-        "statId": "explicit.stat_210067635",
+        "statId": "explicit.stat_681332047",
         "valueMin": 2,
         "valueMax": 4,
         "acceptedTier": "T1"

@@ -125,7 +125,7 @@ describe('createPricingStep against the recorded captures', () => {
       }
     }
     // Worked by hand from the five recorded fetches and the pinned rates above:
-    // e.g. ten listings of 25–200 ex → 5th of 10 is 60 ex × 0.002012 = 0.1207.
-    expect(prices.toSorted((a, b) => a - b)).toEqual([0.1207, 0.2012, 0.3038, 1, 100]);
+    // e.g. ten listings → the 5th of 10 is 55 ex × 0.002012 = 0.1107.
+    expect(prices.toSorted((a, b) => a - b)).toEqual([0.1107, 0.2012, 1, 2, 100]);
   });
 });

@@ -13,6 +13,8 @@
  * may be coined*: a Glossary term is never abbreviated; borrow, never invent
  * (each form is game or trade-site usage); unique across the table; written
  * once and never varied per row; and the tier prefix is never part of a form.
+ * A Local variant of a stat (`explicit.stat_210067635`, weapon Attack Speed) 
+ * shares the form of its global twin: the player does not tell them apart.
  * A form carries no value. A `%` lead marks the percent-increased variant of a
  * flat stat. A `+` lead marks the flat "to" variant of a stat that also rolls
  * as a percent-increased modifier.
@@ -37,6 +39,7 @@ export const SHORT_FORMS: Readonly<Record<string, string>> = {
   'explicit.stat_2974417149': 'Spell Dmg',
   'explicit.stat_124131830': 'Spell Skills',
   'explicit.stat_681332047': 'Atk Spd',
+  'explicit.stat_210067635': 'Atk Spd',
   'explicit.stat_518292764': '+Crit Chance',
   'explicit.stat_2694482655': '+Crit Dmg',
   'explicit.stat_1202301673': 'Proj Skills',

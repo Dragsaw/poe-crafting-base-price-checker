@@ -24,7 +24,6 @@ import { CONTROL_GROUP_WIDTH, MASTHEAD_DEK, MASTHEAD_TITLE } from './frame/Masth
 import { DENOMINATION } from './shared/product';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
 import { ASKING_PRICE_COPY } from './list/AskingPriceLine';
-import { APPENDIX_LEAD } from './list/UnrankableAppendix';
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry, unpriced } from './test-support/list-fixtures';
 import {
   gate,
@@ -430,7 +429,7 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(NONE);
   });
 
-  it('ranks the committed data/ into rows, dropping the below-threshold base', async () => {
+  it('ranks the committed data/ into rows, dropping the below-threshold bases', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked}.json', { eager: true, import: 'default' });
     const dataset = committed['../../../data/dataset.json'];
     const tracked = committed['../../../data/tracked.json'];
@@ -438,14 +437,15 @@ describe('the resting chrome', () => {
     mount();
     await settleTo('ready');
     const rows = Array.from(frame().querySelectorAll('[data-ranked-row]'));
-    expect(rows.map((row) => row.querySelector('[data-unit-name]')?.textContent)).toEqual(['Gold Amulet', 'Solar Amulet']);
+    expect(rows.map((row) => row.querySelector('[data-unit-name]')?.textContent)).toEqual(['Gold Amulet']);
+    expect(frame().textContent).not.toContain('Solar Amulet');
     expect(frame().textContent).not.toContain('Utility Belt');
     for (const row of rows) {
       expect(row.querySelectorAll('[data-unit-glyph]')).toHaveLength(1);
     }
   });
 
-  it('opens two panels on the committed data/, each priced row linking a Forbidden%20Rites search, with no request', async () => {
+  it('opens a panel on the committed data/, the priced row linking a Forbidden%20Rites search, with no request', async () => {
     const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked}.json', { eager: true, import: 'default' });
     const requests = serveArtifacts(server, {
       tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
@@ -458,13 +458,10 @@ describe('the resting chrome', () => {
     act(() => {
       rows[0]?.click();
     });
-    act(() => {
-      rows[1]?.click();
-    });
     await flush();
     const panels = Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel]'));
-    expect(panels).toHaveLength(2);
-    expect(panels.map((panel) => panel.previousElementSibling)).toEqual(rows.slice(0, 2));
+    expect(panels).toHaveLength(1);
+    expect(panels.map((panel) => panel.previousElementSibling)).toEqual(rows.slice(0, 1));
     const links = panels.map((panel) => panel.querySelector<HTMLAnchorElement>('[data-cell="trade-link"] a'));
     for (const link of links) {
       expect(link?.getAttribute('href')).toMatch(
@@ -472,7 +469,6 @@ describe('the resting chrome', () => {
       );
     }
     expect(panels.map((panel) => panel.querySelector('[data-panel-sub]')?.textContent)).toEqual([
-      expect.stringContaining('Payout Threshold 0.25 Divine.'),
       expect.stringContaining('Payout Threshold 0.25 Divine.'),
     ]);
     expect(requests).toHaveLength(fetched);
@@ -1077,8 +1073,8 @@ describe('the list statement', () => {
     await settleTo('ready');
     expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toHaveLength(2);
     expect(frame().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
-    // The committed dataset carries no orb rate until the next sync: the cost line is a money phrase.
-    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe('no figure yet');
+    // The committed dataset now carries an orb rate: the cost line is a figure, not the no-figure phrase.
+    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe('0.01Divine / craft');
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(frame().textContent).not.toContain('recipes.json');
     expect(statement()).toBeNull();
@@ -1144,17 +1140,10 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    // Producer 6.1.0 declares every pool `complete` (the not-in-game tiers no longer make a pool partial),
-    // so no class-level reason fires. Every `jewel/Emerald` tier sits at modifier level 1, below the greater
-    // recipe's floor of 44, so that pair alone is unrankable under the active recipe (state 36).
-    expect(
-      appendixRows().map((row) => [
-        row.querySelector('[data-appendix-class]')?.textContent,
-        row.querySelector('[data-cell="reason"]')?.textContent,
-      ]),
-    ).toEqual([['Emerald', 'recipe cannot reach this class']]);
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('1 Item Class');
-    expect(appendix().textContent).toContain(APPENDIX_LEAD);
+    // Producer 6.1.0 declares every pool `complete`, and the Emerald entry tracks the global Attack Speed
+    // stat its tiers carry, so no Item Class is unrankable: the appendix renders with no rows.
+    expect(appendixRows()).toHaveLength(0);
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('0 Item Classes');
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.
