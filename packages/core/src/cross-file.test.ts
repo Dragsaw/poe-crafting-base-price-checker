@@ -8,6 +8,7 @@ import {
 } from '@poe/contracts';
 import type {
   CraftedTrackedEntry,
+  HybridLine,
   ModifierRef,
   ModifierWeight,
   TrackedEntry,
@@ -27,11 +28,14 @@ const SUFFIX_STAT = 'explicit.stat_9';
 let serial = 0;
 
 /** One weights tier, built in the test (NFR-2). */
-function tier(lines: readonly WeightsLine[], { itemLevelMin = 1, weight = 100 } = {}): ModifierWeight {
+function tier(
+  lines: readonly WeightsLine[],
+  { itemLevelMin = 1, weight = 100, modGroup }: { itemLevelMin?: number; weight?: number; modGroup?: string } = {},
+): ModifierWeight {
   serial += 1;
   return {
     sourceModifierId: `m${String(serial)}`,
-    modGroup: `g${String(serial)}`,
+    modGroup: modGroup ?? `g${String(serial)}`,
     itemLevelMin,
     weight,
     weightSource: 'published',
@@ -88,8 +92,11 @@ function entry(
   return { kind: 'crafted', categoryId, className, itemLevelMin, prefix, suffix, status: 'active' };
 }
 
+const failuresOf = (entries: readonly TrackedEntry[], weights: WeightsFile | null) =>
+  crossFileChecks(entries, weights).failures;
+
 const checksOf = (entries: readonly TrackedEntry[], weights: WeightsFile | null) =>
-  crossFileChecks(entries, weights).map((failure) => [failure.check, failure.entryKey]);
+  failuresOf(entries, weights).map((failure) => [failure.check, failure.entryKey]);
 
 describe('edge alignment (§2.4)', () => {
   const scoped = [T7(), T8()];
@@ -105,7 +112,7 @@ describe('edge alignment (§2.4)', () => {
     ['43.0–80.0', 43, 80],
   ])('accepts %s over T7 and T8', (_label, min, max) => {
     expect(edgeAlignment('prefix', band(min, max), scoped, 82)).toBeUndefined();
-    expect(crossFileChecks([entry({ prefix: band(min, max) })], bows(pools(scoped)))).toEqual([]);
+    expect(failuresOf([entry({ prefix: band(min, max) })], bows(pools(scoped)))).toEqual([]);
   });
 
   it.each([
@@ -113,7 +120,7 @@ describe('edge alignment (§2.4)', () => {
     ['0–9999, sentinel', 0, 9999],
   ])('rejects %s', (_label, min, max) => {
     const tracked = entry({ prefix: band(min, max) });
-    const [failure, ...rest] = crossFileChecks([tracked], bows(pools(scoped)));
+    const [failure, ...rest] = failuresOf([tracked], bows(pools(scoped)));
     expect(rest).toEqual([]);
     expect(failure?.check).toBe('edge-alignment');
     expect(failure?.entryKey).toBe(canonicalKey(tracked));
@@ -142,7 +149,7 @@ describe('edge alignment (§2.4)', () => {
 describe('empty containment set (§2.5)', () => {
   it('fails when no scoped entry contains the reference, naming the ref, the floor and the absence, and no file', () => {
     const tracked = entry({ prefix: band(12, 15) });
-    const [failure, ...rest] = crossFileChecks([tracked], bows(pools([tier([line(STAT, [5, 15])])])));
+    const [failure, ...rest] = failuresOf([tracked], bows(pools([tier([line(STAT, [5, 15])])])));
     expect(rest).toEqual([]);
     expect(failure?.check).toBe('empty-containment-set');
     expect(failure?.detail).toContain(`prefix ${STAT} band [12, 15]`);
@@ -166,7 +173,7 @@ describe('kind agreement (§2.3), universal', () => {
   it('fails a valueless reference when any scoped line on its statId is banded', () => {
     const scoped = [tier([line(STAT)], { itemLevelMin: 55 }), tier([line(STAT, [2, 2])], { itemLevelMin: 82 })];
     const tracked = entry({ prefix: valueless() });
-    const failures = crossFileChecks([tracked], bows(pools(scoped)));
+    const failures = failuresOf([tracked], bows(pools(scoped)));
     expect(failures.map((failure) => failure.check)).toEqual(['kind-agreement']);
     expect(failures[0]?.detail).toContain('1 scoped line on that statId is banded');
   });
@@ -196,21 +203,20 @@ describe('kind agreement (§2.3), universal', () => {
   });
 });
 
-describe('coOccur (§2.1, §2.2)', () => {
+describe('single-line pairs (§2.1 consequence 3)', () => {
   const hybrid = tier([line(STAT, [10, 20]), line(OTHER, [5, 6])]);
   const first = entry({ prefix: band(10, 20) });
   const second = entry({ prefix: band(5, 6, OTHER) });
 
-  it('fails both entries when two refs in one slot name two lines of one scoped entry', () => {
-    const failures = crossFileChecks([first, second], bows(pools([hybrid])));
-    expect(failures.map((failure) => failure.check)).toEqual(['co-occur', 'co-occur']);
+  it('reports no co-occur for two statIds one tier holds; line-set completeness fails each band instead', () => {
+    const failures = failuresOf([first, second], bows(pools([hybrid])));
+    expect(failures.map((failure) => failure.check)).toEqual(['line-set-completeness', 'line-set-completeness']);
     expect(new Set(failures.map((failure) => failure.entryKey))).toEqual(
       new Set([canonicalKey(first), canonicalKey(second)]),
     );
     for (const failure of failures) {
-      expect(failure.detail).toContain(canonicalKey(first) === failure.entryKey ? canonicalKey(second) : canonicalKey(first));
-      expect(failure.detail).toContain('prefix (the two statIds co-occur on one scoped entry)');
-      expect(failure.detail).toContain('suffix (bands intersect)');
+      expect(failure.detail).toContain('band reaches into a hybrid tier');
+      expect(failure.detail).toContain(hybrid.sourceModifierId);
     }
   });
 
@@ -218,13 +224,198 @@ describe('coOccur (§2.1, §2.2)', () => {
     const apart = [tier([line(STAT, [10, 20])]), tier([line(OTHER, [5, 6])])];
     expect(checksOf([first, second], bows(pools(apart)))).toEqual([]);
   });
+});
 
-  it('passes when the other slot keeps the pair apart', () => {
-    const suffixA = tier([line(SUFFIX_STAT, [1, 2])]);
-    const suffixB = tier([line('explicit.stat_8', [1, 2])]);
-    const a = entry({ prefix: band(10, 20), suffix: band(1, 2, SUFFIX_STAT) });
-    const b = entry({ prefix: band(5, 6, OTHER), suffix: band(1, 2, 'explicit.stat_8') });
-    expect(checksOf([a, b], bows(pools([hybrid], [suffixA, suffixB])))).toEqual([]);
+describe('hybrid references (§2.1–§2.5, §2.7)', () => {
+  const A = STAT;
+  const B = OTHER;
+  const C = 'explicit.stat_3';
+  /** A Bows-like family {A, B}: T1 and T2 share one modGroup. A pure A tier sits apart from both. */
+  const H1 = tier([line(A, [30, 40]), line(B, [100, 150])], { itemLevelMin: 75, modGroup: 'hybrid-ab' });
+  const H2 = tier([line(A, [20, 29]), line(B, [60, 99])], { itemLevelMin: 50, modGroup: 'hybrid-ab' });
+  const PURE_A = tier([line(A, [70, 80])], { itemLevelMin: 60 });
+  const hybridRef = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
+  const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
+  const T1_REF = hybridRef(bandLine(A, 30, 40), bandLine(B, 100, 150));
+
+  it('passes a correct hybrid at T1’s edges', () => {
+    expect(failuresOf([entry({ prefix: T1_REF })], bows(pools([H1, H2, PURE_A])))).toEqual([]);
+  });
+
+  it('fails a misaligned line: line B covers T1 only and line A spans T1–T2', () => {
+    const tracked = entry({ prefix: hybridRef(bandLine(A, 20, 40), bandLine(B, 100, 150)) });
+    const failures = failuresOf([tracked], bows(pools([H1, H2, PURE_A])));
+    expect(failures.map((failure) => failure.check)).toEqual(['edge-alignment']);
+    const detail = failures[0]?.detail ?? '';
+    expect(detail).toContain(`prefix hybrid line ${A} band [20, 40]`);
+    expect(detail).toContain('extremes [30, 40]');
+    expect(detail).toContain(`(${H1.sourceModifierId})`);
+    expect(detail).not.toContain(B);
+  });
+
+  it('fails a reference that names a subset of a tier’s lines, naming the tier and the omitted line', () => {
+    const wide = tier([line(A, [30, 40]), line(B, [100, 150]), line(C, [5, 10])]);
+    const failures = failuresOf([entry({ prefix: T1_REF })], bows(pools([H1, wide])));
+    expect(failures.map((failure) => failure.check)).toEqual(['line-set-completeness']);
+    const detail = failures[0]?.detail ?? '';
+    expect(detail).toContain("reference names a subset of this tier's lines");
+    expect(detail).toContain(`${wide.sourceModifierId} {${A}, ${B}, ${C}} omits ${C}`);
+  });
+
+  it('fails a single-line band that reaches into a hybrid tier', () => {
+    const pure = tier([line(A, [35, 45])]);
+    const failures = failuresOf([entry({ prefix: band(35, 45, A) })], bows(pools([pure, H1])));
+    expect(failures.map((failure) => failure.check)).toEqual(['line-set-completeness']);
+    const detail = failures[0]?.detail ?? '';
+    expect(detail).toContain('band reaches into a hybrid tier');
+    expect(detail).toContain(`${H1.sourceModifierId} {${A}, ${B}} interval [30, 40]`);
+  });
+
+  it('fails an empty containment set, listing the wider tier that covers every line and what differs', () => {
+    const wide = tier([line(A, [30, 40]), line(B, [100, 150]), line(C, [5, 10])]);
+    const gone = tier([line(A, [30, 40]), line(B, [100, 150])], { weight: 0 });
+    const notInGame: ModifierWeight = { ...gone, sourceModifierId: 'not-in-game-ab', weightSource: 'not-in-game' };
+    const failures = failuresOf([entry({ prefix: T1_REF })], bows(pools([wide, notInGame])));
+    const empty = failures.find((failure) => failure.check === 'empty-containment-set');
+    expect(empty?.detail).toContain(`prefix hybrid (${A} band [30, 40], ${B} band [100, 150]) at floor 82`);
+    expect(empty?.detail).toContain('no scoped entry contains it');
+    expect(empty?.detail).toContain(`${wide.sourceModifierId} (line set {${A}, ${B}, ${C}} differs on ${C})`);
+    expect(empty?.detail).toContain('not-in-game-ab (not-in-game)');
+    expect(empty?.detail).not.toMatch(/\.json/);
+  });
+
+  it('fails contained tiers in two modGroups, blaming weights.json', () => {
+    const split = tier([line(A, [20, 29]), line(B, [60, 99])], { itemLevelMin: 50, modGroup: 'hybrid-ab-2' });
+    const tracked = entry({ prefix: hybridRef(bandLine(A, 20, 40), bandLine(B, 60, 150)) });
+    const failures = failuresOf([tracked], bows(pools([H1, split])));
+    expect(failures.map((failure) => failure.check)).toEqual(['line-set-completeness']);
+    const detail = failures[0]?.detail ?? '';
+    expect(detail).toContain('weights data publishes one hybrid family under more than one modGroup');
+    expect(detail).toContain(`modGroup hybrid-ab: ${H1.sourceModifierId}`);
+    expect(detail).toContain(`modGroup hybrid-ab-2: ${split.sourceModifierId}`);
+    expect(detail).toContain('weights.json is at fault');
+  });
+
+  it('fails kind agreement on a valueless hybrid line beside a banded line, naming the line and one tier', () => {
+    const tracked = entry({ prefix: hybridRef(bandLine(A, 30, 40), { statId: B }) });
+    const failures = failuresOf([tracked], bows(pools([H1])));
+    const kind = failures.find((failure) => failure.check === 'kind-agreement');
+    expect(kind?.detail).toContain(`prefix hybrid line ${B} valueless`);
+    expect(kind?.detail).toContain(`(e.g. ${H1.sourceModifierId})`);
+    expect(kind?.detail).not.toContain(`line ${A}`);
+  });
+
+  it('fails co-occur on both entries when a hybrid and a single-line reference share a contained tier', () => {
+    const pure = tier([line(A, [30, 40])]);
+    const hybridEntry = entry({ prefix: T1_REF });
+    const singleEntry = entry({ prefix: band(30, 40, A) });
+    const failures = failuresOf([hybridEntry, singleEntry], bows(pools([H1, pure])));
+    // The single-line band also reaches into H1, so §2.7 reports it beside co-occur.
+    const byString = (pairs: readonly (readonly string[])[]) => pairs.map((pair) => JSON.stringify(pair)).toSorted();
+    expect(byString(failures.map((failure) => [failure.check, failure.entryKey]))).toEqual(
+      byString([
+        ['co-occur', canonicalKey(hybridEntry)],
+        ['co-occur', canonicalKey(singleEntry)],
+        ['line-set-completeness', canonicalKey(singleEntry)],
+      ]),
+    );
+    const coOccurs = failures.filter((failure) => failure.check === 'co-occur');
+    expect(coOccurs.map((failure) => failure.entryKey).toSorted()).toEqual(
+      [canonicalKey(hybridEntry), canonicalKey(singleEntry)].toSorted(),
+    );
+    for (const failure of coOccurs) {
+      const partner = failure.entryKey === canonicalKey(hybridEntry) ? singleEntry : hybridEntry;
+      expect(failure.detail).toContain(`overlaps ${canonicalKey(partner)}`);
+      expect(failure.detail).toContain('prefix (shared lines intersect and one scoped tier contains both)');
+      expect(failure.detail).toContain('suffix (bands intersect)');
+    }
+  });
+
+  it('fails co-occur on two suffix hybrids that both contain one scoped suffix tier', () => {
+    const C = 'explicit.stat_7';
+    const D = 'explicit.stat_8';
+    const S1 = tier([line(C, [10, 20]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
+    const S2 = tier([line(C, [21, 25]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
+    const prefix = band(43, 56.5);
+    const narrow = entry({ prefix, suffix: hybridRef(bandLine(C, 10, 20), bandLine(D, 5, 6)) });
+    const wide = entry({ prefix, suffix: hybridRef(bandLine(C, 10, 25), bandLine(D, 5, 6)) });
+    const failures = failuresOf([narrow, wide], bows(pools([T7()], [S1, S2])));
+    expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted()).toEqual(
+      [
+        ['co-occur', canonicalKey(narrow)],
+        ['co-occur', canonicalKey(wide)],
+      ].toSorted(),
+    );
+    for (const failure of failures) {
+      expect(failure.detail).toContain('prefix (bands intersect)');
+      expect(failure.detail).toContain('suffix (shared lines intersect and one scoped tier contains both)');
+    }
+  });
+
+  it('stays silent on an overlapping all-single-line pair, which is contracts’ to refuse', () => {
+    const pool = [tier([line(A, [30, 40])]), tier([line(A, [35, 45])])];
+    expect(failuresOf([entry({ prefix: band(30, 40, A) }), entry({ prefix: band(35, 45, A) })], bows(pools(pool)))).toEqual(
+      [],
+    );
+  });
+
+  it('leaves weight-0 and not-in-game hybrid tiers out of what a band reaches', () => {
+    const zero = tier([line(A, [30, 40]), line(B, [100, 150])], { weight: 0 });
+    // Weight 100, which the weights schema forbids, so only `untrackable` keeps it out of `reached`.
+    const notInGame: ModifierWeight = { ...zero, sourceModifierId: 'not-in-game-ab', weight: 100, weightSource: 'not-in-game' };
+    const pure = tier([line(A, [30, 40])]);
+    expect(failuresOf([entry({ prefix: band(30, 40, A) })], bows(pools([pure, zero, notInGame])))).toEqual([]);
+  });
+
+  it('reaches a hybrid tier from a valueless reference only through a valueless line', () => {
+    const valuelessA = tier([line(A), line(B, [1, 2])]);
+    const failures = failuresOf([entry({ prefix: valueless(A) })], bows(pools([valuelessA])));
+    expect(failures.map((failure) => failure.check)).toEqual(['line-set-completeness']);
+    expect(failures[0]?.detail).toContain('band reaches into a hybrid tier');
+
+    const bandedA = tier([line(A, [30, 40]), line(B, [1, 2])]);
+    const checks = failuresOf([entry({ prefix: valueless(A) })], bows(pools([bandedA]))).map((failure) => failure.check);
+    expect(checks).not.toContain('line-set-completeness');
+  });
+
+  it('reports no co-occur when the bands on the shared line are disjoint', () => {
+    const pure = tier([line(A, [70, 80])]);
+    const failures = failuresOf([entry({ prefix: T1_REF }), entry({ prefix: band(70, 80, A) })], bows(pools([H1, pure])));
+    expect(failures).toEqual([]);
+  });
+});
+
+describe('unvalidated marks (§2.8)', () => {
+  const a = entry({ prefix: band(43, 56.5) });
+  const b = entry({ prefix: band(56, 80) });
+
+  it('marks every crafted entry weights-absent, and fails none, without a weights file', () => {
+    expect(crossFileChecks([a, b], null)).toEqual({
+      failures: [],
+      unvalidated: [a, b]
+        .map((tracked) => ({
+          entryKey: canonicalKey(tracked),
+          categoryId: 'weapon.bow',
+          className: 'Bows',
+          reason: 'weights-absent',
+        }))
+        .toSorted((left, right) => (left.entryKey < right.entryKey ? -1 : 1)),
+    });
+  });
+
+  it('marks every entry of a partial or absent class partial-pool, with no pool failure', () => {
+    const sentinel = entry({ prefix: band(0, 9999) });
+    const partial = crossFileChecks([sentinel, b], bows(pools([T7()], [SUFFIX_TIER], { suffix: 'partial' })));
+    expect(partial.failures).toEqual([]);
+    expect(partial.unvalidated.map((mark) => [mark.entryKey, mark.reason])).toEqual(
+      [sentinel, b].map((tracked) => [canonicalKey(tracked), 'partial-pool']).toSorted(),
+    );
+    const absent = crossFileChecks([sentinel], weightsOf({}));
+    expect(absent.unvalidated.map((mark) => mark.reason)).toEqual(['partial-pool']);
+  });
+
+  it('marks nothing on a complete class', () => {
+    expect(crossFileChecks([a], bows(pools([T7(), T8()])))).toEqual({ failures: [], unvalidated: [] });
   });
 });
 
@@ -236,7 +427,7 @@ describe('class discriminability (§2.6)', () => {
       'armour.chest': { Body_Armours: plain, Body_Armours_dex: plain, Body_Armours_str: plain },
     });
     const tracked = entry({ prefix: band(43, 56.5) }, { categoryId: 'armour.chest', className: 'Body_Armours' });
-    const failures = crossFileChecks([tracked], weights);
+    const failures = failuresOf([tracked], weights);
     expect(failures.map((failure) => failure.check)).toEqual(['class-discriminability']);
     const detail = failures[0]?.detail ?? '';
     for (const part of ['Body_Armours', 'armour.chest', '2 sibling classes', 'class not discriminable']) {
@@ -256,13 +447,13 @@ describe('class discriminability (§2.6)', () => {
 
 describe('crossFileChecks scope', () => {
   it('runs no check without a weights file', () => {
-    expect(crossFileChecks([entry({ prefix: band(0, 9999) })], null)).toEqual([]);
+    expect(failuresOf([entry({ prefix: band(0, 9999) })], null)).toEqual([]);
   });
 
   it('runs no pool check on an absent class or a partial slot', () => {
     const tracked = entry({ prefix: band(0, 9999) });
-    expect(crossFileChecks([tracked], weightsOf({}))).toEqual([]);
-    expect(crossFileChecks([tracked], bows(pools([T7()], [SUFFIX_TIER], { suffix: 'partial' })))).toEqual([]);
+    expect(failuresOf([tracked], weightsOf({}))).toEqual([]);
+    expect(failuresOf([tracked], bows(pools([T7()], [SUFFIX_TIER], { suffix: 'partial' })))).toEqual([]);
   });
 
   it('still runs class discriminability on a class whose own pool is partial', () => {
@@ -281,13 +472,13 @@ describe('crossFileChecks scope', () => {
   it('sees neither pruned nor raw entries', () => {
     const pruned: TrackedEntry = { ...entry({ prefix: band(0, 9999) }), status: 'pruned', prunedReason: 'gone' };
     const raw: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
-    expect(crossFileChecks([pruned, raw], bows(pools([T7()])))).toEqual([]);
+    expect(failuresOf([pruned, raw], bows(pools([T7()])))).toEqual([]);
   });
 
   it('reports one failure per (check, entry), every slot in its detail, sorted by key then check', () => {
     const tracked = entry({ prefix: band(0, 9999), suffix: band(0, 9999, SUFFIX_STAT) });
     const alsoEmpty = entry({ prefix: band(1000, 2000), suffix: band(1, 2, SUFFIX_STAT) });
-    const failures = crossFileChecks([tracked, alsoEmpty], bows(pools([T7(), T8()])));
+    const failures = failuresOf([tracked, alsoEmpty], bows(pools([T7(), T8()])));
     const edge = failures.find((failure) => failure.check === 'edge-alignment');
     expect(edge?.detail).toContain('prefix');
     expect(edge?.detail).toContain('suffix');
@@ -306,6 +497,6 @@ describe('crossFileChecks scope', () => {
     if (!tracked.ok || !weights.ok) {
       throw new Error('a committed data file was refused');
     }
-    expect(crossFileChecks(tracked.value.entries, weights.value)).toEqual([]);
+    expect(failuresOf(tracked.value.entries, weights.value)).toEqual([]);
   });
 });

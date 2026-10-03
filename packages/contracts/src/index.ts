@@ -94,6 +94,7 @@ export type { CanonicalAffix, CanonicalKeyElements, CanonicalLine } from './cano
 
 export {
   describeOverlap,
+  namesHybrid,
   NEVER_CO_OCCUR,
   overlap,
   OVERLAP_SLOTS,

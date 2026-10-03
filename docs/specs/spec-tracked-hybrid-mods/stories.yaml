@@ -32,7 +32,9 @@
   title: Price summed-statId entries with one summed filter
   description: >-
     Implement CAP-6. Sync sums mins and maxes per summed statId. Overlap compares the summed intervals.
-    Valueless lines and missing bounds are rejected.
+    Valueless lines and missing bounds are rejected. TrackedFileSchema also refuses the first within-file
+    kind rule of IMPLEMENTATION-NOTES §2.3: two tracked lines that name one statId under different kinds,
+    wherever each line sits. Story 5 handed this rule to this story; no code implements it yet.
   invoke_dev_with: >-
     Use MSW fixtures only. Make no live trade calls.
 - id: "8"

@@ -76,6 +76,32 @@ describe('checkCatalogue', () => {
     expect(check.excludedKeys).toEqual(new Set([canonicalKey(entry)]));
   });
 
+  it('checks each line of a hybrid reference, one record per missing statId, in line order', () => {
+    const base = crafted('weapon.bow', 'explicit.a', 'explicit.b');
+    if (base.kind !== 'crafted') {
+      throw new Error('expected a crafted entry');
+    }
+    const resolving: TrackedEntry = {
+      ...base,
+      prefix: { kind: 'hybrid', lines: [{ statId: 'explicit.a', valueMin: 1, valueMax: 2 }, { statId: 'explicit.b' }] },
+    };
+    expect(checkCatalogue([resolving], [], IDS).records).toEqual([]);
+
+    const missing: TrackedEntry = {
+      ...base,
+      prefix: {
+        kind: 'hybrid',
+        lines: [{ statId: 'explicit.a' }, { statId: 'explicit.gone' }, { statId: 'explicit.lost', valueMin: 1, valueMax: 2 }],
+      },
+    };
+    const check = checkCatalogue([missing], [], IDS);
+    expect(check.records).toEqual([
+      { kind: 'unresolvable', entryKey: canonicalKey(missing), identifier: 'explicit.gone', identifierKind: 'statId' },
+      { kind: 'unresolvable', entryKey: canonicalKey(missing), identifier: 'explicit.lost', identifierKind: 'statId' },
+    ]);
+    expect(check.excludedKeys).toEqual(new Set([canonicalKey(missing)]));
+  });
+
   it('checks a raw baseTypeId and a crafted categoryId', () => {
     const entry = crafted('weapon.gone', 'explicit.a', 'explicit.b');
     const check = checkCatalogue([GONE_BASE, entry], [], IDS);

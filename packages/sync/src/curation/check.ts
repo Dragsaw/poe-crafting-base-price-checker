@@ -4,7 +4,7 @@
  *
  * Read-only. It reads `data/tracked.json`, `data/config.json`, the
  * committed catalogue and `data/weights.json`, runs the production
- * validators over them, and prints `{ok, checks, issues}` as JSON to stdout. It writes no file and
+ * validators over them, and prints `{ok, checks, issues, unvalidated}` as JSON to stdout. It writes no file and
  * issues no request. Exit 0 when every check passes, 1 otherwise.
  *
  * Four checks, each the production code a sync run uses:
@@ -17,10 +17,16 @@
  *   (IMPLEMENTATION-NOTES.md §6).
  * - `catalogue`: AD-9 resolvability through `checkCatalogue` with an empty
  *   dataset. One issue per `records` entry.
- * - `cross-file`: `core`'s five cross-file checks (AD-17) against
+ * - `cross-file`: `core`'s six cross-file checks (AD-17) against
  *   `data/weights.json`, the same call the sync run-start gate makes. One
  *   issue per failure. `skipped` when the weights file is absent, since no
  *   check runs without it (AD-24).
+ *
+ * `unvalidated` lists each crafted entry that no pool check covered, with its
+ * reason — `weights-absent` or `partial-pool` (IMPLEMENTATION-NOTES §2.8). The
+ * same `crossFileChecks` call gives it, also when the weights file is absent.
+ * A mark is never an issue: it neither fails a check nor moves `ok` or the
+ * exit code.
  *
  * A pass still does not confirm that a floor is the one IMPLEMENTATION-NOTES.md
  * §8 derives: a floor declared too high passes every mechanical check (AD-5).
@@ -34,6 +40,7 @@ import { parseArgs } from 'node:util';
 import { canonicalKey } from '@poe/contracts';
 import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
 import { crossFileChecks } from '@poe/core';
+import type { UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -61,10 +68,18 @@ export interface CheckStatus {
   readonly status: 'passed' | 'failed' | 'skipped';
 }
 
+/** A crafted entry no pool check covered (IMPLEMENTATION-NOTES §2.8), at its index when it has one. */
+export interface CheckUnvalidated extends UnvalidatedMark {
+  readonly path?: string;
+}
+
 export interface TrackedCheckReport {
+  /** Whether every check passed. An unvalidated mark never makes it `false`. */
   readonly ok: boolean;
   readonly checks: readonly CheckStatus[];
   readonly issues: readonly CheckIssue[];
+  /** One mark per unvalidated crafted entry, sorted by canonical key. Listed, never a failure. */
+  readonly unvalidated: readonly CheckUnvalidated[];
 }
 
 /** The inputs of one check, as loaded. */
@@ -141,6 +156,9 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     const index = indexByKey.get(entryKey);
     return index === undefined ? {} : { path: `entries.${String(index)}` };
   };
+  const unvalidated: CheckUnvalidated[] = [];
+  const markedAt = (marks: readonly UnvalidatedMark[]): CheckUnvalidated[] =>
+    marks.map((mark) => ({ ...mark, ...pathOf(mark.entryKey) }));
 
   if (!loaded.config.ok) {
     checks.push({ check: 'pinned-cap', status: 'failed' });
@@ -177,10 +195,15 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   if (!loaded.weights.ok) {
     checks.push({ check: 'cross-file', status: 'failed' });
     issues.push({ check: 'cross-file', message: loaded.weights.error.message });
-  } else if (entries === undefined || loaded.weights.value === null) {
+  } else if (entries === undefined) {
     checks.push({ check: 'cross-file', status: 'skipped' });
+  } else if (loaded.weights.value === null) {
+    // No check runs without the weights file, but each crafted entry is marked (§2.8).
+    checks.push({ check: 'cross-file', status: 'skipped' });
+    unvalidated.push(...markedAt(crossFileChecks(entries, null).unvalidated));
   } else {
-    const failures = crossFileChecks(entries, loaded.weights.value);
+    const { failures, unvalidated: marks } = crossFileChecks(entries, loaded.weights.value);
+    unvalidated.push(...markedAt(marks));
     checks.push({ check: 'cross-file', status: failures.length === 0 ? 'passed' : 'failed' });
     for (const failure of failures) {
       issues.push({
@@ -191,7 +214,8 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     }
   }
 
-  return { ok: issues.length === 0, checks, issues };
+  // A mark never moves `ok` (IMPLEMENTATION-NOTES §2.8).
+  return { ok: issues.length === 0, checks, issues, unvalidated };
 }
 
 /** The weights file as a value: absent is `null`, a refusal is carried rather than thrown. */

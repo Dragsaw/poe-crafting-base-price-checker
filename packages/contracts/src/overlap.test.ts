@@ -4,6 +4,7 @@ import { canonicalKey } from './canonical-key';
 import { parseEnvelope, TrackedFileSchema } from './envelopes';
 import type { HybridModifierRef, ModifierRef, SingleLineModifierRef } from './modifier-ref';
 import {
+  namesHybrid,
   NEVER_CO_OCCUR,
   overlap,
   overlapBranches,
@@ -24,18 +25,20 @@ const valueless = (statId: string): SingleLineModifierRef => ({ kind: 'valueless
 const ALWAYS: CoOccur = () => true;
 
 describe('slotOverlap, in §2.1 branch order', () => {
-  it('reaches the coOccur branch above the statId inequality', () => {
-    expect(slotOverlapBranch(band('a', 1, 2), band('b', 1, 2), 'suffix', ALWAYS)).toBe('co-occur');
+  it('never overlaps two references that share no statId, whatever coOccur says (§2.1 consequence 3)', () => {
+    expect(slotOverlapBranch(band('a', 1, 2), band('b', 1, 2), 'suffix', ALWAYS)).toBeUndefined();
     expect(slotOverlap(band('a', 1, 2), band('b', 1, 2), 'suffix', NEVER_CO_OCCUR)).toBe(false);
   });
 
-  it('never asks coOccur about one statId', () => {
+  it('never asks coOccur about two single-line references', () => {
     const asked: string[] = [];
-    const spy: CoOccur = (x, y) => {
-      asked.push(`${x.statId}/${y.statId}`);
+    const spy: CoOccur = () => {
+      asked.push('asked');
       return true;
     };
     expect(slotOverlap(band('a', 1, 2), band('a', 5, 6), 'prefix', spy)).toBe(false);
+    expect(slotOverlapBranch(band('a', 1, 2), band('a', 2, 6), 'prefix', spy)).toBe('bands-intersect');
+    expect(slotOverlapBranch(band('a', 1, 2), band('b', 1, 2), 'prefix', spy)).toBeUndefined();
     expect(asked).toEqual([]);
   });
 
@@ -158,21 +161,53 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
   });
 });
 
-describe('overlapBranches, who evaluates a pair (§2.1)', () => {
-  const hybrid: HybridModifierRef = {
+describe('slotOverlap with a hybrid reference (§2.1, S = ∅)', () => {
+  const hybrid = (
+    aMin: number,
+    aMax: number,
+    b: HybridModifierRef['lines'][number] = { statId: 'b', valueMin: 1, valueMax: 2 },
+  ): HybridModifierRef => ({
     kind: 'hybrid',
-    lines: [
-      { statId: 'a', valueMin: 10, valueMax: 19 },
-      { statId: 'b', valueMin: 1, valueMax: 2 },
-    ],
-  };
+    lines: [{ statId: 'a', valueMin: aMin, valueMax: aMax }, b],
+  });
 
-  it('evaluates no pair in which any of the four references is hybrid', () => {
+  it('overlaps a single-line reference on a shared line whose bands intersect, when coOccur holds', () => {
+    expect(slotOverlapBranch(hybrid(10, 19), band('a', 15, 25), 'prefix', ALWAYS)).toBe('co-occur');
+    expect(slotOverlapBranch(band('a', 15, 25), hybrid(10, 19), 'prefix', ALWAYS)).toBe('co-occur');
+    expect(slotOverlap(hybrid(10, 19), band('a', 15, 25), 'prefix', NEVER_CO_OCCUR)).toBe(false);
+  });
+
+  it('does not ask coOccur when no shared line intersects, or no statId is shared', () => {
+    const asked: string[] = [];
+    const spy: CoOccur = (x, y, slot) => {
+      asked.push(`${x.kind}/${y.kind}/${slot}`);
+      return true;
+    };
+    expect(slotOverlap(hybrid(10, 19), band('a', 20, 25), 'prefix', spy)).toBe(false);
+    expect(slotOverlap(hybrid(10, 19), band('c', 10, 19), 'prefix', spy)).toBe(false);
+    expect(slotOverlap(hybrid(10, 19), valueless('a'), 'prefix', spy)).toBe(false);
+    expect(asked).toEqual([]);
+    expect(slotOverlap(hybrid(10, 19), band('a', 19, 25), 'suffix', spy)).toBe(true);
+    expect(asked).toEqual(['hybrid/banded/suffix']);
+  });
+
+  it('overlaps two hybrids only when every shared line intersects and coOccur holds', () => {
+    expect(slotOverlapBranch(hybrid(10, 19), hybrid(15, 25), 'prefix', ALWAYS)).toBe('co-occur');
+    expect(slotOverlap(hybrid(10, 19), hybrid(20, 25), 'prefix', ALWAYS)).toBe(false);
+    expect(slotOverlap(hybrid(10, 19), hybrid(10, 19, { statId: 'b', valueMin: 3, valueMax: 4 }), 'prefix', ALWAYS)).toBe(
+      false,
+    );
+    expect(slotOverlap(hybrid(10, 19, { statId: 'b' }), hybrid(10, 19, { statId: 'b' }), 'prefix', ALWAYS)).toBe(true);
+    expect(slotOverlap(hybrid(10, 19), hybrid(15, 25), 'prefix', NEVER_CO_OCCUR)).toBe(false);
+  });
+
+  it('overlapBranches evaluates a pair with a hybrid reference, and namesHybrid picks it out', () => {
     const single = { prefix: band('a', 10, 19), suffix: valueless('s') };
-    expect(overlapBranches(single, single, ALWAYS)).toBeDefined();
-    expect(overlapBranches({ ...single, prefix: hybrid }, single, ALWAYS)).toBeUndefined();
-    expect(overlapBranches(single, { ...single, suffix: hybrid }, ALWAYS)).toBeUndefined();
-    expect(overlapBranches({ prefix: hybrid, suffix: hybrid }, { prefix: hybrid, suffix: hybrid }, ALWAYS)).toBeUndefined();
-    expect(overlap({ ...single, prefix: hybrid }, { ...single, prefix: hybrid }, ALWAYS)).toBe(false);
+    const withHybrid = { ...single, prefix: hybrid(10, 19) };
+    expect(overlapBranches(withHybrid, single, ALWAYS)).toEqual({ prefix: 'co-occur', suffix: 'both-valueless' });
+    expect(overlapBranches(withHybrid, single, NEVER_CO_OCCUR)).toBeUndefined();
+    expect(namesHybrid(single)).toBe(false);
+    expect(namesHybrid(withHybrid)).toBe(true);
+    expect(namesHybrid({ ...single, suffix: hybrid(1, 2) })).toBe(true);
   });
 });
