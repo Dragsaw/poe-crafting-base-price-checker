@@ -57,3 +57,5 @@ Layers run: blind-hunter, deferred-ledger-audit. The ledger audit found nothing.
 - false. "Story 1 yaml description still lists done scope": `stories.yaml` is the planning input, and this spec records the narrowing.
 - maybe-false (medium if true), deferred. `stories.yaml` states no build order between stories. Ledger entry added. Showing that the builders pick stories out of order would settle it.
 - false. "The spine asserts CAP-8 before the code": owner documents lead the code by design, and story 2 implements CAP-8.
+
+Follow-up (2026-10-03): the deferred story-ordering entry is cancelled, and the finding is false. The `bmad-spec` stories schema (`assets/stories-schema.md`) defines `stories.yaml` as "one entry per story, in execution order — stories run top to bottom". The current order meets every dependency the finding named: 2 and 3 come before 4–8, and 9 comes last.
