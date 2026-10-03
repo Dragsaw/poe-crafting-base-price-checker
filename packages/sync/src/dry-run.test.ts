@@ -10,6 +10,7 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   DatasetFileSchema,
+  TRACKED_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { CurrencyRate, DatasetEntry, DatasetFile, SyncReportFile, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it, vi } from 'vitest';
@@ -89,7 +90,7 @@ function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
 
 function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial<DryRunSnapshot> = {}): DryRunSnapshot {
   return {
-    ...(entries === undefined ? {} : { tracked: JSON.stringify({ schemaVersion: '1.0.0', entries }) }),
+    ...(entries === undefined ? {} : { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
     config: CONFIG,
     currencies: CURRENCIES,
     items: ITEMS,
@@ -334,7 +335,7 @@ describe('dryRun: the dataset snapshot', () => {
     { kind: 'raw', baseTypeId: 'P', itemLevelMin: 82, status: 'pinned' },
   ];
   const [A, B, C, P] = rotation as [TrackedEntry, TrackedEntry, TrackedEntry, TrackedEntry];
-  const rotationTracked = JSON.stringify({ schemaVersion: '1.0.0', entries: rotation });
+  const rotationTracked = JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: rotation });
   /** The snapshot's own latest `lastAttemptedAt`, so this is the run's default clock. */
   const A_ATTEMPTED_AT = '2025-12-31T00:00:00.000Z';
   const B_ATTEMPTED_AT = '2025-12-30T00:00:00.000Z';

@@ -3,7 +3,13 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ConfigFileSchema, createFakeFilesystemPort, WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
+import {
+  ConfigFileSchema,
+  createFakeFilesystemPort,
+  TRACKED_SCHEMA_VERSION,
+  trackedEarlierMajorMessage,
+  WEIGHTS_SCHEMA_VERSION,
+} from '@poe/contracts';
 import type { ModifierWeight, WeightsFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
@@ -61,7 +67,7 @@ const WEIGHTS: WeightsFile = {
   },
 };
 
-function trackedText(entries: readonly unknown[], schemaVersion = '1.0.0'): string {
+function trackedText(entries: readonly unknown[], schemaVersion = TRACKED_SCHEMA_VERSION): string {
   return JSON.stringify({ schemaVersion, entries });
 }
 
@@ -145,13 +151,49 @@ describe('checkTracked', () => {
     ]);
   });
 
-  it('refuses an unknown major as one schemaVersion issue', () => {
-    const report = checkTracked(inputsOf([], { tracked: trackedText([], '2.0.0') }));
+  it('refuses a later unknown major as one schemaVersion issue, with the generic message', () => {
+    const report = checkTracked(inputsOf([], { tracked: trackedText([], '3.0.0') }));
 
     expect(report.ok).toBe(false);
     expect(report.issues).toEqual([
       { check: 'schema', path: 'schemaVersion', message: expect.stringContaining('unknown-major') as unknown },
     ]);
+  });
+
+  it('refuses a malformed version with the generic message', () => {
+    const report = checkTracked(inputsOf([], { tracked: trackedText([], 'abc') }));
+
+    expect(report.issues).toEqual([
+      { check: 'schema', path: 'schemaVersion', message: expect.stringContaining('malformed-version') as unknown },
+    ]);
+  });
+
+  // Story hybrid-mods 2, I/O matrix "Earlier major": the §4.1 re-author message.
+  it('refuses an earlier 1.x major with the re-author message, naming both affixes and hybrid', () => {
+    const report = checkTracked(inputsOf([], { tracked: trackedText([crafted], '1.0.0') }));
+
+    expect(report.ok).toBe(false);
+    expect(report.issues).toEqual([
+      {
+        check: 'schema',
+        path: 'schemaVersion',
+        message: `data/tracked.json: ${String(trackedEarlierMajorMessage('1.0.0'))}`,
+      },
+    ]);
+    const message = report.issues[0]?.message ?? '';
+    for (const part of ['major version changed', 'both a prefix and a suffix', '"hybrid"', 'Re-author']) {
+      expect(message).toContain(part);
+    }
+  });
+
+  // Story hybrid-mods 2, I/O matrix "Missing slot".
+  it('reports a crafted entry without a suffix as a schema issue at the suffix path', () => {
+    const prefixOnly: Partial<typeof crafted> = { ...crafted };
+    delete prefixOnly.suffix;
+    const report = checkTracked(inputsOf([prefixOnly]));
+
+    expect(report.ok).toBe(false);
+    expect(report.issues).toEqual([{ check: 'schema', path: 'entries.0.suffix', message: expect.any(String) as unknown }]);
   });
 
   it('reports text that is not JSON', () => {

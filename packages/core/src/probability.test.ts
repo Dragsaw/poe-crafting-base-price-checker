@@ -1,4 +1,10 @@
-import { parseEnvelope, TrackedFileSchema, WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from '@poe/contracts';
+import {
+  parseEnvelope,
+  TRACKED_SCHEMA_VERSION,
+  TrackedFileSchema,
+  WEIGHTS_SCHEMA_VERSION,
+  WeightsFileSchema,
+} from '@poe/contracts';
 import type { ModifierRef, ModifierWeight, WeightsClassPools, WeightsFile, WeightsLine } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
@@ -184,7 +190,7 @@ describe('eligible (§9)', () => {
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'suffix' },
     });
-    expect(combinationProbability(classPools, { itemLevelMin: 65, prefix: band(1, 8) }, 70)).toEqual({
+    expect(combinationProbability(classPools, { itemLevelMin: 65, prefix: band(1, 8), suffix: band(1, 8) }, 70)).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
@@ -199,7 +205,7 @@ describe('eligible (§9)', () => {
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
-    expect(combinationProbability(classPools, { itemLevelMin: 82, suffix: band(1, 2, OTHER) }, 0)).toEqual({
+    expect(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(1, 4), suffix: band(1, 2, OTHER) }, 0)).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
@@ -212,8 +218,11 @@ describe('combinationProbability (§11)', () => {
     const high = tier([line(STAT, [20, 30])], 300, { itemLevelMin: 70 });
     const suffix = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 70 });
     const classPools = pools([low, high], [suffix]);
-    expect(pOf(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12) }, 0))).toBeGreaterThan(0);
-    expect(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12) }, 70)).toEqual({
+    const suffixRef = band(1, 2, OTHER);
+    expect(
+      pOf(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix: suffixRef }, 0)),
+    ).toBeGreaterThan(0);
+    expect(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix: suffixRef }, 70)).toEqual({
       ok: false,
       reason: { kind: 'empty-contained', slot: 'prefix' },
     });
@@ -248,26 +257,12 @@ describe('combinationProbability (§11)', () => {
     ).toEqual({ ok: false, reason: { kind: 'augment-exhausted', firstDrawSlot: 'prefix', modGroup: 'A' } });
   });
 
-  it('skips a weight-0 first draw of an absent affix that would exhaust the augment', () => {
-    const zero = { ...tier([line(STAT, [10, 12])], 0, { modGroup: 'A' }), weightSource: 'not-in-game' as const };
-    const a = tier([line(STAT, [10, 12])], 100, { modGroup: 'B' });
-    const b = tier([line(STAT, [20, 30])], 100, { modGroup: 'C' });
-    const c = tier([line(OTHER, [1, 2])], 200, { modGroup: 'A' });
-    // The absent prefix contains its whole eligible set, zero included.
-    // Prefix first: zero skipped; a → 100 · 200 / 200 = 100; b → 100 · 200 / 200 = 100.
-    // Suffix first: c → 200 · 200 / 200 = 200.
-    const result = combinationProbability(
-      pools([zero, a, b], [c]),
-      { itemLevelMin: 82, suffix: band(1, 2, OTHER) },
-      0,
-    );
-    expect(result).toEqual({ ok: true, p: 1 });
-  });
-
   it('gives empty-eligible-pool for the suffix when only the suffix slot is empty', () => {
     const a = tier([line(STAT, [10, 12])], 100);
     const late = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 90 });
-    expect(combinationProbability(pools([a], [late]), { itemLevelMin: 82, prefix: band(10, 12) }, 0)).toEqual({
+    expect(
+      combinationProbability(pools([a], [late]), { itemLevelMin: 82, prefix: band(10, 12), suffix: band(1, 2, OTHER) }, 0),
+    ).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'suffix' },
     });
@@ -282,23 +277,13 @@ describe('combinationProbability (§11)', () => {
     ).toEqual({ ok: false, reason: { kind: 'augment-exhausted', firstDrawSlot: 'suffix', modGroup: 'A' } });
   });
 
-  it('treats an absent affix as its whole eligible set (P = 1 for that affix)', () => {
-    const a = tier([line(STAT, [10, 12])], 100);
-    const b = tier([line(STAT, [20, 30])], 300);
-    const c = tier([line(OTHER, [1, 2])], 250);
-    const d = tier([line(OTHER, [3, 4])], 750);
-    const classPools = pools([a, b], [c, d]);
-    expect(pOf(affixProbability(classPools, 'suffix', undefined, 82, 0))).toBe(1);
-    const p = pOf(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12) }, 0));
-    expect(closeRelative(p, 0.25)).toBe(true);
-  });
-
   it('gives the same P with and without acceptedTier', () => {
     const classPools = pools([tier([line(STAT, [10, 12])], 100), tier([line(STAT, [20, 30])], 300)], [tier([line(OTHER)], 5)]);
-    const plain = combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12) }, 0);
+    const suffix: ModifierRef = { kind: 'valueless', statId: OTHER };
+    const plain = combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix }, 0);
     const labelled = combinationProbability(
       classPools,
-      { itemLevelMin: 82, prefix: { ...band(10, 12), acceptedTier: 'T1' } },
+      { itemLevelMin: 82, prefix: { ...band(10, 12), acceptedTier: 'T1' }, suffix },
       0,
     );
     expect(labelled).toEqual(plain);
@@ -309,7 +294,7 @@ describe('combinationProbability (§11)', () => {
     const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
     const load = async (name: string): Promise<unknown> =>
       ((await import(/* @vite-ignore */ `${here}/../../../test/fixtures/frozen-data/${name}`)) as { default: unknown }).default;
-    const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'));
+    const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'), TRACKED_SCHEMA_VERSION);
     const weights = parseEnvelope(WeightsFileSchema, await load('weights.json'), WEIGHTS_SCHEMA_VERSION);
     if (!tracked.ok || !weights.ok) {
       throw new Error('a committed data file was refused');

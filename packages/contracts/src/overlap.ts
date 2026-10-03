@@ -8,8 +8,7 @@ import type { ModifierRef } from './modifier-ref.ts';
  * slot runs §2.1's branches **in order**:
  *
  * ```
- * slotOverlap(x, y) =  true              if x is absent or y is absent
- *                      true              if x.statId != y.statId ∧ coOccur(x, y)
+ * slotOverlap(x, y) =  true              if x.statId != y.statId ∧ coOccur(x, y)
  *                      false             if x.statId != y.statId
  *                      true              if both are valueless
  *                      bands intersect   otherwise
@@ -32,8 +31,8 @@ export const OVERLAP_SLOTS: readonly OverlapSlot[] = ['prefix', 'suffix'];
 
 /** The two affixes the predicate reads. A crafted tracked entry satisfies it. */
 export interface OverlapAffixes {
-  readonly prefix?: ModifierRef | undefined;
-  readonly suffix?: ModifierRef | undefined;
+  readonly prefix: ModifierRef;
+  readonly suffix: ModifierRef;
 }
 
 /** Whether one scoped entry of the slot's pool contains both references (§2.2). */
@@ -43,18 +42,15 @@ export type CoOccur = (x: ModifierRef, y: ModifierRef, slot: OverlapSlot) => boo
 export const NEVER_CO_OCCUR: CoOccur = () => false;
 
 /** Which §2.1 branch made a slot overlap. */
-export type SlotOverlapBranch = 'absent' | 'co-occur' | 'both-valueless' | 'bands-intersect';
+export type SlotOverlapBranch = 'co-occur' | 'both-valueless' | 'bands-intersect';
 
 /** The branch that made the slot overlap, or `undefined` when the slot does not overlap. */
 export function slotOverlapBranch(
-  x: ModifierRef | undefined,
-  y: ModifierRef | undefined,
+  x: ModifierRef,
+  y: ModifierRef,
   slot: OverlapSlot,
   coOccur: CoOccur,
 ): SlotOverlapBranch | undefined {
-  if (x === undefined || y === undefined) {
-    return 'absent';
-  }
   if (x.statId !== y.statId && coOccur(x, y, slot)) {
     return 'co-occur';
   }
@@ -71,8 +67,8 @@ export function slotOverlapBranch(
 }
 
 export function slotOverlap(
-  x: ModifierRef | undefined,
-  y: ModifierRef | undefined,
+  x: ModifierRef,
+  y: ModifierRef,
   slot: OverlapSlot,
   coOccur: CoOccur,
 ): boolean {
@@ -105,13 +101,12 @@ export function overlapBranches(
 }
 
 const BRANCH_WORDS: Readonly<Record<SlotOverlapBranch, string>> = {
-  absent: 'absent on one entry',
   'co-occur': 'the two statIds co-occur on one scoped entry',
   'both-valueless': 'both valueless',
   'bands-intersect': 'bands intersect',
 };
 
-/** `prefix (bands intersect), suffix (absent on one entry)`: the slots a payload names. */
+/** `prefix (bands intersect), suffix (both valueless)`: the slots a payload names. */
 export function describeOverlap(branches: Readonly<Record<OverlapSlot, SlotOverlapBranch>>): string {
   return OVERLAP_SLOTS.map((slot) => `${slot} (${BRANCH_WORDS[branches[slot]]})`).join(', ');
 }

@@ -61,6 +61,9 @@ describe('the contracts barrel', () => {
     expect(contracts.ChunkRequestSourceSchema).toBeDefined();
     expect(contracts.SYNC_REPORT_SCHEMA_VERSION).toBe('1.1.0');
     expect(contracts.SYNC_PROGRESS_SCHEMA_VERSION).toBe('1.1.0');
+    expect(contracts.TRACKED_SCHEMA_VERSION).toBe('2.0.0');
+    expect(contracts.SUPPORTED_SCHEMA_VERSION).toBe('1.0.0');
+    expect(contracts.trackedEarlierMajorMessage).toBeTypeOf('function');
   });
 
   it('exports a fake for each of the four ports', () => {

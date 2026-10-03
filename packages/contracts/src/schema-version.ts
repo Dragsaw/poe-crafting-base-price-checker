@@ -71,3 +71,30 @@ export function checkSchemaVersion(found: string, expected: string): SchemaVersi
   }
   return { ok: true, expected, found };
 }
+
+/**
+ * `tracked.json` carries its own contract version, apart from
+ * `SUPPORTED_SCHEMA_VERSION`, so that its major bump leaves every other
+ * artifact's version untouched (IMPLEMENTATION-NOTES §4.1, §12.1). The pattern
+ * is `WEIGHTS_SCHEMA_VERSION`'s.
+ */
+export const TRACKED_SCHEMA_VERSION = '2.0.0';
+
+/**
+ * The refusal for a tracked file at the 1.x major (IMPLEMENTATION-NOTES
+ * §4.1), or `undefined` for any other major. A generic
+ * unknown-major message is not enough here: the curator must re-author the
+ * file, not retry. One spelling for sync and `tracked:check`.
+ */
+export function trackedEarlierMajorMessage(found: string): string | undefined {
+  // The explanation names the 1 → 2 change, so it fits a 1.x file only.
+  if (majorOf(found) !== 1) {
+    return undefined;
+  }
+  return (
+    `schemaVersion ${found} refused (unknown-major; this build reads ${TRACKED_SCHEMA_VERSION}): ` +
+    `the tracked schema's major version changed to ${TRACKED_SCHEMA_VERSION}: crafted entries now require ` +
+    'both a prefix and a suffix, and an affix accepts the "hybrid" kind. Re-author the file against ' +
+    `schemaVersion ${TRACKED_SCHEMA_VERSION}; retrying will not help.`
+  );
+}

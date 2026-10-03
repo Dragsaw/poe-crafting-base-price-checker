@@ -40,6 +40,7 @@ describe('the seven artifacts', () => {
   it('expects weights major 6 and version 1 elsewhere', () => {
     expect(ARTIFACTS.weights.expected).toBe('6.1.0');
     expect(ARTIFACTS.dataset.expected).toBe('1.0.0');
+    expect(ARTIFACTS.tracked.expected).toBe('2.0.0');
   });
 });
 
@@ -72,13 +73,25 @@ describe('loadArtifacts', () => {
 
   // Matrix: invalid shape.
   it('refuses a body that fails its schema, naming the path and both versions', async () => {
-    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '1.0.0', entries: 'nope' } } });
+    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '2.0.0', entries: 'nope' } } });
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'tracked.json',
       cause: 'content',
+      declared: '2.0.0',
+      expected: '2.0.0',
+    });
+  });
+
+  // Story hybrid-mods 2: the page reads tracked.json at its own 2.0.0 major,
+  // and refuses a 1.x file with the generic declared/expected refusal.
+  it('refuses a tracked.json at the earlier 1.x major, naming both versions', async () => {
+    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '1.0.0', entries: [] } } });
+    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+      kind: 'refused',
+      path: 'tracked.json',
       declared: '1.0.0',
-      expected: '1.0.0',
+      expected: '2.0.0',
     });
   });
 
@@ -202,7 +215,7 @@ describe('loadArtifacts', () => {
       path: 'tracked.json',
       cause: 'missing',
       declared: null,
-      expected: '1.0.0',
+      expected: '2.0.0',
     });
   });
 

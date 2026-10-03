@@ -15,6 +15,8 @@ export {
   majorOf,
   SchemaVersionSchema,
   SUPPORTED_SCHEMA_VERSION,
+  TRACKED_SCHEMA_VERSION,
+  trackedEarlierMajorMessage,
 } from './schema-version.ts';
 export type {
   SchemaVersion,
@@ -56,9 +58,8 @@ export type {
 
 /**
  * The two arm schemas are **not** exported. They carry none of the union's
- * `superRefine` rules, so parsing with an arm accepts a crafted entry with no
- * affix and a pruned entry with no reason — the two rows the I/O matrix
- * requires to fail. `TrackedEntrySchema` is the only parse path.
+ * `superRefine` rules, so parsing with an arm accepts a pruned entry with no
+ * reason — a row the I/O matrix requires to fail. `TrackedEntrySchema` is the only parse path.
  */
 export {
   CurationStatusSchema,

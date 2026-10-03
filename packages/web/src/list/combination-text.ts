@@ -68,9 +68,9 @@ export function affixText(ref: ModifierRef, stats: StatTexts): AffixPart {
   return { text: bandedFallback(catalogued, ref.valueMin, ref.valueMax), verbatim: true };
 }
 
-/** A crafted entry's Combination: the prefix, then the suffix, each present one an affix. */
+/** A crafted entry's Combination: the prefix, then the suffix. */
 export function combinationText(entry: CraftedTrackedEntry, stats: StatTexts): readonly AffixPart[] {
-  return [entry.prefix, entry.suffix].flatMap((ref) => (ref === undefined ? [] : [affixText(ref, stats)]));
+  return [affixText(entry.prefix, stats), affixText(entry.suffix, stats)];
 }
 
 /** The parts as one plain string, joined by the middle dot. */

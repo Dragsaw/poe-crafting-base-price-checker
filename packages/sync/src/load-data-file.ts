@@ -9,7 +9,8 @@
  * refusal, which only an edit clears, from a transient fault (`../sync.ts`).
  */
 
-import type { EnvelopeResult, FilesystemPort } from '@poe/contracts';
+import { parseEnvelope, TRACKED_SCHEMA_VERSION, TrackedFileSchema, trackedEarlierMajorMessage } from '@poe/contracts';
+import type { EnvelopeResult, EnvelopeVersionRefused, FilesystemPort, TrackedFile } from '@poe/contracts';
 
 export type DataFileRefusal =
   | 'absent'
@@ -35,6 +36,36 @@ export type DataFileResult<T> =
   | { readonly ok: false; readonly error: DataFileError };
 
 /**
+ * Explains a version refusal the generic sentence cannot: `undefined` keeps
+ * the generic sentence. A file whose major change needs the curator to act
+ * passes one (IMPLEMENTATION-NOTES §4.1).
+ */
+export type VersionRefusalExplainer = (found: string) => string | undefined;
+
+/** The detail of a version refusal: the explainer's text, or the generic sentence naming both versions. */
+export function describeVersionRefusal(
+  result: EnvelopeVersionRefused,
+  explain?: VersionRefusalExplainer,
+): string {
+  return (
+    explain?.(result.found) ??
+    `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`
+  );
+}
+
+/**
+ * `tracked.json` parses against its own contract version
+ * (`TRACKED_SCHEMA_VERSION`), never the shared default, and an earlier major
+ * is refused with §4.1's re-author message. Every sync-side tracked load uses
+ * these two.
+ */
+export function parseTrackedFile(data: unknown): EnvelopeResult<TrackedFile> {
+  return parseEnvelope(TrackedFileSchema, data, TRACKED_SCHEMA_VERSION);
+}
+
+export const explainTrackedVersion: VersionRefusalExplainer = trackedEarlierMajorMessage;
+
+/**
  * Reads and validates one versioned file through `parse` (normally
  * `parseEnvelope` over the file's schema). An absent file is a refusal.
  */
@@ -42,6 +73,7 @@ export async function loadDataFile<T>(
   fs: FilesystemPort,
   path: string,
   parse: (data: unknown) => EnvelopeResult<T>,
+  explainVersion?: VersionRefusalExplainer,
 ): Promise<DataFileResult<T>> {
   const text = await fs.readTextFile(path);
   if (text === undefined) {
@@ -62,11 +94,7 @@ export async function loadDataFile<T>(
     case 'malformed-version':
       return {
         ok: false,
-        error: new DataFileError(
-          path,
-          result.reason,
-          `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
-        ),
+        error: new DataFileError(path, result.reason, describeVersionRefusal(result, explainVersion)),
       };
     case 'invalid':
       return {

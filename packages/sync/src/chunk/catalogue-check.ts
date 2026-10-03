@@ -73,7 +73,7 @@ function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
   }
   for (const ref of [entry.prefix, entry.suffix]) {
-    if (ref !== undefined && !ids.statIds.has(ref.statId)) {
+    if (!ids.statIds.has(ref.statId)) {
       misses.push({ identifier: ref.statId, identifierKind: 'statId' });
     }
   }

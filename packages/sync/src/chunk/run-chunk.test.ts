@@ -12,6 +12,8 @@ import {
   DatasetFileSchema,
   SyncProgressFileSchema,
   SyncReportFileSchema,
+  TRACKED_SCHEMA_VERSION,
+  trackedEarlierMajorMessage,
 } from '@poe/contracts';
 import type {
   DatasetEntry,
@@ -98,7 +100,7 @@ const PRUNED = raw('P', 'pruned');
 const key = canonicalKey;
 
 function trackedText(entries: readonly TrackedEntry[]): string {
-  return JSON.stringify({ schemaVersion: '1.0.0', entries });
+  return JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries });
 }
 
 function progressText(completed: readonly string[]): string {
@@ -592,6 +594,21 @@ describe('runChunk: resume and pass', () => {
     expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
   });
 
+  // Story hybrid-mods 2, I/O matrix "Old progress keys": a key the 2.0.0 tracked
+  // schema can no longer produce (an absent affix encoded as `null`) ages out.
+  it('drops a progress key absent from the current tracked key set, without throwing', async () => {
+    const oldKey = '["crafted","weapon.bow","Bows",82,["explicit.stat_1",1,2],null]';
+    const { fs, ports } = harness(undefined, {
+      [PROGRESS_PATH]: { contents: progressText([oldKey, key(A)]) },
+    });
+    const { visited, step } = scriptedStep();
+
+    await run(ports, step);
+
+    expect(visited).toEqual([key(B), key(C)]);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B), key(C)] });
+  });
+
   it('records completed entries only, never the planned ones', async () => {
     const { fs, ports } = harness();
     await run(ports, scriptedStep(() => ({ kind: 'yielded' })).step);
@@ -835,6 +852,32 @@ describe('runChunk: the lock', () => {
     expect(failures).toHaveLength(1);
     expect(failures[0]).toMatchObject({ message: expect.stringContaining('tracked.json') });
     expect(failures[0]).toMatchObject({ message: expect.stringContaining(key(A)) });
+  });
+
+  // Story hybrid-mods 2, I/O matrix "Earlier major": IMPLEMENTATION-NOTES §4.1.
+  it('refuses a tracked list at the earlier 1.x major with the re-author message, before any step', async () => {
+    const fs = createFakeFilesystemPort({
+      [TRACKED_PATH]: { contents: JSON.stringify({ schemaVersion: '1.0.0', entries: [A] }) },
+    });
+    const { visited, step } = scriptedStep();
+    const failure = run({ fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION }, step);
+
+    await expect(failure).rejects.toBeInstanceOf(DataFileError);
+    await expect(failure).rejects.toMatchObject({ path: TRACKED_PATH, reason: 'unknown-major' });
+    await expect(failure).rejects.toThrow(String(trackedEarlierMajorMessage('1.0.0')));
+    expect(visited).toEqual([]);
+    expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  it('refuses a later or malformed tracked major with the generic message', async () => {
+    for (const version of ['3.0.0', 'abc']) {
+      const fs = createFakeFilesystemPort({
+        [TRACKED_PATH]: { contents: JSON.stringify({ schemaVersion: version, entries: [] }) },
+      });
+      const failure = run({ fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION }, scriptedStep().step);
+      await expect(failure).rejects.toThrow(`schemaVersion ${version} refused`);
+      await expect(failure).rejects.not.toThrow(/Re-author/);
+    }
   });
 });
 
@@ -1640,7 +1683,14 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
     className = 'Bows',
     status: TrackedEntry['status'] = 'active',
   ): TrackedEntry {
-    const base = { kind: 'crafted', categoryId, className, itemLevelMin: 75, prefix: { kind: 'valueless', statId: prefix } } as const;
+    const base = {
+      kind: 'crafted',
+      categoryId,
+      className,
+      itemLevelMin: 75,
+      prefix: { kind: 'valueless', statId: prefix },
+      suffix: { kind: 'valueless', statId: 'explicit.stat_suffix' },
+    } as const;
     return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
   }
 
@@ -1863,35 +1913,43 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
   });
 
   describe('pool coverage (AD-27)', () => {
-    const coveredWeights = (suffixWeight: number): string =>
+    /**
+     * Bows with a covered class, or with a `partial` suffix slot, which leaves
+     * it uncovered (IN §3). A weight-0 suffix would also leave it uncovered,
+     * but every crafted entry now names a suffix, and a weight-0 pool contains
+     * none, so the cross-file gate would refuse the run; a partial slot gets no
+     * pool check.
+     */
+    const coveredWeights = (suffixCoverage: 'complete' | 'partial'): string =>
       JSON.stringify({
         schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
         bases: {
           'weapon.bow': {
             Bows: {
-              prefix: { poolCoverage: 'complete', entries: [coverageTier('p1', 1)] },
-              suffix: { poolCoverage: 'complete', entries: [coverageTier('s1', suffixWeight)] },
+              prefix: { poolCoverage: 'complete', entries: [coverageTier('p1', 'explicit.ok')] },
+              // `explicit.stat_suffix` is the suffix every `craftedEntry` carries.
+              suffix: { poolCoverage: suffixCoverage, entries: [coverageTier('s1', 'explicit.stat_suffix')] },
             },
           },
         },
       });
-    const coverageTier = (id: string, weight: number): unknown => ({
-      sourceModifierId: id, modGroup: id, itemLevelMin: 1, weight,
-      weightSource: weight === 0 ? 'not-in-game' : 'published',
-      lines: [{ statId: 'explicit.ok', ranges: [] }],
+    const coverageTier = (id: string, statId: string): unknown => ({
+      sourceModifierId: id, modGroup: id, itemLevelMin: 1, weight: 1,
+      weightSource: 'published',
+      lines: [{ statId, ranges: [] }],
     });
     const X = craftedEntry('weapon.bow', 'explicit.ok', 'Bows');
     const Y = craftedEntry('armour.chest', 'explicit.ok', 'Body_Armours_str');
 
     it('a present file writes both fields, and a replaced file gives the new figure on the next chunk', async () => {
-      const { fs, ports } = harness([X, Y], { [WEIGHTS_PATH]: { contents: coveredWeights(1) } });
+      const { fs, ports } = harness([X, Y], { [WEIGHTS_PATH]: { contents: coveredWeights('complete') } });
 
       await run(ports, scriptedStep().step);
       const first = await reportOf(fs);
       expect(first?.figures.coverage).toBe(0.5);
       expect(first?.figures.rankableClassCount).toBe(2);
 
-      await fs.writeTextFile(WEIGHTS_PATH, coveredWeights(0));
+      await fs.writeTextFile(WEIGHTS_PATH, coveredWeights('partial'));
       await run(ports, scriptedStep().step);
       const second = await reportOf(fs);
       expect(second?.figures.coverage).toBe(0);
@@ -1910,7 +1968,7 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
     });
 
     it('a present file with no rankable class omits both fields', async () => {
-      const { fs, ports } = harness([A], { [WEIGHTS_PATH]: { contents: coveredWeights(1) } });
+      const { fs, ports } = harness([A], { [WEIGHTS_PATH]: { contents: coveredWeights('complete') } });
 
       await run(ports, scriptedStep().step);
 
@@ -3168,7 +3226,19 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
               },
             ],
           },
-          suffix: { poolCoverage: 'complete', entries: [] },
+          suffix: {
+            poolCoverage: 'complete',
+            entries: [
+              {
+                sourceModifierId: 's1',
+                modGroup: 'S',
+                itemLevelMin: 1,
+                weight: 100,
+                weightSource: 'published',
+                lines: [{ statId: 'explicit.stat_2', ranges: [[1, 2]] }],
+              },
+            ],
+          },
         },
       },
     },
@@ -3179,6 +3249,7 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
     className: 'Bows',
     itemLevelMin: 82,
     prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin, valueMax },
+    suffix: { kind: 'banded', statId: 'explicit.stat_2', valueMin: 1, valueMax: 2 },
     status: 'active',
   });
   const PREVIOUS_PROGRESS = progressText([key(A)]);

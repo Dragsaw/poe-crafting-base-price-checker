@@ -127,6 +127,8 @@ function chase(categoryId: string, className: string): CraftedTrackedEntry {
     className,
     itemLevelMin: 82,
     prefix: { kind: 'banded', statId: TARGET, valueMin: 1, valueMax: 10 },
+    // Contains the whole suffix pool, so P is the prefix's share.
+    suffix: { kind: 'banded', statId: SUFFIX, valueMin: 1, valueMax: 10 },
     status: 'active',
   };
 }
@@ -530,14 +532,15 @@ const RINGS: Pools = [
   [tier(COLD_RES, 10, 80)],
 ];
 
-function ring(prefix: string, suffix?: string, status: CraftedTrackedEntry['status'] = 'active'): CraftedTrackedEntry {
+/** A ring whose suffix defaults to cold resistance, the whole suffix pool: P is the prefix's share. */
+function ring(prefix: string, suffix = COLD_RES, status: CraftedTrackedEntry['status'] = 'active'): CraftedTrackedEntry {
   return {
     kind: 'crafted',
     categoryId: 'accessory.ring',
     className: 'Rings',
     itemLevelMin: 82,
     prefix: banded(prefix, 1, 10, 'T1'),
-    ...(suffix === undefined ? {} : { suffix: banded(suffix, 1, 10, 'T1') }),
+    suffix: banded(suffix, 1, 10, 'T1'),
     status,
     ...(status === 'pruned' ? { prunedReason: 'never sells' } : {}),
   };
@@ -589,7 +592,7 @@ describe('the chase cells', () => {
     mount();
     await settleTo('ready');
     const row = rowNamed('Rings');
-    expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 Life']);
+    expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', 'T1 Life · T1 Cold Res']);
     const column = row.querySelector<HTMLElement>('[data-cell="chase"]');
     expect(column?.style.width).toBe('492px');
     expect(column?.style.paddingRight).toBe('');
@@ -655,7 +658,7 @@ describe('the chase cells', () => {
     mount();
     await settleTo('ready');
     const [first] = chaseCells(rowNamed('Bows'));
-    expect(first?.textContent).toBe('explicit.stat_1 1–10');
+    expect(first?.textContent).toBe(`${TARGET} 1–10 · ${SUFFIX} 1–10`);
     const verbatim = first?.querySelector<HTMLElement>('[data-verbatim]');
     expect(verbatim?.style.fontFamily).toBe(stacks.mono);
     // No ink, mark or glyph of its own, and the line's own size and weight.
@@ -668,7 +671,7 @@ describe('the chase cells', () => {
     serveWorld(standardWorld({ stats: [{ id: TARGET, text: '#% increased Target' }] }));
     mount();
     await settleTo('ready');
-    expect(chaseTexts(rowNamed('Bows'))).toEqual(['1–10% increased Target', '', '']);
+    expect(chaseTexts(rowNamed('Bows'))).toEqual([`1–10% increased Target · ${SUFFIX} 1–10`, '', '']);
   });
 
   it('rewrites the cells and the open panel in the same pass on a recipe switch, and after a raised threshold', async () => {
@@ -680,13 +683,13 @@ describe('the chase cells', () => {
     expect(notes()).toEqual(['', '', '', '', '']);
     click(option('perfect'));
     // Life is mostly out of reach under perfect: its P is small, so it sorts last among the summands.
-    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 ES']);
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', 'T1 ES · T1 Cold Res']);
     expect(panelRows().map((row) => panelCell(row, 'combination'))).toEqual([
       '* pinned T1 Atk Dmg · T1 Cold Res',
-      'T1 Mana',
-      'T1 ES',
-      'T1 Rarity',
-      'T1 Life',
+      'T1 Mana · T1 Cold Res',
+      'T1 ES · T1 Cold Res',
+      'T1 Rarity · T1 Cold Res',
+      'T1 Life · T1 Cold Res',
     ]);
     click(option('greater'));
     const field = frame().querySelector<HTMLInputElement>('[data-payout-threshold] input');
@@ -695,7 +698,7 @@ describe('the chase cells', () => {
     }
     typeInto(field, '2');
     await pastDebounce();
-    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', '']);
+    expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', '']);
     expect(notes()).toEqual(['', '', BELOW_THRESHOLD_NOTE, BELOW_THRESHOLD_NOTE, BELOW_THRESHOLD_NOTE]);
   });
 
@@ -706,14 +709,14 @@ describe('the chase cells', () => {
     click(option('perfect'));
     const row = rowNamed('Rings');
     expect(row.querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
-    expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana', 'T1 ES']);
+    expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', 'T1 ES · T1 Cold Res']);
   });
 });
 
 describe('the crafted panel', () => {
   it('lists the summand, then the rest by canonical key, with their notes; the pruned entry has no row', async () => {
     const now = Date.now();
-    const pruned = ring(RARITY, undefined, 'pruned');
+    const pruned = ring(RARITY, COLD_RES, 'pruned');
     serveWorld(
       ringsWorld({
         tracked: [atkCold, life, es, mana, pruned],
@@ -732,9 +735,9 @@ describe('the crafted panel', () => {
     const rows = panelRows();
     expect(rows.map((row) => panelCell(row, 'combination'))).toEqual([
       '* pinned T1 Atk Dmg · T1 Cold Res',
-      'T1 Mana',
-      'T1 Life',
-      'T1 ES',
+      'T1 Mana · T1 Cold Res',
+      'T1 Life · T1 Cold Res',
+      'T1 ES · T1 Cold Res',
     ]);
     expect(rows.map((row) => panelCell(row, 'note'))).toEqual([
       '',
@@ -783,8 +786,8 @@ describe('the crafted panel', () => {
     const rows = panelRows();
     expect(rows.map((row) => panelCell(row, 'combination'))).toEqual([
       '* pinned T1 Atk Dmg · T1 Cold Res',
-      'T1 Mana',
-      'T1 Life',
+      'T1 Mana · T1 Cold Res',
+      'T1 Life · T1 Cold Res',
     ]);
     expect(rows.map((row) => row.querySelector('[data-state-word]')?.textContent)).toEqual([
       'priced',

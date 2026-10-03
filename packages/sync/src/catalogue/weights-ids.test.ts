@@ -153,6 +153,7 @@ describe('weightsAbsentRecord', () => {
       className,
       itemLevelMin: 1,
       prefix: { kind: 'valueless', statId: 's' },
+      suffix: { kind: 'valueless', statId: 't' },
       status,
       ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
     }) as TrackedEntry;

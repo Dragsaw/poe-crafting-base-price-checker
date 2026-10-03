@@ -18,21 +18,19 @@ import type { TrackedEntry } from './tracked-entry.ts';
  */
 
 /**
- * An affix is **always exactly three elements or the literal `null`** — three
- * distinguishable forms, so an absent affix and a `valueless` affix can never
- * collide. `acceptedTier` is a display-only sibling of the band and never a
- * fourth element.
+ * An affix is **always exactly three elements**: `[statId, min, max]` for a
+ * `banded` reference and `[statId, null, null]` for a `valueless` one. Both
+ * affixes are always present, so there is no absent form (§4.1).
+ * `acceptedTier` is a display-only sibling of the band and never a fourth
+ * element.
  */
-export type CanonicalAffix = readonly [string, number | null, number | null] | null;
+export type CanonicalAffix = readonly [string, number | null, number | null];
 
 export type CanonicalKeyElements =
   | readonly ['crafted', string, string, number, CanonicalAffix, CanonicalAffix]
   | readonly ['raw', string, number];
 
-export function encodeAffix(ref: ModifierRef | undefined): CanonicalAffix {
-  if (ref === undefined) {
-    return null;
-  }
+export function encodeAffix(ref: ModifierRef): CanonicalAffix {
   switch (ref.kind) {
     case 'banded':
       return [ref.statId, ref.valueMin, ref.valueMax];

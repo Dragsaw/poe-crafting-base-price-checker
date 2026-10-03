@@ -187,16 +187,16 @@ describe('the outcomes', () => {
 
   // Matrix: invalid shape.
   it('refuses an invalid tracked.json as a content fault, with no retry', async () => {
-    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '1.0.0', entries: 42 } } });
+    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '2.0.0', entries: 42 } } });
     mount();
     await settleTo('refused');
     expect(frame().querySelector('section')?.getAttribute('role')).toBe('alert');
     expect(frame().hasAttribute('aria-busy')).toBe(false);
     const sentence = refusalBody('tracked.json');
-    expect(sentence).toBe(`${REFUSAL_CONTENT} 1.0.0.`);
+    expect(sentence).toBe(`${REFUSAL_CONTENT} 2.0.0.`);
     expect(sentence).not.toContain('declares');
     expect(frame().querySelector('[data-declared]')).toBeNull();
-    expect(frame().querySelector('[data-expected]')?.textContent).toBe('1.0.0');
+    expect(frame().querySelector('[data-expected]')?.textContent).toBe('2.0.0');
     expect(frame().textContent).not.toContain(MASTHEAD_TITLE);
   });
 
@@ -1234,7 +1234,8 @@ describe('the Unrankable appendix', () => {
     });
     const poolsOf = (statId: string, ranges: number[][]) => ({
       prefix: { poolCoverage: 'complete', entries: [tierOf(statId, ranges)] },
-      suffix: { poolCoverage: 'complete', entries: [tierOf('explicit.stat_9', [[1, 2]])] },
+      // The valueless suffix every `craftedEntry` carries.
+      suffix: { poolCoverage: 'complete', entries: [tierOf('explicit.stat_1967051901', [])] },
     });
     const weights = {
       ...(VALID_BODIES.weights as object),

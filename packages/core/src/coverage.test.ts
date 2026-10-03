@@ -39,6 +39,7 @@ const crafted = (
     className,
     itemLevelMin: 80,
     prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
+    suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     status,
     ...(status === 'pruned' ? { prunedReason: 'gone' } : {}),
   }) as TrackedEntry;

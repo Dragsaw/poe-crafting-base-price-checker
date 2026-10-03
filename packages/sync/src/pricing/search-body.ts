@@ -161,9 +161,7 @@ function statFiltersOf(entry: TrackedEntry): StatFilter[] {
     return [];
   }
   // Prefix and suffix share one `and` group.
-  return [entry.prefix, entry.suffix]
-    .filter((ref): ref is ModifierRef => ref !== undefined)
-    .map(statFilterOf);
+  return [statFilterOf(entry.prefix), statFilterOf(entry.suffix)];
 }
 
 function edgeFor(letters: ReadonlySet<DefenceLetter>, letter: DefenceLetter): FilterEdge {

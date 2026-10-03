@@ -29,11 +29,11 @@ import { readdir, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { canonicalKey, parseEnvelope, TrackedFileSchema } from '@poe/contracts';
+import { canonicalKey } from '@poe/contracts';
 import type { ClockPort, HttpPort, LeagueId, TrackedEntry } from '@poe/contracts';
 
 import { loadActiveLeague } from './load-config.ts';
-import { loadDataFile } from './load-data-file.ts';
+import { explainTrackedVersion, loadDataFile, parseTrackedFile } from './load-data-file.ts';
 import { FIXTURE_WORKLOAD_PATH, pricingFixtureName } from './pricing/fixture-names.ts';
 import { loadItemTypes } from './pricing/load-item-types.ts';
 import { FETCH_LIMIT } from './pricing/price-entry.ts';
@@ -355,9 +355,7 @@ async function main(): Promise<void> {
   // Read-only: the recorder writes under `fixtures/` and nowhere under `data/`.
   const data = createNodeFilesystemPort(REPO_ROOT);
   const league = await loadActiveLeague(data);
-  const tracked = await loadDataFile(data, FIXTURE_WORKLOAD_PATH, (value) =>
-    parseEnvelope(TrackedFileSchema, value),
-  );
+  const tracked = await loadDataFile(data, FIXTURE_WORKLOAD_PATH, parseTrackedFile, explainTrackedVersion);
   const itemTypes = await loadItemTypes(data);
   if (!league.ok || !tracked.ok || !itemTypes.ok) {
     const refused = [league, tracked, itemTypes].flatMap((loaded) => (loaded.ok ? [] : [loaded.error]));

@@ -5,6 +5,8 @@ import {
   INITIAL_SCHEMA_VERSION,
   majorOf,
   SchemaVersionSchema,
+  TRACKED_SCHEMA_VERSION,
+  trackedEarlierMajorMessage,
 } from './schema-version';
 
 describe('SchemaVersionSchema', () => {
@@ -62,5 +64,41 @@ describe('checkSchemaVersion', () => {
       expected: '1.0.0',
       found: 'one.oh',
     });
+  });
+});
+
+describe('trackedEarlierMajorMessage (IMPLEMENTATION-NOTES §4.1)', () => {
+  it('explains an earlier tracked major: the major changed, both affixes, hybrid, re-author', () => {
+    const message = trackedEarlierMajorMessage('1.0.0');
+    expect(message).toBeDefined();
+    expect(message).toContain('1.0.0');
+    expect(message).toContain(TRACKED_SCHEMA_VERSION);
+    expect(message).toContain('major version changed');
+    expect(message).toContain('both a prefix and a suffix');
+    expect(message).toContain('"hybrid"');
+    expect(message).toContain('Re-author');
+  });
+
+  it('leaves the current, a later and a malformed major to the generic refusal', () => {
+    expect(trackedEarlierMajorMessage(TRACKED_SCHEMA_VERSION)).toBeUndefined();
+    expect(trackedEarlierMajorMessage('3.0.0')).toBeUndefined();
+    expect(trackedEarlierMajorMessage('abc')).toBeUndefined();
+  });
+
+  it('explains only the 1.x major, not another earlier major', () => {
+    expect(trackedEarlierMajorMessage('0.9.0')).toBeUndefined();
+  });
+
+  it('opens with the generic refusal lead-in and names no file', () => {
+    const message = trackedEarlierMajorMessage('1.2.0') ?? '';
+    expect(message.startsWith(`schemaVersion 1.2.0 refused (unknown-major; this build reads ${TRACKED_SCHEMA_VERSION}): `)).toBe(
+      true,
+    );
+    expect(message).not.toContain('tracked.json');
+  });
+
+  it('versions tracked.json apart from every other file', () => {
+    expect(TRACKED_SCHEMA_VERSION).toBe('2.0.0');
+    expect(INITIAL_SCHEMA_VERSION).toBe('1.0.0');
   });
 });

@@ -16,8 +16,8 @@ const GONE_BASE: TrackedEntry = { kind: 'raw', baseTypeId: 'Gone Amulet', itemLe
 
 function crafted(
   categoryId: string,
-  prefix: string | undefined,
-  suffix: string | undefined,
+  prefix: string,
+  suffix: string,
   status: TrackedEntry['status'] = 'active',
 ): TrackedEntry {
   return {
@@ -25,8 +25,8 @@ function crafted(
     categoryId,
     className: 'Not_A_Catalogue_Name',
     itemLevelMin: 75,
-    ...(prefix === undefined ? {} : { prefix: { kind: 'valueless', statId: prefix } }),
-    ...(suffix === undefined ? {} : { suffix: { kind: 'valueless', statId: suffix } }),
+    prefix: { kind: 'valueless', statId: prefix },
+    suffix: { kind: 'valueless', statId: suffix },
     status,
     ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
   } as TrackedEntry;
@@ -77,7 +77,7 @@ describe('checkCatalogue', () => {
   });
 
   it('checks a raw baseTypeId and a crafted categoryId', () => {
-    const entry = crafted('weapon.gone', 'explicit.a', undefined);
+    const entry = crafted('weapon.gone', 'explicit.a', 'explicit.b');
     const check = checkCatalogue([GONE_BASE, entry], [], IDS);
     expect(check.records).toEqual([
       { kind: 'unresolvable', entryKey: canonicalKey(GONE_BASE), identifier: 'Gone Amulet', identifierKind: 'baseTypeId' },
@@ -108,7 +108,7 @@ describe('checkCatalogue', () => {
   });
 
   it('does not check, mark or record a pruned entry', () => {
-    const pruned = crafted('weapon.gone', 'explicit.gone', undefined, 'pruned');
+    const pruned = crafted('weapon.gone', 'explicit.gone', 'explicit.b', 'pruned');
     expect(checkCatalogue([pruned], [], IDS)).toEqual({
       marked: [],
       records: [],
@@ -135,7 +135,7 @@ describe('checkCatalogue', () => {
 
 describe('checkCatalogue: jewel entries', () => {
   it('never recovers a crafted jewel entry, which only the pricing step can decide', () => {
-    const jewel = crafted('jewel', 'explicit.a', undefined);
+    const jewel = crafted('jewel', 'explicit.a', 'explicit.b');
     const published: DatasetEntry = { entryKey: canonicalKey(jewel), price: { state: 'unresolvable' } };
     const ids: CatalogueIds = { ...IDS, categoryIds: new Set(['jewel']) };
     expect(checkCatalogue([jewel], [published], ids)).toEqual({
@@ -147,7 +147,7 @@ describe('checkCatalogue: jewel entries', () => {
   });
 
   it('still marks a jewel entry for its own catalogue-id misses', () => {
-    const jewel = crafted('jewel', 'explicit.gone', undefined);
+    const jewel = crafted('jewel', 'explicit.gone', 'explicit.b');
     const ids: CatalogueIds = { ...IDS, categoryIds: new Set(['jewel']) };
     expect(checkCatalogue([jewel], [], ids).records).toEqual([
       { kind: 'unresolvable', entryKey: canonicalKey(jewel), identifier: 'explicit.gone', identifierKind: 'statId' },

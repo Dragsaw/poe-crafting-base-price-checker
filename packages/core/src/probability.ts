@@ -155,20 +155,20 @@ export function isEmptyPool(pool: WeightsPool): boolean {
   return totalWeight(pool.entries) === 0;
 }
 
-/** `C = contained(ref) ∩ E`; an absent affix contains its whole eligible set (§11). */
-export function containedIn(ref: ModifierRef | undefined, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
-  return ref === undefined ? eligibleSet : eligibleSet.filter((entry) => contains(ref, entry));
+/** `C = contained(ref) ∩ E` (§11). */
+export function containedIn(ref: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
+  return eligibleSet.filter((entry) => contains(ref, entry));
 }
 
 /**
  * `P(ref | recipe)` for one slot (§9): the contained eligible weight over the
- * eligible weight, each contained entry counted once. An absent affix is
- * `P = 1`. An empty eligible slot (`W = 0`) is `empty-eligible-pool`.
+ * eligible weight, each contained entry counted once. An empty eligible slot
+ * (`W = 0`) is `empty-eligible-pool`.
  */
 export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
-  ref: ModifierRef | undefined,
+  ref: ModifierRef,
   itemLevelMin: number,
   modifierLevelMin: number,
 ): ProbabilityResult {
@@ -215,10 +215,8 @@ function orderedTerm(
 ): { readonly ok: true; readonly sum: number } | { readonly ok: false; readonly reason: ProbabilityReason } {
   const without = exclusionSums(second);
   let sum = 0;
+  // `contains` never admits a weight-0 tier, so every first draw here is positive-weight.
   for (const entry of first.contained) {
-    if (entry.weight === 0) {
-      continue;
-    }
     const rest = without(entry.modGroup);
     if (rest.eligible === 0) {
       return {
@@ -235,17 +233,16 @@ function orderedTerm(
  * `P(prefix ∧ suffix | recipe)` (§11): the transmute draws from both slots
  * combined by weight, and the augment draws from the other slot with the first
  * affix's `modGroup` removed. The order is scope, truncate, exclude,
- * renormalise. An absent affix contains its whole eligible set, so the one
- * formula covers it. Both slots are checked for `empty-eligible-pool` first,
- * then each declared affix for `empty-contained` (IN §9), then each draw order
- * for `augment-exhausted`.
+ * renormalise. Both slots are checked for `empty-eligible-pool` first, then
+ * each affix for `empty-contained` (IN §9), then each draw order for
+ * `augment-exhausted`.
  */
 export function combinationProbability(
   pools: WeightsClassPools,
   combination: CombinationInput,
   modifierLevelMin: number,
 ): ProbabilityResult {
-  const setsOf = (slot: Slot, ref: ModifierRef | undefined): SlotSets => {
+  const setsOf = (slot: Slot, ref: ModifierRef): SlotSets => {
     const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
     return { slot, eligibleSet, contained: containedIn(ref, eligibleSet), total: totalWeight(eligibleSet) };
   };
@@ -256,11 +253,8 @@ export function combinationProbability(
       return { ok: false, reason: { kind: 'empty-eligible-pool', slot: sets.slot } };
     }
   }
-  for (const [sets, ref] of [
-    [prefix, combination.prefix],
-    [suffix, combination.suffix],
-  ] as const) {
-    if (ref !== undefined && sets.contained.length === 0) {
+  for (const sets of [prefix, suffix]) {
+    if (sets.contained.length === 0) {
       return { ok: false, reason: { kind: 'empty-contained', slot: sets.slot } };
     }
   }

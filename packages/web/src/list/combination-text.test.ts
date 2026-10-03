@@ -28,9 +28,8 @@ const STATS = statTexts({
   ],
 });
 
-function entry(prefix: ModifierRef | undefined, suffix: ModifierRef | undefined): CraftedTrackedEntry {
-  const base = { kind: 'crafted', categoryId: 'armour.helmet', className: 'Helmets', itemLevelMin: 82, status: 'active' } as const;
-  return { ...base, ...(prefix === undefined ? {} : { prefix }), ...(suffix === undefined ? {} : { suffix }) };
+function entry(prefix: ModifierRef, suffix: ModifierRef): CraftedTrackedEntry {
+  return { kind: 'crafted', categoryId: 'armour.helmet', className: 'Helmets', itemLevelMin: 82, prefix, suffix, status: 'active' };
 }
 
 describe('combinationText', () => {
@@ -41,10 +40,6 @@ describe('combinationText', () => {
       { text: 'T1 Cold Res', verbatim: false },
     ]);
     expect(combinationString(parts)).toBe('T1 Mana · T1 Cold Res');
-  });
-
-  it('prints one affix alone', () => {
-    expect(combinationString(combinationText(entry(undefined, banded(COLD_RES, 41, 45, 'T1')), STATS))).toBe('T1 Cold Res');
   });
 
   it('prints a mixture tier verbatim, hyphen kept', () => {

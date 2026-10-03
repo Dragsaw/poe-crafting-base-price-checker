@@ -30,7 +30,9 @@ import {
  */
 
 /**
- * `data/tracked.json` — the player's curated workload (AD-12).
+ * `data/tracked.json` — the player's curated workload (AD-12). Its envelope is
+ * versioned by `TRACKED_SCHEMA_VERSION`, not `SUPPORTED_SCHEMA_VERSION`
+ * (IMPLEMENTATION-NOTES §4.1); a loader passes it to `parseEnvelope`.
  *
  * One file-level rule: each `canonicalKey` (§4.1) appears once in `entries`,
  * so entries equal under it are twins whatever else differs. Each repeat is
@@ -46,10 +48,10 @@ import {
  *
  * A third rule, within-file overlap (FR-16, AD-17, IMPLEMENTATION-NOTES.md
  * §2.1): no two non-`pruned` crafted entries of one class overlap under
- * `overlap` with `NEVER_CO_OCCUR` — intersecting bands, both valueless, or an
- * absent affix on either side of each slot. Each pair is one issue at the
- * later entry's index, naming both canonical keys and each slot's branch. The
- * `coOccur` branch needs the weights file and is `core`'s cross-file check.
+ * `overlap` with `NEVER_CO_OCCUR` — intersecting bands or both valueless, in
+ * each slot. Each pair is one issue at the later entry's index, naming both
+ * canonical keys and each slot's branch. The `coOccur` branch needs the
+ * weights file and is `core`'s cross-file check.
  */
 export const TrackedFileSchema = z
   .strictObject({

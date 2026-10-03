@@ -16,6 +16,7 @@ const crafted: TrackedEntry = {
   className: 'Bows',
   itemLevelMin: 79,
   prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5 },
+  suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
   status: 'active',
 };
 
@@ -34,7 +35,7 @@ describe('canonicalKeyElements', () => {
       'Bows',
       79,
       ['explicit.stat_1', 43, 56.5],
-      null,
+      ['explicit.stat_2', null, null],
     ]);
     expect(canonicalKeyElements(raw)).toEqual(['raw', 'Advanced Dualstring Bow', 79]);
   });
@@ -46,7 +47,7 @@ describe('canonicalKeyElements', () => {
 
   it('leaves acceptedTier out of the key entirely', () => {
     const labelled: TrackedEntry = {
-      ...crafted,
+      ...(crafted as Extract<TrackedEntry, { kind: 'crafted' }>),
       prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5, acceptedTier: 'T7' },
     };
     expect(canonicalKey(labelled)).toBe(canonicalKey(crafted));
@@ -54,8 +55,7 @@ describe('canonicalKeyElements', () => {
 });
 
 describe('encodeAffix', () => {
-  it('encodes an affix in exactly three elements, or the literal null', () => {
-    expect(encodeAffix(undefined)).toBeNull();
+  it('encodes an affix in exactly three elements', () => {
     expect(encodeAffix({ kind: 'valueless', statId: 's' })).toEqual(['s', null, null]);
     expect(encodeAffix({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 })).toEqual([
       's',
@@ -65,25 +65,21 @@ describe('encodeAffix', () => {
   });
 });
 
-describe('the three affix forms', () => {
-  // I/O matrix: "Absent vs valueless affix".
-  it('distinguishes an absent affix from a valueless one', () => {
-    const absent: TrackedEntry = {
-      ...crafted,
-      prefix: undefined,
-      suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
+describe('the banded and valueless affix forms', () => {
+  it('keeps a banded and a valueless affix on one statId apart, and never encodes null', () => {
+    const banded: TrackedEntry = {
+      ...(crafted as Extract<TrackedEntry, { kind: 'crafted' }>),
+      prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 1, valueMax: 1 },
     };
     const valueless: TrackedEntry = {
-      ...crafted,
+      ...(crafted as Extract<TrackedEntry, { kind: 'crafted' }>),
       prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
-      suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     };
 
-    const absentPrefix = (JSON.parse(canonicalKey(absent)) as unknown[])[4];
-    const valuelessPrefix = (JSON.parse(canonicalKey(valueless)) as unknown[])[4];
-    expect(absentPrefix).toBeNull();
-    expect(valuelessPrefix).toEqual(['explicit.stat_1', null, null]);
-    expect(canonicalKey(absent)).not.toBe(canonicalKey(valueless));
+    const elements = canonicalKeyElements(valueless);
+    expect(elements[4]).toEqual(['explicit.stat_1', null, null]);
+    expect(elements.slice(4)).not.toContain(null);
+    expect(canonicalKey(banded)).not.toBe(canonicalKey(valueless));
   });
 });
 

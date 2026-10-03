@@ -21,7 +21,7 @@ export function rawEntry(baseTypeId: string, itemLevelMin = 82): RawTrackedEntry
   return { kind: 'raw', baseTypeId, itemLevelMin, status: 'active' };
 }
 
-/** A crafted entry on one `(categoryId, className)`, carrying one valueless prefix. */
+/** A crafted entry on one `(categoryId, className)`, carrying a valueless prefix and a valueless suffix. */
 export function craftedEntry(className: string, categoryId: string, itemLevelMin = 82): CraftedTrackedEntry {
   return {
     kind: 'crafted',
@@ -29,6 +29,7 @@ export function craftedEntry(className: string, categoryId: string, itemLevelMin
     className,
     itemLevelMin,
     prefix: { kind: 'valueless', statId: 'explicit.stat_3299347043' },
+    suffix: { kind: 'valueless', statId: 'explicit.stat_1967051901' },
     status: 'active',
   };
 }
