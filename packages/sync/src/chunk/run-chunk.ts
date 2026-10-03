@@ -577,7 +577,14 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
     let order: ChunkOrder | undefined;
     let entries: readonly TrackedEntry[] = [];
     /** Both fields or neither (AD-27); set once the weights file is read. */
-    let coverageFigures: { coverage?: number; rankableClassCount?: number } = {};
+    let coverageFigures: { coverage?: number; rankableClassCount?: number } =
+      previousReport?.figures.coverage === undefined || previousReport.figures.rankableClassCount === undefined
+        ? {}
+        : {
+            // A failure before the weights read is no re-read: the figure stays, as on the pause.
+            coverage: previousReport.figures.coverage,
+            rankableClassCount: previousReport.figures.rankableClassCount,
+          };
     let current: TrackedEntry | undefined;
     let attempted = 0;
     let publishAttempted = false;

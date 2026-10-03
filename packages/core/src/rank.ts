@@ -17,7 +17,7 @@ import type {
 
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import type { CrossFileFailure } from './cross-file.ts';
-import { combinationProbability, poolOf } from './probability.ts';
+import { combinationProbability, isEmptyPool, poolOf } from './probability.ts';
 import { foldPair, oldestOf, weakest } from './provenance.ts';
 
 /**
@@ -124,11 +124,12 @@ export interface UnrankableClass {
   readonly className: string;
   readonly reason: UnrankableReason;
   /**
-   * Present only on the recipe-scoped reason, `recipe cannot reach this
+   * Present only on the recipe-scoped form of `recipe cannot reach this
    * class`: the one recipe whose pair is unrankable. The class may rank under
-   * another recipe (EXPERIENCE.md state 36). The other three reasons hold
-   * under every recipe and carry no recipe id. So does `recipe cannot reach
-   * this class` when no recipe exists at all (retro item 29).
+   * another recipe (EXPERIENCE.md state 36). The same reason without a recipe
+   * id holds under every recipe: a `complete` slot with total weight 0, the
+   * same test as `poolCoverage`, or no recipe existing at all (retro item
+   * 29). The other reasons carry no recipe id.
    */
   readonly recipeId?: string;
   /**
@@ -170,8 +171,8 @@ export interface Ranking {
   readonly unresolvable: readonly UnrankedEntry[];
   /**
    * One per distinct non-pruned crafted `(categoryId, className)` whose pair is
-   * absent from the weights file, declares a `partial` slot or fails a
-   * cross-file check; and one per `(class, recipe)` pair the recipe cannot
+   * absent from the weights file, declares a `partial` slot, has an empty
+   * slot (total weight 0) or fails a cross-file check; and one per `(class, recipe)` pair the recipe cannot
    * reach. By `className` in UTF-8 code-unit order, then `categoryId`, then the
    * recipe-free row first, then `recipeId`.
    */
@@ -286,6 +287,10 @@ function unrankableReasonOf(
   }
   if (pools.prefix.poolCoverage === 'partial' || pools.suffix.poolCoverage === 'partial') {
     return 'pool partial';
+  }
+  // One definition with `poolCoverage` (IN §3): an empty slot makes the class unrankable under every recipe.
+  if (isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix)) {
+    return RECIPE_UNREACHABLE;
   }
   return undefined;
 }

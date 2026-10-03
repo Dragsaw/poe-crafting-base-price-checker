@@ -1551,6 +1551,42 @@ describe('runChunk: the Sync Report', () => {
     ]);
   });
 
+  it('a failure before the weights read keeps the previous coverage pair', async () => {
+    const withPair = JSON.stringify({
+      schemaVersion: '1.1.0',
+      runStartedAt: SEVEN_HOURS_AGO,
+      figures: {
+        requestsBySource: { 'tracked-list': 0, 'league-validation': 0 },
+        notReachedCount: 0,
+        coverage: 0.75,
+        rankableClassCount: 4,
+      },
+      records: [],
+    });
+    const fs = createFakeFilesystemPort({
+      [TRACKED_PATH]: { contents: '{not json' },
+      [REPORT_PATH]: { contents: withPair },
+    });
+    await expect(
+      run({ fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION }, scriptedStep().step),
+    ).rejects.toThrow(/tracked\.json/);
+
+    const figures = (await reportOf(fs))?.figures;
+    expect(figures?.coverage).toBe(0.75);
+    expect(figures?.rankableClassCount).toBe(4);
+  });
+
+  it('a failure before the weights read leaves the pair absent when the previous report has none', async () => {
+    const fs = createFakeFilesystemPort({ [TRACKED_PATH]: { contents: '{not json' } });
+    await expect(
+      run({ fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION }, scriptedStep().step),
+    ).rejects.toThrow(/tracked\.json/);
+
+    const figures = (await reportOf(fs))?.figures;
+    expect(figures?.coverage).toBeUndefined();
+    expect(figures?.rankableClassCount).toBeUndefined();
+  });
+
   it('busy: no report write', async () => {
     const { fs, ports } = harness([A], {
       [LOCK_PATH]: { contents: serialiseLock({ pid: 99, startedAt: FIVE_HOURS_AGO }) },
