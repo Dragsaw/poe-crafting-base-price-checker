@@ -1,12 +1,14 @@
 /**
  * The run-start cross-file gate (AD-12, AD-17, FR-33).
  *
- * `core`'s `crossFileChecks` is the one definition of the five checks; this
+ * `core`'s `crossFileChecks` is the one definition of the six checks; this
  * module only calls it. Any failure throws `CrossFileGateError` before the
  * order exists, so the chunk spends no budget, publishes nothing and leaves
  * `sync-progress.json` untouched. The report carries one
  * `cross-file-gate-failure` record per failure, and the run exits non-zero.
- * With the weights file absent there is nothing to check (AD-24).
+ * The gate ignores the unvalidated marks: a mark is never a failure, and none
+ * reaches the report (IMPLEMENTATION-NOTES §2.8). With the weights file absent
+ * there is nothing to check (AD-24).
  */
 
 import type { CrossFileGateFailureRecord, TrackedEntry, WeightsFile } from '@poe/contracts';
@@ -30,7 +32,7 @@ export class CrossFileGateError extends Error {
 
 /** Throws `CrossFileGateError` on any failure; returns on a clean or absent file. */
 export function crossFileGate(entries: readonly TrackedEntry[], weights: WeightsFile | null): void {
-  const failures = crossFileChecks(entries, weights);
+  const { failures } = crossFileChecks(entries, weights);
   if (failures.length > 0) {
     throw new CrossFileGateError(failures);
   }

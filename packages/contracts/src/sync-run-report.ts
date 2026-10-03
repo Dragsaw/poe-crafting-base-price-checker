@@ -180,13 +180,14 @@ export const UncataloguedWeightsIdRecordSchema = z.strictObject({
   identifierKind: z.enum(['statId', 'categoryId']),
 });
 
-/** The five cross-file checks AD-17 defines once in `core`. */
+/** The six cross-file checks AD-17 defines once in `core`. */
 export const CrossFileCheckSchema = z.enum([
   'edge-alignment',
   'empty-containment-set',
   'co-occur',
   'class-discriminability',
   'kind-agreement',
+  'line-set-completeness',
 ]);
 
 export type CrossFileCheck = z.infer<typeof CrossFileCheckSchema>;

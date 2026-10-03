@@ -58,7 +58,7 @@ export const RawTrackedEntrySchema = z.strictObject({
 /**
  * The prune-reason rule, and no other; the arm schemas carry both required
  * affixes. FR-16's within-file overlap rejection is a rule of the whole list,
- * so it lives in `TrackedFileSchema` (`./overlap.ts`); the five cross-file
+ * so it lives in `TrackedFileSchema` (`./overlap.ts`); the six cross-file
  * checks are `core`'s (`cross-file.ts`), because `contracts` sees one file at
  * a time.
  */

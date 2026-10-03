@@ -52,7 +52,7 @@ const tier = (statId: string, min: number, max: number): ModifierWeight => ({
   lines: [{ statId, ranges: [[min, max]] }],
 });
 
-/** A weights file on which `crafted` passes all five cross-file checks. */
+/** A weights file on which `crafted` passes all six cross-file checks. */
 const WEIGHTS: WeightsFile = {
   schemaVersion: WEIGHTS_SCHEMA_VERSION,
   gamePatch: '0.5.5',
@@ -97,6 +97,7 @@ describe('checkTracked', () => {
         { check: 'cross-file', status: 'passed' },
       ],
       issues: [],
+      unvalidated: [],
     });
   });
 
@@ -116,12 +117,41 @@ describe('checkTracked', () => {
     const absent = checkTracked(inputsOf([crafted], { weights: { ok: true, value: null } }));
     expect(absent.ok).toBe(true);
     expect(absent.checks).toContainEqual({ check: 'cross-file', status: 'skipped' });
+    expect(absent.issues).toEqual([]);
+    expect(absent.unvalidated).toEqual([
+      {
+        entryKey: expect.stringContaining('"accessory.amulet","Amulets",75') as unknown,
+        categoryId: 'accessory.amulet',
+        className: 'Amulets',
+        reason: 'weights-absent',
+        path: 'entries.0',
+      },
+    ]);
 
     const error = new DataFileError('data/weights.json', 'unknown-major', 'schemaVersion 9.0.0 refused');
     const refused = checkTracked(inputsOf([crafted], { weights: { ok: false, error } }));
     expect(refused.ok).toBe(false);
     expect(refused.checks).toContainEqual({ check: 'cross-file', status: 'failed' });
     expect(refused.issues).toContainEqual({ check: 'cross-file', message: error.message });
+  });
+
+  it('lists each entry of a partial class as unvalidated without failing on it', () => {
+    const amulets = WEIGHTS.bases['accessory.amulet']?.Amulets;
+    if (amulets === undefined) {
+      throw new Error('fixture class missing');
+    }
+    const partial: WeightsFile = {
+      ...WEIGHTS,
+      bases: { 'accessory.amulet': { Amulets: { ...amulets, suffix: { ...amulets.suffix, poolCoverage: 'partial' } } } },
+    };
+    const sentinel = { ...crafted, prefix: { ...crafted.prefix, valueMin: 0, valueMax: 9999 } };
+    const report = checkTracked(inputsOf([gold, sentinel], { weights: { ok: true, value: partial } }));
+
+    expect(report.ok).toBe(true);
+    expect(report.checks).toContainEqual({ check: 'cross-file', status: 'passed' });
+    expect(report.issues).toEqual([]);
+    expect(report.unvalidated).toHaveLength(1);
+    expect(report.unvalidated[0]).toMatchObject({ reason: 'partial-pool', path: 'entries.1', className: 'Amulets' });
   });
 
   it('reports a schema issue at its path and skips the checks that need entries', () => {

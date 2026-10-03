@@ -12,17 +12,6 @@ import type {
 } from '@poe/contracts';
 
 /**
- * The interim `hybrid` branch of a check that does not yet handle a hybrid
- * reference: the cross-file checks (`cross-file.ts`) call it. The named story
- * replaces each call. The probability term itself takes every kind (§1, §11).
- */
-export function assertSingleLine(ref: ModifierRef, story: number): asserts ref is SingleLineModifierRef {
-  if (ref.kind === 'hybrid') {
-    throw new Error(`hybrid references are not supported yet (SPEC-tracked-hybrid-mods story ${String(story)})`);
-  }
-}
-
-/**
  * The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11).
  *
  * Pure (AD-1). This is the one definition of a tier's interval, of
@@ -230,6 +219,23 @@ export function isEmptyPool(pool: WeightsPool): boolean {
 /** `C = contained(ref) ∩ E` (§11). */
 export function containedIn(ref: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
   return eligibleSet.filter((entry) => contains(ref, entry));
+}
+
+/**
+ * `needs(ref)` (IMPLEMENTATION-NOTES.md §8): the item level a reference
+ * requires, over `tier(ref)` — the **unscoped** pool's entries that `contains`
+ * admits and that are not `untrackable`. A maximum of `w.itemLevelMin` when
+ * the reference names any banded line, a minimum when every line is
+ * valueless, and `undefined`, never `0`, when it contains nothing.
+ */
+export function needs(ref: ModifierRef, pool: WeightsPool): number | undefined {
+  const tier = containedIn(ref, pool.entries).filter((entry) => !untrackable(entry, pool));
+  if (tier.length === 0) {
+    return undefined;
+  }
+  const levels = tier.map((entry) => entry.itemLevelMin);
+  const banded = ref.kind === 'hybrid' ? ref.lines.some((rl) => 'valueMin' in rl) : ref.kind === 'banded';
+  return banded ? Math.max(...levels) : Math.min(...levels);
 }
 
 /**

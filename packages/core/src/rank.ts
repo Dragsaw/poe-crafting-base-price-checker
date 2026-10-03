@@ -109,8 +109,8 @@ export interface RankInput {
 /**
  * FR-4's three reasons, verbatim (PRD-owned), and the provisional fourth. The
  * first two come from the direct lookup of the crafted pair in the weights
- * file; `class disagrees with weights file` is any of the five cross-file
- * checks (`cross-file.ts`), one string for all five. `recipe cannot reach this
+ * file; `class disagrees with weights file` is any of the six cross-file
+ * checks (`cross-file.ts`), one string for all six. `recipe cannot reach this
  * class` is recipe-scoped and provisional (`RECIPE_UNREACHABLE`).
  */
 export type UnrankableReason =

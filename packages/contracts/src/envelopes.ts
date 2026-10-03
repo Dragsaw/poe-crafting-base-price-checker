@@ -12,7 +12,7 @@ import {
 } from './schema-version.ts';
 import { SyncProgressSchema } from './sync-progress.ts';
 import { SyncRunReportSchema } from './sync-run-report.ts';
-import { describeOverlap, NEVER_CO_OCCUR, overlapBranches } from './overlap.ts';
+import { describeOverlap, namesHybrid, NEVER_CO_OCCUR, overlapBranches } from './overlap.ts';
 import { TrackedEntrySchema } from './tracked-entry.ts';
 import type { CraftedTrackedEntry } from './tracked-entry.ts';
 import {
@@ -48,10 +48,12 @@ import {
  *
  * A third rule, within-file overlap (FR-16, AD-17, IMPLEMENTATION-NOTES.md
  * §2.1): no two non-`pruned` crafted entries of one class overlap under
- * `overlap` with `NEVER_CO_OCCUR` — intersecting bands or both valueless, in
- * each slot. Each pair is one issue at the later entry's index, naming both
- * canonical keys and each slot's branch. The `coOccur` branch needs the
- * weights file and is `core`'s cross-file check.
+ * `overlap` — intersecting bands or both valueless, in each slot. Each pair is
+ * one issue at the later entry's index, naming both canonical keys and each
+ * slot's branch. Only a pair whose four references are single-line is
+ * evaluated here, and such a pair never reads `coOccur`, so `NEVER_CO_OCCUR`
+ * stands in for it. A pair with any `hybrid` reference is `core`'s cross-file
+ * `co-occur` check (§2.1, *Who evaluates a pair*).
  */
 export const TrackedFileSchema = z
   .strictObject({
@@ -102,8 +104,8 @@ export const TrackedFileSchema = z
       const earlier = earlierByClass.get(classKey) ?? [];
       const key = canonicalKey(entry);
       for (const other of earlier) {
-        // A twin is the uniqueness rule's issue, not a second one here.
-        if (other.key === key) {
+        // A twin is the uniqueness rule's issue; a pair with a hybrid is core's (§2.1).
+        if (other.key === key || namesHybrid(other.entry) || namesHybrid(entry)) {
           continue;
         }
         const branches = overlapBranches(other.entry, entry, NEVER_CO_OCCUR);

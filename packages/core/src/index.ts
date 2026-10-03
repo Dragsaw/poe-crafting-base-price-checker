@@ -37,7 +37,10 @@ export type { CraftCostResult } from './craft-cost.ts';
 /** Provenance of a crafted pair (AD-10). */
 export { foldPair, oldestOf, provenanceOfTier, weakest } from './provenance.ts';
 
-/** The five cross-file checks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.6), defined once. */
+/**
+ * The six cross-file checks and the unvalidated marks (AD-17,
+ * IMPLEMENTATION-NOTES.md §2.1–§2.8), defined once.
+ */
 export {
   classDiscriminability,
   coOccur,
@@ -45,9 +48,10 @@ export {
   edgeAlignment,
   emptyContainment,
   kindAgreement,
+  lineSetCompleteness,
   scopedPools,
 } from './cross-file.ts';
-export type { CrossFileFailure, ScopedPools } from './cross-file.ts';
+export type { CrossFileFailure, CrossFileResult, ScopedPools, UnvalidatedMark } from './cross-file.ts';
 
 /** The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11). */
 export {
@@ -59,6 +63,7 @@ export {
   interval,
   isEmptyPool,
   lineSet,
+  needs,
   poolOf,
   statIds,
   untrackable,

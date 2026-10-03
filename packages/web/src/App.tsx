@@ -61,7 +61,7 @@ export function App(): JSX.Element {
             ? {
                 ...outcome,
                 now: Date.now(),
-                crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights),
+                crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights).failures,
               }
             : outcome,
         );

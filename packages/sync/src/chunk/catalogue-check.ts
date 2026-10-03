@@ -8,8 +8,8 @@
  * result.
  *
  * Every non-pruned entry is checked, field by field: the `categoryId` (crafted)
- * or the `baseTypeId` (raw), then the prefix `statId`, then the suffix
- * `statId`. `className` is never checked: no catalogue endpoint carries a class
+ * or the `baseTypeId` (raw), then the prefix `statId`s, then the suffix
+ * `statId`s — one per line of a `hybrid` reference. `className` is never checked: no catalogue endpoint carries a class
  * axis. An entry with any miss is:
  *
  * - **marked** `unresolvable`, keeping `lastAttemptedAt`, `lastSearchId` and
@@ -28,6 +28,7 @@
 
 import { canonicalKey } from '@poe/contracts';
 import type { DatasetEntry, TrackedEntry, UnresolvableRecord } from '@poe/contracts';
+import { statIds } from '@poe/core';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 
@@ -73,12 +74,11 @@ function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
   }
   for (const ref of [entry.prefix, entry.suffix]) {
-    if (ref.kind === 'hybrid') {
-      // Interim: the committed data holds no hybrid. Story 5 checks its lines.
-      throw new Error('hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 5)');
-    }
-    if (!ids.statIds.has(ref.statId)) {
-      misses.push({ identifier: ref.statId, identifierKind: 'statId' });
+    // A hybrid reference names one statId per line, in its sorted line order.
+    for (const statId of statIds(ref)) {
+      if (!ids.statIds.has(statId)) {
+        misses.push({ identifier: statId, identifierKind: 'statId' });
+      }
     }
   }
   return misses;

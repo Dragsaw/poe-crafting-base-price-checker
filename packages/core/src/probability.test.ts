@@ -12,6 +12,7 @@ import type {
   WeightsClassPools,
   WeightsFile,
   WeightsLine,
+  WeightsPool,
 } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
@@ -23,6 +24,7 @@ import {
   eligible,
   interval,
   lineSet,
+  needs,
   poolOf,
   statIds,
   untrackable,
@@ -431,5 +433,47 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     expect(lineSet(tier([line(OTHER, [1, 2]), line(STAT, [1, 2])], 1))).toEqual([STAT, OTHER]);
     expect(statIds(hybrid({ statId: OTHER }, { statId: STAT }))).toEqual([STAT, OTHER]);
     expect(statIds(band(1, 2))).toEqual([STAT]);
+  });
+});
+
+describe('needs (§8), over the unscoped pool', () => {
+  const low = tier([line(STAT, [10, 20]), line(OTHER)], 100, { itemLevelMin: 30 });
+  const high = tier([line(STAT, [21, 30]), line(OTHER)], 100, { itemLevelMin: 80 });
+  const pool: WeightsPool = { poolCoverage: 'complete', entries: [low, high] };
+
+  it('is the maximum itemLevelMin when any hybrid line is banded', () => {
+    expect(needs(hybrid(lineBand(10, 30), { statId: OTHER }), pool)).toBe(80);
+  });
+
+  it('is the minimum itemLevelMin when every hybrid line is valueless', () => {
+    const allValueless: WeightsPool = {
+      poolCoverage: 'complete',
+      entries: [low, high].map((w) => ({ ...w, lines: [line(STAT), line(OTHER)] })),
+    };
+    expect(needs(hybrid({ statId: STAT }, { statId: OTHER }), allValueless)).toBe(30);
+  });
+
+  it('is undefined when nothing is contained, and skips a partial pool’s null-line tier', () => {
+    expect(needs(hybrid(lineBand(90, 99), { statId: OTHER }), pool)).toBeUndefined();
+    const nullLine = tier([line(STAT, [10, 20]), line(null)], 100, { itemLevelMin: 30 });
+    expect(needs(band(10, 20), { poolCoverage: 'partial', entries: [nullLine] })).toBeUndefined();
+  });
+
+  it('never lets a weight-0 or not-in-game tier set the floor', () => {
+    const zero = tier([line(STAT, [21, 30]), line(OTHER)], 0, { itemLevelMin: 90 });
+    // Weight 100 here, which the weights schema forbids, so only `untrackable` keeps it out.
+    const notInGame: ModifierWeight = {
+      ...zero,
+      sourceModifierId: 'not-in-game',
+      itemLevelMin: 95,
+      weight: 100,
+      weightSource: 'not-in-game',
+    };
+    expect(needs(hybrid(lineBand(10, 30), { statId: OTHER }), { ...pool, entries: [low, high, zero, notInGame] })).toBe(80);
+  });
+
+  it('reads single-line references the same way', () => {
+    expect(needs(band(10, 30), pool)).toBe(80);
+    expect(needs({ kind: 'valueless', statId: OTHER }, pool)).toBe(30);
   });
 });
