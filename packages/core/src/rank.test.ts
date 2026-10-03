@@ -224,7 +224,7 @@ describe('rank: the I/O matrix', () => {
       dataset: [published(P, priced(0.5)), published(crafted, priced(0.5))],
     });
     expect(everyKey(result)).toEqual([]);
-    expect(result.unrankable).toEqual([]);
+    expect(result.unrankable.map((item) => item.reason)).toEqual([NO_RECIPE]);
   });
 
   it('a dataset entry whose key is not tracked is ignored', () => {
@@ -392,6 +392,8 @@ function craftedOf(
 
 const ABSENT = 'class absent from weights file';
 const PARTIAL = 'pool partial';
+/** What a rankable class gets when `ranked` is given no recipe (retro item 29). */
+const NO_RECIPE = 'recipe cannot reach this class';
 
 describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('names every crafted class, reason verbatim, when no weights envelope is loaded', () => {
@@ -430,20 +432,23 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       tracked: [craftedOf('jewel', 'Emerald'), craftedOf('jewel', 'Emerald', 'pinned', 82), craftedOf('weapon.bow', 'Bows')],
       weights: weightsWith(['jewel', 'Emerald', prefix, suffix], ['weapon.bow', 'Bows']),
     });
-    expect(result.unrankable).toEqual([{ categoryId: 'jewel', className: 'Emerald', reason: PARTIAL, provenance: 'absent' }]);
+    expect(result.unrankable).toEqual([
+      { categoryId: 'weapon.bow', className: 'Bows', reason: NO_RECIPE },
+      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL, provenance: 'absent' },
+    ]);
     expect(result.ordering).toEqual([]);
   });
 
-  it('makes no claim for a complete class: no appendix row, and no ranked row', () => {
+  it('makes no weights claim for a complete class: no ranked row, only the no-recipe reason', () => {
     const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weights: WEIGHTS });
-    expect(result.unrankable).toEqual([]);
+    expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: NO_RECIPE }]);
     expect(result.ordering).toEqual([]);
     expect(result.belowThreshold).toEqual([]);
   });
 
-  it('holds no class, and never the string, while a weights envelope is loaded', () => {
+  it('holds no weights-file reason, and never the string, while a weights envelope is loaded', () => {
     const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weights: WEIGHTS });
-    expect(result.unrankable).toEqual([]);
+    expect(result.unrankable.map((item) => item.reason)).toEqual([NO_RECIPE]);
     expect(JSON.stringify(result)).not.toContain(ABSENT);
   });
 
@@ -498,6 +503,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       crossFileFailures: [{ categoryId: 'weapon.bow', className: 'Bows' }, { categoryId: 'weapon.bow', className: 'Bows' }],
     });
     expect(result.unrankable).toEqual([
+      { categoryId: 'accessory.amulet', className: 'Amulets', reason: NO_RECIPE },
       { categoryId: 'weapon.bow', className: 'Bows', reason: 'class disagrees with weights file' },
     ]);
   });
@@ -831,12 +837,17 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     expect(pricedIn([published(target, { state: 'no-listings' })])).toBe(false);
   });
 
-  it('ranks no crafted row when there is no recipe', () => {
-    const result = rankCrafted({ tracked: [chase('Bows')], recipes: [] });
-    expect(result.ordering).toEqual([]);
-    expect(result.unrankable).toEqual([]);
-    expect(result.uncostableRecipes).toEqual([]);
-  });
+  it.each([[[]], [undefined]])(
+    'a rankable class with no recipe (%j) ranks no row and is Unrankable with no recipe id',
+    (recipes) => {
+      const result = rankCrafted({ tracked: [chase('Bows'), chase('Bows')], recipes });
+      expect(result.ordering).toEqual([]);
+      expect(result.unrankable).toEqual([
+        { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
+      ]);
+      expect(result.uncostableRecipes).toEqual([]);
+    },
+  );
 
   it('a currency without a rate, or with another league’s rate, makes the recipe uncostable, never 0', () => {
     const target = chase('Bows');
