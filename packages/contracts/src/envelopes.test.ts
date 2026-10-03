@@ -15,11 +15,11 @@ import {
   SyncReportFileSchema,
   TrackedFileSchema,
 } from './envelopes';
-import { INITIAL_SCHEMA_VERSION } from './schema-version';
+import { INITIAL_SCHEMA_VERSION, TRACKED_SCHEMA_VERSION } from './schema-version';
 import { without } from './test-support';
 
 const trackedFile = {
-  schemaVersion: INITIAL_SCHEMA_VERSION,
+  schemaVersion: TRACKED_SCHEMA_VERSION,
   entries: [
     {
       kind: 'raw',
@@ -70,40 +70,55 @@ describe('ConfigFileSchema', () => {
 describe('parseEnvelope', () => {
   // I/O matrix: "Unknown major".
   it('refuses an unknown major with a typed result naming both versions', () => {
-    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '2.0.0' });
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '3.0.0' }, TRACKED_SCHEMA_VERSION);
     expect(result).toEqual({
       ok: false,
       reason: 'unknown-major',
-      expected: INITIAL_SCHEMA_VERSION,
-      found: '2.0.0',
+      expected: TRACKED_SCHEMA_VERSION,
+      found: '3.0.0',
+    });
+  });
+
+  // Story hybrid-mods 2: the tracked schema's 2.0.0 major refuses a 1.x file.
+  it('refuses a tracked file at the earlier 1.x major', () => {
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '1.0.0' }, TRACKED_SCHEMA_VERSION);
+    expect(result).toEqual({
+      ok: false,
+      reason: 'unknown-major',
+      expected: TRACKED_SCHEMA_VERSION,
+      found: '1.0.0',
     });
   });
 
   it('refuses an unknown major before it parses the body, not after', () => {
-    const result = parseEnvelope(TrackedFileSchema, {
-      schemaVersion: '2.0.0',
-      entries: 'not even an array',
-    });
+    const result = parseEnvelope(
+      TrackedFileSchema,
+      {
+        schemaVersion: '3.0.0',
+        entries: 'not even an array',
+      },
+      TRACKED_SCHEMA_VERSION,
+    );
     expect(result.ok).toBe(false);
     expect(result.ok === false && result.reason).toBe('unknown-major');
   });
 
   // I/O matrix: "Known major, newer minor".
   it('accepts a newer minor under a known major', () => {
-    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '1.4.0' });
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '2.4.0' }, TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(true);
     expect(result.ok === true && result.value.entries).toHaveLength(1);
   });
 
   it('reports a shape failure as invalid, with the issues', () => {
-    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, entries: [{ kind: 'raw' }] });
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, entries: [{ kind: 'raw' }] }, TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(false);
     expect(result.ok === false && result.reason).toBe('invalid');
     expect(result.ok === false && result.reason === 'invalid' && result.issues.length).toBeGreaterThan(0);
   });
 
   it('reports a malformed version apart from an unknown major', () => {
-    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: 'one' });
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: 'one' }, TRACKED_SCHEMA_VERSION);
     expect(result.ok === false && result.reason).toBe('malformed-version');
   });
 
@@ -123,11 +138,11 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
   const rawKey = canonicalKey(rawTwin);
 
   function fileOf(entries: readonly unknown[]) {
-    return { schemaVersion: INITIAL_SCHEMA_VERSION, entries };
+    return { schemaVersion: TRACKED_SCHEMA_VERSION, entries };
   }
 
   function issuesOf(entries: readonly unknown[]) {
-    const result = parseEnvelope(TrackedFileSchema, fileOf(entries));
+    const result = parseEnvelope(TrackedFileSchema, fileOf(entries), TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(false);
     if (result.ok || result.reason !== 'invalid') {
       throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
@@ -137,7 +152,11 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
 
   // I/O matrix: "Distinct keys".
   it('accepts two entries on one base with different itemLevelMin', () => {
-    const result = parseEnvelope(TrackedFileSchema, fileOf([rawTwin, { ...rawTwin, itemLevelMin: 84 }]));
+    const result = parseEnvelope(
+      TrackedFileSchema,
+      fileOf([rawTwin, { ...rawTwin, itemLevelMin: 84 }]),
+      TRACKED_SCHEMA_VERSION,
+    );
     expect(result.ok).toBe(true);
   });
 
@@ -172,6 +191,7 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
       className: 'Bows',
       itemLevelMin: 79,
       prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5, acceptedTier: 'T7' },
+      suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
       status: 'active',
     } as const;
     const issues = issuesOf([
@@ -199,7 +219,7 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
 
   // I/O matrix: "Empty list".
   it('accepts an empty list', () => {
-    expect(parseEnvelope(TrackedFileSchema, fileOf([])).ok).toBe(true);
+    expect(parseEnvelope(TrackedFileSchema, fileOf([]), TRACKED_SCHEMA_VERSION).ok).toBe(true);
   });
 });
 
@@ -210,12 +230,13 @@ describe('TrackedFileSchema shared floor (AD-17, FR-22)', () => {
     className: 'Amulets',
     itemLevelMin,
     prefix: { kind: 'valueless', statId },
+    suffix: { kind: 'valueless', statId: 'explicit.suffix' },
     status,
     ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
   });
 
   const parse = (entries: readonly unknown[]) =>
-    parseEnvelope(TrackedFileSchema, { schemaVersion: INITIAL_SCHEMA_VERSION, entries });
+    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
 
   // I/O matrix: "Shared floor".
   it('refuses two non-pruned crafted entries on one class at 82 and 75, with the issue at the second', () => {

@@ -21,6 +21,7 @@ const crafted: TrackedEntry = {
   className: 'Amulets',
   itemLevelMin: 54,
   prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
+  suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
   status: 'active',
 };
 

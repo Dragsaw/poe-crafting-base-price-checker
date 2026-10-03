@@ -26,8 +26,9 @@ const SORT = { price: 'asc' };
 function crafted(
   categoryId: string,
   className: string,
-  affixes: Partial<Pick<Extract<TrackedEntry, { kind: 'crafted' }>, 'prefix' | 'suffix'>> = {
+  affixes: Pick<Extract<TrackedEntry, { kind: 'crafted' }>, 'prefix' | 'suffix'> = {
     prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 47, valueMax: 50.5, acceptedTier: 'T5' },
+    suffix: { kind: 'valueless', statId: 'explicit.stat_2', acceptedTier: 'T5' },
   },
 ): TrackedEntry {
   return { kind: 'crafted', categoryId, className, itemLevelMin: 75, ...affixes, status: 'active' };
@@ -95,7 +96,10 @@ describe('buildSearchBody: crafted', () => {
         stats: [
           {
             type: 'and',
-            filters: [{ id: 'explicit.stat_1', value: { min: 47, max: 50.5 }, disabled: false }],
+            filters: [
+              { id: 'explicit.stat_1', value: { min: 47, max: 50.5 }, disabled: false },
+              { id: 'explicit.stat_2', value: {}, disabled: false },
+            ],
           },
         ],
         filters: {
@@ -145,11 +149,17 @@ describe('buildSearchBody: crafted', () => {
 
   it('sends a valueless stat as value {} with no edges', () => {
     const body = buildSearchBody(
-      crafted('accessory.amulet', 'Amulets', { prefix: { kind: 'valueless', statId: 'explicit.v' } }),
+      crafted('accessory.amulet', 'Amulets', {
+        prefix: { kind: 'valueless', statId: 'explicit.v' },
+        suffix: { kind: 'banded', statId: 'explicit.s', valueMin: 3, valueMax: 3 },
+      }),
       itemTypes,
     );
 
-    expect(body.query.stats[0].filters).toEqual([{ id: 'explicit.v', value: {}, disabled: false }]);
+    expect(body.query.stats[0].filters).toEqual([
+      { id: 'explicit.v', value: {}, disabled: false },
+      { id: 'explicit.s', value: { min: 3, max: 3 }, disabled: false },
+    ]);
   });
 
   it('never reads acceptedTier and never emits sale_type', () => {

@@ -10,6 +10,7 @@ const craftedEntry = {
   className: 'Bows',
   itemLevelMin: 79,
   prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5 },
+  suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
   status: 'active',
 } as const;
 
@@ -40,7 +41,7 @@ describe('TrackedEntrySchema', () => {
   });
 
   // I/O matrix: "Kind named, not inferred".
-  it('refuses a crafted entry carrying neither prefix nor suffix', () => {
+  it('refuses a crafted entry carrying neither prefix nor suffix, at both paths', () => {
     const issues = issuesOf({
       kind: 'crafted',
       categoryId: 'weapon.bow',
@@ -48,21 +49,18 @@ describe('TrackedEntrySchema', () => {
       itemLevelMin: 79,
       status: 'active',
     });
-    expect(issues).toHaveLength(1);
-    expect(issues[0]?.message).toContain('at least one affix');
+    expect(issues.map((issue) => issue.path.join('.')).sort()).toEqual(['prefix', 'suffix']);
   });
 
-  it('accepts a crafted entry carrying only a suffix', () => {
-    expect(
-      TrackedEntrySchema.safeParse({
-        kind: 'crafted',
-        categoryId: 'weapon.bow',
-        className: 'Bows',
-        itemLevelMin: 79,
-        suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
-        status: 'active',
-      }).success,
-    ).toBe(true);
+  // Story hybrid-mods 2, I/O matrix "Missing slot": both affixes are required.
+  it('refuses a crafted entry without a prefix, at the prefix path', () => {
+    const issues = issuesOf(without(craftedEntry, 'prefix'));
+    expect(issues.map((issue) => issue.path.join('.'))).toEqual(['prefix']);
+  });
+
+  it('refuses a crafted entry without a suffix, at the suffix path', () => {
+    const issues = issuesOf(without(craftedEntry, 'suffix'));
+    expect(issues.map((issue) => issue.path.join('.'))).toEqual(['suffix']);
   });
 
   // I/O matrix: "Raw entry with an affix".

@@ -331,9 +331,8 @@ accept exactly the references this check catches.
 
 AD-17 states the rule and its two indistinguishable causes. The mechanical obligation this
 file adds is the **error payload**: report the tracked entry by its canonical key (§4.1), the
-reference, the reference's floor, and the
-absence of any entry carrying that `statId` in the scoped pool — and name **neither file as
-at fault**, because `core` cannot tell the causes apart and blaming the tracked list
+reference, the reference's floor, and the absence of any scoped-pool entry that the
+reference contains (§1) — and name **neither file as at fault**, because `core` cannot tell the causes apart and blaming the tracked list
 unconditionally sends a curator hunting a defect in a file that is correct.
 
 **For a hybrid reference the payload also lists what §1 excluded**, each by

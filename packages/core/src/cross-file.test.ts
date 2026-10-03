@@ -1,4 +1,11 @@
-import { canonicalKey, parseEnvelope, TrackedFileSchema, WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from '@poe/contracts';
+import {
+  canonicalKey,
+  parseEnvelope,
+  TRACKED_SCHEMA_VERSION,
+  TrackedFileSchema,
+  WEIGHTS_SCHEMA_VERSION,
+  WeightsFileSchema,
+} from '@poe/contracts';
 import type {
   CraftedTrackedEntry,
   ModifierRef,
@@ -73,11 +80,12 @@ function weightsOf(classes: Record<string, Record<string, WeightsClassPools>>): 
 
 const bows = (classPools: WeightsClassPools) => weightsOf({ 'weapon.bow': { Bows: classPools } });
 
+/** Both affixes are required; the suffix defaults to one that aligns on `SUFFIX_TIER`. */
 function entry(
-  affixes: { prefix?: ModifierRef; suffix?: ModifierRef },
+  { prefix, suffix = band(1, 2, SUFFIX_STAT) }: { prefix: ModifierRef; suffix?: ModifierRef },
   { itemLevelMin = 82, categoryId = 'weapon.bow', className = 'Bows' } = {},
 ): CraftedTrackedEntry {
-  return { kind: 'crafted', categoryId, className, itemLevelMin, ...affixes, status: 'active' };
+  return { kind: 'crafted', categoryId, className, itemLevelMin, prefix, suffix, status: 'active' };
 }
 
 const checksOf = (entries: readonly TrackedEntry[], weights: WeightsFile | null) =>
@@ -202,7 +210,7 @@ describe('coOccur (§2.1, §2.2)', () => {
     for (const failure of failures) {
       expect(failure.detail).toContain(canonicalKey(first) === failure.entryKey ? canonicalKey(second) : canonicalKey(first));
       expect(failure.detail).toContain('prefix (the two statIds co-occur on one scoped entry)');
-      expect(failure.detail).toContain('suffix (absent on one entry)');
+      expect(failure.detail).toContain('suffix (bands intersect)');
     }
   });
 
@@ -293,7 +301,7 @@ describe('crossFileChecks scope', () => {
     const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
     const load = async (name: string): Promise<unknown> =>
       ((await import(/* @vite-ignore */ `${here}/../../../test/fixtures/frozen-data/${name}`)) as { default: unknown }).default;
-    const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'));
+    const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'), TRACKED_SCHEMA_VERSION);
     const weights = parseEnvelope(WeightsFileSchema, await load('weights.json'), WEIGHTS_SCHEMA_VERSION);
     if (!tracked.ok || !weights.ok) {
       throw new Error('a committed data file was refused');

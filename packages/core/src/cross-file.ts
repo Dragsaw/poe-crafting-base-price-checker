@@ -279,11 +279,7 @@ export function crossFileChecks(
       for (const [check, run] of REF_CHECKS) {
         const parts: string[] = [];
         for (const slot of OVERLAP_SLOTS) {
-          const ref = entry[slot];
-          if (ref === undefined) {
-            continue;
-          }
-          const part = run(slot, ref, scoped[slot], entry.itemLevelMin);
+          const part = run(slot, entry[slot], scoped[slot], entry.itemLevelMin);
           if (part !== undefined) {
             parts.push(part);
           }

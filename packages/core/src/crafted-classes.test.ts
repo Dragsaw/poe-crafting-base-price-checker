@@ -9,8 +9,9 @@ const crafted = (className: string, status: 'tracked' | 'pruned', itemLevelMin: 
     categoryId: 'c.' + className,
     className,
     itemLevelMin,
+    prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
+    suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     status,
-    modifiers: [],
   }) as unknown as TrackedEntry;
 
 describe('craftedClassesOf', () => {

@@ -9,6 +9,7 @@ import {
   createFakeGitPort,
   createFakeHttpPort,
   SyncReportFileSchema,
+  TRACKED_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type {
   DatasetEntry,
@@ -100,7 +101,7 @@ function inputs(
 ): Parameters<typeof createFakeFilesystemPort>[0] {
   return {
     [TRACKED_PATH]: {
-      contents: JSON.stringify({ schemaVersion: '1.0.0', entries: tracked }),
+      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: tracked }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
     'data/config.json': {

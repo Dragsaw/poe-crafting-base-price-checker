@@ -424,6 +424,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
     className: 'Emerld',
     itemLevelMin: 1,
     prefix: { kind: 'valueless', statId: 'explicit.x' },
+    suffix: { kind: 'valueless', statId: 'explicit.y' },
     status: 'active',
   };
 

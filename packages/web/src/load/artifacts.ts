@@ -6,6 +6,7 @@ import {
   SUPPORTED_SCHEMA_VERSION,
   SYNC_REPORT_SCHEMA_VERSION,
   SyncReportFileSchema,
+  TRACKED_SCHEMA_VERSION,
   TrackedFileSchema,
   WEIGHTS_SCHEMA_VERSION,
   WeightsFileSchema,
@@ -50,7 +51,7 @@ export const ARTIFACTS = {
   syncReport: artifact('sync-report.json', 'tolerable', SyncReportFileSchema, SYNC_REPORT_SCHEMA_VERSION),
   weights: artifact('weights.json', 'tolerable', WeightsFileSchema, WEIGHTS_EXPECTED_VERSION),
   recipes: artifact('recipes.json', 'tolerable', RecipesFileSchema, SUPPORTED_SCHEMA_VERSION),
-  tracked: artifact('tracked.json', 'required', TrackedFileSchema, SUPPORTED_SCHEMA_VERSION),
+  tracked: artifact('tracked.json', 'required', TrackedFileSchema, TRACKED_SCHEMA_VERSION),
   config: artifact('config.json', 'required', ConfigFileSchema, SUPPORTED_SCHEMA_VERSION),
   catalogueStats: artifact('catalogue/stats.json', 'required', CatalogueStatsFileSchema, SUPPORTED_SCHEMA_VERSION),
 } as const;

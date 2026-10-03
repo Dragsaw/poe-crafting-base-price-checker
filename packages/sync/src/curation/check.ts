@@ -9,8 +9,10 @@
  *
  * Four checks, each the production code a sync run uses:
  *
- * - `schema`: `TrackedFileSchema` through `parseEnvelope`, which includes the
- *   canonical-key uniqueness rule. One issue per schema issue.
+ * - `schema`: `TrackedFileSchema` through `parseEnvelope` at
+ *   `TRACKED_SCHEMA_VERSION`, which includes the canonical-key uniqueness
+ *   rule. One issue per schema issue. An earlier major prints the
+ *   IMPLEMENTATION-NOTES §4.1 re-author message.
  * - `pinned-cap`: `checkPinnedCap` against `config.minChunkSearches`
  *   (IMPLEMENTATION-NOTES.md §6).
  * - `catalogue`: AD-9 resolvability through `checkCatalogue` with an empty
@@ -29,7 +31,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { canonicalKey, parseEnvelope, TrackedFileSchema } from '@poe/contracts';
+import { canonicalKey } from '@poe/contracts';
 import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
 import { crossFileChecks } from '@poe/core';
 
@@ -39,7 +41,7 @@ import { readWeightsIds } from '../catalogue/weights-ids.ts';
 import { checkCatalogue } from '../chunk/catalogue-check.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
-import { DataFileError } from '../load-data-file.ts';
+import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
 import type { DataFileResult } from '../load-data-file.ts';
 import { checkPinnedCap } from '../pinned-cap.ts';
 import { createNodeFilesystemPort } from '../shell.ts';
@@ -92,7 +94,7 @@ function checkSchema(text: string | undefined): SchemaResult {
       issues: [{ check: 'schema', message: `${TRACKED_PATH}: not valid JSON: ${String(error)}` }],
     };
   }
-  const result = parseEnvelope(TrackedFileSchema, data);
+  const result = parseTrackedFile(data);
   if (result.ok) {
     return { ok: true, entries: result.value.entries };
   }
@@ -103,9 +105,7 @@ function checkSchema(text: string | undefined): SchemaResult {
         {
           check: 'schema',
           path: 'schemaVersion',
-          message:
-            `${TRACKED_PATH}: schemaVersion ${result.found} refused ` +
-            `(${result.reason}; this build reads ${result.expected})`,
+          message: `${TRACKED_PATH}: ${describeVersionRefusal(result, explainTrackedVersion)}`,
         },
       ],
     };

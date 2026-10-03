@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 26
+revision: 27
 created: '2026-09-12'
 updated: '2026-10-03'
 binds: []
@@ -2055,8 +2055,8 @@ graph TB
 erDiagram
   BaseType ||--o{ TrackedEntry : "has tracked, raw kind"
   ItemClass ||--o{ TrackedEntry : "has tracked, crafted kind"
-  TrackedEntry }o--o| ModifierRef : "prefix band"
-  TrackedEntry }o--o| ModifierRef : "suffix band"
+  TrackedEntry }o--o| ModifierRef : "prefix reference, crafted kind"
+  TrackedEntry }o--o| ModifierRef : "suffix reference, crafted kind"
   TrackedEntry ||--o| PriceObservation : "latest, per league"
   ItemClass ||--o{ ModifierWeight : "eligible pool"
   ModifierWeight }o--|| ModifierRef : "weighs, at itemLevelMin"
@@ -2068,7 +2068,7 @@ erDiagram
   SyncRunReport ||--o{ TrackedEntry : "reports on"
   TradeCatalogue ||--o{ BaseType : "validates"
   TradeCatalogue ||--o{ ItemClass : "validates categoryId only"
-  TradeCatalogue ||--o{ ModifierRef : "validates statId"
+  TradeCatalogue ||--o{ ModifierRef : "validates each line's statId"
 ```
 
 `web` derives `RankedRow` in the browser and no component persists it (AD-4). **A
@@ -2078,9 +2078,9 @@ a `BaseType` and carries no affix members at all (AD-5). Every crafted entry on 
 `ItemClass` shares that class's `itemLevelMin` (AD-17). **An `ItemClass` is the
 pair `(categoryId, className)` and only its `categoryId` half is catalogue-validatable**;
 the `className` half is checked against `weights.json` by the cross-file gate and nowhere
-else (AD-25, AD-12). A `ModifierRef` is a bounded
-band or a valueless stat reference, optionally carrying a display-only `acceptedTier` that
-only `web` reads (AD-5). A `PriceObservation` exists only where there is an observation, so
+else (AD-25, AD-12). A `ModifierRef` is a bounded band, a valueless stat reference, or a
+hybrid of two or more such lines, optionally carrying a display-only `acceptedTier` on the
+whole reference that only `web` reads (AD-5). A `PriceObservation` exists only where there is an observation, so
 the attempt-scoped `lastSearchId` and `lastSearchLeague` sit on the dataset entry beside
 `lastAttemptedAt` (AD-9). **A `ModifierWeight` is one tier of one modifier holding its own
 `lines`, not a cell in a cohort** (AD-11). `TradeCatalogue` is an identity authority only

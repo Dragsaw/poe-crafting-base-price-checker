@@ -4,6 +4,7 @@ import {
   parseEnvelope,
   RankedRowSchema,
   RecipesFileSchema,
+  TRACKED_SCHEMA_VERSION,
   TrackedFileSchema,
   WEIGHTS_SCHEMA_VERSION,
   WeightsFileSchema,
@@ -81,6 +82,7 @@ const crafted: TrackedEntry = {
   className: 'Amulets',
   itemLevelMin: 54,
   prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
+  suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
   status: 'active',
 };
 
@@ -401,6 +403,7 @@ function craftedOf(
     className,
     itemLevelMin,
     prefix: { kind: 'valueless' as const, statId: 'explicit.stat_1' },
+    suffix: { kind: 'valueless' as const, statId: 'explicit.stat_2' },
   };
   return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
 }
@@ -672,7 +675,10 @@ function poolsFile(...classes: readonly (readonly [string, string, Pools])[]): W
   return file;
 }
 
-/** A prefix-only crafted entry on `statId`, banded `[1, 10]`: P is the contained share of the prefix pool. */
+/**
+ * A crafted entry on `statId`, banded `[1, 10]`, whose suffix contains the
+ * whole suffix pool: P is the contained share of the prefix pool.
+ */
 function chase(
   className: string,
   statId = TARGET,
@@ -685,6 +691,8 @@ function chase(
     className,
     itemLevelMin: 82,
     prefix: { kind: 'banded' as const, statId, valueMin: 1, valueMax: 10 },
+    // Contains every suffix tier these pools carry, so P is the prefix's share.
+    suffix: { kind: 'banded' as const, statId: SUFFIX_STAT, valueMin: 1, valueMax: 10 },
   };
   return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
 }
@@ -975,7 +983,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
     const load = async (name: string): Promise<unknown> =>
       ((await import(/* @vite-ignore */ `${here}/../../../test/fixtures/frozen-data/${name}`)) as { default: unknown }).default;
-    const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'));
+    const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'), TRACKED_SCHEMA_VERSION);
     const weights = parseEnvelope(WeightsFileSchema, await load('weights.json'), WEIGHTS_SCHEMA_VERSION);
     const dataset = parseEnvelope(DatasetFileSchema, await load('dataset.json'));
     const recipes = parseEnvelope(RecipesFileSchema, await load('recipes.json'));

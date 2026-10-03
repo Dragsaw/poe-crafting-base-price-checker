@@ -111,7 +111,6 @@ import {
   SYNC_PROGRESS_SCHEMA_VERSION,
   SyncProgressFileSchema,
   SyncReportFileSchema,
-  TrackedFileSchema,
 } from '@poe/contracts';
 import type {
   ClockPort,
@@ -133,8 +132,8 @@ import type { ChunkOrder } from '@poe/core';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
 import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/league-gate.ts';
-import { DataFileError } from '../load-data-file.ts';
-import type { DataFileResult } from '../load-data-file.ts';
+import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
+import type { DataFileResult, VersionRefusalExplainer } from '../load-data-file.ts';
 import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
 import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
@@ -383,15 +382,15 @@ export const writeStderr = (line: string): void => {
   process.stderr.write(`${line}\n`);
 };
 
-function describeRefusal(path: string, result: Exclude<EnvelopeResult<unknown>, { ok: true }>): DataFileError {
+function describeRefusal(
+  path: string,
+  result: Exclude<EnvelopeResult<unknown>, { ok: true }>,
+  explainVersion?: VersionRefusalExplainer,
+): DataFileError {
   switch (result.reason) {
     case 'unknown-major':
     case 'malformed-version':
-      return new DataFileError(
-        path,
-        result.reason,
-        `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
-      );
+      return new DataFileError(path, result.reason, describeVersionRefusal(result, explainVersion));
     case 'invalid':
       return new DataFileError(
         path,
@@ -407,6 +406,7 @@ async function loadEnvelope<T>(
   fs: FilesystemPort,
   path: string,
   parse: (data: unknown) => EnvelopeResult<T>,
+  explainVersion?: VersionRefusalExplainer,
 ): Promise<T | undefined> {
   const text = await fs.readTextFile(path);
   if (text === undefined) {
@@ -420,7 +420,7 @@ async function loadEnvelope<T>(
   }
   const result = parse(data);
   if (!result.ok) {
-    throw describeRefusal(path, result);
+    throw describeRefusal(path, result, explainVersion);
   }
   return result.value;
 }
@@ -724,9 +724,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       if (progressFault !== undefined) {
         throw progressFault.error;
       }
-      const tracked = await loadEnvelope(fs, TRACKED_PATH, (data) =>
-        parseEnvelope(TrackedFileSchema, data),
-      );
+      const tracked = await loadEnvelope(fs, TRACKED_PATH, parseTrackedFile, explainTrackedVersion);
       entries = tracked?.entries ?? [];
       // Absent means every entry is never attempted.
       dataset = await loadEnvelope(fs, DATASET_PATH, (data) =>
