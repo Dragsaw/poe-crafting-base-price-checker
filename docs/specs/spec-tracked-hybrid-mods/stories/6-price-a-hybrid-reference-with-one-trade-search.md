@@ -21,7 +21,7 @@ context:
 
 ## Implementation Notes
 
-`statFilterOf` became `statFiltersOfRef` (returns an array); a hybrid yields one filter per line, so `statFiltersOf` spreads both slots into the one `and` group. The interim-throw test became two body tests in `search-body.test.ts`. Summed `statId`s are not merged here (story 7). The tests build the body directly and do not go through MSW; the MSW-fixture proof CAP-2 names is not added here.
+`statFilterOf` became `statFiltersOfRef` (returns an array); a hybrid yields one filter per line, so `statFiltersOf` spreads both slots into the one `and` group. The interim-throw test became two body tests in `search-body.test.ts`. Summed `statId`s are not merged here (story 7). `price-entry.hybrid.test.ts` adds the MSW proof: the shared server receives the POSTed body, with a plain-`fetch` port so the real shell port stays confined to `shell-fetch.test.ts`.
 
 ## Review Triage Log
 
