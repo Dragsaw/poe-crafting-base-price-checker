@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:1f21072b570f748c258d8c7079bad9f0a877e2f8b69d1eda1c0b06b52419f5ba",
+  "pageVersion": "sha256:413fe40b017d959faa5736fc8cb32c92ef7171e4672f8a8def1f52e64277b0fa",
   "claims": [
     {
       "id": "claim_ad8c9e97dfd54e3696e4d68856f64390",
@@ -18,11 +18,15 @@
     },
     {
       "id": "claim_92bf17c270844defa3bfa87751d7b749",
-      "statement": "The web App loads the artifacts once and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold, passing the loaded weights file.",
+      "statement": "The web App loads the artifacts once, runs the cross-file checks once, and ranks the tracked and dataset entries with core's rank at the active league and the player's threshold, passing the weights file, the recipes and the currency rates.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L40-L149",
-          "version": "repo-lines-v1:sha256:85903c3388b5dd6c8214c3aed2e472558a7e2a6baed2589b3215ab5fc7f284d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NGRlMjAyMDFmOTZjZjVkNDI0NTQwZmVmMDdhZDEzNDU0YjI4MzdhNjI4ZjZlMmMzNjA4NmU1NDc0ODUxMzU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwMGIzZjMxODhhOWVkNDExMjczYmVlYTg2YmY0Y2QyYWVlZWY5OGVlMDNmZmRkZTI1MDZjMGU0ZTcwZjI0ZmRiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MzIxN2Q1NGY4NzZmMmMwYmIyMDZmM2IxYzU4ZGUwMGIxNDA2ZTU2Mjg1OTYwMmFhZWU4MzU0ZjBlZmY2MjNkIn0"
+          "resource": "repo://packages/web/src/App.tsx#L170-L215",
+          "version": "repo-lines-v1:sha256:6007d7f1f6fd237dc7c7ede37bd985ee47415b87577842914b272523a9d5c1e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NGFhZjU1ZGFhNGVkMDZkMzlmYzIxMzMwMzExYmQxNjU5NjVhOGZhZDQ1MzA5MjA1ODYwZmQ3YTRmYzZlNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3ZjQ4NDIyYTg5ODQxZGM5YzRkMDIwZjNhMWIzZWYwZTYyYTMyODQxYWQ3OWU0NjkwNjhlYjE3ZDBhMDZlZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOTY3ZjE3ODMzMjJmZTBkNDE5NzE3Y2RlZGU4ZTZiOTI0NGU5MWMzNzI4MGU2M2MwZDczNzIxY2U2MDZhNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjOGE2ZTg5ZDg5NjdmYjNjMWJmMzQwOTYwYjExNDE4M2I1ODQ4YWY1YzVjZTBlM2NkYmYzNGJjNjdkYzJiOWEifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/App.tsx#L49-L93",
+          "version": "repo-lines-v1:sha256:6914c26a7bc55d4eddcef81bf25230efac41fecc7da9f0d5e6f48d1c1953e6a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0ZGUyMDIwMWY5NmNmNWQ0MjQ1NDBmZWYwN2FkMTM0NTRiMjgzN2E2MjhmNmUyYzM2MDg2ZTU0NzQ4NTEzNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkYzUyZjA4YjM5YjA4YjAxYzhkMzA4YmY4ODBiMGJlZjAyZmQxZGZjYzlkOWFhOTNhNGQxYjVmNGQ1OGI2Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwYjNmMzE4OGE5ZWQ0MTEyNzNiZWVhODZiZjRjZDJhZWVlZjk4ZWUwM2ZmZGRlMjUwNmMwZTRlNzBmMjRmZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjOTNlMjlhOGU0ZTA3Mzc0YWVlYjEwMTY2MzgxMmFlNzJlNmMwMGZhZWIwY2JmMmZkNTczNGFlMTdhZmI4ZTcifQ"
         }
       ]
     },
@@ -38,19 +42,19 @@
     },
     {
       "id": "claim_1eb68a08412e4e97a4d9f199c55e4ccd",
-      "statement": "While the crafted EV branch is unimplemented, the page lists a crafted Item Class in an Unrankable appendix when no weights file is loaded, when its class is absent from the weights file, or when one of its pools is partial.",
+      "statement": "The page lists a crafted Item Class in the Unrankable appendix when no weights file is loaded, its class is absent from the weights file, a pool is partial, a cross-file check fails for it, or (per recipe) the recipe cannot reach it; all other crafted classes rank once per recipe.",
       "evidence": [
         {
-          "resource": "repo://packages/core/src/rank.ts#L141-L163",
-          "version": "repo-lines-v1:sha256:a9b83b82605ae7f95489b7b8367a25181a767b7409942613cdcd49da15772f45:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMmIzMDliNWE1ZDdiZjc2NDIyZTYwNzZjMWRlMDZhZjJmOTZhNWZjMjhmNWE4ZGEwNmQ4YTRmMzcyN2Q0M2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzMzJhNjA1ZjU4NDc5Y2IzZDA1MjBkOTczY2JkOGYwNDc4ZTk3NmM3N2UzMjQwOGQ4Nzg5OTRhYmIxY2YyNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
+          "resource": "repo://packages/core/src/rank.ts#L271-L290",
+          "version": "repo-lines-v1:sha256:3ccf033cca715e37f89fccba01c05b9731913d5a69b2bc797d3216f5c205c928:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMDNjN2ZmMzU5ZTQ4ZTg2OTdkZTNmMjliNDkzOGVkM2Q3ZjM5MDdjMGFjMWM2YzVjMTdlZDY4YTIxMzc5MTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmYjBkZThmYzE5MGI0YWVmYzRkZDBjYjc1OTdlNmRmMGZhYzBkMTVkMTczYjc5ZTRlY2IxYWE4ZWQxMGI0MGQifQ"
         },
         {
-          "resource": "repo://packages/core/src/rank.ts#L191-L202",
-          "version": "repo-lines-v1:sha256:3a5f6ae9eb38c4c13699ea875291432326dbc79c142758802785bfb4443f3847:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMzI3MDQ3N2Y3YmEzMmM3MTc4YWQ0MTZmNGM0M2YyYjFiYTIzNTVjNDZlMzRjZGY5NzlmMWUzNDQ0MzE1YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NWRkNWNhYzZhN2Y0NTMxZmZjNDE3YTUzMjdhZWQyMGZmMDIxMmVlNTE0ZDJlZTNmYjJiOGY5OGMyODFiYTEifQ"
+          "resource": "repo://packages/core/src/rank.ts#L325-L343",
+          "version": "repo-lines-v1:sha256:b1c820deb86e90b9dbe81b8688c44ba20a1b55fac8a2b60bd5ebbb6e67b4bc37:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4YmZiMjE3NTQ5NGIxYzc4ZjQ0YmYxMzRkMmNjMjI4MzUwN2NlMTVhZjMxNGQ3YzY5ODg3NGRlOGEyZGU1YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0NjM4NTQxYjVjYjExYTRhZGNhZWY4NDk4YzhkYzViNjhmNmE5ZGQyNzdiYzUwNjZmMGMwOWZmYWE3NjA5NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NDdkMTE2Y2I3ZTIxZGNjZjM3NTM3NTQ4MTAzZDllMDYyZTc0ODA3ZTc4NzJiN2I1OTQxM2I3NzYxMjI1NmEifQ"
         },
         {
-          "resource": "repo://packages/web/src/App.tsx#L119-L141",
-          "version": "repo-lines-v1:sha256:e29acc15d51d11a910c25c18d5515ff62b9c344656f73e8ba8b9b1ba5c20d0b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NGFhZjU1ZGFhNGVkMDZkMzlmYzIxMzMwMzExYmQxNjU5NjVhOGZhZDQ1MzA5MjA1ODYwZmQ3YTRmYzZlNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyZGUyYTdkODI1ZjM2MWYzOTdhZDVlYmUyZmU2ZDZmN2FkYmJhOThhZWU4Yjg2ODc0NjI3YzNkMDA3ZjBhYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOTY3ZjE3ODMzMjJmZTBkNDE5NzE3Y2RlZGU4ZTZiOTI0NGU5MWMzNzI4MGU2M2MwZDczNzIxY2U2MDZhNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzM2VkZDEyNTVjZjdiNGEyOWRiZmVmODQ2ODgxMjNhMjg0MDMyNTZjZjdiMDQwYzg1NTdjZDVhNjgyNDI2NDkifQ"
+          "resource": "repo://packages/web/src/App.tsx#L203-L229",
+          "version": "repo-lines-v1:sha256:fec4f449ee6784b1ce5729745f8c09965b083d31c258c4cce6b7f7e982f4f370:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0ZjZiODdlOWUwOTJjYjYxYWE5MzIwOGE4ZjVlYTA1OGVlOTdlMGJhNzNiYTc2ODA4OWY0NDM2YjZjYmJjZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwNDBkYjg3MDRmMDNiMjQxMmU4YzE5YWU4OGRjNzgyZTE2M2Y0Yjc0OGMwMTI5OTE4ZDRkYmQyYWM5ODZjZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMjE3ZDU0Zjg3NmYyYzBiYjIwNmYzYjFjNThkZTAwYjE0MDZlNTYyODU5NjAyYWFlZTgzNTRmMGVmZjYyM2QifQ"
         }
       ]
     },
@@ -79,6 +83,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

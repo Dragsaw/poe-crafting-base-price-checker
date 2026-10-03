@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:90ff0e4da645cbb67dd54d8253523eb841bfdc557527db8484f2105fc6f4f774",
+  "pageVersion": "sha256:2523df69faad9ae6aaf5b296a40bb7beff73fd315ae4a011583d2fdb64ca3cf5",
   "claims": [
     {
       "id": "claim_784eac0f3ce64d41999cc0d37c1d7742",
@@ -32,7 +32,7 @@
       "evidence": [
         {
           "resource": "repo://packages/sync/src/pricing/price-entry.ts#L299-L358",
-          "version": "repo-lines-v1:sha256:589becf02aa8e88736eb15802cc2786c4ffa0fb39c67750cfbe9e85efe59793c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NjBjNTBlYmNiOThhZDYzMjJjNjMyNTgyZTZiZDljZDc3NmQ1NmEzZmNjNmJiYzUyZDg1MDQ5ZjdhNDc5ODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYzU0YmE2MGYzZjNmNDcyNDI5OWI2ZGUzZjU1MTQxMTUyMmFmZDBiN2M2ZTEyZjU2MzQ4MzBlZmY5MzA4MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
+          "version": "repo-lines-v1:sha256:4a315f84dc329b09164551403a25835b2d49190e28d21761352343d747c04519:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NjBjNTBlYmNiOThhZDYzMjJjNjMyNTgyZTZiZDljZDc3NmQ1NmEzZmNjNmJiYzUyZDg1MDQ5ZjdhNDc5ODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYzU0YmE2MGYzZjNmNDcyNDI5OWI2ZGUzZjU1MTQxMTUyMmFmZDBiN2M2ZTEyZjU2MzQ4MzBlZmY5MzA4MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
         },
         {
           "resource": "repo://packages/sync/src/pricing/price-entry.ts#L45-L46",
@@ -42,7 +42,7 @@
     },
     {
       "id": "claim_a7eec7170b3f48e096a3ba4f3157ee98",
-      "statement": "A 429, 5xx, timeout or network failure on either request yields the chunk keeping the price state; any other non-2xx throws MalformedRequestError; a 2xx body of the wrong shape throws UnexpectedTradeResponseError, carrying the searched entry only on the fetch.",
+      "statement": "A 429, 5xx, timeout or network failure on either request yields the chunk keeping the price state; any other non-2xx throws MalformedRequestError; a 2xx body of the wrong shape throws UnexpectedTradeResponseError carrying the entry with lastAttemptedAt stamped, with the search fields set only when the failure was on the fetch.",
       "evidence": [
         {
           "resource": "repo://packages/sync/src/pricing/price-entry.ts#L199-L227",
@@ -50,7 +50,7 @@
         },
         {
           "resource": "repo://packages/sync/src/pricing/price-entry.ts#L304-L350",
-          "version": "repo-lines-v1:sha256:dd36bf024c5fc5fa9ecf13a2a7b8f44ea2db02fe75b2fee023a17bb167728ed1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0N2UxNThmZDNkZjYxNTAyNzBiODE5NzIyNTFjOWE3NjAyYmY0ZTE0NWU5ZmIxZjc1ODM3NjEzZmQzOTExOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1NDMwOWZkMDI1M2Y5YWEzMWI2Yzg4ZDdkZWE1NWUzMzZmMTk5N2VjMGMzNzBjNjRiOTQyNWUxMDU1NjFmZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjMTRlNmMxYzE3M2EzYTdkYWEwZDE0NTAyOTFmNDE0MWMxZTdmNzNmMTRkMzQ2MWUwZDA4ODczZTI2OTcwMzIifQ"
+          "version": "repo-lines-v1:sha256:4998f03a3d65f5bafb2a6d8d9e2bca74a11fc3435368fc651e74ae3689665103:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0N2UxNThmZDNkZjYxNTAyNzBiODE5NzIyNTFjOWE3NjAyYmY0ZTE0NWU5ZmIxZjc1ODM3NjEzZmQzOTExOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1NDMwOWZkMDI1M2Y5YWEzMWI2Yzg4ZDdkZWE1NWUzMzZmMTk5N2VjMGMzNzBjNjRiOTQyNWUxMDU1NjFmZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjMTRlNmMxYzE3M2EzYTdkYWEwZDE0NTAyOTFmNDE0MWMxZTdmNzNmMTRkMzQ2MWUwZDA4ODczZTI2OTcwMzIifQ"
         }
       ]
     },
@@ -100,11 +100,11 @@
     },
     {
       "id": "claim_11b3284518fd4d2cbc9faa5fc26a0316",
-      "statement": "readWeightsIds parses data/weights.json with the contracts WeightsFileSchema via parseEnvelope, refuses a non-JSON, unknown-major, malformed-version or non-conforming file as a whole with a DataFileError naming the file (an invalid refusal names the first issue), and otherwise collects the bases categoryIds and every non-null line statId.",
+      "statement": "readWeightsIds parses data/weights.json with the contracts WeightsFileSchema via parseEnvelope, refuses a non-JSON, unknown-major, malformed-version or non-conforming file as a whole with a DataFileError naming the file (an invalid refusal names the first issue), and otherwise collects the bases categoryIds and every non-null line statId, returning the parsed file for the cross-file gate.",
       "evidence": [
         {
           "resource": "repo://packages/sync/src/catalogue/weights-ids.ts#L1-L90",
-          "version": "repo-lines-v1:sha256:c4c0957cfcfb5152798f4e021b4a2098b4d9d448ec7fd81a859ebfbfa3936a7d:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwZGIzMmQ4MjQ3MDIyYjc1MzhmMzQ0MjZhMjZjYjk4OTNmNjFhMTdmNTRhOTVjY2VmMzA1ZDY2YWQxNjI4NTMifQ"
+          "version": "repo-lines-v1:sha256:bf0a6cd8686c31599483d5738e40f50a4d239fb0f48b645bc266cfaa511d8187:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwZGIzMmQ4MjQ3MDIyYjc1MzhmMzQ0MjZhMjZjYjk4OTNmNjFhMTdmNTRhOTVjY2VmMzA1ZDY2YWQxNjI4NTMifQ"
         }
       ]
     },
@@ -125,6 +125,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

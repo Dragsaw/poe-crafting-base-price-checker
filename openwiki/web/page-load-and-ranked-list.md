@@ -10,10 +10,10 @@ sources:
     resource: repo://packages/web/src/frame/FailureScreen.tsx
   - id: openwiki-source-3fa505b4b2c5c6d73ef067c5
     resource: repo://packages/web/src/frame/trust-facts.ts
+  - id: openwiki-source-8f6c2195c06d3f201f23082b
+    resource: repo://packages/web/src/list/active-ranking.ts
   - id: openwiki-source-3913fa1d9ed69d69b4d3b106
     resource: repo://packages/web/src/list/display-rows.ts
-  - id: openwiki-source-cbe166ac1fc71ae356bc2b0a
-    resource: repo://packages/web/src/list/format.ts
   - id: openwiki-source-1cd8d94203d43a3423d47aff
     resource: repo://packages/web/src/list/list-statement.ts
   - id: openwiki-source-886a98f0b5bc7b727f293662
@@ -28,6 +28,10 @@ sources:
     resource: repo://packages/web/src/load/load-artifacts.test.ts
   - id: openwiki-source-48083b7e06b93884229c0b35
     resource: repo://packages/web/src/load/load-artifacts.ts
+  - id: openwiki-source-be5553cd1ea0004a5af26c8a
+    resource: repo://packages/web/src/recipe/recipe-storage.ts
+  - id: openwiki-source-095960c6807b9299250d5a75
+    resource: repo://packages/web/src/recipe/recipe-view.ts
   - id: openwiki-source-814633b3012ba5d3ee46edcd
     resource: repo://packages/web/src/shared/money.ts
   - id: openwiki-source-691a6949d0ba0a26508630f1
@@ -42,10 +46,10 @@ sources:
     resource: repo://packages/web/src/theme/tokens.ts
   - id: openwiki-source-7f1c49c9ea79c77f6775aee2
     resource: repo://packages/web/src/threshold/threshold-storage.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Web page: artifact load and ranked list
@@ -94,33 +98,43 @@ Then the precedence across all seven applies, and each screen names the **first*
 
 `App.tsx` is a small state machine: `pending`, then exactly one of `ready`, `refused` or `failed`, in a single transition. The set is never rendered row by row. `pending` paints the masthead, a blank trust-strip slot, the asking-price line, twenty skeleton row slots and the page tail. "Try again" resets to `pending` and runs all seven fetches again. A load that has been superseded is aborted. On `ready`, "now" is read **once**, and every age on the page uses it, so ages do not update while the page is open.
 
-## Ranking at the Payout Threshold
+## Ranking at the Payout Threshold and the Craft Recipe
 
-`ReadyBody` calls `rank({ tracked, dataset, activeLeague: config.league, threshold, weights: set.weights })` from `@poe/core` and memoises the result on the set, now and the threshold. From that one ranking it renders the list statement, the ranked list, and the page tail led by the Unrankable appendix. The appendix lists crafted classes that are absent from the weights file or declare a partial pool. `web` computes no ranking term itself (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
+When the set resolves, `App` also runs core's `crossFileChecks` over the tracked list and the weights file once, so the ready state carries `crossFileFailures` beside "now".
+
+`ReadyBody` calls `rank({ tracked, dataset, activeLeague, threshold, weights, crossFileFailures, recipes, currencyRates })` from `@poe/core` and memoises the result on the set, the threshold and the failures. The ranking covers every `(Item Class, recipe)` pair. The active Craft Recipe only narrows it: `forRecipe` (`list/active-ranking.ts`) keeps every raw row, the crafted rows of the active recipe and the Unrankable pairs that hold under every recipe or under the active one. A recipe click therefore re-renders without a re-rank. The page then renders the uniform-prior banner, the list statement, the ranked list, and the page tail led by the Unrankable appendix. `web` computes no ranking term itself (see [Core: ranking and refresh rotation](../core/ranking-and-refresh-rotation.md)).
+
+The **Craft Recipe** control (`recipe/CraftRecipe.tsx`) sits in the masthead beside the threshold. Its options are the one word each recipe derives, split by pipes, and only the inactive word is a button. The Craft Cost prints once beneath the options at 2 dp, or as *no figure yet* when the recipe is uncostable (`recipeCostLine`). The active recipe id is the second persisted value (key `poe-cbpc.craftRecipe`, `recipe/recipe-storage.ts`). It is read once at mount, ignores a throwing storage, and falls back to the first recipe in file order when the stored id is gone. With no recipes loaded the control is absent and no crafted row exists.
+
+**The uniform-prior banner** (`list/UniformPriorBanner.tsx`) is raised when the active recipe has at least one ranked crafted row and every such row has `uniform-prior` provenance. A dismissal lives in memory for the session only.
 
 The **Payout Threshold** (`threshold/threshold-storage.ts`) is the only value the page writes to browser storage (key `poe-cbpc.payoutThreshold`). Its range is 0 to 3 Divine, in steps of 0.05, at 2 decimal places (`MONEY_DECIMALS`). The default is 0.25 (`DEFAULT_THRESHOLD` in `shared/product.ts`). Reading happens once at mount. It accepts only a plain decimal string in range. Anything else, including a storage that throws, gives the default. A write is clamped, and a blocked write is ignored. Changing the threshold re-runs `rank`.
 
 ## From ranking to rows
 
-`toDisplayRows(ranking, dataset, now)` (`list/display-rows.ts`) builds the printed list:
+`toListBranches` (`list/display-rows.ts`) builds the printed list from the active ranking, the dataset and a crafted context (the tracked list, the catalogue's stat texts and the league). A row is either a raw row or a class row:
 
-- `ordering` rows come first, in `core`'s order. Each is numbered by position, with tier 1 for ranks 1–5, tier 2 for 6–10 and tier 3 for 11 onward. The EV prints at 2 dp, or as `< 0.01` for a value above 0 and below 0.005 (`formatDivine` in `shared/money.ts`).
-- The unpriced raw bases follow, unnumbered at tier 3. The order is `noListings` ("an open question"), then `notYetSynced` ("no figure yet"), then `unresolvable` ("not valued"). An unresolvable Raw Base is shown as a row, not only counted.
+- `ordering` rows come first, in `core`'s order. Each is numbered by position, with tier 1 for ranks 1–5, tier 2 for 6–10 and tier 3 for 11 onward. A raw row prints its Base Type id and its EV. A **class row** prints the Item Class name, the class glyph and `core`'s EV, which may be negative. An uncostable recipe's rows print *no figure yet*. A class row also carries the **chase cells**, the first three of `core`'s summands as Combination texts, and the expansion's combination rows: the summands in `core`'s order, then every other non-pruned entry of the class by canonical key. A summand joins its tracked entry by canonical key. Provenance `uniform-prior` prints a mark; `measured` is silence. The EV prints at 2 dp, or as `< 0.01` for a positive value under 0.005 (`formatDivine`).
+- The unpriced raw bases follow, unnumbered at tier 3: `noListings` ("an open question"), then `notYetSynced` ("no figure yet"), then `unresolvable` ("not valued"). An unresolvable Raw Base is shown as a row.
 - `belowThreshold` rows leave the list.
+- **Split branches (state 35).** When the active recipe is uncostable, the list is not honest-empty and a crafted row exists, `forRecipe` sets `split`. The raw branch with its unpriced rows and the crafted branch are then printed as two sequences, each in `core`'s order and tiered by its own position, with no rank numeral on either because none can span the two.
 
-**Honest-empty ordering.** `isHonestEmpty` (`list/list-statement.ts`) is the one predicate that the statement and the row order share. It holds when `ordering` and `belowThreshold` are both empty and at least one unpriced row exists. While it holds, the unpriced rows print as one sequence in canonical key order (`compareCanonicalKeys` on `entryKey`) across all three groups. Every EV cell then reads "no figure yet". Each row keeps its own Price State, so its expansion still prints its own phrase and note.
+Combination text (`list/combination-text.ts`) renders an affix from the catalogue's stat texts, and `list/short-forms.ts` supplies short forms for the cells.
+
+**Honest-empty ordering.** `isHonestEmpty` (`list/list-statement.ts`) is the one predicate that the statement and the row order share. It holds when `core`'s `pricedInLeague` is false and the list still has a row to show: a crafted row of the active recipe or an unpriced raw row. While it holds, every row prints as one sequence in canonical key order (`compareCanonicalKeys` on the row key, a class key or an entry key), unnumbered, with every EV cell reading "no figure yet". Each row keeps its own Price State, so its expansion still prints its own phrase and note.
 
 A missing figure never prints as `0`. The list shows the top **20** rows (`TOP_ROWS` in `shared/product.ts`), with "+ Read the remaining N rows" to grow the list in place. This limit only slices the display: `core` ranks the full tracked list. When the row count drops to 20 or fewer, the grown state is cleared, so a later rise opens collapsed.
 
 The **age cell** (`list/format.ts`, `ageMark`) follows the row's resolved Price State. It uses `observedAt` only where the row prints `priced`, and `lastAttemptedAt` otherwise. A league-mismatched observation therefore reads `lastAttemptedAt`. With neither clock the cell shows "never attempted". An entry younger than 48 hours shows no mark. Older entries show `priced Nd ago` or `tried Nd ago`.
 
-The **list statement** (`list/list-statement.ts`) is a pure check over the ranking:
+The **list statement** (`list/list-statement.ts`) is a pure check over the active ranking, with one slot and this precedence:
 
-- *honest empty*: `isHonestEmpty` holds. The copy is "In canonical order, not ranked: no tracked unit has a price from {league} yet." When every row is `unresolvable`, the copy drops "yet", because no sync will bring a price.
-- *nothing clears*: nothing is in the ordering but something is below the threshold. The copy is "Nothing clears your Payout Threshold of X.XX Divine."
+- *honest empty*: `isHonestEmpty` holds. The copy is "In canonical order, not ranked: no tracked unit has a price from {league} yet." When no crafted row and neither other unpriced group remains, so every row is `unresolvable`, the copy drops "yet".
+- *uncostable* (state 35): the recipe is uncostable and the list is split. The copy names the recipe word and says the Item Classes and Raw Bases are ordered apart, not ranked against each other.
+- *nothing clears*: no raw row is in the ordering and no crafted row has a summand, while something is on the list to say it of. The copy is "Nothing clears your Payout Threshold of X.XX Divine."
 - Otherwise there is no statement.
 
-**Row expansion** shows the evidence behind a row: the price state with its `not-yet-synced` reason, the sample size, both exact ages, the state's note, and a **trade link**. `tradeSearchHref` (`list/trade-link.ts`) builds `https://www.pathofexile.com/trade2/search/poe2/{league}/{lastSearchId}` only when the entry has a stored search, `lastSearchLeague` equals the active league, and the entry is not pruned. Only the league segment is percent-encoded.
+**Row expansion** for a raw row shows the evidence behind it: the price state with its `not-yet-synced` reason, the sample size, both exact ages, the state's note, and a **trade link**. `tradeSearchHref` (`list/trade-link.ts`) builds `https://www.pathofexile.com/trade2/search/poe2/{league}/{lastSearchId}` only when the entry has a stored search, `lastSearchLeague` equals the active league, and the entry is not pruned. Only the league segment is percent-encoded. A class row's expansion lists its combination rows, each with its own state, note, ages and trade link.
 
 ## Page tail and the Unrankable appendix
 
@@ -128,14 +142,14 @@ The **list statement** (`list/list-statement.ts`) is a pure check over the ranki
 
 `UnrankableAppendix` (`list/UnrankableAppendix.tsx`) renders `ranking.unrankable`. Every row is an Item Class, never a Base Type. The title is "Appendix: Unrankable — " followed by the count (`1 Item Class`, `N Item Classes`). The count is rust when there are rows and ink when there are none.
 
-- With rows, the lead line "Tracked, but kept out of the ordering." follows. Then there is one row per class: a class glyph and the class label (`unitLabel`, which changes underscores to spaces), an `unknown` trust mark, the reason, and an empty note cell.
+- With rows, the lead line "Tracked, but kept out of the ordering." follows. Then there is one row per class: a class glyph and the class label (`unitLabel`, which changes underscores to spaces), an `unknown` trust mark, the reason, and a note cell. The reasons are `class absent from weights file`, `pool partial`, `class disagrees with weights file` and, per recipe, `recipe cannot reach this class`. Only the disagreement reason prints a note: the pool is published and complete and the disagreement is in the player's Tracked List. The note names no check or entry.
 - With no rows, the panel is the title alone, with the bottom padding equal to the top padding and no text that says why.
 
 The appendix has one arrangement: every row renders and the document grows. Nothing switches on a count or a measurement. Rows are not interactive: they have no handler, hover tone, role or title. The panel spacing (`appendixPad*`, `appendixLead*`) comes from `theme/tokens.ts`.
 
 ## Trust strip and sync report panel
 
-`frame/trust-facts.ts` holds pure formatters over the published `sync-report.json` and the `weights.json` envelope. It counts records and derives nothing else. The trust strip prints the weights file's producer, date and patch, "Last synced" (a relative age from the report's run times), and "Tracked List last edited" (from the report's `trackedListEditedAt`, with "(not committed)" for a `file-modified` clock). It prints one line per absent tolerable artifact. It also prints a **health line** with exactly two triggers:
+`frame/trust-facts.ts` holds pure formatters over the published `sync-report.json` and the `weights.json` envelope. It counts records and derives nothing else. The trust strip prints the weights file's producer, date and patch, "Last synced" (a relative age from the report's run times), and "Tracked List last edited" (from the report's `trackedListEditedAt`, with "(not committed)" for a `file-modified` clock). It prints one line per absent tolerable artifact. The "+ the full sync report" panel also carries a sixth group under *What is broken*: one verbatim line per cross-file failure, `check · canonical key · detail`, in `core`'s order, computed by `web` at load. No failure means no group. It also prints a **health line** with exactly two triggers:
 
 - a count of `unresolvable` records;
 - pinned starvation, read only from the `pinned-starvation` record whose `pinnedCount` equals the loaded pinned-set size and whose `declaredMinChunkSearches` equals the loaded `minChunkSearches`. It reads "N of M pinned entries starved", or "M pinned entries left the rotation no search" when N is 0. A stale record for a different curation raises nothing.

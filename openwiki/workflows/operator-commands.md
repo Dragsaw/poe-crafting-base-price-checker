@@ -22,10 +22,10 @@ sources:
     resource: repo://packages/sync/src/sync.ts
   - id: openwiki-source-391c3262b7014fb5ca5796f2
     resource: repo://tools/dev-stop/dev-stop.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Operator commands and curation workflow
@@ -104,7 +104,7 @@ The output is a git diff to review. A game patch that renames a stat id shows up
 
 The command works from the listener upward:
 
-1. It takes a snapshot of the listener PIDs and the process table. On Windows it uses `Get-NetTCPConnection` and `Win32_Process` through PowerShell, including creation times. On POSIX it uses `lsof` and `ps`. An `lsof` failure other than "no match" is an error. It never reads as a free port.
+1. It takes a snapshot of the listener PIDs and the process table. On Windows it uses `Get-NetTCPConnection` and `Win32_Process` through PowerShell, including creation times. On POSIX it uses `lsof` and `ps`. An `lsof` failure other than "no match" is an error. On Windows only the not-found error of `Get-NetTCPConnection` reads as no listener, and `parseListenerJson` throws on any unexpected answer, so a failed query never reads as a free port.
 2. `planStop` refuses a listener that is not **this checkout's** Vite, which means a command line that contains `vite` and `<repoRoot>/node_modules/`. Another worktree's server and unrelated programs are left running, with exit 1.
 3. From each listener it climbs through parents while each parent is pnpm's script shell for one `vite` command or `pnpm dev` itself. The climb stops at the first `pnpm dev`. It never goes above that process, because the shells and shims above `pnpm dev` (for example `bash -c "pnpm dev & pnpm test"`) can own other work. The climb also stops at the tool's own ancestors and at a PID cycle. On Windows it stops at a parent that started after its child, because Windows reuses the PID of a dead parent.
 4. It kills each root's tree (`taskkill /T /F` on Windows, children first with `SIGTERM` on POSIX). It then polls the listener for up to 5 seconds.
@@ -115,11 +115,12 @@ It exits 0 when nothing listens or the port becomes free. It exits 1 on a refusa
 
 The `tracked-json` skill (`.claude/skills/tracked-json/`) runs a **lookup → edit → check** loop:
 
-1. **`pnpm tracked:lookup stat|base|class|mods|tiers <query>`** reads the committed catalogue and `data/weights.json` as plain JSON and prints matches as JSON. The `stat` and `base` queries print at most 50 matches. It derives nothing: `tiers` and `mods` print the weights data unchanged. A lookup error prints `{error}` and exits 1. Zero matches is not an error.
+1. **`pnpm tracked:lookup stat|base|class|mods|tiers <query>`** reads the committed catalogue as plain JSON and parses `data/weights.json` with the contracts `WeightsFileSchema`, then prints matches as JSON. The `stat` and `base` queries print at most 50 matches. It derives nothing: `tiers` and `mods` print the weights data unchanged. A lookup error, including a weights file that fails the schema, prints `{error}` and exits 1. Zero matches is not an error.
 2. **Edit** `data/tracked.json`. Each entry is `crafted` or `raw` with a status of `active`, `pinned` or `pruned` (see [Contracts, envelopes and the data/ files](../architecture/contracts-and-data-files.md)).
-3. **`pnpm tracked:check`** (`packages/sync/src/curation/check.ts`) is read-only. It runs the production validators and prints `{ok, checks, issues, pending}`:
+3. **`pnpm tracked:check`** (`packages/sync/src/curation/check.ts`) is read-only. It runs the production validators and prints `{ok, checks, issues}`:
    - `schema`: `TrackedFileSchema` through `parseEnvelope`, including canonical-key uniqueness;
    - `pinned-cap`: `checkPinnedCap` against `config.minChunkSearches` (pinned count ≤ 0.5 × minChunkSearches);
-   - `catalogue`: resolvability through `checkCatalogue` with an empty dataset.
+   - `catalogue`: resolvability through `checkCatalogue` with an empty dataset;
+   - `cross-file`: `core`'s five cross-file checks against `data/weights.json`, the same call the sync run-start gate makes, one issue per failure. It is `skipped` when the weights file is absent and `failed` when the file is refused.
 
-   It exits 0 only when every check passes. The five cross-file checks against `weights.json` are listed in `pending` and not run yet, so a pass does not confirm band edges or floors.
+   It exits 0 only when every check passes. A pass still does not confirm that a declared floor is the one the implementation notes derive: a floor declared too high passes every mechanical check.

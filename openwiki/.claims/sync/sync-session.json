@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:d94bdbdc7d538fb9fe7cb2c6610fb5f4f9c91823a61854e71d2b0b602cb0bf4c",
+  "pageVersion": "sha256:0653b2d7024f326cfefbe4ef6ee3a5833f202e5ff860a3a4cc68fa300dd513cb",
   "claims": [
     {
       "id": "claim_0b10e01bef33463ea93a8dc2336b622e",
@@ -42,11 +42,11 @@
     },
     {
       "id": "claim_91e2e65cc08248cd92a23593694bf846",
-      "statement": "nextWait maps chunk results to waits: busy or dispossessed wait for the lock to be free or stale, deferred and 429 yields wait until notBefore, a no-answer yield backs off, a refusal waits for an input-file change, other throws wait for an input change at most until the backoff, and a completed chunk with nothing due waits for an input change at most 24 hours.",
+      "statement": "nextWait maps chunk results to waits: busy or dispossessed wait for the lock to be free or stale, deferred and 429 yields wait until notBefore, a no-answer yield backs off, a refusal (including a cross-file gate failure) waits for an input-file change, other throws wait for an input change at most until the backoff, and a completed chunk with nothing due waits for an input change at most 24 hours.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/sync.ts#L188-L293",
-          "version": "repo-lines-v1:sha256:ab8d63f4f564e174744ab3321130833f1028d556ba3ef86a1c96185d41a280fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMmIxNDM4NzBjMGQ1NDFiNWUwNWQxYzkwYzQ5YTA3NDlhYzE0ODQzMjBmNGYxYzY4MzI5MDY0MTZjNjkzZjRhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNDAxZTAzZjk5YWI4NzdkYTE2ODZlNTg4YzI5NjZlMDM2NGJkMTI2NTVkNGY4OWM1ZWY2MDA2MzUzYTE2ZmNiIn0"
+          "resource": "repo://packages/sync/src/sync.ts#L180-L300",
+          "version": "repo-lines-v1:sha256:bbd1c9da40371369edb4acbbdfac89201699314110fa8971afc04da35b4ff800:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzYTAyZTllMjQ3ZmM0MjE4ZWVhMjFmM2EyODRkZjlhMWQyN2ZjMjRhMTQ4OThjMTJkMTA2Y2RlYjFiMTg1NWVhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwZTQ2YTY2YmIwNDZmMjNkNmE0MzJkZWJiNjEzMzM1MTBkNWU1ZWYxNDJhYmYxNTBmMzExMmQ0NWY3YjAzZjU2IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmYWZhN2JiNjcwNTM1MWJiNWFkYjVhMzFjYjIyM2ZlYjI0NWY1MmViYmZiODM3NzA4NzE4NDFhZGMxYjMxYTlmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3OWFkMzVlNDA3MWZmMmM4MzQyOGU1ZWY2YzljYTBmMTJhYWM1ODdhNTgwMjU2NjRjYTU2NzJlN2I3ZTg2OWI0In0"
         }
       ]
     },
@@ -113,6 +113,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

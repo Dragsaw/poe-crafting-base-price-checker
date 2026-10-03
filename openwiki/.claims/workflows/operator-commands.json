@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:d66cc5cf50325d16d2b8f039f3b35306f20f9ed80426345ed2e1cccd518f1e0f",
+  "pageVersion": "sha256:3cbda25a216152722443e1f3ceabace006d12e0ecb84eb06884dafc2528dc033",
   "claims": [
     {
       "id": "claim_8f81244d624f4708bbbf267b4e41d4ac",
@@ -70,39 +70,39 @@
     },
     {
       "id": "claim_37f8ca98b3534f3db20d42655b606357",
-      "statement": "pnpm tracked:check is read-only and runs the schema, pinned-cap and catalogue checks with production validators, printing ok, checks, issues and pending, with the weights cross-file checks listed as pending.",
+      "statement": "pnpm tracked:check is read-only and runs the schema, pinned-cap, catalogue and cross-file checks with production validators, printing ok, checks and issues; the cross-file check runs core's five checks against weights.json and is skipped when the file is absent.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/curation/check.ts#L1-L22",
-          "version": "repo-lines-v1:sha256:82c2fd4ffb710b75fb6fcd01feb547ee954fdb992856d603aa45a269d4b85d70:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkN2RmYWY1MGEwYWJjYWM3YTdmMmY1OGUyMjZkYTIyYzA1OGY0MjEwNzNmMjlhYWM2ZDBlM2U1NWJkNDYwMWEifQ"
+          "resource": "repo://packages/sync/src/curation/check.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:0021b80d28a41e5554a6c0e2bc254364b310ae518b81b576cf25e0a1ccdc44da:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhMTAxYjQ0YmNkOWEyMTg0OGI2NzRlZmE2YTIwOTY4Y2Y4ZmJlYzA0ZDU3NDk1OTE1NGQ1ZGMwNjY4YmU0YzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViZmM4OWRmOGUwZjhkOTI0YzI2MDNlMjcyMDZlNDE1NGExMzM0ZGUxZDQzZjNiMjY4ZDcwZmZlMjc1YWM0ZDMifQ"
         },
         {
-          "resource": "repo://packages/sync/src/curation/check.ts#L119-L170",
-          "version": "repo-lines-v1:sha256:f652568536773856458c607d3695eff520739a296dd427adcb293be17add8a83:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzZmQxZDdhZGZlOGVjZDY4ZjU2NTFjMzE2M2VjOTQwMjYzY2ZhZDVkODI4ZDkyNjQ4ZmVjMjdkMDEzOGEyNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMjMwYzZhYWE3YWJjNGVlMDhlNWM3YThlMWE2ODljN2YyYWNiODQ4NzdiNmJkOWExMGQzMzc1MmFkZjk3ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMzNiZDI0ODkxNjA4Y2Y1M2Y4ZTYyNDliMGViNzE3ZThhZmYwZjJmMDI4ZTcyZTQwNzFiZDRiNDg1NDNjMWEifQ"
+          "resource": "repo://packages/sync/src/curation/check.ts#L130-L215",
+          "version": "repo-lines-v1:sha256:071010670bb7590b8806b665faa5cdb10ee64f364e367b1547209a121de001e7:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmYzFmNzUwODI4YzA2MjI0NTU5MDY4ZjBmYWEwN2FmZTNmNGU2ZTE1ZjYyYTUxYjk0MmM2ZjllOGFiYTg3OWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhYzQ0M2ZjOTgwNGEzMzZkNjVhNmE3NWYzMGEyMmM3NjAzZGRiYTQzNzgxZjA5MjBkZDk0M2Q5NTRmODc5N2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNDFkMDJiNWE0MjlmNGJiY2JhYjllYjBjYWUxMWQ4NTE1MmE3MTVmMjEzNDNjODFhNWQxYTBhY2I5NDgwMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyZDY4ZThlYTg5ZTlmZWM1MDNkMjMxYmNhNWY4OTc3Nzk0ZDQzZWI3MWY4N2I3MzQwOWI4Mjc2NzE3NWQ2YTUifQ"
         }
       ]
     },
     {
       "id": "claim_d85fa3b4c1094831b600e2abbcae7361",
-      "statement": "pnpm tracked:lookup reads the committed catalogue and weights file as plain JSON, prints JSON, caps stat and base matches at 50, derives nothing, and exits 1 with {error} on a lookup error.",
+      "statement": "pnpm tracked:lookup reads the committed catalogue as plain JSON and parses weights.json with the contracts WeightsFileSchema, prints JSON, caps stat and base matches at 50, derives nothing, and exits 1 with {error} on a lookup error including a schema failure.",
       "evidence": [
         {
-          "resource": "repo://.claude/skills/tracked-json/scripts/lookup.ts#L1-L32",
-          "version": "repo-lines-v1:sha256:eeccb65960e3bdaba681fff0c782ba7650f53a0bdf84bca174899bea1311fb11:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlYzgxNDMyNmRlY2MxNzlmN2JhMWE1ZmRkZTMzMmY5YTQ4NjliZGUzNWNkNDg0NGU4Y2Q4MWIxMmIwNDAzOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwMzEwNDEzOTI3MzA3Yzc4OGNiN2Y3NDgxZTczMDZmNGY0ODU1MjgyOWY3ZTE5YThkYTMzYTBlZGI0YzBkZWQifQ"
+          "resource": "repo://.claude/skills/tracked-json/scripts/lookup.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:a981eafb49d5fac203e8c279dc2544efd19ab41759a487656170a076b298f1e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxZTFmZWYyY2ZmOWZmMjE3NWMyZTRjNjZjODk4OGE4ZWZmNGNhOTdjNDQ5NWFiYmYzOTBiMGI2NGI1YmVmOGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3NjU3ODA1NDE0OGJhYTMxMzdmZTQwZDM5YmMzMGNiMjhiN2VjNjljNWYwN2U2ZjIzZWQwYjRiODg0YmZjMDgifQ"
         }
       ]
     },
     {
       "id": "claim_1b122b1a55824de3a3744caca86042a3",
-      "statement": "pnpm dev:stop refuses a port listener that is not Vite from this checkout's node_modules, climbs from the listener through script shells to the first pnpm dev without passing its own ancestors or a parent started after its child, kills those trees, and exits 1 if the port stays taken.",
+      "statement": "pnpm dev:stop refuses a port listener that is not Vite from this checkout's node_modules, climbs from the listener through script shells to the first pnpm dev without passing its own ancestors or a parent started after its child, kills those trees, and exits 1 if the port stays taken; a failed or unreadable listener query is an error, never a free port.",
       "evidence": [
         {
-          "resource": "repo://tools/dev-stop/dev-stop.ts#L120-L175",
-          "version": "repo-lines-v1:sha256:45b71de073393aed4f31bc30992cca98b919aa3dd4b2b897e01333cdf6ccdca4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NWY4ODUxMGRiOWJiNTc3N2M5N2E3OWIwZGQxNDk5OTczOGJjODYxMzcyZmM1NTMwYWU0YjZhY2MxZTEyNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3YTBmMzRlZTM1YzY2ZGFhYmMzNjZjMzJjM2Q4MTkwYjgyNzBkOTk0YzQwY2E4OWRhOTAyZGEyNTBiOTk5NzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMmE2Y2VhNGQyZGJjZjI2ZjY4YTg4MTBlN2Y5ODMxNTdkZTcyMDQwODg4OTZjM2I4MDU5MDFjNWFiMWMyMDgifQ"
+          "resource": "repo://tools/dev-stop/dev-stop.ts#L116-L215",
+          "version": "repo-lines-v1:sha256:c43fd96ce3114872833921b734f4adb059080b4c69871826af5d1cb02ffae8a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjM2FlNzBjODQwYTM2MGIyYzU0ODFjZTMwMGEyMWJjMTZiOWQyYzQ3N2ExMmNmMDk5Y2UzYzgxOGVmYTlkYjQ5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyZWU2MDhkY2ZjZTgyZDUzZmM5YjlhYmFhN2IzNjhjYjQzNmJkZTVmYTNiODBhYzNjOTlmZjE5YWY2NjUzMjVkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZDY0YjhmMjZhZmVkNjEyNTM5OWI0NDk4MTdiZTlmYjNlMTFhMzBhMDk4NWJlYmRjZjM3MmNmZjQ5ODg1MTE2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2ZDQ4ZDFhNjNjMjBlNjk1MDQ1OWNhMDUxZjYzNTY4ZjkwZDVmOGM4MGY2MGRlMmQ0MzUyMGM4Y2MzMTRjMDRjIn0"
         },
         {
-          "resource": "repo://tools/dev-stop/dev-stop.ts#L276-L302",
-          "version": "repo-lines-v1:sha256:f800182a50a5929299808ee9300df7582c1c2249b8ebc1ff4f0a69f0d7971eb7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllNTJiMWMxMDQ2YThhYzY3NzgzMWE4ZmY0MWQyODVlMjUwOGJmYWQ1N2JiZTNkMzFjMzA3MTAxMzQxNzczYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiZjc1NTUyOTczZDRkZTU0YzVkYjkzMzZmN2YwZWEyMDYxYmM4OWNjMTcwODU0NGM2YzdlYjk2MjQ0NTdmMzEifQ"
+          "resource": "repo://tools/dev-stop/dev-stop.ts#L267-L330",
+          "version": "repo-lines-v1:sha256:c3a8d009297a4318a848bc11244a8b01ab38e229423592b1c1990f63da3d2018:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmYWIwNDYxYWY1MTlhNjYxYmI4OTEwZTg4ZGYxMzU2MGFjZjY4ZDQ0NTk0NTgwNmY1NTU5M2ViMWJlOTU1NjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWMzM2JkODFmZjc3MjcyNWVlYTI3NmZkMzZmOWJmYjQ4MjE3MDQ4ZDhjZGQzM2E4ODkyOGZkMGY2ZDczZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiOGRjODU0OThkYmRiZWY0NzdiNmNmOGQwNTIxNTc5OTQ2ZWY0NzIwZDVjYWQ3NzE0MTRjN2E3YTZkM2Y3NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzY2M1ZGUxNzM4OGYyMDFkMzNhMTk3ZTI4YWE4YzMzMjMyNTY1ZTEwYTM4YzU3NDRkMzc2MGJmZmZiODg2NjAifQ"
         }
       ]
     },
@@ -119,6 +119,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

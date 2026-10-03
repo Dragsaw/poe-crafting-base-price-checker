@@ -3,9 +3,6 @@ type: subsystem
 title: The pnpm sync session
 description: How the long-running pnpm sync session prices one entry per locked chunk, shares one pacing state across chunks, pre-waits the even spread outside the lock, decides each wait with the pure nextWait/nextState matrix, polls local files instead of sending requests while idle, and stops on SIGINT or SIGTERM; and how it differs from pnpm sync:batch.
 tags: [sync, session, pacing, rate-limits, backoff, lock, cli]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
 sources:
   - id: openwiki-source-869e9d6242b1ef866e244695
     resource: repo://packages/sync/src/shell.ts
@@ -13,7 +10,10 @@ sources:
     resource: repo://packages/sync/src/sync-batch.ts
   - id: openwiki-source-4c0582c853fafa6e932bf71d
     resource: repo://packages/sync/src/sync.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # The pnpm sync session
@@ -61,7 +61,7 @@ The session then creates **one `PacingState`** (the rate-limit bucket ledger and
 | throw that is a refusal | until an input file changes |
 | any other throw | until an input file changes, at most the backoff |
 
-A **refusal** is a `DataFileError` for a watched input path, `PinnedCapExceededError`, `UnknownClassBaseTypeError` or `LeagueMismatchError`. A `DataFileError` on a sync-owned file (dataset, progress, report) is not a refusal: no edit to a watched input would end that wait, so it takes the backoff instead.
+A **refusal** is a `DataFileError` for a watched input path, `PinnedCapExceededError`, `UnknownClassBaseTypeError`, `LeagueMismatchError` or `CrossFileGateError`. A `DataFileError` on a sync-owned file (dataset, progress, report) is not a refusal: no edit to a watched input would end that wait, so it takes the backoff instead.
 
 **Backoff.** `backoffMs(evenInterval, count)` is the even interval doubled for each consecutive backoff, capped at the 6-hour stale threshold (`STALE_LOCK_AFTER_MS`). The count resets to 1 after a fresh State reading and to 0 after any result that is not a backoff.
 

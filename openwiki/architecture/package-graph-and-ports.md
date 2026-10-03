@@ -12,6 +12,8 @@ sources:
     resource: repo://packages/contracts/src/ports/filesystem.ts
   - id: openwiki-source-f94fe3b4c904d5bc753f7ba1
     resource: repo://packages/contracts/src/ports/http.ts
+  - id: openwiki-source-d265cc7c06dcbefb6f92a01b
+    resource: repo://packages/core/src/index.ts
   - id: openwiki-source-2f0b966b270953f200695dca
     resource: repo://packages/sync/src/git/read-only-git-port.ts
   - id: openwiki-source-869e9d6242b1ef866e244695
@@ -24,10 +26,10 @@ sources:
     resource: repo://tools/boundary-check/boundary.test.ts
   - id: openwiki-source-98d5ddb014a0fd4d678f6f2a
     resource: repo://tsconfig.json
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Package graph, ports and purity boundaries
@@ -42,7 +44,7 @@ The repository is a pnpm workspace of four TypeScript packages under `packages/`
 | Package | Role | Workspace deps | Notable external deps |
 | --- | --- | --- | --- |
 | `@poe/contracts` | Zod schemas for every shared concept, the four effect ports, and in-memory fakes | none | `zod` |
-| `@poe/core` | Pure logic: the ranking and the refresh rotation | `contracts` | none |
+| `@poe/core` | Pure logic: the ranking, the probability term, craft cost, provenance, the five cross-file checks and the refresh rotation | `contracts` | none |
 | `@poe/sync` | The imperative shell: CLI commands, trade client, chunk runner, file writes | `contracts`, `core` | none (uses Node builtins) |
 | `@poe/web` | The static React page that loads the published files and renders the ranking | `contracts`, `core` | React 19, Mantine 9.6.1 |
 

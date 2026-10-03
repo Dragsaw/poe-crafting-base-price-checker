@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:5dead54f92fad25cfc89098e578d7519e8894d21c853b91d5911fec644ee8150",
+  "pageVersion": "sha256:5cf844ae8054ba13bcdf9496eb9148cdae42825a947b139f9a09e9fb9b8f03ac",
   "claims": [
     {
       "id": "claim_3e1c1428661441fc88fcea1e03f4b8ff",
@@ -79,12 +79,16 @@
       "statement": "A successful sweep opens a PR whose body starts with 'Deferred entry: <id>' and 'Closes #<issue>' and whose last commit removes the ledger entry; a blocked sweep posts a sweep-attempt comment and adds the sweep:blocked label without pushing.",
       "evidence": [
         {
-          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L249-L283",
-          "version": "repo-lines-v1:sha256:c4477746cc7e753fb0359bfdf60cabf66737ba10cf47ebcf2bc83e0b83461d24:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhZjBkZGFjODBiNzg2MzJlZjE4OGRlZDU2Mjg1NTAxZjA3YzZmZDY2ODk0NTdkNjY0ODRkMDZiM2Y1YTczN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0YWE5NjcxZDE2ZTBjOWJmNGU2OGVkYzI5MDg5MzNjMzY5MDhhMjAwNDJlMTI4ZWMwNDk4OTJkNjhlZTkyNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzYmZiOTY5ODE0N2FjNWJhYTY5ZDk4NmZhNDIyZTQ5YTkzY2Y5OTU0NWYxYjVjNmY1YzhlN2QxNDFlMWFhYWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhYzY3NGQ5MTg4NTZlMWNmN2U4MzZlYTJhNzE5YzI2MzcyMjU4YTE2NjFmMTAyMDRjZmMzZDExODQ1OTlkYmMifQ"
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L191-L191",
+          "version": "repo-lines-v1:sha256:422f3c6fe6eb4875f7d451337ff03f681435a53d75aff5d9f039a664092c0668:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDIyZjNjNmZlNmViNDg3NWY3ZDQ1MTMzN2ZmMDNmNjgxNDM1YTUzZDc1YWZmNWQ5ZjAzOWE2NjQwOTJjMDY2OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDIyZjNjNmZlNmViNDg3NWY3ZDQ1MTMzN2ZmMDNmNjgxNDM1YTUzZDc1YWZmNWQ5ZjAzOWE2NjQwOTJjMDY2OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzliOTk1YWFlNzA0OTIyZjVlN2MwNGFjZWE4Y2IzYmQxNzQ5M2NlZWVkZWI4YmEwNDI1NjU5YWNhZDg2MjNmMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWVhZTQ3OWQ1MGRkMzI0YmM1MWZkMjk2ZWJhNjVmODNkMzYwMDJhMjUxYWVkNjg0NWY2N2UzZWY0NDc2MWY5YiJ9"
         },
         {
-          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L56-L58",
-          "version": "repo-lines-v1:sha256:63072663eb19e4a8032587468d890cae1f545cbc1bd6947a517bdb3661dfccd5:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM5OGRlOGJlMWVhZmY4N2IxMTZhZWY5MjU0ODY3OGYyOWNjMjI3MzMyOTVlMThjNzRlZjM3YzY4YzY1NjkxOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTVmZjY0YmYzMzgzYzgxOTExOWE1NzFmMzU2NWY4YjM4NGJhMWM4MjU1N2RiOTM3NzJkYzMwZTcxMmI5ZmM4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjkxNTVhODAzY2MxYzlkOTFmOTJkNzNjMjI2ZTMyNzNhM2M4NGVkMzZjMzk2N2I1NzY2MmM4YWE0NjRiYmU4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjJhZjE3NDg3MTEyYTdlMzE0MTUxMWI3ZDNjOGQ3NTNlOGE5NTQzNWQzMTdmMDU2NmRhZmMzM2E2ZTdlNjFkOSJ9"
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L240-L275",
+          "version": "repo-lines-v1:sha256:18b5c638d0b5a0a74cc99de931f523dc800c83adf8fcc7a4f01aac320ed61246:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhZjBkZGFjODBiNzg2MzJlZjE4OGRlZDU2Mjg1NTAxZjA3YzZmZDY2ODk0NTdkNjY0ODRkMDZiM2Y1YTczN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzMGJiNmFlYTg5NmZjNWRhMTBlYWQ5NWVjZmQ2NjQ5MmY0YTUzYjkxYTdkNTAxMmMwYzNjN2NiMjZmNTUzM2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1NWYwZTQzNmZlYTZhZjYzMTVmYWY0ZWRmMWM3YmUzMzQ3MTA4ZjIyMGEyYTEwMmNjODIwMzUwNjg0ZGEzNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlOTBkMzhmNmRmZWQwMTkwNWQwMTVlN2ZmMjQxYzVjMmYzYzE0YzkyZDVjNDI2NTIyNzY0NTQ0NjMzY2Y5OTAifQ"
+        },
+        {
+          "resource": "repo://.claude/skills/deferred-work-sweep/SKILL.md#L45-L45",
+          "version": "repo-lines-v1:sha256:15ff64bf3383c819119a571f3565f8b384ba1c82557db93772dc30e712b9fc8f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTVmZjY0YmYzMzgzYzgxOTExOWE1NzFmMzU2NWY4YjM4NGJhMWM4MjU1N2RiOTM3NzJkYzMwZTcxMmI5ZmM4ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTVmZjY0YmYzMzgzYzgxOTExOWE1NzFmMzU2NWY4YjM4NGJhMWM4MjU1N2RiOTM3NzJkYzMwZTcxMmI5ZmM4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTcyYjA0NzkyY2NiM2E4ZWU0YmU3ZWY0MWFhODg4MjMxNTQyZTZjZDE2OTZlN2JmY2M5ZWJiYTRjMzZjM2RkNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjJhZjE3NDg3MTEyYTdlMzE0MTUxMWI3ZDNjOGQ3NTNlOGE5NTQzNWQzMTdmMDU2NmRhZmMzM2E2ZTdlNjFkOSJ9"
         }
       ]
     },
@@ -101,6 +105,6 @@
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

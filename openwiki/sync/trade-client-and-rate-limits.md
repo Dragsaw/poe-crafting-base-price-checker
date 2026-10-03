@@ -24,10 +24,10 @@ sources:
     resource: repo://packages/sync/src/trade/user-agent.ts
   - id: openwiki-source-6c1728bcce531bca96d02755
     resource: repo://test/no-hardcoded-rate-limits.test.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Governed trade client and rate limits
@@ -47,6 +47,7 @@ For each `TradeRequest` (`method`, `url`, optional `body` and `headers`, and an 
 5. **Count** every 4xx against the policy. A response that names no policy counts under `(no policy named)`.
 6. **Answer**:
    - `429` gives a **yield**. `retryAfterMs` comes from a `Retry-After` value in integer seconds. When that is absent, zero or an HTTP date, it is derived from the ledger's penalties, with a floor of the widest window or penalty the response declared and at least 1 s.
+   - when the optional `log` callback is given, a 429 also writes one operator line: the instant, the lane, the policy, the wait spent, the raw `Retry-After` and `X-Rate-Limit-*` headers and the ledger reading the wait was paced on. A threshold refusal sends nothing and logs nothing. `composeChunk` points `log` at the chunk's own sink, stderr by default.
    - any other status, including 5xx and non-429 4xx, is returned unchanged as a `response`. The caller decides what it means.
 
 Every result carries `invalidRequests` (the running 4xx count on the policy) and, where the headers declared a rule, `remaining`. `remaining` is the smallest `hits − state.hits` over all buckets and is never below 0. The chunk runner stops when it drops below 1 (see [The sync chunk runner](chunk-runner.md)).

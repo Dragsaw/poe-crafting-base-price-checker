@@ -20,10 +20,10 @@ sources:
     resource: repo://packages/sync/src/pricing/search-body.ts
   - id: openwiki-source-f003d449d6194f288151c79f
     resource: repo://packages/sync/src/trade/endpoints.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Pricing step and league gate
@@ -48,7 +48,7 @@ Every body has `status: securable`, the price filter `exalted_divine`, `sort: { 
 
 ## The weights ids check
 
-`readWeightsIds` (`packages/sync/src/catalogue/weights-ids.ts`) is the run-start reader of `data/weights.json`. It loads the file through `parseEnvelope` with the full `contracts` `WeightsFileSchema` (version `WEIGHTS_SCHEMA_VERSION`). It then collects the outer `bases` keys (`categoryId`s) and every line's `statId`, skipping a `null` `statId`, which is the producer's own unresolved marker.
+`readWeightsIds` (`packages/sync/src/catalogue/weights-ids.ts`) is the run-start reader of `data/weights.json`. It loads the file through `parseEnvelope` with the full `contracts` `WeightsFileSchema` (version `WEIGHTS_SCHEMA_VERSION`). It then collects the outer `bases` keys (`categoryId`s) and every line's `statId`, skipping a `null` `statId`, which is the producer's own unresolved marker. The result also carries the parsed `WeightsFile`, which the run-start cross-file gate reads.
 
 - An absent file is `absent`: the chunk records `weights-absent` and goes on.
 - Invalid JSON, an unknown or malformed major, or any hard error of the contract refuses the **whole file** with a `DataFileError` naming `data/weights.json`, before any request. An `invalid` refusal names only the first issue's path and message.
@@ -82,7 +82,7 @@ The step sends each request once. It has no retry and no queue of its own.
 | Search answered | `lastAttemptedAt`, `lastSearchId`, `lastSearchLeague` set, whatever the fetch returns | continues |
 | 429, 5xx, timeout or network failure | `lastAttemptedAt` stamped and price state kept. On a fetch, the search fields are also set. | **yields**. After a 429 the yield carries `retryAfterMs`. |
 | Any other non-2xx | as above | throws `MalformedRequestError`, and the chunk aborts |
-| 2xx with a body of the wrong shape | on the fetch: search fields set and price kept, published. On the search: nothing is published. | throws `UnexpectedTradeResponseError` |
+| 2xx with a body of the wrong shape | `lastAttemptedAt` stamped and price kept, published. On the fetch the search fields are set too. On the search they stay as published before. | throws `UnexpectedTradeResponseError` |
 | Jewel-arm base type missing from `items.json` | `unresolvable`, nothing stamped, plus a record | continues |
 
 A request that gets no answer never changes the price state. An older price stays published.

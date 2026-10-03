@@ -1,22 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:96eff51a59a07c1d216c13b2033f07be3c22dc395ca21d6e5074b7db8cbf74b1",
+  "pageVersion": "sha256:6a8e263dcf54d9fa55e6687c32bb916d909b7340c983fbb9e3246173ed1c0e7b",
   "claims": [
     {
       "id": "claim_2071974f4eb6410fa635601e4e9e08e4",
       "statement": "Each exchange first refuses with an invalid-request-threshold yield when the lane's known policy has reached the threshold, then waits once for laneDelayMs (the batch pacer, or the even spread when spread is on), sends with standing User-Agent, X-Requested-With and POST JSON content-type headers applied last, folds the rate-limit headers into the pacing ledger and remembers the lane's policy.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L212-L223",
+          "resource": "repo://packages/sync/src/trade/client.ts#L221-L232",
           "version": "repo-lines-v1:sha256:62971a73d4cc70c91f890631fe222de00edcd614da17afedda2f6e310bd05ea7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmNzIwNDQ3MTA2ZmQ5OTk2OGRkMWNmNmJhZjg4OWExZGM0OGVkMjA1OTJkYzAxZGJiOWMwNDBhZWNkOTVlODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5N2U1MzM4NzM3N2RmM2I0NTFiOTdmODMzODE2ZDAzN2NmYTRlZmI1M2NiNWYyOTNkNmM1MjNlNzgyNmU5OTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhYmViNzcxMTRhYzUwNTQ5ODg5NmUyZjNhNjVkODQ3NjBiOGU1NjMyNmU2ZmM0NWRjNGQ5NTU4NTA3NjRkNGMifQ"
         },
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L343-L351",
-          "version": "repo-lines-v1:sha256:76b2102bfce875cd8b3d1549f3a570a6a4360ac9042bb0ab774f1cb77e297fee:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGYzZWM1YTBkY2NjZjA1YjhkNDQxNzRiNGFmYTAyZWQzZWVlMDc4ZWRiMDczNTI1ZjI2MTcxMzQ0YmJkN2JkNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGJhNWI1ZmUwOTYwOTRhMmRjOWI5YWFmMzJkYTA2ZGQ2NTBkYzQ0OGJlNWM2NWZmMTk0ZDY3MWI3MDEyY2EyOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGRiNDA2Y2Y5MzM0MmViMjY2MTc0OTdmYzllMDA2MjhlZjE0MmJmZjc3NTFlNmI2Yzc4ZjAyYzU4YjhmMTMxNiJ9"
-        },
-        {
-          "resource": "repo://packages/sync/src/trade/client.ts#L415-L465",
-          "version": "repo-lines-v1:sha256:70ce1af8524cf6bb5de90ace2b0d97027bb0be6b5acd253f75523a07a456566b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwYWUxYTM1MDk4NTU4YTVkN2VjZWE5YTRmMDhjZTRkMTJkMWE2Mjg1YzliYTdmM2M3Yjg2MzVhMjFlYjhlNGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljMzQ1MzNkODU3ZTBjMTYzOGFhODA0M2U2YzFjMzRjMmJlNTBiZTY4NzY2ZjhjMDk3MDM5NDBkYWNiZGE4OTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxNzgyYzc4YmEwNTcyNTA1ZjNkYmI3ZWNmMThjYzhmZmE5MzFmYTcwZGZjNzA5NTkxNWU5OGRkMjA3NDczNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5OGY1OWUxY2M1M2MwMjQ0MDU0ZTFjYzYxNGYzNjhiYjhjMjIwZjk2YjAzMmNlZTYzNmI1NDE3MDU0N2RlZDMifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L478-L530",
+          "version": "repo-lines-v1:sha256:00f1cb892ae664c9d5bc6aa0a877446e93189bb305203147c43bf53dda5fc327:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1MTRiOWQ5ZWUyODUwYTU0ODNjM2Y2ZDQ4MzkzMmRlNmQzNjQyNzQxZWVmYzJiYzM2NzhhM2YxNTlkODA0ZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiZDZjNzY0NjQ1MWFhMzYzY2VlMTg1MGJkYjMzNTE4ZWRlOWFhNjdmNzk3NjlmYzZkMmYzYTJhNjkwODI4MDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ODE4MDE1YTc5OWFmM2ZiM2M0Y2RiM2E2OTVjNmI3NWRkYTViZGE5YTBiMjYwNTIwOTNhYzZmMWNlMjgwYjcifQ"
         }
       ]
     },
@@ -25,12 +21,12 @@
       "statement": "A 429 is returned as a yield whose retryAfterMs is the integer-seconds Retry-After header, or else the ledger-derived penalty, or else a floor from the response's declared windows and penalties with a 1 s minimum; the client never retries, and every other status is returned unchanged.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L225-L287",
-          "version": "repo-lines-v1:sha256:657da296784172491470a4a49550be09edd23bbae40efc188bfc9ff7db40a5fb:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1MjMwNWE3OWVhNjBkZDAyNTQ2ZDdhZmI4MzI0ZDQyNzJlYzMxNTI3MmYxYzY3YTBhNzFkY2E3MWZmYWVkZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyZTc2NjU5OGFjYmE1MDEwMDE4MjY2Yjk4N2E3ZmRkNTAyMGEzOGJhZmZmNjYwMGRjZTBlNDY3NzgzN2E5NzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmOTE5MzI1NDEyMzBiYzI4Y2E5ZjRiZjQ4ZDRjNzIxMDAzZGFhNzBmYjhkZWExM2JkMDVmYmM0MWU3ZGFlNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmODExN2E3ZjA4MDE0ODA4ZjdhMzc5NDRjMjMyNDYxYzE0ZjkyYTI3OTI2ZmQxYjU3NGQxOWE3M2VhMGJmZGYifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L234-L290",
+          "version": "repo-lines-v1:sha256:7a27efb0a2f1c00c14fc7ddd3f9e197005b9de7bc1e03e9ceb1597b6a64d3c76:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1MjMwNWE3OWVhNjBkZDAyNTQ2ZDdhZmI4MzI0ZDQyNzJlYzMxNTI3MmYxYzY3YTBhNzFkY2E3MWZmYWVkZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmOTE5MzI1NDEyMzBiYzI4Y2E5ZjRiZjQ4ZDRjNzIxMDAzZGFhNzBmYjhkZWExM2JkMDVmYmM0MWU3ZGFlNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhZWRhNzcwODNhZGYzNDA1YjNlZTU5NGEzOTdkN2FjYTE4MjM3MzM0NjQwZjI4YzRjZWUwYTQzMmVjZWYwNGQifQ"
         },
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L465-L497",
-          "version": "repo-lines-v1:sha256:4381387740f1ed687d233aee74041958d37a2619169a3f14aadc03c9d498c0d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljMzQ1MzNkODU3ZTBjMTYzOGFhODA0M2U2YzFjMzRjMmJlNTBiZTY4NzY2ZjhjMDk3MDM5NDBkYWNiZGE4OTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNzU5NjQ1YzJjZWY1ZjliYWNiNGUyNmFkMGU3NDk1YjhkNmMyZjkwNDlmMTAxMjQ1MWE3ZDBjMWNhYTJhYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiMGJjOGM5NmEzNjczNjBjMzZmNjYyN2ViNjA0NzEyNDFkMmU0ZGVlYWNmYWQ5ZDViNWM0ZTdmNDc0MmVhODMifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L530-L550",
+          "version": "repo-lines-v1:sha256:e8671389ce0a81a4b7cf3549231fa296d50e64615da1e7008628563ab6726453:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNDI3OTAwOTQ5MmQ4ZWQ2Yzg0Njk4Y2EyM2MxZWEzY2QwMTlmZGFmM2Q4MzhjYjJiYWEwYjdjNDU0Y2FjZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlOTY2YmRlMTZjYTM1ZTEwNTFjMmY3OGYxYjkxYTAyZTY5ZDkyNTI3YWJkYmE1NmU2NmYyYTUxYjIxMzgxZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxZWEyZDFjZGRmMWQ4ZTk3YjA4ZDIwZGU3Zjc2NmMwOTViNGE0YWNkNmM2NDMxNWQ0NjBhODg3OTFiZWRiYzgifQ"
         }
       ]
     },
@@ -39,16 +35,12 @@
       "statement": "Sibling clients from createTradeGovernor (and createTradeClients, which wraps it) share one pacing state, invalid-request counts and a serial request queue that survives rejections, and refuse construction on a blank User-Agent.",
       "evidence": [
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L312-L316",
-          "version": "repo-lines-v1:sha256:5652e517edd3a7403ff3e64e09137943076e53a19a0eb1c7e389631f31dc5c1f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGVjZWFjMTk1NDBhYWJkNjFjYjI2NzE4NjhjMzMwNzUwZWY1MWNjODUzYTU4YmRiNTY0N2E3MzhmN2JiOGI4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzIyMmZlNzUwNGZkYWMzZDVjNWNiZjc0NmQ1NWMzZjJhMWNmYWQ3MjBkZjVlYmY3MmQyOWJlYWNkYTI0MjQ1NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmE5MmQ4OTg4ZWEwNzEzY2U1NDc2NGM0ZjEzYzZkZmQyOGI3NTNjMzMzNzM1Y2Q5YWU1Y2ExZWMzMWMxMjVjNyJ9"
+          "resource": "repo://packages/sync/src/trade/client.ts#L371-L376",
+          "version": "repo-lines-v1:sha256:ed2db44ac5f52cd1166012abea77f89a1828fa64186b66e252646e1a9774777b:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGVjZWFjMTk1NDBhYWJkNjFjYjI2NzE4NjhjMzMwNzUwZWY1MWNjODUzYTU4YmRiNTY0N2E3MzhmN2JiOGI4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzIyMmZlNzUwNGZkYWMzZDVjNWNiZjc0NmQ1NWMzZjJhMWNmYWQ3MjBkZjVlYmY3MmQyOWJlYWNkYTI0MjQ1NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGJjNTUxMmUzNDBkMjY4YTY0YmVkODYxY2Q4OWNiNDYxOTAyYWY4ZDA1MzdmZDEzZDgyZDQ2ZjMyNTlmYmU2MiJ9"
         },
         {
-          "resource": "repo://packages/sync/src/trade/client.ts#L377-L389",
-          "version": "repo-lines-v1:sha256:7d100f6e74a83ad614e1a4112afd3b2851d96012802bb3290f4f7c23002c59d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ZGQzODkzNTBmMGE5NWNkMzIzNGM4ZTE4N2Y4NDgxZWZkMzIyMGI4YTkyZTk4NjIyNWIwNzhkMDY2ZDJmMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMzlmYzc1OWQ5MmRkN2IzMjM1MDM1ZjlhZmMyNDI2NWE1ZDU2YTJlZGM4ZTVkOGM0YjM3NzZkZTM3MDllYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMDU4NjcyNzdhNzllODg5Yjk5MmNmNmJhY2NhOWYxODU2NzNhMjAwMzU3NTM5MDBiZGRiYWQwNGRmMTRlMjQifQ"
-        },
-        {
-          "resource": "repo://packages/sync/src/trade/client.ts#L499-L524",
-          "version": "repo-lines-v1:sha256:2d5c12fc5c3e909b405423549807e397cb1affbd5c0e1980ed4d8d23f0f4cddb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjOGQxZGRhMWNkOWI3MTA2ZWNkNzBiY2VlNzc1OGIxYzc3MDNjY2Y0MjA2NzRmZWQzY2QwM2Y3ODRkOGUzMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlZWVmZGQ1MTEzZDk5MDU2ZjFlMTlkZTFiN2Q1YmVkZTZlMGEzMDFmOWU4ZjdiZTRlYWQzZjhmOGRhODY2YzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/sync/src/trade/client.ts#L436-L476",
+          "version": "repo-lines-v1:sha256:148e727056f6bfc9f36fefaba8bf8c2ee0d25de0fcbccf5485fd15c70c9dd55a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ZGQzODkzNTBmMGE5NWNkMzIzNGM4ZTE4N2Y4NDgxZWZkMzIyMGI4YTkyZTk4NjIyNWIwNzhkMDY2ZDJmMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzYTM2ZWQ5ZmU0ZWM4OWJmM2EzZTFiMjkzZWZmNzhiMWZkNDE4ZjkwN2YwMGM2ODI5MTU1NWRhZGU5NWI1NzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMzlmYzc1OWQ5MmRkN2IzMjM1MDM1ZjlhZmMyNDI2NWE1ZDU2YTJlZGM4ZTVkOGM0YjM3NzZkZTM3MDllYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3ZDkwMjIyNmNlYmEzYzUwZDg0ZmJkOTVhNjlhYjFmODYyOGMwNzU5Yjc2YTVjYmQxNDhmM2FmYzdmMmZjNTQifQ"
         }
       ]
     },
@@ -163,10 +155,24 @@
           "version": "repo-lines-v1:sha256:20bbe88b91b7139ccf79ebadaa874c0026712ced2bf473206d3972f4642f9be0:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViNzY4ZGY4OTdiMTZhYTVmNWY4MTJmODExNTFiMjdhZTY5ZTJhNGQzNjVkNmQ1M2NkMWMwNTc4N2YxYTdmODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjYmU4MzZhNjAyYTliMWNlMTQ1YWZhNDViODEyMDA5ZTA2ZmJlNWUwMTFmNzRhMjcwMGY4MDMxYmMxMzFlZDIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_552db0a2105f4f968274703f962c05e0",
+      "statement": "When given a log callback, the trade client writes one operator line per 429 response carrying the lane, policy, wait spent, raw rate-limit headers and the ledger reading the wait was paced on; a threshold refusal logs nothing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/sync/src/trade/client.ts#L290-L346",
+          "version": "repo-lines-v1:sha256:d21dfa703bce2ed72dc587ce24d1872afb68b003a97ff9014d76f8fd9e3b753a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyZTc2NjU5OGFjYmE1MDEwMDE4MjY2Yjk4N2E3ZmRkNTAyMGEzOGJhZmZmNjYwMGRjZTBlNDY3NzgzN2E5NzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExOTRjNGQwMWI1MTc4MGQ3MjViMDczYmE3NjY4ZGQ1MjZlMzYxZTc4NWNlZTI0N2RhNWZiMDZjZjg0MjBmYWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmODExN2E3ZjA4MDE0ODA4ZjdhMzc5NDRjMjMyNDYxYzE0ZjkyYTI3OTI2ZmQxYjU3NGQxOWE3M2VhMGJmZGYifQ"
+        },
+        {
+          "resource": "repo://packages/sync/src/trade/client.ts#L528-L534",
+          "version": "repo-lines-v1:sha256:6c092ec6e9e3f91522d64f98786e583b834b7625bd4a23e7343a65e23ebed529:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjYwYmJkOTE5M2I1MGIzZjE0MDY5NTdjZGZlYjdhZGNhYTQ1ZDhlNzhkNGZmMzUwNmIyMjA3OTVmMWZmMjY2ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmU2M2VmMjFjNzk4MzhiYTc0ZjlkYjA3MWQyODgxZjA4Njg0ODI3YzM1Njc2NWI2NjZkMzkzZjYxZWYzMzVhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2QzZjAwNTg5YjVjZTk4ODgzYzk3MmMyNjU1ZGY3NWI0Njg2OTdlODc0NmE3MjIzZDU1MWRjMWEzY2U4OTViYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjBlOGIzY2ZkNDA4MzBkMjM5NmQ5MzgwMTI4ZGRiNmZmZDRiMGNjMzRhOWY2ZGVkYTE3YWVjYzk2MWJiM2FhMCJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

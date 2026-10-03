@@ -3,9 +3,6 @@ type: workflow
 title: Deferred work as GitHub issues
 description: How carved-out work is recorded in docs/stories/deferred-work.md, how pnpm deferred:issues gives each ledger entry a content id and one GitHub issue labelled deferred, how the unattended deferred-work-sweep skill claims an issue with a claim ref and delivers a PR or a sweep-attempt comment, and which test keeps the ledger parseable.
 tags: [workflow, deferred-work, github-issues, gh, sweep, ledger, agents]
-verified:
-  - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
 sources:
   - id: openwiki-source-3f2c5969c9bab63aa1946dbe
     resource: repo://.claude/skills/deferred-work-sweep/SKILL.md
@@ -18,6 +15,9 @@ sources:
   - id: openwiki-source-f849e96ae83af663ea7ea757
     resource: repo://tools/deferred-issues/plan.ts
 generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+verified:
+  - by: openwiki/0.6.0
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Deferred work as GitHub issues

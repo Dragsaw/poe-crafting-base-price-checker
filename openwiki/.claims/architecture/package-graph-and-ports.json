@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:29bc8b517806e5b4b8207553b84bc50d719af42e65f70c9d9a89fed212c9c891",
+  "pageVersion": "sha256:0ca4162c82e00672dd419f2f15937aa0ea000b9bf49bed01099d11777888d0cf",
   "claims": [
     {
       "id": "claim_9dc10a77881f4ebfb83dbb267d87a397",
@@ -101,10 +101,20 @@
           "version": "repo-lines-v1:sha256:c3ec53bfef27c340a7d2c386ab9952d36136143227ed071cd688ce2edf4f3f5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwOTFiZWI0Y2I3MTZkZjUwOGZmNWNiYjQzODUxMjFmYzlhMGQ4OGI3YzdmM2FkMGNmODAwZTYzOWE4MmJhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjM2ZlMTMxM2Y2YzdmNjkzNzdhOWIwMTY2NzFhODNmYWRmMTUwN2YzZmMwODg4ZDA2YTU5ODE3ZjM0YWIwMWQifQ"
         }
       ]
+    },
+    {
+      "id": "claim_f127f0fc24424b15bec384d766ae8258",
+      "statement": "@poe/core exports the ranking, probability term, craft cost, provenance folding and the five cross-file checks besides the chunk order, and stays pure.",
+      "evidence": [
+        {
+          "resource": "repo://packages/core/src/index.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:5048b06460954428e4ee0b38ce2eae029b89d63db1869a70ec5c318a112dfa13:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkYzE1NGI2YmNhOGQ1ODhhOGM1MmFiODcwZWY2OGRlODM1MThkZmExZTAwZDhiOGRkYmYxMTcyNjk3NjAyNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1OGI2ZjFiNWI5NWY3MjE1OWM1N2NlMWJjMDVmM2I3MzU0Y2MzNjllNjVhYTkzNTg5ODlhMDRhNjRhMWY4ZDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlYmMzNTZiM2VlZWZhMDkxMWU5OWIzOWQyZDk5NzY1N2NlMmRmNWI2NWVhYWFiZDM1M2E3OTdkNzVlNTlkZmMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:42ec2333d76584e041405894b82dd9849e69b164c3e6eb6b49521d9700139c9f",
+  "pageVersion": "sha256:c29a02bb9a5fe1855cfc67396c1b214d96707b8be75e2d201d3ed9094fb5037b",
   "claims": [
     {
       "id": "claim_dd00cbda501d4d93b7a0ce547c0ae51c",
@@ -24,21 +24,25 @@
     },
     {
       "id": "claim_67fede0587404efc898fd12317cb7d52",
-      "statement": "App moves from pending to exactly one of ready, refused or failed in one transition, reads now once when the set resolves, and retrying re-runs all seven fetches.",
+      "statement": "App moves from pending to exactly one of ready, refused or failed in one transition, reads now once and runs the cross-file checks once when the set resolves, and retrying re-runs all seven fetches.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L29-L110",
-          "version": "repo-lines-v1:sha256:9cdfd5e475d1cda8ce140420bd8fd7c18331a8c8bd4dd622a612fc1ece865485:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4ZjQxMDQyZmQ1MjZlNThlNTU0NWIyNzJkYjhjODI3YTc5NWMxMTNmNDMxYmQzY2EzNzVlNGVlNjMyYjY1NjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3NTRjZDczYWZjOGFjMjFiNTc5N2FhY2MwOTc4ZjQ4ZjFjZDRjY2NmNzMwNDdjNzE2OTJmMGJkYzVkODk4MzUifQ"
+          "resource": "repo://packages/web/src/App.tsx#L29-L93",
+          "version": "repo-lines-v1:sha256:a9a8dd07bcbe3058ba06e1e2f8e0e56e54886ae5557a805984b47e0d6d1da382:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkYzUyZjA4YjM5YjA4YjAxYzhkMzA4YmY4ODBiMGJlZjAyZmQxZGZjYzlkOWFhOTNhNGQxYjVmNGQ1OGI2Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlZTIwYmExNDQ5ZjNmMjYxY2M2ZWU3MTdlOGVjMDE4YmM1MDJmZTE5YzBiNTUxNDE1ZDc4OWJiYjE4NDY3OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjOTNlMjlhOGU0ZTA3Mzc0YWVlYjEwMTY2MzgxMmFlNzJlNmMwMGZhZWIwY2JmMmZkNTczNGFlMTdhZmI4ZTcifQ"
         }
       ]
     },
     {
       "id": "claim_23b42750386642e2a6c9922173a11041",
-      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold, passing the parsed weights file (or null) as weights, memoised on the set, now and the threshold.",
+      "statement": "The ready view ranks the whole loaded set with core's rank at the player's threshold over every recipe, passing the weights file (or null), the cross-file failures, the recipes and the currency rates, memoised on the set, the threshold and the failures; the active recipe only narrows the ranking.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L119-L141",
-          "version": "repo-lines-v1:sha256:e29acc15d51d11a910c25c18d5515ff62b9c344656f73e8ba8b9b1ba5c20d0b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NGFhZjU1ZGFhNGVkMDZkMzlmYzIxMzMwMzExYmQxNjU5NjVhOGZhZDQ1MzA5MjA1ODYwZmQ3YTRmYzZlNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyZGUyYTdkODI1ZjM2MWYzOTdhZDVlYmUyZmU2ZDZmN2FkYmJhOThhZWU4Yjg2ODc0NjI3YzNkMDA3ZjBhYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOTY3ZjE3ODMzMjJmZTBkNDE5NzE3Y2RlZGU4ZTZiOTI0NGU5MWMzNzI4MGU2M2MwZDczNzIxY2U2MDZhNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzM2VkZDEyNTVjZjdiNGEyOWRiZmVmODQ2ODgxMjNhMjg0MDMyNTZjZjdiMDQwYzg1NTdjZDVhNjgyNDI2NDkifQ"
+          "resource": "repo://packages/web/src/App.tsx#L161-L215",
+          "version": "repo-lines-v1:sha256:de96ef175554c86213a4705db4fdccae641a899b96640ee619f87c21ea493274:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3ZjQ4NDIyYTg5ODQxZGM5YzRkMDIwZjNhMWIzZWYwZTYyYTMyODQxYWQ3OWU0NjkwNjhlYjE3ZDBhMDZlZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjOGE2ZTg5ZDg5NjdmYjNjMWJmMzQwOTYwYjExNDE4M2I1ODQ4YWY1YzVjZTBlM2NkYmYzNGJjNjdkYzJiOWEifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/list/active-ranking.ts#L1-L46",
+          "version": "repo-lines-v1:sha256:fe3f8900d19ecd1b9fda8c5faf318873ee37a893020813d92dc0a8c6866183f0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -58,15 +62,11 @@
     },
     {
       "id": "claim_27d70c68479044e0913c2dc49c797f07",
-      "statement": "Display rows list ordering rows numbered by position with tiers 1-5, 6-10 and 11+, then unnumbered no-listings, not-yet-synced and unresolvable rows at tier 3 with money-slot phrases instead of figures; in the honest-empty state the unpriced rows print in canonical key order and every EV cell reads no figure yet.",
+      "statement": "Display rows list ordering rows (raw rows and crafted Item Class rows with chase cells and combination rows) numbered by position with tiers 1-5, 6-10 and 11+, then unnumbered no-listings, not-yet-synced and unresolvable rows at tier 3 with money-slot phrases; in the honest-empty state all rows print in canonical key order with every EV cell reading no figure yet, and in the split state the raw and crafted branches print apart without numerals.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/display-rows.ts#L46-L136",
-          "version": "repo-lines-v1:sha256:6db852915ee173f9fc8f30b2c4d31139a2089c361bd399757fac0c72fd9b2cb0:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmNWYxMzljMTYyNjU5ZDAxNThjNDUwYzg5NWM3YzhmODhjODI1MDU1ZTlmNzI5Nzk5ZWE1ZjFmY2M5YjM0ZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkY2VmOTM1MTdiNDgzNTQ4NjU1OTU1NzU1ODFjY2Y1N2FjOWQyODhmOTViOWRiOGIxMjIwNTkwZmU4MjQ4ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        },
-        {
-          "resource": "repo://packages/web/src/list/format.ts#L17-L24",
-          "version": "repo-lines-v1:sha256:1940e576adb2e0d9df9fc26be6cc30ab13b3162d0e6b465708cb8a56df57df53:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGFlOWZjYjNlOGY4MDQzMGNiZGExZTk5MzVmZjg2MWNjZWQ2MGVlZDIwMjQ2Y2I5OTUzZWI1MzI5ODI4YWQ5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTc0ZWU4YThkMWFhODQ1MzkxYmM2NzllYjcwY2U3ZjQ2YTNjZDZmYjJkMTZmY2NhNjdmYTE3OGY0ZjhjMWUwZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjg3MTRmNTZkNzRiNzk5MTkxNmQ2NjFmYWI1ZGI4M2JmZDgzM2JmY2RkNTlkYTAyMWNlMTQxMDBjNTdjODhlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjJjZmM3NGViMWI1MzI4NDMyNzM5NjJlZGEyOGQ3NzZkMDA3ZWIzNzEzOTFjN2Y1NWZjMjBiYWM2NTAxOGJmZCJ9"
+          "resource": "repo://packages/web/src/list/display-rows.ts#L199-L339",
+          "version": "repo-lines-v1:sha256:1c72c493a73a96d293a717d9436159623488e9dd57d1bc8a987db23764dcf2fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5MjA0MGUwOTVhOTRlMmFkYTc0ZTQyMWYzNzE4NzUxYTkxYTgxMGJmZDY2ZjQ4ZjRlOTM5YzdiNzQ4MGViNjcwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -86,11 +86,11 @@
     },
     {
       "id": "claim_cf51cac5d1a541aabdb4c687b58ad10d",
-      "statement": "The list statement is honest-empty when nothing is in ordering or below threshold but unpriced rows exist (dropping 'yet' when every row is unresolvable), nothing-clears when nothing is in the ordering but something is below threshold, and otherwise none.",
+      "statement": "The list statement is honest-empty when nothing is priced in the league and a row exists, uncostable when the active recipe is uncostable and the list is split, nothing-clears when no raw row is ordered and no crafted row has a summand but something is listed, and otherwise none.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/list-statement.ts#L21-L65",
-          "version": "repo-lines-v1:sha256:946973729a6edb757cbacfb01cee92e99fb4646f5f8669b8b242ffe45e55053c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjY2Q5Yjc3ZTk3NTQyNGIzZDdkZWE4MzRlYzNlMGVhNDNhNDQ1MGNjMGM3ZmQyMTBkMjgwYmYyYWIwNTJlZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViMDM1ZWExZDk1YjcxMTI5ZjIxNmRmYmY5YmM5ZDgyNWJkOTYwZWNmZTRlNzE2Y2Q2YWZlOWQyZTIwYjI3ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/web/src/list/list-statement.ts#L1-L99",
+          "version": "repo-lines-v1:sha256:783d372d9d8b8a4aa1b95f9e5be3ef5b3d8dd55bc4cbb7505c6afbf09a87eacd:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTEwMzg0NTdlNDI4YmZlYzFjMmM1Y2U0ZmQ4OTUzMTYzMWFmZjRkOTllYzhlZDUyOTgyZTkwNjk0NzZjMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -133,22 +133,18 @@
       "statement": "The page tail holds the Unrankable appendix (ready state only), then the key block and running foot, pushed to the frame's foot by margin-top auto.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/App.tsx#L138-L159",
-          "version": "repo-lines-v1:sha256:08fcd2851391fac4ba65b81a627ca491ceb1fd8a9d7163caaa6358d79edcec58:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0YjM1Y2RiNmZjZWM5MWM1MDRlNmZiYjcxNzZiNjRkYmY4ZmQ3OGUyMWU5NjhkMjJmOTIyNGI4MzY4NjM3MDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyNTNjNDA1YmUyYTg1YWYxMjljNTNjMmI3YTJmYWY3YTJmNzJhN2RjMGI5MTliYWVjZWU0ZjVlZWFjMDhmMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        },
-        {
-          "resource": "repo://packages/web/src/App.tsx#L72-L90",
-          "version": "repo-lines-v1:sha256:fa348785316a061e51431461733e53e63f8c5f93b1bf18b3bb771bcaf994f8e9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwOGRkODE1NTM0YjI4MTUyMzYyNWI0NjA5N2E1MGEwNjViMjdmNjQ4NDYzMTQ5YTM3N2ZjNzJmNGIyOGY2MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZjY5MDA3YTdlNzVjY2RiMmMxOWVmYTlkOTVjNDNiZjc4N2YzM2EyYjljODI2NWM0YTVjZTY0MmZlNmRiZWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmNTFmYTM5MDFmMzZiODVkZmY3NDUxZDM3MjVmN2Y1Mjc2YjUwZTEzNzJkODBkYzUxNGMzNDM5NTUzZGUxZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3MjBiYjU1NzE3Y2VlNWE5ZjIzZmVlNWI0NzU5YjQwNjgyN2QxZjk1YzhlOGRhNDIwYzVmZjUzODY2YzViZDUifQ"
+          "resource": "repo://packages/web/src/App.tsx#L231-L245",
+          "version": "repo-lines-v1:sha256:4e36f98f4adf1a0dfc0ec7fccffb9a0ebf19fd0ae9dd4a01200d8fae9b10ce4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_b89e97f57d70474b95adb31baf6ab3a5",
-      "statement": "UnrankableAppendix renders one non-interactive row per Unrankable Item Class with class label, unknown mark and reason; with no rows it renders only the title with the count in ink.",
+      "statement": "UnrankableAppendix renders one non-interactive row per Unrankable Item Class with class label, unknown mark, reason and a note shown only for the cross-file disagreement reason; with no rows it renders only the title with the count in ink.",
       "evidence": [
         {
-          "resource": "repo://packages/web/src/list/UnrankableAppendix.tsx#L26-L125",
-          "version": "repo-lines-v1:sha256:17fdeaf4252a9b7c7cf5d7cf2f91582fcda386078aee180e2cc19b1b3dfa97d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2NTcwMTJlYjNkMDJjM2JkYTE5YzY4MzRhZTg2OTNjZmFkNDhjMzA0Mjg4OTgxNzZkNTI2Y2EzMWQ1MmViYmUxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/web/src/list/UnrankableAppendix.tsx#L20-L134",
+          "version": "repo-lines-v1:sha256:3fba6d55d2cedb1ac77cc3dc50e7849312b83372ea6e6090478dc74a1b9419b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3MDJhNzA5OTIxZmI0NzE4ZjA5NmM0MmFmNTE2NGE1OTRhNDZhNDQwMGQ4ZDNjMjk2OTY4MTNmODM1NjQwNDMxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjYmQ0NzIzZjhiMTJlOTg1MmMxMDJlMmRhYTFhZDYxYTAxZjI4NDFhN2E3NWZjZWM3NDU4ZjQwNmVhNDIzMzBlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -201,10 +197,34 @@
           "version": "repo-lines-v1:sha256:0d233b190ce1750b65aedcba9b5574e9fb62ffa70d93b05233890f9e311afbfc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NTA2MjZhZTcyYmZhNTU3ZTA3YTM1ZTdhZGMzZGMyZWVmMDkyZmVhYWI4NWEwNTE0YzRjYmMyNTYxZTJhN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNjQ4YmMyYWEyODlkNmM2YzcwZmQ2ZjIxMmY1OGQwMDU5YmYzMjUzMWU0YTQ1M2RlNzc2NjMyOTZmZDE1MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwMTQ2ZDZlZjE3YTczM2I3YzY1ZTBlZjc1YTYzMmU5OGJiMGQyY2IyYjNmODQ3ZjUyY2Q1ZjU3YzkyY2JiYWUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_d23c5967e02e4c399d89bc1da4653bc8",
+      "statement": "The Craft Recipe control persists the active recipe id in browser storage beside the threshold, falls back to the first recipe when the stored id is gone, and prints the recipe's craft cost once or no figure yet when uncostable.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/recipe/recipe-storage.ts#L1-L46",
+          "version": "repo-lines-v1:sha256:53ca527ccd2d405c51344b83594fdeb0ab4ae97da21acbee5c8ecdbf01067dc4:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/web/src/recipe/recipe-view.ts#L1-L32",
+          "version": "repo-lines-v1:sha256:378d83c6ab3e988509f633b7922fe8ed581f5137e5d7f6f055ec275033fe43be:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZTcxN2ViZGE4ODdiNjEyMDJmZTIxMGFhYmM1Y2VhY2I3ZWU4ZDU1MzQ4YWIxNjFhYzBkZDgzOTliNDczOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_258114f31b2b4998aa46547a296e8668",
+      "statement": "The sync report panel prints one verbatim line per cross-file failure computed at load as a sixth group under what is broken, and no group when there is no failure.",
+      "evidence": [
+        {
+          "resource": "repo://packages/web/src/frame/trust-facts.ts#L1-L261",
+          "version": "repo-lines-v1:sha256:e577797c72bc2769d1f1e1bf8a0b315ae679a1a7de00553fb1265a5493e334f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3ZmVhNjFlZWUzYTRjYzNkMzIwMTEyYzllOGExNmI0MzZmM2M1YTU5ZTNmYWJlMmY0Mjc4YjM3MDJkZTNkYmNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.6.0",
-    "at": "2026-09-27T19:26:28.611Z"
+    "at": "2026-10-03T11:56:06.252Z"
   }
 }

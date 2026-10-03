@@ -5,7 +5,7 @@ description: How @poe/contracts defines every cross-package concept as a Zod sch
 tags: [contracts, zod, schema-versioning, data-files, canonical-key, dataset]
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 sources:
   - id: openwiki-source-91bd8d7e3af778926d4b2592
     resource: repo://packages/contracts/src/canonical-key.ts
@@ -31,7 +31,7 @@ sources:
     resource: repo://packages/sync/src/write-artifact.ts
   - id: openwiki-source-f20f60e1ecaf073e364173ca
     resource: repo://packages/web/src/load/artifacts.ts
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 ---
 
 # Contracts, envelopes and the data/ files
@@ -72,9 +72,9 @@ Most files use `SUPPORTED_SCHEMA_VERSION` (`1.0.0`). Three contracts have their 
 
 ### File-level rules
 
-- `TrackedFileSchema` refuses a repeated canonical key. Each repeat is one issue at its own index and names the first occurrence.
+- `TrackedFileSchema` carries three whole-list rules. A repeated canonical key is one issue at its own index and names the first occurrence. The non-pruned crafted entries of one `(categoryId, className)` must declare the same `itemLevelMin`, the shared floor; the first entry sets it and each later disagreeing entry is one issue naming both floors. Two non-pruned crafted entries of one class may not overlap under the never-co-occur rule, so one item cannot be counted twice. Pruned tombstones and raw entries take no part in the floor and overlap rules. The co-occurring branch of overlap needs the weights file and is a `core` cross-file check.
 - `DatasetFileSchema` refuses a repeated `entryKey`, compared as an exact string, with the same issue shape.
-- `RecipesFileSchema` refuses a repeated recipe `id`.
+- `RecipesFileSchema` refuses a repeated recipe `id`, a recipe that mixes currency grade prefixes, and two recipes that derive the same display word. A recipe needs at least one currency line, and a currency may not repeat within one recipe.
 - `ConfigFileSchema` is a `strictObject` with only `schemaVersion`, `league` and `minChunkSearches` (an integer ≥ 1). It is not a general settings file.
 - The four catalogue files share `catalogueFileEnvelope`: the trade API's `result` payload with `schemaVersion` beside it, so a refresh diff stays a diff of the API's own response.
 
@@ -100,7 +100,7 @@ A tracked entry (`tracked-entry.ts`) is one of exactly two kinds. The entry name
 - **`crafted`**: `categoryId`, `className`, `itemLevelMin`, optional `prefix` and `suffix` modifier refs. At least one affix is required.
 - **`raw`**: `baseTypeId` and `itemLevelMin`, with no affix members at all. The arms are `strictObject`s, so an affix on a raw entry is a parse error.
 
-Each entry has a curation `status`: `active` (rotates), `pinned` (refreshed every chunk, subject to a cap) or `pruned` (a tombstone). A `pruned` entry must carry a free-form `prunedReason`, and a non-pruned entry must not. Only `TrackedEntrySchema` is exported. The two arm schemas are internal because they do not carry these cross-field rules.
+Each entry has a curation `status`: `active` (rotates), `pinned` (refreshed every chunk, subject to a cap) or `pruned` (a tombstone). A `pruned` entry must carry a free-form `prunedReason`, and a non-pruned entry must not; both cases are refinement issues at `prunedReason`. Only `TrackedEntrySchema` is exported. The two arm schemas are internal because they do not carry these cross-field rules.
 
 A modifier ref is either `banded` (`statId`, `valueMin`, `valueMax`, display-only `acceptedTier`) or `valueless` (`statId` only).
 

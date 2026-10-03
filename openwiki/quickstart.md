@@ -18,10 +18,10 @@ sources:
     resource: repo://packages/web/src/App.tsx
   - id: openwiki-source-40275cb92c3610938f16ade3
     resource: repo://pnpm-workspace.yaml
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Quickstart
@@ -33,7 +33,7 @@ A single-operator **Path of Exile 2 crafting base price checker**. It has two ha
 1. **`sync`**, a Node CLI. It prices a hand-curated list of bases, `data/tracked.json`, against the official PoE2 trade API (`/api/trade2`, realm `poe2`). `pnpm sync` is a long-running session that prices one entry per locked chunk and paces its requests evenly over the API's rate-limit buckets. `pnpm sync:batch` runs one bounded chunk and exits, for a scheduler. Every chunk writes `data/dataset.json` (the latest price per entry), `data/sync-progress.json` and `data/sync-report.json`.
 2. **`web`**, a static React 19 + Mantine 9.6.1 page on GitHub Pages. It fetches those files at runtime, validates them, and ranks the entries in the browser above a player-set **Payout Threshold** in Divine.
 
-A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` or `unresolvable`. It is never shown as zero when missing. Today only the **raw** branch is ranked: raw base types, with EV equal to the observed price and a Craft Cost of 0. The crafted EV branch (item classes with recipes and weights) is planned but not implemented in `core` yet. The page already reads the full weights file (contract `6.1.0`) and lists a crafted Item Class in an **Unrankable appendix** when its class is absent from the weights file, when no weights file is loaded, or when one of its pools is `partial`. The planning documents (PRD, architecture spine, UX, stories) are under `docs/`.
+A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` or `unresolvable`. It is never shown as zero when missing. Both branches are ranked. A raw base type has EV equal to the observed price and a Craft Cost of 0. A crafted Item Class is ranked once per Craft Recipe: its EV is the sum of probability times price over its priced tracked entries, less the recipe's Craft Cost, and an uncostable recipe gives no figure. A crafted class that is absent from the weights file, has a partial pool, fails a cross-file check, or cannot be reached by a recipe is listed in the **Unrankable appendix** instead. The planning documents (PRD, architecture spine, UX, stories) are under `docs/`.
 
 ## The four packages
 
@@ -43,9 +43,9 @@ A price is always one of four states: `priced`, `no-listings`, `not-yet-synced` 
 ```
 
 - **contracts**: Zod schemas for every shared shape (including the full weights contract), versioned file envelopes, the canonical entry key, and the four effect ports with in-memory fakes.
-- **core**: pure functions: `rank` (read-time ranking) and `chunkOrder`/`pinnedToKeep` (the sync refresh rotation).
+- **core**: pure functions: `rank` (read-time ranking of both branches), the probability term, craft cost, provenance, the five cross-file checks, and `chunkOrder`/`pinnedToKeep` (the sync refresh rotation).
 - **sync**: the imperative shell. It has the governed trade client, the chunk runner, the long-running sync session, the pricing step, the league gate and the operator commands.
-- **web**: the page. It loads seven artifacts, ranks them with `core`, and renders the list, the trust strip, row expansions and the Unrankable appendix.
+- **web**: the page. It loads seven artifacts, ranks them with `core`, and renders the list with its Craft Recipe control, the trust strip, row expansions and the Unrankable appendix.
 
 The direction is enforced by manifests, dependency-cruiser, ESLint purity rules and tests.
 

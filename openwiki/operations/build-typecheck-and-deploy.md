@@ -24,10 +24,10 @@ sources:
     resource: repo://tools/setup-git-hooks.mjs
   - id: openwiki-source-d67c063568992560840377ea
     resource: repo://tsconfig.tools.json
-generated: { by: "claude-code", at: "2026-09-27T19:26:28.611Z" }
+generated: { by: "claude-code", at: "2026-10-03T11:56:06.252Z" }
 verified:
   - by: openwiki/0.6.0
-    at: 2026-09-27T19:26:28.611Z
+    at: 2026-10-03T11:56:06.252Z
 ---
 
 # Build, typecheck and deploy
@@ -90,7 +90,7 @@ Because the data are committed files, publishing new prices is a git operation: 
 
 ## Scheduled OpenWiki update
 
-`.github/workflows/openwiki-update.yml` refreshes this wiki. It runs daily at 08:00 UTC and on manual dispatch. It checks out the full history (`fetch-depth: 0`), because `openwiki code --update` diffs `HEAD` against the last documented commit and a shallow clone hides that commit. It installs a pinned `openwiki` and runs `openwiki code --update --print` against an OpenAI-compatible provider from repository secrets. The run step is `continue-on-error`. The workflow then deletes `openwiki/.run.json` and opens or updates a pull request on the branch `openwiki/update`. The pull request covers `openwiki/`, `AGENTS.md`, `CLAUDE.md` and the workflow file. When the OpenWiki step fails, the pull request keeps only the pages completed before the failure, and a last step fails the job. Do not hand-edit generated wiki pages. Change the source or docs and let the workflow regenerate them.
+`.github/workflows/openwiki-update.yml` refreshes this wiki. It runs daily at 08:00 UTC and on manual dispatch. It checks out the full history (`fetch-depth: 0`), because `openwiki code --update` diffs `HEAD` against the last documented commit and a shallow clone hides that commit. It installs a pinned `openwiki` and runs `openwiki code --update --print` against an OpenAI-compatible provider from repository secrets. The run step is `continue-on-error`. The workflow then deletes `openwiki/.run.json` and opens or updates a pull request on the branch `openwiki/update`. The pull request adds only the `openwiki/` folder. When the OpenWiki step fails, the pull request keeps only the pages completed before the failure, and a last step fails the job. Do not hand-edit generated wiki pages. Change the source or docs and let the workflow regenerate them.
 
 ## Git hooks and commit conventions
 
