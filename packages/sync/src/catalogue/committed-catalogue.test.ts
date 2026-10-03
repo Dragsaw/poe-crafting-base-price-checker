@@ -28,7 +28,7 @@ const PARSERS: Readonly<Record<CatalogueArtifact, (data: unknown) => EnvelopeRes
   static: (data) => parseEnvelope(CatalogueStaticFileSchema, data),
 };
 
-const ROOT = new URL('../../../../', import.meta.url);
+const ROOT = new URL('../../../../test/fixtures/frozen-data/', import.meta.url);
 
 /** The refusal in one line, so a failure names the field rather than `false`. */
 function describeFailure(result: EnvelopeResult<unknown>): string {
@@ -44,13 +44,13 @@ function describeFailure(result: EnvelopeResult<unknown>): string {
 }
 
 it.each(CATALOGUE_ENDPOINTS)('the committed $outputPath parses', ({ artifact, outputPath }) => {
-  const data: unknown = JSON.parse(readFileSync(new URL(outputPath, ROOT), 'utf8'));
+  const data: unknown = JSON.parse(readFileSync(new URL(outputPath.slice('data/'.length), ROOT), 'utf8'));
   const result = PARSERS[artifact](data);
   expect(describeFailure(result)).toBe('ok');
 });
 
-it('data/catalogue/ holds exactly the endpoint artifacts', () => {
-  const committed = readdirSync(fileURLToPath(new URL('data/catalogue/', ROOT)))
+it('the frozen catalogue/ holds exactly the endpoint artifacts', () => {
+  const committed = readdirSync(fileURLToPath(new URL('catalogue/', ROOT)))
     .filter((name) => name.endsWith('.json'))
     .map((name) => `data/catalogue/${name}`)
     .sort();

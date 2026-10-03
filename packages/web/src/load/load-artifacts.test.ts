@@ -260,15 +260,15 @@ describe('loadArtifacts', () => {
   });
 });
 
-describe('the committed data/ set', () => {
+describe('the frozen data fixture set', () => {
   it('loads as ready through the page’s own descriptors, naming only the missing tolerable files', async () => {
     // Vite's glob, not node:fs: the web project carries no Node types. A test
     // file never enters the bundle, so this is not a source import of data/**.
-    const committed = import.meta.glob<unknown>('../../../../data/**/*.json', { eager: true, import: 'default' });
+    const committed = import.meta.glob<unknown>('../../../../test/fixtures/frozen-data/**/*.json', { eager: true, import: 'default' });
     const missing: ArtifactKey[] = [];
     const answers = Object.fromEntries(
       ARTIFACT_ORDER.map((key): [ArtifactKey, ArtifactAnswer] => {
-        const file = `../../../../data/${ARTIFACTS[key].path}`;
+        const file = `../../../../test/fixtures/frozen-data/${ARTIFACTS[key].path}`;
         if (!(file in committed)) {
           missing.push(key);
           return [key, { kind: 'status', status: 404 }];

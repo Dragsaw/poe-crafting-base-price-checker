@@ -942,7 +942,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     // A non-literal specifier: the files sit outside this package's `rootDir`.
     const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
     const load = async (name: string): Promise<unknown> =>
-      ((await import(/* @vite-ignore */ `${here}/../../../data/${name}`)) as { default: unknown }).default;
+      ((await import(/* @vite-ignore */ `${here}/../../../test/fixtures/frozen-data/${name}`)) as { default: unknown }).default;
     const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'));
     const weights = parseEnvelope(WeightsFileSchema, await load('weights.json'), WEIGHTS_SCHEMA_VERSION);
     const dataset = parseEnvelope(DatasetFileSchema, await load('dataset.json'));

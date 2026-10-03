@@ -10,7 +10,6 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   DatasetFileSchema,
-  SyncReportFileSchema,
 } from '@poe/contracts';
 import type { CurrencyRate, DatasetEntry, DatasetFile, SyncReportFile, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it, vi } from 'vitest';
@@ -44,6 +43,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
 const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
+const FROZEN_DATA_DIR = fileURLToPath(new URL('../../../test/fixtures/frozen-data', import.meta.url));
 
 const LEAGUE = 'Test League';
 /** A yardstick of 2, so the one pinned entry fits the load-time cap (IMPLEMENTATION-NOTES.md §6). */
@@ -451,7 +451,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     // real dataset, report and progress describe the real list, so they are
     // left out: every workload entry is never attempted.
     const snapshot: DryRunSnapshot = {
-      ...(await readRepositorySnapshot()),
+      ...(await readRepositorySnapshot(FROZEN_DATA_DIR)),
       tracked: readFileSync(join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
       dataset: undefined,
       report: undefined,
@@ -483,7 +483,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
   });
 
   it('runs the real tracked list to completion: each visited entry is priced or listed as unrecorded', async () => {
-    const report = await dryRun(await readRepositorySnapshot());
+    const report = await dryRun(await readRepositorySnapshot(FROZEN_DATA_DIR));
 
     expect(report.outcome).toBe('completed');
     const unrecorded = new Set(report.unrecorded ?? []);
@@ -530,71 +530,15 @@ function snapshot(directory: string): Record<string, string> {
 }
 
 describe('pnpm sync:dry', () => {
-  it('exits 0, prints the same parseable JSON twice, and writes nothing to disk', async () => {
+  // Over the live data/, whose content is the player's: only the write guard
+  // is asserted here. The exit code and output are checked by pnpm test:data.
+  it('writes nothing to disk', async () => {
     const before = snapshot(DATA_DIR);
 
-    const first = await runScript();
-    const second = await runScript();
+    const runs = [await runScript(), await runScript(['--at', '2026-06-01T00:00:00.000Z'])];
 
-    expect(first.code, first.stderr).toBe(0);
-    expect(second.code, second.stderr).toBe(0);
-    expect(second.stdout).toBe(first.stdout);
-    expect(first.stderr).toBe('');
-
-    const report = JSON.parse(first.stdout) as Record<string, unknown>;
-    // The optional keys depend on the real data: `unrecorded` on an entry the
-    // fixture workload does not cover, `notBefore` on a pending penalty in
-    // `data/sync-progress.json`.
-    expect(Object.keys(report)).toEqual([
-      'outcome',
-      'completed',
-      'entries',
-      'progress',
-      'dataset',
-      'records',
-      'report',
-      ...['unrecorded', 'pinnedStarvation', 'notBefore'].filter((key) => key in report),
-    ]);
-    expect(report['outcome']).toBe('completed');
-    // Printed as written: the schema accepts it and its keys are in declared order.
-    expect(DatasetFileSchema.safeParse(report['dataset']).success).toBe(true);
-    expect(Object.keys(report['dataset'] as object)).toEqual([
-      'schemaVersion',
-      'league',
-      'generatedAt',
-      'entries',
-      'currencyRates',
-    ]);
-
-    // The run-report assertion Story 1.5 left open: the schema accepts it, in
-    // declared key order, with all three sources present.
-    expect(SyncReportFileSchema.safeParse(report['report']).success).toBe(true);
-    const printed = report['report'] as SyncReportFile;
-    expect(Object.keys(printed)).toEqual(['runStartedAt', 'runFinishedAt', 'figures', 'records', 'schemaVersion']);
-    expect(Object.keys(printed.figures.requestsBySource).toSorted()).toEqual([
-      'league-validation',
-      'tracked-list',
-    ]);
-    // The league gate ran once, against the recorded leagues fixture (Story 1.11).
-    expect(printed.figures.requestsBySource['league-validation']).toBe(1);
-    expect(printed.records.some((record) => record.kind === 'league-mismatch')).toBe(false);
-
-    expect(snapshot(DATA_DIR)).toEqual(before);
-  });
-
-  it('--at sets the clock explicitly and writes nothing to disk', async () => {
-    const before = snapshot(DATA_DIR);
-    const at = '2026-06-01T00:00:00.000Z';
-
-    const run = await runScript(['--at', at]);
-
-    expect(run.code, run.stderr).toBe(0);
-    const report = JSON.parse(run.stdout) as { entries: DatasetEntry[]; dataset: DatasetFile };
-    // Only the entries this run priced are stamped; a skipped one keeps its stamp.
-    const stamped = new Set(report.entries.map((entry) => entry.entryKey));
-    for (const entry of report.dataset.entries.filter((published) => stamped.has(published.entryKey))) {
-      expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
-    }
+    // The scripts ran to an exit: a guard over a script that never started proves nothing.
+    expect(runs.map((run) => typeof run.code)).toEqual(['number', 'number']);
     expect(snapshot(DATA_DIR)).toEqual(before);
   });
 
