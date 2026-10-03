@@ -5,6 +5,7 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
+  TRACKED_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { FilesystemPort, HttpPort, HttpRequest, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
@@ -42,7 +43,7 @@ const LEAGUES_BODY = JSON.stringify({
 function inputs(): Parameters<typeof createFakeFilesystemPort>[0] {
   return {
     [TRACKED_PATH]: {
-      contents: JSON.stringify({ schemaVersion: '1.0.0', entries: [ENTRY] }),
+      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: [ENTRY] }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
     'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 }) },
