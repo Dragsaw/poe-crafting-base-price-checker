@@ -198,3 +198,15 @@ describe('defenceLettersOf', () => {
     },
   );
 });
+
+describe('buildSearchBody: a hybrid reference (interim)', () => {
+  it('throws, naming the story that builds its filters', () => {
+    const entry = crafted('weapon.bow', 'Bows', {
+      prefix: { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1' }, { statId: 'explicit.stat_3' }] },
+      suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
+    });
+    expect(() => buildSearchBody(entry, itemTypes)).toThrow(
+      'hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 6)',
+    );
+  });
+});

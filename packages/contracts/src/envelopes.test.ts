@@ -559,3 +559,39 @@ describe('RecipesFileSchema', () => {
     expect(parseEnvelope(RecipesFileSchema, fileOf([])).ok).toBe(true);
   });
 });
+
+describe('TrackedFileSchema, hybrid references (CAP-1)', () => {
+  const hybridPrefix = (min: number, max: number) => ({
+    kind: 'hybrid',
+    lines: [
+      { statId: 'explicit.stat_691932474', valueMin: min, valueMax: max },
+      { statId: 'explicit.stat_1509134228', valueMin: 25, valueMax: 34 },
+    ],
+  });
+  const crafted = (prefix: unknown) => ({
+    kind: 'crafted',
+    categoryId: 'weapon.bow',
+    className: 'Bows',
+    itemLevelMin: 82,
+    prefix,
+    suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
+    status: 'active',
+  });
+  const parse = (entries: readonly unknown[]) =>
+    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
+
+  it('parses an entry whose prefix is the Bows phys%+accuracy hybrid', () => {
+    expect(parse([crafted(hybridPrefix(16, 20))]).ok).toBe(true);
+  });
+
+  it('does not evaluate the within-file overlap of a pair with a hybrid reference', () => {
+    // The two hybrids' bands intersect on every line; core evaluates the pair (§2.1).
+    expect(parse([crafted(hybridPrefix(16, 20)), crafted(hybridPrefix(18, 22))]).ok).toBe(true);
+    expect(
+      parse([
+        crafted(hybridPrefix(16, 20)),
+        crafted({ kind: 'banded', statId: 'explicit.stat_691932474', valueMin: 16, valueMax: 20 }),
+      ]).ok,
+    ).toBe(true);
+  });
+});

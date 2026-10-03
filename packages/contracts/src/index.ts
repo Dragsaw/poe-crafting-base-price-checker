@@ -44,15 +44,24 @@ export type { DefenceLetter } from './class-name.ts';
 
 export {
   AcceptedTierSchema,
+  BandedHybridLineSchema,
   BandedModifierRefSchema,
+  HybridLineSchema,
+  HybridModifierRefSchema,
   ModifierRefSchema,
   StatIdSchema,
+  ValuelessHybridLineSchema,
   ValuelessModifierRefSchema,
 } from './modifier-ref.ts';
 export type {
+  BandedHybridLine,
   BandedModifierRef,
+  HybridLine,
+  HybridModifierRef,
   ModifierRef,
+  SingleLineModifierRef,
   StatId,
+  ValuelessHybridLine,
   ValuelessModifierRef,
 } from './modifier-ref.ts';
 
@@ -81,7 +90,7 @@ export {
   compareTrackedEntries,
   encodeAffix,
 } from './canonical-key.ts';
-export type { CanonicalAffix, CanonicalKeyElements } from './canonical-key.ts';
+export type { CanonicalAffix, CanonicalKeyElements, CanonicalLine } from './canonical-key.ts';
 
 export {
   describeOverlap,

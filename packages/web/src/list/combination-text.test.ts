@@ -107,3 +107,12 @@ describe('bandedFallback', () => {
     expect(bandedFallback('#', 0.333333, 1e-7)).toBe('0.333333–1e-7');
   });
 });
+
+describe('affixText: a hybrid reference (interim)', () => {
+  it('throws, naming the story that renders its label', () => {
+    const hybrid: ModifierRef = { kind: 'hybrid', lines: [{ statId: PHYS }, { statId: BOLT }] };
+    expect(() => affixText(hybrid, STATS)).toThrow(
+      'hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 8)',
+    );
+  });
+});

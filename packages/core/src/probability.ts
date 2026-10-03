@@ -2,11 +2,23 @@ import type {
   CraftedTrackedEntry,
   ModifierRef,
   ModifierWeight,
+  SingleLineModifierRef,
   WeightsClassPools,
   WeightsFile,
   WeightsLine,
   WeightsPool,
 } from '@poe/contracts';
+
+/**
+ * The interim `hybrid` branch: `core` does not yet price or check a hybrid
+ * reference. The committed data holds none, so this throw is unreachable
+ * today. The named story replaces it.
+ */
+export function assertSingleLine(ref: ModifierRef, story: number): asserts ref is SingleLineModifierRef {
+  if (ref.kind === 'hybrid') {
+    throw new Error(`hybrid references are not supported yet (SPEC-tracked-hybrid-mods story ${String(story)})`);
+  }
+}
 
 /**
  * The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11).
@@ -96,6 +108,7 @@ export function interval(line: WeightsLine): Interval {
  * (§1). It still enters the denominator, where it adds nothing.
  */
 export function contains(ref: ModifierRef, entry: ModifierWeight): boolean {
+  assertSingleLine(ref, 4);
   if (entry.weight === 0) {
     return false;
   }
@@ -157,6 +170,7 @@ export function isEmptyPool(pool: WeightsPool): boolean {
 
 /** `C = contained(ref) ∩ E` (§11). */
 export function containedIn(ref: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
+  assertSingleLine(ref, 4);
   return eligibleSet.filter((entry) => contains(ref, entry));
 }
 
@@ -172,6 +186,7 @@ export function affixProbability(
   itemLevelMin: number,
   modifierLevelMin: number,
 ): ProbabilityResult {
+  assertSingleLine(ref, 4);
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
   const total = totalWeight(eligibleSet);
   if (total === 0) {
@@ -242,6 +257,8 @@ export function combinationProbability(
   combination: CombinationInput,
   modifierLevelMin: number,
 ): ProbabilityResult {
+  assertSingleLine(combination.prefix, 4);
+  assertSingleLine(combination.suffix, 4);
   const setsOf = (slot: Slot, ref: ModifierRef): SlotSets => {
     const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
     return { slot, eligibleSet, contained: containedIn(ref, eligibleSet), total: totalWeight(eligibleSet) };

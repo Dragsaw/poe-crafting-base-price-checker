@@ -73,6 +73,10 @@ function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
   }
   for (const ref of [entry.prefix, entry.suffix]) {
+    if (ref.kind === 'hybrid') {
+      // Interim: the committed data holds no hybrid. Story 5 checks its lines.
+      throw new Error('hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 5)');
+    }
     if (!ids.statIds.has(ref.statId)) {
       misses.push({ identifier: ref.statId, identifierKind: 'statId' });
     }

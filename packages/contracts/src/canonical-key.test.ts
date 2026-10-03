@@ -8,6 +8,7 @@ import {
   compareTrackedEntries,
   encodeAffix,
 } from './canonical-key';
+import { TrackedEntrySchema } from './tracked-entry';
 import type { TrackedEntry } from './tracked-entry';
 
 const crafted: TrackedEntry = {
@@ -121,5 +122,30 @@ describe('compareByCodeUnit', () => {
     expect(compareByCodeUnit('ab', 'abc')).toBeLessThan(0);
     expect(compareByCodeUnit('abc', 'ab')).toBeGreaterThan(0);
     expect(compareByCodeUnit('abc', 'abc')).toBe(0);
+  });
+});
+
+describe('the hybrid affix form (§4.1)', () => {
+  const lineA = { statId: 'explicit.stat_1', valueMin: 25, valueMax: 34 };
+  const lineB = { statId: 'explicit.stat_2' };
+  const withPrefix = (prefix: unknown): TrackedEntry => TrackedEntrySchema.parse({ ...crafted, prefix });
+
+  it('gives two orderings of the same lines one key', () => {
+    expect(canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] }))).toBe(
+      canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineB, lineA] })),
+    );
+  });
+
+  it('encodes ["hybrid", [line, …]] in two elements, without acceptedTier', () => {
+    const entry = withPrefix({ kind: 'hybrid', lines: [lineB, lineA], acceptedTier: 'T1' });
+    const elements = canonicalKeyElements(entry);
+    expect(elements[4]).toEqual(['hybrid', [['explicit.stat_1', 25, 34], ['explicit.stat_2', null, null]]]);
+    expect(canonicalKey(entry)).toBe(canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] })));
+  });
+
+  it('differs from each of its lines encoded alone', () => {
+    const key = canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] }));
+    expect(key).not.toBe(canonicalKey(withPrefix({ kind: 'banded', ...lineA })));
+    expect(key).not.toBe(canonicalKey(withPrefix({ kind: 'valueless', ...lineB })));
   });
 });
