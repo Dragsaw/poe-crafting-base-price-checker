@@ -39,6 +39,7 @@ import { composeChunk } from './compose-chunk.ts';
 import type { ComposeChunkPorts } from './compose-chunk.ts';
 import { createReadOnlyGitPort } from './git/read-only-git-port.ts';
 import { createFetchHttpPort, createNodeFilesystemPort, sleep, systemClock } from './shell.ts';
+import { authLine, createSessionAuth } from './trade/session-auth.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 /**
@@ -53,8 +54,11 @@ export function runSync(ports: SyncPorts): Promise<ChunkOutcome> {
   return composeChunk(ports).run();
 }
 
-export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent'> {
-  /** Where the contact `User-Agent` is read from (`POE_SYNC_USER_AGENT`). */
+export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent' | 'auth'> {
+  /**
+   * Where the contact `User-Agent` (`POE_SYNC_USER_AGENT`) and the optional
+   * session cookie (`POESESSID`, AD-30) are read from.
+   */
   readonly env: Readonly<Record<string, string | undefined>>;
   readonly stdout: (line: string) => void;
   readonly stderr: (line: string) => void;
@@ -69,13 +73,22 @@ export async function syncCommand(deps: SyncCommandDeps): Promise<number> {
     stderr(`pnpm sync:batch: ${contact.message}`);
     return 1;
   }
+  // After the contact refusal, before the first request: one line per run
+  // when the value settles at the edge (IMPLEMENTATION-NOTES.md §13.1, §13.5).
+  const auth = createSessionAuth(env);
+  const line = authLine(auth);
+  if (line !== undefined) {
+    stderr(`pnpm sync:batch: ${line}`);
+  }
   try {
-    const outcome = await runSync({ ...ports, userAgent: contact.userAgent });
+    const outcome = await runSync({ ...ports, userAgent: contact.userAgent, auth });
     const kind = outcome.kind === 'deferred' ? `deferred until ${outcome.notBefore}` : outcome.kind;
     stdout(`pnpm sync:batch: ${kind}, ${String(outcome.completed.length)} completed`);
     return 0;
   } catch (error) {
-    stderr(`pnpm sync:batch: ${error instanceof Error ? error.message : String(error)}`);
+    // The governor already redacted what it passed on; this covers the rest (§13.6).
+    const redacted = auth.redact(error);
+    stderr(`pnpm sync:batch: ${redacted instanceof Error ? redacted.message : String(redacted)}`);
     return 1;
   }
 }

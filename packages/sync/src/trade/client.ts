@@ -40,6 +40,7 @@ import {
   type RateLimitHeaders,
   type RateLimitSkip,
 } from './rate-limit-headers.ts';
+import type { SessionAuth } from './session-auth.ts';
 import { MissingUserAgentError } from './user-agent.ts';
 
 const USER_AGENT_HEADER = 'user-agent';
@@ -418,6 +419,13 @@ export interface TradeGovernorOptions<Source extends string> extends TradeClient
    * restriction or a full bucket.
    */
   readonly spread?: boolean;
+  /**
+   * The process auth holder (AD-30, IMPLEMENTATION-NOTES.md §13). Every error
+   * this governor passes on is redacted through it first (§13.6). Omitted,
+   * errors pass on unchanged: the shells that cannot reach a holder have no
+   * value to remove.
+   */
+  readonly auth?: SessionAuth;
 }
 
 export interface TradeGovernor<Source extends string> {
@@ -561,11 +569,21 @@ export function createTradeGovernor<Source extends string>(
     };
   }
 
+  const { auth } = options;
+  // Redacted in place, then rethrown: the class, the `name` and the identity
+  // survive, so `isTransportFailure` still classifies the throw (§13.6).
+  const redacted = (http: HttpPort, request: TradeRequest): Promise<TradeResult> =>
+    auth === undefined
+      ? exchange(http, request)
+      : exchange(http, request).catch((error: unknown) => {
+          throw auth.redact(error);
+        });
+
   const clientFor = (http: HttpPort): TradeClient => ({
     send(request) {
       const issued = tail.then(
-        () => exchange(http, request),
-        () => exchange(http, request),
+        () => redacted(http, request),
+        () => redacted(http, request),
       );
       // The queue must survive a rejected exchange, or one failure would wedge
       // every later request behind it.

@@ -70,6 +70,7 @@ import { createPacingState, laneDelayMs } from './trade/client.ts';
 import type { PacingState } from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE } from './trade/endpoints.ts';
 import { evenIntervalMs } from './trade/ledger.ts';
+import { authLine, createSessionAuth } from './trade/session-auth.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 const PREFIX = 'pnpm sync:';
@@ -508,11 +509,14 @@ function describeOutcome(outcome: ChunkOutcome): string {
 /** The session's ports: `composeChunk`'s, less what the session itself supplies. */
 export type SyncSessionPorts = Omit<
   ComposeChunkPorts,
-  'userAgent' | 'pacing' | 'spread' | 'requests' | 'session' | 'wrapStep'
+  'userAgent' | 'pacing' | 'spread' | 'requests' | 'session' | 'wrapStep' | 'auth'
 >;
 
 export interface SyncSessionDeps extends SyncSessionPorts {
-  /** Where the contact `User-Agent` is read from (`POE_SYNC_USER_AGENT`). */
+  /**
+   * Where the contact `User-Agent` (`POE_SYNC_USER_AGENT`) and the optional
+   * session cookie (`POESESSID`, AD-30) are read from.
+   */
   readonly env: Readonly<Record<string, string | undefined>>;
   /** The command's arguments, after the script name. */
   readonly argv: readonly string[];
@@ -541,6 +545,13 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
     return 1;
   }
 
+  // One holder per process, beside the pacing state: its line prints once,
+  // before the first request, not per chunk (IMPLEMENTATION-NOTES.md §13.1, §13.5).
+  const auth = createSessionAuth(env);
+  const line = authLine(auth);
+  if (line !== undefined) {
+    stderr(`${PREFIX} ${line}`);
+  }
   const pacing = createPacingState();
   const requests = createRequestCounter();
   const waitPorts: WaitPorts = { fs, clock, sleep: pause, signal };
@@ -567,6 +578,7 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
         ...ports,
         userAgent: contact.userAgent,
         pacing,
+        auth,
         spread: true,
         requests,
         session: {
@@ -578,7 +590,9 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
       }).run();
       result = { kind: 'outcome', outcome };
       stdout(`${PREFIX} ${describeOutcome(outcome)}`);
-    } catch (error) {
+    } catch (thrown) {
+      // The governor already redacted what it passed on; this covers the rest (§13.6).
+      const error = auth.redact(thrown);
       result = { kind: 'error', error };
       stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
     }

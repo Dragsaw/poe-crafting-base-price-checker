@@ -28,6 +28,7 @@ import { runSync, syncCommand } from './sync-batch.ts';
 import type { SyncCommandDeps } from './sync-batch.ts';
 import type * as TradeClientModule from './trade/client.ts';
 import { TRADE_LEAGUES_URL, tradeSearchUrl } from './trade/endpoints.ts';
+import { SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 
 /** Every option set the shell built its trade clients with, in build order. */
@@ -138,12 +139,16 @@ interface Setup {
   readonly wait?: (ms: number) => Promise<void>;
 }
 
+const AUTH_LINE = /^pnpm sync:batch: (authenticated|unauthenticated \()/;
+
 function depsFor(league: string, setup: Setup = {}) {
   const env = setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT };
   const recorded = recording(createFakeFilesystemPort({ ...inputs(league, setup.tracked), ...setup.seeded }));
   const http = httpFor(league, setup.answers);
   const out: string[] = [];
   const err: string[] = [];
+  /** The §13.5 auth lines, kept apart from `err`, with the requests sent before each. */
+  const auth: { readonly line: string; readonly requestsBefore: number }[] = [];
   const deps: SyncCommandDeps = {
     fs: recorded.fs,
     clock: createFakeClockPort(NOW),
@@ -154,9 +159,15 @@ function depsFor(league: string, setup: Setup = {}) {
     log: () => undefined,
     env,
     stdout: (line) => out.push(line),
-    stderr: (line) => err.push(line),
+    stderr: (line) => {
+      if (AUTH_LINE.test(line)) {
+        auth.push({ line, requestsBefore: http.requests.length });
+        return;
+      }
+      err.push(line);
+    },
   };
-  return { deps, fs: recorded.fs, writes: recorded.writes, http, out, err };
+  return { deps, fs: recorded.fs, writes: recorded.writes, http, out, err, auth };
 }
 
 async function reportOf(fs: FilesystemPort): Promise<SyncReportFile | undefined> {
@@ -499,6 +510,68 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
     expect(records[0]).toHaveProperty('message', expect.stringContaining(DATASET_PATH));
     expect(await fs.exists(LOCK_PATH)).toBe(false);
+  });
+
+  describe('the session cookie at the shell edge (AD-30, IMPLEMENTATION-NOTES.md §13.1, §13.5)', () => {
+    const VALID = 'a'.repeat(16) + '0123456789abcdef0123';
+
+    it('an absent value: one unauthenticated (absent) line before the first request, exit unchanged', async () => {
+      const { deps, http, auth, out } = depsFor(LEAGUE);
+
+      expect(await syncCommand(deps)).toBe(0);
+
+      expect(auth).toEqual([{ line: 'pnpm sync:batch: unauthenticated (absent)', requestsBefore: 0 }]);
+      expect(http.requests).toHaveLength(2);
+      expect(out).toEqual(['pnpm sync:batch: completed, 1 completed']);
+    });
+
+    it('a blank value trims to absent', async () => {
+      const { deps, auth } = depsFor(LEAGUE, { env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: '   ' } });
+
+      expect(await syncCommand(deps)).toBe(0);
+
+      expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync:batch: unauthenticated (absent)']);
+    });
+
+    it.each(['a b', 'a;b', 'a,b', '"x', 'café'])('a malformed value %j: one malformed line without the value', async (value) => {
+      const { deps, auth, http } = depsFor(LEAGUE, {
+        env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: value },
+      });
+
+      expect(await syncCommand(deps)).toBe(0);
+
+      expect(auth).toEqual([{ line: 'pnpm sync:batch: unauthenticated (malformed)', requestsBefore: 0 }]);
+      for (const request of http.requests) {
+        expect(request.headers).not.toHaveProperty('cookie');
+      }
+    });
+
+    it('a blank contact is still refused first: exit 1 and no auth line', async () => {
+      const { deps, auth, err } = depsFor(LEAGUE, { env: { [SESSION_COOKIE_ENV_VAR]: 'a b' } });
+
+      expect(await syncCommand(deps)).toBe(1);
+
+      expect(auth).toEqual([]);
+      expect(err[0]).toContain(USER_AGENT_ENV_VAR);
+    });
+
+    it('a valid value prints no line, and no request carries a Cookie', async () => {
+      tradeClientOptions.length = 0;
+      const { deps, auth, err, http } = depsFor(LEAGUE, {
+        env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALID },
+      });
+
+      expect(await syncCommand(deps)).toBe(0);
+
+      expect(auth).toEqual([]);
+      expect(err).toEqual([]);
+      expect(http.requests).toHaveLength(2);
+      for (const request of http.requests) {
+        expect(Object.keys(request.headers).map((name) => name.toLowerCase())).not.toContain('cookie');
+      }
+      // The holder reaches the chunk's governor.
+      expect(tradeClientOptions).toEqual([expect.objectContaining({ auth: expect.anything() as unknown })]);
+    });
   });
 
   it('is reachable at the script name, with the .env overlay', () => {

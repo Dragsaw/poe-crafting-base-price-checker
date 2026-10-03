@@ -39,6 +39,7 @@ import { createRequestCounter } from './request-counter.ts';
 import type { RequestCounter } from './request-counter.ts';
 import { createTradeGovernor } from './trade/client.ts';
 import type { PacingState } from './trade/client.ts';
+import type { SessionAuth } from './trade/session-auth.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
 export interface ComposeChunkPorts {
@@ -77,6 +78,12 @@ export interface ComposeChunkPorts {
   readonly requests?: RequestCounter;
   /** The session only: the chunk's session options (`ChunkSession`). */
   readonly session?: ChunkSession;
+  /**
+   * The live shells only (`./sync.ts`, `./sync-batch.ts`): the process auth
+   * holder (AD-30). Each chunk's governor gets it, as it gets `pacing`, and
+   * redacts every error it passes on through it.
+   */
+  readonly auth?: SessionAuth;
 }
 
 /** The load-time values the pricing step was built on. */
@@ -100,7 +107,7 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
 }
 
 export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
-  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session } = options;
+  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session, auth } = options;
 
   const requests = options.requests ?? createRequestCounter();
   // A fresh governor per chunk: its invalid-request counts stay per chunk,
@@ -118,6 +125,7 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     log: log ?? writeStderr,
     ...(pacing === undefined ? {} : { pacing }),
     ...(spread === undefined ? {} : { spread }),
+    ...(auth === undefined ? {} : { auth }),
   });
 
   const ports: ChunkPorts = {

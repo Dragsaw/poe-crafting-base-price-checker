@@ -53,6 +53,7 @@ import type * as TradeClientModule from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE, TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
 import { recordObservation } from './trade/ledger.ts';
 import { parseRateLimitHeaders } from './trade/rate-limit-headers.ts';
+import { SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 
 /** Every option set a chunk built its governor with, in build order. */
@@ -149,6 +150,7 @@ interface SessionSetup {
 }
 
 const OUTCOME_LINE = /^pnpm sync: (completed|bounded|yielded|busy|deferred|dispossessed)/;
+const AUTH_LINE = /^pnpm sync: (authenticated|unauthenticated \()/;
 
 function sessionFor(setup: SessionSetup = {}) {
   const fs = createFakeFilesystemPort({
@@ -165,6 +167,7 @@ function sessionFor(setup: SessionSetup = {}) {
   const controller = new AbortController();
   const out: { readonly line: string; readonly at: string }[] = [];
   const err: string[] = [];
+  const auth: { readonly line: string; readonly requestsBefore: number }[] = [];
   /** The session's waits, in order. Each advances the fake clock. */
   const sleeps: number[] = [];
   /** The in-chunk waits the governor asked for. */
@@ -208,11 +211,16 @@ function sessionFor(setup: SessionSetup = {}) {
       }
     },
     stderr: (line) => {
+      // A §13.5 auth line is not a chunk line: kept apart, with the requests sent before it.
+      if (AUTH_LINE.test(line)) {
+        auth.push({ line, requestsBefore: fake.requests.length });
+        return;
+      }
       err.push(line);
       countChunk();
     },
   };
-  return { deps, fs, clock, http: fake, out, err, sleeps, waits, controller };
+  return { deps, fs, clock, http: fake, out, err, auth, sleeps, waits, controller };
 }
 
 async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
@@ -582,6 +590,57 @@ describe('pnpm sync: the session with injected ports', () => {
 
     expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST']);
     expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2 });
+  });
+
+  it('an absent cookie over several chunks: exactly one unauthenticated (absent) line, before the first request', async () => {
+    const { deps, http, auth } = sessionFor({ tracked: [ENTRY, SECOND], stopAfter: 3 });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(http.requests.length).toBeGreaterThanOrEqual(3);
+    expect(auth).toEqual([{ line: 'pnpm sync: unauthenticated (absent)', requestsBefore: 0 }]);
+  });
+
+  it.each(['a b', 'a;b', 'a,b', '"x', 'café'])('a malformed cookie %j: one malformed line, exit 0', async (value) => {
+    const { deps, auth } = sessionFor({
+      env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: value },
+      stopAfter: 2,
+      tracked: [ENTRY, SECOND],
+    });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(auth).toEqual([{ line: 'pnpm sync: unauthenticated (malformed)', requestsBefore: 0 }]);
+  });
+
+  it('a blank contact is refused before the auth line is printed', async () => {
+    const { deps, auth } = sessionFor({ env: { [SESSION_COOKIE_ENV_VAR]: '   ' } });
+
+    expect(await syncSessionCommand(deps)).toBe(1);
+
+    expect(auth).toEqual([]);
+  });
+
+  it('a valid cookie prints no line, reaches each chunk governor, and no request carries a Cookie', async () => {
+    governorOptions.length = 0;
+    const { deps, auth, err, http } = sessionFor({
+      env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: `"${'Z'.repeat(32)}"` },
+      tracked: [ENTRY, SECOND],
+      stopAfter: 2,
+    });
+
+    expect(await syncSessionCommand(deps)).toBe(0);
+
+    expect(auth).toEqual([]);
+    expect(err).toEqual([]);
+    for (const request of http.requests) {
+      expect(Object.keys(request.headers).map((name) => name.toLowerCase())).not.toContain('cookie');
+    }
+    // One holder for the process: every chunk's governor gets the same one.
+    expect(governorOptions.length).toBeGreaterThanOrEqual(2);
+    const holders = new Set(governorOptions.map((options) => options['auth']));
+    expect(holders.size).toBe(1);
+    expect([...holders][0]).toBeDefined();
   });
 
   it('a new pass restarts the pass-level requestsBySource', async () => {
