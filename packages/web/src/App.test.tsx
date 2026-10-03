@@ -429,10 +429,10 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(NONE);
   });
 
-  it('ranks the committed data/ into rows, dropping the below-threshold bases', async () => {
-    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked}.json', { eager: true, import: 'default' });
-    const dataset = committed['../../../data/dataset.json'];
-    const tracked = committed['../../../data/tracked.json'];
+  it('ranks the frozen data fixture into rows, dropping the below-threshold bases', async () => {
+    const committed = import.meta.glob<unknown>('../../../test/fixtures/frozen-data/{dataset,tracked}.json', { eager: true, import: 'default' });
+    const dataset = committed['../../../test/fixtures/frozen-data/dataset.json'];
+    const tracked = committed['../../../test/fixtures/frozen-data/tracked.json'];
     serveArtifacts(server, { tracked: { kind: 'json', body: tracked }, dataset: { kind: 'json', body: dataset } });
     mount();
     await settleTo('ready');
@@ -445,11 +445,11 @@ describe('the resting chrome', () => {
     }
   });
 
-  it('opens a panel on the committed data/, the priced row linking a Forbidden%20Rites search, with no request', async () => {
-    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked}.json', { eager: true, import: 'default' });
+  it('opens a panel on the frozen data fixture, the priced row linking a Forbidden%20Rites search, with no request', async () => {
+    const committed = import.meta.glob<unknown>('../../../test/fixtures/frozen-data/{dataset,tracked}.json', { eager: true, import: 'default' });
     const requests = serveArtifacts(server, {
-      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
-      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
+      tracked: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/dataset.json'] },
     });
     mount();
     await settleTo('ready');
@@ -1058,15 +1058,15 @@ describe('the list statement', () => {
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
   });
 
-  it('prints no recipes.json absence line on the committed data/, and the control prints its two recipes', async () => {
-    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes}.json', {
+  it('prints no recipes.json absence line on the frozen data fixture, and the control prints its two recipes', async () => {
+    const committed = import.meta.glob<unknown>('../../../test/fixtures/frozen-data/{dataset,tracked,recipes}.json', {
       eager: true,
       import: 'default',
     });
-    const recipes = committed['../../../data/recipes.json'];
+    const recipes = committed['../../../test/fixtures/frozen-data/recipes.json'];
     serveArtifacts(server, {
-      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
-      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
+      tracked: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/dataset.json'] },
       recipes: { kind: 'json', body: recipes },
     });
     mount();
@@ -1130,16 +1130,16 @@ describe('the Unrankable appendix', () => {
   }
 
   // Matrix: committed.
-  it('renders the appendix on the committed data/, above the key block and the foot', async () => {
-    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights}.json', {
+  it('renders the appendix on the frozen data fixture, above the key block and the foot', async () => {
+    const committed = import.meta.glob<unknown>('../../../test/fixtures/frozen-data/{dataset,tracked,recipes,weights}.json', {
       eager: true,
       import: 'default',
     });
     serveArtifacts(server, {
-      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
-      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
-      recipes: { kind: 'json', body: committed['../../../data/recipes.json'] },
-      weights: { kind: 'json', body: committed['../../../data/weights.json'] },
+      tracked: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/dataset.json'] },
+      recipes: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/recipes.json'] },
+      weights: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/weights.json'] },
     });
     mount();
     await settleTo('ready');
@@ -1392,18 +1392,18 @@ describe('the interaction surface', () => {
   });
 });
 
-describe('the chase cells on the committed data/', () => {
+describe('the chase cells on the frozen data fixture', () => {
   it('shows at most three cells on every crafted row of each recipe, each curated, with no numeral but its tier', async () => {
-    const committed = import.meta.glob<unknown>('../../../data/{dataset,tracked,recipes,weights,catalogue/stats}.json', {
+    const committed = import.meta.glob<unknown>('../../../test/fixtures/frozen-data/{dataset,tracked,recipes,weights,catalogue/stats}.json', {
       eager: true,
       import: 'default',
     });
     serveArtifacts(server, {
-      tracked: { kind: 'json', body: committed['../../../data/tracked.json'] },
-      dataset: { kind: 'json', body: committed['../../../data/dataset.json'] },
-      recipes: { kind: 'json', body: committed['../../../data/recipes.json'] },
-      weights: { kind: 'json', body: committed['../../../data/weights.json'] },
-      catalogueStats: { kind: 'json', body: committed['../../../data/catalogue/stats.json'] },
+      tracked: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/tracked.json'] },
+      dataset: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/dataset.json'] },
+      recipes: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/recipes.json'] },
+      weights: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/weights.json'] },
+      catalogueStats: { kind: 'json', body: committed['../../../test/fixtures/frozen-data/catalogue/stats.json'] },
     });
     mount();
     await settleTo('ready');

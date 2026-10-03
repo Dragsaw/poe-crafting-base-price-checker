@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 import { SHORT_FORMS, shortForm } from './short-forms';
 
-const committed = import.meta.glob<unknown>('../../../../data/tracked.json', { eager: true, import: 'default' });
-const tracked = TrackedFileSchema.parse(committed['../../../../data/tracked.json']);
+const committed = import.meta.glob<unknown>('../../../../test/fixtures/frozen-data/tracked.json', { eager: true, import: 'default' });
+const tracked = TrackedFileSchema.parse(committed['../../../../test/fixtures/frozen-data/tracked.json']);
 
 describe('the short-form table', () => {
   it('gives no two modifiers one form (coinage rule 3), but for a Local variant that shares its global twin’s form', () => {
@@ -34,7 +34,7 @@ describe('the short-form table', () => {
     }
   });
 
-  it('has a form for every statId in the committed data/tracked.json', () => {
+  it('has a form for every statId in the frozen tracked.json fixture', () => {
     const statIds = new Set(
       tracked.entries.flatMap((entry) =>
         entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((ref) => (ref === undefined ? [] : [ref.statId])) : [],

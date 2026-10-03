@@ -34,6 +34,7 @@ export default defineConfig({
     name: 'web',
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}', 'vite.config.test.ts'],
+    exclude: ['**/*.data.test.{ts,tsx}', '**/node_modules/**'],
     setupFiles: ['../../test/setup.ts', './src/test-setup.ts'],
   },
 });

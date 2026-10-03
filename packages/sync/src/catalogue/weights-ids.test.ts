@@ -87,8 +87,8 @@ describe('readWeightsIds', () => {
     );
   });
 
-  it('reads the committed data/weights.json', async () => {
-    const committed = readFileSync(fileURLToPath(new URL('../../../../data/weights.json', import.meta.url)), 'utf8');
+  it('reads the frozen weights.json fixture', async () => {
+    const committed = readFileSync(fileURLToPath(new URL('../../../../test/fixtures/frozen-data/weights.json', import.meta.url)), 'utf8');
     const ids = await readWeightsIds(fsWith(committed));
     expect(ids.kind).toBe('present');
   });

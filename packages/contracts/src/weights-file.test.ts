@@ -48,11 +48,11 @@ const parse = (data: unknown) => parseEnvelope(WeightsFileSchema, data, WEIGHTS_
 const ENTRY_PATH = ['bases', 'accessory.amulet', 'Amulets', 'prefix', 'entries', 0];
 
 describe('WeightsFileSchema — conforming files', () => {
-  it('parses the committed data/weights.json, every entry keeping its lines nested', async () => {
+  it('parses the frozen weights.json fixture, every entry keeping its lines nested', async () => {
     // A non-literal specifier: the file sits outside this package's `rootDir`,
     // so the compiler must not resolve it; Vitest resolves it from this file.
     const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
-    const specifier = `${here}/../../../data/weights.json`;
+    const specifier = `${here}/../../../test/fixtures/frozen-data/weights.json`;
     const committed = ((await import(/* @vite-ignore */ specifier)) as { default: unknown }).default;
     const result = parse(committed);
     if (!result.ok) {
@@ -60,10 +60,10 @@ describe('WeightsFileSchema — conforming files', () => {
     }
     const pools = Object.values(result.value.bases).flatMap((classes) => Object.values(classes));
     const entries = pools.flatMap((pools) => [...pools.prefix.entries, ...pools.suffix.entries]);
-    expect(entries).toHaveLength(8437);
+    expect(entries).toHaveLength(569);
     expect(entries.every((entry) => entry.lines.length > 0)).toBe(true);
     const nullStatIds = entries.flatMap((entry) => entry.lines).filter((line) => line.statId === null);
-    expect(nullStatIds).toHaveLength(16);
+    expect(nullStatIds).toHaveLength(1);
     const partialPools = pools
       .flatMap((pools) => [pools.prefix, pools.suffix])
       .filter((pool) => pool.poolCoverage === 'partial');

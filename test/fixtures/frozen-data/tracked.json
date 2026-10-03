@@ -1,0 +1,4239 @@
+{
+  "schemaVersion": "1.0.0",
+  "entries": [
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "jewel",
+      "className": "Emerald",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2843214518",
+        "valueMin": 5,
+        "valueMax": 15,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_681332047",
+        "valueMin": 2,
+        "valueMax": 4,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Gold Amulet",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Solar Amulet",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Utility Belt",
+      "itemLevelMin": 82,
+      "status": "active"
+    },
+    {
+      "kind": "raw",
+      "baseTypeId": "Wide Belt",
+      "itemLevelMin": 82,
+      "status": "pruned",
+      "prunedReason": "no market"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 35,
+        "valueMax": 52.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 35,
+        "valueMax": 52.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 35,
+        "valueMax": 52.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 35,
+        "valueMax": 52.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 35,
+        "valueMax": 52.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 69,
+        "valueMax": 102,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 69,
+        "valueMax": 102,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 69,
+        "valueMax": 102,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 69,
+        "valueMax": 102,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 69,
+        "valueMax": 102,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 81.5,
+        "valueMax": 127.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 81.5,
+        "valueMax": 127.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 81.5,
+        "valueMax": 127.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 81.5,
+        "valueMax": 127.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 81.5,
+        "valueMax": 127.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 79,
+        "valueMax": 123,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 79,
+        "valueMax": 123,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 79,
+        "valueMax": 123,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 79,
+        "valueMax": 123,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 79,
+        "valueMax": 123,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 73,
+        "valueMax": 100,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 73,
+        "valueMax": 100,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 73,
+        "valueMax": 100,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 73,
+        "valueMax": 100,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 73,
+        "valueMax": 100,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "valueless",
+        "statId": "explicit.stat_1967051901"
+      },
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 170,
+        "valueMax": 196,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "valueless",
+        "statId": "explicit.stat_1967051901"
+      },
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 170,
+        "valueMax": 196,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 170,
+        "valueMax": 196,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 170,
+        "valueMax": 196,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_709508406",
+        "valueMin": 170,
+        "valueMax": 196,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 120,
+        "valueMax": 139,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "valueless",
+        "statId": "explicit.stat_1967051901"
+      },
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 120,
+        "valueMax": 139,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 120,
+        "valueMax": 139,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 120,
+        "valueMax": 139,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 120,
+        "valueMax": 139,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 155.5,
+        "valueMax": 188.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "valueless",
+        "statId": "explicit.stat_1967051901"
+      },
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 155.5,
+        "valueMax": 188.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 155.5,
+        "valueMax": 188.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 155.5,
+        "valueMax": 188.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 155.5,
+        "valueMax": 188.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 170,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "valueless",
+        "statId": "explicit.stat_1967051901"
+      },
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 170,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 170,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 170,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 170,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "valueless",
+        "statId": "explicit.stat_1967051901"
+      },
+      "status": "pruned",
+      "prunedReason": "explicit.stat_1967051901 rolls a valueless tier and a banded tier on Crossbows, so this valueless reference fails kind agreement (AD-17)"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3981240776",
+        "valueMin": 47,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2482852589",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 120,
+        "valueMax": 149,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 180,
+        "valueMax": 189,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_983749596",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2748665614",
+        "valueMin": 7,
+        "valueMax": 8,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1379411836",
+        "valueMin": 23,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 17,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 24,
+        "valueMax": 27,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 41,
+        "valueMax": 45,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_587431675",
+        "valueMin": 35,
+        "valueMax": 38,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3556824919",
+        "valueMin": 35,
+        "valueMax": 39,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2162097452",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 3,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 25,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    }
+  ]
+}

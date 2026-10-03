@@ -10,6 +10,17 @@ export default defineConfig({
     projects: [
       'packages/*',
       {
+        // The invariants of the live `data/`, run by `pnpm test:data` and
+        // excluded from `pnpm test`. Every package project excludes `*.data.test.*`.
+        test: {
+          name: 'data',
+          root: import.meta.dirname,
+          include: ['packages/*/src/**/*.data.test.{ts,tsx}'],
+          setupFiles: ['./test/setup.ts'],
+          globalSetup: ['./test/global-setup.ts'],
+        },
+      },
+      {
         test: {
           name: 'root',
           root: import.meta.dirname,

@@ -175,10 +175,10 @@ describe('buildSyncReport', () => {
   });
 });
 
-describe('the committed data/sync-report.json', () => {
+describe('the frozen sync-report.json fixture', () => {
   it('parses, legacy catalogue-refresh key and all, and the key is gone after the parse', () => {
     const text = readFileSync(
-      fileURLToPath(new URL('../../../../data/sync-report.json', import.meta.url)),
+      fileURLToPath(new URL('../../../../test/fixtures/frozen-data/sync-report.json', import.meta.url)),
       'utf8',
     );
     const parsed = SyncReportFileSchema.parse(JSON.parse(text));
