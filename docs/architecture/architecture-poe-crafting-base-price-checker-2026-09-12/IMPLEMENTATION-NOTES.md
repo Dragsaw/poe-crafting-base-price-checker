@@ -4,7 +4,7 @@ type: architecture-companion
 status: final
 binding: true
 created: '2026-09-19'
-updated: '2026-10-02'
+updated: '2026-10-03'
 governed_by: ARCHITECTURE-SPINE.md
 ---
 
@@ -61,27 +61,70 @@ never reaches this function. Should a future patch introduce one, the file fails
 the answer is a contract amendment: **do not add an epsilon**, because the comparison is
 load-bearing against the sentinel defect AD-5 exists to close and an epsilon readmits it.
 
+### Line sets and the null-line rule (AD-5, AD-17)
+
+AD-17 requires one null-line rule that every caller shares. The rule:
+
+```
+untrackable(entry) ⇔ entry.weightSource == "not-in-game"
+                   ∨ ( pool(entry).poolCoverage == "partial"
+                       ∧ ∃ line ∈ entry.lines : line.statId == null )
+
+lineSet(entry)     = { line.statId : line ∈ entry.lines ∧ line.statId != null }
+
+statIds(ref)       = { ref.statId }                       ref is banded or valueless
+                     { rl.statId : rl ∈ ref.lines }       ref is hybrid
+```
+
+In a `complete` pool, a `null` line on a `weight > 0` tier is an internal engine line
+(`WEIGHTS-FILE-SCHEMA.md` `6.1.0`), so `lineSet` drops it and the tier stays trackable. In
+a `partial` pool the same line may be a real stat the producer did not resolve, so the
+tier is untrackable. **`lineSet` reads only the weights file**, which is what lets
+`tracked:lookup`, `core` and the `sync` gate reach one verdict — provided all three call
+the one `core` implementation. **`tracked:lookup`
+(`.claude/skills/tracked-json/scripts/lookup.ts`) calls `core`'s `lineSet` and
+`untrackable` and keeps no copy of either.** A copy that keeps a `null` `statId` in a line
+set reports the eight `JewelRadiusLargerRadius` tiers across the four Time-Lost jewel
+classes as hybrids.
+
 ### Containment (AD-11, AD-17)
 
 ```
-contains(ref, entry) ⇔ ∃ line ∈ entry.lines such that:
+covers(rl, line)     ⇔ line.statId == rl.statId ∧
+                         ( rl is banded:    line.ranges is non-empty
+                                          ∧ interval(line).min >= rl.valueMin
+                                          ∧ interval(line).max <= rl.valueMax
+                           rl is valueless: line.ranges is empty )
 
-    ref is banded:     line.statId == ref.statId
-                     ∧ line.ranges is non-empty
-                     ∧ interval(line).min >= ref.valueMin
-                     ∧ interval(line).max <= ref.valueMax
+contains(ref, entry) ⇔ entry.weight > 0 ∧ ¬untrackable(entry) ∧
 
-    ref is valueless:  line.statId == ref.statId
-                     ∧ line.ranges is empty
+    ref is banded or valueless:  ∃ line ∈ entry.lines : covers(ref, line)
+
+    ref is hybrid:               lineSet(entry) == statIds(ref)
+                               ∧ ∀ rl ∈ ref.lines : ∃ line ∈ entry.lines : covers(rl, line)
+
+contained(ref)       = { entry ∈ scoped(cat, slot, L) : contains(ref, entry) }
 ```
 
-Three rules ride with it:
+**The containment set of a hybrid reference** is the same-slot entries with `weight > 0`,
+a line set **equal** to the reference's `statId` set, and every line covered by the band
+for that line. An entry whose line set differs is excluded, even when every line the
+reference names is covered. The failures that name such an entry, by its
+`sourceModifierId`, are §2.5 and §2.7. A single-line reference keeps the existential test
+above. §2.7 rejects every configuration in which that test would admit a hybrid tier, so on
+a file that loads, a single-line reference contains pure tiers only.
+
+Five rules ride with it:
 
 - A contained entry contributes its **whole weight, once**, however many of its lines match.
 - A merely-overlapping entry contributes **nothing** to the numerator **and is not an
   error**. It still counts in the denominator.
-- **A line whose `statId` is `null` can never be contained**, but its entry still enters the
+- **A line whose `statId` is `null` can never be covered**, but its entry still enters the
   denominator like any other.
+- **An untrackable entry is never contained**, and it still enters the denominator. A
+  class with a `partial` slot gets no pool check at all, so the null-line half of
+  `untrackable` never decides a gate verdict; it decides what `tracked:lookup` reports
+  (§2.8).
 - **An entry whose `weight` is `0` is never contained**, whatever its `weightSource` and
   whatever its lines carry. It still enters the denominator (it adds nothing) and the
   Provenance fold (AD-10). Because §2.3 to §2.5 read `contained(ref)`, a weight-0 tier
@@ -98,36 +141,72 @@ Overlap is defined by a predicate and never by an enumeration of shapes — an e
 list has twice been found to miss a case.
 
 ```
-overlap(a, b)  ⇔  slotOverlap(a.prefix, b.prefix) ∧ slotOverlap(a.suffix, b.suffix)
+summed(e)  = statIds(e.prefix) ∩ statIds(e.suffix)            -- the summed statIds of one entry
+S          = summed(a) ∩ summed(b)
 
-slotOverlap(x, y) =  true              if x is absent or y is absent
-                     true              if x.statId != y.statId ∧ coOccur(x, y)
-                     false             if x.statId != y.statId
-                     true              if both are valueless
-                     bands intersect   otherwise
+overlap(a, b)  ⇔  slotOverlap(a.prefix, b.prefix, S)
+               ∧  slotOverlap(a.suffix, b.suffix, S)
+               ∧  ∀ s ∈ S : sum(a, s) ∩ sum(b, s) ≠ ∅
+
+sum(e, s)  = [ e.prefix[s].valueMin + e.suffix[s].valueMin ,
+               e.prefix[s].valueMax + e.suffix[s].valueMax ]
+
+slotOverlap(x, y, S) =
+    true                                    if x or y names no statId outside S
+    false                                   if x and y share no statId outside S
+    linesIntersect(x, y, S)                 if x and y are both single-line references
+    linesIntersect(x, y, S) ∧ coOccur(x, y, S) otherwise   -- at least one is hybrid
+
+linesIntersect(x, y, S) ⇔ ∀ s ∈ (statIds(x) ∩ statIds(y)) ∖ S :
+                              both lines on s are valueless
+                            ∨ the bands of the two lines on s intersect
 ```
 
-Evaluate the branches in that order. The `coOccur` branch must sit **above** the
-`statId` inequality, or it is unreachable.
+`e.prefix[s]` is the line on `statId` `s` of the prefix reference: the reference itself
+when it is single-line, the line of that `statId` when it is hybrid. Evaluate the branches
+of `slotOverlap` in that order. `coOccur` takes `S` too (§2.2): a line on a summed
+`statId` keeps its place in the line-set test and drops out of the band test, so the sum
+comparison alone judges it, in a hybrid slot as in a pure one.
 
-**Four consequences, and the fourth is the one an enumeration missed:**
+**A summed `statId` is compared once, as a sum, and never per slot.** Its lines leave the
+per-slot comparison, and the sum comparison replaces it. A slot whose reference names
+nothing outside `S` therefore constrains nothing on its own, which is why the first branch
+is `true`. `S` contains a `statId` only when **both** entries sum it. An entry that names
+`s` in one slot only is compared per slot, as before.
+
+**Four consequences:**
 
 1. Adjacent tiers of one `statId` in one slot are disjoint, and a curator may track both —
    that is the point of AD-5's bands. Bands that *intersect* still overlap and are still
    rejected.
-2. A partial-affix entry subsumes a fuller entry, because leaving a slot absent covers every
-   roll in that slot.
-3. An absent affix means *any roll in that slot*, which is why the conjunction covers **both**
-   slots.
-4. **A prefix-only entry and a suffix-only entry on one item class overlap each other.** Neither
-   subsumes the other and no two bands intersect, yet an item carrying both named modifiers
-   satisfies both entries and is counted twice.
+2. **A hybrid and a single-line reference in one slot overlap only when the single-line
+   `statId` is one of the hybrid's lines outside `S`, the bands on it intersect, and
+   `coOccur` holds.** Two hybrids overlap when the bands of every shared line outside `S`
+   intersect and `coOccur` holds. A slot that names only summed `statId`s defers to the sum
+   (the first branch).
+3. **Two references that share no `statId` never overlap in one slot.** The old `coOccur`
+   branch for unequal `statId`s is withdrawn. The case it caught — two lines of one hybrid
+   tracked as two entries — is now a line-set completeness failure (§2.7), because each
+   single-line band reaches into the hybrid tier.
+4. **Two entries with disjoint per-slot bands on a summed `statId` still overlap when their
+   summed intervals intersect**, because AD-16's one summed filter cannot tell the two
+   populations apart. This holds whether the summed line sits in a pure or a hybrid
+   reference. Per-slot overlap does not apply across slots: a hybrid line in the
+   prefix is compared with a line in the suffix only through the sum.
 
-**Error payload.** An overlap is rejected at load as a `data/tracked.json` validation error
-whose payload **names both offending entries by their canonical key** (§4.1) and the slot
-or slots on which they overlap. Naming one entry sends the curator hunting for a partner
-the checker already knows; naming neither turns a two-line fix into a search of the whole
-list. The rejection itself is AD-17's load-time rule, and this payload does not soften it.
+**Who evaluates a pair.** `contracts` evaluates a pair only when all four of its
+references — both entries' prefix and suffix — are single-line. Such a pair never reaches
+`coOccur`, so the verdict needs only `tracked.json`, and an overlap refuses the file
+(AD-3). `core` evaluates every pair in which **any** of the four references is hybrid, with
+the whole predicate above, sums included, even where the verdict happens not to read
+`coOccur`. `core` reports every overlap it finds on such a pair under the `co-occur` check
+and does not drop it as already seen by `contracts`, because `contracts` never saw it.
+
+**Error payload.** An overlap's payload **names both offending entries by their canonical
+key** (§4.1), the slot or slots on which they overlap, and each summed `statId` whose
+intervals intersect. Naming one entry sends the curator hunting for a partner the checker
+already knows; naming neither turns a two-line fix into a search of the whole list. The
+same payload serves the `contracts` refusal and the `core` failure.
 
 ### 2.2 `coOccur` (AD-11, AD-17)
 
@@ -135,12 +214,23 @@ Under `5.0.0` this is a **direct read of one entry's `lines`**, and no cohort re
 involved:
 
 ```
-coOccur(x, y) ⇔ ∃ entry ∈ scoped(cat, slot, L) such that
-                    contains(x, entry) ∧ contains(y, entry)
+coOccur(x, y, S) ⇔ statIds(x) ∩ statIds(y) ≠ ∅
+                 ∧ ∃ entry ∈ scoped(cat, slot, L) such that
+                       entry.weight > 0 ∧ contains_S(x, entry) ∧ contains_S(y, entry)
 ```
+
+`contains_S` is §1's `contains` with `covers` read as `true` for every reference line
+whose `statId` is in `S`; the line-set test is unchanged. `S` is §2.1's set of `statId`s
+both entries sum, and it is empty wherever the caller has no pair of entries.
 
 The pool is scoped to the item class's own crafted floor `L` — the same `L` that scopes
 every probability on the class, and AD-17 gives a class exactly one.
+
+**`coOccur` is `false` when `x` and `y` share no line**, even where one hybrid tier would
+satisfy both under the single-line containment test. That pair is §2.7's to reject, not
+this predicate's (§2.1 consequence 3). Where the two references share a line, `coOccur`
+holds only when one tier is contained by both: for a hybrid and a single-line reference,
+that is a hybrid tier whose line on the shared `statId` lies inside the single-line band.
 
 **Where the pool cannot answer — a class absent from `weights.json`, or a `partial` pool —
 `coOccur` is `false` and the tracked list still loads.** AD-17 states that ruling and why;
@@ -148,32 +238,58 @@ do not re-derive it here, and do not reach for the refuse-site-wide reading it r
 
 ### 2.3 Kind agreement (AD-17)
 
-AD-17 states the rule and its **universal** quantifier. The only mechanical point this file
-adds: **a line's kind is read from whether its `ranges` array is empty** — empty means
-valueless, non-empty means banded — because `5.0.0` carries no `kind` field to read. The
-within-file half is `contracts`'s and needs no cross-file view.
+AD-17 states the rule and its **universal** quantifier. **A weights line's kind is read
+from whether its `ranges` array is empty** — empty means valueless, non-empty means
+banded — because the weights contract carries no `kind` field to read.
+
+**The check runs per line.** A `banded` or `valueless` reference is one line. A `hybrid`
+reference is checked once for each of its lines, and the failure payload names the
+tracked entry by its canonical key (§4.1), the slot, the offending line's `statId`, the
+line's declared kind and the `sourceModifierId` of one disagreeing weights entry.
+
+**The within-file half is `contracts`'s and needs no cross-file view.** It refuses:
+
+- two tracked lines that name one `statId` under different kinds, wherever each line sits;
+- a summed `statId` (§2.1) whose operand in either slot is `valueless`, because a
+  valueless line has no edge to add;
+- a summed `statId` with a missing bound on either operand. AD-5's banded shape already
+  requires both edges, so this rule names the payload rather than adding a constraint.
+
+A sum has **at most two operands**: a reference names a `statId` at most once (§4.1), so
+each slot contributes at most one line to it.
 
 ### 2.4 Edge alignment (AD-17)
 
 Requiring `valueMax` to be *present* only closes the syntax of an open top. A curator who
 writes `valueMax: 9999` is schema-valid, passes containment, and makes AD-16's stat filter
-operationally min-only — the sentinel defect verbatim. Therefore, for every tracked
-**`banded`** reference, over its containment set under the scope:
+operationally min-only — the sentinel defect verbatim. Therefore, for every **banded
+line** `rl` of a tracked reference — the reference itself when it is `banded`, each banded
+line when it is `hybrid` — over the reference's containment set under the scope:
 
 ```
-lines(ref) = { line : entry ∈ contained(ref)
-                    ∧ line ∈ entry.lines
-                    ∧ line.statId == ref.statId }
+lines(ref, s) = { line : entry ∈ contained(ref)
+                       ∧ line ∈ entry.lines
+                       ∧ line.statId == s }
 
-ref.valueMin == min { interval(line).min : line ∈ lines(ref) }
-ref.valueMax == max { interval(line).max : line ∈ lines(ref) }
+rl.valueMin == min { interval(line).min : line ∈ lines(ref, rl.statId) }
+rl.valueMax == max { interval(line).max : line ∈ lines(ref, rl.statId) }
 ```
 
 **`contained(ref)` returns entries, not lines, and the `statId` filter is load-bearing.**
-A hybrid entry is contained on one of its lines while carrying others under different
-`statId`s (AD-11). Taking the extremes over *every* line of a contained entry would pull a
-foreign line's interval into the comparison, and **every** band over a hybrid `statId`
-would fail alignment permanently, with nothing a curator could write to satisfy it.
+A hybrid tier carries lines under several `statId`s (AD-11). Taking the extremes over
+*every* line of a contained entry would pull a foreign line's interval into the
+comparison, and **every** band over a hybrid `statId` would fail alignment permanently,
+with nothing a curator could write to satisfy it.
+
+**For a hybrid reference, alignment is computed on the containment set, and the
+containment set needs every line covered.** One line's band can therefore span tiers that
+another line's band excludes. Worked case: a hybrid family with tiers T1 and T2, where the
+reference's line *b* band covers T1's *b* interval only. T2 is not contained, so the
+containment set is {T1}. A band on line *a* that spans T1–T2 then reaches T2's *a* edge,
+which is not an extreme of {T1}, and line *a* is **misaligned**. The payload names the
+entry by its canonical key, the slot, the line's `statId`, its declared edges, the
+extremes over the containment set, and the contained tiers by `sourceModifierId`. **An
+empty containment set is not an alignment verdict**; it fails §2.5.
 
 Worked, against a family whose tiers derive to `T7 = [43.0, 56.5]` and `T8 = [56.0, 80.0]`:
 
@@ -203,9 +319,16 @@ absence of any entry carrying that `statId` in the scoped pool — and name **ne
 at fault**, because `core` cannot tell the causes apart and blaming the tracked list
 unconditionally sends a curator hunting a defect in a file that is correct.
 
+**For a hybrid reference the payload also lists what §1 excluded**, each by
+`sourceModifierId`: the scoped entries whose lines cover every reference line but whose
+line set differs, with the `statId`s that differ, and the untrackable entries that carry
+the reference's `statId`s, each marked `not-in-game` (the only untrackable reason a pool
+check meets, §1). The payload names the reference's lines by `statId`.
+
 ### 2.6 Class discriminability (AD-16, AD-17)
 
-The fifth cross-file check, and the only one whose subject is the **search** rather than the
+The fifth cross-file check, and one of two whose subject is the **search** (the other is
+§2.7) rather than the
 valuation. It asks one question of every `crafted` tracked entry: *if this entry's category
 holds more than one class, can AD-16 tell this class apart from its siblings?*
 
@@ -252,6 +375,96 @@ document should say they are.
 *`class not discriminable`*. **Never a fallback to a category-wide search** — that is the
 silent failure this check exists to convert into a loud one, and `prd.md` FR-1's guarantee
 that no base outside the class contributes is what it protects.
+
+### 2.7 Line-set completeness (AD-5, AD-16, AD-17)
+
+The sixth cross-file check. It asks of every reference of every `crafted` tracked entry:
+*does the search for this reference match a tier that the reference does not name in
+full?* AD-16 filters each line by its band, so an item matches when its rolled values fall
+inside the bands. A tier whose interval **intersects** a band can roll a matching value,
+so the test is intersection, not containment.
+
+```
+meets(rl, line) ⇔ line.statId == rl.statId ∧
+                  ( rl is valueless: line.ranges is empty
+                    rl is banded:    line.ranges is non-empty
+                                   ∧ interval(line) ∩ [rl.valueMin, rl.valueMax] ≠ ∅ )
+
+reached(ref)    = { entry ∈ scoped(cat, slot, L) :
+                      entry.weight > 0 ∧ ¬untrackable(entry)
+                    ∧ ∀ rl ∈ lines of ref : ∃ line ∈ entry.lines : meets(rl, line) }
+
+incomplete(ref) ⇔ ∃ entry ∈ reached(ref) : lineSet(entry) ⊋ statIds(ref)
+
+mixedGroup(ref) ⇔ ref is hybrid ∧ | { e.modGroup : e ∈ contained(ref) } | > 1
+
+fails(ref)      = incomplete(ref) ∨ mixedGroup(ref)
+```
+
+`lines of ref` is `[ref]` for a single-line reference and `ref.lines` for a hybrid one.
+`lineSet`, `statIds` and `untrackable` are §1's.
+
+**`incomplete` catches two curator errors with one predicate:**
+
+- **A hybrid reference that names a subset of a tier's lines.** The search then matches
+  that tier and the pure modifier alike, which reproduces the overlap AD-17 rejects. The
+  remedy is to name every line of the tier.
+- **A single-line band that reaches into a hybrid tier's line on its `statId`.** The search
+  for the pure modifier then matches hybrid items, and two single-line entries in one slot
+  that each reach one line of one hybrid tier price the same item twice (§2.1 consequence
+  3). On `data/weights.json`, none of the 2792 pure T1 and T2 tiers intersects a hybrid
+  tier's line on the same `statId`, so for the T1 or T1–T2 bands curators track (`prd.md`
+  FR-22) this half is a safety net. It is not one for lower tiers: 342 of the 7877 pure
+  tiers with `weight > 0` do intersect a hybrid line (for example `IncreasedLife`, accuracy
+  and `LocalPhysicalDamagePercent`), so a band reaching below T2 can fire it.
+
+A reference whose `statId` set is **larger** than every tier's line set reaches nothing
+with more lines, so `incomplete` does not fire. Its containment set is empty and §2.5
+rejects it.
+
+**`mixedGroup` blames the producer data, not the curator.** A family is identified by
+(slot, line set), and AD-17 needs the one `modGroup` its tiers share (§11). Contained tiers
+across two groups mean the weights file published one family under two exclusion groups,
+which a curator cannot fix in `tracked.json`. The committed data has no such family, so a
+synthetic fixture proves the failure.
+
+**Evaluate under the scope, at the entry's own floor**, as §2.4 does.
+
+**Error payloads.** Each names the tracked entry by its canonical key (§4.1) and the slot.
+
+- `incomplete`, hybrid: the reference's `statId`s; each reached tier by `sourceModifierId`
+  with its full line set and the `statId`s the reference omits. Reason: *reference names a
+  subset of this tier's lines*.
+- `incomplete`, single-line: the reference's `statId` and band; each reached hybrid tier by
+  `sourceModifierId` with its line set and its interval on that `statId`. Reason: *band
+  reaches into a hybrid tier*.
+- `mixedGroup`: the reference's `statId`s; the contained tiers by `sourceModifierId`,
+  grouped by `modGroup`. Reason: *weights data publishes one hybrid family under more than
+  one modGroup*. The payload names `weights.json` as the file at fault.
+
+**Where `weights.json` is absent the check does not run**, and §2.8 states the
+`unvalidated` mark that replaces it.
+
+**The check needs its own value in `CrossFileCheckSchema`**, `line-set-completeness`, so
+§12's `cross-file-gate-failure` record names it in its `check` subject field.
+
+### 2.8 Unvalidated entries (AD-12, AD-17)
+
+Two states leave a crafted entry unchecked, and `core` marks it **unvalidated** rather than
+returning nothing:
+
+| Reason | When | Checks skipped |
+| --- | --- | --- |
+| `weights-absent` | no `weights.json` | all six |
+| `partial-pool` | the entry's class has a `partial` slot, or is absent from `weights.json` | every pool check; class discriminability still runs (§2.6) |
+
+`core`'s cross-file result carries failures and marks side by side. A mark is
+`{ entryKey, categoryId, className, reason }`, one per entry, and is **never a failure**:
+the `sync` gate does not abort on it, `web` ranks nothing differently (the class is already
+unrankable under AD-17 and AD-24), and `pnpm tracked:check` lists it without failing
+(`AGENT-WORKFLOW.md`). The callers are `web`'s load, the `sync` gate and `tracked:check`.
+**No mark reaches `sync-report.json`** beyond the existing class-level `weights-absent`
+record of §12.
 
 ---
 
@@ -336,19 +549,46 @@ crafted:  ["crafted", categoryId, className, itemLevelMin, prefixBand, suffixBan
 raw:      ["raw",     baseTypeId, itemLevelMin]
 ```
 
-serialised in that element order. Each affix encodes in exactly one of three
-**distinguishable** forms:
+serialised in that element order. Both affixes are always present (AD-5). Each affix
+encodes in exactly one of three **distinguishable** forms:
 
-| Affix state | Encoding |
+| Affix kind | Encoding |
 | --- | --- |
-| absent | the literal `null` |
 | `banded` | `[statId, valueMin, valueMax]` |
 | `valueless` | `[statId, null, null]` |
+| `hybrid` | `["hybrid", [line, …]]` — each line `[statId, valueMin, valueMax]` or `[statId, null, null]`, sorted by `statId` |
 
-Three forms, so an absent affix and a valueless affix can never collide. **An affix is always
-exactly three elements or `null`** — `acceptedTier` is a display-only sibling of the band, not
-a fourth element, and `lastSearchId` / `lastSearchLeague` are dataset-entry facts. Every
-artifact that keys entries uses this one encoding.
+**The absent form `null` is withdrawn**, because no crafted entry lacks an affix. **A
+single-line affix is always exactly three elements, and a hybrid affix exactly two.** The
+hybrid form cannot collide with a single-line one: its second element is an array, where
+a single-line affix carries a number or `null`. A hybrid key therefore differs from every
+single-line key, including a hybrid's own line encoded alone. `acceptedTier` is a
+display-only sibling of the band or of the hybrid as a whole, never an element, and
+`lastSearchId` / `lastSearchLeague` are dataset-entry facts. Every artifact that keys
+entries uses this one encoding.
+
+**Lines sort by `statId` under the byte-wise ordering of the Conventions table**, so two
+orderings of the same lines in `tracked.json` give one key. The schema sorts them on
+parse; no consumer re-sorts.
+
+**Shape rules of a `hybrid` reference**, enforced by `TrackedFileSchema`:
+
+- at least two lines;
+- no `statId` repeated within the reference;
+- every `statId` a non-empty string;
+- on every banded line, `valueMin` and `valueMax` finite, non-negative and `valueMin <=
+  valueMax`.
+
+A hybrid line takes its kind from its edges, as a single-line reference does: both edges
+make it banded, none makes it valueless. A line carries no `acceptedTier`; the label
+belongs to the hybrid reference as a whole (AD-5).
+
+Each rule has its own schema test (`SPEC-tracked-hybrid-mods` CAP-1).
+
+**The tracked schema's major version names the change.** A file whose `schemaVersion` has
+an earlier major is refused, and the message states that the major version changed and
+that crafted entries now require both affixes and accept the `hybrid` kind. A generic
+*unknown major* message is not enough, because the curator must re-author, not retry.
 
 **The leading kind tag is not decoration.** Without it the two arms would be told apart by
 arity and by whether element 1 happens to look like a `categoryId` or a `baseTypeId` — the
@@ -359,6 +599,11 @@ rotation both have one ordering rather than one per branch. **A `crafted` key ca
 `baseTypeId` and a `raw` key carries no affix members**; neither arm carries a `null`
 placeholder for the other's fields, because a placeholder would make the two arms the same
 shape again.
+
+**Ordering a hybrid affix against a single-line one.** The byte-wise comparison of the
+serialised key decides it, as for every key. No rule above depends on where a hybrid sorts
+relative to a single-line affix, only on the order being total and the same for every
+builder.
 
 ### 4.2 Divine rounding (AD-20, Consistency Conventions)
 
@@ -543,6 +788,20 @@ variations create searches, so neither is required; AD-16 fixes what it emits an
 should not read either capture's serialisation as a constraint. As in §5.1b there is no
 `type_filters.ilvl`, because this is a browse rather than a tracked-entry search.
 
+### 5.1d The trade sum across two mods — capture pending (AD-16)
+
+**No capture is recorded yet.** AD-16's summed filter rests on a manual observation: a
+search with one filter on a `statId` matched items whose prefix and suffix both carry that
+`statId`, on the value of the two summed. Until a capture lands here, every summed price
+rests on that observation alone.
+
+The capture that closes it records one request and response pair: a search with one filter
+on a `statId` named by two mods, for example % increased Rarity of Items (`stat_3917489142`,
+Amulets or Rings) or helmet accuracy, whose `min` exceeds the largest value either mod can
+roll alone. A result that lists such an item proves the sum.
+
+Record the pair as a `sync` fixture (AD-13) and quote the request body here in §5.1's form.
+
 ### 5.2 The three traps (AD-16)
 
 Each is costly to discover in code. A fourth trap — `priced_with_info` versus *"Buyout or
@@ -685,6 +944,29 @@ Encode **the league segment only**, never the whole path. Live league ids carry 
 (*"Forbidden Rites"*, *"Runes of Aldur"*), and an unencoded segment produces a link that
 silently 404s rather than failing where anyone would see it.
 
+### 5.5 The summed stat filter (AD-16)
+
+AD-16 sends a summed `statId` (§2.1) as one filter. Its edges:
+
+```
+min = valueMin(prefix line) + valueMin(suffix line)
+max = valueMax(prefix line) + valueMax(suffix line)
+```
+
+Each slot contributes at most one line per `statId` (§2.3), so a sum has exactly two
+operands, and both are banded, because `contracts` refuses a valueless operand (§2.3). The
+operand pairs are pure + pure, hybrid line + pure, and hybrid line + hybrid line. The
+arithmetic does not distinguish them. The no-rounding rule of AD-16 applies to the sum as
+to every edge.
+
+**The accepted wider population.** The interval `[min_p + min_s, max_p + max_s]` admits
+splits that the tracked bands do not, for example a low prefix with a high suffix from
+different tiers. Where one mod's maximum reaches `min_p + min_s`, the interval also admits
+an item on which only one slot carries the `statId`. AD-17 computes the probability from
+per-slot containment, so the price describes a wider population than the one AD-17 weighs.
+AD-16 accepts this with no mitigation. A `sync` fixture pins the divergence, and §2.7
+judges a summed line by its per-slot band, so the wider reach is not reported.
+
 ---
 
 ## 6. The `pinned` cap (AD-7)
@@ -789,20 +1071,32 @@ under *Alignment is monotone upward* below.
 
 ```
 tier(ref)        = over the UNSCOPED pool for the entry's (item class, slot) —
-                   every entry at every itemLevelMin — carrying that statId
+                   every entry at every itemLevelMin —
 
-                   ref is `banded`:     the entries whose derived interval (§1)
-                                        lies wholly within the band's edges
-                   ref is `valueless`:  every entry publishing that statId
-                                        with an empty `ranges` (AD-5, §1)
+                   the entries that contains(ref, ·) of §1 admits, for every
+                   kind — so a weight-0 or untrackable tier never sets a floor
 
-needs(ref)       = max { w.itemLevelMin : w ∈ tier(ref) }   if ref is `banded`
-                   min { w.itemLevelMin : w ∈ tier(ref) }   if ref is `valueless`
+needs(ref)       = max { w.itemLevelMin : w ∈ tier(ref) }   if ref is `banded`,
+                                                            or `hybrid` with any banded line
+                   min { w.itemLevelMin : w ∈ tier(ref) }   if ref is `valueless`,
+                                                            or `hybrid` with every line valueless
+                   undefined                                if tier(ref) is empty
 
-candidate(entry) = max over the entry's PRESENT affixes of  needs(affix)
+candidate(entry) = max { needs(entry.prefix), needs(entry.suffix) }
 
 floor(cat)       = max over the class's crafted tracked entries of candidate(entry)
 ```
+
+**`needs` over an empty `tier(ref)` is undefined, never `0`.** A maximum or minimum over
+nothing has no value, and a stand-in such as `0` would declare a floor that scopes every
+tier out. An undefined `needs` means the affix names no tier at any item level, so no floor
+can be derived for its entry. `tracked:lookup` reports it, and at load the same reference
+fails §2.5.
+
+**A hybrid's `needs` follows its lines, for the same reason a band's does.** One banded line
+makes the reference name specific tiers, so §2.4 needs every one of them in scope and the
+rarest tier's level governs. When every line is valueless, any contained tier satisfies the
+search, and only §2.5's *at least one* applies.
 
 **`needs` is a maximum on a band and a minimum on a valueless reference, and the split is
 forced rather than stylistic.** A band names a specific tier or run, and §2.4 requires every
@@ -1092,9 +1386,16 @@ augment then draws from the **other** slot's pool with every entry sharing the f
 affix per slot, so exclusion never acts **within** a slot here; rare items are out of v1.
 
 Let `E_P` and `E_S` be the prefix and suffix `eligible(entry, recipe)` sets of §9, and `W_P`,
-`W_S` their totals. Let `C_p = contained(p) ∩ E_P` and `C_s = contained(s) ∩ E_S`; an
-**absent** affix contains its whole eligible set, `C = E`. Let `g(e)` be `e.modGroup`, and
-`W_X∖G` the sum of the weights in `E_X` whose `modGroup ≠ G`.
+`W_S` their totals. Let `C_p = contained(p) ∩ E_P` and `C_s = contained(s) ∩ E_S`, the
+containment sets of §1 for every kind of reference, a hybrid included. Let `g(e)` be
+`e.modGroup`; for a tier of a hybrid family that is the family's `modGroup`, the one its
+containment set shares (§2.7 rejects a set that spans more). Let `W_X∖G` be the sum of the
+weights in `E_X` whose `modGroup ≠ G`.
+
+**A tier counts once, by `sourceModifierId`.** `C_p`, `C_s`, `E_P` and `E_S` are sets of
+weights entries, so a tier that a hybrid family and a pure family both name enters each
+sum once. A hybrid reference's probability is its contained tiers' weight, never a product
+across its lines (AD-17).
 
 ```
                  Σ_{e ∈ C_p}  e.weight · Σ{ f.weight : f ∈ C_s, g(f) ≠ g(e) } / W_S∖g(e)
@@ -1154,11 +1455,31 @@ the player's edit removes a record.
 | `run-failure` | `reason`, `entryKey`, `status` | `message` |
 | `league-mismatch` | `configuredLeague` | `availableLeagues` |
 
+**`core` returns at most one failure per `(check, entryKey)`**, matching the
+`cross-file-gate-failure` subject. A check that fails on both slots of one entry, or on
+several lines of one hybrid reference, puts every slot and line in that one failure's
+`detail`, so no part is lost when records merge.
+
 An absent optional subject field is a value: two `run-failure` records that both lack
 `entryKey` agree on it. A `pinned-starvation` whose yardstick or pinned set changed is a new
 record, because the player's correction is exactly a change to one of those two. **The
 function is defined once, in `contracts`, beside the record schemas**, so a new record kind
 cannot land without declaring its subject.
+
+### 12.1 Artifacts keyed by the canonical key (AD-3, AD-5)
+
+`data/dataset.json`, `data/sync-progress.json` and `data/sync-report.json` carry entry keys
+in §4.1's encoding. **The hybrid form adds keys and changes none**: a single-line affix
+encodes as before, and the withdrawn absent form named no committed entry. So **none of the
+three takes a major `schemaVersion` bump**, and the committed files stay; only
+`tracked.json` bumps (§4.1).
+
+**An entry whose key is not in the current tracked key set is dropped**, never an error.
+`dataset.json` already drops such an entry when it publishes. `sync-progress.json` loads
+such rows without complaint and drops them on the write path, when the chunk order is
+rebuilt from the tracked list; a test proves that a progress file carrying such keys loads
+without throwing and loses them on the next write. A report record that carries an
+`entryKey` is not dropped this way; only the player's edit clears a record (above).
 
 ## 13. The session probe and the auth state (AD-30, AD-8, AD-12)
 

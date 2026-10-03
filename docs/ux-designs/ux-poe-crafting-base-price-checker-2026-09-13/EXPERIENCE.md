@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 16
+revision: 17
 created: 2026-09-13
-updated: 2026-09-27
+updated: 2026-10-03
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -450,6 +450,38 @@ quoted out of a file rather than wrote, and which this fallback shares with the
 cross-file diagnosis below. It takes no ink: an ink states that a figure's
 footing is degraded or broken, and a fallback entry states nothing about the
 figure (`DESIGN.md`, Typography and Colors, which own the treatment).
+
+**A Hybrid Modifier affix is the tier label, then its lines** `[decision — rev 17]`
+(PRD FR-34; CAP-7). A hybrid is one affix, so it carries one Accepted Tier label,
+the `acceptedTier` of the entry as a whole, followed by the short form of each of
+its lines, separated by commas: `T1 % ES, % Evasion`. This holds in every place an
+affix shows today — the ranked list's chase cells and the expansion's
+`{components.combination-row}`. The `·` that joins the two affixes of a
+Combination is unchanged, so `T1 % ES, % Evasion · T1 Mana` is a hybrid prefix and
+a single-line suffix. The rules above apply to each line unchanged:
+
+- **One entry per `statId`, shared.** The short-form table stays keyed by `statId`
+  and a hybrid has no entry of its own. A line reads the same alone and inside a
+  hybrid, so rules 3 and 4 hold per line. Tracking a hybrid whose lines lack a
+  table entry is a product gap, as for a single line.
+- **Short forms are all or none.** An affix prints short forms only when **every**
+  line has one. If the tier, any line's short form or any line's band is missing,
+  **every** line prints its Trade Catalogue text, with its band where it has one,
+  in the fallback's mono verbatim register. Short and catalog forms never mix
+  inside one affix. The two gaps keep their owners from the fallback paragraph.
+- **The joined label obeys the 27-character budget.** The budget is per chase
+  cell, so the comma-joined label ellipsises when it overruns and the full text is
+  one click down. An expansion never cuts it (*What may be cut*).
+- **Three or more lines take no separate rule.** They use the same join, budget
+  and escape valve: a hybrid whose short forms cannot be read in the budget is a
+  candidate for pruning, never for a shorter coinage. The expansion is where it
+  reads in full.
+
+**The ambiguity with two separate affixes is accepted** `[decision — rev 17]`.
+`T1 % ES, % Evasion` can read as two affixes. The PRD accepts this (FR-34) and the
+page adds no glyph, bracket or explanation to separate them. The player wrote the
+Tracked List and knows which is which, as for the rest of this vocabulary
+(*The page never explains this vocabulary*).
 
 `[NOTE FOR UX]` `[memlog 143, re-derived]` **Two Combinations can still read
 identically.** The note was written on the `4.x` reading, in which FR-22 had the
@@ -1177,6 +1209,12 @@ What does bind:
   A `statId` renders as its display text from the stats catalogue (FR-33,
   AD-25). Where the denomination's label comes from is AD-24's, and this
   document does not restate it `[memlog 229]`.
+- **A Hybrid Modifier label adds no binding** `[decision — rev 17]`. The comma is
+  text, so the label passes the colour-removed test. Telling a hybrid from two
+  separate affixes is not a Price State, Provenance or Raw-versus-crafted
+  distinction, and the page does not claim to carry it (see the Domain Vocabulary
+  decision on the accepted ambiguity). Each line is rendered text from the
+  catalogue or the short-form table, never a raw `statId`.
 
 ## Responsive & Platform
 

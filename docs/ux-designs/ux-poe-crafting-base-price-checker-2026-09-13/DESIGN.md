@@ -6,9 +6,9 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 13
+revision: 14
 created: 2026-09-13
-updated: 2026-09-27
+updated: 2026-10-03
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -428,7 +428,7 @@ components:
     evType: '{typography.row-ev}'
     markType: '{typography.row-mark}'
     chaseType: '{typography.row-chase}'
-    chaseText: 'Accepted Tier then canonical short form, per affix · never the modifier value · e.g. "T1 Cold Res · T1 Mana" · see Layout & Spacing'
+    chaseText: 'Accepted Tier then canonical short form, per affix · never the modifier value · e.g. "T1 Cold Res · T1 Mana" · a hybrid affix is one Accepted Tier then its lines'' short forms joined by commas, e.g. "T1 % ES, % Evasion · T1 Mana" (EXPERIENCE.md, Domain Vocabulary) · see Layout & Spacing'
     numerals: 'tabular-nums on rank, EV and every figure'
     padding: '{spacing.pad-rank-right} · {spacing.pad-unit-right} · {spacing.pad-ev-right} · {spacing.pad-chase-cell-right}'
     hoverBackground: '{colors.paper-inset}'
@@ -742,6 +742,7 @@ components:
     glyphWhy: 'resident in Segoe UI Regular, Semibold AND Bold per the hard rule above, collides with no mark in the vocabulary (≡ ▪ ● ○ ∆ × ◊ ? » ↗ †), and reads natively as *a human marked this by hand*, which is what a Curation Status is.'
     glyphRejected: '‡ — pinned and pruned mean INVERSES, and a pair separated by one crossbar at this size whose two meanings are opposites is a worse trade than the ≡/▪ weakness memlog 197 accepted, where the meanings are merely different. • — one nudge from {components.price-state-glyph}.priced ●, on a line that carries both. Weight-alone on the short form — invisible in a scan, and the scan is the job.'
     widthNote: 'VERIFY AT BUILD, not assumed here. `* pinned ` leads a 460px {spacing.col-combination} that already holds tier + short form, and line one does NOT wrap or ellipsise ({components.combination-row}.ellipsis). The mark appears on pinned rows only, so this is a per-row worst case rather than a column-budget change, and no column sum is reopened. Measure the longest tier + short form against 460px less the mark before shipping.'
+    hybridWidthNote: 'VERIFY AT BUILD, not assumed here [decision — rev 17]. A Hybrid Modifier affix is one tier label plus every line, comma-joined (EXPERIENCE.md), and in the catalog-text fallback each line adds its band. Line one still neither wraps nor ellipsises. Measure the longest hybrid Combination, with its pinned mark, against {spacing.col-combination} before shipping, and report an overrun rather than cutting text.'
   tombstone-band:
     background: '{colors.paper-deep}'
     borderTop: '2px solid {colors.edge}'

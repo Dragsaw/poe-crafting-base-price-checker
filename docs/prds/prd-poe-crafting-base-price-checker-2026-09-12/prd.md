@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 24
+revision: 25
 created: 2026-09-12
 updated: 2026-10-03
 sources:
@@ -10,6 +10,7 @@ sources:
   - docs/sprint-change-proposal-2026-09-13.md
   - docs/sprint-change-proposal-2026-09-19.md
   - docs/specs/spec-poesessid-sync/SPEC.md
+  - docs/specs/spec-tracked-hybrid-mods/SPEC.md
 inherits:
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/WEIGHTS-FILE-SCHEMA.md
@@ -27,7 +28,7 @@ This PRD is the requirements layer for a single-player tool that answers one que
 
 **Inheritance.** `ARCHITECTURE-SPINE.md` is settled and its decisions are inherited, not re-decided. A citation `(AD-n)` names the decision and its rationale. Under **AD-0**, a companion section an AD delegates to binds exactly as that AD, so a citation to `IMPLEMENTATION-NOTES.md` or `WEIGHTS-FILE-SCHEMA.md` is a citation to the architecture. The spine's *Retired AD map* is the authority for any id that no longer resolves.
 
-**Conventions.** §3 defines every domain noun and the rest of the document uses those terms verbatim. FRs are numbered globally, FR-1 to FR-33, and a number is never reused or reassigned. A bullet marked *(PRD-owned)* is a product decision this document owns, and the architecture does not adjudicate it. A heading marked *Architecture-owned* names a capability whose acceptance conditions live in the cited decision rather than here; a workflow turning this document into stories reads the cited decision for acceptance rather than the bullets below it. Inline `[ASSUMPTION]` tags are indexed in §11. Revision history lives in `.memlog.md` and git, not here. Rationale that earned recording but not a place here is in `addendum.md`.
+**Conventions.** §3 defines every domain noun and the rest of the document uses those terms verbatim. FRs are numbered globally, FR-1 to FR-34, and a number is never reused or reassigned. A bullet marked *(PRD-owned)* is a product decision this document owns, and the architecture does not adjudicate it. A heading marked *Architecture-owned* names a capability whose acceptance conditions live in the cited decision rather than here; a workflow turning this document into stories reads the cited decision for acceptance rather than the bullets below it. Inline `[ASSUMPTION]` tags are indexed in §11. Revision history lives in `.memlog.md` and git, not here. Rationale that earned recording but not a place here is in `addendum.md`.
 
 ## 1. Vision
 
@@ -71,12 +72,13 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 
 - **Item Class** — one of the classes of item the game distinguishes, and the unit the tool's crafted branch ranks (FR-3). A modifier pool belongs to a class, so the class is the level at which a Combination is curated, priced and valued (AD-5, AD-11). It is the finest unit the crafted branch values: a class holds several Base Types, and the branch does not descend to them (FR-1). The view names a class by its own name — *Bow* — and never prefixes it with the word *class* *(PRD-owned; treatment in `EXPERIENCE.md`)*. `[ASSUMPTION: a class's own name is already what the player calls it, so no disambiguating label is needed. Where several classes of one broad kind differ only in defence type, the name may read as source vocabulary rather than the player's; that is a display fix in `EXPERIENCE.md`, never a change of unit.]`
 - **Base Type** — a specific item base in PoE2, identified by the trade API's own id and never re-encoded (AD-5). A Base Type is what the **raw** branch ranks (FR-3).
-- **Modifier Reference** — the canonical identity of a **Stat Line** a curator tracks: a trade stat id with a closed value band, or a stat id with no value at all for a modifier that rolls no number (AD-5). A Modifier Reference names what the trade API can filter on, never a game modifier.
+- **Modifier Reference** — the canonical identity of what a curator tracks in one affix slot. It is either one **Stat Line**, or every Stat Line of one **Hybrid Modifier** (AD-5, FR-34). Each Stat Line in it is a trade stat id with a closed value band, or a stat id with no value at all for a line that rolls no number. A Modifier Reference names what the trade API can filter on: its Stat Lines, never a game modifier's own identity.
+- **Hybrid Modifier** — a game modifier that publishes more than one Stat Line. A curator tracks it as one Modifier Reference, and the tool prices it as that modifier, not as one of its Stat Lines (FR-34).
 - **Tracked Entry** — one unit of the curated workload, of exactly one of two kinds, each carrying a declared **Item Level Floor** and a **Curation Status** (AD-5, AD-12):
-  - a **crafted** entry names an Item Class, a prefix Modifier Reference and a suffix Modifier Reference, either affix being optional;
+  - a **crafted** entry names an Item Class, a prefix Modifier Reference and a suffix Modifier Reference. Both affixes are required (FR-34);
   - a **raw** entry names a Base Type and no affixes.
 
-  The two kinds are told apart by **what the entry names**, never by craftedness inferred from absent affixes, so a crafted entry with one affix and a Raw Base are never confused (AD-5). Each present Modifier Reference carries a hand-written, display-only **Accepted Tier** label (FR-22).
+  The two kinds are told apart by **what the entry names**, never by craftedness inferred from absent fields, so a crafted entry and a Raw Base are never confused (AD-5). Each Modifier Reference carries a hand-written, display-only **Accepted Tier** label (FR-22).
 - **Raw Base** — a raw Tracked Entry: an uncrafted white base at item level 82, the one case where selling the base may beat crafting on it.
 - **Combination** — the outcome a Tracked Entry describes: this Item Class carrying this prefix and this suffix. A Raw Base describes the degenerate Combination of an uncrafted base, and the Payout Threshold applies to it exactly as to any other (FR-3, AD-17).
 - **Chase Combination** — one of the Combinations on an Item Class that contribute most to its EV. The collapsed ranked row shows it, so the player knows what to look for without expanding the row (FR-2).
@@ -92,7 +94,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Craft Recipe** — a named crafting currency composition. Which recipe is active changes the ordering, not only the cost. v1 ships two: greater transmute plus greater augment, and perfect transmute plus perfect augment *(PRD-owned; FR-26)*.
 - **Craft Cost** — the Divine cost of one Craft Recipe attempt, computed from synced exchange rates and paid on every attempt including failures (AD-20).
 - **Expected Value (EV)** — the ranking figure: the threshold-truncated expected payout of an Item Class under a Craft Recipe, less Craft Cost (FR-1, AD-17). A Raw Base's EV is its price (FR-3).
-- **Stat Line** — one trade-API-visible stat that a game modifier publishes; a modifier may publish several, and they roll together as one draw (AD-11). A Modifier Reference names a Stat Line.
+- **Stat Line** — one trade-API-visible stat that a game modifier publishes; a modifier may publish several, and they roll together as one draw (AD-11). A Modifier Reference names one Stat Line, or every Stat Line of a Hybrid Modifier (FR-34).
 - **Modifier Weight** — one entry of the Weights File: one tier of one modifier in one Item Class and affix slot, carrying its spawn weight and its Stat Lines as published (AD-11, `WEIGHTS-FILE-SCHEMA.md`).
 - **Weights File** — the externally produced file of Modifier Weights that `WEIGHTS-FILE-SCHEMA.md` defines. It is a v1 prerequisite, not an enrichment: it is the only source of pool membership, tier value ranges and item-level availability (AD-11, FR-30).
 - **Trade Catalogue** — the committed mirror of the trade API's own data endpoints, refreshed on command at patch cadence. It is an identity and validation authority only and contributes nothing to the Eligible Pool (AD-25).
@@ -314,10 +316,11 @@ Exactly three declared sources may generate a trade API request, and nothing els
 **Consequences (testable):**
 - A predicate defines overlap, not an enumerated list of shapes; the predicate, its branch order and its consequences are binding in `IMPLEMENTATION-NOTES.md` §2.1 (AD-17).
 - The rejection names both offending entries and the slot on which they overlap (`IMPLEMENTATION-NOTES.md` §2.1).
-- A curator cannot track two Stat Lines of one game modifier as two entries in one slot: the two always roll together, so one item would be counted twice (AD-17; `IMPLEMENTATION-NOTES.md` §2.2). Pricing that conjunction as one outcome is deferred (§7.2).
+- Overlap covers Hybrid Modifiers and a Stat Line named in both affixes, under the same predicate (FR-34; AD-17; `IMPLEMENTATION-NOTES.md` §2.1).
+- A curator cannot track two Stat Lines of one game modifier as two entries in one slot: the two always roll together, so one item would be counted twice (AD-17; `IMPLEMENTATION-NOTES.md` §2.7). The curator tracks that modifier as one Hybrid Modifier reference instead (FR-34).
 - Where the Weights File cannot answer the co-occurrence question, the Tracked List still loads; the affected Item Class is already Unrankable (AD-17, FR-4).
 - The crafted entries on one Item Class share one Item Level Floor; a Raw Base is exempt (AD-17, FR-22).
-- The check runs in the view at load and in `sync` as a run-start gate (AD-17, AD-12).
+- The check runs in the view at load, in `sync` as a run-start gate, and in the curator's tracked-list check (AD-17, AD-12).
 
 #### FR-17: Refresh the Tracked List in a defined, deterministic rotation
 
@@ -341,6 +344,18 @@ The player can see how long it has been since anyone last edited the Tracked Lis
 - A Tracked List with neither date shows *unknown*, never a placeholder date (AD-12, AD-9).
 
 **Notes:** The tool cannot show a Combination nobody told it to watch (Risk R-2, §9). FR-18 prompts a periodic deliberate review; it does not close the gap.
+
+#### FR-34: Price Hybrid Modifiers and summed Stat Lines as the player reads them
+
+A curator can track the outcomes the game actually rolls. A Hybrid Modifier is one outcome, and a stat that rolls in both affixes reads to the player as one summed value. The tool prices both as the player reads them, so the high-value Combinations that carry them are priced and ranked *(PRD-owned)*. Realises UJ-1, UJ-5. The capabilities are those of `SPEC-tracked-hybrid-mods` CAP-1 to CAP-8.
+
+**Consequences (testable):**
+- A tracked affix can be one Hybrid Modifier. The tool prices it, and derives its probability, as that modifier and never as one of its Stat Lines (AD-5, AD-16, AD-17; CAP-1, CAP-2, CAP-3).
+- A crafted entry that names one stat in both its prefix and its suffix, for example % increased Rarity of Items, is priced on the player's summed value of that stat (AD-16; CAP-6). The priced population is therefore wider than the tracked tiers; AD-16 states the accepted effect.
+- The ranked list shows a Hybrid Modifier affix as its Accepted Tier label followed by its Stat Lines, separated by commas, for example `T1 % ES, % Evasion` *(PRD-owned)*. The separator between the two affixes of a Combination does not change. A hybrid label can read like two affixes, and this is accepted. Treatment, overrun and fallback are `EXPERIENCE.md`'s (CAP-7).
+- Every tracked crafted entry has a prefix and a suffix. An entry that lacks either is refused at load (AD-5; CAP-8).
+- A malformed Hybrid Modifier reference is refused at load, and the message names the offending Stat Line (AD-5, AD-17; `IMPLEMENTATION-NOTES.md` §4.1, §2.7; CAP-1, CAP-4).
+- Conjunctions of separate modifiers, beyond one stat summed across both affixes, stay out of scope (§7.2).
 
 ### 4.6 Background Price Sync
 
@@ -383,6 +398,8 @@ Each Tracked Entry declares the item level its search filters on. A stated curat
 
 **Consequences (testable):**
 - The Accepted Tier of a modifier is tier 1, except where tier 1 first appears at item level 81 or 82 and is too rare to chase; the curator then accepts tier 2 *(PRD-owned)*.
+- Curators track only tier 1, or the run of tiers 1 and 2. This is a curation rule, not a check: the tool does not enforce it *(PRD-owned)*.
+- For a Hybrid Modifier, the Accepted Tier and its label apply to the modifier as a whole, never to one of its Stat Lines (FR-34).
 - The declared floor is derived from each affix's accepted band per `IMPLEMENTATION-NOTES.md` §8, and every crafted entry on an Item Class shares that one floor *(PRD-owned)*. The tool enforces the shared floor at load; a Raw Base, pinned at item level 82, is exempt (AD-17, FR-16, FR-3).
 - Choosing the Accepted Tier and writing the Modifier Reference's band are one act: the curator writes the tier's own value range, or the range of a run of whole adjacent tiers, and never a band that contains one tier and clips another (AD-5, AD-17).
 - Spanning a tier boundary is legitimate but comes with a caveat: the span is priced at its cheap end while carrying both tiers' mass, and below the Payout Threshold it can zero a jackpot rather than understate it (AD-17).
@@ -474,7 +491,7 @@ A producer's completeness claim and the consumer's treatment of it are two halve
 - A Tracked Entry a Weights File cannot support is reported at load with the offending entry named, rather than ranked on a guess (AD-17; `IMPLEMENTATION-NOTES.md` §2.4, §2.5).
 - The view reports such a failure at load and still renders the unaffected rows; a sync run treats the same check as a run-start gate and aborts before spending budget (AD-17, AD-12).
 - Whole-tier containment understates probabilities unevenly and can reorder the list. How far it does so is unmeasured and owned by OQ-21 (AD-11). `[ASSUMPTION: the understatement stays acceptable in practice for v1 — an operating bet, not a bound; OQ-21 is the measurement that would settle it.]`
-- A Combination's probability follows one crafting act on the Item Class, and an absent affix is certain (AD-17; `IMPLEMENTATION-NOTES.md` §11).
+- A Combination's probability follows one crafting act on the Item Class (AD-17; `IMPLEMENTATION-NOTES.md` §11).
 
 #### FR-30: Depend on an externally produced Weights File as a v1 prerequisite
 
@@ -564,7 +581,8 @@ The ranking treats a Price Observation from any league but the active one as abs
 
 ### 7.1 In Scope
 
-- Magic items — one prefix, one suffix — tracked per Item Class, at per-entry Item Level Floors derived by the Accepted Tier rule (FR-22).
+- Magic items — one prefix, one suffix — tracked per Item Class, at per-entry Item Level Floors derived by the Accepted Tier rule (FR-22). A tracked crafted entry names both affixes (FR-34).
+- Hybrid Modifiers, and one stat summed across both affixes, priced as the player reads them (FR-34).
 - Raw Bases at item level 82, threshold-truncated like any other outcome.
 - One ranked list of Item Classes and raw Base Types (FR-3), bounded for readability, with Chase Combinations, expandable to the full tracked Combination list including tombstones.
 - Player-set Payout Threshold, re-ranking at read time.
@@ -585,7 +603,7 @@ The spine's *Deferred* section is the register of technical deferrals and their 
 - **Coarser fallback pricing for zero-listing Combinations** — a "base plus this prefix, any suffix" estimate, marked as such. Held as the named option if the unknown bucket proves unusable. `[NOTE FOR PM]` The likeliest thing to be missed if `no-listings` is a large fraction of the Tracked List; check after the first full refresh (§10 OQ-6).
 - **Spawn-weight disambiguation of the unknown bucket** — using modifier rarity to separate "rare and unlisted" from "common and unlisted". The only identified route that *resolves* a `no-listings` entry rather than segregating it; contingent on measured weights *(PRD-owned)*.
 - **Re-seeding the Tracked List from community sources.** The most promising answer to Risk R-2 and the single largest gap v1 leaves open.
-- **Pricing a deliberate conjunction of co-occurring stats.** A curator cannot yet express "both Stat Lines of this hybrid modifier" as one priced outcome, and FR-16 rejects the two-entry spelling. Deferred in the spine; recorded here because a curator will plausibly try it and the rejection is not a defect.
+- **Conjunctions of separate modifiers.** A curator cannot express two different modifiers as one priced outcome. The one exception is a stat summed across both affixes (FR-34). Recorded here because a curator will plausibly try it and the rejection is not a defect.
 - **Measuring how far whole-tier containment understates the ranking.** Open as §10 OQ-21, owned by the spine. Until it is answered, the ordering is trusted on an operating bet (§11), and the deferred pro-rating and dropped-line guards in the spine's *Deferred* section are only as safe as that answer.
 - **A hosted syncer, observability beyond the Sync Report, a repository split for the schema.** Spine-owned deferrals with stated revisit triggers; none changes what the player sees. OAuth and any credential flow beyond the pasted cookie are deferred in the spine on the same terms.
 
