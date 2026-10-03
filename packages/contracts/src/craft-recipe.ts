@@ -47,11 +47,7 @@ export const CraftRecipeSchema = z.strictObject({
 
 export type CraftRecipe = z.infer<typeof CraftRecipeSchema>;
 
-/**
- * The currency-id prefixes that count as grades (Story 3.4 Decision,
- * 2026-10-02, pending IMPLEMENTATION-NOTES ownership): `greater-` and
- * `perfect-`, and no other.
- */
+/** The currency-id prefixes that count as grades (IMPLEMENTATION-NOTES.md §9.1). */
 export const RECIPE_GRADES = ['greater', 'perfect'] as const;
 
 export type RecipeGrade = (typeof RECIPE_GRADES)[number];

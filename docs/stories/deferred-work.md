@@ -144,15 +144,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Architect. AD-5 says `web` replaces each underscore with a space and uses "no display mapping". UX memlog 230 rules that a trailing defence-type suffix prints as defence words (`Gloves_dex_int` → `Gloves (Dex/Int)`, `Body_Armours_str_dex_int` → `Body Armours (Str/Dex/Int)`). Amend AD-5 to admit that one rule. After that, `unitLabel` (`packages/web/src/list/format.ts`) implements it with a test for each suffix form. Today's tracked classes (`Amulets`, `Bows`, `Crossbows`, `Emerald`) carry no suffix, so nothing on the page is wrong yet.
   evidence: Finding HR-8. UX memlog 230. `ARCHITECTURE-SPINE.md` AD-5. `docs/epics.md:1125-1132` repeats "no display mapping" and the `Bow` example, so the PM sweeps it after the AD changes.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Architect. Confirm that the Chase Combination short-form table is a `web` product constant keyed by `statId` (UX memlog 231), and name its module, before the Story 3.5 spec. No contract or artifact holds it today.
-  evidence: Finding HR-9. UX memlog 231. EXPERIENCE.md short-form section. Story 3.5 built the table on that reading, keyed by `statId`, in `packages/web/src/list/short-forms.ts` (`SHORT_FORMS`); the formatter that reads it is `packages/web/src/list/combination-text.ts`. The ruling is still open.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Architect. UX memlog 232 rules that a crafted row's Age cell is the age of its figure: its inputs are the priced entries the EV rests on. Confirm that AD-10's "oldest timestamp of every input" means those EV-contributing entries, and that `core` publishes the fallback reading (the oldest attempted entry when nothing is priced, *never attempted* when every entry is `never-synced`). Do this before the Story 3.5 and 3.6 specs.
-  evidence: Findings HR-17 and XS-35. UX memlog 232. `ARCHITECTURE-SPINE.md` AD-10.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Architect. UX memlog 233 derives a recipe's option word from the grade prefix its currency ids share (`greater-…`, `perfect-…`; none reads `regular`), and a set with mixed grades or duplicate words is refused. Name the prefixes that count as grades, the layer that derives the word, and the cross-file validity predicate (IMPLEMENTATION-NOTES) before the Story 3.4 spec. No contract change.
-  evidence: Finding HR-10. UX memlog 233. `CraftRecipeSchema` (`packages/contracts/src/craft-recipe.ts`) carries no display string. `catalogue/static.json` spells `greater-orb-of-transmutation` and `perfect-orb-of-augmentation`.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Dev. `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx:14`) becomes `A required file did not arrive.` (UX memlog 229, DESIGN.md `fetch-failure-screen.titleText`). Update the tests that assert the old title, and the `App.tsx:33` docblock that says "all eight fetches".
   evidence: UX memlog 229. The old title restated AD-24's count, and the pending AD-24 amendment makes it seven.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
@@ -211,15 +202,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: story 3.3 (2026-09-27)
 
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "[NOTE FOR ARCHITECT] A real `statId` rolls both kinds, which contradicts AD-17's premise for kind agreement (\"a `statId` either rolls a value or it does not\"). On `weapon.crossbow`/`Crossbows` the suffix `explicit.stat_1967051901` has a valueless T1 tier at item level 55 and a banded `[2, 2]` T1 tier at 82, so no reference on that `statId` can pass the universal quantifier at a floor of 82. The six Crossbows entries on it are now `pruned`. Decide whether the quantifier stays universal, or reads only the lines of the reference's own kind."
-  evidence: `pnpm tracked:lookup tiers explicit.stat_1967051901 --class Crossbows`. `packages/core/src/cross-file.ts` `kindAgreement` implements IN §2.3 and AD-17 as written.
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "[NOTE FOR UX] The cross-file diagnosis line format (`check · canonical key · detail`, one verbatim line per failure) and the empty-group behaviour (no failure renders no group, not a zero line) are provisional. Rule on both in EXPERIENCE.md."
-  evidence: `packages/web/src/frame/trust-facts.ts` `diagnosisLine` and `diagnosisGroups`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert them.
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "[NOTE FOR ARCHITECT] `AGENT-WORKFLOW.md` *Parallel worktrees* says \"A pass does not cover the checks that `pnpm tracked:check` lists under `pending`.\" `tracked:check` now runs the five cross-file checks and has no `pending` field. Retire the sentence, or state what a pass still does not confirm (a floor declared too high, AD-5)."
-  evidence: `packages/sync/src/curation/check.ts`. The spec forbids an edit to an owner document in this story.
 - source_spec: `docs/stories/spec-deferred-listenerscript-runs-get-nettcpconnection.md`
   summary: No test runs `snapshotWindows` with a failing listener query, so the first-snapshot path to "nothing listens on port N" is pinned only by reading the code.
   evidence: `snapshotWindows` in `tools/dev-stop/dev-stop.ts` is not exported and no test calls it. It joins `listenerScript` into a larger script, and a hand run of that joined shape with a missing cmdlet exits 1 today. A later edit that inlines its own `SilentlyContinue` query, or wraps the joined script so the `throw` no longer ends it, would make `pnpm dev:stop` print "nothing listens" after a failed query with every test passing. Closing it needs a test seam into `snapshotWindows` (an export or the same `node:child_process` mock the `listenersWindows` failure test uses, reached through an exported caller).
@@ -247,12 +229,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: story 3.4 (2026-10-02)
 
-- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
-  summary: "[NOTE FOR ARCHITECT] Take ownership of the recipe-word predicate in IMPLEMENTATION-NOTES, so the grade-ruling entry above (UX memlog 233, finding HR-10) can close. Story 3.4 built the player's Decision: the grades are the currency-id prefixes `greater-` and `perfect-` only; a recipe whose currencies carry neither reads `regular`; `RecipesFileSchema` refuses a recipe that mixes grades (a grade beside an ungraded currency counts as mixed) and two recipes that derive one word (AD-3 refusal)."
-  evidence: "`packages/contracts/src/craft-recipe.ts` (`RECIPE_GRADES`, `recipeWord`), `packages/contracts/src/envelopes.ts` (`RecipesFileSchema` refine). The spec forbids an owner-document edit."
-- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
-  summary: "[NOTE FOR PM] FR-4 owes a ruling on the provisional reason `recipe cannot reach this class`. `core` gives it to an `(Item Class, recipe)` pair whose `combinationProbability` returns `empty-eligible-pool` or `augment-exhausted`; the appendix prints it for the active recipe only. Adopt or reword it. The Emerald case is closed (retro item 34, player decision 2026-10-03): the producer now emits every jewel mod at `itemLevelMin` 75, so both v1 floors reach it and jewels use the same recipe model as other crafted classes. The reason stays provisional for any other unreachable pair."
-  evidence: "`packages/core/src/rank.ts` `RECIPE_UNREACHABLE`; `packages/web/src/App.test.tsx`, the committed-data appendix test. Check with `pnpm tracked:lookup` on `jewel/Emerald`, or `combinationProbability` at floors 0, 44 and 70."
 - source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
   summary: "Player. Replace the four dummy orb rates in `data/currencies.json` (`greater-` and `perfect-orb-of-transmutation` / `-augmentation`, `source: \"dummy, not measured\"`) with measured values. Until the next sync copies them into `dataset.json`, both recipes are uncostable and the page renders state 35."
   evidence: "`data/currencies.json`; `dataset.json` `currencyRates` holds only divine, exalted and chaos."
@@ -305,3 +281,21 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: No automated path runs `pnpm test:data`, so the live-data invariants (short forms, cell fit, `tracked:check` exit 0, `sync:dry` output shape) are enforced only by hand. Add a non-blocking CI job or a scheduled run. Do not gate `deploy.yml` on it: that blocks a player's data-only push, which is the coupling this spec removed.
   evidence: `deploy.yml` runs `pnpm check`, `pnpm test` and `pnpm build`; `grep test:data .github` finds only a comment. The `*.data.test.ts` files and the `data` project in `vitest.config.ts`.
   retry_when: The player picks the signal channel for a failing live-data check (a non-blocking job, a schedule or a hook).
+
+## Deferred from: spec-epic-3-retro-item-31-apply-the-rulings-in-code (2026-10-03)
+
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
+  summary: "Player. On the live trade API, check that a stat filter with `min: 1, max: 1` on `explicit.stat_1967051901` returns items with the valueless \"Loads an additional bolt\" tier (AD-16). The six Crossbows entries that this spec made active rely on it."
+  evidence: "`data/tracked.json`: six `weapon.crossbow`/`Crossbows` entries with a banded `[1, 1]` suffix on `explicit.stat_1967051901` (IN §2.3). No code calls the live trade API in this spec."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
+  summary: "Player. Under D5 (IN §9), the committed data makes Amulets, Bows and Crossbows unrankable under both committed recipes with `recipe cannot reach this class`: in each class, one or more tracked references contain no tier at or above the recipe floor (for example, Bows T1 attack speed `explicit.stat_210067635` first appears at item level 37, below the greater floor of 44). Crossbows under perfect is unrankable by construction of this spec's data change: the six reactivated suffixes (banded `[1, 1]` on `explicit.stat_1967051901`) contain only the valueless tier, which first appears at item level 55, below the perfect floor of 70. Only Emerald still ranks. Decide per entry whether to prune it, widen its band, or keep it and accept the unrankable pair."
+  evidence: "`packages/web/src/App.test.tsx` *renders the appendix on the committed data/* now expects three appendix rows. `packages/core/src/probability.ts` `combinationProbability` returns `empty-contained`."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
+  summary: "Player. Five of the six Crossbows entries made active in this spec run over the 27-character chase budget (EXPERIENCE.md memlog 104, *Escape valve*): T1 Ele Atk Dmg · T1 Extra Bolt; T1 Flat Cold · T1 Extra Bolt; T1 Flat Fire · T1 Extra Bolt; T1 Flat Lightning · T1 Extra Bolt; T1 Flat Phys · T1 Extra Bolt. Decide per pairing whether to prune it or let its chase cell ellipsise, as for the Story 3.5 candidates."
+  evidence: "`PRUNING_CANDIDATES` in `packages/web/src/list/combination-fit.test.ts` now lists 59 pairings. The Story 3.5 entry, which lists 54, is not rewritten."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
+  summary: "Dev, then architect. `interval()` reads every valueless line as `[1, 1]` (IN §2.3), which is right only where the valueless tier means the count 1. Flag any other mixed-kind `statId` whose valueless tier is not the count 1, in `pnpm tracked:check` or a review step, before a `[1, 1]` reference is written for it. The retro item 31 ruling-5 entry asked for this check, and the planning removal of that entry dropped it."
+  evidence: "Review of this spec (triage row 6). `packages/core/src/probability.ts` `interval`. Today `explicit.stat_1967051901` is the only mixed-kind stat in `data/weights.json`, so no committed data is wrong."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
+  summary: "Dev. `.claude/skills/tracked-json/SKILL.md` step 4 tells an agent to write a banded `[1, 1]` reference for a valueless tier on a mixed-kind stat, but does not warn that the tier may sit below a recipe floor. Under D5 (IN §9) that makes the `(Item Class, recipe)` pair unrankable. Add the warning to step 4."
+  evidence: "Review of this spec (triage row 7). The Crossbows valueless tier sits at item level 55, below the perfect floor of 70 in `data/recipes.json`."

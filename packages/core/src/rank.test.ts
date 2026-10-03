@@ -922,7 +922,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
   });
 
   it('two recipes over one Tracked List give orderings that differ by more than a constant offset', () => {
-    // Bows: P = 0.1 at floor 0 and 0.5 at floor 70. Staves: P = 0.5 at floor 0 and 0 at floor 70.
+    // Bows: P = 0.1 at floor 0 and 0.5 at floor 70. Staves: P = 0.5 at floor 0, and at floor 70 its reference contains no eligible tier.
     const staves: Pools = [[tierOf(TARGET, 50, 1), tierOf(FILLER, 50, 75)], [tierOf(SUFFIX_STAT, 10, 80)]];
     const bows = chase('Bows');
     const stavesEntry = chase('Staves', TARGET, 'active', 'weapon.staff');
@@ -936,7 +936,13 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
         .filter((row) => row.recipeId === recipeId)
         .map((row) => row.className);
     expect(orderOf('greater')).toEqual(['Staves', 'Bows']);
-    expect(orderOf('perfect')).toEqual(['Bows', 'Staves']);
+    expect(orderOf('perfect')).toEqual(['Bows']);
+    expect(result.unrankable).toContainEqual({
+      categoryId: 'weapon.staff',
+      className: 'Staves',
+      reason: 'recipe cannot reach this class',
+      recipeId: 'perfect',
+    });
   });
 
   it('is identical under a shuffled Tracked List, dataset and rate set', () => {
@@ -1037,19 +1043,49 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     ]);
   });
 
-  it('folds the oldest of each summand observedAt and each used rate asOf, and leaves it unset with none', () => {
-    const old = { ...priced(2), observation: { ...observation(2), observedAt: '2026-09-01T00:00:00Z' } } as PriceState;
+  it('takes asOf from the summands only: the oldest observedAt, never a rate asOf (AD-10)', () => {
+    const old = { ...priced(2), observation: { ...observation(2), observedAt: '2026-09-27T00:00:00Z' } } as PriceState;
     const rates = RATES.map((rate) => ({ ...rate, asOf: '2026-09-10T00:00:00Z' }));
+    const filler = chase('Bows', FILLER);
     const [row] = craftedRows(
-      rankCrafted({ tracked: [target], dataset: [published(target, old)], recipes: [GREATER], currencyRates: rates }).ordering,
+      rankCrafted({
+        tracked: [target, filler],
+        dataset: [published(target, old), published(filler, { state: 'no-listings' }, '2026-09-01T00:00:00Z')],
+        recipes: [GREATER],
+        currencyRates: rates,
+      }).ordering,
     );
-    expect(row?.asOf).toBe('2026-09-01T00:00:00Z');
-    const [rated] = craftedRows(
-      rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: rates }).ordering,
+    expect(row?.asOf).toBe('2026-09-27T00:00:00Z');
+    expect(row).not.toHaveProperty('lastAttemptedAt');
+  });
+
+  it('with no summand, sets no asOf and falls back to the oldest lastAttemptedAt among the attempted entries (AD-10)', () => {
+    // Canonical key order: filler, low, target. The oldest attempt is keyed last.
+    const filler = chase('Bows', FILLER);
+    const low = chase('Bows', 'explicit.stat_low');
+    const rates = RATES.map((rate) => ({ ...rate, asOf: '2026-09-10T00:00:00Z' }));
+    const [tried] = craftedRows(
+      rankCrafted({
+        tracked: [target, filler, low],
+        dataset: [
+          published(filler, { state: 'no-listings' }, '2026-09-25T00:00:00Z'),
+          published(low, { state: 'no-listings' }, null),
+          published(target, { state: 'no-listings' }, '2026-09-20T00:00:00Z'),
+        ],
+        recipes: [GREATER],
+        currencyRates: rates,
+      }).ordering,
     );
-    expect(rated?.asOf).toBe('2026-09-10T00:00:00Z');
-    const [bare] = craftedRows(rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: [] }).ordering);
-    expect(bare?.asOf).toBeUndefined();
+    expect(tried?.summands).toEqual([]);
+    expect(tried).not.toHaveProperty('asOf');
+    expect(tried?.lastAttemptedAt).toBe('2026-09-20T00:00:00Z');
+    expect(tried !== undefined && RankedRowSchema.parse(tried)).toEqual(tried);
+  });
+
+  it('with no summand and no attempted entry, sets neither field: never attempted (AD-10)', () => {
+    const [bare] = craftedRows(rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: RATES }).ordering);
+    expect(bare).not.toHaveProperty('asOf');
+    expect(bare).not.toHaveProperty('lastAttemptedAt');
     expect(bare !== undefined && RankedRowSchema.parse(bare)).toEqual(bare);
   });
 

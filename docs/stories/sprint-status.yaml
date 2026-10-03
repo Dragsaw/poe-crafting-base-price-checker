@@ -297,7 +297,7 @@ action_items:
       Age inputs, recipe floor vs cross-file floor, short-form table module, reason
       wording, diagnosis format)"
     owner: "architect/PM/UX"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-32-consolidate-the-four-crafted-class-group"
     epic: 3

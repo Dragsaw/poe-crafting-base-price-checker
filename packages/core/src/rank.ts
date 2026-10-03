@@ -191,10 +191,11 @@ export interface UncostableRecipe {
 }
 
 /**
- * The provisional reason for an `(Item Class, recipe)` pair whose eligible
- * pool is empty after the recipe floor (`empty-eligible-pool`, IN §9), or
- * whose augment has nothing left to add (`augment-exhausted`, IN §11). Story
- * 3.4 Decision, 2026-10-02: FR-4 owns the string and may adopt or reword it.
+ * The reason for an `(Item Class, recipe)` pair whose eligible pool is empty
+ * after the recipe floor (`empty-eligible-pool`), or where a reference
+ * contains no eligible tier (`empty-contained`, both IN §9), or whose augment
+ * has nothing left to add (`augment-exhausted`, IN §11). The string lives in
+ * code, not in `prd.md`.
  */
 export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
 
@@ -459,9 +460,10 @@ export function rank(input: RankInput): Ranking {
 /**
  * One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe
  * cannot reach it: an entry's `combinationProbability` came back
- * `empty-eligible-pool` or `augment-exhausted` (IN §9, §11) — a reason, never
- * `P = 0`. P is computed for every non-pruned entry, priced or not, so the
- * verdict does not move with the threshold or the dataset.
+ * `empty-eligible-pool`, `empty-contained` or `augment-exhausted` (IN §9,
+ * §11) — a reason, never `P = 0`. P is computed for every non-pruned entry,
+ * priced or not, so the verdict does not move with the threshold or the
+ * dataset.
  *
  * A summand is an entry priced in the active league whose **gross** price is
  * at or above the threshold; its contribution is `P × price`. Nothing else is
@@ -478,7 +480,8 @@ function craftedRow(
   input: RankInput,
 ): CraftedRankedRow | undefined {
   const summands: CraftedSummand[] = [];
-  const stamps: string[] = cost.ok ? [...cost.asOf] : [];
+  // Summands only: the rates' asOf is not a timestamp input (AD-10).
+  const stamps: string[] = [];
   for (const { entry, entryKey } of keyed) {
     const probability = combinationProbability(pools, entry, recipe.modifierLevelMin);
     if (!probability.ok) {
@@ -498,6 +501,11 @@ function craftedRow(
   }
   const ordered = summands.toSorted(compareSummands);
   const asOf = oldestOf(stamps);
+  // No summand: fall back to the oldest attempt among the class's entries (AD-10).
+  const lastAttemptedAt =
+    asOf === undefined
+      ? oldestOf(keyed.flatMap(({ entryKey }) => byKey.get(entryKey)?.lastAttemptedAt ?? []))
+      : undefined;
   const grossPayout = ordered.reduce((sum, summand) => sum + summand.contribution, 0);
   return {
     kind: 'crafted',
@@ -512,5 +520,6 @@ function craftedRow(
     summands: ordered,
     provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce(weakest),
     ...(asOf === undefined ? {} : { asOf }),
+    ...(lastAttemptedAt === undefined ? {} : { lastAttemptedAt }),
   };
 }

@@ -163,9 +163,13 @@ export function diagnosisLine(failure: DiagnosisFailure): string {
 /**
  * The sixth group, under *What is broken* after the pinned-starvation group:
  * one verbatim line per cross-file failure, in `core`'s order. No failure,
- * no group — nothing renders, not even a zero.
+ * no group — nothing renders, not even a zero. With no weights envelope the
+ * checks did not run, and the group is one *unknown* line.
  */
-function diagnosisGroups(failures: readonly DiagnosisFailure[]): FigureGroup[] {
+function diagnosisGroups(failures: readonly DiagnosisFailure[], weightsLoaded: boolean): FigureGroup[] {
+  if (!weightsLoaded) {
+    return [UNKNOWN_GROUP];
+  }
   return failures.length === 0 ? [] : [failures.map((failure) => [{ kind: 'verbatim', text: diagnosisLine(failure) }])];
 }
 
@@ -182,7 +186,7 @@ export function panelColumns(
   weightsLoaded: boolean,
   crossFileFailures: readonly DiagnosisFailure[] = [],
 ): PanelColumns {
-  const diagnosis = diagnosisGroups(crossFileFailures);
+  const diagnosis = diagnosisGroups(crossFileFailures, weightsLoaded);
   if (report === null) {
     return [
       [UNKNOWN_GROUP, UNKNOWN_GROUP],

@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 25
+revision: 26
 created: '2026-09-12'
 updated: '2026-10-03'
 binds: []
@@ -391,8 +391,10 @@ never import each other.
   | `valueless` | `(statId)`, no edges at all | a single-line modifier that rolls no number — *"Loads an additional bolt"* |
   | `hybrid` | `lines: [line, …]` — two or more lines, each line `banded` or `valueless` as above | one **hybrid modifier**: every stat line of one game modifier, priced as that modifier (`prd.md` FR-34) |
 
-  A valueless reference or line is **not** a degenerate band, and no component may give it
-  sentinel edges. It still carries pool membership and still counts toward completeness.
+  A valueless reference or line keeps its kind and carries **no edges in the schema**, and
+  no component may give it sentinel edges. AD-17's checks read a valueless weights *tier* as
+  the value `[1, 1]` (`IMPLEMENTATION-NOTES.md` §2.3); that reading gives the reference no
+  band. It still carries pool membership and still counts toward completeness.
 
   **The `hybrid` arm is its own discriminant, never inferred.** No component reads a
   reference as hybrid because an optional extra field is present, and no component reads a
@@ -458,6 +460,10 @@ never import each other.
     accepts, and reaching `categoryId` through the weights file would make pricing depend on
     a file AD-12 guarantees pricing never needs. That guarantee is load-bearing precisely
     when the weights file is absent, which AD-24 makes the product's day-one state.
+
+  **The Chase Combination short-form table is a hand-kept `web` product constant keyed by
+  `statId`, in `packages/web/src/list/short-forms.ts`, and it is neither curated nor
+  fetched.**
 
   **`className` is still never sent, and since revision 17 it is still read.** AD-16 derives
   a **class discriminator** from it — a defence signature, or a base type for `jewel` — and
@@ -786,7 +792,9 @@ never import each other.
 
   `core` propagates the **weakest provenance and the oldest timestamp** of every input
   into each derived figure, **with no exception** — the numerator-only exception retired
-  with `modelled-split`, whose only source was the withdrawn decomposition.
+  with `modelled-split`, whose only source was the withdrawn decomposition. What counts as
+  an input is scoped below: for a probability by its eligible set, and for a crafted row's
+  timestamp by its summands.
 
   **A probability's inputs are exactly the entries its formula sums, numerator and
   denominator alike:** the recipe's eligible set of both slots, `E_P ∪ E_S`
@@ -804,6 +812,15 @@ never import each other.
   recipe, because coverage is read on the unrestricted pool (§9). `web` must render a
   figure resting on anything below `measured` visibly differently from one resting on
   `measured`. **Two render treatments, not three.**
+
+  **A crafted row's timestamp inputs are its summands only** — the priced entries its EV
+  rests on (AD-17) — so its timestamp is the oldest `observedAt` among them. **The currency
+  rates its Craft Cost uses are not timestamp inputs.** A row with no summand falls back to
+  the oldest `lastAttemptedAt` among its item class's non-pruned tracked entries that have
+  one, and to *never attempted* only when none of them has one. **`core` publishes this
+  timestamp, the fallback included**, and `web` derives none; the treatment is
+  `EXPERIENCE.md`'s crafted Age. This is the scope of "every input" for the timestamp; the
+  Provenance scope above is unchanged.
 
   **An unrankable `(itemClass, recipe)` pair carries no Provenance**, because it has no
   figure to label. The one exception is a `partial` pool, whose probabilities carry
@@ -1422,7 +1439,7 @@ never import each other.
   | **`coOccur`** | two entries overlap under §2.1 and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | §2.1, §2.2 |
   | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | §2.7 |
   | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under §10's grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | §2.6 |
-  | **Kind agreement** | **per line**: **any** scoped line sharing a reference line's `statId` disagrees with that line's kind — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. The quantifier is **universal, not existential**: a `statId` either rolls a value or it does not, so one disagreeing line is a defect in the file however many lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | §2.3 |
+  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | §2.3 |
 
   **One null-line rule, reading only the weights file, decides every `statId: null` line**,
   and `tracked:lookup`, `core` and the `sync` gate all call the one `core` implementation,
@@ -1616,10 +1633,9 @@ never import each other.
 
   **Staleness needs no new mechanism.** A hand-maintained rate is `measured` under AD-10 —
   measured by the player against the in-game exchange, which is what that level has always
-  meant — and its `asOf` enters AD-10's propagation like any other timestamp. Since `core`
-  propagates the **oldest** timestamp of every input, a rate the player last touched months
-  ago drags the freshness of everything costed from it, visibly, without a provenance value
-  invented for this case. **An exchange ratio is not an asking price**
+  meant — and no provenance value is invented for this case. **A rate's `asOf` does not age
+  a crafted row's timestamp**: the Craft Cost rates are not timestamp inputs of that row
+  (AD-10). **An exchange ratio is not an asking price**
   — AD-12's *"every price in the
   system is an asking price"* is about payouts, which this is not. If a listing's currency
   has no current rate, `sync` writes the

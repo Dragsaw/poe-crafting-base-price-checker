@@ -292,6 +292,14 @@ describe('the cross-file diagnosis group', () => {
   it('renders nothing with no failure', () => {
     expect(panelColumns(report(), true, []).map((groups) => groups.length)).toEqual([2, 2, 1]);
   });
+
+  it('reads one unknown line when no weights envelope loaded, since the checks did not run', () => {
+    for (const published of [report(), null]) {
+      const [, broken] = panelColumns(published, false, []);
+      expect(broken).toHaveLength(3);
+      expect(broken[2]).toEqual([[{ kind: 'missing', text: UNKNOWN }]]);
+    }
+  });
 });
 
 describe('the affordance', () => {

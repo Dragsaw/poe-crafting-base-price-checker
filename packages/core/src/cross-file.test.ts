@@ -86,6 +86,11 @@ const checksOf = (entries: readonly TrackedEntry[], weights: WeightsFile | null)
 describe('edge alignment (§2.4)', () => {
   const scoped = [T7(), T8()];
 
+  it('counts a valueless line as [1, 1] in the extremes (§2.3)', () => {
+    expect(edgeAlignment('prefix', band(1, 2), [tier([line(STAT)]), tier([line(STAT, [2, 2])])], 82)).toBeUndefined();
+    expect(edgeAlignment('prefix', band(0, 1), [tier([line(STAT)])], 82)).toContain('extremes [1, 1]');
+  });
+
   it.each([
     ['43.0–56.5', 43, 56.5],
     ['56.0–80.0', 56, 80],
@@ -158,9 +163,19 @@ describe('kind agreement (§2.3), universal', () => {
     expect(failures[0]?.detail).toContain('1 scoped line on that statId is banded');
   });
 
-  it('fails a banded reference when any scoped line is valueless', () => {
+  it('passes a banded reference beside a valueless line, which reads as [1, 1]', () => {
     const scoped = [tier([line(STAT, [43, 56.5])]), tier([line(STAT)])];
-    expect(checksOf([entry({ prefix: band(43, 56.5) })], bows(pools(scoped)))[0]?.[0]).toBe('kind-agreement');
+    expect(checksOf([entry({ prefix: band(43, 56.5) })], bows(pools(scoped)))).toEqual([]);
+  });
+
+  it('passes a banded [1, 1] reference on a mixed-kind statId: it contains and aligns on the valueless tier', () => {
+    const scoped = [tier([line(STAT)], { itemLevelMin: 55 }), tier([line(STAT, [2, 2])], { itemLevelMin: 82 })];
+    expect(checksOf([entry({ prefix: band(1, 1) })], bows(pools(scoped)))).toEqual([]);
+  });
+
+  it('still fails a valueless reference beside one banded line, however many valueless lines agree', () => {
+    const scoped = [tier([line(STAT)]), tier([line(STAT)]), tier([line(STAT, [2, 2])])];
+    expect(checksOf([entry({ prefix: valueless() })], bows(pools(scoped)))[0]?.[0]).toBe('kind-agreement');
   });
 
   it('ignores a disagreeing line above the floor or at weight 0', () => {
