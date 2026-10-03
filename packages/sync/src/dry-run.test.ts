@@ -151,7 +151,7 @@ describe('dryRun', () => {
       completed: [canonicalKey(pinned), canonicalKey(active)],
       entries: [noListings(pinned, 1), noListings(active, 0)],
       // Pinned entries are exempt from the pass, so only the active key is recorded.
-      progress: { schemaVersion: '1.1.0', completed: [canonicalKey(active)] },
+      progress: { schemaVersion: '1.2.0', completed: [canonicalKey(active)] },
       dataset: datasetOf(
         [
           noListings(pinned, 1),
@@ -181,7 +181,7 @@ describe('dryRun', () => {
       outcome: 'completed',
       completed: [],
       entries: [],
-      progress: { schemaVersion: '1.1.0', completed: [] },
+      progress: { schemaVersion: '1.2.0', completed: [] },
       dataset: datasetOf([]),
       records: [],
       report: reportOf(0),

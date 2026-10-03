@@ -190,9 +190,40 @@ export type StepResult =
        * §5.3). Absent on a 5xx, a timeout or a threshold refusal.
        */
       readonly retryAfterMs?: number;
+      /**
+       * Set only when the yield was AD-30's downgrade, the `session-expired`
+       * yield (IMPLEMENTATION-NOTES.md §13.4). It writes no `notBefore`; the
+       * outcome carries it to the session, which waits `backoff(1)`.
+       */
+      readonly sessionExpired?: true;
     };
 
 export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
+
+/**
+ * How long a failed session cookie is held off (AD-30, IMPLEMENTATION-NOTES.md
+ * §13.3): a `write` sets `authHoldOffUntil` to the progress write's `now`
+ * plus this.
+ */
+export const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The runner's two narrow ports onto the process auth holder (AD-30,
+ * IMPLEMENTATION-NOTES.md §13.1, §13.3), wired in `../compose-chunk.ts`. The
+ * runner never sees the holder itself, so it never reaches the cookie.
+ */
+export interface ChunkAuth {
+  /**
+   * Called once, after the lock and the `notBefore` check, with the loaded
+   * `authHoldOffUntil` and `now`: while the holder may still probe and the
+   * hold-off is due, it settles `held-off` and no probe goes out.
+   */
+  settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void;
+  /** The hold-off action the next progress write applies, or `undefined` to carry the field. */
+  pendingHoldOff(): 'write' | 'clear' | undefined;
+  /** The progress write applied `action`; the holder stops keeping it. */
+  holdOffApplied(action: 'write' | 'clear'): void;
+}
 
 /** What the run-start gate sees. Later stories add to it. */
 export interface GateContext {
@@ -285,6 +316,12 @@ export interface ChunkPorts {
    * row. Omitted, nothing is latched.
    */
   readonly latchedRetryAfterMs?: () => number | undefined;
+  /**
+   * The live shells only: the auth holder's narrow ports (`ChunkAuth`).
+   * Omitted, nothing settles `held-off` and every progress write carries
+   * `authHoldOffUntil` forward unchanged.
+   */
+  readonly auth?: ChunkAuth;
   /** One line of operator output. Defaults to stderr. */
   readonly log?: (line: string) => void;
   /**
@@ -372,7 +409,16 @@ export interface ChunkStarvation {
 export type ChunkOutcome =
   | (ChunkOutcomeBase & { readonly kind: 'completed' })
   | (ChunkOutcomeBase & { readonly kind: 'bounded'; readonly bound: ChunkBound })
-  | (ChunkOutcomeBase & { readonly kind: 'yielded' })
+  | (ChunkOutcomeBase & {
+      readonly kind: 'yielded';
+      /**
+       * `true` only when the chunk ended on AD-30's downgrade, the
+       * `session-expired` yield (IMPLEMENTATION-NOTES.md §13.4). The downgrade
+       * reset the pacing state in place, so the session cannot read it from the
+       * ledger: it waits `backoff(1)` on this signal.
+       */
+      readonly sessionExpired?: true;
+    })
   | (ChunkOutcomeBase & { readonly kind: 'busy' })
   /**
    * A previous chunk ended on a `429` or a malformed-request abort and wrote a
@@ -572,6 +618,11 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       return { kind: 'deferred', completed: [], entries: [], records, notBefore };
     }
 
+    // The hold-off across processes (§13.1): after the lock and the
+    // `notBefore` check, a due `authHoldOffUntil` settles a valid value
+    // `held-off`, so this run sends no probe.
+    ports.auth?.settleHeldOffIfDue(progress?.authHoldOffUntil, clock.now());
+
     // Read first and outside the failure path: a report this build cannot
     // read is refused with nothing written, so the player's records are never
     // overwritten by a file that lost them (NFR-8).
@@ -691,14 +742,28 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           now: clock.now(),
         }),
       );
+      // The holder's pending hold-off action (§13.3): `write` sets the field
+      // from this write's `now`, `clear` removes it, and none carries the
+      // loaded value forward.
+      const holdOff = ports.auth?.pendingHoldOff();
+      const authHoldOffUntil =
+        holdOff === 'write'
+          ? new Date(Date.parse(clock.now()) + AUTH_HOLD_OFF_MS).toISOString()
+          : holdOff === 'clear'
+            ? undefined
+            : progress?.authHoldOffUntil;
       const progressFile: SyncProgressFile = {
         schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
         completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
           compareCanonicalKeys,
         ),
         ...(until === undefined ? {} : { notBefore: until }),
+        ...(authHoldOffUntil === undefined ? {} : { authHoldOffUntil }),
       };
       await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, progressFile);
+      if (holdOff !== undefined) {
+        ports.auth?.holdOffApplied(holdOff);
+      }
     };
 
     const writeReport = async (
@@ -805,10 +870,10 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       }
       gatePassed = true;
 
-      let ending: { readonly kind: 'completed' } | { readonly kind: 'yielded' } | {
-        readonly kind: 'bounded';
-        readonly bound: ChunkBound;
-      } = { kind: 'completed' };
+      let ending:
+        | { readonly kind: 'completed' }
+        | { readonly kind: 'yielded'; readonly sessionExpired?: true }
+        | { readonly kind: 'bounded'; readonly bound: ChunkBound } = { kind: 'completed' };
       /** The `notBefore` this ending writes: set only by a step's 429 or a latched probe 429 (§5.3, §13.3). */
       let until: string | undefined;
 
@@ -833,7 +898,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           stepRecords.push(...result.records);
         }
         if (result.kind === 'yielded') {
-          ending = { kind: 'yielded' };
+          // A downgrade writes no `notBefore` and tells the session (§13.4).
+          ending = result.sessionExpired === true ? { kind: 'yielded', sessionExpired: true } : { kind: 'yielded' };
           if (result.retryAfterMs !== undefined) {
             until = notBeforeAfter429(clock.now(), result.retryAfterMs);
           }

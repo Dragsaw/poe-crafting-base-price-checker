@@ -65,7 +65,7 @@ This spec captures an opportunity. A capture on 2026-10-02 showed that a POESESS
   4. Signing out revokes it.
 - AD-8 holds. The one governed trade client attaches the cookie. Pacing reads every rule that `X-Rate-Limit-Rules` names. The code contains no rule name, policy name, rule count or bucket (`test/no-hardcoded-rate-limits.test.ts`).
 - The cookie goes on pricing searches and fetches only. It never goes on the league request.
-- The liveness test compares the rule count of a cookie response with the rule count of the no-cookie baseline. The probe costs one extra search per run.
+- The liveness test compares the rule count of a cookie response with the rule count of the no-cookie baseline, under the same rate-limit policy only (`IMPLEMENTATION-NOTES.md` §13.2). The probe costs one extra search per run.
 - A probe 429 settles nothing and stays an ordinary 429. Sync persists the `notBefore` of that 429, also when no further request follows in that chunk. A probe 4xx that is not 429 is not an invalid request, and it does not cause a malformed-request abort.
 - An absent or inactive cookie never fails the run and never changes its exit code. `POE_SYNC_USER_AGENT` stays the only required environment value.
 - The absent-cookie warning prints on every run. It has no off switch.

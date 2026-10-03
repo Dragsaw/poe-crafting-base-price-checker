@@ -213,3 +213,17 @@ export function parseRateLimitHeaders(
 export function ruleNameCount(headers: Readonly<Record<string, string>>): number {
   return ruleNamesOf(lowerCaseHeaders(headers).get(RULES_HEADER)).length;
 }
+
+/**
+ * `policy(X-Rate-Limit-Policy)` of IMPLEMENTATION-NOTES.md §13.2: the header
+ * value, trimmed and case-folded, or `undefined` when it is absent or blank.
+ * The header name is matched case-insensitively. Pure.
+ *
+ * The post-probe liveness test applies only when this equals the baseline's
+ * value (§13.4). The two values are compared with each other and never with
+ * a policy name compiled in (AD-8).
+ */
+export function rateLimitPolicyOf(headers: Readonly<Record<string, string>>): string | undefined {
+  const value = lowerCaseHeaders(headers).get(POLICY_HEADER)?.trim().toLowerCase();
+  return value === undefined || value === '' ? undefined : value;
+}

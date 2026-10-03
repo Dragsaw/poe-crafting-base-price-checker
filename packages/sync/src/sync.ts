@@ -214,14 +214,27 @@ function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
     return false;
   }
   if (result.kind === 'outcome') {
-    return result.outcome.kind === 'yielded' && !context.freshReading;
+    return result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result));
   }
   return !isRefusal(result.error);
 }
 
-/** The count this result's backoff runs at: `1` after a State reading, one more than the last otherwise. */
-function backoffCountFor(state: SessionState, context: ChunkContext): number {
-  return context.freshReading ? 1 : state.backoffCount + 1;
+/**
+ * `true` when the chunk ended on AD-30's downgrade (IMPLEMENTATION-NOTES.md
+ * §13.4). The downgrade reset the pacing state in place, so the ledger cannot
+ * tell it apart from a fresh State reading: the outcome says so explicitly.
+ */
+export function isSessionExpired(result: ChunkResult): boolean {
+  return result.kind === 'outcome' && result.outcome.kind === 'yielded' && result.outcome.sessionExpired === true;
+}
+
+/**
+ * The count this result's backoff runs at: `1` after a State reading and
+ * after a downgrade (the pacing is cold again), one more than the last
+ * otherwise.
+ */
+function backoffCountFor(state: SessionState, context: ChunkContext, result: ChunkResult): number {
+  return context.freshReading || isSessionExpired(result) ? 1 : state.backoffCount + 1;
 }
 
 /**
@@ -244,7 +257,7 @@ function plus(now: string, ms: number): string {
 export function nextWait(result: ChunkResult, state: SessionState, context: ChunkContext): SessionWait {
   const { now, notBefore } = context;
   const backoffUntil = (): string =>
-    plus(now, backoffMs(context.evenIntervalMs, backoffCountFor(state, context)));
+    plus(now, backoffMs(context.evenIntervalMs, backoffCountFor(state, context, result)));
 
   if (result.kind === 'error') {
     const { error } = result;
@@ -275,6 +288,10 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
     case 'yielded':
       if (notBefore !== undefined) {
         return { kind: 'until', until: notBefore, reason: 'a 429', orInputChange: false };
+      }
+      if (outcome.sessionExpired === true) {
+        // The downgrade wrote no `notBefore` and reset the pacing: backoff(1) (§13.4).
+        return { kind: 'until', until: backoffUntil(), reason: 'the session cookie expired', orInputChange: false };
       }
       if (context.freshReading) {
         // A 5xx or a timeout that still carried headers: the spread paces the retry.
@@ -312,7 +329,7 @@ export function nextState(
   iteration: { readonly signature: string; readonly before: RequestsBySource },
 ): SessionState {
   const backoffCount = isBackoff(result, context)
-    ? backoffCountFor(state, context)
+    ? backoffCountFor(state, context, result)
     : 0;
 
   if (result.kind === 'error') {
@@ -601,7 +618,9 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
       const context: ChunkContext = {
         now,
         ...(notBefore === undefined ? {} : { notBefore }),
-        freshReading: pacing.ledger !== ledgerBefore,
+        // The downgrade's in-place reset gives the ledger a new reference; it
+        // is no State reading (§13.4).
+        freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
         evenIntervalMs: sessionEvenIntervalMs(pacing, withGate),
       };
       const wait = nextWait(result, state, context);

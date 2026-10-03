@@ -8,7 +8,7 @@ import type { CurrencyRate, DatasetEntry, HttpRequest, HttpResponse, TrackedEntr
 import { describe, expect, it } from 'vitest';
 
 import { createTradeClient } from '../trade/client.ts';
-import type { TradeRequest } from '../trade/client.ts';
+import type { TradeRequest, TradeResult } from '../trade/client.ts';
 import { tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { createPricingStep, MalformedRequestError, UnexpectedTradeResponseError } from './price-entry.ts';
 import { itemTypesOf } from './search-body.ts';
@@ -535,5 +535,54 @@ describe('createPricingStep: the session cookie marker (AD-30)', () => {
       ['POST', true],
       ['GET', true],
     ]);
+  });
+});
+
+describe('createPricingStep: the session-expired yield (AD-30, IMPLEMENTATION-NOTES.md §13.4)', () => {
+  const EXPIRED: TradeResult = {
+    kind: 'yield',
+    lane: 'x',
+    policy: undefined,
+    waitedMs: 0,
+    skips: [],
+    invalidRequests: 0,
+    retryAfterMs: 0,
+    reason: 'session-expired',
+  };
+
+  /** A client that answers the search, then yields `session-expired` on the request `expireOn`. */
+  function expiringStep(expireOn: 'POST' | 'GET') {
+    const results = ids(1);
+    const fake = createFakeHttpPort({
+      [`POST ${SEARCH_URL}`]: ok({ id: SEARCH_ID, complexity: 1, result: results, total: results.length }),
+    });
+    const clock = createFakeClockPort(NOW);
+    const client = createTradeClient({ http: fake, clock, wait: () => Promise.resolve(), userAgent: 'test (x@y.test)' });
+    return createPricingStep({
+      client: {
+        send: (request) => (request.method === expireOn ? Promise.resolve(EXPIRED) : client.send(request)),
+      },
+      league: LEAGUE,
+      rates: RATES,
+      itemTypes: itemTypesOf({ result: [] }),
+      dataset: [PREVIOUS],
+      clock,
+    });
+  }
+
+  it('on the search: stamps lastAttemptedAt alone, keeps the earlier search fields and the price, no retryAfterMs', async () => {
+    expect(await expiringStep('POST')(ENTRY)).toStrictEqual({
+      kind: 'yielded',
+      entry: { ...PREVIOUS, lastAttemptedAt: NOW },
+      sessionExpired: true,
+    });
+  });
+
+  it('on the fetch: keeps the search fields from this entry’s search and the price, no retryAfterMs', async () => {
+    expect(await expiringStep('GET')(ENTRY)).toStrictEqual({
+      kind: 'yielded',
+      entry: { ...PREVIOUS, lastAttemptedAt: NOW, lastSearchId: SEARCH_ID, lastSearchLeague: LEAGUE },
+      sessionExpired: true,
+    });
   });
 });
