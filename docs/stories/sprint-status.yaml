@@ -267,7 +267,7 @@ action_items:
     action: "Rewrite the masthead dek in EXPERIENCE.md, Masthead.tsx and App.test.tsx
       in one change"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-28-use-one-isemptypool-definition-in-unrank"
     epic: 3

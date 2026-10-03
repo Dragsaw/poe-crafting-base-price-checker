@@ -6,9 +6,9 @@ description: >-
   while the game runs. Warm paper, dense uniform rows, and two semantic inks
   that appear only when something is wrong.
 status: final
-revision: 13
+revision: 14
 created: 2026-09-13
-updated: 2026-09-27
+updated: 2026-10-03
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -416,7 +416,7 @@ components:
     controlPanelsEqualHeight: 'both panels take the height of the taller, so their top and bottom rules line up. A ragged pair of boxes in a masthead reads as two accidents rather than as one control group.'
     copyEyebrow: 'League {activeLeague} — the league alone. The Craft Recipe left the eyebrow at revision 3, because a recipe the player CHOOSES cannot be printed as an attribution fact. It is now {components.craft-recipe}.'
     copyTitle: 'the question the page answers, as a phrase — not a product name'
-    copyDek: 'capped at {spacing.dek-max-width} and two lines. EXPERIENCE.md, The Epic 2 masthead dek, owns the text'
+    copyDek: 'capped at {spacing.dek-max-width} and two lines. EXPERIENCE.md, The masthead dek, owns the text'
   ranked-row:
     height: '{spacing.row-height}'
     background: '{colors.paper}'
@@ -1680,7 +1680,7 @@ top padding, `{spacing.5}` beneath, and three lines with `{spacing.2}` between
 each. The eyebrow is sepia tracked uppercase naming the active league. The title
 is the *question the page answers*, set as a phrase — never a product name and
 never a feature label. The dek is capped at `{spacing.dek-max-width}` and two
-lines. `EXPERIENCE.md`, *The Epic 2 masthead dek*, owns its text. **Both
+lines. `EXPERIENCE.md`, *The masthead dek*, owns its text. **Both
 controls float right inside the block as one group** —
 `{components.craft-recipe}` at `{spacing.recipe-panel-width}`, then
 `{spacing.masthead-control-gap}`, then `{components.payout-threshold}` at
@@ -2140,10 +2140,9 @@ file` — in `{spacing.col-appendix-reason}`; and a quiet italic note in
 rust, because rust says something is broken and nothing here is. There is no
 lead and there are no rows, and the bottom padding matches the top, 16px. The
 panel keeps its place above the key block, so the page's order does not change
-with the data. It says nothing about why it is empty. In the committed state,
-where `recipes.json` is published with no recipe, the masthead dek already says
-so (`EXPERIENCE.md`, state 37). When `recipes.json` is absent, the trust strip's
-absence line says so. Repeating either here would state one fact in two places.
+with the data. It says nothing about why it is empty. When `recipes.json` is
+absent, the trust strip's absence line says so (`EXPERIENCE.md`, state 38).
+Repeating it here would state one fact in two places.
 
 *Every row here is an Item Class, and that is a rule rather than an
 observation.* Unrankability governs the crafted branch only — a Raw Base needs

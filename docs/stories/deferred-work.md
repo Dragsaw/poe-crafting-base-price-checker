@@ -111,12 +111,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
     - the recipes-absent line claims "no crafted rows can be ranked" although `rank` never reads recipes (`frame/AbsenceLines.tsx:44-48`)
   evidence: Retro F18. `docs/reviews/review-epic-2-diff.md` items A8, A9, A10, A13, A14, A15, A18, E7, E10 and E12.
 
-## Deferred from: epic 2 retro item 19 (2026-09-27)
-
-- source_spec: `docs/stories/spec-epic-2-retro-item-19-make-the-committed-day-one-state-explain.md`
-  summary: When Epic 3 ranks crafted rows, rewrite the Epic 2 dek in EXPERIENCE.md (its owner), `MASTHEAD_DEK` in `packages/web/src/frame/Masthead.tsx`, and the dek assertions in `packages/web/src/App.test.tsx` in the same change, because "Crafted Item Classes are not ranked yet" becomes false.
-  evidence: The spec's frozen Decision ("Epic 3 rewrites the dek when it ranks crafted rows"). No Epic 3 AC carries it.
-
 ## Deferred from: epic 2 retro item 18 rebase onto retro item 20 (2026-09-27)
 
 - source_spec: `docs/stories/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md`
@@ -272,9 +266,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
   summary: "Review B3. The dummy orb rates in `data/currencies.json` reach `dataset.json` on the next sync. The published page then prints made-up Craft Costs and crafted EVs, and nothing flags them. No layer reads a rate's `source`."
   evidence: "`data/currencies.json` (`source: \"dummy, not measured\"`). `craftCost` in `packages/core/src/craft-cost.ts` reads only `rate` and `league`. Settled when the player replaces the rates before a sync, or when a gate refuses a non-measured `source`. Severity: medium."
-- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
-  summary: "Review B4. Since Story 3.4 ranks crafted Item Classes, the masthead dek is false on the page. `MASTHEAD_DEK` in `packages/web/src/frame/Masthead.tsx` still says crafted Item Classes are not ranked yet. EXPERIENCE.md owns the copy, so this sharpens the open epic 2 retro item 19 entry."
-  evidence: "`packages/web/src/frame/Masthead.tsx` `MASTHEAD_DEK`. The review brief (AGENT-WORKFLOW) forbids a reviewer edit of EXPERIENCE.md. Severity: low."
 
 ## Deferred from: story 3.5 (2026-10-02)
 
