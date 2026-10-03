@@ -1,4 +1,4 @@
-import type { ModifierRef } from './modifier-ref.ts';
+import type { ModifierRef, SingleLineModifierRef } from './modifier-ref.ts';
 
 /**
  * The overlap predicate (AD-17, IMPLEMENTATION-NOTES.md §2.1), defined once.
@@ -36,7 +36,7 @@ export interface OverlapAffixes {
 }
 
 /** Whether one scoped entry of the slot's pool contains both references (§2.2). */
-export type CoOccur = (x: ModifierRef, y: ModifierRef, slot: OverlapSlot) => boolean;
+export type CoOccur = (x: SingleLineModifierRef, y: SingleLineModifierRef, slot: OverlapSlot) => boolean;
 
 /** The within-file `coOccur`: the tracked list alone cannot see a pool. */
 export const NEVER_CO_OCCUR: CoOccur = () => false;
@@ -46,8 +46,8 @@ export type SlotOverlapBranch = 'co-occur' | 'both-valueless' | 'bands-intersect
 
 /** The branch that made the slot overlap, or `undefined` when the slot does not overlap. */
 export function slotOverlapBranch(
-  x: ModifierRef,
-  y: ModifierRef,
+  x: SingleLineModifierRef,
+  y: SingleLineModifierRef,
   slot: OverlapSlot,
   coOccur: CoOccur,
 ): SlotOverlapBranch | undefined {
@@ -67,8 +67,8 @@ export function slotOverlapBranch(
 }
 
 export function slotOverlap(
-  x: ModifierRef,
-  y: ModifierRef,
+  x: SingleLineModifierRef,
+  y: SingleLineModifierRef,
   slot: OverlapSlot,
   coOccur: CoOccur,
 ): boolean {
@@ -77,18 +77,29 @@ export function slotOverlap(
 
 /** `overlap(a, b) ⇔ slotOverlap(a.prefix, b.prefix) ∧ slotOverlap(a.suffix, b.suffix)`. */
 export function overlap(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): boolean {
-  return OVERLAP_SLOTS.every((slot) => slotOverlap(a[slot], b[slot], slot, coOccur));
+  return overlapBranches(a, b, coOccur) !== undefined;
+}
+
+function isSingleLine(ref: ModifierRef): ref is SingleLineModifierRef {
+  return ref.kind !== 'hybrid';
 }
 
 /**
  * Each slot's branch when the two entries overlap, or `undefined` when they
  * do not. A payload names the slots from it.
+ *
+ * Only a pair whose four references are single-line is evaluated here; a pair
+ * with any `hybrid` reference returns `undefined`, because `core` evaluates it
+ * (IMPLEMENTATION-NOTES §2.1, *Who evaluates a pair*).
  */
 export function overlapBranches(
   a: OverlapAffixes,
   b: OverlapAffixes,
   coOccur: CoOccur,
 ): Readonly<Record<OverlapSlot, SlotOverlapBranch>> | undefined {
+  if (!isSingleLine(a.prefix) || !isSingleLine(a.suffix) || !isSingleLine(b.prefix) || !isSingleLine(b.suffix)) {
+    return undefined;
+  }
   const prefix = slotOverlapBranch(a.prefix, b.prefix, 'prefix', coOccur);
   if (prefix === undefined) {
     return undefined;

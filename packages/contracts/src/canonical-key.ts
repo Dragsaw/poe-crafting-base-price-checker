@@ -18,24 +18,38 @@ import type { TrackedEntry } from './tracked-entry.ts';
  */
 
 /**
- * An affix is **always exactly three elements**: `[statId, min, max]` for a
- * `banded` reference and `[statId, null, null]` for a `valueless` one. Both
- * affixes are always present, so there is no absent form (§4.1).
- * `acceptedTier` is a display-only sibling of the band and never a fourth
- * element.
+ * A single-line affix is **always exactly three elements**: `[statId, min,
+ * max]` for a `banded` reference and `[statId, null, null]` for a `valueless`
+ * one. A hybrid line encodes the same way.
  */
-export type CanonicalAffix = readonly [string, number | null, number | null];
+export type CanonicalLine = readonly [string, number | null, number | null];
+
+/**
+ * An affix is a `CanonicalLine`, or `["hybrid", [line, …]]` for a `hybrid`
+ * reference (§4.1). The two forms never collide: the hybrid form's second
+ * element is an array. Both affixes are always present, so there is no absent
+ * form. `acceptedTier` is a display-only sibling and never an element.
+ */
+export type CanonicalAffix = CanonicalLine | readonly ['hybrid', readonly CanonicalLine[]];
 
 export type CanonicalKeyElements =
   | readonly ['crafted', string, string, number, CanonicalAffix, CanonicalAffix]
   | readonly ['raw', string, number];
 
+/** The lines are already sorted by `statId`: the schema sorts them on parse (§4.1). */
 export function encodeAffix(ref: ModifierRef): CanonicalAffix {
   switch (ref.kind) {
     case 'banded':
       return [ref.statId, ref.valueMin, ref.valueMax];
     case 'valueless':
       return [ref.statId, null, null];
+    case 'hybrid':
+      return [
+        'hybrid',
+        ref.lines.map((line): CanonicalLine =>
+          'valueMin' in line ? [line.statId, line.valueMin, line.valueMax] : [line.statId, null, null],
+        ),
+      ];
   }
 }
 

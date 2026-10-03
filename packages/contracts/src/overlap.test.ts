@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { canonicalKey } from './canonical-key';
 import { parseEnvelope, TrackedFileSchema } from './envelopes';
-import type { ModifierRef } from './modifier-ref';
+import type { HybridModifierRef, ModifierRef, SingleLineModifierRef } from './modifier-ref';
 import {
   NEVER_CO_OCCUR,
   overlap,
@@ -13,13 +13,13 @@ import {
 } from './overlap';
 import { TRACKED_SCHEMA_VERSION } from './schema-version';
 
-const band = (statId: string, valueMin: number, valueMax: number): ModifierRef => ({
+const band = (statId: string, valueMin: number, valueMax: number): SingleLineModifierRef => ({
   kind: 'banded',
   statId,
   valueMin,
   valueMax,
 });
-const valueless = (statId: string): ModifierRef => ({ kind: 'valueless', statId });
+const valueless = (statId: string): SingleLineModifierRef => ({ kind: 'valueless', statId });
 
 const ALWAYS: CoOccur = () => true;
 
@@ -155,5 +155,24 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
         { ...crafted({ prefix: band('a', 1, 3), suffix: S }), className: 'Other' },
       ]).ok,
     ).toBe(true);
+  });
+});
+
+describe('overlapBranches, who evaluates a pair (§2.1)', () => {
+  const hybrid: HybridModifierRef = {
+    kind: 'hybrid',
+    lines: [
+      { statId: 'a', valueMin: 10, valueMax: 19 },
+      { statId: 'b', valueMin: 1, valueMax: 2 },
+    ],
+  };
+
+  it('evaluates no pair in which any of the four references is hybrid', () => {
+    const single = { prefix: band('a', 10, 19), suffix: valueless('s') };
+    expect(overlapBranches(single, single, ALWAYS)).toBeDefined();
+    expect(overlapBranches({ ...single, prefix: hybrid }, single, ALWAYS)).toBeUndefined();
+    expect(overlapBranches(single, { ...single, suffix: hybrid }, ALWAYS)).toBeUndefined();
+    expect(overlapBranches({ prefix: hybrid, suffix: hybrid }, { prefix: hybrid, suffix: hybrid }, ALWAYS)).toBeUndefined();
+    expect(overlap({ ...single, prefix: hybrid }, { ...single, prefix: hybrid }, ALWAYS)).toBe(false);
   });
 });

@@ -324,3 +324,12 @@ describe('combinationProbability (§11)', () => {
     }
   });
 });
+
+describe('a hybrid reference (interim)', () => {
+  it('throws from contains, naming the story that computes it', () => {
+    const hybrid: ModifierRef = { kind: 'hybrid', lines: [{ statId: STAT }, { statId: OTHER }] };
+    expect(() => contains(hybrid, tier([{ statId: STAT, ranges: [] }], 1))).toThrow(
+      'hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 4)',
+    );
+  });
+});

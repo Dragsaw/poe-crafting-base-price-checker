@@ -37,7 +37,7 @@ describe('the short-form table', () => {
   it('has a form for every statId in the frozen tracked.json fixture', () => {
     const statIds = new Set(
       tracked.entries.flatMap((entry) =>
-        entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((ref) => (ref === undefined ? [] : [ref.statId])) : [],
+        entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((ref) => (ref.kind === 'hybrid' ? ref.lines.map((line) => line.statId) : [ref.statId])) : [],
       ),
     );
     expect(statIds.size).toBeGreaterThan(0);

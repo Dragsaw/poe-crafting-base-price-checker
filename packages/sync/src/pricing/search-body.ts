@@ -153,6 +153,9 @@ function statFilterOf(ref: ModifierRef): StatFilter {
       return { id: ref.statId, value: { min: ref.valueMin, max: ref.valueMax }, disabled: false };
     case 'valueless':
       return { id: ref.statId, value: {}, disabled: false };
+    case 'hybrid':
+      // Interim: the committed data holds no hybrid. Story 6 builds its filters.
+      throw new Error('hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 6)');
   }
 }
 

@@ -114,17 +114,19 @@ describe('ModifierRefSchema', () => {
   });
 
   /**
-   * AC: an exhaustive `switch` over the two kinds type-checks with **no default
-   * arm**. `tsc -b` compiles this file; a third arm added to the union without
-   * a case here is a compile error, not a runtime surprise.
+   * AC: an exhaustive `switch` over the three kinds type-checks with **no
+   * default arm**. `tsc -b` compiles this file; a fourth arm added to the union
+   * without a case here is a compile error, not a runtime surprise.
    */
-  it('exhausts both kinds with no default arm', () => {
+  it('exhausts every kind with no default arm', () => {
     function describeRef(ref: ModifierRef): string {
       switch (ref.kind) {
         case 'banded':
           return `${ref.statId}:${String(ref.valueMin)}-${String(ref.valueMax)}`;
         case 'valueless':
           return `${ref.statId}:valueless`;
+        case 'hybrid':
+          return ref.lines.map((line) => line.statId).join('+');
       }
     }
 
@@ -132,5 +134,75 @@ describe('ModifierRefSchema', () => {
       describeRef({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),
     ).toBe('s:1-2');
     expect(describeRef({ kind: 'valueless', statId: 's' })).toBe('s:valueless');
+    expect(describeRef({ kind: 'hybrid', lines: [{ statId: 'a' }, { statId: 'b' }] })).toBe('a+b');
+  });
+});
+
+/** The Bows phys%+accuracy hybrid (SPEC-tracked-hybrid-mods CAP-1). */
+const ACCURACY = 'explicit.stat_691932474';
+const PHYS = 'explicit.stat_1509134228';
+
+function hybrid(lines: unknown[], extra: Record<string, unknown> = {}): unknown {
+  return { kind: 'hybrid', lines, ...extra };
+}
+
+describe('ModifierRefSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () => {
+  it('accepts a banded hybrid and sorts its lines by statId', () => {
+    const parsed = ModifierRefSchema.parse(
+      hybrid(
+        [
+          { statId: ACCURACY, valueMin: 16, valueMax: 20 },
+          { statId: PHYS, valueMin: 25, valueMax: 34 },
+        ],
+        { acceptedTier: 'T1' },
+      ),
+    );
+    expect(parsed).toEqual({
+      kind: 'hybrid',
+      lines: [
+        { statId: PHYS, valueMin: 25, valueMax: 34 },
+        { statId: ACCURACY, valueMin: 16, valueMax: 20 },
+      ],
+      acceptedTier: 'T1',
+    });
+  });
+
+  it('accepts a hybrid that mixes a banded and a valueless line', () => {
+    expect(
+      ModifierRefSchema.safeParse(hybrid([{ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }, { statId: 'explicit.stat_2' }]))
+        .success,
+    ).toBe(true);
+  });
+
+  it('rejects fewer than two lines at lines', () => {
+    expect(issuePaths(hybrid([]))).toEqual(['lines']);
+    expect(issuePaths(hybrid([{ statId: 'explicit.stat_1' }]))).toEqual(['lines']);
+  });
+
+  it('rejects a repeated statId at the line', () => {
+    expect(issuePaths(hybrid([{ statId: 'explicit.stat_1' }, { statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }]))).toEqual([
+      'lines.1.statId',
+    ]);
+  });
+
+  it('rejects an empty statId at the line', () => {
+    expect(issuePaths(hybrid([{ statId: '' }, { statId: 'explicit.stat_2' }]))).toEqual(['lines.0.statId']);
+  });
+
+  it.each([
+    ['min > max', { valueMin: 3, valueMax: 2 }],
+    ['a negative edge', { valueMin: -1, valueMax: 2 }],
+    ['an infinite edge', { valueMin: 1, valueMax: Number.POSITIVE_INFINITY }],
+    ['a NaN edge', { valueMin: Number.NaN, valueMax: 2 }],
+    ['one edge only', { valueMin: 1 }],
+  ])('rejects a line band with %s at the line', (_name, band) => {
+    expect(issuePaths(hybrid([{ statId: 'explicit.stat_1', ...band }, { statId: 'explicit.stat_2' }]))).toEqual(['lines.0']);
+  });
+
+  it.each([
+    ['kind', { kind: 'valueless' }],
+    ['acceptedTier', { acceptedTier: 'T1' }],
+  ])('rejects a line that carries %s (strict)', (_name, extra) => {
+    expect(issuePaths(hybrid([{ statId: 'explicit.stat_1', ...extra }, { statId: 'explicit.stat_2' }]))).toEqual(['lines.0']);
   });
 });

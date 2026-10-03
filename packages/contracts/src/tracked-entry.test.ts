@@ -122,3 +122,30 @@ describe('TrackedEntrySchema', () => {
     expect(unitOf(TrackedEntrySchema.parse(rawEntry))).toBe('Advanced Dualstring Bow');
   });
 });
+
+describe('TrackedEntrySchema, a hybrid affix (CAP-1)', () => {
+  it('parses a crafted entry whose prefix is a hybrid, with its lines sorted', () => {
+    const parsed = TrackedEntrySchema.parse({
+      ...craftedEntry,
+      prefix: {
+        kind: 'hybrid',
+        lines: [
+          { statId: 'explicit.stat_691932474', valueMin: 16, valueMax: 20 },
+          { statId: 'explicit.stat_1509134228', valueMin: 25, valueMax: 34 },
+        ],
+      },
+    });
+    expect(parsed.kind === 'crafted' && parsed.prefix).toEqual({
+      kind: 'hybrid',
+      lines: [
+        { statId: 'explicit.stat_1509134228', valueMin: 25, valueMax: 34 },
+        { statId: 'explicit.stat_691932474', valueMin: 16, valueMax: 20 },
+      ],
+    });
+  });
+
+  it('refuses a one-line hybrid with the issue on prefix.lines', () => {
+    const issues = issuesOf({ ...craftedEntry, prefix: { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1' }] } });
+    expect(issues.map((issue) => issue.path.join('.'))).toEqual(['prefix.lines']);
+  });
+});

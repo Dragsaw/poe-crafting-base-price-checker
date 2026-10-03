@@ -19,7 +19,7 @@ import type {
 } from '@poe/contracts';
 
 import { craftedClassesOf } from './crafted-classes.ts';
-import { containedIn, contains, eligible, interval, poolOf } from './probability.ts';
+import { assertSingleLine, containedIn, contains, eligible, interval, poolOf } from './probability.ts';
 import type { Slot } from './probability.ts';
 
 /**
@@ -64,6 +64,7 @@ export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPool
 }
 
 function formatRef(slot: Slot, ref: ModifierRef): string {
+  assertSingleLine(ref, 5);
   return ref.kind === 'banded'
     ? `${slot} ${ref.statId} band [${String(ref.valueMin)}, ${String(ref.valueMax)}]`
     : `${slot} ${ref.statId} valueless`;
@@ -82,6 +83,7 @@ export function edgeAlignment(
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
+  assertSingleLine(ref, 5);
   if (ref.kind !== 'banded') {
     return undefined;
   }
@@ -118,6 +120,7 @@ export function emptyContainment(
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
+  assertSingleLine(ref, 5);
   if (scoped.some((entry) => contains(ref, entry))) {
     return undefined;
   }
@@ -139,6 +142,7 @@ export function kindAgreement(
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
+  assertSingleLine(ref, 5);
   if (ref.kind !== 'valueless') {
     return undefined;
   }

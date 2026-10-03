@@ -57,6 +57,10 @@ export function bandedFallback(text: string, valueMin: number, valueMax: number)
  * fallback: the catalogue text, with the band on a banded reference.
  */
 export function affixText(ref: ModifierRef, stats: StatTexts): AffixPart {
+  if (ref.kind === 'hybrid') {
+    // Interim: the committed data holds no hybrid. Story 8 renders its label.
+    throw new Error('hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 8)');
+  }
   const form = shortForm(ref.statId);
   const catalogued = stats.get(ref.statId) ?? ref.statId;
   if (ref.kind === 'valueless') {
