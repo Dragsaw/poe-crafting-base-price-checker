@@ -281,7 +281,7 @@ action_items:
     action: "Give a rankable crafted class with no recipe a row or reason, and stop
       formatDivine printing -0.00"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-3-retro-2026-10-03.md"
   - id: "epic-3-retro-item-30-decouple-data-dependent-tests-from-live"
     epic: 3
