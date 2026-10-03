@@ -7,7 +7,7 @@ import {
   type DatasetEntry,
   type TrackedEntry,
 } from '@poe/contracts';
-import { classKeyOf, type Ranking, type UnrankedEntry } from '@poe/core';
+import { craftedClassesOf, type Ranking, type UnrankedEntry } from '@poe/core';
 
 import { formatDivine } from '../shared/money';
 import { combinationText, type AffixPart, type StatTexts } from './combination-text';
@@ -134,17 +134,12 @@ interface KeyedEntry {
 
 /** The non-pruned crafted entries, grouped by their class key, each with its canonical key. */
 function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, readonly KeyedEntry[]> {
-  const classes = new Map<string, KeyedEntry[]>();
-  for (const entry of tracked) {
-    if (entry.kind !== 'crafted' || entry.status === 'pruned') {
-      continue;
-    }
-    const classKey = classKeyOf(entry.categoryId, entry.className);
-    const group = classes.get(classKey) ?? [];
-    group.push({ entry, entryKey: canonicalKey(entry) });
-    classes.set(classKey, group);
-  }
-  return classes;
+  return new Map(
+    [...craftedClassesOf(tracked)].map(([classKey, members]) => [
+      classKey,
+      members.map((entry) => ({ entry, entryKey: canonicalKey(entry) })),
+    ]),
+  );
 }
 
 /**

@@ -18,7 +18,8 @@ export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.t
 export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';
 
 /** The ranking, both branches (AD-17): computed at read time, league-scoped, over every recipe. */
-export { classKeyOf, compareRankedRows, rank, RECIPE_UNREACHABLE } from './rank.ts';
+export { compareRankedRows, rank, RECIPE_UNREACHABLE } from './rank.ts';
+export { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 export type {
   NotYetSyncedEntry,
   RankInput,

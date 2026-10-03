@@ -18,6 +18,7 @@ import type {
   WeightsFile,
 } from '@poe/contracts';
 
+import { craftedClassesOf } from './crafted-classes.ts';
 import { containedIn, contains, eligible, interval, poolOf } from './probability.ts';
 import type { Slot } from './probability.ts';
 
@@ -228,16 +229,7 @@ export function crossFileChecks(
   if (weights === null) {
     return [];
   }
-  const byClass = new Map<string, CraftedTrackedEntry[]>();
-  for (const entry of entries) {
-    if (entry.kind !== 'crafted' || entry.status === 'pruned') {
-      continue;
-    }
-    const classKey = JSON.stringify([entry.categoryId, entry.className]);
-    const members = byClass.get(classKey) ?? [];
-    members.push(entry);
-    byClass.set(classKey, members);
-  }
+  const byClass = craftedClassesOf(entries);
 
   const failures: CrossFileFailure[] = [];
   const fail = (entry: CraftedTrackedEntry, entryKey: string, check: CrossFileCheck, parts: readonly string[]): void => {

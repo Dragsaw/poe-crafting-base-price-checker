@@ -170,8 +170,8 @@ describe('the note cell', () => {
     expect(note({ categoryId: 'c.bows', className: 'Bows', reason: 'class absent from weights file' })).toBe('');
   });
 
-  it('keeps the unknown mark on a pool partial row carrying provenance absent', () => {
-    const panel = mountAppendix([{ categoryId: 'c.bows', className: 'Bows', reason: 'pool partial', provenance: 'absent' }]);
+  it('keeps the unknown mark on a pool partial row', () => {
+    const panel = mountAppendix([{ categoryId: 'c.bows', className: 'Bows', reason: 'pool partial' }]);
     expect(panel.querySelector('[data-cell="mark"]')?.textContent).toBe(`${glyphs.unknown}${HAIR_SPACE}unknown`);
   });
 });

@@ -16,6 +16,7 @@ import type {
 } from '@poe/contracts';
 
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
+import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
 import { combinationProbability, isEmptyPool, poolOf } from './probability.ts';
 import { foldPair, oldestOf, weakest } from './provenance.ts';
@@ -132,11 +133,6 @@ export interface UnrankableClass {
    * 29). The other reasons carry no recipe id.
    */
   readonly recipeId?: string;
-  /**
-   * `absent`, set only on the reason `pool partial` (AD-10): the pool is not
-   * fully known, under every recipe. No other reason carries a Provenance.
-   */
-  readonly provenance?: 'absent';
 }
 
 /** An entry that contributes nothing to the ordering — not zero, nothing (AD-9). */
@@ -208,11 +204,6 @@ const KIND_ORDER: Readonly<Record<RankedRow['kind'], number>> = { raw: 0, crafte
 /** The serialised key a row breaks ties on: a raw row's canonical key, a crafted row's class key. */
 function rowKey(row: RankedRow): string {
   return row.kind === 'raw' ? row.entryKey : row.classKey;
-}
-
-/** The serialised Item Class key, `["crafted", categoryId, className]`: the class prefix of its entries' canonical keys (§4.1). */
-export function classKeyOf(categoryId: string, className: string): string {
-  return JSON.stringify(['crafted', categoryId, className]);
 }
 
 /**
@@ -323,7 +314,7 @@ export function rank(input: RankInput): Ranking {
   /** Keyed on the serialised pair, so one class with several entries is one row. */
   const unrankable = new Map<string, UnrankableClass>();
   const disagreeing = new Set(
-    (input.crossFileFailures ?? []).map((failure) => JSON.stringify([failure.categoryId, failure.className])),
+    (input.crossFileFailures ?? []).map((failure) => classKeyOf(failure.categoryId, failure.className)),
   );
   /** The non-pruned crafted entries of each rankable class, keyed on the serialised pair. */
   const rankableClasses = new Map<string, { readonly pools: WeightsClassPools; readonly entries: CraftedTrackedEntry[] }>();
@@ -333,29 +324,6 @@ export function rank(input: RankInput): Ranking {
       continue;
     }
     if (entry.kind === 'crafted') {
-      const { categoryId, className } = entry;
-      const classKey = JSON.stringify([categoryId, className]);
-      const reason =
-        unrankableReasonOf(input.weights, categoryId, className) ??
-        (disagreeing.has(classKey) ? 'class disagrees with weights file' : undefined);
-      if (reason !== undefined) {
-        unrankable.set(
-          classKey,
-          reason === 'pool partial'
-            ? { categoryId, className, reason, provenance: 'absent' }
-            : { categoryId, className, reason },
-        );
-        continue;
-      }
-      const known = rankableClasses.get(classKey);
-      if (known !== undefined) {
-        known.entries.push(entry);
-        continue;
-      }
-      const lookup = input.weights === null ? undefined : poolOf(input.weights, categoryId, className);
-      if (lookup?.ok === true) {
-        rankableClasses.set(classKey, { pools: lookup.pools, entries: [entry] });
-      }
       continue;
     }
     const entryKey = canonicalKey(entry);
@@ -405,6 +373,25 @@ export function rank(input: RankInput): Ranking {
     }
   }
 
+  for (const [classKey, members] of craftedClassesOf(input.tracked)) {
+    const [first] = members;
+    if (first === undefined) {
+      continue;
+    }
+    const { categoryId, className } = first;
+    const reason =
+      unrankableReasonOf(input.weights, categoryId, className) ??
+      (disagreeing.has(classKey) ? 'class disagrees with weights file' : undefined);
+    if (reason !== undefined) {
+      unrankable.set(classKey, { categoryId, className, reason });
+      continue;
+    }
+    const lookup = input.weights === null ? undefined : poolOf(input.weights, categoryId, className);
+    if (lookup?.ok === true) {
+      rankableClasses.set(classKey, { pools: lookup.pools, entries: members });
+    }
+  }
+
   const costs = recipes.map((recipe) => craftCost(recipe, rates, input.activeLeague));
   const uncostableRecipes: UncostableRecipe[] = [];
   recipes.forEach((recipe, index) => {
@@ -425,7 +412,7 @@ export function rank(input: RankInput): Ranking {
     }
     if (recipes.length === 0) {
       // No recipe exists to try, so the class would be in neither list nor appendix. Retro item 29.
-      unrankable.set(JSON.stringify([first.categoryId, first.className]), {
+      unrankable.set(classKeyOf(first.categoryId, first.className), {
         categoryId: first.categoryId,
         className: first.className,
         reason: RECIPE_UNREACHABLE,
@@ -439,7 +426,7 @@ export function rank(input: RankInput): Ranking {
       }
       const row = craftedRow(first, recipe, cost, pools, keyed, byKey, input);
       if (row === undefined) {
-        unrankable.set(JSON.stringify([first.categoryId, first.className, recipe.id]), {
+        unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
           categoryId: first.categoryId,
           className: first.className,
           reason: RECIPE_UNREACHABLE,
