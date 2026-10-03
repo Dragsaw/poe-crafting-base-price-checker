@@ -38,7 +38,7 @@ stat filter compares against.
 
 | Line shape | `ranges` | Derived interval |
 | --- | --- | --- |
-| No `#` — a flat, valueless line | `[]` | none; the line is `valueless` |
+| No `#` — a flat, valueless line | `[]` | `[1, 1]` (§2.3); the line's kind stays `valueless` |
 | One `#` | `[[a, b]]` | `[a, b]` |
 | Two `#` | `[[a1, b1], [a2, b2]]` | `[(a1+a2)/2, (b1+b2)/2]` — **pending OQ-12** |
 | Three or more `#` | `[[…], […], […]]` | **cannot occur** — a file error (`WEIGHTS-FILE-SCHEMA.md`) |
@@ -91,8 +91,7 @@ classes as hybrids.
 
 ```
 covers(rl, line)     ⇔ line.statId == rl.statId ∧
-                         ( rl is banded:    line.ranges is non-empty
-                                          ∧ interval(line).min >= rl.valueMin
+                         ( rl is banded:    interval(line).min >= rl.valueMin
                                           ∧ interval(line).max <= rl.valueMax
                            rl is valueless: line.ranges is empty )
 
@@ -238,9 +237,27 @@ do not re-derive it here, and do not reach for the refuse-site-wide reading it r
 
 ### 2.3 Kind agreement (AD-17)
 
-AD-17 states the rule and its **universal** quantifier. **A weights line's kind is read
-from whether its `ranges` array is empty** — empty means valueless, non-empty means
-banded — because the weights contract carries no `kind` field to read.
+AD-17 states the rule. **A weights line's kind is read from whether its `ranges` array is
+empty** — empty means valueless, non-empty means banded — because the weights contract
+carries no `kind` field to read.
+
+**A valueless tier reads as the value 1, the interval `[1, 1]`.** One `statId` can carry a
+valueless tier beside a banded one. The usual case is *"Loads an additional bolt"*
+(`explicit.stat_1967051901` on `weapon.crossbow`/`Crossbows`): its valueless tier is the
+value 1 beside the `[2, 2]` tier. §1's interval function returns `[1, 1]` for an empty
+`ranges`, so containment (§1), edge alignment (§2.4) and line-set completeness (§2.7) read
+the valueless tier as that band, and a banded `[1, 1]` reference line contains it and
+aligns on it.
+
+```
+disagrees(rl, line) ⇔ line.statId == rl.statId
+                     ∧ rl is valueless
+                     ∧ line.ranges is non-empty
+```
+
+A banded reference line therefore never disagrees with a scoped line. **A reference line
+with no band fails when any scoped line on its `statId` is banded**, and the quantifier is
+**universal**: one banded line fails it however many valueless lines agree.
 
 **The check runs per line.** A `banded` or `valueless` reference is one line. A `hybrid`
 reference is checked once for each of its lines, and the failure payload names the
@@ -387,8 +404,7 @@ so the test is intersection, not containment.
 ```
 meets(rl, line) ⇔ line.statId == rl.statId ∧
                   ( rl is valueless: line.ranges is empty
-                    rl is banded:    line.ranges is non-empty
-                                   ∧ interval(line) ∩ [rl.valueMin, rl.valueMax] ≠ ∅ )
+                    rl is banded:    interval(line) ∩ [rl.valueMin, rl.valueMax] ≠ ∅ )
 
 reached(ref)    = { entry ∈ scoped(cat, slot, L) :
                       entry.weight > 0 ∧ ¬untrackable(entry)
@@ -1227,6 +1243,14 @@ undefined, and `core` returns that `(itemClass, recipe)` pair as **unrankable wi
 impossible craft in the ordering among merely unprofitable ones, and the player would read it
 as a bad craft rather than a craft this orb cannot perform on this item.
 
+**An empty `contained(ref) ∩ eligible(entry, recipe)` is the same reason, not a zero.** The
+cross-file checks scope at the entry's own floor and ignore the recipe (AD-17), so a
+reference can pass §2.5, contain tiers in `pool(entry)`, and contain none above the
+recipe's floor. When that holds for any reference of any non-pruned tracked entry of the pair, `core`
+returns the `(itemClass, recipe)` pair as unrankable with the reason it gives an empty
+`eligible` set (`recipe cannot reach this class`, `rank.ts` `RECIPE_UNREACHABLE`). It never
+returns `P = 0` for that reference, for the reason the paragraph above gives.
+
 **Truncation happens after containment and before coverage is read, not instead of either.**
 `contained(ref)` is resolved against `pool(entry)` by §2.4's own rule, and only the
 intersection above removes tiers; a reference that fails edge alignment fails it identically
@@ -1237,6 +1261,27 @@ not made the producer's file less complete.
 **The floors are data.** Greater transmutation and greater augmentation declare `44`, perfect
 orbs declare `70`, and both numbers live in `data/recipes.json` where the player maintains
 them, never here and never in the spine. A patch that moves a floor is a data edit (AD-3).
+
+### 9.1 The recipe word (AD-3)
+
+The Craft Recipe control names a recipe by one word, and the file declares no display
+name. `contracts` derives the word from the recipe's currency ids
+(`packages/contracts/src/craft-recipe.ts` `recipeWord`):
+
+```
+grades            = { "greater", "perfect" }
+grade(currencyId) = g          if currencyId starts with g + "-", for g ∈ grades
+                    none       otherwise
+
+word(recipe)      = g          if every currency of the recipe has grade g
+                    "regular"  if no currency of the recipe has a grade
+                    undefined  otherwise -- mixed
+```
+
+**The grades are the currency-id prefixes `greater-` and `perfect-`, and no other.** A
+recipe whose currencies carry neither reads `regular`. **`RecipesFileSchema` refuses** a
+recipe with a mixed set — a graded currency beside an ungraded one counts as mixed — and
+two recipes that derive one word. Both refusals are AD-3 refusals of `recipes.json`.
 
 ---
 

@@ -144,15 +144,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Architect. AD-5 says `web` replaces each underscore with a space and uses "no display mapping". UX memlog 230 rules that a trailing defence-type suffix prints as defence words (`Gloves_dex_int` → `Gloves (Dex/Int)`, `Body_Armours_str_dex_int` → `Body Armours (Str/Dex/Int)`). Amend AD-5 to admit that one rule. After that, `unitLabel` (`packages/web/src/list/format.ts`) implements it with a test for each suffix form. Today's tracked classes (`Amulets`, `Bows`, `Crossbows`, `Emerald`) carry no suffix, so nothing on the page is wrong yet.
   evidence: Finding HR-8. UX memlog 230. `ARCHITECTURE-SPINE.md` AD-5. `docs/epics.md:1125-1132` repeats "no display mapping" and the `Bow` example, so the PM sweeps it after the AD changes.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Architect. Confirm that the Chase Combination short-form table is a `web` product constant keyed by `statId` (UX memlog 231), and name its module, before the Story 3.5 spec. No contract or artifact holds it today.
-  evidence: Finding HR-9. UX memlog 231. EXPERIENCE.md short-form section. Story 3.5 built the table on that reading, keyed by `statId`, in `packages/web/src/list/short-forms.ts` (`SHORT_FORMS`); the formatter that reads it is `packages/web/src/list/combination-text.ts`. The ruling is still open.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Architect. UX memlog 232 rules that a crafted row's Age cell is the age of its figure: its inputs are the priced entries the EV rests on. Confirm that AD-10's "oldest timestamp of every input" means those EV-contributing entries, and that `core` publishes the fallback reading (the oldest attempted entry when nothing is priced, *never attempted* when every entry is `never-synced`). Do this before the Story 3.5 and 3.6 specs.
-  evidence: Findings HR-17 and XS-35. UX memlog 232. `ARCHITECTURE-SPINE.md` AD-10.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
-  summary: Architect. UX memlog 233 derives a recipe's option word from the grade prefix its currency ids share (`greater-…`, `perfect-…`; none reads `regular`), and a set with mixed grades or duplicate words is refused. Name the prefixes that count as grades, the layer that derives the word, and the cross-file validity predicate (IMPLEMENTATION-NOTES) before the Story 3.4 spec. No contract change.
-  evidence: Finding HR-10. UX memlog 233. `CraftRecipeSchema` (`packages/contracts/src/craft-recipe.ts`) carries no display string. `catalogue/static.json` spells `greater-orb-of-transmutation` and `perfect-orb-of-augmentation`.
-- source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
   summary: Dev. `FETCH_FAILURE_TITLE` (`packages/web/src/frame/FailureScreen.tsx:14`) becomes `A required file did not arrive.` (UX memlog 229, DESIGN.md `fetch-failure-screen.titleText`). Update the tests that assert the old title, and the `App.tsx:33` docblock that says "all eight fetches".
   evidence: UX memlog 229. The old title restated AD-24's count, and the pending AD-24 amendment makes it seven.
 - source_spec: `docs/stories/epic-2-retro-2026-09-27.md`
@@ -211,15 +202,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: story 3.3 (2026-09-27)
 
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "[NOTE FOR ARCHITECT] A real `statId` rolls both kinds, which contradicts AD-17's premise for kind agreement (\"a `statId` either rolls a value or it does not\"). On `weapon.crossbow`/`Crossbows` the suffix `explicit.stat_1967051901` has a valueless T1 tier at item level 55 and a banded `[2, 2]` T1 tier at 82, so no reference on that `statId` can pass the universal quantifier at a floor of 82. The six Crossbows entries on it are now `pruned`. Decide whether the quantifier stays universal, or reads only the lines of the reference's own kind."
-  evidence: `pnpm tracked:lookup tiers explicit.stat_1967051901 --class Crossbows`. `packages/core/src/cross-file.ts` `kindAgreement` implements IN §2.3 and AD-17 as written.
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "[NOTE FOR UX] The cross-file diagnosis line format (`check · canonical key · detail`, one verbatim line per failure) and the empty-group behaviour (no failure renders no group, not a zero line) are provisional. Rule on both in EXPERIENCE.md."
-  evidence: `packages/web/src/frame/trust-facts.ts` `diagnosisLine` and `diagnosisGroups`; `trust-facts.test.ts` and `trust-strip.test.tsx` assert them.
-- source_spec: `docs/stories/spec-3-3-the-five-cross-file-checks-defined-once-and-run-by-both-shells.md`
-  summary: "[NOTE FOR ARCHITECT] `AGENT-WORKFLOW.md` *Parallel worktrees* says \"A pass does not cover the checks that `pnpm tracked:check` lists under `pending`.\" `tracked:check` now runs the five cross-file checks and has no `pending` field. Retire the sentence, or state what a pass still does not confirm (a floor declared too high, AD-5)."
-  evidence: `packages/sync/src/curation/check.ts`. The spec forbids an edit to an owner document in this story.
 - source_spec: `docs/stories/spec-deferred-listenerscript-runs-get-nettcpconnection.md`
   summary: No test runs `snapshotWindows` with a failing listener query, so the first-snapshot path to "nothing listens on port N" is pinned only by reading the code.
   evidence: `snapshotWindows` in `tools/dev-stop/dev-stop.ts` is not exported and no test calls it. It joins `listenerScript` into a larger script, and a hand run of that joined shape with a missing cmdlet exits 1 today. A later edit that inlines its own `SilentlyContinue` query, or wraps the joined script so the `throw` no longer ends it, would make `pnpm dev:stop` print "nothing listens" after a failed query with every test passing. Closing it needs a test seam into `snapshotWindows` (an export or the same `node:child_process` mock the `listenersWindows` failure test uses, reached through an exported caller).
@@ -247,12 +229,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: story 3.4 (2026-10-02)
 
-- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
-  summary: "[NOTE FOR ARCHITECT] Take ownership of the recipe-word predicate in IMPLEMENTATION-NOTES, so the grade-ruling entry above (UX memlog 233, finding HR-10) can close. Story 3.4 built the player's Decision: the grades are the currency-id prefixes `greater-` and `perfect-` only; a recipe whose currencies carry neither reads `regular`; `RecipesFileSchema` refuses a recipe that mixes grades (a grade beside an ungraded currency counts as mixed) and two recipes that derive one word (AD-3 refusal)."
-  evidence: "`packages/contracts/src/craft-recipe.ts` (`RECIPE_GRADES`, `recipeWord`), `packages/contracts/src/envelopes.ts` (`RecipesFileSchema` refine). The spec forbids an owner-document edit."
-- source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
-  summary: "[NOTE FOR PM] FR-4 owes a ruling on the provisional reason `recipe cannot reach this class`. `core` gives it to an `(Item Class, recipe)` pair whose `combinationProbability` returns `empty-eligible-pool` or `augment-exhausted`; the appendix prints it for the active recipe only. Adopt or reword it. The case is live, not defensive: every `jewel/Emerald` tier in the committed `weights.json` has `itemLevelMin` 1, so both v1 floors (44 and 70) empty its prefix pool, and Emerald is in the appendix under both recipes. The Emerald re-floor to 82 does not change this, because the recipe floor reads the tier's level, not the entry's (IN §9)."
-  evidence: "`packages/core/src/rank.ts` `RECIPE_UNREACHABLE`; `packages/web/src/App.test.tsx`, the committed-data appendix test. Check with `pnpm tracked:lookup` on `jewel/Emerald`, or `combinationProbability` at floors 0, 44 and 70."
 - source_spec: `docs/stories/spec-3-4-the-crafted-ev-craft-cost-and-the-craft-recipe-control.md`
   summary: "Player. Replace the four dummy orb rates in `data/currencies.json` (`greater-` and `perfect-orb-of-transmutation` / `-augmentation`, `source: \"dummy, not measured\"`) with measured values. Until the next sync copies them into `dataset.json`, both recipes are uncostable and the page renders state 35."
   evidence: "`data/currencies.json`; `dataset.json` `currencyRates` holds only divine, exalted and chaos."
@@ -305,3 +281,21 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: No automated path runs `pnpm test:data`, so the live-data invariants (short forms, cell fit, `tracked:check` exit 0, `sync:dry` output shape) are enforced only by hand. Add a non-blocking CI job or a scheduled run. Do not gate `deploy.yml` on it: that blocks a player's data-only push, which is the coupling this spec removed.
   evidence: `deploy.yml` runs `pnpm check`, `pnpm test` and `pnpm build`; `grep test:data .github` finds only a comment. The `*.data.test.ts` files and the `data` project in `vitest.config.ts`.
   retry_when: The player picks the signal channel for a failing live-data check (a non-blocking job, a schedule or a hook).
+
+## Deferred from: epic 3 retro item 31 (2026-10-03)
+
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-answer-the-open-owner-rulings.md`
+  summary: "Dev. Bring `core`'s crafted `asOf` in line with AD-10: the timestamp inputs are the summands only, so the Craft Cost rates leave `stamps`. With no summand, `core` publishes the fallback, the oldest `lastAttemptedAt` of the class's tracked entries, or *never attempted*. The Age cell build (the Story 3.5 entry on the crafted Age cell) prints it."
+  evidence: "Ruling 2 of the spec, written into spine AD-10. `packages/core/src/rank.ts` `craftedRow` seeds `stamps` with `cost.asOf` and has no attempted fallback; `packages/contracts/src/ranked-row.ts` documents `asOf`."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-answer-the-open-owner-rulings.md`
+  summary: "Dev. D5: an empty `contained ∩ eligible` set under a recipe floor makes the `(Item Class, recipe)` pair unrankable with `recipe cannot reach this class`, never `P = 0` (IN §9). Change `combinationProbability` or `craftedRow` to return the reason, and flip `rank.test.ts` (the Staves case that ranks at `−craftCost`)."
+  evidence: "Ruling 3 of the spec. Retro D5 (`docs/stories/epic-3-retro-2026-10-03.md`). `packages/core/src/probability.ts` `combinationProbability` returns a reason only for an empty eligible total or an exhausted augment."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-answer-the-open-owner-rulings.md`
+  summary: "Dev, then player. Read a valueless tier as the band `[1, 1]` in `kindAgreement`, containment (`covers`) and `meets` (IN §1, §2.3, §2.7; AD-17). A reference line with no band beside a banded scoped line still fails. The six pruned Crossbows entries on `explicit.stat_1967051901` are `valueless` references, so they still fail after the code change: rewrite each suffix as a banded `[1, 1]` reference through the `tracked-json` skill, clear `status: pruned`, and run `pnpm tracked:check`. Before relying on them, check that a trade search with `min: 1, max: 1` on that stat returns items with the valueless \"Loads an additional bolt\" tier (AD-16), and flag any other mixed-kind `statId` whose valueless tier is not the count 1."
+  evidence: "Ruling 5 of the spec. `packages/core/src/cross-file.ts` `kindAgreement` counts every line of the other kind; containment and `meets` still exclude valueless tiers."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-answer-the-open-owner-rulings.md`
+  summary: "Dev. The comment at `packages/contracts/src/craft-recipe.ts` (above `RECIPE_GRADES`) still says the recipe-word rule is pending IMPLEMENTATION-NOTES ownership. Cite IN §9.1 instead."
+  evidence: "Ruling 1 of the spec, written into IN §9.1 *The recipe word (AD-3)*. The spec changed no code."
+- source_spec: `docs/stories/spec-epic-3-retro-item-31-answer-the-open-owner-rulings.md`
+  summary: "[NOTE FOR UX] The cross-file diagnosis group renders nothing both when every check passes and when the checks did not run (no weights envelope loaded). The player can read an absent group as \"all checks pass\". Rule whether the not-run case prints a word, as the coverage group does with *not measured* / *unknown*."
+  evidence: "Edge-case review of this spec. EXPERIENCE.md `{components.sync-report-panel}` (ruling 7, revision 18) rules only the no-failure case; `packages/web/src/frame/trust-facts.ts` `diagnosisGroups` returns `[]` for both."
