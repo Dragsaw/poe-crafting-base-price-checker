@@ -18,6 +18,19 @@ describe('formatDivine', () => {
   });
 });
 
+describe('formatDivine on a negative figure', () => {
+  it('never prints -0.00', () => {
+    expect(formatDivine(-0.001)).toBe('0.00');
+    expect(formatDivine(-0.0049)).toBe('0.00');
+    expect(formatDivine(-0)).toBe('0.00');
+  });
+
+  it('keeps the sign of a negative figure that rounds to a non-zero value', () => {
+    expect(formatDivine(-0.01)).toBe('-0.01');
+    expect(formatDivine(-2.5)).toBe('-2.50');
+  });
+});
+
 describe('formatThreshold', () => {
   it('always prints two decimals, zero included', () => {
     expect(formatThreshold(0.25)).toBe('0.25');
