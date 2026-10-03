@@ -312,7 +312,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
       completed: [],
       notBefore: '2026-09-26T12:01:00.000Z',
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
     });
     const report = await reportOf(fs);
     expect(report?.records).toEqual([]);
@@ -609,22 +609,50 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
      * before an `authenticated` settle. The fake records every request.
      */
     function probing(deps: SyncCommandDeps, ...answers: (HttpResponse | Error)[]): SyncCommandDeps {
+      return probingThen(deps, answers);
+    }
+
+    /**
+     * As `probing`, and every later cookie request is answered by `after`:
+     * by default the fake's answer with the live rule set added, so the
+     * cookie stays live (§13.4).
+     */
+    function probingThen(
+      deps: SyncCommandDeps,
+      answers: (HttpResponse | Error)[],
+      after: (answer: HttpResponse) => HttpResponse = (answer) => ({
+        ...answer,
+        headers: { ...answer.headers, ...LIVE.headers },
+      }),
+    ): SyncCommandDeps {
       const fake = deps.http;
       return {
         ...deps,
         http: {
           send(request) {
             const sent = fake.send(request);
-            const answer =
-              request.method === 'POST' && request.headers['cookie'] !== undefined ? answers.shift() : undefined;
-            if (answer === undefined) {
+            if (request.headers['cookie'] === undefined) {
               return sent;
+            }
+            const answer = request.method === 'POST' ? answers.shift() : undefined;
+            if (answer === undefined) {
+              return sent.then(after);
             }
             return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
           },
         },
       };
     }
+
+    const progressOf = async (fs: FilesystemPort): Promise<Record<string, unknown>> =>
+      JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '{}') as Record<string, unknown>;
+
+    const NOW_PLUS_24H = '2026-09-27T12:00:00.000Z';
+    const HOLD_OFF = '2026-09-27T06:00:00.000Z';
+    const PAST_HOLD_OFF = '2026-09-26T11:00:00.000Z';
+    const progressSeed = (fields: Record<string, unknown>) => ({
+      [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.2.0', completed: [], ...fields }) },
+    });
 
     function withResults(setup: Setup = {}) {
       const built = depsFor(LEAGUE, { env: COOKIE_ENV, answers: { search: SEARCH_WITH_RESULTS }, ...setup });
@@ -729,6 +757,92 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(http.requests.every((request) => request.headers['cookie'] === undefined)).toBe(true);
       expect(err).toHaveLength(1);
       expect(auth).toEqual([{ line: 'pnpm sync:batch: unauthenticated (not-probed)', requestsBefore: 2 }]);
+    });
+
+    it.each([
+      ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' } as HttpResponse],
+      ['a 401', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
+      ['a 2xx that is not live', FETCHED],
+    ])('CAP-3, %s on the cookie fetch: one expired line, the entry stamped, yielded, the hold-off written, exit 0', async (_label, downgrading) => {
+      const { deps, http, auth, err, out, fs } = withResults();
+
+      expect(await syncCommand(probingThen(deps, [LIVE], () => downgrading))).toBe(0);
+
+      expect(auth.map((entry) => entry.line)).toEqual([
+        'pnpm sync:batch: authenticated',
+        'pnpm sync:batch: unauthenticated (expired)',
+      ]);
+      expect(err).toEqual([]);
+      expect(out).toEqual(['pnpm sync:batch: yielded, 0 completed']);
+      const progress = await progressOf(fs);
+      expect(progress).toEqual({ schemaVersion: '1.2.0', completed: [], authHoldOffUntil: NOW_PLUS_24H });
+      // The entry is stamped and keeps the search fields from this entry's search; the price is unchanged.
+      const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
+      expect(dataset.entries[0]).toMatchObject({
+        lastAttemptedAt: NOW,
+        lastSearchId: 'S1',
+        price: { state: 'not-yet-synced', reason: 'never-synced' },
+      });
+      // A downgrade is not a request-rejected abort: no record.
+      expect((await reportOf(fs))?.records).toEqual([]);
+      expect(cookies(http).at(-1)).toEqual(['GET', COOKIE]);
+    });
+
+    it('CAP-5, held off: unauthenticated (held-off), no session-probe request, exit 0, the field unchanged', async () => {
+      const { deps, http, auth, fs } = withResults({ seeded: progressSeed({ authHoldOffUntil: HOLD_OFF }) });
+
+      expect(await syncCommand(probing(deps, LIVE))).toBe(0);
+
+      expect(auth).toEqual([{ line: 'pnpm sync:batch: unauthenticated (held-off)', requestsBefore: 0 }]);
+      expect(http.requests.every((request) => request.headers['cookie'] === undefined)).toBe(true);
+      expect((await reportOf(fs))?.figures.requestsBySource['session-probe']).toBe(0);
+      expect((await progressOf(fs))['authHoldOffUntil']).toBe(HOLD_OFF);
+    });
+
+    it('CAP-5, the hold-off is past: the run probes, and live clears the field', async () => {
+      const { deps, auth, fs } = withResults({ seeded: progressSeed({ authHoldOffUntil: PAST_HOLD_OFF }) });
+
+      expect(await syncCommand(probing(deps, LIVE))).toBe(0);
+
+      expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync:batch: authenticated']);
+      expect(await progressOf(fs)).not.toHaveProperty('authHoldOffUntil');
+    });
+
+    it.each([
+      ['not-elevated', { ...SEARCH_WITH_RESULTS, body: JSON.stringify({ id: 'PROBE', result: RESULTS }) }],
+      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' } as HttpResponse],
+    ])('CAP-5, %s writes the hold-off in the chunk’s progress write', async (_reason, answer) => {
+      const { deps, fs } = withResults();
+
+      expect(await syncCommand(probing(deps, answer))).toBe(0);
+
+      expect((await progressOf(fs))['authHoldOffUntil']).toBe(NOW_PLUS_24H);
+    });
+
+    it.each([
+      ['probe-failed', COOKIE_ENV, [{ status: 503, headers: {}, body: '' } as HttpResponse]],
+      ['a probe 429', COOKIE_ENV, [{ status: 429, headers: { 'retry-after': '60' }, body: '' } as HttpResponse]],
+      ['absent', { [USER_AGENT_ENV_VAR]: CONTACT }, []],
+      ['malformed', { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: 'a b' }, []],
+    ])('CAP-5, %s carries the field forward unchanged', async (_label, env, answers) => {
+      const { deps, fs } = withResults({ env, seeded: progressSeed({ authHoldOffUntil: PAST_HOLD_OFF }) });
+
+      expect(await syncCommand(probing(deps, ...answers))).toBe(0);
+
+      expect((await progressOf(fs))['authHoldOffUntil']).toBe(PAST_HOLD_OFF);
+    });
+
+    it('CAP-5, not-probed (no 2xx search) carries the field forward unchanged', async () => {
+      const { deps, auth, fs } = depsFor(LEAGUE, {
+        env: COOKIE_ENV,
+        answers: { search: { status: 503, headers: {}, body: '' } },
+        seeded: progressSeed({ authHoldOffUntil: PAST_HOLD_OFF }),
+      });
+
+      expect(await syncCommand(deps)).toBe(0);
+
+      expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync:batch: unauthenticated (not-probed)']);
+      expect((await progressOf(fs))['authHoldOffUntil']).toBe(PAST_HOLD_OFF);
     });
 
     it('no entry attempted (a gate 429): no probe, not-probed at the end, exit 0', async () => {

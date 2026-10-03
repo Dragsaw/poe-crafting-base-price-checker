@@ -182,6 +182,12 @@ type Leg =
       readonly kind: 'yield';
       /** Set only on a `429` yield: the delay the client's yield carried (§5.3). */
       readonly retryAfterMs?: number;
+      /**
+       * Set only on AD-30's downgrade (IMPLEMENTATION-NOTES.md §13.4). It is
+       * read like any request with no answer: no `retryAfterMs`, so the entry
+       * is stamped and keeps its earlier search fields and price state.
+       */
+      readonly sessionExpired?: true;
     }
   | { readonly kind: 'malformed'; readonly status: number };
 
@@ -194,6 +200,7 @@ function yieldedWith(
     kind: 'yielded',
     entry,
     ...(leg.retryAfterMs === undefined ? {} : { retryAfterMs: leg.retryAfterMs }),
+    ...(leg.sessionExpired === true ? { sessionExpired: true } : {}),
   };
 }
 
@@ -214,6 +221,10 @@ async function sendLeg(send: () => Promise<TradeResult>): Promise<Leg> {
     throw error;
   }
   if (result.kind === 'yield') {
+    if (result.reason === 'session-expired') {
+      // The downgrading answer is discarded: AD-9's request with no answer.
+      return { kind: 'yield', sessionExpired: true };
+    }
     const retryAfterMs = penaltyRetryAfterMs(result);
     return retryAfterMs === undefined ? { kind: 'yield' } : { kind: 'yield', retryAfterMs };
   }

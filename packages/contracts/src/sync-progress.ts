@@ -36,13 +36,18 @@ export const SyncProgressSchema = z.strictObject({
   notBefore: IsoTimestampSchema.optional().describe(
     'Penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3). A run that starts before this instant defers: it sends nothing and exits 0. Written only by a chunk that ends on a 429 or a malformed-request abort; every other ending that writes progress clears it. Absent never defers.',
   ),
+  authHoldOffUntil: IsoTimestampSchema.optional().describe(
+    'The session-cookie hold-off across processes (AD-30, IMPLEMENTATION-NOTES.md §13.3). While a run starts before this instant, a valid session cookie settles held-off and no probe is sent. Written as now + 24h by a not-elevated, probe-rejected or expired outcome, removed by a live probe, and carried forward by every other progress write. Holds the due time only, never the cookie value.',
+  ),
 });
 
 /**
  * The `sync-progress.json` contract version. 1.1.0 added the optional
- * `notBefore`. The schema is strict, so a build older than the change refuses a
- * file carrying the field, which is acceptable because only `sync` reads it.
+ * `notBefore`. 1.2.0 added the optional `authHoldOffUntil` (IMPLEMENTATION-NOTES.md
+ * §13.7), so a 1.1.0 file still parses. The schema is strict, so a build older
+ * than a change refuses a file carrying the field, which is acceptable because
+ * only `sync` reads it.
  */
-export const SYNC_PROGRESS_SCHEMA_VERSION = '1.1.0';
+export const SYNC_PROGRESS_SCHEMA_VERSION = '1.2.0';
 
 export type SyncProgress = z.infer<typeof SyncProgressSchema>;

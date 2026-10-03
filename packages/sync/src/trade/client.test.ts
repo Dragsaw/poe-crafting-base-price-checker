@@ -8,6 +8,8 @@ import {
   createTradeClients,
   createTradeGovernor,
   laneDelayMs,
+  penaltyRetryAfterMs,
+  resetPacingState,
 } from './client.ts';
 import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from './session-auth.ts';
 import { MissingUserAgentError, USER_AGENT_ENV_VAR } from './user-agent.ts';
@@ -861,6 +863,8 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
       readonly baseline?: HttpResponse;
       readonly probe?: ProbeAnswer;
       readonly value?: string;
+      /** The answer to a request that carries the cookie. Defaults to a live 2xx. */
+      readonly cookieAnswer?: (request: HttpRequest) => HttpResponse;
     } = {},
   ) {
     const sent: Sent[] = [];
@@ -878,10 +882,16 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
       [`GET ${FETCH_URL}`]: response(200, {}, '{"result":[]}'),
       [`GET ${DATA_URL}`]: response(200, {}, '[]'),
     });
+    const cookieAnswer =
+      options.cookieAnswer ??
+      ((request: HttpRequest) =>
+        response(200, LIVE_SEARCH_HEADERS, request.method === 'POST' ? BASELINE_BODY : '{"result":[]}'));
     const http: HttpPort = {
       send(request) {
         record('http', request);
-        return fake.send(request);
+        return request.headers['cookie'] === undefined
+          ? fake.send(request)
+          : Promise.resolve(cookieAnswer(request));
       },
     };
     const answer: ProbeAnswer = options.probe ?? response(200, LIVE_SEARCH_HEADERS, PROBE_BODY);
@@ -912,7 +922,7 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
       pricing.send({ method: 'POST', url: SEARCH_URL, body: BODY, lane: 'search', cookieEligible: true });
     const fetch = () => pricing.send({ method: 'GET', url: FETCH_URL, lane: 'fetch', cookieEligible: true });
     const leagues = () => league.send({ method: 'GET', url: DATA_URL, lane: 'data' });
-    return { sent, lines, logs, holder, waits, governor, search, fetch, leagues };
+    return { sent, lines, logs, holder, waits, governor, probe, search, fetch, leagues };
   }
 
   const probesOf = (sent: readonly Sent[]) => sent.filter((entry) => entry.port === 'probe');
@@ -1126,5 +1136,149 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
 
     expect(probesOf(h.sent)).toEqual([]);
     expect(h.sent.every((entry) => entry.cookie === undefined)).toBe(true);
+  });
+
+  it('a live probe records the clear action and keeps the baseline rule count', async () => {
+    const h = probeHarness();
+
+    await h.search();
+
+    expect(h.holder.baselineRuleCount).toBe(1);
+    expect(h.holder.pendingHoldOff()).toBe('clear');
+  });
+
+  describe('the downgrade (§13.4)', () => {
+    const NOT_LIVE_HEADERS = CLEAR_SEARCH_HEADERS;
+
+    it.each([
+      ['a 401', response(401, CLEAR_SEARCH_HEADERS, 'nope')],
+      ['a 403', response(403, { 'content-type': 'text/html', 'cf-mitigated': 'challenge' }, 'blocked')],
+      ['a 2xx that is not live', response(200, NOT_LIVE_HEADERS, '{"result":[]}')],
+    ])(
+      '%s on a cookie fetch: one expired line, cold pacing in place, a session-expired yield with no response, no invalid count, no later cookie',
+      async (_label, downgrading) => {
+        const h = probeHarness({
+          cookieAnswer: (request) =>
+            request.method === 'GET'
+              ? downgrading
+              : response(200, LIVE_SEARCH_HEADERS, BASELINE_BODY),
+        });
+        const pacing = h.governor.pacing;
+        const lanePolicies = pacing.lanePolicies;
+
+        await h.search();
+        expect(h.lines).toEqual(['authenticated']);
+        expect(Object.keys(pacing.ledger)).not.toHaveLength(0);
+
+        const fetched = await h.fetch();
+
+        expect(fetched).toMatchObject({ kind: 'yield', reason: 'session-expired', retryAfterMs: 0 });
+        expect(fetched.kind === 'yield' && fetched.response).toBeUndefined();
+        expect(fetched.kind === 'yield' && penaltyRetryAfterMs(fetched)).toBeUndefined();
+        expect(fetched.invalidRequests).toBe(0);
+        expect(h.lines).toEqual(['authenticated', 'unauthenticated (expired)']);
+        expect(h.holder.state).toEqual({ kind: 'unauthenticated', reason: 'expired' });
+        expect(h.holder.pendingHoldOff()).toBe('write');
+        // Cold, in place: the same object and the same lane memo.
+        expect(h.governor.pacing).toBe(pacing);
+        expect(pacing.lanePolicies).toBe(lanePolicies);
+        expect(pacing.ledger).toEqual({});
+        expect(lanePolicies.size).toBe(0);
+        // The 403 or 401 was not counted: threshold 1 is not reached.
+        const again = await h.search();
+        expect(again.kind).toBe('response');
+        expect(again.invalidRequests).toBe(0);
+        await h.fetch();
+
+        const cookies = httpOf(h.sent).map((entry) => entry.cookie);
+        expect(cookies).toEqual([undefined, COOKIE, undefined, undefined]);
+        expect(probesOf(h.sent)).toHaveLength(1);
+        expect(h.lines).toHaveLength(2);
+      },
+    );
+
+    it('a downgrade on a cookie search: the same yield, and the search answer is discarded', async () => {
+      const h = probeHarness({ cookieAnswer: () => response(403, {}, 'blocked') });
+
+      await h.search();
+      const searched = await h.search();
+
+      expect(searched).toMatchObject({ kind: 'yield', reason: 'session-expired' });
+      expect(searched.kind === 'yield' && searched.response).toBeUndefined();
+      expect(h.lines).toEqual(['authenticated', 'unauthenticated (expired)']);
+    });
+
+    it('still live: no line, and the answer is used', async () => {
+      const h = probeHarness();
+
+      await h.search();
+      const fetched = await h.fetch();
+
+      expect(fetched.kind === 'response' && fetched.response.status).toBe(200);
+      expect(h.lines).toEqual(['authenticated']);
+      expect(h.holder.state).toEqual({ kind: 'authenticated' });
+    });
+
+    it.each([
+      ['a 429', response(429, { ...LIVE_SEARCH_HEADERS, 'retry-after': '30' }), 'yield'],
+      ['a 503', response(503, {}, 'busy'), 'response'],
+      ['a 404', response(404, LIVE_SEARCH_HEADERS, 'gone'), 'response'],
+    ])('%s on a cookie request stays ordinary: no downgrade', async (_label, answer, kind) => {
+      const h = probeHarness({
+        cookieAnswer: (request) =>
+          request.method === 'GET' ? answer : response(200, LIVE_SEARCH_HEADERS, BASELINE_BODY),
+      });
+
+      await h.search();
+      const fetched = await h.fetch();
+
+      expect(fetched.kind).toBe(kind);
+      expect(fetched.kind === 'yield' ? fetched.reason : undefined).not.toBe('session-expired');
+      expect(h.lines).toEqual(['authenticated']);
+      expect(h.holder.state).toEqual({ kind: 'authenticated' });
+    });
+
+    it('a later governor over the expired holder sends no cookie and no probe', async () => {
+      const h = probeHarness({
+        cookieAnswer: (request) =>
+          request.method === 'GET' ? response(401, {}) : response(200, LIVE_SEARCH_HEADERS, BASELINE_BODY),
+      });
+      await h.search();
+      await h.fetch();
+
+      const probe = createFakeHttpPort({});
+      const http = createFakeHttpPort({
+        [`POST ${SEARCH_URL}`]: response(200, CLEAR_SEARCH_HEADERS, BASELINE_BODY),
+        [`GET ${FETCH_URL}`]: response(200, {}, '{"result":[]}'),
+      });
+      const next = createTradeGovernor({
+        http: { pricing: http },
+        clock: createFakeClockPort(NOW),
+        wait: recordingWait().wait,
+        userAgent: CONTACT,
+        auth: { holder: h.holder, probe },
+      });
+      await next.clients.pricing.send({ method: 'POST', url: SEARCH_URL, body: BODY, cookieEligible: true });
+      await next.clients.pricing.send({ method: 'GET', url: FETCH_URL, cookieEligible: true });
+
+      expect(probe.requests).toEqual([]);
+      expect(http.requests.every((request) => request.headers['cookie'] === undefined)).toBe(true);
+      expect(h.lines).toEqual(['authenticated', 'unauthenticated (expired)']);
+    });
+  });
+});
+
+describe('resetPacingState (§13.4)', () => {
+  it('empties the ledger and the lane memo of the same object', () => {
+    const pacing = createPacingState();
+    pacing.ledger = { [SEARCH_POLICY]: { policy: SEARCH_POLICY, observedAt: NOW, rules: [] } };
+    pacing.lanePolicies.set('search', SEARCH_POLICY);
+    const memo = pacing.lanePolicies;
+
+    resetPacingState(pacing);
+
+    expect(pacing.ledger).toEqual({});
+    expect(pacing.lanePolicies).toBe(memo);
+    expect(memo.size).toBe(0);
   });
 });

@@ -16,6 +16,7 @@ import type {
   FakeClockPort,
   FakeFilesystemPort,
   HttpPort,
+  HttpRequest,
   HttpResponse,
   SyncReportFile,
   TrackedEntry,
@@ -25,7 +26,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { CrossFileGateError } from './chunk/cross-file-gate.ts';
 import { LOCK_PATH, serialiseLock, STALE_LOCK_AFTER_MS } from './chunk/lock.ts';
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
-import { DATASET_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
+import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { LeagueMismatchError, LeagueRequestRejectedError } from './league/league-gate.ts';
 import { DataFileError } from './load-data-file.ts';
 import { MalformedRequestError, UnexpectedTradeResponseError } from './pricing/price-entry.ts';
@@ -294,6 +295,20 @@ describe('nextWait: the session matrix', () => {
     }, { signature: 's', before: zeroRequests() });
     expect(read.backoffCount).toBe(0);
     expect(nextWait(noAnswer, read, COLD)).toMatchObject({ until: at(36_000) });
+  });
+
+  it('session-expired: backoff(1) whatever the backoff count, and no fresh reading resets it (§13.4)', () => {
+    const expired = outcome({ ...base, kind: 'yielded', newPass: false, sessionExpired: true });
+    const deep: SessionState = { ...INITIAL_SESSION_STATE, backoffCount: 3 };
+    const wait = { kind: 'until', until: at(36_000), reason: 'the session cookie expired', orInputChange: false };
+
+    expect(nextWait(expired, deep, COLD)).toEqual(wait);
+    // Even a context that saw the reset ledger as a reading.
+    expect(nextWait(expired, deep, { ...COLD, freshReading: true })).toEqual(wait);
+    expect(nextState(deep, expired, COLD, { signature: 's', before: zeroRequests() }).backoffCount).toBe(1);
+    expect(
+      nextState(deep, expired, { ...COLD, freshReading: true }, { signature: 's', before: zeroRequests() }).backoffCount,
+    ).toBe(1);
   });
 
   it('caps the backoff at the 6 h stale threshold', () => {
@@ -639,12 +654,30 @@ describe('pnpm sync: the session with injected ports', () => {
      * before an `authenticated` settle. The fake records every request.
      */
     function probing(...answers: (HttpResponse | Error)[]) {
+      return probingThen(answers);
+    }
+
+    /**
+     * As `probing`, and every later cookie request is answered by `after`: by
+     * default the fake's answer with the live rule set added, so the cookie
+     * stays live (§13.4).
+     */
+    function probingThen(
+      answers: (HttpResponse | Error)[],
+      after: (request: HttpRequest, answer: HttpResponse) => HttpResponse = (_request, answer) => ({
+        ...answer,
+        headers: { ...answer.headers, ...LIVE.headers },
+      }),
+    ) {
       return (fake: ReturnType<typeof createFakeHttpPort>): HttpPort => ({
         send(request) {
           const sent = fake.send(request);
-          const answer = request.method === 'POST' && request.headers['cookie'] !== undefined ? answers.shift() : undefined;
-          if (answer === undefined) {
+          if (request.headers['cookie'] === undefined) {
             return sent;
+          }
+          const answer = request.method === 'POST' ? answers.shift() : undefined;
+          if (answer === undefined) {
+            return sent.then((fakeAnswer) => after(request, fakeAnswer));
           }
           return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
         },
@@ -731,6 +764,78 @@ describe('pnpm sync: the session with injected ports', () => {
         ['POST', COOKIE],
       ]);
       expect(auth).toEqual([{ line: 'pnpm sync: authenticated', requestsBefore: 5 }]);
+    });
+
+    it('CAP-3: the second chunk’s fetch gets a 403: one expired line, the hold-off written, backoff(1), and no later Cookie or probe', async () => {
+      const RESULTS = ['r1'];
+      const SEARCH = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: 1 });
+      const FETCHED = JSON.stringify({ result: [{ listing: { price: { amount: 2, currency: 'divine' } } }] });
+      let cookieFetches = 0;
+      const { deps, auth, err, http, fs, out } = sessionFor({
+        env: COOKIE_ENV,
+        tracked: [ENTRY, SECOND, THIRD],
+        stopAfter: 3,
+        fixtures: {
+          [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: SEARCH },
+          [`GET ${tradeFetchUrl(RESULTS, 'S1')}`]: { status: 200, headers: {}, body: FETCHED },
+        },
+        http: probingThen([{ ...LIVE, body: SEARCH }], (request, answer) => {
+          if (request.method === 'GET') {
+            cookieFetches += 1;
+            if (cookieFetches === 2) {
+              return { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' };
+            }
+          }
+          return { ...answer, headers: { ...answer.headers, ...LIVE.headers } };
+        }),
+      });
+
+      expect(await syncSessionCommand(deps)).toBe(0);
+
+      expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync: authenticated', 'pnpm sync: unauthenticated (expired)']);
+      expect(err).toEqual([]);
+      expect(cookies(http)).toEqual([
+        // Chunk 1: the gate, the baseline, the probe, the fetch.
+        ['GET', undefined],
+        ['POST', undefined],
+        ['POST', COOKIE],
+        ['GET', COOKIE],
+        // Chunk 2: the search, then the fetch that got the 403.
+        ['POST', COOKIE],
+        ['GET', COOKIE],
+        // Chunk 3: no cookie and no probe.
+        ['POST', undefined],
+        ['GET', undefined],
+      ]);
+      const yielded = out.find((entry) => entry.line === 'pnpm sync: yielded, 0 completed');
+      expect(yielded).toBeDefined();
+      const progress = JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '{}') as Record<string, unknown>;
+      // Written by chunk 2, carried forward by chunk 3.
+      expect(progress['authHoldOffUntil']).toBe(new Date(Date.parse(yielded?.at ?? '') + 24 * 3_600_000).toISOString());
+      expect(progress).not.toHaveProperty('notBefore');
+      // The downgrade reset the pacing to cold, so backoff(1) is the cold even interval.
+      expect(announced(out, 'the session cookie expired')).toEqual([backoffMs(COLD_EVEN_INTERVAL_MS, 1)]);
+      expect((await reportOf(fs))?.figures.requestsBySource['session-probe']).toBe(1);
+    });
+
+    it('CAP-5: a due hold-off settles held-off once, before any request, and the session never probes', async () => {
+      const HOLD_OFF = '2026-09-27T06:00:00.000Z';
+      const { deps, auth, http, fs } = sessionFor({
+        env: COOKIE_ENV,
+        tracked: [ENTRY, SECOND, THIRD],
+        stopAfter: 3,
+        seeded: {
+          [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.2.0', completed: [], authHoldOffUntil: HOLD_OFF }) },
+        },
+        http: probing(LIVE),
+      });
+
+      expect(await syncSessionCommand(deps)).toBe(0);
+
+      expect(auth).toEqual([{ line: 'pnpm sync: unauthenticated (held-off)', requestsBefore: 0 }]);
+      expect(http.requests.every((request) => request.headers['cookie'] === undefined)).toBe(true);
+      const progress = JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '{}') as Record<string, unknown>;
+      expect(progress['authHoldOffUntil']).toBe(HOLD_OFF);
     });
 
     it('no 2xx pricing search: unauthenticated (not-probed) once, at the end of the session', async () => {

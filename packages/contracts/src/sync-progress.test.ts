@@ -52,10 +52,28 @@ describe('SyncProgressFileSchema', () => {
   });
 
   it('stamps a minor version, so a 1.0.0 progress file keeps its major', () => {
-    expect(SYNC_PROGRESS_SCHEMA_VERSION).toBe('1.1.0');
+    expect(SYNC_PROGRESS_SCHEMA_VERSION).toBe('1.2.0');
     expect(
       parseEnvelope(SyncProgressFileSchema, { schemaVersion: INITIAL_SCHEMA_VERSION, completed: [] }).ok,
     ).toBe(true);
+  });
+
+  it('reads a 1.1.0 body unchanged, with no authHoldOffUntil (§13.7)', () => {
+    const file = { schemaVersion: '1.1.0', completed: ['k'], notBefore: '2026-09-26T16:00:00.000Z' };
+    expect(parseEnvelope(SyncProgressFileSchema, file)).toEqual({ ok: true, value: file });
+  });
+
+  it('accepts an optional authHoldOffUntil instant, and refuses a non-instant (AD-30, §13.3)', () => {
+    const file = {
+      schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
+      completed: [],
+      authHoldOffUntil: '2026-09-27T16:00:00.000Z',
+    };
+    expect(parseEnvelope(SyncProgressFileSchema, file)).toEqual({ ok: true, value: file });
+    expect(SyncProgressSchema.parse({ completed: [] }).authHoldOffUntil).toBeUndefined();
+    expect(SyncProgressSchema.safeParse({ completed: [], authHoldOffUntil: 'tomorrow' }).success).toBe(
+      false,
+    );
   });
 
   it('refuses a duplicated key and an empty key', () => {

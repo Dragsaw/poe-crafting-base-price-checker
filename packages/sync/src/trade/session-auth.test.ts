@@ -201,3 +201,112 @@ describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () =>
     expect(holder.withCookie({})).toEqual({ cookie: `POESESSID="${CANARY}"` });
   });
 });
+
+describe('the downgrade and the hold-off (IMPLEMENTATION-NOTES.md §13.1, §13.3, §13.4)', () => {
+  const NOW = '2026-10-03T12:00:00.000Z';
+  const LATER = '2026-10-04T12:00:00.000Z';
+
+  it.each([
+    ['authenticated', 'clear'],
+    ['not-elevated', 'write'],
+    ['probe-rejected', 'write'],
+    ['probe-failed', undefined],
+    ['not-probed', undefined],
+    ['held-off', undefined],
+  ] as const)('a %s settle records %s', (outcome, action) => {
+    const { holder } = withLines(CANARY);
+    holder.settle(outcome);
+    expect(holder.pendingHoldOff()).toBe(action);
+  });
+
+  it.each([['absent', ''], ['malformed', 'a b']])('an %s edge settle records no action', (_label, value) => {
+    expect(withLines(value).holder.pendingHoldOff()).toBeUndefined();
+  });
+
+  it('expire: authenticated becomes expired once, prints one line, records write and drops the cookie', () => {
+    const { holder, lines } = withLines(CANARY);
+    holder.settle('authenticated');
+
+    expect(holder.expire()).toBe(true);
+    expect(holder.expire()).toBe(false);
+
+    expect(holder.state).toEqual({ kind: 'unauthenticated', reason: 'expired' });
+    expect(lines).toEqual(['authenticated', 'unauthenticated (expired)']);
+    expect(holder.pendingHoldOff()).toBe('write');
+    expect(holder.isAuthenticated).toBe(false);
+    expect(holder.canProbe).toBe(false);
+    // No other transition: a settle after the downgrade is a no-op.
+    holder.settle('authenticated');
+    expect(holder.state).toEqual({ kind: 'unauthenticated', reason: 'expired' });
+    expect(lines).toHaveLength(2);
+  });
+
+  it.each([
+    ['unsettled', (): void => undefined],
+    ['not-elevated', (holder: ReturnType<typeof withCookie>): void => holder.settle('not-elevated')],
+  ])('expire from %s is a no-op that prints nothing', (_label, before) => {
+    const { holder, lines } = withLines(CANARY);
+    before(holder);
+    const printed = lines.length;
+    expect(holder.expire()).toBe(false);
+    expect(lines).toHaveLength(printed);
+    expect(holder.state.kind).not.toBe('authenticated');
+  });
+
+  it('holdOffApplied clears only the action it names', () => {
+    const { holder } = withLines(CANARY);
+    holder.settle('authenticated');
+    holder.holdOffApplied('write');
+    expect(holder.pendingHoldOff()).toBe('clear');
+    holder.holdOffApplied('clear');
+    expect(holder.pendingHoldOff()).toBeUndefined();
+  });
+
+  it('the latest settle wins: a clear then an expiry leaves write pending', () => {
+    const { holder } = withLines(CANARY);
+    holder.settle('authenticated');
+    holder.expire();
+    expect(holder.pendingHoldOff()).toBe('write');
+  });
+
+  it('keeps the baseline rule count for the process', () => {
+    const holder = withCookie(CANARY);
+    expect(holder.baselineRuleCount).toBeUndefined();
+    holder.rememberBaseline(2);
+    expect(holder.baselineRuleCount).toBe(2);
+  });
+
+  it('settleHeldOffIfDue: a due hold-off settles held-off with one line and no action', () => {
+    const { holder, lines } = withLines(CANARY);
+    holder.settleHeldOffIfDue(LATER, NOW);
+    expect(holder.state).toEqual({ kind: 'unauthenticated', reason: 'held-off' });
+    expect(lines).toEqual(['unauthenticated (held-off)']);
+    expect(holder.pendingHoldOff()).toBeUndefined();
+    expect(holder.canProbe).toBe(false);
+  });
+
+  it.each([
+    ['past', NOW, LATER],
+    ['exactly now', NOW, NOW],
+    ['absent', undefined, NOW],
+  ])('settleHeldOffIfDue: a %s hold-off leaves the holder able to probe', (_label, until, now) => {
+    const { holder, lines } = withLines(CANARY);
+    holder.settleHeldOffIfDue(until, now);
+    expect(holder.canProbe).toBe(true);
+    expect(lines).toEqual([]);
+  });
+
+  it('settleHeldOffIfDue never moves a settled holder', () => {
+    const { holder, lines } = withLines('');
+    holder.settleHeldOffIfDue(LATER, NOW);
+    expect(holder.state).toEqual({ kind: 'unauthenticated', reason: 'absent' });
+    expect(lines).toEqual(['unauthenticated (absent)']);
+  });
+
+  it('the holder JSON still shows the state only', () => {
+    const holder = withCookie(CANARY);
+    holder.rememberBaseline(1);
+    holder.settle('authenticated');
+    expect(JSON.stringify(holder)).toBe('{"state":{"kind":"authenticated"}}');
+  });
+});
