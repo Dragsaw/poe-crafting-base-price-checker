@@ -506,7 +506,7 @@ function craftedRow(
     craftCost: cost.ok ? cost.divine : { kind: 'uncostable', currencyId: cost.reason.currencyId },
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
-    provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce(weakest),
+    provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce((left, right) => weakest(left, right)),
     ...(asOf !== undefined && { asOf }),
     ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
   };

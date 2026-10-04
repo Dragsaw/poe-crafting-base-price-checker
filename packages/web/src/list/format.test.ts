@@ -157,7 +157,7 @@ describe('the expansion copy', () => {
   });
 
   it('prints the state word, with the reason for not-yet-synced, and a glyph per state', () => {
-    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE, UNRESOLVABLE].map(stateWord)).toEqual([
+    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE, UNRESOLVABLE].map((state) => stateWord(state))).toEqual([
       'priced',
       'no-listings',
       'not-yet-synced · never-synced',

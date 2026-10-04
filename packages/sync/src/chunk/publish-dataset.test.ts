@@ -53,7 +53,7 @@ describe('buildDatasetFile', () => {
     const file = buildDatasetFile(inputs({ tracked, stepEntries: [attempted(e, NOW), attempted(c, NOW)] }));
 
     expect(file.entries).toHaveLength(5);
-    expect(file.entries.map((entry) => entry.entryKey)).toEqual(tracked.map(key).toSorted(compareCanonicalKeys));
+    expect(file.entries.map((entry) => entry.entryKey)).toEqual(tracked.map((entry) => key(entry)).toSorted(compareCanonicalKeys));
     expect(file.entries.filter((entry) => entry.price.state === 'no-listings')).toEqual(
       [attempted(e, NOW), attempted(c, NOW)].toSorted(byKey),
     );
@@ -153,6 +153,6 @@ describe('buildDatasetFile', () => {
 
     expect(reversed).toEqual(forward);
     expect(rotated).toEqual(forward);
-    expect(forward.entries.map((entry) => entry.entryKey)).toEqual(tracked.map(key).toSorted(compareCanonicalKeys));
+    expect(forward.entries.map((entry) => entry.entryKey)).toEqual(tracked.map((entry) => key(entry)).toSorted(compareCanonicalKeys));
   });
 });

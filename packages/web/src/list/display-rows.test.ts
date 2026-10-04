@@ -17,7 +17,7 @@ function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetE
 
 describe('tierOf', () => {
   it('is 1 for ranks 1–5, 2 for 6–10 and 3 from 11 on', () => {
-    expect([1, 5, 6, 10, 11, 20, 21, 40].map(tierOf)).toEqual([1, 1, 2, 2, 3, 3, 3, 3]);
+    expect([1, 5, 6, 10, 11, 20, 21, 40].map((position) => tierOf(position))).toEqual([1, 1, 2, 2, 3, 3, 3, 3]);
   });
 });
 
@@ -257,7 +257,7 @@ describe('the summands in web', () => {
     const allowed = new Set([
       './display-rows.ts: summands.map((summand) => summand.entryKey));',
       './display-rows.ts: summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),',
-      './display-rows.ts: summands.map((summand) => summand.entryKey), ...rest].flatMap(combination),',
+      './display-rows.ts: summands.map((summand) => summand.entryKey), ...rest].flatMap((entryKey) => combination(entryKey)),',
       // State 25 reads whether any summand survives (Story 3.4).
       './list-statement.ts: summands.length > 0);',
     ]);

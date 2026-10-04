@@ -35,7 +35,7 @@ export function buildDatasetFile(inputs: DatasetInputs): DatasetFile {
   const previous = new Map(inputs.previous.map((entry) => [entry.entryKey, entry]));
   // A later step entry for the same key wins: it is the more recent state.
   const stepped = new Map(inputs.stepEntries.map((entry) => [entry.entryKey, entry]));
-  const keys = [...new Set(inputs.tracked.map(canonicalKey))].toSorted(compareCanonicalKeys);
+  const keys = [...new Set(inputs.tracked.map((entry) => canonicalKey(entry)))].toSorted(compareCanonicalKeys);
 
   const entries = keys.map(
     (entryKey): DatasetEntry =>

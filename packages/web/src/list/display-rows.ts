@@ -187,7 +187,7 @@ function craftedDetail(
     .toSorted(compareCanonicalKeys);
   return {
     chase: row.summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),
-    combinations: [...row.summands.map((summand) => summand.entryKey), ...rest].flatMap(combination),
+    combinations: [...row.summands.map((summand) => summand.entryKey), ...rest].flatMap((entryKey) => combination(entryKey)),
   };
 }
 

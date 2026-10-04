@@ -107,8 +107,8 @@ const key = (path: string): string => {
 const relativeLabel = (path: string): string => key(path).slice(key(REPO_ROOT).length + 1);
 
 function uncovered(expected: readonly string[], covered: Iterable<string>): string[] {
-  const seen = new Set([...covered].map(key));
-  return expected.filter((path) => !seen.has(key(path))).map(relativeLabel);
+  const seen = new Set([...covered].map((path) => key(path)));
+  return expected.filter((path) => !seen.has(key(path))).map((path) => relativeLabel(path));
 }
 
 // --- TypeScript -------------------------------------------------------------
@@ -239,7 +239,7 @@ describe('TARGETS lists every hand-listed tools/ and .claude/ entry', () => {
 describe.each(TARGETS.map((target) => [target.path, target] as const))(
   '%s stays under type, lint and test coverage',
   (_path, target) => {
-    const all = target.files.map(relativeLabel);
+    const all = target.files.map((path) => relativeLabel(path));
 
     it('holds at least one source file, and a test file when Vitest lists it', () => {
       expect(target.files.length, `no source file in ${target.path}`).toBeGreaterThan(0);
@@ -346,7 +346,7 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
           expect(
             uncovered(tests, collected),
             `Vitest: with root include ${vitestInclude} dropped, the checker did not report every test file`,
-          ).toEqual(tests.map(relativeLabel));
+          ).toEqual(tests.map((path) => relativeLabel(path)));
         });
       });
     }

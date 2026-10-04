@@ -182,7 +182,7 @@ function statFiltersOf(entry: TrackedEntry): StatFilter[] {
   });
   const suffix = linesOf(entry.suffix)
     .filter((line) => !summed.has(line.statId))
-    .map(statFilterOfLine);
+    .map((line) => statFilterOfLine(line));
   return [...prefix, ...suffix];
 }
 

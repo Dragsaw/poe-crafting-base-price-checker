@@ -85,5 +85,5 @@ export function outputRate(rate: CurrencyRate): CurrencyRate {
 
 /** The whole rate set as `sync` writes it out, in the file's own order. */
 export function outputRates(rates: readonly CurrencyRate[]): CurrencyRate[] {
-  return rates.map(outputRate);
+  return rates.map((rate) => outputRate(rate));
 }

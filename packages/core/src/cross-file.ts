@@ -109,7 +109,7 @@ function lineText(rl: ReferenceLine): string {
 
 /** A reference as a payload names it: the slot, then each line's `statId` and band or kind. */
 function formatReference(slot: Slot, reference: ModifierRef): string {
-  return reference.kind === 'hybrid' ? `${slot} hybrid (${reference.lines.map(lineText).join(', ')})` : `${slot} ${lineText(reference)}`;
+  return reference.kind === 'hybrid' ? `${slot} hybrid (${reference.lines.map((line) => lineText(line)).join(', ')})` : `${slot} ${lineText(reference)}`;
 }
 
 /** One line of a reference, as a per-line payload names it (§2.3, §2.4). */

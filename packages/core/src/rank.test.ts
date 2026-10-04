@@ -254,8 +254,8 @@ describe('rank: the I/O matrix', () => {
     const A = raw('A');
     const B = raw('B');
     const dataset = [published(B, priced(0.5)), published(A, priced(0.5))];
-    expect(keysOf(ranked({ tracked: [B, A], dataset }).ordering)).toEqual([A, B].map(canonicalKey));
-    expect(keysOf(ranked({ tracked: [A, B], dataset }).ordering)).toEqual([A, B].map(canonicalKey));
+    expect(keysOf(ranked({ tracked: [B, A], dataset }).ordering)).toEqual([A, B].map((entry) => canonicalKey(entry)));
+    expect(keysOf(ranked({ tracked: [A, B], dataset }).ordering)).toEqual([A, B].map((entry) => canonicalKey(entry)));
   });
 
   it('breaks ties on the whole serialised key, not a bare base type id', () => {
@@ -277,7 +277,7 @@ describe('rank: the I/O matrix', () => {
       tracked: [A, B, C],
       dataset: [published(A, priced(0.3)), published(B, priced(2)), published(C, priced(0.9))],
     });
-    expect(keysOf(result.ordering)).toEqual([B, C, A].map(canonicalKey));
+    expect(keysOf(result.ordering)).toEqual([B, C, A].map((entry) => canonicalKey(entry)));
     expect(rawRows(result.ordering)[1]?.status).toBe('pinned');
   });
 
@@ -296,7 +296,7 @@ describe('rank: the I/O matrix', () => {
       dataset: [published(A, priced(0.2)), published(B, priced(0.01))],
     });
     expect(result.ordering).toEqual([]);
-    expect(keysOf(result.belowThreshold)).toEqual([A, B].map(canonicalKey));
+    expect(keysOf(result.belowThreshold)).toEqual([A, B].map((entry) => canonicalKey(entry)));
   });
 
   it('every non-ordering group is in canonical key order', () => {

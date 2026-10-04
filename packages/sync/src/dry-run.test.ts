@@ -358,7 +358,7 @@ describe('dryRun: the dataset snapshot', () => {
 
   it('orders the rotation by the snapshot’s lastAttemptedAt', async () => {
     const report = await dryRun(withDataset);
-    expect(report.completed).toEqual([P, C, B, A].map(canonicalKey));
+    expect(report.completed).toEqual([P, C, B, A].map((entry) => canonicalKey(entry)));
   });
 
   it('visits the same keys in the same order as runChunk on the same fake and clock', async () => {
@@ -403,7 +403,7 @@ describe('dryRun: the dataset snapshot', () => {
     const report = await dryRun(withDataset);
     expect(report.dataset?.league).toBe(LEAGUE);
     expect(report.dataset?.entries.map((entry) => entry.entryKey)).toEqual(
-      rotation.map(canonicalKey).toSorted(compareCanonicalKeys),
+      rotation.map((entry) => canonicalKey(entry)).toSorted(compareCanonicalKeys),
     );
     // Every tracked entry was visited, so every entry is this run's, stamped
     // with the default clock: the snapshot's own latest `lastAttemptedAt`.
@@ -471,7 +471,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
 
     expect(report.outcome).toBe('completed');
     expect(report.entries).toHaveLength(active.length);
-    expect(new Set(report.entries.map((entry) => entry.entryKey))).toEqual(new Set(active.map(canonicalKey)));
+    expect(new Set(report.entries.map((entry) => entry.entryKey))).toEqual(new Set(active.map((entry) => canonicalKey(entry))));
     for (const entry of report.entries) {
       expect(entry.price.state, entry.entryKey).toBe('priced');
     }
@@ -483,7 +483,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     expect(report.dataset).not.toBeNull();
     expect(DatasetFileSchema.safeParse(report.dataset).success).toBe(true);
     expect(report.dataset?.entries.map((entry) => entry.entryKey)).toEqual(
-      [...new Set(tracked.entries.map(canonicalKey))].toSorted(compareCanonicalKeys),
+      [...new Set(tracked.entries.map((entry) => canonicalKey(entry)))].toSorted(compareCanonicalKeys),
     );
     expect(report).not.toHaveProperty('unrecorded');
   });

@@ -408,11 +408,6 @@
       "count": 1
     }
   },
-  "packages/core/src/chunk-order.test.ts": {
-    "unicorn/no-array-callback-reference": {
-      "count": 2
-    }
-  },
   "packages/core/src/chunk-order.ts": {
     "complexity": {
       "count": 1
@@ -427,9 +422,6 @@
       "count": 1
     },
     "unicorn/consistent-boolean-name": {
-      "count": 2
-    },
-    "unicorn/no-array-callback-reference": {
       "count": 2
     }
   },
@@ -503,9 +495,6 @@
     "unicorn/consistent-boolean-name": {
       "count": 3
     },
-    "unicorn/no-array-callback-reference": {
-      "count": 1
-    },
     "unicorn/no-array-sort": {
       "count": 1
     }
@@ -542,9 +531,6 @@
     "unicorn/consistent-boolean-name": {
       "count": 6
     },
-    "unicorn/no-array-callback-reference": {
-      "count": 1
-    },
     "unicorn/no-array-sort": {
       "count": 2
     },
@@ -572,9 +558,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 4
     },
     "unicorn/no-null": {
       "count": 16
@@ -606,9 +589,6 @@
       "count": 1
     },
     "sonarjs/reduce-initial-value": {
-      "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
       "count": 1
     },
     "unicorn/no-array-reduce": {
@@ -748,16 +728,10 @@
   "packages/sync/src/chunk/publish-dataset.test.ts": {
     "unicorn/name-replacements": {
       "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 2
     }
   },
   "packages/sync/src/chunk/publish-dataset.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
       "count": 1
     }
   },
@@ -918,9 +892,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 4
     },
     "unicorn/no-unreadable-for-of-expression": {
       "count": 2
@@ -1108,9 +1079,6 @@
   "packages/sync/src/pricing/normalise.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 1
     }
   },
   "packages/sync/src/pricing/price-entry.fixtures.test.ts": {
@@ -1191,9 +1159,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 1
     }
   },
   "packages/sync/src/request-counter.ts": {
@@ -1223,9 +1188,6 @@
   },
   "packages/sync/src/shell-fetch.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
       "count": 1
     }
   },
@@ -1570,9 +1532,6 @@
     }
   },
   "packages/web/src/frame/trust-facts.test.ts": {
-    "unicorn/no-array-callback-reference": {
-      "count": 15
-    },
     "unicorn/no-null": {
       "count": 7
     }
@@ -1731,9 +1690,6 @@
     }
   },
   "packages/web/src/list/display-rows.test.ts": {
-    "unicorn/no-array-callback-reference": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 4
     }
@@ -1750,9 +1706,6 @@
     },
     "unicorn/name-replacements": {
       "count": 1
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 1
     }
   },
   "packages/web/src/list/expansion.test.tsx": {
@@ -1761,11 +1714,6 @@
     },
     "unicorn/no-null": {
       "count": 2
-    }
-  },
-  "packages/web/src/list/format.test.ts": {
-    "unicorn/no-array-callback-reference": {
-      "count": 1
     }
   },
   "packages/web/src/list/format.ts": {
@@ -2293,9 +2241,6 @@
     },
     "unicorn/name-replacements": {
       "count": 3
-    },
-    "unicorn/no-array-callback-reference": {
-      "count": 4
     },
     "unicorn/no-array-sort": {
       "count": 1

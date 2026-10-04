@@ -39,7 +39,7 @@ function published(
 
 const UNRESOLVABLE: PriceState = { state: 'unresolvable' };
 
-const keysOf = (entries: readonly TrackedEntry[]): string[] => entries.map(canonicalKey);
+const keysOf = (entries: readonly TrackedEntry[]): string[] => entries.map((entry) => canonicalKey(entry));
 
 function order(input: Partial<ChunkOrderInput> & Pick<ChunkOrderInput, 'tracked'>) {
   return chunkOrder({ dataset: [], completed: [], now: NOW, ...input });
@@ -58,7 +58,7 @@ describe('chunkOrder: rows', () => {
 
     expect(keysOf(result.pinned)).toEqual(keysOf([P]));
     expect(keysOf(result.rotation)).toEqual(keysOf([A, U]));
-    expect([...result.pinned, ...result.rotation].map(canonicalKey)).not.toContain(canonicalKey(X));
+    expect([...result.pinned, ...result.rotation].map((entry) => canonicalKey(entry))).not.toContain(canonicalKey(X));
   });
 
   it('never attempted sorts before any attempted entry', () => {

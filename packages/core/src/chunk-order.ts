@@ -130,7 +130,7 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
 
   return {
     pinned: entriesOf(pinned),
-    rotation: [...entriesOf(active.filter(open)), ...entriesOf(unresolvable.filter(open))],
+    rotation: [...entriesOf(active.filter((item) => open(item))), ...entriesOf(unresolvable.filter((item) => open(item)))],
     completed: isNewPass ? [] : completed,
     newPass: isNewPass,
   };

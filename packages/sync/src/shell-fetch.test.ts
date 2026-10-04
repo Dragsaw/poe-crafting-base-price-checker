@@ -71,7 +71,7 @@ afterEach(async () => {
     socket.destroy();
   }
   sockets.clear();
-  await Promise.all(servers.splice(0).map(closeServer));
+  await Promise.all(servers.splice(0).map((server) => closeServer(server)));
 });
 
 describe('createFetchHttpPort against a loopback server', () => {

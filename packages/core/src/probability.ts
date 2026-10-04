@@ -187,7 +187,7 @@ export function contains(reference: ModifierRef, entry: ModifierWeight, summed: 
   }
   const coveredBy = (rl: ReferenceLine) =>
     entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
-  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every(coveredBy) : coveredBy(reference);
+  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => coveredBy(line)) : coveredBy(reference);
 }
 
 /**
