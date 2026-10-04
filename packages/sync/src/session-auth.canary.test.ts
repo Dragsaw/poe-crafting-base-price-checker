@@ -21,10 +21,7 @@ import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from './trade/session-auth.
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 import { NamedError } from './test-support/named-error.ts';
 
-/**
- * SPEC-poesessid-sync CAP-4, IMPLEMENTATION-NOTES.md §13.6: any 8+ character
- * substring of the canary, raw, URL-encoded or base64, in any output fails.
- */
+/** SPEC-poesessid-sync CAP-4, IMPLEMENTATION-NOTES.md §13.6: no 8+ character substring of the canary may leak. */
 
 const CANARY = 'k3Zq8VwT1nRb6YpXe4LmHs9DjCg2FaUo7Qi5';
 const LEAGUE = 'Test League';
@@ -72,10 +69,7 @@ function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof c
   };
 }
 
-/**
- * The base64 characters of `bytes` that survive inside any longer value: whole
- * 3-byte groups from window byte 0, 1 or 2 encode the same whatever surrounds them.
- */
+/** The base64 characters of `bytes` that survive inside a longer value: whole 3-byte groups from byte 0, 1 or 2. */
 function alignedBase64(bytes: Buffer): string[] {
   const forms: string[] = [];
   for (const encoding of ['base64', 'base64url'] as const) {
@@ -607,10 +601,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   const TRACKED: readonly TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }];
   type Downgrade = '401' | '403' | 'not-live';
 
-  /**
-   * A live probe, then a downgrade quoting the cookie: a `401` or `403` answers the fetch,
-   * `not-live` answers the next entry's search with the baseline's rule count and policy.
-   */
+  /** A live probe, then a downgrade quoting the cookie: a `401` or `403` answers the fetch, `not-live` the next search. */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;
     let isProbed = false;
