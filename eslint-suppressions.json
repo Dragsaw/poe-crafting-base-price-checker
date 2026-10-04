@@ -59,11 +59,6 @@
       "count": 4
     }
   },
-  "packages/contracts/src/envelopes.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/contracts/src/envelopes.ts": {
     "local/max-comment-run": {
       "count": 8
