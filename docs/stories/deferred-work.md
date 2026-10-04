@@ -277,11 +277,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   evidence: `packages/web/src/list/tracked.data.test.ts` holds the live checks. `pnpm tracked:check` (`packages/sync/src/curation/check.ts`) runs the schema and cross-file checks only. Retro item 31 (R6) is the open ruling on where the short-form table lives.
   retry_when: The owner ruling on the short-form module (retro item 31, R6) places the table where `sync` may import it.
 
-- source_spec: `docs/stories/spec-epic-3-retro-item-30-decouple-data-dependent-tests-from-live.md`
-  summary: No automated path runs `pnpm test:data`, so the live-data invariants (short forms, cell fit, `tracked:check` exit 0, `sync:dry` output shape) are enforced only by hand. Add a non-blocking CI job or a scheduled run. Do not gate `deploy.yml` on it: that blocks a player's data-only push, which is the coupling this spec removed.
-  evidence: `deploy.yml` runs `pnpm check`, `pnpm test` and `pnpm build`; `grep test:data .github` finds only a comment. The `*.data.test.ts` files and the `data` project in `vitest.config.ts`.
-  retry_when: The player picks the signal channel for a failing live-data check (a non-blocking job, a schedule or a hook).
-
 ## Deferred from: spec-epic-3-retro-item-31-apply-the-rulings-in-code (2026-10-03)
 
 - source_spec: `docs/stories/spec-epic-3-retro-item-31-apply-the-rulings-in-code.md`
