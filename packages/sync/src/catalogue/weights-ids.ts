@@ -25,6 +25,7 @@ import type {
   UncataloguedWeightsIdRecord,
   WeightsAbsentRecord,
   WeightsFile,
+  WeightsLine,
 } from '@poe/contracts';
 
 import { DataFileError } from '../load-data-file.ts';
@@ -44,6 +45,54 @@ export type WeightsIds =
       readonly file: WeightsFile;
     };
 
+function parseWeightsText(text: string): WeightsFile {
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch (error) {
+    throw new DataFileError(WEIGHTS_PATH, 'not-json', `not valid JSON: ${String(error)}`);
+  }
+  const result = parseEnvelope(WeightsFileSchema, data, WEIGHTS_SCHEMA_VERSION);
+  if (result.ok) {
+    return result.value;
+  }
+  switch (result.reason) {
+    case 'unknown-major':
+    case 'malformed-version': {
+      throw new DataFileError(
+        WEIGHTS_PATH,
+        result.reason,
+        `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
+      );
+    }
+    case 'invalid': {
+      const [first] = result.issues;
+      const where = first === undefined ? '(root)' : first.path.join('.') || '(root)';
+      throw new DataFileError(WEIGHTS_PATH, 'invalid', `invalid: ${where}: ${first?.message ?? 'refused'}`);
+    }
+  }
+}
+
+function* weightsLines(bases: WeightsFile['bases']): Generator<WeightsLine> {
+  for (const classes of Object.values(bases)) {
+    for (const pools of Object.values(classes)) {
+      for (const entry of [...pools.prefix.entries, ...pools.suffix.entries]) {
+        yield* entry.lines;
+      }
+    }
+  }
+}
+
+function collectStatIds(bases: WeightsFile['bases']): Set<string> {
+  const statIds = new Set<string>();
+  for (const line of weightsLines(bases)) {
+    if (line.statId !== null) {
+      statIds.add(line.statId);
+    }
+  }
+  return statIds;
+}
+
 /**
  * Reads the weights ids and the parsed file. Absent is a value; an unreadable, unknown-major or
  * non-conforming file throws a `DataFileError`.
@@ -53,44 +102,9 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   if (text === undefined) {
     return { kind: 'absent' };
   }
-  let data: unknown;
-  try {
-    data = JSON.parse(text);
-  } catch (error) {
-    throw new DataFileError(WEIGHTS_PATH, 'not-json', `not valid JSON: ${String(error)}`);
-  }
-  const result = parseEnvelope(WeightsFileSchema, data, WEIGHTS_SCHEMA_VERSION);
-  if (!result.ok) {
-    switch (result.reason) {
-      case 'unknown-major':
-      case 'malformed-version': {
-        throw new DataFileError(
-          WEIGHTS_PATH,
-          result.reason,
-          `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
-        );
-      }
-      case 'invalid': {
-        const [first] = result.issues;
-        const where = first === undefined ? '(root)' : first.path.join('.') || '(root)';
-        throw new DataFileError(WEIGHTS_PATH, 'invalid', `invalid: ${where}: ${first?.message ?? 'refused'}`);
-      }
-    }
-  }
-  const { bases } = result.value;
-  const statIds = new Set<string>();
-  for (const classes of Object.values(bases)) {
-    for (const pools of Object.values(classes)) {
-      for (const entry of [...pools.prefix.entries, ...pools.suffix.entries]) {
-        for (const line of entry.lines) {
-          if (line.statId !== null) {
-            statIds.add(line.statId);
-          }
-        }
-      }
-    }
-  }
-  return { kind: 'present', statIds, categoryIds: new Set(Object.keys(bases)), file: result.value };
+  const file = parseWeightsText(text);
+  const { bases } = file;
+  return { kind: 'present', statIds: collectStatIds(bases), categoryIds: new Set(Object.keys(bases)), file };
 }
 
 /**

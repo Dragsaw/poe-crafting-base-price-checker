@@ -365,17 +365,8 @@
     }
   },
   "packages/sync/src/catalogue/weights-ids.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 4
-    },
-    "max-depth": {
-      "count": 2
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 1
     }
   },
   "packages/sync/src/chunk/catalogue-check.ts": {
