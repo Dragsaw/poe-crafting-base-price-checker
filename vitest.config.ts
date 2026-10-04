@@ -30,6 +30,7 @@ export default defineConfig({
             'tools/deferred-issues/*.test.ts',
             'tools/dev-stop/*.test.ts',
             'tools/dts-specifiers/*.test.ts',
+            'tools/lint-on-edit/*.test.ts',
             '.claude/skills/tracked-json/scripts/*.test.ts',
           ],
           setupFiles: ['./test/setup.ts'],

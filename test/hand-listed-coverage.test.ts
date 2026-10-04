@@ -78,6 +78,7 @@ const TARGETS: readonly Target[] = [
   directoryTarget('tools/deferred-issues'),
   directoryTarget('tools/dev-stop'),
   directoryTarget('tools/dts-specifiers'),
+  directoryTarget('tools/lint-on-edit'),
   // Only `tsconfig.tools.json` lists it: its test lives in `test/`, and no
   // ESLint `files` glob names `.mjs` under `tools/`.
   { path: 'tools/prune-pages.mjs', files: [abs('tools/prune-pages.mjs')], tsInclude: 'tools/prune-pages.mjs' },
