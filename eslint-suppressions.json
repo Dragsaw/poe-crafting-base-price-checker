@@ -519,9 +519,6 @@
     "complexity": {
       "count": 2
     },
-    "max-classes-per-file": {
-      "count": 1
-    },
     "max-lines-per-function": {
       "count": 2
     },

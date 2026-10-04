@@ -21,6 +21,9 @@ import { isTransportFailure } from '../trade/transport-failure.ts';
 import { currentRates, lowerMedian, outputRate, toDivine } from './normalise.ts';
 import { buildSearchBody, UnknownClassBaseTypeError } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
+import { UnexpectedTradeResponseError } from './unexpected-trade-response-error.ts';
+
+export { UnexpectedTradeResponseError } from './unexpected-trade-response-error.ts';
 
 /** AD-16: the cheapest ten result ids are fetched, never more. */
 export const FETCH_LIMIT = 10;
@@ -43,25 +46,6 @@ export class MalformedRequestError extends Error {
     this.requestKind = requestKind;
     this.status = status;
     this.entry = entry;
-  }
-}
-
-/**
- * A 2xx body of the wrong shape aborts the chunk; `entry` has search fields only after an answered search (AD-9).
- */
-export class UnexpectedTradeResponseError extends Error {
-  readonly entryKey: string;
-  readonly requestKind: RequestKind;
-  readonly entry?: DatasetEntry;
-
-  constructor(entryKey: string, requestKind: RequestKind, detail: string, entry?: DatasetEntry) {
-    super(`${entryKey}: the trade ${requestKind} answered an unexpected body: ${detail}`);
-    this.name = 'UnexpectedTradeResponseError';
-    this.entryKey = entryKey;
-    this.requestKind = requestKind;
-    if (entry !== undefined) {
-      this.entry = entry;
-    }
   }
 }
 
