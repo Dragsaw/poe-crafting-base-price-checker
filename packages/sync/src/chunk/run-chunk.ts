@@ -18,11 +18,8 @@ import type {
   CurrencyRate,
   DatasetEntry,
   DatasetFile,
-  EnvelopeResult,
   FilesystemPort,
   GitPort,
-  LeagueMismatchRecord,
-  RunFailureRecord,
   SyncProgressFile,
   SyncRunRecord,
   TrackedEntry,
@@ -33,24 +30,23 @@ import type { ChunkOrder } from '@poe/core';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
 import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/league-gate.ts';
-import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
-import type { DataFileResult, VersionRefusalExplainer } from '../load-data-file.ts';
+import { explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
+import type { DataFileResult } from '../load-data-file.ts';
 import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
 import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
 import { checkCatalogue } from './catalogue-check.ts';
-import { CrossFileGateError, crossFileGate, crossFileGateRecords } from './cross-file-gate.ts';
-import { acquireLock, isLockHeld, isOwnLockReleased, STALE_LOCK_AFTER_MS } from './lock.ts';
+import { crossFileGate } from './cross-file-gate.ts';
+import { acquireLock, isLockHeld, isOwnLockReleased } from './lock.ts';
 import { buildDatasetFile } from './publish-dataset.ts';
+import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './run-chunk/data-paths.ts';
+import { failureRecords } from './run-chunk/failure-records.ts';
+import { loadEnvelope } from './run-chunk/load-envelope.ts';
+import { failureNotBefore, notBeforeAfter429 } from './run-chunk/not-before.ts';
 import { buildSyncReport } from './sync-report.ts';
 
-export const TRACKED_PATH = 'data/tracked.json';
-export const PROGRESS_PATH = 'data/sync-progress.json';
-/** The published Dataset (AD-19), written under the lock by explicit path with this chunk's step entries merged in. */
-export const DATASET_PATH = 'data/dataset.json';
-/** The Sync Report (FR-25, AD-12), read under the lock before anything else and written after progress by explicit path. */
-export const REPORT_PATH = 'data/sync-report.json';
+
 
 /** What one step reports for one entry: an absent allowance bounds nothing, and `yielded` stops the chunk now. */
 export type StepResult =
@@ -212,107 +208,11 @@ export const writeStderr = (line: string): void => {
   process.stderr.write(`${line}\n`);
 };
 
-function describeRefusal(
-  path: string,
-  result: Exclude<EnvelopeResult<unknown>, { ok: true }>,
-  explainVersion?: VersionRefusalExplainer,
-): DataFileError {
-  switch (result.reason) {
-    case 'unknown-major':
-    case 'malformed-version': {
-      return new DataFileError(path, result.reason, describeVersionRefusal(result, explainVersion));
-    }
-    case 'invalid': {
-      return new DataFileError(
-        path,
-        'invalid',
-        `invalid: ${result.issues
-          .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
-          .join('; ')}`,
-      );
-    }
-  }
-}
-
-async function loadEnvelope<T>(
-  fs: FilesystemPort,
-  path: string,
-  parse: (data: unknown) => EnvelopeResult<T>,
-  explainVersion?: VersionRefusalExplainer,
-): Promise<T | undefined> {
-  const text = await fs.readTextFile(path);
-  if (text === undefined) {
-    return undefined;
-  }
-  let data: unknown;
-  try {
-    data = JSON.parse(text);
-  } catch (error) {
-    throw new DataFileError(path, 'not-json', `not valid JSON: ${String(error)}`, { cause: error });
-  }
-  const result = parse(data);
-  if (!result.ok) {
-    throw describeRefusal(path, result, explainVersion);
-  }
-  return result.value;
-}
-
-/** The two `notBefore` formulas (IMPLEMENTATION-NOTES.md §5.3), capped at `staleLockAfter` so no `Retry-After` outlasts a crashed run's lock. */
-function notBeforeAfter429(now: string, retryAfterMs: number): string {
-  return new Date(Date.parse(now) + Math.min(retryAfterMs, STALE_LOCK_AFTER_MS)).toISOString();
-}
-
-function notBeforeAfterAbort(now: string): string {
-  return new Date(Date.parse(now) + STALE_LOCK_AFTER_MS).toISOString();
-}
-
-/** The hold-off a failed run publishes: after an abort, after a latched 429, or none. */
-function failureNotBefore(now: string, isRejected: boolean, latchedMs: number | undefined): string | undefined {
-  if (isRejected) {
-    return notBeforeAfterAbort(now);
-  }
-  return latchedMs === undefined ? undefined : notBeforeAfter429(now, latchedMs);
-}
-
 function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound | undefined {
   if (step.searchRemaining !== undefined && step.searchRemaining < 1) {
     return 'search';
   }
   return step.fetchRemaining !== undefined && step.fetchRemaining < 1 ? 'fetch' : undefined;
-}
-
-/** The records a throw leaves in the report: one per failing check of a cross-file gate failure, otherwise one (AD-19 for a league mismatch). */
-function failureRecords(error: unknown, current: TrackedEntry | undefined): SyncRunRecord[] {
-  return error instanceof CrossFileGateError ? crossFileGateRecords(error) : [failureRecord(error, current)];
-}
-
-function failureRecord(error: unknown, current: TrackedEntry | undefined): LeagueMismatchRecord | RunFailureRecord {
-  if (error instanceof LeagueMismatchError) {
-    return {
-      kind: 'league-mismatch',
-      configuredLeague: error.configuredLeague,
-      availableLeagues: [...error.availableLeagues],
-    };
-  }
-  const message = (error instanceof Error ? error.message : String(error)) || 'unknown error';
-  if (error instanceof LeagueRequestRejectedError) {
-    return { kind: 'run-failure', reason: 'trade-request-rejected', status: error.status, message };
-  }
-  if (error instanceof MalformedRequestError) {
-    return {
-      kind: 'run-failure',
-      reason: 'trade-request-rejected',
-      entryKey: error.entryKey,
-      status: error.status,
-      message,
-    };
-  }
-  return {
-    kind: 'run-failure',
-    reason: 'unrecoverable-error',
-    ...(current !== undefined && { entryKey: canonicalKey(current) }),
-    message,
-  };
 }
 
 export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
@@ -776,3 +676,5 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
     await isOwnLockReleased(fs, mine);
   }
 }
+
+export {DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH} from './run-chunk/data-paths.ts';
