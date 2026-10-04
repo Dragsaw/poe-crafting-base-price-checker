@@ -7,9 +7,12 @@ import { describe, expect, it } from 'vitest';
 import { composeChunk } from '../compose-chunk.ts';
 import { NamedError } from '../test-support/named-error.ts';
 import { TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
-import { createSessionAuth } from '../trade/session-auth.ts';
+import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from '../trade/session-auth.ts';
+import { USER_AGENT_ENV_VAR } from '../trade/user-agent.ts';
 import type { Failure, ThrowingHttp } from './test-support.ts';
-import { CANARY, CONTACT, ENV, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatch, runSession, textOf } from './test-support.ts';
+import { CANARY, CONTACT, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatch, runSession, textOf } from './test-support.ts';
+
+const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
 
 describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §13.2, §13.6)', () => {
   const RESULTS = ['r1'];
@@ -77,7 +80,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     const captured = capturing();
     const http = cookieThrowingHttp('probe', failure);
 
-    const { code, lines } = await runBatch(captured, http.port);
+    const { code, lines } = await runBatch(captured, http.port, ENV);
 
     expect(http.threw()).toBe(1);
     expect(code).toBe(0);
@@ -90,7 +93,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     const captured = capturing();
     const http = cookieThrowingHttp('probe', failure);
 
-    const { code, lines } = await runSession(captured, http.port);
+    const { code, lines } = await runSession(captured, http.port, ENV);
 
     expect(http.threw()).toBe(1);
     expect(code).toBe(0);
@@ -103,7 +106,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     const captured = capturing();
     const http = cookieThrowingHttp('fetch', failure);
 
-    const { lines } = await runBatch(captured, http.port);
+    const { lines } = await runBatch(captured, http.port, ENV);
 
     expect(http.threw()).toBe(1);
     expect(lines).toContain('pnpm sync:batch: authenticated');
@@ -115,7 +118,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     const captured = capturing();
     const http = cookieThrowingHttp('fetch', failure);
 
-    const { code, lines } = await runSession(captured, http.port);
+    const { code, lines } = await runSession(captured, http.port, ENV);
 
     expect(code).toBe(0);
     expect(http.threw()).toBeGreaterThan(0);

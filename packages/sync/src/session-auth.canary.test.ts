@@ -4,14 +4,40 @@ import { createFakeClockPort, createFakeGitPort, createFakeHttpPort } from '@poe
 import type { HttpRequest } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { NamedError } from './test-support/named-error.ts';
+
 import { composeChunk } from './compose-chunk.ts';
 import { TRADE_LEAGUES_URL, tradeSearchUrl } from './trade/endpoints.ts';
-import { createSessionAuth } from './trade/session-auth.ts';
+import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
+import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 import type { ThrowingHttp } from './session-auth-canary/test-support.ts';
-import { CANARY, CONTACT, ENV, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, quotingError, runBatch, runSession, textOf } from './session-auth-canary/test-support.ts';
+import { CANARY, CONTACT, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatch, runSession, textOf } from './session-auth-canary/test-support.ts';
 import type { Failure } from './session-auth-canary/test-support.ts';
 
 /** SPEC-poesessid-sync CAP-4, IMPLEMENTATION-NOTES.md §13.6: no 8+ character substring of the canary may leak. */
+
+const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
+
+/** An error whose message, stack and nested cause all quote the canary. */
+export function quotingError(failure: Failure): Error {
+  const cookie = `POESESSID=${CANARY}`;
+  const cause = new Error(`socket said ${encodeURIComponent(cookie)}`, {
+    cause: new Error(`header ${Buffer.from(cookie).toString('base64')}`, {
+      cause: `raw ${CANARY}`,
+    }),
+  });
+  let error: Error;
+  if (failure === 'transport') {
+    error = new TypeError('fetch failed', { cause });
+  } else if (failure === 'timeout') {
+    error = new NamedError('TimeoutError', `The operation timed out (Cookie: POESESSID=${CANARY})`, { cause });
+  } else {
+    error = new Error(`unexpected Cookie: POESESSID=${CANARY}`, { cause });
+  }
+  error.stack = `${error.name}: ${error.message}\n    at send (cookie=${CANARY})\n    at ${Buffer.from(CANARY).toString('base64')}`;
+  Object.assign(error, { request: { headers: { cookie: `POESESSID=${CANARY}` } } });
+  return error;
+}
 
 type Target = 'leagues' | 'search';
 
@@ -96,7 +122,7 @@ describe('CAP-4: the canary never leaves the holder', () => {
     const captured = capturing();
     const http = throwingHttp(target, failure);
 
-    const { lines } = await runBatch(captured, http.port);
+    const { lines } = await runBatch(captured, http.port, ENV);
 
     expect(http.threw()).toBeGreaterThan(0);
     const scanned = [...lines, ...captured.texts, ...(await captured.files())].join('\n');
@@ -107,7 +133,7 @@ describe('CAP-4: the canary never leaves the holder', () => {
     const captured = capturing();
     const http = throwingHttp(target, failure);
 
-    const { code, lines } = await runSession(captured, http.port);
+    const { code, lines } = await runSession(captured, http.port, ENV);
 
     expect(code).toBe(0);
     expect(http.threw()).toBeGreaterThan(0);
@@ -119,10 +145,10 @@ describe('CAP-4: the canary never leaves the holder', () => {
     ['pnpm sync:batch', runBatch, 1],
     ['pnpm sync', runSession, 0],
   ] as const)('%s: a throw from outside the governor (the lock create) is redacted by the shell', async (_shell, run, exit) => {
-    const captured = capturing({ lockFault: true });
+    const captured = capturing({ lockFault: () => quotingError('other') });
     const http = throwingHttp('none');
 
-    const { code, lines } = await run(captured, http.port);
+    const { code, lines } = await run(captured, http.port, ENV);
 
     expect(code).toBe(exit);
     expect(captured.lockFaults()).toBeGreaterThan(0);

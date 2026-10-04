@@ -9,16 +9,12 @@ import type { FilesystemPort, HttpPort, TrackedEntry } from '@poe/contracts';
 
 import { syncCommand } from '../sync-batch.ts';
 import { syncSessionCommand } from '../sync.ts';
-import { NamedError } from '../test-support/named-error.ts';
 import { shellDataInputs } from '../test-support/shell-data-inputs.ts';
-import { SESSION_COOKIE_ENV_VAR } from '../trade/session-auth.ts';
-import { USER_AGENT_ENV_VAR } from '../trade/user-agent.ts';
 
 export const CANARY = 'k3Zq8VwT1nRb6YpXe4LmHs9DjCg2FaUo7Qi5';
 export const LEAGUE = 'Test League';
 export const NOW = '2026-09-26T12:00:00.000Z';
 export const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
-export const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
 export const ENTRY: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' };
 
 export const LEAGUES_BODY = JSON.stringify({
@@ -91,27 +87,6 @@ function collectText(thrown: unknown, seen: Set<unknown>): string {
 
 export type Failure = 'transport' | 'timeout' | 'other';
 
-/** An error whose message, stack and nested cause all quote the canary. */
-export function quotingError(failure: Failure): Error {
-  const cookie = `POESESSID=${CANARY}`;
-  const cause = new Error(`socket said ${encodeURIComponent(cookie)}`, {
-    cause: new Error(`header ${Buffer.from(cookie).toString('base64')}`, {
-      cause: `raw ${CANARY}`,
-    }),
-  });
-  let error: Error;
-  if (failure === 'transport') {
-    error = new TypeError('fetch failed', { cause });
-  } else if (failure === 'timeout') {
-    error = new NamedError('TimeoutError', `The operation timed out (Cookie: POESESSID=${CANARY})`, { cause });
-  } else {
-    error = new Error(`unexpected Cookie: POESESSID=${CANARY}`, { cause });
-  }
-  error.stack = `${error.name}: ${error.message}\n    at send (cookie=${CANARY})\n    at ${Buffer.from(CANARY).toString('base64')}`;
-  Object.assign(error, { request: { headers: { cookie: `POESESSID=${CANARY}` } } });
-  return error;
-}
-
 export interface ThrowingHttp {
   readonly port: HttpPort;
   /** How many times the port rejected with the canary error. */
@@ -128,7 +103,7 @@ export interface Captured {
 
 /** A fake filesystem that records every write. `lockFault` rejects the lock create: a throw outside the governor. */
 export function capturing(
-  options: { readonly lockFault?: boolean; readonly tracked?: readonly TrackedEntry[] } = {},
+  options: { readonly lockFault?: () => Error; readonly tracked?: readonly TrackedEntry[] } = {},
 ): Captured {
   const fs = createFakeFilesystemPort(inputs(options.tracked));
   const written = new Set<string>();
@@ -144,9 +119,9 @@ export function capturing(
         return fs.writeTextFile(path, contents);
       },
       createExclusive: (path, contents) => {
-        if (options.lockFault === true) {
+        if (options.lockFault !== undefined) {
           lockFaults += 1;
-          return Promise.reject(quotingError('other'));
+          return Promise.reject(options.lockFault());
         }
         return fs.createExclusive(path, contents);
       },
@@ -161,12 +136,14 @@ export function capturing(
   };
 }
 
+type Environment = Readonly<Record<string, string | undefined>>;
+
 export interface ShellRun {
   readonly code: number;
   readonly lines: string[];
 }
 
-export async function runBatch(captured: Captured, http: HttpPort): Promise<ShellRun> {
+export async function runBatch(captured: Captured, http: HttpPort, environment: Environment): Promise<ShellRun> {
   const lines: string[] = [];
   const code = await syncCommand({
     fs: captured.fs,
@@ -178,7 +155,7 @@ export async function runBatch(captured: Captured, http: HttpPort): Promise<Shel
     log: (line) => {
       lines.push(line);
     },
-    env: ENV,
+    env: environment,
     stdout: (line) => {
       lines.push(line);
     },
@@ -192,7 +169,7 @@ export async function runBatch(captured: Captured, http: HttpPort): Promise<Shel
 /** More pauses than any passing case needs; past it, `runSession` throws. */
 const MAX_SESSION_PAUSES = 200;
 
-export async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun> {
+export async function runSession(captured: Captured, http: HttpPort, environment: Environment): Promise<ShellRun> {
   const lines: string[] = [];
   const controller = new AbortController();
   let chunks = 0;
@@ -231,7 +208,7 @@ export async function runSession(captured: Captured, http: HttpPort): Promise<Sh
     log: (text) => {
       lines.push(text);
     },
-    env: ENV,
+    env: environment,
     argv: [],
     signal: controller.signal,
     stdout: line,

@@ -6,14 +6,17 @@ import { describe, expect, it } from 'vitest';
 
 import { composeChunk } from '../compose-chunk.ts';
 import { TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
-import { createSessionAuth } from '../trade/session-auth.ts';
-import { CONTACT, ENTRY, ENV, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatch, runSession } from './test-support.ts';
+import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from '../trade/session-auth.ts';
+import { USER_AGENT_ENV_VAR } from '../trade/user-agent.ts';
+import { CANARY, CONTACT, ENTRY, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatch, runSession } from './test-support.ts';
 
 /** A body and headers that quote the request's cookie in every form. */
 const quoting = (cookie: string) => ({
   body: `echo ${cookie} ${encodeURIComponent(cookie)} ${Buffer.from(cookie).toString('base64')}`,
   headers: { 'set-cookie': cookie, 'x-echo': Buffer.from(cookie).toString('base64') },
 });
+
+const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
 
 describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => {
   const RESULTS = ['r1'];
@@ -79,7 +82,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
     const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
-    const { code, lines } = await runBatch(captured, http.port);
+    const { code, lines } = await runBatch(captured, http.port, ENV);
 
     expect(code).toBe(0);
     expect(http.downgraded()).toBe(1);
@@ -93,7 +96,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
     const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
-    const { code, lines } = await runSession(captured, http.port);
+    const { code, lines } = await runSession(captured, http.port, ENV);
 
     expect(code).toBe(0);
     expect(http.downgraded()).toBe(1);
