@@ -10,3 +10,4 @@ allowBuilds:
 # spine pins these exactly, so the gate is waived per package rather than off.
 minimumReleaseAgeExclude:
   - dependency-cruiser@18.4.0
+  - eslint-plugin-unicorn@77.0.0

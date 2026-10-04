@@ -1,5 +1,8 @@
+import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
 import js from '@eslint/js';
+import vitest from '@vitest/eslint-plugin';
 import sonarjs from 'eslint-plugin-sonarjs';
+import unicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
 
 /**
@@ -51,7 +54,17 @@ const coreRestrictedGlobals = [
   { name: 'performance', message: CLOCK },
 ];
 
+/** Test code is exempt from the function, nesting and statement size rules. */
+const TEST_FILES = ['**/*.test.{ts,tsx,mts,cts,mjs}', 'test/**'];
+
+const sizeLimits = { skipBlankLines: true, skipComments: true };
+
 export default tseslint.config(
+  {
+    // An unused `eslint-disable` is a finding, so a suppression cannot outlive
+    // the code it excused.
+    linterOptions: { reportUnusedDisableDirectives: 'error' },
+  },
   {
     ignores: [
       '**/node_modules/**',
@@ -83,10 +96,84 @@ export default tseslint.config(
       'tools/**/*.ts',
       '.claude/skills/tracked-json/scripts/*.ts',
       '*.{ts,mts,cts,mjs}',
+      'tools/**/*.mjs',
       // Leading-dot filenames are not matched by a `*` glob.
       '.dependency-cruiser.mjs',
+      // A node script with no extension, so no glob by extension reaches it.
+      '.githooks/commit-msg',
     ],
-    extends: [js.configs.recommended, tseslint.configs.recommended, sonarjs.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      sonarjs.configs.recommended,
+      unicorn.configs.recommended,
+      comments.recommended,
+    ],
+    rules: {
+      // Size and complexity.
+      'max-lines': ['error', { max: 300, ...sizeLimits }],
+      'max-lines-per-function': ['error', { max: 60, ...sizeLimits }],
+      complexity: ['error', 10],
+      'sonarjs/cognitive-complexity': ['error', 15],
+      'max-depth': ['error', 3],
+      'max-params': ['error', 4],
+      'max-nested-callbacks': ['error', 3],
+      'max-statements': ['error', 30],
+      'max-classes-per-file': ['error', 1],
+
+      // Type escapes.
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' },
+      ],
+      '@typescript-eslint/ban-ts-comment': [
+        'error',
+        {
+          'ts-expect-error': 'allow-with-description',
+          'ts-ignore': true,
+          'ts-nocheck': true,
+          'ts-check': false,
+          minimumDescriptionLength: 10,
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'error',
+
+      // Ways to bypass the gate. Deferred work goes to docs/stories/deferred-work.md.
+      '@eslint-community/eslint-comments/require-description': 'error',
+      '@eslint-community/eslint-comments/no-unlimited-disable': 'error',
+      'no-warning-comments': ['error', { terms: ['todo', 'fixme', 'hack', 'xxx'], location: 'anywhere' }],
+      'no-console': 'error',
+      eqeqeq: 'error',
+      curly: ['error', 'all'],
+      'no-param-reassign': 'error',
+      'no-else-return': 'error',
+      'no-await-in-loop': 'error',
+      'no-shadow': 'off',
+      '@typescript-eslint/no-shadow': 'error',
+    },
+  },
+  {
+    files: TEST_FILES,
+    rules: {
+      'max-lines-per-function': 'off',
+      complexity: 'off',
+      'max-depth': 'off',
+      'max-nested-callbacks': 'off',
+      'max-statements': 'off',
+    },
+  },
+  {
+    files: ['**/*.test.{ts,tsx,mts,cts,mjs}'],
+    plugins: { vitest },
+    rules: {
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-disabled-tests': 'error',
+      'vitest/expect-expect': 'error',
+      'vitest/no-conditional-expect': 'error',
+      'vitest/no-identical-title': 'error',
+      'vitest/valid-expect': 'error',
+    },
   },
   {
     // AD-1 purity for `core` (see `coreRestrictedGlobals`). `Date` itself stays
