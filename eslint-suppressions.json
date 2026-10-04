@@ -334,9 +334,6 @@
     }
   },
   "packages/sync/src/fixtures-record.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "max-lines": {
       "count": 1
     }

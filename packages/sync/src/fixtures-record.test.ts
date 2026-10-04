@@ -36,11 +36,8 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-/**
- * Importing the recorder is deliberate: the module has an entry guard, so the
- * import runs nothing. That guard is asserted **by behaviour** below, with two
- * spawns, because a source scan passes just as happily on an inverted guard.
- */
+// The entry guard makes the import above run nothing. It is asserted by
+// behaviour below, with spawns, because a source scan passes on an inverted guard.
 
 const SCRIPT = fileURLToPath(new URL('fixtures-record.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
