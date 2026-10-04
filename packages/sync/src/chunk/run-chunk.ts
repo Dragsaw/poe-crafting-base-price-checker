@@ -20,7 +20,7 @@ import type {
   SyncRunRecord,
   TrackedEntry,
 } from '@poe/contracts';
-import { chunkOrder, pinnedToKeep, poolCoverage } from '@poe/core';
+import { chunkOrder, poolCoverage } from '@poe/core';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
@@ -39,6 +39,7 @@ import { loadEnvelope } from './run-chunk/load-envelope.ts';
 import { failureNotBefore, notBeforeAfter429 } from './run-chunk/not-before.ts';
 import { publish } from './run-chunk/publish-artifacts.ts';
 import { carriedCoverage, createRunState, newRecords, passNow, starvationNow } from './run-chunk/run-state.ts';
+import { runSteps } from './run-chunk/step-loop.ts';
 import { writeReport } from './run-chunk/write-report.ts';
 import { buildSyncReport } from './sync-report.ts';
 
@@ -201,13 +202,6 @@ export const writeStderr = (line: string): void => {
   process.stderr.write(`${line}\n`);
 };
 
-function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound | undefined {
-  if (step.searchRemaining !== undefined && step.searchRemaining < 1) {
-    return 'search';
-  }
-  return step.fetchRemaining !== undefined && step.fetchRemaining < 1 ? 'fetch' : undefined;
-}
-
 export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
   const { fs, clock, pid, requests, session } = ports;
   const log = ports.log ?? writeStderr;
@@ -369,74 +363,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       }
       state.isGatePassed = true;
 
-      let ending:
-        | { readonly kind: 'completed' }
-        | { readonly kind: 'yielded'; readonly sessionExpired?: true }
-        | { readonly kind: 'bounded'; readonly bound: ChunkBound } = { kind: 'completed' };
-      /** The `notBefore` this ending writes: set only by a step's 429 or a latched probe 429 (§5.3, §13.3). */
-      let until: string | undefined;
-
-      const isRotationWaiting = plan.rotation.length > 0;
-      let pinnedLimit = plan.pinned.length;
-      let rotationVisited = 0;
-
-      for (;;) {
-        const isInPinned = state.pinnedVisited < pinnedLimit;
-        const entry = isInPinned ? plan.pinned[state.pinnedVisited] : plan.rotation[rotationVisited];
-        if (entry === undefined) {
-          break;
-        }
-        state.current = entry;
-        state.attempted += 1;
-        // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one step per entry in plan order, each step's pacing and bounds depend on the last
-        const result = await ready.step(entry);
-        state.current = undefined;
-        if (result.entry !== undefined) {
-          state.stepEntries.push(result.entry);
-        }
-        if (result.kind === 'completed' && result.records !== undefined) {
-          state.stepRecords.push(...result.records);
-        }
-        if (result.kind === 'yielded') {
-          // A downgrade writes no `notBefore` and tells the session (§13.4).
-          ending = result.sessionExpired === true ? { kind: 'yielded', sessionExpired: true } : { kind: 'yielded' };
-          if (result.retryAfterMs !== undefined) {
-            until = notBeforeAfter429(clock.now(), result.retryAfterMs);
-          }
-          break;
-        }
-        const key = canonicalKey(entry);
-        state.completed.push(key);
-
-        if (isInPinned) {
-          state.pinnedVisited += 1;
-          const remaining = result.searchRemaining;
-          if (remaining !== undefined) {
-            // Every step so far spent one search, the reporting one included.
-            state.discoveredAllowance ??= remaining + state.completed.length;
-            const left = pinnedLimit - state.pinnedVisited;
-            // R < P + 1 with rows 2–3 waiting is starvation, even when nothing is left to cut.
-            if (isRotationWaiting && remaining < left + 1) {
-              state.isTruncated = true;
-            }
-            pinnedLimit = state.pinnedVisited + pinnedToKeep(left, remaining, isRotationWaiting);
-          }
-        } else {
-          rotationVisited += 1;
-          state.rotationCompleted.push(key);
-        }
-
-        const hasNext = state.pinnedVisited < pinnedLimit || rotationVisited < plan.rotation.length;
-        const bound = boundOf(result);
-        if (bound !== undefined && hasNext) {
-          ending = { kind: 'bounded', bound };
-          break;
-        }
-        if (hasNext && session?.maxEntries !== undefined && state.attempted >= session.maxEntries) {
-          ending = { kind: 'bounded', bound: 'entries' };
-          break;
-        }
-      }
+      let { ending, until } = await runSteps(state, ready, plan);
 
       // A probe 429 settles nothing and ends the chunk as a 429 yield, also
       // when no further request followed it in this chunk (§13.3).
