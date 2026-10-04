@@ -5,6 +5,8 @@ import sonarjs from 'eslint-plugin-sonarjs';
 import unicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
 
+import local from './tools/eslint-local/index.ts';
+
 /**
  * ESM, not TypeScript: ESLint 10 needs `jiti` to load a `.ts` config, and `.mjs`
  * removes that dependency entirely.
@@ -136,7 +138,11 @@ export default tseslint.config(
       unicorn.configs.recommended,
       comments.recommended,
     ],
+    plugins: { local },
     rules: {
+      // Comments: no core or plugin rule bounds their length (the size rules skip them).
+      'local/max-comment-run': ['error', { maxLines: 3 }],
+
       // Size and complexity.
       'max-lines': ['error', { max: 300, ...sizeLimits }],
       'max-lines-per-function': ['error', { max: 60, ...sizeLimits }],
