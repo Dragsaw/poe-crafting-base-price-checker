@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 28
+revision: 29
 created: '2026-09-12'
-updated: '2026-10-03'
+updated: '2026-10-04'
 binds: []
 sources:
   - docs/specs/spec-tracked-hybrid-mods/SPEC.md
@@ -1153,9 +1153,8 @@ never import each other.
   the two bands.** The trade site sums one `statId` across the item's mods, so two per-slot
   filters on one id would each compare the summed value and match the wrong population.
   The edges and the operand rules are in `IMPLEMENTATION-NOTES.md` §5.5, binding under
-  AD-0. **The premise that the trade site sums rests on a manual observation until the
-  capture in `IMPLEMENTATION-NOTES.md` §5.1d lands**. Until then every summed price is
-  provisional.
+  AD-0. The premise that the trade site sums is a measurement, not an assumption: the
+  captured request in `IMPLEMENTATION-NOTES.md` §5.1d is its evidence.
 
   **Accepted effect: a summed filter prices a wider population than AD-17 weighs.** The
   summed interval admits value splits, and even single-slot items, that per-slot
