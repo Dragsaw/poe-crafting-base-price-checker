@@ -1,35 +1,5 @@
 /**
- * `pnpm sync` — the long-running sync session (FR-19, AD-7, AD-8).
- *
- * One process prices **one entry per iteration**. Each iteration is the same
- * chunk `pnpm sync:batch` runs (`./compose-chunk.ts`, `./chunk/run-chunk.ts`),
- * bounded to one entry: it takes the lock, loads, prices, publishes and
- * releases. The lock is taken per entry and never held across a wait, so
- * IMPLEMENTATION-NOTES.md §7 and its 6 h stale rule are unchanged.
- *
- * **One pacing state lives for the whole process** (`PacingState`: the bucket
- * ledger and the lane memo). Each chunk gets a fresh governor seeded with it,
- * paced with the even spread (`spreadBeforeNext`, §5.3), and its own
- * invalid-request counts. Before each chunk the session pre-waits the spread
- * delay of the lanes the next entry spends on — `DATA_LANE` when the league
- * gate is due, `SEARCH_LANE` and `FETCH_LANE` — **outside** the lock, so the
- * waits inside a chunk are only the fetch lane's small gaps. There is no
- * startup wait: the first request goes out cold and its response seeds the
- * ledger.
- *
- * After each chunk, `nextWait` (pure) decides the wait from the outcome or the
- * throw, the `notBefore` the chunk left in `sync-progress.json`, and whether
- * the chunk brought a fresh State reading (the ledger changed). `runWait`
- * spends it: a timed wait, a local poll of the input files' `modifiedAt`, or a
- * local poll of the lock file. Nothing idle sends a request.
- *
- * The first SIGINT or SIGTERM cancels a wait at once, or lets the running
- * entry finish, and the command exits 0. A throw never stops the session: it
- * is printed and waited out.
- *
- * **No test runs `main`.** `sync.test.ts` drives `syncSessionCommand` with
- * injected ports; the entry guard at the bottom means importing the module
- * runs nothing.
+ * `pnpm sync`: one entry per iteration; the lock is taken per entry and never held across a wait (FR-19, AD-7, AD-8).
  */
 
 import { realpathSync } from 'node:fs';
@@ -80,24 +50,13 @@ const MS_PER_HOUR = 60 * 60 * 1000;
 /** `--pinned-max-age <hours>`'s default (AD-7): a pinned entry is due once it is older. */
 export const DEFAULT_PINNED_MAX_AGE_HOURS = 4;
 
-/**
- * The first backoff on a lane whose policy the session has not read yet: the
- * even interval of the measured search bucket `600:21600` (21 600 s / 600
- * hits = 36 s, IMPLEMENTATION-NOTES.md §5.3, which owns the figure).
- */
+/** First backoff on a lane with no policy read yet: the even interval of the `600:21600` search bucket (§5.3). */
 export const COLD_EVEN_INTERVAL_MS = 36_000;
 
-/**
- * How often a wait polls the local input files or the lock file. A local
- * read, never a request: an idle wait sends nothing.
- */
+/** How often a wait polls the local input or lock file: a local read, never a request. */
 export const LOCAL_POLL_MS = 5000;
 
-/**
- * The hand-owned inputs under `data/` a chunk reads and never writes. A change
- * to any of them — its presence or its `modifiedAt` — ends a wait for an input
- * change, and makes the league gate due again.
- */
+/** Hand-owned inputs a chunk reads and never writes: a change ends an input wait and makes the league gate due. */
 export const INPUT_PATHS: readonly string[] = [
   TRACKED_PATH,
   CONFIG_PATH,
@@ -188,12 +147,7 @@ export type SessionWait =
 
 const NO_WAIT: SessionWait = { kind: 'none' };
 
-/**
- * A throw only an edit to an input file clears. A `DataFileError` counts only
- * for a watched input: a refused sync-owned file (the dataset, progress or the
- * report) is not in `INPUT_PATHS`, so a wait for an input change would never
- * end, and it takes the backoff instead.
- */
+/** A throw only an edit to an input file clears; a refused sync-owned file is not in `INPUT_PATHS`, so it backs off. */
 function isRefusal(error: unknown): boolean {
   return (
     (error instanceof DataFileError && INPUT_PATHS.includes(error.path)) ||
@@ -204,12 +158,7 @@ function isRefusal(error: unknown): boolean {
   );
 }
 
-/**
- * Whether the result earns a backoff (decisions 5 and 6): a yield that wrote
- * no `notBefore` and brought no State reading (no answer), or a throw that is
- * not a refusal, a league mismatch or a malformed request and wrote no
- * `notBefore`.
- */
+/** Decisions 5 and 6: no `notBefore`, and a yield with no State reading or a throw that is no refusal. */
 function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   if (context.notBefore !== undefined) {
     return false;
@@ -217,28 +166,17 @@ function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   return result.kind === 'outcome' ? result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result)) : !isRefusal(result.error);
 }
 
-/**
- * `true` when the chunk ended on AD-30's downgrade (IMPLEMENTATION-NOTES.md
- * §13.4). The downgrade reset the pacing state in place, so the ledger cannot
- * tell it apart from a fresh State reading: the outcome says so explicitly.
- */
+/** AD-30's downgrade (§13.4) resets the pacing in place, so only the outcome tells it from a State reading. */
 export function isSessionExpired(result: ChunkResult): boolean {
   return result.kind === 'outcome' && result.outcome.kind === 'yielded' && result.outcome.sessionExpired === true;
 }
 
-/**
- * The count this result's backoff runs at: `1` after a State reading and
- * after a downgrade (the pacing is cold again), one more than the last
- * otherwise.
- */
+/** `1` after a State reading or a downgrade (the pacing is cold again), else one more than the last. */
 function backoffCountFor(state: SessionState, context: ChunkContext, result: ChunkResult): number {
   return context.freshReading || isSessionExpired(result) ? 1 : state.backoffCount + 1;
 }
 
-/**
- * The `count`-th consecutive backoff: the even interval, doubled per
- * consecutive backoff, capped at the 6 h stale threshold (`STALE_LOCK_AFTER_MS`).
- */
+/** The even interval doubled per consecutive backoff, capped at the 6 h stale threshold (`STALE_LOCK_AFTER_MS`). */
 export function backoffMs(evenInterval: number, count: number): number {
   const doubled = evenInterval * 2 ** Math.max(0, count - 1);
   return Math.min(doubled, STALE_LOCK_AFTER_MS);
@@ -248,10 +186,7 @@ function plus(now: string, ms: number): string {
   return new Date(Date.parse(now) + ms).toISOString();
 }
 
-/**
- * The wait after one chunk (the I/O matrix of the session). Pure: the result,
- * the state before it and what the session read around the chunk go in.
- */
+/** The wait after one chunk (the session's I/O matrix); pure. */
 export function nextWait(result: ChunkResult, state: SessionState, context: ChunkContext): SessionWait {
   const { now } = context;
   const backoffUntil = (): string =>
@@ -395,10 +330,7 @@ export function preWaitMs(pacing: PacingState, now: string, hasGate: boolean): n
   return Math.max(0, ...entryLanes(hasGate).map((lane) => laneDelayMs(pacing, lane, now, true)));
 }
 
-/**
- * The tightest even interval over the lanes an entry spends on; a lane whose
- * policy is unread counts as `COLD_EVEN_INTERVAL_MS`.
- */
+/** The tightest even interval over the lanes an entry spends on; an unread policy counts as `COLD_EVEN_INTERVAL_MS`. */
 export function sessionEvenIntervalMs(pacing: PacingState, hasGate: boolean): number {
   return Math.max(
     ...entryLanes(hasGate).map(
@@ -410,11 +342,7 @@ export function sessionEvenIntervalMs(pacing: PacingState, hasGate: boolean): nu
 // ---------------------------------------------------------------------------
 // Local reads
 
-/**
- * The presence and `modifiedAt` of every input file, as one comparable string.
- * It never throws: a transient fs fault (`EBUSY`, `EPERM`) on one path records
- * an error marker in that path's part, so it cannot end the session.
- */
+/** Presence and `modifiedAt` of every input as one string; a transient fs fault marks its path and never throws. */
 export async function inputSignature(fs: FilesystemPort): Promise<string> {
   const parts = await Promise.all(
     INPUT_PATHS.map(async (path) => {
@@ -428,10 +356,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
   return JSON.stringify(parts);
 }
 
-/**
- * `true` when the lock file is absent, or stale by §7's rule (`isStaleState`).
- * A read that throws answers `false`, so the poll continues.
- */
+/** `true` when the lock file is absent or stale (§7); a read that throws is `false`, so the poll continues. */
 export async function isLockFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
   try {
     const found = await readLock(fs);
@@ -581,10 +506,7 @@ export type SyncSessionPorts = Omit<
 >;
 
 export interface SyncSessionDependencies extends SyncSessionPorts {
-  /**
-   * Where the contact `User-Agent` (`POE_SYNC_USER_AGENT`) and the optional
-   * session cookie (`POESESSID`, AD-30) are read from.
-   */
+  /** Where the contact `User-Agent` and the optional session cookie (AD-30) are read from. */
   readonly env: Readonly<Record<string, string | undefined>>;
   /** The command's arguments, after the script name. */
   readonly argv: readonly string[];
@@ -712,10 +634,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDependencies):
     return 1;
   }
 
-  // One holder per process, beside the pacing state. Each settle prints one
-  // line, once per process, at the moment it settles: an edge state here,
-  // before the first request; a probe outcome from a chunk's governor
-  // (IMPLEMENTATION-NOTES.md §13.1–§13.3, §13.5).
+  // One holder per process: each settle prints one line, once, when it settles (§13.1–§13.3, §13.5).
   const auth = createSessionAuth(env, { onSettle: (line) => stderr(`${PREFIX} ${line}`) });
   const runtime: SessionRuntime = {
     ports,
