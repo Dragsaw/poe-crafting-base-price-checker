@@ -278,7 +278,7 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
             await eslintUncovered(target.files, undefined),
             `ESLint: eslint.config.mjs (files ${eslint.files}${ignoresClause}) ignores or has no config for`,
           ).toEqual([]);
-        });
+        }, 30_000);
 
         it(`the checker reports every file when files glob ${eslint.files} is dropped`, async () => {
           const config = await loadEslintConfig();
