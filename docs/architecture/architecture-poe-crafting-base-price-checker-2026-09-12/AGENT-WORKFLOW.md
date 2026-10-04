@@ -32,7 +32,7 @@ pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere (nev
 
 `pnpm check` is the point that enforces the package boundaries. `dependency-cruiser` fails the build on an import in the wrong direction (AD-1). An agent that imports from `core` into `sync` therefore learns about the fault in seconds, and no reviewer is necessary.
 
-**The gate runs in three places.** The `.githooks/pre-push` hook runs `pnpm check` (see Commit conventions). `.github/workflows/test.yml` runs it on a pull request. For an agent, a PostToolUse hook (`tools/lint-on-edit`) lints, typechecks and dependency-cruises each file after the agent edits it, so a fault shows on the edit and not at the end. `deploy.yml` runs `pnpm check:fast` and `pnpm test`, not `pnpm test:data`: a player's data-only push must still deploy.
+**The gate runs in four places.** The `.githooks/pre-push` hook runs `pnpm check` (see Commit conventions). `.github/workflows/test.yml` runs it on a pull request, and `.github/workflows/deploy.yml` runs it before the build. For an agent, a PostToolUse hook (`tools/lint-on-edit`) lints, typechecks and dependency-cruises each file after the agent edits it, so a fault shows on the edit and not at the end.
 
 **The lint baseline is a ratchet.** `eslint-suppressions.json` records the violations that existed when the type-aware rules arrived. A new violation fails `pnpm lint`. When a change fixes a baselined violation, its suppression is stale and `pnpm lint` fails until `pnpm lint:prune` removes it. An agent never runs `eslint --suppress-*`, and never edits `eslint-suppressions.json` upward: the only permitted change to the file is `pnpm lint:prune`. `LINT_FAST=1` skips the type-aware rules. Only the PostToolUse hook sets it.
 
@@ -156,7 +156,7 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 
 ## Commit conventions
 
-A commit subject is `type(scope): description` or `type: description`. A `feat`/`fix`/`test` commit scoped to a package (`contracts`, `core`, `sync`, `web`) names its story (`story 1.N`) or retro item (`retro item(s) N`) in the description — a `docs`/`chore` commit, or one with no package scope, does not need to. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`). The `.githooks/pre-push` hook runs `pnpm check` and blocks the push when it fails. It skips a push that only deletes refs. `git push --no-verify` skips it, and CI still runs the gate.
+A commit subject is `type(scope): description` or `type: description`. The type is lowercase and one of the types the hook lists, and the subject has no trailing period (the `deferred` scope is exempt). The subject needs no story or retro item id. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`). The `.githooks/pre-push` hook runs `pnpm check` and blocks the push when it fails. It skips a push that only deletes refs. `git push --no-verify` skips it, and CI still runs the gate.
 
 ## Review brief
 

@@ -17,6 +17,7 @@
     "tools/deferred-issues/*.ts",
     "tools/dev-stop/*.ts",
     "tools/dts-specifiers/*.ts",
+    "tools/eslint-rules/*.ts",
     "tools/lint-on-edit/*.ts",
     "tools/prune-pages.mjs",
     ".claude/skills/tracked-json/scripts/*.ts",

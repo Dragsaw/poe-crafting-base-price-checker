@@ -6,8 +6,6 @@
 import { readFileSync } from 'node:fs';
 
 const KNOWN_TYPES = ['feat', 'fix', 'test', 'docs', 'chore', 'wip', 'refactor', 'perf', 'build', 'ci'];
-const ID_TYPES = new Set(['feat', 'fix', 'test']);
-const KNOWN_PACKAGES = new Set(['contracts', 'core', 'sync', 'web']);
 const SUBJECT_PATTERN = /^([a-z]+)(\(([a-z0-9,\- ]+)\))?: (.+)$/;
 // The deferred-work-sweep skill's own automation commits carry a full,
 // period-terminated ledger `summary:`/`evidence:` sentence after the dash
@@ -42,11 +40,11 @@ function lint(subject) {
     }
     fail(
       `the subject "${subject}" is not "type: description" or "type(scope): description".`,
-      `Start the subject with one of: ${KNOWN_TYPES.join(', ')}. Example: "feat(sync): story 1.9 short description".`,
+      `Start the subject with one of: ${KNOWN_TYPES.join(', ')}. Example: "feat(sync): short description".`,
     );
   }
 
-  const [, type, , scope, description] = match;
+  const [, type, , scope] = match;
   if (!KNOWN_TYPES.includes(type)) {
     fail(
       `the commit type "${type}" is not one of: ${KNOWN_TYPES.join(', ')}.`,
@@ -56,25 +54,6 @@ function lint(subject) {
 
   if (scope !== PERIOD_EXEMPT_SCOPE && subject.endsWith('.')) {
     fail(`the subject ends with a period.`, `Remove the trailing period.`);
-  }
-
-  if (!ID_TYPES.has(type)) {
-    return;
-  }
-
-  const scopedPackages = scope ? scope.split(',').map((s) => s.trim()) : [];
-  const scopesAllKnown = scopedPackages.length > 0 && scopedPackages.every((s) => KNOWN_PACKAGES.has(s));
-  if (!scopesAllKnown) {
-    return;
-  }
-
-  const hasStoryId = /\bstor(?:y|ies)\s+\d+\.\d+\b/i.test(description);
-  const hasRetroId = /\bretro items?\b/i.test(description);
-  if (!hasStoryId && !hasRetroId) {
-    fail(
-      `type "${type}" with a package scope (${scope}) names no story or retro item.`,
-      `Name the work in the description: "story <epic>.<number>" or "retro item(s) <n>". See AGENT-WORKFLOW.md's Commit conventions. If this commit is tooling or ledger housekeeping instead of story/retro work, use "chore" or "docs" instead of "${type}".`,
-    );
   }
 }
 

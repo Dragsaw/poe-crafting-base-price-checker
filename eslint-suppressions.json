@@ -26,6 +26,9 @@
     "complexity": {
       "count": 3
     },
+    "local/max-comment-run": {
+      "count": 2
+    },
     "max-classes-per-file": {
       "count": 1
     },
@@ -66,11 +69,39 @@
       "count": 1
     }
   },
+  ".dependency-cruiser.mjs": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   ".githooks/commit-msg": {
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  ".githooks/pre-push": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "depcruise.rules.mjs": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "eslint.config.mjs": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
+  "packages/contracts/src/base-type.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -86,8 +117,16 @@
     }
   },
   "packages/contracts/src/canonical-key.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    },
     "unicorn/no-null": {
       "count": 4
+    }
+  },
+  "packages/contracts/src/class-name.ts": {
+    "local/max-comment-run": {
+      "count": 2
     }
   },
   "packages/contracts/src/craft-recipe.test.ts": {
@@ -96,10 +135,18 @@
     }
   },
   "packages/contracts/src/craft-recipe.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/max-nested-calls": {
       "count": 3
     },
     "unicorn/no-for-each": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/currency-rate.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -109,6 +156,11 @@
     },
     "unicorn/no-null": {
       "count": 1
+    }
+  },
+  "packages/contracts/src/dataset.ts": {
+    "local/max-comment-run": {
+      "count": 4
     }
   },
   "packages/contracts/src/envelopes.test.ts": {
@@ -126,6 +178,9 @@
     }
   },
   "packages/contracts/src/envelopes.ts": {
+    "local/max-comment-run": {
+      "count": 8
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -133,7 +188,25 @@
       "count": 7
     }
   },
+  "packages/contracts/src/index.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/index.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/contracts/src/item-class.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/contracts/src/modifier-ref.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/consistent-function-scoping": {
       "count": 1
     },
@@ -142,6 +215,9 @@
     }
   },
   "packages/contracts/src/modifier-ref.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    },
     "unicorn/name-replacements": {
       "count": 10
     },
@@ -161,6 +237,9 @@
     }
   },
   "packages/contracts/src/overlap.ts": {
+    "local/max-comment-run": {
+      "count": 10
+    },
     "max-params": {
       "count": 2
     },
@@ -171,7 +250,20 @@
       "count": 1
     }
   },
+  "packages/contracts/src/ports/clock.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/ports/fakes/clock.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/contracts/src/ports/fakes/filesystem.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
@@ -185,14 +277,64 @@
       "count": 1
     }
   },
+  "packages/contracts/src/ports/fakes/git.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/ports/fakes/http.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/ports/filesystem.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
+  "packages/contracts/src/ports/git.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/contracts/src/ports/http.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/contracts/src/price-observation.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/contracts/src/primitives.test.ts": {
     "sonarjs/no-floating-point-equality": {
       "count": 1
     }
   },
+  "packages/contracts/src/primitives.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
   "packages/contracts/src/ranked-row.test.ts": {
     "unicorn/no-null": {
       "count": 2
+    }
+  },
+  "packages/contracts/src/ranked-row.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    }
+  },
+  "packages/contracts/src/schema-version.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    }
+  },
+  "packages/contracts/src/sync-progress.ts": {
+    "local/max-comment-run": {
+      "count": 3
     }
   },
   "packages/contracts/src/sync-run-report.test.ts": {
@@ -219,7 +361,15 @@
     }
   },
   "packages/contracts/src/sync-run-report.ts": {
+    "local/max-comment-run": {
+      "count": 12
+    },
     "unicorn/consistent-boolean-name": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/test-support.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -237,9 +387,34 @@
       "count": 1
     }
   },
+  "packages/contracts/src/tracked-entry.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    }
+  },
+  "packages/contracts/src/tracked-list-age.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/tracked-list-age.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/contracts/src/trade-catalogue.test.ts": {
     "unicorn/no-null": {
       "count": 4
+    }
+  },
+  "packages/contracts/src/trade-catalogue.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    }
+  },
+  "packages/contracts/src/trade-leagues.ts": {
+    "local/max-comment-run": {
+      "count": 1
     }
   },
   "packages/contracts/src/weights-file.test.ts": {
@@ -257,6 +432,9 @@
     }
   },
   "packages/contracts/src/weights-file.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
@@ -276,6 +454,9 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 4
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     },
@@ -294,8 +475,23 @@
       "count": 1
     }
   },
+  "packages/core/src/coverage.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/core/src/craft-cost.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/core/src/crafted-classes.test.ts": {
     "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/core/src/crafted-classes.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -332,6 +528,9 @@
     "complexity": {
       "count": 2
     },
+    "local/max-comment-run": {
+      "count": 10
+    },
     "max-depth": {
       "count": 6
     },
@@ -355,6 +554,11 @@
     },
     "unicorn/no-array-sort": {
       "count": 1
+    }
+  },
+  "packages/core/src/index.ts": {
+    "local/max-comment-run": {
+      "count": 3
     }
   },
   "packages/core/src/probability.test.ts": {
@@ -384,6 +588,9 @@
     }
   },
   "packages/core/src/probability.ts": {
+    "local/max-comment-run": {
+      "count": 14
+    },
     "max-params": {
       "count": 1
     },
@@ -400,8 +607,16 @@
       "count": 1
     }
   },
+  "packages/core/src/provenance.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/core/src/rank.test.ts": {
     "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "local/max-comment-run": {
       "count": 1
     },
     "max-lines": {
@@ -438,6 +653,9 @@
   "packages/core/src/rank.ts": {
     "complexity": {
       "count": 2
+    },
+    "local/max-comment-run": {
+      "count": 15
     },
     "max-lines": {
       "count": 1
@@ -477,6 +695,9 @@
     }
   },
   "packages/sync/src/catalogue-refresh.test.ts": {
+    "local/max-comment-run": {
+      "count": 8
+    },
     "max-lines": {
       "count": 1
     },
@@ -509,6 +730,9 @@
     }
   },
   "packages/sync/src/catalogue-refresh.ts": {
+    "local/max-comment-run": {
+      "count": 14
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -536,7 +760,15 @@
       "count": 1
     }
   },
+  "packages/sync/src/catalogue/catalogue-ids.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/sync/src/catalogue/committed-catalogue.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
@@ -559,10 +791,23 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 4
+    },
     "max-depth": {
       "count": 2
     },
     "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/chunk/catalogue-check.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/chunk/cross-file-gate.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -575,6 +820,9 @@
     }
   },
   "packages/sync/src/chunk/lock.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "unicorn/consistent-boolean-name": {
       "count": 3
     }
@@ -591,6 +839,9 @@
     }
   },
   "packages/sync/src/chunk/publish-dataset.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-array-callback-reference": {
       "count": 1
     }
@@ -598,6 +849,9 @@
   "packages/sync/src/chunk/run-chunk.test.ts": {
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 2
+    },
+    "local/max-comment-run": {
+      "count": 4
     },
     "max-lines": {
       "count": 1
@@ -643,6 +897,9 @@
     "complexity": {
       "count": 2
     },
+    "local/max-comment-run": {
+      "count": 37
+    },
     "max-depth": {
       "count": 13
     },
@@ -679,7 +936,15 @@
       "count": 1
     }
   },
+  "packages/sync/src/chunk/sync-report.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/sync/src/compose-chunk.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    },
     "max-lines-per-function": {
       "count": 1
     }
@@ -698,6 +963,9 @@
   "packages/sync/src/curation/check.ts": {
     "complexity": {
       "count": 1
+    },
+    "local/max-comment-run": {
+      "count": 3
     },
     "max-lines-per-function": {
       "count": 1
@@ -719,6 +987,9 @@
     }
   },
   "packages/sync/src/dry-run.data.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
@@ -731,6 +1002,9 @@
   },
   "packages/sync/src/dry-run.test.ts": {
     "@typescript-eslint/no-unsafe-member-access": {
+      "count": 1
+    },
+    "local/max-comment-run": {
       "count": 1
     },
     "max-lines": {
@@ -750,6 +1024,9 @@
     }
   },
   "packages/sync/src/dry-run.ts": {
+    "local/max-comment-run": {
+      "count": 9
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -764,6 +1041,9 @@
     }
   },
   "packages/sync/src/fixtures-record.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "max-lines": {
       "count": 1
     },
@@ -784,6 +1064,9 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 10
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -801,6 +1084,9 @@
     }
   },
   "packages/sync/src/git/read-only-git-port.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/consistent-function-scoping": {
       "count": 1
     },
@@ -815,8 +1101,16 @@
     }
   },
   "packages/sync/src/git/read-only-git-port.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "sonarjs/no-os-command-from-path": {
       "count": 1
+    }
+  },
+  "packages/sync/src/index.ts": {
+    "local/max-comment-run": {
+      "count": 12
     }
   },
   "packages/sync/src/league/league-gate.test.ts": {
@@ -831,11 +1125,27 @@
     }
   },
   "packages/sync/src/league/league-gate.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "max-classes-per-file": {
       "count": 1
     }
   },
+  "packages/sync/src/load-config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/load-data-file.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
   "packages/sync/src/no-git-write.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -846,12 +1156,25 @@
       "count": 1
     }
   },
+  "packages/sync/src/pinned-cap.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/pricing/fixture-names.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
   "packages/sync/src/pricing/fixture-port.test.ts": {
     "unicorn/prefer-iterator-to-array": {
       "count": 1
     }
   },
   "packages/sync/src/pricing/fixture-port.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "no-await-in-loop": {
       "count": 1
     },
@@ -876,6 +1199,16 @@
       "count": 1
     }
   },
+  "packages/sync/src/pricing/load-currencies.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/load-item-types.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/sync/src/pricing/normalise.test.ts": {
     "sonarjs/no-floating-point-equality": {
       "count": 3
@@ -885,21 +1218,33 @@
     }
   },
   "packages/sync/src/pricing/normalise.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "unicorn/no-array-callback-reference": {
       "count": 1
     }
   },
   "packages/sync/src/pricing/price-entry.fixtures.test.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "no-await-in-loop": {
       "count": 1
     }
   },
   "packages/sync/src/pricing/price-entry.hybrid.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/deprecation": {
       "count": 3
     }
   },
   "packages/sync/src/pricing/price-entry.summed.test.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "sonarjs/deprecation": {
       "count": 3
     }
@@ -921,6 +1266,9 @@
   "packages/sync/src/pricing/price-entry.ts": {
     "complexity": {
       "count": 2
+    },
+    "local/max-comment-run": {
+      "count": 7
     },
     "max-classes-per-file": {
       "count": 1
@@ -956,6 +1304,9 @@
     }
   },
   "packages/sync/src/pricing/search-body.ts": {
+    "local/max-comment-run": {
+      "count": 7
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -963,7 +1314,15 @@
       "count": 1
     }
   },
+  "packages/sync/src/request-counter.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/sync/src/session-auth.canary.test.ts": {
+    "local/max-comment-run": {
+      "count": 5
+    },
     "max-lines": {
       "count": 1
     },
@@ -990,6 +1349,9 @@
     }
   },
   "packages/sync/src/shell-fetch.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-array-callback-reference": {
       "count": 1
     },
@@ -998,6 +1360,9 @@
     }
   },
   "packages/sync/src/shell.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "no-await-in-loop": {
       "count": 1
     },
@@ -1006,6 +1371,9 @@
     }
   },
   "packages/sync/src/shell.ts": {
+    "local/max-comment-run": {
+      "count": 7
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1022,6 +1390,9 @@
   "packages/sync/src/sync-batch.test.ts": {
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 1
+    },
+    "local/max-comment-run": {
+      "count": 4
     },
     "max-lines": {
       "count": 1
@@ -1049,6 +1420,9 @@
     }
   },
   "packages/sync/src/sync-batch.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1059,6 +1433,9 @@
   "packages/sync/src/sync.test.ts": {
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 1
+    },
+    "local/max-comment-run": {
+      "count": 4
     },
     "max-lines": {
       "count": 1
@@ -1082,6 +1459,9 @@
   "packages/sync/src/sync.ts": {
     "complexity": {
       "count": 3
+    },
+    "local/max-comment-run": {
+      "count": 15
     },
     "max-depth": {
       "count": 1
@@ -1115,6 +1495,9 @@
     }
   },
   "packages/sync/src/trade/client.test.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "max-lines": {
       "count": 1
     },
@@ -1134,6 +1517,9 @@
   "packages/sync/src/trade/client.ts": {
     "complexity": {
       "count": 1
+    },
+    "local/max-comment-run": {
+      "count": 39
     },
     "max-lines": {
       "count": 1
@@ -1160,12 +1546,23 @@
       "count": 3
     }
   },
+  "packages/sync/src/trade/endpoints.ts": {
+    "local/max-comment-run": {
+      "count": 7
+    }
+  },
   "packages/sync/src/trade/invalid-requests.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
   "packages/sync/src/trade/ledger.ts": {
+    "local/max-comment-run": {
+      "count": 8
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     },
@@ -1176,7 +1573,15 @@
       "count": 1
     }
   },
+  "packages/sync/src/trade/rate-limit-headers.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/sync/src/trade/rate-limit-headers.ts": {
+    "local/max-comment-run": {
+      "count": 8
+    },
     "unicorn/no-unreadable-for-of-expression": {
       "count": 1
     }
@@ -1202,6 +1607,9 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 16
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -1212,6 +1620,16 @@
       "count": 1
     }
   },
+  "packages/sync/src/trade/transport-failure.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/trade/user-agent.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    }
+  },
   "packages/sync/src/write-artifact.test.ts": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
@@ -1220,9 +1638,17 @@
       "count": 1
     }
   },
+  "packages/sync/src/write-artifact.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/App.test.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 5
+    },
+    "local/max-comment-run": {
+      "count": 2
     },
     "max-lines": {
       "count": 1
@@ -1253,6 +1679,9 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 4
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1261,16 +1690,30 @@
     }
   },
   "packages/web/src/frame/AbsenceLines.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-null": {
       "count": 1
     }
   },
   "packages/web/src/frame/FailureScreen.tsx": {
+    "local/max-comment-run": {
+      "count": 4
+    },
     "unicorn/name-replacements": {
       "count": 1
     }
   },
+  "packages/web/src/frame/Frame.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/frame/Masthead.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1278,7 +1721,25 @@
       "count": 1
     }
   },
+  "packages/web/src/frame/RowSlots.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/SyncReportPanel.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/TradeGlyph.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/frame/TrustStrip.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1295,6 +1756,9 @@
     }
   },
   "packages/web/src/frame/trust-facts.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "unicorn/consistent-boolean-name": {
       "count": 3
     },
@@ -1304,6 +1768,9 @@
   },
   "packages/web/src/frame/trust-strip.test.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "local/max-comment-run": {
       "count": 1
     },
     "max-lines": {
@@ -1316,7 +1783,20 @@
       "count": 5
     }
   },
+  "packages/web/src/list/AskingPriceLine.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/ColumnHeader.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/web/src/list/CombinationRow.tsx": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1324,12 +1804,28 @@
       "count": 5
     }
   },
+  "packages/web/src/list/ExpansionPanel.tsx": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
+  "packages/web/src/list/KeyBlock.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/list/ListStatement.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-null": {
       "count": 1
     }
   },
   "packages/web/src/list/RankedList.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-null": {
       "count": 2
     },
@@ -1339,6 +1835,9 @@
   },
   "packages/web/src/list/RankedRow.tsx": {
     "complexity": {
+      "count": 1
+    },
+    "local/max-comment-run": {
       "count": 1
     },
     "max-lines-per-function": {
@@ -1351,22 +1850,49 @@
       "count": 4
     }
   },
+  "packages/web/src/list/RunningFoot.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/TrustMark.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/list/UniformPriorBanner.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
+  "packages/web/src/list/UnitGlyph.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/list/UnrankableAppendix.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/no-null": {
       "count": 2
     }
   },
   "packages/web/src/list/active-ranking.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
   "packages/web/src/list/combination-fit.test.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
@@ -1378,6 +1904,9 @@
     }
   },
   "packages/web/src/list/combination-text.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "sonarjs/no-misleading-array-reverse": {
       "count": 2
     },
@@ -1394,6 +1923,9 @@
     }
   },
   "packages/web/src/list/display-rows.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1427,6 +1959,9 @@
     }
   },
   "packages/web/src/list/format.ts": {
+    "local/max-comment-run": {
+      "count": 10
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     }
@@ -1440,6 +1975,9 @@
     }
   },
   "packages/web/src/list/list-statement.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "unicorn/consistent-boolean-name": {
       "count": 3
     }
@@ -1457,11 +1995,24 @@
       "count": 1
     }
   },
+  "packages/web/src/list/short-forms.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "packages/web/src/list/tracked.data.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-unnecessary-array-flat-map": {
       "count": 1
     },
     "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/trade-link.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -1474,6 +2025,11 @@
     },
     "unicorn/prefer-dom-node-html-methods": {
       "count": 2
+    }
+  },
+  "packages/web/src/load/artifacts.ts": {
+    "local/max-comment-run": {
+      "count": 1
     }
   },
   "packages/web/src/load/load-artifacts.test.ts": {
@@ -1500,16 +2056,25 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 4
+    },
     "unicorn/no-null": {
       "count": 4
     }
   },
   "packages/web/src/load/prune-allowlist.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-top-level-assignment-in-function": {
       "count": 1
     }
   },
   "packages/web/src/recipe/CraftRecipe.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "max-lines-per-function": {
       "count": 1
     },
@@ -1518,6 +2083,9 @@
     }
   },
   "packages/web/src/recipe/craft-recipe.test.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "max-lines": {
       "count": 1
     },
@@ -1555,17 +2123,51 @@
       "count": 1
     }
   },
+  "packages/web/src/recipe/recipe-storage.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/web/src/recipe/recipe-view.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
+  "packages/web/src/shared/cell.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "packages/web/src/shared/product.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/web/src/shared/text.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
+  "packages/web/src/shared/time.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/web/src/test-setup.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-null": {
       "count": 1
     }
   },
   "packages/web/src/test-support/artifact-server.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    },
     "sonarjs/deprecation": {
       "count": 4
     },
@@ -1586,6 +2188,9 @@
     }
   },
   "packages/web/src/test-support/dom.tsx": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-null": {
       "count": 1
     },
@@ -1594,7 +2199,15 @@
     }
   },
   "packages/web/src/test-support/list-fixtures.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "max-params": {
+      "count": 1
+    }
+  },
+  "packages/web/src/test-support/threshold-input.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -1604,6 +2217,9 @@
     }
   },
   "packages/web/src/theme/theme.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "unicorn/no-null": {
       "count": 1
     }
@@ -1614,11 +2230,17 @@
     }
   },
   "packages/web/src/theme/tokens.ts": {
+    "local/max-comment-run": {
+      "count": 15
+    },
     "max-params": {
       "count": 1
     }
   },
   "packages/web/src/threshold/PayoutThreshold.tsx": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "max-lines-per-function": {
       "count": 1
     }
@@ -1639,7 +2261,15 @@
       "count": 3
     }
   },
+  "packages/web/src/threshold/threshold-storage.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    }
+  },
   "packages/web/vite.config.test.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1651,6 +2281,9 @@
     }
   },
   "packages/web/vite.config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     }
@@ -1667,6 +2300,9 @@
     }
   },
   "test/contracts-isolation.test.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
@@ -1684,6 +2320,9 @@
     }
   },
   "test/core-purity-lint.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/consistent-function-scoping": {
       "count": 1
     },
@@ -1691,12 +2330,23 @@
       "count": 3
     }
   },
+  "test/core-rank-purity.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "test/deferred-ledger.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     }
   },
   "test/global-setup.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1705,6 +2355,9 @@
     }
   },
   "test/guard-after-last-file-fixture/late.fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/assertions-in-tests": {
       "count": 1
     },
@@ -1712,7 +2365,20 @@
       "count": 1
     }
   },
+  "test/guard-after-last-file-fixture/names.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "test/guard-after-last-file-fixture/vitest.config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "test/guard-after-last-file.test.ts": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1724,6 +2390,9 @@
     }
   },
   "test/guard-concurrent-fixture/concurrent.fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/assertions-in-tests": {
       "count": 2
     },
@@ -1737,7 +2406,20 @@
       "count": 1
     }
   },
+  "test/guard-concurrent-fixture/names.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "test/guard-concurrent-fixture/vitest.config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "test/guard-concurrent.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1749,6 +2431,9 @@
     }
   },
   "test/guard-hooks-fixture/late-request.fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/assertions-in-tests": {
       "count": 3
     },
@@ -1762,7 +2447,20 @@
       "count": 2
     }
   },
+  "test/guard-hooks-fixture/names.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "test/guard-hooks-fixture/vitest.config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "test/guard-hooks.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1771,6 +2469,9 @@
     }
   },
   "test/guard-linger-fixture/linger.fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/assertions-in-tests": {
       "count": 2
     },
@@ -1778,7 +2479,20 @@
       "count": 1
     }
   },
+  "test/guard-linger-fixture/names.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "test/guard-linger-fixture/vitest.config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "test/guard-linger.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1787,6 +2501,9 @@
     }
   },
   "test/guard-reuse-fixture/a-issuer.fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/assertions-in-tests": {
       "count": 1
     },
@@ -1794,12 +2511,28 @@
       "count": 1
     }
   },
+  "test/guard-reuse-fixture/b-bystander.fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "test/guard-reuse-fixture/names.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "test/guard-reuse-fixture/vitest.config.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/no-array-sort": {
       "count": 1
     }
   },
   "test/guard-reuse.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1810,6 +2543,9 @@
   "test/hand-listed-coverage.test.ts": {
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 1
+    },
+    "local/max-comment-run": {
+      "count": 4
     },
     "no-await-in-loop": {
       "count": 2
@@ -1849,6 +2585,9 @@
     }
   },
   "test/no-hardcoded-rate-limits.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1857,6 +2596,9 @@
     }
   },
   "test/no-network.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/assertions-in-tests": {
       "count": 2
     },
@@ -1877,6 +2619,9 @@
     }
   },
   "test/prune-pages.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 7
     },
@@ -1900,6 +2645,9 @@
     }
   },
   "test/session-cookie-shells.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1911,6 +2659,9 @@
     }
   },
   "test/setup.ts": {
+    "local/max-comment-run": {
+      "count": 10
+    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -1925,11 +2676,24 @@
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 1
+    },
     "unicorn/name-replacements": {
       "count": 1
     },
     "unicorn/no-array-sort": {
       "count": 1
+    }
+  },
+  "tools/check/check.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "tools/check/check.ts": {
+    "local/max-comment-run": {
+      "count": 2
     }
   },
   "tools/deferred-issues/deferred-issues.test.ts": {
@@ -1942,6 +2706,9 @@
   },
   "tools/deferred-issues/deferred-issues.ts": {
     "complexity": {
+      "count": 1
+    },
+    "local/max-comment-run": {
       "count": 1
     },
     "max-lines-per-function": {
@@ -1966,8 +2733,16 @@
       "count": 1
     }
   },
+  "tools/deferred-issues/fixture.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
   "tools/deferred-issues/ledger.ts": {
     "complexity": {
+      "count": 1
+    },
+    "local/max-comment-run": {
       "count": 1
     },
     "sonarjs/cognitive-complexity": {
@@ -1985,6 +2760,9 @@
   "tools/deferred-issues/plan.ts": {
     "complexity": {
       "count": 1
+    },
+    "local/max-comment-run": {
+      "count": 2
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
@@ -2023,6 +2801,9 @@
     "complexity": {
       "count": 1
     },
+    "local/max-comment-run": {
+      "count": 9
+    },
     "no-await-in-loop": {
       "count": 1
     },
@@ -2049,6 +2830,9 @@
     }
   },
   "tools/dts-specifiers/rewrite-dts-specifiers.test.ts": {
+    "local/max-comment-run": {
+      "count": 3
+    },
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
@@ -2069,6 +2853,9 @@
     }
   },
   "tools/dts-specifiers/rewrite-dts-specifiers.ts": {
+    "local/max-comment-run": {
+      "count": 6
+    },
     "max-params": {
       "count": 1
     },
@@ -2079,7 +2866,20 @@
       "count": 3
     }
   },
+  "tools/lint-on-edit/lint-on-edit.e2e.test.ts": {
+    "local/max-comment-run": {
+      "count": 1
+    }
+  },
+  "tools/lint-on-edit/lint-on-edit.ts": {
+    "local/max-comment-run": {
+      "count": 4
+    }
+  },
   "tools/prune-pages.mjs": {
+    "local/max-comment-run": {
+      "count": 2
+    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -2097,7 +2897,15 @@
     }
   },
   "tools/setup-git-hooks.mjs": {
+    "local/max-comment-run": {
+      "count": 1
+    },
     "sonarjs/no-os-command-from-path": {
+      "count": 1
+    }
+  },
+  "vitest.config.ts": {
+    "local/max-comment-run": {
       "count": 1
     }
   }
