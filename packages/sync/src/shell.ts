@@ -112,6 +112,30 @@ function hasErrorCode(error: unknown, code: string): boolean {
 }
 
 /**
+ * `wx` is `O_CREAT | O_EXCL`: of two concurrent takers exactly one succeeds. The
+ * contents are written after the create, so a reader can see the file empty for
+ * an instant; the lock reader treats an unreadable lock as held, never as free.
+ */
+async function didCreateExclusive(target: string, contents: string): Promise<boolean> {
+  await mkdir(nodePath.dirname(target), { recursive: true });
+  let handle;
+  try {
+    handle = await open(target, 'wx');
+  } catch (error) {
+    if (hasErrorCode(error, 'EEXIST')) {
+      return false;
+    }
+    throw error;
+  }
+  try {
+    await handle.writeFile(contents, { encoding: 'utf8' });
+  } finally {
+    await handle.close();
+  }
+  return true;
+}
+
+/**
  * The real `FilesystemPort`. Every path is resolved against `root`, so the
  * shell names the repository once and the code below it names `data/...`
  * exactly as the fakes do.
@@ -133,31 +157,8 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
     writeTextFile(path, contents) {
       return writeTextFile(at(path), contents);
     },
-    /**
-     * `wx` is `O_CREAT | O_EXCL`: the operating system creates the file only
-     * if it is absent, in one step, so of two concurrent takers exactly one
-     * succeeds. The contents are written after the create, so a reader can see
-     * the file empty for an instant; the lock reader treats an unreadable lock
-     * as held, never as free.
-     */
-    async createExclusive(path, contents) {
-      const target = at(path);
-      await mkdir(nodePath.dirname(target), { recursive: true });
-      let handle;
-      try {
-        handle = await open(target, 'wx');
-      } catch (error) {
-        if (hasErrorCode(error, 'EEXIST')) {
-          return false;
-        }
-        throw error;
-      }
-      try {
-        await handle.writeFile(contents, { encoding: 'utf8' });
-      } finally {
-        await handle.close();
-      }
-      return true;
+    createExclusive(path, contents) {
+      return didCreateExclusive(at(path), contents);
     },
     async deleteFile(path) {
       await rm(at(path), { force: true });
