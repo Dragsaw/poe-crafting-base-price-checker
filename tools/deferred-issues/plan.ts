@@ -1,13 +1,7 @@
 import type { LedgerEntry } from './ledger.ts';
 
-/**
- * The pure diff of `pnpm deferred:issues`: ledger entries against the issues
- * that carry the label `deferred`. It gives the creates, the duplicate closes
- * and the report lines of the spec's I/O & Edge-Case Matrix. It closes only a
- * duplicate issue; every other mismatch is reported and left alone.
- *
- * Run by bare `node` (type stripping), so this module imports only builtins.
- */
+// Diff rules: docs/stories/spec-deferred-work-github-issues.md.
+// Run by bare `node` (type stripping): builtins and `.ts` siblings only.
 
 export interface IssueInfo {
   readonly number: number;
@@ -81,11 +75,7 @@ function byId(issues: readonly IssueInfo[]): Map<string, IssueInfo[]> {
   return groups;
 }
 
-/**
- * Each open issue that shares its id with a lower-numbered open issue. The
- * lowest open issue stays, so the sync never closes the issue that `--list`
- * names. A group with no open issue gets no close.
- */
+/** Each open issue that shares its id with a lower-numbered one: the lowest open issue stays. */
 export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[] {
   const closes: PlannedClose[] = [];
   for (const group of byId(issues).values()) {

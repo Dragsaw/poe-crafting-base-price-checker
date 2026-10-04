@@ -1,18 +1,7 @@
 import { createHash } from 'node:crypto';
 
-/**
- * The pure half of `pnpm deferred:issues`: it parses
- * `docs/stories/deferred-work.md` and gives each entry its content id.
- *
- * An entry is a top-level `- source_spec:` bullet that has `summary:` and
- * `evidence:` fields. A key line is two spaces of indent, then `[a-z_]+:`. A
- * line with more indent continues the field above it. A blank line, a new
- * top-level bullet or any other unindented line ends the entry. Each value is
- * its lines, trimmed and joined with single spaces. Any other bullet is a note
- * and gets no id.
- *
- * Run by bare `node` (type stripping), so this module imports only builtins.
- */
+// Entry format and ids: docs/stories/spec-deferred-work-github-issues.md.
+// Run by bare `node` (type stripping): builtins only.
 
 export interface LedgerEntry {
   readonly id: string;

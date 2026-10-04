@@ -1123,16 +1123,6 @@
       "count": 1
     }
   },
-  "tools/deferred-issues/ledger.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "tools/deferred-issues/plan.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
   "tools/dev-stop/dev-stop.test.ts": {
     "max-lines": {
       "count": 1
