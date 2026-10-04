@@ -161,7 +161,7 @@ async function tradeServerOver(listings: readonly Listing[], received: unknown[]
 function rarityTier(sourceModifierId: string, min: number, max: number): ModifierWeight {
   return {
     sourceModifierId,
-    modGroup: sourceModifierId.replace(/\d+$/, ''),
+    modGroup: sourceModifierId.replace(/(?<!\d)\d+$/, ''),
     itemLevelMin: 1,
     weight: 1000,
     weightSource: 'published',

@@ -136,18 +136,11 @@ describe('rewriteDtsSpecifiers', () => {
     );
   });
 
-  it('leaves bare and scoped package specifiers unchanged', () => {
-    const text = "import { z } from 'zod';\nexport { x } from '@poe/x.ts';";
-    expect(rewriteDtsSpecifiers(text)).toBe(text);
-  });
-
-  it('leaves a declaration-file specifier unchanged', () => {
-    const text = "export type { T } from './types.d.ts';";
-    expect(rewriteDtsSpecifiers(text)).toBe(text);
-  });
-
-  it('leaves an already rewritten specifier unchanged', () => {
-    const text = "export { a } from './a.js';";
+  it.each([
+    ['leaves bare and scoped package specifiers unchanged', "import { z } from 'zod';\nexport { x } from '@poe/x.ts';"],
+    ['leaves a declaration-file specifier unchanged', "export type { T } from './types.d.ts';"],
+    ['leaves an already rewritten specifier unchanged', "export { a } from './a.js';"],
+  ])('%s', (_title, text) => {
     expect(rewriteDtsSpecifiers(text)).toBe(text);
   });
 });

@@ -24,84 +24,53 @@ function runHook(subject: string) {
 }
 
 describe('commit-msg hook', () => {
-  it('accepts a story commit with a known package scope', () => {
-    const result = runHook('feat(sync): story 1.9 structured Sync Report with requests per source');
+  it.each([
+    ['accepts a story commit with a known package scope', 'feat(sync): story 1.9 structured Sync Report with requests per source'],
+    ['accepts a retro item commit with a known package scope', 'fix(sync): retro item 17, an answered search keeps its fields'],
+    ['accepts a docs commit with no scope and no id', 'docs: mark story 1.9 done in sprint status'],
+    ['accepts a chore commit with a scope outside the package list', 'chore(depcruise): enforce core import purity'],
+    ['accepts a plural "stories" id on a known package scope', 'feat(sync): stories 1.9 and 1.10 combined change'],
+    [
+      'accepts the deferred-work-sweep resolve commit, period included',
+      'chore(deferred): resolve — Nothing forbids core from importing node builtins.',
+    ],
+    [
+      'accepts the deferred-work-sweep mark-blocked commit, period included',
+      'chore(deferred): mark blocked — Nothing forbids core from importing node builtins.',
+    ],
+    ['accepts the deferred-work-sweep wip commit', 'wip(deferred): blocked run state — some-item-slug'],
+    ['accepts a merge commit unconditionally', "Merge branch 'feature-x'"],
+  ])('%s', (_title, subject) => {
+    const result = runHook(subject);
     expect(result.status).toBe(0);
   });
 
-  it('accepts a retro item commit with a known package scope', () => {
-    const result = runHook('fix(sync): retro item 17, an answered search keeps its fields');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts a docs commit with no scope and no id', () => {
-    const result = runHook('docs: mark story 1.9 done in sprint status');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts a chore commit with a scope outside the package list', () => {
-    const result = runHook('chore(depcruise): enforce core import purity');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts a plural "stories" id on a known package scope', () => {
-    const result = runHook('feat(sync): stories 1.9 and 1.10 combined change');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts the deferred-work-sweep resolve commit, period included', () => {
-    const result = runHook('chore(deferred): resolve — Nothing forbids core from importing node builtins.');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts the deferred-work-sweep mark-blocked commit, period included', () => {
-    const result = runHook('chore(deferred): mark blocked — Nothing forbids core from importing node builtins.');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts the deferred-work-sweep wip commit', () => {
-    const result = runHook('wip(deferred): blocked run state — some-item-slug');
-    expect(result.status).toBe(0);
-  });
-
-  it('accepts a merge commit unconditionally', () => {
-    const result = runHook("Merge branch 'feature-x'");
-    expect(result.status).toBe(0);
-  });
-
-  it('rejects a subject with no type prefix', () => {
-    const result = runHook('structured Sync Report with requests per source');
+  it.each([
+    [
+      'rejects a subject with no type prefix',
+      'structured Sync Report with requests per source',
+      'is not "type: description"',
+    ],
+    ['rejects an unknown commit type', 'feature(sync): story 1.9 structured Sync Report', 'is not one of'],
+    ['rejects a subject ending with a period', 'docs: mark story 1.9 done in sprint status.', 'ends with a period'],
+    [
+      'rejects a feat/fix/test commit on a known package with no story or retro id',
+      'feat(sync): tidy up the trade client',
+      'names no story or retro item',
+    ],
+    [
+      'rejects a capitalized type with a message naming the case problem',
+      'Fix(sync): story 1.9 short description',
+      'is not lowercase',
+    ],
+    [
+      'rejects a chore commit outside the deferred scope that ends with a period',
+      'chore(depcruise): enforce core import purity.',
+      'ends with a period',
+    ],
+  ])('%s', (_title, subject, message) => {
+    const result = runHook(subject);
     expect(result.status).toBe(1);
-    expect(result.stderr).toContain('is not "type: description"');
-  });
-
-  it('rejects an unknown commit type', () => {
-    const result = runHook('feature(sync): story 1.9 structured Sync Report');
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain('is not one of');
-  });
-
-  it('rejects a subject ending with a period', () => {
-    const result = runHook('docs: mark story 1.9 done in sprint status.');
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain('ends with a period');
-  });
-
-  it('rejects a feat/fix/test commit on a known package with no story or retro id', () => {
-    const result = runHook('feat(sync): tidy up the trade client');
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain('names no story or retro item');
-  });
-
-  it('rejects a capitalized type with a message naming the case problem', () => {
-    const result = runHook('Fix(sync): story 1.9 short description');
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain('is not lowercase');
-  });
-
-  it('rejects a chore commit outside the deferred scope that ends with a period', () => {
-    const result = runHook('chore(depcruise): enforce core import purity.');
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain('ends with a period');
+    expect(result.stderr).toContain(message);
   });
 });

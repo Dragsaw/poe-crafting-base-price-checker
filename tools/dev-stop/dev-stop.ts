@@ -248,7 +248,7 @@ function snapshotPosix(port: number): Snapshot {
   const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
   const processes = ps
     .split('\n')
-    .map((line) => /^\s*(\d+)\s+(\d+)\s+(.*)$/.exec(line))
+    .map((line) => /^\s*(\d+)\s+(\d+)\s+(\S.*)$/.exec(line))
     .filter((match) => match !== null)
     .map((match) => ({ pid: Number(match[1]), ppid: Number(match[2]), commandLine: match[3]! }));
   return { listeners, processes };

@@ -23,7 +23,7 @@ function fail(reason, fix) {
 function readSubject(messagePath) {
   const message = readFileSync(messagePath, 'utf8');
   const firstLine = message.split('\n', 1)[0];
-  return firstLine.replace(/\s+$/, '');
+  return firstLine.trimEnd();
 }
 
 function lint(subject) {

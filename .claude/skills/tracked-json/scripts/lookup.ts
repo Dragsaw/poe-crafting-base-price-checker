@@ -372,11 +372,9 @@ export type Command =
   | { readonly kind: 'mods'; readonly className: string; readonly slot?: Slot; readonly category?: string }
   | { readonly kind: 'tiers'; readonly statId: string; readonly className: string; readonly category?: string };
 
-/** Parses the arguments after the script name. Throws `UsageError`. */
-export function parseCommand(argv: readonly string[]): Command {
-  let parsed;
+function parseOptions(argv: readonly string[]) {
   try {
-    parsed = parseArgs({
+    return parseArgs({
       args: [...argv],
       allowPositionals: true,
       strict: true,
@@ -389,7 +387,11 @@ export function parseCommand(argv: readonly string[]): Command {
   } catch (error) {
     throw new UsageError(error instanceof Error ? error.message : String(error));
   }
-  const { positionals, values } = parsed;
+}
+
+/** Parses the arguments after the script name. Throws `UsageError`. */
+export function parseCommand(argv: readonly string[]): Command {
+  const { positionals, values } = parseOptions(argv);
   const [kind, query, ...extra] = positionals;
   if (extra.length > 0) {
     throw new UsageError(`unexpected argument ${extra.join(' ')}`);

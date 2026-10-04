@@ -515,14 +515,6 @@ describe('the payout threshold', () => {
     localStorage.clear();
   });
 
-  function thresholdInput(): HTMLInputElement {
-    const found = frame().querySelector<HTMLInputElement>('[data-payout-threshold] input');
-    if (found === null) {
-      throw new Error('no threshold input rendered');
-    }
-    return found;
-  }
-
   function rankedNames(): (string | null)[] {
     return Array.from(frame().querySelectorAll('[data-ranked-row] [data-unit-name]'), (node) => node.textContent);
   }
@@ -602,10 +594,10 @@ describe('the payout threshold', () => {
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     for (const g of gates) {g.open();}
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
 
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
     reload();
@@ -629,7 +621,7 @@ describe('the payout threshold', () => {
     expect(rankedNames()).toContain('High Belt');
     expect(rankedNames()).not.toContain('Low Belt');
 
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     // Before the debounce the ranking has not moved.
     expect(rankedNames()).toContain('Mid Belt');
     await pastDebounce();
@@ -649,12 +641,12 @@ describe('the payout threshold', () => {
     serveLadder(held.promise);
     mount();
     expect(frame().dataset['state']).toBe('pending');
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     // The set arrives before the debounce elapses.
     held.open();
     await settleTo('ready');
     await pastDebounce();
-    expect(thresholdInput().value).toBe('0.60');
+    expect(payoutField().value).toBe('0.60');
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
     growList();
     expect(rankedNames()).not.toContain('Mid Belt');
@@ -668,7 +660,7 @@ describe('the payout threshold', () => {
     await settleTo('ready');
     growList();
     expect(rankedNames()).not.toContain('Low Belt');
-    typeInto(thresholdInput(), '0.1');
+    typeInto(payoutField(), '0.1');
     await pastDebounce();
     expect(rankedNames().at(-1)).toBe('Low Belt');
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
@@ -681,11 +673,11 @@ describe('the payout threshold', () => {
     await settleTo('ready');
     growList();
     const before = rankedNames();
-    typeInto(thresholdInput(), '');
+    typeInto(payoutField(), '');
     await pastDebounce();
     expect(rankedNames()).toEqual(before);
-    blur(thresholdInput());
-    expect(thresholdInput().value).toBe('0.25');
+    blur(payoutField());
+    expect(payoutField().value).toBe('0.25');
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBeNull();
   });
 
@@ -694,7 +686,7 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     await pastDebounce();
     growList();
     const firstRow = frame().querySelector<HTMLElement>('[data-ranked-row]');
@@ -707,7 +699,7 @@ describe('the payout threshold', () => {
     serveLadder();
     reload();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.60');
+    expect(payoutField().value).toBe('0.60');
     expect(frame().querySelectorAll('[data-ranked-row][data-open]')).toHaveLength(0);
     expect(frame().querySelector('[data-expand-affordance]')?.getAttribute('aria-expanded')).toBe('false');
     growList();
@@ -719,7 +711,7 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.60');
+    expect(payoutField().value).toBe('0.60');
     growList();
     expect(rankedNames()).not.toContain('Mid Belt');
     expect(rankedNames()).toContain('High Belt');
@@ -731,7 +723,7 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     growList();
     expect(rankedNames()).toContain('Mid Belt');
     expect(rankedNames()).not.toContain('Low Belt');
@@ -748,9 +740,9 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     growList();
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     await pastDebounce();
     expect(rankedNames()).not.toContain('Mid Belt');
     expect(rankedNames()).toContain('High Belt');
@@ -762,16 +754,16 @@ describe('the payout threshold', () => {
     mount();
     await settleTo('ready');
     const atRest = frame().outerHTML;
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     await pastDebounce();
-    blur(thresholdInput());
+    blur(payoutField());
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
 
     localStorage.clear();
     serveLadder();
     reload();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     // React's generated ids differ per mount; everything else must match byte for byte.
     const strip = (html: string): string => html.replaceAll(/\s(id|for|aria-describedby)="[^"]*"/g, '');
     expect(strip(frame().outerHTML)).toBe(strip(atRest));

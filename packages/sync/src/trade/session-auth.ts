@@ -104,7 +104,7 @@ function formsOf(value: string): string[] {
   const bytes = Buffer.from(value, 'utf8');
   const forms = new Set<string>([value, encodeURIComponent(value), bytes.toString('base64')]);
   for (const encoding of ['base64', 'base64url'] as const) {
-    forms.add(bytes.toString(encoding).replace(/=+$/, ''));
+    forms.add(bytes.toString(encoding).replace(/={1,2}$/, ''));
     for (let offset = 0; offset < 3; offset += 1) {
       const shifted = Buffer.concat([Buffer.alloc(offset), bytes]);
       // Only whole 3-byte groups are stable whatever follows the value, and
