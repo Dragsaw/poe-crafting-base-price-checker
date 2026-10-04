@@ -12,6 +12,7 @@
     "typecheck": "tsc -b && node tools/dts-specifiers/rewrite-dts-specifiers.ts",
     "lint": "eslint . --max-warnings=0",
     "dup": "jscpd",
+    "knip": "knip",
     "depcruise": "depcruise packages --config .dependency-cruiser.mjs",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run depcruise",
     "test": "vitest run --project=!data",
