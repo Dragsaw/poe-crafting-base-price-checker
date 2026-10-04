@@ -43,6 +43,27 @@
       },
       "status": "active"
     },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 75,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
     { "kind": "raw", "baseTypeId": "Gold Amulet", "itemLevelMin": 82, "status": "active" },
     { "kind": "raw", "baseTypeId": "Solar Amulet", "itemLevelMin": 82, "status": "active" },
     { "kind": "raw", "baseTypeId": "Utility Belt", "itemLevelMin": 82, "status": "active" },

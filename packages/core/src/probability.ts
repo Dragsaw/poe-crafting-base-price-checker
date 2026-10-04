@@ -100,10 +100,28 @@ export function interval(line: WeightsLine): Interval {
  * weights file alone: the entry and its own pool's coverage.
  */
 export function untrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'poolCoverage'>): boolean {
-  return (
-    entry.weightSource === 'not-in-game' ||
-    (pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null))
-  );
+  return untrackableReason(entry, pool) !== undefined;
+}
+
+/** Why `untrackable` holds (§1): `undefined` for a trackable entry. */
+export type UntrackableReason = 'not-in-game' | 'partial-pool-null-line';
+
+/**
+ * The null-line rule's verdict with its reason. `untrackable` delegates here,
+ * so `core`, the sync gate and `tracked:lookup` share one rule. It reads the
+ * entry and its own pool's coverage alone.
+ */
+export function untrackableReason(
+  entry: ModifierWeight,
+  pool: Pick<WeightsPool, 'poolCoverage'>,
+): UntrackableReason | undefined {
+  if (entry.weightSource === 'not-in-game') {
+    return 'not-in-game';
+  }
+  if (pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null)) {
+    return 'partial-pool-null-line';
+  }
+  return undefined;
 }
 
 /**

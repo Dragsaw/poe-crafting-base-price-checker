@@ -803,19 +803,51 @@ variations create searches, so neither is required; AD-16 fixes what it emits an
 should not read either capture's serialisation as a constraint. As in §5.1b there is no
 `type_filters.ilvl`, because this is a browse rather than a tracked-entry search.
 
-### 5.1d The trade sum across two mods — capture pending (AD-16)
+### 5.1d The trade sum across two mods (AD-16)
 
-**No capture is recorded yet.** AD-16's summed filter rests on a manual observation: a
-search with one filter on a `statId` matched items whose prefix and suffix both carry that
-`statId`, on the value of the two summed. Until a capture lands here, every summed price
-rests on that observation alone.
+A search with one filter on a `statId` matches items whose prefix and suffix both carry
+that `statId`, on the value of the two summed. The recorded pair below shows it.
 
-The capture that closes it records one request and response pair: a search with one filter
-on a `statId` named by two mods, for example % increased Rarity of Items (`stat_3917489142`,
-Amulets or Rings) or helmet accuracy, whose `min` exceeds the largest value either mod can
-roll alone. A result that lists such an item proves the sum.
+**Recorded request.** `pnpm fixtures:record` sent it for the Amulets rarity T1 prefix +
+T1 suffix entry of `fixtures/tracked.json` (prefix band `[16, 19]`, suffix band
+`[15, 18]`; `% increased Rarity of Items`, `stat_3917489142`, which a prefix and a suffix
+can each roll). The summed filter is `[31, 37]`, above either mod's maximum of 19. The
+body, in §5.1's form:
 
-Record the pair as a `sync` fixture (AD-13) and quote the request body here in §5.1's form.
+```jsonc
+{
+  "query": {
+    "status": { "option": "securable" },
+    "stats": [ { "type": "and", "filters": [
+      { "id": "explicit.stat_3917489142", "value": { "min": 31, "max": 37 }, "disabled": false }
+    ] } ],
+    "filters": {
+      "type_filters": { "filters": {
+        "category": { "option": "accessory.amulet" },
+        "ilvl":     { "min": 75 },
+        "rarity":   { "option": "magic" }
+      } },
+      "trade_filters": { "filters": {
+        "price": { "option": "exalted_divine" }
+      } }
+    }
+  },
+  "sort": { "price": "asc" }
+}
+```
+
+The response reported `total: 362`. Its search fixture is
+`fixtures/trade-search-5b7951a14672da02.json` and its fetch leg is
+`fixtures/trade-fetch-697c0e1874acd165.json`.
+
+**Result: it proves the sum.** None of the ten fetched items carries one mod that reaches 31,
+because a single rarity mod rolls at most 19. Each carries two mods on `stat_3917489142`,
+one prefix (`P1` or `P2`) and one suffix (`S1` or `S2`) (the `tier` tag of each entry of an
+item's `explicitMods[].mods` in the fetch fixture: prefix or suffix, then the tier number), and the item's displayed value is
+their sum: 31, 32 or 33. For example, `P1` `[16, 19]` + `S1` `[15, 18]` reads 31 to 33
+across eight items, and `P1` + `S2` `[11, 14]` reads 32 on one. The listing shows the accepted wider population
+of §5.5 as well: one item is `P2` `[12, 15]` + `S1`, a prefix from outside the tracked T1
+band, admitted because the sum reaches 33.
 
 ### 5.2 The three traps (AD-16)
 

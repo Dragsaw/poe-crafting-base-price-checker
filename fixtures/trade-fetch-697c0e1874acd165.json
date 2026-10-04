@@ -1,0 +1,1313 @@
+{
+  "result": [
+    {
+      "id": "c909484892d5df5c3777330d296fb4aa82aee034b9a7b977757bcfcee9590fb9",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-25T15:03:42Z",
+        "stash": {
+          "name": "상점",
+          "x": 0,
+          "y": 11
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 1,
+          "currency": "exalted"
+        },
+        "fee": 4029,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU3RlbGxhckFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/a44db4cd4a/StellarAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "c909484892d5df5c3777330d296fb4aa82aee034b9a7b977757bcfcee9590fb9",
+        "name": "",
+        "typeLine": "Hoarder's Stellar Amulet of Archaeology",
+        "baseType": "Stellar Amulet",
+        "rarity": "Magic",
+        "ilvl": 75,
+        "identified": true,
+        "note": "~b/o 1 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+5 to all [Attributes|Attributes]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1379411836",
+            "mods": [
+              {
+                "level": 31,
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "7"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "31% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              },
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_1379411836",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "0c4b626d0111b06e7e96e2107335f13ccb37410aff1ed065ad7271b375150dbc",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-25T09:35:57Z",
+        "stash": {
+          "name": "1",
+          "x": 2,
+          "y": 10
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 1,
+          "currency": "exalted"
+        },
+        "fee": 4245,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "0c4b626d0111b06e7e96e2107335f13ccb37410aff1ed065ad7271b375150dbc",
+        "name": "",
+        "typeLine": "Hoarder's Bloodstone Amulet of Archaeology",
+        "baseType": "Bloodstone Amulet",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 1 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+38 to maximum Life",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3299347043",
+            "mods": [
+              {
+                "level": 23,
+                "magnitudes": [
+                  {
+                    "min": "30",
+                    "max": "40"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "31% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              },
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3299347043",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ee011dc8fa60c4bbe5feccb4b3a2ac20b191ff3b41e350cc5aadef19e6bf55ae",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-09T21:19:56Z",
+        "stash": {
+          "name": "1",
+          "x": 6,
+          "y": 11
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 1,
+          "currency": "exalted"
+        },
+        "fee": 3448,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQXp1cmVBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e49b170ba2/AzureAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "ee011dc8fa60c4bbe5feccb4b3a2ac20b191ff3b41e350cc5aadef19e6bf55ae",
+        "name": "",
+        "typeLine": "Collector's Azure Amulet of Archaeology",
+        "baseType": "Azure Amulet",
+        "rarity": "Magic",
+        "ilvl": 76,
+        "identified": true,
+        "note": "~b/o 1 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "32",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "23% increased Mana Regeneration Rate",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_789117908",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "30"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "33% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "Collector's",
+                "tier": "P2",
+                "level": 29,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "15"
+                  }
+                ]
+              },
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_789117908",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ab4d4fc3ee347fd06bb4133c1d550590f82985a9e890cf7e193638a71fa455e5",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-22T15:10:45Z",
+        "stash": {
+          "name": "5",
+          "x": 6,
+          "y": 9
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 1,
+          "currency": "exalted"
+        },
+        "fee": 3730,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "ab4d4fc3ee347fd06bb4133c1d550590f82985a9e890cf7e193638a71fa455e5",
+        "name": "",
+        "typeLine": "Hoarder's Bloodstone Amulet of Raiding",
+        "baseType": "Bloodstone Amulet",
+        "rarity": "Magic",
+        "ilvl": 79,
+        "identified": true,
+        "note": "~b/o 1 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+34 to maximum Life",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3299347043",
+            "mods": [
+              {
+                "level": 23,
+                "magnitudes": [
+                  {
+                    "min": "30",
+                    "max": "40"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "of Raiding",
+                "tier": "S2",
+                "level": 24,
+                "magnitudes": [
+                  {
+                    "min": "11",
+                    "max": "14"
+                  }
+                ]
+              },
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3299347043",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "67df8f9447d630913db0a137faeba385c06dcc39d58e5c1cdc82632908271486",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-21T03:05:01Z",
+        "stash": {
+          "name": "11",
+          "x": 11,
+          "y": 7
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "exalted"
+        },
+        "fee": 4245,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "67df8f9447d630913db0a137faeba385c06dcc39d58e5c1cdc82632908271486",
+        "name": "",
+        "typeLine": "Hoarder's Bloodstone Amulet of Archaeology",
+        "baseType": "Bloodstone Amulet",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 2 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+39 to maximum Life",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3299347043",
+            "mods": [
+              {
+                "level": 23,
+                "magnitudes": [
+                  {
+                    "min": "30",
+                    "max": "40"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              },
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3299347043",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "3fef4f2ecd039d2c15bcff74816b8b5d97e25f1c950992140624763c535daff9",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-20T21:28:42Z",
+        "stash": {
+          "name": "19",
+          "x": 11,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "exalted"
+        },
+        "fee": 4221,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvSmFkZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/ac51014172/JadeAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "3fef4f2ecd039d2c15bcff74816b8b5d97e25f1c950992140624763c535daff9",
+        "name": "",
+        "typeLine": "Hoarder's Jade Amulet of Archaeology",
+        "baseType": "Jade Amulet",
+        "rarity": "Magic",
+        "ilvl": 80,
+        "identified": true,
+        "note": "~b/o 2 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+13 to [Dexterity|Dexterity]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3261801346",
+            "mods": [
+              {
+                "level": 10,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "33% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              },
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3261801346",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "b39bab032118e2eac0ab2904585431330863e147f6068d89807c93eedb4fdfa3",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-26T18:22:42Z",
+        "stash": {
+          "name": "2",
+          "x": 1,
+          "y": 5
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 3,
+          "currency": "exalted"
+        },
+        "fee": 4101,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "b39bab032118e2eac0ab2904585431330863e147f6068d89807c93eedb4fdfa3",
+        "name": "",
+        "typeLine": "Hoarder's Solar Amulet of Archaeology",
+        "baseType": "Solar Amulet",
+        "rarity": "Magic",
+        "ilvl": 79,
+        "identified": true,
+        "note": "~b/o 3 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+10 to [Spirit|Spirit]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3981240776",
+            "mods": [
+              {
+                "level": 38,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              },
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3981240776",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "f1a1d3f8bf820b2576490f6996501a3a13a43a9ebbf5e160a9550b907f1c08da",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-14T07:03:18Z",
+        "stash": {
+          "name": "9",
+          "x": 9,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 3,
+          "currency": "exalted"
+        },
+        "fee": 4221,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "f1a1d3f8bf820b2576490f6996501a3a13a43a9ebbf5e160a9550b907f1c08da",
+        "name": "",
+        "typeLine": "Hoarder's Amber Amulet of Archaeology",
+        "baseType": "Amber Amulet",
+        "rarity": "Magic",
+        "ilvl": 80,
+        "identified": true,
+        "note": "~b/o 3 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+10 to [Strength|Strength]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_4080418644",
+            "mods": [
+              {
+                "level": 10,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "31% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              },
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_4080418644",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "323f13e0fef8e44df9f73b6ef1e45a6f9ad8ef26240d4a34935984640eae2482",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-11T21:19:19Z",
+        "stash": {
+          "name": "7",
+          "x": 0,
+          "y": 6
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 4,
+          "currency": "exalted"
+        },
+        "fee": 4101,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "323f13e0fef8e44df9f73b6ef1e45a6f9ad8ef26240d4a34935984640eae2482",
+        "name": "",
+        "typeLine": "Hoarder's Amber Amulet of Archaeology",
+        "baseType": "Amber Amulet",
+        "rarity": "Magic",
+        "ilvl": 79,
+        "identified": true,
+        "note": "~b/o 4 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+10 to [Strength|Strength]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_4080418644",
+            "mods": [
+              {
+                "level": 10,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              },
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_4080418644",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "42069023a6d4e8705694e8dd2a42d180bae2a1057b902253580a85c94ebeeaf2",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-21T13:41:56Z",
+        "stash": {
+          "name": "5",
+          "x": 0,
+          "y": 7
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 4,
+          "currency": "exalted"
+        },
+        "fee": 4101,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "42069023a6d4e8705694e8dd2a42d180bae2a1057b902253580a85c94ebeeaf2",
+        "name": "",
+        "typeLine": "Hoarder's Solar Amulet of Archaeology",
+        "baseType": "Solar Amulet",
+        "rarity": "Magic",
+        "ilvl": 79,
+        "identified": true,
+        "note": "~b/o 4 exalted",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "37",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+11 to [Spirit|Spirit]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3981240776",
+            "mods": [
+              {
+                "level": 38,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "33% increased [ItemRarity|Rarity of Items] found",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3917489142",
+            "mods": [
+              {
+                "name": "Hoarder's",
+                "tier": "P1",
+                "level": 47,
+                "magnitudes": [
+                  {
+                    "min": "16",
+                    "max": "19"
+                  }
+                ]
+              },
+              {
+                "name": "of Archaeology",
+                "tier": "S1",
+                "level": 40,
+                "magnitudes": [
+                  {
+                    "min": "15",
+                    "max": "18"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3917489142",
+                [
+                  0,
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3981240776",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

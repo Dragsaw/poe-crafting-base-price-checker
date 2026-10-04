@@ -700,6 +700,156 @@
     },
     {
       "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 17,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 3,
+        "valueMax": 4,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2463230181",
+        "valueMin": 125,
+        "valueMax": 200,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
       "categoryId": "weapon.crossbow",
       "className": "Crossbows",
       "itemLevelMin": 82,
