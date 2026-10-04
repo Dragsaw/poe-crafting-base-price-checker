@@ -114,7 +114,11 @@ function leaksIn(text: string): string[] {
 }
 
 /** Every text an error carries: message, stack, own string fields and the cause chain. */
-function textOf(thrown: unknown, seen = new Set<unknown>()): string {
+function textOf(thrown: unknown): string {
+  return collectText(thrown, new Set());
+}
+
+function collectText(thrown: unknown, seen: Set<unknown>): string {
   if (typeof thrown === 'string') {
     return thrown;
   }
@@ -127,7 +131,7 @@ function textOf(thrown: unknown, seen = new Set<unknown>()): string {
     parts.push(thrown.message, thrown.stack ?? '', String(thrown));
   }
   for (const key of Reflect.ownKeys(thrown)) {
-    parts.push(textOf((thrown as Record<string | symbol, unknown>)[key], seen));
+    parts.push(collectText((thrown as Record<string | symbol, unknown>)[key], seen));
   }
   return parts.join('\n');
 }

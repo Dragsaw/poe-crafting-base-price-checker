@@ -299,14 +299,12 @@ export function lookupMods(
         const reason = untrackableReason(entry, pool);
         return reason === undefined
           ? []
-          : [
-              {
-                tierLabel: entry.tierLabel ?? null,
-                itemLevelMin: entry.itemLevelMin,
-                sourceModifierId: entry.sourceModifierId,
-                reason,
-              },
-            ];
+          : {
+              tierLabel: entry.tierLabel ?? null,
+              itemLevelMin: entry.itemLevelMin,
+              sourceModifierId: entry.sourceModifierId,
+              reason,
+            };
       });
       mods.push({
         slot,
@@ -517,7 +515,8 @@ function main(): void {
     throw error;
   }
   try {
-    process.stdout.write(`${JSON.stringify(runCommand(command, createJsonReader(REPO_ROOT)), null, 2)}\n`);
+    const result = runCommand(command, createJsonReader(REPO_ROOT));
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   } catch (error) {
     if (error instanceof LookupError) {
       process.stdout.write(`${JSON.stringify({ error: error.message }, null, 2)}\n`);

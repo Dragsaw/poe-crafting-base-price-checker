@@ -29,13 +29,16 @@ const EXEMPTIONS: Readonly<Record<string, readonly string[]>> = {
 };
 
 function sources(directory: string): string[] {
-  return readdirSync(directory).flatMap((name) => {
+  const found: string[] = [];
+  for (const name of readdirSync(directory)) {
     const path = join(directory, name);
     if (statSync(path).isDirectory()) {
-      return sources(path);
+      found.push(...sources(path));
+    } else if (/\.[cm]?[jt]sx?$/.test(name) && !name.includes('.test.')) {
+      found.push(path);
     }
-    return /\.[cm]?[jt]sx?$/.test(name) && !name.includes('.test.') ? [path] : [];
-  });
+  }
+  return found;
 }
 
 /** The exemption key for `file`: relative to `ROOT`, `/`-separated on every platform. */

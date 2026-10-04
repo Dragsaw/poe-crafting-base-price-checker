@@ -123,7 +123,7 @@ export function untrackableReason(
  * unit. A `null` line is dropped here; `untrackable` decides what it means.
  */
 export function lineSet(entry: ModifierWeight): readonly string[] {
-  return entry.lines.flatMap((line) => (line.statId === null ? [] : [line.statId])).sort(compareByCodeUnit);
+  return entry.lines.flatMap((line) => line.statId ?? []).sort(compareByCodeUnit);
 }
 
 /** `statIds(ref)` (§1): the `statId`s a reference names, sorted by code unit. */

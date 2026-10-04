@@ -519,21 +519,21 @@ const RINGS: Pools = [
   [tier(COLD_RES, 10, 80)],
 ];
 
-/** A ring whose suffix defaults to cold resistance, the whole suffix pool: P is the prefix's share. */
-function ring(prefix: string, suffix = COLD_RES, status: CraftedTrackedEntry['status'] = 'active'): CraftedTrackedEntry {
+/** A ring whose suffix is cold resistance, the whole suffix pool: P is the prefix's share. */
+function ring(prefix: string, status: CraftedTrackedEntry['status'] = 'active'): CraftedTrackedEntry {
   return {
     kind: 'crafted',
     categoryId: 'accessory.ring',
     className: 'Rings',
     itemLevelMin: 82,
     prefix: banded(prefix, 1, 10, 'T1'),
-    suffix: banded(suffix, 1, 10, 'T1'),
+    suffix: banded(COLD_RES, 1, 10, 'T1'),
     status,
     ...((status === 'pruned') && { prunedReason: 'never sells' }),
   };
 }
 
-const atkCold = ring(ATK_DMG, COLD_RES, 'pinned');
+const atkCold = ring(ATK_DMG, 'pinned');
 const mana = ring(MANA);
 const life = ring(LIFE);
 const es = ring(ES);
@@ -749,7 +749,7 @@ describe('the chase cells', () => {
 describe('the crafted panel', () => {
   it('lists the summand, then the rest by canonical key, with their notes; the pruned entry has no row', async () => {
     const now = Date.now();
-    const pruned = ring(RARITY, COLD_RES, 'pruned');
+    const pruned = ring(RARITY, 'pruned');
     serveWorld(
       ringsWorld({
         tracked: [atkCold, life, es, mana, pruned],

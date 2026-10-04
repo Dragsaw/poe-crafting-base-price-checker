@@ -100,31 +100,31 @@ describe('parseEnvelope', () => {
       TRACKED_SCHEMA_VERSION,
     );
     expect(result.ok).toBe(false);
-    expect(result.ok === false && result.reason).toBe('unknown-major');
+    expect(!result.ok && result.reason).toBe('unknown-major');
   });
 
   // I/O matrix: "Known major, newer minor".
   it('accepts a newer minor under a known major', () => {
     const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '2.4.0' }, TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(true);
-    expect(result.ok === true && result.value.entries).toHaveLength(1);
+    expect(result.ok && result.value.entries).toHaveLength(1);
   });
 
   it('reports a shape failure as invalid, with the issues', () => {
     const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, entries: [{ kind: 'raw' }] }, TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(false);
-    expect(result.ok === false && result.reason).toBe('invalid');
-    expect(result.ok === false && result.reason === 'invalid' && result.issues.length).toBeGreaterThan(0);
+    expect(!result.ok && result.reason).toBe('invalid');
+    expect(!result.ok && result.reason === 'invalid' && result.issues.length).toBeGreaterThan(0);
   });
 
   it('reports a malformed version apart from an unknown major', () => {
     const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: 'one' }, TRACKED_SCHEMA_VERSION);
-    expect(result.ok === false && result.reason).toBe('malformed-version');
+    expect(!result.ok && result.reason).toBe('malformed-version');
   });
 
   it('reports a file with no version field as invalid rather than guessing', () => {
     const result = parseEnvelope(TrackedFileSchema, { entries: [] });
-    expect(result.ok === false && result.reason).toBe('invalid');
+    expect(!result.ok && result.reason).toBe('invalid');
   });
 });
 
@@ -511,7 +511,7 @@ describe('RecipesFileSchema', () => {
   it('parses a versioned file of recipes', () => {
     const result = parseEnvelope(RecipesFileSchema, recipesFileOf([recipe, perfect]));
     expect(result.ok).toBe(true);
-    expect(result.ok === true && result.value.recipes).toHaveLength(2);
+    expect(result.ok && result.value.recipes).toHaveLength(2);
   });
 
   it('accepts one regular recipe beside graded ones', () => {

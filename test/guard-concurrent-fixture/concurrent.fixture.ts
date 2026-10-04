@@ -21,8 +21,10 @@ import { DESCRIBE_FIRST, DESCRIBE_SECOND, IT_FIRST, IT_SECOND } from './names';
 
 const noop = (): void => {};
 
-/** Returns a function that resolves for each caller once `parties` callers have arrived. */
-function barrier(parties: number): () => Promise<void> {
+const PARTIES = 2;
+
+/** Returns a function that resolves for each caller once both parties have arrived. */
+function barrier(): () => Promise<void> {
   let arrived = 0;
   let open: () => void = noop;
   const opened = new Promise<void>((resolve) => {
@@ -30,7 +32,7 @@ function barrier(parties: number): () => Promise<void> {
   });
   return () => {
     arrived += 1;
-    if (arrived === parties) {
+    if (arrived === PARTIES) {
       open();
     }
     return opened;
@@ -52,11 +54,11 @@ async function meetThenFetchFromTimer(meet: () => Promise<void>, url: string): P
 }
 
 describe.concurrent('pair', () => {
-  const meet = barrier(2);
+  const meet = barrier();
   it(DESCRIBE_FIRST.title, () => meetThenFetchFromTimer(meet, DESCRIBE_FIRST.url));
   it(DESCRIBE_SECOND.title, () => meetThenFetchFromTimer(meet, DESCRIBE_SECOND.url));
 });
 
-const meet = barrier(2);
+const meet = barrier();
 it.concurrent(IT_FIRST.title, () => meetThenFetchFromTimer(meet, IT_FIRST.url));
 it.concurrent(IT_SECOND.title, () => meetThenFetchFromTimer(meet, IT_SECOND.url));

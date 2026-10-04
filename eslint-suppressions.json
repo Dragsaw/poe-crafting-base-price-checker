@@ -47,17 +47,11 @@
     "unicorn/import-style": {
       "count": 1
     },
-    "unicorn/max-nested-calls": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     },
     "unicorn/no-null": {
       "count": 7
-    },
-    "unicorn/no-unnecessary-array-flat-map": {
-      "count": 1
     }
   },
   ".dependency-cruiser.mjs": {
@@ -120,9 +114,6 @@
   "packages/contracts/src/craft-recipe.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/max-nested-calls": {
-      "count": 3
     }
   },
   "packages/contracts/src/currency-rate.ts": {
@@ -146,9 +137,6 @@
     },
     "unicorn/explicit-length-check": {
       "count": 1
-    },
-    "unicorn/no-unnecessary-boolean-comparison": {
-      "count": 7
     }
   },
   "packages/contracts/src/envelopes.ts": {
@@ -439,9 +427,6 @@
     "unicorn/no-null": {
       "count": 2
     },
-    "unicorn/no-unnecessary-parameters": {
-      "count": 2
-    },
     "unicorn/require-array-sort-compare": {
       "count": 9
     }
@@ -509,9 +494,6 @@
     },
     "unicorn/no-array-sort": {
       "count": 2
-    },
-    "unicorn/no-unnecessary-array-flat-map": {
-      "count": 1
     }
   },
   "packages/core/src/provenance.ts": {
@@ -733,9 +715,6 @@
     "unicorn/no-null": {
       "count": 4
     },
-    "unicorn/no-unnecessary-parameters": {
-      "count": 1
-    },
     "unicorn/require-array-sort-compare": {
       "count": 1
     },
@@ -924,9 +903,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/no-unnecessary-parameters": {
-      "count": 1
     }
   },
   "packages/sync/src/git/read-only-git-port.ts": {
@@ -973,9 +949,6 @@
       "count": 1
     },
     "unicorn/import-style": {
-      "count": 1
-    },
-    "unicorn/no-unnecessary-array-flat-map": {
       "count": 1
     },
     "unicorn/prefer-iterator-to-array": {
@@ -1129,9 +1102,6 @@
       "count": 1
     },
     "no-await-in-loop": {
-      "count": 1
-    },
-    "unicorn/no-unnecessary-parameters": {
       "count": 1
     },
     "vitest/no-conditional-expect": {
@@ -1479,9 +1449,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 3
-    },
-    "unicorn/no-unnecessary-parameters": {
-      "count": 1
     }
   },
   "packages/web/src/frame/trust-strip.test.tsx": {
@@ -1676,11 +1643,6 @@
       "count": 1
     }
   },
-  "packages/web/src/list/short-forms.test.ts": {
-    "unicorn/no-unnecessary-array-flat-map": {
-      "count": 1
-    }
-  },
   "packages/web/src/list/short-forms.ts": {
     "local/max-comment-run": {
       "count": 1
@@ -1688,9 +1650,6 @@
   },
   "packages/web/src/list/tracked.data.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/no-unnecessary-array-flat-map": {
       "count": 1
     }
   },
@@ -1763,9 +1722,6 @@
     },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/no-unnecessary-parameters": {
-      "count": 1
     },
     "unicorn/require-array-sort-compare": {
       "count": 1
@@ -2006,9 +1962,6 @@
     },
     "sonarjs/assertions-in-tests": {
       "count": 2
-    },
-    "unicorn/no-unnecessary-parameters": {
-      "count": 1
     },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 1

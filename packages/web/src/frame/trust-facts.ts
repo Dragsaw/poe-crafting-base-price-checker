@@ -71,8 +71,8 @@ export function trackedListEdit(report: SyncReport | null): TrackedListEdit | un
   return { date: utcDate(edited.at), suffix: edited.source === 'file-modified' ? NOT_COMMITTED_SUFFIX : '' };
 }
 
-function countOf(report: SyncReport, kind: SyncReport['records'][number]['kind']): number {
-  return report.records.filter((record) => record.kind === kind).length;
+function countUnresolvable(report: SyncReport): number {
+  return report.records.filter((record) => record.kind === 'unresolvable').length;
 }
 
 /** The loaded curation that a `pinned-starvation` record must describe to count on the health line. */
@@ -101,7 +101,7 @@ export function healthSignals(report: SyncReport | null, curation: Curation): re
     return [];
   }
   const signals: string[] = [];
-  const unresolvable = countOf(report, 'unresolvable');
+  const unresolvable = countUnresolvable(report);
   if (unresolvable > 0) {
     signals.push(`${unresolvable.toLocaleString('en-US')} unresolvable`);
   }
@@ -213,7 +213,7 @@ export function panelColumns(
       ),
     ],
   ];
-  const unresolvableCount = countOf(report, 'unresolvable');
+  const unresolvableCount = countUnresolvable(report);
   const unresolvable: FigureGroup = [
     [
       figure(unresolvableCount),

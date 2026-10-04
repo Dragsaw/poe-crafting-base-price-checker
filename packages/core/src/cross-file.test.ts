@@ -64,8 +64,8 @@ const band = (valueMin: number, valueMax: number, statId = STAT): ModifierRef =>
 const valueless = (statId = STAT): ModifierRef => ({ kind: 'valueless', statId });
 
 /** T7 derives to `[43, 56.5]` (a two-`#` line), T8 to `[56, 80]`. */
-const T7 = (itemLevelMin = 60) => tier([line(STAT, [40, 53], [46, 60])], { itemLevelMin });
-const T8 = (itemLevelMin = 75) => tier([line(STAT, [56, 80])], { itemLevelMin });
+const T7 = () => tier([line(STAT, [40, 53], [46, 60])], { itemLevelMin: 60 });
+const T8 = () => tier([line(STAT, [56, 80])], { itemLevelMin: 75 });
 /** A suffix pool one reference aligns on. */
 const SUFFIX_TIER = tier([line(SUFFIX_STAT, [1, 2])]);
 

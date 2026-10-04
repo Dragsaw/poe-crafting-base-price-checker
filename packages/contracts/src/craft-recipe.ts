@@ -2,6 +2,14 @@ import { z } from 'zod';
 
 import { CurrencyIdSchema } from './currency-rate.ts';
 
+const CurrencyLineSchema = z.strictObject({
+  currencyId: CurrencyIdSchema,
+  quantity: z
+    .number()
+    .positive()
+    .describe('How many units of the currency one craft spends. Always positive.'),
+});
+
 /**
  * One Craft Recipe, as `data/recipes.json` declares it (AD-3, AD-20).
  *
@@ -13,15 +21,7 @@ import { CurrencyIdSchema } from './currency-rate.ts';
 export const CraftRecipeSchema = z.strictObject({
   id: z.string().min(1).describe('The recipe id. Unique within `recipes.json`.'),
   currencies: z
-    .array(
-      z.strictObject({
-        currencyId: CurrencyIdSchema,
-        quantity: z
-          .number()
-          .positive()
-          .describe('How many units of the currency one craft spends. Always positive.'),
-      }),
-    )
+    .array(CurrencyLineSchema)
     .min(1, 'a recipe spends at least one currency; an empty list would cost nothing (AD-20)')
     .superRefine((lines, context) => {
       const firstIndexById = new Map<string, number>();

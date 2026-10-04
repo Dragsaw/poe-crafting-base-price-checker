@@ -27,7 +27,7 @@ describe('the live data/tracked.json', () => {
   it('has a short form for every crafted statId', () => {
     const statIds = new Set(
       tracked.entries.flatMap((entry) =>
-        entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((reference) => (reference.kind === 'hybrid' ? reference.lines.map((line) => line.statId) : [reference.statId])) : [],
+        entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((reference) => (reference.kind === 'hybrid' ? reference.lines.map((line) => line.statId) : reference.statId)) : [],
       ),
     );
     expect(statIds.size).toBeGreaterThan(0);

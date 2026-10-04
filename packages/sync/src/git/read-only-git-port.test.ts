@@ -35,8 +35,8 @@ async function git(arguments_: string[], environment: Record<string, string> = {
   await run('git', arguments_, { cwd: repository, env: { ...process.env, ...environment }, windowsHide: true });
 }
 
-async function commitFile(name: string, content: string, authorDate: string): Promise<void> {
-  await writeFile(join(repository, name), content);
+async function commitFile(name: string, authorDate: string): Promise<void> {
+  await writeFile(join(repository, name), '{"v":1}\n');
   await git(['add', '--', name]);
   await git(['commit', '-q', '-m', `edit ${name}`], { GIT_AUTHOR_DATE: authorDate, GIT_COMMITTER_DATE: authorDate });
 }
@@ -49,10 +49,10 @@ beforeAll(async () => {
   await git(['config', 'commit.gpgsign', 'false']);
   await git(['config', 'user.name', 'Test']);
   await git(['config', 'user.email', 'test@example.invalid']);
-  await commitFile('tracked.json', '{"v":1}\n', '2026-09-20T14:00:00+02:00');
-  await commitFile('other.json', '{"v":1}\n', '2026-09-22T09:30:00+00:00');
+  await commitFile('tracked.json', '2026-09-20T14:00:00+02:00');
+  await commitFile('other.json', '2026-09-22T09:30:00+00:00');
   await mkdir(join(repository, 'data'));
-  await commitFile('data/tracked.json', '{"v":1}\n', '2026-09-24T08:15:00-05:00');
+  await commitFile('data/tracked.json', '2026-09-24T08:15:00-05:00');
   vi.unstubAllEnvs();
 });
 

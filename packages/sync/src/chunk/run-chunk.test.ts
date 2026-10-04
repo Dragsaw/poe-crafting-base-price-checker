@@ -458,10 +458,9 @@ describe('runChunk: the published dataset', () => {
 
     expect(outcome.kind).toBe('bounded');
     const written = (await fs.readTextFile(DATASET_PATH)) ?? '';
-    const block = (entry: DatasetEntry): string =>
-      JSON.stringify(entry, null, 2).split('\n').map((line) => `    ${line}`).join('\n');
-    expect(previous).toContain(block(carried));
-    expect(written).toContain(block(carried));
+    const block = JSON.stringify(carried, null, 2).split('\n').map((line) => `    ${line}`).join('\n');
+    expect(previous).toContain(block);
+    expect(written).toContain(block);
     const dataset = await datasetOf(fs);
     expect(dataset?.entries.map((entry) => entry.entryKey)).toEqual(
       [key(A), key(C)].toSorted(compareCanonicalKeys),
