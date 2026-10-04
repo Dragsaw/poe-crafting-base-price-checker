@@ -3,16 +3,14 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
-  SUPPORTED_SCHEMA_VERSION,
   SyncReportFileSchema,
-  TRACKED_SCHEMA_VERSION,
-  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { FakeFilesystemPort, FilesystemPort, HttpResponse, SyncReportFile, TrackedEntry } from '@poe/contracts';
 
-import { REPORT_PATH, TRACKED_PATH } from '../chunk/run-chunk.ts';
+import { REPORT_PATH } from '../chunk/run-chunk.ts';
 import type { SyncCommandDependencies } from '../sync-batch.ts';
 import { TRADE_LEAGUES_URL, tradeSearchUrl } from '../trade/endpoints.ts';
+import { shellDataInputs } from '../test-support/shell-data-inputs.ts';
 import { USER_AGENT_ENV_VAR } from '../trade/user-agent.ts';
 
 export const LEAGUE = 'Test League';
@@ -25,28 +23,7 @@ function inputs(
   league: string,
   tracked: readonly TrackedEntry[] = [ENTRY],
 ): Parameters<typeof createFakeFilesystemPort>[0] {
-  return {
-    [TRACKED_PATH]: {
-      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: tracked }),
-      modifiedAt: '2026-09-20T07:00:00.000Z',
-    },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league, minChunkSearches: 1 }) },
-    'data/currencies.json': {
-      contents: JSON.stringify({
-        schemaVersion: SUPPORTED_SCHEMA_VERSION,
-        rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
-      }),
-    },
-    'data/catalogue/items.json': {
-      contents: JSON.stringify({
-        schemaVersion: SUPPORTED_SCHEMA_VERSION,
-        result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
-      }),
-    },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
-    'data/weights.json': { contents: JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
-  };
+  return shellDataInputs({ tracked, league });
 }
 
 export const LEAGUES_BODY = JSON.stringify({

@@ -423,11 +423,6 @@
       "count": 3
     }
   },
-  "packages/sync/src/sync.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/trade/client.test.ts": {
     "max-lines": {
       "count": 1

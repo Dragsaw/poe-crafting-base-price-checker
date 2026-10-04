@@ -4,16 +4,13 @@ import {
   createFakeClockPort,
   createFakeFilesystemPort,
   createFakeGitPort,
-  SUPPORTED_SCHEMA_VERSION,
-  TRACKED_SCHEMA_VERSION,
-  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { FilesystemPort, HttpPort, TrackedEntry } from '@poe/contracts';
 
-import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { syncCommand } from '../sync-batch.ts';
 import { syncSessionCommand } from '../sync.ts';
 import { NamedError } from '../test-support/named-error.ts';
+import { shellDataInputs } from '../test-support/shell-data-inputs.ts';
 import { SESSION_COOKIE_ENV_VAR } from '../trade/session-auth.ts';
 import { USER_AGENT_ENV_VAR } from '../trade/user-agent.ts';
 
@@ -32,35 +29,7 @@ export const LEAGUES_BODY = JSON.stringify({
 });
 
 function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof createFakeFilesystemPort>[0] {
-  return {
-    [TRACKED_PATH]: {
-      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }),
-      modifiedAt: '2026-09-20T07:00:00.000Z',
-    },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 1 }) },
-    'data/currencies.json': {
-      contents: JSON.stringify({
-        schemaVersion: SUPPORTED_SCHEMA_VERSION,
-        rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
-      }),
-    },
-    'data/catalogue/items.json': {
-      contents: JSON.stringify({
-        schemaVersion: SUPPORTED_SCHEMA_VERSION,
-        result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
-      }),
-    },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
-    'data/weights.json': {
-      contents: JSON.stringify({
-        schemaVersion: WEIGHTS_SCHEMA_VERSION,
-        gamePatch: '0.5.5',
-        producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
-        bases: {},
-      }),
-    },
-  };
+  return shellDataInputs({ tracked: entries });
 }
 
 /** The base64 characters of `bytes` that survive inside a longer value: whole 3-byte groups from byte 0, 1 or 2. */

@@ -301,9 +301,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: "[NOTE FOR UX] `EXPERIENCE.md` still counts five cross-file checks: state 27 lists them by name, and state 15a and the Unrankable reason say 'one string for all five checks'. IN §2.7 adds line-set completeness as the sixth, and `core` now runs six. Add it to state 27's list, and change 'five' to 'six' where the text counts the checks."
   evidence: "Review of this spec (triage row 17). `EXPERIENCE.md:207-209`, `:921` and `:933`. `CrossFileCheckSchema` in `packages/contracts/src/sync-run-report.ts` has six values. A reviewer does not edit a UX-owned document (AGENT-WORKFLOW Review brief rule 2)."
 - source_spec: `docs/stories/spec-poesessid-retro-3-canary-cap-and-schema-constants.md`
-  summary: "Dev. The `inputs()` fixture builder exists in three copies under `packages/sync/src/`: `session-auth.canary.test.ts`, `sync.test.ts` and `sync-batch.test.ts`. They now use the `@poe/contracts` schema constants, but a shape change in one copy can still miss the others. Move them to one shared test helper."
-  evidence: "Retro A6 (`docs/specs/spec-poesessid-sync/RETROSPECTIVE.md`) counts the three copies. Retro item 3 asked only for the constants, and a shared module is new structure, so this spec did not merge them (Implementation Notes)."
-- source_spec: `docs/stories/spec-poesessid-retro-3-canary-cap-and-schema-constants.md`
   summary: "Dev. The session harness in `packages/sync/src/sync.test.ts` aborts after 200 fake sleeps and gives no message, so a test that trips the guard fails on a later assertion and names no reason. Make it throw as `runSession` in `session-auth.canary.test.ts` does past `MAX_SESSION_PAUSES`: name the cap and the lines captured so far."
   evidence: "Retro V1 names only the canary harness, so this spec left `sync.test.ts` unchanged (Implementation Notes). The guard still ends the loop, so it cannot hang."
 
