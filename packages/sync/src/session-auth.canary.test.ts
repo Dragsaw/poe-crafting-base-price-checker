@@ -22,11 +22,8 @@ import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 import { NamedError } from './test-support/named-error.ts';
 
 /**
- * SPEC-poesessid-sync CAP-4, IMPLEMENTATION-NOTES.md §13.6: with a known
- * canary of 32+ characters as the session cookie, every throw path is forced
- * through both shells. The test fails on any 8+ character substring of the
- * canary, raw, URL-encoded or base64, in stdout, stderr, the chunk log, a
- * thrown value or any file written.
+ * SPEC-poesessid-sync CAP-4, IMPLEMENTATION-NOTES.md §13.6: any 8+ character
+ * substring of the canary, raw, URL-encoded or base64, in any output fails.
  */
 
 const CANARY = 'k3Zq8VwT1nRb6YpXe4LmHs9DjCg2FaUo7Qi5';
@@ -76,10 +73,8 @@ function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof c
 }
 
 /**
- * The base64 and base64url characters that encode `bytes` inside any longer
- * value. A 3-byte group of the encoding starts at the window's byte 0, 1 or 2,
- * depending on where the window sits. From that byte, each whole group made
- * of the window's own bytes encodes the same characters whatever surrounds it.
+ * The base64 characters of `bytes` that survive inside any longer value: whole
+ * 3-byte groups from window byte 0, 1 or 2 encode the same whatever surrounds them.
  */
 function alignedBase64(bytes: Buffer): string[] {
   const forms: string[] = [];
@@ -200,11 +195,7 @@ interface Captured {
   readonly lockFaults: () => number;
 }
 
-/**
- * A fake filesystem that records every write. With `lockFault`, taking the
- * lock rejects with the canary error: a throw from outside the governor that
- * reaches the shell's own `catch` before any report is written.
- */
+/** A fake filesystem that records every write. `lockFault` rejects the lock create: a throw outside the governor. */
 function capturing(
   options: { readonly lockFault?: boolean; readonly tracked?: readonly TrackedEntry[] } = {},
 ): Captured {
@@ -472,10 +463,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     return error;
   }
 
-  /**
-   * `probe`: the probe (the first cookie-carrying search) throws. `fetch`: the
-   * probe is live, then the fetch that carries the cookie throws.
-   */
+  /** `probe`: the first cookie-carrying search throws. `fetch`: the probe is live, then the fetch throws. */
   function cookieThrowingHttp(target: 'probe' | 'fetch', failure: Failure): ThrowingHttp {
     let threw = 0;
     let isProbed = false;
@@ -620,10 +608,8 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   type Downgrade = '401' | '403' | 'not-live';
 
   /**
-   * A live probe, then a downgrade that quotes the cookie. A `401` or `403`
-   * answers the fetch. `not-live` answers the next entry's search with the
-   * baseline's rule count under the baseline's policy; the fetch before it
-   * answers fewer rules under its own policy and is not tested.
+   * A live probe, then a downgrade quoting the cookie: a `401` or `403` answers the fetch,
+   * `not-live` answers the next entry's search with the baseline's rule count and policy.
    */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;

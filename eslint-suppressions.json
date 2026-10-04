@@ -410,7 +410,7 @@
   },
   "packages/sync/src/session-auth.canary.test.ts": {
     "local/max-comment-run": {
-      "count": 5
+      "count": 3
     },
     "max-lines": {
       "count": 1
