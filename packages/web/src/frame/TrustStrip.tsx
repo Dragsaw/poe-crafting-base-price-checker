@@ -72,7 +72,6 @@ export function TrustStrip({
     pinnedCount: set.tracked.entries.filter((entry) => entry.status === 'pinned').length,
     minChunkSearches: set.config.minChunkSearches,
   });
-  const [producer, generatedAt, gamePatch] = weightsFacts(set.weights);
 
   return (
     <>
@@ -93,12 +92,7 @@ export function TrustStrip({
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div data-trust-line="weights">
-            <Label>{WEIGHTS_FILE_LABEL}</Label>
-            {`${NBSP} `}
-            {producer.name} <Value value={producer.value} /> <Separator /> {generatedAt.name}{' '}
-            <Value value={generatedAt.value} /> <Separator /> {gamePatch.name} <Value value={gamePatch.value} />
-          </div>
+          <WeightsLine facts={weightsFacts(set.weights)} />
           <span
             data-strip-affordance=""
             className="fg-strip-affordance"
@@ -107,36 +101,69 @@ export function TrustStrip({
             {open ? AFFORDANCE_OPEN : AFFORDANCE_CLOSED}
           </span>
         </div>
-        <div data-trust-line="sync">
-          <Label>{LAST_SYNCED_LABEL}</Label>
-          {`${NBSP} `}
-          <Value value={lastSynced(report, now)} /> <Separator /> <Label>{TRACKED_LIST_EDITED_LABEL}</Label>
-          {`${NBSP} `}
-          {edit === undefined ? <Value value={undefined} /> : `${edit.date}${edit.suffix}`}
-        </div>
+        <SyncLine lastSyncedText={lastSynced(report, now)} edit={edit} />
         <AbsenceLines absent={absent} />
-        {signals.length > 0 ? (
-          <div
-            data-health-line=""
-            style={{
-              height: px(spacing.frameReserveHealthLine),
-              lineHeight: px(spacing.frameReserveHealthLine),
-            }}
-          >
-            {signals.map((signal, index) => (
-              <span key={signal}>
-                {index > 0 ? <Separator /> : undefined}
-                <span data-health-signal="" style={{ color: colors.rust, fontWeight: 700 }}>
-                  <span style={{ fontSize: px(9) }}>{`${glyphs.unresolvable}${NBSP}`}</span>
-                  {signal}
-                </span>
-              </span>
-            ))}
-          </div>
-        ) : undefined}
+        <HealthLine signals={signals} />
       </div>
       {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== undefined, crossFileFailures)} /> : undefined}
     </>
+  );
+}
+
+type WeightsFacts = ReturnType<typeof weightsFacts>;
+
+function WeightsLine({ facts }: { readonly facts: WeightsFacts }): JSX.Element {
+  const [producer, generatedAt, gamePatch] = facts;
+  return (
+    <div data-trust-line="weights">
+      <Label>{WEIGHTS_FILE_LABEL}</Label>
+      {`${NBSP} `}
+      {producer.name} <Value value={producer.value} /> <Separator /> {generatedAt.name}{' '}
+      <Value value={generatedAt.value} /> <Separator /> {gamePatch.name} <Value value={gamePatch.value} />
+    </div>
+  );
+}
+
+function SyncLine({
+  lastSyncedText,
+  edit,
+}: {
+  readonly lastSyncedText: string | undefined;
+  readonly edit: ReturnType<typeof trackedListEdit>;
+}): JSX.Element {
+  return (
+    <div data-trust-line="sync">
+      <Label>{LAST_SYNCED_LABEL}</Label>
+      {`${NBSP} `}
+      <Value value={lastSyncedText} /> <Separator /> <Label>{TRACKED_LIST_EDITED_LABEL}</Label>
+      {`${NBSP} `}
+      {edit === undefined ? <Value value={undefined} /> : `${edit.date}${edit.suffix}`}
+    </div>
+  );
+}
+
+function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.Element | undefined {
+  if (signals.length === 0) {
+    return undefined;
+  }
+  return (
+    <div
+      data-health-line=""
+      style={{
+        height: px(spacing.frameReserveHealthLine),
+        lineHeight: px(spacing.frameReserveHealthLine),
+      }}
+    >
+      {signals.map((signal, index) => (
+        <span key={signal}>
+          {index > 0 ? <Separator /> : undefined}
+          <span data-health-signal="" style={{ color: colors.rust, fontWeight: 700 }}>
+            <span style={{ fontSize: px(9) }}>{`${glyphs.unresolvable}${NBSP}`}</span>
+            {signal}
+          </span>
+        </span>
+      ))}
+    </div>
   );
 }
 

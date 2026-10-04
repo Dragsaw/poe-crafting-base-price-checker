@@ -634,9 +634,6 @@
   "packages/web/src/frame/TrustStrip.tsx": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "max-lines-per-function": {
-      "count": 1
     }
   },
   "packages/web/src/frame/trust-facts.ts": {
