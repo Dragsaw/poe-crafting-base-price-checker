@@ -214,23 +214,8 @@
       "count": 1
     }
   },
-  "packages/core/src/coverage.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/core/src/craft-cost.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
   "packages/core/src/crafted-classes.test.ts": {
     "unicorn/prefer-iterator-to-array": {
-      "count": 1
-    }
-  },
-  "packages/core/src/crafted-classes.ts": {
-    "local/max-comment-run": {
       "count": 1
     }
   },
@@ -239,28 +224,12 @@
       "count": 2
     }
   },
-  "packages/core/src/index.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
   "packages/core/src/probability.ts": {
-    "local/max-comment-run": {
-      "count": 14
-    },
     "unicorn/consistent-boolean-name": {
       "count": 3
     }
   },
-  "packages/core/src/provenance.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
   "packages/core/src/rank.ts": {
-    "local/max-comment-run": {
-      "count": 12
-    },
     "unicorn/prefer-iterator-to-array": {
       "count": 1
     }

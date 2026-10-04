@@ -2,17 +2,7 @@ import type { CraftedTrackedEntry, ModifierWeight, Provenance, WeightsClassPools
 
 import { eligible } from './probability.ts';
 
-/**
- * Provenance of a crafted `(Item Class, recipe)` pair (AD-10, IMPLEMENTATION-NOTES.md
- * §9). Pure (AD-1).
- *
- * The order is `absent` < `uniform-prior` < `measured`. A tier maps by its
- * `weightSource` and nothing else: `published` and `not-in-game` are `measured`,
- * `absent` is `uniform-prior`. The inputs of a pair are exactly the entries the
- * probability formula sums: the recipe's eligible set over both slots. A tier
- * below the recipe floor is not an input. A weight-0 tier in that set is an
- * input like any other.
- */
+/** Provenance of a crafted `(Item Class, recipe)` pair: order, `weightSource` mapping and inputs are AD-10's. */
 
 /** The labels a ranked row can carry: never `absent`. */
 type RankedProvenance = Exclude<Provenance, 'absent'>;
@@ -29,10 +19,7 @@ export function provenanceOfTier(tier: Pick<ModifierWeight, 'weightSource'>): Ra
   return tier.weightSource === 'absent' ? 'uniform-prior' : 'measured';
 }
 
-/**
- * The weakest label over the recipe's eligible set of both slots. An empty set
- * folds to `measured`: it holds no invented weight.
- */
+/** The weakest label over the eligible set of both slots; an empty set folds to `measured`, holding no invented weight. */
 export function foldPair(
   pools: WeightsClassPools,
   entry: Pick<CraftedTrackedEntry, 'itemLevelMin'>,

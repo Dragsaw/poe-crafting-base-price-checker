@@ -1,19 +1,9 @@
 import { INITIAL_SCHEMA_VERSION } from '@poe/contracts';
 
-/**
- * Placeholder export. `core` is pure: no I/O, no clock, no randomness, no env.
- * It may import `@poe/contracts` and nothing else in this workspace.
- *
- * Story 1.2 retired `CONTRACTS_PLACEHOLDER`; this now proves the one allowed
- * workspace edge against a real `contracts` export.
- */
+/** Placeholder export: proves the one workspace edge `core` may have, to `@poe/contracts` (AD-1). */
 export const CORE_PLACEHOLDER = `contracts@${INITIAL_SCHEMA_VERSION}:core`;
 
-/**
- * The chunk runner's selection order (AD-7). Relative specifiers carry `.ts`:
- * `pnpm sync:dry` loads this source under bare `node`, whose type stripping
- * performs no extension resolution.
- */
+/** The chunk runner's selection order (AD-7). Specifiers carry `.ts`: `pnpm sync:dry` runs this under bare `node`, which resolves no extension. */
 export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.ts';
 export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';
 
@@ -37,10 +27,7 @@ export type { CraftCostResult } from './craft-cost.ts';
 /** Provenance of a crafted pair (AD-10). */
 export { foldPair, oldestOf, provenanceOfTier, weakest } from './provenance.ts';
 
-/**
- * The six cross-file checks and the unvalidated marks (AD-17,
- * IMPLEMENTATION-NOTES.md §2.1–§2.8), defined once.
- */
+/** The six cross-file checks and the unvalidated marks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.8). */
 export {
   classDiscriminability,
   coOccur,

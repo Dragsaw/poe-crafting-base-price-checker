@@ -12,10 +12,7 @@ export interface PoolCoverage {
 }
 
 /**
- * Pool coverage (AD-27, IMPLEMENTATION-NOTES.md §3). Pure (AD-1).
- *
- * `undefined` when no class is rankable, since the fraction is undefined then.
- * The caller omits both fields for it, and for an absent weights file.
+ * Pool coverage (AD-27, IMPLEMENTATION-NOTES.md §3). `undefined` when no class is rankable: the fraction is undefined.
  */
 export function poolCoverage(
   entries: readonly TrackedEntry[],

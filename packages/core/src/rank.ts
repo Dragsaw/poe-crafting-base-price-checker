@@ -23,52 +23,7 @@ export { compareRankedRows } from './rank-order.ts';
 export type { NotYetSyncedEntry, UnrankedEntry } from './rank-raw-groups.ts';
 
 /**
- * The ranking, both branches (AD-17, AD-9, AD-19, AD-20, IMPLEMENTATION-NOTES.md
- * §4.1, §4.2, §9, §11).
- *
- * Pure (AD-1, AD-4). The tracked entries, the published dataset entries, the
- * active league and the Payout Threshold go in as values; a typed `Ranking`
- * comes out. Nothing is read from anywhere else and no clock is consulted.
- * Every expected data condition is a group of the result. One caller error
- * throws: a threshold that is not a finite number ≥ 0 is a `RangeError`,
- * before anything is grouped. `rank` never clamps or coerces it.
- *
- * Per non-pruned `raw` tracked entry, joined to its dataset entry by canonical
- * key:
- *
- * - no dataset entry: `notYetSynced`, reason `never-synced`.
- * - `priced` with `observation.league !== activeLeague`: `notYetSynced`,
- *   reason `league-mismatch` (AD-19). Only the observation's league is
- *   compared, and the threshold is never applied to it.
- * - `priced` with `priceDivine < threshold`: a row in `belowThreshold`, never
- *   in the ordering (FR-3, AD-17).
- * - `priced` with `priceDivine ≥ threshold`: a row in `ordering`, EV equal to
- *   the price verbatim, Craft Cost zero.
- * - `no-listings`, `unresolvable`, `not-yet-synced`: their own group, the
- *   published reason kept.
- *
- * `pruned` entries appear in no group. Each distinct non-pruned crafted
- * `(categoryId, className)` is looked up directly in the parsed weights file,
- * by `categoryId`, then `className`, and never through a sibling `className`:
- * with no file, or no such pair, it is one `unrankable` class, reason `class
- * absent from weights file` (AD-24); with either slot declaring `poolCoverage: "partial"`, reason
- * `pool partial`. A complete pair named by a cross-file failure is reason
- * `class disagrees with weights file` (AD-17); the other two reasons take
- * precedence. Otherwise a complete pair makes no claim. `poolCoverage` is trusted as
- * declared (AD-11). Dataset entries no tracked entry names are ignored.
- * `core` never reads `lastSearchId` or `lastSearchLeague` (AD-9).
- *
- * **The crafted branch (AD-17).** Every class that makes no claim above is
- * ranked once per recipe: one `(Item Class, recipe)` pair per row, every pair
- * in the one `ordering`. The pair's EV is `Σ P × price` over the entries priced
- * in the active league whose gross price is `≥ threshold`, less the recipe's
- * Craft Cost (`craftCost`, AD-20), subtracted once. P is
- * `combinationProbability` and nothing else. A pair with no surviving summand
- * ranks at `−craftCost` with `summands: []`. A pair the recipe cannot reach is
- * Unrankable under that recipe only, as `recipe cannot reach this class`. An
- * uncostable recipe still ranks its pairs, with EV `null`, after the
- * comparable rows and by gross payout (EXPERIENCE.md state 35), and is named
- * in `uncostableRecipes`.
+ * The ranking, both branches (AD-17, AD-9, AD-19, AD-20); a threshold that is not a finite number ≥ 0 is a `RangeError`, never clamped.
  */
 
 export interface RankInput {
@@ -77,42 +32,20 @@ export interface RankInput {
   readonly dataset: readonly DatasetEntry[];
   /** The active league, verbatim from `data/config.json` (AD-19). */
   readonly activeLeague: string;
-  /**
-   * The Payout Threshold in divine (FR-7). An entry survives at `price ≥ threshold`.
-   * Must be finite and ≥ 0 (0 is valid); any other value makes `rank` throw a `RangeError`.
-   */
+  /** The Payout Threshold in divine (FR-7), finite and ≥ 0 (0 is valid); any other value makes `rank` throw a `RangeError`. */
   readonly threshold: number;
-  /**
-   * The parsed weights file, or `undefined` when it is absent (AD-24). A crafted
-   * Item Class whose pair is missing from it, or with no file at all, is
-   * Unrankable as `class absent from weights file`; one with a `partial` slot
-   * is Unrankable as `pool partial` (FR-4).
-   */
+  /** The parsed weights file, or `undefined` when absent (AD-24); an absent or `partial` class is Unrankable (FR-4). */
   readonly weights: WeightsFile | undefined;
-  /**
-   * The cross-file failures of this tracked list against `weights`, from
-   * `crossFileChecks`, computed once per load by the caller. Each failure's
-   * `(categoryId, className)` is Unrankable as `class disagrees with weights
-   * file`, unless the lookup already gave it one of the other two reasons,
-   * which take precedence. Absent means none.
-   */
+  /** Cross-file failures from `crossFileChecks`, computed once per load by the caller; the other two Unrankable reasons take precedence. Absent means none. */
   readonly crossFileFailures?: readonly Pick<CrossFileFailure, 'categoryId' | 'className'>[];
-  /**
-   * The Craft Recipes, in `recipes.json` file order (AD-3). Every rankable
-   * crafted Item Class is ranked once per recipe. Absent or empty: no crafted
-   * row exists.
-   */
+  /** The Craft Recipes in `recipes.json` file order (AD-3); absent or empty means no crafted row. */
   readonly recipes?: readonly CraftRecipe[];
   /** The rate set `core` costs recipes from: `dataset.json`'s `currencyRates` (AD-20). Absent means none. */
   readonly currencyRates?: readonly CurrencyRate[];
 }
 
 /**
- * FR-4's three reasons, verbatim (PRD-owned), and the provisional fourth. The
- * first two come from the direct lookup of the crafted pair in the weights
- * file; `class disagrees with weights file` is any of the six cross-file
- * checks (`cross-file.ts`), one string for all six. `recipe cannot reach this
- * class` is recipe-scoped and provisional (`RECIPE_UNREACHABLE`).
+ * FR-4's three reasons (PRD-owned) and the provisional fourth: the first two come from the direct pair lookup, the third from any cross-file check.
  */
 export type UnrankableReason =
   | 'class absent from weights file'
@@ -126,12 +59,7 @@ export interface UnrankableClass {
   readonly className: string;
   readonly reason: UnrankableReason;
   /**
-   * Present only on the recipe-scoped form of `recipe cannot reach this
-   * class`: the one recipe whose pair is unrankable. The class may rank under
-   * another recipe (EXPERIENCE.md state 36). The same reason without a recipe
-   * id holds under every recipe: a `complete` slot with total weight 0, the
-   * same test as `poolCoverage`, or no recipe existing at all (retro item
-   * 29). The other reasons carry no recipe id.
+   * Present only on the recipe-scoped form of `recipe cannot reach this class`; without it the reason holds under every recipe (EXPERIENCE.md, Epic 3 retro item 29).
    */
   readonly recipeId?: string;
 }
@@ -139,12 +67,7 @@ export interface UnrankableClass {
 
 export interface Ranking {
   /**
-   * Every ranked row, raw and crafted, over every recipe, in one ordering
-   * (AD-17). First the comparable rows — raw rows and the crafted rows of a
-   * costable recipe — by EV descending, then `compareRankedRows`. Then the
-   * crafted rows of an uncostable recipe, whose EV is `null`: by gross payout
-   * descending, then `compareRankedRows` (EXPERIENCE.md state 35). They are
-   * ordered among themselves only, never against the comparable rows.
+   * Every ranked row over every recipe (AD-17): comparable rows by EV descending, then `compareRankedRows`; uncostable-recipe rows (EV `null`) after them, ordered among themselves only (EXPERIENCE.md state 35).
    */
   readonly ordering: readonly RankedRow[];
   /** Priced raw rows below the threshold, in canonical key order. Never in `ordering`. */
@@ -155,22 +78,11 @@ export interface Ranking {
   readonly notYetSynced: readonly NotYetSyncedEntry[];
   /** In canonical key order. */
   readonly unresolvable: readonly UnrankedEntry[];
-  /**
-   * One per distinct non-pruned crafted `(categoryId, className)` whose pair is
-   * absent from the weights file, declares a `partial` slot, has an empty
-   * slot (total weight 0) or fails a cross-file check; and one per `(class, recipe)` pair the recipe cannot
-   * reach. By `className` in UTF-8 code-unit order, then `categoryId`, then the
-   * recipe-free row first, then `recipeId`.
-   */
+  /** One per Unrankable class and per `(class, recipe)` pair the recipe cannot reach; sorted by `className` (code units), `categoryId`, recipe-free first, `recipeId`. */
   readonly unrankable: readonly UnrankableClass[];
   /** The recipes `core` could not cost, in `recipes.json` file order, each naming its first unrated currency (AD-20). */
   readonly uncostableRecipes: readonly UncostableRecipe[];
-  /**
-   * Some non-pruned tracked entry, raw or crafted, carries a `priced`
-   * observation in the active league, at any price. `false` after a league
-   * reset (EXPERIENCE.md state 23): a crafted pair still ranks at minus its
-   * Craft Cost, but nothing it rests on is priced.
-   */
+  /** Some non-pruned entry has a `priced` observation in the active league; `false` after a league reset (EXPERIENCE.md state 23). */
   readonly pricedInLeague: boolean;
 }
 
@@ -181,11 +93,7 @@ export interface UncostableRecipe {
 }
 
 /**
- * The reason for an `(Item Class, recipe)` pair whose eligible pool is empty
- * after the recipe floor (`empty-eligible-pool`), or where a reference
- * contains no eligible tier (`empty-contained`, both IN §9), or whose augment
- * has nothing left to add (`augment-exhausted`, IN §11). The string lives in
- * code, not in `prd.md`.
+ * The reason for a pair with an empty eligible pool or contained set (IMPLEMENTATION-NOTES.md §9) or an exhausted augment (§11). The string lives in code, not in `prd.md`.
  */
 export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
 
@@ -198,11 +106,7 @@ const byItemClass = (left: UnrankableClass, right: UnrankableClass): number =>
   compareCanonicalKeys(left.categoryId, right.categoryId) ||
   compareCanonicalKeys(left.recipeId ?? '', right.recipeId ?? '');
 
-/**
- * The direct lookup `bases[categoryId][className]`, by `categoryId`, then
- * `className`, never falling back to a sibling class (WEIGHTS-FILE-SCHEMA.md, *`bases` key*).
- * Own keys only, so a pair never resolves through the object prototype.
- */
+/** The direct lookup `bases[categoryId][className]` (WEIGHTS-FILE-SCHEMA.md, *`bases` key*); own keys only, so a pair never resolves through the object prototype. */
 function unrankableReasonOf(
   weights: WeightsFile | undefined,
   categoryId: string,
