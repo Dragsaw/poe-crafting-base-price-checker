@@ -309,9 +309,6 @@
     }
   },
   "packages/sync/src/chunk/run-chunk.test.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    },
     "max-lines": {
       "count": 1
     }

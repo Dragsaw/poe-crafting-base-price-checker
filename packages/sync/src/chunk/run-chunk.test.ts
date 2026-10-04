@@ -59,10 +59,7 @@ import type {
   StepResult,
 } from './run-chunk.ts';
 
-/**
- * The runner's ports as the tests build them: the shell's `load` hook is made
- * from `publication`, `starvationRecord` and `gate` overrides by `run` below.
- */
+/** `run` builds the shell's `load` hook from the `publication`, `starvationRecord` and `gate` overrides. */
 type TestPorts = Omit<ChunkPorts, 'load'> & {
   readonly publication?: ChunkPublication;
   readonly starvationRecord?: ChunkSetup['starvationRecord'];
@@ -142,11 +139,7 @@ function catalogueWithout(...missing: string[]): CatalogueIds {
 /** A catalogue in which every tracked id resolves. */
 const RESOLVES_ALL = catalogueWithout();
 
-/**
- * The read-only git port, the request counter, the starvation record and the
- * catalogue every runner needs: no history, nothing counted, a yardstick of
- * 10, and every id resolving.
- */
+/** No history, nothing counted, a yardstick of 10 and every id resolving. */
 function shellPorts(): Pick<TestPorts, 'git' | 'requests' | 'starvationRecord' | 'catalogue'> {
   return {
     git: createFakeGitPort(),
@@ -1971,13 +1964,8 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
   });
 
   describe('pool coverage (AD-27)', () => {
-    /**
-     * Bows with a covered class, or with a `partial` suffix slot, which leaves
-     * it uncovered (IN §3). A weight-0 suffix would also leave it uncovered,
-     * but every crafted entry now names a suffix, and a weight-0 pool contains
-     * none, so the cross-file gate would refuse the run; a partial slot gets no
-     * pool check.
-     */
+    // A `partial` suffix slot leaves a class uncovered (IN §3) and gets no pool check;
+    // a weight-0 suffix would make the cross-file gate refuse the run.
     const X = craftedEntry('weapon.bow', 'explicit.ok', 'Bows');
     const Y = craftedEntry('armour.chest', 'explicit.ok', 'Body_Armours_str');
 
@@ -2203,11 +2191,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
   )}\n`;
   const PREVIOUS_PROGRESS = progressText([key(A)]);
 
-  /**
-   * The real gate over a governed client whose port is counted as
-   * `league-validation`, beside a step whose port is counted as
-   * `tracked-list`: the composition every shell builds.
-   */
+  /** The composition every shell builds: the gate counts as `league-validation`, the step as `tracked-list`. */
   function gated(
     league: string,
     answer: HttpResponse,
