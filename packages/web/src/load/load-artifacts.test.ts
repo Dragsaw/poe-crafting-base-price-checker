@@ -122,19 +122,21 @@ describe('loadArtifacts', () => {
   // Matrix: missing version.
   it('declares undefined when the file carries no schemaVersion, or a non-string one', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
       declared: undefined,
+      expected: '1.0.0',
     });
 
     serveArtifacts(server, { config: { kind: 'json', body: { schemaVersion: 1 } } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
       declared: undefined,
+      expected: '1.0.0',
     });
   });
 
@@ -205,7 +207,7 @@ describe('loadArtifacts', () => {
   // Matrix: required absent.
   it('refuses a required artifact that is absent, declaring undefined', async () => {
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'tracked.json',
       cause: 'missing',
@@ -248,7 +250,7 @@ describe('loadArtifacts', () => {
   // Matrix: non-JSON body.
   it('refuses a 200 that is not JSON, declaring undefined', async () => {
     serveArtifacts(server, { weights: { kind: 'text', body: '<!doctype html><html></html>' } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'weights.json',
       cause: 'content',
