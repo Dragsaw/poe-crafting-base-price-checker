@@ -25,6 +25,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 - `pnpm dev` binds port 5173 with `strictPort`. A taken port gives a loud bind failure, and Vite does not move to the next port. To use a different port, run `pnpm dev --port <n>`. Do not edit `packages/web/vite.config.ts`.
 - `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. The repository ships no supervisor.
 - Stop it with `pnpm dev:stop`, and give `--port <n>` if you started it on another port. Run this even after you stop the background task. On Windows, a task stop kills only the top process, and Vite keeps the port. `pnpm dev:stop` kills the whole `pnpm dev` process tree and exits 1 if the port stays taken. It refuses a listener that is not the Vite of this checkout, for example the server of another worktree.
+- `pnpm check` is the done gate. A PostToolUse hook (`tools/lint-on-edit`) lints each edited file. Never run `eslint --suppress-*`. Use `pnpm lint:prune` for the lint baseline. Details: `AGENT-WORKFLOW.md`.
 
 ## Conventions that differ from defaults
 
