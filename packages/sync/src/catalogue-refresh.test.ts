@@ -16,6 +16,8 @@ import type * as TradeClientModule from './trade/client.ts';
 import { CATALOGUE_ENDPOINTS, TRADE_LEAGUES_URL } from './trade/endpoints.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 
+const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
+
 /** Every option set the command built its trade client with, in build order. */
 const tradeClientOptions = vi.hoisted((): unknown[] => []);
 
@@ -354,8 +356,8 @@ it('issues exactly four requests, one per data endpoint and no leagues request',
 
   expect(outcome.ok).toBe(true);
   expect(instance.http.requests).toHaveLength(4);
-  expect(instance.http.requests.map((request) => request.url).sort()).toEqual(
-    CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.url).sort(),
+  expect(instance.http.requests.map((request) => request.url).toSorted(byCodeUnit)).toEqual(
+    CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.url).toSorted(byCodeUnit),
   );
   for (const request of instance.http.requests) {
     expect(request.method).toBe('GET');
@@ -507,8 +509,8 @@ it('writes every artifact under the repository root, in data/catalogue', async (
     expect(within.split(sep)).not.toContain('packages');
     expect(within.split(sep).slice(0, 2)).toEqual(['data', 'catalogue']);
   }
-  expect(instance.writes.map(({ path }) => relative(REPO_ROOT, path).split(sep).join('/')).sort()).toEqual(
-    CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.outputPath).sort(),
+  expect(instance.writes.map(({ path }) => relative(REPO_ROOT, path).split(sep).join('/')).toSorted(byCodeUnit)).toEqual(
+    CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.outputPath).toSorted(byCodeUnit),
   );
 });
 

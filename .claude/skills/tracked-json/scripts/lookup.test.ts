@@ -307,7 +307,7 @@ describe('lookupMods', () => {
           slot: 'prefix',
           modGroup: 'BaseLocalDefencesAndLife',
           text: 'BaseLocalDefencesAndLife',
-          statIds: [EVASION, LIFE].toSorted(),
+          statIds: [EVASION, LIFE].toSorted((a, b) => Number(a > b) - Number(a < b)),
           trackable: true,
           untrackable: [],
           tierCount: 2,

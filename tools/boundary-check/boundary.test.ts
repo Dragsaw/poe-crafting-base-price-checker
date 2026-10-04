@@ -84,7 +84,7 @@ it('reports every forbidden edge, by rule name and at error severity', async () 
         from: violation.from,
         to: violation.to,
       }))
-      .sort((a, b) => a.rule.localeCompare(b.rule)),
+      .toSorted((a, b) => a.rule.localeCompare(b.rule)),
   ).toEqual(EXPECTED_VIOLATIONS);
 
   // Every rule must be the one that stops `pnpm check`, not a warning.

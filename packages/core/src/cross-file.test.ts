@@ -237,7 +237,10 @@ const hybridReference = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybri
 
 const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
 
-const byString = (pairs: readonly (readonly string[])[]) => pairs.map((pair) => JSON.stringify(pair)).toSorted();
+const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
+const byPair = (a: readonly string[], b: readonly string[]): number => byCodeUnit(a.join(','), b.join(','));
+
+const byString = (pairs: readonly (readonly string[])[]) => pairs.map((pair) => JSON.stringify(pair)).toSorted(byCodeUnit);
 
 describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   const A = STAT;
@@ -330,8 +333,8 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
       ]),
     );
     const coOccurs = failures.filter((failure) => failure.check === 'co-occur');
-    expect(coOccurs.map((failure) => failure.entryKey).toSorted()).toEqual(
-      [canonicalKey(hybridEntry), canonicalKey(singleEntry)].toSorted(),
+    expect(coOccurs.map((failure) => failure.entryKey).toSorted(byCodeUnit)).toEqual(
+      [canonicalKey(hybridEntry), canonicalKey(singleEntry)].toSorted(byCodeUnit),
     );
     for (const failure of coOccurs) {
       const partner = failure.entryKey === canonicalKey(hybridEntry) ? singleEntry : hybridEntry;
@@ -350,11 +353,11 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
     const narrow = entry({ prefix, suffix: hybridReference(bandLine(E, 10, 20), bandLine(D, 5, 6)) });
     const wide = entry({ prefix, suffix: hybridReference(bandLine(E, 10, 25), bandLine(D, 5, 6)) });
     const failures = failuresOf([narrow, wide], bows(pools([T7()], [S1, S2])));
-    expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted()).toEqual(
+    expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted(byPair)).toEqual(
       [
         ['co-occur', canonicalKey(narrow)],
         ['co-occur', canonicalKey(wide)],
-      ].toSorted(),
+      ].toSorted(byPair),
     );
     for (const failure of failures) {
       expect(failure.detail).toContain('prefix (bands intersect)');
@@ -425,11 +428,11 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
       const low = withSuffix(41, 60);
       const lower = withSuffix(21, 40);
       const failures = failuresOf([low, lower], weights);
-      expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted()).toEqual(
+      expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted(byPair)).toEqual(
         [
           ['co-occur', canonicalKey(low)],
           ['co-occur', canonicalKey(lower)],
-        ].toSorted(),
+        ].toSorted(byPair),
       );
       for (const failure of failures) {
         expect(failure.detail).toContain('prefix (shared lines intersect and one scoped tier contains both)');
@@ -468,7 +471,7 @@ describe('unvalidated marks (§2.8)', () => {
     const partial = crossFileChecks([sentinel, b], bows(pools([T7()], [SUFFIX_TIER], { suffix: 'partial' })));
     expect(partial.failures).toEqual([]);
     expect(partial.unvalidated.map((mark) => [mark.entryKey, mark.reason])).toEqual(
-      [sentinel, b].map((tracked) => [canonicalKey(tracked), 'partial-pool']).toSorted(),
+      [sentinel, b].map((tracked) => [canonicalKey(tracked), 'partial-pool']).toSorted(byPair),
     );
     const absent = crossFileChecks([sentinel], weightsOf({}));
     expect(absent.unvalidated.map((mark) => mark.reason)).toEqual(['partial-pool']);
@@ -544,7 +547,7 @@ describe('crossFileChecks scope', () => {
     expect(edge?.detail).toContain('suffix');
     expect(failures.filter((failure) => failure.check === 'edge-alignment')).toHaveLength(1);
     const keys = failures.map((failure) => `${failure.entryKey}|${failure.check}`);
-    expect(keys).toEqual(keys.toSorted());
+    expect(keys).toEqual(keys.toSorted(byCodeUnit));
     expect(failures[0]).toMatchObject({ categoryId: 'weapon.bow', className: 'Bows' });
   });
 

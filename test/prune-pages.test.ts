@@ -8,6 +8,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { ALLOWLIST, prunePages } from '../tools/prune-pages.mjs';
 
+const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
+
 /**
  * The prune step behind `pnpm build`. That its allowlist equals `ARTIFACTS` is
  * asserted in `packages/web/src/load/prune-allowlist.test.ts`, which can import
@@ -47,7 +49,7 @@ function filesUnder(dir: string): string[] {
     }
   };
   walk(dir);
-  return out.sort();
+  return out.toSorted(byCodeUnit);
 }
 
 const SEVEN: string[] = ALLOWLIST.map((entry: { readonly path: string }) => entry.path);
@@ -75,8 +77,8 @@ describe('prunePages', () => {
     const data = tree([...SEVEN, ...UNFETCHED]);
     const distribution = tree([...BUNDLE, ...SEVEN, ...UNFETCHED]);
     const result = prunePages(distribution, data);
-    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].toSorted());
-    expect(result.removed.toSorted()).toEqual([...UNFETCHED].sort());
+    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].toSorted(byCodeUnit));
+    expect(result.removed.toSorted(byCodeUnit)).toEqual([...UNFETCHED].toSorted(byCodeUnit));
     expect(result.kept).toEqual(SEVEN);
   });
 
@@ -84,7 +86,7 @@ describe('prunePages', () => {
     const data = tree([...SEVEN, 'extra/deep/file.json']);
     const distribution = tree([...BUNDLE, ...SEVEN, 'extra/deep/file.json']);
     prunePages(distribution, data);
-    expect(readdirSync(distribution).sort()).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].sort());
+    expect(readdirSync(distribution).toSorted(byCodeUnit)).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].toSorted(byCodeUnit));
   });
 
   it('tolerates the three absent-tolerable artifacts being missing', () => {
@@ -131,7 +133,7 @@ describe('the CLI and the build script', () => {
     const { script, dist } = repository([...SEVEN, 'sync-progress.json']);
     execFileSync(process.execPath, [script], { stdio: 'pipe' });
     expect(existsSync(join(dist, 'sync-progress.json'))).toBe(false);
-    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].sort());
+    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].toSorted(byCodeUnit));
   });
 
   it('exits non-zero when a required artifact is missing', () => {

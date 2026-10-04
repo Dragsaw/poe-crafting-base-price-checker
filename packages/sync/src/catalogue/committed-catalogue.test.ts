@@ -50,7 +50,7 @@ it('the frozen catalogue/ holds exactly the endpoint artifacts', () => {
   const committed = readdirSync(fileURLToPath(new URL('catalogue/', ROOT)))
     .filter((name) => name.endsWith('.json'))
     .map((name) => `data/catalogue/${name}`)
-    .sort();
-  const expected = CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.outputPath).sort();
+    .toSorted((a, b) => Number(a > b) - Number(a < b));
+  const expected = CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.outputPath).toSorted((a, b) => Number(a > b) - Number(a < b));
   expect(committed).toEqual(expected);
 });

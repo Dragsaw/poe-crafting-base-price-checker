@@ -187,7 +187,7 @@ describe('defenceLettersOf', () => {
     ['Boots_int', ['int']],
     ['Shields_str_dex', ['str', 'dex']],
   ])('%s carries %j', (className, letters) => {
-    expect([...(defenceLettersOf(className) ?? [])].toSorted()).toEqual(letters.toSorted());
+    expect([...(defenceLettersOf(className) ?? [])].toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(letters.toSorted((a, b) => Number(a > b) - Number(a < b)));
   });
 
   it.each(['Amulets', 'Time-Lost_Diamond', 'One_Hand_Axes', 'str', 'Boots_int_int'])(

@@ -46,8 +46,8 @@ describe('loadArtifacts', () => {
     expect(requests).toHaveLength(7);
     // The server publishes `catalogue/static.json` as a trap; the page never fetches it.
     expect(requests.map((request) => request.url.pathname)).not.toContain(`/${NEVER_FETCHED_PATH}`);
-    expect(requests.map((request) => request.url.pathname).sort()).toEqual(
-      ARTIFACT_ORDER.map((key) => `/${ARTIFACTS[key].path}`).sort(),
+    expect(requests.map((request) => request.url.pathname).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(
+      ARTIFACT_ORDER.map((key) => `/${ARTIFACTS[key].path}`).toSorted((a, b) => Number(a > b) - Number(a < b)),
     );
     for (const request of requests) {
       expect(request.cache).toBe('no-cache');

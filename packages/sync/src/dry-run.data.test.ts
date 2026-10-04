@@ -93,7 +93,7 @@ describe('pnpm sync:dry over the live data/', () => {
     expect(SyncReportFileSchema.safeParse(report['report']).success).toBe(true);
     const printed = report['report'] as SyncReportFile;
     expect(Object.keys(printed)).toEqual(['runStartedAt', 'runFinishedAt', 'figures', 'records', 'schemaVersion']);
-    expect(Object.keys(printed.figures.requestsBySource).toSorted()).toEqual([
+    expect(Object.keys(printed.figures.requestsBySource).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual([
       'league-validation',
       'session-probe',
       'tracked-list',

@@ -6,17 +6,11 @@
     "max-params": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
     "unicorn/no-null": {
       "count": 9
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     }
   },
   ".claude/skills/tracked-json/scripts/lookup.ts": {
@@ -368,14 +362,8 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 9
-    },
     "unicorn/no-null": {
       "count": 2
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 9
     }
   },
   "packages/core/src/cross-file.ts": {
@@ -452,17 +440,11 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
     "unicorn/no-null": {
       "count": 16
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     }
   },
   "packages/core/src/rank.ts": {
@@ -504,9 +486,6 @@
     "no-await-in-loop": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 4
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -515,12 +494,6 @@
     },
     "unicorn/name-replacements": {
       "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 4
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 4
     }
   },
   "packages/sync/src/catalogue-refresh.ts": {
@@ -559,15 +532,6 @@
   "packages/sync/src/catalogue/committed-catalogue.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 2
     }
   },
   "packages/sync/src/catalogue/weights-ids.test.ts": {
@@ -635,9 +599,6 @@
     "no-await-in-loop": {
       "count": 10
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -646,9 +607,6 @@
     },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     },
     "vitest/no-conditional-expect": {
       "count": 3
@@ -680,17 +638,6 @@
       "count": 1
     },
     "unicorn/no-null": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/chunk/sync-report.test.ts": {
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
       "count": 1
     }
   },
@@ -745,13 +692,7 @@
     "local/max-comment-run": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/import-style": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
       "count": 1
     }
   },
@@ -796,17 +737,8 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 2
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     }
   },
   "packages/sync/src/fixtures-record.ts": {
@@ -996,12 +928,6 @@
   "packages/sync/src/pricing/search-body.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 2
     },
     "vitest/no-conditional-expect": {
       "count": 2
@@ -1479,12 +1405,6 @@
   "packages/web/src/list/combination-fit.test.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 2
     }
   },
   "packages/web/src/list/combination-text.ts": {
@@ -1566,17 +1486,8 @@
     }
   },
   "packages/web/src/load/load-artifacts.test.ts": {
-    "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
-    },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 2
     }
   },
   "packages/web/src/load/load-artifacts.ts": {
@@ -1616,17 +1527,8 @@
     "no-await-in-loop": {
       "count": 3
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
-    },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     },
     "vitest/no-conditional-expect": {
       "count": 1
@@ -1784,16 +1686,7 @@
     "local/max-comment-run": {
       "count": 3
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/import-style": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
       "count": 1
     }
   },
@@ -2007,9 +1900,6 @@
     "sonarjs/deprecation": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -2018,12 +1908,6 @@
     },
     "unicorn/name-replacements": {
       "count": 3
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     },
     "vitest/no-conditional-expect": {
       "count": 1
@@ -2058,20 +1942,11 @@
     "local/max-comment-run": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 7
-    },
     "unicorn/import-style": {
       "count": 1
     },
     "unicorn/name-replacements": {
       "count": 3
-    },
-    "unicorn/no-array-sort": {
-      "count": 5
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 7
     }
   },
   "test/session-cookie-shells.test.ts": {
@@ -2104,9 +1979,6 @@
       "count": 1
     },
     "unicorn/name-replacements": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
       "count": 1
     }
   },
@@ -2233,20 +2105,11 @@
     "local/max-comment-run": {
       "count": 3
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
     "unicorn/import-style": {
       "count": 1
     },
     "unicorn/name-replacements": {
       "count": 10
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 2
     }
   },
   "tools/dts-specifiers/rewrite-dts-specifiers.ts": {

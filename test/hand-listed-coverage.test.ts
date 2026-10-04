@@ -37,7 +37,7 @@ function directoryFiles(rel: string): string[] {
   return readdirSync(abs(rel), { withFileTypes: true })
     .filter((entry) => entry.isFile() && SOURCE.test(entry.name))
     .map((entry) => entry.name)
-    .sort()
+    .toSorted((a, b) => Number(a > b) - Number(a < b))
     .map((name) => join(abs(rel), name));
 }
 

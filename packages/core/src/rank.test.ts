@@ -29,6 +29,12 @@ import { poolCoverage } from './coverage.ts';
 import { compareRankedRows, rank } from './rank.ts';
 import type { RankInput, Ranking } from './rank.ts';
 
+const byPair = (a: readonly string[], b: readonly string[]): number => {
+  const left = a.join(',');
+  const right = b.join(',');
+  return Number(left > right) - Number(left < right);
+};
+
 const LEAGUE = 'Forbidden Rites';
 const OLD_LEAGUE = 'Standard Rites';
 const THRESHOLD = 0.25;
@@ -1051,7 +1057,7 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
       [[tierOf(TARGET, 10, 75), invented(tierOf(FILLER, 10, 1))], [tierOf(SUFFIX_STAT, 10, 80)]],
     ]);
     const rows = craftedRows(rankCrafted({ tracked: [target], dataset: priced1, weights }).ordering);
-    expect(rows.map((row) => [row.recipeId, row.provenance]).toSorted()).toEqual([
+    expect(rows.map((row) => [row.recipeId, row.provenance]).toSorted(byPair)).toEqual([
       ['greater', 'uniform-prior'],
       ['perfect', 'measured'],
     ]);

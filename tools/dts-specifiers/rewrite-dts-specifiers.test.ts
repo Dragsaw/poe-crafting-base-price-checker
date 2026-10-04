@@ -244,9 +244,9 @@ describe('TARGET_PACKAGES', () => {
       .map((entry) => entry.name)
       .filter((package_) => existsSync(join(PACKAGES_DIR, package_, 'tsconfig.json')))
       .filter((package_) => resolveCompilerOptions(join(PACKAGES_DIR, package_)).emitDeclarationOnly === true)
-      .sort();
+      .toSorted((a, b) => Number(a > b) - Number(a < b));
 
-    expect([...TARGET_PACKAGES].sort()).toEqual(emitDeclarationOnly);
+    expect([...TARGET_PACKAGES].toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(emitDeclarationOnly);
   });
 });
 

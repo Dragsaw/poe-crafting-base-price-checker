@@ -122,6 +122,6 @@ describe('the frozen Combination texts', () => {
     const over = new Set(
       texts.map((parts) => combinationString(parts)).filter((text) => text.length > CHASE_BUDGET),
     );
-    expect([...over].toSorted()).toEqual(PRUNING_CANDIDATES.toSorted());
+    expect([...over].toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(PRUNING_CANDIDATES.toSorted((a, b) => Number(a > b) - Number(a < b)));
   });
 });

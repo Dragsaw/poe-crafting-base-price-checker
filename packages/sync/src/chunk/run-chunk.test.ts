@@ -740,7 +740,7 @@ describe('runChunk: the lock', () => {
       run({ fs, clock, pid: 2, ...shellPorts(), publication: PUBLICATION, log: () => {} }, second.step),
     ]);
 
-    const kinds = outcomes.map((outcome) => outcome.kind).toSorted();
+    const kinds = outcomes.map((outcome) => outcome.kind).toSorted((a, b) => Number(a > b) - Number(a < b));
     expect(kinds).toEqual(['busy', 'completed']);
     expect(first.visited.length + second.visited.length).toBe(2);
     expect(outcomes.flatMap((outcome) => outcome.records)).toHaveLength(1);

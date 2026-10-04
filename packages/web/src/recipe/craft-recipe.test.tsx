@@ -599,7 +599,7 @@ describe('the chase cells', () => {
 
   it('holds the longest hybrid label the short-form table can build in the chase cell, ellipsised, and in the panel row, whole', async () => {
     // T1-T2 and the three longest distinct forms: the widest label a hybrid affix can print.
-    const forms = [...new Set(Object.values(SHORT_FORMS))].sort((a, b) => b.length - a.length || (a < b ? -1 : 1)).slice(0, 3);
+    const forms = [...new Set(Object.values(SHORT_FORMS))].toSorted((a, b) => b.length - a.length || (a < b ? -1 : 1)).slice(0, 3);
     const statIds = forms.map((form) => {
       const found = Object.entries(SHORT_FORMS).find(([, value]) => value === form);
       if (found === undefined) {
@@ -607,7 +607,7 @@ describe('the chase cells', () => {
       }
       return found[0];
     });
-    const label = `T1-T2 ${[...forms].sort().join(', ')}`;
+    const label = `T1-T2 ${forms.toSorted((a, b) => Number(a > b) - Number(a < b)).join(', ')}`;
     const widest: CraftedTrackedEntry = {
       kind: 'crafted',
       categoryId: 'accessory.ring',

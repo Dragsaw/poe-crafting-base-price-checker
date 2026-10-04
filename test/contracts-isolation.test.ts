@@ -65,7 +65,7 @@ function workspaceEdgesOf(manifest: Manifest): string[] {
       }
     }
   }
-  return [...edges].sort();
+  return [...edges].toSorted((a, b) => Number(a > b) - Number(a < b));
 }
 
 it('declares a workspace edge only where the one-way graph allows one', () => {

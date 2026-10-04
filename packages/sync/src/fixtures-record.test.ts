@@ -167,7 +167,7 @@ it('records the five GET interactions it can construct by itself today', () => {
     expect(interaction.url.startsWith('https://www.pathofexile.com/api/trade2/')).toBe(true);
     expect(fixturePathOf(interaction).endsWith(`${interaction.name}.json`)).toBe(true);
   }
-  expect(FIXTURE_INTERACTIONS.map((interaction) => interaction.name).sort()).toEqual([
+  expect(FIXTURE_INTERACTIONS.map((interaction) => interaction.name).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual([
     'trade-data-filters',
     'trade-data-items',
     'trade-data-leagues',
