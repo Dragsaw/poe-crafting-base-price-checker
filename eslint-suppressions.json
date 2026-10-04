@@ -100,11 +100,6 @@
       "count": 10
     }
   },
-  "packages/contracts/src/overlap.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/contracts/src/overlap.ts": {
     "local/max-comment-run": {
       "count": 10
