@@ -10,9 +10,6 @@
     }
   },
   ".githooks/commit-msg": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 2
     },

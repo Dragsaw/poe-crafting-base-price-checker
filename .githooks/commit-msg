@@ -24,24 +24,32 @@ function readSubject(messagePath) {
   return firstLine.trimEnd();
 }
 
+function isPassThrough(subject) {
+  return ['Merge ', 'Revert ', 'fixup!', 'squash!'].some((prefix) => subject.startsWith(prefix));
+}
+
+function failUnmatched(subject) {
+  const caseInsensitiveMatch = subject.match(new RegExp(SUBJECT_PATTERN.source, 'i'));
+  if (caseInsensitiveMatch && KNOWN_TYPES.includes(caseInsensitiveMatch[1].toLowerCase())) {
+    fail(
+      `the commit type "${caseInsensitiveMatch[1]}" is not lowercase.`,
+      `Lowercase the type: "${caseInsensitiveMatch[1].toLowerCase()}${caseInsensitiveMatch[2] ?? ''}: ${caseInsensitiveMatch[4]}".`,
+    );
+  }
+  fail(
+    `the subject "${subject}" is not "type: description" or "type(scope): description".`,
+    `Start the subject with one of: ${KNOWN_TYPES.join(', ')}. Example: "feat(sync): short description".`,
+  );
+}
+
 function lint(subject) {
-  if (subject.startsWith('Merge ') || subject.startsWith('Revert ') || subject.startsWith('fixup!') || subject.startsWith('squash!')) {
+  if (isPassThrough(subject)) {
     return;
   }
 
   const match = subject.match(SUBJECT_PATTERN);
   if (!match) {
-    const caseInsensitiveMatch = subject.match(new RegExp(SUBJECT_PATTERN.source, 'i'));
-    if (caseInsensitiveMatch && KNOWN_TYPES.includes(caseInsensitiveMatch[1].toLowerCase())) {
-      fail(
-        `the commit type "${caseInsensitiveMatch[1]}" is not lowercase.`,
-        `Lowercase the type: "${caseInsensitiveMatch[1].toLowerCase()}${caseInsensitiveMatch[2] ?? ''}: ${caseInsensitiveMatch[4]}".`,
-      );
-    }
-    fail(
-      `the subject "${subject}" is not "type: description" or "type(scope): description".`,
-      `Start the subject with one of: ${KNOWN_TYPES.join(', ')}. Example: "feat(sync): short description".`,
-    );
+    failUnmatched(subject);
   }
 
   const [, type, , scope] = match;
