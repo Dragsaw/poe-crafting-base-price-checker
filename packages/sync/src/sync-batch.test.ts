@@ -52,10 +52,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-/**
- * The `pnpm sync:batch` composition, driven with injected ports. Nothing here
- * runs the command itself, touches the network, or writes under `data/`.
- */
+/** The `pnpm sync:batch` composition, driven with injected ports: no network, no writes under `data/`. */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const SCRIPT = fileURLToPath(new URL('sync-batch.ts', import.meta.url));
@@ -599,11 +596,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const COOKIE = `POESESSID=${VALUE}`;
     const COOKIE_ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALUE };
     const RESULTS = ['r1', 'r2'];
-    /**
-     * The live API names a policy on every answer, and a search and a fetch
-     * are counted under different policies (§13.2). The baseline search
-     * answers one rule without the cookie.
-     */
+    /** Every answer names its policy, and a search and a fetch differ (§13.2); the baseline search answers one rule. */
     const SEARCH_HEADERS = {
       'x-rate-limit-policy': 'trade-search-request-limit',
       'x-rate-limit-rules': 'Ip',
@@ -639,20 +632,12 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       body: SEARCH_WITH_RESULTS.body,
     };
 
-    /**
-     * Answers each cookie-carrying search from `answers` in turn while any are
-     * left: those are the probes, because nothing else carries the cookie
-     * before an `authenticated` settle. The fake records every request.
-     */
+    /** Answers each cookie-carrying search from `answers` in turn: those are the probes, before any `authenticated` settle. */
     function probing(dependencies: SyncCommandDependencies, ...answers: (HttpResponse | Error)[]): SyncCommandDependencies {
       return probingThen(dependencies, answers);
     }
 
-    /**
-     * As `probing`, and every later cookie request is answered by `after`:
-     * by default a search gets the live rule set and a fetch keeps the fake's
-     * answer under its own policy, so the cookie stays live (§13.4).
-     */
+    /** As `probing`; every later cookie request is answered by `after`, live by default so the cookie stays live (§13.4). */
     function probingThen(
       dependencies: SyncCommandDependencies,
       answers: (HttpResponse | Error)[],

@@ -419,9 +419,6 @@
     }
   },
   "packages/sync/src/sync-batch.test.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    },
     "max-lines": {
       "count": 1
     }
