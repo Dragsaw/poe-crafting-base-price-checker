@@ -22,14 +22,19 @@ An agent can therefore run the entire test suite with no network connection. No 
 
 ```
 pnpm install
-pnpm check          # typecheck + lint + dependency-cruiser, all packages
-pnpm test           # vitest, all packages, zero network, reads the frozen fixture set, not data/
-pnpm test:data      # the invariants of the live data/ (the `data` vitest project)
+pnpm check          # the full done gate: typecheck, lint (type-aware, with baseline), dependency-cruiser, dup, knip, test, test:data, build
+pnpm check:fast     # stage A of pnpm check only: the static checks, no tests, no build
+pnpm test           # vitest, all packages, zero network, reads the frozen fixture set, not data/ (part of pnpm check)
+pnpm test:data      # the invariants of the live data/ (the `data` vitest project; part of pnpm check)
 pnpm dev            # web against the committed dataset + fixtures
 pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere (never pnpm sync or pnpm sync:batch)
 ```
 
 `pnpm check` is the point that enforces the package boundaries. `dependency-cruiser` fails the build on an import in the wrong direction (AD-1). An agent that imports from `core` into `sync` therefore learns about the fault in seconds, and no reviewer is necessary.
+
+**The gate runs in three places.** The `.githooks/pre-push` hook runs `pnpm check` (see Commit conventions). `.github/workflows/test.yml` runs it on a pull request. For an agent, a PostToolUse hook (`tools/lint-on-edit`) lints, typechecks and dependency-cruises each file after the agent edits it, so a fault shows on the edit and not at the end. `deploy.yml` runs `pnpm check:fast` and `pnpm test`, not `pnpm test:data`: a player's data-only push must still deploy.
+
+**The lint baseline is a ratchet.** `eslint-suppressions.json` records the violations that existed when the type-aware rules arrived. A new violation fails `pnpm lint`. When a change fixes a baselined violation, its suppression is stale and `pnpm lint` fails until `pnpm lint:prune` removes it. An agent never runs `eslint --suppress-*`, and never edits `eslint-suppressions.json` upward: the only permitted change to the file is `pnpm lint:prune`. `LINT_FAST=1` skips the type-aware rules. Only the PostToolUse hook sets it.
 
 `pnpm sync:dry` is the most important debugging tool. The command runs the full sync pipeline deterministically against recorded fixtures. The command writes a dataset and a run report to stdout, and writes nothing to disk. An agent can therefore examine the actions of the syncer and send no request to GGG.
 
@@ -151,7 +156,7 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 
 ## Commit conventions
 
-A commit subject is `type(scope): description` or `type: description`. A `feat`/`fix`/`test` commit scoped to a package (`contracts`, `core`, `sync`, `web`) names its story (`story 1.N`) or retro item (`retro item(s) N`) in the description — a `docs`/`chore` commit, or one with no package scope, does not need to. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`).
+A commit subject is `type(scope): description` or `type: description`. A `feat`/`fix`/`test` commit scoped to a package (`contracts`, `core`, `sync`, `web`) names its story (`story 1.N`) or retro item (`retro item(s) N`) in the description — a `docs`/`chore` commit, or one with no package scope, does not need to. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`). The `.githooks/pre-push` hook runs `pnpm check` and blocks the push when it fails. It skips a push that only deletes refs. `git push --no-verify` skips it, and CI still runs the gate.
 
 ## Review brief
 
@@ -173,7 +178,7 @@ The `must-discharge-audit` review layer (`_bmad/custom/bmad-build-auto.toml`) ch
 
 ## Definition of done for an agent task
 
-1. `pnpm check` and `pnpm test` pass, and neither command makes a network call.
+1. `pnpm check` passes, and the command makes no network call.
 2. Every new external interaction has a committed fixture.
 3. Every new shared shape is a Zod schema in `contracts`, and the code validates the shape at its trust boundary.
 4. The task adds no dependency edge outside the graph in the spine.
