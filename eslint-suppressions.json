@@ -383,11 +383,6 @@
       "count": 2
     }
   },
-  "packages/sync/src/compose-chunk.ts": {
-    "local/max-comment-run": {
-      "count": 5
-    }
-  },
   "packages/sync/src/curation/check.test.ts": {
     "max-lines": {
       "count": 1

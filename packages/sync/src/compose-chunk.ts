@@ -1,25 +1,4 @@
-/**
- * The one chunk composition `pnpm sync`, `pnpm sync:batch` and `pnpm sync:dry`
- * share (AD-7, AD-8, AD-12).
- *
- * From the shell's ports it builds **one governor** of two sibling trade
- * clients (`createTradeGovernor`) over one `HttpPort` counted twice — as
- * `league-validation` for the gate and `tracked-list` for the step — the
- * committed catalogue loader, and the runner's `load` hook. The shells differ
- * only in the ports they pass: the live commands a real filesystem, clock and
- * `fetch`; the dry run in-memory fakes and the recorded fixture port. Only
- * the `pnpm sync` session passes `pacing`, `spread`, `requests` and
- * `session`, so the batch and dry chunks are unchanged.
- *
- * **Every file load runs under the lock**, inside `runChunk`, after AD-8's
- * `notBefore` check. `load` reads `data/config.json`, evaluates
- * IMPLEMENTATION-NOTES.md §6's pinned-cap inequality over the tracked list
- * the runner loaded, reads `data/currencies.json` and the committed item
- * types, and builds the publication, the starvation record, the league gate
- * and the pricing step on the dataset the runner loaded. A refusal names its
- * file and is thrown before any request; the runner turns it into a
- * `run-failure`.
- */
+/** The one chunk composition the three `pnpm sync*` commands share. Every file load runs under the lock (AD-7, AD-8, AD-12). */
 
 import type { ClockPort, FilesystemPort, GitPort, HttpPort, LeagueId } from '@poe/contracts';
 
@@ -56,34 +35,17 @@ export interface ComposeChunkPorts {
   readonly pid: number;
   /** One line of operator output. Defaults to stderr inside `runChunk`. */
   readonly log?: (line: string) => void;
-  /**
-   * Wraps the pricing step the load builds. Only the dry run passes one, to
-   * skip an entry whose search has no recorded fixture (`dry-run.ts`).
-   */
+  /** Only the dry run passes one, to skip an entry with no recorded fixture (`dry-run.ts`). */
   readonly wrapStep?: (step: ChunkStep, context: StepContext) => ChunkStep;
-  /**
-   * The `pnpm sync` session only (`./sync.ts`). The pacing memory every chunk
-   * of the session shares: this chunk's fresh governor starts from it rather
-   * than cold (AD-8). Omitted, the governor starts cold, as the batch and dry
-   * compositions do.
-   */
+  /** Session only (`./sync.ts`): the pacing memory the chunk's fresh governor starts from, else cold (AD-8). */
   readonly pacing?: PacingState;
   /** The session only: pace with the even spread (`spreadBeforeNext`). */
   readonly spread?: boolean;
-  /**
-   * The session only: the request counter every chunk of the session counts
-   * through, so the report's figure can cover the pass. Omitted, the chunk
-   * builds its own.
-   */
+  /** Session only: the counter shared across chunks, so the report covers the pass. */
   readonly requests?: RequestCounter;
   /** The session only: the chunk's session options (`ChunkSession`). */
   readonly session?: ChunkSession;
-  /**
-   * The live shells only (`./sync.ts`, `./sync-batch.ts`): the process auth
-   * holder (AD-30). Each chunk's governor gets it, as it gets `pacing`, with a
-   * probe port counted as `session-probe`. The governor probes, settles and
-   * attaches through it, and redacts every error it passes on through it.
-   */
+  /** Live shells only: the process auth holder (AD-30), passed to each chunk's governor with a `session-probe` port. */
   readonly auth?: SessionAuth;
 }
 
