@@ -8,24 +8,9 @@ import {
   type TolerableKey,
 } from './artifacts';
 
-/**
- * One load of the seven artifacts, resolved to exactly one outcome (AD-24,
- * FR-33). Each artifact is one plain `fetch` with `cache: 'no-cache'` and no
- * query token: the browser revalidates every load and reuses its copy only on
- * a `304`, so each load is as fresh as a full download. The Pages CDN's
- * `max-age=600` staleness, and a rare set that mixes files across a data
- * commit, are accepted costs (AD-24). The loader never rejects — every failure
- * is a typed outcome.
- */
+/** One load resolves to one outcome and never rejects; each fetch is `cache: 'no-cache'` with no query token, so CDN staleness and a mixed-commit set are accepted costs (AD-24, FR-33). */
 
-/**
- * Why a file was refused, so the refusal screen blames the right thing:
- * - `version`: the file declares an unknown major, a malformed version, or no
- *   string `schemaVersion` at all.
- * - `content`: the body is not JSON, or it declares the expected major but its
- *   shape fails the schema.
- * - `missing`: a required file returned 404.
- */
+/** `version`: unknown major or malformed or non-string `schemaVersion`; `content`: not JSON, or fails the schema at the expected major; `missing`: a required 404. */
 export type RefusalCause = 'version' | 'content' | 'missing';
 
 export type LoadOutcome =
@@ -39,10 +24,7 @@ export type LoadOutcome =
       readonly kind: 'refused';
       readonly path: string;
       readonly cause: RefusalCause;
-      /**
-       * The declared `schemaVersion`, or `undefined` where the file declares no
-       * string one. Undefined, not a sentinel string: a file may declare any string.
-       */
+      /** The declared `schemaVersion`, or `undefined` for a non-string one: not a sentinel, since a file may declare any string. */
       readonly declared: string | undefined;
       readonly expected: string;
     }
@@ -139,13 +121,7 @@ async function fetchOne(
   return typeof body === 'string' ? parseBody(descriptor, body) : body;
 }
 
-/**
- * Precedence across the seven: any artifact that did not arrive gives the
- * fetch-failure screen; otherwise any invalid (or required-and-absent)
- * artifact gives the refusal screen; otherwise the set is ready. Each screen
- * names the first failing artifact in AD-24 order. A refusal carries its
- * cause: the invalid file's own cause, or `missing` for a required 404.
- */
+/** Any not-arrived gives the failure screen, then any invalid or required-absent the refusal screen; each names the first failing artifact in AD-24 order. */
 function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome {
   for (const key of ARTIFACT_ORDER) {
     if (results[key].kind === 'not-arrived') {

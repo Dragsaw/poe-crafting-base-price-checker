@@ -749,11 +749,6 @@
       "count": 1
     }
   },
-  "packages/web/src/load/load-artifacts.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
   "packages/web/src/load/prune-allowlist.test.ts": {
     "local/max-comment-run": {
       "count": 1
