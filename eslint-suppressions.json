@@ -626,11 +626,6 @@
       "count": 1
     }
   },
-  "packages/web/src/frame/TrustStrip.tsx": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
   "packages/web/src/frame/trust-facts.ts": {
     "local/max-comment-run": {
       "count": 6

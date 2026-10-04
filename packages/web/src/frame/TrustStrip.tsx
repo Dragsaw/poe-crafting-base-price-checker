@@ -41,10 +41,7 @@ function Value({ value }: { readonly value: string | undefined }): JSX.Element {
   return value === undefined ? <em data-missing="" style={{ fontStyle: 'italic' }}>{UNKNOWN}</em> : <>{value}</>;
 }
 
-/**
- * The whole strip toggles `{components.sync-report-panel}` in place, closed on every load. A cross-file
- * failure changes nothing here: its diagnosis is the panel's sixth group (FR-10, FR-18, FR-24, FR-25).
- */
+/** The whole strip toggles `{components.sync-report-panel}`, closed on every load; a cross-file failure shows only in the panel (FR-10, FR-18, FR-24). */
 export function TrustStrip({
   set,
   absent,
