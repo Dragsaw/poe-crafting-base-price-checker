@@ -34,6 +34,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 
 ## Known pitfalls
 
+- A comment states only a non-obvious why, in at most three lines, and the same holds for JSDoc blocks. Never narrate what the code does, how it got there, or the story of a decision. Put rationale in its owner document and cite it by id (`AD-n`, `FR-n`). Observed 2026-10-04: comment runs of 103 and 48 lines in `packages/sync/src/chunk/run-chunk.ts` and `packages/core/src/rank.ts`.
 - Each planning fact has one owner document. Write the fact there. Cite it elsewhere by stable id (`FR-n`, `AD-n`, `OQ-n`, companion `§n`). Do not restate the text of the owner. A citation stays correct when the source changes, and a copy drifts without a signal. The owners are:
   - `prd.md` owns what the player gets, and why. This covers capabilities, player-observable behavior, scope, risks and metrics. It holds no formulas, predicates, field names, file paths, schema versions, filter shapes or revision narrative.
   - `ARCHITECTURE-SPINE.md` owns decisions (ADs). `IMPLEMENTATION-NOTES.md` owns formulas, predicates, report field identifiers and error payloads. `WEIGHTS-FILE-SCHEMA.md` owns the weights contract and its version. `AGENT-WORKFLOW.md` owns command-level rules. UX `EXPERIENCE.md` owns view treatments. The PRD keeps the requirement, and UX owns the appearance.
