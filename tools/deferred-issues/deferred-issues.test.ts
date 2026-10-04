@@ -258,6 +258,13 @@ describe('pnpm deferred:issues', () => {
     expect(err).toContain('--ref is allowed only with --dry-run');
   });
 
+  it('refuses --list with --dry-run, before any call', () => {
+    const { code, calls, err } = exec(['--list', '--dry-run']);
+    expect(code).toBe(1);
+    expect(calls).toEqual([]);
+    expect(err).toContain('--list and --dry-run do not combine');
+  });
+
   it('refuses an unknown argument', () => {
     const { code, calls } = exec(['--force']);
     expect(code).toBe(1);
