@@ -51,17 +51,7 @@ export function Masthead({
         height: px(170),
       }}
     >
-      <div style={{ maxWidth: px(spacing.dekMaxWidth) }}>
-        <div style={{ ...typeStyle('eyebrow'), color: colors.sepia, textTransform: 'uppercase' }}>
-          {league === undefined ? '\u{A0}' : eyebrowText(league)}
-        </div>
-        <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
-          {MASTHEAD_TITLE}
-        </h1>
-        <p style={{ ...typeStyle('dek'), color: colors['ink-secondary'], margin: `${px(spacing.s2)} 0 0` }}>
-          {MASTHEAD_DEK}
-        </p>
-      </div>
+      <MastheadTitle league={league} />
       <div
         data-control-group=""
         style={{
@@ -72,24 +62,41 @@ export function Masthead({
           flex: '0 0 auto',
         }}
       >
-        {/* The Craft Recipe's inboard slot: the control, or an empty slot of its width. */}
-        <div
-          data-recipe-slot=""
-          aria-hidden={recipe === undefined ? 'true' : undefined}
-          style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto', display: 'flex' }}
-        >
-          {recipe === undefined ? undefined : (
-            <CraftRecipe
-              options={recipe.options}
-              activeId={recipe.activeId}
-              cost={recipe.cost}
-              onChange={recipe.onChange}
-            />
-          )}
-        </div>
+        <RecipeSlot recipe={recipe} />
         <PayoutThreshold value={threshold} onChange={onThresholdChange} />
       </div>
     </header>
+  );
+}
+
+function MastheadTitle({ league }: { readonly league: string | undefined }): JSX.Element {
+  return (
+    <div style={{ maxWidth: px(spacing.dekMaxWidth) }}>
+      <div style={{ ...typeStyle('eyebrow'), color: colors.sepia, textTransform: 'uppercase' }}>
+        {league === undefined ? '\u{A0}' : eyebrowText(league)}
+      </div>
+      <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
+        {MASTHEAD_TITLE}
+      </h1>
+      <p style={{ ...typeStyle('dek'), color: colors['ink-secondary'], margin: `${px(spacing.s2)} 0 0` }}>
+        {MASTHEAD_DEK}
+      </p>
+    </div>
+  );
+}
+
+/** The Craft Recipe's inboard slot: the control, or an empty slot of its width. */
+function RecipeSlot({ recipe }: { readonly recipe: MastheadRecipe | undefined }): JSX.Element {
+  return (
+    <div
+      data-recipe-slot=""
+      aria-hidden={recipe === undefined ? 'true' : undefined}
+      style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto', display: 'flex' }}
+    >
+      {recipe === undefined ? undefined : (
+        <CraftRecipe options={recipe.options} activeId={recipe.activeId} cost={recipe.cost} onChange={recipe.onChange} />
+      )}
+    </div>
   );
 }
 
