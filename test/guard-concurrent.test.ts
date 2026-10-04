@@ -65,9 +65,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('charges each request of two concurrent tests to the test that issued it', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-concurrent-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-concurrent-'));
   try {
-    const outputFile = nodePath.join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -96,6 +96,6 @@ it('charges each request of two concurrent tests to the test that issued it', { 
     // file-level check found nothing left.
     expect(file?.message ?? '').toBe('');
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

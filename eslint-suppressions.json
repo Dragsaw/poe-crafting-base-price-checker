@@ -1495,9 +1495,6 @@
   "test/global-setup.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/name-replacements": {
-      "count": 2
     }
   },
   "test/guard-after-last-file-fixture/late.fixture.ts": {
@@ -1521,9 +1518,6 @@
   "test/guard-after-last-file.test.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "test/guard-concurrent-fixture/concurrent.fixture.ts": {
@@ -1549,9 +1543,6 @@
   },
   "test/guard-concurrent.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/name-replacements": {
       "count": 1
     },
     "vitest/no-conditional-expect": {
@@ -1582,9 +1573,6 @@
   "test/guard-hooks.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "test/guard-linger-fixture/linger.fixture.ts": {
@@ -1607,9 +1595,6 @@
   },
   "test/guard-linger.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/name-replacements": {
       "count": 1
     }
   },
@@ -1639,9 +1624,6 @@
   "test/guard-reuse.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "test/hand-listed-coverage.test.ts": {
@@ -1653,9 +1635,6 @@
     },
     "sonarjs/deprecation": {
       "count": 1
-    },
-    "unicorn/name-replacements": {
-      "count": 3
     },
     "vitest/no-conditional-expect": {
       "count": 1
@@ -1683,9 +1662,6 @@
   "test/prune-pages.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/name-replacements": {
-      "count": 3
     }
   },
   "test/session-cookie-shells.test.ts": {
@@ -1822,9 +1798,6 @@
   "tools/dts-specifiers/rewrite-dts-specifiers.test.ts": {
     "local/max-comment-run": {
       "count": 3
-    },
-    "unicorn/name-replacements": {
-      "count": 10
     }
   },
   "tools/dts-specifiers/rewrite-dts-specifiers.ts": {
@@ -1833,9 +1806,6 @@
     },
     "max-params": {
       "count": 1
-    },
-    "unicorn/name-replacements": {
-      "count": 3
     }
   },
   "tools/lint-on-edit/lint-on-edit.e2e.test.ts": {
@@ -1853,7 +1823,7 @@
       "count": 2
     },
     "unicorn/name-replacements": {
-      "count": 5
+      "count": 2
     }
   },
   "tools/setup-git-hooks.mjs": {

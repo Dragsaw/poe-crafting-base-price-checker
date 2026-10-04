@@ -29,8 +29,8 @@ export const ALLOWLIST = [
   { path: 'catalogue/stats.json', required: true },
 ];
 
-/** Every file under `dir`, as a `/`-separated path relative to `dir`. */
-function filesUnder(dir) {
+/** Every file under `directory`, as a `/`-separated path relative to `directory`. */
+function filesUnder(directory) {
   const out = [];
   const walk = (current) => {
     const entries = readdirSync(current, { withFileTypes: true });
@@ -39,17 +39,17 @@ function filesUnder(dir) {
       if (entry.isDirectory()) {
         walk(full);
       } else {
-        out.push(nodePath.relative(dir, full).split(nodePath.sep).join('/'));
+        out.push(nodePath.relative(directory, full).split(nodePath.sep).join('/'));
       }
     }
   };
-  walk(dir);
+  walk(directory);
   return out.toSorted((a, b) => Number(a > b) - Number(a < b));
 }
 
-/** Removes `dir` and its parents up to (not including) `stop`, while each is empty. */
-function removeEmptyDirectories(dir, stop) {
-  let current = dir;
+/** Removes `directory` and its parents up to (not including) `stop`, while each is empty. */
+function removeEmptyDirectories(directory, stop) {
+  let current = directory;
   while (current !== stop && current.startsWith(stop) && existsSync(current) && readdirSync(current).length === 0) {
     rmdirSync(current);
     current = nodePath.resolve(current, '..');
@@ -57,36 +57,36 @@ function removeEmptyDirectories(dir, stop) {
 }
 
 /**
- * Prunes `distDir` of every file that `dataDir` published and the allowlist
+ * Prunes `distDirectory` of every file that `dataDirectory` published and the allowlist
  * does not name. Returns what it kept and removed. Throws, naming each, when a
- * required artifact is missing from `distDir`.
+ * required artifact is missing from `distDirectory`.
  */
-export function prunePages(distDir, dataDir) {
-  if (!existsSync(distDir) || !statSync(distDir).isDirectory()) {
-    throw new Error(`prune-pages: no build output at ${distDir}; run vite build first.`);
+export function prunePages(distDirectory, dataDirectory) {
+  if (!existsSync(distDirectory) || !statSync(distDirectory).isDirectory()) {
+    throw new Error(`prune-pages: no build output at ${distDirectory}; run vite build first.`);
   }
   const allowed = new Set(ALLOWLIST.map((artifact) => artifact.path));
   const removed = [];
-  for (const path of filesUnder(dataDir)) {
+  for (const path of filesUnder(dataDirectory)) {
     if (allowed.has(path)) {
       continue;
     }
-    const target = nodePath.join(distDir, ...path.split('/'));
+    const target = nodePath.join(distDirectory, ...path.split('/'));
     if (!existsSync(target)) {
       continue;
     }
 
     rmSync(target);
     removed.push(path);
-    removeEmptyDirectories(nodePath.resolve(target, '..'), nodePath.resolve(distDir));
+    removeEmptyDirectories(nodePath.resolve(target, '..'), nodePath.resolve(distDirectory));
   }
-  const missing = ALLOWLIST.filter((artifact) => artifact.required && !existsSync(nodePath.join(distDir, ...artifact.path.split('/'))));
+  const missing = ALLOWLIST.filter((artifact) => artifact.required && !existsSync(nodePath.join(distDirectory, ...artifact.path.split('/'))));
   if (missing.length > 0) {
     throw new Error(
-      `prune-pages: required artifact(s) missing from ${distDir}: ${missing.map((artifact) => artifact.path).join(', ')}`,
+      `prune-pages: required artifact(s) missing from ${distDirectory}: ${missing.map((artifact) => artifact.path).join(', ')}`,
     );
   }
-  const kept = ALLOWLIST.map((artifact) => artifact.path).filter((path) => existsSync(nodePath.join(distDir, ...path.split('/'))));
+  const kept = ALLOWLIST.map((artifact) => artifact.path).filter((path) => existsSync(nodePath.join(distDirectory, ...path.split('/'))));
   return { kept, removed };
 }
 
@@ -95,9 +95,9 @@ export function prunePages(distDir, dataDir) {
 // comparison false, and the build would publish all of `data/` and exit 0.
 if (import.meta.main) {
   const root = nodePath.resolve(import.meta.dirname, '..');
-  const distDir = nodePath.resolve(root, 'packages/web/dist');
+  const distDirectory = nodePath.resolve(root, 'packages/web/dist');
   try {
-    const { kept, removed } = prunePages(distDir, nodePath.resolve(root, 'data'));
+    const { kept, removed } = prunePages(distDirectory, nodePath.resolve(root, 'data'));
     console.log(`prune-pages: kept ${kept.join(', ')}`);
     console.log(`prune-pages: removed ${removed.length === 0 ? 'nothing' : removed.join(', ')}`);
   } catch (error) {

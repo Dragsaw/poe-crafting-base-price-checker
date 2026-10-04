@@ -58,9 +58,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('reports a request from a hook that belongs to no test as issued outside any test', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-linger-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-linger-'));
   try {
-    const outputFile = nodePath.join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -84,6 +84,6 @@ it('reports a request from a hook that belongs to no test as issued outside any 
     }
     expect(message).not.toContain('issued by test');
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

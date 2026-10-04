@@ -65,9 +65,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('fails the issuer through the real hooks, and never the innocent test', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-hooks-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-hooks-'));
   try {
-    const outputFile = nodePath.join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -95,6 +95,6 @@ it('fails the issuer through the real hooks, and never the innocent test', { tim
     expect(file?.message).toContain("No test's afterEach reported these requests:");
     expect(file?.message).toContain(`GET ${LATE_URL} (issued by test "${LATE_ISSUER}")`);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

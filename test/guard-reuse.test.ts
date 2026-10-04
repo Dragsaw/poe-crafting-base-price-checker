@@ -63,9 +63,9 @@ function fileEndingWith(report: JsonReport, suffix: string): FileResult | undefi
 }
 
 it('blocks a request that fires between files of a reused worker, and names its issuer', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-reuse-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-reuse-'));
   try {
-    const outputFile = nodePath.join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -88,6 +88,6 @@ it('blocks a request that fires between files of a reused worker, and names its 
     expect(bystander?.status).toBe('failed');
     expect(bystander?.message).toContain(`GET ${LATE_URL} (issued by test "${ISSUER_TEST}")`);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

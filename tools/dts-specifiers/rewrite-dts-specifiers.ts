@@ -49,10 +49,10 @@ export function rewriteDtsSpecifiers(text: string): string {
   );
 }
 
-function collectDeclarationFiles(dir: string): string[] {
+function collectDeclarationFiles(directory: string): string[] {
   const files: string[] = [];
-  for (const name of readdirSync(dir)) {
-    const path = nodePath.join(dir, name);
+  for (const name of readdirSync(directory)) {
+    const path = nodePath.join(directory, name);
     if (statSync(path).isDirectory()) {files.push(...collectDeclarationFiles(path));}
     else if (/\.d\.[mc]?ts$/.test(name)) {files.push(path);}
   }
@@ -60,15 +60,15 @@ function collectDeclarationFiles(dir: string): string[] {
 }
 
 /**
- * Rewrites every `**\/*.d.ts`, `.d.mts` and `.d.cts` under `dir` in place. Writes a file only when its
+ * Rewrites every `**\/*.d.ts`, `.d.mts` and `.d.cts` under `directory` in place. Writes a file only when its
  * content changes, and returns the files it changed.
  */
-export function rewriteDtsSpecifiersIn(dir: string): string[] {
-  if (!existsSync(dir) || !statSync(dir).isDirectory()) {
-    throw new Error(`declaration directory not found: ${dir}`);
+export function rewriteDtsSpecifiersIn(directory: string): string[] {
+  if (!existsSync(directory) || !statSync(directory).isDirectory()) {
+    throw new Error(`declaration directory not found: ${directory}`);
   }
   const changed: string[] = [];
-  for (const file of collectDeclarationFiles(dir)) {
+  for (const file of collectDeclarationFiles(directory)) {
     const before = readFileSync(file, 'utf8');
     const after = rewriteDtsSpecifiers(before);
     if (after === before) {
@@ -116,7 +116,7 @@ function isInvokedDirectly(): boolean {
 
 if (isInvokedDirectly()) {
   try {
-    for (const dir of TARGET_DIRS) {rewriteDtsSpecifiersIn(dir);}
+    for (const directory of TARGET_DIRS) {rewriteDtsSpecifiersIn(directory);}
   } catch (error: unknown) {
     process.stderr.write(`rewrite-dts-specifiers: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;

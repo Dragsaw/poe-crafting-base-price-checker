@@ -21,7 +21,7 @@ declare module 'vitest' {
  * A test can start a request it does not await. When that request fires after
  * the setup file's `afterAll` in the last file of a worker, the guard blocks
  * it, but no hook inside the worker can still fail the run. So the worker
- * appends the request to `<dir>/<pid>.log`, and the check below reads the
+ * appends the request to `<directory>/<pid>.log`, and the check below reads the
  * record after every worker has exited.
  *
  * `onClose`, not the teardown this function could return: the teardown runs
@@ -31,24 +31,24 @@ declare module 'vitest' {
  * write into this run's record.
  */
 export default function setup(project: TestProject): void {
-  const dir = mkdtempSync(nodePath.join(tmpdir(), 'no-network-'));
-  project.provide('noNetworkRecordDir', dir);
+  const directory = mkdtempSync(nodePath.join(tmpdir(), 'no-network-'));
+  project.provide('noNetworkRecordDir', directory);
   // Async, so a throw becomes a rejection: Vitest calls every project's
   // callback before it awaits them, and a synchronous throw would skip the rest.
   project.vitest.onClose(async () => {
-    assertNoLateRequests(dir);
+    assertNoLateRequests(directory);
   });
 }
 
-function assertNoLateRequests(dir: string): void {
+function assertNoLateRequests(directory: string): void {
   let lines: string[];
   try {
-    lines = readdirSync(dir)
+    lines = readdirSync(directory)
       .filter((name) => name.endsWith('.log'))
-      .flatMap((name) => readFileSync(nodePath.join(dir, name), 'utf8').split('\n'))
+      .flatMap((name) => readFileSync(nodePath.join(directory, name), 'utf8').split('\n'))
       .filter((line) => line !== '');
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    rmSync(directory, { recursive: true, force: true });
   }
   if (lines.length > 0) {
     // Vitest prints only the message before the stack, so the message names each URL.

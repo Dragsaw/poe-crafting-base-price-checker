@@ -22,23 +22,23 @@ const REPO_ROOT = nodePath.resolve(fileURLToPath(new URL('..', import.meta.url))
 const TOOLS_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.tools.json');
 const SOLUTION_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.json');
 
-/** JS too: a `.mjs` helper in a guarded directory is not covered by `<dir>/*.ts`, so it must be reported. */
+/** JS too: a `.mjs` helper in a guarded directory is not covered by `<directory>/*.ts`, so it must be reported. */
 const SOURCE = /\.[cm]?[jt]sx?$/;
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 
-const abs = (rel: string): string => nodePath.join(REPO_ROOT, ...rel.split('/'));
+const abs = (relativePath: string): string => nodePath.join(REPO_ROOT, ...relativePath.split('/'));
 
 /**
- * Source files directly in `rel`, read at run time so a new file is guarded
+ * Source files directly in `relativePath`, read at run time so a new file is guarded
  * with no edit. Subdirectories are skipped: `tools/boundary-check/fixture/` is
  * excluded from every tool on purpose.
  */
-function directoryFiles(rel: string): string[] {
-  return readdirSync(abs(rel), { withFileTypes: true })
+function directoryFiles(relativePath: string): string[] {
+  return readdirSync(abs(relativePath), { withFileTypes: true })
     .filter((entry) => entry.isFile() && SOURCE.test(entry.name))
     .map((entry) => entry.name)
     .toSorted((a, b) => Number(a > b) - Number(a < b))
-    .map((name) => nodePath.join(abs(rel), name));
+    .map((name) => nodePath.join(abs(relativePath), name));
 }
 
 interface Target {
@@ -57,13 +57,13 @@ interface Target {
 const DEFAULT_ESLINT: Target['eslint'] = { files: 'tools/**/*.ts' };
 
 const directoryTarget = (
-  dir: string,
+  directory: string,
   eslint: Target['eslint'] = DEFAULT_ESLINT,
 ): Target => ({
-  path: dir,
-  files: directoryFiles(dir),
-  tsInclude: `${dir}/*.ts`,
-  vitestInclude: `${dir}/*.test.ts`,
+  path: directory,
+  files: directoryFiles(directory),
+  tsInclude: `${directory}/*.ts`,
+  vitestInclude: `${directory}/*.test.ts`,
   eslint,
 });
 

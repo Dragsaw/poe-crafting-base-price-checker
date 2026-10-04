@@ -83,18 +83,18 @@ interface ChildRun {
 }
 
 async function runWithDelay(delayMs: number): Promise<ChildRun> {
-  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-after-last-file-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-after-last-file-'));
   try {
-    const childTemporary = nodePath.join(dir, 'tmp');
+    const childTemporary = nodePath.join(directory, 'tmp');
     await mkdir(childTemporary);
-    const outputFile = nodePath.join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile, delayMs, childTemporary);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
     const temporaryEntries = await readdir(childTemporary);
     const leftRecordDirectories = temporaryEntries.filter((name) => name.startsWith('no-network-'));
     return { code, output, report, leftRecordDirs: leftRecordDirectories };
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 }
 

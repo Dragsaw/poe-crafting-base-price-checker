@@ -19,23 +19,23 @@ const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < 
 const scratch: string[] = [];
 
 afterEach(() => {
-  for (const dir of scratch.splice(0)) {
-    rmSync(dir, { recursive: true, force: true });
+  for (const directory of scratch.splice(0)) {
+    rmSync(directory, { recursive: true, force: true });
   }
 });
 
 function tree(files: readonly string[]): string {
-  const dir = mkdtempSync(nodePath.join(tmpdir(), 'prune-pages-'));
-  scratch.push(dir);
+  const directory = mkdtempSync(nodePath.join(tmpdir(), 'prune-pages-'));
+  scratch.push(directory);
   for (const file of files) {
-    const full = nodePath.join(dir, ...file.split('/'));
+    const full = nodePath.join(directory, ...file.split('/'));
     mkdirSync(nodePath.dirname(full), { recursive: true });
     writeFileSync(full, '{}');
   }
-  return dir;
+  return directory;
 }
 
-function filesUnder(dir: string): string[] {
+function filesUnder(directory: string): string[] {
   const out: string[] = [];
   const walk = (current: string): void => {
     const entries = readdirSync(current, { withFileTypes: true });
@@ -44,11 +44,11 @@ function filesUnder(dir: string): string[] {
       if (entry.isDirectory()) {
         walk(full);
       } else {
-        out.push(nodePath.relative(dir, full).split(nodePath.sep).join('/'));
+        out.push(nodePath.relative(directory, full).split(nodePath.sep).join('/'));
       }
     }
   };
-  walk(dir);
+  walk(directory);
   return out.toSorted(byCodeUnit);
 }
 
