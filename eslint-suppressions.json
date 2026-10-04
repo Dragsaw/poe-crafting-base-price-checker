@@ -591,11 +591,6 @@
       "count": 6
     }
   },
-  "packages/web/src/list/expansion.test.tsx": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/web/src/list/format.ts": {
     "local/max-comment-run": {
       "count": 10
