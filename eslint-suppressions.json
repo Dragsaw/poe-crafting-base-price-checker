@@ -254,11 +254,6 @@
       "count": 1
     }
   },
-  "packages/core/src/cross-file.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/core/src/cross-file.ts": {
     "unicorn/consistent-boolean-name": {
       "count": 2
