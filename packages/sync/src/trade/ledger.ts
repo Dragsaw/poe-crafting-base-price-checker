@@ -116,6 +116,34 @@ function elapsedMsSince(observedAt: string, now: string): number {
   return Math.max(0, to - from);
 }
 
+function paceRule(rule: ObservedRule, policy: string, now: string, from: PaceDecision): PaceDecision {
+  let decision = from;
+  // Each rule ages from its own reading, so a rule carried over from an
+  // earlier response is not credited with time it did not serve.
+  const elapsedMs = elapsedMsSince(rule.observedAt, now);
+  for (const [index, limit] of rule.buckets.entries()) {
+    const used = rule.state[index];
+    if (used === undefined) {
+      continue;
+    }
+
+    const penaltyMs = used.penalty * MS_PER_SECOND - elapsedMs;
+    if (penaltyMs > decision.delayMs) {
+      decision = { delayMs: penaltyMs, policy, rule: rule.name, bucket: limit, cause: 'penalty' };
+    }
+
+    if (used.hits < limit.hits) {
+      continue;
+    }
+
+    const windowMs = limit.seconds * MS_PER_SECOND - elapsedMs;
+    if (windowMs > decision.delayMs) {
+      decision = { delayMs: windowMs, policy, rule: rule.name, bucket: limit, cause: 'window' };
+    }
+  }
+  return decision;
+}
+
 /**
  * The delay before the next request against `policy`, taken as the **maximum**
  * over every unsatisfied bucket of every rule in that policy — the tightest
@@ -144,33 +172,9 @@ export function paceBeforeNext(
   }
 
   let decision: PaceDecision = { ...CLEAR, policy };
-
   for (const rule of observation.rules) {
-    // Each rule ages from its own reading, so a rule carried over from an
-    // earlier response is not credited with time it did not serve.
-    const elapsedMs = elapsedMsSince(rule.observedAt, now);
-    for (const [index, limit] of rule.buckets.entries()) {
-      const used = rule.state[index];
-      if (used === undefined) {
-        continue;
-      }
-
-      const penaltyMs = used.penalty * MS_PER_SECOND - elapsedMs;
-      if (penaltyMs > decision.delayMs) {
-        decision = { delayMs: penaltyMs, policy, rule: rule.name, bucket: limit, cause: 'penalty' };
-      }
-
-      if (used.hits < limit.hits) {
-        continue;
-      }
-
-      const windowMs = limit.seconds * MS_PER_SECOND - elapsedMs;
-      if (windowMs > decision.delayMs) {
-        decision = { delayMs: windowMs, policy, rule: rule.name, bucket: limit, cause: 'window' };
-      }
-    }
+    decision = paceRule(rule, policy, now, decision);
   }
-
   return decision;
 }
 

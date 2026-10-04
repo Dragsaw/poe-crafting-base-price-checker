@@ -640,9 +640,6 @@
     "local/max-comment-run": {
       "count": 8
     },
-    "sonarjs/cognitive-complexity": {
-      "count": 1
-    },
     "unicorn/prefer-iterator-to-array": {
       "count": 1
     }
