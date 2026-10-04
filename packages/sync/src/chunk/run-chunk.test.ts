@@ -1536,12 +1536,12 @@ describe('runChunk: the Sync Report', () => {
 
     expect(logs.some((line) => line.includes(`disk full: ${failing}`))).toBe(true);
     // A failed publication does not stop the report.
-    if (failing === PROGRESS_PATH) {
-      const finalReport = await reportOf(fs);
-      expect(finalReport?.records).toEqual([
-        { kind: 'run-failure', reason: 'trade-request-rejected', entryKey: key(B), status: 400, message: failure.message },
-      ]);
-    }
+    const finalReport = await reportOf(fs);
+    expect(finalReport?.records).toEqual(
+      failing === PROGRESS_PATH
+        ? [{ kind: 'run-failure', reason: 'trade-request-rejected', entryKey: key(B), status: 400, message: failure.message }]
+        : undefined,
+    );
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -1669,12 +1669,12 @@ describe('runChunk: the Sync Report', () => {
             ? Promise.reject(new Error('late'))
             : Promise.resolve({ kind: 'completed' });
         });
-        if (throws) {
-          await expect(running).rejects.toThrow('late');
-        } else {
-          const outcome = await running;
-          expect(outcome.kind).toBe('dispossessed');
-        }
+        const [settled] = await Promise.allSettled([running]);
+        expect(settled).toMatchObject(
+          throws
+            ? { status: 'rejected', reason: { message: 'late' } }
+            : { status: 'fulfilled', value: { kind: 'dispossessed' } },
+        );
         expect(await fs.exists(REPORT_PATH)).toBe(false);
         expect(await fs.exists(DATASET_PATH)).toBe(false);
         expect(await fs.readTextFile(LOCK_PATH)).toBe(successor);

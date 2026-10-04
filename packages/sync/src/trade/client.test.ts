@@ -525,16 +525,12 @@ it('never yields zero, even when the ledger holds nothing for the policy', async
 
   const parsedNothing = await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
   expect(parsedNothing.kind).toBe('yield');
-  if (parsedNothing.kind === 'yield') {
-    expect(parsedNothing.retryAfterMs).toBeGreaterThan(0);
-  }
+  expect(parsedNothing.kind === 'yield' ? parsedNothing.retryAfterMs : undefined).toBeGreaterThan(0);
 
   // And a 429 carrying no governance headers at all still yields a real delay.
   const noHeaders = await client.send({ method: 'GET', url: DATA_URL, lane: 'data' });
   expect(noHeaders.kind).toBe('yield');
-  if (noHeaders.kind === 'yield') {
-    expect(noHeaders.retryAfterMs).toBeGreaterThan(0);
-  }
+  expect(noHeaders.kind === 'yield' ? noHeaders.retryAfterMs : undefined).toBeGreaterThan(0);
 });
 
 it('defaults the lane to the request method and path when the caller names none', async () => {

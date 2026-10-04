@@ -446,18 +446,18 @@ describe('the crafted states', () => {
     );
     mount();
     await settleTo('ready');
-    for (const recipeId of ['greater', 'perfect']) {
-      if (recipeId === 'perfect') {
-        click(option('perfect'));
-        expect(costLine()).toBe('no figure yet');
-      }
+    const expectCanonicalSequence = (recipeId: string): void => {
       expect(statement()?.dataset['listStatement'], recipeId).toBe('honest-empty');
       expect(frame().querySelector('[data-list-branch="crafted"]'), recipeId).toBeNull();
       // Canonical key order: every crafted class key sorts before every raw key.
       expect(names(), recipeId).toEqual(['Bows', 'Staves', 'Gold Amulet', 'Wide Belt']);
       expect(cells('rank'), recipeId).toEqual(['', '', '', '']);
       expect(cells('ev'), recipeId).toEqual(['no figure yet', 'no figure yet', 'no figure yet', 'no figure yet']);
-    }
+    };
+    expectCanonicalSequence('greater');
+    click(option('perfect'));
+    expect(costLine()).toBe('no figure yet');
+    expectCanonicalSequence('perfect');
   });
 
   it('state 36: a pair the recipe cannot reach is Unrankable under that recipe only', async () => {

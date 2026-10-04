@@ -1,5 +1,6 @@
-import { it } from 'vitest';
+import { expect, it } from 'vitest';
 
+import { drainEscapedRequests } from '../setup';
 import { INNOCENT_TEST, LATE_ISSUER, LATE_URL, OWN_TEST, OWN_URL } from './names';
 
 /**
@@ -22,7 +23,8 @@ const gate = deferred();
 const settled = deferred();
 
 it(OWN_TEST, async () => {
-  await fetch(OWN_URL);
+  const response = await fetch(OWN_URL);
+  expect(response.ok).toBe(false);
 });
 
 it(LATE_ISSUER, () => {
@@ -33,9 +35,10 @@ it(LATE_ISSUER, () => {
         settled.resolve();
       });
   }, 0);
+  expect(drainEscapedRequests()).toEqual([]);
 });
 
 it(INNOCENT_TEST, async () => {
   gate.resolve();
-  await settled.promise;
+  await expect(settled.promise).resolves.toBeUndefined();
 });

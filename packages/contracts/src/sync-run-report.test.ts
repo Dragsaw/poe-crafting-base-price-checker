@@ -161,10 +161,8 @@ describe('isSameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
 
   for (const { base, observation } of cases) {
     it(`${base.kind}: the same record, ignoring observations`, () => {
-      expect(isSameRecord(base, { ...base })).toBe(true);
-      if (observation !== undefined) {
-        expect(isSameRecord(base, observation)).toBe(true);
-      }
+      const sameRecords = observation === undefined ? [{ ...base }] : [{ ...base }, observation];
+      expect(sameRecords.map((other) => isSameRecord(base, other))).toEqual(sameRecords.map(() => true));
     });
 
     const subjects: readonly string[] = RECORD_SUBJECTS[base.kind];

@@ -74,6 +74,7 @@ it(LATE_ISSUER, () => {
         lateSettled.resolve();
       });
   }, 0);
+  expect(drainEscapedRequests()).toEqual([]);
 });
 
 it('does not charge a late request to the test running when it settles', async ({ task }) => {
@@ -129,6 +130,7 @@ describe('a request recorded after the last afterEach of its test', () => {
       release = resolve;
     });
     settled = fetchWhenReleased(gate);
+    expect(drainEscapedRequests()).toEqual([]);
   });
 
   // Runs after the test's `afterEach`, which found nothing, and before the

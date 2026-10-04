@@ -1,6 +1,7 @@
-import { it } from 'vitest';
+import { expect, it } from 'vitest';
 
 import { fetchAndSwallow } from '../fetch-and-swallow';
+import { drainEscapedRequests } from '../setup';
 import { ISSUER_TEST, LATE_URL } from './names';
 
 /**
@@ -16,4 +17,5 @@ it(ISSUER_TEST, () => {
   setTimeout(() => {
     void fetchAndSwallow(LATE_URL);
   }, 300);
+  expect(drainEscapedRequests()).toEqual([]);
 });

@@ -1,6 +1,7 @@
-import { afterAll, beforeAll, describe, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { fetchAndSwallow } from '../fetch-and-swallow';
+import { drainEscapedRequests } from '../setup';
 import { HOOK_URLS, SUITE_ONE_TEST, SUITE_TWO_TEST } from './names';
 
 /**
@@ -14,13 +15,17 @@ import { HOOK_URLS, SUITE_ONE_TEST, SUITE_TWO_TEST } from './names';
  * must report each request as issued outside any test.
  */
 describe('suite one', () => {
-  it(SUITE_ONE_TEST, () => {});
+  it(SUITE_ONE_TEST, () => {
+    expect(drainEscapedRequests()).toEqual([]);
+  });
   afterAll(() => fetchAndSwallow(HOOK_URLS.suiteOneAfterAll));
 });
 
 describe('suite two', () => {
   beforeAll(() => fetchAndSwallow(HOOK_URLS.suiteTwoBeforeAll));
-  it(SUITE_TWO_TEST, () => {});
+  it(SUITE_TWO_TEST, () => {
+    expect(drainEscapedRequests()).toEqual([]);
+  });
 });
 
 // Registered after the setup file's `afterAll`. The child config sets

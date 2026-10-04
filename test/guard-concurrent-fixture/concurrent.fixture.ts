@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { DESCRIBE_FIRST, DESCRIBE_SECOND, IT_FIRST, IT_SECOND } from './names';
 
@@ -39,26 +39,30 @@ function barrier(): () => Promise<void> {
   };
 }
 
-async function meetThenFetchFromTimer(meet: () => Promise<void>, url: string): Promise<void> {
+/** Resolves with whether the blocked request was answered `ok`. */
+async function didFetchSucceedAfterMeeting(meet: () => Promise<void>, url: string): Promise<boolean> {
   await meet();
-  await new Promise<void>((settle) => {
+  return new Promise<boolean>((settle) => {
     setTimeout(() => {
       // The rejection is swallowed: only the guard's `afterEach` may fail the test.
       void fetch(url)
-        .catch(() => {})
-        .finally(() => {
-          settle();
-        });
+        .then((response) => response.ok)
+        .catch(() => false)
+        .then(settle);
     }, 0);
   });
 }
 
+async function expectBlocked(meet: () => Promise<void>, url: string): Promise<void> {
+  expect(await didFetchSucceedAfterMeeting(meet, url)).toBe(false);
+}
+
 describe.concurrent('pair', () => {
   const meet = barrier();
-  it(DESCRIBE_FIRST.title, () => meetThenFetchFromTimer(meet, DESCRIBE_FIRST.url));
-  it(DESCRIBE_SECOND.title, () => meetThenFetchFromTimer(meet, DESCRIBE_SECOND.url));
+  it(DESCRIBE_FIRST.title, () => expectBlocked(meet, DESCRIBE_FIRST.url));
+  it(DESCRIBE_SECOND.title, () => expectBlocked(meet, DESCRIBE_SECOND.url));
 });
 
 const meet = barrier();
-it.concurrent(IT_FIRST.title, () => meetThenFetchFromTimer(meet, IT_FIRST.url));
-it.concurrent(IT_SECOND.title, () => meetThenFetchFromTimer(meet, IT_SECOND.url));
+it.concurrent(IT_FIRST.title, () => expectBlocked(meet, IT_FIRST.url));
+it.concurrent(IT_SECOND.title, () => expectBlocked(meet, IT_SECOND.url));

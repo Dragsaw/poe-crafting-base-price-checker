@@ -190,17 +190,16 @@ describe('defenceLettersOf', () => {
     expect([...(defenceLettersOf(className) ?? [])].toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(letters.toSorted((a, b) => Number(a > b) - Number(a < b)));
   });
 
-  it.each(['Amulets', 'Time-Lost_Diamond', 'One_Hand_Axes', 'str', 'Boots_int_int'])(
-    '%s takes the greedy run without repetition',
-    (className) => {
-      const letters = defenceLettersOf(className);
-      if (className === 'Boots_int_int') {
-        expect([...(letters ?? [])]).toEqual(['int']);
-      } else {
-        expect(letters).toBeUndefined();
-      }
-    },
-  );
+  it.each([
+    ['Amulets', undefined],
+    ['Time-Lost_Diamond', undefined],
+    ['One_Hand_Axes', undefined],
+    ['str', undefined],
+    ['Boots_int_int', ['int']],
+  ])('%s takes the greedy run without repetition', (className, expected) => {
+    const letters = defenceLettersOf(className);
+    expect(letters === undefined ? undefined : [...letters]).toEqual(expected);
+  });
 });
 
 describe('buildSearchBody: a hybrid reference', () => {

@@ -85,10 +85,9 @@ it('charges each request of two concurrent tests to the test that issued it', { 
       expect(result?.status, testCase.title).toBe('failed');
       expect(messages, testCase.title).toContain('[no-network] 1 request(s) had no fixture and were blocked');
       expect(messages, testCase.title).toContain(testCase.url);
-      for (const other of CONCURRENT_CASES) {
-        if (other !== testCase) {
-          expect(messages, testCase.title).not.toContain(other.url);
-        }
+      const others = CONCURRENT_CASES.filter((candidate) => candidate !== testCase);
+      for (const other of others) {
+        expect(messages, testCase.title).not.toContain(other.url);
       }
     }
 

@@ -222,9 +222,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 1
     }
   },
   "packages/contracts/src/sync-run-report.ts": {
@@ -481,9 +478,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 3
     }
   },
   "packages/sync/src/chunk/run-chunk.ts": {
@@ -648,11 +642,6 @@
       "count": 2
     }
   },
-  "packages/sync/src/pricing/load-currencies.test.ts": {
-    "vitest/no-conditional-expect": {
-      "count": 1
-    }
-  },
   "packages/sync/src/pricing/load-currencies.ts": {
     "local/max-comment-run": {
       "count": 1
@@ -719,9 +708,6 @@
   "packages/sync/src/pricing/search-body.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 2
     }
   },
   "packages/sync/src/pricing/search-body.ts": {
@@ -743,9 +729,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 3
     }
   },
   "packages/sync/src/shell-fetch.test.ts": {
@@ -822,9 +805,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 2
     }
   },
   "packages/sync/src/trade/client.ts": {
@@ -1157,9 +1137,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 1
     }
   },
   "packages/web/src/recipe/recipe-storage.ts": {
@@ -1298,9 +1275,6 @@
   "test/guard-after-last-file-fixture/late.fixture.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "sonarjs/assertions-in-tests": {
-      "count": 1
     }
   },
   "test/guard-after-last-file-fixture/names.ts": {
@@ -1322,9 +1296,6 @@
     "local/max-comment-run": {
       "count": 1
     },
-    "sonarjs/assertions-in-tests": {
-      "count": 2
-    },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 1
     }
@@ -1342,17 +1313,11 @@
   "test/guard-concurrent.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 1
     }
   },
   "test/guard-hooks-fixture/late-request.fixture.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "sonarjs/assertions-in-tests": {
-      "count": 3
     },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 1
@@ -1376,9 +1341,6 @@
   "test/guard-linger-fixture/linger.fixture.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "sonarjs/assertions-in-tests": {
-      "count": 2
     }
   },
   "test/guard-linger-fixture/names.ts": {
@@ -1398,9 +1360,6 @@
   },
   "test/guard-reuse-fixture/a-issuer.fixture.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "sonarjs/assertions-in-tests": {
       "count": 1
     }
   },
@@ -1433,9 +1392,6 @@
     },
     "sonarjs/deprecation": {
       "count": 1
-    },
-    "vitest/no-conditional-expect": {
-      "count": 1
     }
   },
   "test/no-hardcoded-rate-limits.test.ts": {
@@ -1447,13 +1403,7 @@
     "local/max-comment-run": {
       "count": 1
     },
-    "sonarjs/assertions-in-tests": {
-      "count": 2
-    },
     "unicorn/prefer-promise-with-resolvers": {
-      "count": 2
-    },
-    "vitest/expect-expect": {
       "count": 2
     }
   },

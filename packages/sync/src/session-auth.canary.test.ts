@@ -437,10 +437,8 @@ describe('CAP-4: the canary never leaves the holder', () => {
     expect(http.threw()).toBeGreaterThan(0);
     const scanned = [textOf(thrown), ...captured.texts, ...(await captured.files())].join('\n');
     expect(leaksIn(scanned)).toEqual([]);
-    if (failure === 'other') {
-      // The non-transport throw reached the caller with its class intact.
-      expect(thrown).toBeInstanceOf(Error);
-    }
+    // The non-transport throw reached the caller with its class intact.
+    expect(failure !== 'other' || thrown instanceof Error).toBe(true);
   });
 });
 
@@ -585,12 +583,9 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     }
 
     expect(http.threw()).toBe(1);
-    if (target === 'probe' || failure !== 'other') {
-      // The probe error is never passed on; a transport throw on the fetch yields.
-      expect(thrown).toBeUndefined();
-    } else {
-      expect(thrown).toBeInstanceOf(Error);
-    }
+    // The probe error is never passed on; a transport throw on the fetch yields.
+    const wasPassedOn = target !== 'probe' && failure === 'other';
+    expect(thrown instanceof Error ? 'an Error' : thrown).toEqual(wasPassedOn ? 'an Error' : undefined);
     const scanned = [textOf(thrown), ...captured.texts, ...(await captured.files())].join('\n');
     expect(leaksIn(scanned)).toEqual([]);
   });

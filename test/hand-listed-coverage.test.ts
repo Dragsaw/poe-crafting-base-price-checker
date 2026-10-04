@@ -242,9 +242,10 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
 
     it('holds at least one source file, and a test file when Vitest lists it', () => {
       expect(target.files.length, `no source file in ${target.path}`).toBeGreaterThan(0);
-      if (target.vitestInclude !== undefined) {
-        expect(testFiles(target).length, `no .test.ts file in ${target.path}`).toBeGreaterThan(0);
-      }
+      expect(
+        target.vitestInclude === undefined || testFiles(target).length > 0,
+        `no .test.ts file in ${target.path}`,
+      ).toBe(true);
     });
 
     describe('TypeScript', () => {
