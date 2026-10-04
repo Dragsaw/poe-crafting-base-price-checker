@@ -31,13 +31,16 @@ export async function readPricingFixtures(directory: string): Promise<PricingFix
   const fixtures = new Map<string, string>();
   const entries = await readdir(directory);
   const names = entries.toSorted((a, b) => Number(a > b) - Number(a < b));
-  for (const file of names) {
-    const match = PRICING_FIXTURE_FILE.exec(file);
-    const name = match?.[1];
-    if (name === undefined) {
-      continue;
+  const read = await Promise.all(
+    names.map(async (file) => {
+      const name = PRICING_FIXTURE_FILE.exec(file)?.[1];
+      return name === undefined ? undefined : ([name, await readFile(join(directory, file), { encoding: 'utf8' })] as const);
+    }),
+  );
+  for (const pair of read) {
+    if (pair !== undefined) {
+      fixtures.set(pair[0], pair[1]);
     }
-    fixtures.set(name, await readFile(join(directory, file), { encoding: 'utf8' }));
   }
   return fixtures;
 }

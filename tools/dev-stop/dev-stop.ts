@@ -327,6 +327,7 @@ async function main(): Promise<number> {
       return 0;
     }
     if (Date.now() >= deadline) {break;}
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: poll interval between listener checks
     await new Promise((done) => setTimeout(done, 250));
   }
   process.stderr.write(`dev-stop: port ${port} is still taken after killing PID ${plan.roots.join(', ')}.\n`);

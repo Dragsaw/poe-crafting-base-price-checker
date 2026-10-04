@@ -474,23 +474,26 @@ it('writes the committed catalogue back byte for byte on a second refresh agains
     fixtures[`GET ${endpoint.url}`] = respond(payload);
   }
 
-  for (const round of ['first', 'second'] as const) {
-    const instance = harness(fixtures);
+  const rounds = ['first', 'second'] as const;
+  await Promise.all(
+    rounds.map(async (round) => {
+      const instance = harness(fixtures);
 
-    const outcome = await instance.refresh();
+      const outcome = await instance.refresh();
 
-    expect(outcome, `${round} refresh failed`).toMatchObject({ ok: true });
-    expect(instance.writes, `${round} refresh did not write four artifacts`).toHaveLength(4);
-    for (const endpoint of CATALOGUE_ENDPOINTS) {
-      const path = catalogueFilePathOf(endpoint);
-      const write = instance.writes.find((candidate) => candidate.path === path);
-      expect(write, `${round} refresh did not write ${endpoint.artifact}`).toBeDefined();
-      expect(
-        write?.contents === committed[endpoint.artifact],
-        `${round} refresh wrote ${endpoint.artifact}.json with bytes that differ from the committed file`,
-      ).toBe(true);
-    }
-  }
+      expect(outcome, `${round} refresh failed`).toMatchObject({ ok: true });
+      expect(instance.writes, `${round} refresh did not write four artifacts`).toHaveLength(4);
+      for (const endpoint of CATALOGUE_ENDPOINTS) {
+        const path = catalogueFilePathOf(endpoint);
+        const write = instance.writes.find((candidate) => candidate.path === path);
+        expect(write, `${round} refresh did not write ${endpoint.artifact}`).toBeDefined();
+        expect(
+          write?.contents === committed[endpoint.artifact],
+          `${round} refresh wrote ${endpoint.artifact}.json with bytes that differ from the committed file`,
+        ).toBe(true);
+      }
+    }),
+  );
 });
 
 it('writes every artifact under the repository root, in data/catalogue', async () => {

@@ -897,6 +897,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         }
         current = entry;
         attempted += 1;
+        // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one step per entry in plan order, each step's pacing and bounds depend on the last
         const result = await ready.step(entry);
         current = undefined;
         if (result.entry !== undefined) {

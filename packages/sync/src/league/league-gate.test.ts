@@ -92,11 +92,14 @@ describe('createLeagueGate', () => {
   });
 
   it('compares ids byte for byte, so case and spacing are a mismatch', async () => {
-    for (const league of ['forbidden rites', 'Forbidden  Rites', ' Forbidden Rites', 'Forbidden Rites ']) {
-      const { gate } = gateAnswering(ok(LEAGUES), league);
-      const error = await mismatchOf(gate({ entries: [] }));
-      expect(error.configuredLeague).toBe(league);
-    }
+    const leagues = ['forbidden rites', 'Forbidden  Rites', ' Forbidden Rites', 'Forbidden Rites '];
+    await Promise.all(
+      leagues.map(async (league) => {
+        const { gate } = gateAnswering(ok(LEAGUES), league);
+        const error = await mismatchOf(gate({ entries: [] }));
+        expect(error.configuredLeague).toBe(league);
+      }),
+    );
   });
 
   it('treats an empty league list as a mismatch with no available leagues', async () => {
@@ -108,21 +111,26 @@ describe('createLeagueGate', () => {
   });
 
   it('throws a rejection naming the status on a non-429 4xx or another non-2xx', async () => {
-    for (const status of [404, 403, 302]) {
-      const { gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
+    await Promise.all(
+      [404, 403, 302].map(async (status) => {
+        const { gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
 
-      const error: unknown = await gate({ entries: [] }).catch((error_: unknown) => error_);
+        const error: unknown = await gate({ entries: [] }).catch((error_: unknown) => error_);
 
-      expect(error).toBeInstanceOf(LeagueRequestRejectedError);
-      expect((error as LeagueRequestRejectedError).status).toBe(status);
-    }
+        expect(error).toBeInstanceOf(LeagueRequestRejectedError);
+        expect((error as LeagueRequestRejectedError).status).toBe(status);
+      }),
+    );
   });
 
   it('throws an unexpected-response error on a body that is not the payload shape', async () => {
-    for (const body of ['not json', JSON.stringify({ leagues: [] }), JSON.stringify({ result: [{ text: 'x' }] })]) {
-      const { gate } = gateAnswering({ status: 200, headers: {}, body }, 'Standard');
-      await expect(gate({ entries: [] })).rejects.toBeInstanceOf(UnexpectedLeaguesResponseError);
-    }
+    const bodies = ['not json', JSON.stringify({ leagues: [] }), JSON.stringify({ result: [{ text: 'x' }] })];
+    await Promise.all(
+      bodies.map(async (body) => {
+        const { gate } = gateAnswering({ status: 200, headers: {}, body }, 'Standard');
+        await expect(gate({ entries: [] })).rejects.toBeInstanceOf(UnexpectedLeaguesResponseError);
+      }),
+    );
   });
 
   it('yields on a 429, with the one request sent and nothing slept out', async () => {
@@ -142,19 +150,23 @@ describe('createLeagueGate', () => {
   });
 
   it('yields on a 5xx', async () => {
-    for (const status of [500, 503]) {
-      const { http, gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
-      await expect(gate({ entries: [] })).resolves.toEqual(YIELD);
-      expect(http.requests).toHaveLength(1);
-    }
+    await Promise.all(
+      [500, 503].map(async (status) => {
+        const { http, gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
+        await expect(gate({ entries: [] })).resolves.toEqual(YIELD);
+        expect(http.requests).toHaveLength(1);
+      }),
+    );
   });
 
   it('yields on a timeout and on a fetch network failure', async () => {
-    for (const error of [timeoutError(), new TypeError('fetch failed')]) {
-      const http = rejectingPort(error);
-      await expect(gateOver(http, 'Standard')({ entries: [] })).resolves.toEqual(YIELD);
-      expect(http.sent()).toBe(1);
-    }
+    await Promise.all(
+      [timeoutError(), new TypeError('fetch failed')].map(async (error) => {
+        const http = rejectingPort(error);
+        await expect(gateOver(http, 'Standard')({ entries: [] })).resolves.toEqual(YIELD);
+        expect(http.sent()).toBe(1);
+      }),
+    );
   });
 
   it('rethrows any other port rejection', async () => {

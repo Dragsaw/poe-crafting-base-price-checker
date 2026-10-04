@@ -455,6 +455,7 @@ function remainingMs(until: string, clock: ClockPort): number {
 /** Spends one wait. Returns early on an abort. `signature` is the input signature the wait compares against. */
 export async function runWait(wait: SessionWait, ports: WaitPorts, signature: string): Promise<void> {
   const { fs, clock, sleep: pause, signal } = ports;
+  /* eslint-disable no-await-in-loop -- polling loops: each pause or probe decides whether the next iteration runs */
   switch (wait.kind) {
     case 'none': {
       return;
@@ -495,6 +496,7 @@ export async function runWait(wait: SessionWait, ports: WaitPorts, signature: st
       }
     }
   }
+  /* eslint-enable no-await-in-loop -- end of the sequential block above */
 }
 
 function describeWait(wait: Exclude<SessionWait, { kind: 'none' }>): string {
@@ -577,6 +579,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise
   let state = INITIAL_SESSION_STATE;
 
   try {
+    /* eslint-disable no-await-in-loop -- sequential on purpose: one chunk per pass, and each pass reads the state the last one left */
     while (!signal.aborted) {
       const signature = await inputSignature(fs);
       const isWithGate = gateDue(state, signature);
@@ -637,6 +640,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise
       stdout(`${PREFIX} ${describeWait(wait)}`);
       await runWait(wait, waitPorts, signature);
     }
+    /* eslint-enable no-await-in-loop -- end of the sequential block above */
   } finally {
     // Runs on a throw too, so the process never ends unsettled without its
     // line. A holder still unsettled had no 2xx pricing search to probe on,

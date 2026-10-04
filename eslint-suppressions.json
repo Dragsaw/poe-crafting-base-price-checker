@@ -483,9 +483,6 @@
     "max-lines": {
       "count": 1
     },
-    "no-await-in-loop": {
-      "count": 1
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -506,9 +503,6 @@
     "max-statements": {
       "count": 1
     },
-    "no-await-in-loop": {
-      "count": 2
-    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     },
@@ -517,9 +511,6 @@
     }
   },
   "packages/sync/src/catalogue/catalogue-ids.test.ts": {
-    "no-await-in-loop": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 1
     }
@@ -629,9 +620,6 @@
       "count": 1
     },
     "max-statements": {
-      "count": 1
-    },
-    "no-await-in-loop": {
       "count": 1
     },
     "sonarjs/cognitive-complexity": {
@@ -751,9 +739,6 @@
     "max-lines-per-function": {
       "count": 1
     },
-    "no-await-in-loop": {
-      "count": 4
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -783,9 +768,6 @@
     }
   },
   "packages/sync/src/league/league-gate.test.ts": {
-    "no-await-in-loop": {
-      "count": 5
-    },
     "unicorn/prefer-await": {
       "count": 2
     }
@@ -837,9 +819,6 @@
   "packages/sync/src/pricing/fixture-port.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "no-await-in-loop": {
-      "count": 1
     },
     "unicorn/import-style": {
       "count": 1
@@ -1056,9 +1035,6 @@
     },
     "max-statements": {
       "count": 1
-    },
-    "no-await-in-loop": {
-      "count": 11
     },
     "sonarjs/cognitive-complexity": {
       "count": 2
@@ -2081,9 +2057,6 @@
     },
     "local/max-comment-run": {
       "count": 9
-    },
-    "no-await-in-loop": {
-      "count": 1
     },
     "sonarjs/no-os-command-from-path": {
       "count": 4

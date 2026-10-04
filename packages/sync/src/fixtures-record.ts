@@ -307,6 +307,7 @@ export async function recordFixtures(
     return { payload: stripped };
   }
 
+  /* eslint-disable no-await-in-loop -- sequential on purpose: recorded requests share one rate-limit ledger and stop at the first failure */
   for (const interaction of FIXTURE_INTERACTIONS) {
     const outcome = await capture(interaction.name, {
       method: interaction.method,
@@ -329,9 +330,11 @@ export async function recordFixtures(
       }
     }
   }
+  /* eslint-enable no-await-in-loop -- end of the sequential block above */
 
   const written: string[] = [];
   for (const { path, contents } of captured) {
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: `written` lists exactly the files written before a failure
     await ports.writeFixture(path, contents);
     written.push(path);
   }
@@ -392,6 +395,7 @@ async function main(): Promise<void> {
       continue;
     }
 
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the "removed" lines print in directory order
     await rm(path);
     process.stdout.write(`removed ${path}\n`);
   }

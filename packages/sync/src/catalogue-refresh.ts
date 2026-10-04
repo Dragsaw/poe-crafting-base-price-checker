@@ -188,6 +188,7 @@ export async function refreshCatalogue(
   for (const endpoint of CATALOGUE_ENDPOINTS) {
     let result: Awaited<ReturnType<typeof client.send>>;
     try {
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one lane, requests pace against one ledger entry
       result = await client.send({
         method: 'GET',
         url: endpoint.url,
@@ -277,6 +278,7 @@ export async function refreshCatalogue(
   const written: string[] = [];
   for (const { path, contents } of captured) {
     try {
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the failure message reports how many writes had landed
       await ports.writeCatalogueFile(path, contents);
     } catch (error) {
       // The one place all-or-nothing can still be broken: a permission or disk

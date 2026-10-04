@@ -81,16 +81,19 @@ describe('loadCatalogueIds', () => {
   it.each([CATALOGUE_STATS_PATH, CATALOGUE_ITEMS_PATH, CATALOGUE_FILTERS_PATH])(
     'refuses an absent or invalid %s with a typed error naming it',
     async (path) => {
-      for (const contents of [undefined, '{"schemaVersion":"1.0.0"}', '{"schemaVersion":"2.0.0","result":[]}']) {
-        const loaded = await loadCatalogueIds(fsWith({ [path]: contents }));
-        expect(loaded.ok).toBe(false);
-        if (loaded.ok) {
-          continue;
-        }
+      const bodies = [undefined, '{"schemaVersion":"1.0.0"}', '{"schemaVersion":"2.0.0","result":[]}'];
+      await Promise.all(
+        bodies.map(async (contents) => {
+          const loaded = await loadCatalogueIds(fsWith({ [path]: contents }));
+          expect(loaded.ok).toBe(false);
+          if (loaded.ok) {
+            return;
+          }
 
-        expect(loaded.error).toBeInstanceOf(DataFileError);
-        expect(loaded.error.path).toBe(path);
-      }
+          expect(loaded.error).toBeInstanceOf(DataFileError);
+          expect(loaded.error.path).toBe(path);
+        }),
+      );
     },
   );
 
