@@ -611,11 +611,6 @@
       "count": 1
     }
   },
-  "packages/web/src/frame/Masthead.tsx": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
   "packages/web/src/frame/RowSlots.tsx": {
     "local/max-comment-run": {
       "count": 1

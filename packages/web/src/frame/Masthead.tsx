@@ -5,11 +5,7 @@ import { DENOMINATION } from '../shared/product';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { PayoutThreshold } from '../threshold/PayoutThreshold';
 
-/**
- * The title is the DESIGN mockup string (`mockups/key-hero-resting.html`). The
- * dek is EXPERIENCE.md's masthead copy (*The masthead dek*). It states a
- * capability and is true in every state.
- */
+/** The title is the DESIGN mockup string (`mockups/key-hero-resting.html`); the dek is EXPERIENCE.md's masthead copy. */
 export const MASTHEAD_TITLE = 'What is worth picking up';
 export const MASTHEAD_DEK = `Item Classes ranked by expected payout per craft, beside the Base Types worth selling raw. Every figure is in ${DENOMINATION}.`;
 
@@ -20,12 +16,7 @@ function eyebrowText(league: string): string {
 /** The right-hand control group's width: 216 recipe + 16 gap + 276 threshold. */
 export const CONTROL_GROUP_WIDTH = columnSums.mastheadControls.reduce((a, b) => a + b, 0);
 
-/**
- * The 170px masthead: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42
- * + 20 pad. The eyebrow reads the league alone. The right-hand control group holds
- * the Payout Threshold at the outer edge and the Craft Recipe in the inboard
- * slot, which stays empty at its width while no recipe is loaded.
- */
+/** 170px: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42 + 20 pad; the recipe slot stays empty at its width with no recipe. */
 export function Masthead({
   league,
   threshold,
