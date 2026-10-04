@@ -292,8 +292,8 @@ it('names the real fetch port in no test file', () => {
   // A bare identifier scan, not an import-specifier regex: a specifier regex
   // misses `from './shell'`, a dynamic `await import(...)` and a re-export, all
   // of which reach the same function.
-  const sourceDir = fileURLToPath(new URL('.', import.meta.url));
-  const testFiles = readdirSync(sourceDir, { recursive: true, encoding: 'utf8' }).filter((name) =>
+  const sourceDirectory = fileURLToPath(new URL('.', import.meta.url));
+  const testFiles = readdirSync(sourceDirectory, { recursive: true, encoding: 'utf8' }).filter((name) =>
     name.endsWith('.test.ts'),
   );
 
@@ -301,7 +301,7 @@ it('names the real fetch port in no test file', () => {
   // The exemption below must not go dead silently: a rename or a deletion of the
   // loopback test would reopen L-V1 with no failure.
   expect(testFiles).toContain('shell-fetch.test.ts');
-  expect(readFileSync(`${sourceDir}shell-fetch.test.ts`, 'utf8')).toContain('createFetchHttpPort');
+  expect(readFileSync(`${sourceDirectory}shell-fetch.test.ts`, 'utf8')).toContain('createFetchHttpPort');
   for (const name of testFiles) {
     if (name === 'catalogue-refresh.test.ts') {
       // This file names it in the comment above, and nowhere else.
@@ -311,7 +311,7 @@ it('names the real fetch port in no test file', () => {
       // The one file that executes the port, against its own loopback server.
       continue;
     }
-    const source = readFileSync(`${sourceDir}${name}`, 'utf8');
+    const source = readFileSync(`${sourceDirectory}${name}`, 'utf8');
     expect(source, `${name} must not name the real fetch port`).not.toContain(
       'createFetchHttpPort',
     );

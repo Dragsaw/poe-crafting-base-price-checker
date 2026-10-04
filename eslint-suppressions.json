@@ -32,9 +32,6 @@
     "sonarjs/cognitive-complexity": {
       "count": 2
     },
-    "unicorn/name-replacements": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 7
     }
@@ -392,9 +389,6 @@
     "max-lines": {
       "count": 1
     },
-    "unicorn/name-replacements": {
-      "count": 2
-    },
     "unicorn/no-null": {
       "count": 6
     }
@@ -464,9 +458,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "packages/sync/src/catalogue-refresh.ts": {
@@ -530,11 +521,6 @@
   "packages/sync/src/chunk/lock.ts": {
     "local/max-comment-run": {
       "count": 6
-    }
-  },
-  "packages/sync/src/chunk/publish-dataset.test.ts": {
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "packages/sync/src/chunk/publish-dataset.ts": {
@@ -645,9 +631,6 @@
   "packages/sync/src/dry-run.ts": {
     "local/max-comment-run": {
       "count": 9
-    },
-    "unicorn/name-replacements": {
-      "count": 2
     },
     "unicorn/no-null": {
       "count": 2
@@ -880,9 +863,6 @@
   "packages/sync/src/sync-batch.ts": {
     "local/max-comment-run": {
       "count": 3
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "packages/sync/src/sync.test.ts": {
@@ -917,9 +897,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 2
-    },
-    "unicorn/name-replacements": {
-      "count": 3
     },
     "unicorn/no-null": {
       "count": 1
@@ -1048,9 +1025,6 @@
   "packages/web/src/frame/FailureScreen.tsx": {
     "local/max-comment-run": {
       "count": 4
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "packages/web/src/frame/Frame.tsx": {
@@ -1239,9 +1213,6 @@
       "count": 1
     },
     "max-params": {
-      "count": 1
-    },
-    "unicorn/name-replacements": {
       "count": 1
     }
   },
@@ -1457,9 +1428,6 @@
   "packages/web/vite.config.test.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "packages/web/vite.config.ts": {
@@ -1469,7 +1437,7 @@
   },
   "test/commit-msg-hook.test.ts": {
     "unicorn/name-replacements": {
-      "count": 2
+      "count": 1
     }
   },
   "test/contracts-isolation.test.ts": {
@@ -1672,9 +1640,6 @@
   "test/setup.ts": {
     "local/max-comment-run": {
       "count": 10
-    },
-    "unicorn/name-replacements": {
-      "count": 1
     }
   },
   "tools/boundary-check/boundary.test.ts": {
@@ -1682,9 +1647,6 @@
       "count": 1
     },
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/name-replacements": {
       "count": 1
     }
   },
@@ -1820,9 +1782,6 @@
   },
   "tools/prune-pages.mjs": {
     "local/max-comment-run": {
-      "count": 2
-    },
-    "unicorn/name-replacements": {
       "count": 2
     }
   },

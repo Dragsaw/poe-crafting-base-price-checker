@@ -45,13 +45,13 @@ import {
   LOCAL_POLL_MS,
   nextState,
   nextWait,
-  parseArgs as parseArguments,
+  parseArguments,
   preWaitMs,
   runWait,
   sessionEvenIntervalMs,
   syncSessionCommand,
 } from './sync.ts';
-import type { ChunkContext, ChunkResult, SessionState, SyncSessionDeps as SyncSessionDependencies } from './sync.ts';
+import type { ChunkContext, ChunkResult, SessionState, SyncSessionDependencies } from './sync.ts';
 import { createPacingState } from './trade/client.ts';
 import type * as TradeClientModule from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE, TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
@@ -250,7 +250,7 @@ const networkDown = (): HttpPort => ({
 
 // ---------------------------------------------------------------------------
 
-describe('parseArgs', () => {
+describe('parseArguments', () => {
   it('defaults the pinned maximum age to 4 hours', () => {
     expect(parseArguments([])).toEqual({ ok: true, options: { pinnedMaxAgeMs: 4 * 3_600_000 } });
   });

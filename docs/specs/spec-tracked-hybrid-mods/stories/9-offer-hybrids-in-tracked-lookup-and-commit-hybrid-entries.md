@@ -43,7 +43,7 @@ context:
 ## Code Map
 
 - `packages/core/src/probability.ts:98-106` -- `untrackable`. Add `untrackableReason` beside it, export it from `packages/core/src/index.ts:~69`, and test it in `probability.test.ts`.
-- `.claude/skills/tracked-json/scripts/lookup.ts` -- `lookupMods` (`:257`, the `new Set` key), `ModRow`, `lookupTiers`, `TierRow`. The pool is `resolved.pools[slot]` (it has `poolCoverage`). The header comment describes what the lookup derives.
+- `.claude/skills/tracked-json/scripts/lookup.ts` -- `lookupMods` (`:257`, the `new Set` key), `ModifierRow`, `lookupTiers`, `TierRow`. The pool is `resolved.pools[slot]` (it has `poolCoverage`). The header comment describes what the lookup derives.
 - `package.json` devDependencies -- add `"@poe/core": "workspace:*"` and run `pnpm install`. `tsconfig.tools.json` and eslint already cover the script.
 - `.claude/skills/tracked-json/scripts/lookup.test.ts` -- `:328` pins `[null]`, so rewrite it. The synthetic weights builders are at the top, and *the committed data/* is at `:443`.
 - `.claude/skills/tracked-json/SKILL.md` -- `:11` (six checks + `unvalidated`, deferred `:311`), loop step 4 (hybrid reference: all lines, banded or valueless per line, FR-22 per hybrid tier), 4b (a hybrid-shared `statId` is never offered as a single-line band that meets a hybrid tier, so offer the hybrid; a statId in both slots is a summed pair per AD-16 / IN §2.1, and a valueless line or a missing bound is invalid), step 5 (`needs(hybrid)` is §8), interactive steps 2 and 5.
@@ -71,7 +71,7 @@ context:
 ## Implementation Notes
 
 - Bows holds 5 distinct suffix references, not the 6 the Decisions text counts, so the hybrid prefix is crossed with 5 suffixes and 5 entries were added. Every suffix already tracked on Bows is covered.
-- `ModRow.untrackable` rows also carry `sourceModifierId`, to name the tier.
+- `ModifierRow.untrackable` rows also carry `sourceModifierId`, to name the tier.
 - The re-record of `fixtures/trade-*` moved market data: the median expectation for the existing entries changed (0.1107 to 0.3119) beside the new summed entry. The review diff left the recorded `trade-*` files out.
 - The `+` in the `+Accuracy` short form is the Decisions text's wording.
 

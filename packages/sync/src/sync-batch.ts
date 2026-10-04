@@ -54,7 +54,7 @@ export function runSync(ports: SyncPorts): Promise<ChunkOutcome> {
   return composeChunk(ports).run();
 }
 
-export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent' | 'auth'> {
+export interface SyncCommandDependencies extends Omit<SyncPorts, 'userAgent' | 'auth'> {
   /**
    * Where the contact `User-Agent` (`POE_SYNC_USER_AGENT`) and the optional
    * session cookie (`POESESSID`, AD-30) are read from.
@@ -65,7 +65,7 @@ export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent' | 'auth'> {
 }
 
 /** The command: the exit code it should end with. `0` on any outcome, `1` on a refusal or a throw. */
-export async function syncCommand(dependencies: SyncCommandDeps): Promise<number> {
+export async function syncCommand(dependencies: SyncCommandDependencies): Promise<number> {
   const { env, stdout, stderr, ...ports } = dependencies;
   const contact = resolveUserAgent(env);
   if (!contact.ok) {

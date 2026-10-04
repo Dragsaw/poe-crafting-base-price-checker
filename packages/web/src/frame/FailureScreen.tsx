@@ -32,7 +32,7 @@ export const REFUSAL_VERSION_EXPECTS = 'the page expects';
 export const REFUSAL_CONTENT = 'Its content does not match the schema the page expects, version';
 export const REFUSAL_MISSING = 'It was not published, and the page cannot render without it.';
 
-export type FailureScreenProps =
+export type FailureScreenProperties =
   | {
       readonly variant: 'refused';
       readonly path: string;
@@ -97,7 +97,7 @@ function RefusalCauseSentence({
  * the whole page — no masthead, no list, nothing stale served. No card, no
  * icon, no illustration: the failure is set like the rest of the page.
  */
-export function FailureScreen(properties: FailureScreenProps): JSX.Element {
+export function FailureScreen(properties: FailureScreenProperties): JSX.Element {
   const isRefused = properties.variant === 'refused';
   return (
     <section data-failure={properties.variant} role="alert" style={{ paddingTop: px(spacing.gutter) }}>

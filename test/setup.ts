@@ -91,7 +91,7 @@ const { server, escapedRequests, currentTest } = guard;
  * when this directory holds a record. `undefined` in a project that does not
  * load that global setup: such a project keeps only the in-memory record.
  */
-const recordDir = inject('noNetworkRecordDir');
+const recordDirectory = inject('noNetworkRecordDir');
 
 /**
  * Writes a request that arrived while no file of this worker was open to the
@@ -99,11 +99,11 @@ const recordDir = inject('noNetworkRecordDir');
  * the request.
  */
 function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undefined): void {
-  if (recordDir === undefined || guard.fileOpen) {
+  if (recordDirectory === undefined || guard.fileOpen) {
     return;
   }
   appendFileSync(
-    nodePath.join(recordDir, `${String(process.pid)}.log`),
+    nodePath.join(recordDirectory, `${String(process.pid)}.log`),
     `${described} (${describeIssuer(issuedBy)})\n`,
   );
 }

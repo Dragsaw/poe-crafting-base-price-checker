@@ -291,9 +291,9 @@ const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const FIXTURES_DIR = fileURLToPath(new URL('../../../fixtures/', import.meta.url));
 
 /** A read-only snapshot; an absent file is `undefined`. */
-async function readSnapshot(path: string, dataDir?: string): Promise<string | undefined> {
+async function readSnapshot(path: string, dataDirectory?: string): Promise<string | undefined> {
   try {
-    const location = dataDir === undefined ? nodePath.resolve(REPO_ROOT, path) : nodePath.resolve(dataDir, path.slice('data/'.length));
+    const location = dataDirectory === undefined ? nodePath.resolve(REPO_ROOT, path) : nodePath.resolve(dataDirectory, path.slice('data/'.length));
     return await readFile(location, { encoding: 'utf8' });
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
@@ -305,20 +305,20 @@ async function readSnapshot(path: string, dataDir?: string): Promise<string | un
 
 /**
  * The repository's own inputs and recorded fixtures, read and never written.
- * `dataDir` stands in for `data/`: a test passes the frozen fixture directory.
+ * `dataDirectory` stands in for `data/`: a test passes the frozen fixture directory.
  */
-export async function readRepositorySnapshot(dataDir?: string): Promise<DryRunSnapshot> {
+export async function readRepositorySnapshot(dataDirectory?: string): Promise<DryRunSnapshot> {
   return {
-    tracked: await readSnapshot(TRACKED_PATH, dataDir),
-    dataset: await readSnapshot(DATASET_PATH, dataDir),
-    config: await readSnapshot(CONFIG_PATH, dataDir),
-    currencies: await readSnapshot(CURRENCIES_PATH, dataDir),
-    items: await readSnapshot(CATALOGUE_ITEMS_PATH, dataDir),
-    stats: await readSnapshot(CATALOGUE_STATS_PATH, dataDir),
-    filters: await readSnapshot(CATALOGUE_FILTERS_PATH, dataDir),
-    weights: await readSnapshot(WEIGHTS_PATH, dataDir),
-    report: await readSnapshot(REPORT_PATH, dataDir),
-    progress: await readSnapshot(PROGRESS_PATH, dataDir),
+    tracked: await readSnapshot(TRACKED_PATH, dataDirectory),
+    dataset: await readSnapshot(DATASET_PATH, dataDirectory),
+    config: await readSnapshot(CONFIG_PATH, dataDirectory),
+    currencies: await readSnapshot(CURRENCIES_PATH, dataDirectory),
+    items: await readSnapshot(CATALOGUE_ITEMS_PATH, dataDirectory),
+    stats: await readSnapshot(CATALOGUE_STATS_PATH, dataDirectory),
+    filters: await readSnapshot(CATALOGUE_FILTERS_PATH, dataDirectory),
+    weights: await readSnapshot(WEIGHTS_PATH, dataDirectory),
+    report: await readSnapshot(REPORT_PATH, dataDirectory),
+    progress: await readSnapshot(PROGRESS_PATH, dataDirectory),
     fixtures: await readPricingFixtures(FIXTURES_DIR),
   };
 }

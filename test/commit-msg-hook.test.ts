@@ -8,13 +8,13 @@ import { describe, expect, it } from 'vitest';
 const HOOK_PATH = fileURLToPath(new URL('../.githooks/commit-msg', import.meta.url));
 
 function runHook(subject: string) {
-  const workDir = mkdtempSync(nodePath.join(tmpdir(), 'commit-msg-hook-'));
+  const workDirectory = mkdtempSync(nodePath.join(tmpdir(), 'commit-msg-hook-'));
   try {
-    const messagePath = nodePath.join(workDir, 'MSG');
+    const messagePath = nodePath.join(workDirectory, 'MSG');
     writeFileSync(messagePath, `${subject}\n`);
     return spawnSync(process.execPath, [HOOK_PATH, messagePath], { encoding: 'utf8' });
   } finally {
-    rmSync(workDir, { recursive: true, force: true });
+    rmSync(workDirectory, { recursive: true, force: true });
   }
 }
 

@@ -66,7 +66,7 @@ context:
 - `packages/sync/src/sync.ts` `nextWait` / `syncSessionCommand` -- decisions 5 and 6. The session tells a no-answer yield from a 5xx that carried headers by comparing the pacing state's `ledger` before and after the chunk: an unchanged `ledger` means no fresh reading. It keeps a consecutive-no-answer count and resets it on a reading. The 36 s cold floor is a named constant, owned by §5.3. Put `STALE_LOCK_AFTER_MS` (`chunk/lock.ts:40`) on the cap.
 - `sync.ts` `preWaitMs` -- the gate is due when no league is confirmed, **or** the last outcome was `completed` (so the next chunk starts a new pass), **or** the input-file signature changed since the chunk that confirmed the league.
 - `sync.ts` `isLockFree` -- do not copy the stale rule. Export `isStaleState` from `chunk/lock.ts:96` and call it.
-- `sync.ts` `parseArgs` -- skip a literal `--`.
+- `sync.ts` `parseArguments` -- skip a literal `--`.
 - `prd.md` FR-19, first consequence -- a batch run exits quietly while another run holds the lock, and the session waits for the lock (AD-7). No mechanism.
 - `docs/stories/deferred-work.md` -- append one entry that names this spec as `source_spec`. It says that open entries written before 2026-09-27 which name `pnpm sync` or `packages/sync/src/sync.ts` for the one-chunk command now mean `pnpm sync:batch` and `sync-batch.ts`. Do not edit the existing entries.
 
@@ -77,7 +77,7 @@ context:
 - [x] `chunk-order.ts` (+ test) -- `pinnedMaxAgeMs`.
 - [x] `run-chunk.ts`, `compose-chunk.ts` (+ tests) -- the session options, the new outcome fields, and the gate 4xx `notBefore`.
 - [x] `sync-batch.ts` -- the rename.
-- [x] `sync.ts` (+ test) -- `syncSessionCommand(deps)`, `parseArgs` (`--pinned-max-age`), and a pure `nextWait(outcome | error, state)` that follows the matrix. `main` wires signals. Test every matrix row with fakes. Test that a wait cancels on abort. Test that an abort during a chunk releases the lock.
+- [x] `sync.ts` (+ test) -- `syncSessionCommand(deps)`, `parseArguments` (`--pinned-max-age`), and a pure `nextWait(outcome | error, state)` that follows the matrix. `main` wires signals. Test every matrix row with fakes. Test that a wait cancels on abort. Test that an abort during a chunk releases the lock.
 - [x] `package.json` (`sync` and `sync:batch`, both with `--env-file-if-exists=.env`), `index.ts` exports and comments, `tools/dts-specifiers/rewrite-dts-specifiers.ts:92`, `.claude/skills/deferred-work-sweep/SKILL.md:86`.
 - [x] Planning docs. Spine: AD-7 (the chunk stays the unit, with two invokers and the session's stale-pinned rule), AD-8 (spread pacing), the Stack *Sync invoker* row and Deployment. `IMPLEMENTATION-NOTES.md` §5.3 (the spread formula, which §5.3 owns). `AGENT-WORKFLOW.md:28,67,85`. `epics.md:108`. `prd.md:346,352`: a sentence that names the session and cites AD-7, and no mechanism. FR-level pinned behaviour: the PRD says a pinned entry "is refreshed first whenever a Chunk can afford it". Retarget that sentence to cite AD-7. Also FR-19's first consequence, and the backoff (decisions 5 and 6) in AD-7 and §5.3.
 - [x] `sync.ts` (+ test) -- the backoff (decisions 5 and 6), the gate-due pre-wait, `isLockFree` through the exported `isStaleState`, and `--`. Tests for the new matrix rows: a no-answer yield on a cold lane waits 36 s, then 72 s on the next one, and resets after a reading. An other-throw ends at the backoff or at an input change. A new pass pre-waits `DATA_LANE`. A held lock that ages past 6 h ends the wait.
@@ -121,7 +121,7 @@ Iteration 1 (baseline `4818ae6e6f96662e6ecff1757ec1382314a149bf`). Layers: blind
 | 7 | VG4, VG-other | `isLockFree`'s stale branches are untested, and it copies the private `isStaleState` of `lock.ts` | medium | The only test deletes the lock (`absent`). A copy can drift from §7 | patch |
 | 8 | VG-other | The batch and dry-run "unchanged" checks use `objectContaining` and would not see `spread` or `pacing` passed | low | `sync-batch.test.ts:391`, `dry-run.test.ts:172`. The fix is a direct assertion | patch |
 | 9 | BH5 | PRD FR-19 still says a second invocation "exits quietly". A session's chunk is busy and the session waits | low | `prd.md` FR-19 consequence 1, the one this build amends. A direct sentence correction | patch |
-| 10 | BH14, EC8 | `parseArgs` rejects a literal `--` separator | low | `pnpm sync -- --pinned-max-age 2` exits 1 with `unknown argument "--"`. The fix skips `--` | patch |
+| 10 | BH14, EC8 | `parseArguments` rejects a literal `--` separator | low | `pnpm sync -- --pinned-max-age 2` exits 1 with `unknown argument "--"`. The fix skips `--` | patch |
 | 11 | BH11 | Open ledger entries say "`pnpm sync`" for the one-chunk command, and one names `sync.ts` as its location | low | `deferred-work.md` spec-1-11 entries. The fix appends one note entry | patch |
 | 12 | BH1, EC3 | The "nothing due" wait can overshoot the next due instant | low | Only reachable when no `active` entry is due, which is rare. The fix needs a next-due instant from `core` | reject |
 | 13 | BH4, EC7 | A second signal during a chunk leaves the lock for 6 h. An in-lock wait is not cut by the first signal | low | The time-only stale rule is §7, which the intent forbids changing. "Lets the running entry finish" is the frozen behaviour. The batch command had the same kill-in-chunk exposure | reject |

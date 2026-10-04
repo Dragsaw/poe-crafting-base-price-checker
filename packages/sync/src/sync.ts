@@ -114,12 +114,12 @@ export interface SessionOptions {
   readonly pinnedMaxAgeMs: number;
 }
 
-export type ParsedArgs =
+export type ParsedArguments =
   | { readonly ok: true; readonly options: SessionOptions }
   | { readonly ok: false; readonly message: string };
 
 /** `--pinned-max-age <hours>` (a positive number) and a literal `--`, which is skipped. */
-export function parseArgs(argv: readonly string[]): ParsedArgs {
+export function parseArguments(argv: readonly string[]): ParsedArguments {
   let hours = DEFAULT_PINNED_MAX_AGE_HOURS;
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -535,7 +535,7 @@ export type SyncSessionPorts = Omit<
   'userAgent' | 'pacing' | 'spread' | 'requests' | 'session' | 'wrapStep' | 'auth'
 >;
 
-export interface SyncSessionDeps extends SyncSessionPorts {
+export interface SyncSessionDependencies extends SyncSessionPorts {
   /**
    * Where the contact `User-Agent` (`POE_SYNC_USER_AGENT`) and the optional
    * session cookie (`POESESSID`, AD-30) are read from.
@@ -552,11 +552,11 @@ export interface SyncSessionDeps extends SyncSessionPorts {
 }
 
 /** The session: runs until `signal` aborts, then exits `0`. `1` only on a refusal before any request. */
-export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise<number> {
+export async function syncSessionCommand(dependencies: SyncSessionDependencies): Promise<number> {
   const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = dependencies;
   const { fs, clock } = ports;
 
-  const arguments_ = parseArgs(argv);
+  const arguments_ = parseArguments(argv);
   if (!arguments_.ok) {
     stderr(`${PREFIX} ${arguments_.message}`);
     return 1;

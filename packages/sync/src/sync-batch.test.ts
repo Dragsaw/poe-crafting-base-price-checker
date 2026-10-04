@@ -30,7 +30,7 @@ import { LOCK_PATH, serialiseLock } from './chunk/lock.ts';
 import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { LeagueMismatchError } from './league/league-gate.ts';
 import { runSync, syncCommand } from './sync-batch.ts';
-import type { SyncCommandDeps as SyncCommandDependencies } from './sync-batch.ts';
+import type { SyncCommandDependencies } from './sync-batch.ts';
 import type * as TradeClientModule from './trade/client.ts';
 import { TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
 import { SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';

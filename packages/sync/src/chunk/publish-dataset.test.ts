@@ -49,13 +49,13 @@ function inputs(overrides: Partial<DatasetInputs>): DatasetInputs {
 describe('buildDatasetFile', () => {
   it('first run: 5 tracked, 2 visited → 2 step entries and 3 never-synced, sorted by canonical key', () => {
     const tracked = ['E', 'D', 'C', 'B', 'A'].map((id) => raw(id));
-    const [e, , c] = tracked as [TrackedEntry, TrackedEntry, TrackedEntry];
-    const file = buildDatasetFile(inputs({ tracked, stepEntries: [attempted(e, NOW), attempted(c, NOW)] }));
+    const [entryE, , entryC] = tracked as [TrackedEntry, TrackedEntry, TrackedEntry];
+    const file = buildDatasetFile(inputs({ tracked, stepEntries: [attempted(entryE, NOW), attempted(entryC, NOW)] }));
 
     expect(file.entries).toHaveLength(5);
     expect(file.entries.map((entry) => entry.entryKey)).toEqual(tracked.map((entry) => key(entry)).toSorted(compareCanonicalKeys));
     expect(file.entries.filter((entry) => entry.price.state === 'no-listings')).toEqual(
-      [attempted(e, NOW), attempted(c, NOW)].toSorted(byKey),
+      [attempted(entryE, NOW), attempted(entryC, NOW)].toSorted(byKey),
     );
     for (const entry of file.entries) {
       if (entry.price.state === 'no-listings') {

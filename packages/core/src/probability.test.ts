@@ -260,11 +260,11 @@ describe('combinationProbability (§11)', () => {
     const b = tier([line(STAT, [20, 30])], 300, { modGroup: 'B' });
     const c = tier([line(OTHER, [1, 2])], 200, { modGroup: 'A' });
     const d = tier([line(OTHER, [3, 4])], 200, { modGroup: 'D' });
-    const e = tier([line(OTHER, [5, 9])], 600, { modGroup: 'E' });
+    const tierE = tier([line(OTHER, [5, 9])], 600, { modGroup: 'E' });
     // Prefix first: a → 100 · 200 / 800 = 25. Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
     const p = pOf(
       combinationProbability(
-        pools([a, b], [c, d, e]),
+        pools([a, b], [c, d, tierE]),
         { itemLevelMin: 82, prefix: band(10, 12), suffix: band(1, 4, OTHER) },
         0,
       ),
@@ -386,11 +386,11 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const b = tier([line(STAT, [20, 30])], 300, { modGroup: 'B' });
     const c = tier([line(THIRD, [1, 2])], 200, { modGroup: 'H' });
     const d = tier([line(THIRD, [3, 4])], 200, { modGroup: 'D' });
-    const e = tier([line(THIRD, [5, 9])], 600, { modGroup: 'E' });
+    const tierE = tier([line(THIRD, [5, 9])], 600, { modGroup: 'E' });
     // Prefix first: h → 100 · 200 / 800 = 25. Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
     const p = pOf(
       combinationProbability(
-        pools([h, b], [c, d, e]),
+        pools([h, b], [c, d, tierE]),
         { itemLevelMin: 82, prefix: hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), suffix: band(1, 4, THIRD) },
         0,
       ),

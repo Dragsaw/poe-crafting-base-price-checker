@@ -31,10 +31,10 @@ it('serves the repo data/ folder as static files under a relative base', () => {
 
 it('never imports data/** from source', () => {
   const offenders: string[] = [];
-  const walk = (dir: string): void => {
-    const entries = readdirSync(dir, { withFileTypes: true });
+  const walk = (directory: string): void => {
+    const entries = readdirSync(directory, { withFileTypes: true });
     for (const entry of entries) {
-      const full = nodePath.join(dir, entry.name);
+      const full = nodePath.join(directory, entry.name);
       if (entry.isDirectory()) {
         walk(full);
       } else if (/\.(ts|tsx)$/.test(entry.name)) {

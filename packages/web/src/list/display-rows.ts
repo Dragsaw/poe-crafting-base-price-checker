@@ -32,7 +32,7 @@ import { isHonestEmpty } from './list-statement';
 export type Tier = 1 | 2 | 3;
 
 /** What an EV cell holds: a figure at 2dp, or the money-slot phrase naming the open question. */
-type EvCell =
+type ExpectedValueCell =
   | { readonly kind: 'figure'; readonly text: string }
   | { readonly kind: 'phrase'; readonly text: string };
 
@@ -46,7 +46,7 @@ export interface DisplayRow {
   /** A Base Type's id, verbatim. */
   readonly label: string;
   readonly itemLevel: number;
-  readonly ev: EvCell;
+  readonly ev: ExpectedValueCell;
   readonly age: AgeMark | undefined;
   /** The Curation Status. `pinned` leads the combination cell; the trade-link test refuses `pruned`. */
   readonly status: CurationStatus;
@@ -75,7 +75,7 @@ export interface ClassDisplayRow {
   readonly label: string;
   readonly itemLevel: number;
   /** The EV at 2dp — negative is a real figure — or *no figure yet* when the recipe is uncostable. */
-  readonly ev: EvCell;
+  readonly ev: ExpectedValueCell;
   readonly age: undefined;
   /** `core`'s label of the pair. Only `uniform-prior` prints a mark; `measured` is silence (FR-11). */
   readonly provenance: CraftedRankedRow['provenance'];
@@ -295,7 +295,7 @@ export function toDisplayRows(
   // State 23 prints "In canonical order": one sequence across the crafted rows and all three
   // unpriced groups, by key (a class key or a canonical key), with no numeral and one EV phrase.
   if (honestEmpty) {
-    const phrase: EvCell = { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
+    const phrase: ExpectedValueCell = { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
     return [...ranked, ...trailing]
       .map((row): ListRow => ({ ...row, numeral: undefined, tier: 3, ev: phrase }))
       .toSorted((left, right) => compareCanonicalKeys(left.key, right.key));

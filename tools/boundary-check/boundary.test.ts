@@ -36,10 +36,10 @@ interface CruiseOutput {
  * mirroring `packages/<name>/src` is matched by the real `^packages/...`
  * regexes with no parameterisation.
  */
-async function cruiseFixture(baseDir: string): Promise<CruiseOutput> {
+async function cruiseFixture(baseDirectory: string): Promise<CruiseOutput> {
   const result = await cruise(['packages'], {
     ...shippedConfig.options,
-    baseDir,
+    baseDir: baseDirectory,
     ruleSet: { forbidden: shippedConfig.forbidden },
     validate: true,
   });

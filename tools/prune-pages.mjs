@@ -57,13 +57,13 @@ function removeEmptyDirectories(directory, stop) {
 }
 
 /**
- * Prunes `distDirectory` of every file that `dataDirectory` published and the allowlist
+ * Prunes `distributionDirectory` of every file that `dataDirectory` published and the allowlist
  * does not name. Returns what it kept and removed. Throws, naming each, when a
- * required artifact is missing from `distDirectory`.
+ * required artifact is missing from `distributionDirectory`.
  */
-export function prunePages(distDirectory, dataDirectory) {
-  if (!existsSync(distDirectory) || !statSync(distDirectory).isDirectory()) {
-    throw new Error(`prune-pages: no build output at ${distDirectory}; run vite build first.`);
+export function prunePages(distributionDirectory, dataDirectory) {
+  if (!existsSync(distributionDirectory) || !statSync(distributionDirectory).isDirectory()) {
+    throw new Error(`prune-pages: no build output at ${distributionDirectory}; run vite build first.`);
   }
   const allowed = new Set(ALLOWLIST.map((artifact) => artifact.path));
   const removed = [];
@@ -71,22 +71,22 @@ export function prunePages(distDirectory, dataDirectory) {
     if (allowed.has(path)) {
       continue;
     }
-    const target = nodePath.join(distDirectory, ...path.split('/'));
+    const target = nodePath.join(distributionDirectory, ...path.split('/'));
     if (!existsSync(target)) {
       continue;
     }
 
     rmSync(target);
     removed.push(path);
-    removeEmptyDirectories(nodePath.resolve(target, '..'), nodePath.resolve(distDirectory));
+    removeEmptyDirectories(nodePath.resolve(target, '..'), nodePath.resolve(distributionDirectory));
   }
-  const missing = ALLOWLIST.filter((artifact) => artifact.required && !existsSync(nodePath.join(distDirectory, ...artifact.path.split('/'))));
+  const missing = ALLOWLIST.filter((artifact) => artifact.required && !existsSync(nodePath.join(distributionDirectory, ...artifact.path.split('/'))));
   if (missing.length > 0) {
     throw new Error(
-      `prune-pages: required artifact(s) missing from ${distDirectory}: ${missing.map((artifact) => artifact.path).join(', ')}`,
+      `prune-pages: required artifact(s) missing from ${distributionDirectory}: ${missing.map((artifact) => artifact.path).join(', ')}`,
     );
   }
-  const kept = ALLOWLIST.map((artifact) => artifact.path).filter((path) => existsSync(nodePath.join(distDirectory, ...path.split('/'))));
+  const kept = ALLOWLIST.map((artifact) => artifact.path).filter((path) => existsSync(nodePath.join(distributionDirectory, ...path.split('/'))));
   return { kept, removed };
 }
 
@@ -95,9 +95,9 @@ export function prunePages(distDirectory, dataDirectory) {
 // comparison false, and the build would publish all of `data/` and exit 0.
 if (import.meta.main) {
   const root = nodePath.resolve(import.meta.dirname, '..');
-  const distDirectory = nodePath.resolve(root, 'packages/web/dist');
+  const distributionDirectory = nodePath.resolve(root, 'packages/web/dist');
   try {
-    const { kept, removed } = prunePages(distDirectory, nodePath.resolve(root, 'data'));
+    const { kept, removed } = prunePages(distributionDirectory, nodePath.resolve(root, 'data'));
     console.log(`prune-pages: kept ${kept.join(', ')}`);
     console.log(`prune-pages: removed ${removed.length === 0 ? 'nothing' : removed.join(', ')}`);
   } catch (error) {

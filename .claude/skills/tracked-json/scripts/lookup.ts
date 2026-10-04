@@ -248,7 +248,7 @@ function byItemLevel(left: ModifierWeight, right: ModifierWeight): number {
   return left.itemLevelMin - right.itemLevelMin;
 }
 
-export interface ModRow {
+export interface ModifierRow {
   readonly slot: Slot;
   readonly modGroup: string;
   readonly text: string;
@@ -271,9 +271,9 @@ export interface ModRow {
 export function lookupMods(
   weights: WeightsFile,
   selector: ClassSelector & { readonly slot?: Slot },
-): { categoryId: string; className: string; mods: ModRow[] } {
+): { categoryId: string; className: string; mods: ModifierRow[] } {
   const resolved = resolveClass(weights, selector);
-  const mods: ModRow[] = [];
+  const mods: ModifierRow[] = [];
   const slots = selector.slot === undefined ? SLOTS : [selector.slot];
   for (const slot of slots) {
     const pool = resolved.pools[slot];
