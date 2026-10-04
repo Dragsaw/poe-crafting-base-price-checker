@@ -82,12 +82,12 @@ export interface RankInput {
    */
   readonly threshold: number;
   /**
-   * The parsed weights file, or `null` when it is absent (AD-24). A crafted
+   * The parsed weights file, or `undefined` when it is absent (AD-24). A crafted
    * Item Class whose pair is missing from it, or with no file at all, is
    * Unrankable as `class absent from weights file`; one with a `partial` slot
    * is Unrankable as `pool partial` (FR-4).
    */
-  readonly weights: WeightsFile | null;
+  readonly weights: WeightsFile | undefined;
   /**
    * The cross-file failures of this tracked list against `weights`, from
    * `crossFileChecks`, computed once per load by the caller. Each failure's
@@ -259,11 +259,11 @@ const byItemClass = (left: UnrankableClass, right: UnrankableClass): number =>
  * Own keys only, so a pair never resolves through the object prototype.
  */
 function unrankableReasonOf(
-  weights: WeightsFile | null,
+  weights: WeightsFile | undefined,
   categoryId: string,
   className: string,
 ): UnrankableReason | undefined {
-  const classes = weights !== null && Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
+  const classes = weights !== undefined && Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
   const pools = classes !== undefined && Object.hasOwn(classes, className) ? classes[className] : undefined;
   if (pools === undefined) {
     return 'class absent from weights file';
@@ -370,7 +370,7 @@ export function rank(input: RankInput): Ranking {
       unrankable.set(classKey, { categoryId, className, reason });
       continue;
     }
-    const lookup = input.weights === null ? undefined : poolOf(input.weights, categoryId, className);
+    const lookup = input.weights === undefined ? undefined : poolOf(input.weights, categoryId, className);
     if (lookup?.ok === true) {
       rankableClasses.set(classKey, { pools: lookup.pools, entries: members });
     }

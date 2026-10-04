@@ -39,13 +39,12 @@ import { parseArgs } from 'node:util';
 
 import { canonicalKey } from '@poe/contracts';
 import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
-import type { UnvalidatedMark } from '@poe/core';
+import { crossFileChecks, type UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { readWeightsIds } from '../catalogue/weights-ids.ts';
 import { checkCatalogue } from '../chunk/catalogue-check.ts';
-import { runCrossFileChecks } from '../chunk/cross-file-gate.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
 import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
@@ -202,9 +201,9 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   } else if (loaded.weights.value === undefined) {
     // No check runs without the weights file, but each crafted entry is marked (§2.8).
     checks.push({ check: 'cross-file', status: 'skipped' });
-    unvalidated.push(...markedAt(runCrossFileChecks(entries, undefined).unvalidated));
+    unvalidated.push(...markedAt(crossFileChecks(entries, undefined).unvalidated));
   } else {
-    const { failures, unvalidated: marks } = runCrossFileChecks(entries, loaded.weights.value);
+    const { failures, unvalidated: marks } = crossFileChecks(entries, loaded.weights.value);
     unvalidated.push(...markedAt(marks));
     checks.push({ check: 'cross-file', status: failures.length === 0 ? 'passed' : 'failed' });
     for (const failure of failures) {

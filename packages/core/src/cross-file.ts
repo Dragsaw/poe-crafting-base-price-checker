@@ -406,10 +406,10 @@ function isPoolCheckable(pools: WeightsClassPools): boolean {
 /**
  * Every failure of the six checks over the tracked list against the parsed
  * weights file, sorted by canonical key, then by check, and every unvalidated
- * mark, one per entry, sorted by canonical key (§2.8). With `weights` `null`
+ * mark, one per entry, sorted by canonical key (§2.8). With `weights` `undefined`
  * there is no failure and every crafted entry is marked `weights-absent`.
  */
-export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | null): CrossFileResult {
+export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
   const byClass = craftedClassesOf(entries);
 
   const failures: CrossFileFailure[] = [];
@@ -436,7 +436,7 @@ export function crossFileChecks(entries: readonly TrackedEntry[], weights: Weigh
         unvalidated.push({ entryKey: key, categoryId: entry.categoryId, className: entry.className, reason });
       }
     };
-    if (weights === null) {
+    if (weights === undefined) {
       mark('weights-absent');
       continue;
     }

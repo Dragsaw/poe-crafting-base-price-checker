@@ -99,10 +99,10 @@ function entry(
   return { kind: 'crafted', categoryId, className, itemLevelMin, prefix, suffix, status: 'active' };
 }
 
-const failuresOf = (entries: readonly TrackedEntry[], weights: WeightsFile | null) =>
+const failuresOf = (entries: readonly TrackedEntry[], weights: WeightsFile | undefined) =>
   crossFileChecks(entries, weights).failures;
 
-const checksOf = (entries: readonly TrackedEntry[], weights: WeightsFile | null) =>
+const checksOf = (entries: readonly TrackedEntry[], weights: WeightsFile | undefined) =>
   failuresOf(entries, weights).map((failure) => [failure.check, failure.entryKey]);
 
 describe('edge alignment (§2.4)', () => {
@@ -447,15 +447,12 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   });
 });
 
-// eslint-disable-next-line unicorn/no-null -- boundary: `crossFileChecks` takes `WeightsFile | null`, null being the loaded set's absent weights file (AD-24).
-const NO_WEIGHTS: WeightsFile | null = null;
-
 describe('unvalidated marks (§2.8)', () => {
   const a = entry({ prefix: band(43, 56.5) });
   const b = entry({ prefix: band(56, 80) });
 
   it('marks every crafted entry weights-absent, and fails none, without a weights file', () => {
-    expect(crossFileChecks([a, b], NO_WEIGHTS)).toEqual({
+    expect(crossFileChecks([a, b], undefined)).toEqual({
       failures: [],
       unvalidated: [a, b]
         .map((tracked) => canonicalKey(tracked))
@@ -513,7 +510,7 @@ describe('class discriminability (§2.6)', () => {
 
 describe('crossFileChecks scope', () => {
   it('runs no check without a weights file', () => {
-    expect(failuresOf([entry({ prefix: band(0, 9999) })], NO_WEIGHTS)).toEqual([]);
+    expect(failuresOf([entry({ prefix: band(0, 9999) })], undefined)).toEqual([]);
   });
 
   it('runs no pool check on an absent class or a partial slot', () => {

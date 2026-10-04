@@ -84,6 +84,3 @@ export type TolerableKey = Exclude<ArtifactKey, RequiredKey>;
 export type ArtifactSet = { readonly [K in RequiredKey]: Parsed<K> } & {
   readonly [K in TolerableKey]: Parsed<K> | undefined;
 };
-
-// eslint-disable-next-line unicorn/no-null -- boundary: core's `weights` input is `WeightsFile | null`, null being the absent file (AD-24).
-export const ABSENT_WEIGHTS: Parsed<'weights'> | null = null;

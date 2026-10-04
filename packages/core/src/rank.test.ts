@@ -79,8 +79,6 @@ function weightsWith(...classes: readonly (readonly [string, string, Coverage?, 
   };
 }
 
-// eslint-disable-next-line unicorn/no-null -- boundary: `RankInput.weights` is `WeightsFile | null`, the loaded set carries null for an absent file (AD-24).
-const NO_WEIGHTS: WeightsFile | null = null;
 
 const UNCOSTABLE = 'uncostable';
 
@@ -428,7 +426,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('names every crafted class, reason verbatim, when no weights envelope is loaded', () => {
     const result = ranked({
       tracked: [craftedOf('weapon.bow', 'Bows'), craftedOf('accessory.amulet', 'Amulets'), raw('A')],
-      weights: NO_WEIGHTS,
+      weights: undefined,
     });
     expect(result.unrankable).toEqual([
       { categoryId: 'accessory.amulet', className: 'Amulets', reason: ABSENT },
@@ -484,7 +482,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('makes one class of two crafted entries on one (categoryId, className)', () => {
     const result = ranked({
       tracked: [craftedOf('weapon.bow', 'Bows', 'active', 54), craftedOf('weapon.bow', 'Bows', 'pinned', 82)],
-      weights: NO_WEIGHTS,
+      weights: undefined,
     });
     expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: ABSENT }]);
   });
@@ -492,7 +490,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('keeps two classes that share a className but not a categoryId, breaking on categoryId', () => {
     const result = ranked({
       tracked: [craftedOf('armour.chest', 'Body Armours'), craftedOf('armour.chest.alt', 'Body Armours')],
-      weights: NO_WEIGHTS,
+      weights: undefined,
     });
     expect(result.unrankable.map((item) => item.categoryId)).toEqual(['armour.chest', 'armour.chest.alt']);
   });
@@ -504,7 +502,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
         craftedOf('weapon.staff', 'Staves', 'pruned'),
         craftedOf('weapon.staff', 'Staves', 'active'),
       ],
-      weights: NO_WEIGHTS,
+      weights: undefined,
     });
     expect(result.unrankable.map((item) => item.className)).toEqual(['Staves']);
   });
@@ -512,7 +510,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('holds no class for a raw-only Tracked List, and leaves the raw branch unchanged', () => {
     const A = raw('A');
     const input = { tracked: [A], dataset: [published(A, priced(0.5))] };
-    const absent = ranked({ ...input, weights: NO_WEIGHTS });
+    const absent = ranked({ ...input, weights: undefined });
     expect(absent.unrankable).toEqual([]);
     expect(absent).toEqual(ranked({ ...input, weights: WEIGHTS }));
   });
@@ -520,7 +518,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('sorts by className in UTF-8 code-unit order, not locale order', () => {
     const result = ranked({
       tracked: [craftedOf('c.b', 'bows'), craftedOf('c.a', 'Wands'), craftedOf('c.c', 'Amulets')],
-      weights: NO_WEIGHTS,
+      weights: undefined,
     });
     expect(result.unrankable.map((item) => item.className)).toEqual(['Amulets', 'Wands', 'bows']);
   });
@@ -560,9 +558,9 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       craftedOf('weapon.staff', 'Staves', 'pruned'),
       raw('A'),
     ];
-    const expected = ranked({ tracked, weights: NO_WEIGHTS });
+    const expected = ranked({ tracked, weights: undefined });
     for (const seed of [1, 7, 42]) {
-      expect(ranked({ tracked: permute(tracked, seed), weights: NO_WEIGHTS })).toEqual(expected);
+      expect(ranked({ tracked: permute(tracked, seed), weights: undefined })).toEqual(expected);
     }
   });
 });
@@ -845,7 +843,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
   });
 
   it('a class-level reason holds under every recipe, with no recipe id and no crafted row', () => {
-    const result = rankCrafted({ tracked: [chase('Bows')], weights: NO_WEIGHTS });
+    const result = rankCrafted({ tracked: [chase('Bows')], weights: undefined });
     expect(craftedRows(result.ordering)).toEqual([]);
     expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: ABSENT }]);
   });

@@ -13,7 +13,7 @@
 
 import type { CrossFileGateFailureRecord, TrackedEntry, WeightsFile } from '@poe/contracts';
 import { crossFileChecks } from '@poe/core';
-import type { CrossFileFailure, CrossFileResult } from '@poe/core';
+import type { CrossFileFailure } from '@poe/core';
 
 export class CrossFileGateError extends Error {
   readonly failures: readonly CrossFileFailure[];
@@ -30,15 +30,9 @@ export class CrossFileGateError extends Error {
   }
 }
 
-/** `crossFileChecks` with an absent weights file as `undefined`. */
-export function runCrossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
-  // eslint-disable-next-line unicorn/no-null -- boundary: `crossFileChecks` takes `WeightsFile | null`, null being the absent weights file (AD-24).
-  return crossFileChecks(entries, weights === undefined ? null : weights);
-}
-
 /** Throws `CrossFileGateError` on any failure; returns on a clean or absent file. */
 export function crossFileGate(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): void {
-  const { failures } = runCrossFileChecks(entries, weights);
+  const { failures } = crossFileChecks(entries, weights);
   if (failures.length > 0) {
     throw new CrossFileGateError(failures);
   }
