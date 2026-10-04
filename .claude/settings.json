@@ -35,6 +35,18 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Edit|Write|MultiEdit|mcp__serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|rename_symbol|replace_in_files|safe_delete_symbol))$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/lint-on-edit/lint-on-edit.ts\"",
+            "timeout": 40
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "matcher": "",
