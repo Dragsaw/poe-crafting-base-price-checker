@@ -308,11 +308,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/chunk/run-chunk.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/chunk/sync-report.ts": {
     "local/max-comment-run": {
       "count": 2
