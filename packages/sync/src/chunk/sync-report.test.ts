@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { SyncReportFileSchema } from '@poe/contracts';
+import { SYNC_REPORT_SCHEMA_VERSION, SyncReportFileSchema } from '@poe/contracts';
 import type { PinnedStarvationRecord, SyncReportFile, SyncRunRecord } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
@@ -51,7 +51,7 @@ describe('buildSyncReport', () => {
         notReachedCount: 0,
       },
       records: [],
-      schemaVersion: '1.2.0',
+      schemaVersion: SYNC_REPORT_SCHEMA_VERSION,
     });
     expect(SyncReportFileSchema.safeParse(report).success).toBe(true);
   });

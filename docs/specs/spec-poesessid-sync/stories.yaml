@@ -23,8 +23,8 @@
 - id: "3"
   title: Mid-run downgrade and the hold-off across processes
   description: >-
-    A 401, a 403 or a not-live 2xx on a cookie request after the probe causes
-    a downgrade. The downgrade drops the cookie, resets pacing to cold in
+    A 401, a 403 or a tested not-live 2xx on a cookie request after the probe
+    causes a downgrade. The downgrade drops the cookie, resets pacing to cold in
     place and ends the chunk as a session-expired yield (SPEC CAP-3). The
     story also writes and clears authHoldOffUntil in sync-progress.json
     1.2.0, and settles held-off runs with no probe (SPEC CAP-5).

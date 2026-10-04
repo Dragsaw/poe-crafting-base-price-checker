@@ -8,8 +8,11 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
+  SUPPORTED_SCHEMA_VERSION,
+  SYNC_PROGRESS_SCHEMA_VERSION,
   SyncReportFileSchema,
   TRACKED_SCHEMA_VERSION,
+  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type {
   DatasetEntry,
@@ -107,24 +110,24 @@ function inputs(
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
     'data/config.json': {
-      contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches }),
+      contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
     'data/currencies.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
       }),
     },
     'data/catalogue/items.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
       }),
     },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/weights.json': { contents: JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
+    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/weights.json': { contents: JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
   };
 }
 
@@ -746,14 +749,31 @@ describe('pnpm sync: the session with injected ports', () => {
     });
 
     it('a probe 429: no line, notBefore persisted, and the next chunk probes again', async () => {
-      const { deps, auth, http } = sessionFor({
+      const { deps, auth, http, fs, clock } = sessionFor({
         env: COOKIE_ENV,
         tracked: [ENTRY, SECOND, THIRD],
         stopAfter: 2,
         http: probing({ status: 429, headers: { 'retry-after': '60' }, body: '' }, LIVE),
       });
+      // At the session's first wait: the notBefore the probe-429 chunk left in
+      // the progress file, and the instant the wait ends.
+      let first: { readonly persisted: unknown; readonly until: string } | undefined;
+      const sleep = deps.sleep;
+      const watched: SyncSessionDeps = {
+        ...deps,
+        sleep: async (ms, signal) => {
+          if (first === undefined) {
+            const progress = JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '{}') as Record<string, unknown>;
+            first = { persisted: progress['notBefore'], until: new Date(Date.parse(clock.now()) + ms).toISOString() };
+          }
+          await sleep(ms, signal);
+        },
+      };
 
-      expect(await syncSessionCommand(deps)).toBe(0);
+      expect(await syncSessionCommand(watched)).toBe(0);
+
+      // retry-after: 60 from the probe at NOW.
+      expect(first).toEqual({ persisted: '2026-09-26T12:01:00.000Z', until: '2026-09-26T12:01:00.000Z' });
 
       expect(cookies(http)).toEqual([
         ['GET', undefined],
@@ -825,7 +845,7 @@ describe('pnpm sync: the session with injected ports', () => {
         tracked: [ENTRY, SECOND, THIRD],
         stopAfter: 3,
         seeded: {
-          [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.2.0', completed: [], authHoldOffUntil: HOLD_OFF }) },
+          [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [], authHoldOffUntil: HOLD_OFF }) },
         },
         http: probing(LIVE),
       });
@@ -890,7 +910,7 @@ describe('pnpm sync: the session with injected ports', () => {
   function hourOldPinned(argv: readonly string[]) {
     const pinned: TrackedEntry = { ...SECOND, status: 'pinned' };
     const dataset = {
-      schemaVersion: '1.0.0',
+      schemaVersion: SUPPORTED_SCHEMA_VERSION,
       league: LEAGUE,
       generatedAt: NOW,
       entries: [
@@ -1029,7 +1049,7 @@ describe('pnpm sync: the session with injected ports', () => {
   it('a league mismatch is printed and waited out until an input file changes', async () => {
     const { deps, err, out, fs, http } = sessionFor({ stopAfter: 2 });
     fs.setFile('data/config.json', {
-      contents: JSON.stringify({ schemaVersion: '1.0.0', league: 'Nope League', minChunkSearches: 1 }),
+      contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: 'Nope League', minChunkSearches: 1 }),
       modifiedAt: NOW,
     });
     let polls = 0;
@@ -1041,7 +1061,7 @@ describe('pnpm sync: the session with injected ports', () => {
         polls += 1;
         if (polls === 3) {
           fs.setFile('data/config.json', {
-            contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 }),
+            contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 1 }),
             modifiedAt: '2026-09-26T13:00:00.000Z',
           });
         }

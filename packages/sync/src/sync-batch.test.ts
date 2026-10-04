@@ -8,13 +8,18 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
+  SUPPORTED_SCHEMA_VERSION,
+  SYNC_PROGRESS_SCHEMA_VERSION,
+  SYNC_REPORT_SCHEMA_VERSION,
   SyncReportFileSchema,
   TRACKED_SCHEMA_VERSION,
+  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type {
   DatasetEntry,
   FakeFilesystemPort,
   FilesystemPort,
+  HttpRequest,
   HttpResponse,
   SyncReportFile,
   TrackedEntry,
@@ -70,22 +75,22 @@ function inputs(
       contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: tracked }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league, minChunkSearches: 1 }) },
+    'data/config.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league, minChunkSearches: 1 }) },
     'data/currencies.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
       }),
     },
     'data/catalogue/items.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
       }),
     },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/weights.json': { contents: JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
+    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/weights.json': { contents: JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
   };
 }
 
@@ -312,7 +317,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
       completed: [],
       notBefore: '2026-09-26T12:01:00.000Z',
-      schemaVersion: '1.2.0',
+      schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
     });
     const report = await reportOf(fs);
     expect(report?.records).toEqual([]);
@@ -472,7 +477,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     };
     const published = `${JSON.stringify(
       {
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         league: LEAGUE,
         generatedAt: '2026-09-25T12:00:00.000Z',
         entries: [priced],
@@ -581,24 +586,42 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const COOKIE = `POESESSID=${VALUE}`;
     const COOKIE_ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALUE };
     const RESULTS = ['r1', 'r2'];
+    /**
+     * The live API names a policy on every answer, and a search and a fetch
+     * are counted under different policies (§13.2). The baseline search
+     * answers one rule without the cookie.
+     */
+    const SEARCH_HEADERS = {
+      'x-rate-limit-policy': 'trade-search-request-limit',
+      'x-rate-limit-rules': 'Ip',
+      'x-rate-limit-ip': '30:300:60',
+      'x-rate-limit-ip-state': '1:300:0',
+    };
+    /** One rule, under the fetch's own policy: never `tested` against the search baseline. */
+    const FETCH_HEADERS = {
+      'x-rate-limit-policy': 'trade-fetch-request-limit',
+      'x-rate-limit-rules': 'Ip',
+      'x-rate-limit-ip': '30:300:60',
+      'x-rate-limit-ip-state': '1:300:0',
+    };
     const SEARCH_WITH_RESULTS: HttpResponse = {
       status: 200,
-      headers: {},
+      headers: SEARCH_HEADERS,
       body: JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length }),
     };
     const FETCHED: HttpResponse = {
       status: 200,
-      headers: {},
+      headers: FETCH_HEADERS,
       body: JSON.stringify({ result: [{ listing: { price: { amount: 2, currency: 'divine' } } }] }),
     };
-    /** One rule more than the fake's baseline answer, which names none. */
+    /** The search policy with one rule more than the baseline: a live cookie. The rule name and bucket are illustrative. */
     const LIVE: HttpResponse = {
       status: 200,
       headers: {
-        'x-rate-limit-policy': 'search-policy',
-        'x-rate-limit-rules': 'Ip',
-        'x-rate-limit-ip': '30:300:60',
-        'x-rate-limit-ip-state': '1:300:0',
+        ...SEARCH_HEADERS,
+        'x-rate-limit-rules': 'Ip,Account',
+        'x-rate-limit-account': '60:300:60',
+        'x-rate-limit-account-state': '1:300:0',
       },
       body: SEARCH_WITH_RESULTS.body,
     };
@@ -614,16 +637,14 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     /**
      * As `probing`, and every later cookie request is answered by `after`:
-     * by default the fake's answer with the live rule set added, so the
-     * cookie stays live (§13.4).
+     * by default a search gets the live rule set and a fetch keeps the fake's
+     * answer under its own policy, so the cookie stays live (§13.4).
      */
     function probingThen(
       deps: SyncCommandDeps,
       answers: (HttpResponse | Error)[],
-      after: (answer: HttpResponse) => HttpResponse = (answer) => ({
-        ...answer,
-        headers: { ...answer.headers, ...LIVE.headers },
-      }),
+      after: (answer: HttpResponse, request: HttpRequest) => HttpResponse = (answer, request) =>
+        request.method === 'POST' ? { ...answer, headers: { ...answer.headers, ...LIVE.headers } } : answer,
     ): SyncCommandDeps {
       const fake = deps.http;
       return {
@@ -636,7 +657,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
             }
             const answer = request.method === 'POST' ? answers.shift() : undefined;
             if (answer === undefined) {
-              return sent.then(after);
+              return sent.then((response) => after(response, request));
             }
             return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
           },
@@ -651,7 +672,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const HOLD_OFF = '2026-09-27T06:00:00.000Z';
     const PAST_HOLD_OFF = '2026-09-26T11:00:00.000Z';
     const progressSeed = (fields: Record<string, unknown>) => ({
-      [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.2.0', completed: [], ...fields }) },
+      [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [], ...fields }) },
     });
 
     function withResults(setup: Setup = {}) {
@@ -675,11 +696,12 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
         ['GET', COOKIE],
       ]);
       expect(http.requests[3]?.url).toBe(tradeFetchUrl(RESULTS, 'S1'));
+      // The fetch answers fewer rules than the probe, under its own policy: not tested, no downgrade (§13.4).
       expect(auth).toEqual([{ line: 'pnpm sync:batch: authenticated', requestsBefore: 3 }]);
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: completed, 1 completed']);
       const report = await reportOf(fs);
-      expect(report?.schemaVersion).toBe('1.2.0');
+      expect(report?.schemaVersion).toBe(SYNC_REPORT_SCHEMA_VERSION);
       expect(report?.figures.requestsBySource).toEqual({
         'tracked-list': 2,
         'league-validation': 1,
@@ -762,7 +784,6 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     it.each([
       ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' } as HttpResponse],
       ['a 401', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
-      ['a 2xx that is not live', FETCHED],
     ])('CAP-3, %s on the cookie fetch: one expired line, the entry stamped, yielded, the hold-off written, exit 0', async (_label, downgrading) => {
       const { deps, http, auth, err, out, fs } = withResults();
 
@@ -775,7 +796,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: yielded, 0 completed']);
       const progress = await progressOf(fs);
-      expect(progress).toEqual({ schemaVersion: '1.2.0', completed: [], authHoldOffUntil: NOW_PLUS_24H });
+      expect(progress).toEqual({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [], authHoldOffUntil: NOW_PLUS_24H });
       // The entry is stamped and keeps the search fields from this entry's search; the price is unchanged.
       const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
       expect(dataset.entries[0]).toMatchObject({
@@ -786,6 +807,40 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       // A downgrade is not a request-rejected abort: no record.
       expect((await reportOf(fs))?.records).toEqual([]);
       expect(cookies(http).at(-1)).toEqual(['GET', COOKIE]);
+    });
+
+    it('CAP-3, a search 2xx that is not live: the next entry’s search expires the cookie, the fetch before it did not', async () => {
+      const second: TrackedEntry = { ...ENTRY, itemLevelMin: 83 };
+      const { deps, http, auth, err, out, fs } = withResults({ tracked: [ENTRY, second] });
+
+      // After the probe, every cookie request gets the answer the cookie-less request gets.
+      expect(await syncCommand(probingThen(deps, [LIVE], (answer) => answer))).toBe(0);
+
+      expect(cookies(http)).toEqual([
+        ['GET', undefined],
+        ['POST', undefined],
+        ['POST', COOKIE],
+        ['GET', COOKIE],
+        ['POST', COOKIE],
+      ]);
+      expect(auth.map((entry) => entry.line)).toEqual([
+        'pnpm sync:batch: authenticated',
+        'pnpm sync:batch: unauthenticated (expired)',
+      ]);
+      expect(err).toEqual([]);
+      expect(out).toEqual(['pnpm sync:batch: yielded, 1 completed']);
+      expect((await progressOf(fs))['authHoldOffUntil']).toBe(NOW_PLUS_24H);
+      // The second entry is stamped with no search fields: the downgrading search was its first.
+      const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
+      // The first entry was priced from its fetch, which was not a downgrade.
+      expect(dataset.entries.find((entry) => entry.entryKey === canonicalKey(ENTRY))).toMatchObject({
+        lastSearchId: 'S1',
+        price: { state: 'priced' },
+      });
+      const stamped = dataset.entries.find((entry) => entry.entryKey === canonicalKey(second));
+      expect(stamped).toMatchObject({ lastAttemptedAt: NOW, price: { state: 'not-yet-synced', reason: 'never-synced' } });
+      expect(stamped).not.toHaveProperty('lastSearchId');
+      expect((await reportOf(fs))?.records).toEqual([]);
     });
 
     it('CAP-5, held off: unauthenticated (held-off), no session-probe request, exit 0, the field unchanged', async () => {

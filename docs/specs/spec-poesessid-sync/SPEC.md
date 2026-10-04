@@ -96,4 +96,4 @@ This spec captures an opportunity. A capture on 2026-10-02 showed that a POESESS
 ## Assumptions
 
 - Sync runs only on the operator's machine, not in CI. CI therefore needs no secret.
-- An inactive cookie receives a 401 or 403, or a 2xx with fewer rules. Both cause a downgrade. By 2026-11-02, OQ-26 finds out which response happens.
+- An inactive cookie receives a 401 or 403, or a 2xx with fewer rules. `IMPLEMENTATION-NOTES.md` §13.4 sets which of these responses is a downgrade, with §13.2 `tested`. By 2026-11-02, OQ-26 finds out which response happens.

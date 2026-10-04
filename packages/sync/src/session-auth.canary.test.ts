@@ -5,7 +5,9 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
+  SUPPORTED_SCHEMA_VERSION,
   TRACKED_SCHEMA_VERSION,
+  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { FilesystemPort, HttpPort, HttpRequest, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
@@ -40,36 +42,53 @@ const LEAGUES_BODY = JSON.stringify({
   ],
 });
 
-function inputs(): Parameters<typeof createFakeFilesystemPort>[0] {
+function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof createFakeFilesystemPort>[0] {
   return {
     [TRACKED_PATH]: {
-      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: [ENTRY] }),
+      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 }) },
+    'data/config.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 1 }) },
     'data/currencies.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
       }),
     },
     'data/catalogue/items.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
       }),
     },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
+    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
     'data/weights.json': {
       contents: JSON.stringify({
-        schemaVersion: '6.0.0',
+        schemaVersion: WEIGHTS_SCHEMA_VERSION,
         gamePatch: '0.5.5',
         producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
         bases: {},
       }),
     },
   };
+}
+
+/**
+ * The base64 and base64url characters that encode `bytes` inside any longer
+ * value. A 3-byte group of the encoding starts at the window's byte 0, 1 or 2,
+ * depending on where the window sits. From that byte, each whole group made
+ * of the window's own bytes encodes the same characters whatever surrounds it.
+ */
+function alignedBase64(bytes: Buffer): string[] {
+  const forms: string[] = [];
+  for (const encoding of ['base64', 'base64url'] as const) {
+    for (let lead = 0; lead < 3; lead += 1) {
+      const groups = Math.floor((bytes.length - lead) / 3);
+      forms.push(bytes.subarray(lead, lead + groups * 3).toString(encoding));
+    }
+  }
+  return forms;
 }
 
 /** Every 8-character window of the canary, in each form a leak could take. */
@@ -79,8 +98,11 @@ const NEEDLES: readonly string[] = (() => {
     const window = CANARY.slice(start, start + 8);
     found.add(window);
     found.add(encodeURIComponent(window));
-    found.add(Buffer.from(window).toString('base64').replace(/=+$/, ''));
-    found.add(Buffer.from(window).toString('base64url'));
+    for (const form of alignedBase64(Buffer.from(window))) {
+      found.add(form);
+      // base64 carries `+` and `/`, which a URL encodes.
+      found.add(encodeURIComponent(form));
+    }
   }
   return [...found];
 })();
@@ -178,8 +200,10 @@ interface Captured {
  * lock rejects with the canary error: a throw from outside the governor that
  * reaches the shell's own `catch` before any report is written.
  */
-function capturing(options: { readonly lockFault?: boolean } = {}): Captured {
-  const fs = createFakeFilesystemPort(inputs());
+function capturing(
+  options: { readonly lockFault?: boolean; readonly tracked?: readonly TrackedEntry[] } = {},
+): Captured {
+  const fs = createFakeFilesystemPort(inputs(options.tracked));
   const written = new Set<string>();
   const texts: string[] = [];
   let lockFaults = 0;
@@ -233,12 +257,22 @@ async function runBatch(captured: Captured, http: HttpPort): Promise<ShellRun> {
   return { code, lines };
 }
 
+/** More pauses than any passing case needs; past it, `runSession` throws. */
+const MAX_SESSION_PAUSES = 200;
+
 async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun> {
   const lines: string[] = [];
   const controller = new AbortController();
   let chunks = 0;
+  let pauses = 0;
   const clock = createFakeClockPort(NOW);
+  // The fake pause resolves at once, so a session that never prints a second
+  // chunk line spins and starves Vitest's timeout. The cap ends it loudly.
   const advance = (ms: number): Promise<void> => {
+    pauses += 1;
+    if (pauses > MAX_SESSION_PAUSES) {
+      controller.abort();
+    }
     clock.set(new Date(Date.parse(clock.now()) + ms).toISOString());
     return Promise.resolve();
   };
@@ -266,6 +300,11 @@ async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun>
     stdout: line,
     stderr: line,
   });
+  if (pauses > MAX_SESSION_PAUSES) {
+    throw new Error(
+      `runSession: no second chunk line after ${String(MAX_SESSION_PAUSES)} pauses; lines:\n${lines.join('\n')}`,
+    );
+  }
   return { code, lines };
 }
 
@@ -282,6 +321,21 @@ describe('CAP-4: the canary never leaves the holder', () => {
   it('the needles are the canary windows (a self-check of the scan)', () => {
     expect(leaksIn(`x ${CANARY.slice(3, 12)} y`)).not.toEqual([]);
     expect(leaksIn(Buffer.from(CANARY.slice(0, 9)).toString('base64'))).not.toEqual([]);
+  });
+
+  it.each(['', 'x', 'xy'])('every 8 characters of the canary, base64 behind %j, are caught at the end of a value or before more bytes', (prefix) => {
+    const missed: string[] = [];
+    for (let start = 0; start + 8 <= CANARY.length; start += 1) {
+      for (const suffix of ['', '!']) {
+        for (const encoding of ['base64', 'base64url'] as const) {
+          const leak = Buffer.from(`${prefix}${CANARY.slice(start, start + 8)}${suffix}`).toString(encoding);
+          if (leaksIn(leak).length === 0) {
+            missed.push(`${encoding} at ${start}${suffix === '' ? ', at the end' : ''}`);
+          }
+        }
+      }
+    }
+    expect(missed).toEqual([]);
   });
 
   it('control: a chunk built with no holder passes the canary on, so the scan can see a leak', async () => {
@@ -533,12 +587,23 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
 describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => {
   const RESULTS = ['r1'];
   const SEARCHED = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length });
-  const LIVE_HEADERS = {
-    'x-rate-limit-policy': 'search-policy',
+  /** Every answer names its policy, as the live API does; a search and a fetch differ (§13.2). */
+  const SEARCH_HEADERS = {
+    'x-rate-limit-policy': 'trade-search-request-limit',
     'x-rate-limit-rules': 'Ip',
     'x-rate-limit-ip': '30:300:60',
     'x-rate-limit-ip-state': '1:300:0',
   };
+  const FETCH_HEADERS = { ...SEARCH_HEADERS, 'x-rate-limit-policy': 'trade-fetch-request-limit' };
+  /** The search policy with one rule more than the baseline: a live probe. The rule name and bucket are illustrative. */
+  const LIVE_HEADERS = {
+    ...SEARCH_HEADERS,
+    'x-rate-limit-rules': 'Ip,Account',
+    'x-rate-limit-account': '60:300:60',
+    'x-rate-limit-account-state': '1:300:0',
+  };
+  /** A second entry, so a search carries the cookie after the probe. */
+  const TRACKED: readonly TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }];
   /** A body and headers that quote the request's cookie in every form. */
   const quoting = (cookie: string) => ({
     body: `echo ${cookie} ${encodeURIComponent(cookie)} ${Buffer.from(cookie).toString('base64')}`,
@@ -547,13 +612,19 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
 
   type Downgrade = '401' | '403' | 'not-live';
 
-  /** A live probe, then the fetch that carries the cookie gets a downgrade that quotes it. */
+  /**
+   * A live probe, then a downgrade that quotes the cookie. A `401` or `403`
+   * answers the fetch. `not-live` answers the next entry's search with the
+   * baseline's rule count under the baseline's policy; the fetch before it
+   * answers fewer rules under its own policy and is not tested.
+   */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;
+    let probed = false;
     const fake = createFakeHttpPort({
       [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
-      [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: SEARCHED },
-      [`GET ${tradeFetchUrl(RESULTS, 'S1')}`]: { status: 200, headers: {}, body: '{"result":[]}' },
+      [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: SEARCH_HEADERS, body: SEARCHED },
+      [`GET ${tradeFetchUrl(RESULTS, 'S1')}`]: { status: 200, headers: FETCH_HEADERS, body: '{"result":[]}' },
     });
     return {
       port: {
@@ -562,16 +633,20 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
           if (cookie === undefined) {
             return fake.send(request);
           }
-          if (request.method === 'GET') {
-            downgraded += 1;
-            const echo = quoting(cookie);
-            return Promise.resolve(
-              kind === 'not-live'
-                ? { status: 200, headers: echo.headers, body: echo.body }
-                : { status: Number(kind), headers: echo.headers, body: echo.body },
-            );
+          if (request.method === 'POST' && !probed) {
+            probed = true;
+            return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
           }
-          return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
+          const echo = quoting(cookie);
+          if (kind === 'not-live' && request.method === 'POST') {
+            downgraded += 1;
+            return Promise.resolve({ status: 200, headers: { ...SEARCH_HEADERS, ...echo.headers }, body: echo.body });
+          }
+          if (kind !== 'not-live' && request.method === 'GET') {
+            downgraded += 1;
+            return Promise.resolve({ status: Number(kind), headers: echo.headers, body: echo.body });
+          }
+          return fake.send(request);
         },
       },
       downgraded: () => downgraded,
@@ -581,7 +656,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   const KINDS: readonly Downgrade[] = ['401', '403', 'not-live'];
 
   it.each(KINDS)('pnpm sync:batch: a %s downgrade quoting the cookie leaves no trace', async (kind) => {
-    const captured = capturing();
+    const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
     const { code, lines } = await runBatch(captured, http.port);
@@ -595,7 +670,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   });
 
   it.each(KINDS)('pnpm sync: a %s downgrade quoting the cookie leaves no trace', async (kind) => {
-    const captured = capturing();
+    const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
     const { code, lines } = await runSession(captured, http.port);
@@ -609,7 +684,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   });
 
   it.each(KINDS)('the outcome of a chunk with a %s downgrade carries no trace', async (kind) => {
-    const captured = capturing();
+    const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
     const outcome = await composeChunk({
@@ -625,6 +700,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
     }).run();
 
     expect(outcome).toMatchObject({ kind: 'yielded', sessionExpired: true });
+    expect(http.downgraded()).toBe(1);
     const scanned = [JSON.stringify(outcome), ...captured.texts, ...(await captured.files())].join('\n');
     expect(leaksIn(scanned)).toEqual([]);
   });

@@ -10,7 +10,11 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   DatasetFileSchema,
+  SUPPORTED_SCHEMA_VERSION,
+  SYNC_PROGRESS_SCHEMA_VERSION,
+  SYNC_REPORT_SCHEMA_VERSION,
   TRACKED_SCHEMA_VERSION,
+  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { CurrencyRate, DatasetEntry, DatasetFile, SyncReportFile, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it, vi } from 'vitest';
@@ -48,9 +52,9 @@ const FROZEN_DATA_DIR = fileURLToPath(new URL('../../../test/fixtures/frozen-dat
 
 const LEAGUE = 'Test League';
 /** A yardstick of 2, so the one pinned entry fits the load-time cap (IMPLEMENTATION-NOTES.md §6). */
-const CONFIG = JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 2 });
+const CONFIG = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 2 });
 const CURRENCIES = JSON.stringify({
-  schemaVersion: '1.0.0',
+  schemaVersion: SUPPORTED_SCHEMA_VERSION,
   rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
 });
 /** Every base type the synthetic entries below name, in one group no category id matches. */
@@ -63,11 +67,11 @@ const ITEMS_CATALOGUE = {
     },
   ],
 };
-const ITEMS = JSON.stringify({ schemaVersion: '1.0.0', ...ITEMS_CATALOGUE });
-const STATS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
-const FILTERS = JSON.stringify({ schemaVersion: '1.0.0', result: [] });
+const ITEMS = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, ...ITEMS_CATALOGUE });
+const STATS = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] });
+const FILTERS = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] });
 /** A present weights file with no ids, so no weights record arises. */
-const WEIGHTS = JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} });
+const WEIGHTS = JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} });
 
 /** The league gate's answer: the synthetic league is one the API carries. */
 const LEAGUES_ANSWER = JSON.stringify({ result: [{ id: 'Standard' }, { id: LEAGUE }] });
@@ -120,7 +124,7 @@ const entries: TrackedEntry[] = [
 
 function datasetOf(published: readonly DatasetEntry[]): DatasetFile {
   return {
-    schemaVersion: '1.0.0',
+    schemaVersion: SUPPORTED_SCHEMA_VERSION,
     league: LEAGUE,
     generatedAt: DRY_RUN_INSTANT,
     entries: [...published],
@@ -138,7 +142,7 @@ function reportOf(trackedListRequests: number, notReachedCount = 0): SyncReportF
       notReachedCount,
     },
     records: [],
-    schemaVersion: '1.2.0',
+    schemaVersion: SYNC_REPORT_SCHEMA_VERSION,
   };
 }
 
@@ -151,7 +155,7 @@ describe('dryRun', () => {
       completed: [canonicalKey(pinned), canonicalKey(active)],
       entries: [noListings(pinned, 1), noListings(active, 0)],
       // Pinned entries are exempt from the pass, so only the active key is recorded.
-      progress: { schemaVersion: '1.2.0', completed: [canonicalKey(active)] },
+      progress: { schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [canonicalKey(active)] },
       dataset: datasetOf(
         [
           noListings(pinned, 1),
@@ -181,7 +185,7 @@ describe('dryRun', () => {
       outcome: 'completed',
       completed: [],
       entries: [],
-      progress: { schemaVersion: '1.2.0', completed: [] },
+      progress: { schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [] },
       dataset: datasetOf([]),
       records: [],
       report: reportOf(0),
@@ -190,7 +194,7 @@ describe('dryRun', () => {
 
   it('publishes the output rate set: divine exactly 1, others at 4dp, league and asOf verbatim', async () => {
     const currencies = JSON.stringify({
-      schemaVersion: '1.0.0',
+      schemaVersion: SUPPORTED_SCHEMA_VERSION,
       rates: [
         { currencyId: 'divine', rate: 1, source: 'measured', league: 'Old League', asOf: '2025-12-01T00:00:00Z' },
         { currencyId: 'chaos', rate: 0.00812345, source: 'measured', league: 'Old League', asOf: '2025-12-02T00:00:00Z' },
@@ -341,7 +345,7 @@ describe('dryRun: the dataset snapshot', () => {
   const A_ATTEMPTED_AT = '2025-12-31T00:00:00.000Z';
   const B_ATTEMPTED_AT = '2025-12-30T00:00:00.000Z';
   const datasetText = JSON.stringify({
-    schemaVersion: '1.0.0',
+    schemaVersion: SUPPORTED_SCHEMA_VERSION,
     league: 'Standard',
     generatedAt: A_ATTEMPTED_AT,
     entries: [
