@@ -1,29 +1,6 @@
-/**
- * `pnpm fixtures:record` — the explicit, human-invoked recorder (NFR-2, AD-13).
- *
- * It issues live GET requests through the **same governed client** every other
- * story spends through, strips every personal identifier at record time, and
- * writes the payloads under `fixtures/`. Its output is a reviewable diff, which
- * is the mechanism that makes a change by GGG visible before it becomes a
- * production incident.
- *
- * **No test runs this.** It is referenced by no vitest config and by no setup
- * file, and the entry guard at the bottom means importing the module — which
- * `fixtures-record.test.ts` does, to drive `recordFixtures` against the fakes —
- * issues nothing.
- *
- * **What it records**: the leagues endpoint and the four `data/*` endpoints,
- * whose URLs it takes from `trade/endpoints.ts` — the same declaration
- * `catalogue:refresh` reads — and, for every non-pruned entry of the fixture
- * workload `fixtures/tracked.json` (`FIXTURE_WORKLOAD_PATH`), the POST search
- * and its fetch leg (Story 1.7). The workload is a small fixed list, not
- * `data/tracked.json`, so the player's list can grow with no new recording. The
- * search body is built by `buildSearchBody`, the same builder the pricing
- * step sends, in the league `data/config.json` names. No request body is
- * hand-written here; a hand-written body records what the team believes the
- * API takes rather than what it takes, which is the defect the fixture rules
- * exist to prevent. `data/` is read and never written.
- */
+// `pnpm fixtures:record` (NFR-2, AD-13): the explicit, human-invoked recorder. No test runs it, and the entry guard
+// below keeps importing it side-effect free. Request bodies come from `buildSearchBody`, never hand-written: a fixture
+// must record what the API takes, not what the team believes it takes.
 
 import { readdir, rm } from 'node:fs/promises';
 import nodePath from 'node:path';
@@ -71,11 +48,7 @@ const PRICING_FIXTURE_FILE = /^trade-(search|fetch)-[0-9a-f]+\.json$/;
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
 
-/**
- * One recordable interaction. All five share a lane because they are the same
- * kind of GET against the same endpoint family; which policy that lane spends
- * against is learned from `X-Rate-Limit-Policy` and never declared here.
- */
+/** One recordable GET. Its policy is learned from `X-Rate-Limit-Policy`, never declared here. */
 export interface FixtureInteraction {
   /** Names the interaction, never a test (AGENT-WORKFLOW, Fixture hygiene). */
   readonly name: string;
@@ -83,12 +56,7 @@ export interface FixtureInteraction {
   readonly url: string;
 }
 
-/**
- * The five interactions: the leagues endpoint plus the four the catalogue is
- * made of. **Both spellings come from `endpoints.ts`**, so a recorded fixture
- * and the artifact `catalogue:refresh` commits can never describe two different
- * URLs.
- */
+// Both spellings come from `endpoints.ts`, so a fixture and the `catalogue:refresh` artifact cannot describe two URLs.
 export const FIXTURE_INTERACTIONS: readonly FixtureInteraction[] = [
   { name: 'trade-data-leagues', method: 'GET', url: TRADE_LEAGUES_URL },
   ...CATALOGUE_ENDPOINTS.map((endpoint) => ({
@@ -100,12 +68,8 @@ export const FIXTURE_INTERACTIONS: readonly FixtureInteraction[] = [
 
 export const REDACTED = '[redacted]';
 
-/**
- * Keys whose value is a personal identifier wherever it appears. Account names
- * and character names are personal identifiers (AGENT-WORKFLOW, Fixture
- * hygiene); a whisper template embeds the character name in its text, and the
- * token is the same string in another encoding.
- */
+// Account and character names are personal identifiers (AGENT-WORKFLOW, Fixture hygiene); a whisper template and
+// its token carry the character name.
 const IDENTIFIER_KEYS = new Set([
   'accountname',
   'charactername',
@@ -128,17 +92,9 @@ function isIdentifierKey(key: string, parentKey: string | undefined): boolean {
   );
 }
 
-/**
- * Replaces every personal identifier with `REDACTED`, **keeping the key**.
- *
- * Structure is never removed, only values: the hygiene rule keeps a field even
- * where no code uses it, because the loss of that field is itself a signal. The
- * redaction propagates **into** an identifier key's value, so a list of
- * character names is stripped element by element rather than passing through
- * because it happened not to be a bare string. A bare `name` is only an
- * identifier inside an identity container — elsewhere it is a catalogue label,
- * and blanking those would gut the very payloads being recorded.
- */
+// Keeps the key and replaces the value: the loss of a field is itself a signal (AGENT-WORKFLOW, Fixture hygiene).
+// Redaction propagates into an identifier key's value, so a list of names is stripped per element. A bare `name`
+// is an identifier only inside an identity container.
 export function stripPersonalIdentifiers(
   value: unknown,
   parentKey?: string,
@@ -169,11 +125,7 @@ export function fixturePathOf(interaction: Pick<FixtureInteraction, 'name'>): st
   return nodePath.join(FIXTURES_DIR, `${interaction.name}.json`);
 }
 
-/**
- * Consistency Conventions: UTF-8 without BOM, LF, two-space JSON, trailing
- * newline — so a re-record diffs as changed data rather than as
- * reserialisation noise.
- */
+/** UTF-8 without BOM, LF, two-space JSON, trailing newline (Consistency Conventions): a re-record diffs as data. */
 export function serialiseFixture(payload: unknown): string {
   return serialiseJsonArtifact(payload);
 }
@@ -194,10 +146,7 @@ export interface RecordOutcome {
   readonly written: readonly string[];
 }
 
-/**
- * What the pricing interactions are built from: the active league (from
- * `data/config.json`), the tracked entries and the committed item catalogue.
- */
+
 export interface PricingWorkload {
   readonly league: LeagueId;
   readonly entries: readonly TrackedEntry[];
@@ -218,13 +167,7 @@ function searchAnswerOf(payload: unknown): { id: string; result: string[] } | un
   return typeof id !== 'string' || !Array.isArray(result) ? undefined : { id, result: result.filter((item): item is string => typeof item === 'string') };
 }
 
-/**
- * One tracked entry's two interactions: the POST search, built by
- * `buildSearchBody` exactly as the pricing step builds it, and — where the
- * search found anything — the fetch of its cheapest ten ids. Each is named
- * for its own request (`pricing/fixture-names.ts`), which is what lets the
- * dry run serve it back. Returns the failure, or `undefined`.
- */
+// Each interaction is named for its own request (`pricing/fixture-names.ts`), which lets the dry run serve it back.
 async function recordPricing(
   entry: TrackedEntry,
   workload: PricingWorkload,
@@ -258,12 +201,8 @@ async function recordPricing(
   return typeof fetched === 'string' ? fetched : undefined;
 }
 
-/**
- * Issues every interaction, **buffers every payload, and writes only once all
- * of them succeeded.** A mid-loop failure would otherwise leave `fixtures/` half
- * re-recorded — a diff that mixes today's capture with last month's, which is
- * unreviewable and is exactly what the fixture set exists to make legible.
- */
+// Buffers every payload and writes only once all succeeded: a mid-loop failure would leave `fixtures/` half re-recorded,
+// an unreviewable mix of today's capture and last month's.
 export async function recordFixtures(
   ports: RecorderPorts,
   workload?: PricingWorkload,
@@ -410,10 +349,7 @@ async function main(): Promise<void> {
   await removeStalePricingFixtures(outcome.written);
 }
 
-/**
- * The entry guard. `node packages/sync/src/fixtures-record.ts` runs `main`;
- * importing the module — which the co-located test does — runs nothing.
- */
+// Importing the module, as the co-located test does, runs nothing.
 const entry = process.argv[1];
 const isInvokedDirectly = entry !== undefined && nodePath.resolve(entry) === fileURLToPath(import.meta.url);
 
