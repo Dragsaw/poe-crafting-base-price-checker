@@ -1,4 +1,3 @@
-
 import { CORE_PLACEHOLDER } from '@poe/core';
 
 /**

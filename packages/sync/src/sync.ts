@@ -317,7 +317,7 @@ function withoutLeague(state: SessionState): SessionState {
   return {
     passEnded: state.passEnded,
     backoffCount: state.backoffCount,
-    ...(!(state.passStart === undefined) && { passStart: state.passStart }),
+    ...(state.passStart !== undefined && { passStart: state.passStart }),
   };
 }
 
@@ -604,8 +604,8 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
           session: {
             maxEntries: 1,
             pinnedMaxAgeMs: args.options.pinnedMaxAgeMs,
-            ...(!(state.passStart === undefined) && { requestsSince: state.passStart }),
-            ...(!(state.confirmedLeague === undefined) && { confirmedLeague: state.confirmedLeague }),
+            ...(state.passStart !== undefined && { requestsSince: state.passStart }),
+            ...(state.confirmedLeague !== undefined && { confirmedLeague: state.confirmedLeague }),
           },
         }).run();
         result = { kind: 'outcome', outcome };
@@ -621,7 +621,7 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
       const notBefore = await pendingNotBefore(fs, now);
       const context: ChunkContext = {
         now,
-        ...(!(notBefore === undefined) && { notBefore }),
+        ...(notBefore !== undefined && { notBefore }),
         // The downgrade's in-place reset gives the ledger a new reference; it
         // is no State reading (§13.4).
         freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
@@ -630,7 +630,7 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
       const wait = nextWait(result, state, context);
       state = nextState(state, result, context, { signature, before });
 
-      if (!(wait.kind !== 'none' && !signal.aborted)) {
+      if (wait.kind === 'none' || signal.aborted) {
         continue;
       }
 

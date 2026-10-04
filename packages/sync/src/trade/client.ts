@@ -776,7 +776,7 @@ export function createTradeGovernor<Source extends string>(
         waitedMs,
         skips: parsed.skips,
         invalidRequests: counted,
-        ...(!(remaining === undefined) && { remaining }),
+        ...(remaining !== undefined && { remaining }),
         response,
         ...penaltyOf(response, parsed, policy),
       };
@@ -799,7 +799,7 @@ export function createTradeGovernor<Source extends string>(
       waitedMs,
       skips: parsed.skips,
       invalidRequests: counted,
-      ...(!(remaining === undefined) && { remaining }),
+      ...(remaining !== undefined && { remaining }),
       response,
     };
   }

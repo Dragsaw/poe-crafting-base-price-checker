@@ -29,7 +29,7 @@ function gateOver(http: HttpPort, league: string, invalidRequestThreshold?: numb
     clock: createFakeClockPort('2026-09-26T00:00:00.000Z'),
     wait: () => Promise.resolve(),
     userAgent: CONTACT,
-    ...(!(invalidRequestThreshold === undefined) && { invalidRequestThreshold }),
+    ...(invalidRequestThreshold !== undefined && { invalidRequestThreshold }),
   });
   return createLeagueGate({ client, league });
 }

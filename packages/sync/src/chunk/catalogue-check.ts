@@ -54,9 +54,9 @@ export function markUnresolvable(entryKey: string, before: DatasetEntry | undefi
   return {
     entryKey,
     price: { state: 'unresolvable' },
-    ...(!(before?.lastAttemptedAt === undefined) && { lastAttemptedAt: before.lastAttemptedAt }),
-    ...(!(before?.lastSearchId === undefined) && { lastSearchId: before.lastSearchId }),
-    ...(!(before?.lastSearchLeague === undefined) && { lastSearchLeague: before.lastSearchLeague }),
+    ...(before?.lastAttemptedAt !== undefined && { lastAttemptedAt: before.lastAttemptedAt }),
+    ...(before?.lastSearchId !== undefined && { lastSearchId: before.lastSearchId }),
+    ...(before?.lastSearchLeague !== undefined && { lastSearchLeague: before.lastSearchLeague }),
   };
 }
 

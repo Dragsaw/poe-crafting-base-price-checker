@@ -350,7 +350,7 @@ export function rank(input: RankInput): Ranking {
           ev: observation.priceDivine,
           craftCost: 0,
           observation,
-          ...(!(base.lastAttemptedAt === undefined) && { lastAttemptedAt: base.lastAttemptedAt }),
+          ...(base.lastAttemptedAt !== undefined && { lastAttemptedAt: base.lastAttemptedAt }),
         };
         if (observation.priceDivine < input.threshold) {
           belowThreshold.push(row);
@@ -507,7 +507,7 @@ function craftedRow(
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
     provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce(weakest),
-    ...(!(asOf === undefined) && { asOf }),
-    ...(!(lastAttemptedAt === undefined) && { lastAttemptedAt }),
+    ...(asOf !== undefined && { asOf }),
+    ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
   };
 }

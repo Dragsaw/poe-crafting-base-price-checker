@@ -387,7 +387,7 @@ async function main(): Promise<void> {
   const written = new Set(outcome.written.map((path) => resolve(path)));
   for (const name of await readdir(FIXTURES_DIR)) {
     const path = resolve(join(FIXTURES_DIR, name));
-    if (!(PRICING_FIXTURE_FILE.test(name) && !written.has(path))) {
+    if (!PRICING_FIXTURE_FILE.test(name) || written.has(path)) {
       continue;
     }
 

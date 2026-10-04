@@ -893,7 +893,7 @@ function datasetText(entries: readonly { key: string; at?: string; unresolvable?
     entries: entries.map(({ key: entryKey, at, unresolvable }) => ({
       entryKey,
       price: { state: unresolvable === true ? 'unresolvable' : 'no-listings' },
-      ...(!(at === undefined) && { lastAttemptedAt: at }),
+      ...(at !== undefined && { lastAttemptedAt: at }),
     })),
     currencyRates: [],
   });
@@ -1349,7 +1349,7 @@ describe('runChunk: the Sync Report', () => {
     const { fs, ports } = harness([A], {}, { git: createFakeGitPort(commits) });
     fs.setFile(TRACKED_PATH, {
       contents: trackedText([A]),
-      ...(!(modifiedAt === undefined) && { modifiedAt }),
+      ...(modifiedAt !== undefined && { modifiedAt }),
     });
 
     await run(ports, scriptedStep().step);

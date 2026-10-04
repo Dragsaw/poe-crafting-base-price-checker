@@ -538,7 +538,7 @@ function failureRecord(error: unknown, current: TrackedEntry | undefined): Leagu
   return {
     kind: 'run-failure',
     reason: 'unrecoverable-error',
-    ...(!(current === undefined) && { entryKey: canonicalKey(current) }),
+    ...(current !== undefined && { entryKey: canonicalKey(current) }),
     message,
   };
 }
@@ -675,7 +675,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       session === undefined
         ? {}
         : {
-            ...(!(order === undefined) && { newPass: order.newPass }),
+            ...(order !== undefined && { newPass: order.newPass }),
             ...(gatePassed && setup !== undefined && { confirmedLeague: setup.publication.league }),
           };
 
@@ -751,8 +751,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
           compareCanonicalKeys,
         ),
-        ...(!(until === undefined) && { notBefore: until }),
-        ...(!(authHoldOffUntil === undefined) && { authHoldOffUntil }),
+        ...(until !== undefined && { notBefore: until }),
+        ...(authHoldOffUntil !== undefined && { authHoldOffUntil }),
       };
       await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, progressFile);
       if (holdOff !== undefined) {
@@ -777,7 +777,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         figures: {
           requestsBySource: requestsBetween(countFrom(), requests.snapshot()),
           notReachedCount: Math.max(0, eligible - attempted),
-          ...(!(trackedListEditedAt === undefined) && { trackedListEditedAt }),
+          ...(trackedListEditedAt !== undefined && { trackedListEditedAt }),
           ...coverageFigures,
         },
         runStartedAt,
@@ -832,7 +832,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         dataset: check.orderDataset,
         completed: progress?.completed ?? [],
         now: clock.now(),
-        ...(!(session?.pinnedMaxAgeMs === undefined) && { pinnedMaxAgeMs: session.pinnedMaxAgeMs }),
+        ...(session?.pinnedMaxAgeMs !== undefined && { pinnedMaxAgeMs: session.pinnedMaxAgeMs }),
       });
       order = plan;
 

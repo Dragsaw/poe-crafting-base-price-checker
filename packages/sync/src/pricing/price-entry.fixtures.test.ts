@@ -113,7 +113,7 @@ describe('createPricingStep against the recorded captures', () => {
       expect(priced?.lastSearchLeague).toBe(league);
       expect(priced?.lastAttemptedAt).toBe(NOW);
       expect(priced?.price.state).toBe('priced');
-      if (!(priced?.price.state === 'priced')) {
+      if (priced?.price.state !== 'priced') {
         return;
       }
 

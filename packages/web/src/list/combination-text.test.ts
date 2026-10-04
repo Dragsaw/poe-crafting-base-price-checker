@@ -112,7 +112,7 @@ describe('bandedFallback', () => {
 
 /** A hybrid reference built through its schema, so its lines arrive sorted by `statId` as in production. */
 function hybrid(lines: readonly object[], acceptedTier?: string): ModifierRef {
-  return HybridModifierRefSchema.parse({ kind: 'hybrid', lines, ...(!(acceptedTier === undefined) && { acceptedTier }) });
+  return HybridModifierRefSchema.parse({ kind: 'hybrid', lines, ...(acceptedTier !== undefined && { acceptedTier }) });
 }
 
 function line(statId: string, valueMin: number, valueMax: number): object {

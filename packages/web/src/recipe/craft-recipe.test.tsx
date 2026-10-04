@@ -665,7 +665,7 @@ describe('the chase cells', () => {
     click(rowNamed('Rings'));
     const [panel] = panelRows();
     expect(panel === undefined ? '' : panelCell(panel, 'combination')).toBe(`${label} · T1 Cold Res`);
-    for (const node of [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *')]) {
+    for (const node of frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *')) {
       expect(node.style.textOverflow).toBe('');
     }
   });
@@ -826,7 +826,7 @@ describe('the crafted panel', () => {
       'Open the trade search for T1 Atk Dmg · T1 Cold Res on Rings',
     );
     // Nothing in the expansion is ellipsised.
-    for (const node of [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *')]) {
+    for (const node of frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *')) {
       expect(node.style.textOverflow).toBe('');
     }
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', '', '']);

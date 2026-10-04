@@ -71,7 +71,7 @@ export function rewriteDtsSpecifiersIn(dir: string): string[] {
   for (const file of collectDeclarationFiles(dir)) {
     const before = readFileSync(file, 'utf8');
     const after = rewriteDtsSpecifiers(before);
-    if (!(after !== before)) {
+    if (after === before) {
       continue;
     }
 

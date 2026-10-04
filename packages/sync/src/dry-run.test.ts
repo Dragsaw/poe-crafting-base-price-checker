@@ -94,7 +94,7 @@ function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
 
 function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial<DryRunSnapshot> = {}): DryRunSnapshot {
   return {
-    ...(!(entries === undefined) && { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
+    ...(entries !== undefined && { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
     config: CONFIG,
     currencies: CURRENCIES,
     items: ITEMS,

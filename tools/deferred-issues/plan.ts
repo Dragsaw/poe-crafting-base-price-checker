@@ -131,7 +131,7 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
     const group = groups.get(entry.id);
     if (group === undefined) {
       creates.push({ id: entry.id, title: entry.title, body: issueBody(entry) });
-    } else if (group.every((issue) => !(issue.state === 'OPEN'))) {
+    } else if (group.every((issue) => issue.state !== 'OPEN')) {
       const numbers = group.map((issue) => `#${issue.number}`).join(', ');
       reports.push(`Closed, still listed: ${entry.id} is in the ledger, and its issue ${numbers} is closed`);
     }

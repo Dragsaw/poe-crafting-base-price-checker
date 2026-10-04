@@ -110,7 +110,7 @@ describe('the non-empty appendix', () => {
 
   it('leads each row with the class glyph, marks it unknown, and prints the reason verbatim with an empty note', () => {
     const panel = mountAppendix([klass('Bows'), klass('Wands')]);
-    for (const row of [...panel.querySelectorAll<HTMLElement>('[data-appendix-row]')]) {
+    for (const row of panel.querySelectorAll<HTMLElement>('[data-appendix-row]')) {
       const first = row.querySelector('[data-cell="class"]');
       expect(first?.firstElementChild?.getAttribute('data-unit-glyph')).toBe('class');
       expect(first?.firstElementChild?.textContent).toBe(glyphs.unitClass);
@@ -142,7 +142,7 @@ describe('the non-empty appendix', () => {
   it('makes no row interactive: no role, tabindex, title, cursor, hover class or control', () => {
     const panel = mountAppendix([klass('Bows'), klass('Wands')]);
     expect(panel.querySelectorAll('button, a, input, [role], [tabindex], [title]')).toHaveLength(0);
-    for (const row of [...panel.querySelectorAll<HTMLElement>('[data-appendix-row]')]) {
+    for (const row of panel.querySelectorAll<HTMLElement>('[data-appendix-row]')) {
       expect(row.className).toBe('');
       expect(row.style.cursor).toBe('');
       const before = panel.innerHTML;
