@@ -30,7 +30,7 @@ const PRICING_FIXTURE_FILE = /^(trade-(?:search|fetch)-[0-9a-f]+|trade-data-leag
 export async function readPricingFixtures(directory: string): Promise<PricingFixtures> {
   const fixtures = new Map<string, string>();
   const entries = await readdir(directory);
-  const names = entries.toSorted();
+  const names = entries.toSorted((a, b) => Number(a > b) - Number(a < b));
   for (const file of names) {
     const match = PRICING_FIXTURE_FILE.exec(file);
     const name = match?.[1];

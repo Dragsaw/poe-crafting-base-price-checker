@@ -334,7 +334,7 @@ function describe429(
   const rateHeaders = Object.entries(headers)
     .map(([name, value]): [string, string] => [name.toLowerCase(), value])
     .filter(([name]) => name === RETRY_AFTER_HEADER || name.startsWith(RATE_LIMIT_HEADER_PREFIX))
-    .sort(([left], [right]) => compareCodeUnits(left, right));
+    .toSorted(([left], [right]) => compareCodeUnits(left, right));
   const reading =
     pacedOn === undefined
       ? 'no reading'

@@ -142,7 +142,7 @@ function printReports(reports: readonly string[], out: Output): void {
 /** One JSON object for each entry, in ledger order, with the lowest open issue. */
 function listEntries(entries: readonly LedgerEntry[], issues: readonly IssueInfo[]): unknown[] {
   const open = new Map<string, number>();
-  const byNumber = [...issues].sort((a, b) => a.number - b.number);
+  const byNumber = issues.toSorted((a, b) => a.number - b.number);
   for (const issue of byNumber) {
     const id = readMarker(issue.body);
     if (id !== undefined && issue.state === 'OPEN' && !open.has(id)) {

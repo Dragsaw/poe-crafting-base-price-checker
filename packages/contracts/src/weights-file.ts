@@ -146,7 +146,7 @@ const WeightsCategorySchema = z
         continue;
       }
       defence.push(className);
-      const letterSet = [...letters].toSorted().join('_');
+      const letterSet = [...letters].toSorted((a, b) => Number(a > b) - Number(a < b)).join('_');
       const first = firstByLetterSet.get(letterSet);
       if (first === undefined) {
         firstByLetterSet.set(letterSet, className);

@@ -119,7 +119,7 @@ function formsOf(value: string): string[] {
       }
     }
   }
-  return [...forms].filter((form) => form !== '').sort((a, b) => b.length - a.length);
+  return [...forms].filter((form) => form !== '').toSorted((a, b) => b.length - a.length);
 }
 
 /**
@@ -135,7 +135,7 @@ function redactableForms(value: string): string[] {
       forms.add(form);
     }
   }
-  return [...forms].sort((a, b) => b.length - a.length);
+  return [...forms].toSorted((a, b) => b.length - a.length);
 }
 
 function scrub(text: string, forms: readonly string[]): string {

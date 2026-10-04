@@ -352,7 +352,7 @@ export function lineSetCompleteness(
 export function coOccur(scoped: ScopedPools): CoOccur {
   const cache = new Map<string, boolean>();
   return (x, y, slot, summed) => {
-    const key = JSON.stringify([slot, x, y, [...summed].sort(compareByCodeUnit)]);
+    const key = JSON.stringify([slot, x, y, [...summed].toSorted(compareByCodeUnit)]);
     const cached = cache.get(key);
     if (cached !== undefined) {
       return cached;

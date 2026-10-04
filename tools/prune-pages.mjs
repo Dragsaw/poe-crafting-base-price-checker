@@ -44,7 +44,7 @@ function filesUnder(dir) {
     }
   };
   walk(dir);
-  return out.sort();
+  return out.toSorted((a, b) => Number(a > b) - Number(a < b));
 }
 
 /** Removes `dir` and its parents up to (not including) `stop`, while each is empty. */

@@ -91,9 +91,6 @@
     }
   },
   "packages/contracts/src/canonical-key.test.ts": {
-    "unicorn/no-array-sort": {
-      "count": 3
-    },
     "unicorn/no-null": {
       "count": 9
     }
@@ -170,9 +167,6 @@
     },
     "unicorn/name-replacements": {
       "count": 10
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
     }
   },
   "packages/contracts/src/overlap.test.ts": {
@@ -189,9 +183,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 9
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
     }
   },
   "packages/contracts/src/ports/clock.ts": {
@@ -208,16 +199,7 @@
     "local/max-comment-run": {
       "count": 2
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
     "unicorn/prefer-iterator-to-array": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
       "count": 1
     }
   },
@@ -283,15 +265,6 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 5
-    },
-    "unicorn/no-array-sort": {
-      "count": 5
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 5
-    },
     "vitest/no-conditional-expect": {
       "count": 1
     }
@@ -306,17 +279,6 @@
   },
   "packages/contracts/src/test-support.ts": {
     "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/tracked-entry.test.ts": {
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
       "count": 1
     }
   },
@@ -351,25 +313,13 @@
     }
   },
   "packages/contracts/src/weights-file.test.ts": {
-    "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 2
     }
   },
   "packages/contracts/src/weights-file.ts": {
     "local/max-comment-run": {
       "count": 3
-    },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     }
   },
   "packages/core/src/chunk-order.ts": {
@@ -452,9 +402,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 3
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
     }
   },
   "packages/core/src/index.ts": {
@@ -488,9 +435,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 6
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
     }
   },
   "packages/core/src/provenance.ts": {
@@ -965,13 +909,7 @@
     "no-await-in-loop": {
       "count": 1
     },
-    "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
     "unicorn/import-style": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
       "count": 1
     }
   },
@@ -1242,9 +1180,6 @@
     "unicorn/consistent-boolean-name": {
       "count": 3
     },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
     "unicorn/prefer-await": {
       "count": 3
     }
@@ -1297,9 +1232,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
     }
   },
   "packages/sync/src/trade/transport-failure.ts": {
@@ -2049,9 +1981,6 @@
   "test/guard-reuse-fixture/vitest.config.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
     }
   },
   "test/guard-reuse.test.ts": {
@@ -2218,9 +2147,6 @@
     "unicorn/import-style": {
       "count": 1
     },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 3
     }
@@ -2258,9 +2184,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
-    },
-    "unicorn/no-array-sort": {
-      "count": 3
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {
@@ -2359,12 +2282,6 @@
     },
     "unicorn/name-replacements": {
       "count": 5
-    },
-    "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/require-array-sort-compare": {
-      "count": 1
     }
   },
   "tools/setup-git-hooks.mjs": {

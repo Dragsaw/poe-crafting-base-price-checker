@@ -123,12 +123,12 @@ export function untrackableReason(
  * unit. A `null` line is dropped here; `untrackable` decides what it means.
  */
 export function lineSet(entry: ModifierWeight): readonly string[] {
-  return entry.lines.flatMap((line) => line.statId ?? []).sort(compareByCodeUnit);
+  return entry.lines.flatMap((line) => line.statId ?? []).toSorted(compareByCodeUnit);
 }
 
 /** `statIds(ref)` (§1): the `statId`s a reference names, sorted by code unit. */
 export function statIds(reference: ModifierRef): readonly string[] {
-  return reference.kind === 'hybrid' ? reference.lines.map((rl) => rl.statId).sort(compareByCodeUnit) : [reference.statId];
+  return reference.kind === 'hybrid' ? reference.lines.map((rl) => rl.statId).toSorted(compareByCodeUnit) : [reference.statId];
 }
 
 /** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */

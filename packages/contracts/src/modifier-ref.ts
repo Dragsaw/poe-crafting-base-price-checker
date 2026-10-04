@@ -117,7 +117,7 @@ const HybridLinesSchema = z
       seen.add(line.statId);
     }
   })
-  .transform((lines) => [...lines].sort((a, b) => compareByCodeUnit(a.statId, b.statId)));
+  .transform((lines) => lines.toSorted((a, b) => compareByCodeUnit(a.statId, b.statId)));
 
 export const HybridModifierRefSchema = z
   .strictObject({

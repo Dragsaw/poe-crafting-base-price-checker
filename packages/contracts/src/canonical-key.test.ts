@@ -95,7 +95,7 @@ describe('the two key spaces', () => {
   });
 
   it('sorts every crafted key before every raw key', () => {
-    const keys = [canonicalKey(raw), canonicalKey(crafted)].sort(compareCanonicalKeys);
+    const keys = [canonicalKey(raw), canonicalKey(crafted)].toSorted(compareCanonicalKeys);
     expect(keys[0]).toBe(canonicalKey(crafted));
     expect(compareTrackedEntries(crafted, raw)).toBeLessThan(0);
   });
@@ -104,10 +104,10 @@ describe('the two key spaces', () => {
 describe('compareByCodeUnit', () => {
   // I/O matrix: "Key ordering".
   it('sorts by code unit, not by locale collation', () => {
-    expect(['a', 'B'].sort(compareByCodeUnit)).toEqual(['B', 'a']);
+    expect(['a', 'B'].toSorted(compareByCodeUnit)).toEqual(['B', 'a']);
     expect('B'.localeCompare('a')).toBeGreaterThan(0);
 
-    expect(['é', 'z'].sort(compareByCodeUnit)).toEqual(['z', 'é']);
+    expect(['é', 'z'].toSorted(compareByCodeUnit)).toEqual(['z', 'é']);
     expect('é'.localeCompare('z')).toBeLessThan(0);
   });
 

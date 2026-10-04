@@ -202,7 +202,7 @@ export interface OverlapBranches {
  */
 export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): OverlapBranches | undefined {
   const theirs = summedStatIds(b);
-  const summed = new Set([...summedStatIds(a)].filter((statId) => theirs.has(statId)).sort(compareByCodeUnit));
+  const summed = new Set([...summedStatIds(a)].filter((statId) => theirs.has(statId)).toSorted(compareByCodeUnit));
   const sums: SummedOverlap[] = [];
   for (const statId of summed) {
     const left = summedInterval(a, statId);

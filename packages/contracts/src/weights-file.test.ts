@@ -7,6 +7,8 @@ import { WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from './weights-file';
 
 type Json = Record<string, unknown>;
 
+const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
+
 function entryOf(overrides: Json = {}): Json {
   return {
     sourceModifierId: 'prefix\0BaseSpirit\u{0}16\0+# to Spirit',
@@ -223,8 +225,8 @@ describe('the className grammar', () => {
     ['str', undefined],
   ] as const)('splits %s', (className, letters) => {
     const split = defenceLettersOf(className);
-    expect(split === undefined ? undefined : [...split].toSorted()).toEqual(
-      letters === undefined ? undefined : [...letters].toSorted(),
+    expect(split === undefined ? undefined : [...split].toSorted(byCodeUnit)).toEqual(
+      letters === undefined ? undefined : [...letters].toSorted(byCodeUnit),
     );
   });
 

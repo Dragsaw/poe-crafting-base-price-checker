@@ -60,7 +60,7 @@ describe('TrackedEntrySchema', () => {
       itemLevelMin: 79,
       status: 'active',
     });
-    expect(issues.map((issue) => issue.path.join('.')).sort()).toEqual(['prefix', 'suffix']);
+    expect(issues.map((issue) => issue.path.join('.')).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(['prefix', 'suffix']);
   });
 
   // Story hybrid-mods 2, I/O matrix "Missing slot": both affixes are required.

@@ -65,7 +65,7 @@ export function issueBody(entry: LedgerEntry): string {
 /** Groups the issues by the id of their marker, in number order. */
 function byId(issues: readonly IssueInfo[]): Map<string, IssueInfo[]> {
   const groups = new Map<string, IssueInfo[]>();
-  const byNumber = [...issues].sort((a, b) => a.number - b.number);
+  const byNumber = issues.toSorted((a, b) => a.number - b.number);
   for (const issue of byNumber) {
     const id = readMarker(issue.body);
     if (id === undefined) {
@@ -97,7 +97,7 @@ export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[
       closes.push({ number: issue.number, keep: keep.number });
     }
   }
-  return closes.sort((a, b) => a.number - b.number);
+  return closes.toSorted((a, b) => a.number - b.number);
 }
 
 function countIds(entries: readonly LedgerEntry[]): Map<string, number> {
@@ -110,7 +110,7 @@ function countIds(entries: readonly LedgerEntry[]): Map<string, number> {
 
 function markerReports(issues: readonly IssueInfo[]): string[] {
   const reports: string[] = [];
-  const byNumber = [...issues].sort((a, b) => a.number - b.number);
+  const byNumber = issues.toSorted((a, b) => a.number - b.number);
   for (const issue of byNumber) {
     if (readMarker(issue.body) === undefined) {
       reports.push(`No marker: #${issue.number} has the label deferred and no valid \`Deferred entry: dw-…\` first line`);

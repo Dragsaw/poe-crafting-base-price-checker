@@ -15,6 +15,8 @@ import {
   type SyncRunRecord,
 } from './sync-run-report';
 
+const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
+
 const figures = {
   requestsBySource: {
     'tracked-list': 8,
@@ -152,9 +154,9 @@ describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
   ];
 
   it('declares a subject list for every record kind', () => {
-    const kinds = SyncRunRecordSchema.options.map((option) => option.shape.kind.value).sort();
-    expect(Object.keys(RECORD_SUBJECTS).sort()).toEqual(kinds);
-    expect(cases.map((c) => c.base.kind).sort()).toEqual(kinds);
+    const kinds = SyncRunRecordSchema.options.map((option) => option.shape.kind.value).toSorted(byCodeUnit);
+    expect(Object.keys(RECORD_SUBJECTS).toSorted(byCodeUnit)).toEqual(kinds);
+    expect(cases.map((c) => c.base.kind).toSorted(byCodeUnit)).toEqual(kinds);
   });
 
   for (const { base, observation } of cases) {
@@ -251,7 +253,7 @@ describe('SyncRunRecordSchema', () => {
       activeRefreshed: 1,
     };
     expect(PinnedStarvationRecordSchema.parse(record)).toEqual(record);
-    expect(Object.keys(PinnedStarvationRecordSchema.shape).sort()).toEqual([
+    expect(Object.keys(PinnedStarvationRecordSchema.shape).toSorted(byCodeUnit)).toEqual([
       'activeRefreshed',
       'declaredMinChunkSearches',
       'discoveredAllowance',
@@ -369,7 +371,7 @@ describe('SyncRunRecordSchema', () => {
       availableLeagues: ['Forbidden Rites', 'Standard'],
     };
     expect(SyncRunRecordSchema.parse(record)).toEqual(record);
-    expect(Object.keys(LeagueMismatchRecordSchema.shape).sort()).toEqual([
+    expect(Object.keys(LeagueMismatchRecordSchema.shape).toSorted(byCodeUnit)).toEqual([
       'availableLeagues',
       'configuredLeague',
       'kind',

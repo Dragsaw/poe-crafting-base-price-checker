@@ -6,7 +6,7 @@ import { BaseSequencer, type TestSpecification } from 'vitest/node';
 /** Runs the fixtures in path order, so the issuer always runs before the bystander. */
 class ByPathSequencer extends BaseSequencer {
   override sort(files: TestSpecification[]): Promise<TestSpecification[]> {
-    return Promise.resolve([...files].sort((left, right) => left.moduleId.localeCompare(right.moduleId)));
+    return Promise.resolve(files.toSorted((left, right) => left.moduleId.localeCompare(right.moduleId)));
   }
 }
 
