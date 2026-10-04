@@ -81,29 +81,21 @@ export function artifactUrl(baseUrl: string, path: string): string {
   return new URL(baseUrl + path, document.baseURI).href;
 }
 
-async function fetchOne(
-  key: ArtifactKey,
-  fetchImpl: FetchLike,
-  baseUrl: string,
-  signal: AbortSignal | undefined,
-): Promise<Fetched> {
-  const descriptor = ARTIFACTS[key];
-  const init: RequestInit = signal === undefined ? { cache: 'no-cache' } : { cache: 'no-cache', signal };
-  let body: string;
+/** The response body, or the terminal `Fetched` where the artifact is absent or did not arrive. */
+async function readBody(url: string, fetchImpl: FetchLike, init: RequestInit): Promise<string | Fetched> {
   try {
-    const response = await fetchImpl(artifactUrl(baseUrl, descriptor.path), init);
+    const response = await fetchImpl(url, init);
     // 404 is absent. Any other non-OK status did not arrive.
     if (response.status === 404) {
       return { kind: 'absent' };
     }
-    if (!response.ok) {
-      return { kind: 'not-arrived' };
-    }
-    body = await response.text();
+    return response.ok ? await response.text() : { kind: 'not-arrived' };
   } catch {
     return { kind: 'not-arrived' };
   }
+}
 
+function parseBody(descriptor: (typeof ARTIFACTS)[ArtifactKey], body: string): Fetched {
   let data: unknown;
   try {
     data = JSON.parse(body);
@@ -111,12 +103,11 @@ async function fetchOne(
     // Not JSON at all: nothing declared, and the fault is the content.
     return { kind: 'invalid', cause: 'content', declared: undefined };
   }
-
   const result = parseEnvelope(descriptor.schema, data, descriptor.expected);
-  if (result.ok) {
-    return { kind: 'valid', value: result.value };
-  }
-  const declared = declaredVersion(data);
+  return result.ok ? { kind: 'valid', value: result.value } : refusedFetch(result, declaredVersion(data));
+}
+
+function refusedFetch(result: Extract<ReturnType<typeof parseEnvelope>, { readonly ok: false }>, declared: string | undefined): Fetched {
   // Exhaustive by construction: a new `parseEnvelope` reason fails the
   // `never` default at compile time rather than becoming a silent `version`.
   switch (result.reason) {
@@ -134,6 +125,18 @@ async function fetchOne(
       return result satisfies never;
     }
   }
+}
+
+async function fetchOne(
+  key: ArtifactKey,
+  fetchImpl: FetchLike,
+  baseUrl: string,
+  signal: AbortSignal | undefined,
+): Promise<Fetched> {
+  const descriptor = ARTIFACTS[key];
+  const init: RequestInit = signal === undefined ? { cache: 'no-cache' } : { cache: 'no-cache', signal };
+  const body = await readBody(artifactUrl(baseUrl, descriptor.path), fetchImpl, init);
+  return typeof body === 'string' ? parseBody(descriptor, body) : body;
 }
 
 /**

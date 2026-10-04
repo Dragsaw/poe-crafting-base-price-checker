@@ -775,9 +775,6 @@
     }
   },
   "packages/web/src/load/load-artifacts.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 4
     }
