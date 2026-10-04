@@ -783,7 +783,8 @@ it('logs one line on a 429, naming the response headers and the reading it was p
     log: (line) => lines.push(line),
   });
 
-  expect((await client.send({ method: 'POST', url: SEARCH_URL })).kind).toBe('response');
+  const outcome = await client.send({ method: 'POST', url: SEARCH_URL });
+  expect(outcome.kind).toBe('response');
   expect(lines).toEqual([]);
 
   // A later instant, so the line tells the reading's age from the 429's.

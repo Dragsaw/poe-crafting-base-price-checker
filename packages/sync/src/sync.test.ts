@@ -607,7 +607,8 @@ describe('pnpm sync: the session with injected ports', () => {
     expect(await syncSessionCommand(deps)).toBe(0);
 
     expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST']);
-    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2, 'session-probe': 0 });
+    const report = await reportOf(fs);
+    expect(report?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2, 'session-probe': 0 });
   });
 
   it('an absent cookie over several chunks: exactly one unauthenticated (absent) line, before the first request', async () => {
@@ -709,7 +710,8 @@ describe('pnpm sync: the session with injected ports', () => {
       ]);
       expect(auth).toEqual([{ line: 'pnpm sync: authenticated', requestsBefore: 3 }]);
       expect(err).toEqual([]);
-      expect((await reportOf(fs))?.figures.requestsBySource).toEqual({
+      const report = await reportOf(fs);
+      expect(report?.figures.requestsBySource).toEqual({
         'league-validation': 1,
         'tracked-list': 3,
         'session-probe': 1,
@@ -832,7 +834,8 @@ describe('pnpm sync: the session with injected ports', () => {
       expect(progress).not.toHaveProperty('notBefore');
       // The downgrade reset the pacing to cold, so backoff(1) is the cold even interval.
       expect(announced(out, 'the session cookie expired')).toEqual([backoffMs(COLD_EVEN_INTERVAL_MS, 1)]);
-      expect((await reportOf(fs))?.figures.requestsBySource['session-probe']).toBe(1);
+      const report = await reportOf(fs);
+      expect(report?.figures.requestsBySource['session-probe']).toBe(1);
     });
 
     it('CAP-5: a due hold-off settles held-off once, before any request, and the session never probes', async () => {
@@ -877,7 +880,8 @@ describe('pnpm sync: the session with injected ports', () => {
 
     expect(http.requests.map((request) => request.method)).toEqual(['GET', 'POST', 'POST', 'GET', 'POST', 'POST']);
     // The new pass only, not the six requests of both passes.
-    expect((await reportOf(fs))?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2, 'session-probe': 0 });
+    const report = await reportOf(fs);
+    expect(report?.figures.requestsBySource).toEqual({ 'league-validation': 1, 'tracked-list': 2, 'session-probe': 0 });
   });
 
   it('a transient fs fault on a local read does not end the session', async () => {

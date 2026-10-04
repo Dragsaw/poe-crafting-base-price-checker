@@ -90,7 +90,8 @@ async function runWithDelay(delayMs: number): Promise<ChildRun> {
     const outputFile = join(dir, 'report.json');
     const { code, output } = await runChild(outputFile, delayMs, childTemporary);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
-    const leftRecordDirectories = (await readdir(childTemporary)).filter((name) => name.startsWith('no-network-'));
+    const temporaryEntries = await readdir(childTemporary);
+    const leftRecordDirectories = temporaryEntries.filter((name) => name.startsWith('no-network-'));
     return { code, output, report, leftRecordDirs: leftRecordDirectories };
   } finally {
     await rm(dir, { recursive: true, force: true });

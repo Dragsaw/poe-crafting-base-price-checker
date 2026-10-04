@@ -175,7 +175,8 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
     },
     async lastModifiedAt(path) {
       try {
-        return (await stat(at(path))).mtime.toISOString();
+        const stats = await stat(at(path));
+        return stats.mtime.toISOString();
       } catch (error) {
         if (hasErrorCode(error, 'ENOENT')) {
           return;

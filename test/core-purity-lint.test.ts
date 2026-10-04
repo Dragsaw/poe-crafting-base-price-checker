@@ -86,9 +86,12 @@ describe('core purity lint (AD-1)', { timeout: 30_000 }, () => {
   it('the core block applies to core source only', async () => {
     const rulesFor = async (path: string): Promise<Record<string, unknown>> =>
       ((await eslint.calculateConfigForFile(path)) as { rules?: Record<string, unknown> } | undefined)?.rules ?? {};
-    expect((await rulesFor(CORE_FILE))[GLOBALS]).toBeDefined();
-    expect((await rulesFor(CORE_TEST_FILE))[GLOBALS]).toBeUndefined();
-    expect((await rulesFor(SYNC_FILE))[GLOBALS]).toBeUndefined();
+    const coreRules = await rulesFor(CORE_FILE);
+    const coreTestRules = await rulesFor(CORE_TEST_FILE);
+    const syncRules = await rulesFor(SYNC_FILE);
+    expect(coreRules[GLOBALS]).toBeDefined();
+    expect(coreTestRules[GLOBALS]).toBeUndefined();
+    expect(syncRules[GLOBALS]).toBeUndefined();
   });
 
   it.each(IMPURE)('%s in core source is a %s error', async (_label, rule, code) => {

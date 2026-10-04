@@ -97,9 +97,11 @@ describe('acquireLock', () => {
       [LOCK_PATH]: { contents: stale },
       [BREAK_MARKER_PATH]: { contents: serialiseLock({ pid: 8, startedAt: SEVEN_HOURS_AGO }) },
     });
-    expect((await acquireLock(fs, clock, 5)).kind).toBe('busy');
+    const first = await acquireLock(fs, clock, 5);
+    expect(first.kind).toBe('busy');
     expect(await fs.exists(BREAK_MARKER_PATH)).toBe(false);
-    expect((await acquireLock(fs, clock, 5)).kind).toBe('acquired');
+    const second = await acquireLock(fs, clock, 5);
+    expect(second.kind).toBe('acquired');
   });
 
   it('does not break a lock that changed between the judgement and the break', async () => {

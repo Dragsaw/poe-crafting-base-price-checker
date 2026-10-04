@@ -220,7 +220,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(await fs.exists(DATASET_PATH)).toBe(false);
     expect(await fs.exists(PROGRESS_PATH)).toBe(false);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
-    expect((await reportOf(fs))?.records).toEqual([
+    const report = await reportOf(fs);
+    expect(report?.records).toEqual([
       { kind: 'league-mismatch', configuredLeague: 'Nope League', availableLeagues: ['Standard', LEAGUE] },
     ]);
     expect(err).toHaveLength(1);
@@ -234,7 +235,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     await expect(
       runSync({ fs, clock, http, git, wait, pid, log, userAgent: CONTACT }),
     ).rejects.toBeInstanceOf(LeagueMismatchError);
-    expect((await reportOf(fs))?.records.map((record) => record.kind)).toEqual(['league-mismatch']);
+    const report = await reportOf(fs);
+    expect(report?.records.map((record) => record.kind)).toEqual(['league-mismatch']);
   });
 
   it('refuses a blank contact before any request or write, with exit 1', async () => {
@@ -256,7 +258,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(http.requests).toEqual([]);
     expect(writes).toEqual([REPORT_PATH]);
     expect(err[0]).toContain('data/config.json');
-    const records = (await reportOf(fs))?.records ?? [];
+    const report = await reportOf(fs);
+    const records = report?.records ?? [];
     expect(records).toEqual([expect.objectContaining({ kind: 'run-failure', reason: 'unrecoverable-error' })]);
     expect(records[0]).toHaveProperty('message', expect.stringContaining('data/config.json'));
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -271,7 +274,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(http.requests).toEqual([]);
     expect(writes).toEqual([REPORT_PATH]);
     expect(err[0]).toContain(TRACKED_PATH);
-    const records = (await reportOf(fs))?.records ?? [];
+    const report = await reportOf(fs);
+    const records = report?.records ?? [];
     expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
     expect(records[0]).toHaveProperty('message', expect.stringContaining(TRACKED_PATH));
     expect(await fs.exists(DATASET_PATH)).toBe(false);
@@ -286,7 +290,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(await syncCommand(deps)).toBe(1);
 
     expect(http.requests).toEqual([]);
-    const records = (await reportOf(fs))?.records ?? [];
+    const report = await reportOf(fs);
+    const records = report?.records ?? [];
     expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
     expect(records[0]).toHaveProperty('message', expect.stringContaining(TRACKED_PATH));
   });
@@ -499,7 +504,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     };
     expect(dataset.entries).toHaveLength(1);
     expect(dataset.entries[0]?.price).toEqual(priced.price);
-    expect((await reportOf(fs))?.records).toEqual([]);
+    const report = await reportOf(fs);
+    expect(report?.records).toEqual([]);
   });
 
   it('a malformed published dataset: exit 1, no request, a run-failure naming it, the dataset untouched', async () => {
@@ -513,7 +519,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(writes).toEqual([REPORT_PATH]);
     expect(err[0]).toContain(DATASET_PATH);
     expect(await fs.readTextFile(DATASET_PATH)).toBe('{ not json');
-    const records = (await reportOf(fs))?.records ?? [];
+    const report = await reportOf(fs);
+    const records = report?.records ?? [];
     expect(records).toEqual([expect.objectContaining({ kind: 'run-failure' })]);
     expect(records[0]).toHaveProperty('message', expect.stringContaining(DATASET_PATH));
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -731,7 +738,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
         ['GET', undefined],
       ]);
       // A rejected probe is no malformed abort: no run-failure record.
-      expect((await reportOf(fs))?.records).toEqual([]);
+      const report = await reportOf(fs);
+      expect(report?.records).toEqual([]);
     });
 
     it('a probe 429 on an entry with 0 results: the chunk yields, notBefore is persisted, not-probed at the end', async () => {
@@ -802,7 +810,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
         price: { state: 'not-yet-synced', reason: 'never-synced' },
       });
       // A downgrade is not a request-rejected abort: no record.
-      expect((await reportOf(fs))?.records).toEqual([]);
+      const report = await reportOf(fs);
+      expect(report?.records).toEqual([]);
       expect(cookies(http).at(-1)).toEqual(['GET', COOKIE]);
     });
 
@@ -826,7 +835,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       ]);
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: yielded, 1 completed']);
-      expect((await progressOf(fs))['authHoldOffUntil']).toBe(NOW_PLUS_24H);
+      const progress = await progressOf(fs);
+      expect(progress['authHoldOffUntil']).toBe(NOW_PLUS_24H);
       // The second entry is stamped with no search fields: the downgrading search was its first.
       const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
       // The first entry was priced from its fetch, which was not a downgrade.
@@ -837,7 +847,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       const stamped = dataset.entries.find((entry) => entry.entryKey === canonicalKey(second));
       expect(stamped).toMatchObject({ lastAttemptedAt: NOW, price: { state: 'not-yet-synced', reason: 'never-synced' } });
       expect(stamped).not.toHaveProperty('lastSearchId');
-      expect((await reportOf(fs))?.records).toEqual([]);
+      const report = await reportOf(fs);
+      expect(report?.records).toEqual([]);
     });
 
     it('CAP-5, held off: unauthenticated (held-off), no session-probe request, exit 0, the field unchanged', async () => {
@@ -847,8 +858,10 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
       expect(auth).toEqual([{ line: 'pnpm sync:batch: unauthenticated (held-off)', requestsBefore: 0 }]);
       expect(http.requests.every((request) => request.headers['cookie'] === undefined)).toBe(true);
-      expect((await reportOf(fs))?.figures.requestsBySource['session-probe']).toBe(0);
-      expect((await progressOf(fs))['authHoldOffUntil']).toBe(HOLD_OFF);
+      const report = await reportOf(fs);
+      expect(report?.figures.requestsBySource['session-probe']).toBe(0);
+      const progress = await progressOf(fs);
+      expect(progress['authHoldOffUntil']).toBe(HOLD_OFF);
     });
 
     it('CAP-5, the hold-off is past: the run probes, and live clears the field', async () => {
@@ -868,7 +881,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
       expect(await syncCommand(probing(deps, answer))).toBe(0);
 
-      expect((await progressOf(fs))['authHoldOffUntil']).toBe(NOW_PLUS_24H);
+      const progress = await progressOf(fs);
+      expect(progress['authHoldOffUntil']).toBe(NOW_PLUS_24H);
     });
 
     it.each([
@@ -881,7 +895,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
       expect(await syncCommand(probing(deps, ...answers))).toBe(0);
 
-      expect((await progressOf(fs))['authHoldOffUntil']).toBe(PAST_HOLD_OFF);
+      const progress = await progressOf(fs);
+      expect(progress['authHoldOffUntil']).toBe(PAST_HOLD_OFF);
     });
 
     it('CAP-5, not-probed (no 2xx search) carries the field forward unchanged', async () => {
@@ -894,7 +909,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(await syncCommand(deps)).toBe(0);
 
       expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync:batch: unauthenticated (not-probed)']);
-      expect((await progressOf(fs))['authHoldOffUntil']).toBe(PAST_HOLD_OFF);
+      const progress = await progressOf(fs);
+      expect(progress['authHoldOffUntil']).toBe(PAST_HOLD_OFF);
     });
 
     it('no entry attempted (a gate 429): no probe, not-probed at the end, exit 0', async () => {
