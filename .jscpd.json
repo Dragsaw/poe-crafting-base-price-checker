@@ -1,0 +1,16 @@
+{
+  "path": ["packages", "tools", "test"],
+  "format": ["typescript", "tsx"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/*.test.{ts,tsx}",
+    "tools/boundary-check/fixture/**"
+  ],
+  "minLines": 5,
+  "minTokens": 50,
+  "threshold": 3,
+  "reporters": ["console"],
+  "output": "./.jscpd-report",
+  "gitignore": true
+}

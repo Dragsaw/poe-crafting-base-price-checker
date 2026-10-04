@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import sonarjs from 'eslint-plugin-sonarjs';
 import tseslint from 'typescript-eslint';
 
 /**
@@ -85,7 +86,7 @@ export default tseslint.config(
       // Leading-dot filenames are not matched by a `*` glob.
       '.dependency-cruiser.mjs',
     ],
-    extends: [js.configs.recommended, tseslint.configs.recommended],
+    extends: [js.configs.recommended, tseslint.configs.recommended, sonarjs.configs.recommended],
   },
   {
     // AD-1 purity for `core` (see `coreRestrictedGlobals`). `Date` itself stays
