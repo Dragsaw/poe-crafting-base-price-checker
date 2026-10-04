@@ -287,11 +287,6 @@
       "count": 2
     }
   },
-  "packages/core/src/rank.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/core/src/rank.ts": {
     "local/max-comment-run": {
       "count": 12
