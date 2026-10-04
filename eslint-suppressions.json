@@ -217,9 +217,6 @@
     }
   },
   "packages/contracts/src/sync-run-report.test.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    },
     "max-lines": {
       "count": 1
     }
@@ -281,11 +278,6 @@
       "count": 1
     }
   },
-  "packages/core/src/coverage.test.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
   "packages/core/src/coverage.ts": {
     "local/max-comment-run": {
       "count": 1
@@ -343,9 +335,6 @@
     }
   },
   "packages/core/src/probability.test.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    },
     "max-lines": {
       "count": 1
     }
@@ -367,9 +356,6 @@
     }
   },
   "packages/core/src/rank.test.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 1
     },
@@ -870,20 +856,12 @@
       "count": 3
     }
   },
-  "packages/sync/src/write-artifact.test.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
   "packages/sync/src/write-artifact.ts": {
     "local/max-comment-run": {
       "count": 1
     }
   },
   "packages/web/src/App.test.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 5
-    },
     "local/max-comment-run": {
       "count": 2
     },
@@ -957,9 +935,6 @@
     }
   },
   "packages/web/src/frame/trust-strip.test.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 1
     },
@@ -1478,11 +1453,6 @@
       "count": 1
     }
   },
-  "tools/deferred-issues/plan.test.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 24
-    }
-  },
   "tools/deferred-issues/plan.ts": {
     "complexity": {
       "count": 1
@@ -1495,9 +1465,6 @@
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 3
-    },
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 2
     },
@@ -1512,9 +1479,6 @@
     }
   },
   "tools/dev-stop/dev-stop.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 2
-    },
     "local/max-comment-run": {
       "count": 9
     },

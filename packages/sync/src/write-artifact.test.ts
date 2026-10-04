@@ -92,7 +92,7 @@ describe('writeArtifact', () => {
 
   it('refuses a key the strict schema does not declare', async () => {
     const fs = createFakeFilesystemPort();
-    const extra = { ...reversed(), history: [] } as DatasetFile;
+    const extra = { ...reversed(), history: [] };
     await expect(writeArtifact(fs, PATH, DatasetFileSchema, extra)).rejects.toBeInstanceOf(InvalidArtifactError);
     expect(await fs.exists(PATH)).toBe(false);
   });

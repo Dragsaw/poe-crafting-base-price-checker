@@ -169,7 +169,7 @@ describe('isSameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
     for (const subjectKey of subjects) {
       it(`${base.kind}: a change to ${subjectKey} alone is a new record`, () => {
         const fields = base as Readonly<Record<string, unknown>>;
-        const other = { ...fields, [subjectKey]: changed(fields[subjectKey]) } as SyncRunRecord;
+        const other: SyncRunRecord = Object.assign({}, base, { [subjectKey]: changed(fields[subjectKey]) });
         expect(isSameRecord(base, other)).toBe(false);
       });
     }

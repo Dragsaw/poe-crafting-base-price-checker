@@ -40,8 +40,7 @@ export type StopPlan =
 /** The port from `--port <n>` or `--port=<n>`, else the default. */
 export function parsePort(argv: readonly string[]): number {
   let raw: string | undefined;
-  for (let index = 0; index < argv.length; index++) {
-    const argument = argv[index]!;
+  for (const [index, argument] of argv.entries()) {
     if (argument === '--port') {raw = argv[index + 1] ?? '';}
     else if (argument.startsWith('--port=')) {raw = argument.slice('--port='.length);}
   }
@@ -255,11 +254,13 @@ function listenersPosix(port: number): number[] {
 function snapshotPosix(port: number): Snapshot {
   const listeners = listenersPosix(port);
   const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
-  const processes = ps
-    .split('\n')
-    .map((line) => /^\s*(\d+)\s+(\d+)\s+(\S.*)$/.exec(line))
-    .filter((match) => match !== null)
-    .map((match) => ({ pid: Number(match[1]), ppid: Number(match[2]), commandLine: match[3]! }));
+  const processes: ProcessInfo[] = [];
+  for (const line of ps.split('\n')) {
+    const [, pid, ppid, commandLine] = /^\s*(\d+)\s+(\d+)\s+(\S.*)$/.exec(line) ?? [];
+    if (pid !== undefined && ppid !== undefined && commandLine !== undefined) {
+      processes.push({ pid: Number(pid), ppid: Number(ppid), commandLine });
+    }
+  }
   return { listeners, processes };
 }
 

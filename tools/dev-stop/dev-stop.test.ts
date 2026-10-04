@@ -43,6 +43,12 @@ afterEach(() => {
 const ROOT = String.raw`E:\Projects\poe`;
 const NONE = new Set<number>();
 
+const VITE_NODE: ProcessInfo = {
+  pid: 16,
+  ppid: 15,
+  commandLine: String.raw`node "E:\Projects\poe\node_modules\.bin\\..\vite\bin\vite.js" --config packages/web/vite.config.ts`,
+};
+
 /** The chain observed under a background `pnpm dev` on Windows, harness shell included. */
 const CHAIN: readonly ProcessInfo[] = [
   { pid: 1, ppid: 0, commandLine: String.raw`C:\Users\me\.local\bin\claude.exe` },
@@ -52,11 +58,7 @@ const CHAIN: readonly ProcessInfo[] = [
   { pid: 13, ppid: 12, commandLine: String.raw`cmd.exe /d /c ""C:\pnpm\12.5.1\bin\pnpm.cmd" dev --port 5199"` },
   { pid: 14, ppid: 13, commandLine: String.raw`"C:\pnpm\12.5.1\pnpm.exe" dev --port 5199` },
   { pid: 15, ppid: 14, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts "--port" "5199"' },
-  {
-    pid: 16,
-    ppid: 15,
-    commandLine: String.raw`node "E:\Projects\poe\node_modules\.bin\\..\vite\bin\vite.js" --config packages/web/vite.config.ts`,
-  },
+  VITE_NODE,
 ];
 
 describe('parsePort', () => {
@@ -126,7 +128,7 @@ describe('planStop', () => {
       const chain: ProcessInfo[] = [
         { pid: 30, ppid: 1, commandLine },
         { pid: 15, ppid: 30, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts' },
-        CHAIN.find((info) => info.pid === 16)!,
+        VITE_NODE,
       ];
       expect(planStop([16], chain, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
     }
@@ -135,7 +137,7 @@ describe('planStop', () => {
   it('never climbs into a shell whose vite command is followed by another on a new line', () => {
     const chain: ProcessInfo[] = [
       { pid: 30, ppid: 1, commandLine: 'sh -c vite --config packages/web/vite.config.ts\npnpm test' },
-      { ...CHAIN.find((info) => info.pid === 16)!, ppid: 30 },
+      { ...VITE_NODE, ppid: 30 },
     ];
     expect(planStop([16], chain, ROOT, NONE)).toEqual({ kind: 'kill', roots: [16] });
   });
@@ -145,7 +147,7 @@ describe('planStop', () => {
       { pid: 40, ppid: 1, commandLine: 'bash -c "pnpm -r --parallel dev"' },
       { pid: 41, ppid: 40, commandLine: String.raw`C:\pnpm\pnpm.exe -r --parallel dev` },
       { pid: 15, ppid: 41, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts' },
-      CHAIN.find((info) => info.pid === 16)!,
+      VITE_NODE,
     ];
     expect(planStop([16], recursive, ROOT, NONE)).toEqual({ kind: 'kill', roots: [15] });
     const filtered = recursive.map((info) =>

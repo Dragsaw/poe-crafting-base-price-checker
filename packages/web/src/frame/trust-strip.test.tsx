@@ -63,7 +63,7 @@ function mountStrip(
   absent: readonly TolerableKey[] = [],
   crossFileFailures: readonly DiagnosisFailure[] = [],
 ): HTMLDivElement {
-  const set = { ...BASE_SET, syncReport: COMMITTED_REPORT, ...overrides } as ArtifactSet;
+  const set: ArtifactSet = { ...BASE_SET, syncReport: COMMITTED_REPORT, ...overrides };
   return mount(<TrustStrip set={set} absent={absent} now={REPORT_CLOCK} crossFileFailures={crossFileFailures} />);
 }
 

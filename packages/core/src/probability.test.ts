@@ -173,12 +173,12 @@ describe('contains (§1)', () => {
 });
 
 describe('poolOf', () => {
-  const weights = {
+  const weights: WeightsFile = {
     schemaVersion: WEIGHTS_SCHEMA_VERSION,
     gamePatch: '0.5.5',
     producer: { id: 'test', generatedAt: '2026-09-26T10:52:22.504Z' },
     bases: { 'armour.chest': { Body_Armours_dex: pools([], []) } },
-  } as WeightsFile;
+  };
 
   it('looks the class up directly', () => {
     expect(poolOf(weights, 'armour.chest', 'Body_Armours_dex').ok).toBe(true);

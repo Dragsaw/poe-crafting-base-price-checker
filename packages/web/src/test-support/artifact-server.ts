@@ -147,3 +147,24 @@ export function gate(): { readonly promise: Promise<void>; readonly open: () => 
   });
   return { promise, open };
 }
+
+/** Every artifact answers only after its gate opens, one key at a time or all at once. */
+export function gatedArtifacts(): {
+  readonly answers: Partial<Record<ArtifactKey, ArtifactAnswer>>;
+  readonly open: (key: ArtifactKey) => void;
+  readonly openAll: () => void;
+} {
+  const held = ARTIFACT_ORDER.map((key) => ({ key, ...gate() }));
+  const opens = new Map(held.map(({ key, open }) => [key, open]));
+  return {
+    answers: Object.fromEntries(held.map(({ key, promise }) => [key, { kind: 'gated', gate: promise } satisfies ArtifactAnswer])),
+    open: (key) => {
+      opens.get(key)?.();
+    },
+    openAll: () => {
+      for (const open of opens.values()) {
+        open();
+      }
+    },
+  };
+}

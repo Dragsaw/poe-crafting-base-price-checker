@@ -1067,7 +1067,10 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
   });
 
   it('takes asOf from the summands only: the oldest observedAt, never a rate asOf (AD-10)', () => {
-    const old = { ...priced(2), observation: { ...observation(2), observedAt: '2026-09-27T00:00:00Z' } } as PriceState;
+    const old: PriceState = {
+      state: 'priced',
+      observation: { ...observation(2), observedAt: '2026-09-27T00:00:00Z' },
+    };
     const rates = RATES.map((rate) => ({ ...rate, asOf: '2026-09-10T00:00:00Z' }));
     const filler = chase('Bows', FILLER);
     const [row] = craftedRows(

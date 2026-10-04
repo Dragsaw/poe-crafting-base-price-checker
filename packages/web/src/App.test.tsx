@@ -25,6 +25,7 @@ import { ASKING_PRICE_COPY } from './list/AskingPriceLine';
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry, unpriced } from './test-support/list-fixtures';
 import {
   gate,
+  gatedArtifacts,
   NEVER_FETCHED_PATH,
   serveArtifacts,
   sharedServer,
@@ -81,11 +82,8 @@ function refusalBody(path: string): string {
 
 describe('the pending state', () => {
   it('paints the masthead and twenty skeleton slots in the final layout', () => {
-    const gates = ARTIFACT_ORDER.map(() => gate());
-    serveArtifacts(
-      server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
-    );
+    const held = gatedArtifacts();
+    serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(frame().getAttribute('aria-busy')).toBe('true');
@@ -99,28 +97,25 @@ describe('the pending state', () => {
     expect(stripSlot?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     expect(stripSlot?.textContent).toBe('');
     expect(frame().querySelector('[data-trust-strip]')).toBeNull();
-    for (const g of gates) {g.open();}
+    held.openAll();
   });
 
   it('changes nothing rendered while any artifact is still outstanding, then moves in one transition', async () => {
-    const gates = new Map<ArtifactKey, ReturnType<typeof gate>>(ARTIFACT_ORDER.map((key) => [key, gate()]));
-    serveArtifacts(
-      server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: gates.get(key)?.promise } as ArtifactAnswer])),
-    );
+    const held = gatedArtifacts();
+    serveArtifacts(server, held.answers);
     mount();
     const pending = frame().outerHTML;
 
     // Six of the seven arrive, one at a time; the page does not move.
     for (const key of ARTIFACT_ORDER.slice(0, 6)) {
-      gates.get(key)?.open();
+      held.open(key);
       // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the page is asserted unmoved after each single arrival
       await flush();
       expect(mountedContainer()?.outerHTML).toContain(pending);
       expect(frame().outerHTML).toBe(pending);
     }
 
-    gates.get('catalogueStats')?.open();
+    held.open('catalogueStats');
     await settleTo('ready');
     expect(frame().querySelectorAll('[data-row-slot]')).toHaveLength(0);
   });
@@ -313,17 +308,14 @@ describe('the resting chrome', () => {
 
   // Matrix: skeleton.
   it('paints the asking line, the labelled header, the slots, the key block and the foot while pending', () => {
-    const gates = ARTIFACT_ORDER.map(() => gate());
-    serveArtifacts(
-      server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
-    );
+    const held = gatedArtifacts();
+    serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(chrome()).toEqual(ALL);
     expect(frame().querySelector('[data-column-header]')?.textContent).toContain('Item Class / Base Type');
     expect(frame().textContent).toContain(ASKING_PRICE_COPY);
-    for (const g of gates) {g.open();}
+    held.openAll();
   });
 
   it('renders the chrome in order around the ranked rows when ready', async () => {
@@ -539,15 +531,12 @@ describe('the payout threshold', () => {
   });
 
   it('renders while pending and ready, and not on the two failure screens', async () => {
-    const gates = ARTIFACT_ORDER.map(() => gate());
-    serveArtifacts(
-      server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
-    );
+    const held = gatedArtifacts();
+    serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(payoutField().value).toBe('0.25');
-    for (const g of gates) {g.open();}
+    held.openAll();
     await settleTo('ready');
     expect(payoutField().value).toBe('0.25');
 
@@ -1234,17 +1223,14 @@ describe('the Unrankable appendix', () => {
 
   // Matrix: loading.
   it('is absent while pending, and the tail keeps the key block and the foot', async () => {
-    const gates = ARTIFACT_ORDER.map(() => gate());
-    serveArtifacts(
-      server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
-    );
+    const held = gatedArtifacts();
+    serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
     expect(tailOrder()).toEqual(['keyBlock', 'runningFoot']);
     expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
-    for (const g of gates) {g.open();}
+    held.openAll();
     await settleTo('ready');
   });
 
