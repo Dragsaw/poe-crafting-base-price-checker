@@ -685,16 +685,7 @@
     }
   },
   "packages/web/src/list/RankedRow.tsx": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
-      "count": 1
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
