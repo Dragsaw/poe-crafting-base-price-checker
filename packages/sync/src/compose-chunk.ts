@@ -38,7 +38,7 @@ import type { ItemTypes } from './pricing/search-body.ts';
 import { createRequestCounter } from './request-counter.ts';
 import type { RequestCounter } from './request-counter.ts';
 import { createTradeGovernor } from './trade/client.ts';
-import type { PacingState } from './trade/client.ts';
+import type { PacingState, TradeGovernor } from './trade/client.ts';
 import type { SessionAuth } from './trade/session-auth.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
@@ -107,13 +107,13 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
   return loaded.value;
 }
 
-export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
-  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session, auth } = options;
+type ChunkGovernor = TradeGovernor<'league-validation' | 'tracked-list'>;
 
-  const requests = options.requests ?? createRequestCounter();
+function createChunkGovernor(options: ComposeChunkPorts, requests: RequestCounter): ChunkGovernor {
+  const { clock, http, wait, userAgent, log, pacing, spread, auth } = options;
   // A fresh governor per chunk: its invalid-request counts stay per chunk,
   // while a session's pacing memory carries across (AD-8).
-  const governor = createTradeGovernor({
+  return createTradeGovernor({
     http: {
       'league-validation': requests.counted(http, 'league-validation'),
       'tracked-list': requests.counted(http, 'tracked-list'),
@@ -130,7 +130,42 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     // `session-probe` figure is its one trace (AD-12, AD-30).
     ...(auth !== undefined && { auth: { holder: auth, probe: requests.counted(http, 'session-probe') } }),
   });
-  const { clients } = governor;
+}
+
+function createChunkLoad(options: ComposeChunkPorts, clients: ChunkGovernor['clients']): ChunkPorts['load'] {
+  const { fs, clock, wrapStep } = options;
+  return async ({ entries, dataset }) => {
+    const config = valueOf(await loadConfig(fs));
+    // Straight after the config, so a later refusal cannot hide an excess.
+    const cap = checkPinnedCap(entries, config);
+    if (!cap.ok) {
+      throw new PinnedCapExceededError(cap.error);
+    }
+    const rates = valueOf(await loadCurrencies(fs));
+    const itemTypes = valueOf(await loadItemTypes(fs));
+    const { league } = config;
+    const step = createPricingStep({
+      client: clients['tracked-list'],
+      league,
+      rates,
+      itemTypes,
+      dataset,
+      clock,
+    });
+    return {
+      publication: { league, currencyRates: outputRates(rates) },
+      starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
+      gate: createLeagueGate({ client: clients['league-validation'], league }),
+      step: wrapStep === undefined ? step : wrapStep(step, { league, itemTypes }),
+    };
+  };
+}
+
+export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
+  const { fs, clock, git, pid, log, session, auth } = options;
+
+  const requests = options.requests ?? createRequestCounter();
+  const governor = createChunkGovernor(options, requests);
 
   const ports: ChunkPorts = {
     fs,
@@ -138,46 +173,22 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     pid,
     git,
     requests,
-    load: async ({ entries, dataset }) => {
-      const config = valueOf(await loadConfig(fs));
-      // Straight after the config, so a later refusal cannot hide an excess.
-      const cap = checkPinnedCap(entries, config);
-      if (!cap.ok) {
-        throw new PinnedCapExceededError(cap.error);
-      }
-      const rates = valueOf(await loadCurrencies(fs));
-      const itemTypes = valueOf(await loadItemTypes(fs));
-      const { league } = config;
-      const step = createPricingStep({
-        client: clients['tracked-list'],
-        league,
-        rates,
-        itemTypes,
-        dataset,
-        clock,
-      });
-      return {
-        publication: { league, currencyRates: outputRates(rates) },
-        starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
-        gate: createLeagueGate({ client: clients['league-validation'], league }),
-        step: wrapStep === undefined ? step : wrapStep(step, { league, itemTypes }),
-      };
-    },
+    load: createChunkLoad(options, governor.clients),
     catalogue: () => loadCatalogueIds(fs),
     latchedRetryAfterMs: () => governor.latchedRetryAfterMs(),
     // The runner sees two narrow ports, never the holder: the run-start
     // hold-off settle and the pending hold-off action (§13.1, §13.3).
     ...(auth !== undefined && {
-          auth: {
-            settleHeldOffIfDue: (holdOffUntil, now) => {
-              auth.settleHeldOffIfDue(holdOffUntil, now);
-            },
-            pendingHoldOff: () => auth.pendingHoldOff(),
-            holdOffApplied: (action) => {
-              auth.holdOffApplied(action);
-            },
-          },
-        }),
+      auth: {
+        settleHeldOffIfDue: (holdOffUntil, now) => {
+          auth.settleHeldOffIfDue(holdOffUntil, now);
+        },
+        pendingHoldOff: () => auth.pendingHoldOff(),
+        holdOffApplied: (action) => {
+          auth.holdOffApplied(action);
+        },
+      },
+    }),
     ...(log !== undefined && { log }),
     ...(session !== undefined && { session }),
   };

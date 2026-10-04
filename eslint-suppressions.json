@@ -414,9 +414,6 @@
   "packages/sync/src/compose-chunk.ts": {
     "local/max-comment-run": {
       "count": 5
-    },
-    "max-lines-per-function": {
-      "count": 1
     }
   },
   "packages/sync/src/curation/check.test.ts": {
