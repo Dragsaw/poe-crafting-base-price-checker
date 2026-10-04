@@ -125,10 +125,11 @@ describe('compareByCodeUnit', () => {
   });
 });
 
+const withPrefix = (prefix: unknown): TrackedEntry => TrackedEntrySchema.parse({ ...crafted, prefix });
+
 describe('the hybrid affix form (§4.1)', () => {
   const lineA = { statId: 'explicit.stat_1', valueMin: 25, valueMax: 34 };
   const lineB = { statId: 'explicit.stat_2' };
-  const withPrefix = (prefix: unknown): TrackedEntry => TrackedEntrySchema.parse({ ...crafted, prefix });
 
   it('gives two orderings of the same lines one key', () => {
     expect(canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] }))).toBe(

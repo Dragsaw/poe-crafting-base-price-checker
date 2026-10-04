@@ -226,6 +226,12 @@ describe('single-line pairs (§2.1 consequence 3)', () => {
   });
 });
 
+const hybridReference = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
+
+const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
+
+const byString = (pairs: readonly (readonly string[])[]) => pairs.map((pair) => JSON.stringify(pair)).toSorted();
+
 describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   const A = STAT;
   const B = OTHER;
@@ -234,8 +240,6 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   const H1 = tier([line(A, [30, 40]), line(B, [100, 150])], { itemLevelMin: 75, modGroup: 'hybrid-ab' });
   const H2 = tier([line(A, [20, 29]), line(B, [60, 99])], { itemLevelMin: 50, modGroup: 'hybrid-ab' });
   const PURE_A = tier([line(A, [70, 80])], { itemLevelMin: 60 });
-  const hybridReference = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
-  const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
   const T1_REF = hybridReference(bandLine(A, 30, 40), bandLine(B, 100, 150));
 
   it('passes a correct hybrid at T1’s edges', () => {
@@ -311,7 +315,6 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
     const singleEntry = entry({ prefix: band(30, 40, A) });
     const failures = failuresOf([hybridEntry, singleEntry], bows(pools([H1, pure])));
     // The single-line band also reaches into H1, so §2.7 reports it beside co-occur.
-    const byString = (pairs: readonly (readonly string[])[]) => pairs.map((pair) => JSON.stringify(pair)).toSorted();
     expect(byString(failures.map((failure) => [failure.check, failure.entryKey]))).toEqual(
       byString([
         ['co-occur', canonicalKey(hybridEntry)],

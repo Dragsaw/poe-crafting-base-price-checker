@@ -94,29 +94,32 @@ describe('overlap, the consequences', () => {
   });
 });
 
+const crafted = (
+  affixes: { prefix: ModifierReference; suffix: ModifierReference },
+  status: 'active' | 'pruned' = 'active',
+) => ({
+  kind: 'crafted' as const,
+  categoryId: 'weapon.bow',
+  className: 'Bows',
+  itemLevelMin: 82,
+  ...affixes,
+  status,
+  ...((status === 'pruned') && { prunedReason: 'no market' }),
+});
+
+const parse = (entries: readonly unknown[]) =>
+  parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
+
+const issuesOf = (entries: readonly unknown[]) => {
+  const result = parse(entries);
+  if (result.ok || result.reason !== 'invalid') {
+    throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+  }
+  return result.issues;
+};
+
 describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
   const S = valueless('s');
-  const crafted = (
-    affixes: { prefix: ModifierReference; suffix: ModifierReference },
-    status: 'active' | 'pruned' = 'active',
-  ) => ({
-    kind: 'crafted' as const,
-    categoryId: 'weapon.bow',
-    className: 'Bows',
-    itemLevelMin: 82,
-    ...affixes,
-    status,
-    ...((status === 'pruned') && { prunedReason: 'no market' }),
-  });
-  const parse = (entries: readonly unknown[]) =>
-    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
-  const issuesOf = (entries: readonly unknown[]) => {
-    const result = parse(entries);
-    if (result.ok || result.reason !== 'invalid') {
-      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
-    }
-    return result.issues;
-  };
 
   it('refuses intersecting bands, naming both keys and the slots, at the later index', () => {
     const first = crafted({ prefix: band('a', 43, 60), suffix: S });
@@ -216,9 +219,10 @@ describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () 
   });
 });
 
+const lines = (...entries: HybridModifierReference['lines']): HybridModifierReference => ({ kind: 'hybrid', lines: entries });
+
 describe('summed statIds (§2.1 summed(e), sum(e, s))', () => {
   const RARITY = 'explicit.stat_3917489142';
-  const lines = (...entries: HybridModifierReference['lines']): HybridModifierReference => ({ kind: 'hybrid', lines: entries });
 
   it('names the statIds both slots name, pure line or hybrid line, either side', () => {
     expect([...summedStatIds({ prefix: band(RARITY, 16, 19), suffix: band(RARITY, 15, 18) })]).toEqual([RARITY]);
@@ -255,9 +259,16 @@ describe('summed statIds (§2.1 summed(e), sum(e, s))', () => {
   });
 });
 
+const hybridOnA = (aMin: number, aMax: number): HybridModifierReference => ({
+  kind: 'hybrid',
+  lines: [
+    { statId: 'a', valueMin: aMin, valueMax: aMax },
+    { statId: 'b', valueMin: 1, valueMax: 2 },
+  ],
+});
+
 describe('overlap with summed statIds (§2.1 S)', () => {
   const RARITY = 'explicit.stat_3917489142';
-  const lines = (...entries: HybridModifierReference['lines']): HybridModifierReference => ({ kind: 'hybrid', lines: entries });
   const rarity = (prefixMin: number, prefixMax: number, suffixMin: number, suffixMax: number) => ({
     prefix: band(RARITY, prefixMin, prefixMax),
     suffix: band(RARITY, suffixMin, suffixMax),
@@ -282,17 +293,10 @@ describe('overlap with summed statIds (§2.1 S)', () => {
       asked.push([...summed]);
       return true;
     };
-    const hybrid = (aMin: number, aMax: number): HybridModifierReference => ({
-      kind: 'hybrid',
-      lines: [
-        { statId: 'a', valueMin: aMin, valueMax: aMax },
-        { statId: 'b', valueMin: 1, valueMax: 2 },
-      ],
-    });
     // Disjoint bands on a summed line do not stop the slot; the line outside S decides.
-    expect(slotOverlapBranch(hybrid(1, 2), hybrid(50, 60), 'suffix', spy, new Set(['a']))).toBe('co-occur');
+    expect(slotOverlapBranch(hybridOnA(1, 2), hybridOnA(50, 60), 'suffix', spy, new Set(['a']))).toBe('co-occur');
     expect(asked).toEqual([['a']]);
-    expect(slotOverlapBranch(hybrid(1, 2), hybrid(50, 60), 'suffix', spy)).toBeUndefined();
+    expect(slotOverlapBranch(hybridOnA(1, 2), hybridOnA(50, 60), 'suffix', spy)).toBeUndefined();
   });
 
   it('overlaps two rarity entries whose per-slot bands are disjoint but whose sums intersect', () => {
@@ -345,8 +349,6 @@ describe('TrackedFileSchema within-file overlap of summed statIds', () => {
     suffix: band(RARITY, suffixMin, suffixMax),
     status: 'active' as const,
   });
-  const parse = (entries: readonly unknown[]) =>
-    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
 
   it('refuses intersecting sums, naming both keys, the slots and the summed statId with both intervals', () => {
     const first = amulet(16, 19, 15, 18);

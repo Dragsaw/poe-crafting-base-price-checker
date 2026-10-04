@@ -106,9 +106,6 @@
     }
   },
   "packages/contracts/src/canonical-key.test.ts": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-array-sort": {
       "count": 3
     },
@@ -129,11 +126,6 @@
       "count": 2
     }
   },
-  "packages/contracts/src/craft-recipe.test.ts": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    }
-  },
   "packages/contracts/src/craft-recipe.ts": {
     "local/max-comment-run": {
       "count": 2
@@ -151,9 +143,6 @@
     }
   },
   "packages/contracts/src/dataset.test.ts": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 1
     }
@@ -166,9 +155,6 @@
   "packages/contracts/src/envelopes.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 12
     },
     "unicorn/explicit-length-check": {
       "count": 1
@@ -207,9 +193,6 @@
     "local/max-comment-run": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     }
@@ -231,9 +214,6 @@
   "packages/contracts/src/overlap.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 6
     }
   },
   "packages/contracts/src/overlap.ts": {
@@ -342,9 +322,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 5
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-array-sort": {
       "count": 5
     },
@@ -370,9 +347,6 @@
   },
   "packages/contracts/src/tracked-entry.test.ts": {
     "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
       "count": 1
     },
     "unicorn/no-array-sort": {
@@ -493,9 +467,6 @@
     },
     "sonarjs/no-alphabetical-sort": {
       "count": 9
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 3
     },
     "unicorn/no-null": {
       "count": 2
@@ -1377,9 +1348,6 @@
     },
     "sonarjs/no-redundant-optional": {
       "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 5
     },
     "unicorn/import-style": {
       "count": 1

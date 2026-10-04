@@ -128,6 +128,19 @@ describe('parseEnvelope', () => {
   });
 });
 
+function trackedFileOf(entries: readonly unknown[]) {
+  return { schemaVersion: TRACKED_SCHEMA_VERSION, entries };
+}
+
+function trackedIssuesOf(entries: readonly unknown[]) {
+  const result = parseEnvelope(TrackedFileSchema, trackedFileOf(entries), TRACKED_SCHEMA_VERSION);
+  expect(result.ok).toBe(false);
+  if (result.ok || result.reason !== 'invalid') {
+    throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+  }
+  return result.issues;
+}
+
 describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
   const rawTwin = {
     kind: 'raw',
@@ -137,24 +150,11 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
   } as const;
   const rawKey = canonicalKey(rawTwin);
 
-  function fileOf(entries: readonly unknown[]) {
-    return { schemaVersion: TRACKED_SCHEMA_VERSION, entries };
-  }
-
-  function issuesOf(entries: readonly unknown[]) {
-    const result = parseEnvelope(TrackedFileSchema, fileOf(entries), TRACKED_SCHEMA_VERSION);
-    expect(result.ok).toBe(false);
-    if (result.ok || result.reason !== 'invalid') {
-      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
-    }
-    return result.issues;
-  }
-
   // I/O matrix: "Distinct keys".
   it('accepts two entries on one base with different itemLevelMin', () => {
     const result = parseEnvelope(
       TrackedFileSchema,
-      fileOf([rawTwin, { ...rawTwin, itemLevelMin: 84 }]),
+      trackedFileOf([rawTwin, { ...rawTwin, itemLevelMin: 84 }]),
       TRACKED_SCHEMA_VERSION,
     );
     expect(result.ok).toBe(true);
@@ -162,7 +162,7 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
 
   // I/O matrix: "Exact twin".
   it('refuses an exact twin with one issue at the repeat, naming the key and the first index', () => {
-    const issues = issuesOf([rawTwin, rawTwin]);
+    const issues = trackedIssuesOf([rawTwin, rawTwin]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['entries', 1]);
     expect(issues[0]?.message).toContain(rawKey);
@@ -171,14 +171,14 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
 
   // I/O matrix: "Status twin".
   it('refuses one key held active and pinned', () => {
-    const issues = issuesOf([rawTwin, { ...rawTwin, status: 'pinned' }]);
+    const issues = trackedIssuesOf([rawTwin, { ...rawTwin, status: 'pinned' }]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['entries', 1]);
   });
 
   // I/O matrix: "Pruned twin".
   it('refuses one key held active and pruned', () => {
-    const issues = issuesOf([rawTwin, { ...rawTwin, status: 'pruned', prunedReason: 'too slow' }]);
+    const issues = trackedIssuesOf([rawTwin, { ...rawTwin, status: 'pruned', prunedReason: 'too slow' }]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['entries', 1]);
   });
@@ -194,7 +194,7 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
       suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
       status: 'active',
     } as const;
-    const issues = issuesOf([
+    const issues = trackedIssuesOf([
       crafted,
       { ...crafted, prefix: { ...crafted.prefix, acceptedTier: 'T6' } },
     ]);
@@ -206,7 +206,7 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
   // I/O matrix: "Triplet".
   it('reports each repeat of a key at its own index, each naming the first occurrence', () => {
     const other = { ...rawTwin, itemLevelMin: 84 };
-    const issues = issuesOf([rawTwin, other, rawTwin, rawTwin]);
+    const issues = trackedIssuesOf([rawTwin, other, rawTwin, rawTwin]);
     expect(issues.map((issue) => issue.path)).toEqual([
       ['entries', 2],
       ['entries', 3],
@@ -219,25 +219,25 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
 
   // I/O matrix: "Empty list".
   it('accepts an empty list', () => {
-    expect(parseEnvelope(TrackedFileSchema, fileOf([]), TRACKED_SCHEMA_VERSION).ok).toBe(true);
+    expect(parseEnvelope(TrackedFileSchema, trackedFileOf([]), TRACKED_SCHEMA_VERSION).ok).toBe(true);
   });
 });
 
+const parse = (entries: readonly unknown[]) =>
+  parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
+
+const amulet = (itemLevelMin: number, statId: string, status = 'active') => ({
+  kind: 'crafted',
+  categoryId: 'accessory.amulet',
+  className: 'Amulets',
+  itemLevelMin,
+  prefix: { kind: 'valueless', statId },
+  suffix: { kind: 'valueless', statId: 'explicit.suffix' },
+  status,
+  ...((status === 'pruned') && { prunedReason: 'no market' }),
+});
+
 describe('TrackedFileSchema shared floor (AD-17, FR-22)', () => {
-  const amulet = (itemLevelMin: number, statId: string, status = 'active') => ({
-    kind: 'crafted',
-    categoryId: 'accessory.amulet',
-    className: 'Amulets',
-    itemLevelMin,
-    prefix: { kind: 'valueless', statId },
-    suffix: { kind: 'valueless', statId: 'explicit.suffix' },
-    status,
-    ...((status === 'pruned') && { prunedReason: 'no market' }),
-  });
-
-  const parse = (entries: readonly unknown[]) =>
-    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
-
   // I/O matrix: "Shared floor".
   it('refuses two non-pruned crafted entries on one class at 82 and 75, with the issue at the second', () => {
     const result = parse([amulet(82, 'explicit.a'), amulet(75, 'explicit.b')]);
@@ -285,6 +285,24 @@ describe('TrackedFileSchema shared floor (AD-17, FR-22)', () => {
   });
 });
 
+function syncFileOf(entries: readonly unknown[]) {
+  return {
+    schemaVersion: INITIAL_SCHEMA_VERSION,
+    league: 'Forbidden Rites',
+    generatedAt: '2026-09-20T09:02:00Z',
+    entries,
+    currencyRates: [],
+  };
+}
+
+function syncIssuesOf(entries: readonly unknown[]) {
+  const result = parseEnvelope(DatasetFileSchema, syncFileOf(entries));
+  if (result.ok || result.reason !== 'invalid') {
+    throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+  }
+  return result.issues;
+}
+
 describe('the sync-owned envelopes', () => {
   it('parses a dataset file carrying its entries and the current rate set', () => {
     const dataset = {
@@ -317,36 +335,18 @@ describe('the sync-owned envelopes', () => {
       price: { state: 'not-yet-synced', reason: 'never-synced' },
     } as const;
 
-    function fileOf(entries: readonly unknown[]) {
-      return {
-        schemaVersion: INITIAL_SCHEMA_VERSION,
-        league: 'Forbidden Rites',
-        generatedAt: '2026-09-20T09:02:00Z',
-        entries,
-        currencyRates: [],
-      };
-    }
-
-    function issuesOf(entries: readonly unknown[]) {
-      const result = parseEnvelope(DatasetFileSchema, fileOf(entries));
-      if (result.ok || result.reason !== 'invalid') {
-        throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
-      }
-      return result.issues;
-    }
-
     // I/O matrix: "Distinct keys".
     it('accepts two entries with different entryKeys', () => {
       const result = parseEnvelope(
         DatasetFileSchema,
-        fileOf([neverSynced, { ...neverSynced, entryKey: '["raw","Advanced Dualstring Bow",84]' }]),
+        syncFileOf([neverSynced, { ...neverSynced, entryKey: '["raw","Advanced Dualstring Bow",84]' }]),
       );
       expect(result.ok).toBe(true);
     });
 
     // I/O matrix: "Exact twin".
     it('refuses an exact twin with one issue at the repeat, naming the key and the first index', () => {
-      const issues = issuesOf([neverSynced, neverSynced]);
+      const issues = syncIssuesOf([neverSynced, neverSynced]);
       expect(issues).toHaveLength(1);
       expect(issues[0]?.path).toEqual(['entries', 1]);
       expect(issues[0]?.message).toContain(key);
@@ -377,7 +377,7 @@ describe('the sync-owned envelopes', () => {
         lastSearchId: 'aBcDeF',
         lastSearchLeague: 'Forbidden Rites',
       };
-      const issues = issuesOf([priced, { entryKey: key, price: { state: 'no-listings' } }]);
+      const issues = syncIssuesOf([priced, { entryKey: key, price: { state: 'no-listings' } }]);
       expect(issues).toHaveLength(1);
       expect(issues[0]?.path).toEqual(['entries', 1]);
     });
@@ -385,7 +385,7 @@ describe('the sync-owned envelopes', () => {
     // I/O matrix: "Triplet".
     it('reports each repeat of a key at its own index, each naming the first occurrence', () => {
       const other = { ...neverSynced, entryKey: '["raw","Advanced Dualstring Bow",84]' };
-      const issues = issuesOf([neverSynced, other, neverSynced, neverSynced]);
+      const issues = syncIssuesOf([neverSynced, other, neverSynced, neverSynced]);
       expect(issues.map((issue) => issue.path)).toEqual([
         ['entries', 2],
         ['entries', 3],
@@ -398,7 +398,7 @@ describe('the sync-owned envelopes', () => {
 
     // I/O matrix: "Empty list".
     it('accepts an empty list', () => {
-      expect(parseEnvelope(DatasetFileSchema, fileOf([])).ok).toBe(true);
+      expect(parseEnvelope(DatasetFileSchema, syncFileOf([])).ok).toBe(true);
     });
   });
 
@@ -483,6 +483,18 @@ describe('the sync-owned envelopes', () => {
   });
 });
 
+function recipesFileOf(recipes: readonly unknown[]) {
+  return { schemaVersion: INITIAL_SCHEMA_VERSION, recipes };
+}
+
+function recipesIssuesOf(recipes: readonly unknown[]) {
+  const result = parseEnvelope(RecipesFileSchema, recipesFileOf(recipes));
+  if (result.ok || result.reason !== 'invalid') {
+    throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+  }
+  return result.issues;
+}
+
 describe('RecipesFileSchema', () => {
   const recipe = {
     id: 'greater',
@@ -490,33 +502,21 @@ describe('RecipesFileSchema', () => {
     modifierLevelMin: 0,
   } as const;
 
-  function fileOf(recipes: readonly unknown[]) {
-    return { schemaVersion: INITIAL_SCHEMA_VERSION, recipes };
-  }
-
   const perfect = {
     id: 'perfect',
     currencies: [{ currencyId: 'perfect-transmute', quantity: 1 }],
     modifierLevelMin: 70,
   } as const;
 
-  function issuesOf(recipes: readonly unknown[]) {
-    const result = parseEnvelope(RecipesFileSchema, fileOf(recipes));
-    if (result.ok || result.reason !== 'invalid') {
-      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
-    }
-    return result.issues;
-  }
-
   it('parses a versioned file of recipes', () => {
-    const result = parseEnvelope(RecipesFileSchema, fileOf([recipe, perfect]));
+    const result = parseEnvelope(RecipesFileSchema, recipesFileOf([recipe, perfect]));
     expect(result.ok).toBe(true);
     expect(result.ok === true && result.value.recipes).toHaveLength(2);
   });
 
   it('accepts one regular recipe beside graded ones', () => {
     const regular = { id: 'regular', currencies: [{ currencyId: 'orb-of-transmutation', quantity: 1 }], modifierLevelMin: 0 };
-    expect(parseEnvelope(RecipesFileSchema, fileOf([recipe, perfect, regular])).ok).toBe(true);
+    expect(parseEnvelope(RecipesFileSchema, recipesFileOf([recipe, perfect, regular])).ok).toBe(true);
   });
 
   it('refuses a recipe that mixes grades, with one issue at its index naming it', () => {
@@ -528,15 +528,15 @@ describe('RecipesFileSchema', () => {
       ],
       modifierLevelMin: 44,
     };
-    const issues = issuesOf([perfect, mixed]);
+    const issues = recipesIssuesOf([perfect, mixed]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['recipes', 1]);
     expect(issues[0]?.message).toContain('mixed');
-    expect(issuesOf([{ ...mixed, currencies: [mixed.currencies[0], { currencyId: 'exalted', quantity: 1 }] }])).toHaveLength(1);
+    expect(recipesIssuesOf([{ ...mixed, currencies: [mixed.currencies[0], { currencyId: 'exalted', quantity: 1 }] }])).toHaveLength(1);
   });
 
   it('refuses two recipes that derive one word, naming the word and the first recipe', () => {
-    const issues = issuesOf([recipe, perfect, { ...recipe, id: 'greater-too' }]);
+    const issues = recipesIssuesOf([recipe, perfect, { ...recipe, id: 'greater-too' }]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['recipes', 2]);
     expect(issues[0]?.message).toContain('greater');
@@ -549,7 +549,7 @@ describe('RecipesFileSchema', () => {
   });
 
   it('refuses a repeated id with one issue at the repeat, naming the id and the first index', () => {
-    const result = parseEnvelope(RecipesFileSchema, fileOf([recipe, { ...recipe, modifierLevelMin: 5 }]));
+    const result = parseEnvelope(RecipesFileSchema, recipesFileOf([recipe, { ...recipe, modifierLevelMin: 5 }]));
     if (result.ok || result.reason !== 'invalid') {
       throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
     }
@@ -560,81 +560,82 @@ describe('RecipesFileSchema', () => {
   });
 
   it('accepts an empty list', () => {
-    expect(parseEnvelope(RecipesFileSchema, fileOf([])).ok).toBe(true);
+    expect(parseEnvelope(RecipesFileSchema, recipesFileOf([])).ok).toBe(true);
   });
 });
 
-describe('TrackedFileSchema, hybrid references (CAP-1)', () => {
-  const hybridPrefix = (min: number, max: number) => ({
-    kind: 'hybrid',
-    lines: [
-      { statId: 'explicit.stat_691932474', valueMin: min, valueMax: max },
-      { statId: 'explicit.stat_1509134228', valueMin: 25, valueMax: 34 },
-    ],
-  });
-  const crafted = (prefix: unknown) => ({
-    kind: 'crafted',
-    categoryId: 'weapon.bow',
-    className: 'Bows',
-    itemLevelMin: 82,
-    prefix,
-    suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
-    status: 'active',
-  });
-  const parse = (entries: readonly unknown[]) =>
-    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
+const hybridPrefix = (min: number, max: number) => ({
+  kind: 'hybrid',
+  lines: [
+    { statId: 'explicit.stat_691932474', valueMin: min, valueMax: max },
+    { statId: 'explicit.stat_1509134228', valueMin: 25, valueMax: 34 },
+  ],
+});
 
+const craftedBow = (prefix: unknown) => ({
+  kind: 'crafted',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
+  itemLevelMin: 82,
+  prefix,
+  suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
+  status: 'active',
+});
+
+describe('TrackedFileSchema, hybrid references (CAP-1)', () => {
   it('parses an entry whose prefix is the Bows phys%+accuracy hybrid', () => {
-    expect(parse([crafted(hybridPrefix(16, 20))]).ok).toBe(true);
+    expect(parse([craftedBow(hybridPrefix(16, 20))]).ok).toBe(true);
   });
 
   it('does not evaluate the within-file overlap of a pair with a hybrid reference', () => {
     // The two hybrids' bands intersect on every line; core evaluates the pair (§2.1).
-    expect(parse([crafted(hybridPrefix(16, 20)), crafted(hybridPrefix(18, 22))]).ok).toBe(true);
+    expect(parse([craftedBow(hybridPrefix(16, 20)), craftedBow(hybridPrefix(18, 22))]).ok).toBe(true);
     expect(
       parse([
-        crafted(hybridPrefix(16, 20)),
-        crafted({ kind: 'banded', statId: 'explicit.stat_691932474', valueMin: 16, valueMax: 20 }),
+        craftedBow(hybridPrefix(16, 20)),
+        craftedBow({ kind: 'banded', statId: 'explicit.stat_691932474', valueMin: 16, valueMax: 20 }),
       ]).ok,
     ).toBe(true);
   });
 });
 
+const banded = (statId: string, valueMin: number, valueMax: number) => ({ kind: 'banded', statId, valueMin, valueMax });
+
+const valueless = (statId: string) => ({ kind: 'valueless', statId });
+
+const craftedAmulet = (
+  prefix: unknown,
+  suffix: unknown,
+  { className = 'Amulets', status = 'active' }: { className?: string; status?: 'active' | 'pruned' } = {},
+) => ({
+  kind: 'crafted',
+  categoryId: 'accessory.amulet',
+  className,
+  itemLevelMin: 82,
+  prefix,
+  suffix,
+  status,
+  ...((status === 'pruned') && { prunedReason: 'no market' }),
+});
+
+const summedIssuesOf = (entries: readonly unknown[]) => {
+  const result = parse(entries);
+  if (result.ok || result.reason !== 'invalid') {
+    throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+  }
+  return result.issues;
+};
+
 describe('TrackedFileSchema, within-file kind agreement and summed operands (§2.3)', () => {
   const RARITY = 'explicit.stat_3917489142';
-  const banded = (statId: string, valueMin: number, valueMax: number) => ({ kind: 'banded', statId, valueMin, valueMax });
-  const valueless = (statId: string) => ({ kind: 'valueless', statId });
-  const crafted = (
-    prefix: unknown,
-    suffix: unknown,
-    { className = 'Amulets', status = 'active' }: { className?: string; status?: 'active' | 'pruned' } = {},
-  ) => ({
-    kind: 'crafted',
-    categoryId: 'accessory.amulet',
-    className,
-    itemLevelMin: 82,
-    prefix,
-    suffix,
-    status,
-    ...((status === 'pruned') && { prunedReason: 'no market' }),
-  });
-  const parse = (entries: readonly unknown[]) =>
-    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
-  const issuesOf = (entries: readonly unknown[]) => {
-    const result = parse(entries);
-    if (result.ok || result.reason !== 'invalid') {
-      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
-    }
-    return result.issues;
-  };
 
   it('loads a summed statId with two banded operands', () => {
-    expect(parse([crafted(banded(RARITY, 16, 19), banded(RARITY, 15, 18))]).ok).toBe(true);
+    expect(parse([craftedAmulet(banded(RARITY, 16, 19), banded(RARITY, 15, 18))]).ok).toBe(true);
   });
 
   it('refuses a summed statId with a valueless operand, naming the entry, the slot and the statId', () => {
-    const entry = crafted(valueless(RARITY), valueless(RARITY));
-    const issues = issuesOf([entry]);
+    const entry = craftedAmulet(valueless(RARITY), valueless(RARITY));
+    const issues = summedIssuesOf([entry]);
     expect(issues.map((issue) => issue.path)).toEqual([
       ['entries', 0, 'prefix'],
       ['entries', 0, 'suffix'],
@@ -650,7 +651,7 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
 
   it('refuses a valueless hybrid line on a summed statId at that line', () => {
     const prefix = { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1' }, { statId: RARITY }] };
-    const issues = issuesOf([crafted(prefix, valueless(RARITY))]);
+    const issues = summedIssuesOf([craftedAmulet(prefix, valueless(RARITY))]);
     expect(issues.map((issue) => issue.path)).toEqual([
       ['entries', 0, 'prefix', 'lines', 1],
       ['entries', 0, 'suffix'],
@@ -658,12 +659,12 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
   });
 
   it('refuses a summed operand with a missing bound as a shape issue at that slot', () => {
-    const shapeIssuesAt = (issues: ReturnType<typeof issuesOf>) =>
+    const shapeIssuesAt = (issues: ReturnType<typeof summedIssuesOf>) =>
       issues.filter((issue) => issue.code !== 'custom').map((issue) => issue.path.slice(0, 3));
-    const issues = issuesOf([crafted(banded(RARITY, 16, 19), { kind: 'banded', statId: RARITY, valueMin: 15 })]);
+    const issues = summedIssuesOf([craftedAmulet(banded(RARITY, 16, 19), { kind: 'banded', statId: RARITY, valueMin: 15 })]);
     expect(shapeIssuesAt(issues)).toEqual([['entries', 0, 'suffix']]);
-    const hybridIssues = issuesOf([
-      crafted(
+    const hybridIssues = summedIssuesOf([
+      craftedAmulet(
         { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }, { statId: RARITY, valueMin: 16 }] },
         banded(RARITY, 15, 18),
       ),
@@ -672,9 +673,9 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
   });
 
   it('refuses one statId banded in one line and valueless in another, at the later line, naming both locations', () => {
-    const issues = issuesOf([
-      crafted(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
-      crafted(banded('explicit.stat_b', 1, 2), valueless('explicit.stat_a'), { className: 'Other' }),
+    const issues = summedIssuesOf([
+      craftedAmulet(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
+      craftedAmulet(banded('explicit.stat_b', 1, 2), valueless('explicit.stat_a'), { className: 'Other' }),
     ]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['entries', 1, 'suffix']);
@@ -685,16 +686,16 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
 
   it('refuses a kind clash on a hybrid line, and inside one entry', () => {
     const prefix = { kind: 'hybrid', lines: [{ statId: 'explicit.stat_a', valueMin: 1, valueMax: 2 }, { statId: 'explicit.stat_z' }] };
-    const issues = issuesOf([
-      crafted(prefix, banded('explicit.stat_s', 1, 2)),
-      crafted(banded('explicit.stat_b', 1, 2), banded('explicit.stat_z', 1, 2), { className: 'Other' }),
+    const issues = summedIssuesOf([
+      craftedAmulet(prefix, banded('explicit.stat_s', 1, 2)),
+      craftedAmulet(banded('explicit.stat_b', 1, 2), banded('explicit.stat_z', 1, 2), { className: 'Other' }),
     ]);
     expect(issues).toHaveLength(1);
     expect(issues[0]?.path).toEqual(['entries', 1, 'suffix']);
     expect(issues[0]?.message).toContain('banded at entries.1.suffix');
     expect(issues[0]?.message).toContain('valueless at entries.0.prefix.lines.1');
     // Summed with a valueless operand as well: both rules speak.
-    const summed = issuesOf([crafted(valueless(RARITY), banded(RARITY, 15, 18))]);
+    const summed = summedIssuesOf([craftedAmulet(valueless(RARITY), banded(RARITY, 15, 18))]);
     expect(summed.map((issue) => issue.path)).toEqual([
       ['entries', 0, 'prefix'],
       ['entries', 0, 'suffix'],
@@ -709,8 +710,8 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
   it('loads one statId under one kind in many lines', () => {
     expect(
       parse([
-        crafted(banded('explicit.stat_a', 1, 2), valueless('explicit.stat_v')),
-        crafted(banded('explicit.stat_a', 3, 4), valueless('explicit.stat_v'), { className: 'Other' }),
+        craftedAmulet(banded('explicit.stat_a', 1, 2), valueless('explicit.stat_v')),
+        craftedAmulet(banded('explicit.stat_a', 3, 4), valueless('explicit.stat_v'), { className: 'Other' }),
       ]).ok,
     ).toBe(true);
   });
@@ -718,8 +719,8 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
   it('skips pruned and raw entries', () => {
     expect(
       parse([
-        crafted(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
-        crafted(valueless('explicit.stat_a'), valueless('explicit.stat_a'), { status: 'pruned' }),
+        craftedAmulet(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
+        craftedAmulet(valueless('explicit.stat_a'), valueless('explicit.stat_a'), { status: 'pruned' }),
         { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' },
       ]).ok,
     ).toBe(true);

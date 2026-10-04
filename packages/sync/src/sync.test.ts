@@ -270,11 +270,13 @@ describe('parseArgs', () => {
   );
 });
 
+const outcome = (value: ChunkOutcome): ChunkResult => ({ kind: 'outcome', outcome: value });
+
+const failure = (error: unknown): ChunkResult => ({ kind: 'error', error });
+
 describe('nextWait: the session matrix', () => {
   const COLD: ChunkContext = { now: NOW, freshReading: false, evenIntervalMs: COLD_EVEN_INTERVAL_MS };
   const base = { completed: [], entries: [], records: [] };
-  const outcome = (value: ChunkOutcome): ChunkResult => ({ kind: 'outcome', outcome: value });
-  const failure = (error: unknown): ChunkResult => ({ kind: 'error', error });
   const at = (ms: number): string => new Date(Date.parse(NOW) + ms).toISOString();
 
   it('5xx or timeout with a State reading: continue, the spread paces the retry', () => {
@@ -449,26 +451,26 @@ describe('the gate-due pre-wait', () => {
   });
 });
 
-describe('runWait and the local polls', () => {
-  function waitPorts(fs: FakeFilesystemPort, clock: FakeClockPort, step = LOCAL_POLL_MS) {
-    const controller = new AbortController();
-    const sleeps: number[] = [];
-    return {
-      controller,
-      sleeps,
-      ports: {
-        fs,
-        clock,
-        signal: controller.signal,
-        sleep: (ms: number) => {
-          sleeps.push(ms);
-          clock.set(new Date(Date.parse(clock.now()) + Math.min(ms, step)).toISOString());
-          return Promise.resolve();
-        },
+function waitPorts(fs: FakeFilesystemPort, clock: FakeClockPort, step = LOCAL_POLL_MS) {
+  const controller = new AbortController();
+  const sleeps: number[] = [];
+  return {
+    controller,
+    sleeps,
+    ports: {
+      fs,
+      clock,
+      signal: controller.signal,
+      sleep: (ms: number) => {
+        sleeps.push(ms);
+        clock.set(new Date(Date.parse(clock.now()) + Math.min(ms, step)).toISOString());
+        return Promise.resolve();
       },
-    };
-  }
+    },
+  };
+}
 
+describe('runWait and the local polls', () => {
   it('an other-throw wait ends at the backoff', async () => {
     const fs = createFakeFilesystemPort(inputs([ENTRY]));
     const clock = createFakeClockPort(NOW);
@@ -559,6 +561,30 @@ describe('runWait and the local polls', () => {
     expect(Date.now() - started).toBeLessThan(5000);
   });
 });
+
+const cookies = (http: ReturnType<typeof createFakeHttpPort>) =>
+  http.requests.map((request) => [request.method, request.headers['cookie']]);
+
+/** A pinned entry last attempted 1 h before NOW, beside one active entry. */
+function hourOldPinned(argv: readonly string[]) {
+  const pinned: TrackedEntry = { ...SECOND, status: 'pinned' };
+  const dataset = {
+    schemaVersion: SUPPORTED_SCHEMA_VERSION,
+    league: LEAGUE,
+    generatedAt: NOW,
+    entries: [
+      { entryKey: canonicalKey(pinned), price: { state: 'no-listings' }, lastAttemptedAt: '2026-09-26T11:00:00.000Z' },
+    ] satisfies DatasetEntry[],
+    currencyRates: [],
+  };
+  const session = sessionFor({
+    tracked: [pinned, ENTRY],
+    minChunkSearches: 2,
+    seeded: { [DATASET_PATH]: { contents: JSON.stringify(dataset) } },
+    argv,
+  });
+  return { ...session, pinned };
+}
 
 describe('pnpm sync: the session with injected ports', () => {
   it('refuses a blank contact before any request, with exit 1', async () => {
@@ -684,9 +710,6 @@ describe('pnpm sync: the session with injected ports', () => {
         },
       });
     }
-
-    const cookies = (http: ReturnType<typeof createFakeHttpPort>) =>
-      http.requests.map((request) => [request.method, request.headers['cookie']]);
 
     it('a live cookie over three chunks: one probe, one authenticated line, and session-probe 1 for the pass', async () => {
       governorOptions.length = 0;
@@ -906,27 +929,6 @@ describe('pnpm sync: the session with injected ports', () => {
     expect(faults).toBe(1);
     expect(lines(out)[0]).toBe(`pnpm sync: completed, 1 completed: ${canonicalKey(ENTRY)}`);
   });
-
-  /** A pinned entry last attempted 1 h before NOW, beside one active entry. */
-  function hourOldPinned(argv: readonly string[]) {
-    const pinned: TrackedEntry = { ...SECOND, status: 'pinned' };
-    const dataset = {
-      schemaVersion: SUPPORTED_SCHEMA_VERSION,
-      league: LEAGUE,
-      generatedAt: NOW,
-      entries: [
-        { entryKey: canonicalKey(pinned), price: { state: 'no-listings' }, lastAttemptedAt: '2026-09-26T11:00:00.000Z' },
-      ] satisfies DatasetEntry[],
-      currencyRates: [],
-    };
-    const session = sessionFor({
-      tracked: [pinned, ENTRY],
-      minChunkSearches: 2,
-      seeded: { [DATASET_PATH]: { contents: JSON.stringify(dataset) } },
-      argv,
-    });
-    return { ...session, pinned };
-  }
 
   it('a fresh pinned entry is skipped under the 4 h default: the first search prices the active one', async () => {
     const { deps, out } = hourOldPinned([]);

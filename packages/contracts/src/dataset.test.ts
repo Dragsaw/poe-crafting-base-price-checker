@@ -17,6 +17,23 @@ const observation = {
   },
 };
 
+function label(price: PriceState): string {
+  switch (price.state) {
+    case 'priced': {
+      return String(price.observation.priceDivine);
+    }
+    case 'no-listings': {
+      return 'no listings';
+    }
+    case 'not-yet-synced': {
+      return price.reason;
+    }
+    case 'unresolvable': {
+      return 'unresolvable';
+    }
+  }
+}
+
 describe('PriceStateSchema', () => {
   it('carries four states, and the observation lives inside the priced arm alone', () => {
     expect(PriceStateSchema.parse({ state: 'priced', observation })).toEqual({
@@ -44,23 +61,6 @@ describe('PriceStateSchema', () => {
   });
 
   it('exhausts all four states with no default arm', () => {
-    function label(price: PriceState): string {
-      switch (price.state) {
-        case 'priced': {
-          return String(price.observation.priceDivine);
-        }
-        case 'no-listings': {
-          return 'no listings';
-        }
-        case 'not-yet-synced': {
-          return price.reason;
-        }
-        case 'unresolvable': {
-          return 'unresolvable';
-        }
-      }
-    }
-
     expect(label({ state: 'not-yet-synced', reason: 'never-synced' })).toBe('never-synced');
   });
 });

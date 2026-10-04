@@ -15,6 +15,20 @@ function unrecognisedKeys(data: unknown): string[] {
   );
 }
 
+function describeReference(reference: ModifierReference): string {
+  switch (reference.kind) {
+    case 'banded': {
+      return `${reference.statId}:${String(reference.valueMin)}-${String(reference.valueMax)}`;
+    }
+    case 'valueless': {
+      return `${reference.statId}:valueless`;
+    }
+    case 'hybrid': {
+      return reference.lines.map((line) => line.statId).join('+');
+    }
+  }
+}
+
 describe('ModifierRefSchema', () => {
   it('accepts a closed band carrying both edges', () => {
     expect(
@@ -113,20 +127,6 @@ describe('ModifierRefSchema', () => {
    * without a case here is a compile error, not a runtime surprise.
    */
   it('exhausts every kind with no default arm', () => {
-    function describeReference(reference: ModifierReference): string {
-      switch (reference.kind) {
-        case 'banded': {
-          return `${reference.statId}:${String(reference.valueMin)}-${String(reference.valueMax)}`;
-        }
-        case 'valueless': {
-          return `${reference.statId}:valueless`;
-        }
-        case 'hybrid': {
-          return reference.lines.map((line) => line.statId).join('+');
-        }
-      }
-    }
-
     expect(
       describeReference({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),
     ).toBe('s:1-2');

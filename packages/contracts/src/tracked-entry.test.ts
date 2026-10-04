@@ -26,6 +26,17 @@ function issuesOf(data: unknown) {
   return result.success ? [] : result.error.issues;
 }
 
+function unitOf(entry: TrackedEntry): string {
+  switch (entry.kind) {
+    case 'crafted': {
+      return `${entry.categoryId}/${entry.className}`;
+    }
+    case 'raw': {
+      return entry.baseTypeId;
+    }
+  }
+}
+
 describe('TrackedEntrySchema', () => {
   it('parses both arms', () => {
     expect(TrackedEntrySchema.parse(craftedEntry)).toEqual(craftedEntry);
@@ -109,17 +120,6 @@ describe('TrackedEntrySchema', () => {
 
   /** AC: an exhaustive `switch` over the two kinds, with no default arm. */
   it('exhausts both kinds with no default arm', () => {
-    function unitOf(entry: TrackedEntry): string {
-      switch (entry.kind) {
-        case 'crafted': {
-          return `${entry.categoryId}/${entry.className}`;
-        }
-        case 'raw': {
-          return entry.baseTypeId;
-        }
-      }
-    }
-
     expect(unitOf(TrackedEntrySchema.parse(craftedEntry))).toBe('weapon.bow/Bows');
     expect(unitOf(TrackedEntrySchema.parse(rawEntry))).toBe('Advanced Dualstring Bow');
   });

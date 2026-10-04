@@ -86,6 +86,11 @@ describe('RequestsBySourceSchema', () => {
   });
 });
 
+/** A value of the same type that differs from `value`. */
+function changed(value: unknown): unknown {
+  return typeof value === 'number' ? value + 1 : `${String(value)}-changed`;
+}
+
 describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
   /** One record per kind, plus an observation-only change where the kind has observations. */
   const cases: readonly {
@@ -151,11 +156,6 @@ describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
     expect(Object.keys(RECORD_SUBJECTS).sort()).toEqual(kinds);
     expect(cases.map((c) => c.base.kind).sort()).toEqual(kinds);
   });
-
-  /** A value of the same type that differs from `value`. */
-  function changed(value: unknown): unknown {
-    return typeof value === 'number' ? value + 1 : `${String(value)}-changed`;
-  }
 
   for (const { base, observation } of cases) {
     it(`${base.kind}: the same record, ignoring observations`, () => {
