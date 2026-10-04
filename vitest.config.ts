@@ -27,6 +27,7 @@ export default defineConfig({
           include: [
             'test/**/*.test.ts',
             'tools/boundary-check/*.test.ts',
+            'tools/check/*.test.ts',
             'tools/deferred-issues/*.test.ts',
             'tools/dev-stop/*.test.ts',
             'tools/dts-specifiers/*.test.ts',
