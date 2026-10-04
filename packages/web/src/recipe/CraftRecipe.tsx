@@ -20,15 +20,7 @@ export type RecipeCost =
   | { readonly kind: 'figure'; readonly text: string }
   | { readonly kind: 'phrase'; readonly text: string };
 
-/**
- * `{components.craft-recipe}`: the page's second ranking dial (FR-26). It
- * takes `{components.payout-threshold}`'s chrome exactly. The words are the
- * control: no Mantine form control, no select, no pill. They are divided by
- * the trust strip's pipe, never the middle dot. Only the inactive word is a
- * target; a click on it makes it active at once, with no debounce (state 34).
- * The Craft Cost prints once beneath the options — the page's only printing
- * of it.
- */
+/** `{components.craft-recipe}` (FR-26): the words are the control, not a form control; only the inactive word is a target, and a click applies at once, no debounce (state 34). */
 export function CraftRecipe({
   options,
   activeId,

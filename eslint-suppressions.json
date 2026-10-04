@@ -754,11 +754,6 @@
       "count": 1
     }
   },
-  "packages/web/src/recipe/CraftRecipe.tsx": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
   "packages/web/src/recipe/craft-recipe.test.tsx": {
     "local/max-comment-run": {
       "count": 2
@@ -833,11 +828,6 @@
   "packages/web/src/theme/tokens.ts": {
     "local/max-comment-run": {
       "count": 15
-    }
-  },
-  "packages/web/src/threshold/PayoutThreshold.tsx": {
-    "local/max-comment-run": {
-      "count": 2
     }
   },
   "packages/web/src/threshold/threshold-storage.ts": {
