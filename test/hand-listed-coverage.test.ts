@@ -124,7 +124,15 @@ function tsUncovered(files: readonly string[], json: Record<string, unknown>): s
 
 // --- ESLint -----------------------------------------------------------------
 
-/** Files that the flat config ignores, or that match no config block. */
+/**
+ * A rule that only the main lint block sets, which `files` lists by glob. Later
+ * blocks scope rule overrides to `tools/**`, test globs and `*.config.*`, so a
+ * file can match some block and still miss the main block. Such a file is not
+ * linted by the repo's rules, so it counts as uncovered.
+ */
+const MAIN_BLOCK_RULE = 'max-lines';
+
+/** Files that the flat config ignores, or that the main lint block does not reach. */
 async function eslintUncovered(
   files: readonly string[],
   config: readonly Linter.Config[] | undefined,
@@ -135,7 +143,8 @@ async function eslintUncovered(
   for (const path of files) {
     const ignored = await eslint.isPathIgnored(path);
     const calculated: unknown = ignored ? undefined : await eslint.calculateConfigForFile(path);
-    if (!ignored && calculated !== undefined) {
+    const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
+    if (!ignored && rules?.[MAIN_BLOCK_RULE] !== undefined) {
       covered.push(path);
     }
   }
