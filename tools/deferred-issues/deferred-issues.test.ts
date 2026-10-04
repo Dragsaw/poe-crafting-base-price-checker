@@ -33,31 +33,34 @@ function fake(options: FakeOptions = {}): { runner: Runner; calls: Call[] } {
   const lists = options.lists ?? [[]];
   let listCall = 0;
   let nextNumber = 900;
-  const runner: Runner = (command, arguments_, stdin) => {
-    calls.push({ cmd: command, args: arguments_, stdin });
-    if (command === 'git' && arguments_[0] === 'show') {
-      return options.gitShowFails === true ? FAIL("fatal: invalid object name 'origin/master'") : OK(options.ledger ?? FIXTURE_LEDGER);
-    }
-    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'list') {
+  const answers: Record<string, (arguments_: readonly string[]) => RunResult> = {
+    'git show': () =>
+      options.gitShowFails === true ? FAIL("fatal: invalid object name 'origin/master'") : OK(options.ledger ?? FIXTURE_LEDGER),
+    'gh issue list': () => {
       const list = lists[Math.min(listCall, lists.length - 1)];
       listCall += 1;
       return list === undefined ? FAIL('HTTP 502') : OK(JSON.stringify(list));
-    }
-    if (command === 'gh' && arguments_[0] === 'label') {
-      return options.failLabel === true ? FAIL('HTTP 403') : OK();
-    }
-    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'create') {
+    },
+    'gh label': () => (options.failLabel === true ? FAIL('HTTP 403') : OK()),
+    'gh issue create': (arguments_) => {
       const title = arguments_[arguments_.indexOf('--title') + 1] ?? '';
       if (options.failCreate?.(title) === true) {
         return FAIL('HTTP 422: Validation Failed');
       }
       nextNumber += 1;
-      return OK(`https://github.com/o/r/issues/${nextNumber}\n`);
+      return OK(`https://github.com/o/r/issues/${nextNumber}
+`);
+    },
+    'gh issue close': () => (options.failClose === true ? FAIL('HTTP 500') : OK()),
+  };
+  const runner: Runner = (command, arguments_, stdin) => {
+    calls.push({ cmd: command, args: arguments_, stdin });
+    const key = command === 'gh' && arguments_[0] === 'issue' ? `gh issue ${arguments_[1]}` : `${command} ${arguments_[0]}`;
+    const answer = answers[key];
+    if (answer === undefined) {
+      throw new Error(`unexpected call: ${command} ${arguments_.join(' ')}`);
     }
-    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'close') {
-      return options.failClose === true ? FAIL('HTTP 500') : OK();
-    }
-    throw new Error(`unexpected call: ${command} ${arguments_.join(' ')}`);
+    return answer(arguments_);
   };
   return { runner, calls };
 }
