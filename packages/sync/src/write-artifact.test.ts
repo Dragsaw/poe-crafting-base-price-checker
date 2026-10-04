@@ -59,7 +59,7 @@ describe('writeArtifact', () => {
     const fs = createFakeFilesystemPort();
     await writeArtifact(fs, PATH, DatasetFileSchema, reversed());
     const text = (await fs.readTextFile(PATH)) ?? '';
-    expect(text.charCodeAt(0)).toBe('{'.charCodeAt(0));
+    expect(text.codePointAt(0)).toBe('{'.codePointAt(0));
     expect(text).not.toContain('\u{FEFF}');
     expect(text).not.toContain('\r');
     expect(text.endsWith('}\n')).toBe(true);

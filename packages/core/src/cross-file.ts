@@ -148,7 +148,7 @@ export function edgeAlignment(
       continue;
     }
     let min = Infinity;
-    let max = Number.NEGATIVE_INFINITY;
+    let max = -Infinity;
     for (const entry of contained) {
       for (const line of entry.lines) {
         if (line.statId !== rl.statId) {

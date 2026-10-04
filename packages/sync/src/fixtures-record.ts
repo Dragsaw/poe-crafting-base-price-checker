@@ -121,7 +121,7 @@ const IDENTITY_CONTAINER_KEYS = new Set(['name']);
 
 function isIdentifierKey(key: string, parentKey: string | undefined): boolean {
   const lower = key.toLowerCase();
-  return IDENTIFIER_KEYS.has(lower) ? true : (
+  return IDENTIFIER_KEYS.has(lower) || (
     parentKey !== undefined &&
     IDENTITY_CONTAINERS.has(parentKey.toLowerCase()) &&
     IDENTITY_CONTAINER_KEYS.has(lower)

@@ -136,11 +136,12 @@ export function PayoutThreshold({
             onChange={(next) => {
               setDraft(next);
               const parsed = parseDraft(next);
-              if (parsed !== undefined) {
-                const threshold = clampThreshold(parsed);
-                lastValid.current = threshold;
-                commit(threshold);
+              if (parsed === undefined) {
+                return;
               }
+              const threshold = clampThreshold(parsed);
+              lastValid.current = threshold;
+              commit(threshold);
             }}
             onBlur={() => {
               commit.flush();

@@ -82,5 +82,5 @@ export function thresholdReached(
   policy: string | undefined,
   threshold: number | undefined,
 ): boolean {
-  return threshold === undefined ? false : invalidRequestsFor(counts, policy) >= threshold;
+  return threshold !== undefined && invalidRequestsFor(counts, policy) >= threshold;
 }

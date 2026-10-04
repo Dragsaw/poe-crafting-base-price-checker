@@ -816,8 +816,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // this order; a recovered entry enters it as an ordinary entry (AD-7).
       const check = checkCatalogue(entries, dataset?.entries ?? [], catalogue.value);
       marked = check.marked;
-      checkRecords.push(...check.records);
       checkRecords.push(
+        ...check.records,
         ...(weights.kind === 'absent'
           ? [weightsAbsentRecord(entries)]
           : checkWeightsIds(weights, catalogue.value)),

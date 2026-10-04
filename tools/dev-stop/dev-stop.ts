@@ -47,7 +47,7 @@ export function parsePort(argv: readonly string[]): number {
   }
   if (raw === undefined) {return DEFAULT_PORT;}
   const port = Number(raw);
-  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+  if (!Number.isSafeInteger(port) || port < 1 || port > 65_535) {
     throw new Error(`--port needs an integer from 1 to 65535, got "${raw}"`);
   }
   return port;
@@ -64,8 +64,8 @@ function tokenize(commandLine: string): string[] {
 }
 
 /** The program name of a path: last segment, lowercase, no Windows executable extension. */
-function programName(token: string | undefined): string {
-  return (normalize(token ?? '').split('/').pop() ?? '').replace(/\.(exe|cmd|bat|ps1)$/, '');
+function programName(token = ''): string {
+  return (normalize(token).split('/').pop() ?? '').replace(/\.(exe|cmd|bat|ps1)$/, '');
 }
 
 /**
@@ -207,8 +207,8 @@ function listenerScript(port: number): string {
  */
 export function parseListenerJson(value: unknown): number[] {
   if (value === null) {return [];}
-  if (Number.isInteger(value)) {return [value as number];}
-  if (Array.isArray(value) && value.every((item) => Number.isInteger(item))) {return [...(value as number[])];}
+  if (Number.isSafeInteger(value)) {return [value as number];}
+  if (Array.isArray(value) && value.every((item) => Number.isSafeInteger(item))) {return [...(value as number[])];}
   throw new Error(`unexpected listener query result: ${JSON.stringify(value)}`);
 }
 

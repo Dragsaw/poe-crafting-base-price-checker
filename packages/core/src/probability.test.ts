@@ -87,7 +87,7 @@ function pOf(result: ProbabilityResult): number {
 }
 
 function closeRelative(actual: number, expected: number, tolerance = 1e-12): boolean {
-  return actual === expected ? true : Math.abs(actual - expected) <= tolerance * Math.max(Math.abs(actual), Math.abs(expected));
+  return actual === expected || Math.abs(actual - expected) <= tolerance * Math.max(Math.abs(actual), Math.abs(expected));
 }
 
 describe('interval (§1)', () => {

@@ -335,7 +335,7 @@ describe('rank: the threshold domain', () => {
     expect(call).toThrow(/threshold.*NaN/);
   });
 
-  it.each([-0.01, Infinity, Number.NEGATIVE_INFINITY])(
+  it.each([-0.01, Infinity, -Infinity])(
     'threshold %s throws a RangeError and returns no Ranking',
     (threshold) => {
       const A = raw('A');

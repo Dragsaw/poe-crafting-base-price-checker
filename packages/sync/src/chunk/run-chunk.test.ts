@@ -415,7 +415,7 @@ describe('runChunk: the published dataset', () => {
     await run(ports, scriptedStep().step);
 
     const text = (await fs.readTextFile(DATASET_PATH)) ?? '';
-    expect(text.charCodeAt(0)).not.toBe(0xFE_FF);
+    expect(text.codePointAt(0)).not.toBe(0xFE_FF);
     expect(text).not.toContain('\r');
     expect(text.endsWith('}\n')).toBe(true);
     expect(text.endsWith('\n\n')).toBe(false);

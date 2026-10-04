@@ -159,11 +159,13 @@ export function paceBeforeNext(
         decision = { delayMs: penaltyMs, policy, rule: rule.name, bucket: limit, cause: 'penalty' };
       }
 
-      if (used.hits >= limit.hits) {
-        const windowMs = limit.seconds * MS_PER_SECOND - elapsedMs;
-        if (windowMs > decision.delayMs) {
-          decision = { delayMs: windowMs, policy, rule: rule.name, bucket: limit, cause: 'window' };
-        }
+      if (used.hits < limit.hits) {
+        continue;
+      }
+
+      const windowMs = limit.seconds * MS_PER_SECOND - elapsedMs;
+      if (windowMs > decision.delayMs) {
+        decision = { delayMs: windowMs, policy, rule: rule.name, bucket: limit, cause: 'window' };
       }
     }
   }

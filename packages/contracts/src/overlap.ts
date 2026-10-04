@@ -119,7 +119,7 @@ function linesIntersect(x: ModifierReference, y: ModifierReference, shared: read
     if (!isLeftBanded && !isRightBanded) {
       return true;
     }
-    return isLeftBanded && isRightBanded ? left.valueMin <= right.valueMax && right.valueMin <= left.valueMax : false;
+    return isLeftBanded && isRightBanded && left.valueMin <= right.valueMax && right.valueMin <= left.valueMax;
   });
 }
 
