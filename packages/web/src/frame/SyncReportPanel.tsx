@@ -79,12 +79,12 @@ export function SyncReportPanel({ columns }: { readonly columns: PanelColumns })
       }}
     >
       {columns.map((groups, columnIndex) => {
-        const last = columnIndex === columns.length - 1;
+        const isLast = columnIndex === columns.length - 1;
         return (
           <div
             key={PANEL_HEADINGS[columnIndex]}
             data-panel-column=""
-            style={{ flex: '1 1 0', minWidth: 0, paddingRight: last ? 0 : px(spacing.syncReportColumnGap) }}
+            style={{ flex: '1 1 0', minWidth: 0, paddingRight: isLast ? 0 : px(spacing.syncReportColumnGap) }}
           >
             <span
               data-panel-heading=""

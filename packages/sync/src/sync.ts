@@ -347,15 +347,15 @@ export function nextState(
   }
   const passStart =
     outcome.newPass || state.passStart === undefined ? iteration.before : state.passStart;
-  const passEnded = outcome.kind === 'completed';
+  const isPassEnded = outcome.kind === 'completed';
   if (outcome.confirmedLeague === undefined) {
-    return { ...withoutLeague(state), passStart, passEnded, backoffCount };
+    return { ...withoutLeague(state), passStart, passEnded: isPassEnded, backoffCount };
   }
   return {
     confirmedLeague: outcome.confirmedLeague,
     confirmedSignature: iteration.signature,
     passStart,
-    passEnded,
+    passEnded: isPassEnded,
     backoffCount,
   };
 }
@@ -579,9 +579,9 @@ export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise
   try {
     while (!signal.aborted) {
       const signature = await inputSignature(fs);
-      const withGate = gateDue(state, signature);
+      const isWithGate = gateDue(state, signature);
 
-      const delayMs = preWaitMs(pacing, clock.now(), withGate);
+      const delayMs = preWaitMs(pacing, clock.now(), isWithGate);
       if (delayMs > 0) {
         stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
         await pause(delayMs, signal);
@@ -625,7 +625,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise
         // The downgrade's in-place reset gives the ledger a new reference; it
         // is no State reading (§13.4).
         freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
-        evenIntervalMs: sessionEvenIntervalMs(pacing, withGate),
+        evenIntervalMs: sessionEvenIntervalMs(pacing, isWithGate),
       };
       const wait = nextWait(result, state, context);
       state = nextState(state, result, context, { signature, before });

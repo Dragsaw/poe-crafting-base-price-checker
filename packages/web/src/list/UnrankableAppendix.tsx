@@ -41,26 +41,26 @@ const [baseWidth, markWidth, reasonWidth, noteWidth] = columnSums.appendix;
  * at the top's 16px, and nothing saying why (state 37).
  */
 export function UnrankableAppendix({ classes }: { readonly classes: readonly UnrankableClass[] }): JSX.Element {
-  const empty = classes.length === 0;
+  const isEmpty = classes.length === 0;
   return (
     <section
-      data-unrankable-appendix={empty ? 'empty' : ''}
+      data-unrankable-appendix={isEmpty ? 'empty' : ''}
       style={{
         background: colors['paper-inset'],
         border: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
         padding: `${px(spacing.appendixPadTop)} ${px(spacing.appendixPadX)} ${px(
-          empty ? spacing.appendixPadTop : spacing.appendixPadBottom,
+          isEmpty ? spacing.appendixPadTop : spacing.appendixPadBottom,
         )}`,
         boxSizing: 'border-box',
       }}
     >
       <h2 data-appendix-title="" style={{ ...typeStyle('appendix-title'), margin: 0, color: colors.ink }}>
         {APPENDIX_TITLE}
-        <span data-appendix-count="" style={{ color: empty ? colors.ink : colors.rust }}>
+        <span data-appendix-count="" style={{ color: isEmpty ? colors.ink : colors.rust }}>
           {appendixCount(classes.length)}
         </span>
       </h2>
-      {empty ? null : (
+      {isEmpty ? null : (
         <>
           <p
             data-appendix-lead=""

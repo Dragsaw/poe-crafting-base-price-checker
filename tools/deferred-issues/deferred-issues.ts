@@ -171,13 +171,13 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
     error_.write(`${PROGRAM}: ${String(error)}\n${USAGE}`);
     return 1;
   }
-  const dryRun = values['dry-run'] === true;
-  const list = values.list === true;
-  if (values.ref !== undefined && !dryRun) {
+  const isDryRun = values['dry-run'] === true;
+  const isList = values.list === true;
+  if (values.ref !== undefined && !isDryRun) {
     error_.write(`${PROGRAM}: --ref is allowed only with --dry-run\n${USAGE}`);
     return 1;
   }
-  if (list && dryRun) {
+  if (isList && isDryRun) {
     error_.write(`${PROGRAM}: --list and --dry-run do not combine\n${USAGE}`);
     return 1;
   }
@@ -194,13 +194,13 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
     return 1;
   }
 
-  if (list) {
+  if (isList) {
     out.write(`${JSON.stringify(listEntries(entries.value, issues.value), null, 2)}\n`);
     return 0;
   }
 
   const plan = planSync(entries.value, issues.value, reference);
-  if (dryRun) {
+  if (isDryRun) {
     printPlan(plan, out);
     printReports(plan.reports, out);
     out.write(`dry run: ${plan.creates.length} to create, ${plan.closes.length} to close as duplicate, ${plan.reports.length} reported\n`);
@@ -208,7 +208,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
   }
 
   const reports = [...plan.reports];
-  let failed = plan.duplicateLedgerIds.length > 0;
+  let isFailed = plan.duplicateLedgerIds.length > 0;
 
   // Labels are written only when an issue is: an up-to-date run writes nothing.
   if (plan.creates.length > 0 || plan.closes.length > 0) {
@@ -241,7 +241,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
       created += 1;
       out.write(`created: ${create.id} ${firstLine(made.stdout)}\n`);
     } else {
-      failed = true;
+      isFailed = true;
       reports.push(`Create failed: ${create.id}: ${firstLine(made.stderr)}`);
     }
   }
@@ -273,14 +273,14 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
       closed += 1;
       out.write(`closed: #${close.number} as not planned, Duplicate of #${close.keep}\n`);
     } else {
-      failed = true;
+      isFailed = true;
       reports.push(`Close failed: #${close.number}: ${firstLine(done.stderr)}`);
     }
   }
 
   printReports(reports, out);
   out.write(`${created} created, ${closed} closed as duplicate, ${reports.length} reported\n`);
-  return failed ? 2 : 0;
+  return isFailed ? 2 : 0;
 }
 
 function isInvokedDirectly(): boolean {

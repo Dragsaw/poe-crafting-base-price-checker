@@ -502,7 +502,7 @@ export function createTradeGovernor<Source extends string>(
   if (userAgent.trim() === '') {
     throw new MissingUserAgentError();
   }
-  const spread = options.spread === true;
+  const isSpread = options.spread === true;
   const pacing = options.pacing ?? createPacingState();
   const { lanePolicies } = pacing;
 
@@ -546,12 +546,12 @@ export function createTradeGovernor<Source extends string>(
    * cookie is dropped first (§13.4 step 1). The holder's `expired` state then
    * keeps it dropped for every later governor of the process.
    */
-  let cookieDropped = false;
+  let isCookieDropped = false;
 
   /** Whether `request` goes out with the cookie: marked, and the holder live. */
   function carriesCookie(request: TradeRequest): boolean {
     return (
-      !cookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
+      !isCookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
     );
   }
 
@@ -583,7 +583,7 @@ export function createTradeGovernor<Source extends string>(
    * queues, so only this call's own responses move it.
    */
   async function paceLane(lane: string): Promise<number> {
-    const delayMs = laneDelayMs(pacing, lane, clock.now(), spread);
+    const delayMs = laneDelayMs(pacing, lane, clock.now(), isSpread);
     if (delayMs <= 0) {
       return 0;
     }
@@ -667,8 +667,8 @@ export function createTradeGovernor<Source extends string>(
       // policy is tested against it (§13.4).
       const baselineCount = ruleNameCount(baseline.headers);
       holder.rememberBaseline(baselineCount, rateLimitPolicyOf(baseline.headers));
-      const live = ruleNameCount(response.headers) > baselineCount;
-      holder.settle(live ? 'authenticated' : 'not-elevated');
+      const isLive = ruleNameCount(response.headers) > baselineCount;
+      holder.settle(isLive ? 'authenticated' : 'not-elevated');
       return;
     }
     if (isInvalidRequest(status)) {
@@ -730,11 +730,11 @@ export function createTradeGovernor<Source extends string>(
     // before this response replaces it.
     const pacedOn = knownPolicy === undefined ? undefined : pacing.ledger[knownPolicy];
 
-    const withCookie = carriesCookie(request);
+    const isWithCookie = carriesCookie(request);
     const response = await http.send({
       method: request.method,
       url: request.url,
-      headers: outboundHeaders(request, withCookie),
+      headers: outboundHeaders(request, isWithCookie),
       body: request.body,
     });
 
@@ -742,10 +742,10 @@ export function createTradeGovernor<Source extends string>(
 
     // The downgrade (§13.4), before the invalid-request count: the
     // downgrading 401 or 403 is not counted, and its answer is not returned.
-    if (withCookie && auth !== undefined && isDowngrade(auth.holder, response)) {
+    if (isWithCookie && auth !== undefined && isDowngrade(auth.holder, response)) {
       // 1. Drop the cookie. 2. Reset the pacing to cold, in place. 3. The
       // holder settles `expired` and records the hold-off write. 4. Yield.
-      cookieDropped = true;
+      isCookieDropped = true;
       resetPacingState(pacing);
       auth.holder.expire();
       return {
@@ -836,7 +836,7 @@ export function createTradeGovernor<Source extends string>(
   return {
     clients,
     pacing,
-    delayBeforeMs: (lane) => laneDelayMs(pacing, lane, clock.now(), spread),
+    delayBeforeMs: (lane) => laneDelayMs(pacing, lane, clock.now(), isSpread),
     latchedRetryAfterMs: () => latched?.retryAfterMs,
   };
 }

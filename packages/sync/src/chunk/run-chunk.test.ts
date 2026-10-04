@@ -2550,8 +2550,8 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     const progress = progressWithNotBefore([key(A)], until);
     const built = harness([A, B], { [PROGRESS_PATH]: { contents: progress } });
     const { fs, writes } = recording(built.fs);
-    let gateCalled = false;
-    let catalogueCalled = false;
+    let isGateCalled = false;
+    let isCatalogueCalled = false;
     let loads = 0;
     const { visited, step } = scriptedStep();
 
@@ -2564,11 +2564,11 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
           return Promise.reject(new Error('load must not run on a deferred chunk'));
         },
         gate: () => {
-          gateCalled = true;
+          isGateCalled = true;
           return Promise.resolve({ kind: 'pass' });
         },
         catalogue: () => {
-          catalogueCalled = true;
+          isCatalogueCalled = true;
           return Promise.resolve({ ok: true, value: RESOLVES_ALL });
         },
       },
@@ -2577,8 +2577,8 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
 
     expect(outcome).toEqual({ kind: 'deferred', completed: [], entries: [], records: [], notBefore: until });
     expect(visited).toEqual([]);
-    expect(gateCalled).toBe(false);
-    expect(catalogueCalled).toBe(false);
+    expect(isGateCalled).toBe(false);
+    expect(isCatalogueCalled).toBe(false);
     expect(loads).toBe(0);
     // The lock is the only file touched, and it is gone again.
     expect(writes.filter((path) => path !== LOCK_PATH)).toEqual([]);

@@ -114,12 +114,12 @@ function linesIntersect(x: ModifierReference, y: ModifierReference, shared: read
     if (left === undefined || right === undefined) {
       return false;
     }
-    const leftBanded = 'valueMin' in left;
-    const rightBanded = 'valueMin' in right;
-    if (!leftBanded && !rightBanded) {
+    const isLeftBanded = 'valueMin' in left;
+    const isRightBanded = 'valueMin' in right;
+    if (!isLeftBanded && !isRightBanded) {
       return true;
     }
-    return leftBanded && rightBanded ? left.valueMin <= right.valueMax && right.valueMin <= left.valueMax : false;
+    return isLeftBanded && isRightBanded ? left.valueMin <= right.valueMax && right.valueMin <= left.valueMax : false;
   });
 }
 

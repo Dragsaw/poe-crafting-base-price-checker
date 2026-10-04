@@ -102,8 +102,8 @@ export function checkCatalogue(
     const entryKey = canonicalKey(entry);
     const misses = missesOf(entry, ids);
     if (misses.length === 0) {
-      const undecidable = entry.kind === 'crafted' && entry.categoryId === 'jewel';
-      if (!undecidable && published.get(entryKey)?.price.state === 'unresolvable') {
+      const isUndecidable = entry.kind === 'crafted' && entry.categoryId === 'jewel';
+      if (!isUndecidable && published.get(entryKey)?.price.state === 'unresolvable') {
         recovered.add(entryKey);
       }
       continue;

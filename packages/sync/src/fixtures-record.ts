@@ -401,9 +401,9 @@ async function main(): Promise<void> {
  * importing the module — which the co-located test does — runs nothing.
  */
 const entry = process.argv[1];
-const invokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
+const isInvokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
 
-if (invokedDirectly) {
+if (isInvokedDirectly) {
   main().catch((error: unknown) => {
     process.stderr.write(`pnpm fixtures:record: ${String(error)}\n`);
     process.exitCode = 1;

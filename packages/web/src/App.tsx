@@ -49,10 +49,10 @@ export function App(): JSX.Element {
   const [view, setView] = useState<ViewState>({ kind: 'pending' });
 
   useEffect(() => {
-    let live = true;
+    let isLive = true;
     const controller = new AbortController();
     void loadArtifacts({ signal: controller.signal }).then((outcome) => {
-      if (live) {
+      if (isLive) {
         // "Now" is read once, as the set resolves, and held: ages never tick.
         setView(
           outcome.kind === 'ready'
@@ -66,7 +66,7 @@ export function App(): JSX.Element {
       }
     });
     return () => {
-      live = false;
+      isLive = false;
       controller.abort();
     };
   }, [attempt]);

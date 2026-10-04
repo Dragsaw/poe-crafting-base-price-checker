@@ -470,7 +470,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
    */
   function cookieThrowingHttp(target: 'probe' | 'fetch', failure: Failure): ThrowingHttp {
     let threw = 0;
-    let probed = false;
+    let isProbed = false;
     const fake = createFakeHttpPort({
       [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
       [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: SEARCHED },
@@ -484,8 +484,8 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
             return fake.send(request);
           }
           expect(cookie).toBe(`POESESSID=${CANARY}`);
-          const isProbe = request.method === 'POST' && !probed;
-          probed = true;
+          const isProbe = request.method === 'POST' && !isProbed;
+          isProbed = true;
           if ((target === 'probe' && isProbe) || (target === 'fetch' && request.method === 'GET')) {
             threw += 1;
             return Promise.reject(quotingRequestError(request, failure));
@@ -622,7 +622,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
    */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;
-    let probed = false;
+    let isProbed = false;
     const fake = createFakeHttpPort({
       [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
       [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: SEARCH_HEADERS, body: SEARCHED },
@@ -635,8 +635,8 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
           if (cookie === undefined) {
             return fake.send(request);
           }
-          if (request.method === 'POST' && !probed) {
-            probed = true;
+          if (request.method === 'POST' && !isProbed) {
+            isProbed = true;
             return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
           }
           const echo = quoting(cookie);

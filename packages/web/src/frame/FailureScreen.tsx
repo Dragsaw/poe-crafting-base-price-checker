@@ -98,14 +98,14 @@ function RefusalCauseSentence({
  * icon, no illustration: the failure is set like the rest of the page.
  */
 export function FailureScreen(properties: FailureScreenProps): JSX.Element {
-  const refused = properties.variant === 'refused';
+  const isRefused = properties.variant === 'refused';
   return (
     <section data-failure={properties.variant} role="alert" style={{ paddingTop: px(spacing.gutter) }}>
       <div style={{ ...typeStyle('eyebrow'), color: colors.rust }}>
-        {refused ? REFUSAL_EYEBROW : FETCH_FAILURE_EYEBROW}
+        {isRefused ? REFUSAL_EYEBROW : FETCH_FAILURE_EYEBROW}
       </div>
       <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
-        {refused ? REFUSAL_TITLE : FETCH_FAILURE_TITLE}
+        {isRefused ? REFUSAL_TITLE : FETCH_FAILURE_TITLE}
       </h1>
       {properties.variant === 'refused' ? (
         <>

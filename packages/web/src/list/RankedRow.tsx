@@ -48,14 +48,14 @@ export function RankedRow({
   readonly onToggle: (key: string) => void;
 }): JSX.Element {
   const strong = row.tier === 1 ? 700 : 400;
-  const raw = row.unit === 'raw';
+  const isRaw = row.unit === 'raw';
   const marker = open ? spacing.openRowMarker : 0;
 
   return (
     <div
       data-ranked-row=""
       data-tier={row.tier}
-      data-raw={raw ? '' : undefined}
+      data-raw={isRaw ? '' : undefined}
       data-open={open ? '' : undefined}
       className="fg-row"
       onClick={() => {
@@ -98,7 +98,7 @@ export function RankedRow({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             fontWeight: strong,
-            fontStyle: raw ? 'italic' : 'normal',
+            fontStyle: isRaw ? 'italic' : 'normal',
           }}
         >
           {row.label}
@@ -138,10 +138,10 @@ export function RankedRow({
           ...typeStyle('row-chase'),
           overflow: 'hidden',
           // A crafted row's three cells carry `pad-chase-cell-right` each, so the column pads nothing more.
-          ...(!raw && { display: 'flex', paddingRight: undefined }),
+          ...(!isRaw && { display: 'flex', paddingRight: undefined }),
         }}
       >
-        {raw ? (
+        {isRaw ? (
           <span
             data-raw-note=""
             style={{
