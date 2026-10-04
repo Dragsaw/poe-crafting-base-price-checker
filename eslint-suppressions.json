@@ -1151,14 +1151,8 @@
     }
   },
   "tools/deferred-issues/plan.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 2
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 1
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {

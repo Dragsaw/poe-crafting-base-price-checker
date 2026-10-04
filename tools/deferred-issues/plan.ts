@@ -119,19 +119,17 @@ function markerReports(issues: readonly IssueInfo[]): string[] {
   return reports;
 }
 
-export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], reference: string): SyncPlan {
+function duplicateReports(counts: ReadonlyMap<string, number>, ids: readonly string[]): string[] {
+  return ids.map((id) => `Duplicate ledger id: ${counts.get(id)} entries give ${id}; no issue is created for it`);
+}
+
+function planEntries(
+  entries: readonly LedgerEntry[],
+  groups: ReadonlyMap<string, readonly IssueInfo[]>,
+  duplicateLedgerIds: readonly string[],
+): { creates: PlannedCreate[]; reports: string[] } {
   const creates: PlannedCreate[] = [];
   const reports: string[] = [];
-
-  const counts = countIds(entries);
-  const duplicateLedgerIds = [...counts].filter(([, n]) => n > 1).map(([id]) => id);
-  for (const id of duplicateLedgerIds) {
-    reports.push(`Duplicate ledger id: ${counts.get(id)} entries give ${id}; no issue is created for it`);
-  }
-
-  reports.push(...markerReports(issues));
-
-  const groups = byId(issues);
   const seen = new Set<string>();
   for (const entry of entries) {
     if (seen.has(entry.id)) {
@@ -149,8 +147,15 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
       reports.push(`Closed, still listed: ${entry.id} is in the ledger, and its issue ${numbers} is closed`);
     }
   }
+  return { creates, reports };
+}
 
-  const ledgerIds = new Set(counts.keys());
+function entryGoneReports(
+  groups: ReadonlyMap<string, readonly IssueInfo[]>,
+  ledgerIds: ReadonlySet<string>,
+  reference: string,
+): string[] {
+  const reports: string[] = [];
   for (const [id, group] of groups) {
     if (ledgerIds.has(id)) {
       continue;
@@ -161,6 +166,19 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
       }
     }
   }
+  return reports;
+}
 
-  return { creates, closes: planDuplicateCloses(issues), reports, duplicateLedgerIds };
+export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], reference: string): SyncPlan {
+  const counts = countIds(entries);
+  const duplicateLedgerIds = [...counts].filter(([, n]) => n > 1).map(([id]) => id);
+  const groups = byId(issues);
+  const planned = planEntries(entries, groups, duplicateLedgerIds);
+  const reports = [
+    ...duplicateReports(counts, duplicateLedgerIds),
+    ...markerReports(issues),
+    ...planned.reports,
+    ...entryGoneReports(groups, new Set(counts.keys()), reference),
+  ];
+  return { creates: planned.creates, closes: planDuplicateCloses(issues), reports, duplicateLedgerIds };
 }
