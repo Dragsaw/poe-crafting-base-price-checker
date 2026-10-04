@@ -315,11 +315,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/dry-run.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/dry-run.ts": {
     "local/max-comment-run": {
       "count": 9
