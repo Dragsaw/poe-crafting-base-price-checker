@@ -592,6 +592,12 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
   });
 });
 
+/** A body and headers that quote the request's cookie in every form. */
+const quoting = (cookie: string) => ({
+  body: `echo ${cookie} ${encodeURIComponent(cookie)} ${Buffer.from(cookie).toString('base64')}`,
+  headers: { 'set-cookie': cookie, 'x-echo': Buffer.from(cookie).toString('base64') },
+});
+
 describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => {
   const RESULTS = ['r1'];
   const SEARCHED = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length });
@@ -612,12 +618,6 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   };
   /** A second entry, so a search carries the cookie after the probe. */
   const TRACKED: readonly TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }];
-  /** A body and headers that quote the request's cookie in every form. */
-  const quoting = (cookie: string) => ({
-    body: `echo ${cookie} ${encodeURIComponent(cookie)} ${Buffer.from(cookie).toString('base64')}`,
-    headers: { 'set-cookie': cookie, 'x-echo': Buffer.from(cookie).toString('base64') },
-  });
-
   type Downgrade = '401' | '403' | 'not-live';
 
   /**

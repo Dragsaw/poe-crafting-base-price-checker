@@ -57,6 +57,9 @@ function fsWith(overrides: Record<string, string | undefined> = {}) {
   );
 }
 
+const read = (path: string): string =>
+  readFileSync(fileURLToPath(new URL(`../../../../${path}`, import.meta.url)), 'utf8');
+
 describe('loadCatalogueIds', () => {
   it('flattens every group of the three files into id sets', async () => {
     const loaded = await loadCatalogueIds(fsWith());
@@ -92,8 +95,6 @@ describe('loadCatalogueIds', () => {
   );
 
   it('loads the committed catalogue', async () => {
-    const read = (path: string): string =>
-      readFileSync(fileURLToPath(new URL(`../../../../${path}`, import.meta.url)), 'utf8');
     const loaded = await loadCatalogueIds(
       fsWith({
         [CATALOGUE_STATS_PATH]: read(CATALOGUE_STATS_PATH),

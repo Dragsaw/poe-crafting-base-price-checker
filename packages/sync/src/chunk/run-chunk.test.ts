@@ -210,6 +210,11 @@ async function progressOf(fs: FakeFilesystemPort): Promise<unknown> {
   return text === undefined ? undefined : SyncProgressFileSchema.parse(JSON.parse(text));
 }
 
+async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
+  const text = await fs.readTextFile(REPORT_PATH);
+  return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
+}
+
 describe('runChunk: the three bounds and the yield', () => {
   it('workload bound: completes every non-pruned entry, writes progress, releases the lock', async () => {
     const { fs, ports } = harness();
@@ -330,31 +335,31 @@ describe('runChunk: the three bounds and the yield', () => {
   });
 });
 
-describe('runChunk: the step entries', () => {
-  function entryOf(tracked: TrackedEntry, state: 'no-listings' | 'never-synced'): DatasetEntry {
-    return {
-      entryKey: key(tracked),
-      price:
-        state === 'no-listings'
-          ? { state: 'no-listings' }
-          : { state: 'not-yet-synced', reason: 'never-synced' },
-      lastAttemptedAt: NOW,
-    };
-  }
+function stepEntryOf(tracked: TrackedEntry, state: 'no-listings' | 'never-synced'): DatasetEntry {
+  return {
+    entryKey: key(tracked),
+    price:
+      state === 'no-listings'
+        ? { state: 'no-listings' }
+        : { state: 'not-yet-synced', reason: 'never-synced' },
+    lastAttemptedAt: NOW,
+  };
+}
 
+describe('runChunk: the step entries', () => {
   it('collects completed and yielded entries on the outcome, in visiting order', async () => {
     const { ports } = harness();
     const { step } = scriptedStep((entry) =>
       key(entry) === key(B)
-        ? { kind: 'yielded', entry: entryOf(entry, 'never-synced') }
-        : { kind: 'completed', entry: entryOf(entry, 'no-listings') },
+        ? { kind: 'yielded', entry: stepEntryOf(entry, 'never-synced') }
+        : { kind: 'completed', entry: stepEntryOf(entry, 'no-listings') },
     );
 
     const outcome = await run(ports, step);
 
     expect(outcome.kind).toBe('yielded');
     expect(outcome.completed).toEqual([key(A)]);
-    expect(outcome.entries).toEqual([entryOf(A, 'no-listings'), entryOf(B, 'never-synced')]);
+    expect(outcome.entries).toEqual([stepEntryOf(A, 'no-listings'), stepEntryOf(B, 'never-synced')]);
   });
 
   it('a step that returns no entry adds nothing', async () => {
@@ -363,6 +368,27 @@ describe('runChunk: the step entries', () => {
     expect(outcome.entries).toEqual([]);
   });
 });
+
+async function datasetOf(fs: FakeFilesystemPort): Promise<DatasetFile | undefined> {
+  const text = await fs.readTextFile(DATASET_PATH);
+  return text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text));
+}
+
+function previousFile(entries: readonly DatasetEntry[]): string {
+  return `${JSON.stringify(
+    { schemaVersion: SUPPORTED_SCHEMA_VERSION, league: 'Old League', generatedAt: SEVEN_HOURS_AGO, entries, currencyRates: [] },
+    null,
+    2,
+  )}\n`;
+}
+
+function neverSynced(tracked: TrackedEntry): DatasetEntry {
+  return { entryKey: key(tracked), price: { state: 'not-yet-synced', reason: 'never-synced' } };
+}
+
+function noListings(tracked: TrackedEntry, at = NOW): DatasetEntry {
+  return { entryKey: key(tracked), price: { state: 'no-listings' }, lastAttemptedAt: at };
+}
 
 describe('runChunk: the published dataset', () => {
   const DIVINE: ChunkPublication['currencyRates'][number] = {
@@ -374,27 +400,6 @@ describe('runChunk: the published dataset', () => {
   };
   const RATES = [DIVINE];
   const PUBLISHING: ChunkPublication = { league: 'New League', currencyRates: RATES };
-
-  function noListings(tracked: TrackedEntry, at = NOW): DatasetEntry {
-    return { entryKey: key(tracked), price: { state: 'no-listings' }, lastAttemptedAt: at };
-  }
-
-  function neverSynced(tracked: TrackedEntry): DatasetEntry {
-    return { entryKey: key(tracked), price: { state: 'not-yet-synced', reason: 'never-synced' } };
-  }
-
-  function previousFile(entries: readonly DatasetEntry[]): string {
-    return `${JSON.stringify(
-      { schemaVersion: SUPPORTED_SCHEMA_VERSION, league: 'Old League', generatedAt: SEVEN_HOURS_AGO, entries, currencyRates: [] },
-      null,
-      2,
-    )}\n`;
-  }
-
-  async function datasetOf(fs: FakeFilesystemPort): Promise<DatasetFile | undefined> {
-    const text = await fs.readTextFile(DATASET_PATH);
-    return text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text));
-  }
 
   it('completed: one entry per tracked entry, pruned included, sorted, with the passed-in league and rates', async () => {
     const { fs, ports } = harness([C, A, B, PRUNED], {}, { publication: PUBLISHING });
@@ -1154,6 +1159,17 @@ describe('runChunk: the declared yardstick is never a chunk bound', () => {
   });
 });
 
+/** P1–P3 pinned and A, B waiting: the first pinned step reports R=2, so P3 is cut. */
+function starvingStep(): ChunkStep {
+  let remaining = 3;
+  return scriptedStep((entry) => {
+    remaining -= 1;
+    return entry.status === 'pinned'
+      ? { kind: 'completed', searchRemaining: remaining }
+      : { kind: 'completed' };
+  }).step;
+}
+
 describe('runChunk: the Sync Report', () => {
   const D = raw('D');
   const E = raw('E');
@@ -1171,11 +1187,6 @@ describe('runChunk: the Sync Report', () => {
   };
   const BROKEN: SyncRunRecord = { kind: 'stale-lock-broken', pid: 7, startedAt: SEVEN_HOURS_AGO };
 
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
-
   function reportText(records: readonly SyncRunRecord[], schemaVersion = '1.0.0'): string {
     return JSON.stringify({
       runStartedAt: SEVEN_HOURS_AGO,
@@ -1184,17 +1195,6 @@ describe('runChunk: the Sync Report', () => {
       records,
       schemaVersion,
     });
-  }
-
-  /** P1–P3 pinned and A, B waiting: the first pinned step reports R=2, so P3 is cut. */
-  function starvingStep(): ChunkStep {
-    let remaining = 3;
-    return scriptedStep((entry) => {
-      remaining -= 1;
-      return entry.status === 'pinned'
-        ? { kind: 'completed', searchRemaining: remaining }
-        : { kind: 'completed' };
-    }).step;
   }
 
   const SEARCH_URL = 'https://example.test/search';
@@ -1690,40 +1690,68 @@ describe('runChunk: the Sync Report', () => {
   });
 });
 
-describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
-  const STAT_GONE = 'explicit.gone';
+const weightsPoolOf = (...entries: unknown[]): unknown => ({ poolCoverage: 'complete', entries });
 
-  function craftedEntry(
-    categoryId: string,
-    prefix: string,
-    className = 'Bows',
-    status: TrackedEntry['status'] = 'active',
-  ): TrackedEntry {
-    const base = {
-      kind: 'crafted',
-      categoryId,
-      className,
-      itemLevelMin: 75,
-      prefix: { kind: 'valueless', statId: prefix },
-      suffix: { kind: 'valueless', statId: 'explicit.stat_suffix' },
-    } as const;
-    return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
-  }
+const weightsEntryOf = (id: string, ...lines: unknown[]): unknown => ({
+  sourceModifierId: id,
+  modGroup: id,
+  itemLevelMin: 1,
+  weight: 1,
+  weightSource: 'published',
+  lines,
+});
 
-  const withCatalogue = (...missing: string[]): Partial<TestPorts> => ({
-    catalogue: () => Promise.resolve({ ok: true, value: catalogueWithout(...missing) }),
+const weightsLineOf = (statId: string | null): unknown => ({ statId, ranges: [] });
+
+const coveredWeights = (suffixCoverage: 'complete' | 'partial'): string =>
+  JSON.stringify({
+    schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
+    bases: {
+      'weapon.bow': {
+        Bows: {
+          prefix: { poolCoverage: 'complete', entries: [coverageTier('p1', 'explicit.ok')] },
+          // `explicit.stat_suffix` is the suffix every `craftedEntry` carries.
+          suffix: { poolCoverage: suffixCoverage, entries: [coverageTier('s1', 'explicit.stat_suffix')] },
+        },
+      },
+    },
   });
 
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
+const coverageTier = (id: string, statId: string): unknown => ({
+  sourceModifierId: id, modGroup: id, itemLevelMin: 1, weight: 1,
+  weightSource: 'published',
+  lines: [{ statId, ranges: [] }],
+});
 
-  async function publishedOf(fs: FakeFilesystemPort, entry: TrackedEntry): Promise<DatasetEntry | undefined> {
-    const text = await fs.readTextFile(DATASET_PATH);
-    const file = text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text));
-    return file?.entries.find((published) => published.entryKey === key(entry));
-  }
+async function publishedOf(fs: FakeFilesystemPort, entry: TrackedEntry): Promise<DatasetEntry | undefined> {
+  const text = await fs.readTextFile(DATASET_PATH);
+  const file = text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text));
+  return file?.entries.find((published) => published.entryKey === key(entry));
+}
+
+const withCatalogue = (...missing: string[]): Partial<TestPorts> => ({
+  catalogue: () => Promise.resolve({ ok: true, value: catalogueWithout(...missing) }),
+});
+
+function craftedEntry(
+  categoryId: string,
+  prefix: string,
+  className = 'Bows',
+  status: TrackedEntry['status'] = 'active',
+): TrackedEntry {
+  const base = {
+    kind: 'crafted',
+    categoryId,
+    className,
+    itemLevelMin: 75,
+    prefix: { kind: 'valueless', statId: prefix },
+    suffix: { kind: 'valueless', statId: 'explicit.stat_suffix' },
+  } as const;
+  return status === 'pruned' ? { ...base, status, prunedReason: 'no market' } : { ...base, status };
+}
+
+describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
+  const STAT_GONE = 'explicit.gone';
 
 
   it('unknown stat: marked unresolvable and recorded, never searched, and the others are priced', async () => {
@@ -1943,24 +1971,6 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
      * none, so the cross-file gate would refuse the run; a partial slot gets no
      * pool check.
      */
-    const coveredWeights = (suffixCoverage: 'complete' | 'partial'): string =>
-      JSON.stringify({
-        schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
-        bases: {
-          'weapon.bow': {
-            Bows: {
-              prefix: { poolCoverage: 'complete', entries: [coverageTier('p1', 'explicit.ok')] },
-              // `explicit.stat_suffix` is the suffix every `craftedEntry` carries.
-              suffix: { poolCoverage: suffixCoverage, entries: [coverageTier('s1', 'explicit.stat_suffix')] },
-            },
-          },
-        },
-      });
-    const coverageTier = (id: string, statId: string): unknown => ({
-      sourceModifierId: id, modGroup: id, itemLevelMin: 1, weight: 1,
-      weightSource: 'published',
-      lines: [{ statId, ranges: [] }],
-    });
     const X = craftedEntry('weapon.bow', 'explicit.ok', 'Bows');
     const Y = craftedEntry('armour.chest', 'explicit.ok', 'Body_Armours_str');
 
@@ -2004,26 +2014,16 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
   });
 
   it('weights miss: one record per distinct uncatalogued id, nulls skipped, and the run continues', async () => {
-    const lineOf = (statId: string | null): unknown => ({ statId, ranges: [] });
-    const entryOf = (id: string, ...lines: unknown[]): unknown => ({
-      sourceModifierId: id,
-      modGroup: id,
-      itemLevelMin: 1,
-      weight: 1,
-      weightSource: 'published',
-      lines,
-    });
-    const poolOf = (...entries: unknown[]): unknown => ({ poolCoverage: 'complete', entries });
     const weights = JSON.stringify({
       schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
       bases: {
         'weapon.bow': {
           Bows: {
-            prefix: poolOf(entryOf('p1', lineOf('explicit.w1'), lineOf(null))),
-            suffix: poolOf(entryOf('s1', lineOf('explicit.w1')), entryOf('s2', lineOf('explicit.ok'))),
+            prefix: weightsPoolOf(weightsEntryOf('p1', weightsLineOf('explicit.w1'), weightsLineOf(null))),
+            suffix: weightsPoolOf(weightsEntryOf('s1', weightsLineOf('explicit.w1')), weightsEntryOf('s2', weightsLineOf('explicit.ok'))),
           },
         },
-        'weapon.gone': { Gone: { prefix: poolOf(), suffix: poolOf() } },
+        'weapon.gone': { Gone: { prefix: weightsPoolOf(), suffix: weightsPoolOf() } },
       },
     });
     const { fs, ports } = harness(
@@ -2195,11 +2195,6 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     2,
   )}\n`;
   const PREVIOUS_PROGRESS = progressText([key(A)]);
-
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
 
   /**
    * The real gate over a governed client whose port is counted as
@@ -2507,32 +2502,27 @@ describe('runChunk: the league gate (Story 1.11)', () => {
   });
 });
 
-describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3)', () => {
-  /** The progress file of a previous chunk that ended on a penalty. */
-  function progressWithNotBefore(completed: readonly string[], notBefore: string): string {
-    return JSON.stringify({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed, notBefore });
-  }
-
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
-
-  /** A filesystem that records every path written through it. */
-  function recording(fs: FakeFilesystemPort): { readonly fs: FakeFilesystemPort; readonly writes: string[] } {
-    const writes: string[] = [];
-    return {
-      writes,
-      fs: {
-        ...fs,
-        writeTextFile: (path, contents) => {
-          writes.push(path);
-          return fs.writeTextFile(path, contents);
-        },
+/** A filesystem that records every path written through it. */
+function recordingWrites(fs: FakeFilesystemPort): { readonly fs: FakeFilesystemPort; readonly writes: string[] } {
+  const writes: string[] = [];
+  return {
+    writes,
+    fs: {
+      ...fs,
+      writeTextFile: (path, contents) => {
+        writes.push(path);
+        return fs.writeTextFile(path, contents);
       },
-    };
-  }
+    },
+  };
+}
 
+/** The progress file of a previous chunk that ended on a penalty. */
+function progressWithNotBefore(completed: readonly string[], notBefore: string): string {
+  return JSON.stringify({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed, notBefore });
+}
+
+describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3)', () => {
   it('step 429: progress gets notBefore = NOW + the yield’s retry-after', async () => {
     const { fs, ports } = harness([A, B]);
     const { step } = scriptedStep((entry) =>
@@ -2590,7 +2580,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     const until = '2026-09-26T12:00:01.000Z';
     const progress = progressWithNotBefore([key(A)], until);
     const built = harness([A, B], { [PROGRESS_PATH]: { contents: progress } });
-    const { fs, writes } = recording(built.fs);
+    const { fs, writes } = recordingWrites(built.fs);
     let isGateCalled = false;
     let isCatalogueCalled = false;
     let loads = 0;
@@ -2698,7 +2688,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
       [PROGRESS_PATH]: { contents: progress },
       [REPORT_PATH]: { contents: previousReport },
     });
-    const { fs, writes } = recording(built.fs);
+    const { fs, writes } = recordingWrites(built.fs);
     const { visited, step } = scriptedStep();
 
     const outcome = await run({ ...built.ports, fs }, step);
@@ -2810,17 +2800,12 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
   });
 });
 
+async function datasetEntriesOf(fs: FakeFilesystemPort): Promise<readonly DatasetEntry[] | undefined> {
+  const text = await fs.readTextFile(DATASET_PATH);
+  return text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text)).entries;
+}
+
 describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
-
-  async function datasetEntriesOf(fs: FakeFilesystemPort): Promise<readonly DatasetEntry[] | undefined> {
-    const text = await fs.readTextFile(DATASET_PATH);
-    return text === undefined ? undefined : DatasetFileSchema.parse(JSON.parse(text)).entries;
-  }
-
   const X = raw('X');
   const D = raw('D');
   const MISSING_X: Partial<TestPorts> = {
@@ -3093,24 +3078,19 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
   });
 });
 
+/** A gate that passes and counts its calls. */
+function countingGate(): { readonly calls: number[]; readonly gate: NonNullable<ChunkSetup['gate']> } {
+  const calls: number[] = [];
+  return {
+    calls,
+    gate: () => {
+      calls.push(1);
+      return Promise.resolve({ kind: 'pass' });
+    },
+  };
+}
+
 describe('runChunk: under a session (ChunkPorts.session)', () => {
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
-
-  /** A gate that passes and counts its calls. */
-  function countingGate(): { readonly calls: number[]; readonly gate: NonNullable<ChunkSetup['gate']> } {
-    const calls: number[] = [];
-    return {
-      calls,
-      gate: () => {
-        calls.push(1);
-        return Promise.resolve({ kind: 'pass' });
-      },
-    };
-  }
-
   it('maxEntries 1 with an entry left ends bounded by entries, and names the pass and the league', async () => {
     const { fs, ports } = harness([A, B]);
     const { visited, step } = scriptedStep();
@@ -3257,12 +3237,17 @@ describe('runChunk: under a session (ChunkPorts.session)', () => {
   });
 });
 
-describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
-  async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
-    const text = await fs.readTextFile(REPORT_PATH);
-    return text === undefined ? undefined : SyncReportFileSchema.parse(JSON.parse(text));
-  }
+const bow = (valueMin: number, valueMax: number): TrackedEntry => ({
+  kind: 'crafted',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
+  itemLevelMin: 82,
+  prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin, valueMax },
+  suffix: { kind: 'banded', statId: 'explicit.stat_2', valueMin: 1, valueMax: 2 },
+  status: 'active',
+});
 
+describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
   /** A Bows class whose one prefix tier derives to `[43, 56.5]`. */
   const BOWS_WEIGHTS = JSON.stringify({
     schemaVersion: WEIGHTS_SCHEMA_VERSION,
@@ -3300,15 +3285,6 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
         },
       },
     },
-  });
-  const bow = (valueMin: number, valueMax: number): TrackedEntry => ({
-    kind: 'crafted',
-    categoryId: 'weapon.bow',
-    className: 'Bows',
-    itemLevelMin: 82,
-    prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin, valueMax },
-    suffix: { kind: 'banded', statId: 'explicit.stat_2', valueMin: 1, valueMax: 2 },
-    status: 'active',
   });
   const PREVIOUS_PROGRESS = progressText([key(A)]);
 
@@ -3379,17 +3355,17 @@ describe('runChunk: the cross-file gate (AD-12, AD-17)', () => {
   });
 });
 
-describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () => {
-  /** A step that latches the governor's penalty while it completes, as a probe 429 does. */
-  function latching(result: StepResult): { readonly step: ChunkStep; readonly latched: () => number | undefined } {
-    let latchedMs: number | undefined;
-    const { step } = scriptedStep(() => {
-      latchedMs ??= 120_000;
-      return result;
-    });
-    return { step, latched: () => latchedMs };
-  }
+/** A step that latches the governor's penalty while it completes, as a probe 429 does. */
+function latching(result: StepResult): { readonly step: ChunkStep; readonly latched: () => number | undefined } {
+  let latchedMs: number | undefined;
+  const { step } = scriptedStep(() => {
+    latchedMs ??= 120_000;
+    return result;
+  });
+  return { step, latched: () => latchedMs };
+}
 
+describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () => {
   it('the entry completes with no further request: the chunk yields and persists notBefore', async () => {
     const { fs, ports } = harness([A]);
     const { step, latched } = latching({ kind: 'completed' });
@@ -3459,6 +3435,10 @@ describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () =>
   });
 });
 
+const progressWith = (fields: Record<string, unknown>) => ({
+  [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.1.0', completed: [], ...fields }) },
+});
+
 describe('runChunk: the session-cookie hold-off (AD-30, IMPLEMENTATION-NOTES.md §13.1, §13.3, §13.4)', () => {
   const HOLD_OFF = '2026-09-27T06:00:00.000Z';
   const NOW_PLUS_24H = '2026-09-27T12:00:00.000Z';
@@ -3481,10 +3461,6 @@ describe('runChunk: the session-cookie hold-off (AD-30, IMPLEMENTATION-NOTES.md 
     };
     return { auth, calls, pending: () => action };
   }
-
-  const progressWith = (fields: Record<string, unknown>) => ({
-    [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.1.0', completed: [], ...fields }) },
-  });
 
   it('reads a 1.1.0 progress file and writes the current version', async () => {
     const { fs, ports } = harness([A], progressWith({}));

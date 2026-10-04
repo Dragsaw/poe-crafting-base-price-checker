@@ -9,9 +9,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -582,9 +579,6 @@
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-array-callback-reference": {
       "count": 4
     },
@@ -658,9 +652,6 @@
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -698,9 +689,6 @@
     "no-await-in-loop": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 1
     }
@@ -725,9 +713,6 @@
     }
   },
   "packages/sync/src/catalogue/weights-ids.test.ts": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 2
     }
@@ -770,9 +755,6 @@
     }
   },
   "packages/sync/src/chunk/publish-dataset.test.ts": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     },
@@ -809,9 +791,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 24
     },
     "unicorn/import-style": {
       "count": 1
@@ -852,9 +831,6 @@
       "count": 1
     },
     "sonarjs/cognitive-complexity": {
-      "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
       "count": 1
     },
     "unicorn/no-null": {
@@ -1021,9 +997,6 @@
   },
   "packages/sync/src/git/read-only-git-port.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
       "count": 1
     },
     "unicorn/import-style": {
@@ -1217,9 +1190,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/require-array-sort-compare": {
       "count": 2
     },
@@ -1251,9 +1221,6 @@
       "count": 1
     },
     "no-await-in-loop": {
-      "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
       "count": 1
     },
     "unicorn/no-unnecessary-parameters": {

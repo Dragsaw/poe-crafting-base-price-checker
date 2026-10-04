@@ -701,6 +701,7 @@ function recipeOf(id: string, modifierLevelMin: number, ...currencyIds: string[]
   return { id, currencies: currencyIds.map((currencyId) => ({ currencyId, quantity: 1 })), modifierLevelMin };
 }
 
+const divineRecipe = (id: string): CraftRecipe => recipeOf(id, 0, 'divine');
 function rateOf(currencyId: string, rate: number, league: string = LEAGUE): CurrencyRate {
   return { currencyId, rate, source: 'measured', league, asOf: '2026-09-26T00:00:00Z' };
 }
@@ -909,7 +910,6 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
   });
 
   it('ties break raw first, then the serialised key, then the recipe id', () => {
-    const recipe = (id: string): CraftRecipe => recipeOf(id, 0, 'divine');
     const bows = chase('Bows');
     const amulets = chase('Amulets', TARGET, 'active', 'accessory.amulet');
     const A = raw('A');
@@ -920,7 +920,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
       activeLeague: LEAGUE,
       threshold: THRESHOLD,
       weights: poolsFile(['weapon.bow', 'Bows', BOWS_POOLS], ['accessory.amulet', 'Amulets', BOWS_POOLS]),
-      recipes: [recipe('zeta'), recipe('alpha')],
+      recipes: [divineRecipe('zeta'), divineRecipe('alpha')],
       currencyRates: [rateOf('divine', 0.5)],
     });
     expect(result.ordering.map((row) => row.ev)).toEqual([0.5, 0.5, 0.5, 0.5, 0.5]);

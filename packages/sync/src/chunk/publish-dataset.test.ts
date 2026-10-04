@@ -15,6 +15,7 @@ function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): Tra
 }
 
 const key = canonicalKey;
+const rotate = <T>(items: readonly T[]): T[] => [...items.slice(1), ...items.slice(0, 1)];
 const byKey = (a: DatasetEntry, b: DatasetEntry): number => compareCanonicalKeys(a.entryKey, b.entryKey);
 
 function attempted(tracked: TrackedEntry, at: string): DatasetEntry {
@@ -141,7 +142,6 @@ describe('buildDatasetFile', () => {
     const [a, b, c, d] = tracked as [TrackedEntry, TrackedEntry, TrackedEntry, TrackedEntry];
     const previous = [attempted(a, EARLIER), attempted(b, EARLIER)];
     const stepEntries = [attempted(c, NOW), attempted(d, NOW)];
-    const rotate = <T>(items: readonly T[]): T[] => [...items.slice(1), ...items.slice(0, 1)];
 
     const forward = buildDatasetFile(inputs({ tracked, previous, stepEntries }));
     const reversed = buildDatasetFile(

@@ -207,6 +207,14 @@ it('runs nothing when the module is imported rather than invoked', async () => {
   expect(result.code).toBe(0);
 });
 
+const read = (entryPoint: string): string | undefined => {
+  try {
+    return readFileSync(`${REPO_ROOT}${entryPoint}`, 'utf8');
+  } catch {
+    return undefined;
+  }
+};
+
 it('is referenced by no vitest config and by no setup file', () => {
   // Split deliberately. A missing *required* entry means a config was renamed
   // or moved, and a scan that skipped it would pass while saying nothing — the
@@ -224,14 +232,6 @@ it('is referenced by no vitest config and by no setup file', () => {
     'packages/web/vite.config.ts',
     'packages/web/src/test-setup.ts',
   ];
-
-  const read = (entryPoint: string): string | undefined => {
-    try {
-      return readFileSync(`${REPO_ROOT}${entryPoint}`, 'utf8');
-    } catch {
-      return undefined;
-    }
-  };
 
   for (const entryPoint of required) {
     const source = read(entryPoint);

@@ -59,12 +59,14 @@ beforeAll(async () => {
   vi.unstubAllEnvs();
 });
 
+function unstubAllEnvironments(): void {
+  vi.unstubAllEnvs();
+}
+
 beforeEach(() => {
   // The suite's `afterEach` may unstub; each test re-applies the isolation.
   isolate();
-  return () => {
-    vi.unstubAllEnvs();
-  };
+  return unstubAllEnvironments;
 });
 
 afterAll(async () => {

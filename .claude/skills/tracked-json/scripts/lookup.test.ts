@@ -258,14 +258,14 @@ describe('lookupClass', () => {
   });
 });
 
-describe('loadWeights', () => {
-  function readerOf(weights: unknown) {
-    return (path: string): unknown => {
-      expect(path).toBe(WEIGHTS_PATH);
-      return weights;
-    };
-  }
+function readerOf(weights: unknown) {
+  return (path: string): unknown => {
+    expect(path).toBe(WEIGHTS_PATH);
+    return weights;
+  };
+}
 
+describe('loadWeights', () => {
   it('names the file, the path and the message of a schema-invalid weights file', () => {
     const broken = structuredClone(WEIGHTS) as unknown as {
       bases: Record<string, Record<string, { prefix: { entries: Record<string, unknown>[] } }>>;

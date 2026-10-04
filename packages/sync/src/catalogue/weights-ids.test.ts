@@ -145,19 +145,19 @@ describe('checkWeightsIds', () => {
   });
 });
 
-describe('weightsAbsentRecord', () => {
-  const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
-    ({
-      kind: 'crafted',
-      categoryId: 'c',
-      className,
-      itemLevelMin: 1,
-      prefix: { kind: 'valueless', statId: 's' },
-      suffix: { kind: 'valueless', statId: 't' },
-      status,
-      ...((status === 'pruned') && { prunedReason: 'x' }),
-    });
+const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
+  ({
+    kind: 'crafted',
+    categoryId: 'c',
+    className,
+    itemLevelMin: 1,
+    prefix: { kind: 'valueless', statId: 's' },
+    suffix: { kind: 'valueless', statId: 't' },
+    status,
+    ...((status === 'pruned') && { prunedReason: 'x' }),
+  });
 
+describe('weightsAbsentRecord', () => {
   it('names the distinct classNames of non-pruned crafted entries, sorted by code point', () => {
     expect(
       weightsAbsentRecord([

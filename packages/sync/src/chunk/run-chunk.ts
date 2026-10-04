@@ -554,6 +554,12 @@ function failureRecord(error: unknown, current: TrackedEntry | undefined): Leagu
 export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
   const { fs, clock, pid, git, requests, session } = ports;
   const log = ports.log ?? writeStderr;
+  // The original error is always the one rethrown: a fault in a
+  // failure-path write goes to the log, and the report is still attempted
+  // after a failed publication.
+  const secondary = (what: string, fault: unknown): void => {
+    log(`sync: ${what} failed on the failure path: ${String(fault)}`);
+  };
 
   const acquisition = await acquireLock(fs, clock, pid);
   if (acquisition.kind === 'busy') {
@@ -978,12 +984,6 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         log('sync: the lock was taken over during this chunk; writing nothing');
         throw error;
       }
-      // The original error is always the one rethrown: a fault in a
-      // failure-path write goes to the log, and the report is still attempted
-      // after a failed publication.
-      const secondary = (what: string, fault: unknown): void => {
-        log(`sync: ${what} failed on the failure path: ${String(fault)}`);
-      };
       if (error instanceof LeagueMismatchError) {
         // The run's premise is wrong: the report alone, with this chunk's lock
         // record and the mismatch; the check's marks and records are discarded

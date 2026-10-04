@@ -251,13 +251,14 @@ describe('buildSearchBody: a hybrid reference', () => {
   });
 });
 
+const filtersOf = (entry: TrackedEntry) => buildSearchBody(entry, itemTypes).query.stats[0].filters;
+const ids = (entry: TrackedEntry) => filtersOf(entry).map((filter) => filter.id);
+
 describe('buildSearchBody: a summed statId (IMPLEMENTATION-NOTES.md §5.5)', () => {
   const RARITY = 'explicit.stat_3917489142';
   const PHYS = 'explicit.stat_1509134228';
   const ACCURACY = 'explicit.stat_691932474';
   const LIGHT = 'explicit.stat_1263695895';
-  const filtersOf = (entry: TrackedEntry) => buildSearchBody(entry, itemTypes).query.stats[0].filters;
-  const ids = (entry: TrackedEntry) => filtersOf(entry).map((filter) => filter.id);
 
   it('pure + pure: one rarity filter whose edges are the sums', () => {
     const entry = crafted('accessory.amulet', 'Amulets', {
