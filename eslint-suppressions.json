@@ -5,9 +5,6 @@
     },
     "max-params": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 9
     }
   },
   ".claude/skills/tracked-json/scripts/lookup.ts": {
@@ -31,9 +28,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 2
-    },
-    "unicorn/no-null": {
-      "count": 7
     }
   },
   ".dependency-cruiser.mjs": {
@@ -929,16 +923,10 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/web/src/frame/AbsenceLines.tsx": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/no-null": {
       "count": 1
     }
   },
@@ -957,9 +945,6 @@
       "count": 2
     },
     "max-lines-per-function": {
-      "count": 1
-    },
-    "unicorn/no-null": {
       "count": 1
     }
   },
@@ -984,14 +969,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 3
-    }
-  },
-  "packages/web/src/frame/trust-facts.test.ts": {
-    "unicorn/no-null": {
-      "count": 7
     }
   },
   "packages/web/src/frame/trust-facts.ts": {
@@ -1008,9 +985,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 8
     }
   },
   "packages/web/src/list/AskingPriceLine.tsx": {
@@ -1029,9 +1003,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 5
     }
   },
   "packages/web/src/list/ExpansionPanel.tsx": {
@@ -1047,17 +1018,11 @@
   "packages/web/src/list/ListStatement.tsx": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/web/src/list/RankedList.tsx": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/web/src/list/RankedRow.tsx": {
@@ -1072,9 +1037,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 4
     }
   },
   "packages/web/src/list/RunningFoot.tsx": {
@@ -1100,9 +1062,6 @@
   "packages/web/src/list/UnrankableAppendix.tsx": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/web/src/list/active-ranking.ts": {
@@ -1120,11 +1079,6 @@
       "count": 6
     }
   },
-  "packages/web/src/list/display-rows.test.ts": {
-    "unicorn/no-null": {
-      "count": 4
-    }
-  },
   "packages/web/src/list/display-rows.ts": {
     "local/max-comment-run": {
       "count": 6
@@ -1139,19 +1093,11 @@
   "packages/web/src/list/expansion.test.tsx": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/web/src/list/format.ts": {
     "local/max-comment-run": {
       "count": 10
-    }
-  },
-  "packages/web/src/list/list-statement.test.ts": {
-    "unicorn/no-null": {
-      "count": 3
     }
   },
   "packages/web/src/list/list-statement.ts": {
@@ -1184,19 +1130,11 @@
       "count": 1
     }
   },
-  "packages/web/src/load/load-artifacts.test.ts": {
-    "unicorn/no-null": {
-      "count": 4
-    }
-  },
   "packages/web/src/load/load-artifacts.ts": {
     "complexity": {
       "count": 1
     },
     "local/max-comment-run": {
-      "count": 4
-    },
-    "unicorn/no-null": {
       "count": 4
     }
   },
@@ -1211,9 +1149,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/web/src/recipe/craft-recipe.test.tsx": {
@@ -1222,9 +1157,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 4
     },
     "vitest/no-conditional-expect": {
       "count": 1
@@ -1263,9 +1195,6 @@
   "packages/web/src/test-setup.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/web/src/test-support/artifact-server.ts": {
@@ -1274,9 +1203,6 @@
     },
     "sonarjs/deprecation": {
       "count": 4
-    },
-    "unicorn/no-null": {
-      "count": 2
     },
     "unicorn/no-thenable": {
       "count": 1
@@ -1287,9 +1213,6 @@
   },
   "packages/web/src/test-support/dom.tsx": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/no-null": {
       "count": 1
     }
   },
@@ -1306,17 +1229,9 @@
       "count": 1
     }
   },
-  "packages/web/src/theme/theme.test.ts": {
-    "unicorn/no-null": {
-      "count": 1
-    }
-  },
   "packages/web/src/theme/theme.ts": {
     "local/max-comment-run": {
       "count": 3
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/web/src/theme/tokens.ts": {
@@ -1333,11 +1248,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    }
-  },
-  "packages/web/src/threshold/threshold-storage.test.ts": {
-    "unicorn/no-null": {
-      "count": 3
     }
   },
   "packages/web/src/threshold/threshold-storage.ts": {
@@ -1583,9 +1493,6 @@
   "tools/deferred-issues/deferred-issues.test.ts": {
     "sonarjs/cognitive-complexity": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 5
     }
   },
   "tools/deferred-issues/deferred-issues.ts": {
@@ -1603,9 +1510,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 3
     }
   },
   "tools/deferred-issues/fixture.ts": {
@@ -1627,9 +1531,6 @@
   "tools/deferred-issues/plan.test.ts": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 24
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "tools/deferred-issues/plan.ts": {

@@ -54,7 +54,7 @@ export function CombinationText({ parts }: { readonly parts: readonly AffixPart[
     <>
       {parts.map((part, index) => (
         <Fragment key={index}>
-          {index === 0 ? null : AFFIX_JOIN}
+          {index === 0 ? undefined : AFFIX_JOIN}
           {part.verbatim ? (
             <span data-verbatim="" style={{ fontFamily: stacks.mono }}>
               {part.text}
@@ -115,7 +115,7 @@ export function CombinationRow({
                 {`${glyphs.pinned} pinned`}
               </span>{' '}
             </>
-          ) : null}
+          ) : undefined}
           <CombinationText parts={row.text} />
         </div>
         <div data-cell="state" style={{ ...fixedCell(state), ...typeStyle('detail-meta') }}>
@@ -155,7 +155,7 @@ export function CombinationRow({
           // The glyph alone is the click target; the cell only places it.
           style={{ ...fixedCell(tradeLink), ...typeStyle('detail-meta'), textAlign: 'right' }}
         >
-          {row.tradeHref === undefined ? null : <TradeGlyph href={row.tradeHref} label={row.tradeLabel} />}
+          {row.tradeHref === undefined ? undefined : <TradeGlyph href={row.tradeHref} label={row.tradeLabel} />}
         </div>
       </div>
       <div
@@ -174,10 +174,10 @@ export function CombinationRow({
           {row.note}
         </div>
         <div data-cell="observed" style={fixedCell(observed)}>
-          {row.ages.observed ?? null}
+          {row.ages.observed}
         </div>
         <div data-cell="attempted" style={fixedCell(attempted)}>
-          {row.ages.attempted ?? null}
+          {row.ages.attempted}
         </div>
       </div>
     </div>

@@ -80,7 +80,10 @@ type RequiredKey = {
 }[ArtifactKey];
 export type TolerableKey = Exclude<ArtifactKey, RequiredKey>;
 
-/** One consistent set. A tolerable artifact that was absent is `null`, never a stand-in. */
+/** One consistent set. A tolerable artifact that was absent is `undefined`, never a stand-in. */
 export type ArtifactSet = { readonly [K in RequiredKey]: Parsed<K> } & {
-  readonly [K in TolerableKey]: Parsed<K> | null;
+  readonly [K in TolerableKey]: Parsed<K> | undefined;
 };
+
+// eslint-disable-next-line unicorn/no-null -- boundary: core's `weights` input is `WeightsFile | null`, null being the absent file (AD-24).
+export const ABSENT_WEIGHTS: Parsed<'weights'> | null = null;

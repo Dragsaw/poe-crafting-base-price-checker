@@ -125,7 +125,7 @@ export function TrustStrip({
           >
             {signals.map((signal, index) => (
               <span key={signal}>
-                {index > 0 ? <Separator /> : null}
+                {index > 0 ? <Separator /> : undefined}
                 <span data-health-signal="" style={{ color: colors.rust, fontWeight: 700 }}>
                   <span style={{ fontSize: px(9) }}>{`${glyphs.unresolvable}${NBSP}`}</span>
                   {signal}
@@ -133,9 +133,9 @@ export function TrustStrip({
               </span>
             ))}
           </div>
-        ) : null}
+        ) : undefined}
       </div>
-      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== null, crossFileFailures)} /> : null}
+      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== undefined, crossFileFailures)} /> : undefined}
     </>
   );
 }

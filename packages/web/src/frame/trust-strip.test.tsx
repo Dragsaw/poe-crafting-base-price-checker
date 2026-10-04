@@ -77,7 +77,7 @@ function strip(): HTMLElement {
 
 const line = (name: string): string =>
   (strip().querySelector(`[data-trust-line="${name}"]`)?.textContent ?? '').replaceAll(NBSP, ' ');
-const panel = (): HTMLElement | null => mountedContainer()?.querySelector<HTMLElement>('[data-sync-report-panel]') ?? null;
+const panel = (): HTMLElement | undefined => mountedContainer()?.querySelector<HTMLElement>('[data-sync-report-panel]') ?? undefined;
 const affordance = (): string | null | undefined => strip().querySelector('[data-strip-affordance]')?.textContent;
 
 function click(target: Element | null | undefined): void {
@@ -148,7 +148,7 @@ describe('the resting strip', () => {
 
   // Matrix: weights absent.
   it('reads the three line-one values unknown and carries the absence line inside the strip', () => {
-    mountStrip({ weights: null }, ['weights']);
+    mountStrip({ weights: undefined }, ['weights']);
     expect(line('weights')).toBe('Weights File  producer unknown | generatedAt unknown | gamePatch unknown');
     expect(strip().querySelectorAll('[data-trust-line="weights"] [data-missing]')).toHaveLength(3);
     const absence = strip().querySelectorAll<HTMLElement>('[data-absence-lines] p');
@@ -158,7 +158,7 @@ describe('the resting strip', () => {
 
   it('orders absence lines weights, recipes, sync-report after line two and before the health line', () => {
     mountStrip(
-      { syncReport: null, weights: null, recipes: null },
+      { syncReport: undefined, weights: undefined, recipes: undefined },
       ['syncReport', 'weights', 'recipes'],
     );
     const lines = Array.from(strip().querySelectorAll('[data-absence-lines] p'), (p) => p.textContent);
@@ -235,13 +235,13 @@ describe('the toggle and the panel', () => {
   it('is closed on load, and a click anywhere on the strip opens then closes it', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     mountStrip();
-    expect(panel()).toBeNull();
+    expect(panel()).toBeUndefined();
     expect(affordance()).toBe(AFFORDANCE_CLOSED);
     click(strip().querySelector('[data-trust-line="sync"]'));
-    expect(panel()).not.toBeNull();
+    expect(panel()).not.toBeUndefined();
     expect(affordance()).toBe(AFFORDANCE_OPEN);
     click(strip().querySelector('[data-trust-line="weights"]'));
-    expect(panel()).toBeNull();
+    expect(panel()).toBeUndefined();
     expect(affordance()).toBe(AFFORDANCE_CLOSED);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
@@ -250,7 +250,7 @@ describe('the toggle and the panel', () => {
     mountStrip();
     click(strip());
     click(panel());
-    expect(panel()).not.toBeNull();
+    expect(panel()).not.toBeUndefined();
   });
 
   it('holds three equal columns, one heading each, and the committed figures', () => {
@@ -292,14 +292,14 @@ describe('the toggle and the panel', () => {
   });
 
   it('reads coverage unknown with weights absent', () => {
-    mountStrip({ weights: null }, ['weights']);
+    mountStrip({ weights: undefined }, ['weights']);
     click(strip());
     const cover = panel()?.querySelectorAll('[data-panel-column]')[2];
     expect(cover?.querySelector('[data-figure-group]')?.textContent).toBe('unknown');
   });
 
   it('still toggles with sync-report.json absent, and every group reads unknown under its heading', () => {
-    mountStrip({ syncReport: null }, ['syncReport']);
+    mountStrip({ syncReport: undefined }, ['syncReport']);
     click(strip());
     const groups = panel()?.querySelectorAll('[data-figure-group]') ?? [];
     expect(groups).toHaveLength(5);
@@ -364,7 +364,7 @@ describe('the cross-file diagnosis (AD-17)', () => {
   });
 
   it('reads one italic unknown line with weights absent: the checks did not run', () => {
-    mountStrip({ weights: null }, ['weights']);
+    mountStrip({ weights: undefined }, ['weights']);
     click(strip());
     const broken = panel()?.querySelectorAll('[data-panel-column]')[1];
     const groups = broken?.querySelectorAll<HTMLElement>('[data-figure-group]') ?? [];

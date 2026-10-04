@@ -18,7 +18,7 @@ import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
 import { isBannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
-import type { ArtifactSet } from './load/artifacts';
+import { ABSENT_WEIGHTS, type ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
 import { activeRecipe, readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
 import { recipeCostLine, recipeOptions } from './recipe/recipe-view';
@@ -59,7 +59,7 @@ export function App(): JSX.Element {
             ? {
                 ...outcome,
                 now: Date.now(),
-                crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights).failures,
+                crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights ?? ABSENT_WEIGHTS).failures,
               }
             : outcome,
         );
@@ -97,7 +97,7 @@ export function App(): JSX.Element {
             dataset: readySet.dataset.entries,
             activeLeague: readySet.config.league,
             threshold,
-            weights: readySet.weights,
+            weights: readySet.weights ?? ABSENT_WEIGHTS,
             crossFileFailures: readyFailures,
             recipes: readySet.recipes?.recipes ?? [],
             currencyRates: readySet.dataset.currencyRates,
@@ -229,7 +229,7 @@ function ReadyBody({
   }, [ranking, recipe, set, now, threshold, stats]);
   return (
     <>
-      {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : null}
+      {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : undefined}
       <ListStatement statement={statement} />
       <RankedList
         branches={branches}

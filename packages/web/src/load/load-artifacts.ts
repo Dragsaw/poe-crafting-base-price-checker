@@ -40,10 +40,10 @@ export type LoadOutcome =
       readonly path: string;
       readonly cause: RefusalCause;
       /**
-       * The declared `schemaVersion`, or `null` where the file declares no
-       * string one. A null, not a sentinel string: a file may declare any string.
+       * The declared `schemaVersion`, or `undefined` where the file declares no
+       * string one. Undefined, not a sentinel string: a file may declare any string.
        */
-      readonly declared: string | null;
+      readonly declared: string | undefined;
       readonly expected: string;
     }
   | { readonly kind: 'failed'; readonly path: string };
@@ -53,7 +53,7 @@ type Fetched =
   | { readonly kind: 'valid'; readonly value: unknown }
   | { readonly kind: 'absent' }
   | { readonly kind: 'not-arrived' }
-  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | null };
+  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | undefined };
 
 type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
@@ -65,15 +65,15 @@ export interface LoadOptions {
   readonly signal?: AbortSignal;
 }
 
-/** The file's `schemaVersion` string, or `null` where it is missing or not a string. */
-function declaredVersion(data: unknown): string | null {
+/** The file's `schemaVersion` string, or `undefined` where it is missing or not a string. */
+function declaredVersion(data: unknown): string | undefined {
   if (typeof data === 'object' && data !== null && 'schemaVersion' in data) {
     const version = data.schemaVersion;
     if (typeof version === 'string') {
       return version;
     }
   }
-  return null;
+  return undefined;
 }
 
 /** `BASE_URL + path`, resolved against the document so Node's fetch accepts it in tests too. */
@@ -109,7 +109,7 @@ async function fetchOne(
     data = JSON.parse(body);
   } catch {
     // Not JSON at all: nothing declared, and the fault is the content.
-    return { kind: 'invalid', cause: 'content', declared: null };
+    return { kind: 'invalid', cause: 'content', declared: undefined };
   }
 
   const result = parseEnvelope(descriptor.schema, data, descriptor.expected);
@@ -128,7 +128,7 @@ async function fetchOne(
       // Covers both a failed version probe (no string version declared) and a
       // failed shape parse at the expected major. A non-object body or a
       // non-string version reads as `version` on purpose (item 22 review).
-      return { kind: 'invalid', cause: declared === null ? 'version' : 'content', declared };
+      return { kind: 'invalid', cause: declared === undefined ? 'version' : 'content', declared };
     }
     default: {
       return result satisfies never;
@@ -167,7 +167,7 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
         kind: 'refused',
         path: descriptor.path,
         cause: 'missing',
-        declared: null,
+        declared: undefined,
         expected: descriptor.expected,
       };
     }
@@ -181,7 +181,7 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
       set[key] = result.value;
     } else {
       // Only a tolerable artifact can reach here absent: the loop above refused the rest.
-      set[key] = null;
+      set[key] = undefined;
       absent.push(key as TolerableKey);
     }
   }

@@ -55,7 +55,7 @@ describe('line one', () => {
   });
 
   it('leaves all three unknown when weights.json is absent', () => {
-    expect(weightsFacts(null).map((fact) => fact.value)).toEqual([undefined, undefined, undefined]);
+    expect(weightsFacts(undefined).map((fact) => fact.value)).toEqual([undefined, undefined, undefined]);
   });
 
   it('prints dates in UTC, never local time', () => {
@@ -79,7 +79,7 @@ describe('line two', () => {
     const figures = { ...BASE_REPORT.figures };
     delete figures.trackedListEditedAt;
     expect(trackedListEdit({ ...BASE_REPORT, figures })).toBeUndefined();
-    expect(trackedListEdit(null)).toBeUndefined();
+    expect(trackedListEdit(undefined)).toBeUndefined();
   });
 
   it('reads Last synced from runFinishedAt, else runStartedAt, and unknown with no report', () => {
@@ -89,7 +89,7 @@ describe('line two', () => {
     const started = report({ runStartedAt: '2026-09-26T10:00:00Z' });
     delete started.runFinishedAt;
     expect(lastSynced(started, NOW)).toBe('2 hours ago');
-    expect(lastSynced(null, NOW)).toBeUndefined();
+    expect(lastSynced(undefined, NOW)).toBeUndefined();
   });
 });
 
@@ -99,7 +99,7 @@ describe('the health line', () => {
 
   it('raises nothing on a healthy run or an absent report', () => {
     expect(healthSignals(report(), CURATION)).toEqual([]);
-    expect(healthSignals(null, CURATION)).toEqual([]);
+    expect(healthSignals(undefined, CURATION)).toEqual([]);
   });
 
   it('counts unresolvable records', () => {
@@ -252,7 +252,7 @@ describe('the panel copy', () => {
   });
 
   it('reads every group unknown when sync-report.json is absent', () => {
-    const columns = panelColumns(null, true);
+    const columns = panelColumns(undefined, true);
     expect(columns.map((groups) => groups.length)).toEqual([2, 2, 1]);
     for (const groups of columns) {
       for (const group of groups) {
@@ -285,7 +285,7 @@ describe('the cross-file diagnosis group', () => {
   });
 
   it('shows beside an absent report too, since web ran the checks itself', () => {
-    const [, broken] = panelColumns(null, true, [failure]);
+    const [, broken] = panelColumns(undefined, true, [failure]);
     expect(broken).toHaveLength(3);
   });
 
@@ -294,7 +294,7 @@ describe('the cross-file diagnosis group', () => {
   });
 
   it('reads one unknown line when no weights envelope loaded, since the checks did not run', () => {
-    for (const published of [report(), null]) {
+    for (const published of [report(), undefined]) {
       const [, broken] = panelColumns(published, false, []);
       expect(broken).toHaveLength(3);
       expect(broken[2]).toEqual([[{ kind: 'missing', text: UNKNOWN }]]);

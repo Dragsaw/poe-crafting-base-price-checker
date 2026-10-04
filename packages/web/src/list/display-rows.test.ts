@@ -2,6 +2,7 @@ import { rank } from '@poe/core';
 import { compareCanonicalKeys, type DatasetEntry, type RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { ABSENT_WEIGHTS } from '../load/artifacts';
 import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW } from '../test-support/dom';
@@ -11,7 +12,7 @@ import { isHonestEmpty } from './list-statement';
 
 /** A raw-only list, narrowed to Raw Base rows. */
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
-  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: null });
+  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: ABSENT_WEIGHTS });
   return toDisplayRows(ranking, dataset, NOW).flatMap((row) => (row.unit === 'raw' ? [row] : []));
 }
 
@@ -132,7 +133,7 @@ describe('toDisplayRows', () => {
       dataset,
       activeLeague: TEST_LEAGUE,
       threshold: DEFAULT_THRESHOLD,
-      weights: null,
+      weights: ABSENT_WEIGHTS,
     });
     expect(ranking.belowThreshold.length).toBeGreaterThan(0);
     expect(isHonestEmpty(ranking)).toBe(false);
@@ -189,7 +190,7 @@ describe('toDisplayRows', () => {
         dataset: entries.map((entry, index) => priced(entry, 30 - index, hoursBefore(NOW, 1))),
         activeLeague: TEST_LEAGUE,
         threshold: 0,
-        weights: null,
+        weights: ABSENT_WEIGHTS,
       }),
       [],
       NOW,
@@ -200,7 +201,7 @@ describe('toDisplayRows', () => {
 
     const tiny = rawEntry('Tiny');
     const [only] = toDisplayRows(
-      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weights: null }),
+      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weights: ABSENT_WEIGHTS }),
       [],
       NOW,
     );

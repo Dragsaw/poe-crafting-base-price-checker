@@ -60,7 +60,7 @@ export function UnrankableAppendix({ classes }: { readonly classes: readonly Unr
           {appendixCount(classes.length)}
         </span>
       </h2>
-      {isEmpty ? null : (
+      {isEmpty ? undefined : (
         <>
           <p
             data-appendix-lead=""
@@ -127,7 +127,7 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
           color: colors['ink-tertiary'],
         }}
       >
-        {item.reason === 'class disagrees with weights file' ? DISAGREES_NOTE : null}
+        {item.reason === 'class disagrees with weights file' ? DISAGREES_NOTE : undefined}
       </div>
     </div>
   );

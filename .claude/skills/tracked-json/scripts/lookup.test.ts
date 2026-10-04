@@ -27,6 +27,9 @@ import {
   WEIGHTS_PATH,
 } from './lookup';
 
+// eslint-disable-next-line unicorn/no-null -- boundary: the weights, filters and printed JSON carry `null` (a null `statId`, categoryText, untrackable), which `undefined` cannot stand in for.
+const JSON_NULL = null;
+
 const SCRIPT = fileURLToPath(new URL('lookup.ts', import.meta.url));
 const DATA_DIR = nodePath.join(REPO_ROOT, 'data');
 
@@ -70,7 +73,7 @@ const FILTERS = {
           id: 'category',
           option: {
             options: [
-              { id: null, text: 'Any' },
+              { id: JSON_NULL, text: 'Any' },
               { id: 'accessory.amulet', text: 'Amulet' },
               { id: 'armour.chest', text: 'Body Armour' },
             ],
@@ -153,7 +156,7 @@ const WEIGHTS = WeightsFileSchema.parse({
         },
         suffix: {
           poolCoverage: 'complete',
-          entries: [tier('suffix', 'Thorns', 1, 'T1', '# to # Thorns', [{ statId: null, ranges: [] }])],
+          entries: [tier('suffix', 'Thorns', 1, 'T1', '# to # Thorns', [{ statId: JSON_NULL, ranges: [] }])],
         },
       },
     },
@@ -232,7 +235,7 @@ describe('lookupClass', () => {
       { categoryId: 'armour.chest', categoryText: 'Body Armour', className: 'Body_Armours_dex' },
     ]);
     expect(lookupClass(WEIGHTS, FILTERS, 'armour.shield').matches).toEqual([
-      { categoryId: 'armour.shield', categoryText: null, className: 'Body_Armours_dex' },
+      { categoryId: 'armour.shield', categoryText: JSON_NULL, className: 'Body_Armours_dex' },
     ]);
   });
 
@@ -373,7 +376,7 @@ const B = 'explicit.stat_b';
 
 function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
   const notInGame = {
-    ...tier('prefix', 'Dead', 1, 'T1', 'dead', [{ statId: null, ranges: [] }]),
+    ...tier('prefix', 'Dead', 1, 'T1', 'dead', [{ statId: JSON_NULL, ranges: [] }]),
     weight: 0,
     weightSource: 'not-in-game',
   };
@@ -395,14 +398,14 @@ function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
               tier('prefix', 'Hybrid', 20, 'T1', 'a b', [
                 { statId: B, ranges: [[5, 6]] },
                 { statId: A, ranges: [[3, 4]] },
-                { statId: null, ranges: [] },
+                { statId: JSON_NULL, ranges: [] },
               ]),
               notInGame,
               // A mixed family: only the {A, null} tier is untrackable, and only in a partial pool.
               tier('prefix', 'Mixed', 10, 'T2', 'a', [{ statId: A, ranges: [[1, 2]] }]),
               tier('prefix', 'Mixed', 20, 'T1', 'a', [
                 { statId: A, ranges: [[3, 4]] },
-                { statId: null, ranges: [] },
+                { statId: JSON_NULL, ranges: [] },
               ]),
             ],
           },
@@ -455,9 +458,9 @@ describe('the null-line rule in lookupMods and lookupTiers', () => {
     expect(t1?.lines).toEqual([
       { statId: B, ranges: [[5, 6]] },
       { statId: A, ranges: [[3, 4]] },
-      { statId: null, ranges: [] },
+      { statId: JSON_NULL, ranges: [] },
     ]);
-    expect(t1).toMatchObject({ lineSet: [A, B], untrackable: null });
+    expect(t1).toMatchObject({ lineSet: [A, B], untrackable: JSON_NULL });
     expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T1')).toMatchObject({
       lineSet: [A],
       untrackable: 'partial-pool-null-line',
@@ -486,7 +489,7 @@ describe('lookupTiers', () => {
       modGroup: 'BaseSpirit',
       lines: [{ statId: SPIRIT, ranges: [[30, 33]] }],
       lineSet: [SPIRIT],
-      untrackable: null,
+      untrackable: JSON_NULL,
     });
   });
 

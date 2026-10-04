@@ -100,6 +100,7 @@ export const theme = createTheme({
     ...shadowless,
     Accordion: {
       defaultProps: {
+        // eslint-disable-next-line unicorn/no-null -- boundary: Mantine Accordion drops the chevron only on an explicit `null`; `undefined` and `false` fall back to the default (Accordion.mjs `chevron === null`).
         chevron: null,
         disableChevronRotation: true,
         transitionDuration: 0,

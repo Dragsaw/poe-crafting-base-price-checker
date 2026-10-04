@@ -30,10 +30,10 @@ export function absenceLine(key: TolerableKey): string {
  * style (ink-secondary). No mark and no colour: absence is a declared state,
  * not a break. Each line is budgeted at `frameReserveAbsenceLine`.
  */
-export function AbsenceLines({ absent }: { readonly absent: readonly TolerableKey[] }): JSX.Element | null {
+export function AbsenceLines({ absent }: { readonly absent: readonly TolerableKey[] }): JSX.Element | undefined {
   const shown = ABSENCE_ORDER.filter((key) => absent.includes(key));
   if (shown.length === 0) {
-    return null;
+    return undefined;
   }
   return (
     <div data-absence-lines="">

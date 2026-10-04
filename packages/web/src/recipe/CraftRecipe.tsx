@@ -75,7 +75,7 @@ export function CraftRecipe({
               >
                 |
               </span>
-            ) : null}
+            ) : undefined}
             {option.id === activeId ? (
               <span data-recipe-option={option.id} data-active="" aria-current="true" className="fg-recipe-option">
                 {option.word}

@@ -38,6 +38,12 @@ export const MATCH_CAP = 50;
 export const SLOTS = ['prefix', 'suffix'] as const;
 export type Slot = (typeof SLOTS)[number];
 
+// The printed JSON keeps a key for an absent value, which `undefined` would drop.
+function absentAsNull<T>(value: T | undefined): T | null {
+  // eslint-disable-next-line unicorn/no-null -- boundary: the subcommands print JSON, where an absent value is `null` and a key must stay.
+  return value === undefined ? null : value;
+}
+
 /** A fault in the data or the query. Printed as `{error}` on stdout, exit 1. */
 export class LookupError extends Error {
   constructor(message: string) {
@@ -195,7 +201,7 @@ export function lookupClass(weights: WeightsFile, filters: unknown, query: strin
   const texts = categoryTexts(filters);
   const matches: ClassMatch[] = [];
   for (const [categoryId, classes] of Object.entries(weights.bases)) {
-    const categoryText = texts.get(categoryId) ?? null;
+    const categoryText = absentAsNull(texts.get(categoryId));
     for (const className of Object.keys(classes)) {
       if (isContaining(className, query) || isContaining(categoryId, query) || isContaining(categoryText ?? '', query)) {
         matches.push({ categoryId, categoryText, className });
@@ -300,7 +306,7 @@ export function lookupMods(
         return reason === undefined
           ? []
           : {
-              tierLabel: entry.tierLabel ?? null,
+              tierLabel: absentAsNull(entry.tierLabel),
               itemLevelMin: entry.itemLevelMin,
               sourceModifierId: entry.sourceModifierId,
               reason,
@@ -315,7 +321,7 @@ export function lookupMods(
         untrackable,
         tierCount: tiers.length,
         itemLevelMin: { min: first?.itemLevelMin ?? 0, max: last?.itemLevelMin ?? 0 },
-        tierLabels: tiers.map((entry) => entry.tierLabel ?? null),
+        tierLabels: tiers.map((entry) => absentAsNull(entry.tierLabel)),
       });
     }
   }
@@ -351,14 +357,14 @@ export function lookupTiers(
     for (const entry of carrying.toSorted(byItemLevel)) {
       tiers.push({
         slot,
-        tierLabel: entry.tierLabel ?? null,
+        tierLabel: absentAsNull(entry.tierLabel),
         itemLevelMin: entry.itemLevelMin,
         weight: entry.weight,
         weightSource: entry.weightSource,
         modGroup: entry.modGroup,
         lines: entry.lines,
         lineSet: lineSet(entry),
-        untrackable: untrackableReason(entry, pool) ?? null,
+        untrackable: absentAsNull(untrackableReason(entry, pool)),
       });
     }
   }
@@ -516,10 +522,10 @@ function main(): void {
   }
   try {
     const result = runCommand(command, createJsonReader(REPO_ROOT));
-    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify(result, undefined, 2)}\n`);
   } catch (error) {
     if (error instanceof LookupError) {
-      process.stdout.write(`${JSON.stringify({ error: error.message }, null, 2)}\n`);
+      process.stdout.write(`${JSON.stringify({ error: error.message }, undefined, 2)}\n`);
       process.exitCode = 1;
       return;
     }

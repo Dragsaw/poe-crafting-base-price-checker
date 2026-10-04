@@ -40,17 +40,17 @@ export interface WeightsFact {
 }
 
 /** Line one, from the weights header as published (FR-10). An absent file leaves all three *unknown*. */
-export function weightsFacts(weights: WeightsEnvelope | null): readonly [WeightsFact, WeightsFact, WeightsFact] {
+export function weightsFacts(weights: WeightsEnvelope | undefined): readonly [WeightsFact, WeightsFact, WeightsFact] {
   return [
     { name: 'producer', value: weights?.producer.id },
-    { name: 'generatedAt', value: weights === null ? undefined : utcDate(weights.producer.generatedAt) },
+    { name: 'generatedAt', value: weights === undefined ? undefined : utcDate(weights.producer.generatedAt) },
     { name: 'gamePatch', value: weights?.gamePatch },
   ];
 }
 
 /** `Last synced`: the run's finish, or its start on an aborted run, against the load's `now`. */
-export function lastSynced(report: SyncReport | null, now: number): string | undefined {
-  if (report === null) {
+export function lastSynced(report: SyncReport | undefined, now: number): string | undefined {
+  if (report === undefined) {
     return undefined;
   }
   const at = report.runFinishedAt ?? report.runStartedAt;
@@ -63,7 +63,7 @@ export interface TrackedListEdit {
   readonly suffix: string;
 }
 
-export function trackedListEdit(report: SyncReport | null): TrackedListEdit | undefined {
+export function trackedListEdit(report: SyncReport | undefined): TrackedListEdit | undefined {
   const edited = report?.figures.trackedListEditedAt;
   if (edited === undefined) {
     return undefined;
@@ -96,8 +96,8 @@ export interface Curation {
  * `N of M pinned entries starved`, or
  * `M pinned entries left the rotation no search` when N is 0.
  */
-export function healthSignals(report: SyncReport | null, curation: Curation): readonly string[] {
-  if (report === null) {
+export function healthSignals(report: SyncReport | undefined, curation: Curation): readonly string[] {
+  if (report === undefined) {
     return [];
   }
   const signals: string[] = [];
@@ -182,12 +182,12 @@ function diagnosisGroups(failures: readonly DiagnosisFailure[], areWeightsLoaded
  * weights envelope and *unknown* when it did not, never `0` (AD-27).
  */
 export function panelColumns(
-  report: SyncReport | null,
+  report: SyncReport | undefined,
   areWeightsLoaded: boolean,
   crossFileFailures: readonly DiagnosisFailure[] = [],
 ): PanelColumns {
   const diagnosis = diagnosisGroups(crossFileFailures, areWeightsLoaded);
-  if (report === null) {
+  if (report === undefined) {
     return [
       [UNKNOWN_GROUP, UNKNOWN_GROUP],
       [UNKNOWN_GROUP, UNKNOWN_GROUP, ...diagnosis],

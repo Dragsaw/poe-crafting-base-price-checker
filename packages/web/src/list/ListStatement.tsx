@@ -10,9 +10,9 @@ import type { ListStatement as Statement } from './list-statement';
  * nor a money-slot phrase. The two statements are exclusive, so one slot at
  * `frameReserveListStatement` serves both.
  */
-export function ListStatement({ statement }: { readonly statement: Statement }): JSX.Element | null {
+export function ListStatement({ statement }: { readonly statement: Statement }): JSX.Element | undefined {
   if (statement.kind === 'none') {
-    return null;
+    return undefined;
   }
   return (
     <p

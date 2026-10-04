@@ -2,6 +2,7 @@ import { rank, type Ranking } from '@poe/core';
 import type { CraftedRankedRow, DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { ABSENT_WEIGHTS } from '../load/artifacts';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
@@ -13,7 +14,7 @@ function statementFor(
   dataset: readonly DatasetEntry[],
   threshold = 0.25,
 ): ReturnType<typeof listStatement> {
-  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: null }), threshold, TEST_LEAGUE);
+  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: ABSENT_WEIGHTS }), threshold, TEST_LEAGUE);
 }
 
 const belt = rawEntry('Wide Belt');
@@ -62,7 +63,7 @@ describe('listStatement', () => {
       priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
       unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
     ];
-    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weights: null });
+    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weights: ABSENT_WEIGHTS });
     expect(ranking.noListings).toHaveLength(1);
     expect(ranking.notYetSynced).toHaveLength(2);
     expect(isHonestEmpty(ranking)).toBe(true);
@@ -196,6 +197,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
       {
         ...empty,
         pricedInLeague: false,
+        // eslint-disable-next-line unicorn/no-null -- boundary: core's crafted ranking row types `ev` as `number | null`, null being not-yet-synced.
         ordering: [{ ...craftedRow(0), craftCost: { kind: 'uncostable', currencyId: 'x' }, ev: null }],
         uncostableRecipes: [{ recipeId: 'greater', currencyId: 'x' }],
       },

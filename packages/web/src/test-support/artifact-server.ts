@@ -80,7 +80,7 @@ export interface RecordedRequest {
 
 async function respondWhenOpen(answer: Extract<ArtifactAnswer, { kind: 'gated' }>): Promise<Response> {
   await answer.gate;
-  return respond(answer.then ?? { kind: 'json', body: null });
+  return respond(answer.then ?? { kind: 'text', body: 'null', contentType: 'application/json' });
 }
 
 function respond(answer: ArtifactAnswer): Response | Promise<Response> {
@@ -96,7 +96,7 @@ function respond(answer: ArtifactAnswer): Response | Promise<Response> {
       });
     }
     case 'status': {
-      return new HttpResponse(null, { status: answer.status });
+      return new HttpResponse(undefined, { status: answer.status });
     }
     case 'network-error': {
       return HttpResponse.error();

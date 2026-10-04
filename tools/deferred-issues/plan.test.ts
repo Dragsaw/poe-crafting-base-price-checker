@@ -27,6 +27,7 @@ describe('readMarker', () => {
   });
 
   it('rejects a null body, a marker on a later line, a longer id and upper-case hex', () => {
+    // eslint-disable-next-line unicorn/no-null -- boundary: `gh issue list --json body` yields null for an empty body, which `readMarker` accepts.
     expect(readMarker(null)).toBeUndefined();
     expect(readMarker('')).toBeUndefined();
     expect(readMarker('title\nDeferred entry: dw-0123456789')).toBeUndefined();

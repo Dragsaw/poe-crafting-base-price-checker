@@ -120,13 +120,13 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: missing version.
-  it('declares null when the file carries no schemaVersion, or a non-string one', async () => {
+  it('declares undefined when the file carries no schemaVersion, or a non-string one', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });
     expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
-      declared: null,
+      declared: undefined,
     });
 
     serveArtifacts(server, { config: { kind: 'json', body: { schemaVersion: 1 } } });
@@ -134,7 +134,7 @@ describe('loadArtifacts', () => {
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
-      declared: null,
+      declared: undefined,
     });
   });
 
@@ -203,13 +203,13 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: required absent.
-  it('refuses a required artifact that is absent, declaring null', async () => {
+  it('refuses a required artifact that is absent, declaring undefined', async () => {
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'tracked.json',
       cause: 'missing',
-      declared: null,
+      declared: undefined,
       expected: '2.0.0',
     });
   });
@@ -241,18 +241,18 @@ describe('loadArtifacts', () => {
     expect(outcome.kind).toBe('ready');
     if (outcome.kind !== 'ready') {return;}
     expect(outcome.absent).toEqual(['syncReport', 'recipes']);
-    expect(outcome.set.recipes).toBeNull();
-    expect(outcome.set.syncReport).toBeNull();
+    expect(outcome.set.recipes).toBeUndefined();
+    expect(outcome.set.syncReport).toBeUndefined();
   });
 
   // Matrix: non-JSON body.
-  it('refuses a 200 that is not JSON, declaring null', async () => {
+  it('refuses a 200 that is not JSON, declaring undefined', async () => {
     serveArtifacts(server, { weights: { kind: 'text', body: '<!doctype html><html></html>' } });
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'weights.json',
       cause: 'content',
-      declared: null,
+      declared: undefined,
       expected: '6.1.0',
     });
   });

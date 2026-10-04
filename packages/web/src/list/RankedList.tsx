@@ -131,7 +131,7 @@ function Branch({
         return (
           <Fragment key={row.key}>
             <RankedRow row={row} open={isOpen} onToggle={onToggle} />
-            {isOpen ? expansionPanel(row) : null}
+            {isOpen ? expansionPanel(row) : undefined}
           </Fragment>
         );
       })}
@@ -150,7 +150,7 @@ function Branch({
             {grown ? COLLAPSE_COPY : expandCopy(remaining)}
           </button>
         </div>
-      ) : null}
+      ) : undefined}
     </div>
   );
 }

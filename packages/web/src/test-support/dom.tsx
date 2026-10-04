@@ -11,6 +11,7 @@ import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
+import { ABSENT_WEIGHTS } from '../load/artifacts';
 import { toDisplayRows } from '../list/display-rows';
 import { RankedList } from '../list/RankedList';
 import { DEFAULT_THRESHOLD } from '../shared/product';
@@ -99,7 +100,7 @@ function rerender(node: ReactNode): void {
 
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: null }), dataset, NOW);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: ABSENT_WEIGHTS }), dataset, NOW);
   return <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />;
 }
 

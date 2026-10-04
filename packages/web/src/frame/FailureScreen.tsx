@@ -37,8 +37,8 @@ export type FailureScreenProperties =
       readonly variant: 'refused';
       readonly path: string;
       readonly cause: RefusalCause;
-      /** The declared `schemaVersion`, or `null` where the file declares no string one. */
-      readonly declared: string | null;
+      /** The declared `schemaVersion`, or `undefined` where the file declares no string one. */
+      readonly declared: string | undefined;
       readonly expected: string;
     }
   | { readonly variant: 'failed'; readonly path: string; readonly onRetry: () => void };
@@ -61,14 +61,14 @@ function RefusalCauseSentence({
   expected,
 }: {
   readonly cause: RefusalCause;
-  readonly declared: string | null;
+  readonly declared: string | undefined;
   readonly expected: string;
 }): JSX.Element {
   switch (cause) {
     case 'version': {
       return (
         <>
-          {declared === null ? (
+          {declared === undefined ? (
             REFUSAL_NO_VERSION_DECLARED
           ) : (
             <>

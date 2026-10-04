@@ -16,6 +16,7 @@ Object.defineProperty(globalThis, 'matchMedia', {
     ({
       matches: false,
       media: query,
+      // eslint-disable-next-line unicorn/no-null -- boundary: `MediaQueryList.onchange` is typed `... | null`; `undefined` and an `as` cast both fail the compiler/lint.
       onchange: null,
       addListener: () => {},
       removeListener: () => {},

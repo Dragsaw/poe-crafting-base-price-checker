@@ -780,8 +780,8 @@ describe('the crafted panel', () => {
     expect(unresolvable?.querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors.rust));
     expect(unresolvable?.querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.rust));
     // The trade link follows the raw path: only the summand carries a stored search.
-    const links = rows.map((row) => row.querySelector('[data-cell="trade-link"] a')?.getAttribute('href') ?? null);
-    expect(links).toEqual(['https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/AbC123', null, null, null]);
+    const links = rows.map((row) => row.querySelector('[data-cell="trade-link"] a')?.getAttribute('href') ?? undefined);
+    expect(links).toEqual(['https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/AbC123', undefined, undefined, undefined]);
     expect(rows[0]?.querySelector('[data-cell="trade-link"] a')?.getAttribute('aria-label')).toBe(
       'Open the trade search for T1 Atk Dmg · T1 Cold Res on Rings',
     );

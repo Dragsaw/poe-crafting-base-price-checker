@@ -78,7 +78,7 @@ export function Masthead({
           aria-hidden={recipe === undefined ? 'true' : undefined}
           style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto', display: 'flex' }}
         >
-          {recipe === undefined ? null : (
+          {recipe === undefined ? undefined : (
             <CraftRecipe
               options={recipe.options}
               activeId={recipe.activeId}

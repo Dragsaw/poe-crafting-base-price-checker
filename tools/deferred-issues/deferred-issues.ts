@@ -31,6 +31,9 @@ import { LEDGER_PATH, planDuplicateCloses, planSync, readMarker, type IssueInfo,
  * imports only builtins and its siblings.
  */
 
+// eslint-disable-next-line unicorn/no-null -- boundary: the `list` output is JSON, and `undefined` would drop the key where the report prints null.
+const LIST_ABSENT = null;
+
 export interface RunResult {
   readonly status: number;
   readonly stdout: string;
@@ -154,8 +157,8 @@ function listEntries(entries: readonly LedgerEntry[], issues: readonly IssueInfo
     sourceSpec: entry.sourceSpec,
     summary: entry.summary,
     evidence: entry.evidence,
-    retryWhen: entry.retryWhen ?? null,
-    issue: open.get(entry.id) ?? null,
+    retryWhen: entry.retryWhen ?? LIST_ABSENT,
+    issue: open.get(entry.id) ?? LIST_ABSENT,
   }));
 }
 
@@ -196,7 +199,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
   }
 
   if (isList) {
-    out.write(`${JSON.stringify(listEntries(entries.value, issues.value), null, 2)}\n`);
+    out.write(`${JSON.stringify(listEntries(entries.value, issues.value), undefined, 2)}\n`);
     return 0;
   }
 

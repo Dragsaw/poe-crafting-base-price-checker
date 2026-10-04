@@ -83,7 +83,7 @@ export function RankedRow({
           color: RANK_COLOR[row.tier],
         }}
       >
-        {row.numeral === undefined ? null : row.numeral}
+        {row.numeral}
       </div>
       <div
         data-cell="unit"
@@ -126,10 +126,10 @@ export function RankedRow({
       <div data-cell="provenance" style={{ ...cellStyle(COLUMNS.provenance), ...typeStyle('row-mark') }}>
         {row.unit === 'class' && row.provenance === 'uniform-prior' ? (
           <TrustMark kind="prior" word={PRIOR_ONLY} />
-        ) : null}
+        ) : undefined}
       </div>
       <div data-cell="age" style={{ ...cellStyle(COLUMNS.age), ...typeStyle('row-mark') }}>
-        {row.age === undefined ? null : <TrustMark kind={row.age.kind} word={row.age.word} />}
+        {row.age === undefined ? undefined : <TrustMark kind={row.age.kind} word={row.age.word} />}
       </div>
       <div
         data-cell="chase"
@@ -169,7 +169,7 @@ export function RankedRow({
                   color: row.tier === 1 ? colors['ink-chase-emphasis'] : colors['ink-secondary'],
                 }}
               >
-                {parts === undefined ? null : <CombinationText parts={parts} />}
+                {parts === undefined ? undefined : <CombinationText parts={parts} />}
               </div>
             );
           })
