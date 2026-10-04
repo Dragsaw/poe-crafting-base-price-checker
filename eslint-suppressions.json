@@ -269,11 +269,6 @@
       "count": 3
     }
   },
-  "packages/core/src/probability.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/core/src/probability.ts": {
     "local/max-comment-run": {
       "count": 14
