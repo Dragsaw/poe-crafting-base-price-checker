@@ -65,6 +65,10 @@ export function carriedCoverage(previous: SyncReportFile | undefined): CoverageF
     : { coverage: previous.figures.coverage, rankableClassCount: previous.figures.rankableClassCount };
 }
 
+export function logLockTakenOver(state: RunState): void {
+  state.log('sync: the lock was taken over during this chunk; writing nothing');
+}
+
 export function createRunState(input: RunStateInput): RunState {
   return {
     ...input,
