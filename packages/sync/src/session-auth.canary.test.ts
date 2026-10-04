@@ -5,7 +5,9 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
+  SUPPORTED_SCHEMA_VERSION,
   TRACKED_SCHEMA_VERSION,
+  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type { FilesystemPort, HttpPort, HttpRequest, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
@@ -46,24 +48,24 @@ function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof c
       contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 }) },
+    'data/config.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 1 }) },
     'data/currencies.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
       }),
     },
     'data/catalogue/items.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
       }),
     },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
+    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
     'data/weights.json': {
       contents: JSON.stringify({
-        schemaVersion: '6.0.0',
+        schemaVersion: WEIGHTS_SCHEMA_VERSION,
         gamePatch: '0.5.5',
         producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
         bases: {},
@@ -235,12 +237,22 @@ async function runBatch(captured: Captured, http: HttpPort): Promise<ShellRun> {
   return { code, lines };
 }
 
+/** More pauses than any passing case needs; past it, `runSession` throws. */
+const MAX_SESSION_PAUSES = 200;
+
 async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun> {
   const lines: string[] = [];
   const controller = new AbortController();
   let chunks = 0;
+  let pauses = 0;
   const clock = createFakeClockPort(NOW);
+  // The fake pause resolves at once, so a session that never prints a second
+  // chunk line spins and starves Vitest's timeout. The cap ends it loudly.
   const advance = (ms: number): Promise<void> => {
+    pauses += 1;
+    if (pauses > MAX_SESSION_PAUSES) {
+      controller.abort();
+    }
     clock.set(new Date(Date.parse(clock.now()) + ms).toISOString());
     return Promise.resolve();
   };
@@ -268,6 +280,11 @@ async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun>
     stdout: line,
     stderr: line,
   });
+  if (pauses > MAX_SESSION_PAUSES) {
+    throw new Error(
+      `runSession: no second chunk line after ${String(MAX_SESSION_PAUSES)} pauses; lines:\n${lines.join('\n')}`,
+    );
+  }
   return { code, lines };
 }
 

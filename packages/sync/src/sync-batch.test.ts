@@ -8,8 +8,12 @@ import {
   createFakeFilesystemPort,
   createFakeGitPort,
   createFakeHttpPort,
+  SUPPORTED_SCHEMA_VERSION,
+  SYNC_PROGRESS_SCHEMA_VERSION,
+  SYNC_REPORT_SCHEMA_VERSION,
   SyncReportFileSchema,
   TRACKED_SCHEMA_VERSION,
+  WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
 import type {
   DatasetEntry,
@@ -71,22 +75,22 @@ function inputs(
       contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: tracked }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
-    'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league, minChunkSearches: 1 }) },
+    'data/config.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league, minChunkSearches: 1 }) },
     'data/currencies.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
       }),
     },
     'data/catalogue/items.json': {
       contents: JSON.stringify({
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         result: [{ id: 'accessory', label: 'Accessories', entries: [{ type: 'Solar Amulet' }] }],
       }),
     },
-    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', result: [] }) },
-    'data/weights.json': { contents: JSON.stringify({ schemaVersion: '6.0.0', gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
+    'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/weights.json': { contents: JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} }) },
   };
 }
 
@@ -313,7 +317,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
       completed: [],
       notBefore: '2026-09-26T12:01:00.000Z',
-      schemaVersion: '1.2.0',
+      schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
     });
     const report = await reportOf(fs);
     expect(report?.records).toEqual([]);
@@ -473,7 +477,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     };
     const published = `${JSON.stringify(
       {
-        schemaVersion: '1.0.0',
+        schemaVersion: SUPPORTED_SCHEMA_VERSION,
         league: LEAGUE,
         generatedAt: '2026-09-25T12:00:00.000Z',
         entries: [priced],
@@ -668,7 +672,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const HOLD_OFF = '2026-09-27T06:00:00.000Z';
     const PAST_HOLD_OFF = '2026-09-26T11:00:00.000Z';
     const progressSeed = (fields: Record<string, unknown>) => ({
-      [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.2.0', completed: [], ...fields }) },
+      [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [], ...fields }) },
     });
 
     function withResults(setup: Setup = {}) {
@@ -697,7 +701,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: completed, 1 completed']);
       const report = await reportOf(fs);
-      expect(report?.schemaVersion).toBe('1.2.0');
+      expect(report?.schemaVersion).toBe(SYNC_REPORT_SCHEMA_VERSION);
       expect(report?.figures.requestsBySource).toEqual({
         'tracked-list': 2,
         'league-validation': 1,
@@ -792,7 +796,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: yielded, 0 completed']);
       const progress = await progressOf(fs);
-      expect(progress).toEqual({ schemaVersion: '1.2.0', completed: [], authHoldOffUntil: NOW_PLUS_24H });
+      expect(progress).toEqual({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [], authHoldOffUntil: NOW_PLUS_24H });
       // The entry is stamped and keeps the search fields from this entry's search; the price is unchanged.
       const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
       expect(dataset.entries[0]).toMatchObject({
