@@ -436,9 +436,9 @@ describe('the crafted states', () => {
     serveWorld(
       standardWorld({
         dataset: [
-          priced(bows, 1, hoursBefore(now, 30 * 24), 'Standard'),
-          priced(staves, 2, hoursBefore(now, 30 * 24), 'Standard'),
-          priced(belt, 0.4, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(bows, 1, hoursBefore(now, 30 * 24), { league: 'Standard' }),
+          priced(staves, 2, hoursBefore(now, 30 * 24), { league: 'Standard' }),
+          priced(belt, 0.4, hoursBefore(now, 30 * 24), { league: 'Standard' }),
         ],
         // greater costable, perfect uncostable.
         rates: RATES.slice(0, 2),
@@ -533,7 +533,7 @@ function ringsWorld(overrides: Partial<World> = {}): World {
   return {
     tracked: [atkCold, mana, life, es, rarity],
     dataset: [
-      priced(atkCold, 1000, hoursBefore(now, 1), TEST_LEAGUE, SEARCH),
+      priced(atkCold, 1000, hoursBefore(now, 1), { search: SEARCH }),
       priced(mana, 100, hoursBefore(now, 1)),
       priced(life, 1.5, hoursBefore(now, 1)),
       priced(es, 1.2, hoursBefore(now, 1)),
@@ -741,7 +741,7 @@ describe('the crafted panel', () => {
       ringsWorld({
         tracked: [atkCold, life, es, mana, pruned],
         dataset: [
-          priced(atkCold, 1000, hoursBefore(now, 2), TEST_LEAGUE, SEARCH),
+          priced(atkCold, 1000, hoursBefore(now, 2), { search: SEARCH }),
           priced(mana, 0.1, hoursBefore(now, 3)),
           unpriced(life, { state: 'no-listings' }, hoursBefore(now, 4)),
           unpriced(es, { state: 'unresolvable' }, hoursBefore(now, 5)),
@@ -797,7 +797,7 @@ describe('the crafted panel', () => {
     serveWorld(
       ringsWorld({
         tracked: [atkCold, mana, life],
-        dataset: [priced(atkCold, 1000, hoursBefore(now, 1)), priced(mana, 9, hoursBefore(now, 1), 'Standard')],
+        dataset: [priced(atkCold, 1000, hoursBefore(now, 1)), priced(mana, 9, hoursBefore(now, 1), { league: 'Standard' })],
       }),
     );
     mount();

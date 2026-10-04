@@ -408,7 +408,7 @@ export function rank(input: RankInput): Ranking {
       if (cost === undefined) {
         continue;
       }
-      const row = craftedRow(first, recipe, cost, pools, keyed, byKey, input);
+      const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, input });
       if (row === undefined) {
         unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
           categoryId: first.categoryId,
@@ -440,6 +440,16 @@ export function rank(input: RankInput): Ranking {
   };
 }
 
+interface CraftedRowOptions {
+  readonly first: CraftedTrackedEntry;
+  readonly recipe: CraftRecipe;
+  readonly cost: CraftCostResult;
+  readonly pools: WeightsClassPools;
+  readonly keyed: readonly { readonly entry: CraftedTrackedEntry; readonly entryKey: string }[];
+  readonly byKey: ReadonlyMap<string, DatasetEntry>;
+  readonly input: RankInput;
+}
+
 /**
  * One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe
  * cannot reach it: an entry's `combinationProbability` came back
@@ -453,15 +463,7 @@ export function rank(input: RankInput): Ranking {
  * summed. EV is the gross payout less the Craft Cost, subtracted once; an
  * uncostable recipe leaves EV `null`.
  */
-function craftedRow(
-  first: CraftedTrackedEntry,
-  recipe: CraftRecipe,
-  cost: CraftCostResult,
-  pools: WeightsClassPools,
-  keyed: readonly { readonly entry: CraftedTrackedEntry; readonly entryKey: string }[],
-  byKey: ReadonlyMap<string, DatasetEntry>,
-  input: RankInput,
-): CraftedRankedRow | undefined {
+function craftedRow({ first, recipe, cost, pools, keyed, byKey, input }: CraftedRowOptions): CraftedRankedRow | undefined {
   const summands: CraftedSummand[] = [];
   // Summands only: the rates' asOf is not a timestamp input (AD-10).
   const stamps: string[] = [];

@@ -262,8 +262,7 @@ export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
   reference: ModifierRef,
-  itemLevelMin: number,
-  modifierLevelMin: number,
+  { itemLevelMin, modifierLevelMin }: { readonly itemLevelMin: number; readonly modifierLevelMin: number },
 ): ProbabilityResult {
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
   const total = totalWeight(eligibleSet);

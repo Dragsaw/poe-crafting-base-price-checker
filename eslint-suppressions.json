@@ -2,9 +2,6 @@
   ".claude/skills/tracked-json/scripts/lookup.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "max-params": {
-      "count": 1
     }
   },
   ".claude/skills/tracked-json/scripts/lookup.ts": {
@@ -141,11 +138,8 @@
     "local/max-comment-run": {
       "count": 10
     },
-    "max-params": {
-      "count": 2
-    },
     "unicorn/consistent-boolean-name": {
-      "count": 7
+      "count": 5
     }
   },
   "packages/contracts/src/ports/clock.ts": {
@@ -343,9 +337,6 @@
     "local/max-comment-run": {
       "count": 14
     },
-    "max-params": {
-      "count": 1
-    },
     "unicorn/consistent-boolean-name": {
       "count": 3
     }
@@ -374,9 +365,6 @@
       "count": 1
     },
     "max-lines-per-function": {
-      "count": 1
-    },
-    "max-params": {
       "count": 1
     },
     "max-statements": {
@@ -1016,9 +1004,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "max-params": {
-      "count": 1
     }
   },
   "packages/web/src/list/expansion.test.tsx": {
@@ -1141,9 +1126,6 @@
   "packages/web/src/test-support/list-fixtures.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "max-params": {
-      "count": 1
     }
   },
   "packages/web/src/test-support/threshold-input.ts": {
@@ -1159,9 +1141,6 @@
   "packages/web/src/theme/tokens.ts": {
     "local/max-comment-run": {
       "count": 15
-    },
-    "max-params": {
-      "count": 1
     }
   },
   "packages/web/src/threshold/PayoutThreshold.tsx": {
@@ -1452,9 +1431,6 @@
   "tools/dts-specifiers/rewrite-dts-specifiers.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "max-params": {
-      "count": 1
     }
   },
   "tools/lint-on-edit/lint-on-edit.e2e.test.ts": {

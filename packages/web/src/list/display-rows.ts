@@ -151,10 +151,17 @@ function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, r
  */
 function craftedDetail(
   row: CraftedRankedRow,
-  entries: readonly KeyedEntry[],
-  byKey: ReadonlyMap<string, DatasetEntry>,
-  { stats, activeLeague }: CraftedContext,
-  now: number,
+  {
+    entries,
+    byKey,
+    crafted: { stats, activeLeague },
+    now,
+  }: {
+    readonly entries: readonly KeyedEntry[];
+    readonly byKey: ReadonlyMap<string, DatasetEntry>;
+    readonly crafted: CraftedContext;
+    readonly now: number;
+  },
 ): Pick<ClassDisplayRow, 'chase' | 'combinations'> {
   const tracked = new Map(entries.map((keyed) => [keyed.entryKey, keyed.entry]));
   const summandKeys = new Set(row.summands.map((summand) => summand.entryKey));
@@ -252,7 +259,7 @@ export function toDisplayRows(
             : { kind: 'figure', text: formatDivine(row.ev) },
         age: undefined,
         provenance: row.provenance,
-        ...craftedDetail(row, classes.get(row.classKey) ?? [], byKey, crafted, now),
+        ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey, crafted, now }),
       };
     }
     return {

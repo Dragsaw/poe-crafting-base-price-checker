@@ -42,7 +42,7 @@ const SPECIFIER =
 export function rewriteDtsSpecifiers(text: string): string {
   return text.replaceAll(
     SPECIFIER,
-    (match, lead: string, quote: string, stem: string, extension: string) => {
+    (match, ...[lead, quote, stem, extension]: [string, string, string, string]) => {
       // `./types.d.ts` names a declaration file and is left as written.
       return stem.endsWith('.d') ? match : `${lead}${quote}${stem}.${EXTENSION_MAP[extension]}${quote}`;
     },

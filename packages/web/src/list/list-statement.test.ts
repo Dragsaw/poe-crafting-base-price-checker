@@ -39,9 +39,9 @@ describe('listStatement', () => {
     const statement = statementFor(
       [belt, ring, amulet],
       [
-        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
-        priced(amulet, 2, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
+        priced(amulet, 2, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       ],
     );
     expect(statement).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
@@ -58,8 +58,8 @@ describe('listStatement', () => {
   it('is honest-empty when no-listings and not-yet-synced rows mix', () => {
     const tracked = [belt, ring, amulet];
     const dataset = [
-      priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
-      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+      priced(belt, 1.5, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
+      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
     ];
     const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weights: undefined });
@@ -75,7 +75,7 @@ describe('listStatement', () => {
       [belt, ring, amulet],
       [
         priced(belt, 1.5, hoursBefore(NOW, 1)),
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       ],
     );
     expect(statement).toEqual({ kind: 'none' });

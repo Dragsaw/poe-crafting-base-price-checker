@@ -117,7 +117,7 @@ describe('contains (§1)', () => {
     const clipped = tier([line(STAT, [45, 50])], 100);
     const inside = tier([line(STAT, [51, 55])], 300);
     expect(contains(band(47, 50), clipped)).toBe(false);
-    const p = pOf(affixProbability(pools([clipped, inside], [tier([line(OTHER)], 1)]), 'prefix', band(47, 55), 82, 0));
+    const p = pOf(affixProbability(pools([clipped, inside], [tier([line(OTHER)], 1)]), 'prefix', band(47, 55), { itemLevelMin: 82, modifierLevelMin: 0 }));
     expect(p).toBe(300 / 400);
   });
 
@@ -125,7 +125,7 @@ describe('contains (§1)', () => {
     const t7 = tier([line(STAT, [34, 44], [52, 69])], 200);
     const t8 = tier([line(STAT, [56, 80])], 100);
     const outside = tier([line(STAT, [81, 90])], 700);
-    const p = pOf(affixProbability(pools([t7, t8, outside], []), 'prefix', band(43, 80), 82, 0));
+    const p = pOf(affixProbability(pools([t7, t8, outside], []), 'prefix', band(43, 80), { itemLevelMin: 82, modifierLevelMin: 0 }));
     expect(p).toBeCloseTo(300 / 1000, 10);
   });
 
@@ -146,7 +146,7 @@ describe('contains (§1)', () => {
     // Two lines of one statId: the schema refuses it, and the weight still counts once.
     const doubled = tier([line(STAT, [10, 12]), line(STAT, [11, 12])], 50);
     const rest = tier([line(STAT, [20, 30])], 850);
-    const p = pOf(affixProbability(pools([hybridTier, doubled, rest], []), 'prefix', band(10, 12), 82, 0));
+    const p = pOf(affixProbability(pools([hybridTier, doubled, rest], []), 'prefix', band(10, 12), { itemLevelMin: 82, modifierLevelMin: 0 }));
     expect(p).toBeCloseTo(150 / 1000, 10);
   });
 
@@ -154,7 +154,7 @@ describe('contains (§1)', () => {
     const unresolved = tier([unresolvedLine([10, 12])], 500);
     const hit = tier([line(STAT, [10, 12])], 500);
     expect(contains(band(10, 12), unresolved)).toBe(false);
-    expect(pOf(affixProbability(pools([unresolved, hit], []), 'prefix', band(10, 12), 82, 0))).toBe(0.5);
+    expect(pOf(affixProbability(pools([unresolved, hit], []), 'prefix', band(10, 12), { itemLevelMin: 82, modifierLevelMin: 0 }))).toBe(0.5);
   });
 
   it('never contains a weight-0 tier, not-in-game or published, whatever its lines carry', () => {
@@ -213,7 +213,7 @@ describe('eligible (§9)', () => {
 
   it('gives empty-eligible-pool, never 0, for a recipe floor above the entry floor', () => {
     const classPools = pools(pool.entries, pool.entries);
-    expect(affixProbability(classPools, 'suffix', band(1, 8), 65, 70)).toEqual({
+    expect(affixProbability(classPools, 'suffix', band(1, 8), { itemLevelMin: 65, modifierLevelMin: 70 })).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'suffix' },
     });
@@ -228,7 +228,7 @@ describe('eligible (§9)', () => {
     const zeroB = { ...tier([line(STAT, [3, 4])], 0), weightSource: 'not-in-game' as const };
     const live = tier([line(OTHER, [1, 2])], 100);
     const classPools = pools([zeroA, zeroB], [live]);
-    expect(affixProbability(classPools, 'prefix', band(1, 4), 82, 0)).toEqual({
+    expect(affixProbability(classPools, 'prefix', band(1, 4), { itemLevelMin: 82, modifierLevelMin: 0 })).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
@@ -342,8 +342,8 @@ describe('combinationProbability (§11)', () => {
           `precondition failed: no modGroup spans both eligible slots, but ${entry.categoryId}/${entry.className} shares ${shared[0]?.modGroup ?? ''}; the product check does not apply`,
         );
       }
-      const pPrefix = pOf(affixProbability(lookup.pools, 'prefix', entry.prefix, entry.itemLevelMin, 0));
-      const pSuffix = pOf(affixProbability(lookup.pools, 'suffix', entry.suffix, entry.itemLevelMin, 0));
+      const pPrefix = pOf(affixProbability(lookup.pools, 'prefix', entry.prefix, { itemLevelMin: entry.itemLevelMin, modifierLevelMin: 0 }));
+      const pSuffix = pOf(affixProbability(lookup.pools, 'suffix', entry.suffix, { itemLevelMin: entry.itemLevelMin, modifierLevelMin: 0 }));
       const p = pOf(combinationProbability(lookup.pools, entry, 0));
       if (!isCloseRelative(p, pPrefix * pSuffix)) {
         throw new Error(`${JSON.stringify(entry)}: ${String(p)} != ${String(pPrefix * pSuffix)}`);
@@ -361,9 +361,9 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const rest = tier([line(THIRD, [1, 2])], 350);
     const classPools = pools([h1, h2, pure1, pure2, rest], []);
     const reference = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
-    expect(pOf(affixProbability(classPools, 'prefix', reference, 82, 0))).toBeCloseTo(150 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', reference, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(150 / 1000, 10);
     // The single-line band on the shared statId still admits both families (§1's existential test).
-    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), 82, 0))).toBeCloseTo(650 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(650 / 1000, 10);
   });
 
   it('does not contain a tier whose line set is a superset of the reference statIds', () => {
@@ -380,8 +380,8 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const referenceAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
     expect(contains(referenceAB, ac)).toBe(false);
     expect(contains(referenceAC, ab)).toBe(false);
-    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, 82, 0))).toBeCloseTo(100 / 1000, 10);
-    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, 82, 0))).toBeCloseTo(300 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(100 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(300 / 1000, 10);
   });
 
   it('computes the two-order sum by hand for a hybrid prefix and a suffix in its modGroup', () => {
@@ -424,7 +424,7 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     expect(contains(reference, zero)).toBe(false);
     const classPools = pools([zero, live, rest], []);
     expect(eligible(classPools.prefix, 82, 0)).toContain(zero);
-    expect(pOf(affixProbability(classPools, 'prefix', reference, 82, 0))).toBe(100 / 400);
+    expect(pOf(affixProbability(classPools, 'prefix', reference, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBe(100 / 400);
   });
 
   it('applies the null-line rule: untrackable reads the entry and its pool coverage alone', () => {

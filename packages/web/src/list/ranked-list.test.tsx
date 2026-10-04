@@ -230,8 +230,8 @@ describe('the unpriced trail', () => {
         [active, oldTry, recentTry],
         [
           { ...priced(active, 1, hoursBefore(NOW, 72)), lastAttemptedAt: hoursBefore(NOW, 1) },
-          priced(oldTry, 0.9, hoursBefore(NOW, 96), 'Standard'),
-          { ...priced(recentTry, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'), lastAttemptedAt: hoursBefore(NOW, 2) },
+          priced(oldTry, 0.9, hoursBefore(NOW, 96), { league: 'Standard' }),
+          { ...priced(recentTry, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }), lastAttemptedAt: hoursBefore(NOW, 2) },
         ],
       ),
     );

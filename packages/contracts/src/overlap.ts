@@ -123,6 +123,12 @@ function linesIntersect(x: ModifierReference, y: ModifierReference, shared: read
   });
 }
 
+export interface SlotOverlapOptions {
+  readonly slot: OverlapSlot;
+  readonly coOccur: CoOccur;
+  readonly summed?: ReadonlySet<string>;
+}
+
 /**
  * The branch that made the slot overlap, or `undefined` when the slot does
  * not overlap (§2.1 `slotOverlap(x, y, S)`, branches in order). A reference
@@ -135,9 +141,7 @@ function linesIntersect(x: ModifierReference, y: ModifierReference, shared: read
 export function slotOverlapBranch(
   x: ModifierReference,
   y: ModifierReference,
-  slot: OverlapSlot,
-  coOccur: CoOccur,
-  summed: ReadonlySet<string> = NO_SUMMED,
+  { slot, coOccur, summed = NO_SUMMED }: SlotOverlapOptions,
 ): SlotOverlapBranch | undefined {
   const outside = (reference: ModifierReference) => statIdsOf(reference).filter((statId) => !summed.has(statId));
   const ours = outside(x);
@@ -155,14 +159,8 @@ export function slotOverlapBranch(
   return coOccur(x, y, slot, summed) ? 'co-occur' : undefined;
 }
 
-export function slotOverlap(
-  x: ModifierReference,
-  y: ModifierReference,
-  slot: OverlapSlot,
-  coOccur: CoOccur,
-  summed: ReadonlySet<string> = NO_SUMMED,
-): boolean {
-  return slotOverlapBranch(x, y, slot, coOccur, summed) !== undefined;
+export function slotOverlap(x: ModifierReference, y: ModifierReference, options: SlotOverlapOptions): boolean {
+  return slotOverlapBranch(x, y, options) !== undefined;
 }
 
 /** `overlap(a, b)` (§2.1): both slots overlap outside `S`, and every sum in `S` intersects. */
@@ -212,11 +210,11 @@ export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: C
     }
     sums.push({ statId, a: left, b: right });
   }
-  const prefix = slotOverlapBranch(a.prefix, b.prefix, 'prefix', coOccur, summed);
+  const prefix = slotOverlapBranch(a.prefix, b.prefix, { slot: 'prefix', coOccur, summed });
   if (prefix === undefined) {
     return undefined;
   }
-  const suffix = slotOverlapBranch(a.suffix, b.suffix, 'suffix', coOccur, summed);
+  const suffix = slotOverlapBranch(a.suffix, b.suffix, { slot: 'suffix', coOccur, summed });
   return suffix === undefined ? undefined : { prefix, suffix, sums };
 }
 

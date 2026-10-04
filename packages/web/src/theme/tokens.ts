@@ -251,57 +251,62 @@ export interface TypeRole {
   readonly letterSpacing?: string;
 }
 
-function role(
-  stack: keyof typeof stacks,
-  fontSize: string,
-  fontWeight: TypeRole['fontWeight'],
-  lineHeight: string,
-  letterSpacing?: string,
-): TypeRole {
-  const base = { fontFamily: stacks[stack], fontSize, fontWeight, lineHeight };
-  return letterSpacing === undefined ? base : { ...base, letterSpacing };
+function roleIn(stack: keyof typeof stacks) {
+  return (
+    fontSize: string,
+    fontWeight: TypeRole['fontWeight'],
+    lineHeight: string,
+    letterSpacing?: string,
+  ): TypeRole => {
+    const base = { fontFamily: stacks[stack], fontSize, fontWeight, lineHeight };
+    return letterSpacing === undefined ? base : { ...base, letterSpacing };
+  };
 }
 
+const sans = roleIn('sans');
+const serif = roleIn('serif');
+const mono = roleIn('mono');
+
 export const typeRoles = {
-  eyebrow: role('sans', '10px', '600', '1.4', '0.22em'),
-  'masthead-title': role('serif', '38px', '400', '1.15', '-0.012em'),
-  dek: role('serif', '14px', '400', '1.5'),
-  'threshold-label': role('sans', '9.5px', '600', '1.2', '0.16em'),
-  'threshold-value': role('serif', '32px', '400', '1.05'),
-  'threshold-value-unit': role('serif', '13px', '400', '1.2'),
-  'threshold-range': role('sans', '9.5px', '400', '1.2'),
-  'recipe-label': role('sans', '9.5px', '600', '1.2', '0.16em'),
-  'recipe-option': role('serif', '15px', '400', '1.25'),
-  'recipe-cost-figure': role('serif', '13px', '400', '1.2'),
-  'recipe-cost': role('sans', '9.5px', '400', '1.2'),
-  'trust-strip': role('sans', '11.5px', '400', '1.85'),
-  'asking-note': role('serif', '12.5px', '400', '1.4'),
-  'column-header': role('sans', '9.5px', '600', '1.2', '0.2em'),
-  'row-rank': role('serif', '12px', '400', '1.2'),
-  'row-unit-name': role('serif', '14px', '400', '1.2'),
-  'row-unit-glyph': role('sans', '11.5px', '400', '1.2'),
-  'row-ev': role('serif', '14px', '400', '1.2'),
-  'row-mark': role('sans', '10px', '600', '1.2'),
-  'row-chase': role('sans', '10.5px', '400', '1.2'),
-  'money-phrase': role('sans', '10.5px', '400', '1.2'),
-  'appendix-title': role('serif', '18px', '400', '1.2'),
-  'appendix-lead': role('sans', '11.5px', '400', '1.55'),
-  'appendix-row': role('serif', '13px', '400', '1.2'),
-  'key-heading': role('sans', '9.5px', '600', '1.2', '0.18em'),
-  'key-body': role('sans', '10.5px', '400', '1.85'),
+  eyebrow: sans('10px', '600', '1.4', '0.22em'),
+  'masthead-title': serif('38px', '400', '1.15', '-0.012em'),
+  dek: serif('14px', '400', '1.5'),
+  'threshold-label': sans('9.5px', '600', '1.2', '0.16em'),
+  'threshold-value': serif('32px', '400', '1.05'),
+  'threshold-value-unit': serif('13px', '400', '1.2'),
+  'threshold-range': sans('9.5px', '400', '1.2'),
+  'recipe-label': sans('9.5px', '600', '1.2', '0.16em'),
+  'recipe-option': serif('15px', '400', '1.25'),
+  'recipe-cost-figure': serif('13px', '400', '1.2'),
+  'recipe-cost': sans('9.5px', '400', '1.2'),
+  'trust-strip': sans('11.5px', '400', '1.85'),
+  'asking-note': serif('12.5px', '400', '1.4'),
+  'column-header': sans('9.5px', '600', '1.2', '0.2em'),
+  'row-rank': serif('12px', '400', '1.2'),
+  'row-unit-name': serif('14px', '400', '1.2'),
+  'row-unit-glyph': sans('11.5px', '400', '1.2'),
+  'row-ev': serif('14px', '400', '1.2'),
+  'row-mark': sans('10px', '600', '1.2'),
+  'row-chase': sans('10.5px', '400', '1.2'),
+  'money-phrase': sans('10.5px', '400', '1.2'),
+  'appendix-title': serif('18px', '400', '1.2'),
+  'appendix-lead': sans('11.5px', '400', '1.55'),
+  'appendix-row': serif('13px', '400', '1.2'),
+  'key-heading': sans('9.5px', '600', '1.2', '0.18em'),
+  'key-body': sans('10.5px', '400', '1.85'),
   /** The sync report panel's verbatim register: `key-body`'s size, weight and line height in the mono stack. */
-  'sync-report-verbatim': role('mono', '10.5px', '400', '1.85'),
-  'running-foot': role('sans', '11px', '400', '1.5'),
-  'panel-title': role('serif', '20px', '400', '1.2'),
-  'panel-sub': role('sans', '11.5px', '400', '1.5'),
-  'detail-row': role('serif', '12.5px', '400', '1.2'),
-  'detail-meta': role('sans', '10.5px', '400', '1.2'),
-  'combination-line-2': role('sans', '10.5px', '400', '20px'),
-  'tombstone-band-label': role('sans', '9.5px', '600', '1.2', '0.16em'),
-  'expand-affordance': role('sans', '12.5px', '400', '1.5'),
-  'banner-lead': role('serif', '13.5px', '700', '1.35'),
-  'banner-body': role('serif', '12.5px', '400', '1.4'),
-  'failure-body': role('serif', '15px', '400', '1.55'),
+  'sync-report-verbatim': mono('10.5px', '400', '1.85'),
+  'running-foot': sans('11px', '400', '1.5'),
+  'panel-title': serif('20px', '400', '1.2'),
+  'panel-sub': sans('11.5px', '400', '1.5'),
+  'detail-row': serif('12.5px', '400', '1.2'),
+  'detail-meta': sans('10.5px', '400', '1.2'),
+  'combination-line-2': sans('10.5px', '400', '20px'),
+  'tombstone-band-label': sans('9.5px', '600', '1.2', '0.16em'),
+  'expand-affordance': sans('12.5px', '400', '1.5'),
+  'banner-lead': serif('13.5px', '700', '1.35'),
+  'banner-body': serif('12.5px', '400', '1.4'),
+  'failure-body': serif('15px', '400', '1.55'),
 } as const satisfies Record<string, TypeRole>;
 
 export type TypeRoleName = keyof typeof typeRoles;

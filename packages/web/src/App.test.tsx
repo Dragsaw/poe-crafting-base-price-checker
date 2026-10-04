@@ -866,9 +866,9 @@ describe('the list statement', () => {
       bodiesWith(
         [belt, ring, amulet],
         [
-          priced(belt, 1.5, hoursBefore(now, 30 * 24), 'Standard'),
-          priced(ring, 0.8, hoursBefore(now, 30 * 24), 'Standard'),
-          priced(amulet, 2, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(belt, 1.5, hoursBefore(now, 30 * 24), { league: 'Standard' }),
+          priced(ring, 0.8, hoursBefore(now, 30 * 24), { league: 'Standard' }),
+          priced(amulet, 2, hoursBefore(now, 30 * 24), { league: 'Standard' }),
         ],
       ),
     );
@@ -909,8 +909,8 @@ describe('the list statement', () => {
       bodiesWith(
         [belt, ring, amulet],
         [
-          priced(belt, 1.5, hoursBefore(now, 30 * 24), 'Standard'),
-          priced(ring, 0.8, hoursBefore(now, 30 * 24), 'Standard'),
+          priced(belt, 1.5, hoursBefore(now, 30 * 24), { league: 'Standard' }),
+          priced(ring, 0.8, hoursBefore(now, 30 * 24), { league: 'Standard' }),
           unpriced(amulet, { state: 'no-listings' }, hoursBefore(now, 2)),
         ],
       ),
@@ -945,7 +945,7 @@ describe('the list statement', () => {
     serveBodies(
       bodiesWith(
         [belt, ring],
-        [priced(belt, 1.5, hoursBefore(now, 1)), priced(ring, 0.8, hoursBefore(now, 30 * 24), 'Standard')],
+        [priced(belt, 1.5, hoursBefore(now, 1)), priced(ring, 0.8, hoursBefore(now, 30 * 24), { league: 'Standard' })],
       ),
     );
     mount();
@@ -1269,7 +1269,7 @@ describe('the interaction surface', () => {
     const bodies = bodiesWith(
       [...filler, craftedEntry('Bows', 'weapon.bow'), craftedEntry('Wands', 'weapon.wand')],
       filler.map((entry, index) =>
-        priced(entry, 1 + index / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(index)}`, league: TEST_LEAGUE }),
+        priced(entry, 1 + index / 10, hoursBefore(now, 1), { search: { id: `search${String(index)}`, league: TEST_LEAGUE } }),
       ),
     );
     const requests = serveArtifacts(server, {

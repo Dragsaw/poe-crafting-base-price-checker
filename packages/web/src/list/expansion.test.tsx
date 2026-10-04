@@ -103,7 +103,7 @@ describe('the expansion panel', () => {
 
   it('cuts the combination row into 460 + 250 + 116 + 116 + 24 and 560 + 200 + 206, at 28 + 20 minimum', () => {
     const belt = rawEntry('Wide Belt');
-    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH));
+    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), { search: SEARCH }));
     const widths = (line: string): number[] =>
       Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => cssNumber(c.style.width));
     expect(widths('1')).toEqual([...columnSums.combinationLine1]);
@@ -120,7 +120,7 @@ describe('the expansion panel', () => {
 
   it('never truncates, ellipsises or tooltips inside a combination row, and line two wraps', () => {
     const belt = rawEntry('Wide Belt');
-    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH));
+    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), { search: SEARCH }));
     for (const node of [row, ...row.querySelectorAll<HTMLElement>('*')]) {
       expect(node.style.textOverflow).toBe('');
       expect(node.style.overflow).toBe('');
@@ -135,7 +135,7 @@ describe('the Raw Base combination row', () => {
   it('prints a priced raw entry: ● priced, 0.80, 10 listings, the raw note, both ages and ↗', () => {
     const belt = rawEntry('Wide Belt', 82);
     const row = openOne(belt, {
-      ...priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH),
+      ...priced(belt, 0.8, hoursBefore(NOW, 11), { search: SEARCH }),
       lastAttemptedAt: hoursBefore(NOW, 11),
     });
     expect(line1(row)).toEqual(['no affixes', `${glyphs.priced}\u{A0}priced`, '0.80', '10 listings']);
@@ -225,7 +225,7 @@ describe('the Raw Base combination row', () => {
   // Matrix: league mismatch, and an old-league search.
   it('prints a league mismatch with its reason and the state-6 note, and blanks an old-league link', () => {
     const amulet = rawEntry('Jade Amulet');
-    const row = openOne(amulet, priced(amulet, 3, hoursBefore(NOW, 50), 'Standard', { id: 'old', league: 'Standard' }));
+    const row = openOne(amulet, priced(amulet, 3, hoursBefore(NOW, 50), { league: 'Standard', search: { id: 'old', league: 'Standard' } }));
     expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · league-mismatch`);
     expect(line2(row)).toEqual(['the observation belongs to another league', '', 'tried 2d ago']);
     const blank = cell(row, 'trade-link');
@@ -330,7 +330,7 @@ describe('the trade link', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     const openSpy = vi.spyOn(globalThis, 'open').mockImplementation(() => null); // eslint-disable-line unicorn/no-null -- boundary: `window.open` is typed to return `WindowProxy | null`, so the stub must return null.
     const belt = rawEntry('Wide Belt');
-    const view = mountList([belt], [priced(belt, 0.8, hoursBefore(NOW, 1), TEST_LEAGUE, SEARCH)]);
+    const view = mountList([belt], [priced(belt, 0.8, hoursBefore(NOW, 1), { search: SEARCH })]);
     click(rowsIn(view)[0]);
     const link = view.querySelector<HTMLAnchorElement>('[data-cell="trade-link"] a');
     document.addEventListener('click', stop);
@@ -348,7 +348,7 @@ describe('the trade link', () => {
   // Matrix: league with spaces.
   it('encodes the league segment alone', () => {
     const belt = rawEntry('Wide Belt');
-    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 1), TEST_LEAGUE, { id: 'A/b+c', league: TEST_LEAGUE }));
+    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 1), { search: { id: 'A/b+c', league: TEST_LEAGUE } }));
     expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(
       'https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/A/b+c',
     );

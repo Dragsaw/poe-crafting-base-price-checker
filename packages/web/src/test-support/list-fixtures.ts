@@ -59,8 +59,7 @@ export function priced(
   entry: TrackedEntry,
   priceDivine: number,
   observedAt: string,
-  league: string = TEST_LEAGUE,
-  search?: StoredSearch,
+  { league = TEST_LEAGUE, search }: { readonly league?: string; readonly search?: StoredSearch } = {},
 ): DatasetEntry {
   return {
     ...searchFields(search),

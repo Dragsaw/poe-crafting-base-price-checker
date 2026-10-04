@@ -87,10 +87,17 @@ const FILTERS = {
 function tier(
   slot: string,
   moduleGroup: string,
-  itemLevelMin: number,
-  tierLabel: string,
-  text: string,
-  lines: readonly { statId: string | null; ranges: number[][] }[],
+  {
+    itemLevelMin,
+    tierLabel,
+    text,
+    lines,
+  }: {
+    readonly itemLevelMin: number;
+    readonly tierLabel: string;
+    readonly text: string;
+    readonly lines: readonly { statId: string | null; ranges: number[][] }[];
+  },
 ): Record<string, unknown> {
   return {
     sourceModifierId: `${slot}\0${moduleGroup}\0${String(itemLevelMin)}\0${text}`,
@@ -120,20 +127,20 @@ const WEIGHTS = WeightsFileSchema.parse({
           poolCoverage: 'complete',
           // Out of order on purpose: `tiers` sorts by itemLevelMin.
           entries: [
-            tier('prefix', 'BaseSpirit', 25, 'T2', '+# to Spirit', [{ statId: SPIRIT, ranges: [[34, 37]] }]),
-            tier('prefix', 'BaseSpirit', 16, 'T3', '+# to Spirit', [{ statId: SPIRIT, ranges: [[30, 33]] }]),
-            tier('prefix', 'BaseSpirit', 54, 'T1', '+# to Spirit', [{ statId: SPIRIT, ranges: [[47, 50]] }]),
-            tier('prefix', 'IncreasedLife', 1, 'T1', '+# to maximum Life', [{ statId: LIFE, ranges: [[10, 19]] }]),
+            tier('prefix', 'BaseSpirit', { itemLevelMin: 25, tierLabel: 'T2', text: '+# to Spirit', lines: [{ statId: SPIRIT, ranges: [[34, 37]] }] }),
+            tier('prefix', 'BaseSpirit', { itemLevelMin: 16, tierLabel: 'T3', text: '+# to Spirit', lines: [{ statId: SPIRIT, ranges: [[30, 33]] }] }),
+            tier('prefix', 'BaseSpirit', { itemLevelMin: 54, tierLabel: 'T1', text: '+# to Spirit', lines: [{ statId: SPIRIT, ranges: [[47, 50]] }] }),
+            tier('prefix', 'IncreasedLife', { itemLevelMin: 1, tierLabel: 'T1', text: '+# to maximum Life', lines: [{ statId: LIFE, ranges: [[10, 19]] }] }),
           ],
         },
         suffix: {
           poolCoverage: 'complete',
           entries: [
-            tier('suffix', 'SpiritSuffix', 40, 'T1', '+# to Spirit', [{ statId: SPIRIT, ranges: [[5, 6]] }]),
+            tier('suffix', 'SpiritSuffix', { itemLevelMin: 40, tierLabel: 'T1', text: '+# to Spirit', lines: [{ statId: SPIRIT, ranges: [[5, 6]] }] }),
             // One modGroup, two mod families: two rows, not one hybrid.
-            tier('suffix', 'GemLevel', 41, 'T1', '+# to Level of all Melee Skills', [{ statId: MELEE, ranges: [[2, 2]] }]),
-            tier('suffix', 'GemLevel', 5, 'T2', '+# to Level of all Spell Skills', [{ statId: SPELL, ranges: [[1, 1]] }]),
-            tier('suffix', 'GemLevel', 41, 'T1', '+# to Level of all Spell Skills', [{ statId: SPELL, ranges: [[2, 2]] }]),
+            tier('suffix', 'GemLevel', { itemLevelMin: 41, tierLabel: 'T1', text: '+# to Level of all Melee Skills', lines: [{ statId: MELEE, ranges: [[2, 2]] }] }),
+            tier('suffix', 'GemLevel', { itemLevelMin: 5, tierLabel: 'T2', text: '+# to Level of all Spell Skills', lines: [{ statId: SPELL, ranges: [[1, 1]] }] }),
+            tier('suffix', 'GemLevel', { itemLevelMin: 41, tierLabel: 'T1', text: '+# to Level of all Spell Skills', lines: [{ statId: SPELL, ranges: [[2, 2]] }] }),
           ],
         },
       },
@@ -143,20 +150,20 @@ const WEIGHTS = WeightsFileSchema.parse({
         prefix: {
           poolCoverage: 'complete',
           entries: [
-            tier('prefix', 'BaseLocalDefencesAndLife', 33, 'T1', '#% increased Evasion Rating\n+# to maximum Life', [
+            tier('prefix', 'BaseLocalDefencesAndLife', { itemLevelMin: 33, tierLabel: 'T1', text: '#% increased Evasion Rating\n+# to maximum Life', lines: [
               { statId: EVASION, ranges: [[21, 26]] },
               { statId: LIFE, ranges: [[20, 23]] },
-            ]),
-            tier('prefix', 'BaseLocalDefencesAndLife', 16, 'T2', '#% increased Evasion Rating\n+# to maximum Life', [
+            ] }),
+            tier('prefix', 'BaseLocalDefencesAndLife', { itemLevelMin: 16, tierLabel: 'T2', text: '#% increased Evasion Rating\n+# to maximum Life', lines: [
               { statId: EVASION, ranges: [[14, 20]] },
               { statId: LIFE, ranges: [[11, 19]] },
-            ]),
-            tier('prefix', 'IncreasedLife', 1, 'T1', '+# to maximum Life', [{ statId: LIFE, ranges: [[10, 19]] }]),
+            ] }),
+            tier('prefix', 'IncreasedLife', { itemLevelMin: 1, tierLabel: 'T1', text: '+# to maximum Life', lines: [{ statId: LIFE, ranges: [[10, 19]] }] }),
           ],
         },
         suffix: {
           poolCoverage: 'complete',
-          entries: [tier('suffix', 'Thorns', 1, 'T1', '# to # Thorns', [{ statId: JSON_NULL, ranges: [] }])],
+          entries: [tier('suffix', 'Thorns', { itemLevelMin: 1, tierLabel: 'T1', text: '# to # Thorns', lines: [{ statId: JSON_NULL, ranges: [] }] })],
         },
       },
     },
@@ -376,7 +383,7 @@ const B = 'explicit.stat_b';
 
 function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
   const notInGame = {
-    ...tier('prefix', 'Dead', 1, 'T1', 'dead', [{ statId: JSON_NULL, ranges: [] }]),
+    ...tier('prefix', 'Dead', { itemLevelMin: 1, tierLabel: 'T1', text: 'dead', lines: [{ statId: JSON_NULL, ranges: [] }] }),
     weight: 0,
     weightSource: 'not-in-game',
   };
@@ -391,22 +398,22 @@ function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
             poolCoverage,
             entries: [
               // An internal engine line on a weight > 0 tier: one {A, B} family, not a second one.
-              tier('prefix', 'Hybrid', 10, 'T2', 'a b', [
+              tier('prefix', 'Hybrid', { itemLevelMin: 10, tierLabel: 'T2', text: 'a b', lines: [
                 { statId: A, ranges: [[1, 2]] },
                 { statId: B, ranges: [[3, 4]] },
-              ]),
-              tier('prefix', 'Hybrid', 20, 'T1', 'a b', [
+              ] }),
+              tier('prefix', 'Hybrid', { itemLevelMin: 20, tierLabel: 'T1', text: 'a b', lines: [
                 { statId: B, ranges: [[5, 6]] },
                 { statId: A, ranges: [[3, 4]] },
                 { statId: JSON_NULL, ranges: [] },
-              ]),
+              ] }),
               notInGame,
               // A mixed family: only the {A, null} tier is untrackable, and only in a partial pool.
-              tier('prefix', 'Mixed', 10, 'T2', 'a', [{ statId: A, ranges: [[1, 2]] }]),
-              tier('prefix', 'Mixed', 20, 'T1', 'a', [
+              tier('prefix', 'Mixed', { itemLevelMin: 10, tierLabel: 'T2', text: 'a', lines: [{ statId: A, ranges: [[1, 2]] }] }),
+              tier('prefix', 'Mixed', { itemLevelMin: 20, tierLabel: 'T1', text: 'a', lines: [
                 { statId: A, ranges: [[3, 4]] },
                 { statId: JSON_NULL, ranges: [] },
-              ]),
+              ] }),
             ],
           },
           suffix: { poolCoverage: 'complete', entries: [] },
