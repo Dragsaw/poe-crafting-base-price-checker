@@ -58,7 +58,7 @@ import { CATALOGUE_ITEMS_PATH } from './pricing/load-item-types.ts';
 import { MalformedRequestError } from './pricing/price-entry.ts';
 import { UnknownClassBaseTypeError } from './pricing/search-body.ts';
 import { createRequestCounter } from './request-counter.ts';
-import type { RequestsBySource } from './request-counter.ts';
+import type { RequestCounter, RequestsBySource } from './request-counter.ts';
 import {
   abortableSleep,
   createFetchHttpPort,
@@ -71,6 +71,7 @@ import type { PacingState } from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE } from './trade/endpoints.ts';
 import { evenIntervalMs } from './trade/ledger.ts';
 import { createSessionAuth } from './trade/session-auth.ts';
+import type { SessionAuth } from './trade/session-auth.ts';
 import { resolveUserAgent } from './trade/user-agent.ts';
 
 const PREFIX = 'pnpm sync:';
@@ -595,10 +596,109 @@ export interface SyncSessionDependencies extends SyncSessionPorts {
   readonly sleep: (ms: number, signal: AbortSignal) => Promise<void>;
 }
 
+/** What every iteration of the session loop shares. */
+interface SessionRuntime {
+  readonly ports: SyncSessionPorts;
+  readonly userAgent: string;
+  readonly pinnedMaxAgeMs: number;
+  readonly auth: SessionAuth;
+  readonly pacing: PacingState;
+  readonly requests: RequestCounter;
+  readonly waitPorts: WaitPorts;
+  readonly stdout: (line: string) => void;
+  readonly stderr: (line: string) => void;
+}
+
+/** Waits out the spread delay before a chunk, outside the lock. `true` when an abort ended it. */
+async function isAbortedDuringSpreadWait(runtime: SessionRuntime, isWithGate: boolean): Promise<boolean> {
+  const { pacing, waitPorts, stdout } = runtime;
+  const { clock, sleep: pause, signal } = waitPorts;
+  const delayMs = preWaitMs(pacing, clock.now(), isWithGate);
+  if (delayMs <= 0) {
+    return false;
+  }
+  stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
+  await pause(delayMs, signal);
+  return signal.aborted;
+}
+
+/** Runs one chunk bounded to one entry. A throw is printed and returned, never rethrown. */
+async function runSessionChunk(runtime: SessionRuntime, state: SessionState): Promise<ChunkResult> {
+  const { ports, auth, stdout, stderr } = runtime;
+  try {
+    const outcome = await composeChunk({
+      ...ports,
+      userAgent: runtime.userAgent,
+      pacing: runtime.pacing,
+      auth,
+      spread: true,
+      requests: runtime.requests,
+      session: {
+        maxEntries: 1,
+        pinnedMaxAgeMs: runtime.pinnedMaxAgeMs,
+        ...(state.passStart !== undefined && { requestsSince: state.passStart }),
+        ...(state.confirmedLeague !== undefined && { confirmedLeague: state.confirmedLeague }),
+      },
+    }).run();
+    stdout(`${PREFIX} ${describeOutcome(outcome)}`);
+    return { kind: 'outcome', outcome };
+  } catch (error_) {
+    // The governor already redacted what it passed on; this covers the rest (§13.6).
+    const error = auth.redact(error_);
+    stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
+    return { kind: 'error', error };
+  }
+}
+
+async function readChunkContext(
+  runtime: SessionRuntime,
+  result: ChunkResult,
+  ledgerBefore: PacingState['ledger'],
+  isWithGate: boolean,
+): Promise<ChunkContext> {
+  const { pacing, waitPorts } = runtime;
+  const now = waitPorts.clock.now();
+  const notBefore = await pendingNotBefore(waitPorts.fs, now);
+  return {
+    now,
+    ...(notBefore !== undefined && { notBefore }),
+    // The downgrade's in-place reset gives the ledger a new reference; it
+    // is no State reading (§13.4).
+    freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
+    evenIntervalMs: sessionEvenIntervalMs(pacing, isWithGate),
+  };
+}
+
+/** One pass of the session loop: pre-wait, one chunk, then the wait it earned. Returns the state after it. */
+async function runIteration(runtime: SessionRuntime, state: SessionState): Promise<SessionState> {
+  const { waitPorts, requests, pacing, stdout } = runtime;
+  const signature = await inputSignature(waitPorts.fs);
+  const isWithGate = isGateDue(state, signature);
+
+  if (await isAbortedDuringSpreadWait(runtime, isWithGate)) {
+    return state;
+  }
+
+  const before = requests.snapshot();
+  const ledgerBefore = pacing.ledger;
+  const result = await runSessionChunk(runtime, state);
+
+  const context = await readChunkContext(runtime, result, ledgerBefore, isWithGate);
+  const wait = nextWait(result, state, context);
+  const next = nextState(state, result, context, { signature, before });
+
+  if (wait.kind === 'none' || waitPorts.signal.aborted) {
+    return next;
+  }
+
+  stdout(`${PREFIX} ${describeWait(wait)}`);
+  await runWait(wait, waitPorts, signature);
+  return next;
+}
+
 /** The session: runs until `signal` aborts, then exits `0`. `1` only on a refusal before any request. */
 export async function syncSessionCommand(dependencies: SyncSessionDependencies): Promise<number> {
   const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = dependencies;
-  const { fs, clock } = ports;
 
   const arguments_ = parseArguments(argv);
   if (!arguments_.ok) {
@@ -617,72 +717,23 @@ export async function syncSessionCommand(dependencies: SyncSessionDependencies):
   // before the first request; a probe outcome from a chunk's governor
   // (IMPLEMENTATION-NOTES.md §13.1–§13.3, §13.5).
   const auth = createSessionAuth(env, { onSettle: (line) => stderr(`${PREFIX} ${line}`) });
-  const pacing = createPacingState();
-  const requests = createRequestCounter();
-  const waitPorts: WaitPorts = { fs, clock, sleep: pause, signal };
+  const runtime: SessionRuntime = {
+    ports,
+    userAgent: contact.userAgent,
+    pinnedMaxAgeMs: arguments_.options.pinnedMaxAgeMs,
+    auth,
+    pacing: createPacingState(),
+    requests: createRequestCounter(),
+    waitPorts: { fs: ports.fs, clock: ports.clock, sleep: pause, signal },
+    stdout,
+    stderr,
+  };
   let state = INITIAL_SESSION_STATE;
 
   try {
     /* eslint-disable no-await-in-loop -- sequential on purpose: one chunk per pass, and each pass reads the state the last one left */
     while (!signal.aborted) {
-      const signature = await inputSignature(fs);
-      const isWithGate = isGateDue(state, signature);
-
-      const delayMs = preWaitMs(pacing, clock.now(), isWithGate);
-      if (delayMs > 0) {
-        stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
-        await pause(delayMs, signal);
-        if (signal.aborted) {
-          break;
-        }
-      }
-
-      const before = requests.snapshot();
-      const ledgerBefore = pacing.ledger;
-      let result: ChunkResult;
-      try {
-        const outcome = await composeChunk({
-          ...ports,
-          userAgent: contact.userAgent,
-          pacing,
-          auth,
-          spread: true,
-          requests,
-          session: {
-            maxEntries: 1,
-            pinnedMaxAgeMs: arguments_.options.pinnedMaxAgeMs,
-            ...(state.passStart !== undefined && { requestsSince: state.passStart }),
-            ...(state.confirmedLeague !== undefined && { confirmedLeague: state.confirmedLeague }),
-          },
-        }).run();
-        result = { kind: 'outcome', outcome };
-        stdout(`${PREFIX} ${describeOutcome(outcome)}`);
-      } catch (error_) {
-        // The governor already redacted what it passed on; this covers the rest (§13.6).
-        const error = auth.redact(error_);
-        result = { kind: 'error', error };
-        stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
-      }
-
-      const now = clock.now();
-      const notBefore = await pendingNotBefore(fs, now);
-      const context: ChunkContext = {
-        now,
-        ...(notBefore !== undefined && { notBefore }),
-        // The downgrade's in-place reset gives the ledger a new reference; it
-        // is no State reading (§13.4).
-        freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
-        evenIntervalMs: sessionEvenIntervalMs(pacing, isWithGate),
-      };
-      const wait = nextWait(result, state, context);
-      state = nextState(state, result, context, { signature, before });
-
-      if (wait.kind === 'none' || signal.aborted) {
-        continue;
-      }
-
-      stdout(`${PREFIX} ${describeWait(wait)}`);
-      await runWait(wait, waitPorts, signature);
+      state = await runIteration(runtime, state);
     }
     /* eslint-enable no-await-in-loop -- end of the sequential block above */
   } finally {

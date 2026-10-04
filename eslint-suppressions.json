@@ -662,25 +662,10 @@
     }
   },
   "packages/sync/src/sync.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 15
     },
-    "max-depth": {
-      "count": 1
-    },
     "max-lines": {
-      "count": 1
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "max-statements": {
-      "count": 1
-    },
-    "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
