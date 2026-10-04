@@ -346,9 +346,6 @@
   "packages/core/src/cross-file.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/core/src/cross-file.ts": {
@@ -388,9 +385,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 6
     }
   },
   "packages/core/src/probability.ts": {
@@ -418,9 +412,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 16
     }
   },
   "packages/core/src/rank.ts": {
@@ -443,9 +434,6 @@
       "count": 1
     },
     "sonarjs/cognitive-complexity": {
-      "count": 1
-    },
-    "unicorn/no-null": {
       "count": 1
     },
     "unicorn/prefer-iterator-to-array": {

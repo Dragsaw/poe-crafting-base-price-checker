@@ -503,6 +503,7 @@ function craftedRow(
     recipeId: recipe.id,
     grossPayout,
     craftCost: cost.ok ? cost.divine : { kind: 'uncostable', currencyId: cost.reason.currencyId },
+    // eslint-disable-next-line unicorn/no-null -- boundary: `RankedRow.ev` is `z.number().nullable()` in the contracts schema.
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
     provenance,

@@ -79,6 +79,11 @@ function weightsWith(...classes: readonly (readonly [string, string, Coverage?, 
   };
 }
 
+// eslint-disable-next-line unicorn/no-null -- boundary: `RankInput.weights` is `WeightsFile | null`, the loaded set carries null for an absent file (AD-24).
+const NO_WEIGHTS: WeightsFile | null = null;
+
+const UNCOSTABLE = 'uncostable';
+
 /** Every crafted class these tests name by default, both slots `complete`. */
 const WEIGHTS = weightsWith(['accessory.amulet', 'Amulets'], ['weapon.bow', 'Bows']);
 
@@ -116,10 +121,10 @@ const priced = (priceDivine: number, league: string = LEAGUE): PriceState => ({
 function published(
   entry: TrackedEntry,
   price: PriceState,
-  /** `null` publishes no `lastAttemptedAt`; `undefined` would take the default. */
-  lastAttemptedAt: string | null = ATTEMPTED,
+  /** `false` publishes no `lastAttemptedAt`; `undefined` would take the default. */
+  lastAttemptedAt: string | false = ATTEMPTED,
 ): DatasetEntry {
-  return lastAttemptedAt === null
+  return lastAttemptedAt === false
     ? { entryKey: canonicalKey(entry), price }
     : { entryKey: canonicalKey(entry), price, lastAttemptedAt };
 }
@@ -165,7 +170,7 @@ describe('rank: the I/O matrix', () => {
 
   it('a priced row whose dataset entry has no lastAttemptedAt carries none', () => {
     const A = raw('A');
-    const result = ranked({ tracked: [A], dataset: [published(A, priced(0.5), null)] });
+    const result = ranked({ tracked: [A], dataset: [published(A, priced(0.5), false)] });
     expect(keysOf(result.ordering)).toEqual([canonicalKey(A)]);
     expect(result.ordering[0]).not.toHaveProperty('lastAttemptedAt');
   });
@@ -227,7 +232,7 @@ describe('rank: the I/O matrix', () => {
       tracked: [N, U, X],
       dataset: [
         published(N, { state: 'no-listings' }),
-        published(U, { state: 'unresolvable' }, null),
+        published(U, { state: 'unresolvable' }, false),
         published(X, { state: 'not-yet-synced', reason: 'no-exchange-rate' }),
       ],
     });
@@ -382,7 +387,7 @@ function matrixInput(): RankInput {
       published(entries.below, priced(0.1)),
       published(entries.oldLeague, priced(0.5, OLD_LEAGUE)),
       published(entries.noListings, { state: 'no-listings' }),
-      published(entries.unresolvable, { state: 'unresolvable' }, null),
+      published(entries.unresolvable, { state: 'unresolvable' }, false),
       published(entries.noRate, { state: 'not-yet-synced', reason: 'no-exchange-rate' }),
       published(entries.pruned, priced(0.5)),
       published(entries.tieA, priced(0.5)),
@@ -423,7 +428,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('names every crafted class, reason verbatim, when no weights envelope is loaded', () => {
     const result = ranked({
       tracked: [craftedOf('weapon.bow', 'Bows'), craftedOf('accessory.amulet', 'Amulets'), raw('A')],
-      weights: null,
+      weights: NO_WEIGHTS,
     });
     expect(result.unrankable).toEqual([
       { categoryId: 'accessory.amulet', className: 'Amulets', reason: ABSENT },
@@ -479,7 +484,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('makes one class of two crafted entries on one (categoryId, className)', () => {
     const result = ranked({
       tracked: [craftedOf('weapon.bow', 'Bows', 'active', 54), craftedOf('weapon.bow', 'Bows', 'pinned', 82)],
-      weights: null,
+      weights: NO_WEIGHTS,
     });
     expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: ABSENT }]);
   });
@@ -487,7 +492,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('keeps two classes that share a className but not a categoryId, breaking on categoryId', () => {
     const result = ranked({
       tracked: [craftedOf('armour.chest', 'Body Armours'), craftedOf('armour.chest.alt', 'Body Armours')],
-      weights: null,
+      weights: NO_WEIGHTS,
     });
     expect(result.unrankable.map((item) => item.categoryId)).toEqual(['armour.chest', 'armour.chest.alt']);
   });
@@ -499,7 +504,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
         craftedOf('weapon.staff', 'Staves', 'pruned'),
         craftedOf('weapon.staff', 'Staves', 'active'),
       ],
-      weights: null,
+      weights: NO_WEIGHTS,
     });
     expect(result.unrankable.map((item) => item.className)).toEqual(['Staves']);
   });
@@ -507,7 +512,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('holds no class for a raw-only Tracked List, and leaves the raw branch unchanged', () => {
     const A = raw('A');
     const input = { tracked: [A], dataset: [published(A, priced(0.5))] };
-    const absent = ranked({ ...input, weights: null });
+    const absent = ranked({ ...input, weights: NO_WEIGHTS });
     expect(absent.unrankable).toEqual([]);
     expect(absent).toEqual(ranked({ ...input, weights: WEIGHTS }));
   });
@@ -515,7 +520,7 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
   it('sorts by className in UTF-8 code-unit order, not locale order', () => {
     const result = ranked({
       tracked: [craftedOf('c.b', 'bows'), craftedOf('c.a', 'Wands'), craftedOf('c.c', 'Amulets')],
-      weights: null,
+      weights: NO_WEIGHTS,
     });
     expect(result.unrankable.map((item) => item.className)).toEqual(['Amulets', 'Wands', 'bows']);
   });
@@ -555,9 +560,9 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       craftedOf('weapon.staff', 'Staves', 'pruned'),
       raw('A'),
     ];
-    const expected = ranked({ tracked, weights: null });
+    const expected = ranked({ tracked, weights: NO_WEIGHTS });
     for (const seed of [1, 7, 42]) {
-      expect(ranked({ tracked: permute(tracked, seed), weights: null })).toEqual(expected);
+      expect(ranked({ tracked: permute(tracked, seed), weights: NO_WEIGHTS })).toEqual(expected);
     }
   });
 });
@@ -840,7 +845,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
   });
 
   it('a class-level reason holds under every recipe, with no recipe id and no crafted row', () => {
-    const result = rankCrafted({ tracked: [chase('Bows')], weights: null });
+    const result = rankCrafted({ tracked: [chase('Bows')], weights: NO_WEIGHTS });
     expect(craftedRows(result.ordering)).toEqual([]);
     expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: ABSENT }]);
   });
@@ -854,9 +859,9 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
       currencyRates: RATES.slice(0, 2),
     });
     expect(reset.pricedInLeague).toBe(false);
-    expect(craftedRows(reset.ordering).map((row) => [row.recipeId, row.ev])).toEqual([
+    expect(craftedRows(reset.ordering).map((row) => [row.recipeId, row.ev ?? UNCOSTABLE])).toEqual([
       ['greater', -GREATER_COST],
-      ['perfect', null],
+      ['perfect', UNCOSTABLE],
     ]);
     expect(reset.uncostableRecipes.map((item) => item.recipeId)).toEqual(['perfect']);
   });
@@ -915,9 +920,9 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
       recipes: [GREATER],
       currencyRates: [],
     });
-    expect(craftedRows(result.ordering).map((row) => [row.className, row.grossPayout, row.ev])).toEqual([
-      ['Staves', 0 + 0.1 * 3, null],
-      ['Bows', 0 + 0.1 * 1, null],
+    expect(craftedRows(result.ordering).map((row) => [row.className, row.grossPayout, row.ev ?? UNCOSTABLE])).toEqual([
+      ['Staves', 0 + 0.1 * 3, UNCOSTABLE],
+      ['Bows', 0 + 0.1 * 1, UNCOSTABLE],
     ]);
   });
 
@@ -1089,7 +1094,7 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
         tracked: [target, filler, low],
         dataset: [
           published(filler, { state: 'no-listings' }, '2026-09-25T00:00:00Z'),
-          published(low, { state: 'no-listings' }, null),
+          published(low, { state: 'no-listings' }, false),
           published(target, { state: 'no-listings' }, '2026-09-20T00:00:00Z'),
         ],
         recipes: [GREATER],

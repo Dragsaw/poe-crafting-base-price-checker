@@ -66,6 +66,9 @@ const line = (statId: string | null, ...ranges: (readonly [number, number])[]): 
   ranges: ranges.map(([min, max]) => [min, max] as [number, number]),
 });
 
+// eslint-disable-next-line unicorn/no-null -- boundary: the weights file schema allows a null `statId` for an unresolved line (WEIGHTS-FILE-SCHEMA).
+const unresolvedLine = (...ranges: (readonly [number, number])[]): WeightsLine => line(null, ...ranges);
+
 const band = (valueMin: number, valueMax: number, statId = STAT): ModifierRef => ({
   kind: 'banded',
   statId,
@@ -148,7 +151,7 @@ describe('contains (§1)', () => {
   });
 
   it('never contains a null-statId line, whose entry stays in the denominator', () => {
-    const unresolved = tier([line(null, [10, 12])], 500);
+    const unresolved = tier([unresolvedLine([10, 12])], 500);
     const hit = tier([line(STAT, [10, 12])], 500);
     expect(contains(band(10, 12), unresolved)).toBe(false);
     expect(pOf(affixProbability(pools([unresolved, hit], []), 'prefix', band(10, 12), 82, 0))).toBe(0.5);
@@ -400,7 +403,7 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
   });
 
   it('contains a weight > 0 tier whose null line is an internal engine line in a complete pool', () => {
-    const engine = tier([line(STAT, [10, 12]), line(null), line(OTHER, [4, 6])], 100);
+    const engine = tier([line(STAT, [10, 12]), unresolvedLine(), line(OTHER, [4, 6])], 100);
     expect(lineSet(engine)).toEqual([STAT, OTHER]);
     expect(untrackable(engine, { poolCoverage: 'complete' })).toBe(false);
     expect(contains(hybrid(lineBand(10, 12), lineBand(4, 6, OTHER)), engine)).toBe(true);
@@ -426,7 +429,7 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
 
   it('applies the null-line rule: untrackable reads the entry and its pool coverage alone', () => {
     const notInGame = { ...tier([line(STAT, [10, 12])], 0), weightSource: 'not-in-game' as const };
-    const withNull = tier([line(STAT, [10, 12]), line(null, [1, 2])], 100);
+    const withNull = tier([line(STAT, [10, 12]), unresolvedLine([1, 2])], 100);
     const plain = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
     expect(untrackable(notInGame, { poolCoverage: 'complete' })).toBe(true);
     expect(untrackable(withNull, { poolCoverage: 'partial' })).toBe(true);
@@ -435,8 +438,8 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
   });
 
   it('names the reason: not-in-game first, then a null line in a partial pool, else undefined', () => {
-    const notInGame = { ...tier([line(STAT, [10, 12]), line(null, [1, 2])], 0), weightSource: 'not-in-game' as const };
-    const withNull = tier([line(STAT, [10, 12]), line(null, [1, 2])], 100);
+    const notInGame = { ...tier([line(STAT, [10, 12]), unresolvedLine([1, 2])], 0), weightSource: 'not-in-game' as const };
+    const withNull = tier([line(STAT, [10, 12]), unresolvedLine([1, 2])], 100);
     const plain = tier([line(STAT, [10, 12])], 100);
     expect(untrackableReason(notInGame, { poolCoverage: 'partial' })).toBe('not-in-game');
     expect(untrackableReason(notInGame, { poolCoverage: 'complete' })).toBe('not-in-game');
@@ -499,7 +502,7 @@ describe('needs (§8), over the unscoped pool', () => {
 
   it('is undefined when nothing is contained, and skips a partial pool’s null-line tier', () => {
     expect(needs(hybrid(lineBand(90, 99), { statId: OTHER }), pool)).toBeUndefined();
-    const nullLine = tier([line(STAT, [10, 20]), line(null)], 100, { itemLevelMin: 30 });
+    const nullLine = tier([line(STAT, [10, 20]), unresolvedLine()], 100, { itemLevelMin: 30 });
     expect(needs(band(10, 20), { poolCoverage: 'partial', entries: [nullLine] })).toBeUndefined();
   });
 
