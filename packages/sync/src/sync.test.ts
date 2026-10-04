@@ -204,7 +204,7 @@ function sessionFor(setup: SessionSetup = {}) {
       return Promise.resolve();
     },
     pid: 4242,
-    log: () => undefined,
+    log: () => {},
     env: setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT },
     argv: setup.argv ?? [],
     signal: controller.signal,

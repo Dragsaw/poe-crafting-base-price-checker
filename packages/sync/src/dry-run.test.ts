@@ -94,7 +94,7 @@ function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
 
 function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial<DryRunSnapshot> = {}): DryRunSnapshot {
   return {
-    ...(entries === undefined ? {} : { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
+    ...(!(entries === undefined) && { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
     config: CONFIG,
     currencies: CURRENCIES,
     items: ITEMS,
@@ -382,7 +382,7 @@ describe('dryRun: the dataset snapshot', () => {
               return Promise.resolve({ kind: 'completed' });
             },
           }),
-        log: () => undefined,
+        log: () => {},
         catalogue: () =>
           Promise.resolve({
             ok: true,
@@ -492,7 +492,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     const report = await dryRun(await readRepositorySnapshot(FROZEN_DATA_DIR));
 
     expect(report.outcome).toBe('completed');
-    const unrecorded = new Set(report.unrecorded ?? []);
+    const unrecorded = new Set(report.unrecorded);
     const priced = report.entries.map((entry) => entry.entryKey);
     expect(priced.filter((key) => unrecorded.has(key))).toEqual([]);
     expect(new Set([...priced, ...unrecorded])).toEqual(new Set(report.completed));

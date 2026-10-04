@@ -115,7 +115,7 @@ function describeIssues(issues: EnvelopeIssues): string {
   if (first === undefined) {
     return 'the schema refused it without naming an issue';
   }
-  const path = first.path.map((segment) => String(segment)).join('.');
+  const path = first.path.map(String).join('.');
   return path === '' ? first.message : `${path}: ${first.message}`;
 }
 

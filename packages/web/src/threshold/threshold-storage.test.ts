@@ -14,9 +14,9 @@ function storageHolding(value: string | null): Pick<Storage, 'getItem'> {
 
 const throwing: Storage = {
   length: 0,
-  clear: () => undefined,
+  clear: () => {},
   key: () => null,
-  removeItem: () => undefined,
+  removeItem: () => {},
   getItem: () => {
     throw new DOMException('blocked', 'SecurityError');
   },

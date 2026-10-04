@@ -124,13 +124,11 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     invalidRequestThreshold: INVALID_REQUEST_THRESHOLD,
     // A 429's diagnostic line goes where the chunk's own lines go.
     log: log ?? writeStderr,
-    ...(pacing === undefined ? {} : { pacing }),
-    ...(spread === undefined ? {} : { spread }),
+    ...(!(pacing === undefined) && { pacing }),
+    ...(!(spread === undefined) && { spread }),
     // The probe goes out on its own counted port, so the report's
     // `session-probe` figure is its one trace (AD-12, AD-30).
-    ...(auth === undefined
-      ? {}
-      : { auth: { holder: auth, probe: requests.counted(http, 'session-probe') } }),
+    ...(!(auth === undefined) && { auth: { holder: auth, probe: requests.counted(http, 'session-probe') } }),
   });
   const { clients } = governor;
 
@@ -169,9 +167,7 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     latchedRetryAfterMs: () => governor.latchedRetryAfterMs(),
     // The runner sees two narrow ports, never the holder: the run-start
     // hold-off settle and the pending hold-off action (§13.1, §13.3).
-    ...(auth === undefined
-      ? {}
-      : {
+    ...(!(auth === undefined) && {
           auth: {
             settleHeldOffIfDue: (holdOffUntil, now) => {
               auth.settleHeldOffIfDue(holdOffUntil, now);
@@ -182,8 +178,8 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
             },
           },
         }),
-    ...(log === undefined ? {} : { log }),
-    ...(session === undefined ? {} : { session }),
+    ...(!(log === undefined) && { log }),
+    ...(!(session === undefined) && { session }),
   };
 
   return { ports, run: () => runChunk(ports) };

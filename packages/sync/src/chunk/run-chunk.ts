@@ -538,7 +538,7 @@ function failureRecord(error: unknown, current: TrackedEntry | undefined): Leagu
   return {
     kind: 'run-failure',
     reason: 'unrecoverable-error',
-    ...(current === undefined ? {} : { entryKey: canonicalKey(current) }),
+    ...(!(current === undefined) && { entryKey: canonicalKey(current) }),
     message,
   };
 }
@@ -598,10 +598,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
               requestsBySource: {},
               notReachedCount: 0,
               // The pause is no re-read of the weights file: the figure stays.
-              ...(previous?.figures.coverage === undefined ||
-              previous.figures.rankableClassCount === undefined
-                ? {}
-                : {
+              ...(!(previous?.figures.coverage === undefined ||
+              previous.figures.rankableClassCount === undefined) && {
                     coverage: previous.figures.coverage,
                     rankableClassCount: previous.figures.rankableClassCount,
                   }),
@@ -677,8 +675,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       session === undefined
         ? {}
         : {
-            ...(order === undefined ? {} : { newPass: order.newPass }),
-            ...(gatePassed && setup !== undefined ? { confirmedLeague: setup.publication.league } : {}),
+            ...(!(order === undefined) && { newPass: order.newPass }),
+            ...(gatePassed && setup !== undefined && { confirmedLeague: setup.publication.league }),
           };
 
     const starvationNow = (): { readonly pinnedStarvation?: ChunkStarvation } =>
@@ -753,8 +751,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
           compareCanonicalKeys,
         ),
-        ...(until === undefined ? {} : { notBefore: until }),
-        ...(authHoldOffUntil === undefined ? {} : { authHoldOffUntil }),
+        ...(!(until === undefined) && { notBefore: until }),
+        ...(!(authHoldOffUntil === undefined) && { authHoldOffUntil }),
       };
       await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, progressFile);
       if (holdOff !== undefined) {
@@ -779,7 +777,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         figures: {
           requestsBySource: requestsBetween(countFrom(), requests.snapshot()),
           notReachedCount: Math.max(0, eligible - attempted),
-          ...(trackedListEditedAt === undefined ? {} : { trackedListEditedAt }),
+          ...(!(trackedListEditedAt === undefined) && { trackedListEditedAt }),
           ...coverageFigures,
         },
         runStartedAt,
@@ -834,7 +832,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         dataset: check.orderDataset,
         completed: progress?.completed ?? [],
         now: clock.now(),
-        ...(session?.pinnedMaxAgeMs === undefined ? {} : { pinnedMaxAgeMs: session.pinnedMaxAgeMs }),
+        ...(!(session?.pinnedMaxAgeMs === undefined) && { pinnedMaxAgeMs: session.pinnedMaxAgeMs }),
       });
       order = plan;
 

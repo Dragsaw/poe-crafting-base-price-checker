@@ -125,7 +125,7 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
         return await readFile(at(path), { encoding: 'utf8' });
       } catch (error) {
         if (hasErrorCode(error, 'ENOENT')) {
-          return undefined;
+          return;
         }
         throw error;
       }
@@ -178,7 +178,7 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
         return (await stat(at(path))).mtime.toISOString();
       } catch (error) {
         if (hasErrorCode(error, 'ENOENT')) {
-          return undefined;
+          return;
         }
         throw error;
       }

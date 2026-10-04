@@ -193,8 +193,8 @@ function yieldedWith(
   return {
     kind: 'yielded',
     entry,
-    ...(leg.retryAfterMs === undefined ? {} : { retryAfterMs: leg.retryAfterMs }),
-    ...(leg.sessionExpired === true ? { sessionExpired: true } : {}),
+    ...(!(leg.retryAfterMs === undefined) && { retryAfterMs: leg.retryAfterMs }),
+    ...((leg.sessionExpired === true) && { sessionExpired: true }),
   };
 }
 
@@ -332,7 +332,7 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
       return {
         kind: 'completed',
         entry: { ...searched, price: { state: 'no-listings' } },
-        ...(searchRemaining === undefined ? {} : { searchRemaining }),
+        ...(!(searchRemaining === undefined) && { searchRemaining }),
       };
     }
 
@@ -358,8 +358,8 @@ export function createPricingStep(options: PricingStepOptions): ChunkStep {
     return {
       kind: 'completed',
       entry: { ...searched, price: priceOf(listings, rates, league, attemptedAt) },
-      ...(searchRemaining === undefined ? {} : { searchRemaining }),
-      ...(fetchRemaining === undefined ? {} : { fetchRemaining }),
+      ...(!(searchRemaining === undefined) && { searchRemaining }),
+      ...(!(fetchRemaining === undefined) && { fetchRemaining }),
     };
   };
 }

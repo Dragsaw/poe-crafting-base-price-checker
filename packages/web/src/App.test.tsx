@@ -436,7 +436,7 @@ describe('the resting chrome', () => {
     serveArtifacts(server, { tracked: { kind: 'json', body: tracked }, dataset: { kind: 'json', body: dataset } });
     mount();
     await settleTo('ready');
-    const rows = Array.from(frame().querySelectorAll('[data-ranked-row]'));
+    const rows = [...frame().querySelectorAll('[data-ranked-row]')];
     expect(rows.map((row) => row.querySelector('[data-unit-name]')?.textContent)).toEqual(['Gold Amulet']);
     expect(frame().textContent).not.toContain('Solar Amulet');
     expect(frame().textContent).not.toContain('Utility Belt');
@@ -454,12 +454,12 @@ describe('the resting chrome', () => {
     mount();
     await settleTo('ready');
     const fetched = requests.length;
-    const rows = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'));
+    const rows = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')];
     act(() => {
       rows[0]?.click();
     });
     await flush();
-    const panels = Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel]'));
+    const panels = [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel]')];
     expect(panels).toHaveLength(1);
     expect(panels.map((panel) => panel.previousElementSibling)).toEqual(rows.slice(0, 1));
     const links = panels.map((panel) => panel.querySelector<HTMLAnchorElement>('[data-cell="trade-link"] a'));
@@ -584,7 +584,7 @@ describe('the payout threshold', () => {
     const group = frame().querySelector<HTMLElement>('[data-control-group]');
     expect(group?.style.width).toBe('508px');
     expect(group?.style.gap).toBe('16px');
-    const [recipe, threshold] = Array.from(group?.children ?? []) as HTMLElement[];
+    const [recipe, threshold] = [...group?.children ?? []] as HTMLElement[];
     expect(recipe?.dataset['recipeSlot']).toBe('');
     expect(recipe?.style.width).toBe('216px');
     expect(threshold?.dataset['payoutThreshold']).toBe('');
@@ -783,7 +783,7 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
   const bodies = bodiesWith([lost], [unpriced(lost, { state: 'unresolvable' }, hoursBefore(Date.now(), 1))]);
 
   function lostRow(): HTMLElement {
-    const rows = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'));
+    const rows = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')];
     expect(rows).toHaveLength(1);
     const [row] = rows;
     if (row === undefined) {
@@ -1120,7 +1120,7 @@ describe('the Unrankable appendix', () => {
   }
 
   function appendixRows(): HTMLElement[] {
-    return Array.from(frame().querySelectorAll<HTMLElement>('[data-appendix-row]'));
+    return [...frame().querySelectorAll<HTMLElement>('[data-appendix-row]')];
   }
 
   /** The page tail's children, by their first data attribute. */
@@ -1352,7 +1352,7 @@ describe('the interaction surface', () => {
     await settleTo('ready');
 
     // An appendix row does nothing on a click: no expansion, no change to the page.
-    const appendixRows = Array.from(frame().querySelectorAll<HTMLElement>('[data-appendix-row]'));
+    const appendixRows = [...frame().querySelectorAll<HTMLElement>('[data-appendix-row]')];
     expect(appendixRows).toHaveLength(2);
     const beforeAppendix = frame().innerHTML;
     for (const row of appendixRows) {
@@ -1386,7 +1386,7 @@ describe('the interaction surface', () => {
     // A header click sorts nothing, and the header holds nothing clickable.
     const header = frame().querySelector<HTMLElement>('[data-column-header]');
     const before = unitNames();
-    for (const label of Array.from(header?.children ?? []) as HTMLElement[]) {
+    for (const label of [...header?.children ?? []] as HTMLElement[]) {
       act(() => {
         label.click();
       });
@@ -1425,11 +1425,11 @@ describe('the chase cells on the frozen data fixture', () => {
           frame().querySelector<HTMLElement>('[data-recipe-option="perfect"]')?.click();
         });
       }
-      const crafted = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]:not([data-raw])'));
+      const crafted = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]:not([data-raw])')];
       expect(crafted.length, recipeId).toBeGreaterThan(0);
       let filled = 0;
       for (const row of crafted) {
-        const slots = Array.from(row.querySelectorAll<HTMLElement>('[data-chase-cell]'));
+        const slots = [...row.querySelectorAll<HTMLElement>('[data-chase-cell]')];
         expect(slots, recipeId).toHaveLength(3);
         for (const cell of slots) {
           expect(cell.querySelector('[data-verbatim]'), cell.textContent).toBeNull();

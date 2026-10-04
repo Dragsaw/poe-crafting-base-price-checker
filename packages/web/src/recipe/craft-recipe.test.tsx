@@ -274,7 +274,7 @@ function click(element: Element): void {
 }
 
 function rowNamed(name: string): HTMLElement {
-  const row = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]')).find(
+  const row = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')].find(
     (candidate) => candidate.querySelector('[data-unit-name]')?.textContent === name,
   );
   if (row === undefined) {
@@ -425,7 +425,7 @@ describe('the crafted states', () => {
     expect(control().querySelector('[data-recipe-cost-figure]')).toBeNull();
     expect(statement()?.dataset['listStatement']).toBe('uncostable');
     expect(statement()?.textContent).toBe(uncostableCopy('perfect'));
-    const [rawBranch, craftedBranch] = Array.from(frame().querySelectorAll<HTMLElement>('[data-list-branch]'));
+    const [rawBranch, craftedBranch] = [...frame().querySelectorAll<HTMLElement>('[data-list-branch]')];
     expect(rawBranch?.dataset['listBranch']).toBe('raw');
     expect(craftedBranch?.dataset['listBranch']).toBe('crafted');
     expect(names(rawBranch)).toEqual(['Wide Belt', 'Gold Amulet']);
@@ -462,7 +462,7 @@ describe('the crafted states', () => {
     });
     mount();
     await settleTo('ready');
-    const branches = Array.from(frame().querySelectorAll<HTMLElement>('[data-list-branch]'));
+    const branches = [...frame().querySelectorAll<HTMLElement>('[data-list-branch]')];
     expect(branches).toHaveLength(2);
     expect(branches.map((branch) => branch.querySelectorAll('[data-ranked-row]').length)).toEqual([20, 20]);
     expect(branches.map((branch) => branch.querySelector('[data-expand-affordance]')?.textContent)).toEqual([
@@ -556,7 +556,7 @@ function ring(prefix: string, suffix = COLD_RES, status: CraftedTrackedEntry['st
     prefix: banded(prefix, 1, 10, 'T1'),
     suffix: banded(suffix, 1, 10, 'T1'),
     status,
-    ...(status === 'pruned' ? { prunedReason: 'never sells' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'never sells' }),
   };
 }
 
@@ -585,7 +585,7 @@ function ringsWorld(overrides: Partial<World> = {}): World {
 }
 
 function chaseCells(row: HTMLElement): HTMLElement[] {
-  return Array.from(row.querySelectorAll<HTMLElement>('[data-cell="chase"] [data-chase-cell]'));
+  return [...row.querySelectorAll<HTMLElement>('[data-cell="chase"] [data-chase-cell]')];
 }
 
 function chaseTexts(row: HTMLElement): string[] {
@@ -593,7 +593,7 @@ function chaseTexts(row: HTMLElement): string[] {
 }
 
 function panelRows(): HTMLElement[] {
-  return Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-combination-row]'));
+  return [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-combination-row]')];
 }
 
 function panelCell(row: HTMLElement, cell: string): string {
@@ -665,7 +665,7 @@ describe('the chase cells', () => {
     click(rowNamed('Rings'));
     const [panel] = panelRows();
     expect(panel === undefined ? '' : panelCell(panel, 'combination')).toBe(`${label} · T1 Cold Res`);
-    for (const node of Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *'))) {
+    for (const node of [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *')]) {
       expect(node.style.textOverflow).toBe('');
     }
   });
@@ -826,7 +826,7 @@ describe('the crafted panel', () => {
       'Open the trade search for T1 Atk Dmg · T1 Cold Res on Rings',
     );
     // Nothing in the expansion is ellipsised.
-    for (const node of Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *'))) {
+    for (const node of [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *')]) {
       expect(node.style.textOverflow).toBe('');
     }
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', '', '']);

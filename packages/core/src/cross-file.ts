@@ -428,7 +428,7 @@ export function crossFileChecks(entries: readonly TrackedEntry[], weights: Weigh
 
   for (const members of byClass.values()) {
     // One failure per (check, entry): a twin, which the schema refuses anyway, is checked once.
-    const keyed = [...new Map(members.map((entry) => [canonicalKey(entry), entry])).entries()].map(
+    const keyed = [...new Map(members.map((entry) => [canonicalKey(entry), entry]))].map(
       ([key, entry]) => ({ entry, key }),
     );
     const mark = (reason: UnvalidatedMark['reason']): void => {

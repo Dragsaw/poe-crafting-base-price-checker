@@ -28,7 +28,7 @@ function crafted(
     prefix: { kind: 'valueless', statId: prefix },
     suffix: { kind: 'valueless', statId: suffix },
     status,
-    ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'x' }),
   } as TrackedEntry;
 }
 

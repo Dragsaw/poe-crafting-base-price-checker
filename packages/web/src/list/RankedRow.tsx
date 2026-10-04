@@ -138,7 +138,7 @@ export function RankedRow({
           ...typeStyle('row-chase'),
           overflow: 'hidden',
           // A crafted row's three cells carry `pad-chase-cell-right` each, so the column pads nothing more.
-          ...(raw ? {} : { display: 'flex', paddingRight: undefined }),
+          ...(!raw && { display: 'flex', paddingRight: undefined }),
         }}
       >
         {raw ? (

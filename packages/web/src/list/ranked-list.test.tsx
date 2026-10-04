@@ -22,7 +22,7 @@ function many(count: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntr
 describe('the column header', () => {
   it('prints the six final labels in six fixed flex cells', () => {
     const view = mountList([], []);
-    const cells = Array.from(view.querySelectorAll<HTMLElement>('[data-column-header] [data-header-cell]'));
+    const cells = [...view.querySelectorAll<HTMLElement>('[data-column-header] [data-header-cell]')];
     expect(cells.map((c) => c.textContent)).toEqual([
       '',
       'Item Class / Base Type',
@@ -334,7 +334,7 @@ describe('the trust mark and the unit glyphs', () => {
 describe('the key block', () => {
   it('holds three columns, the first being Silence means healthy, and no curation marks', () => {
     const container = mount(<KeyBlock />);
-    const columns = Array.from(container.querySelectorAll('[data-key-column]'));
+    const columns = [...container.querySelectorAll('[data-key-column]')];
     expect(columns).toHaveLength(3);
     expect(columns.map((c) => c.firstElementChild?.textContent)).toEqual([...KEY_TITLES]);
     expect(KEY_TITLES[0]).toBe('Silence means healthy');

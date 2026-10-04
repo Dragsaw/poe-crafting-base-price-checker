@@ -13,6 +13,6 @@ import { ISSUER_TEST, LATE_URL } from './names';
  */
 it(ISSUER_TEST, () => {
   setTimeout(() => {
-    fetch(LATE_URL).catch(() => undefined);
+    fetch(LATE_URL).catch(() => {});
   }, 300);
 });

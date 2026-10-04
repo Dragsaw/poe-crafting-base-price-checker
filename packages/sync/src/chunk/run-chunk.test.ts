@@ -87,7 +87,7 @@ function run(ports: TestPorts, step: ChunkStep): Promise<ChunkOutcome> {
   return runChunk({
     ...base,
     load:
-      load ?? (() => Promise.resolve({ publication, starvationRecord, step, ...(gate ? { gate } : {}) })),
+      load ?? (() => Promise.resolve({ publication, starvationRecord, step, ...(gate && { gate }) })),
   });
 }
 
@@ -737,7 +737,7 @@ describe('runChunk: the lock', () => {
     const outcomes = await Promise.all(
       [1, 2, 3, 4].map((pid) =>
         run(
-          { fs, clock, pid, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+          { fs, clock, pid, ...shellPorts(), publication: PUBLICATION, log: () => {} },
           scriptedStep().step,
         ),
       ),
@@ -893,7 +893,7 @@ function datasetText(entries: readonly { key: string; at?: string; unresolvable?
     entries: entries.map(({ key: entryKey, at, unresolvable }) => ({
       entryKey,
       price: { state: unresolvable === true ? 'unresolvable' : 'no-listings' },
-      ...(at === undefined ? {} : { lastAttemptedAt: at }),
+      ...(!(at === undefined) && { lastAttemptedAt: at }),
     })),
     currencyRates: [],
   });
@@ -1349,7 +1349,7 @@ describe('runChunk: the Sync Report', () => {
     const { fs, ports } = harness([A], {}, { git: createFakeGitPort(commits) });
     fs.setFile(TRACKED_PATH, {
       contents: trackedText([A]),
-      ...(modifiedAt === undefined ? {} : { modifiedAt }),
+      ...(!(modifiedAt === undefined) && { modifiedAt }),
     });
 
     await run(ports, scriptedStep().step);
@@ -2721,7 +2721,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     });
     const chunk = (remaining: number) =>
       run(
-        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => {} },
         scriptedStep(() => ({ kind: 'completed', searchRemaining: remaining })).step,
       );
 
@@ -2746,7 +2746,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     });
     const chunk = () =>
       run(
-        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => {} },
         scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 })).step,
       );
 
@@ -3373,7 +3373,7 @@ describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () =>
     const { fs, ports } = harness([A]);
     const { step } = scriptedStep();
 
-    const outcome = await run({ ...ports, latchedRetryAfterMs: () => undefined }, step);
+    const outcome = await run({ ...ports, latchedRetryAfterMs: () => {} }, step);
 
     expect(outcome.kind).toBe('completed');
     expect(await progressOf(fs)).toEqual({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [key(A)] });

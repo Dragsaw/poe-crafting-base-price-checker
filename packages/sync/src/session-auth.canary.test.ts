@@ -352,7 +352,7 @@ describe('CAP-4: the canary never leaves the holder', () => {
         wait: () => Promise.resolve(),
         userAgent: CONTACT,
         pid: 4242,
-        log: () => undefined,
+        log: () => {},
       }).run();
     } catch (error) {
       thrown = error;
@@ -415,7 +415,7 @@ describe('CAP-4: the canary never leaves the holder', () => {
         wait: () => Promise.resolve(),
         userAgent: CONTACT,
         pid: 4242,
-        log: () => undefined,
+        log: () => {},
         auth: createSessionAuth(ENV),
       }).run();
     } catch (error) {
@@ -567,7 +567,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
         wait: () => Promise.resolve(),
         userAgent: CONTACT,
         pid: 4242,
-        log: () => undefined,
+        log: () => {},
         auth: createSessionAuth(ENV),
       }).run();
     } catch (error) {
@@ -697,7 +697,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
       wait: () => Promise.resolve(),
       userAgent: CONTACT,
       pid: 4242,
-      log: () => undefined,
+      log: () => {},
       auth: createSessionAuth(ENV),
     }).run();
 

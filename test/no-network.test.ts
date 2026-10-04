@@ -51,14 +51,14 @@ it('fails a test through the guard, naming every escaped URL', async () => {
 // name A. The two tests run in file order and share this state.
 const LATE_URL = 'https://unrouted.invalid/api/trade2/fetch/late';
 const LATE_ISSUER = 'issues an unfixtured request from a timer it does not await';
-let releaseLateRequest: () => void = () => undefined;
+let releaseLateRequest: () => void = () => {};
 let lateRequestSettled: Promise<void> = Promise.resolve();
 
 it(LATE_ISSUER, () => {
   const gate = new Promise<void>((resolve) => {
     releaseLateRequest = resolve;
   });
-  let settle: () => void = () => undefined;
+  let settle: () => void = () => {};
   lateRequestSettled = new Promise<void>((resolve) => {
     settle = resolve;
   });
@@ -113,7 +113,7 @@ it("fails a test's own guard for a request it issued", async ({ task }) => {
 describe('a request recorded after the last afterEach of its test', () => {
   const AFTER_LAST_URL = 'https://unrouted.invalid/api/trade2/fetch/after-last';
   const AFTER_LAST_ISSUER = 'issues a request that settles after its afterEach';
-  let release: () => void = () => undefined;
+  let release: () => void = () => {};
   let settled: Promise<void> = Promise.resolve();
 
   it(AFTER_LAST_ISSUER, () => {

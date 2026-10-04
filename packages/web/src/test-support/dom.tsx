@@ -90,7 +90,7 @@ export function rerenderList(
 
 /** The ranked rows under `within`, in document order. */
 export function rowsIn(within: HTMLElement): HTMLElement[] {
-  return Array.from(within.querySelectorAll<HTMLElement>('[data-ranked-row]'));
+  return [...within.querySelectorAll<HTMLElement>('[data-ranked-row]')];
 }
 
 /** The one `[data-cell=name]` under `within`; throws when there is none. */

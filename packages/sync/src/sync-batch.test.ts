@@ -161,7 +161,7 @@ function depsFor(league: string, setup: Setup = {}) {
     git: createFakeGitPort(),
     wait: setup.wait ?? (() => Promise.resolve()),
     pid: 4242,
-    log: () => undefined,
+    log: () => {},
     env,
     stdout: (line) => out.push(line),
     stderr: (line) => {

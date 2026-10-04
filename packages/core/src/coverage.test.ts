@@ -41,7 +41,7 @@ const crafted = (
     prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
     suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     status,
-    ...(status === 'pruned' ? { prunedReason: 'gone' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'gone' }),
   }) as TrackedEntry;
 
 const full = { prefix: pool(10), suffix: pool(10) };

@@ -220,7 +220,7 @@ describe('the resting strip', () => {
       expect(signal.style.fontWeight).toBe('700');
     }
     // The absence line sits before the health line.
-    const children = Array.from(strip().children);
+    const children = [...strip().children];
     const absenceIndex = children.findIndex((child) => child.hasAttribute('data-absence-lines'));
     expect(absenceIndex).toBeGreaterThan(-1);
     expect(children.indexOf(health as HTMLElement)).toBe(absenceIndex + 1);
@@ -280,7 +280,7 @@ describe('the toggle and the panel', () => {
     expect(open?.style.overflowY).toBe('auto');
     expect(open?.style.padding).toBe('14px 16px 12px');
     expect(open?.style.background).toBe(rgb(colors['paper-inset']));
-    const columns = Array.from(open?.querySelectorAll<HTMLElement>('[data-panel-column]') ?? []);
+    const columns = [...open?.querySelectorAll<HTMLElement>('[data-panel-column]') ?? []];
     expect(columns).toHaveLength(3);
     expect(columns.map((column) => column.querySelectorAll('[data-panel-heading]').length)).toEqual([1, 1, 1]);
     expect(columns.map((column) => column.querySelector('[data-panel-heading]')?.textContent)).toEqual([...PANEL_HEADINGS]);
@@ -365,7 +365,7 @@ describe('the cross-file diagnosis (AD-17)', () => {
     expect(groups).toHaveLength(3);
     const diagnosis = groups[2];
     expect(diagnosis?.style.marginTop).toBe(px(spacing.syncReportGroupGap));
-    const lines = Array.from(diagnosis?.querySelectorAll<HTMLElement>('[data-verbatim]') ?? []);
+    const lines = [...diagnosis?.querySelectorAll<HTMLElement>('[data-verbatim]') ?? []];
     expect(lines.map((line) => line.textContent)).toEqual(
       FAILURES.map((failure) => `${failure.check} · ${failure.entryKey} · ${failure.detail}`),
     );

@@ -394,7 +394,7 @@ it('counts the requests sent before a failure, and prints the count beside it', 
 
   expect(outcome).toMatchObject({ ok: false, requests: 2 });
   const stdout: string[] = [];
-  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: () => undefined })).toBe(1);
+  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: () => {} })).toBe(1);
   expect(stdout).toEqual(['requests: 2']);
 });
 

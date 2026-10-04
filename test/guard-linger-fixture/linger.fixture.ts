@@ -15,17 +15,17 @@ import { HOOK_URLS, SUITE_ONE_TEST, SUITE_TWO_TEST } from './names';
 
 /** Awaits the fetch and swallows its rejection, so only the guard reports the request. */
 async function fetchAndSwallow(url: string): Promise<void> {
-  await fetch(url).catch(() => undefined);
+  await fetch(url).catch(() => {});
 }
 
 describe('suite one', () => {
-  it(SUITE_ONE_TEST, () => undefined);
+  it(SUITE_ONE_TEST, () => {});
   afterAll(() => fetchAndSwallow(HOOK_URLS.suiteOneAfterAll));
 });
 
 describe('suite two', () => {
   beforeAll(() => fetchAndSwallow(HOOK_URLS.suiteTwoBeforeAll));
-  it(SUITE_TWO_TEST, () => undefined);
+  it(SUITE_TWO_TEST, () => {});
 });
 
 // Registered after the setup file's `afterAll`. The child config sets

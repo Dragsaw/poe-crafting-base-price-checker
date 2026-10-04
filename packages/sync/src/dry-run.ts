@@ -280,9 +280,9 @@ export async function dryRun(snapshot: DryRunSnapshot, options: DryRunOptions = 
     dataset,
     records: outcome.records,
     report,
-    ...(unrecorded.length === 0 ? {} : { unrecorded }),
-    ...(outcome.pinnedStarvation === undefined ? {} : { pinnedStarvation: outcome.pinnedStarvation }),
-    ...(notBefore === undefined ? {} : { notBefore }),
+    ...(!(unrecorded.length === 0) && { unrecorded }),
+    ...(!(outcome.pinnedStarvation === undefined) && { pinnedStarvation: outcome.pinnedStarvation }),
+    ...(!(notBefore === undefined) && { notBefore }),
   };
 }
 

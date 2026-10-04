@@ -776,7 +776,7 @@ export function createTradeGovernor<Source extends string>(
         waitedMs,
         skips: parsed.skips,
         invalidRequests: counted,
-        ...(remaining === undefined ? {} : { remaining }),
+        ...(!(remaining === undefined) && { remaining }),
         response,
         ...penaltyOf(response, parsed, policy),
       };
@@ -799,7 +799,7 @@ export function createTradeGovernor<Source extends string>(
       waitedMs,
       skips: parsed.skips,
       invalidRequests: counted,
-      ...(remaining === undefined ? {} : { remaining }),
+      ...(!(remaining === undefined) && { remaining }),
       response,
     };
   }
@@ -821,7 +821,7 @@ export function createTradeGovernor<Source extends string>(
       );
       // The queue must survive a rejected exchange, or one failure would wedge
       // every later request behind it.
-      tail = issued.catch(() => undefined);
+      tail = issued.catch(() => {});
       return issued;
     },
   });

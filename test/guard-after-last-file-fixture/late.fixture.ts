@@ -15,6 +15,6 @@ const delay = Number(process.env[DELAY_ENV] ?? '0');
 
 it(ISSUER_TEST, () => {
   setTimeout(() => {
-    fetch(LATE_URL).catch(() => undefined);
+    fetch(LATE_URL).catch(() => {});
   }, delay);
 });

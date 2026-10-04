@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 function panelsIn(within: HTMLElement): HTMLElement[] {
-  return Array.from(within.querySelectorAll<HTMLElement>('[data-expansion-panel]'));
+  return [...within.querySelectorAll<HTMLElement>('[data-expansion-panel]')];
 }
 
 function click(target: HTMLElement | null | undefined): void {
@@ -31,7 +31,7 @@ function click(target: HTMLElement | null | undefined): void {
 function openOne(entry: RawTrackedEntry, published: DatasetEntry | undefined, threshold = DEFAULT_THRESHOLD): HTMLElement {
   const view = mountList([entry], published === undefined ? [] : [published], threshold);
   click(rowsIn(view)[0]);
-  const rows = Array.from(view.querySelectorAll<HTMLElement>('[data-combination-row]'));
+  const rows = [...view.querySelectorAll<HTMLElement>('[data-combination-row]')];
   expect(rows).toHaveLength(1);
   const [only] = rows;
   if (only === undefined) {

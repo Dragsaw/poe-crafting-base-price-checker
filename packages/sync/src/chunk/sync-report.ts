@@ -83,7 +83,7 @@ export function buildSyncReport({
 }: SyncReportInputs): SyncReportFile {
   return {
     runStartedAt,
-    ...(runFinishedAt === undefined ? {} : { runFinishedAt }),
+    ...(!(runFinishedAt === undefined) && { runFinishedAt }),
     figures: {
       ...figures,
       requestsBySource: chunkRequests(figures.requestsBySource),

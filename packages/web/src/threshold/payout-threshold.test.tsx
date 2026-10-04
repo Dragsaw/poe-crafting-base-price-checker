@@ -29,7 +29,7 @@ afterEach(() => {
   container = undefined;
 });
 
-function mountPanel(value: number, onChange: (value: number) => void = () => undefined): HTMLDivElement {
+function mountPanel(value: number, onChange: (value: number) => void = () => {}): HTMLDivElement {
   container = document.createElement('div');
   document.body.append(container);
   const mounted = createRoot(container);

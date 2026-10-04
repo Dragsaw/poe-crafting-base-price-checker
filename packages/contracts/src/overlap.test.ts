@@ -106,7 +106,7 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
     itemLevelMin: 82,
     ...affixes,
     status,
-    ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'no market' }),
   });
   const parse = (entries: readonly unknown[]) =>
     parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);

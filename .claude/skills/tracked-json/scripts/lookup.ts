@@ -421,8 +421,8 @@ export function parseCommand(argv: readonly string[]): Command {
       return {
         kind,
         className: values.class,
-        ...(slot === undefined ? {} : { slot }),
-        ...(category === undefined ? {} : { category }),
+        ...(!(slot === undefined) && { slot }),
+        ...(!(category === undefined) && { category }),
       };
     }
     case 'tiers': {
@@ -439,7 +439,7 @@ export function parseCommand(argv: readonly string[]): Command {
         kind,
         statId: query,
         className: values.class,
-        ...(category === undefined ? {} : { category }),
+        ...(!(category === undefined) && { category }),
       };
     }
     case undefined: {

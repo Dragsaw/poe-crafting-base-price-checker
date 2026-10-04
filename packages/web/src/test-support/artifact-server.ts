@@ -134,7 +134,7 @@ export function serveArtifacts(
 
 /** A promise and the function that settles it. */
 export function gate(): { readonly promise: Promise<void>; readonly open: () => void } {
-  let open: () => void = () => undefined;
+  let open: () => void = () => {};
   const promise = new Promise<void>((resolve) => {
     open = resolve;
   });
