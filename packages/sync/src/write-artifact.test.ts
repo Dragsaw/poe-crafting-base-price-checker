@@ -2,6 +2,7 @@ import { createFakeFilesystemPort, DatasetFileSchema, SyncProgressFileSchema } f
 import type { DatasetFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { rejectionOf } from './test-support/rejection-of.ts';
 import { InvalidArtifactError, writeArtifact } from './write-artifact.ts';
 
 const PATH = 'data/dataset.json';
@@ -82,7 +83,7 @@ describe('writeArtifact', () => {
     const refusal = writeArtifact(fs, PATH, DatasetFileSchema, invalid);
 
     await expect(refusal).rejects.toBeInstanceOf(InvalidArtifactError);
-    const error = (await refusal.catch((error_: unknown) => error_)) as InvalidArtifactError;
+    const error = (await rejectionOf(refusal)) as InvalidArtifactError;
     expect(error.path).toBe(PATH);
     expect(error.issues.map((issue) => issue.path)).toContainEqual(['generatedAt']);
     expect(error.message).toContain(PATH);

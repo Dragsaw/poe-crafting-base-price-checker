@@ -3,6 +3,7 @@ import type { AddressInfo, Socket } from 'node:net';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createFetchHttpPort, REQUEST_TIMEOUT_MS } from './shell.ts';
+import { rejectionOf } from './test-support/rejection-of.ts';
 import { isTransportFailure } from './trade/transport-failure.ts';
 
 /**
@@ -55,15 +56,6 @@ function readBody(request: IncomingMessage): Promise<string> {
     request.on('end', () => done(Buffer.concat(chunks).toString('utf8')));
     request.on('error', fail);
   });
-}
-
-async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
-  try {
-    await promise;
-  } catch (error) {
-    return error;
-  }
-  throw new Error('expected the request to reject');
 }
 
 afterEach(async () => {

@@ -700,13 +700,20 @@ describe('pnpm sync: the session with injected ports', () => {
       }),
     ) {
       return (fake: ReturnType<typeof createFakeHttpPort>): HttpPort => ({
-        send(request) {
+        async send(request) {
           const sent = fake.send(request);
           if (request.headers['cookie'] === undefined) {
             return sent;
           }
           const answer = request.method === 'POST' ? answers.shift() : undefined;
-          return answer === undefined ? sent.then((fakeAnswer) => after(request, fakeAnswer)) : sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+          const fakeAnswer = await sent;
+          if (answer === undefined) {
+            return after(request, fakeAnswer);
+          }
+          if (answer instanceof Error) {
+            throw answer;
+          }
+          return answer;
         },
       });
     }

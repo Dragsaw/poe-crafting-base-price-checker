@@ -758,11 +758,6 @@
       "count": 12
     }
   },
-  "packages/sync/src/league/league-gate.test.ts": {
-    "unicorn/prefer-await": {
-      "count": 2
-    }
-  },
   "packages/sync/src/league/league-gate.ts": {
     "local/max-comment-run": {
       "count": 3
@@ -867,9 +862,6 @@
     },
     "unicorn/no-null": {
       "count": 3
-    },
-    "unicorn/prefer-await": {
-      "count": 5
     }
   },
   "packages/sync/src/pricing/price-entry.ts": {
@@ -963,9 +955,6 @@
     },
     "unicorn/no-null": {
       "count": 1
-    },
-    "unicorn/prefer-await": {
-      "count": 2
     }
   },
   "packages/sync/src/sync-batch.ts": {
@@ -991,9 +980,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/prefer-await": {
-      "count": 2
     }
   },
   "packages/sync/src/sync.ts": {
@@ -1056,9 +1042,6 @@
       "count": 2
     },
     "unicorn/consistent-boolean-name": {
-      "count": 3
-    },
-    "unicorn/prefer-await": {
       "count": 3
     }
   },
@@ -1124,9 +1107,6 @@
   },
   "packages/sync/src/write-artifact.test.ts": {
     "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    },
-    "unicorn/prefer-await": {
       "count": 1
     }
   },
@@ -1534,9 +1514,6 @@
     "unicorn/no-thenable": {
       "count": 1
     },
-    "unicorn/prefer-await": {
-      "count": 1
-    },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 1
     }
@@ -1671,9 +1648,6 @@
     },
     "sonarjs/assertions-in-tests": {
       "count": 1
-    },
-    "unicorn/prefer-await": {
-      "count": 1
     }
   },
   "test/guard-after-last-file-fixture/names.ts": {
@@ -1770,9 +1744,6 @@
     },
     "sonarjs/assertions-in-tests": {
       "count": 2
-    },
-    "unicorn/prefer-await": {
-      "count": 1
     }
   },
   "test/guard-linger-fixture/names.ts": {
@@ -1801,9 +1772,6 @@
       "count": 1
     },
     "sonarjs/assertions-in-tests": {
-      "count": 1
-    },
-    "unicorn/prefer-await": {
       "count": 1
     }
   },
@@ -1870,9 +1838,6 @@
     },
     "sonarjs/assertions-in-tests": {
       "count": 2
-    },
-    "unicorn/prefer-await": {
-      "count": 1
     },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 2

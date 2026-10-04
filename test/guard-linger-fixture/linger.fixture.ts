@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, it } from 'vitest';
 
+import { fetchAndSwallow } from '../fetch-and-swallow';
 import { HOOK_URLS, SUITE_ONE_TEST, SUITE_TWO_TEST } from './names';
 
 /**
@@ -12,12 +13,6 @@ import { HOOK_URLS, SUITE_ONE_TEST, SUITE_TWO_TEST } from './names';
  * lingered from that test would charge the hook's request to it. The guard
  * must report each request as issued outside any test.
  */
-
-/** Awaits the fetch and swallows its rejection, so only the guard reports the request. */
-async function fetchAndSwallow(url: string): Promise<void> {
-  await fetch(url).catch(() => {});
-}
-
 describe('suite one', () => {
   it(SUITE_ONE_TEST, () => {});
   afterAll(() => fetchAndSwallow(HOOK_URLS.suiteOneAfterAll));

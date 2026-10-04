@@ -78,6 +78,11 @@ export interface RecordedRequest {
   readonly cache: RequestCache;
 }
 
+async function respondWhenOpen(answer: Extract<ArtifactAnswer, { kind: 'gated' }>): Promise<Response> {
+  await answer.gate;
+  return respond(answer.then ?? { kind: 'json', body: null });
+}
+
 function respond(answer: ArtifactAnswer): Response | Promise<Response> {
   switch (answer.kind) {
     case 'json': {
@@ -97,7 +102,7 @@ function respond(answer: ArtifactAnswer): Response | Promise<Response> {
       return HttpResponse.error();
     }
     case 'gated': {
-      return answer.gate.then(() => respond(answer.then ?? { kind: 'json', body: null }));
+      return respondWhenOpen(answer);
     }
   }
 }

@@ -119,13 +119,16 @@ describe('a request recorded after the last afterEach of its test', () => {
   let release: () => void = noop;
   let settled: Promise<void> = Promise.resolve();
 
+  async function fetchWhenReleased(gate: Promise<void>): Promise<void> {
+    await gate;
+    await fetch(AFTER_LAST_URL);
+  }
+
   it(AFTER_LAST_ISSUER, () => {
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
-    settled = gate.then(async () => {
-      await fetch(AFTER_LAST_URL);
-    });
+    settled = fetchWhenReleased(gate);
   });
 
   // Runs after the test's `afterEach`, which found nothing, and before the

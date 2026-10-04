@@ -662,13 +662,20 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       return {
         ...dependencies,
         http: {
-          send(request) {
+          async send(request) {
             const sent = fake.send(request);
             if (request.headers['cookie'] === undefined) {
               return sent;
             }
             const answer = request.method === 'POST' ? answers.shift() : undefined;
-            return answer === undefined ? sent.then((response) => after(response, request)) : sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+            const response = await sent;
+            if (answer === undefined) {
+              return after(response, request);
+            }
+            if (answer instanceof Error) {
+              throw answer;
+            }
+            return answer;
           },
         },
       };

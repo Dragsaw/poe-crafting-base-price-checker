@@ -1,5 +1,6 @@
 import { it } from 'vitest';
 
+import { fetchAndSwallow } from '../fetch-and-swallow';
 import { ISSUER_TEST, LATE_URL } from './names';
 
 /**
@@ -13,6 +14,6 @@ import { ISSUER_TEST, LATE_URL } from './names';
  */
 it(ISSUER_TEST, () => {
   setTimeout(() => {
-    fetch(LATE_URL).catch(() => {});
+    void fetchAndSwallow(LATE_URL);
   }, 300);
 });

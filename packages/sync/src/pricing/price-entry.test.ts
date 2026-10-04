@@ -14,6 +14,7 @@ import { createPricingStep, MalformedRequestError, UnexpectedTradeResponseError 
 import { itemTypesOf } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
 import { NamedError } from '../test-support/named-error.ts';
+import { rejectionOf } from '../test-support/rejection-of.ts';
 
 const LEAGUE = 'Forbidden Rites';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -315,10 +316,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
   it('another 4xx on the search throws MalformedRequestError with the stamped entry', async () => {
     const { run } = setup({ search: status(400), dataset: [PREVIOUS] });
 
-    const error = await run().then(
-      () => {},
-      (error_: unknown) => error_,
-    );
+    const error = await rejectionOf(run());
 
     expect(error).toBeInstanceOf(MalformedRequestError);
     expect(error).toMatchObject({
@@ -332,10 +330,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
   it('another 4xx on the fetch throws MalformedRequestError with the answered search fields and the price state kept', async () => {
     const { run } = setup({ results: ids(1), fetch: status(404), dataset: [PREVIOUS] });
 
-    const error = await run().then(
-      () => {},
-      (error_: unknown) => error_,
-    );
+    const error = await rejectionOf(run());
 
     expect(error).toBeInstanceOf(MalformedRequestError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch', status: 404 });
@@ -368,10 +363,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
 
   it('a search answered 200 with {} throws UnexpectedTradeResponseError with lastAttemptedAt stamped, the search fields and the price state kept, and sends no fetch', async () => {
     const { http, run } = setup({ search: ok({}), dataset: [PREVIOUS] });
-    const error = await run().then(
-      () => {},
-      (error_: unknown) => error_,
-    );
+    const error = await rejectionOf(run());
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
     // A request was issued, so lastAttemptedAt is stamped (AD-9); no search
@@ -385,10 +377,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
 
   it('a search answered 200 with {} for a never-published entry carries a stamped never-synced entry', async () => {
     const { http, run } = setup({ search: ok({}) });
-    const error = await run().then(
-      () => {},
-      (error_: unknown) => error_,
-    );
+    const error = await rejectionOf(run());
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
     expect((error as UnexpectedTradeResponseError).entry).toStrictEqual({
@@ -401,10 +390,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
 
   it('a fetch answered 200 with {} throws UnexpectedTradeResponseError with the answered search fields and the price state kept', async () => {
     const { run } = setup({ results: ids(1), fetch: ok({}), dataset: [PREVIOUS] });
-    const error = await run().then(
-      () => {},
-      (error_: unknown) => error_,
-    );
+    const error = await rejectionOf(run());
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch' });
     // The answered search sets its two fields whatever the fetch returns (AD-9).

@@ -1,5 +1,6 @@
 import { it } from 'vitest';
 
+import { fetchAndSwallow } from '../fetch-and-swallow';
 import { DELAY_ENV, ISSUER_TEST, LATE_URL } from './names';
 
 /**
@@ -15,6 +16,6 @@ const delay = Number(process.env[DELAY_ENV] ?? '0');
 
 it(ISSUER_TEST, () => {
   setTimeout(() => {
-    fetch(LATE_URL).catch(() => {});
+    void fetchAndSwallow(LATE_URL);
   }, delay);
 });

@@ -12,6 +12,7 @@ import {
   UnexpectedLeaguesResponseError,
 } from './league-gate.ts';
 import { NamedError } from '../test-support/named-error.ts';
+import { rejectionOf } from '../test-support/rejection-of.ts';
 
 const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
 
@@ -63,10 +64,7 @@ const PASS: GateResult = { kind: 'pass' };
 const YIELD: GateResult = { kind: 'yield' };
 
 async function mismatchOf(promise: Promise<GateResult>): Promise<LeagueMismatchError> {
-  const error: unknown = await promise.then(
-    () => {},
-    (error_: unknown) => error_,
-  );
+  const error = await rejectionOf(promise);
   expect(error).toBeInstanceOf(LeagueMismatchError);
   return error as LeagueMismatchError;
 }
@@ -115,7 +113,7 @@ describe('createLeagueGate', () => {
       [404, 403, 302].map(async (status) => {
         const { gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
 
-        const error: unknown = await gate({ entries: [] }).catch((error_: unknown) => error_);
+        const error = await rejectionOf(gate({ entries: [] }));
 
         expect(error).toBeInstanceOf(LeagueRequestRejectedError);
         expect((error as LeagueRequestRejectedError).status).toBe(status);

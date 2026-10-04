@@ -815,22 +815,40 @@ export function createTradeGovernor<Source extends string>(
 
   // Redacted in place, then rethrown: the class, the `name` and the identity
   // survive, so `isTransportFailure` still classifies the throw (§13.6).
+  const redactedExchange = async (
+    holderAuth: TradeGovernorAuth,
+    http: HttpPort,
+    request: TradeRequest,
+  ): Promise<TradeResult> => {
+    try {
+      return await exchange(http, request);
+    } catch (error) {
+      throw holderAuth.holder.redact(error);
+    }
+  };
+
   const redacted = (http: HttpPort, request: TradeRequest): Promise<TradeResult> =>
-    auth === undefined
-      ? exchange(http, request)
-      : exchange(http, request).catch((error: unknown) => {
-          throw auth.holder.redact(error);
-        });
+    auth === undefined ? exchange(http, request) : redactedExchange(auth, http, request);
+
+  // The queue must survive a rejected exchange, or one failure would wedge
+  // every later request behind it.
+  const settle = async (promise: Promise<unknown>): Promise<void> => {
+    try {
+      await promise;
+    } catch {
+      // Swallowed on purpose: the caller of `send` gets the rejection.
+    }
+  };
+
+  const issueAfter = async (previous: Promise<unknown>, http: HttpPort, request: TradeRequest): Promise<TradeResult> => {
+    await previous;
+    return redacted(http, request);
+  };
 
   const clientFor = (http: HttpPort): TradeClient => ({
     send(request) {
-      const issued = tail.then(
-        () => redacted(http, request),
-        () => redacted(http, request),
-      );
-      // The queue must survive a rejected exchange, or one failure would wedge
-      // every later request behind it.
-      tail = issued.catch(() => {});
+      const issued = issueAfter(tail, http, request);
+      tail = settle(issued);
       return issued;
     },
   });
