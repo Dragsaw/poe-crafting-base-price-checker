@@ -214,7 +214,7 @@ describe('runChunk: the three bounds and the yield', () => {
     expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B), key(C)], entries: [], records: [] });
     expect(visited).toEqual([key(A), key(B), key(C)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A), key(B), key(C)],
     });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
@@ -232,7 +232,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     expect(outcome).toMatchObject({ kind: 'bounded', bound: 'search', completed: [key(A), key(B)] });
     expect(visited).not.toContain(key(C));
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B)] });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -260,7 +260,7 @@ describe('runChunk: the three bounds and the yield', () => {
     const outcome = await run(ports, step);
 
     expect(outcome).toEqual({ kind: 'completed', completed: [key(A), key(B)], entries: [], records: [] });
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B)] });
   });
 
   it('an allowance of exactly 1 does not bound', async () => {
@@ -294,7 +294,7 @@ describe('runChunk: the three bounds and the yield', () => {
 
     expect(outcome).toEqual({ kind: 'yielded', completed: [key(A)], entries: [], records: [] });
     expect(visited).toEqual([key(A), key(B)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
@@ -574,7 +574,7 @@ describe('runChunk: resume and pass', () => {
     expect(visited).toEqual([key(B), key(C)]);
     expect(outcome.completed).toEqual([key(B), key(C)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A), key(B), key(C)],
     });
   });
@@ -591,7 +591,7 @@ describe('runChunk: resume and pass', () => {
 
     expect(visited).toEqual([key(A)]);
     // The earlier pass's B and C are gone: only this pass's work is recorded.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
   });
 
   // Story hybrid-mods 2, I/O matrix "Old progress keys": a key the 2.0.0 tracked
@@ -606,13 +606,13 @@ describe('runChunk: resume and pass', () => {
     await run(ports, step);
 
     expect(visited).toEqual([key(B), key(C)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B), key(C)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B), key(C)] });
   });
 
   it('records completed entries only, never the planned ones', async () => {
     const { fs, ports } = harness();
     await run(ports, scriptedStep(() => ({ kind: 'yielded' })).step);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [] });
   });
 
   it('refuses a progress file of an unknown major and still releases the lock', async () => {
@@ -633,7 +633,7 @@ describe('runChunk: resume and pass', () => {
     // `SyncProgressFileSchema` extends the progress shape with `schemaVersion`,
     // so the declared order puts it last.
     expect(await fs.readTextFile(PROGRESS_PATH)).toBe(
-      `{\n  "completed": [\n    ${JSON.stringify(key(A))}\n  ],\n  "schemaVersion": "1.1.0"\n}\n`,
+      `{\n  "completed": [\n    ${JSON.stringify(key(A))}\n  ],\n  "schemaVersion": "1.2.0"\n}\n`,
     );
   });
 });
@@ -772,7 +772,7 @@ describe('runChunk: the lock', () => {
 
     expect(await fs.exists(LOCK_PATH)).toBe(false);
     // What the chunk completed is kept, and no penalty is remembered.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
   });
 
   it('a MalformedRequestError from the step releases the lock and is rethrown', async () => {
@@ -919,7 +919,7 @@ describe('runChunk: the Refresh Rotation', () => {
     // it is recovered into row 2 rather than waiting in row 3 (AD-7).
     expect(visited).toEqual([key(C), key(U), key(B), key(A)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A), key(B), key(C), key(U)],
     });
   });
@@ -962,7 +962,7 @@ describe('runChunk: the Refresh Rotation', () => {
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 2, activeRefreshed: 2 },
     });
     // Row 1 is exempt from the pass.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B)] });
   });
 
   it('starvation leaves the outcome kind unchanged: the reserved search still bounds the chunk', async () => {
@@ -1051,7 +1051,7 @@ describe('runChunk: the Refresh Rotation', () => {
       records: [],
       pinnedStarvation: { discoveredAllowance: 3, pinnedCount: 3, pinnedRefreshed: 1, activeRefreshed: 0 },
     });
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [] });
   });
 
   it('a recovered pinned + unresolvable entry rejoins row 1, exempt from the pass', async () => {
@@ -1066,7 +1066,7 @@ describe('runChunk: the Refresh Rotation', () => {
     await run(ports, step);
 
     expect(visited).toEqual([key(PU), key(A)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
   });
 
   it('no rotation waiting: 3 pinned alone with R=1 are all visited, with no record', async () => {
@@ -1097,7 +1097,7 @@ describe('runChunk: the Refresh Rotation', () => {
     await run(ports, step);
 
     expect(visited).toEqual([key(P1), key(B)]);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B)] });
   });
 });
 
@@ -1390,7 +1390,7 @@ describe('runChunk: the Sync Report', () => {
     });
     // A malformed-request abort remembers the full staleLockAfter (§5.3).
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A), key(B)],
       notBefore: '2026-09-26T18:00:00.000Z',
     });
@@ -1448,7 +1448,7 @@ describe('runChunk: the Sync Report', () => {
       price: { state: 'not-yet-synced', reason: 'never-synced' },
     });
     // Only a MalformedRequestError writes the abort notBefore.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B)] });
 
     const report = await reportOf(fs);
     expect(report?.records).toEqual([
@@ -1488,7 +1488,7 @@ describe('runChunk: the Sync Report', () => {
     expect(byKey.get(key(B))).toEqual(done(B));
     expect(byKey.get(key(C))).toEqual(stamped);
     // Only a rejected request writes the abort notBefore.
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A), key(B)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A), key(B)] });
 
     const report = await reportOf(fs);
     expect(report?.records).toEqual([
@@ -1560,7 +1560,7 @@ describe('runChunk: the Sync Report', () => {
     ).rejects.toBe(failure);
 
     expect(await fs.exists(DATASET_PATH)).toBe(true);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
     const report = await reportOf(fs);
     expect(report?.records).toEqual([
       { kind: 'run-failure', reason: 'unrecoverable-error', entryKey: key(B), message: 'step exploded' },
@@ -1580,7 +1580,7 @@ describe('runChunk: the Sync Report', () => {
     ]);
     // The gate runs after the order, so the throw publishes the marks (none here).
     expect(await fs.exists(DATASET_PATH)).toBe(true);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [] });
   });
 
   it('a failure record follows the records carried from the previous report', async () => {
@@ -2293,7 +2293,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     const published = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
     expect(published.league).toBe('Standard');
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [],
       notBefore: '2026-09-26T18:00:00.000Z',
     });
@@ -2366,7 +2366,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     expect(published.league).toBe('Old League');
     expect(published.entries.map((entry) => entry.entryKey)).toEqual([key(A), key(B)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A)],
       notBefore: '2026-09-26T12:01:00.000Z',
     });
@@ -2392,7 +2392,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
     expect((await run(ports, scriptedStep().step)).kind).toBe('yielded');
 
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A)],
       notBefore: '2026-09-26T14:00:00.000Z',
     });
@@ -2425,7 +2425,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
 
     expect((await run(ports, scriptedStep().step)).kind).toBe('yielded');
 
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
     expect(await fs.exists(DATASET_PATH)).toBe(true);
     expect((await reportOf(fs))?.figures.notReachedCount).toBe(1);
   });
@@ -2470,7 +2470,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
 describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3)', () => {
   /** The progress file of a previous chunk that ended on a penalty. */
   function progressWithNotBefore(completed: readonly string[], notBefore: string): string {
-    return JSON.stringify({ schemaVersion: '1.1.0', completed, notBefore });
+    return JSON.stringify({ schemaVersion: '1.2.0', completed, notBefore });
   }
 
   async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
@@ -2502,7 +2502,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     expect((await run(ports, step)).kind).toBe('yielded');
 
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A)],
       notBefore: '2026-09-26T12:01:00.000Z',
     });
@@ -2525,7 +2525,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
 
     expect((await run(ports, step)).kind).toBe('yielded');
 
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [] });
   });
 
   it.each([
@@ -2904,7 +2904,7 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
     const published = await datasetEntriesOf(fs);
     expect(published?.find((entry) => entry.entryKey === key(X))?.price).toEqual({ state: 'unresolvable' });
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [],
       notBefore: '2026-09-26T12:01:00.000Z',
     });
@@ -2944,7 +2944,7 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
     expect((await datasetEntriesOf(fs))?.find((entry) => entry.entryKey === key(X))?.price).toEqual({
       state: 'unresolvable',
     });
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [] });
     const report = await reportOf(fs);
     expect(report?.figures.notReachedCount).toBe(3);
     expect(report?.records).toEqual([UNRESOLVABLE_X]);
@@ -3007,7 +3007,7 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
     expect(published?.find((entry) => entry.entryKey === key(B))).toEqual(noListingsNow(B));
     expect(published?.find((entry) => entry.entryKey === key(X))?.price).toEqual({ state: 'unresolvable' });
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A), key(B)].toSorted(compareCanonicalKeys),
     });
     expect((await reportOf(fs))?.records).toEqual([
@@ -3076,7 +3076,7 @@ describe('runChunk: under a session (ChunkPorts.session)', () => {
     });
     expect(visited).toEqual([key(A)]);
     expect(calls).toHaveLength(1);
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
   });
 
   it('maxEntries 1 on the last entry of the pass is completed', async () => {
@@ -3341,7 +3341,7 @@ describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () =>
     // The entry the baseline answered keeps its result.
     expect(outcome.completed).toEqual([key(A)]);
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [key(A)],
       notBefore: '2026-09-26T12:02:00.000Z',
     });
@@ -3374,7 +3374,7 @@ describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () =>
     const outcome = await run({ ...ports, latchedRetryAfterMs: () => undefined }, step);
 
     expect(outcome.kind).toBe('completed');
-    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.1.0', completed: [key(A)] });
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
   });
   it('the step throws after the latch (an unexpected baseline body): the failure path still persists notBefore', async () => {
     const { fs, ports } = harness([A]);
@@ -3393,9 +3393,150 @@ describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () =>
     await expect(run({ ...ports, latchedRetryAfterMs: () => latchedMs }, step)).rejects.toBe(failure);
 
     expect(await progressOf(fs)).toEqual({
-      schemaVersion: '1.1.0',
+      schemaVersion: '1.2.0',
       completed: [],
       notBefore: '2026-09-26T12:02:00.000Z',
     });
+  });
+});
+
+describe('runChunk: the session-cookie hold-off (AD-30, IMPLEMENTATION-NOTES.md §13.1, §13.3, §13.4)', () => {
+  const HOLD_OFF = '2026-09-27T06:00:00.000Z';
+  const NOW_PLUS_24H = '2026-09-27T12:00:00.000Z';
+
+  /** A recording stand-in for the holder's two narrow ports. */
+  function fakeAuth(pending?: 'write' | 'clear') {
+    const calls: string[] = [];
+    let action = pending;
+    const auth: NonNullable<ChunkPorts['auth']> = {
+      settleHeldOffIfDue: (until, now) => {
+        calls.push(`settle ${String(until)} ${now}`);
+      },
+      pendingHoldOff: () => action,
+      holdOffApplied: (applied) => {
+        calls.push(`applied ${applied}`);
+        if (action === applied) {
+          action = undefined;
+        }
+      },
+    };
+    return { auth, calls, pending: () => action };
+  }
+
+  const progressWith = (fields: Record<string, unknown>) => ({
+    [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.1.0', completed: [], ...fields }) },
+  });
+
+  it('reads a 1.1.0 progress file and writes 1.2.0', async () => {
+    const { fs, ports } = harness([A], progressWith({}));
+    await run(ports, scriptedStep().step);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
+  });
+
+  it('after the lock and the notBefore check, hands the loaded hold-off and now to the settle port', async () => {
+    const { auth, calls } = fakeAuth();
+    const { ports } = harness([A], progressWith({ authHoldOffUntil: HOLD_OFF }), { auth });
+    await run(ports, scriptedStep().step);
+    expect(calls[0]).toBe(`settle ${HOLD_OFF} ${NOW}`);
+  });
+
+  it('a deferred run settles nothing and applies no pending action', async () => {
+    const { auth, calls, pending } = fakeAuth('write');
+    const seeded = progressWith({ notBefore: '2026-09-26T13:00:00.000Z', authHoldOffUntil: HOLD_OFF });
+    const { fs, ports } = harness([A], seeded, { auth });
+    const outcome = await run(ports, scriptedStep().step);
+    expect(outcome.kind).toBe('deferred');
+    expect(calls).toEqual([]);
+    expect(pending()).toBe('write');
+    // Untouched: the seeded 1.1.0 bytes, not a rewrite.
+    expect(await fs.readTextFile(PROGRESS_PATH)).toBe(seeded[PROGRESS_PATH].contents);
+  });
+
+  it('a failed progress write applies nothing: the pending write survives for the next write', async () => {
+    const { auth, calls, pending } = fakeAuth('write');
+    const { fs, ports } = harness([A], progressWith({}), { auth });
+    const faulty = {
+      ...fs,
+      writeTextFile: (path: string, contents: string) =>
+        path === PROGRESS_PATH ? Promise.reject(new Error(`disk full: ${path}`)) : fs.writeTextFile(path, contents),
+    };
+
+    await expect(run({ ...ports, fs: faulty }, scriptedStep().step)).rejects.toThrow(`disk full: ${PROGRESS_PATH}`);
+
+    expect(calls.some((call) => call.startsWith('applied'))).toBe(false);
+    expect(pending()).toBe('write');
+  });
+
+  it('a busy run applies no pending action', async () => {
+    const { auth, calls, pending } = fakeAuth('write');
+    const { ports } = harness([A], { [LOCK_PATH]: { contents: serialiseLock({ pid: 7, startedAt: FIVE_HOURS_AGO }) } }, { auth });
+    expect((await run(ports, scriptedStep().step)).kind).toBe('busy');
+    expect(calls).toEqual([]);
+    expect(pending()).toBe('write');
+  });
+
+  it('a pending write sets authHoldOffUntil = now + 24h in the chunk’s progress write, and is applied', async () => {
+    const { auth, calls, pending } = fakeAuth('write');
+    const { fs, ports } = harness([A], progressWith({}), { auth });
+    await run(ports, scriptedStep().step);
+    expect(await progressOf(fs)).toEqual({
+      schemaVersion: '1.2.0',
+      completed: [key(A)],
+      authHoldOffUntil: NOW_PLUS_24H,
+    });
+    expect(calls).toContain('applied write');
+    expect(pending()).toBeUndefined();
+  });
+
+  it('a pending clear removes the field', async () => {
+    const { auth, pending } = fakeAuth('clear');
+    const { fs, ports } = harness([A], progressWith({ authHoldOffUntil: HOLD_OFF }), { auth });
+    await run(ports, scriptedStep().step);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)] });
+    expect(pending()).toBeUndefined();
+  });
+
+  it.each([
+    ['no auth port', undefined],
+    ['no pending action', fakeAuth().auth],
+  ])('%s: the loaded value is carried forward', async (_label, auth) => {
+    const { fs, ports } = harness([A], progressWith({ authHoldOffUntil: HOLD_OFF }), auth === undefined ? {} : { auth });
+    await run(ports, scriptedStep().step);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [key(A)], authHoldOffUntil: HOLD_OFF });
+  });
+
+  it('a session-expired step yield: yielded with the signal, the entry stamped, no notBefore, the hold-off written', async () => {
+    const { auth } = fakeAuth('write');
+    const { fs, ports } = harness([A, B], progressWith({}), { auth });
+    const stamped: DatasetEntry = {
+      entryKey: key(A),
+      price: { state: 'not-yet-synced', reason: 'never-synced' },
+      lastAttemptedAt: NOW,
+    };
+    const { visited, step } = scriptedStep(() => ({ kind: 'yielded', entry: stamped, sessionExpired: true }));
+
+    const outcome = await run(ports, step);
+
+    expect(outcome).toMatchObject({ kind: 'yielded', sessionExpired: true, completed: [] });
+    expect(visited).toEqual([key(A)]);
+    expect(await progressOf(fs)).toEqual({ schemaVersion: '1.2.0', completed: [], authHoldOffUntil: NOW_PLUS_24H });
+    const dataset = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
+    expect(dataset.entries.find((entry) => entry.entryKey === key(A))?.lastAttemptedAt).toBe(NOW);
+  });
+
+  it('an ordinary yield carries no session-expired signal', async () => {
+    const { ports } = harness([A], progressWith({}));
+    const outcome = await run(ports, scriptedStep(() => ({ kind: 'yielded' })).step);
+    expect(outcome.kind === 'yielded' && outcome.sessionExpired).toBeUndefined();
+  });
+
+  it('the failure path applies the pending action in its progress write', async () => {
+    const { auth, pending } = fakeAuth('write');
+    const { fs, ports } = harness([A], progressWith({}), { auth });
+    await expect(
+      run(ports, () => Promise.reject(new Error('boom'))),
+    ).rejects.toThrow('boom');
+    expect(await progressOf(fs)).toMatchObject({ authHoldOffUntil: NOW_PLUS_24H });
+    expect(pending()).toBeUndefined();
   });
 });

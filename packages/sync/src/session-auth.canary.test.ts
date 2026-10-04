@@ -529,3 +529,103 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     expect(leaksIn(scanned)).toEqual([]);
   });
 });
+
+describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => {
+  const RESULTS = ['r1'];
+  const SEARCHED = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length });
+  const LIVE_HEADERS = {
+    'x-rate-limit-policy': 'search-policy',
+    'x-rate-limit-rules': 'Ip',
+    'x-rate-limit-ip': '30:300:60',
+    'x-rate-limit-ip-state': '1:300:0',
+  };
+  /** A body and headers that quote the request's cookie in every form. */
+  const quoting = (cookie: string) => ({
+    body: `echo ${cookie} ${encodeURIComponent(cookie)} ${Buffer.from(cookie).toString('base64')}`,
+    headers: { 'set-cookie': cookie, 'x-echo': Buffer.from(cookie).toString('base64') },
+  });
+
+  type Downgrade = '401' | '403' | 'not-live';
+
+  /** A live probe, then the fetch that carries the cookie gets a downgrade that quotes it. */
+  function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
+    let downgraded = 0;
+    const fake = createFakeHttpPort({
+      [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
+      [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: SEARCHED },
+      [`GET ${tradeFetchUrl(RESULTS, 'S1')}`]: { status: 200, headers: {}, body: '{"result":[]}' },
+    });
+    return {
+      port: {
+        send: (request: HttpRequest) => {
+          const cookie = request.headers['cookie'];
+          if (cookie === undefined) {
+            return fake.send(request);
+          }
+          if (request.method === 'GET') {
+            downgraded += 1;
+            const echo = quoting(cookie);
+            return Promise.resolve(
+              kind === 'not-live'
+                ? { status: 200, headers: echo.headers, body: echo.body }
+                : { status: Number(kind), headers: echo.headers, body: echo.body },
+            );
+          }
+          return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
+        },
+      },
+      downgraded: () => downgraded,
+    };
+  }
+
+  const KINDS: readonly Downgrade[] = ['401', '403', 'not-live'];
+
+  it.each(KINDS)('pnpm sync:batch: a %s downgrade quoting the cookie leaves no trace', async (kind) => {
+    const captured = capturing();
+    const http = downgradingHttp(kind);
+
+    const { code, lines } = await runBatch(captured, http.port);
+
+    expect(code).toBe(0);
+    expect(http.downgraded()).toBe(1);
+    expect(lines).toContain('pnpm sync:batch: unauthenticated (expired)');
+    const scanned = [...lines, ...captured.texts, ...(await captured.files())].join('\n');
+    expect(scanned).toContain('authHoldOffUntil');
+    expect(leaksIn(scanned)).toEqual([]);
+  });
+
+  it.each(KINDS)('pnpm sync: a %s downgrade quoting the cookie leaves no trace', async (kind) => {
+    const captured = capturing();
+    const http = downgradingHttp(kind);
+
+    const { code, lines } = await runSession(captured, http.port);
+
+    expect(code).toBe(0);
+    expect(http.downgraded()).toBe(1);
+    expect(lines).toContain('pnpm sync: unauthenticated (expired)');
+    const scanned = [...lines, ...captured.texts, ...(await captured.files())].join('\n');
+    expect(scanned).toContain('authHoldOffUntil');
+    expect(leaksIn(scanned)).toEqual([]);
+  });
+
+  it.each(KINDS)('the outcome of a chunk with a %s downgrade carries no trace', async (kind) => {
+    const captured = capturing();
+    const http = downgradingHttp(kind);
+
+    const outcome = await composeChunk({
+      fs: captured.fs,
+      clock: createFakeClockPort(NOW),
+      http: http.port,
+      git: createFakeGitPort(),
+      wait: () => Promise.resolve(),
+      userAgent: CONTACT,
+      pid: 4242,
+      log: () => undefined,
+      auth: createSessionAuth(ENV),
+    }).run();
+
+    expect(outcome).toMatchObject({ kind: 'yielded', sessionExpired: true });
+    const scanned = [JSON.stringify(outcome), ...captured.texts, ...(await captured.files())].join('\n');
+    expect(leaksIn(scanned)).toEqual([]);
+  });
+});

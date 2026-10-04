@@ -40,6 +40,7 @@ import {
   type RateLimitBucket,
   type RateLimitHeaders,
   type RateLimitSkip,
+  rateLimitPolicyOf,
   ruleNameCount,
 } from './rate-limit-headers.ts';
 import type { SessionAuth } from './session-auth.ts';
@@ -53,6 +54,8 @@ const JSON_CONTENT_TYPE = 'application/json';
 const RETRY_AFTER_HEADER = 'retry-after';
 
 const TOO_MANY_REQUESTS = 429;
+const UNAUTHORIZED = 401;
+const FORBIDDEN = 403;
 const MS_PER_SECOND = 1000;
 
 /**
@@ -154,10 +157,17 @@ export interface TradeResponseResult extends TradeExchange {
   readonly response: HttpResponse;
 }
 
+/**
+ * `session-expired` is AD-30's downgrade (IMPLEMENTATION-NOTES.md §13.4): a
+ * request that carried the session cookie got a `401`, a `403` or a 2xx that
+ * failed the liveness test. It carries no response and no penalty, so the
+ * pricing step reads it as AD-9's request with no answer.
+ */
 export type TradeYieldReason =
   | 'retry-after-header'
   | 'derived-penalty'
-  | 'invalid-request-threshold';
+  | 'invalid-request-threshold'
+  | 'session-expired';
 
 /**
  * A `429`, or a refusal at the Invalid Requests Threshold. The client **never
@@ -171,11 +181,16 @@ export interface TradeYieldResult extends TradeExchange {
   readonly kind: 'yield';
   /**
    * `0` on an `invalid-request-threshold` yield, because that breach is not
-   * recoverable by waiting — the run has to stop, not pause.
+   * recoverable by waiting — the run has to stop, not pause. `0` on a
+   * `session-expired` yield too, which carries no penalty:
+   * `penaltyRetryAfterMs` answers `undefined` for both.
    */
   readonly retryAfterMs: number;
   readonly reason: TradeYieldReason;
-  /** Absent on a threshold refusal: nothing was issued, so nothing came back. */
+  /**
+   * Absent on a threshold refusal: nothing was issued, so nothing came back.
+   * Absent on a `session-expired` yield: the downgrading answer is discarded.
+   */
   readonly response?: HttpResponse;
 }
 
@@ -186,6 +201,7 @@ export interface TradeYieldResult extends TradeExchange {
  * IMPLEMENTATION-NOTES.md §5.3, the input to a chunk's `notBefore`.
  */
 export function penaltyRetryAfterMs(result: TradeYieldResult): number | undefined {
+  // `invalid-request-threshold` and `session-expired` carry no penalty.
   return result.reason === 'retry-after-header' || result.reason === 'derived-penalty'
     ? result.retryAfterMs
     : undefined;
@@ -405,6 +421,18 @@ export function createPacingState(): PacingState {
 }
 
 /**
+ * Resets `pacing` to cold **in place** (AD-30, IMPLEMENTATION-NOTES.md §13.4):
+ * the same object keeps living in the session, with an empty ledger and an
+ * empty lane memo, so no authenticated reading paces an unauthenticated
+ * request. The ledger becomes a new reference, so a caller that compares
+ * ledgers by reference must not read the reset as a fresh State reading.
+ */
+export function resetPacingState(pacing: PacingState): void {
+  pacing.ledger = EMPTY_LEDGER;
+  pacing.lanePolicies.clear();
+}
+
+/**
  * The delay the governor would ask before the next request on `lane`, at
  * `now`. `spread` selects the session's even spread (`spreadBeforeNext`) over
  * the batch pacer (`paceBeforeNext`). A lane whose policy is unknown asks
@@ -514,11 +542,44 @@ export function createTradeGovernor<Source extends string>(
    * settled `authenticated` (AD-30). The holder adds the header itself, so the
    * value never passes through this module as a string it keeps.
    */
-  function outboundHeaders(request: TradeRequest): Record<string, string> {
+  function outboundHeaders(request: TradeRequest, withCookie: boolean): Record<string, string> {
     const headers = headersFor(request, userAgent);
-    return request.cookieEligible === true && auth?.holder.isAuthenticated === true
-      ? auth.holder.withCookie(headers)
-      : headers;
+    return withCookie && auth !== undefined ? auth.holder.withCookie(headers) : headers;
+  }
+
+  /**
+   * Set by this governor's downgrade, before the holder hears of it, so the
+   * cookie is dropped first (§13.4 step 1). The holder's `expired` state then
+   * keeps it dropped for every later governor of the process.
+   */
+  let cookieDropped = false;
+
+  /** Whether `request` goes out with the cookie: marked, and the holder live. */
+  function carriesCookie(request: TradeRequest): boolean {
+    return (
+      !cookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
+    );
+  }
+
+  /**
+   * A downgrade (§13.4): the answer to a request that carried the cookie is a
+   * `401` or a `403` (a Cloudflare `403` too; no rule reads the body or a
+   * header), or a 2xx under the baseline's policy whose rule-name count is not
+   * above the baseline's. Counts only, as the probe's test (§13.2). A 2xx under
+   * another policy (a fetch) is not: the search baseline's count says nothing
+   * about it. A `429`, a `5xx` and any other `4xx` are not.
+   */
+  function isDowngrade(holder: SessionAuth, response: HttpResponse): boolean {
+    if (response.status === UNAUTHORIZED || response.status === FORBIDDEN) {
+      return true;
+    }
+    const baseline = holder.baselineRuleCount;
+    return (
+      isSuccess(response.status) &&
+      baseline !== undefined &&
+      rateLimitPolicyOf(response.headers) === holder.baselinePolicy &&
+      ruleNameCount(response.headers) <= baseline
+    );
   }
 
   /**
@@ -608,7 +669,11 @@ export function createTradeGovernor<Source extends string>(
       return;
     }
     if (isSuccess(status)) {
-      const live = ruleNameCount(response.headers) > ruleNameCount(baseline.headers);
+      // Kept by the holder: every later cookie answer under the baseline's
+      // policy is tested against it (§13.4).
+      const baselineCount = ruleNameCount(baseline.headers);
+      holder.rememberBaseline(baselineCount, rateLimitPolicyOf(baseline.headers));
+      const live = ruleNameCount(response.headers) > baselineCount;
       holder.settle(live ? 'authenticated' : 'not-elevated');
       return;
     }
@@ -671,14 +736,35 @@ export function createTradeGovernor<Source extends string>(
     // before this response replaces it.
     const pacedOn = knownPolicy === undefined ? undefined : pacing.ledger[knownPolicy];
 
+    const withCookie = carriesCookie(request);
     const response = await http.send({
       method: request.method,
       url: request.url,
-      headers: outboundHeaders(request),
+      headers: outboundHeaders(request, withCookie),
       body: request.body,
     });
 
     const { parsed, respondedAt, policy } = fold(lane, knownPolicy, response);
+
+    // The downgrade (§13.4), before the invalid-request count: the
+    // downgrading 401 or 403 is not counted, and its answer is not returned.
+    if (withCookie && auth !== undefined && isDowngrade(auth.holder, response)) {
+      // 1. Drop the cookie. 2. Reset the pacing to cold, in place. 3. The
+      // holder settles `expired` and records the hold-off write. 4. Yield.
+      cookieDropped = true;
+      resetPacingState(pacing);
+      auth.holder.expire();
+      return {
+        kind: 'yield',
+        lane,
+        policy,
+        waitedMs,
+        skips: parsed.skips,
+        invalidRequests: invalidRequestsFor(invalidRequests, policy),
+        retryAfterMs: 0,
+        reason: 'session-expired',
+      };
+    }
 
     // Every `4xx` counts, not only the three the documentation names.
     if (isInvalidRequest(response.status)) {

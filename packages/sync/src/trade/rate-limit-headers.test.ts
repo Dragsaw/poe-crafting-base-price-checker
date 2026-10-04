@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseRateLimitHeaders, ruleNameCount } from './rate-limit-headers.ts';
+import { parseRateLimitHeaders, rateLimitPolicyOf, ruleNameCount } from './rate-limit-headers.ts';
 
 /**
  * The rule names below appear **only here**. They are what a live response
@@ -153,5 +153,17 @@ describe('ruleNameCount (IMPLEMENTATION-NOTES.md §13.2)', () => {
     [{ 'x-rate-limit-rules': ' , ,' }, 0],
   ])('%j names %i distinct rule(s)', (headers, count) => {
     expect(ruleNameCount(headers)).toBe(count);
+  });
+});
+
+describe('rateLimitPolicyOf (IMPLEMENTATION-NOTES.md §13.2)', () => {
+  it.each([
+    [{}, undefined],
+    [{ 'x-rate-limit-policy': '' }, undefined],
+    [{ 'x-rate-limit-policy': '  ' }, undefined],
+    [{ 'x-rate-limit-policy': 'some-policy' }, 'some-policy'],
+    [{ 'X-Rate-Limit-Policy': ' Some-Policy ' }, 'some-policy'],
+  ])('%j is %s', (headers, policy) => {
+    expect(rateLimitPolicyOf(headers)).toBe(policy);
   });
 });

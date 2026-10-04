@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 27
+revision: 28
 created: '2026-09-12'
 updated: '2026-10-03'
 binds: []
@@ -1872,8 +1872,11 @@ never import each other.
   (AD-12).
 
   **The state settles once per process and only downgrades.** One liveness test applies to
-  every response that carried the cookie. The test compares the rule count against an
-  unauthenticated baseline and never compiles in a rule name (AD-8). The first answered
+  every response that carried the cookie under the baseline's rate-limit policy. The test
+  compares the rule count against an unauthenticated baseline of that policy, and never
+  compiles in a rule name or a policy name (AD-8). A cookie response under another policy (a
+  fetch) is held to the `401`/`403` rule only. **Rejected:** comparing a fetch with the search
+  baseline, which holds only while both policies list the same rules. The first answered
   pricing search is the baseline, and one probe search settles the state. A probe `429`
   settles nothing and stays AD-8's `429`: its `notBefore` persists through AD-8's path even
   when the probe is the last request of the chunk (`IMPLEMENTATION-NOTES.md` §13.3). A probe
@@ -2355,8 +2358,8 @@ poe-crafting-base-price-checker/
   `POESESSID` adds a rule name to `X-Rate-Limit-Rules`, measured once (research [30]). The
   second is that a dead cookie gets `401` or `403` on trade2, which is assumed. A capture of
   the no-cookie response carried `set-cookie: POESESSID`, so a dead cookie may get a 200 with
-  fewer rules instead. AD-30 is safe either way, because every cookie response is held to the
-  rule-count test. What a re-check settles is whether the warnings name the right reason, and
+  fewer rules instead. AD-30 is safe either way, because every cookie search is held to the
+  rule-count test, and a dead cookie is caught at the next search. What a re-check settles is whether the warnings name the right reason, and
   whether the cookie gives any gain. **Re-check by 2026-11-02**: record the rule names of the
   first live cookie run, sign out and record one cookie request, and capture the cookie and
   no-cookie requests with the contact `User-Agent` in

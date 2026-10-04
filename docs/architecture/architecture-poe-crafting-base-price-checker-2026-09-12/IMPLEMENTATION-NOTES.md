@@ -1552,11 +1552,19 @@ In these three cases the state settles `unauthenticated` and sync sends no probe
                 Cookie: POESESSID=<value>
 3. live(r)  ⇔  r.status is 2xx
               ∧  |names(r.X-Rate-Limit-Rules)|  >  |names(baseline.X-Rate-Limit-Rules)|
+4. tested(r) ⇔  policy(r.X-Rate-Limit-Policy)  =  policy(baseline.X-Rate-Limit-Policy)
 ```
 
 `names(h)` is the set of comma-separated rule names in the header, trimmed and case-folded.
 The predicate compares **counts only**. It never compares names, and no name or count is in
 the code (`test/no-hardcoded-rate-limits.test.ts` enforces this).
+
+`policy(h)` is the header value, trimmed and case-folded, or *none* when the header is absent
+or blank. *None* equals *none*. `tested` compares the two values with each other and never
+with a value in the code. The probe repeats the baseline's request and does not apply
+`tested`. After the probe, `live` applies only to a `tested` response (§13.4). A search and
+a fetch are counted under different policies. So the search baseline's count says nothing
+about a fetch.
 
 The baseline's answer is the pricing step's result in every case. The probe's State reading
 replaces the pacing values like any other reading (§5.3). The probe's search `id` never
@@ -1617,7 +1625,11 @@ cookie:
 
 - a `401` or `403`, a Cloudflare `403` included. No rule reads the body or a `cf-mitigated`
   header (AD-30).
-- a 2xx with `¬live(r)`.
+- a 2xx with `tested(r) ∧ ¬live(r)`.
+
+A 2xx that is not `tested` is never a downgrade. Its answer is the step's result, and its
+State reading paces like any other (§5.3). A cookie that dies with no `401` or `403` is then
+caught by the next `tested` response, which is the next entry's search.
 
 A probe `401` or `403` is `probe-rejected` and is not a downgrade. On a downgrade, the
 governor does these four things, in this order:

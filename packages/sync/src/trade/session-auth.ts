@@ -19,8 +19,17 @@
  * the process, and settles the holder by the §13.3 rows through `settle`, which
  * hands the §13.5 line to the shell's `onSettle` listener (§13.2, §13.3). After
  * an `authenticated` settle the governor asks `withCookie` to add the header,
- * so the value never leaves this module. The downgrade and the hold-off belong
- * to the next story.
+ * so the value never leaves this module.
+ *
+ * The holder lives for the process; a governor lives for one chunk. So the
+ * holder keeps what must outlive a chunk: the state, the baseline's rule count
+ * and policy (`rememberBaseline`, read by every later liveness test, §13.2) and the
+ * pending hold-off action. A cookie response after the probe that fails the
+ * test downgrades the holder through `expire`, the one move out of
+ * `authenticated` (§13.4). Each move records the §13.3 hold-off action, and
+ * the chunk runner applies it in its next `sync-progress.json` write through
+ * two narrow ports wired in `compose-chunk.ts`: `settleHeldOffIfDue` at run
+ * start and `pendingHoldOff` / `holdOffApplied` in `publish` (§13.1, §13.3).
  */
 
 import { Buffer } from 'node:buffer';
@@ -38,6 +47,21 @@ export type SessionAuthReason =
   | 'probe-failed'
   | 'not-probed'
   | 'expired';
+
+/**
+ * What the next `sync-progress.json` write does with `authHoldOffUntil`
+ * (§13.3): `write` sets it to the write's `now` plus the hold-off, `clear`
+ * removes it. No pending action carries the loaded value forward.
+ */
+export type HoldOffAction = 'write' | 'clear';
+
+/** The §13.3 action each settle records; a reason absent here records none. */
+const HOLD_OFF_ACTIONS: Partial<Record<SessionAuthReason | 'authenticated', HoldOffAction>> = {
+  authenticated: 'clear',
+  'not-elevated': 'write',
+  'probe-rejected': 'write',
+  expired: 'write',
+};
 
 export type SessionAuthState =
   | { readonly kind: 'unsettled' }
@@ -126,9 +150,15 @@ export class SessionAuth {
   readonly #value: string | undefined;
   /** The value and its encoded forms, longest first; empty when no value is kept. */
   readonly #forms: readonly string[];
-  /** Changed only by `settle`, and only from `unsettled`. */
+  /** Changed by `settle` only from `unsettled`, and by `expire` only from `authenticated`. */
   #state: SessionAuthState;
   readonly #onSettle: ((line: string) => void) | undefined;
+  /** The baseline's rule-name count, kept from the probe for the whole process (§13.2). */
+  #baselineRuleCount: number | undefined;
+  /** The baseline's `policy(X-Rate-Limit-Policy)`, kept with the count (§13.2). */
+  #baselinePolicy: string | undefined;
+  /** The hold-off action no progress write has applied yet (§13.3). */
+  #pendingHoldOff: HoldOffAction | undefined;
 
   /** Built by `createSessionAuth`; a valid value is the only one kept. */
   constructor(
@@ -169,17 +199,98 @@ export class SessionAuth {
   }
 
   /**
+   * The baseline's rule-name count, which the probe and every later liveness
+   * test compare against (§13.2). `undefined` until the governor probed.
+   */
+  get baselineRuleCount(): number | undefined {
+    return this.#baselineRuleCount;
+  }
+
+  /**
+   * The baseline's `policy(X-Rate-Limit-Policy)` (§13.2): only a later cookie
+   * answer under this policy is held to the rule-count test (§13.4).
+   * `undefined` before the probe, and when the baseline carried no policy.
+   */
+  get baselinePolicy(): string | undefined {
+    return this.#baselinePolicy;
+  }
+
+  /**
+   * Keeps the baseline's rule-name count and policy for the rest of the
+   * process. The governor calls it once, at the probe, before it settles.
+   * Counts only: no rule name is kept (§13.2).
+   */
+  rememberBaseline(ruleCount: number, policy: string | undefined): void {
+    this.#baselineRuleCount = ruleCount;
+    this.#baselinePolicy = policy;
+  }
+
+  /**
    * Settles the holder by a §13.3 row and hands the §13.5 line to `onSettle`,
    * once. A no-op unless the holder is `unsettled`: a settled state never
-   * moves here, and no line prints twice.
+   * moves here, and no line prints twice. The row's hold-off action becomes
+   * the pending one.
    */
   settle(outcome: SessionAuthReason | 'authenticated'): void {
     if (this.#state.kind !== 'unsettled') {
       return;
     }
-    this.#state =
-      outcome === 'authenticated' ? { kind: 'authenticated' } : { kind: 'unauthenticated', reason: outcome };
-    this.#onSettle?.(describeState(this.#state));
+    this.#moveTo(
+      outcome === 'authenticated' ? { kind: 'authenticated' } : { kind: 'unauthenticated', reason: outcome },
+      HOLD_OFF_ACTIONS[outcome],
+    );
+  }
+
+  /**
+   * The downgrade (§13.4): `authenticated` becomes `unauthenticated
+   * (expired)`, which drops the cookie for the rest of the process, prints
+   * one line and records a pending hold-off `write`. A no-op from any other
+   * state. Returns whether the holder moved.
+   */
+  expire(): boolean {
+    if (this.#state.kind !== 'authenticated') {
+      return false;
+    }
+    this.#moveTo({ kind: 'unauthenticated', reason: 'expired' }, HOLD_OFF_ACTIONS.expired);
+    return true;
+  }
+
+  /**
+   * The run-start hold-off check (§13.1), called after the lock and the
+   * `notBefore` check with the loaded `authHoldOffUntil`. While the holder
+   * may still probe and `now` is before that instant, it settles `held-off`,
+   * so the run sends no probe. Records no action: the field carries forward.
+   */
+  settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void {
+    if (!this.canProbe || holdOffUntil === undefined) {
+      return;
+    }
+    if (Date.parse(now) < Date.parse(holdOffUntil)) {
+      this.settle('held-off');
+    }
+  }
+
+  /** The hold-off action no progress write has applied yet, or `undefined`. */
+  pendingHoldOff(): HoldOffAction | undefined {
+    return this.#pendingHoldOff;
+  }
+
+  /**
+   * A progress write applied `action`. The pending action clears only when
+   * it is still that one, so an action recorded after the read survives.
+   */
+  holdOffApplied(action: HoldOffAction): void {
+    if (this.#pendingHoldOff === action) {
+      this.#pendingHoldOff = undefined;
+    }
+  }
+
+  #moveTo(state: SessionAuthState, action: HoldOffAction | undefined): void {
+    this.#state = state;
+    if (action !== undefined) {
+      this.#pendingHoldOff = action;
+    }
+    this.#onSettle?.(describeState(state));
   }
 
   /**
