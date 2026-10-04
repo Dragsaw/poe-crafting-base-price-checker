@@ -270,14 +270,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/catalogue-refresh.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/catalogue/catalogue-ids.ts": {
     "local/max-comment-run": {
       "count": 1
