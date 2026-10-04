@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 // Lints a commit subject against AGENT-WORKFLOW.md's Commit conventions.
-// Exit 1 blocks the commit and prints one reason plus the fix.
-// Installed via `core.hooksPath .githooks` (see package.json "prepare").
+// Exit 1 blocks the commit. Installed via `core.hooksPath .githooks` (package.json "prepare").
 
 import { readFileSync } from 'node:fs';
 
 const KNOWN_TYPES = ['feat', 'fix', 'test', 'docs', 'chore', 'wip', 'refactor', 'perf', 'build', 'ci'];
 const SUBJECT_PATTERN = /^([a-z]+)(\(([a-z0-9,\- ]+)\))?: (.+)$/;
-// The deferred-work-sweep skill's own automation commits carry a full,
-// period-terminated ledger `summary:`/`evidence:` sentence after the dash
-// (`chore(deferred): resolve — <summary>.`, `wip(deferred): blocked run
-// state — <slug>`), so the trailing-period rule does not apply to them.
+// Automation commits of the deferred-work-sweep skill end with a ledger sentence's period
+// (`chore(deferred): resolve — <summary>.`), so the period rule skips that scope.
 const PERIOD_EXEMPT_SCOPE = 'deferred';
 
 function fail(reason, fix) {

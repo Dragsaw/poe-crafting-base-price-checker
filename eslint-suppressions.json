@@ -10,9 +10,6 @@
     }
   },
   ".githooks/commit-msg": {
-    "local/max-comment-run": {
-      "count": 2
-    },
     "unicorn/name-replacements": {
       "count": 1
     }
