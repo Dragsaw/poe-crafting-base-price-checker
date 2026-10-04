@@ -532,7 +532,7 @@ interface SummandScan {
   readonly stamps: string[];
 }
 
-/** The summands of one pair, or `undefined` when the recipe cannot reach the class. */
+/** `undefined`: the recipe cannot reach the class. P is computed for priced and unpriced entries alike, so the verdict ignores the threshold. */
 function scanSummands({ recipe, pools, keyed, byKey, input }: CraftedRowOptions): SummandScan | undefined {
   const summands: CraftedSummand[] = [];
   // Summands only: the rates' asOf is not a timestamp input (AD-10).
@@ -565,19 +565,7 @@ function weakestProvenance({ first, recipe, pools, keyed }: CraftedRowOptions): 
   return provenance;
 }
 
-/**
- * One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe
- * cannot reach it: an entry's `combinationProbability` came back
- * `empty-eligible-pool`, `empty-contained` or `augment-exhausted` (IN §9,
- * §11) — a reason, never `P = 0`. P is computed for every non-pruned entry,
- * priced or not, so the verdict does not move with the threshold or the
- * dataset.
- *
- * A summand is an entry priced in the active league whose **gross** price is
- * at or above the threshold; its contribution is `P × price`. Nothing else is
- * summed. EV is the gross payout less the Craft Cost, subtracted once; an
- * uncostable recipe leaves EV `null`.
- */
+/** One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe cannot reach it (IN §9, §11). */
 function craftedRow(options: CraftedRowOptions): CraftedRankedRow | undefined {
   const { first, recipe, cost, keyed, byKey } = options;
   const scan = scanSummands(options);
