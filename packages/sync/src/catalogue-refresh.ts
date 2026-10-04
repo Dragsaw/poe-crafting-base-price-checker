@@ -52,6 +52,7 @@ import {
 } from './shell.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { createTradeClient } from './trade/client.ts';
+import type { TradeClient, TradeResult } from './trade/client.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 import {
   CATALOGUE_ENDPOINTS,
@@ -162,6 +163,96 @@ function refused(failure: string, requests: number): CatalogueRefreshOutcome {
   return { ok: false, failure, written: [], requests };
 }
 
+type Step<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly failure: string };
+
+function failed(failure: string): { readonly ok: false; readonly failure: string } {
+  return { ok: false, failure };
+}
+
+async function fetchBody(client: TradeClient, endpoint: CatalogueEndpoint): Promise<Step<string>> {
+  let result: TradeResult;
+  try {
+    result = await client.send({
+      method: 'GET',
+      url: endpoint.url,
+      // One lane over all four: they pace against one ledger entry, not four cold lanes.
+      lane: DATA_LANE,
+    });
+  } catch (error) {
+    // A rejection (timeout, DNS, reset) must also come back as a sentence, never a throw.
+    return failed(`${endpoint.artifact} could not be reached (${String(error)}). Nothing was written.`);
+  }
+
+  if (result.kind === 'yield') {
+    return failed(
+      `rate limited on ${endpoint.artifact}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`,
+    );
+  }
+
+  return result.response.status === 200
+    ? { ok: true, value: result.response.body }
+    : failed(`${endpoint.artifact} answered ${String(result.response.status)}. Nothing was written.`);
+}
+
+function validateBody(endpoint: CatalogueEndpoint, body: string): Step<Record<string, unknown>> {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body);
+  } catch (error) {
+    // A 200 with an HTML interstitial is the usual cause; a bare SyntaxError names no endpoint.
+    return failed(
+      `${endpoint.artifact} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`,
+    );
+  }
+
+  const schemas = SCHEMAS[endpoint.artifact];
+
+  const parsedPayload = schemas.payload.safeParse(payload);
+  if (!parsedPayload.success) {
+    return failed(
+      `${endpoint.artifact} does not match its catalogue schema — ${describeIssues(parsedPayload.error.issues)}. Nothing was written.`,
+    );
+  }
+
+  // The raw parsed JSON, not the schema output: ids reach disk verbatim and unknown fields survive.
+  const envelope = {
+    ...(payload as Record<string, unknown>),
+    schemaVersion: SUPPORTED_SCHEMA_VERSION,
+  };
+
+  // Unreachable today (the envelope is `payload.extend({schemaVersion})`); a gate for a future constraint.
+  const parsedFile = schemas.file.safeParse(envelope);
+  return parsedFile.success
+    ? { ok: true, value: envelope }
+    : failed(
+        `${endpoint.artifact} does not match its file envelope — ${describeIssues(parsedFile.error.issues)}. Nothing was written.`,
+      );
+}
+
+async function writeCaptured(
+  ports: CatalogueRefreshPorts,
+  captured: readonly { path: string; contents: string }[],
+  requests: () => number,
+): Promise<CatalogueRefreshOutcome> {
+  const written: string[] = [];
+  for (const { path, contents } of captured) {
+    try {
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the failure message reports how many writes had landed
+      await ports.writeCatalogueFile(path, contents);
+    } catch (error) {
+      // The one place all-or-nothing can break: the failure says how many landed and which path refused.
+      return {
+        ok: false,
+        failure: `writing ${path} failed (${String(error)}). ${String(written.length)} of ${String(captured.length)} artifacts had already been written; the catalogue is now mixed, so re-run pnpm catalogue:refresh or revert data/catalogue/.`,
+        written,
+        requests: requests(),
+      };
+    }
+    written.push(path);
+  }
+  return { ok: true, written, requests: requests() };
+}
+
 /**
  * Issues the four GETs, **buffers every artifact, and writes only once all four
  * have been fetched and validated.**
@@ -186,116 +277,22 @@ export async function refreshCatalogue(
   const captured: { path: string; contents: string }[] = [];
 
   for (const endpoint of CATALOGUE_ENDPOINTS) {
-    let result: Awaited<ReturnType<typeof client.send>>;
-    try {
-      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one lane, requests pace against one ledger entry
-      result = await client.send({
-        method: 'GET',
-        url: endpoint.url,
-        // One lane over all four, so they pace against one ledger entry rather
-        // than seeding four cold lanes.
-        lane: DATA_LANE,
-      });
-    } catch (error) {
-      // A rejection, not a status: the 30 s `AbortSignal.timeout`, a DNS
-      // failure, a socket reset. "A returned failure, never a throw" has to
-      // hold for these too, or the human gets a stack trace instead of a
-      // sentence naming which endpoint went quiet.
-      return refused(
-        `${endpoint.artifact} could not be reached (${String(error)}). Nothing was written.`,
-        requests(),
-      );
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one lane, requests pace against one ledger entry
+    const body = await fetchBody(client, endpoint);
+    if (!body.ok) {
+      return refused(body.failure, requests());
     }
-
-    if (result.kind === 'yield') {
-      // A yield is a value, never a throw: the client has already decided not
-      // to spend, and the human needs the delay it named to know when to
-      // return.
-      return refused(
-        `rate limited on ${endpoint.artifact}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`,
-        requests(),
-      );
+    const envelope = validateBody(endpoint, body.value);
+    if (!envelope.ok) {
+      return refused(envelope.failure, requests());
     }
-
-    if (result.response.status !== 200) {
-      return refused(
-        `${endpoint.artifact} answered ${String(result.response.status)}. Nothing was written.`,
-        requests(),
-      );
-    }
-
-    let payload: unknown;
-    try {
-      payload = JSON.parse(result.response.body);
-    } catch (error) {
-      // A 200 carrying an HTML interstitial is the usual cause, and a bare
-      // SyntaxError names neither the endpoint nor the fact that it answered.
-      return refused(
-        `${endpoint.artifact} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`,
-        requests(),
-      );
-    }
-
-    const schemas = SCHEMAS[endpoint.artifact];
-
-    const parsedPayload = schemas.payload.safeParse(payload);
-    if (!parsedPayload.success) {
-      return refused(
-        `${endpoint.artifact} does not match its catalogue schema — ${describeIssues(parsedPayload.error.issues)}. Nothing was written.`,
-        requests(),
-      );
-    }
-
-    /**
-     * The payload **as it arrived**, plus `schemaVersion`. The raw parsed JSON
-     * is spread rather than the schema's output value: ids go to disk verbatim,
-     * never trimmed, re-encoded, case-folded, sorted or flattened, and an
-     * unknown field GGG sends survives the round trip.
-     */
-    const envelope = {
-      ...(payload as Record<string, unknown>),
-      schemaVersion: SUPPORTED_SCHEMA_VERSION,
-    };
-
-    // Unreachable today: the envelope is exactly `payload.extend({schemaVersion})`
-    // and the version is a constant, so a payload that parsed cannot fail here.
-    // It is a gate against a future envelope that adds a constraint, not a path
-    // this story can exercise.
-    const parsedFile = schemas.file.safeParse(envelope);
-    if (!parsedFile.success) {
-      return refused(
-        `${endpoint.artifact} does not match its file envelope — ${describeIssues(parsedFile.error.issues)}. Nothing was written.`,
-        requests(),
-      );
-    }
-
     captured.push({
       path: catalogueFilePathOf(endpoint),
-      contents: serialiseCatalogue(envelope),
+      contents: serialiseCatalogue(envelope.value),
     });
   }
 
-  const written: string[] = [];
-  for (const { path, contents } of captured) {
-    try {
-      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the failure message reports how many writes had landed
-      await ports.writeCatalogueFile(path, contents);
-    } catch (error) {
-      // The one place all-or-nothing can still be broken: a permission or disk
-      // failure part way down leaves new files beside stale ones. Nothing here
-      // can undo the writes that landed, so the failure **says how many did**
-      // and names the path that refused — the human needs both to know what
-      // their working tree now holds.
-      return {
-        ok: false,
-        failure: `writing ${path} failed (${String(error)}). ${String(written.length)} of ${String(captured.length)} artifacts had already been written; the catalogue is now mixed, so re-run pnpm catalogue:refresh or revert data/catalogue/.`,
-        written,
-        requests: requests(),
-      };
-    }
-    written.push(path);
-  }
-  return { ok: true, written, requests: requests() };
+  return writeCaptured(ports, captured, requests);
 }
 
 async function main(): Promise<void> {

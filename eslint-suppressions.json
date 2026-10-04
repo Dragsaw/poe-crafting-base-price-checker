@@ -342,16 +342,7 @@
   },
   "packages/sync/src/catalogue-refresh.ts": {
     "local/max-comment-run": {
-      "count": 14
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "max-statements": {
-      "count": 1
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 1
+      "count": 10
     }
   },
   "packages/sync/src/catalogue/catalogue-ids.ts": {
