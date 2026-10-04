@@ -53,10 +53,10 @@ export interface RunState {
   isTruncated: boolean;
 }
 
-export type RunStateInput = Pick<
-  RunState,
-  'ports' | 'log' | 'mine' | 'requestsAtStart' | 'records' | 'progress' | 'previousReport'
->;
+/** What `runChunk` knows once it holds the lock, before any load. */
+export type RunContext = Pick<RunState, 'ports' | 'log' | 'mine' | 'requestsAtStart' | 'records'>;
+
+export type RunStateInput = RunContext & Pick<RunState, 'progress' | 'previousReport'>;
 
 /** A failure before the weights read is no re-read: the previous report's coverage pair stays. */
 export function carriedCoverage(previous: SyncReportFile | undefined): CoverageFigures {

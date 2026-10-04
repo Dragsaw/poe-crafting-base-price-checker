@@ -1,30 +1,22 @@
-/**
- * One bounded, resumable, single-instance chunk (AD-7, FR-19). The run-start sequence under the lock is AD-12's cost order.
- * A throw writes the report, and the dataset and progress once the order exists (AD-12, IMPLEMENTATION-NOTES.md §5.3).
- */
+/** One bounded, resumable, single-instance chunk (AD-7, FR-19): the run-start sequence is AD-12's cost order, and a throw writes what AD-12 and IMPLEMENTATION-NOTES.md §5.3 specify. */
 
-import { parseEnvelope, SyncProgressFileSchema, SyncReportFileSchema } from '@poe/contracts';
-import type { ClockPort, CurrencyRate, DatasetEntry, FilesystemPort, GitPort, SyncProgressFile, SyncRunRecord, TrackedEntry } from '@poe/contracts';
+import { parseEnvelope, SyncReportFileSchema } from '@poe/contracts';
+import type { ClockPort, CurrencyRate, DatasetEntry, FilesystemPort, GitPort, SyncLock, SyncRunRecord, TrackedEntry } from '@poe/contracts';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
-import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/league-gate.ts';
 import type { DataFileResult } from '../load-data-file.ts';
-import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
 import type { RequestsBySource } from '../request-counter.ts';
-import { writeArtifact } from '../write-artifact.ts';
-import { acquireLock, isLockHeld, isOwnLockReleased } from './lock.ts';
-import { PROGRESS_PATH, REPORT_PATH } from './run-chunk/data-paths.ts';
+import { acquireLock, isOwnLockReleased } from './lock.ts';
+import { REPORT_PATH } from './run-chunk/data-paths.ts';
 import { finishChunk, gateYieldOutcome } from './run-chunk/chunk-ending.ts';
-import { failureRecords } from './run-chunk/failure-records.ts';
+import { failRun } from './run-chunk/failure-path.ts';
 import { loadEnvelope } from './run-chunk/load-envelope.ts';
-import { failureNotBefore } from './run-chunk/not-before.ts';
-import { publish } from './run-chunk/publish-artifacts.ts';
+import { deferIfPaused, loadProgress } from './run-chunk/pause-deferral.ts';
+import type { ProgressLoad } from './run-chunk/pause-deferral.ts';
 import { checkRunStart, loadRunInputs, planOrder, runLeagueGate } from './run-chunk/run-start.ts';
-import { carriedCoverage, createRunState, newRecords } from './run-chunk/run-state.ts';
-import type { RunState } from './run-chunk/run-state.ts';
+import { createRunState } from './run-chunk/run-state.ts';
+import type { RunContext, RunState } from './run-chunk/run-state.ts';
 import { runSteps } from './run-chunk/step-loop.ts';
-import { writeReport } from './run-chunk/write-report.ts';
-import { buildSyncReport } from './sync-report.ts';
 
 export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './run-chunk/data-paths.ts';
 
@@ -185,7 +177,14 @@ export const writeStderr = (line: string): void => {
   process.stderr.write(`${line}\n`);
 };
 
-async function runNormalPath(state: RunState, progressFault: { readonly error: unknown } | undefined): Promise<ChunkOutcome> {
+function busyOutcome(log: (line: string) => void, holder: SyncLock | undefined): ChunkOutcome {
+  const described =
+    holder === undefined ? 'an unreadable lock' : `pid ${String(holder.pid)} since ${holder.startedAt}`;
+  log(`sync: another run holds the lock (${described}); nothing to do this invocation`);
+  return { kind: 'busy', completed: [], entries: [], records: [] };
+}
+
+async function runNormalPath(state: RunState, progressFault: ProgressLoad['fault']): Promise<ChunkOutcome> {
   if (progressFault !== undefined) {
     throw progressFault.error;
   }
@@ -200,140 +199,44 @@ async function runNormalPath(state: RunState, progressFault: { readonly error: u
   return finishChunk(state, ready, await runSteps(state, ready, plan));
 }
 
-export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
-  const { fs, clock, pid, requests } = ports;
-  const log = ports.log ?? writeStderr;
-  // The original error is always the one rethrown: a fault in a
-  // failure-path write goes to the log, and the report is still attempted
-  // after a failed publication.
-  const secondary = (what: string, fault: unknown): void => {
-    log(`sync: ${what} failed on the failure path: ${String(fault)}`);
-  };
-
-  const acquisition = await acquireLock(fs, clock, pid);
-  if (acquisition.kind === 'busy') {
-    const holder =
-      acquisition.holder === undefined
-        ? 'an unreadable lock'
-        : `pid ${String(acquisition.holder.pid)} since ${acquisition.holder.startedAt}`;
-    log(`sync: another run holds the lock (${holder}); nothing to do this invocation`);
-    return { kind: 'busy', completed: [], entries: [], records: [] };
+async function runUnderLock(context: RunContext): Promise<ChunkOutcome> {
+  const { ports } = context;
+  const { progress, fault } = await loadProgress(ports.fs);
+  const paused = await deferIfPaused(context, progress);
+  if (paused !== undefined) {
+    return paused;
   }
-
-  const mine = acquisition.lock;
-  const runStartedAt = mine.startedAt;
-  const requestsAtStart = requests.snapshot();
-  const records: SyncRunRecord[] = acquisition.broken === undefined ? [] : [acquisition.broken];
-
+  // After the lock and the `notBefore` check, a due hold-off settles `held-off`, so this run sends no probe (§13.1).
+  ports.auth?.settleHeldOffIfDue(progress?.authHoldOffUntil, ports.clock.now());
+  // Read outside the failure path: a report this build cannot read is refused with nothing written (NFR-8).
+  const previousReport = await loadEnvelope(ports.fs, REPORT_PATH, (data) =>
+    parseEnvelope(SyncReportFileSchema, data),
+  );
+  const state = createRunState({ ...context, progress, previousReport });
   try {
-    // The penalty memory (AD-8, IMPLEMENTATION-NOTES.md §5.3) is read before every other load; an unreadable progress file is thrown later, so it still fails the run with a report.
-    let progress: SyncProgressFile | undefined;
-    let progressFault: { readonly error: unknown } | undefined;
-    try {
-      progress = await loadEnvelope(fs, PROGRESS_PATH, (data) =>
-        parseEnvelope(SyncProgressFileSchema, data),
-      );
-    } catch (error) {
-      progressFault = { error };
-    }
-    const notBefore = progress?.notBefore;
-    if (notBefore !== undefined && Date.parse(clock.now()) < Date.parse(notBefore)) {
-      log(
-        `sync: a previous chunk set a pause until ${notBefore} (a 429 or a rejected request); nothing sent this invocation`,
-      );
-      // The one write: a broken stale lock's record is the only trace of the
-      // crash, so the report carries it alone.
-      if (acquisition.broken !== undefined && (await isLockHeld(fs, mine))) {
-        const previous = await loadEnvelope(fs, REPORT_PATH, (data) =>
-          parseEnvelope(SyncReportFileSchema, data),
-        );
-        await writeArtifact(
-          fs,
-          REPORT_PATH,
-          SyncReportFileSchema,
-          buildSyncReport({
-            previous,
-            newRecords: records,
-            figures: {
-              requestsBySource: {},
-              notReachedCount: 0,
-              // The pause is no re-read of the weights file: the figure stays.
-              ...carriedCoverage(previous),
-            },
-            runStartedAt,
-            runFinishedAt: clock.now(),
-          }),
-        );
-      }
-      return { kind: 'deferred', completed: [], entries: [], records, notBefore };
-    }
+    return await runNormalPath(state, fault);
+  } catch (error) {
+    return await failRun(state, error);
+  }
+}
 
-    // The hold-off across processes (§13.1): after the lock and the
-    // `notBefore` check, a due `authHoldOffUntil` settles a valid value
-    // `held-off`, so this run sends no probe.
-    ports.auth?.settleHeldOffIfDue(progress?.authHoldOffUntil, clock.now());
-
-    // Read first and outside the failure path: a report this build cannot
-    // read is refused with nothing written, so the player's records are never
-    // overwritten by a file that lost them (NFR-8).
-    const previousReport = await loadEnvelope(fs, REPORT_PATH, (data) =>
-      parseEnvelope(SyncReportFileSchema, data),
-    );
-
-    const state = createRunState({ ports, log, mine, requestsAtStart, records, progress, previousReport });
-
-    try {
-      return await runNormalPath(state, progressFault);
-    } catch (error) {
-      // A report that could not be written is not written again.
-      if (state.isReportAttempted) {
-        throw error;
-      }
-      if (!(await isLockHeld(fs, mine))) {
-        log('sync: the lock was taken over during this chunk; writing nothing');
-        throw error;
-      }
-      if (error instanceof LeagueMismatchError) {
-        // The run's premise is wrong: the report alone, with this chunk's lock
-        // record and the mismatch; the check's marks and records are discarded
-        // with the dataset write (AD-12).
-        try {
-          await writeReport(state, [...records, ...failureRecords(error, state.current)]);
-        } catch (error_) {
-          secondary('writing the report', error_);
-        }
-        throw error;
-      }
-      if (state.order !== undefined && state.setup !== undefined && !state.isPublishAttempted) {
-        // A throw once the order exists publishes the step entries and the marks, plus the failing entry for a rejected
-        // request or an unexpected body, which keeps an answered search's fields (AD-9, IMPLEMENTATION-NOTES.md §5.3).
-        const isMalformed = error instanceof MalformedRequestError;
-        // The gate's non-429 4xx is a rejected request too, and would be
-        // refused again on the next tick: it writes the same abort `notBefore`.
-        const isRejected = isMalformed || error instanceof LeagueRequestRejectedError;
-        const failing =
-          (isMalformed || error instanceof UnexpectedTradeResponseError) ? error.entry : undefined;
-        // A probe 429 latched before the throw still persists its penalty (§13.3).
-        const latchedMs = isRejected ? undefined : ports.latchedRetryAfterMs?.();
-        try {
-          await publish(
-            state,
-            state.setup.publication,
-            failing === undefined ? state.stepEntries : [...state.stepEntries, failing],
-            failureNotBefore(clock.now(), isRejected, latchedMs),
-          );
-        } catch (error_) {
-          secondary('publishing the dataset and progress', error_);
-        }
-      }
-      try {
-        await writeReport(state, newRecords(state, failureRecords(error, state.current)));
-      } catch (error_) {
-        secondary('writing the report', error_);
-      }
-      throw error;
-    }
+export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
+  const log = ports.log ?? writeStderr;
+  const acquisition = await acquireLock(ports.fs, ports.clock, ports.pid);
+  if (acquisition.kind === 'busy') {
+    return busyOutcome(log, acquisition.holder);
+  }
+  const mine = acquisition.lock;
+  const context: RunContext = {
+    ports,
+    log,
+    mine,
+    requestsAtStart: ports.requests.snapshot(),
+    records: acquisition.broken === undefined ? [] : [acquisition.broken],
+  };
+  try {
+    return await runUnderLock(context);
   } finally {
-    await isOwnLockReleased(fs, mine);
+    await isOwnLockReleased(ports.fs, mine);
   }
 }
