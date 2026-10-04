@@ -408,11 +408,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/session-auth.canary.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/shell-fetch.test.ts": {
     "local/max-comment-run": {
       "count": 1
