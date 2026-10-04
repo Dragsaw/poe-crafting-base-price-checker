@@ -688,8 +688,7 @@ function poolsFile(...classes: readonly (readonly [string, string, Pools])[]): W
 }
 
 /**
- * A crafted entry on `statId`, banded `[1, 10]`, whose suffix contains the
- * whole suffix pool: P is the contained share of the prefix pool.
+ * A crafted entry on `statId`, banded `[1, 10]`, whose suffix holds the whole suffix pool, so P is the prefix pool's share.
  */
 function chase(
   className: string,
