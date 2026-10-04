@@ -14,11 +14,10 @@ import type {
 
 import { markUnresolvable } from '../chunk/catalogue-check.ts';
 import type { ChunkStep, StepResult } from '../chunk/run-chunk.ts';
-import { penaltyRetryAfterMs } from '../trade/client.ts';
-import type { TradeClient, TradeResult } from '../trade/client.ts';
+import type { TradeClient } from '../trade/client.ts';
 import { FETCH_LANE, SEARCH_LANE, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
-import { isTransportFailure } from '../trade/transport-failure.ts';
 import { currentRates, lowerMedian, outputRate, toDivine } from './normalise.ts';
+import { sendLeg, yieldedWith } from './price-entry-leg.ts';
 import { buildSearchBody, UnknownClassBaseTypeError } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
 import { UnexpectedTradeResponseError } from './unexpected-trade-response-error.ts';
@@ -98,80 +97,27 @@ function parseSearchAnswer(body: string): SearchAnswer | undefined {
 }
 
 /** A `null` result or a listing with no readable price is not counted in `sampleSize`. */
+function listingOf(item: unknown): Listing | undefined {
+  if (!isRecord(item) || !isRecord(item['listing'])) {
+    return undefined;
+  }
+  const price = item['listing']['price'];
+  if (!isRecord(price)) {
+    return undefined;
+  }
+  const { amount, currency } = price;
+  const isReadable =
+    typeof amount === 'number' && typeof currency === 'string' && currency !== '' && Number.isFinite(amount) && amount > 0;
+  return isReadable ? { amount, currency } : undefined;
+}
+
 function parseListings(body: string): Listing[] | undefined {
   const data = parseJson(body);
   if (!isRecord(data) || !Array.isArray(data['result'])) {
     return undefined;
   }
-  const listings: Listing[] = [];
-  const items = data['result'];
-  for (const item of items) {
-    if (!isRecord(item) || !isRecord(item['listing'])) {
-      continue;
-    }
-    const price = item['listing']['price'];
-    if (!isRecord(price)) {
-      continue;
-    }
-    const { amount, currency } = price;
-    if (typeof amount !== 'number' || typeof currency !== 'string' || currency === '' || !Number.isFinite(amount) || amount <= 0) {
-      continue;
-    }
-    listings.push({ amount, currency });
-  }
-  return listings;
-}
-
-type Leg =
-  | { readonly kind: 'answered'; readonly result: Extract<TradeResult, { kind: 'response' }> }
-  | {
-      readonly kind: 'yield';
-      /** Set only on a `429` yield: the delay the client's yield carried (§5.3). */
-      readonly retryAfterMs?: number;
-      /** AD-30's downgrade (IMPLEMENTATION-NOTES.md §13.4): read as a request with no answer. */
-      readonly sessionExpired?: true;
-    }
-  | { readonly kind: 'malformed'; readonly status: number };
-
-/** The step's yield, carrying the leg's `retryAfterMs` where it has one. */
-function yieldedWith(
-  leg: Extract<Leg, { kind: 'yield' }>,
-  entry: DatasetEntry,
-): Extract<StepResult, { kind: 'yielded' }> {
-  return {
-    kind: 'yielded',
-    entry,
-    ...(leg.retryAfterMs !== undefined && { retryAfterMs: leg.retryAfterMs }),
-    ...((leg.sessionExpired === true) && { sessionExpired: true }),
-  };
-}
-
-const SERVER_ERROR = 500;
-
-/** A timeout or a lost connection yields as a 429 and a 5xx do: server trouble stops the chunk. */
-async function sendLeg(send: () => Promise<TradeResult>): Promise<Leg> {
-  let result: TradeResult;
-  try {
-    result = await send();
-  } catch (error) {
-    if (isTransportFailure(error)) {
-      return { kind: 'yield' };
-    }
-    throw error;
-  }
-  if (result.kind === 'yield') {
-    if (result.reason === 'session-expired') {
-      // The downgrading answer is discarded: AD-9's request with no answer.
-      return { kind: 'yield', sessionExpired: true };
-    }
-    const retryAfterMs = penaltyRetryAfterMs(result);
-    return retryAfterMs === undefined ? { kind: 'yield' } : { kind: 'yield', retryAfterMs };
-  }
-  const { status } = result.response;
-  if (status >= SERVER_ERROR) {
-    return { kind: 'yield' };
-  }
-  return status < 200 || status >= 300 ? { kind: 'malformed', status } : { kind: 'answered', result };
+  const items: unknown[] = data['result'];
+  return items.flatMap((item) => listingOf(item) ?? []);
 }
 
 /** `no-exchange-rate` where any listing's currency has no current rate: nothing is stored unnormalised (AD-20). */
@@ -210,97 +156,165 @@ function priceOf(
   };
 }
 
-export function createPricingStep(options: PricingStepOptions): ChunkStep {
-  const { client, league, itemTypes, clock } = options;
-  const rates = currentRates(options.rates, league);
-  const published = new Map(options.dataset.map((entry) => [entry.entryKey, entry]));
+interface StepContext {
+  readonly client: TradeClient;
+  readonly league: LeagueId;
+  readonly itemTypes: ItemTypes;
+  readonly clock: ClockPort;
+  readonly rates: ReadonlyMap<string, CurrencyRate>;
+  readonly published: ReadonlyMap<string, DatasetEntry>;
+}
 
-  return async (tracked: TrackedEntry): Promise<StepResult> => {
-    const entryKey = canonicalKey(tracked);
-    // Built first: a jewel-arm miss is decided before any request.
-    let body: string;
-    try {
-      body = JSON.stringify(buildSearchBody(tracked, itemTypes));
-    } catch (error) {
-      if (!(error instanceof UnknownClassBaseTypeError)) {
-        throw error;
-      }
-      // AD-25: the entry is marked and reported, no search is issued, and the
-      // chunk continues. Offline work stamps nothing.
-      return {
-        kind: 'completed',
-        entry: markUnresolvable(entryKey, published.get(entryKey)),
-        records: [
-          {
-            kind: 'unresolvable',
-            entryKey,
-            identifier: error.baseTypeId,
-            identifierKind: 'baseTypeId',
-          },
-        ],
-      };
-    }
-    const before: DatasetEntry = published.get(entryKey) ?? { entryKey, price: NEVER_SYNCED };
+type Yielded = Extract<StepResult, { kind: 'yielded' }>;
 
-    const attemptedAt = clock.now();
-    const stamped: DatasetEntry = { ...before, lastAttemptedAt: attemptedAt };
+interface Searched {
+  readonly kind: 'searched';
+  readonly answer: SearchAnswer;
+  readonly entry: DatasetEntry;
+  readonly remaining: number | undefined;
+}
 
-    const search = await sendLeg(() =>
-      // Cookie-eligible: the governor probes on the first answered search and
-      // attaches the session cookie once it is live (AD-30).
-      client.send({ method: 'POST', url: tradeSearchUrl(league), body, lane: SEARCH_LANE, cookieEligible: true }),
-    );
-    if (search.kind === 'yield') {
-      return yieldedWith(search, stamped);
-    }
-    if (search.kind === 'malformed') {
-      throw new MalformedRequestError(entryKey, 'search', search.status, stamped);
-    }
+interface Fetched {
+  readonly kind: 'fetched';
+  readonly listings: readonly Listing[];
+  readonly remaining: number | undefined;
+}
 
-    const answer = parseSearchAnswer(search.result.response.body);
-    if (answer === undefined) {
-      throw new UnexpectedTradeResponseError(entryKey, 'search', 'no top-level `id` and `result`', stamped);
-    }
-    // An answered search sets the search fields, whatever the answer holds (AD-16).
-    const searched: DatasetEntry = {
-      ...stamped,
-      lastSearchId: answer.id,
-      lastSearchLeague: league,
-    };
-    const searchRemaining = search.result.remaining;
+type BuiltSearch =
+  | { readonly kind: 'body'; readonly body: string }
+  | { readonly kind: 'unresolvable'; readonly error: UnknownClassBaseTypeError };
 
-    if (answer.result.length === 0) {
-      return {
-        kind: 'completed',
-        entry: { ...searched, price: { state: 'no-listings' } },
-        ...(searchRemaining !== undefined && { searchRemaining }),
-      };
+// Built first: a jewel-arm miss is decided before any request.
+function serialisedSearch(tracked: TrackedEntry, itemTypes: ItemTypes): BuiltSearch {
+  try {
+    return { kind: 'body', body: JSON.stringify(buildSearchBody(tracked, itemTypes)) };
+  } catch (error) {
+    if (error instanceof UnknownClassBaseTypeError) {
+      return { kind: 'unresolvable', error };
     }
+    throw error;
+  }
+}
 
-    const ids = answer.result.slice(0, FETCH_LIMIT);
-    const fetched = await sendLeg(() =>
-      client.send({ method: 'GET', url: tradeFetchUrl(ids, answer.id), lane: FETCH_LANE, cookieEligible: true }),
-    );
-    // The unit is the request (AD-9): a fetch that yields or answers 4xx keeps
-    // the answered search's fields, and the price state stays as published.
-    if (fetched.kind === 'yield') {
-      return yieldedWith(fetched, searched);
-    }
-    if (fetched.kind === 'malformed') {
-      throw new MalformedRequestError(entryKey, 'fetch', fetched.status, searched);
-    }
+// AD-25: the entry is marked and reported, no search is issued, and the chunk continues.
+function unresolvableStep(
+  error: UnknownClassBaseTypeError,
+  entryKey: string,
+  published: ReadonlyMap<string, DatasetEntry>,
+): StepResult {
+  return {
+    kind: 'completed',
+    entry: markUnresolvable(entryKey, published.get(entryKey)),
+    records: [
+      {
+        kind: 'unresolvable',
+        entryKey,
+        identifier: error.baseTypeId,
+        identifierKind: 'baseTypeId',
+      },
+    ],
+  };
+}
 
-    const listings = parseListings(fetched.result.response.body);
-    if (listings === undefined) {
-      throw new UnexpectedTradeResponseError(entryKey, 'fetch', 'no top-level `result` array', searched);
-    }
-    const fetchRemaining = fetched.result.remaining;
+async function runSearch(
+  context: StepContext,
+  entryKey: string,
+  body: string,
+  stamped: DatasetEntry,
+): Promise<Searched | Yielded> {
+  const { client, league } = context;
+  const search = await sendLeg(() =>
+    // Cookie-eligible: the governor probes on the first answered search and
+    // attaches the session cookie once it is live (AD-30).
+    client.send({ method: 'POST', url: tradeSearchUrl(league), body, lane: SEARCH_LANE, cookieEligible: true }),
+  );
+  if (search.kind === 'yield') {
+    return yieldedWith(search, stamped);
+  }
+  if (search.kind === 'malformed') {
+    throw new MalformedRequestError(entryKey, 'search', search.status, stamped);
+  }
+  const answer = parseSearchAnswer(search.result.response.body);
+  if (answer === undefined) {
+    throw new UnexpectedTradeResponseError(entryKey, 'search', 'no top-level `id` and `result`', stamped);
+  }
+  // An answered search sets the search fields, whatever the answer holds (AD-16).
+  const entry: DatasetEntry = { ...stamped, lastSearchId: answer.id, lastSearchLeague: league };
+  return { kind: 'searched', answer, entry, remaining: search.result.remaining };
+}
 
+async function runFetch(
+  context: StepContext,
+  entryKey: string,
+  answer: SearchAnswer,
+  searched: DatasetEntry,
+): Promise<Fetched | Yielded> {
+  const ids = answer.result.slice(0, FETCH_LIMIT);
+  const fetched = await sendLeg(() =>
+    context.client.send({ method: 'GET', url: tradeFetchUrl(ids, answer.id), lane: FETCH_LANE, cookieEligible: true }),
+  );
+  // The unit is the request (AD-9): a fetch that yields or answers 4xx keeps
+  // the answered search's fields, and the price state stays as published.
+  if (fetched.kind === 'yield') {
+    return yieldedWith(fetched, searched);
+  }
+  if (fetched.kind === 'malformed') {
+    throw new MalformedRequestError(entryKey, 'fetch', fetched.status, searched);
+  }
+  const listings = parseListings(fetched.result.response.body);
+  if (listings === undefined) {
+    throw new UnexpectedTradeResponseError(entryKey, 'fetch', 'no top-level `result` array', searched);
+  }
+  return { kind: 'fetched', listings, remaining: fetched.result.remaining };
+}
+
+async function priceEntry(context: StepContext, tracked: TrackedEntry): Promise<StepResult> {
+  const { league, clock, rates, published } = context;
+  const entryKey = canonicalKey(tracked);
+  const built = serialisedSearch(tracked, context.itemTypes);
+  if (built.kind === 'unresolvable') {
+    return unresolvableStep(built.error, entryKey, published);
+  }
+  const before: DatasetEntry = published.get(entryKey) ?? { entryKey, price: NEVER_SYNCED };
+
+  const attemptedAt = clock.now();
+  const stamped: DatasetEntry = { ...before, lastAttemptedAt: attemptedAt };
+
+  const search = await runSearch(context, entryKey, built.body, stamped);
+  if (search.kind === 'yielded') {
+    return search;
+  }
+  const { answer, entry: searched, remaining: searchRemaining } = search;
+  if (answer.result.length === 0) {
     return {
       kind: 'completed',
-      entry: { ...searched, price: priceOf(listings, rates, league, attemptedAt) },
+      entry: { ...searched, price: { state: 'no-listings' } },
       ...(searchRemaining !== undefined && { searchRemaining }),
-      ...(fetchRemaining !== undefined && { fetchRemaining }),
     };
+  }
+
+  const fetch = await runFetch(context, entryKey, answer, searched);
+  if (fetch.kind === 'yielded') {
+    return fetch;
+  }
+  const { listings, remaining: fetchRemaining } = fetch;
+  return {
+    kind: 'completed',
+    entry: { ...searched, price: priceOf(listings, rates, league, attemptedAt) },
+    ...(searchRemaining !== undefined && { searchRemaining }),
+    ...(fetchRemaining !== undefined && { fetchRemaining }),
   };
+}
+
+export function createPricingStep(options: PricingStepOptions): ChunkStep {
+  const { client, league, itemTypes, clock } = options;
+  const context: StepContext = {
+    client,
+    league,
+    itemTypes,
+    clock,
+    rates: currentRates(options.rates, league),
+    published: new Map(options.dataset.map((entry) => [entry.entryKey, entry])),
+  };
+  return (tracked: TrackedEntry) => priceEntry(context, tracked);
 }

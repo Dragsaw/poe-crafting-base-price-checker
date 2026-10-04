@@ -515,17 +515,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/pricing/price-entry.ts": {
-    "complexity": {
-      "count": 2
-    },
-    "max-lines-per-function": {
-      "count": 2
-    },
-    "max-statements": {
-      "count": 1
-    }
-  },
   "packages/sync/src/pricing/search-body.test.ts": {
     "max-lines": {
       "count": 1
