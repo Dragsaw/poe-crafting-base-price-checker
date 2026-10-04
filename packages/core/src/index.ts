@@ -67,6 +67,7 @@ export {
   poolOf,
   statIds,
   untrackable,
+  untrackableReason,
 } from './probability.ts';
 export type {
   CombinationInput,
@@ -76,6 +77,7 @@ export type {
   ProbabilityResult,
   ReferenceLine,
   Slot,
+  UntrackableReason,
 } from './probability.ts';
 
 /** Pool coverage (AD-27, IMPLEMENTATION-NOTES.md §3). */

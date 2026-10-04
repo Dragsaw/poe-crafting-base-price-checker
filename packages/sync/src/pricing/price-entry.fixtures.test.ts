@@ -128,8 +128,9 @@ describe('createPricingStep against the recorded captures', () => {
         prices.push(result.entry.price.observation.priceDivine);
       }
     }
-    // Worked by hand from the five recorded fetches and the pinned rates above:
-    // e.g. ten listings → the 5th of 10 is 55 ex × 0.002012 = 0.1107.
-    expect(prices.toSorted((a, b) => a - b)).toEqual([0.1107, 0.2012, 1, 2, 100]);
+    // Worked by hand from the six recorded fetches and the pinned rates above:
+    // e.g. ten listings → the 5th of 10 is 155 ex × 0.002012 = 0.3119, and the
+    // summed-statId entry's 5th of 10 is 2 ex × 0.002012 = 0.004.
+    expect(prices.toSorted((a, b) => a - b)).toEqual([0.004, 0.2012, 0.3119, 1, 2, 100]);
   });
 });

@@ -1,209 +1,19 @@
 {
   "result": [
     {
-      "id": "92132d667b725b1f70c4b8020efa9abc4a1399295d84d89f81806c59b92ff4c4",
+      "id": "3ccf83bbfefcf5c38060a7b98c0a54c5b9dd8e7a0bcf51b0f093a90b7a81f008",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-10-03T11:35:51Z",
+        "indexed": "2026-10-04T02:41:44Z",
         "stash": {
-          "name": "4",
-          "x": 1,
-          "y": 3
+          "name": "11",
+          "x": 4,
+          "y": 0
         },
         "price": {
           "type": "~b/o",
-          "amount": 90,
-          "currency": "exalted"
-        },
-        "fee": 1365,
-        "account": {
-          "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "ru_RU",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "92132d667b725b1f70c4b8020efa9abc4a1399295d84d89f81806c59b92ff4c4",
-        "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 90 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "30",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+11 to [Spirit|Spirit]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
-            "mods": [
-              {
-                "level": 38,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_3981240776",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "8257336a2d50237e2ee9ef1fbd52d0afe9be1c254bba479b6f9418930acc241d",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-10-03T09:46:19Z",
-        "stash": {
-          "name": "2",
-          "x": 8,
-          "y": 10
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 95,
-          "currency": "exalted"
-        },
-        "fee": 1365,
-        "account": {
-          "name": "[redacted]",
-          "online": null,
-          "lastCharacterName": "[redacted]",
-          "language": "ru_RU",
-          "realm": "poe2"
-        },
-        "whisper": "[redacted]"
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "8257336a2d50237e2ee9ef1fbd52d0afe9be1c254bba479b6f9418930acc241d",
-        "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 95 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "30",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+10 to [Spirit|Spirit]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
-            "mods": [
-              {
-                "level": 38,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_3981240776",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "6b2067295e112168da5d218cb5825af9879327f0e1bd74fff960988571f71d03",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-10-02T17:50:39Z",
-        "stash": {
-          "name": "9",
-          "x": 0,
-          "y": 1
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 100,
-          "currency": "exalted"
+          "amount": 1,
+          "currency": "divine"
         },
         "fee": 1365,
         "account": {
@@ -216,16 +26,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
         "league": "Forbidden Rites",
-        "id": "6b2067295e112168da5d218cb5825af9879327f0e1bd74fff960988571f71d03",
+        "id": "3ccf83bbfefcf5c38060a7b98c0a54c5b9dd8e7a0bcf51b0f093a90b7a81f008",
         "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 100 exalted",
+        "note": "~b/o 1 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -239,7 +49,7 @@
             "name": "Level",
             "values": [
               [
-                "30",
+                "35",
                 0
               ]
             ],
@@ -249,16 +59,16 @@
         ],
         "implicitMods": [
           {
-            "description": "+11 to [Spirit|Spirit]",
+            "description": "12% increased [ItemRarity|Rarity of Items] found",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
+            "hash": "stat.implicit.stat_3917489142",
             "mods": [
               {
-                "level": 38,
+                "level": 44,
                 "magnitudes": [
                   {
-                    "min": "10",
-                    "max": "15"
+                    "min": "12",
+                    "max": "20"
                   }
                 ]
               }
@@ -271,7 +81,7 @@
           "hashes": {
             "implicit": [
               [
-                "implicit.stat_3981240776",
+                "implicit.stat_3917489142",
                 [
                   0
                 ]
@@ -282,383 +92,19 @@
       }
     },
     {
-      "id": "7a79227a7d0692cc5563b07efedb563662e5c82e488aa61062ffc7a01bab4095",
+      "id": "a0bb94329f8685d56ce7bbf650cc8ec140bc5f84ecc8e68cbc3e6794497fe585",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-10-03T10:17:15Z",
+        "indexed": "2026-10-04T07:19:57Z",
         "stash": {
-          "name": "9",
-          "x": 0,
+          "name": "8",
+          "x": 4,
           "y": 2
         },
         "price": {
           "type": "~b/o",
-          "amount": 100,
-          "currency": "exalted"
-        },
-        "fee": 1365,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "7a79227a7d0692cc5563b07efedb563662e5c82e488aa61062ffc7a01bab4095",
-        "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 100 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "30",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+13 to [Spirit|Spirit]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
-            "mods": [
-              {
-                "level": 38,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_3981240776",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "007a0fdac2dac1d68b1d2f14d1465adb3cbfaa9bd5b67226c7a35ac9a3dd0373",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-10-03T10:17:15Z",
-        "stash": {
-          "name": "9",
-          "x": 0,
-          "y": 3
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 100,
-          "currency": "exalted"
-        },
-        "fee": 1365,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "007a0fdac2dac1d68b1d2f14d1465adb3cbfaa9bd5b67226c7a35ac9a3dd0373",
-        "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 100 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "30",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+14 to [Spirit|Spirit]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
-            "mods": [
-              {
-                "level": 38,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_3981240776",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "8448e11d16503096dd860a1834d22c209e59d8a0c273ccc8aa0773f8793216f2",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-10-03T07:02:21Z",
-        "stash": {
-          "name": "base",
-          "x": 11,
-          "y": 10
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 140,
-          "currency": "exalted"
-        },
-        "fee": 1365,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "8448e11d16503096dd860a1834d22c209e59d8a0c273ccc8aa0773f8793216f2",
-        "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 140 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "30",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+12 to [Spirit|Spirit]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
-            "mods": [
-              {
-                "level": 38,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_3981240776",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "a39ae2dc895005823279e37e58f3676ef68a59d1ace05ece9cc7b6b37c9f780f",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-10-03T07:02:28Z",
-        "stash": {
-          "name": "base",
-          "x": 11,
-          "y": 11
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 140,
-          "currency": "exalted"
-        },
-        "fee": 1365,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "a39ae2dc895005823279e37e58f3676ef68a59d1ace05ece9cc7b6b37c9f780f",
-        "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
-        "rarity": "Normal",
-        "ilvl": 82,
-        "identified": true,
-        "note": "~b/o 140 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "30",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+15 to [Spirit|Spirit]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
-            "mods": [
-              {
-                "level": 38,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 0,
-        "frameTypeId": "Normal",
-        "extended": {
-          "hashes": {
-            "implicit": [
-              [
-                "implicit.stat_3981240776",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "df4dcaa512449e4b0bcff7f22ee5f721eb266687235e62bdf030e2f0325897e9",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-10-02T01:59:43Z",
-        "stash": {
-          "name": "Gear",
-          "x": 1,
-          "y": 1
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 150,
-          "currency": "exalted"
+          "amount": 1,
+          "currency": "divine"
         },
         "fee": 1365,
         "account": {
@@ -675,16 +121,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
         "league": "Forbidden Rites",
-        "id": "df4dcaa512449e4b0bcff7f22ee5f721eb266687235e62bdf030e2f0325897e9",
+        "id": "a0bb94329f8685d56ce7bbf650cc8ec140bc5f84ecc8e68cbc3e6794497fe585",
         "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 150 exalted",
+        "note": "~b/o 1 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -698,7 +144,7 @@
             "name": "Level",
             "values": [
               [
-                "30",
+                "35",
                 0
               ]
             ],
@@ -708,16 +154,16 @@
         ],
         "implicitMods": [
           {
-            "description": "+15 to [Spirit|Spirit]",
+            "description": "14% increased [ItemRarity|Rarity of Items] found",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
+            "hash": "stat.implicit.stat_3917489142",
             "mods": [
               {
-                "level": 38,
+                "level": 44,
                 "magnitudes": [
                   {
-                    "min": "10",
-                    "max": "15"
+                    "min": "12",
+                    "max": "20"
                   }
                 ]
               }
@@ -730,7 +176,7 @@
           "hashes": {
             "implicit": [
               [
-                "implicit.stat_3981240776",
+                "implicit.stat_3917489142",
                 [
                   0
                 ]
@@ -741,19 +187,19 @@
       }
     },
     {
-      "id": "dce2a102c94f40534eda3e85875d3c77303032ae9ff75a6d3587cabe95b91903",
+      "id": "fb7ed7af362ee610858a5e2b62a546a4dabe35aaf000235ae77a58ef34d9398c",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-30T22:03:15Z",
+        "indexed": "2026-10-04T07:42:47Z",
         "stash": {
-          "name": "4",
+          "name": "10",
           "x": 0,
-          "y": 7
+          "y": 10
         },
         "price": {
           "type": "~b/o",
-          "amount": 150,
-          "currency": "exalted"
+          "amount": 1,
+          "currency": "divine"
         },
         "fee": 1365,
         "account": {
@@ -766,16 +212,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
         "league": "Forbidden Rites",
-        "id": "dce2a102c94f40534eda3e85875d3c77303032ae9ff75a6d3587cabe95b91903",
+        "id": "fb7ed7af362ee610858a5e2b62a546a4dabe35aaf000235ae77a58ef34d9398c",
         "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 150 exalted",
+        "note": "~b/o 1 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -789,7 +235,7 @@
             "name": "Level",
             "values": [
               [
-                "30",
+                "35",
                 0
               ]
             ],
@@ -799,16 +245,16 @@
         ],
         "implicitMods": [
           {
-            "description": "+14 to [Spirit|Spirit]",
+            "description": "16% increased [ItemRarity|Rarity of Items] found",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
+            "hash": "stat.implicit.stat_3917489142",
             "mods": [
               {
-                "level": 38,
+                "level": 44,
                 "magnitudes": [
                   {
-                    "min": "10",
-                    "max": "15"
+                    "min": "12",
+                    "max": "20"
                   }
                 ]
               }
@@ -821,7 +267,7 @@
           "hashes": {
             "implicit": [
               [
-                "implicit.stat_3981240776",
+                "implicit.stat_3917489142",
                 [
                   0
                 ]
@@ -832,19 +278,391 @@
       }
     },
     {
-      "id": "606d39079e1bf268c9988001a61acc55db5d3ce840cd8b00ffbee8706fd23566",
+      "id": "fb04c6bf1aaf3acb7a5a7f7373a8637658f9a654fbb7fab55eb171d23641d4a3",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-26T15:31:53Z",
+        "indexed": "2026-10-04T07:20:15Z",
         "stash": {
-          "name": "1",
-          "x": 1,
+          "name": "7",
+          "x": 4,
+          "y": 5
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 1,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "en_US",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "fb04c6bf1aaf3acb7a5a7f7373a8637658f9a654fbb7fab55eb171d23641d4a3",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 1 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "18% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "d70e2b310e5cb939d6cedfa88925a59c8327d08da803618e1e5032f1a5d47315",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-04T06:56:35Z",
+        "stash": {
+          "name": "karışık kuru yemiş",
+          "x": 4,
+          "y": 4
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "en_US",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "d70e2b310e5cb939d6cedfa88925a59c8327d08da803618e1e5032f1a5d47315",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "20% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "88d3c9d8226be4504ad4dfb1a011aa4f669b1f792a83db73307e8a1190ab5104",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-24T01:37:13Z",
+        "stash": {
+          "name": "25",
+          "x": 0,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "88d3c9d8226be4504ad4dfb1a011aa4f669b1f792a83db73307e8a1190ab5104",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "18% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "5ccf4232fa085d1d3d67ad16667b7e1520f5c6770cd15c77e8f8f9dd2bc83d5b",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-30T16:15:35Z",
+        "stash": {
+          "name": "5",
+          "x": 0,
+          "y": 10
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "5ccf4232fa085d1d3d67ad16667b7e1520f5c6770cd15c77e8f8f9dd2bc83d5b",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "19% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "71b164d735601b48ace5afff7cd063f51a2f9d7e66c7518a2066418ded7920b9",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-03T10:59:33Z",
+        "stash": {
+          "name": "5",
+          "x": 2,
           "y": 1
         },
         "price": {
           "type": "~b/o",
-          "amount": 151,
-          "currency": "exalted"
+          "amount": 2,
+          "currency": "divine"
         },
         "fee": 1365,
         "account": {
@@ -857,16 +675,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
         "league": "Forbidden Rites",
-        "id": "606d39079e1bf268c9988001a61acc55db5d3ce840cd8b00ffbee8706fd23566",
+        "id": "71b164d735601b48ace5afff7cd063f51a2f9d7e66c7518a2066418ded7920b9",
         "name": "",
-        "typeLine": "Solar Amulet",
-        "baseType": "Solar Amulet",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
         "rarity": "Normal",
         "ilvl": 82,
         "identified": true,
-        "note": "~b/o 151 exalted",
+        "note": "~b/o 2 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -880,7 +698,7 @@
             "name": "Level",
             "values": [
               [
-                "30",
+                "35",
                 0
               ]
             ],
@@ -890,16 +708,16 @@
         ],
         "implicitMods": [
           {
-            "description": "+12 to [Spirit|Spirit]",
+            "description": "14% increased [ItemRarity|Rarity of Items] found",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_3981240776",
+            "hash": "stat.implicit.stat_3917489142",
             "mods": [
               {
-                "level": 38,
+                "level": 44,
                 "magnitudes": [
                   {
-                    "min": "10",
-                    "max": "15"
+                    "min": "12",
+                    "max": "20"
                   }
                 ]
               }
@@ -912,7 +730,193 @@
           "hashes": {
             "implicit": [
               [
-                "implicit.stat_3981240776",
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "4ead143d03487ad10a048bda9c8a6847dc5313120ef82640d47a2c69a3141bcd",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-04T06:47:28Z",
+        "stash": {
+          "name": "$$$",
+          "x": 9,
+          "y": 9
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "4ead143d03487ad10a048bda9c8a6847dc5313120ef82640d47a2c69a3141bcd",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "20% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "b12fa9564152f2acaa0757923a0a0b90e528a5ec57ed21d0a82715a9086e0aab",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-03T09:43:30Z",
+        "stash": {
+          "name": "11",
+          "x": 0,
+          "y": 6
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 2,
+          "currency": "divine"
+        },
+        "fee": 1365,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "ko_KR",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "b12fa9564152f2acaa0757923a0a0b90e528a5ec57ed21d0a82715a9086e0aab",
+        "name": "",
+        "typeLine": "Gold Amulet",
+        "baseType": "Gold Amulet",
+        "rarity": "Normal",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 2 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "35",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "16% increased [ItemRarity|Rarity of Items] found",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3917489142",
+            "mods": [
+              {
+                "level": 44,
+                "magnitudes": [
+                  {
+                    "min": "12",
+                    "max": "20"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 0,
+        "frameTypeId": "Normal",
+        "extended": {
+          "hashes": {
+            "implicit": [
+              [
+                "implicit.stat_3917489142",
                 [
                   0
                 ]

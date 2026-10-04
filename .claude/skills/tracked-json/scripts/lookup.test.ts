@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { WeightsFileSchema } from '@poe/contracts';
+import { type WeightsFile, WeightsFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -307,7 +307,9 @@ describe('lookupMods', () => {
           slot: 'prefix',
           modGroup: 'BaseLocalDefencesAndLife',
           text: 'BaseLocalDefencesAndLife',
-          statIds: [EVASION, LIFE],
+          statIds: [EVASION, LIFE].toSorted(),
+          trackable: true,
+          untrackable: [],
           tierCount: 2,
           itemLevelMin: { min: 16, max: 33 },
           tierLabels: ['T2', 'T1'],
@@ -317,6 +319,8 @@ describe('lookupMods', () => {
           modGroup: 'IncreasedLife',
           text: 'IncreasedLife',
           statIds: [LIFE],
+          trackable: true,
+          untrackable: [],
           tierCount: 1,
           itemLevelMin: { min: 1, max: 1 },
           tierLabels: ['T1'],
@@ -325,7 +329,7 @@ describe('lookupMods', () => {
     });
   });
 
-  it('prints both slots without a slot, and keeps a null statId', () => {
+  it('prints both slots without a slot, and drops a null line from the line set', () => {
     const found = lookupMods(WEIGHTS, { className: 'Body_Armours_dex', category: 'armour.chest' });
 
     expect(found.mods.map((row) => [row.slot, row.modGroup])).toEqual([
@@ -333,7 +337,8 @@ describe('lookupMods', () => {
       ['prefix', 'IncreasedLife'],
       ['suffix', 'Thorns'],
     ]);
-    expect(found.mods[2]?.statIds).toEqual([null]);
+    // A weight-500 tier with only a null line in a complete pool is trackable, with no line to write.
+    expect(found.mods[2]).toMatchObject({ statIds: [], trackable: true, untrackable: [] });
   });
 
   it('prints one row per mod family when a modGroup holds several', () => {
@@ -363,6 +368,104 @@ describe('lookupMods', () => {
   });
 });
 
+const A = 'explicit.stat_a';
+const B = 'explicit.stat_b';
+
+function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
+  const notInGame = {
+    ...tier('prefix', 'Dead', 1, 'T1', 'dead', [{ statId: null, ranges: [] }]),
+    weight: 0,
+    weightSource: 'not-in-game',
+  };
+  return WeightsFileSchema.parse({
+    schemaVersion: '6.0.0',
+    gamePatch: '0.4.0',
+    producer: { id: 'test', generatedAt: '2026-10-02T00:00:00Z' },
+    bases: {
+      'accessory.ring': {
+        Rings: {
+          prefix: {
+            poolCoverage,
+            entries: [
+              // An internal engine line on a weight > 0 tier: one {A, B} family, not a second one.
+              tier('prefix', 'Hybrid', 10, 'T2', 'a b', [
+                { statId: A, ranges: [[1, 2]] },
+                { statId: B, ranges: [[3, 4]] },
+              ]),
+              tier('prefix', 'Hybrid', 20, 'T1', 'a b', [
+                { statId: B, ranges: [[5, 6]] },
+                { statId: A, ranges: [[3, 4]] },
+                { statId: null, ranges: [] },
+              ]),
+              notInGame,
+              // A mixed family: only the {A, null} tier is untrackable, and only in a partial pool.
+              tier('prefix', 'Mixed', 10, 'T2', 'a', [{ statId: A, ranges: [[1, 2]] }]),
+              tier('prefix', 'Mixed', 20, 'T1', 'a', [
+                { statId: A, ranges: [[3, 4]] },
+                { statId: null, ranges: [] },
+              ]),
+            ],
+          },
+          suffix: { poolCoverage: 'complete', entries: [] },
+        },
+      },
+    },
+  });
+}
+
+describe('the null-line rule in lookupMods and lookupTiers', () => {
+  const rings = { className: 'Rings', slot: 'prefix' } as const;
+
+  it('offers a hybrid as one row with its sorted line set, and an internal line is not a second family', () => {
+    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((mod) => mod.modGroup === 'Hybrid');
+
+    expect(row).toMatchObject({ statIds: [A, B], trackable: true, untrackable: [], tierCount: 2, tierLabels: ['T2', 'T1'] });
+  });
+
+  it('reports a not-in-game tier with no line set, untrackable, and its reason', () => {
+    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((mod) => mod.modGroup === 'Dead');
+
+    expect(row).toMatchObject({
+      statIds: [],
+      trackable: false,
+      untrackable: [{ tierLabel: 'T1', itemLevelMin: 1, reason: 'not-in-game' }],
+    });
+  });
+
+  it('makes a {A, null} tier untrackable only in a partial pool, naming the reason', () => {
+    const complete = lookupMods(nullLineWeights('complete'), rings).mods.find((mod) => mod.modGroup === 'Mixed');
+    const partial = lookupMods(nullLineWeights('partial'), rings).mods.find((mod) => mod.modGroup === 'Mixed');
+
+    expect(complete).toMatchObject({ statIds: [A], trackable: true, untrackable: [], tierCount: 2 });
+    // One family, one untrackable tier: the family is not trackable, and only that tier is listed.
+    expect(partial).toMatchObject({
+      statIds: [A],
+      trackable: false,
+      tierCount: 2,
+      untrackable: [{ tierLabel: 'T1', itemLevelMin: 20, reason: 'partial-pool-null-line' }],
+    });
+    expect(partial?.untrackable).toHaveLength(1);
+  });
+
+  it('adds lineSet and untrackable to a tiers row beside the verbatim lines', () => {
+    const complete = lookupTiers(nullLineWeights('complete'), A, { className: 'Rings' }).tiers;
+    const partial = lookupTiers(nullLineWeights('partial'), A, { className: 'Rings' }).tiers;
+
+    const t1 = complete.find((row) => row.modGroup === 'Hybrid' && row.tierLabel === 'T1');
+    expect(t1?.lines).toEqual([
+      { statId: B, ranges: [[5, 6]] },
+      { statId: A, ranges: [[3, 4]] },
+      { statId: null, ranges: [] },
+    ]);
+    expect(t1).toMatchObject({ lineSet: [A, B], untrackable: null });
+    expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T1')).toMatchObject({
+      lineSet: [A],
+      untrackable: 'partial-pool-null-line',
+    });
+    expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T2')?.untrackable).toBeNull();
+  });
+});
+
 describe('lookupTiers', () => {
   it('lists, per slot, the tiers carrying the statId in itemLevelMin order, ranges verbatim', () => {
     const found = lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets' });
@@ -382,6 +485,8 @@ describe('lookupTiers', () => {
       weightSource: 'published',
       modGroup: 'BaseSpirit',
       lines: [{ statId: SPIRIT, ranges: [[30, 33]] }],
+      lineSet: [SPIRIT],
+      untrackable: null,
     });
   });
 
@@ -463,6 +568,34 @@ describe('the committed data/', () => {
     expect(hybrid[0]?.statIds).toHaveLength(2);
     expect(hybrid[0]?.text).toBe('BaseLocalDefencesAndLife');
     expect(found.mods.filter((row) => row.text === '')).toEqual([]);
+  });
+
+  it('offers the Bows phys%+accuracy hybrid prefix as one trackable row', () => {
+    const found = lookupMods(loadWeights(read), { className: 'Bows', slot: 'prefix' });
+    const hybrid = found.mods.filter((row) => row.modGroup === 'LocalIncreasedPhysicalDamagePercentAndAccuracyRating');
+
+    expect(hybrid).toHaveLength(1);
+    expect(hybrid[0]).toMatchObject({
+      statIds: ['explicit.stat_1509134228', 'explicit.stat_691932474'],
+      trackable: true,
+      untrackable: [],
+    });
+    const tiers = lookupTiers(loadWeights(read), 'explicit.stat_691932474', { className: 'Bows' }).tiers;
+    const t1 = tiers.find((row) => row.slot === 'prefix' && row.tierLabel === 'T1');
+    expect(t1?.lineSet).toEqual(['explicit.stat_1509134228', 'explicit.stat_691932474']);
+    expect(t1?.untrackable).toBeNull();
+  });
+
+  it('reports the Time-Lost Diamond IncisionChance as untrackable, and offers JewelRadiusLargerRadius as a one-line family', () => {
+    const found = lookupMods(loadWeights(read), { className: 'Time-Lost_Diamond' });
+    const incision = found.mods.find((row) => row.modGroup === 'IncisionChance');
+
+    expect(incision).toMatchObject({ slot: 'prefix', statIds: [], trackable: false });
+    expect(incision?.untrackable.map((tier) => tier.reason)).toEqual(['not-in-game']);
+    const radius = found.mods.find(
+      (row) => row.modGroup === 'JewelRadiusLargerRadius' && row.statIds.includes('explicit.stat_3891355829|1'),
+    );
+    expect(radius).toMatchObject({ statIds: ['explicit.stat_3891355829|1'], trackable: true, untrackable: [] });
   });
 
   it('splits the Amulets gem-level suffix modGroup into its four mod families', () => {

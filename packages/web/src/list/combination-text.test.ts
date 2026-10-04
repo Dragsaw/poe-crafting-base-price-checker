@@ -1,4 +1,4 @@
-import type { CraftedTrackedEntry, ModifierRef } from '@poe/contracts';
+import { HybridModifierRefSchema, type CraftedTrackedEntry, type ModifierRef } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { banded } from '../test-support/list-fixtures';
@@ -9,6 +9,8 @@ const MANA = 'explicit.stat_1050105434';
 const PHYS = 'explicit.stat_1509134228';
 const BOLT = 'explicit.stat_1967051901';
 const FIRE = 'explicit.stat_709508406';
+const ES = 'explicit.stat_2482852589';
+const EVASION = 'explicit.stat_2106365538';
 const UNFORMED = 'explicit.stat_99';
 
 const STATS = statTexts({
@@ -108,11 +110,75 @@ describe('bandedFallback', () => {
   });
 });
 
-describe('affixText: a hybrid reference (interim)', () => {
-  it('throws, naming the story that renders its label', () => {
-    const hybrid: ModifierRef = { kind: 'hybrid', lines: [{ statId: PHYS }, { statId: BOLT }] };
-    expect(() => affixText(hybrid, STATS)).toThrow(
-      'hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 8)',
-    );
+/** A hybrid reference built through its schema, so its lines arrive sorted by `statId` as in production. */
+function hybrid(lines: readonly object[], acceptedTier?: string): ModifierRef {
+  return HybridModifierRefSchema.parse({ kind: 'hybrid', lines, ...(acceptedTier === undefined ? {} : { acceptedTier }) });
+}
+
+function line(statId: string, valueMin: number, valueMax: number): object {
+  return { statId, valueMin, valueMax };
+}
+
+describe('affixText: a hybrid reference', () => {
+  it('prints the tier, then the short forms, comma-joined, in the curated register', () => {
+    expect(affixText(hybrid([line(EVASION, 10, 20), line(ES, 30, 40)], 'T1'), STATS)).toEqual({
+      text: 'T1 % ES, % Evasion',
+      verbatim: false,
+    });
+  });
+
+  it('orders the lines by printed text, not by statId, whatever the file order', () => {
+    // MANA sorts before PHYS by statId; `% Phys` sorts before `Mana` by code unit.
+    expect(MANA < PHYS).toBe(true);
+    for (const lines of [
+      [line(PHYS, 1, 2), line(MANA, 3, 4)],
+      [line(MANA, 3, 4), line(PHYS, 1, 2)],
+    ]) {
+      expect(affixText(hybrid(lines, 'T1'), STATS)).toEqual({ text: 'T1 % Phys, Mana', verbatim: false });
+    }
+  });
+
+  it('joins three lines with the same comma, under a mixture tier', () => {
+    expect(affixText(hybrid([line(MANA, 1, 2), line(PHYS, 3, 4), line(COLD_RES, 5, 6)], 'T1-T2'), STATS)).toEqual({
+      text: 'T1-T2 % Phys, Cold Res, Mana',
+      verbatim: false,
+    });
+  });
+
+  it('prints every line in catalogue form with its band when there is no tier', () => {
+    expect(affixText(hybrid([line(COLD_RES, 41, 45), line(FIRE, 4.41, 5)]), STATS)).toEqual({
+      text: '41–45% to Cold Resistance, Adds # to # Fire Damage 4.41–5',
+      verbatim: true,
+    });
+  });
+
+  it('prints every line in catalogue form, none short, when one line has no short form', () => {
+    expect(affixText(hybrid([line(COLD_RES, 41, 45), line(UNFORMED, 20, 30)], 'T1'), STATS)).toEqual({
+      text: '20–30% increased Something, 41–45% to Cold Resistance',
+      verbatim: true,
+    });
+  });
+
+  it('prints every line in catalogue form when a line is valueless, and that line has no band', () => {
+    expect(affixText(hybrid([line(COLD_RES, 41, 45), { statId: BOLT }], 'T1'), STATS)).toEqual({
+      text: '41–45% to Cold Resistance, Loads an additional bolt',
+      verbatim: true,
+    });
+  });
+
+  it('prints the raw statId, with its band, for a line the catalogue does not hold', () => {
+    expect(affixText(hybrid([line(COLD_RES, 41, 45), line('explicit.stat_404', 1, 2)]), STATS)).toEqual({
+      text: '41–45% to Cold Resistance, explicit.stat_404 1–2',
+      verbatim: true,
+    });
+  });
+
+  it('joins a hybrid prefix and a single suffix with the middle dot', () => {
+    const parts = combinationText(entry(hybrid([line(ES, 1, 2), line(EVASION, 3, 4)], 'T1'), banded(MANA, 150, 180, 'T1')), STATS);
+    expect(parts).toEqual([
+      { text: 'T1 % ES, % Evasion', verbatim: false },
+      { text: 'T1 Mana', verbatim: false },
+    ]);
+    expect(combinationString(parts)).toBe('T1 % ES, % Evasion · T1 Mana');
   });
 });

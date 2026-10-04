@@ -28,6 +28,7 @@ import {
   poolOf,
   statIds,
   untrackable,
+  untrackableReason,
 } from './probability.ts';
 import type { ProbabilityResult } from './probability.ts';
 
@@ -427,6 +428,17 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     expect(untrackable(withNull, { poolCoverage: 'partial' })).toBe(true);
     expect(untrackable(withNull, { poolCoverage: 'complete' })).toBe(false);
     expect(untrackable(plain, { poolCoverage: 'partial' })).toBe(false);
+  });
+
+  it('names the reason: not-in-game first, then a null line in a partial pool, else undefined', () => {
+    const notInGame = { ...tier([line(STAT, [10, 12]), line(null, [1, 2])], 0), weightSource: 'not-in-game' as const };
+    const withNull = tier([line(STAT, [10, 12]), line(null, [1, 2])], 100);
+    const plain = tier([line(STAT, [10, 12])], 100);
+    expect(untrackableReason(notInGame, { poolCoverage: 'partial' })).toBe('not-in-game');
+    expect(untrackableReason(notInGame, { poolCoverage: 'complete' })).toBe('not-in-game');
+    expect(untrackableReason(withNull, { poolCoverage: 'partial' })).toBe('partial-pool-null-line');
+    expect(untrackableReason(withNull, { poolCoverage: 'complete' })).toBeUndefined();
+    expect(untrackableReason(plain, { poolCoverage: 'partial' })).toBeUndefined();
   });
 
   it('sorts lineSet and statIds by code unit', () => {

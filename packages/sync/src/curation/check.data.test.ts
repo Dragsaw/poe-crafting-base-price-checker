@@ -22,4 +22,15 @@ describe('pnpm tracked:check over the live data/', () => {
       expect.arrayContaining([{ check: 'cross-file', status: 'passed' }]),
     );
   });
+
+  it('leaves no Bows entry unvalidated: the hybrid entries are covered by their pool checks', async () => {
+    const run = await new Promise<{ stdout: string }>((resolve) => {
+      execFile(process.execPath, [SCRIPT], { encoding: 'utf8' }, (_error, stdout) => {
+        resolve({ stdout });
+      });
+    });
+
+    const { unvalidated } = JSON.parse(run.stdout) as { unvalidated: { className: string }[] };
+    expect(unvalidated.filter((mark) => mark.className === 'Bows')).toEqual([]);
+  });
 });

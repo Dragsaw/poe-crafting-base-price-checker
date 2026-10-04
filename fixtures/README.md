@@ -44,6 +44,10 @@ is named for a digest of its own request (method, URL and body), so
 `pnpm sync:dry` serves back only the answer to exactly that request. A search
 that found nothing has no fetch file.
 
+The workload includes one summed-`statId` entry, an Amulets rarity T1 prefix and T1
+suffix. Its search carries the one summed filter, and its fetch leg is the capture that
+IMPLEMENTATION-NOTES §5.1d quotes.
+
 `tracked.json` is the one hand-edited file here. It is the recorder's input,
 not a capture: a small fixed workload, one entry per distinct search shape,
 that the fixture-backed tests own. It is deliberately not `data/tracked.json`,

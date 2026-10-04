@@ -8,6 +8,7 @@ import { App } from '../App';
 import { BELOW_THRESHOLD_NOTE, STATE_NOTES } from '../list/format';
 import { uncostableCopy } from '../list/list-statement';
 import { expandCopy } from '../list/RankedList';
+import { SHORT_FORMS } from '../list/short-forms';
 import { HAIR_SPACE } from '../list/TrustMark';
 import { serveArtifacts, sharedServer, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb } from '../test-support/dom';
@@ -99,6 +100,19 @@ function tier(statId: string, weight: number, itemLevelMin: number): ModifierWei
     weight,
     weightSource: 'published',
     lines: [{ statId, ranges: [[1, 10]] }],
+  };
+}
+
+/** One hybrid pool tier: one modifier carrying a line for each `statId`. */
+function hybridTier(statIds: readonly string[], weight: number, itemLevelMin: number): ModifierWeight {
+  serial += 1;
+  return {
+    sourceModifierId: `m${String(serial)}`,
+    modGroup: `g${String(serial)}`,
+    itemLevelMin,
+    weight,
+    weightSource: 'published',
+    lines: statIds.map((statId) => ({ statId, ranges: [[1, 10]] })),
   };
 }
 
@@ -607,6 +621,52 @@ describe('the chase cells', () => {
       // A curated cell prints no numeral but its tier.
       expect(cell.textContent.replaceAll(/T\d+/g, '')).not.toMatch(/\d/);
       expect(cell.querySelector('[data-verbatim]')).toBeNull();
+    }
+  });
+
+  it('holds the longest hybrid label the short-form table can build in the chase cell, ellipsised, and in the panel row, whole', async () => {
+    // T1-T2 and the three longest distinct forms: the widest label a hybrid affix can print.
+    const forms = [...new Set(Object.values(SHORT_FORMS))].sort((a, b) => b.length - a.length || (a < b ? -1 : 1)).slice(0, 3);
+    const statIds = forms.map((form) => {
+      const found = Object.entries(SHORT_FORMS).find(([, value]) => value === form);
+      if (found === undefined) {
+        throw new Error(`no statId for ${form}`);
+      }
+      return found[0];
+    });
+    const label = `T1-T2 ${[...forms].sort().join(', ')}`;
+    const widest: CraftedTrackedEntry = {
+      kind: 'crafted',
+      categoryId: 'accessory.ring',
+      className: 'Rings',
+      itemLevelMin: 82,
+      prefix: {
+        kind: 'hybrid',
+        acceptedTier: 'T1-T2',
+        lines: statIds.map((statId) => ({ statId, valueMin: 1, valueMax: 10 })).sort((a, b) => (a.statId < b.statId ? -1 : 1)),
+      },
+      suffix: banded(COLD_RES, 1, 10, 'T1'),
+      status: 'active',
+    };
+    const now = Date.now();
+    serveWorld({
+      tracked: [widest],
+      dataset: [priced(widest, 100, hoursBefore(now, 1))],
+      classes: [['accessory.ring', 'Rings', [[hybridTier(statIds, 10, 75)], [tier(COLD_RES, 10, 80)]]]],
+    });
+    mount();
+    await settleTo('ready');
+    const [cell] = chaseCells(rowNamed('Rings'));
+    expect(cell?.textContent).toBe(`${label} · T1 Cold Res`);
+    expect(cell?.style.whiteSpace).toBe('nowrap');
+    expect(cell?.style.overflow).toBe('hidden');
+    expect(cell?.style.textOverflow).toBe('ellipsis');
+    expect(cell?.querySelector('[data-verbatim]')).toBeNull();
+    click(rowNamed('Rings'));
+    const [panel] = panelRows();
+    expect(panel === undefined ? '' : panelCell(panel, 'combination')).toBe(`${label} · T1 Cold Res`);
+    for (const node of Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel] *'))) {
+      expect(node.style.textOverflow).toBe('');
     }
   });
 

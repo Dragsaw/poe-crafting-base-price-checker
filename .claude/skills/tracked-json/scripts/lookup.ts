@@ -7,9 +7,11 @@
  * `@poe/contracts`, so the typed weights tree is the contract's own. It prints
  * JSON to stdout, and never writes a file or touches the network.
  *
- * It derives nothing. `tiers` and `mods` print the weights data verbatim: no
- * interval, no floor. The interval derivation is `core`'s alone
- * (IMPLEMENTATION-NOTES.md §1), and a second copy here is forbidden.
+ * It derives no interval and no floor: `tiers` and `mods` print the weights data
+ * verbatim. The interval derivation is `core`'s alone (IMPLEMENTATION-NOTES.md §1),
+ * and a second copy here is forbidden. The line set and the null-line verdict are
+ * `core`'s too (`lineSet`, `untrackableReason`); `mods` and `tiers` call them and
+ * keep no copy.
  *
  * - A lookup error (an absent or unreadable file, a weights file that fails
  *   the schema, an unknown or ambiguous class) prints `{error}` to stdout and exits 1.
@@ -23,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { type ModifierWeight, type WeightsClassPools, type WeightsFile, WeightsFileSchema } from '@poe/contracts';
+import { lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
 
 export const STATS_PATH = 'data/catalogue/stats.json';
 export const ITEMS_PATH = 'data/catalogue/items.json';
@@ -246,8 +249,15 @@ export interface ModRow {
   readonly slot: Slot;
   readonly modGroup: string;
   readonly text: string;
-  /** The distinct `statId`s of one tier's lines, in line order; `null` kept verbatim. More than one means a hybrid. */
-  readonly statIds: (string | null)[];
+  /**
+   * The family's line set (`core`'s `lineSet`, IMPLEMENTATION-NOTES.md §1): the non-null `statId`s of
+   * its tiers, sorted. More than one means a hybrid. Empty when the tiers carry only `null` lines.
+   */
+  readonly statIds: string[];
+  /** False when any tier of the family is untrackable (the null-line rule); the tiers are in `untrackable`. */
+  readonly trackable: boolean;
+  /** Each untrackable tier of the family, with `core`'s reason. Empty when `trackable`. */
+  readonly untrackable: { readonly tierLabel: unknown; readonly itemLevelMin: number; readonly sourceModifierId: string; readonly reason: UntrackableReason }[];
   readonly tierCount: number;
   readonly itemLevelMin: { readonly min: number; readonly max: number };
   /** The tier labels, in ascending `itemLevelMin` order. */
@@ -262,11 +272,13 @@ export function lookupMods(
   const resolved = resolveClass(weights, selector);
   const mods: ModRow[] = [];
   for (const slot of selector.slot === undefined ? SLOTS : [selector.slot]) {
-    // A modGroup can hold several mod families (one statId set each), so a row is a
-    // modGroup and one statId set: a hybrid is one row, two families are two rows.
-    const families = new Map<string, { modGroup: string; statIds: (string | null)[]; tiers: ModifierWeight[] }>();
-    for (const entry of resolved.pools[slot].entries) {
-      const statIds = [...new Set(entry.lines.map((line) => line.statId))];
+    const pool = resolved.pools[slot];
+    // A family is (modGroup, line set): a modGroup can hold several mod families, so a hybrid
+    // is one row and two families of one modGroup are two rows. `core` owns the line set and
+    // the null-line rule; nothing here re-derives either.
+    const families = new Map<string, { modGroup: string; statIds: string[]; tiers: ModifierWeight[] }>();
+    for (const entry of pool.entries) {
+      const statIds = [...lineSet(entry)];
       const key = JSON.stringify([entry.modGroup, statIds]);
       const family = families.get(key);
       if (family === undefined) {
@@ -279,11 +291,26 @@ export function lookupMods(
       const tiers = unsorted.toSorted(byItemLevel);
       const first = tiers[0];
       const last = tiers.at(-1);
+      const untrackable = tiers.flatMap((entry) => {
+        const reason = untrackableReason(entry, pool);
+        return reason === undefined
+          ? []
+          : [
+              {
+                tierLabel: entry.tierLabel ?? null,
+                itemLevelMin: entry.itemLevelMin,
+                sourceModifierId: entry.sourceModifierId,
+                reason,
+              },
+            ];
+      });
       mods.push({
         slot,
         modGroup,
         text: first?.modGroup ?? '',
         statIds,
+        trackable: untrackable.length === 0,
+        untrackable,
         tierCount: tiers.length,
         itemLevelMin: { min: first?.itemLevelMin ?? 0, max: last?.itemLevelMin ?? 0 },
         tierLabels: tiers.map((entry) => entry.tierLabel ?? null),
@@ -302,6 +329,10 @@ export interface TierRow {
   readonly modGroup: string;
   /** The entry's lines, verbatim: each `statId` with its `ranges`. */
   readonly lines: readonly unknown[];
+  /** `core`'s line set of the entry: its non-null `statId`s, sorted. */
+  readonly lineSet: readonly string[];
+  /** `core`'s null-line verdict: the reason the tier is untrackable, or `null` when it is trackable. */
+  readonly untrackable: UntrackableReason | null;
 }
 
 /** Per slot, every tier of the class with a line carrying `statId`, in ascending `itemLevelMin`. */
@@ -313,9 +344,8 @@ export function lookupTiers(
   const resolved = resolveClass(weights, selector);
   const tiers: TierRow[] = [];
   for (const slot of SLOTS) {
-    const carrying = resolved.pools[slot].entries.filter((entry) =>
-      entry.lines.some((line) => line.statId === statId),
-    );
+    const pool = resolved.pools[slot];
+    const carrying = pool.entries.filter((entry) => entry.lines.some((line) => line.statId === statId));
     for (const entry of carrying.toSorted(byItemLevel)) {
       tiers.push({
         slot,
@@ -325,6 +355,8 @@ export function lookupTiers(
         weightSource: entry.weightSource,
         modGroup: entry.modGroup,
         lines: entry.lines,
+        lineSet: lineSet(entry),
+        untrackable: untrackableReason(entry, pool) ?? null,
       });
     }
   }

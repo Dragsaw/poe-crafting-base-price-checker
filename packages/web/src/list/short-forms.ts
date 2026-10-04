@@ -56,6 +56,7 @@ export const SHORT_FORMS: Readonly<Record<string, string>> = {
   'explicit.stat_2891184298': 'Cast Spd',
   'explicit.stat_328541901': 'Int',
   'explicit.stat_789117908': 'Mana Regen',
+  'explicit.stat_691932474': '+Accuracy',
 };
 
 /** The short form for `statId`, or `undefined` for a product gap (no entry in the table). */
