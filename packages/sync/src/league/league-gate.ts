@@ -1,32 +1,5 @@
 /**
- * The run-start league gate (FR-32, AD-19, AD-12).
- *
- * `runChunk` calls it through `ChunkSetup.gate` (built by
- * `../compose-chunk.ts`), under the lock, after every offline check and the
- * order, and before any search (AD-12's cost order). It sends **exactly one**
- * GET to the trade leagues endpoint through the governed client, which the
- * shell counts as `league-validation`, and checks that the configured league
- * is one of the ids the endpoint answered.
- * The ids compare **byte for byte**: `forbidden rites` is not
- * `Forbidden Rites`, because the search URL addresses the league by that
- * exact string.
- *
- * The consequences, by answer. The classes mirror the pricing step's
- * (`../pricing/price-entry.ts`):
- *
- * | Answer | Gate result | Report (`runChunk`) |
- * | --- | --- | --- |
- * | 2xx, the league is an id | `pass` | no record |
- * | 2xx, the league is not an id | throws `LeagueMismatchError` | `league-mismatch` |
- * | 2xx body that is not the payload shape | throws `UnexpectedLeaguesResponseError` | `run-failure`, `unrecoverable-error` |
- * | a client yield (429, invalid-request threshold), 5xx, timeout, network failure | `yield` | no record; the chunk yields (AD-8) |
- * | any other non-2xx | throws `LeagueRequestRejectedError` | `run-failure`, `trade-request-rejected` |
- * | any other port rejection | rethrown | `run-failure`, `unrecoverable-error` |
- *
- * A yield sends no search: the chunk ends before its first entry, so no
- * budget is spent on a league that was not validated.
- *
- * The league arrives as a value; this module never names `config.json`.
+ * The run-start league gate (FR-32, AD-19, AD-12): one governed GET, ids compared byte for byte as the search URL uses them.
  */
 
 import { LeaguesPayloadSchema } from '@poe/contracts';
@@ -40,11 +13,7 @@ import { isTransportFailure } from '../trade/transport-failure.ts';
 
 const SERVER_ERROR = 500;
 
-/**
- * The configured league is not among the ids the trade API carries. A routine
- * configuration fault: `runChunk` turns it into a `league-mismatch` record
- * carrying the list the player corrects `config.json` from.
- */
+/** The configured league is not among the trade API's ids; `runChunk` reports it as `league-mismatch`. */
 export class LeagueMismatchError extends Error {
   readonly configuredLeague: LeagueId;
   /** Every id the endpoint answered, in endpoint order. */
@@ -64,10 +33,7 @@ export class LeagueMismatchError extends Error {
   }
 }
 
-/**
- * The leagues request answered a non-2xx that is neither a 429 nor a 5xx. It
- * names no entry: the gate runs before any entry is visited.
- */
+/** A non-2xx that is neither 429 nor 5xx; it names no entry because the gate runs before any entry. */
 export class LeagueRequestRejectedError extends Error {
   readonly status: number;
 

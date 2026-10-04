@@ -430,9 +430,6 @@
     }
   },
   "packages/sync/src/league/league-gate.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    },
     "max-classes-per-file": {
       "count": 1
     }
