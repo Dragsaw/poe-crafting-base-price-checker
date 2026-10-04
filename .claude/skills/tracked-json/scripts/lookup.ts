@@ -1,7 +1,4 @@
-/**
- * `pnpm tracked:lookup stat|base|class|mods|tiers <query>`: read-only; prints JSON, never writes or hits the network.
- * It derives no interval and no line set: `core` owns both (IMPLEMENTATION-NOTES.md §1).
- */
+/** `pnpm tracked:lookup`: read-only JSON; `core` owns the interval and the line set (IMPLEMENTATION-NOTES.md §1). */
 
 import { readFileSync, realpathSync } from 'node:fs';
 import nodePath from 'node:path';

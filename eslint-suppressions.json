@@ -5,9 +5,6 @@
     }
   },
   ".claude/skills/tracked-json/scripts/lookup.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "max-classes-per-file": {
       "count": 1
     },
