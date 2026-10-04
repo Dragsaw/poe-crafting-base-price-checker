@@ -42,16 +42,8 @@ function Value({ value }: { readonly value: string | undefined }): JSX.Element {
 }
 
 /**
- * `{components.trust-strip}`: between the masthead and the asking-price line,
- * always present, never dismissible. Two lines of plain facts — attribution,
- * not health — with no mark and no colour on any of them (FR-10, FR-18). Then
- * one line per absent tolerable artifact, then the rust health line, raised by
- * data only for unresolvable entries or pinned starvation (FR-24, FR-25).
- *
- * The whole strip is the click target for `{components.sync-report-panel}`,
- * which opens in place beneath it and is closed on every load. A cross-file
- * failure changes nothing here: its diagnosis is the panel's sixth group. The request
- * log is untouched: toggling reads what the load already holds.
+ * The whole strip toggles `{components.sync-report-panel}` in place, closed on every load. A cross-file
+ * failure changes nothing here: its diagnosis is the panel's sixth group (FR-10, FR-18, FR-24, FR-25).
  */
 export function TrustStrip({
   set,
@@ -167,11 +159,7 @@ function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.E
   );
 }
 
-/**
- * The skeleton's trust strip: the resting strip's rules, padding and two
- * empty lines, so the page below never jumps at the pending → ready
- * transition (EXPERIENCE.md state 22). No text, no affordance, no click.
- */
+/** The skeleton's strip: same rules, padding and two empty lines, so the page never jumps at pending → ready (EXPERIENCE.md state 22). */
 export function TrustStripSlot(): JSX.Element {
   const role = typeStyle('trust-strip');
   return (

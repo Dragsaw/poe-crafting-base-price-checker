@@ -628,7 +628,7 @@
   },
   "packages/web/src/frame/TrustStrip.tsx": {
     "local/max-comment-run": {
-      "count": 2
+      "count": 1
     }
   },
   "packages/web/src/frame/trust-facts.ts": {
