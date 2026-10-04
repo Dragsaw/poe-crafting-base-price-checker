@@ -46,14 +46,18 @@ describe('PriceStateSchema', () => {
   it('exhausts all four states with no default arm', () => {
     function label(price: PriceState): string {
       switch (price.state) {
-        case 'priced':
+        case 'priced': {
           return String(price.observation.priceDivine);
-        case 'no-listings':
+        }
+        case 'no-listings': {
           return 'no listings';
-        case 'not-yet-synced':
+        }
+        case 'not-yet-synced': {
           return price.reason;
-        case 'unresolvable':
+        }
+        case 'unresolvable': {
           return 'unresolvable';
+        }
       }
     }
 

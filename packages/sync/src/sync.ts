@@ -279,13 +279,16 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
 
   const { outcome } = result;
   switch (outcome.kind) {
-    case 'busy':
+    case 'busy': {
       return { kind: 'lock', reason: 'another run holds the lock' };
-    case 'dispossessed':
+    }
+    case 'dispossessed': {
       return { kind: 'lock', reason: 'the lock was taken over' };
-    case 'deferred':
+    }
+    case 'deferred': {
       return { kind: 'until', until: outcome.notBefore, reason: 'a trade penalty', orInputChange: false };
-    case 'yielded':
+    }
+    case 'yielded': {
       if (notBefore !== undefined) {
         return { kind: 'until', until: notBefore, reason: 'a 429', orInputChange: false };
       }
@@ -298,7 +301,8 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
         return NO_WAIT;
       }
       return { kind: 'until', until: backoffUntil(), reason: 'no answer', orInputChange: false };
-    case 'completed':
+    }
+    case 'completed': {
       if (outcome.completed.length === 0 && outcome.entries.length === 0) {
         return {
           kind: 'input-change',
@@ -307,8 +311,10 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
         };
       }
       return NO_WAIT;
-    case 'bounded':
+    }
+    case 'bounded': {
       return NO_WAIT;
+    }
   }
 }
 
@@ -459,9 +465,10 @@ function remainingMs(until: string, clock: ClockPort): number {
 export async function runWait(wait: SessionWait, ports: WaitPorts, signature: string): Promise<void> {
   const { fs, clock, sleep: pause, signal } = ports;
   switch (wait.kind) {
-    case 'none':
+    case 'none': {
       return;
-    case 'until':
+    }
+    case 'until': {
       for (;;) {
         const left = remainingMs(wait.until, clock);
         if (left <= 0 || signal.aborted) {
@@ -475,7 +482,8 @@ export async function runWait(wait: SessionWait, ports: WaitPorts, signature: st
           return;
         }
       }
-    case 'input-change':
+    }
+    case 'input-change': {
       for (;;) {
         const left = wait.until === undefined ? LOCAL_POLL_MS : remainingMs(wait.until, clock);
         if (left <= 0 || signal.aborted) {
@@ -486,26 +494,31 @@ export async function runWait(wait: SessionWait, ports: WaitPorts, signature: st
           return;
         }
       }
-    case 'lock':
+    }
+    case 'lock': {
       for (;;) {
         if (signal.aborted || (await lockIsFree(fs, clock))) {
           return;
         }
         await pause(LOCAL_POLL_MS, signal);
       }
+    }
   }
 }
 
 function describeWait(wait: Exclude<SessionWait, { kind: 'none' }>): string {
   switch (wait.kind) {
-    case 'until':
+    case 'until': {
       return `waiting until ${wait.until} (${wait.reason}${wait.orInputChange ? ', or an input file change' : ''})`;
-    case 'input-change':
+    }
+    case 'input-change': {
       return `waiting for an input file under data/ to change (${wait.reason}${
         wait.until === undefined ? '' : `, at most until ${wait.until}`
       })`;
-    case 'lock':
+    }
+    case 'lock': {
       return `waiting for the lock to be free (${wait.reason})`;
+    }
   }
 }
 

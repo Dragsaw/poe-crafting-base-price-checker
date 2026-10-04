@@ -5,19 +5,21 @@ import { PANEL_HEADINGS, type FigureGroup, type PanelColumns, type Segment } fro
 
 function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
   switch (segment.kind) {
-    case 'figure':
+    case 'figure': {
       return (
         <span data-figure="" style={{ color: colors.ink, fontVariantNumeric: 'tabular-nums', fontStyle: 'normal' }}>
           {segment.text}
         </span>
       );
-    case 'missing':
+    }
+    case 'missing': {
       return (
         <em data-missing="" style={{ fontStyle: 'italic' }}>
           {segment.text}
         </em>
       );
-    case 'verbatim':
+    }
+    case 'verbatim': {
       // The panel's own size, weight and line height in the mono stack; the
       // panel's ink, never a semantic colour. A canonical key has no spaces,
       // so it may break anywhere.
@@ -29,8 +31,10 @@ function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
           {segment.text}
         </span>
       );
-    case 'text':
+    }
+    case 'text': {
       return <>{segment.text}</>;
+    }
   }
 }
 

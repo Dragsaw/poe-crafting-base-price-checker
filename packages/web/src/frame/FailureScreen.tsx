@@ -65,7 +65,7 @@ function RefusalCauseSentence({
   readonly expected: string;
 }): JSX.Element {
   switch (cause) {
-    case 'version':
+    case 'version': {
       return (
         <>
           {declared === null ? (
@@ -78,14 +78,17 @@ function RefusalCauseSentence({
           ; {REFUSAL_VERSION_EXPECTS} <span data-expected="">{expected}</span>.
         </>
       );
-    case 'content':
+    }
+    case 'content': {
       return (
         <>
           {REFUSAL_CONTENT} <span data-expected="">{expected}</span>.
         </>
       );
-    case 'missing':
+    }
+    case 'missing': {
       return <>{REFUSAL_MISSING}</>;
+    }
   }
 }
 

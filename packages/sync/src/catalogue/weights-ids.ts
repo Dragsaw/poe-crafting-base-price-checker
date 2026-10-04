@@ -63,12 +63,13 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   if (!result.ok) {
     switch (result.reason) {
       case 'unknown-major':
-      case 'malformed-version':
+      case 'malformed-version': {
         throw new DataFileError(
           WEIGHTS_PATH,
           result.reason,
           `schemaVersion ${result.found} refused (${result.reason}; this build reads ${result.expected})`,
         );
+      }
       case 'invalid': {
         const [first] = result.issues;
         const where = first === undefined ? '(root)' : first.path.join('.') || '(root)';

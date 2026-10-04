@@ -440,10 +440,12 @@ export function parseCommand(argv: readonly string[]): Command {
         ...(category === undefined ? {} : { category }),
       };
     }
-    case undefined:
+    case undefined: {
       throw new UsageError('missing <subcommand>');
-    default:
+    }
+    default: {
       throw new UsageError(`unknown subcommand ${kind}`);
+    }
   }
 }
 
@@ -453,16 +455,21 @@ export type ReadJson = (path: string) => unknown;
 /** Runs one command over the files `read` returns. Pure apart from `read`. */
 export function runCommand(command: Command, read: ReadJson): unknown {
   switch (command.kind) {
-    case 'stat':
+    case 'stat': {
       return lookupStat(read(STATS_PATH), command.query);
-    case 'base':
+    }
+    case 'base': {
       return lookupBase(read(ITEMS_PATH), command.query);
-    case 'class':
+    }
+    case 'class': {
       return lookupClass(loadWeights(read), read(FILTERS_PATH), command.query);
-    case 'mods':
+    }
+    case 'mods': {
       return lookupMods(loadWeights(read), command);
-    case 'tiers':
+    }
+    case 'tiers': {
       return lookupTiers(loadWeights(read), command.statId, command);
+    }
   }
 }
 

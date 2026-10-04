@@ -254,7 +254,7 @@ export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): Sear
         sort: SORT,
       };
     }
-    case 'type':
+    case 'type': {
       return {
         query: {
           status: STATUS,
@@ -264,7 +264,8 @@ export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): Sear
         },
         sort: SORT,
       };
-    case 'none':
+    }
+    case 'none': {
       return {
         query: {
           status: STATUS,
@@ -273,5 +274,6 @@ export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): Sear
         },
         sort: SORT,
       };
+    }
   }
 }

@@ -338,15 +338,18 @@ export function rank(input: RankInput): Ranking {
 
     const price = published.price;
     switch (price.state) {
-      case 'no-listings':
+      case 'no-listings': {
         noListings.push(base);
         break;
-      case 'unresolvable':
+      }
+      case 'unresolvable': {
         unresolvable.push(base);
         break;
-      case 'not-yet-synced':
+      }
+      case 'not-yet-synced': {
         notYetSynced.push({ ...base, reason: price.reason });
         break;
+      }
       case 'priced': {
         const { observation } = price;
         if (observation.league !== input.activeLeague) {

@@ -443,9 +443,10 @@ function describeRefusal(
 ): DataFileError {
   switch (result.reason) {
     case 'unknown-major':
-    case 'malformed-version':
+    case 'malformed-version': {
       return new DataFileError(path, result.reason, describeVersionRefusal(result, explainVersion));
-    case 'invalid':
+    }
+    case 'invalid': {
       return new DataFileError(
         path,
         'invalid',
@@ -453,6 +454,7 @@ function describeRefusal(
           .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
           .join('; ')}`,
       );
+    }
   }
 }
 

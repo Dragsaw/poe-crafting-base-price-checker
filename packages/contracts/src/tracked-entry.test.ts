@@ -111,10 +111,12 @@ describe('TrackedEntrySchema', () => {
   it('exhausts both kinds with no default arm', () => {
     function unitOf(entry: TrackedEntry): string {
       switch (entry.kind) {
-        case 'crafted':
+        case 'crafted': {
           return `${entry.categoryId}/${entry.className}`;
-        case 'raw':
+        }
+        case 'raw': {
           return entry.baseTypeId;
+        }
       }
     }
 

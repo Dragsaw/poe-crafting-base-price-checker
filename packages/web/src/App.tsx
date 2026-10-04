@@ -113,7 +113,7 @@ export function App(): JSX.Element {
   }, []);
 
   switch (view.kind) {
-    case 'pending':
+    case 'pending': {
       return (
         <Frame state="pending">
           <Masthead league={undefined} threshold={threshold} onThresholdChange={changeThreshold} />
@@ -123,6 +123,7 @@ export function App(): JSX.Element {
           <PageTail />
         </Frame>
       );
+    }
     case 'ready': {
       if (ranking === undefined) {
         throw new Error('a ready view always has a ranking');
@@ -165,7 +166,7 @@ export function App(): JSX.Element {
         </Frame>
       );
     }
-    case 'refused':
+    case 'refused': {
       return (
         <Frame state="refused">
           <FailureScreen
@@ -177,12 +178,14 @@ export function App(): JSX.Element {
           />
         </Frame>
       );
-    case 'failed':
+    }
+    case 'failed': {
       return (
         <Frame state="failed">
           <FailureScreen variant="failed" path={view.path} onRetry={retry} />
         </Frame>
       );
+    }
   }
 }
 

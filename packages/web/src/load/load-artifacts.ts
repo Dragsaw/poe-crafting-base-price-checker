@@ -121,15 +121,18 @@ async function fetchOne(
   // `never` default at compile time rather than becoming a silent `version`.
   switch (result.reason) {
     case 'unknown-major':
-    case 'malformed-version':
+    case 'malformed-version': {
       return { kind: 'invalid', cause: 'version', declared };
-    case 'invalid':
+    }
+    case 'invalid': {
       // Covers both a failed version probe (no string version declared) and a
       // failed shape parse at the expected major. A non-object body or a
       // non-string version reads as `version` on purpose (item 22 review).
       return { kind: 'invalid', cause: declared === null ? 'version' : 'content', declared };
-    default:
+    }
+    default: {
       return result satisfies never;
+    }
   }
 }
 

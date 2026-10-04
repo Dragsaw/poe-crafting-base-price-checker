@@ -121,12 +121,15 @@ describe('ModifierRefSchema', () => {
   it('exhausts every kind with no default arm', () => {
     function describeRef(ref: ModifierRef): string {
       switch (ref.kind) {
-        case 'banded':
+        case 'banded': {
           return `${ref.statId}:${String(ref.valueMin)}-${String(ref.valueMax)}`;
-        case 'valueless':
+        }
+        case 'valueless': {
           return `${ref.statId}:valueless`;
-        case 'hybrid':
+        }
+        case 'hybrid': {
           return ref.lines.map((line) => line.statId).join('+');
+        }
       }
     }
 

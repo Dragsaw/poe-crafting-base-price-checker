@@ -122,14 +122,18 @@ export function rawExpansionNote(itemLevelMin: number): string {
 /** Line two's note for a Raw Base: the raw note when priced; otherwise the state's own note replaces it. */
 export function rawCombinationNote(state: CombinationState, itemLevelMin: number): string {
   switch (state.state) {
-    case 'priced':
+    case 'priced': {
       return rawExpansionNote(itemLevelMin);
-    case 'no-listings':
+    }
+    case 'no-listings': {
       return STATE_NOTES['no-listings'];
-    case 'not-yet-synced':
+    }
+    case 'not-yet-synced': {
       return STATE_NOTES[state.reason];
-    case 'unresolvable':
+    }
+    case 'unresolvable': {
       return STATE_NOTES.unresolvable;
+    }
   }
 }
 
@@ -144,14 +148,18 @@ export const BELOW_THRESHOLD_NOTE = 'below the threshold — adds nothing to EV'
  */
 export function craftedCombinationNote(state: CombinationState, summand: boolean): string {
   switch (state.state) {
-    case 'priced':
+    case 'priced': {
       return summand ? '' : BELOW_THRESHOLD_NOTE;
-    case 'no-listings':
+    }
+    case 'no-listings': {
       return STATE_NOTES['no-listings'];
-    case 'not-yet-synced':
+    }
+    case 'not-yet-synced': {
       return STATE_NOTES[state.reason];
-    case 'unresolvable':
+    }
+    case 'unresolvable': {
       return STATE_NOTES.unresolvable;
+    }
   }
 }
 
@@ -187,27 +195,34 @@ export function combinationFigure(
   state: CombinationState,
 ): { readonly kind: 'figure' | 'phrase'; readonly text: string } {
   switch (state.state) {
-    case 'priced':
+    case 'priced': {
       return { kind: 'figure', text: formatDivine(state.priceDivine) };
-    case 'no-listings':
+    }
+    case 'no-listings': {
       return { kind: 'phrase', text: MONEY_PHRASES.noListings };
-    case 'not-yet-synced':
+    }
+    case 'not-yet-synced': {
       return { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
-    case 'unresolvable':
+    }
+    case 'unresolvable': {
       return { kind: 'phrase', text: MONEY_PHRASES.unresolvable };
+    }
   }
 }
 
 /** The sample cell: the listing count the figure rested on. */
 export function sampleText(state: CombinationState): string {
   switch (state.state) {
-    case 'priced':
+    case 'priced': {
       return `${String(state.sampleSize)} ${plural(state.sampleSize, 'listing', 'listings')}`;
-    case 'no-listings':
+    }
+    case 'no-listings': {
       return '0 listings found';
+    }
     case 'not-yet-synced':
-    case 'unresolvable':
+    case 'unresolvable': {
       return 'no sample';
+    }
   }
 }
 

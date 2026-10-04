@@ -381,20 +381,22 @@ export function parseEnvelope<S extends z.ZodType>(
     // switch with a code path that returns nothing, which is a compile error
     // rather than a silent relabelling as `malformed-version`.
     switch (version.reason) {
-      case 'unknown-major':
+      case 'unknown-major': {
         return {
           ok: false,
           reason: 'unknown-major',
           expected: version.expected,
           found: version.found,
         };
-      case 'malformed':
+      }
+      case 'malformed': {
         return {
           ok: false,
           reason: 'malformed-version',
           expected: version.expected,
           found: version.found,
         };
+      }
     }
   }
 
