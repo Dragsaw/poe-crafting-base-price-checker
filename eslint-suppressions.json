@@ -4,14 +4,6 @@
       "count": 1
     }
   },
-  ".claude/skills/tracked-json/scripts/lookup.ts": {
-    "max-classes-per-file": {
-      "count": 1
-    },
-    "max-lines": {
-      "count": 1
-    }
-  },
   ".dependency-cruiser.mjs": {
     "local/max-comment-run": {
       "count": 1
