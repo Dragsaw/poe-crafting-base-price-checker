@@ -40,10 +40,10 @@ const LEAGUES_BODY = JSON.stringify({
   ],
 });
 
-function inputs(): Parameters<typeof createFakeFilesystemPort>[0] {
+function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof createFakeFilesystemPort>[0] {
   return {
     [TRACKED_PATH]: {
-      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: [ENTRY] }),
+      contents: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }),
       modifiedAt: '2026-09-20T07:00:00.000Z',
     },
     'data/config.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', league: LEAGUE, minChunkSearches: 1 }) },
@@ -178,8 +178,10 @@ interface Captured {
  * lock rejects with the canary error: a throw from outside the governor that
  * reaches the shell's own `catch` before any report is written.
  */
-function capturing(options: { readonly lockFault?: boolean } = {}): Captured {
-  const fs = createFakeFilesystemPort(inputs());
+function capturing(
+  options: { readonly lockFault?: boolean; readonly tracked?: readonly TrackedEntry[] } = {},
+): Captured {
+  const fs = createFakeFilesystemPort(inputs(options.tracked));
   const written = new Set<string>();
   const texts: string[] = [];
   let lockFaults = 0;
@@ -533,12 +535,23 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
 describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => {
   const RESULTS = ['r1'];
   const SEARCHED = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length });
-  const LIVE_HEADERS = {
-    'x-rate-limit-policy': 'search-policy',
+  /** Every answer names its policy, as the live API does; a search and a fetch differ (§13.2). */
+  const SEARCH_HEADERS = {
+    'x-rate-limit-policy': 'trade-search-request-limit',
     'x-rate-limit-rules': 'Ip',
     'x-rate-limit-ip': '30:300:60',
     'x-rate-limit-ip-state': '1:300:0',
   };
+  const FETCH_HEADERS = { ...SEARCH_HEADERS, 'x-rate-limit-policy': 'trade-fetch-request-limit' };
+  /** The search policy with one rule more than the baseline: a live probe. The rule name and bucket are illustrative. */
+  const LIVE_HEADERS = {
+    ...SEARCH_HEADERS,
+    'x-rate-limit-rules': 'Ip,Account',
+    'x-rate-limit-account': '60:300:60',
+    'x-rate-limit-account-state': '1:300:0',
+  };
+  /** A second entry, so a search carries the cookie after the probe. */
+  const TRACKED: readonly TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }];
   /** A body and headers that quote the request's cookie in every form. */
   const quoting = (cookie: string) => ({
     body: `echo ${cookie} ${encodeURIComponent(cookie)} ${Buffer.from(cookie).toString('base64')}`,
@@ -547,13 +560,19 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
 
   type Downgrade = '401' | '403' | 'not-live';
 
-  /** A live probe, then the fetch that carries the cookie gets a downgrade that quotes it. */
+  /**
+   * A live probe, then a downgrade that quotes the cookie. A `401` or `403`
+   * answers the fetch. `not-live` answers the next entry's search with the
+   * baseline's rule count under the baseline's policy; the fetch before it
+   * answers fewer rules under its own policy and is not tested.
+   */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;
+    let probed = false;
     const fake = createFakeHttpPort({
       [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
-      [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: SEARCHED },
-      [`GET ${tradeFetchUrl(RESULTS, 'S1')}`]: { status: 200, headers: {}, body: '{"result":[]}' },
+      [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: SEARCH_HEADERS, body: SEARCHED },
+      [`GET ${tradeFetchUrl(RESULTS, 'S1')}`]: { status: 200, headers: FETCH_HEADERS, body: '{"result":[]}' },
     });
     return {
       port: {
@@ -562,16 +581,20 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
           if (cookie === undefined) {
             return fake.send(request);
           }
-          if (request.method === 'GET') {
-            downgraded += 1;
-            const echo = quoting(cookie);
-            return Promise.resolve(
-              kind === 'not-live'
-                ? { status: 200, headers: echo.headers, body: echo.body }
-                : { status: Number(kind), headers: echo.headers, body: echo.body },
-            );
+          if (request.method === 'POST' && !probed) {
+            probed = true;
+            return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
           }
-          return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
+          const echo = quoting(cookie);
+          if (kind === 'not-live' && request.method === 'POST') {
+            downgraded += 1;
+            return Promise.resolve({ status: 200, headers: { ...SEARCH_HEADERS, ...echo.headers }, body: echo.body });
+          }
+          if (kind !== 'not-live' && request.method === 'GET') {
+            downgraded += 1;
+            return Promise.resolve({ status: Number(kind), headers: echo.headers, body: echo.body });
+          }
+          return fake.send(request);
         },
       },
       downgraded: () => downgraded,
@@ -581,7 +604,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   const KINDS: readonly Downgrade[] = ['401', '403', 'not-live'];
 
   it.each(KINDS)('pnpm sync:batch: a %s downgrade quoting the cookie leaves no trace', async (kind) => {
-    const captured = capturing();
+    const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
     const { code, lines } = await runBatch(captured, http.port);
@@ -595,7 +618,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   });
 
   it.each(KINDS)('pnpm sync: a %s downgrade quoting the cookie leaves no trace', async (kind) => {
-    const captured = capturing();
+    const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
     const { code, lines } = await runSession(captured, http.port);
@@ -609,7 +632,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   });
 
   it.each(KINDS)('the outcome of a chunk with a %s downgrade carries no trace', async (kind) => {
-    const captured = capturing();
+    const captured = capturing({ tracked: TRACKED });
     const http = downgradingHttp(kind);
 
     const outcome = await composeChunk({
@@ -625,6 +648,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
     }).run();
 
     expect(outcome).toMatchObject({ kind: 'yielded', sessionExpired: true });
+    expect(http.downgraded()).toBe(1);
     const scanned = [JSON.stringify(outcome), ...captured.texts, ...(await captured.files())].join('\n');
     expect(leaksIn(scanned)).toEqual([]);
   });

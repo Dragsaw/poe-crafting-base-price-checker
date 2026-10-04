@@ -15,6 +15,7 @@ import type {
   DatasetEntry,
   FakeFilesystemPort,
   FilesystemPort,
+  HttpRequest,
   HttpResponse,
   SyncReportFile,
   TrackedEntry,
@@ -581,24 +582,42 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const COOKIE = `POESESSID=${VALUE}`;
     const COOKIE_ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALUE };
     const RESULTS = ['r1', 'r2'];
+    /**
+     * The live API names a policy on every answer, and a search and a fetch
+     * are counted under different policies (§13.2). The baseline search
+     * answers one rule without the cookie.
+     */
+    const SEARCH_HEADERS = {
+      'x-rate-limit-policy': 'trade-search-request-limit',
+      'x-rate-limit-rules': 'Ip',
+      'x-rate-limit-ip': '30:300:60',
+      'x-rate-limit-ip-state': '1:300:0',
+    };
+    /** One rule, under the fetch's own policy: never `tested` against the search baseline. */
+    const FETCH_HEADERS = {
+      'x-rate-limit-policy': 'trade-fetch-request-limit',
+      'x-rate-limit-rules': 'Ip',
+      'x-rate-limit-ip': '30:300:60',
+      'x-rate-limit-ip-state': '1:300:0',
+    };
     const SEARCH_WITH_RESULTS: HttpResponse = {
       status: 200,
-      headers: {},
+      headers: SEARCH_HEADERS,
       body: JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length }),
     };
     const FETCHED: HttpResponse = {
       status: 200,
-      headers: {},
+      headers: FETCH_HEADERS,
       body: JSON.stringify({ result: [{ listing: { price: { amount: 2, currency: 'divine' } } }] }),
     };
-    /** One rule more than the fake's baseline answer, which names none. */
+    /** The search policy with one rule more than the baseline: a live cookie. The rule name and bucket are illustrative. */
     const LIVE: HttpResponse = {
       status: 200,
       headers: {
-        'x-rate-limit-policy': 'search-policy',
-        'x-rate-limit-rules': 'Ip',
-        'x-rate-limit-ip': '30:300:60',
-        'x-rate-limit-ip-state': '1:300:0',
+        ...SEARCH_HEADERS,
+        'x-rate-limit-rules': 'Ip,Account',
+        'x-rate-limit-account': '60:300:60',
+        'x-rate-limit-account-state': '1:300:0',
       },
       body: SEARCH_WITH_RESULTS.body,
     };
@@ -614,16 +633,14 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     /**
      * As `probing`, and every later cookie request is answered by `after`:
-     * by default the fake's answer with the live rule set added, so the
-     * cookie stays live (§13.4).
+     * by default a search gets the live rule set and a fetch keeps the fake's
+     * answer under its own policy, so the cookie stays live (§13.4).
      */
     function probingThen(
       deps: SyncCommandDeps,
       answers: (HttpResponse | Error)[],
-      after: (answer: HttpResponse) => HttpResponse = (answer) => ({
-        ...answer,
-        headers: { ...answer.headers, ...LIVE.headers },
-      }),
+      after: (answer: HttpResponse, request: HttpRequest) => HttpResponse = (answer, request) =>
+        request.method === 'POST' ? { ...answer, headers: { ...answer.headers, ...LIVE.headers } } : answer,
     ): SyncCommandDeps {
       const fake = deps.http;
       return {
@@ -636,7 +653,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
             }
             const answer = request.method === 'POST' ? answers.shift() : undefined;
             if (answer === undefined) {
-              return sent.then(after);
+              return sent.then((response) => after(response, request));
             }
             return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
           },
@@ -675,6 +692,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
         ['GET', COOKIE],
       ]);
       expect(http.requests[3]?.url).toBe(tradeFetchUrl(RESULTS, 'S1'));
+      // The fetch answers fewer rules than the probe, under its own policy: not tested, no downgrade (§13.4).
       expect(auth).toEqual([{ line: 'pnpm sync:batch: authenticated', requestsBefore: 3 }]);
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: completed, 1 completed']);
@@ -762,7 +780,6 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     it.each([
       ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' } as HttpResponse],
       ['a 401', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
-      ['a 2xx that is not live', FETCHED],
     ])('CAP-3, %s on the cookie fetch: one expired line, the entry stamped, yielded, the hold-off written, exit 0', async (_label, downgrading) => {
       const { deps, http, auth, err, out, fs } = withResults();
 
@@ -786,6 +803,40 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       // A downgrade is not a request-rejected abort: no record.
       expect((await reportOf(fs))?.records).toEqual([]);
       expect(cookies(http).at(-1)).toEqual(['GET', COOKIE]);
+    });
+
+    it('CAP-3, a search 2xx that is not live: the next entry’s search expires the cookie, the fetch before it did not', async () => {
+      const second: TrackedEntry = { ...ENTRY, itemLevelMin: 83 };
+      const { deps, http, auth, err, out, fs } = withResults({ tracked: [ENTRY, second] });
+
+      // After the probe, every cookie request gets the answer the cookie-less request gets.
+      expect(await syncCommand(probingThen(deps, [LIVE], (answer) => answer))).toBe(0);
+
+      expect(cookies(http)).toEqual([
+        ['GET', undefined],
+        ['POST', undefined],
+        ['POST', COOKIE],
+        ['GET', COOKIE],
+        ['POST', COOKIE],
+      ]);
+      expect(auth.map((entry) => entry.line)).toEqual([
+        'pnpm sync:batch: authenticated',
+        'pnpm sync:batch: unauthenticated (expired)',
+      ]);
+      expect(err).toEqual([]);
+      expect(out).toEqual(['pnpm sync:batch: yielded, 1 completed']);
+      expect((await progressOf(fs))['authHoldOffUntil']).toBe(NOW_PLUS_24H);
+      // The second entry is stamped with no search fields: the downgrading search was its first.
+      const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
+      // The first entry was priced from its fetch, which was not a downgrade.
+      expect(dataset.entries.find((entry) => entry.entryKey === canonicalKey(ENTRY))).toMatchObject({
+        lastSearchId: 'S1',
+        price: { state: 'priced' },
+      });
+      const stamped = dataset.entries.find((entry) => entry.entryKey === canonicalKey(second));
+      expect(stamped).toMatchObject({ lastAttemptedAt: NOW, price: { state: 'not-yet-synced', reason: 'never-synced' } });
+      expect(stamped).not.toHaveProperty('lastSearchId');
+      expect((await reportOf(fs))?.records).toEqual([]);
     });
 
     it('CAP-5, held off: unauthenticated (held-off), no session-probe request, exit 0, the field unchanged', async () => {
