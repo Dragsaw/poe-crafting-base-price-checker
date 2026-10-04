@@ -76,11 +76,7 @@ const WEIGHTS = JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatc
 /** The league gate's answer: the synthetic league is one the API carries. */
 const LEAGUES_ANSWER = JSON.stringify({ result: [{ id: 'Standard' }, { id: LEAGUE }] });
 
-/**
- * An in-memory answer per entry: a search that found nothing. It is not a
- * fixture file — the ordering tests below need synthetic entries, and the
- * recorded captures are exercised by the repository run at the bottom.
- */
+/** An in-memory empty search per entry: the ordering tests need synthetic entries, not recorded captures. */
 function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
   const itemTypes = itemTypesOf(ITEMS_CATALOGUE);
   return new Map([
