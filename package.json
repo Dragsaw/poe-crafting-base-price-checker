@@ -11,6 +11,7 @@
     "prepare": "node tools/setup-git-hooks.mjs",
     "typecheck": "tsc -b && node tools/dts-specifiers/rewrite-dts-specifiers.ts",
     "lint": "eslint . --max-warnings=0",
+    "lint:prune": "eslint . --prune-suppressions",
     "dup": "jscpd",
     "knip": "knip",
     "depcruise": "depcruise packages --config .dependency-cruiser.mjs",
