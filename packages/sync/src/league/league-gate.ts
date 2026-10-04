@@ -10,39 +10,13 @@ import { penaltyRetryAfterMs } from '../trade/client.ts';
 import type { TradeClient, TradeResult } from '../trade/client.ts';
 import { DATA_LANE, TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
 import { isTransportFailure } from '../trade/transport-failure.ts';
+import { LeagueMismatchError } from './league-mismatch-error.ts';
+import { LeagueRequestRejectedError } from './league-request-rejected-error.ts';
+
+export { LeagueMismatchError } from './league-mismatch-error.ts';
+export { LeagueRequestRejectedError } from './league-request-rejected-error.ts';
 
 const SERVER_ERROR = 500;
-
-/** The configured league is not among the trade API's ids; `runChunk` reports it as `league-mismatch`. */
-export class LeagueMismatchError extends Error {
-  readonly configuredLeague: LeagueId;
-  /** Every id the endpoint answered, in endpoint order. */
-  readonly availableLeagues: readonly LeagueId[];
-
-  constructor(configuredLeague: LeagueId, availableLeagues: readonly LeagueId[]) {
-    super(
-      `the configured league ${JSON.stringify(configuredLeague)} is not one the trade API carries (${
-        availableLeagues.length === 0
-          ? 'it listed none'
-          : availableLeagues.map((id) => JSON.stringify(id)).join(', ')
-      }); the run is aborted`,
-    );
-    this.name = 'LeagueMismatchError';
-    this.configuredLeague = configuredLeague;
-    this.availableLeagues = availableLeagues;
-  }
-}
-
-/** A non-2xx that is neither 429 nor 5xx; it names no entry because the gate runs before any entry. */
-export class LeagueRequestRejectedError extends Error {
-  readonly status: number;
-
-  constructor(status: number) {
-    super(`the trade leagues request answered ${String(status)}; the run is aborted`);
-    this.name = 'LeagueRequestRejectedError';
-    this.status = status;
-  }
-}
 
 /** A 2xx whose body is not the leagues payload shape. */
 export class UnexpectedLeaguesResponseError extends Error {
