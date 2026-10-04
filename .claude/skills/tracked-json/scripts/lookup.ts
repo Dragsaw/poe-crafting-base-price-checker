@@ -24,7 +24,7 @@ import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { type ModifierWeight, type WeightsClassPools, type WeightsFile, WeightsFileSchema } from '@poe/contracts';
+import { type ModifierWeight, type WeightsClassPools, type WeightsFile, WeightsFileSchema, type WeightsPool } from '@poe/contracts';
 import { lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
 
 export const STATS_PATH = 'data/catalogue/stats.json';
@@ -135,12 +135,9 @@ export function lookupBase(items: unknown, query: string): { matches: BaseMatch[
   const found: BaseMatch[] = [];
   const seen = new Set<string>();
   for (const group of arrayAt(items, 'result')) {
-    const groupId = isRecord(group) ? (stringAt(group, 'id') ?? '') : '';
+    const groupId = idOf(group);
     for (const entry of arrayAt(group, 'entries')) {
-      if (!isRecord(entry) || entry['name'] !== undefined) {
-        continue;
-      }
-      const type = stringAt(entry, 'type');
+      const type = baseTypeOf(entry);
       const key = `${groupId}\0${type ?? ''}`;
       if (type === undefined || !isContaining(type, query) || seen.has(key)) {
         continue;
@@ -150,6 +147,14 @@ export function lookupBase(items: unknown, query: string): { matches: BaseMatch[
     }
   }
   return capped(found);
+}
+
+function idOf(group: unknown): string {
+  return isRecord(group) ? (stringAt(group, 'id') ?? '') : '';
+}
+
+function baseTypeOf(entry: unknown): string | undefined {
+  return isRecord(entry) && entry['name'] === undefined ? stringAt(entry, 'type') : undefined;
 }
 
 // --- class --------------------------------------------------------------------
@@ -172,25 +177,24 @@ export function loadWeights(read: ReadJson): WeightsFile {
   throw new LookupError(`${WEIGHTS_PATH}: ${where}: ${issue?.message ?? 'invalid'}`);
 }
 
+function categoryOptions(filters: unknown): unknown[] {
+  return arrayAt(filters, 'result').flatMap((group) =>
+    arrayAt(group, 'filters').flatMap((filter) =>
+      isRecord(filter) && filter['id'] === 'category' ? arrayAt(filter['option'], 'options') : [],
+    ),
+  );
+}
+
 function categoryTexts(filters: unknown): Map<string, string> {
   const texts = new Map<string, string>();
-  for (const group of arrayAt(filters, 'result')) {
-    for (const filter of arrayAt(group, 'filters')) {
-      if (!isRecord(filter) || filter['id'] !== 'category') {
-        continue;
-      }
-      const options = arrayAt(filter['option'], 'options');
-      for (const option of options) {
-        if (!isRecord(option)) {
-          continue;
-        }
-
-        const id = stringAt(option, 'id');
-        const text = stringAt(option, 'text');
-        if (id !== undefined && text !== undefined) {
-          texts.set(id, text);
-        }
-      }
+  for (const option of categoryOptions(filters)) {
+    if (!isRecord(option)) {
+      continue;
+    }
+    const id = stringAt(option, 'id');
+    const text = stringAt(option, 'text');
+    if (id !== undefined && text !== undefined) {
+      texts.set(id, text);
     }
   }
   return texts;
@@ -279,53 +283,65 @@ export function lookupMods(
   selector: ClassSelector & { readonly slot?: Slot },
 ): { categoryId: string; className: string; mods: ModifierRow[] } {
   const resolved = resolveClass(weights, selector);
-  const mods: ModifierRow[] = [];
   const slots = selector.slot === undefined ? SLOTS : [selector.slot];
+  const mods: ModifierRow[] = [];
   for (const slot of slots) {
     const pool = resolved.pools[slot];
-    // A family is (modGroup, line set): a modGroup can hold several mod families, so a hybrid
-    // is one row and two families of one modGroup are two rows. `core` owns the line set and
-    // the null-line rule; nothing here re-derives either.
-    const families = new Map<string, { modGroup: string; statIds: string[]; tiers: ModifierWeight[] }>();
-    for (const entry of pool.entries) {
-      const statIds = [...lineSet(entry)];
-      const key = JSON.stringify([entry.modGroup, statIds]);
-      const family = families.get(key);
-      if (family === undefined) {
-        families.set(key, { modGroup: entry.modGroup, statIds, tiers: [entry] });
-      } else {
-        family.tiers.push(entry);
-      }
-    }
-    for (const { modGroup, statIds, tiers: unsorted } of families.values()) {
-      const tiers = unsorted.toSorted(byItemLevel);
-      const first = tiers[0];
-      const last = tiers.at(-1);
-      const untrackable = tiers.flatMap((entry) => {
-        const reason = untrackableReason(entry, pool);
-        return reason === undefined
-          ? []
-          : {
-              tierLabel: absentAsNull(entry.tierLabel),
-              itemLevelMin: entry.itemLevelMin,
-              sourceModifierId: entry.sourceModifierId,
-              reason,
-            };
-      });
-      mods.push({
-        slot,
-        modGroup,
-        text: first?.modGroup ?? '',
-        statIds,
-        trackable: untrackable.length === 0,
-        untrackable,
-        tierCount: tiers.length,
-        itemLevelMin: { min: first?.itemLevelMin ?? 0, max: last?.itemLevelMin ?? 0 },
-        tierLabels: tiers.map((entry) => absentAsNull(entry.tierLabel)),
-      });
+    for (const family of modifierFamilies(pool.entries).values()) {
+      mods.push(modifierRow(slot, family, pool));
     }
   }
   return { categoryId: resolved.categoryId, className: resolved.className, mods };
+}
+
+interface ModifierFamily {
+  readonly modGroup: string;
+  readonly statIds: string[];
+  readonly tiers: ModifierWeight[];
+}
+
+// A family is (modGroup, line set): a hybrid is one row, two families of one modGroup are two. `core` owns the line set.
+function modifierFamilies(entries: readonly ModifierWeight[]): Map<string, ModifierFamily> {
+  const families = new Map<string, ModifierFamily>();
+  for (const entry of entries) {
+    const statIds = [...lineSet(entry)];
+    const key = JSON.stringify([entry.modGroup, statIds]);
+    const family = families.get(key);
+    if (family === undefined) {
+      families.set(key, { modGroup: entry.modGroup, statIds, tiers: [entry] });
+    } else {
+      family.tiers.push(entry);
+    }
+  }
+  return families;
+}
+
+function modifierRow(slot: Slot, family: ModifierFamily, pool: WeightsPool): ModifierRow {
+  const tiers = family.tiers.toSorted(byItemLevel);
+  const first = tiers[0];
+  const last = tiers.at(-1);
+  const untrackable = tiers.flatMap((entry) => {
+    const reason = untrackableReason(entry, pool);
+    return reason === undefined
+      ? []
+      : {
+          tierLabel: absentAsNull(entry.tierLabel),
+          itemLevelMin: entry.itemLevelMin,
+          sourceModifierId: entry.sourceModifierId,
+          reason,
+        };
+  });
+  return {
+    slot,
+    modGroup: family.modGroup,
+    text: first?.modGroup ?? '',
+    statIds: family.statIds,
+    trackable: untrackable.length === 0,
+    untrackable,
+    tierCount: tiers.length,
+    itemLevelMin: { min: first?.itemLevelMin ?? 0, max: last?.itemLevelMin ?? 0 },
+    tierLabels: tiers.map((entry) => absentAsNull(entry.tierLabel)),
+  };
 }
 
 export interface TierRow {
@@ -402,53 +418,17 @@ export function parseCommand(argv: readonly string[]): Command {
   if (extra.length > 0) {
     throw new UsageError(`unexpected argument ${extra.join(' ')}`);
   }
-  const category = values.category;
   switch (kind) {
     case 'stat':
     case 'base':
     case 'class': {
-      if (query === undefined) {
-        throw new UsageError(`${kind}: missing <query>`);
-      }
-      if (category !== undefined || values.class !== undefined || values.slot !== undefined) {
-        throw new UsageError(`${kind}: takes no options`);
-      }
-      return { kind, query };
+      return parseQueryCommand(kind, query, values);
     }
     case 'mods': {
-      if (query !== undefined) {
-        throw new UsageError(`mods: unexpected argument ${query}`);
-      }
-      if (values.class === undefined) {
-        throw new UsageError('mods: missing --class <className>');
-      }
-      const slot = values.slot;
-      if (slot !== undefined && slot !== 'prefix' && slot !== 'suffix') {
-        throw new UsageError(`mods: --slot must be prefix or suffix, not ${slot}`);
-      }
-      return {
-        kind,
-        className: values.class,
-        ...(slot !== undefined && { slot }),
-        ...(category !== undefined && { category }),
-      };
+      return parseModsCommand(query, values);
     }
     case 'tiers': {
-      if (query === undefined) {
-        throw new UsageError('tiers: missing <statId>');
-      }
-      if (values.class === undefined) {
-        throw new UsageError('tiers: missing --class <className>');
-      }
-      if (values.slot !== undefined) {
-        throw new UsageError('tiers: takes no --slot; it prints both slots');
-      }
-      return {
-        kind,
-        statId: query,
-        className: values.class,
-        ...(category !== undefined && { category }),
-      };
+      return parseTiersCommand(query, values);
     }
     case undefined: {
       throw new UsageError('missing <subcommand>');
@@ -457,6 +437,56 @@ export function parseCommand(argv: readonly string[]): Command {
       throw new UsageError(`unknown subcommand ${kind}`);
     }
   }
+}
+
+type OptionValues = ReturnType<typeof parseOptions>['values'];
+
+function parseQueryCommand(kind: 'stat' | 'base' | 'class', query: string | undefined, values: OptionValues): Command {
+  if (query === undefined) {
+    throw new UsageError(`${kind}: missing <query>`);
+  }
+  if (values.category !== undefined || values.class !== undefined || values.slot !== undefined) {
+    throw new UsageError(`${kind}: takes no options`);
+  }
+  return { kind, query };
+}
+
+function parseModsCommand(query: string | undefined, values: OptionValues): Command {
+  if (query !== undefined) {
+    throw new UsageError(`mods: unexpected argument ${query}`);
+  }
+  if (values.class === undefined) {
+    throw new UsageError('mods: missing --class <className>');
+  }
+  const { category, slot } = values;
+  if (slot !== undefined && slot !== 'prefix' && slot !== 'suffix') {
+    throw new UsageError(`mods: --slot must be prefix or suffix, not ${slot}`);
+  }
+  return {
+    kind: 'mods',
+    className: values.class,
+    ...(slot !== undefined && { slot }),
+    ...(category !== undefined && { category }),
+  };
+}
+
+function parseTiersCommand(query: string | undefined, values: OptionValues): Command {
+  if (query === undefined) {
+    throw new UsageError('tiers: missing <statId>');
+  }
+  if (values.class === undefined) {
+    throw new UsageError('tiers: missing --class <className>');
+  }
+  if (values.slot !== undefined) {
+    throw new UsageError('tiers: takes no --slot; it prints both slots');
+  }
+  const { category } = values;
+  return {
+    kind: 'tiers',
+    statId: query,
+    className: values.class,
+    ...(category !== undefined && { category }),
+  };
 }
 
 /** Reads one data file as plain JSON. An absent or unparseable file throws `LookupError` naming it. */

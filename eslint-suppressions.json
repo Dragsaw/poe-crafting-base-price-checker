@@ -5,26 +5,14 @@
     }
   },
   ".claude/skills/tracked-json/scripts/lookup.ts": {
-    "complexity": {
-      "count": 3
-    },
     "local/max-comment-run": {
       "count": 2
     },
     "max-classes-per-file": {
       "count": 1
     },
-    "max-depth": {
-      "count": 2
-    },
     "max-lines": {
       "count": 1
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 2
     }
   },
   ".dependency-cruiser.mjs": {
