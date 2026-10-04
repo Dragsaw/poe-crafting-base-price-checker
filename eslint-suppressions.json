@@ -613,17 +613,11 @@
     }
   },
   "packages/sync/src/trade/client.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
-      "count": 39
+      "count": 37
     },
     "max-lines": {
       "count": 1
-    },
-    "max-lines-per-function": {
-      "count": 2
     }
   },
   "packages/sync/src/trade/endpoints.ts": {
