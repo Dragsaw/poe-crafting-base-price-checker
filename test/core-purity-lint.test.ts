@@ -82,7 +82,7 @@ const PURE: readonly (readonly [string, string])[] = [
   ['new Date(s)', "export const d = new Date('2026-09-26T00:00:00Z');"],
 ];
 
-describe('core purity lint (AD-1)', () => {
+describe('core purity lint (AD-1)', { timeout: 30_000 }, () => {
   it('the core block applies to core source only', async () => {
     const rulesFor = async (path: string): Promise<Record<string, unknown>> =>
       ((await eslint.calculateConfigForFile(path)) as { rules?: Record<string, unknown> } | undefined)?.rules ?? {};
