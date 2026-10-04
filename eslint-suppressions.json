@@ -661,11 +661,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/sync.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/trade/client.test.ts": {
     "local/max-comment-run": {
       "count": 2
