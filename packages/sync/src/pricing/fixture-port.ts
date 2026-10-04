@@ -31,15 +31,18 @@ export async function readPricingFixtures(directory: string): Promise<PricingFix
   const fixtures = new Map<string, string>();
   const entries = await readdir(directory);
   const names = entries.toSorted((a, b) => Number(a > b) - Number(a < b));
-  const read = await Promise.all(
+  const read = await Promise.allSettled(
     names.map(async (file) => {
       const name = PRICING_FIXTURE_FILE.exec(file)?.[1];
       return name === undefined ? undefined : ([name, await readFile(join(directory, file), { encoding: 'utf8' })] as const);
     }),
   );
-  for (const pair of read) {
-    if (pair !== undefined) {
-      fixtures.set(pair[0], pair[1]);
+  for (const settled of read) {
+    if (settled.status === 'rejected') {
+      throw settled.reason;
+    }
+    if (settled.value !== undefined) {
+      fixtures.set(settled.value[0], settled.value[1]);
     }
   }
   return fixtures;
