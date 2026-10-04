@@ -44,10 +44,7 @@ export function readStoredThreshold(storage?: Pick<Storage, 'getItem'>): number 
       return DEFAULT_THRESHOLD;
     }
     const value = Number(raw);
-    if (!Number.isFinite(value) || value < THRESHOLD_MIN || value > THRESHOLD_MAX) {
-      return DEFAULT_THRESHOLD;
-    }
-    return roundToDecimals(value);
+    return !Number.isFinite(value) || value < THRESHOLD_MIN || value > THRESHOLD_MAX ? DEFAULT_THRESHOLD : roundToDecimals(value);
   } catch {
     return DEFAULT_THRESHOLD;
   }

@@ -92,8 +92,5 @@ export function listStatement(
   if (ranking.split === true && ranking.recipe !== undefined) {
     return { kind: 'uncostable', text: uncostableCopy(ranking.recipe.word) };
   }
-  if (nothingClears(ranking)) {
-    return { kind: 'nothing-clears', text: nothingClearsCopy(threshold) };
-  }
-  return { kind: 'none' };
+  return nothingClears(ranking) ? { kind: 'nothing-clears', text: nothingClearsCopy(threshold) } : { kind: 'none' };
 }

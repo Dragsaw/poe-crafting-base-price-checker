@@ -228,17 +228,11 @@ function defaultLaneOf(request: TradeRequest): string {
     return `${request.method} ${request.url}`;
   }
   const segments = pathname.split('/').filter((segment) => segment !== '');
-  if (segments.length <= 1) {
-    return `${request.method} ${pathname}`;
-  }
-  return `${request.method} /${segments.slice(0, -1).join('/')}`;
+  return segments.length <= 1 ? `${request.method} ${pathname}` : `${request.method} /${segments.slice(0, -1).join('/')}`;
 }
 
 function laneOf(request: TradeRequest): string {
-  if (request.lane !== undefined && request.lane.trim() !== '') {
-    return request.lane;
-  }
-  return defaultLaneOf(request);
+  return request.lane !== undefined && request.lane.trim() !== '' ? request.lane : defaultLaneOf(request);
 }
 
 /**
@@ -339,7 +333,7 @@ function describe429(
   const rateHeaders = Object.entries(headers)
     .map(([name, value]): [string, string] => [name.toLowerCase(), value])
     .filter(([name]) => name === RETRY_AFTER_HEADER || name.startsWith(RATE_LIMIT_HEADER_PREFIX))
-    .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0));
+    .sort(([left], [right]) => (left < right ? -1 : (left > right ? 1 : 0)));
   const reading =
     pacedOn === undefined
       ? 'no reading'

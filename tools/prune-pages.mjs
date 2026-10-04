@@ -71,11 +71,13 @@ export function prunePages(distDir, dataDir) {
       continue;
     }
     const target = join(distDir, ...path.split('/'));
-    if (existsSync(target)) {
-      rmSync(target);
-      removed.push(path);
-      removeEmptyDirs(resolve(target, '..'), resolve(distDir));
+    if (!existsSync(target)) {
+      continue;
     }
+
+    rmSync(target);
+    removed.push(path);
+    removeEmptyDirs(resolve(target, '..'), resolve(distDir));
   }
   const missing = ALLOWLIST.filter((artifact) => artifact.required && !existsSync(join(distDir, ...artifact.path.split('/'))));
   if (missing.length > 0) {

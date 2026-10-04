@@ -64,8 +64,5 @@ export function resolveUserAgent(
 ): UserAgentResult {
   const raw = env[USER_AGENT_ENV_VAR];
   const userAgent = raw === undefined ? '' : raw.trim();
-  if (userAgent === '') {
-    return { ok: false, variable: USER_AGENT_ENV_VAR, message: missingUserAgentMessage() };
-  }
-  return { ok: true, userAgent };
+  return userAgent === '' ? { ok: false, variable: USER_AGENT_ENV_VAR, message: missingUserAgentMessage() } : { ok: true, userAgent };
 }

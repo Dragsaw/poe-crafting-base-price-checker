@@ -103,7 +103,7 @@ export function PayoutThreshold({
               borderBottom: `${px(spacing.hairline)} solid transparent`,
             }}
           >
-            {typeof draft === 'number' ? formatThreshold(draft) : draft === '' ? '0' : draft}
+            {typeof draft === 'number' ? formatThreshold(draft) : (draft === '' ? '0' : draft)}
           </span>
           <NumberInput
             id={id}

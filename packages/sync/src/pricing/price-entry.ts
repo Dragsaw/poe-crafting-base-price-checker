@@ -139,10 +139,7 @@ function parseSearchAnswer(body: string): SearchAnswer | undefined {
   if (typeof id !== 'string' || id === '' || !Array.isArray(result)) {
     return undefined;
   }
-  if (!result.every((item): item is string => typeof item === 'string')) {
-    return undefined;
-  }
-  return { id, result };
+  return result.every((item): item is string => typeof item === 'string') ? { id, result } : undefined;
 }
 
 /**
@@ -165,10 +162,7 @@ function parseListings(body: string): Listing[] | undefined {
       continue;
     }
     const { amount, currency } = price;
-    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
-      continue;
-    }
-    if (typeof currency !== 'string' || currency === '') {
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0 || typeof currency !== 'string' || currency === '') {
       continue;
     }
     listings.push({ amount, currency });
@@ -232,10 +226,7 @@ async function sendLeg(send: () => Promise<TradeResult>): Promise<Leg> {
   if (status >= SERVER_ERROR) {
     return { kind: 'yield' };
   }
-  if (status < 200 || status >= 300) {
-    return { kind: 'malformed', status };
-  }
-  return { kind: 'answered', result };
+  return status < 200 || status >= 300 ? { kind: 'malformed', status } : { kind: 'answered', result };
 }
 
 /**

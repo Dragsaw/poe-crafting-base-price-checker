@@ -498,10 +498,7 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
   if (step.searchRemaining !== undefined && step.searchRemaining < 1) {
     return 'search';
   }
-  if (step.fetchRemaining !== undefined && step.fetchRemaining < 1) {
-    return 'fetch';
-  }
-  return undefined;
+  return step.fetchRemaining !== undefined && step.fetchRemaining < 1 ? 'fetch' : undefined;
 }
 
 /**
@@ -514,10 +511,7 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
  * step was on, where it was on one.
  */
 function failureRecords(error: unknown, current: TrackedEntry | undefined): SyncRunRecord[] {
-  if (error instanceof CrossFileGateError) {
-    return crossFileGateRecords(error);
-  }
-  return [failureRecord(error, current)];
+  return error instanceof CrossFileGateError ? crossFileGateRecords(error) : [failureRecord(error, current)];
 }
 
 function failureRecord(error: unknown, current: TrackedEntry | undefined): LeagueMismatchRecord | RunFailureRecord {
@@ -751,9 +745,9 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       const authHoldOffUntil =
         holdOff === 'write'
           ? new Date(Date.parse(clock.now()) + AUTH_HOLD_OFF_MS).toISOString()
-          : holdOff === 'clear'
+          : (holdOff === 'clear'
             ? undefined
-            : progress?.authHoldOffUntil;
+            : progress?.authHoldOffUntil);
       const progressFile: SyncProgressFile = {
         schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
         completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
@@ -1017,9 +1011,9 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
             failing === undefined ? stepEntries : [...stepEntries, failing],
             rejected
               ? notBeforeAfterAbort(clock.now())
-              : latchedMs === undefined
+              : (latchedMs === undefined
                 ? undefined
-                : notBeforeAfter429(clock.now(), latchedMs),
+                : notBeforeAfter429(clock.now(), latchedMs)),
           );
         } catch (fault) {
           secondary('publishing the dataset and progress', fault);

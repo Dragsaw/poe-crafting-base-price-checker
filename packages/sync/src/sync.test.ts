@@ -679,10 +679,7 @@ describe('pnpm sync: the session with injected ports', () => {
             return sent;
           }
           const answer = request.method === 'POST' ? answers.shift() : undefined;
-          if (answer === undefined) {
-            return sent.then((fakeAnswer) => after(request, fakeAnswer));
-          }
-          return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+          return answer === undefined ? sent.then((fakeAnswer) => after(request, fakeAnswer)) : sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
         },
       });
     }

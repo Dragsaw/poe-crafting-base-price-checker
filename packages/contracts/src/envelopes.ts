@@ -401,8 +401,5 @@ export function parseEnvelope<S extends z.ZodType>(
   }
 
   const parsed = schema.safeParse(data);
-  if (!parsed.success) {
-    return { ok: false, reason: 'invalid', issues: parsed.error.issues };
-  }
-  return { ok: true, value: parsed.data as z.infer<S> };
+  return parsed.success ? { ok: true, value: parsed.data as z.infer<S> } : { ok: false, reason: 'invalid', issues: parsed.error.issues };
 }

@@ -58,8 +58,5 @@ export async function resolveTrackedListAge({
     return { source: 'git-author-date', at: authorDate };
   }
   const modifiedAt = await filesystem.lastModifiedAt(path);
-  if (modifiedAt !== undefined) {
-    return { source: 'file-modified', at: modifiedAt };
-  }
-  return undefined;
+  return modifiedAt === undefined ? undefined : { source: 'file-modified', at: modifiedAt };
 }

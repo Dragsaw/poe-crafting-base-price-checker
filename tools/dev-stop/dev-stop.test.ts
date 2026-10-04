@@ -26,9 +26,9 @@ vi.mock('node:child_process', async (importOriginal) => {
       file,
       failure.inject
         ? args.map((arg) => arg.replaceAll('Get-NetTCPConnection', MISSING_CMDLET))
-        : failure.badShape
+        : (failure.badShape
           ? args.map((arg) => arg.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
-          : args,
+          : args),
       options,
     )) as typeof real.execFileSync;
   return { ...real, execFileSync };
@@ -102,8 +102,7 @@ describe('planStop', () => {
   it('reads the real Windows forms: quoted cmd.exe path, extra cmd switches, pnpm store path', () => {
     const real = CHAIN.map((info) => {
       if (info.pid === 15) {return { ...info, commandLine: String.raw`"C:\WINDOWS\system32\cmd.exe" /d /s /c vite --config x` };}
-      if (info.pid === 14) {return { ...info, commandLine: String.raw`"C:\pnpm\bin\\..\node_modules\pnpm\pnpm.exe"   dev --port 5199` };}
-      return info;
+      return info.pid === 14 ? { ...info, commandLine: String.raw`"C:\pnpm\bin\\..\node_modules\pnpm\pnpm.exe"   dev --port 5199` } : info;
     });
     expect(planStop([16], real, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
   });

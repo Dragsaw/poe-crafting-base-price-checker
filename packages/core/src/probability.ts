@@ -89,10 +89,7 @@ export function interval(line: WeightsLine): Interval {
   if (first === undefined) {
     return { min: 1, max: 1 };
   }
-  if (second === undefined) {
-    return { min: first[0], max: first[1] };
-  }
-  return { min: (first[0] + second[0]) / 2, max: (first[1] + second[1]) / 2 };
+  return second === undefined ? { min: first[0], max: first[1] } : { min: (first[0] + second[0]) / 2, max: (first[1] + second[1]) / 2 };
 }
 
 /**
@@ -118,10 +115,7 @@ export function untrackableReason(
   if (entry.weightSource === 'not-in-game') {
     return 'not-in-game';
   }
-  if (pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null)) {
-    return 'partial-pool-null-line';
-  }
-  return undefined;
+  return pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null) ? 'partial-pool-null-line' : undefined;
 }
 
 /**
@@ -193,10 +187,7 @@ export function contains(ref: ModifierRef, entry: ModifierWeight, summed: Readon
   }
   const coveredBy = (rl: ReferenceLine) =>
     entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
-  if (ref.kind === 'hybrid') {
-    return sameIds(lineSet(entry), statIds(ref)) && ref.lines.every(coveredBy);
-  }
-  return coveredBy(ref);
+  return ref.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(ref)) && ref.lines.every(coveredBy) : coveredBy(ref);
 }
 
 /**
@@ -207,10 +198,7 @@ export function contains(ref: ModifierRef, entry: ModifierWeight, summed: Readon
 export function poolOf(weights: WeightsFile, categoryId: string, className: string): PoolLookup {
   const classes = Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
   const pools = classes !== undefined && Object.hasOwn(classes, className) ? classes[className] : undefined;
-  if (pools === undefined) {
-    return { ok: false, reason: { kind: 'class-absent' } };
-  }
-  return { ok: true, pools };
+  return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
 /**
@@ -279,10 +267,7 @@ export function affixProbability(
 ): ProbabilityResult {
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
   const total = totalWeight(eligibleSet);
-  if (total === 0) {
-    return { ok: false, reason: { kind: 'empty-eligible-pool', slot } };
-  }
-  return { ok: true, p: totalWeight(containedIn(ref, eligibleSet)) / total };
+  return total === 0 ? { ok: false, reason: { kind: 'empty-eligible-pool', slot } } : { ok: true, p: totalWeight(containedIn(ref, eligibleSet)) / total };
 }
 
 interface SlotSets {
@@ -368,8 +353,5 @@ export function combinationProbability(
     return prefixFirst;
   }
   const suffixFirst = orderedTerm(suffix, prefix);
-  if (!suffixFirst.ok) {
-    return suffixFirst;
-  }
-  return { ok: true, p: (prefixFirst.sum + suffixFirst.sum) / (prefix.total + suffix.total) };
+  return suffixFirst.ok ? { ok: true, p: (prefixFirst.sum + suffixFirst.sum) / (prefix.total + suffix.total) } : suffixFirst;
 }

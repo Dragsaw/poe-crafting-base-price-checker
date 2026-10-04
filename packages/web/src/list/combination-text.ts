@@ -73,10 +73,7 @@ export function affixText(ref: ModifierRef, stats: StatTexts): AffixPart {
   if (ref.kind === 'valueless') {
     return form === undefined ? { text: catalogued, verbatim: true } : { text: form, verbatim: false };
   }
-  if (form !== undefined && ref.acceptedTier !== undefined) {
-    return { text: `${ref.acceptedTier} ${form}`, verbatim: false };
-  }
-  return { text: bandedFallback(catalogued, ref.valueMin, ref.valueMax), verbatim: true };
+  return form !== undefined && ref.acceptedTier !== undefined ? { text: `${ref.acceptedTier} ${form}`, verbatim: false } : { text: bandedFallback(catalogued, ref.valueMin, ref.valueMax), verbatim: true };
 }
 
 /** The comma that joins the lines of one hybrid affix: `T1 % Phys, Accuracy`. */

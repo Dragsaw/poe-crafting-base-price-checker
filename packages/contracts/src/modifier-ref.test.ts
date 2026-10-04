@@ -5,18 +5,12 @@ import type { ModifierRef } from './modifier-ref';
 
 function issuePaths(data: unknown): string[] {
   const result = ModifierRefSchema.safeParse(data);
-  if (result.success) {
-    return [];
-  }
-  return result.error.issues.map((issue) => issue.path.join('.'));
+  return result.success ? [] : result.error.issues.map((issue) => issue.path.join('.'));
 }
 
 function unrecognisedKeys(data: unknown): string[] {
   const result = ModifierRefSchema.safeParse(data);
-  if (result.success) {
-    return [];
-  }
-  return result.error.issues.flatMap((issue) =>
+  return result.success ? [] : result.error.issues.flatMap((issue) =>
     issue.code === 'unrecognized_keys' ? issue.keys : [],
   );
 }

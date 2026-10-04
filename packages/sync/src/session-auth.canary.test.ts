@@ -278,11 +278,13 @@ async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun>
   };
   const line = (text: string): void => {
     lines.push(text);
-    if (/^pnpm sync: (?!unauthenticated|authenticated|waiting)/.test(text)) {
-      chunks += 1;
-      if (chunks >= 2) {
-        controller.abort();
-      }
+    if (!/^pnpm sync: (?!unauthenticated|authenticated|waiting)/.test(text)) {
+      return;
+    }
+
+    chunks += 1;
+    if (chunks >= 2) {
+      controller.abort();
     }
   };
   const code = await syncSessionCommand({

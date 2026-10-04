@@ -192,10 +192,7 @@ export class SessionAuth {
    * probe and, after an `authenticated` settle, on a cookie-eligible request.
    */
   withCookie(headers: Readonly<Record<string, string>>): Record<string, string> {
-    if (this.#value === undefined) {
-      return { ...headers };
-    }
-    return { ...headers, [COOKIE_HEADER]: `${SESSION_COOKIE_ENV_VAR}=${this.#value}` };
+    return this.#value === undefined ? { ...headers } : { ...headers, [COOKIE_HEADER]: `${SESSION_COOKIE_ENV_VAR}=${this.#value}` };
   }
 
   /**
@@ -300,10 +297,7 @@ export class SessionAuth {
    * `AggregateError`'s `errors`. A thrown string comes back scrubbed.
    */
   redact<T>(thrown: T): T {
-    if (this.#forms.length === 0) {
-      return thrown;
-    }
-    return redactWith(thrown, this.#forms, new Set()) as T;
+    return this.#forms.length === 0 ? thrown : (redactWith(thrown, this.#forms, new Set()) as T);
   }
 
   toJSON(): { readonly state: SessionAuthState } {

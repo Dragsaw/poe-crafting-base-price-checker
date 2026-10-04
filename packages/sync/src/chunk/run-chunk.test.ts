@@ -291,7 +291,7 @@ describe('runChunk: the three bounds and the yield', () => {
   it('yield: the yielded entry is not completed, and the outcome is a value, not a throw', async () => {
     const { fs, ports } = harness();
     const { visited, step } = scriptedStep((entry) =>
-      key(entry) === key(B) ? { kind: 'yielded' } : { kind: 'completed' },
+      ({ kind: key(entry) === key(B) ? 'yielded' : 'completed' }),
     );
 
     const outcome = await run(ports, step);
@@ -1028,9 +1028,7 @@ describe('runChunk: the Refresh Rotation', () => {
   it('a rotation step reporting a low allowance never truncates or records', async () => {
     const { ports } = harness([P1, A, B]);
     const { visited, step } = scriptedStep((entry) =>
-      entry.status === 'pinned'
-        ? { kind: 'completed', searchRemaining: 5 }
-        : { kind: 'completed', searchRemaining: 0 },
+      ({ kind: 'completed', searchRemaining: entry.status === 'pinned' ? 5 : 0 }),
     );
 
     const outcome = await run(ports, step);
@@ -1317,7 +1315,7 @@ describe('runChunk: the Sync Report', () => {
     const { fs, ports } = harness([A, B, C]);
     await run(
       ports,
-      scriptedStep((entry) => (key(entry) === key(B) ? { kind: 'yielded' } : { kind: 'completed' })).step,
+      scriptedStep((entry) => (({ kind: key(entry) === key(B) ? 'yielded' : 'completed' }))).step,
     );
     expect((await reportOf(fs))?.figures.notReachedCount).toBe(1);
   });

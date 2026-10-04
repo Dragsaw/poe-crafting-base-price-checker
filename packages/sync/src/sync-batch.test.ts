@@ -656,10 +656,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
               return sent;
             }
             const answer = request.method === 'POST' ? answers.shift() : undefined;
-            if (answer === undefined) {
-              return sent.then((response) => after(response, request));
-            }
-            return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+            return answer === undefined ? sent.then((response) => after(response, request)) : sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
           },
         },
       };

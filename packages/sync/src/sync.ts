@@ -213,10 +213,7 @@ function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   if (context.notBefore !== undefined) {
     return false;
   }
-  if (result.kind === 'outcome') {
-    return result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result));
-  }
-  return !isRefusal(result.error);
+  return result.kind === 'outcome' ? result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result)) : !isRefusal(result.error);
 }
 
 /**
@@ -271,10 +268,7 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
         orInputChange: error instanceof MalformedRequestError,
       };
     }
-    if (isRefusal(error)) {
-      return { kind: 'input-change', reason: 'a refused input or a league mismatch' };
-    }
-    return { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
+    return isRefusal(error) ? { kind: 'input-change', reason: 'a refused input or a league mismatch' } : { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
   }
 
   const { outcome } = result;
@@ -422,10 +416,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
 export async function lockIsFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
   try {
     const found = await readLock(fs);
-    if (found.state === 'absent') {
-      return true;
-    }
-    return await isStaleState(fs, found, clock.now(), LOCK_PATH);
+    return found.state === 'absent' ? true : (await isStaleState(fs, found, clock.now(), LOCK_PATH));
   } catch {
     return false;
   }
@@ -526,9 +517,9 @@ function describeOutcome(outcome: ChunkOutcome): string {
   const kind: string =
     outcome.kind === 'deferred'
       ? `deferred until ${outcome.notBefore}`
-      : outcome.kind === 'bounded'
+      : (outcome.kind === 'bounded'
         ? `bounded by ${outcome.bound}`
-        : outcome.kind;
+        : outcome.kind);
   const keys = outcome.completed.length === 0 ? '' : `: ${outcome.completed.join(', ')}`;
   return `${kind}, ${String(outcome.completed.length)} completed${keys}`;
 }
@@ -639,10 +630,12 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
       const wait = nextWait(result, state, context);
       state = nextState(state, result, context, { signature, before });
 
-      if (wait.kind !== 'none' && !signal.aborted) {
-        stdout(`${PREFIX} ${describeWait(wait)}`);
-        await runWait(wait, waitPorts, signature);
+      if (!(wait.kind !== 'none' && !signal.aborted)) {
+        continue;
       }
+
+      stdout(`${PREFIX} ${describeWait(wait)}`);
+      await runWait(wait, waitPorts, signature);
     }
   } finally {
     // Runs on a throw too, so the process never ends unsettled without its

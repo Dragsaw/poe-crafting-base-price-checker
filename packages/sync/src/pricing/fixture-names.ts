@@ -48,10 +48,7 @@ export const LEAGUES_FIXTURE_NAME = 'trade-data-leagues';
  * the league gate's GET, the digest name for every pricing request.
  */
 export function servedFixtureName(request: PricingFixtureRequest): string {
-  if (request.method === 'GET' && request.url === TRADE_LEAGUES_URL && request.body === undefined) {
-    return LEAGUES_FIXTURE_NAME;
-  }
-  return pricingFixtureName(request);
+  return request.method === 'GET' && request.url === TRADE_LEAGUES_URL && request.body === undefined ? LEAGUES_FIXTURE_NAME : pricingFixtureName(request);
 }
 
 /**

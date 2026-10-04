@@ -121,10 +121,7 @@ const IDENTITY_CONTAINER_KEYS = new Set(['name']);
 
 function isIdentifierKey(key: string, parentKey: string | undefined): boolean {
   const lower = key.toLowerCase();
-  if (IDENTIFIER_KEYS.has(lower)) {
-    return true;
-  }
-  return (
+  return IDENTIFIER_KEYS.has(lower) ? true : (
     parentKey !== undefined &&
     IDENTITY_CONTAINERS.has(parentKey.toLowerCase()) &&
     IDENTITY_CONTAINER_KEYS.has(lower)
@@ -218,10 +215,7 @@ function searchAnswerOf(payload: unknown): { id: string; result: string[] } | un
     return undefined;
   }
   const { id, result } = payload as { id?: unknown; result?: unknown };
-  if (typeof id !== 'string' || !Array.isArray(result)) {
-    return undefined;
-  }
-  return { id, result: result.filter((item): item is string => typeof item === 'string') };
+  return typeof id !== 'string' || !Array.isArray(result) ? undefined : { id, result: result.filter((item): item is string => typeof item === 'string') };
 }
 
 /**
@@ -393,10 +387,12 @@ async function main(): Promise<void> {
   const written = new Set(outcome.written.map((path) => resolve(path)));
   for (const name of await readdir(FIXTURES_DIR)) {
     const path = resolve(join(FIXTURES_DIR, name));
-    if (PRICING_FIXTURE_FILE.test(name) && !written.has(path)) {
-      await rm(path);
-      process.stdout.write(`removed ${path}\n`);
+    if (!(PRICING_FIXTURE_FILE.test(name) && !written.has(path))) {
+      continue;
     }
+
+    await rm(path);
+    process.stdout.write(`removed ${path}\n`);
   }
 }
 

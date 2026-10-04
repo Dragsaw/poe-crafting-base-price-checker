@@ -74,10 +74,7 @@ function compareOldestFirst(left: Placed, right: Placed): number {
     if (left.attemptedAt === undefined) {
       return -1;
     }
-    if (right.attemptedAt === undefined) {
-      return 1;
-    }
-    return left.attemptedAt - right.attemptedAt;
+    return right.attemptedAt === undefined ? 1 : left.attemptedAt - right.attemptedAt;
   }
   return compareTrackedEntries(left.entry, right.entry);
 }
@@ -147,8 +144,5 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
  * Otherwise visit all `left`.
  */
 export function pinnedToKeep(left: number, remaining: number, rotationWaiting: boolean): number {
-  if (!rotationWaiting || remaining >= left + 1) {
-    return left;
-  }
-  return Math.min(left, Math.max(remaining - 1, 0));
+  return !rotationWaiting || remaining >= left + 1 ? left : Math.min(left, Math.max(remaining - 1, 0));
 }

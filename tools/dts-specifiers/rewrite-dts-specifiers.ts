@@ -44,8 +44,7 @@ export function rewriteDtsSpecifiers(text: string): string {
     SPECIFIER,
     (match, lead: string, quote: string, stem: string, extension: string) => {
       // `./types.d.ts` names a declaration file and is left as written.
-      if (stem.endsWith('.d')) {return match;}
-      return `${lead}${quote}${stem}.${EXTENSION_MAP[extension]}${quote}`;
+      return stem.endsWith('.d') ? match : `${lead}${quote}${stem}.${EXTENSION_MAP[extension]}${quote}`;
     },
   );
 }
@@ -72,10 +71,12 @@ export function rewriteDtsSpecifiersIn(dir: string): string[] {
   for (const file of collectDeclarationFiles(dir)) {
     const before = readFileSync(file, 'utf8');
     const after = rewriteDtsSpecifiers(before);
-    if (after !== before) {
-      writeFileSync(file, after);
-      changed.push(file);
+    if (!(after !== before)) {
+      continue;
     }
+
+    writeFileSync(file, after);
+    changed.push(file);
   }
   return changed;
 }

@@ -103,10 +103,7 @@ export interface SummedInterval {
 export function summedInterval(affixes: OverlapAffixes, statId: string): SummedInterval | undefined {
   const prefix = lineOn(affixes.prefix, statId);
   const suffix = lineOn(affixes.suffix, statId);
-  if (prefix === undefined || suffix === undefined || !('valueMin' in prefix) || !('valueMin' in suffix)) {
-    return undefined;
-  }
-  return { min: prefix.valueMin + suffix.valueMin, max: prefix.valueMax + suffix.valueMax };
+  return prefix === undefined || suffix === undefined || !('valueMin' in prefix) || !('valueMin' in suffix) ? undefined : { min: prefix.valueMin + suffix.valueMin, max: prefix.valueMax + suffix.valueMax };
 }
 
 /** `linesIntersect(x, y, S)` (§2.1) over the shared `statId`s outside `S`, which the caller found non-empty. */
@@ -122,10 +119,7 @@ function linesIntersect(x: ModifierRef, y: ModifierRef, shared: readonly string[
     if (!leftBanded && !rightBanded) {
       return true;
     }
-    if (leftBanded && rightBanded) {
-      return left.valueMin <= right.valueMax && right.valueMin <= left.valueMax;
-    }
-    return false;
+    return leftBanded && rightBanded ? left.valueMin <= right.valueMax && right.valueMin <= left.valueMax : false;
   });
 }
 
@@ -223,10 +217,7 @@ export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: C
     return undefined;
   }
   const suffix = slotOverlapBranch(a.suffix, b.suffix, 'suffix', coOccur, summed);
-  if (suffix === undefined) {
-    return undefined;
-  }
-  return { prefix, suffix, sums };
+  return suffix === undefined ? undefined : { prefix, suffix, sums };
 }
 
 const BRANCH_WORDS: Readonly<Record<SlotOverlapBranch, string>> = {

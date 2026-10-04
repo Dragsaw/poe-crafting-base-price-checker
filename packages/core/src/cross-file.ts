@@ -252,10 +252,12 @@ export function kindAgreement(
         continue;
       }
       for (const line of entry.lines) {
-        if (disagrees(rl, line)) {
-          disagreeing += 1;
-          first ??= entry;
+        if (!disagrees(rl, line)) {
+          continue;
         }
+
+        disagreeing += 1;
+        first ??= entry;
       }
     }
     if (first === undefined) {
@@ -300,10 +302,7 @@ export function lineSetCompleteness(
   const parts: string[] = [];
 
   const wider = scoped.filter((entry) => {
-    if (entry.weight === 0 || untrackable(entry, COMPLETE)) {
-      return false;
-    }
-    if (!lines.every((rl) => entry.lines.some((line) => meets(rl, line)))) {
+    if (entry.weight === 0 || untrackable(entry, COMPLETE) || !lines.every((rl) => entry.lines.some((line) => meets(rl, line)))) {
       return false;
     }
     const tierSet = lineSet(entry);

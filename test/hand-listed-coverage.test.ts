@@ -130,9 +130,7 @@ async function eslintUncovered(
   config: readonly Linter.Config[] | undefined,
 ): Promise<string[]> {
   const eslint =
-    config === undefined
-      ? new ESLint({ cwd: REPO_ROOT })
-      : new ESLint({ cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
+    new ESLint(config === undefined ? { cwd: REPO_ROOT } : { cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
   const covered: string[] = [];
   for (const path of files) {
     const ignored = await eslint.isPathIgnored(path);

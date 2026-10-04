@@ -220,10 +220,7 @@ export function compareRankedRows(left: RankedRow, right: RankedRow): number {
     return byKind;
   }
   const byKey = compareCanonicalKeys(rowKey(left), rowKey(right));
-  if (byKey !== 0 || left.kind !== 'crafted' || right.kind !== 'crafted') {
-    return byKey;
-  }
-  return compareCanonicalKeys(left.recipeId, right.recipeId);
+  return byKey !== 0 || left.kind !== 'crafted' || right.kind !== 'crafted' ? byKey : compareCanonicalKeys(left.recipeId, right.recipeId);
 }
 
 /**
@@ -239,18 +236,12 @@ function compareOrdering(left: RankedRow, right: RankedRow): number {
   }
   const leftFigure = leftEv ?? (left.kind === 'crafted' ? left.grossPayout : 0);
   const rightFigure = rightEv ?? (right.kind === 'crafted' ? right.grossPayout : 0);
-  if (leftFigure !== rightFigure) {
-    return rightFigure - leftFigure;
-  }
-  return compareRankedRows(left, right);
+  return leftFigure === rightFigure ? compareRankedRows(left, right) : rightFigure - leftFigure;
 }
 
 /** Contribution descending, then the entry's canonical key (AD-17). */
 function compareSummands(left: CraftedSummand, right: CraftedSummand): number {
-  if (left.contribution !== right.contribution) {
-    return right.contribution - left.contribution;
-  }
-  return compareCanonicalKeys(left.entryKey, right.entryKey);
+  return left.contribution === right.contribution ? compareCanonicalKeys(left.entryKey, right.entryKey) : right.contribution - left.contribution;
 }
 
 const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): number =>
@@ -281,10 +272,7 @@ function unrankableReasonOf(
     return 'pool partial';
   }
   // One definition with `poolCoverage` (IN §3): an empty slot makes the class unrankable under every recipe.
-  if (isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix)) {
-    return RECIPE_UNREACHABLE;
-  }
-  return undefined;
+  return isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix) ? RECIPE_UNREACHABLE : undefined;
 }
 
 function unranked(
@@ -321,10 +309,7 @@ export function rank(input: RankInput): Ranking {
   const rankableClasses = new Map<string, { readonly pools: WeightsClassPools; readonly entries: CraftedTrackedEntry[] }>();
 
   for (const entry of input.tracked) {
-    if (entry.status === 'pruned') {
-      continue;
-    }
-    if (entry.kind === 'crafted') {
+    if ((entry.status === 'pruned') || (entry.kind === 'crafted')) {
       continue;
     }
     const entryKey = canonicalKey(entry);

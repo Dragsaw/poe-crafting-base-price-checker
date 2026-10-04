@@ -35,12 +35,9 @@ function describeFailure(result: EnvelopeResult<unknown>): string {
   if (result.ok) {
     return 'ok';
   }
-  if (result.reason === 'invalid') {
-    return result.issues
+  return result.reason === 'invalid' ? result.issues
       .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
-      .join('; ');
-  }
-  return `${result.reason}: found ${result.found}, this build reads ${result.expected}`;
+      .join('; ') : `${result.reason}: found ${result.found}, this build reads ${result.expected}`;
 }
 
 it.each(CATALOGUE_ENDPOINTS)('the committed $outputPath parses', ({ artifact, outputPath }) => {

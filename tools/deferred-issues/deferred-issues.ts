@@ -65,7 +65,7 @@ export const run: Runner = (cmd, args, stdin) => {
   return {
     status: result.status ?? 1,
     stdout: result.stdout ?? '',
-    stderr: result.error !== undefined ? String(result.error) : (result.stderr ?? ''),
+    stderr: result.error === undefined ? (result.stderr ?? '') : String(result.error),
   };
 };
 
@@ -81,10 +81,7 @@ function readEntries(runner: Runner, ref: string): Read<LedgerEntry[]> {
     return { ok: false, error: `git show ${ref}:${LEDGER_PATH} failed: ${firstLine(shown.stderr)}` };
   }
   const entries = parseLedger(shown.stdout);
-  if (entries.length === 0) {
-    return { ok: false, error: `0 entries parse from ${LEDGER_PATH} on ${ref}` };
-  }
-  return { ok: true, value: entries };
+  return entries.length === 0 ? { ok: false, error: `0 entries parse from ${LEDGER_PATH} on ${ref}` } : { ok: true, value: entries };
 }
 
 export function readIssues(runner: Runner): Read<IssueInfo[]> {
@@ -112,10 +109,7 @@ export function readIssues(runner: Runner): Read<IssueInfo[]> {
   if (!Array.isArray(parsed) || !parsed.every(isIssue)) {
     return { ok: false, error: 'gh issue list printed an unexpected shape' };
   }
-  if (parsed.length >= LIST_LIMIT) {
-    return { ok: false, error: `gh issue list reached its limit of ${LIST_LIMIT}, so some issues may be missing` };
-  }
-  return { ok: true, value: parsed };
+  return parsed.length >= LIST_LIMIT ? { ok: false, error: `gh issue list reached its limit of ${LIST_LIMIT}, so some issues may be missing` } : { ok: true, value: parsed };
 }
 
 function isIssue(value: unknown): value is IssueInfo {

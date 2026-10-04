@@ -174,12 +174,14 @@ function categoryTexts(filters: unknown): Map<string, string> {
         continue;
       }
       for (const option of arrayAt(filter['option'], 'options')) {
-        if (isRecord(option)) {
-          const id = stringAt(option, 'id');
-          const text = stringAt(option, 'text');
-          if (id !== undefined && text !== undefined) {
-            texts.set(id, text);
-          }
+        if (!isRecord(option)) {
+          continue;
+        }
+
+        const id = stringAt(option, 'id');
+        const text = stringAt(option, 'text');
+        if (id !== undefined && text !== undefined) {
+          texts.set(id, text);
         }
       }
     }
