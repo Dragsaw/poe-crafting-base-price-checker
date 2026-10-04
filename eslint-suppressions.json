@@ -871,9 +871,6 @@
     "unicorn/import-style": {
       "count": 1
     },
-    "unicorn/no-await-expression-member": {
-      "count": 78
-    },
     "unicorn/no-null": {
       "count": 4
     },
