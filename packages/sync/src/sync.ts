@@ -472,49 +472,75 @@ function remainingMs(until: string, clock: ClockPort): number {
 
 /** Spends one wait. Returns early on an abort. `signature` is the input signature the wait compares against. */
 export async function runWait(wait: SessionWait, ports: WaitPorts, signature: string): Promise<void> {
-  const { fs, clock, sleep: pause, signal } = ports;
-  /* eslint-disable no-await-in-loop -- polling loops: each pause or probe decides whether the next iteration runs */
   switch (wait.kind) {
     case 'none': {
       return;
     }
     case 'until': {
-      for (;;) {
-        const left = remainingMs(wait.until, clock);
-        if (left <= 0 || signal.aborted) {
-          return;
-        }
-        await pause(wait.orInputChange ? Math.min(left, LOCAL_POLL_MS) : left, signal);
-        if (signal.aborted) {
-          return;
-        }
-        if (wait.orInputChange && (await inputSignature(fs)) !== signature) {
-          return;
-        }
-      }
+      return waitUntil(wait, ports, signature);
     }
     case 'input-change': {
-      for (;;) {
-        const left = wait.until === undefined ? LOCAL_POLL_MS : remainingMs(wait.until, clock);
-        if (left <= 0 || signal.aborted) {
-          return;
-        }
-        await pause(Math.min(left, LOCAL_POLL_MS), signal);
-        if (signal.aborted || (await inputSignature(fs)) !== signature) {
-          return;
-        }
-      }
+      return waitForInputChange(wait, ports, signature);
     }
     case 'lock': {
-      for (;;) {
-        if (signal.aborted || (await isLockFree(fs, clock))) {
-          return;
-        }
-        await pause(LOCAL_POLL_MS, signal);
-      }
+      return waitForLock(ports);
     }
   }
-  /* eslint-enable no-await-in-loop -- end of the sequential block above */
+}
+
+async function waitUntil(
+  wait: Extract<SessionWait, { kind: 'until' }>,
+  ports: WaitPorts,
+  signature: string,
+): Promise<void> {
+  const { fs, clock, sleep: pause, signal } = ports;
+  /* eslint-disable no-await-in-loop -- polling loop: each pause or probe decides whether the next iteration runs */
+  for (;;) {
+    const left = remainingMs(wait.until, clock);
+    if (left <= 0 || signal.aborted) {
+      return;
+    }
+    await pause(wait.orInputChange ? Math.min(left, LOCAL_POLL_MS) : left, signal);
+    if (signal.aborted) {
+      return;
+    }
+    if (wait.orInputChange && (await inputSignature(fs)) !== signature) {
+      return;
+    }
+  }
+  /* eslint-enable no-await-in-loop -- end of the polling loop above */
+}
+
+async function waitForInputChange(
+  wait: Extract<SessionWait, { kind: 'input-change' }>,
+  ports: WaitPorts,
+  signature: string,
+): Promise<void> {
+  const { fs, clock, sleep: pause, signal } = ports;
+  /* eslint-disable no-await-in-loop -- polling loop: each pause or probe decides whether the next iteration runs */
+  for (;;) {
+    const left = wait.until === undefined ? LOCAL_POLL_MS : remainingMs(wait.until, clock);
+    if (left <= 0 || signal.aborted) {
+      return;
+    }
+    await pause(Math.min(left, LOCAL_POLL_MS), signal);
+    if (signal.aborted || (await inputSignature(fs)) !== signature) {
+      return;
+    }
+  }
+  /* eslint-enable no-await-in-loop -- end of the polling loop above */
+}
+
+async function waitForLock(ports: WaitPorts): Promise<void> {
+  const { fs, clock, sleep: pause, signal } = ports;
+  /* eslint-disable no-await-in-loop -- polling loop: each pause or probe decides whether the next iteration runs */
+  for (;;) {
+    if (signal.aborted || (await isLockFree(fs, clock))) {
+      return;
+    }
+    await pause(LOCAL_POLL_MS, signal);
+  }
+  /* eslint-enable no-await-in-loop -- end of the polling loop above */
 }
 
 function describeWait(wait: Exclude<SessionWait, { kind: 'none' }>): string {

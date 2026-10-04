@@ -663,7 +663,7 @@
   },
   "packages/sync/src/sync.ts": {
     "complexity": {
-      "count": 2
+      "count": 1
     },
     "local/max-comment-run": {
       "count": 15
@@ -681,7 +681,7 @@
       "count": 1
     },
     "sonarjs/cognitive-complexity": {
-      "count": 2
+      "count": 1
     }
   },
   "packages/sync/src/trade/client.test.ts": {
