@@ -606,11 +606,6 @@
       "count": 6
     }
   },
-  "packages/web/src/list/ranked-list.test.tsx": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/web/src/list/short-forms.ts": {
     "local/max-comment-run": {
       "count": 1
