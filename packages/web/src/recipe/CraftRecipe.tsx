@@ -59,71 +59,91 @@ export function CraftRecipe({
       >
         {RECIPE_LABEL}
       </div>
-      <div
-        data-recipe-options=""
-        role="group"
-        aria-label={RECIPE_LABEL}
-        style={{ ...typeStyle('recipe-option'), marginTop: px(spacing.recipeOptionsGap), whiteSpace: 'nowrap' }}
-      >
-        {options.map((option, index) => (
-          <Fragment key={option.id}>
-            {index > 0 ? (
-              <span
-                data-separator=""
-                aria-hidden="true"
-                style={{ color: colors['ink-tertiary'], fontWeight: 400, padding: `0 ${px(spacing.trustSeparatorPadX)}` }}
-              >
-                |
-              </span>
-            ) : undefined}
-            {option.id === activeId ? (
-              <span data-recipe-option={option.id} data-active="" aria-current="true" className="fg-recipe-option">
-                {option.word}
-              </span>
-            ) : (
-              <button
-                type="button"
-                data-recipe-option={option.id}
-                data-inactive=""
-                className="fg-recipe-option"
-                onClick={() => {
-                  onChange(option.id);
-                }}
-              >
-                {option.word}
-              </button>
-            )}
-          </Fragment>
-        ))}
-      </div>
-      <div
-        data-recipe-cost={cost.kind}
-        style={{ marginTop: 'auto', paddingTop: px(spacing.recipeCostGap) }}
-      >
-        {cost.kind === 'figure' ? (
-          <span style={{ ...typeStyle('recipe-cost'), color: colors['ink-secondary'] }}>
+      <RecipeOptions options={options} activeId={activeId} onChange={onChange} />
+      <RecipeCostLine cost={cost} />
+    </div>
+  );
+}
+
+function RecipeOptions({
+  options,
+  activeId,
+  onChange,
+}: {
+  readonly options: readonly RecipeOption[];
+  readonly activeId: string;
+  readonly onChange: (recipeId: string) => void;
+}): JSX.Element {
+  return (
+    <div
+      data-recipe-options=""
+      role="group"
+      aria-label={RECIPE_LABEL}
+      style={{ ...typeStyle('recipe-option'), marginTop: px(spacing.recipeOptionsGap), whiteSpace: 'nowrap' }}
+    >
+      {options.map((option, index) => (
+        <Fragment key={option.id}>
+          {index > 0 ? (
             <span
-              data-recipe-cost-figure=""
-              style={{
-                ...typeStyle('recipe-cost-figure'),
-                color: colors.ink,
-                fontVariantNumeric: 'tabular-nums',
-                marginRight: px(spacing.recipeCostFigureGap),
+              data-separator=""
+              aria-hidden="true"
+              style={{ color: colors['ink-tertiary'], fontWeight: 400, padding: `0 ${px(spacing.trustSeparatorPadX)}` }}
+            >
+              |
+            </span>
+          ) : undefined}
+          {option.id === activeId ? (
+            <span data-recipe-option={option.id} data-active="" aria-current="true" className="fg-recipe-option">
+              {option.word}
+            </span>
+          ) : (
+            <button
+              type="button"
+              data-recipe-option={option.id}
+              data-inactive=""
+              className="fg-recipe-option"
+              onClick={() => {
+                onChange(option.id);
               }}
             >
-              {cost.text}
-            </span>
-            {RECIPE_COST_UNIT}
-          </span>
-        ) : (
+              {option.word}
+            </button>
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+function RecipeCostLine({ cost }: { readonly cost: RecipeCost }): JSX.Element {
+  return (
+    <div
+      data-recipe-cost={cost.kind}
+      style={{ marginTop: 'auto', paddingTop: px(spacing.recipeCostGap) }}
+    >
+      {cost.kind === 'figure' ? (
+        <span style={{ ...typeStyle('recipe-cost'), color: colors['ink-secondary'] }}>
           <span
-            data-money-phrase=""
-            style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}
+            data-recipe-cost-figure=""
+            style={{
+              ...typeStyle('recipe-cost-figure'),
+              color: colors.ink,
+              fontVariantNumeric: 'tabular-nums',
+              marginRight: px(spacing.recipeCostFigureGap),
+            }}
           >
             {cost.text}
           </span>
-        )}
-      </div>
+          {RECIPE_COST_UNIT}
+        </span>
+      ) : (
+        <span
+          data-money-phrase=""
+          style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}
+        >
+          {cost.text}
+        </span>
+      )}
     </div>
   );
 }
