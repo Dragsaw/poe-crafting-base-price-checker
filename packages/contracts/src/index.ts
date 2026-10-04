@@ -94,6 +94,7 @@ export type { CanonicalAffix, CanonicalKeyElements, CanonicalLine } from './cano
 
 export {
   describeOverlap,
+  linesOf,
   namesHybrid,
   NEVER_CO_OCCUR,
   overlap,
@@ -101,8 +102,19 @@ export {
   overlapBranches,
   slotOverlap,
   slotOverlapBranch,
+  summedInterval,
+  summedStatIds,
 } from './overlap.ts';
-export type { CoOccur, OverlapAffixes, OverlapSlot, SlotOverlapBranch } from './overlap.ts';
+export type {
+  CoOccur,
+  NamedLine,
+  OverlapAffixes,
+  OverlapBranches,
+  OverlapSlot,
+  SlotOverlapBranch,
+  SummedInterval,
+  SummedOverlap,
+} from './overlap.ts';
 
 export { CraftRecipeSchema, RECIPE_GRADES, recipeWord, REGULAR_RECIPE_WORD } from './craft-recipe.ts';
 export type { CraftRecipe, RecipeGrade, RecipeWord } from './craft-recipe.ts';

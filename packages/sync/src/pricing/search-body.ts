@@ -1,26 +1,22 @@
 /**
  * The AD-16 search body, built from the tracked entry alone
- * (`IMPLEMENTATION-NOTES.md` §5.1, §5.2, §10.2).
+ * (`IMPLEMENTATION-NOTES.md` §5.1, §5.2, §5.5, §10.2).
  *
  * Pure: an entry and the committed item catalogue in, a body out. It issues no
- * request and reads no file. The one refusal it can raise — a `jewel`-arm base
- * type the catalogue does not carry — is thrown **before** any request exists,
- * so a wrong class name never becomes a search issued in hope. The pricing
- * step catches it and marks that one entry `unresolvable` (AD-25).
+ * request and reads no file. The one refusal it can raise on a schema-valid
+ * entry — a `jewel`-arm base type the catalogue does not carry — is thrown
+ * **before** any request exists, so a wrong class name never becomes a search
+ * issued in hope. The pricing step catches it and marks that one entry
+ * `unresolvable` (AD-25). A summed `statId` with a valueless operand also
+ * throws, but the tracked schema refuses such an entry first (§2.3).
  *
  * The object literals below are written in one fixed key order. The body is
  * serialised with `JSON.stringify`, and a stable order is what makes one entry
  * produce one byte string — which is what the recorded fixtures are keyed on.
  */
 
-import { canonicalKey, defenceLettersOf } from '@poe/contracts';
-import type {
-  CraftedTrackedEntry,
-  DefenceLetter,
-  ItemCatalogue,
-  ModifierRef,
-  TrackedEntry,
-} from '@poe/contracts';
+import { canonicalKey, defenceLettersOf, linesOf, summedInterval, summedStatIds } from '@poe/contracts';
+import type { CraftedTrackedEntry, DefenceLetter, ItemCatalogue, NamedLine, TrackedEntry } from '@poe/contracts';
 
 /**
  * The committed item catalogue as the search builder reads it: every
@@ -143,33 +139,51 @@ function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Disc
 }
 
 /**
- * The stat filters of one modifier reference: one for a single-line reference,
- * one per line for a hybrid (AD-16, SPEC-tracked-hybrid-mods CAP-2). A banded
- * edge goes out **exactly** as declared — never rounded to reach an integer —
- * and `disabled: false` is written on every filter (§5.1). A valueless line
- * carries `{}`. The schema already sorted a hybrid's lines by `statId`.
+ * The stat filter of one line a reference names: one for a single-line
+ * reference, one per line for a hybrid (AD-16, SPEC-tracked-hybrid-mods
+ * CAP-2). A banded edge goes out **exactly** as declared — never rounded to
+ * reach an integer — and `disabled: false` is written on every filter (§5.1).
+ * A valueless line carries `{}`.
  */
-function statFiltersOfRef(ref: ModifierRef): StatFilter[] {
-  switch (ref.kind) {
-    case 'banded':
-      return [{ id: ref.statId, value: { min: ref.valueMin, max: ref.valueMax }, disabled: false }];
-    case 'valueless':
-      return [{ id: ref.statId, value: {}, disabled: false }];
-    case 'hybrid':
-      return ref.lines.map((line) => ({
-        id: line.statId,
-        value: 'valueMin' in line ? { min: line.valueMin, max: line.valueMax } : {},
-        disabled: false,
-      }));
-  }
+function statFilterOfLine(line: NamedLine): StatFilter {
+  return {
+    id: line.statId,
+    value: 'valueMin' in line ? { min: line.valueMin, max: line.valueMax } : {},
+    disabled: false,
+  };
 }
 
+/**
+ * The entry's stat filters, prefix lines then suffix lines, in one `and`
+ * group. The schema already sorted a hybrid's lines by `statId`.
+ *
+ * A summed `statId` (`summedStatIds`, IMPLEMENTATION-NOTES.md §2.1) goes out
+ * as **one** filter, §5.5's sum: it takes its prefix line's place, and the
+ * suffix line on it is dropped, so no id repeats. The sum is plain addition
+ * and never rounded (AD-16). A valueless operand has no edge to add; the
+ * schema refuses one (§2.3), so meeting one here throws.
+ */
 function statFiltersOf(entry: TrackedEntry): StatFilter[] {
   if (entry.kind === 'raw') {
     return [];
   }
-  // Prefix and suffix share one `and` group.
-  return [...statFiltersOfRef(entry.prefix), ...statFiltersOfRef(entry.suffix)];
+  const summed = summedStatIds(entry);
+  const prefix = linesOf(entry.prefix).map((line) => {
+    if (!summed.has(line.statId)) {
+      return statFilterOfLine(line);
+    }
+    const sum = summedInterval(entry, line.statId);
+    if (sum === undefined) {
+      throw new Error(
+        `entry ${canonicalKey(entry)} sums statId ${line.statId} with a valueless operand, which the tracked schema refuses (IMPLEMENTATION-NOTES.md §2.3); no request was issued`,
+      );
+    }
+    return statFilterOfLine({ statId: line.statId, valueMin: sum.min, valueMax: sum.max });
+  });
+  const suffix = linesOf(entry.suffix)
+    .filter((line) => !summed.has(line.statId))
+    .map(statFilterOfLine);
+  return [...prefix, ...suffix];
 }
 
 function edgeFor(letters: ReadonlySet<DefenceLetter>, letter: DefenceLetter): FilterEdge {

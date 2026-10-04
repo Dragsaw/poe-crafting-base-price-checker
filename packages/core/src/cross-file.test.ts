@@ -19,7 +19,7 @@ import type {
 } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { classDiscriminability, crossFileChecks, edgeAlignment, emptyContainment } from './cross-file.ts';
+import { classDiscriminability, coOccur, crossFileChecks, edgeAlignment, emptyContainment } from './cross-file.ts';
 
 const STAT = 'explicit.stat_1';
 const OTHER = 'explicit.stat_2';
@@ -382,6 +382,55 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
     const pure = tier([line(A, [70, 80])]);
     const failures = failuresOf([entry({ prefix: T1_REF }), entry({ prefix: band(70, 80, A) })], bows(pools([H1, pure])));
     expect(failures).toEqual([]);
+  });
+
+  describe('a hybrid pair whose shared line is summed (§2.1, §2.2)', () => {
+    const L = 'explicit.stat_light';
+    /** A suffix family {B, L} in one modGroup, whose L line rolls 15 on every tier. */
+    const suffixTier = (bMin: number, bMax: number) =>
+      tier([line(B, [bMin, bMax]), line(L, [15, 15])], { modGroup: 'light-acc' });
+    const SL_HIGH = suffixTier(200, 250);
+    const SL1 = suffixTier(41, 60);
+    const SL2 = suffixTier(21, 40);
+    const weights = bows(pools([H1], [SL_HIGH, SL1, SL2]));
+    const withSuffix = (bMin: number, bMax: number) =>
+      entry({ prefix: T1_REF, suffix: hybridRef(bandLine(B, bMin, bMax), bandLine(L, 15, 15)) });
+
+    it('memoises coOccur per S: one instance answers the same pair differently under an empty and a summed S', () => {
+      const x = hybridRef(bandLine(B, 41, 60), bandLine(L, 15, 15));
+      const y = hybridRef(bandLine(B, 50, 55), bandLine(L, 15, 15));
+      const scoped = { prefix: [], suffix: [SL1] };
+      const summedB = new Set([B]);
+
+      const emptyFirst = coOccur(scoped);
+      expect(emptyFirst(x, y, 'suffix', new Set())).toBe(false);
+      expect(emptyFirst(x, y, 'suffix', summedB)).toBe(true);
+
+      const summedFirst = coOccur(scoped);
+      expect(summedFirst(x, y, 'suffix', summedB)).toBe(true);
+      expect(summedFirst(x, y, 'suffix', new Set())).toBe(false);
+    });
+
+    it('fails co-occur on both entries when the sums intersect, though the per-slot B bands are disjoint', () => {
+      const low = withSuffix(41, 60);
+      const lower = withSuffix(21, 40);
+      const failures = failuresOf([low, lower], weights);
+      expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted()).toEqual(
+        [
+          ['co-occur', canonicalKey(low)],
+          ['co-occur', canonicalKey(lower)],
+        ].toSorted(),
+      );
+      for (const failure of failures) {
+        expect(failure.detail).toContain('prefix (shared lines intersect and one scoped tier contains both)');
+        expect(failure.detail).toContain('suffix (shared lines intersect and one scoped tier contains both)');
+        expect(failure.detail).toContain(`sum ${B} [141, 210] and [121, 190] intersect`);
+      }
+    });
+
+    it('reports no co-occur when the sums are disjoint, though both slots overlap outside them', () => {
+      expect(failuresOf([withSuffix(41, 60), withSuffix(200, 250)], weights)).toEqual([]);
+    });
   });
 });
 

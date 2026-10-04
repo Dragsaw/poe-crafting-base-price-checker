@@ -599,3 +599,129 @@ describe('TrackedFileSchema, hybrid references (CAP-1)', () => {
     ).toBe(true);
   });
 });
+
+describe('TrackedFileSchema, within-file kind agreement and summed operands (§2.3)', () => {
+  const RARITY = 'explicit.stat_3917489142';
+  const banded = (statId: string, valueMin: number, valueMax: number) => ({ kind: 'banded', statId, valueMin, valueMax });
+  const valueless = (statId: string) => ({ kind: 'valueless', statId });
+  const crafted = (
+    prefix: unknown,
+    suffix: unknown,
+    { className = 'Amulets', status = 'active' }: { className?: string; status?: 'active' | 'pruned' } = {},
+  ) => ({
+    kind: 'crafted',
+    categoryId: 'accessory.amulet',
+    className,
+    itemLevelMin: 82,
+    prefix,
+    suffix,
+    status,
+    ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
+  });
+  const parse = (entries: readonly unknown[]) =>
+    parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
+  const issuesOf = (entries: readonly unknown[]) => {
+    const result = parse(entries);
+    if (result.ok || result.reason !== 'invalid') {
+      throw new Error(`expected an invalid refusal, got ${JSON.stringify(result)}`);
+    }
+    return result.issues;
+  };
+
+  it('loads a summed statId with two banded operands', () => {
+    expect(parse([crafted(banded(RARITY, 16, 19), banded(RARITY, 15, 18))]).ok).toBe(true);
+  });
+
+  it('refuses a summed statId with a valueless operand, naming the entry, the slot and the statId', () => {
+    const entry = crafted(valueless(RARITY), valueless(RARITY));
+    const issues = issuesOf([entry]);
+    expect(issues.map((issue) => issue.path)).toEqual([
+      ['entries', 0, 'prefix'],
+      ['entries', 0, 'suffix'],
+    ]);
+    for (const issue of issues) {
+      expect(issue.message).toContain(RARITY);
+      expect(issue.message).toContain('valueless');
+      expect(issue.message).toContain('["crafted","accessory.amulet","Amulets"');
+    }
+    expect(issues[0]?.message).toContain('prefix line');
+    expect(issues[1]?.message).toContain('suffix line');
+  });
+
+  it('refuses a valueless hybrid line on a summed statId at that line', () => {
+    const prefix = { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1' }, { statId: RARITY }] };
+    const issues = issuesOf([crafted(prefix, valueless(RARITY))]);
+    expect(issues.map((issue) => issue.path)).toEqual([
+      ['entries', 0, 'prefix', 'lines', 1],
+      ['entries', 0, 'suffix'],
+    ]);
+  });
+
+  it('refuses a summed operand with a missing bound as a shape issue at that slot', () => {
+    const shapeIssuesAt = (issues: ReturnType<typeof issuesOf>) =>
+      issues.filter((issue) => issue.code !== 'custom').map((issue) => issue.path.slice(0, 3));
+    const issues = issuesOf([crafted(banded(RARITY, 16, 19), { kind: 'banded', statId: RARITY, valueMin: 15 })]);
+    expect(shapeIssuesAt(issues)).toEqual([['entries', 0, 'suffix']]);
+    const hybridIssues = issuesOf([
+      crafted(
+        { kind: 'hybrid', lines: [{ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }, { statId: RARITY, valueMin: 16 }] },
+        banded(RARITY, 15, 18),
+      ),
+    ]);
+    expect(shapeIssuesAt(hybridIssues)).toEqual([['entries', 0, 'prefix']]);
+  });
+
+  it('refuses one statId banded in one line and valueless in another, at the later line, naming both locations', () => {
+    const issues = issuesOf([
+      crafted(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
+      crafted(banded('explicit.stat_b', 1, 2), valueless('explicit.stat_a'), { className: 'Other' }),
+    ]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['entries', 1, 'suffix']);
+    expect(issues[0]?.message).toContain('explicit.stat_a');
+    expect(issues[0]?.message).toContain('valueless at entries.1.suffix');
+    expect(issues[0]?.message).toContain('banded at entries.0.prefix');
+  });
+
+  it('refuses a kind clash on a hybrid line, and inside one entry', () => {
+    const prefix = { kind: 'hybrid', lines: [{ statId: 'explicit.stat_a', valueMin: 1, valueMax: 2 }, { statId: 'explicit.stat_z' }] };
+    const issues = issuesOf([
+      crafted(prefix, banded('explicit.stat_s', 1, 2)),
+      crafted(banded('explicit.stat_b', 1, 2), banded('explicit.stat_z', 1, 2), { className: 'Other' }),
+    ]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toEqual(['entries', 1, 'suffix']);
+    expect(issues[0]?.message).toContain('banded at entries.1.suffix');
+    expect(issues[0]?.message).toContain('valueless at entries.0.prefix.lines.1');
+    // Summed with a valueless operand as well: both rules speak.
+    const summed = issuesOf([crafted(valueless(RARITY), banded(RARITY, 15, 18))]);
+    expect(summed.map((issue) => issue.path)).toEqual([
+      ['entries', 0, 'prefix'],
+      ['entries', 0, 'suffix'],
+    ]);
+    expect(summed[0]?.message).toContain(`sums statId ${RARITY} across its prefix and suffix`);
+    expect(summed[0]?.message).toContain('its prefix line on it is valueless');
+    expect(summed[1]?.message).toContain(
+      `statId ${RARITY} is banded at entries.0.suffix and valueless at entries.0.prefix`,
+    );
+  });
+
+  it('loads one statId under one kind in many lines', () => {
+    expect(
+      parse([
+        crafted(banded('explicit.stat_a', 1, 2), valueless('explicit.stat_v')),
+        crafted(banded('explicit.stat_a', 3, 4), valueless('explicit.stat_v'), { className: 'Other' }),
+      ]).ok,
+    ).toBe(true);
+  });
+
+  it('skips pruned and raw entries', () => {
+    expect(
+      parse([
+        crafted(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
+        crafted(valueless('explicit.stat_a'), valueless('explicit.stat_a'), { status: 'pruned' }),
+        { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' },
+      ]).ok,
+    ).toBe(true);
+  });
+});

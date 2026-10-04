@@ -436,6 +436,34 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
   });
 });
 
+describe('contains with summed statIds (§2.2 contains_S)', () => {
+  const summed = new Set([OTHER]);
+
+  it('drops the band test of a hybrid line on a summed statId and keeps the line-set test', () => {
+    const entry = tier([line(STAT, [10, 12]), line(OTHER, [40, 60])], 100);
+    const ref = hybrid(lineBand(10, 12), lineBand(1, 2, OTHER));
+    expect(contains(ref, entry)).toBe(false);
+    expect(contains(ref, entry, summed)).toBe(true);
+    // The line that is not summed keeps its band test.
+    expect(contains(hybrid(lineBand(20, 30), lineBand(1, 2, OTHER)), entry, summed)).toBe(false);
+    // The line set still has to match exactly.
+    const wider = tier([line(STAT, [10, 12]), line(OTHER, [40, 60]), line(THIRD, [1, 2])], 100);
+    expect(contains(ref, wider, summed)).toBe(false);
+  });
+
+  it('needs only a line on the summed statId for a single-line reference', () => {
+    const entry = tier([line(OTHER, [40, 60])], 100);
+    expect(contains(band(1, 2, OTHER), entry)).toBe(false);
+    expect(contains(band(1, 2, OTHER), entry, summed)).toBe(true);
+    expect(contains(band(1, 2, OTHER), tier([line(STAT, [1, 2])], 100), summed)).toBe(false);
+  });
+
+  it('still never contains a weight-0 tier', () => {
+    const zero = tier([line(STAT, [10, 12]), line(OTHER, [40, 60])], 0);
+    expect(contains(hybrid(lineBand(10, 12), lineBand(40, 60, OTHER)), zero, summed)).toBe(false);
+  });
+});
+
 describe('needs (§8), over the unscoped pool', () => {
   const low = tier([line(STAT, [10, 20]), line(OTHER)], 100, { itemLevelMin: 30 });
   const high = tier([line(STAT, [21, 30]), line(OTHER)], 100, { itemLevelMin: 80 });

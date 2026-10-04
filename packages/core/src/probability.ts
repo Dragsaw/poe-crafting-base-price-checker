@@ -139,6 +139,9 @@ export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
   return derived.min >= rl.valueMin && derived.max <= rl.valueMax;
 }
 
+/** The empty `S`, for a caller with no pair of entries. */
+const NO_SUMMED: ReadonlySet<string> = new Set();
+
 function sameIds(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((id, index) => id === b[index]);
 }
@@ -159,17 +162,23 @@ function sameIds(a: readonly string[], b: readonly string[]): boolean {
  * `partial` slot gets no pool check (§1) and no probability (`rank.ts` reports
  * it before it computes one). A new caller with a `partial` pool calls
  * `untrackable` first.
+ *
+ * **`summed` is §2.2's `S`**, and `contains(ref, entry, S)` is `contains_S`: a
+ * reference line on a `statId` in `S` drops its band test and keeps the
+ * line-set test, so it needs only a line of the entry on that `statId`. `S`
+ * is empty, and this is §1's `contains`, wherever the caller has no pair of
+ * entries.
  */
-export function contains(ref: ModifierRef, entry: ModifierWeight): boolean {
+export function contains(ref: ModifierRef, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
   if (entry.weight === 0) {
     return false;
   }
+  const coveredBy = (rl: ReferenceLine) =>
+    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
   if (ref.kind === 'hybrid') {
-    return (
-      sameIds(lineSet(entry), statIds(ref)) && ref.lines.every((rl) => entry.lines.some((line) => covers(rl, line)))
-    );
+    return sameIds(lineSet(entry), statIds(ref)) && ref.lines.every(coveredBy);
   }
-  return entry.lines.some((line) => covers(ref, line));
+  return coveredBy(ref);
 }
 
 /**

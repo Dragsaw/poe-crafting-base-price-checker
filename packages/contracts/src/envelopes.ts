@@ -12,7 +12,15 @@ import {
 } from './schema-version.ts';
 import { SyncProgressSchema } from './sync-progress.ts';
 import { SyncRunReportSchema } from './sync-run-report.ts';
-import { describeOverlap, namesHybrid, NEVER_CO_OCCUR, overlapBranches } from './overlap.ts';
+import {
+  describeOverlap,
+  linesOf,
+  namesHybrid,
+  NEVER_CO_OCCUR,
+  OVERLAP_SLOTS,
+  overlapBranches,
+  summedStatIds,
+} from './overlap.ts';
 import { TrackedEntrySchema } from './tracked-entry.ts';
 import type { CraftedTrackedEntry } from './tracked-entry.ts';
 import {
@@ -48,12 +56,24 @@ import {
  *
  * A third rule, within-file overlap (FR-16, AD-17, IMPLEMENTATION-NOTES.md
  * §2.1): no two non-`pruned` crafted entries of one class overlap under
- * `overlap` — intersecting bands or both valueless, in each slot. Each pair is
- * one issue at the later entry's index, naming both canonical keys and each
- * slot's branch. Only a pair whose four references are single-line is
- * evaluated here, and such a pair never reads `coOccur`, so `NEVER_CO_OCCUR`
- * stands in for it. A pair with any `hybrid` reference is `core`'s cross-file
+ * `overlap`, which compares each `statId` both entries sum once, as a sum.
+ * Each pair is one issue at the later entry's index, naming both canonical
+ * keys, each slot's branch and each summed `statId` whose intervals
+ * intersect. Only a pair whose four references are single-line is evaluated
+ * here, and such a pair never reads `coOccur`, so `NEVER_CO_OCCUR` stands in
+ * for it. A pair with any `hybrid` reference is `core`'s cross-file
  * `co-occur` check (§2.1, *Who evaluates a pair*).
+ *
+ * Two more rules, the within-file half of kind agreement (§2.3), over the
+ * lines of every non-`pruned` crafted entry. Each issue's path is the
+ * offending line: `entries.i.<slot>`, or `entries.i.<slot>.lines.j` in a
+ * hybrid (`j` counts the lines as the schema sorted them). A `statId` that one
+ * line names banded and another valueless, wherever each sits, is one issue
+ * at each later line of the other kind, naming both locations. A summed
+ * `statId` (`summedStatIds`) whose operand in either slot is valueless is one
+ * issue at that line, naming the entry, the slot and the `statId`. §2.3's
+ * third case, a summed operand with a missing bound, is the banded shape's own
+ * refusal (AD-5), reported at that slot before these rules run.
  */
 export const TrackedFileSchema = z
   .strictObject({
@@ -121,7 +141,44 @@ export const TrackedFileSchema = z
       earlier.push({ index, key, entry });
       earlierByClass.set(classKey, earlier);
     });
+    const firstKindByStatId = new Map<string, { readonly kind: LineKind; readonly at: string }>();
+    file.entries.forEach((entry, index) => {
+      if (entry.kind !== 'crafted' || entry.status === 'pruned') {
+        return;
+      }
+      const summed = summedStatIds(entry);
+      for (const slot of OVERLAP_SLOTS) {
+        const ref = entry[slot];
+        linesOf(ref).forEach((line, lineIndex) => {
+          const path = ref.kind === 'hybrid' ? ['entries', index, slot, 'lines', lineIndex] : ['entries', index, slot];
+          const at = path.join('.');
+          const kind: LineKind = 'valueMin' in line ? 'banded' : 'valueless';
+          if (kind === 'valueless' && summed.has(line.statId)) {
+            ctx.addIssue({
+              code: 'custom',
+              path,
+              message: `entry ${canonicalKey(entry)} sums statId ${line.statId} across its prefix and suffix, and its ${slot} line on it is valueless; a summed operand needs both edges (IMPLEMENTATION-NOTES.md §2.3, §5.5)`,
+            });
+          }
+          const first = firstKindByStatId.get(line.statId);
+          if (first === undefined) {
+            firstKindByStatId.set(line.statId, { kind, at });
+            return;
+          }
+          if (first.kind !== kind) {
+            ctx.addIssue({
+              code: 'custom',
+              path,
+              message: `statId ${line.statId} is ${kind} at ${at} and ${first.kind} at ${first.at}; every tracked line on one statId takes one kind (IMPLEMENTATION-NOTES.md §2.3)`,
+            });
+          }
+        });
+      }
+    });
   });
+
+/** The kind a tracked line declares: both edges make it banded, none makes it valueless (§4.1). */
+type LineKind = 'banded' | 'valueless';
 
 /**
  * `data/recipes.json` — the Craft Recipes (AD-20). Absent-tolerable (AD-24).
