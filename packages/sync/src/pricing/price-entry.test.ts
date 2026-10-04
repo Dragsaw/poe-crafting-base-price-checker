@@ -256,6 +256,26 @@ describe('createPricingStep: states by cause', () => {
     expect(result.entry?.price.state === 'priced' && result.entry.price.observation.sampleSize).toBe(2);
   });
 
+  it('leaves listings with no readable price out of sampleSize', async () => {
+    const { run } = setup({
+      results: ids(8),
+      fetch: ok({
+        result: [
+          { id: 'a' },
+          { id: 'b', listing: {} },
+          { id: 'c', listing: { price: 'free' } },
+          { id: 'd', listing: { price: { amount: '3', currency: 'divine' } } },
+          { id: 'e', listing: { price: { amount: 3, currency: '' } } },
+          { id: 'f', listing: { price: { amount: -1, currency: 'divine' } } },
+          { id: 'g', listing: { price: { amount: 3, currency: 7 } } },
+          { id: 'h', listing: { price: { amount: 2, currency: 'divine' } } },
+        ],
+      }),
+    });
+    const result = await run();
+    expect(result.entry?.price.state === 'priced' && result.entry.price.observation.sampleSize).toBe(1);
+  });
+
   it('never puts the search fields on the observation', async () => {
     const { run } = setup({ results: ids(1), fetch: ok(listings([[1, 'divine']])) });
     const result = await run();
