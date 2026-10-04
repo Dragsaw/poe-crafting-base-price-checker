@@ -85,3 +85,13 @@ Do not invoke any skill. Do not start any subagent of your own. You are the revi
 Return your findings as text in your final message. Do not send your findings through any findings-reporting tool the host may offer.
 
 """
+
+[[workflow.review_layers]]
+id = "impeccable-design-review"
+name = "Impeccable Design Reviewer"
+when = "The diff changes a file under packages/web/src/ or a UX mockup."
+instruction = """
+Launch a context-free subagent with this prompt:
+
+Read `{project-root}/_bmad/custom/prompts/impeccable-design-review.md` and follow it. The diff is at `{diff_file}`. The spec is at `{claims_file}`.
+"""

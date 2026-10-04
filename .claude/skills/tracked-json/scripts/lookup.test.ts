@@ -7,12 +7,14 @@ import { describe, expect, it } from 'vitest';
 import {
   createJsonReader,
   LookupError,
+  loadRecipes,
   loadWeights,
   lookupBase,
   lookupClass,
   lookupStat,
   MATCH_CAP,
   parseCommand,
+  RECIPES_PATH,
   REPO_ROOT,
   runCommand,
   UsageError,
@@ -201,6 +203,21 @@ describe('loadWeights', () => {
     expect(() => runCommand({ kind: 'class', query: 'amul' }, (path) => (path === WEIGHTS_PATH ? broken : FILTERS))).toThrow(
       `${WEIGHTS_PATH}: bases.accessory.amulet.Amulets.prefix.entries.0.weight: weight is negative`,
     );
+  });
+});
+
+describe('loadRecipes', () => {
+  it('reads the recipes, and gives none for an absent or invalid file', () => {
+    const recipes = [{ id: 'perfect', currencies: [{ currencyId: 'perfect-orb-of-transmutation', quantity: 1 }], modifierLevelMin: 70 }];
+
+    expect(loadRecipes(() => ({ schemaVersion: '1.0.0', recipes }))).toEqual(recipes);
+    expect(
+      loadRecipes((path) => {
+        throw new LookupError(`${path}: the file is absent`);
+      }),
+    ).toEqual([]);
+    expect(loadRecipes(() => ({ recipes: 'nope' }))).toEqual([]);
+    expect(RECIPES_PATH).toBe('data/recipes.json');
   });
 });
 

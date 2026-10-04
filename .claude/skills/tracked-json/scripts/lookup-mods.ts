@@ -1,5 +1,5 @@
-import { type ModifierWeight, type WeightsFile, type WeightsPool } from '@poe/contracts';
-import { lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
+import { type CraftRecipe, type ModifierWeight, type WeightsFile, type WeightsPool } from '@poe/contracts';
+import { canRecipeRoll, lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
 
 import { absentAsNull } from './lookup-absent-as-null.ts';
 import { type ClassSelector, resolveClass, SLOTS, type Slot } from './lookup-weights.ts';
@@ -105,14 +105,17 @@ export interface TierRow {
   readonly lineSet: readonly string[];
   /** `core`'s null-line verdict: why the tier is untrackable, or `null` when it is trackable. */
   readonly untrackable: UntrackableReason | null;
+  /** Whether each recipe can roll this tier (IMPLEMENTATION-NOTES §9). Absent when `data/recipes.json` is unusable. */
+  readonly recipes?: readonly { readonly recipeId: string; readonly modifierLevelMin: number; readonly reached: boolean }[];
 }
 
 /** Per slot, every tier of the class with a line carrying `statId`, in ascending `itemLevelMin`. */
 export function lookupTiers(
   weights: WeightsFile,
   statId: string,
-  selector: ClassSelector,
+  selector: ClassSelector & { readonly recipes?: readonly CraftRecipe[] },
 ): { categoryId: string; className: string; statId: string; tiers: TierRow[] } {
+  const recipes = selector.recipes ?? [];
   const resolved = resolveClass(weights, selector);
   const tiers: TierRow[] = [];
   for (const slot of SLOTS) {
@@ -129,6 +132,13 @@ export function lookupTiers(
         lines: entry.lines,
         lineSet: lineSet(entry),
         untrackable: absentAsNull(untrackableReason(entry, pool)),
+        ...(recipes.length > 0 && {
+          recipes: recipes.map((recipe) => ({
+            recipeId: recipe.id,
+            modifierLevelMin: recipe.modifierLevelMin,
+            reached: canRecipeRoll(entry.itemLevelMin, recipe.modifierLevelMin),
+          })),
+        }),
       });
     }
   }

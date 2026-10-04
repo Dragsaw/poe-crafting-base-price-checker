@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "league": "Forbidden Rites",
-  "generatedAt": "2026-10-02T21:55:07.623Z",
+  "generatedAt": "2026-10-04T15:42:33.837Z",
   "entries": [
     {
       "entryKey": "[\"crafted\",\"accessory.amulet\",\"Amulets\",82,[\"explicit.stat_1050105434\",180,189],[\"explicit.stat_1202301673\",3,3]]",
@@ -867,9 +867,9 @@
         "state": "priced",
         "observation": {
           "league": "Forbidden Rites",
-          "observedAt": "2026-09-27T19:33:13.594Z",
-          "priceDivine": 4,
-          "sampleSize": 9,
+          "observedAt": "2026-10-04T13:58:15.461Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
           "exchangeObservation": {
             "currencyId": "divine",
             "rate": 1,
@@ -879,7 +879,7 @@
           }
         }
       },
-      "lastAttemptedAt": "2026-09-27T19:33:13.594Z",
+      "lastAttemptedAt": "2026-10-04T13:58:15.461Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoWxJvHp5lVGCZqtF4PxgKyEl-N2nrGwkrLuzz_H5jqwVkqBMCZoVhlF46KGBRG6K-BkIcvHtq_2xgtxHUhd7DwVcOQjFh8FeZVrGwI7ltAXasralNaWx7_p2xjDR1tCx4mtTQIcLNOZF8Z7T1qSEK4ZEuXiKM_ZcV69vZ_OHVv3QKvuEdsmX3aiPL7S7--7oUOg2xPthE-gcpaTqCbspkGwL4TCH33pbqhIxshyDHd7YQc7qSkT_X-kY2dEhSAuq61vPM_e0EXL-AvFJuCWlAQAA",
       "lastSearchLeague": "Forbidden Rites"
     },
@@ -889,7 +889,7 @@
         "state": "priced",
         "observation": {
           "league": "Forbidden Rites",
-          "observedAt": "2026-09-27T19:33:50.464Z",
+          "observedAt": "2026-10-04T13:58:34.595Z",
           "priceDivine": 1,
           "sampleSize": 10,
           "exchangeObservation": {
@@ -901,7 +901,7 @@
           }
         }
       },
-      "lastAttemptedAt": "2026-09-27T19:33:50.464Z",
+      "lastAttemptedAt": "2026-10-04T13:58:34.595Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQXYrDMAyE76LnUNLQtE6uspSgtdUicH6wlZASfPdV2rIkbPfNnvF8I2uBKChjhHqBfhDuO6ghkh0DfnuClD19tb8WkMdA6mLnIIMbe6HwMtipTPPg2bIc1kBTnExhyqI0lb6d0I-0NrSs-FOZQYsz1GWueMdxbVLCDX2klH3EXUx1PF6q3PyhnfM37Vx9oF3TdTPq6wvN5r45WhS69-Gx2wRaSzGqesB29CTrQthP_rfeFKoEDCz7YIt3tpCSuhLQ_Vc6BLa0C9KM6rrG8cQdrYSUfgC0Fm-npQEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
@@ -911,8 +911,8 @@
         "state": "priced",
         "observation": {
           "league": "Forbidden Rites",
-          "observedAt": "2026-09-27T19:34:27.340Z",
-          "priceDivine": 4,
+          "observedAt": "2026-10-04T13:58:53.760Z",
+          "priceDivine": 3,
           "sampleSize": 10,
           "exchangeObservation": {
             "currencyId": "divine",
@@ -923,7 +923,7 @@
           }
         }
       },
-      "lastAttemptedAt": "2026-09-27T19:34:27.340Z",
+      "lastAttemptedAt": "2026-10-04T13:58:53.760Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoWxuwpK8yihBtdUicH6wlZAS_O6T1zES1t3Z5-h8R2iDKChzhHaDcRIeB2ghkp0DXj1BKr59tT83kMdE6uLgoIAbe6HwNNipTOvk2bKccqAzZW3qylR1o7ML-plyQ8-KL6sCelyhrd4U7zjmJiXc0EdKxUtc815_lI35wzr_oM4vSJd02a35XL_b_XdPi0L3MTwOV0BrKUZVT9jPniQfg_3if8tro0rAwHIM9nhnCympKwHdf6VTYEuHIK2oruscLzxQJqT0BbYv_UShAQAA",
       "lastSearchLeague": "Forbidden Rites"
     },
@@ -933,9 +933,9 @@
         "state": "priced",
         "observation": {
           "league": "Forbidden Rites",
-          "observedAt": "2026-09-27T19:35:04.277Z",
-          "priceDivine": 7,
-          "sampleSize": 7,
+          "observedAt": "2026-10-04T13:59:12.944Z",
+          "priceDivine": 4,
+          "sampleSize": 9,
           "exchangeObservation": {
             "currencyId": "divine",
             "rate": 1,
@@ -945,7 +945,7 @@
           }
         }
       },
-      "lastAttemptedAt": "2026-09-27T19:35:04.277Z",
+      "lastAttemptedAt": "2026-10-04T13:59:12.944Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAyF30XXoTRJl4S8yihBtdUicH6wlZAS_O6T1zES1t3Z5-h8R2iDIChzgHaDcRIeB2ghkJk93hxBzL59tT83kOdE6uJgIYM7OyH_MtiqTOvk2LCcUqAr6ktTVR9VftHZBd1MqaFnxdcZ9LhC2yjcckg9mr-jCxSzt7C8OBflOa_q8g-s_IGVb2DXeN3t-dq_2_13T4NCj9E_D2dAYygEVU_Yz44kXYPd4n7Lm0IVj57lGOzxwQZiVFc82v9KJ8-GDkFaUV3bWV54oESI8Qs906FwogEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
@@ -3084,6 +3084,521 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_2162097452\",2,2]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:59:32.176Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:59:32.176Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqIKIdi2_MlXII25nKQGWOIgK5d-XtFoFWvsW59rnXnsBLyjBQ7PAMAoPPTTgqQsOvwxBLO56kj8XkNtIScVeQwEXNkLuIbBO3zSPhjuWXR5oq_KgVHms6zr1TmgCZQfLCX9SBVicoanKMvE1-2yVEBc0nmLxkqeqgypPH_Ve_eP94dQL2DmeV1EfK7SrevXsUOg6uNvmEujsENzum4wlyddgM5mn8zFbOnQs2ymLV-4gxqTST-DRUi9vXNE9aVVun-5lXiffhvyqzDhxqN8tMDruaJODZkyqbjVP3FMOFOMvJlmHefEBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_2923486259\",20,27]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:59:51.432Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:59:51.432Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqIKMdcCvTBXyiNtZSoAlBlGh_PuSdqpAa99sX_tc2yt4QZk8NCsMo_DQQwOeusnhlyEI2U2P8ucKch0pqthryODMRsjdBdaxTMtouGM5pIG2yI9K5VVZlrF3RjNRcrAc8bXKwOICTZHnka_ZJ6uIOKPxFLKnPFWrt7I6qvf6H0_lfzz18QR3CqfNsvcj2k2-CTsUugzuuvsFOjtM7vBNxpKkf7CZzcO7UrHi0LHspyxeuIMQoko_E4-Wennhiu5BK1L7fEvTPek75DdpwolD_eqA0XFHuz1owajqVvPMPaWFQvgFkGnzufMBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_3325883026\",18.1,23]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:00:10.716Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:00:10.716Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqILAKsavTBVyidtZSoAlBlGh_PuSdtpAa9_iXPtcX6_gBWXy0KwwjMJDDw146iaHZ0MQsrse5Y8V5DZSVLHXkMGFjZB7CKzjNy2j4Y7lkAbaIj8qlddVVcXeGc1EycFyxL-rDCwu0BR5HvmafbKKiAsaTyF7yitL9VbXZa6O_3hFfSh-iKp8AjyF02bdR4x2U2-eHQpdB3fbXQOdHSZ3-CRjSdJF2Mzm171W8cehY9lPWbxyByFElb4mHi318sIV3V-W1D7fy5Qn3Yf8pkw4cahfBRgdd7TbgxaMqm41z9xTWiiEbwYKFY71AQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_3362812763\",38,43]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:00:30.384Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:00:30.384Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqIKAGOuvTBVyidtZSoAlBlGh_PuSdqpAa99sX_tc2yt4QZk8HFcYRuGhhyN46iaHZ0MQsrse5a8V5DZSVLHXkMGFjZB7CKxjmZbRcMdySANtkddK5U1VVbF3RjNRcrAc8Z8qA4sLHIs8j3zNPllFxAWNp5C95JVlrZpCfdTlP17Z_PGq8gXuFE6bZR9HtJt8E3YodB3cbfcLdHaY3OGbjCVJ_2Azm6d3o2LFoWPZT1m8cgchRJV-Jh4t9fLGFd2TVqT2-Z6me9J3yG_ShBOH-t0Bo-OOdnvQglHVreaZe0oLhfALvr39ofMBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_3372524247\",36,45]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:00:49.746Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:00:49.746Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAyF38XXqIKQ_oxXmSrkJW5nKQGWBESF8u5L2qkCrb2zfezv2F7ABwyjh2aBfgjcd9CAJzU6_DIEsbjrSf5cINwGSip2Ggq4sAnkHgLrVKZ5MKw47PJAW5UHIcqTlDL1TmhGyg6WE_5DFGBxhqYqy8TX7LNVQlzQeIrFS15dH8VeSCGP_3j14Y8n9y9w53heLfs4ol3lq1BhoGvvbptfoLP96HbfZCyF_A82k3l6n0SqOHQctlMWr6wgxqTSz8iDpS68cUX3pFW5fbqn-Z78HfKrNOOCQ_3ugMGxos0eNGNSdat54o7yQjH-AsuYrI_zAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:01:09.152Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:01:09.152Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqAKWbcCvTBXyiNtZSoAmBlGh_PuSVttAa9_iXPtcX6_gBWXy0KwwjMJDDw146iaHn4YgZDc9yh8ryHWkqGKvIYMTGyF3F1jHb1pGwx3LIQ20Rf5WlnmllIq9M5qJkoPliK_LDCwu0BR5HvmafbKKiBMaTyF7yHupi3dV1YUq__GK1x9e9QB3DMfNsvcQ7abePDsUOg_uursFOjtM7vBFxpKke7CZza93VcYfh45lP2XxzB2EEFW6TDxa6uWJK7q_JKl9vpUpT7oO-U2ZcOJQPwswOu5otwctGFXdap65p7RQCN_xL6iu8wEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_4080418644\",31,33]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:01:29.168Z",
+          "priceDivine": 2,
+          "sampleSize": 9,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:01:29.168Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3YqDQAyF3yXXUsYfiuurLEVSJ-0GZtSdiWKRefedaZeiYO-SnOQ7SVbwgjJ5aFYYRuGhhwY8dZPDqyEI2VOP8vcK8hgpqthryODGRsi9BNaxTMtouGM5pYE2V-eiUHVVVbF3RjNRcrAc8V9FBhYXaHKlIl-zT1YRcUPjKWSHvErVqsrr8wGvzP95ZXmAu4TLZtnXEe0m34QdCt0H99j9Ap0dJnf6IWNJ0j_YzObtXRex4tCx7Kcs3rmDEKJKvxOPlnr54IruTctT-_xM0z3pO-Q3acKJQ_3pgNFxR7s9aMGo6lbzzD2lhUL4A2NhJgLzAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_1062208444\",92,100],[\"explicit.stat_587431675\",30,34]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:01:48.636Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:01:48.636Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3Y6CQAyF36XXxPCnsrzKxpAuU90mM8DOFIIh8-7OqDGQ1bu2p_1O2wWcoIwO6gX6QbjvoAZH7WjxRxP45K4H-XsBuQ4UVOwUJHBmLWQfAqtQpnnQ3LLs4kCTpYc8T6uyLEPvhHqk6GA44L_yBAzOUGdpGviKXbQKiDNqRz55y9tXx7LIDsf9P1yRPnFF-YZ28qfVro8bmlW-ClsUuvT2unkFWtOPdvdL2pDEd7Ce9Mu7ykPFomXZThm8cAveB5X-Rh4MdfLBFe2LlsX26Z7Ge-JzyK3SiBOL6tMBg-WWNnvQjEFVjeKJO4oLeX8DEaXPz_IBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_2162097452\",2,2]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:02:08.127Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:02:08.127Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAyF38XXqIIM-sOrTBXyiNtZSoAlBlGhvPuSVttAa-9ycuzv2F7AC8rooV6gH4T7Dmrw1I4OPwxByO5-tN8XkNtA0cVOQwYXNkLuYbCO3zQPhluWXWpo3spjua8OVV7E2gnNSCnBcsQXpyIDizPUShUxQLNPWZFxQeMpZE-Bqtir_HQoK_UPqH5wT2DncF7N-tihWenVs0Wha-9um1Ogs_3odp9kLEk6B5vJ_CYfU6RDx7LtsnjlFkKILn2NPFjq5EUqur_DpPLpLtM6eZJ-JRNOHOpXCwyOW9rMQTNGVzeaJ-4oDRTCN7U_rhjyAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_2923486259\",20,27]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:02:47.220Z",
+          "priceDivine": 2,
+          "sampleSize": 9,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:02:47.220Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqIKstIVfmSrkEbezlABLAqJC-fc5rbaB1r7l5trn2l7ABwyjh3qBfgjcd1CDp3Z0-GEIYnb3xX5fINwGEhc7DRlc2ARyD4O1fNM8GG457FJD87Y_7Q_lscwLqZ3QjJQSLAu-qIoMLM5QK1VIgGafsoRxQeMpZk-BqlLCPKiy-gdU-Q_v-AR3jufVtI8tmpVePVsMdO3dbXMMdLYf3e6TjKWQDsJmMr_ZJyU_Dh2HbZfFK7cQo7j0NfJgqQsvUtH9nSaVT3eZ9smT9CuZcMGhfrXA4LilzRw0o7i60TxxR2mgGL8BDRVOR_QBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_3325883026\",18.1,23]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:03:06.927Z",
+          "priceDivine": 1,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:03:06.927Z",
+      "lastSearchId": "H4sIAAAAAAAAA3VQ7W6DMAx8F_9GiI_SMV5lqpBH3M5SAjQxiArl3Ze0Ugda-8_ns-98XsEJyuSgWWEYhYceGnDUTRa_NYFP7nygv1aQ20iBxV5BAmfWQvZBsAptWkbNHUsaF9ryUB-O1UeV5WF2Rj1RdDAc5PPPPAGDCzRFkQcDxS56BY0zakc-eS1YFlVdl1lx_C9Yp0_F8oXgyZ829z5ytBu8KTsUugz2tnsHWjNMNv0hbUjiS1jP-uleF6Fj0bLstwxeuAPvA0vXiUdDvbxxRfuXJY7PdxjzZBG6DYxyYlG9CzBa7mh3By0YWNUqnrmneJD3v_s9SRP2AQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_3362812763\",38,43]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:03:26.550Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:03:26.550Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAyF38XXqCo_pYxXmSrkEbezlABLDKJCefcmbbWB1t7l5Njfsb2AE5TRQb1APwj3HdTgqB0tfmkCn9z9YH8uINeBgoudggTOrIXsw2AVvmkeNLcsu9jQ5EVVlIfjYZ-G2gn1SDHBcMCnH2kCBmeosywNAYpdzAqMM2pHPnkNzMusSrNjmf8D5tWTV-QvcCd_Wk372KJZ6dWzRaFLb6-bY6A1_Wh336QNSTwI60n_ZldZ-LFoWbZdBi_cgvfBpZ-RB0OdvElF-3eaWD7dZdxnH6VbyYgTi-rdAoPlljZz0IzBVY3iiTuKA3l_AyPBQF_0AQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_3372524247\",36,45]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:03:46.209Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:03:46.209Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCoplI5fmSrkEbezlABLDKJC-fcl7bSB1r7l5trn2l7AC8rooV6gH4T7Dmrw1I4OPwxByO5-tN8XkNtA0cVOQwYXNkLuYbCO3zQPhluWXWpoDsWpOJZVuc9j7YRmpJRgOeLztzwDizPUSuUxQLNPWZFxQeMpZM-Bh0qVqlBF9Q94OP7wivIJ7hzOq2kfWzQrvXq2KHTt3W1zDHS2H93uk4wlSQdhM5nf7JOKPw4dy7bL4pVbCCG69DXyYKmTF6no_k6Tyqe7TPvsk_QrmXDiUL9aYHDc0mYOmjG6utE8cUdpoBC-AVbkEXH0AQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:04:05.889Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:04:05.889Z",
+      "lastSearchId": "H4sIAAAAAAAAA3VQ0W6DMAz8Fz-jqmGwQn9lqpBH3M5SAjQxiArl35e00wZa--bz2Xc-L-AFZfRwXKAfhPsOjuCpHR1-GoKQ3flIfywgt4Eii52GDM5shNyDYB3bNA-GW5ZdWmjeiqp4Lw_lXsXZCc1IycFylFe1ysDiDMc8V9FAs09eUeOMxlPIngvW6lBUtSry_4Llj56qnsidwml17SNFs8KrskWhS-9um2egs_3odl9kLEl6CJvJ_HpXeew4dCzbLYsXbiGEyNJ15MFSJy9c0f0lSePTHaY8-wT9CiY5cahfBRgct7S5g2aMrG40T9xROiiEb2xTFVD0AQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_4080418644\",31,33]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:04:25.627Z",
+          "priceDivine": 1,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:04:25.627Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAyF38XXqOIn7VhfZaqQR9zOUgI0MYgK5d2XtNoGWnuXk2N_x_YCXlBGD8cF-kG47-AIntrR4achCNndj_bHAnIbKLrYacjgzEbIPQzW8ZvmwXDLsksNTaVqddi_7fMi1k5oRkoJliO-eC8ysDjDsSyLGKDZp6zIOKPxFLKnQJXXuSrqg1L_gNUPr6qe4E7htJr2sUWz0qtni0KX3t02x0Bn-9HtvshYknQQNpP5za7L-OPQsWy7LF64hRCiS9eRB0udvEhF93eaVD7dZdonT9KvZMKJQ_1qgcFxS5s5aMbo6kbzxB2lgUL4Bv4dm_z0AQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"explicit.stat_3484657501\",191,221],[\"explicit.stat_587431675\",30,34]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:04:45.532Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:04:45.532Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAyF38XXqOK3sL7KVCGPuJ2lBFhiEBXKuy9ppw209i4nx_6O7RWcoEwOTisMo_DQwwkcdZPFD03gk7sf7PcV5DZScLFXkMCFtZB9GKzCNy2j5o7lEBvaomzKY1VXaRZqZ9QTxQTDAZ-9ZQkYXOCU51kIUOxiVmBcUDvyyVNg1dRlkR3r6h-vSH9wRfmEdvbnzbCPJdqN3jw7FLoO9ra7BVozTPbwSdqQxHuwnvVvdpOHH4uWZd9l8ModeB9c-pp4NNTLi1S0f5eJ5fNdxn3SKN1GRpxYVK8WGC13tJuDFgyuahXP3FMcyPtviU6opvMBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_2162097452\",2,2]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:05:05.384Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:05:05.384Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0Y6CMBBF_2WeiYHSVfFXNobM0tGdpAVsC8GQ_vu2Gg1ETfatt3fm3JmZwXn0g4PDDF3vuWvhAI6aweKPJgjZzY_29wz-2lN0sVWQwYm1J3s3WMVvmnrNDftNaqiLfCtEvpdSxtoR9UApwXDEl1UGBic4SBHxil1KioQTakche4srRVWVcpfL8gUnxQNX_Rsniq3Iq538Ei-4B-3dbMdwXCx-P0i90Itng57Onb2u7orWdIPd_JI25NNtWY_6mbxPkRYt-3WXwTM3EEJ06TJwb6j1H1LRPmlFKh9vMq2TJ-kWMuG8RfVpgd5yQ6s5aMLoqlrxyC2lgUL4A7-85oY_AgAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_2923486259\",20,27]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:05:25.225Z",
+          "priceDivine": 1,
+          "sampleSize": 2,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:05:25.225Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3W7CMAyF38XXFSppBg2vMqHKawyzlP6QpFVRlXdfAhtqBUi7y8mxv2N7BufRDw4OM3S9566FAziqB4tfhiBkNz_anzP4a0_RxVZDBic2nuzdYB2_aeoN1-w3qaHa5jsh8lJKGWtHNAOlhIYjvlAZNDjBQYqI1-xSUiSc0DgK2UtcIZQq5D6XxRNOij-c-jdOKFHIcic-1BNO5L84sX-BO4bjYvX7SaqFXjxr9HTu7HV1WbRNN9jNN5mGfLoum9E8sst0EIuW_bqrwTPXEEJ06TJw31Dr36SifdC2qXy8ybRPnqRbyITzFvW7BXrLNa3moAmjqyvNI7eUBgrhB1WxEMlBAgAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_3325883026\",18.1,23]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:05:45.110Z",
+          "priceDivine": 5,
+          "sampleSize": 1,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:05:45.110Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3W6DMAyF3yXXCEGSdcCrTBXyiNtZSoAlAVGhvPuSdj-gttLu4hz7O_ZZmfPgJ8ealQ2jp6FnDXPYTRbeNbKQXfUov63MX0aMKvSKZexE2qO9CaTiNy6jpo58ngbasjhwXlRSytg7g54wORiKeFFnzMDCGskjXpFLTpFwAu0wZA9xgte1kK-FFHc4yX9w9f9xgr9UlSj44Q5XVnn5DeTiAfAYjpvjb6G0m3rz7MDjebCXXbZgzTDZ_AO1QZ_yJT3rX_cqRWLBkt9PGThTx0KIKn5ONBrs_RNXsH-3pPb5WqZ7ilS6TZlw3oJ6dsBoqcPdHrhAVFWraKYe00IhfAEIA5CwQwIAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_3362812763\",38,43]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:06:05.026Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:06:05.026Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0YqDMBBF_yXPUjQJVv2VpcismXYHEnWTKBbJv2_S0qK0hX3LzZ05d2ZW5jz4ybFmZcPoaehZwxx2k4VvjSxkNz_aXyvz1xGjC71iGTuT9mjvBqn4jcuoqSN_SA1tkZec55WUMtbOoCdMCYYiXtQZM7CwRvKIV-RSUiScQTsM2Vuc4HUt5DGX4gUn-QNX_x8nSl4V_Fi-4kT1wIk3uFM4bVa_n6Td6M2zA4-XwV53lwVrhskeflAb9Om6pGf9zK7SQSxY8vsuAxfqWAjRxd-JRoO9_5AK9kkrUvl8k2mfPEm3kQnnLahPC4yWOtzNgQtEV7WKZuoxDRTCH3tlHtFBAgAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_3372524247\",36,45]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:06:24.961Z",
+          "priceDivine": 0.0239,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:06:24.961Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0Y6CMBBF_2WeicFSRfyVjSGzdHQnaYFtC8GQ_vu2Gg1ETfatt3fm3JmZwXn0g4PjDF3vuWvhCI6aweK3JgjZzY_21wz-2lN0sVWQwZm1J3s3WMVvmnrNDftNaqi3-V6I_CCljLUj6oFSguGIL6oMDE5wlCLiFbuUFAln1I5C9hZXiKoqZJnL4gUnxQNX_R9XlGInpJDl63T7B273BncKp8Xq95PUC714Nujp0tnr6rJoTTfYzQ9pQz5dl_Won9mHdBCLlv26y-CFGwghuvQ7cG-o9R9S0T5p21Q-3mTaJ0_SLWTCeYvq0wK95YZWc9CE0VW14pFbSgOF8AcOQE__QQIAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_3917489142\",15,18]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:06:44.974Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:06:44.974Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3W6DMAyF38XXqIKQraSvMlXIA7ezlABLAqJCefcl7X5AbaXdxTn2d-yzgPPoRweHBfrBc9_BARw1o8V3TRCyqx7ltwX8ZaCoYtdCBifWnuxN4DZ-0zxobtjv0kBd5K9C5JWUMvZOqEdKDoYjvlQZGJzhIEXEt-ySUyScUDsK2UNcKZQq5T6X5R1Oih-c-j9OFXtZqUKKO1zx8o0rqge4YziuTr9FUq_q1bNBT-feXjbJojX9aHcfpA35lC7rSf96VykQi5b9dsrgmRsIIar0OfJgqPNPXNH-XZLap2uZ7slT6VZlwnmL7bMDBssNbfagGaPa1i1P3FFaKIQvNPdL3kECAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_4080418644\",31,33]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T14:07:05.008Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0W6DMAxF_8XPqAoQddBfmSrkEbezlABLAqJC-fcl7VaBRqW95eba59pewHn0o4PTAv3gue_gBI7a0eKHJgjZ3Y_2-wL-NlB0sVOQwYW1J_swWMVvmgfNLftDamhycSwKUUkpY-2EeqSUYDjiyzoDgzOcZBHxil1KioQLakch28WVRV2X8k3I8g9OFr-4-t84KSoh8-q4N13-gyvLHdw5nFerP07SrPTq2aKna29vm8uiNf1oD5-kDfl0XdaTfmZX6SAWLfttl8ErtxBCdOlr5MFQ51-kon3S8lQ-3WXaRyTpVjLhvEX1aoHBckubOWjG6KpG8cQdpYFC-AamucVyQQIAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"armour.helmet\",\"Helmets_str\",82,[\"hybrid\",[[\"explicit.stat_1062208444\",39,42],[\"explicit.stat_3299347043\",42,49]]],[\"explicit.stat_587431675\",30,34]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:07:25.081Z",
+          "priceDivine": 2,
+          "sampleSize": 4,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:07:25.081Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3W6DMAyF38XXqOInLdBXmSrkEbezlABLAqJCefcl7VaB2kq7y8mxv2N7AevQjRaOC_SD476DI1hqR4OfisAnNz_YHwu460DBxU5CAmdWjszdYBm-aR4Ut-x2saHJ0kOep5UQItROqEaKCZoDvqgT0DjDUeQBL9nGpEA4o7Lkk5e4Iq_rQpSpKJ5wIv_D1f_G7atSFNmh3D8Pl_7SCvGCdvKn1eb3izQrvXq26OjSm-vmsGh0P5rdFylNLh6X1aQe2VW8h0HDbtul8cIteB9c-h550NS5N6loHrQslk83GfdJo7QrGXHOoHy3wGC4pc0cNGNwZSN54o7iQN7_ABTv40ZAAgAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
       "entryKey": "[\"crafted\",\"jewel\",\"Emerald\",82,[\"explicit.stat_2843214518\",5,15],[\"explicit.stat_681332047\",2,4]]",
       "price": {
         "state": "priced",
@@ -3125,6 +3640,28 @@
       },
       "lastAttemptedAt": "2026-10-02T20:25:16.473Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WeTYPS1OqvbBozhWkzCQpBtDaGf1_Ybjaadt-Aw5w7MyuMAcM0QruCdYHtAC2MpCaPV0MQix-e8NcK4ekoURw0FHBjE8i_AOv0TIszrDgcckFXClmXjaxFk_7OaCbKCT0n_akpoMcF2lJUya95zFFJcUMzUiw--ypRSVGeavnmk7-64wfZJV42rb5G6Db3zVFhoLv1z90mHoTODoerfeRVsJnNX-w5N-_Rc9iX9HhnBTEmGjzq_-KcZ0W7QlowUd1pnnmgbIjxGxoabPCfAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:50:26.316Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:50:26.316Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WeTQM11eqvbBozhWkzCQpBtDaGf1_YZjeadt-Aw5w7MyuMAcM0QruCdYHtAC2MpCaPV0MQix-e8NcK4ekoURw0FHBjE8i_AOv0TIszrDgcckEnRVnLpqxFk_7OaCbKCT0nfdUU0OMCrRTH5Nc85qikuKEZKRYffUcpRFVX5elNJ-tfXfPBdomXTa-vGbrNfXNUGOhu_XO3igehs8Phah95F2xm8xd8zt179Bz2JT3eWUGMiQaP-r8451nRrpAWTFR3mmceKBti_AZCXtZNoAEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3194,15 +3731,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T20:31:03.898Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ0a7CIAyG36XXixnOOLdXMWapUE0TNgiwObPw7sIx52TL0Tvgo9_fdgEfMIwe2gWMDWwGaMGTHB1eNUEsfnjC5wXC01KiOCgo4MY6kHsDVumZZqtZctjlgk6UVS2aqi6b9HdCPVJO6Dnpj00BPc7QinKf_Ip9jkqKG2pPsfjoO55EVe3LQ_1PJ-pfXfPBdomXVa_vGbrVfXWUGOhu3HOzigehNcPuah55F6wn_Rd8yt07dBy2JT3eWUKMiQaH6lucdSxpU0gzJqo6xRMPlA0xvgAHPiMyoAEAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_1202301673\",3,4]]",
       "price": {
         "state": "priced",
@@ -3222,6 +3750,28 @@
       },
       "lastAttemptedAt": "2026-10-02T20:31:42.761Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqIJQ1p9XmSrkJm5lKRCUBEqF8u5z1mkCrbtzfOLzJV4gRIxjgPMCbojsejhDID16vFqCVHxzwZ8LxOdAQrE3UMCNbST_AmykTfNgWXPc5YG2aspTVe-VOsrdCe1IOaFj0VdNU0CHs1SHkwQYDjlLHDe0gVLxXqhKVZfVx6H-I6x_dPs3sku6rN76-kO7Oq9KjZHuzj83q3gQDq7fXd0j74LtZH9jj0o6Hj3H7UiHd9aQktDo0fwXN3jWtBmkGYWa1vDEPWVDSl-es7d2oAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:51:21.498Z",
+          "priceDivine": 20,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:51:21.498Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqAI6SttfmSrkJm5lKZAoCZQK5d_nrNoEWvfm-MTnJl4gRIxjgPMC1kW2A5whkBo9Xg1BKr654M8F4tORUBw0FHBjE8m_AGtp0-wMK467PNBVTXmq9h91fZS7E5qRckLPoq-apoAeZ6nakwRoDjlLHDc0gVLxVlhXZXloD_vmr6_90b2zXdJl9djXJ7rVeVUqjHS3_rnZxYPQ2WF3tY-8DDaT-Q0-1tLx6DluR3q8s4KUhEaP-r8451nRZpBmFKo7zRMPlA0pfQHSwoWnoQEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3291,15 +3841,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T20:34:18.962Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_EyMgB_pXLobUrZomg5FtIIbsv1935gxE71vXZ33erQv4gGH0cFrADoFtDyfwpEaHF0MQs18u-HuB8BhIKPYaMriyCeSegLW0aR4MKw67NNDm1f6Yl4eiaOTuhGaklNCx6POqyqDDWar6KAGafcoSxxWNp5h9FH41eVkW-0P97qv_dJ9s53hePfb5iXZ1XpUKA92se2x2cSccbL-72HtaBpvJvIKbQjoOHYftSIc3VhCj0OBQ_xc3OFa0GaQZhepW88Q9JUOMP5eicNihAQAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_1202301673\",3,4]]",
       "price": {
         "state": "priced",
@@ -3319,6 +3860,28 @@
       },
       "lastAttemptedAt": "2026-10-02T20:34:58.161Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ3W7DIAxG38XXUZSf0nZ5lamKXHArSyQgIGmqiHcfrNOUaN0d-ODzGa_gA4bJQ7eCsYHNCB14kpPDqyaIxTdP-HOF8LSUKI4KCrixDuRegFUq02I1Sw5lbujrj0N1PoqTqNPbGfVEOWHgpG9FAQMu0ImmFClAsc9ZyXFD7SkW74VN1bRVfTy1f4U_vsMb2SVeNrO-_tBv7pujxEB34567VTwIrRnLq3nkXbCe9W_suUkVh47DvmXAO0uIMdHgUP0XZx1L2jXSgomqXvHMI2VDjF_aWthdoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:51:40.159Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:51:40.159Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXCAFdoOVVpgq5iVtZCj9KAqVCefeZtppA6-4Sn_h8jhfwAcPooV6gHwL3HdTgSY8OL5YgJk8u-HuB8BhIKHYGEriyDeRegI2UaR4saw7p2tDkp6_sWKpK5fJ2QjvSmtCy6A8qgRZnqFWRKgkw7NcscVzReorJR2GRZ1lZlQf1x5dXb19--mA7x_Nm2Ncnms19c9QY6Na7x24Xd8Kh79JLf1-XwXayv8HHQioOHYd9S4s31hCj0ODQ_Bc3ONa0a6QZhZrG8MQdrYYYfwCyKB_WoQEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3388,15 +3951,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T20:39:49.234Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXCDVQCuVVpgq5xK0shR8lgVKhvHuddZpA6-4Sn_h8jldwHv3koF5hGD0PPdTgqJ0sXg1BSL654K8V_HMkodhrSODGxpN9A9ZSpmU03LJPY0OjzsdDdSrKQsnbGc1EMaFj0edFAh0uUBdZWkiAZhezxHFD4ygkH4WnSuV5djiWf3yq_PGp8wfbJVw2w74_0Wzum2OLnu6Dfe528SAchz69Do-4DDaz-Q2uMqlYtOz3LR3euYUQhHqL-r-40XJLu0ZaUKhuNM_cUzSE8AL3SOqpoQEAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_1202301673\",3,4]]",
       "price": {
         "state": "priced",
@@ -3416,6 +3970,28 @@
       },
       "lastAttemptedAt": "2026-10-02T20:40:28.861Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoSRx6U9eZZSg2moROLFxnDQl-N0rr2MkrLuzdazzyVpgiBjHAZoFnI_semhgID0GvFqCVHxzwV8LxKcnodgbKODGNlJ4AzZSptlb1hx3uaFVSh1O51Kpvbyd0I6UEzoW_fFcQIczNFWtxG94yFGiuKEdKBUffVVd1qqsDkf1x6d-dPsPsku6rEZ9f6Fd3VdHjZHuLjw3m3gQetfvru6RV8F2sr-xp1oqAQPHbUuHd9aQktAY0PwX5wNr2jTSjEJNa3jinrIhpRejVA8rnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:51:58.653Z",
+          "priceDivine": 0.133,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:51:58.653Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WeTaPS1eqvbBozhWkzCYoBtDaGf19o041mu28whzl3mBWcRz85aFcwo2czQAuO5GTxoglC9uQRf6_gHyNFioOCDK6sPdkXYBXLtIyaJftDauiEENWpyYU4xrcz6olSQs9RXzcZ9LhAW5Qi-hW7FBUVV9SOQvbRVxZ5XtWV-PqjK-q3rvlgO4fzZtbXH7rNfXOU6Olm7GO3ijvhaIbDxdzTLljP-jf4VMaKRct-39LjjSWEEKm3qP6LGy1L2jXSgpGqTvHMAyVDCD8kNrD_oAEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3485,15 +4061,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T20:59:42.779Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ3YrDIBBG32WuQ2liaX5eZSlhqtMyYKKoSVOC717dskvCdu90jnO-cVbwAcPkoVvB2MBmhA48ycnhVRPE4psn_LVCeFpKFEcFBdxYB3JvwCqVabGaJYdDbuiFEOemPQpxSm9n1BPlhIGTvm4LGHCBrqxE8iv2OSopbqg9xeKj79yUQlTHU_1HV9Y_uvaD7RIvm1nff-g3981RYqC7cc_dKh6E1oyHq3nkXbCe9W9wU6WKQ8dh3zLgnSXEmGhwqP6Ls44l7RppwURVr3jmkbIhxhdhVkWAoAEAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_1202301673\",3,4]]",
       "price": {
         "state": "priced",
@@ -3513,6 +4080,28 @@
       },
       "lastAttemptedAt": "2026-10-02T21:00:22.966Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WeTaPSVNdf2TRmCtNmEhQCaG0M_76wzW40bd9gDnPuMCv4gGHy0K1gbGAzQgee5OTwogli8csT_l4hPCwliqOCAq6sA7knYJXKtFjNksMhN_SibY7iqz216emMeqIcMHCyN6KAARfoqrJMesU-JyXDFbWnWLzVVXVZi7I6NeLF96c7vpGd43kz6fMH_ea-OUoMdDPusVvEndCa8XAx97wJ1rP-j23rVHHoOOxbBryxhBgTDQ7VpzjrWNKukRZMVPWKZx4pG2L8AfRSHReeAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:52:17.171Z",
+          "priceDivine": 0.008,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:52:17.171Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGpLB5RfmSrkJm5lKZAoCZQK5d_nrNoEWveW-NjnJl4gRIxjgHYB6yLbAVoIpEaPV0OQim8u-HOB-HQkFAcNBdzYRPIvwFrKNDvDiuMuD3RlU5_Kc1M10jqhGSkH9Cz2uiygxxnaw34ves0hJ4nhhiZQKt7qjtJc1VX58Ud3qH905ze2S7qsnvr6Qre6r44KI92tf2428SB0dthd7SOvgs1kfoObo1Q8eo7bkR7vrCAlodGj_i_OeVa0GaQZhepO88QDZUNKX3XggwqfAQAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3582,15 +4171,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T21:03:04.398Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ0a7CIAyG36XXi9nEONyrnJilQjVN2FiAzZmFdxeOOWaLnjvoR7-_dAEfMIwemgXsENj20IAnNTq8GIJY_PKEfxYIj4ESxV5DAVc2gdwLsE5lmgfDisMuN7RC1gdxkkeZnk5oRsoBHSd7LQrocIamKsuk1-xzUjJc0XiKxVfdUVZC7MtD_aGr6j_d6YvtHM-rUV9faFf31VFhoJt1j80m7oSD7XcXe8-rYDOZd7Dcp4pDx2Hb0uGNFcSYaHCo_4sbHCvaNNKMiepW88Q9ZUOMTzCAdnWfAQAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_1202301673\",3,4]]",
       "price": {
         "state": "priced",
@@ -3610,6 +4190,28 @@
       },
       "lastAttemptedAt": "2026-10-02T21:03:44.888Z",
       "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WejUGtteuvbBozhWkzCYoBtDaGf1_YNqlmu28whzmXmRWcRz85aFcwo2czQAuO5GTxoglC9ssj_l7BP0aKFAcFGVxZe7JPwCqWaRk1S_Z5auga8VWL00Ec49MZ9UQpoOdoPxV5nUGPC7RF2eR1jFDsUlq0XFE7CtlHZVGKshLFsan-OKuX8PBBdg7nzW-fU3Sb--Yo0dPN2MduGXfC0Qz5xdzTNljP-j1KGSsWLft9S483lhBCpN6i-i9utCxp10gLRqo6xTMPlAwh_AB9-bssogEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:52:36.117Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:52:36.117Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WejUG3auuvbBozhWkzCQpBtDaGf1_Ypqlmu28whzmXmRVGj34aoV3BWM9mgBZGkpPDiyYI2S-P-HsF_7AUKQ4KMriy9uSegFUs02I1S_Z5augacarE8SDq-HRGPVEK6Dnaj0VeZdDjAm1RNnkVIxSPKS1arqhHCtlHZVkIUTf1V_VHWTQv4emD7RzOm-8-x-g2981RoqebcY_dNu6E1gz5xdzTOljP-j1LGSsOHft9S483lhBCpN6h-i_OOpa0a6QFI1Wd4pkHSoYQfgBafdyeowEAAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3679,12 +4281,113 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"explicit.stat_709508406\",81.5,127.5],[\"explicit.stat_681332047\",17,19]]",
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_1202301673\",3,4]]",
       "price": {
-        "state": "no-listings"
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:52:54.663Z",
+          "priceDivine": 27,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
       },
-      "lastAttemptedAt": "2026-10-02T21:06:28.088Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WejVFbq_VXNo2ZwrSZBIUAWhvDvxe22axmu28whzmXmRWcRz856FbQxrMeoQNHYrJ4VQQh--YRf63gn4YixVFCBjdWnuwbsIxlWoxiwT5PDX1TnOuiPRan-HRGNVEKGDja2zKvMxhwga6smryOEZJdSouWGypHIfuoPLXl4VAVx-aPsmx-hOcPtku4bL77HqPf3DdHgZ7u2j5323gQGj3mV_1I62A1q99ZqlixaNnvWwa8s4AQIvUW5X9xxrKgXSMtGKnsJc88UjKE8AIfHSnhowEAAA",
+      "lastAttemptedAt": "2026-10-04T13:52:54.663Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3YqDMBBG32WupWi0Wn2VpcjUTMtA_CGJ1iJ59x23ZVHahb1L5mTOR74FnEc_OqgW6AfPfQcVOGpGixdDEKIfLvhrAf8YSCh2GiK4svFkn4C1jGkeDDfsD-tCnRzjMkkzpU7ydkIz0prQsujzYwQtzlAVpeg1uzVJDFc0jkL0UZeXSZmqrMjebBL00qk4_rcvUbFK4yQv0jdh-tJlH2TncN78_NlIvblvjg16uvX2sSv2Tjj03eHS39dm2UzmN_akZGLRst-vtHjjBkIQ6i3qv-IGyw3tFmlGobrWPHFHqyGEbyjDKBXuAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:53:13.242Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:53:13.242Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q64qDMBCF32V-S9F4q77KUmRqpmUgXojRWiTvvuO2FKUt7L9kTs53JmeBwaEbBygX6HrHXQslDFSPFs-GwAd_usg_C7h7T6JiqyGACxtH9iGwljHNveGa3WE1VFEaFlGcKHWUtxOakdaEhgWfpQE0OEOZF4LXPKxJQrigGcgHH3FZERWxSvLkjSZBT5wKw3_zVBSGWZ7F6Tsvf-KiT9ud_Gnz9Ucl1ea-Odbo6NrZ-67ZG2HftYdzd1urZTOZV_BRycSiZbe3NHjlGrwX1VnU3-J6yzXtjDSjqLrSPHFLK8H7XxtL5IXvAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_2463230181\",125,200]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:53:31.869Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:53:31.869Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q7YqDMBBF32V-S9H4UfVVliJTMy0D8YMYrUXy7h23S1HaXfZfMidzLrkLDA7dOEC5QNc77looYaB6tHg2BD745oK_FnD3noRiqyGACxtH9glYy5jm3nDN7rAuVFEaFlGcKJXL2wnNSGtCw6LP0gAanKE8FqLXPKxJYrigGcgHH3VZERWxSo7Jm02CfnQqDP_tU0kWqziM8uhdqNI_hSd_2vz-2Uq1uW-ONTq6dva-K_dG2Hft4dzd1nbZTOYVnSuZWLTs9isNXrkG74U6i_q3uN5yTbtFmlGorjRP3NJq8P4BgCsOVvIBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:53:50.513Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:53:50.513Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q7YqDMBBF32V-S9H4UfVVliJTMy0D8YMYrUXy7jtud4vSFvZfMidzLrkLDA7dOEC5QNc77looYaB6tHg2BD744YK_FnD3noRiqyGACxtH9gFYy5jm3nDN7rAuVFEaFlGcKJXL2wnNSGtCw6LP0gAanKE8FqLXPKxJYrigGcgHb3VZERWxSo7Ji02CfnUqDP_tU1mRJLnK0vRFqOI_X_pGd_Knzd8fnVSb--ZYo6NrZ--7am-Efdcezt1t7ZbNZJ7BuZKJRctuv9LglWvwXqizqD_F9ZZr2i3SjEJ1pXnillaD9991RQXY8AEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.bow\",\"Bows\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:54:09.292Z",
+          "priceDivine": 10,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:54:09.292Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q7YqDMBBF32V-i2jq96ssRaZmWgbiBzFai-Tdd9yWRWkX9l8yJ3MuuSuMDt00QrVCPzjuO6hgpGayeDEEPvjhgr9WcI-BhGKnIYArG0f2CVjLmJbBcMMu3BbqOI3K-JQoVcjbGc1EW0LLos_SAFpcoMpL0WsetyQxXNGM5IOPuqyMy5NK8uTNJkEvnYqif_vSuFClyrN3XxIm8UuYftCd_Xn392cn9e6-Ozbo6Nbbx6HaO-HQd-Glv2_dspnNb3KhZGLRsjuutHjjBrwX6izqv-IGyw0dFmlBobrWPHNHm8H7b_62tTPwAQAA",
       "lastSearchLeague": "Forbidden Rites"
     },
     {
@@ -3710,11 +4413,35 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_1967051901\",null,null]]",
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_1967051901\",1,1]]",
       "price": {
-        "state": "not-yet-synced",
-        "reason": "never-synced"
-      }
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T13:54:27.998Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCJF1lNFfmSrkJm5lKZAoCZQK5d9nVm0CrXtzfOJzEy8QE6YxwmkB5xO7AU4QSY8BL5YgF99c8OcC6eFJKA4GCriyTRSegI20afaWNadyHehUdWhUe2iqVu5OaEdaE3oWvXqvCuhxlqo-lrVEGI5rmliuaCPl4rWyPTZVrdpK_VX-CF_Izvm8ee3zF93mvCk1Jrq58Ngt407o3VDq4GK8uPu6EraT_c3-eJNOwMBpP9fjjTXkLDQFNP9l-sCadoM0o1DTGZ54oNWQ8xdcAimxpwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:54:46.727Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:54:46.727Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCEEpMPorU4XcxK0sBYKSQKlQ_n1mVSvQujfHJz438QI-YBg9nBawQ2Dbwwk8qdHhxRDE5JcL_l4gPAYSir2GBK5sArknYC1tmgfDikO6DrR5VtR5U9RZI3cnNCOtCR2LPj9mCXQ4S1VWaSkRmv2aJpYrGk8x-ag85FlW1VVR_jXWL2HzwXaO581zn99oN-dNqTDQzbrHbht3wsH2qXLW-4u9rzthM5l3-tdBOg4dh_1chzdWEKPQ4FD_lzk4VrQbpBmF6lbzxD2thhh_ABZrVjqoAQAA",
+      "lastSearchLeague": "Forbidden Rites"
     },
     {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_2694482655\",23,25]]",
@@ -3761,15 +4488,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1037193709\",140,156.5],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T21:09:12.256Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_EwKiIv6ViyF1q6bJYGQbiCH773Zn7gI571vXZ33erQv4gGH0cF7ADoFtD2fwpEaHV0MQs28u-GuB8BxIKPYaMrixCeTegLW0aR4MKw55GmjLoqrLpqqLRu5OaEZKCR2LvtwXGXQ4S3U45geJ0OxTmlhuaDzF7KPyeCqralfs67_G-kfYfLBd4mX13Pc32tV5VSoMdLfuudnGg3Cwfa6c9f5qH2knbCbzm37aSceh47Cd6_DOCmIUGhzq_zIHx4o2gzSjUN1qnrinZIjxBS6fy4qoAQAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_1202301673\",5,5]]",
       "price": {
         "state": "priced",
@@ -3792,11 +4510,35 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_1967051901\",null,null]]",
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_1967051901\",1,1]]",
       "price": {
-        "state": "not-yet-synced",
-        "reason": "never-synced"
-      }
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T13:55:05.493Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7DIAxF_8XPURWydW36K1MVueBWlkhAQNJUEf8-s2pTonVvxgefC14gJkxjhNMCzid2A5wgkh4DXixBrr654M8F0sOTUBwMVHBlmyg8ARtp0-wta067MtCpfd2qt_emOcrdCe1IJaFn0atDXUGPc6laCTAcS5Y4rmgj5eq1sP041HvV1uqv8Ef3QnbO59Vbn3_oVudVqTHRzYXHZhV3Qu-GnQ4uxou7l4Wwnexv9rGRTsDAaTvX44015Cw0BTT_ZfrAmjaDNKNQ0xmeeKBiyPkLnWyc_aUBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:55:24.274Z",
+          "priceDivine": 30,
+          "sampleSize": 8,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:55:24.274Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ7arDIAyG7yW_y2i7793KYZRMsxGwVdR2HcV7X9w4hxZ6_sU85nk1E4SIsQ9wmcC6yLaDCwRSvcebIUjFhwv-mSC-HAnFTkMBdzaR_BewljaNzrDiuMkDTbUvz9V2V9cnuTug6SkntCz66lgW0OKYq7MEaA45Sxx3NIFSsSqsq7I8HA_b_YrvV7dmu6br7LHfTzSz86xUGOlh_Wuxiyehs91GeRvCzT7zRtgM5i_9VEvHo-e4nGvxwQpSEho96v8ynWdFi0EaUahuNA_cUTak9AZeLHnWpgEAAA",
+      "lastSearchLeague": "Forbidden Rites"
     },
     {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_2694482655\",23,25]]",
@@ -3843,15 +4585,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1509134228\",170,179],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T21:11:57.508Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoeSnW9O-yihBtdUicGJjO2lK8LtPXtlIILuTdazz2VogRIxjgMsC1kW2A1wgkBo93gxBKn644K8F4suRUBw0FHBnE8m_AWtp0-wMK46HPNBVH-W5ao513crdCc1IOaFn0VensoAe51ydJUBzyFniuKMJlIpd4WdbNU1dHk87vl_dnu2arqvHvj_Rrc6rUmGkh_WvzS6ehM4OB-VtCDf7zBthM5m_9LaWjkfPcTvX44MVpCQ0etT_ZTrPijaDNKNQ3WmeeKBsSOkbZtjkZqYBAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_1202301673\",5,5]]",
       "price": {
         "state": "priced",
@@ -3874,11 +4607,35 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_1967051901\",null,null]]",
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_1967051901\",1,1]]",
       "price": {
-        "state": "not-yet-synced",
-        "reason": "never-synced"
-      }
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T13:55:43.110Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7DIAxF_8XPURSm0rT5lamKXHArSyQgIGmqiH8frNOUaOsb-OBzjVcIEeMUoFvBush2hA4Cqcnj1RCk6ptn_LlCfDrKFEcNFdzYRPIvwDqXaXGGFce6NPTifGhOR9lKkd_OaCYqCQNnvWwqGHCBrj3UMgdoDiUrO25oAqXqjfDYNlKcm79C8eMT_8gu6bKZ9fWHfnPfHBVGulv_3K3iQejsWCtvQ7jaR1kIm9n8Zp8-csWj57jvG_DOClLKNHrU7zKdZ0W7RlowU91rnnmkYkjpC88zuFelAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:56:01.962Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:56:01.962Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7DIAxF_8XPURS6krT5lamKXHArSyREQNJUEf8-WKcp0bo38MHnGq_gA4bJQ7uCHQPbAVrwpCaHV0MQi2-e8OcK4TlSojhoKODGJpB7AdapTMtoWHEoc0MnzsfqVMtGivR2RjNRTug56WVVQI8LtM2xlClAs89ZyXFD4ykWb4UHUVV1U3_IPz7R_PjE-Y3tEi-bYV-f6Db3zVFhoLt1z90uHoSjHUrlrPdX-8gbYTOb3_TTIVUcOg77vh7vrCDGRIND_V_m6FjRrpEWTFR3mmceKBti_ALZOLZTpgEAAA",
+      "lastSearchLeague": "Forbidden Rites"
     },
     {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_2694482655\",23,25]]",
@@ -3925,15 +4682,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_1940865751\",50,74.5],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T21:14:44.013Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WejdFWq_VXNo2ZwrSZBIUAWhvDvxe2m41mu28whzl3mBWcRz856FbQxrMeoQNHYrJ4VQQh--YRf63gn4YixVFCBjdWnuwbsIxlWoxiwT5PDX15ror2VDd1Gd_OqCZKCQNHfV1kMOACXVPldQyQ7FJWdNxQOQrZR-GpLY_HQ1E1f3xl8-Mrzx9sl3DZDPv-RL-5b44CPd21fe528SA0esyF1c5d9SNthNWsftPbQ6xYtOz3fQPeWUAIkXqL8r9MY1nQrpEWjFT2kmceKRlCeAHhzCvjpgEAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_1202301673\",5,5]]",
       "price": {
         "state": "priced",
@@ -3956,11 +4704,35 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_1967051901\",null,null]]",
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_1967051901\",1,1]]",
       "price": {
-        "state": "not-yet-synced",
-        "reason": "never-synced"
-      }
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T13:56:20.857Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCMFYOuivTBVyE7eyFAhKAqVC-feZVp1A694cn_jcxAuEiHEMcFzADZFdD0cIpEePZ0uQsgcX_L1AvA8kFHsDGVzYRvJPwEbaNA-WNcd8HWirqjrUTVFVn3J3QjvSmtCx6EulcpVBh7PUdZ0rCTEc1jzxXNAGStlbadkcvgpVNkX5V_oSvpGd0mnz3uc_2s15U2qMdHX-vlvHjXBwfa69C-HsbutS2E72N7v-kI5Hz3E_1-GVNaQkNHo0_2UOnjXtBmlGoaY1PHFPqyGlH2TrvhupAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:56:39.771Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:56:39.771Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E4LuQPSvXAypWzVNBiPbQAzZf7-i8QI571vXZ33erTOEiHEIcJrB9ZFdBycIpAePF0uQsicX_D1DfPQkFDsDGVzZRvIvwEbaNPWWNcd8GWiUUlV9LJT6krsj2oGWhJZFvyvLvMygxUnqus5LCTEcljzxXNEGStlH6X5XFNWhUuVf5-EtPH6wndN59eDXR5rVeVVqjHRz_rHZx52wd12uvQvh4u7LVtiO9je93kvHo-e4nWvxxhpSEho9mv8ye8-aNoM0oVDTGB65o8WQ0g9hRP4SqgEAAA",
+      "lastSearchLeague": "Forbidden Rites"
     },
     {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_2694482655\",23,25]]",
@@ -4007,15 +4779,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_3336890334\",155.5,188.5],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T21:17:31.789Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7CMAxF_8XPVQWEQuFXJlSZxCBLaVMlaSmq8u84Q5tajb05PvG5iWcIEeMQ4DyD6yO7Ds4QSA8er5YgFd9c8NcM8dmTUOwMFHBjG8m_ARtp09Rb1hzLPNAopQ71aaPUXu6OaAfKCS2LfltVZVVAi5PUdV1WEmI45Dzx3NAGSsVH6aHeKrXb7I9_nccf4emD7ZIuiwe_P9IszotSY6S788_VPh6EvetK7V0IV_fIW2E72t_0eicdj57jeq7FO2tISWj0aP7L7D1rWg3ShEJNY3jkjrIhpRdZsGOiqgEAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_1202301673\",5,5]]",
       "price": {
         "state": "priced",
@@ -4038,11 +4801,48 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_1967051901\",null,null]]",
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_1967051901\",1,1]]",
       "price": {
-        "state": "not-yet-synced",
-        "reason": "never-synced"
-      }
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:56:58.728Z",
+          "priceDivine": 1,
+          "sampleSize": 3,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:56:58.728Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqILStdBfmSrkJm5lKZAoCZQK5d_nrNoEWvfm-MTnJl4gRIxjgPMC1kW2A5whkBo9Xg1BKr654M8F4tORUBw0FHBjE8m_AGtp0-wMK467PNDVzelQt82xkasTmpFyQM9ir_ZlAT3OUtWt-DWHHCWKG5pAqXjrq9rjqfyo2rL6K_zRvZFd0mX11NcXutV5VSqMdLf-udnEg9DZYae8DeFqH3kfbCbzm93spePRc9zO9XhnBSkJjR71f5nOs6LNIM0oVHeaJx4oG1L6AgskbvykAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:57:17.716Z",
+          "priceDivine": 0.02,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:57:17.716Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E4PgAfpXLobUrZomg5FtIIbsv1-n8QI571vXZ33erQv4gGH0cFrADoFtDyfwpEaHF0MQsycX_L1AeAwkFHsNGVzZBHIvwFraNA-GFYddGmjLpj6Ux6Zq5OqEZqQU0LHY90WeQYezVOVR_Jp9ihLFFY2nmH30Ffs8r-qq_Prrq9-6T7ZzPK_e-vpDuzqvSoWBbtY9Nqu4Ew623ylnvb_Ye1oIm8n8pjeFdBw6Dtu5Dm-sIEahwaH-L3NwrGgzSDMK1a3miXtKhhh_AGfoFM-lAQAA",
+      "lastSearchLeague": "Forbidden Rites"
     },
     {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_2694482655\",23,25]]",
@@ -4089,15 +4889,6 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_387439868\",120,139],[\"explicit.stat_681332047\",17,19]]",
-      "price": {
-        "state": "no-listings"
-      },
-      "lastAttemptedAt": "2026-10-02T21:20:20.861Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ0arCMAyG3yXXQ3QVV32Vg4zYRgl062i7ORl9d7MjRzb03KX5mu9vM0FMmPoIpwl8l9i3cIJIpg94cQS5-OWCfyZIj46EYmuhgCu7ROEF2Eqbxs6x4bSZB2qlq7066oOWqwO6nuaAhsW-K7cFNDhKpY7itxznKFFc0UXKxVffQe-UKrf76tNX_em-2c75vHjr6w_14rwoDSa6-fBYreJO2Pl2Y4KP8eLv80LYDe6drkvpBAyc1nMN3thAzkJTQPtfZhfY0GqQRhRqa8sDtzQbcn4CXxyJf6UBAAA",
-      "lastSearchLeague": "Forbidden Rites"
-    },
-    {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_1202301673\",5,5]]",
       "price": {
         "state": "priced",
@@ -4120,11 +4911,48 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_1967051901\",null,null]]",
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_1967051901\",1,1]]",
       "price": {
-        "state": "not-yet-synced",
-        "reason": "never-synced"
-      }
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:57:36.746Z",
+          "priceDivine": 4,
+          "sampleSize": 2,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:57:36.746Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0WrDMAxF_0XPoThjbZr-yihBtdUicGJjO2lK8L9XXtlIWPcm6-qeK2uBmDCNEU4LOJ_YDXCCSHoMeLEEufrWRf5aID08iYqDgQqubBOFl8BG2jR7y5rTrhi6RrV7dfxUBxmd0I5UAnoWet2oCnqcpWoPwjccS5Qgrmgj5eotT2Ybta9bVf8F_uDewM75vFr19YVu9V6VGhPdXHhsLnEn9G7Y6eBivLh7uQfbyf5mHz-kEzBw2vp6vLGGnEVNAc1_mT6wpo2RZhTVdIYnHqgQcn4CX9bdCKQBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_210067635\",17,19]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T13:57:55.813Z",
+          "priceDivine": 3,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T13:57:55.813Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYvDIAyG_0s-l-F2t3bbXzlGyTQbAVtFbddR_O8XbzBa6H2LeczzamaICdMQ4TKD84ldDxeIpIeAN0uQqz8u-GeG9PIkFHsDFdzZJgpvwEbaNHnLmtOuDLSNOh_V6VvVcnVEO1AJ6Fjs-0ZV0OEk1bkWv-FYokRxRxspV5u-w16puqm_jhu-j27Dds3XxVvff2gX50WpMdHDhddqFU9C7_qdDi7Gm3uWhbAd7Sf9dJBOwMBpPdfhgzXkLDQFNP9l-sCaVoM0oVDTGh65p2LI-Rd4zuajpQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
     },
     {
       "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_2694482655\",23,25]]",
@@ -4171,13 +4999,2638 @@
       "lastSearchLeague": "Forbidden Rites"
     },
     {
-      "entryKey": "[\"crafted\",\"weapon.crossbow\",\"Crossbows\",82,[\"explicit.stat_709508406\",170,196],[\"explicit.stat_681332047\",17,19]]",
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1574590649\",17,25.5],[\"explicit.stat_1250712710\",35,38]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:08:05.312Z",
+          "priceDivine": 3,
+          "sampleSize": 1,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:08:05.312Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCAFtRsuvTBXyEreyFCBKDKVC-feFdppA694Sn_hcxwsEQRkDNAsMTnjooYFAevT4ZQli9uQJfy4gD0eJYm8ggytbIf8CbFKZZmdZs-RrQ1uq-qjOxcfxnN5OaEdaEzpO-rLOoMMZmkrlKgUYDmtWclzRBorZe2Glirqs6rL4IzyoH-Hh9EZ3iZfNtK9ftJv75qhR6Db4x24Zd0I39HnQ5MQ_N8J2sr_hpypVPHqWfVuHN9YQY6Li0fwX6Txr2jXSjIma1vDEPa2GGL8BjyVARqYBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1574590649\",17,25.5],[\"explicit.stat_1998951374\",14,16]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:08:25.463Z",
+          "priceDivine": 0.0798,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:08:25.463Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCI2OlMKvTBXyEreyFCBKAqNC-feZtqpA694Sn_hcxwuEiHEM0CwwuMhDDw0E0qPHb0uQsjsX_LVAvDkSir2BDC5sI_kHYCNlmp1lzTFfG9pCVaWqP45lLW8ntCOtCR2Lvqgy6HCG5qByJQGGw5oljgvaQCl7L6zrU62Kz6r8KyyfwuL4RndO5820j1-0m_vmqDHSdfC33TJ-CN3Q50GTi_6-EbaTfYWfDlLx6Dnu2zq8soaUhEaP5r9I51nTrpFmFGpawxP3tBpS-gUXRYlXpgEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1574590649\",17,25.5],[\"explicit.stat_2162097452\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:08:45.728Z",
+          "priceDivine": 5,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:08:45.728Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-i8yi2-lfOYbk2mwEqpa2Oof0v1_cxlBu963N0zxvmgVCxDgGaBYYXOShhwYC6dHjjyVI2YML_l4g3h0Jxd5ABhe2kfwTsJEyzc6y5pivDW1RncqqPhzLWt5OaEdaEzoWfXHKoMMZGlXllQQYDmuWOC5oA6Xso1AVR3WoRar-CMuXr_wgO6fzZtbnH9rNfXPUGOk6-PtuFTdCN_R50OSif-yD7WTf0V9KKh49x31bh1fWkJLQ6NH8F-k8a9o10oxCTWt44p5WQ0q_iai43qQBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1574590649\",17,25.5],[\"explicit.stat_289128254\",17,20]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:09:05.975Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:09:05.975Z",
+      "lastSearchId": "H4sIAAAAAAAAA32QYYuDMAyG_0s-i0yxN_WvHENybTYCVUtbPYf0v1_cYChs963N0zxvmhVCxDgFaFcYXeRxgBYC6cnjjyVI2YML_l4h3h0JxcFABle2kfwTsJEyLc6y5phvDV2hzpVqTl9VI29ntBNtCT2Lvjhn0OMCbalyJQGGw5YljivaQCl7KyzrpijrUlX_-E5vbJd02Q37_ES3u--OGiPdRn8_7OKX0I1DHjS56B8LYTvbV3hdSsWj53hs6_HGGlISGj2aT5HOs6ZDIy0o1HSGZx5oM6T0B2HIuHSlAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1574590649\",17,25.5],[\"explicit.stat_3057012405\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      },
+      "lastAttemptedAt": "2026-10-04T14:09:26.266Z"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1798257884\",90,119],[\"explicit.stat_1250712710\",35,38]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:10:02.669Z",
+          "priceDivine": 20,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:10:02.669Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqCJ0iJ9XmSrkJW5lKUCUGEqF8u4L7TSB1t0lPvH5HK8QBGUK0K4wOuFxgBYC6cnjlyWI2ZMn_LmCPBwlioOBDK5shfwLsEllWpxlzXLaGjpVNXVRVnX9kd7OaCfaEnpO-ibPoMcFWqWa5DcctqikuKINFLP3vqLMK1VUKv_jO5c_vnP9RneJl92wr090u_vuqFHoNvrHYRd3QjcOp6DJiX8uhO1sf8PrIlU8epZjW4831hBjouLR_BfpPGs6NNKCiZrO8MwDbYYYvwE-8gJEpQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1798257884\",90,119],[\"explicit.stat_1998951374\",14,16]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:10:43.178Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:10:43.178Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqFq6thB-ZaqQl7iVpQBREigVyr_XtNoEWveW-MTnOp4hJkxDhHqG3ifuO6ghkhkCfjuCXDy54K8Z0t2TUOwsFHBhlyi8AFsp0-QdG067paFRpa72x7KqDvJ2RDfQktCy6PVHAS1OUCulxW85LlGiuKCLlIv3Pq0rfVSf5V-fOvz4Tm9053xeDfv6RLO6r44GE137cN_s4kbo-24XDfkUngthN7rf8GovlYCB07atxSsbyFloCmj_i_SBDW0aaUKhtrE8ckeLIecHppLLVaUBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1798257884\",90,119],[\"explicit.stat_2162097452\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:11:23.747Z",
+          "priceDivine": 55,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:11:23.747Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoTQmXX5eZZSg2WoROImxnTQl-N2rtGUkrLuzdazzyVogRIxjgGaBwUUeemggkB49_liClD254O8F4t2RUOwNZHBhG8m_ABsp0-wsa46HtaHNy7pSp7KqCnk7oR1pTehY9PUxgw5naPK8Fr_hsEaJ4oI2UMo--lT-pY51WZzUH1_x1hUfZOd03oz6-kK7uW-OGiNdB3_fbeJG6Ib-EDS56J_rYDvZ3-hKScWj57hv6_DKGlISGj2a_yKdZ027RppRqGkNT9zTakjpAbXsf_WjAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1798257884\",90,119],[\"explicit.stat_289128254\",17,20]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:12:04.397Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:12:04.397Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0WrDMAxF_0XPodRmI05-ZZSg2WoROImxnSwl-N-ntGMkrHuzdaxzZa2QMuYpQbvCGDKPA7SQyE4RPz1BqR5c8McK-R5IKA4OKriyzxSfgJ2UaQmeLefT1tCpujH6vTbmTd7O6CfaEnoWfXOuoMcFWqUa8TtOW5QorugTleqlT5tGaTH-1an6R6fPL2yXctnN-vxDt7vvjhYz3cZ4P6ziizCMwylZCjk-9sF-9r_hRkslYuR8bOvxxhZKEZojuv8iQ2RLh0ZaUKjrHM880GYo5Ruic_xbpAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_1798257884\",90,119],[\"explicit.stat_3057012405\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:12:45.246Z",
+          "priceDivine": 40,
+          "sampleSize": 3,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:12:45.246Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQW4rDMAxF96LvUPJoyGMrQwkaWy0CJzG2kkkJ3nudtgwJ0_mzdaxzZa3gBWXy0K4wWuFxgBY8qcnhtyEIyZNH_LWC3C1FioOGBK5shNwLsI5lWqxhxXLaGrqsauq8rOr6HN_OaCbaEnqO-iZNoMcF2ixrol-z36Ki4orGU0g--oq0rNIsP6flH19Rvn3FJ90lXHbDvj7R7e67o0Kh2-juh138ENpxOHlFVtxzIWxm8xte57Hi0LEc23q8sYIQIhWH-r9I61jRoZEWjFR3mmceaDOE8ABXELycpQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_3984865854\",56,65],[\"explicit.stat_1250712710\",35,38]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:13:26.054Z",
+          "priceDivine": 6,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:13:26.054Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCrQUMavTBXyEreyFCBKDKVC-feFdppA694Sn_hcxwsEQRkDNAsMTnjooYFAevT4ZQli9uQJfy4gD0eJYm8ggytbIf8CbFKZZmdZsxzWhrb8qE91pWp1Sm8ntCOtCR0nvaoy6HCGplJJbzisSclwRRsoZm91eaGO57w458c_ulL96Mr6je4SL5tZX39oN_fNUaPQbfCP3SruhG7oD0GTE__cB9vJ_obXRap49Cz7tg5vrCHGRMWj-S_Seda0a6QZEzWt4Yl7Wg0xfgOG914wpAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_3984865854\",56,65],[\"explicit.stat_1998951374\",14,16]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:14:06.937Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:14:06.937Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqBIrYYFfmSrkJW5lKUCUGEaF8u8L7TSB1r0lPvG5jleIgjJFaFcYvfA4QAuRzBTw0xGk4sEz_lhB7p4yxcFCAVd2QuEJ2OYyLd6xYTltDd250ZWulVZVfjujm2hL6DnrVV1Ajwu0tcp6y3FLyoYrukipeKkrm0Y3qjy__9WV1Y-urF_oLumym_X5h2533x0NCt3GcD-s4ovQj8MpGvISHvtgN7vfcP2WKwEDy7GtxxsbSClTCWj_i_SBDR0aacFMbWd55oE2Q0rfHpeXIaQBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_3984865854\",56,65],[\"explicit.stat_2162097452\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:14:47.906Z",
+          "priceDivine": 70,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:14:47.906Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqNpYwii_MlXIS9zKUoAoMYwK5d8X2qoCrXtLfOJzHS8QBWWM0CwweOGhhwYimTHgtyNIxY1n_LWAXD1lir2FAs7shMIdsM1lmr1jw3JYG9qPY63qStda5bcTupHWhI6zXlcFdDhDU-mstxzXpGw4o4uUipe68r0q346fSpd_dOphUy9kp3TaTHr_Qbu5b44GhS5DuO4W8UPoh_4QDXkJt22wm9wzui5zJWBg2bd1eGEDKWUqAe1_kT6woV0jzZipbS1P3NNqSOkXNU_emqIBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_3984865854\",56,65],[\"explicit.stat_289128254\",17,20]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:15:28.936Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:15:28.936Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqFqzwlJ-ZaqQl7iVpQBREhgVyr_PtFUFEntLfOJzHc8QE6YhQj1D7xP3HdQQyQwBfxxBLh5c8PcM6e5JKHYWCriySxSegK2UafKODafD0tB8nvVJV6UuT_J2RDfQktCy6MuqgBYnqKtS9JbjkiSGK7pIudjVKX0-Kq12bMevl0197Ngu-bIa9fmFZnVfHQ0muvXhvtnEL6Hvu0M05FN4rIPd6N7hWkklYOC0bWvxxgZyFpoC2v8ifWBDm0aaUKhtLI_c0WLI-Q8hUSu2owEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"explicit.stat_3984865854\",56,65],[\"explicit.stat_3057012405\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:16:10.065Z",
+          "priceDivine": 3,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:16:10.065Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGKFMMqvTBXyEreyFCBKAqNC-featppA694Sn_hcxwuEiHEM0CwwuMhDDw0E0qPHb0uQsgcX_LVAvDkSir2BDC5sI_knYCNlmp1lzfGwNrTFqS7rStWqlLcT2pHWhI5Fr6oMOpyhqZToDYc1SQwXtIFS9l6Xq8_841jm6o-uUC9dcXqjO6fzZtbnH9rNfXPUGOk6-NtuFT-EbugPQZOL_rEPtpP9Da-PUvHoOe7bOryyhpSERo_mv0jnWdOukWYUalrDE_e0GlK6A-8V4OikAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_3984865854\",35,38]]],[\"explicit.stat_1250712710\",35,38]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:16:51.253Z",
+          "priceDivine": 20,
+          "sampleSize": 3,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:16:51.253Z",
+      "lastSearchId": "H4sIAAAAAAAAA5WQXWrDMBCE77LPJvhPjZurlGC20iYsyLaQZMfB6O5dJ6XYtIX2QbDa0XyDZoEQMY4BTgsMLvLQwwkC6dHjuyVI2UMX-W2BeHckKvYGMriwjeSfAhtZ0-wsa46H1dAWucrl1FUtbye0I60JHQu-LjPocJZBCd5wWJOEcEEbKGU_4qrXpm5eVKO-4yr1iauaP-OKUuXHojwW-T9x53TefP1ZSbu5b0aNka6Dv--avRG6oT8ETS76R71sJ_sV3pSy8eg57m0dXllDSqJGj-a3SOdZ085IM4pqWsMT97QSUvoAHI2rJvMBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_3984865854\",35,38]]],[\"explicit.stat_1998951374\",14,16]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:17:32.505Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:17:32.505Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q4YrDIBCE38XfoTSN9kxf5ShhT7dlwSSiJpcSfPfbtOVIaA_uh7DuON_gzCImSEMUp1n0PlHfiZOIaIYAXw5FLu46y5-zSDePrEJnRSEu5BKGh0CW1zh5R4bSbjE05V7t-chK8tsR3IBLQkuMl4dCtDDxoBhvKS5JTLiAi5iLt7iq1lIflVavuEo9cZX-N66sa12rsvp4xZXyiSuPb3DnfF59_VFJs7qvRgMJr324bZr9RvB9t4sGfQr3esmN7jdcH3gTIFDa2lq4khE5s5oC2L8ifSCDGyNOwKptLI3U4ULI-QeE7WI38wEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_3984865854\",35,38]]],[\"explicit.stat_2162097452\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:18:13.879Z",
+          "priceDivine": 160,
+          "sampleSize": 2,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:18:13.879Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0WrDMAxF_0XPoaRJ3KX9lVGCZqtF4CTGdrKU4H-f0m4joR3swSDrWufKd4YQMQ4BTjP0LnLfwQkC6cHjhyVI2V0X-X2GeHMkKnYGMriwjeQfAhtp0-Qsa467ZaDZ5yqXU5WVvB3RDrQ4tCz4qsigxUkKJXjDYXESwgVtoJS9xJXHuqoPqlbPuFJ948r637hifyjy41uliuftfpZ7ATun8-rjj0Ca1X1Vaox07f1tk-snoeu7XdDkor-Hy3a0v9Z1IR2PnuN2rMUra0hJ1OjR_GXpPGvaDNKEoprG8MgdLYSUvgA2KlAm8QEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_3984865854\",35,38]]],[\"explicit.stat_289128254\",17,20]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:18:55.287Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:18:55.287Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q4YqDMBCE3yW_pWjUXtpXOYrsJduyEDUk0bNI3r1rWw7lPLgfgc1O5hsyswgR4hDEeRa9i9R34iwC6sHDl0WRsqfO8ucs4t0hq9AZkYkr2Yj-JZDhNU7OkqZ4WAxNkdc5n6qs-O0IdsAloSXGVzITLUw81Iw3FJYkJlzBBkzZLq48qUoda1X_xpX1G1eqf-OkOhVSyR1a8fGmyXyHdkmX1c9fjTSr-2rUEPHW-_um2G8E13eHoNFF_2yX7Gh_wpXkjQdPcWtr4UZapMRq9GD-inSeNG6MOAGrpjE0UocLIaUH_o6eL_IBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.sceptre\",\"Sceptres\",82,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_3984865854\",35,38]]],[\"explicit.stat_3057012405\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:19:36.820Z",
+          "priceDivine": 5,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:19:36.820Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q4WrDMAyE30W_Q0mTuEv7KqMEzVaLwEmM7WQpwe9epR0jYd3YD4Os832Hb4YQMQ4BTjP0LnLfwQkC6cHjhyVI2UMX-X2GeHMkKnYGMriwjeSfAhtZ0-Qsa467xdDsc5XLqcpK3o5oB1oSWhZ8VWTQ4iSDErzhsCQJ4YI2UMpe4spjXdUHVaufuFJ94cr6_7hcveX7osrVH7jjC9w5nVdff1bSrO6rUWOka-9vm2Y_CV3f7YImF_2jXraj_Q6vC9l49By3thavrCElUaNH81uk86xpY6QJRTWN4ZE7Wggp3QF1bxX-8wEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      },
+      "lastAttemptedAt": "2026-10-04T14:20:18.447Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WeTYPS1NVf2TRmCtNmElQCaG0M_76wbRrNdt-Aw5w7Myv4gGHy0K4w2sDjAC14UpPDiyGIxS9P-HuF8LCUKA4aCriyCeSegHV6psUaVhwOuaArhazLRtaiSX9nNBPlhJ6T_tQU0OMCbSmq5Nfsc1RSXNF4isVnXyUqKcpTLf_45Et3_CA7x_Om1ecI3ea-OSoMdBvdY7eJO6Edh4O3hC4vg81s3sFfuX2HjsO-qMcbK4gx0eBQ_xdoHSvaFdKCiepO88wDZUOMP3uUF1OhAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_210067635\",26,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:30:18.857Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:30:18.857Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0a6DIAyG36XXZkHNdPoqy2J6oFuaoBJA52J49wPbcqI52x3w0e9vu4Lz6CcH7Qqj8TwO0IIjOVn80QQhe_KIzyv4h6FIcVCQwZW1J_sCrOIzLUazZH9IBV0uyjpvylo08e-MeqKU0HPUV00GPS7Q5qKIfsUuRUXFFbWjkH30FbkQVV2Vx3-6onrritMH2yVcNr2-Zug2981RoqfbaB-7VdwJzTgcnCG0aRusZ_0XfUr9W7Ts90U93lhCCJF6i-pboLEsaVdIC0aqOsUzD5QMIfwC61OYO6IBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:31:00.607Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:31:00.607Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WeTaNYbfVXNo2ZhWkzCSoBtDaGf19om41mu2_AYc6dmRWcRz85aFcYjedxgBYcycnityYI2ZNH_LWCfxiKFAcFGVxZe7IvwCo-02I0S_aHVNAVeXkqmvKUN_HvjHqilNBz1NdNBj0u0Ba5iH7FLkVFxRW1o5B99Im6OR7Poq6qPz5Rvn2i-qC7hMum2dcQ3ea-OUr0dBvtY7eLO6EZh4MzhDatg_Wsf6PPaQCLlv2-qMcbSwghUm9R_RdoLEvaFdKCkapO8cwDJUMIP3wlqdajAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:31:42.423Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:31:42.423Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0Y6DIBBF_2WejRFra_VXNo2ZhWkzCSoBtDaGf19om41mu2_AYc6dmRWcRz85aFcYjedxgBYcycnityYI2ZNH_LWCfxiKFAcFGVxZe7IvwCo-02I0S_Z5KuhEcahFc6iLJv6dUU-UEnqO-lOTQY8LtKIoo1-xS1FRcUXtKGQffUdxLpuyPlV_dFVeibfw-EF3CZdNs68hus19c5To6Tbax24Xd0IzDrkzhDatg_Wsf7PPaQCLlv2-qMcbSwghUm9R_RdoLEvaFdKCkapO8cwDJUMIP-osaiqjAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1037193709\",69,102],[\"explicit.stat_9187492\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:32:24.347Z",
+          "priceDivine": 3,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:32:24.347Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0YqDMBBF_2WepWgta-OvLEVmk2kZiBqS6Fok_76TtizKdt-SnMy5l1khRIxTgHaF0UUeB2ghkJ48flmCVDy44M8V4t2RUBwMFHBlG8k_ARt5psVZ1hwPeaCryrqpVN2USv7OaCfKCT2L_kMV0OMCbVUexW845ChRXNEGSsVbn6rOzUkd_8jql-v0xnRJl03PZ_9uc98cNUa6jf6-W8M3oRuHQ3CEPm-C7Wx_g8-5u0fPcT_U4401pCQ0ejT_BTrPmnaDtKBQ0xmeeaBsSOkHPjgFi54BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:33:06.312Z",
+          "priceDivine": 340,
+          "sampleSize": 1,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:33:06.312Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqIJQ-vcqU4W8xK0sBYiSwKhQ3r3OOk2gdXeOT3y-xAuEiHEMcFlgcJGHHi4QSI8ePy1BKr654I8F4sORUOwNFHBjG8m_ABtp0-wsa467PNBWTXmu6r1SJ7k7oR0pJ3Qs-qppCuhwlup4lgDDIWeJ44Y2UCreC1Wp6rI6HOs_wvpHt38ju6br6q2vP7Sr86rUGOk--MdmFV-Ebuh3wRH6vA22k_0NPinpePQct0Md3llDSkKjR_NfoPOsaTNIMwo1reGJe8qGlJ6jVPKjogEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_210067635\",26,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:33:48.396Z",
+          "priceDivine": 50,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:33:48.396Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqIJ0UNpfmSrkJW5lKUCUBEaF8u9z1mkCrXtzfOJzE68QIsYpwGWF0UUeB7hAID15_LAEqfjmgt9XiA9HQnEwUMCNbST_BGykTYuzrDke8kBX1eW5Or4p1crdGe1EOaFn0Vd1XUCPi1SnswQYDjlLHDe0gVLxUqiqsmxOzbH-41PNj061L2zXdN089vmJbnPelBoj3Uf_2O3ik9CNwyE4Qp_XwXa2v9Gtko5Hz3E_1OOdNaQkNHo0_wU6z5p2g7SgUNMZnnmgbEjpC83sYLOjAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:34:30.550Z",
+          "priceDivine": 16,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:34:30.550Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqBop6aC_MlXIS9zKUoAoCZQK5d9n1mkCrXtzfOJzEy8QE6YxwnmBwSceejhDJDMG_HQEufjmgj8WSA9PQrG3UMCVXaLwBGylTbN3bDgd1oG21G9NeayUquXuhG6kNaFj0ZdaF9DhLNV7IwGW45oljiu6SLl4KVSnpqpqddL6j1Adf3xKv9Bd8mXz2ucv2s15UxpMdBvCY7eMO6Ef-kP0hGHdB7vJ_UbXSjoBA6f9UIc3NpCz0BTQ_hfoAxvaDdKMQm1reeKeVkPOXz5YLASkAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:35:12.837Z",
+          "priceDivine": 90,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:35:12.837Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCC0MVuivTBXyEreyFCBKAqNC-fc56zSB1r05PvG5iTcIEeMc4LzB5CJPI5whkJ49fliCVHxzwe8bxLsjoTgaKODKNpJ_ADbSptVZ1hzLPNCr5qVTr3VVtXJ3QTtTThhY9KppChhwlerUSYDhkLPEcUUbKBVPhY1qq646vdV_fHVZqx9h80R3SZfdax-_6HfnXakx0m3y98MyPgndNJbBEfq8D7aL_c1uK-l49ByPQwPeWENKQqNH81-g86zpMEgrCjW94YVHyoaUvgCoUe_4pAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1509134228\",155,179],[\"explicit.stat_9187492\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:35:55.173Z",
+          "priceDivine": 100,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:35:55.173Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0a6CMAyG36XXxBwQIvgqxpC6VdNkwLINxJC9--nUnECO3nX91u_fuoAPGEYPxwUGG3jo4Qie1OjwYghi9uSCTwuEhyWh2GvI4MomkHsB1tKm2RpWHHZpoM2rnybfl0VRy90JzUgpoWPR51WVQYezVIdGAjT7lCWOKxpPMfsobPL6UDbFP9v-7So_mM7xvHro6wPt6rwqFQa6De6x2cOd0A79zltCl1bBZjJ_wXUhHYeOw3aowxsriFFocKi_BVrHijaDNKNQ3WqeuKdkiPEX7mh-g58BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:36:37.856Z",
+          "priceDivine": 180,
+          "sampleSize": 7,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:36:37.856Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXCPFT2o5XmSrkJW5lKUCUBEaF8u512mkCrbtLfOLzOV7BBwyTh3aF0QYeB2jBk5ocfhmCmD254M8Vwt2SUBw0ZHBlE8i9AGsp02INKw55aujKj0NxPjanppS3M5qJUkLPoq-bDHpcoG2qvJEAzT5lieOKxlPM3guroqqL8niq_wp_fIc3sku8bGZ9_aHb3DdHhYFuo7vvVvFNaMch95bQpW2wmc1v8LmSikPHYd_U440VxCg0ONT_BVrHinaNtKBQ3WmeeaBkiPEBEa8x7qIBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_210067635\",26,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:37:20.361Z",
+          "priceDivine": 25,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:37:20.361Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCEHaUMavTBXyEreyFCBKAqNC-fcl6zSB1r0lPvG5jjfwAcPsodtgsoGnETrwpGaHH4YgFt884fcNwsNSojhqKODGJpB7AtapTKs1rDiUuaGv385V28iLrNPbBc1MOWHgpD_JAgZcoZOilClAs89ZyXFD4ykWL4Wirqrm0pzkH59ofnyifWG7xutu2Ocn-t19d1QY6D65x2EXn4R2GktvCV1eB5vF_Ea3IlUcOg7HpgHvrCDGRIND_V-gdazo0EgrJqp7zQuPlA0xfgGW_UKWowEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:38:03.028Z",
+          "priceDivine": 35,
+          "sampleSize": 5,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:38:03.028Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7DIAxF_8XPUbTSkKX5lamKPHArSyRBQNJUEf9eaKcp0bo38MHnGq_gA4bJQ7vCaAOPA7TgSU0Ovw1BLJ484a8Vwt1SojhoKODCJpB7AdapTIs1rDiUuaE7nKqPppaf8pDezmgmygk9J_1RFtDjAq0UpUwBmn3OSo4LGk-xeCsU9amqGlFL-Ucojj9C8U53jufNtK9fdJv75qgw0HV0990yboR2HEpvCV3eB5vZ_EY3IlUcOg77ph6vrCDGRIND_V-gdaxo10gLJqo7zTMPlA0xPgBT8rD4pAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:38:45.680Z",
+          "priceDivine": 5,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:38:45.680Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCA1GWsqvTBXyEreyFCBKAqVC-feaVptA694Sn_hcxwuEiHEM0CwwuMhDDw0E0qPHb0uQsicX_LVAvDsSir2BDC5sI_kXYCNlmp1lzTFfG9riVH3UB3VUhbyd0I60JnQs-k-VQYczNKrMlQQYDmuWOC5oA6XsrVAVdXkqj4fqj6_Kq-LH-EZ3TufNtK9ftJv75qgx0nXw990yboRu6PPgCP26D7aT_c2uS6l49Bz3TR1eWUNKQqNH81-g86xp10gzCjWt4Yl7Wg0pPQDF-3MEpAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_1940865751\",35,52.5],[\"explicit.stat_9187492\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:39:28.632Z",
+          "priceDivine": 20,
+          "sampleSize": 5,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:39:28.632Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCA0GLfArU4W8xK0sBYiSwKhQ_n1OO02gdW-JT3yu4w18wDB76DaYbOBphA48qdnhpyGI2YML_tgg3C0JxVFDBlc2gdwTsJYyrdaw4pCnhr5oq7fmVJ_rQt4uaGZKCQOL_r3OYMAVurrMawnQ7FOWOK5oPMXspbAtmnPVln9tP7LqhekSL7tBnx_od_fdUWGg2-Tuhz18EdppzL0ldGkVbBbzG9yUUnHoOBybBryxghiFBof6v0DrWNGhkVYUqnvNC4-UDDF-A1S-zVifAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:40:11.430Z",
+          "priceDivine": 10,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:40:11.430Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoSRx6U9eZZSg2WoROImxnTQl-N0nt2UkrLuzdazzyVogRIxjgGaBwUUeemggkB49fluCVDy54K8F4sORUOwNFHBlG8m_ABsp0-wsa4673NAqpQ6nc6nUXt5OaEfKCR2L_nguoMMZmqpW4jcccpQormgDpeKjr6rLWpXV4aj--NRbt_8gu6TLatTXF9rVfXXUGOk2-MdmE3dCN_S74Ah9Xgbbyf4Gn2qpePQct00d3lhDSkKjR_NfoPOsadNIMwo1reGJe8qGlH4AfjZ096EBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_210067635\",26,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:40:54.295Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:40:54.295Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqKKko5RfmSrkJW5lKUCUBEaF8u9z1mkCrXtLfOJzHa8QIsYpQLvC6CKPA7QQSE8ePyxBKr654PcV4sORUBwMFHBjG8k_ARsp0-Isa46H3NAppermUip1krcz2olyQs-iP18K6HGB9lgp8RsOOUoUN7SBUvHSVx3Lsj7X6u2Prqp_dFXzwnZN182szz90m_vmqDHSffSP3So-Cd04HIIj9HkbbGf7G91UUvHoOe6beryzhpSERo_mv0DnWdOukRYUajrDMw-UDSl9AcbEVkuiAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:41:37.269Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:41:37.269Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqNoSYMCvTBXyEreyFCBKAqNC-fclbTWB1r0lPvG5jjfwAcPsodtgsoGnETrwpGaHX4YgFnee8OcG4WYpURw1FHBhE8g9AOtUptUaVhxOuaGXUtZN-yZlmd4uaGbKCQMn_UdbwIArdO9CJr9mn6OS4oLGUyxe-kTdlmUj6qr64xPy6RPVC905nnfDPj7R7-67o8JA18ndDrv4JrTTePKW0OV1sFnMb3QjUsWh43BsGvDKCmJMNDjU_wVax4oOjbRiorrXvPBI2RDjD563BpOjAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:42:20.303Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:42:20.303Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPCA1CW-BXpgp5iVtZChAlgVGh_PvMOk2gdW-JT3yu4xVCxDgFaFcYXeRxgBYC6cnjhyVI2TcX_L5CfDgSioOBDG5sI_knYCNlWpxlzTHfGjql1Llu3pSq5O2MdqItoWfRX5oMelygLUolfsNhixLFDW2glL30nYq6bMrL-a-uyqviR3h6obum627Y5ye63X131BjpPvrHYRefhG4c8uAI_bYOtrP9za5LqXj0HI9NPd5ZQ0pCo0fzX6DzrOnQSAsKNZ3hmQfaDCl9AQi-xW-jAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_3336890334\",79,123],[\"explicit.stat_9187492\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:43:03.435Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:43:03.435Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0WrDMAxF_0XPobRxWJP8yihBs9UicBJjO2lK8L9XXsdIWPdm60jnCq0QIsYpQLvC6CKPA7QQSE8evyxBKr654M8V4sORUBwMFHBlG8m_ABsp0-Isa46HPNAppT7q5qhUJb0z2olyQs-iPzcF9LhAeyqV-A2HHCWKK9pAqXjra071uWrKPzL146remC7pstnztX-3-W-eGiPdRv_YneFO6MbhEByhz5dgO9vf4LqUikfPcT_U4401pCQ0ejT_BTrPmnaDtKBQ0xmeeaBsSOkJFFeCU54BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:43:46.768Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:43:46.768Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqAJSFcavTBXyEreyFCBKAqNC-fc5qzaB1r0lPvG5jjcIEeMcoNtgcpGnEToIpGePH5YgFd9c8PsG8eFIKI4GCrixjeSfgI2UaXWWNcdTbuhV25zVW3tp5emCdqYcMLDYG1XAgCt0VVmK3nDISWK4oQ2Uipe6qi5rVVaXRv3x_ejOL2TXdN1N-vxBv7vvjhoj3Sf_OCzik9BN4yk4Qp93wXaxv8FtLRWPnuOxacA7a0hJaPRo_gt0njUdGmlFoaY3vPBI2ZDSF8pk7eugAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_210067635\",26,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:44:30.161Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:44:30.161Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqOqghYxfmSrkJW5lKUCUBEaF8u911mkCrXtLfOxzE68QIsYpQLvC6CKPA7QQSE8ePy1BKr654I8V4t2RUBwMFHBlG8k_ARsp0-Isa46HPNBVqjlV76pW0jqjnSgH9Cz2piqgxwXat-NR9IZDThLDFW2gVLzUldJcN3V1_qMr6x9dqV7YLumyeerzC93mvjlqjHQb_X23iS9CNw6H4Ah9Xgbb2f5Gq1IqHj3H_VCPN9aQktDo0fwX6Dxr2g3SgkJNZ3jmgbIhpQcBKkaHoQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:45:13.549Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:45:13.549Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W7DIAxG38XXUdWRn9K8ylRFHriVJZIgIFmqiHcvtNqUaN0d-ODzGa_gA4bJQ7vCaAOPA7TgSU0OvwxBLJ484c8Vwt1SojhoKODKJpB7AdapTIs1rDgcckNXylNVnmUj09MZzUQ5oOdkP5UF9LhA-3E8Jr1mn5OS4YrGUyze6kRzriopmrr-4xM_PlG_0V3iZTPr6w_d5r45Kgx0G919t4pvQjsOB28JXd4Gm9n8RkuRKg4dh31TjzdWEGOiwaH-L9A6VrRrpAUT1Z3mmQfKhhgfY_DKlqIBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:45:57.100Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:45:57.100Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3Y6DIBBG32Wujak_rdRX2TRmFqbNJKgE0NoY3n2hbTaa7d7BHOZ8w6zgPPrJQbvCaDyPA7TgSE4WvzVByJ484q8V_MNQpDgoyODK2pN9AVaxTIvRLNnnqaGrRFNXZ3ES8emMeqIU0HO0N1UGPS7QFodD1Ct2KSkarqgdheyj7liI8lw2p_qPrs7r4i08ftBdwmUz6-sP3ea-OUr0dBvtY7eKO6EZh9wZQpu2wXrWv9mijBWLlv2-qccbSwghUm9R_RdoLEvaNdKCkapO8cwDJUMIP_X5CWqiAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"explicit.stat_387439868\",73,100],[\"explicit.stat_9187492\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:46:40.667Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:46:40.667Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0WrDMAxF_0XPobRNWZP8yihBs9UicBJjK1lK8L9PbulIWPdm60jnCi0QBWWM0CwweOGhhwYimTHglyNIxYMr_lxA7p6UYm-hgCs7ofAEbLVMs3dsWHZ5oC2r86msq49KWyd0I-WAjtV-LgvocIbmsN-r3nLMSWq4oouUire6-qC--vhH9nKd3pgu6bJa87l-u_qvngaFbkO4b67wTeiHfhc9YciHYDe53-DqqJWAgWU71OGNDaSkVALa_wJ9YEObQZpRqW0tT9xTNqT0AzDRYEKdAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_1202301673\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:47:24.343Z",
+          "priceDivine": 8,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:47:24.343Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0YqDMBBF_2WepWi0WvsrS5FZMy0DUUMSXYvk33fclkVpF_YtmZM5l9wFfMAwejgvMNjAQw9n8NSODj8NQUx-uOCPBcLdklDsNSRwZRPIPQBrGdNsDbccDutCkx3TOssLpU7ydkIz0prQsejLYwIdznCuatFr9muSGK5oPMXkra6sszpXRVW82CToqVNp-m9fplKVp1lZ5S_C_Kkr3sgu8bL5-aORZnPfHFsMdBvcfVfsF6Ed-oO3hG7tls1kfoNPSiYOHYf9Uoc3biFGocGh_ivQOm5pt0gzCtWN5ol7Wg0xfgM-T2hB8AEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_210067635\",26,28]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:48:08.235Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:48:08.235Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3YqDMBBG32WupWj891WWIrNmWgaihiS6Fsm7N7a7i9Iu7F0yJ3M-8q1gHbrJQrPCqB2PAzRgqZsMfioCHz14wB8ruJumQHGQEMGFlSPzBCzDmBatuGN32hbaJI_rJM2EqMLbGdVEW0LPQV_kEfS4QFPWQS_ZbknBcEFlyUdvdUWd1KnIyuzFFoK-dSKO_-0TSRwXZZHmLz5R_OiqN7azP---_qyk3d13xw4dXUdzOzT7RajH4WQ1odnKZTWr3-hKhIlBw-641OOVO_A-UGdQ_hWoDXd0WKQFA5Wt5JkH2gze3wEvmTw98QEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_2694482655\",23,25]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:48:52.075Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:48:52.075Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0WqEMBBF_2WeZdEYXfVXyiJTM7sMRA1JtC6Sf2_stkXZLfQtmZM5l9wVnEc_OWhWGI3ncYAGHHWTxXdNEJIvHvHbCv5uKFIcFCRwZe3JPgCrOKbFaO7Yn7aFNivSOsulEFV8O6OeaEvoOerLIoEeF2jOddQrdltSNFxROwrJS11ZZ3Uu5Fk-2WLQt06k6b99oqylrERZFE9Ckf_4ihe6S7js_v7opN3dd8cOPd1Gez9U-0FoxuHkDKHd2mU969_oSsSJRcv-uNTjjTsIIVJvUf0VaCx3dFikBSNVreKZB9oMIXwCH4emSvIBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_518292764\",4.41,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:49:36.164Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:49:36.164Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q3YqDMBBG32WuRTT1_1WWIrNmWgaihiS6Fsm7N7ZlUdqFvUvmZM5HvhWsQzdZaFYYteNxgAYsdZPBb0XgowcP-GsFd9MUKA4SIriwcmSegGUY06IVd-zibaFN86ROT5kQVXg7o5poS-g56Is8gh4XaMo66CXbLSkYLqgs-eijrqjT-iSyMnuzhaCXTiTJv315WolalMW7L4uz9CXMP-jO_rz7-7OTdnffHTt0dB3N7VDtD6Eeh9hqQrO1y2pWv9mVCBODht1xqccrd-B9oM6g_CtQG-7osEgLBipbyTMPtBm8vwOJjmW28gEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.spear\",\"Spears\",82,[\"hybrid\",[[\"explicit.stat_1509134228\",65,79],[\"explicit.stat_691932474\",150,200]]],[\"explicit.stat_9187492\",3,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:50:20.364Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:50:20.364Z",
+      "lastSearchId": "H4sIAAAAAAAAA42Q0YqDMBBF_2WepWi01fgrS5FZMy0DUUMSXYvk3xvbsijtwr4lczLnkruA8-hHB_UCg_E89FCDo3a0-K0JQvLgEX8t4G-GIsVeQQIX1p7sE7CKY5qN5pb9YV1osmMqs7wQoopvJ9QjrQkdR_3pmECHM9SljHrFbk2KhgtqRyH5qDvJTOaiKIs3Wwx66USa_tsns6ospHiz5S9X8cF0DufNt591NJv75tiip-tgb7tWfwjN0B-cIbRrsawn_RtciTixaNnvlzq8cgshROotqr8CjeWWdos0Y6SqUTxxT6shhDvzB2Ia7QEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:07:45.193Z",
+          "priceDivine": 18,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:07:45.193Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCLAppZfmSrkJW5lKUCUBEqF8u912mkCrXtLfOJz7awQIsYpQLvC6CKPA7QQSE8evy1BKp5c8NcK8e5IKA4GCriwjeRfgI2UaXGWNcdDbuiqqlbq47Mua3k7o50oJ_Qs-lNZQI8LtEqdxG845ChRXNAGSsVbn6oaVatjXf7RNT-25o3rnM6bSV8bdJv75qgx0nX0991H3AjdOBxueWXRs53tb-5RScWj57jv6fHKGlISGj2a__KcZ027RlpQqOkMzzxQNqT0AAYeEPGfAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:51:04.636Z",
+          "priceDivine": 7,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:51:04.636Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y1h1PdS_cgzJbDYCVUtbnUP63y_ejqFs963N0zxv0gVCxDgGqBcYXOShhxoCtaPHiyVI2S8X_L1AfDgSir2BDK5sI_knYCNlmp3lluNhbWjyvFBKfxXHQt5OaEdaEzoWfXXMoMMZaqUq8RsOa5QormgDpeyjT-mTLnVZ5NWb7_Sn0x9k53TejPpcodncN8cWI90G_9j9xJ3QDf3hvu4seraTfeWWSioePcd9T4c3biElodGj-S_PeW5p10gzCjWN4Yl7Wg0p_QCgtYZcoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_1600707273\",4,5]]",
       "price": {
         "state": "no-listings"
       },
-      "lastAttemptedAt": "2026-10-02T21:23:11.237Z",
-      "lastSearchId": "H4sIAAAAAAAAA3WQ7aqDMAyG7yW_ZXRf6nYrhyFZm41AtdJW55De-0nPYCh4_qV5mudtM0OIGIcA1xlcH9l1cIVAevB4twSp-OOCf2aI756EYmeggAfbSP4D2Eibpt6y5rjLA02lLmdVn1QpV0e0A-WAlsW-r1QBLU5SXUrxGw45ShQPtIFSsekr6_3xeFCnasP31W3Ybum2eOvnD83ivCg1Rno6_16t4kXYu26nvQvh7l55IWxH-02vD9Lx6Dmu51p8soaUhEaP5r_M3rOm1SBNKNQ0hkfuKBtS-gVAOnsTpQEAAA",
+      "lastAttemptedAt": "2026-10-04T14:51:48.971Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXodjJ2qx5lVGCZqtF4PxgO2lK8LtPXsdIWHdn61jnk7xCiBinAM0Kwxh56KGBQGby-OkIUvHNBX-sEB8jCcXeQgFXdpH8E7CVMi2jY8PxkBvasqy0Pp4qVcnbGd1EOaFj0Z9VAR0u0Gh9Fr_lkKNEcUUXKBUvffqkVK3qsv7re_vRHV_ILumyGfW5Qru5b44GI90G_9j9xJ1wHPrDPe8senaz-81911Lx6Dnuezq8sYGUhEaP9r-80bOhXSMtKNS2lmfuKRtS-gLrsHBYoAEAAA",
       "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T14:52:33.439Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y9Cph_OvHEOyNhuBqqWtziH975fejqHs9q3N0zxv0hV8wDB5aFcYbeBxgBY8qcnhxRDE7JcL_l4hPCwJxUFDBlc2gdwTsJYyLdaw4nBIDd3xWBZF_VXmpbyd0UyUEnoW_SnPoMcF2qI4iV-zT1GiuKLxFLMPvrqqmrysmzdf9aer_5Gd43kz6nOFbnPfHBUGuo3usfuJO6Edh8M97Sx6NrN55TaFVBw6DvueHm-sIEahwaH-lGcdK9o10oJCdad55oGSIcYfvcrsaaABAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:53:17.983Z",
+          "priceDivine": 1,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:53:17.983Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7CMAxF_8XPFSKUwuivTKgyiUGW0jZK0lJU5d9xYJpajb0lPvG5dmYIEeMQoJ6hd5H7DmoIpAePF0uQihcX_D1DfDgSip2BAq5sI_k3YCNlmpxlzXGTG5rdrlSqOpTbUt6OaAfKCS2L_rQtoMUJaqVO4jcccpQormgDpeKz77g_qsO-qv7oyupHV36yndN5Met7h2ZxXxw1Rrr1_rH6ijuh67vNPS8teraj_U3-UlLx6Dmue1q8sYaUhEaP5r8851nTqpEmFGoawyN3lA0pPQFUwWQNoQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:54:02.613Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:54:02.613Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGrIOgG_MlXIS9zKUoAoBEqF8u912mkCrXtLfOJz7awwRozTCM0Kg4889NDASGYK-O0IUvHkgr9WiHdPQrG3UMCFXaTwAmylTIt3bDgeckNbllqp06c-ank7o5soJ3Qs-vpYQIcLNErV4rc85ihRXNCNlIr3vqpWqvoo6-qPT-sfnz690Z3TeTPsa4l2c98cDUa6DuG--4sboR_6wy1vLXp2s_tNrpRUAgaO-54Or2wgJaExoP0vzwc2tGukBYXa1vLMPWVDSg_mIBi1ogEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T14:54:47.373Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGqgrYBfmSrkJW5lKUCUBEqF8u9z1mkCrXtLfOJz7awQIsYpQLvC6CKPA7QQSE8ePy1BKr654I8V4tORUBwMFHBjG8m_ABsp0-Isa46H3NCVZaXU-VIdK3k7o50oJ_Qs-uZYQI8LtEo14jcccpQobmgDpeKt71SWF1U3VVX_8Z1-dOc3smu6bkZ9rdBt7pujxkj30T93P_EgdONweOSdRc92tr-5tZKKR89x39PjnTWkJDR6NP_lOc-ado20oFDTGZ55oGxI6QtYb8TToAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T14:55:32.173Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCJlmQq_MlXIS9zKUoAoBEqF8u912mkCrXtLfOJz7awwRozTCM0Kg4889NDASGYK-O0IUvHkgr9WiHdPQrG3UMCFXaTwAmylTIt3bDgeckN7PFZK6c-qrOTtjG6inNCx6OuygA4XaJSqxW95zFGiuKAbKRVvfbpWqtS6PP3RffzY9BvXOZ03k742aDf3zdFgpOsQ7ruPuBH6oT_c8sqiZze739yTkkrAwHHf0-GVDaQkNAa0_-X5wIZ2jbSgUNtanrmnbEjpAXTIcoafAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:56:17.062Z",
+          "priceDivine": 5,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:56:17.062Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqCJEhcKrTBXyEreyFH4UAqVCefc5qzaB1t0lPvH57GwwBQzzBM0Gwxh46KGBiczs8dMRxOybC_7YIDxHEoq9hQxu7AL5F2ArZVpHx4bDKTW0RaGVOpc61_J2QTdTSuhY9HWeQYcrNErV4rc8pShR3NBNFLO3vkpXdX4pi_KPrvzRVfqN7Rqvu1lfO7S7--5oMNB98M_DVzwIx6E_PdLSome3uN_ki5KKR8_h2NPhnQ3EKDR4tP_ljZ4NHRppRaG2tbxwT8kQ4xeTWGn3oQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2231156303\",90,119],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:57:02.070Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:57:02.070Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y7CTOfWvHENybTYCVUtbnUP63y9u7FBu963N0zxv0gVCxDgGaBYYXOShhwYC6dHjtyVI2ZML_logPhwJxd5ABle2kfwLsJEyzc6y5nhYG9rjsVDqVBZ5IW8ntCOtCR2Lvs4z6HCGRqla_IbDGiWKK9pAKfvoO1e1Uuc6r_7oyreu_GS7pMtm1tcO7ea-OWqMdBv8Y_cVd0I39If7urTo2U72N7lSUvHoOe57OryxhpSERo_mvzznWdOukWYUalrDE_e0GlL6ARu9M26hAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:57:47.172Z",
+          "priceDivine": 5,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:57:47.172Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoeSXenmVUYJmq0XgJMZx0pTgd5_cjpGw7s7Wsc4neYMpYJgnaDcYXeBxgBYm0rPHL0sQsycX_LlBeDgSioOBDK5sA_kXYCNlWp1lzeGUGrqyyRul6ubjLG8XtDOlhJ5FX6oMelyhrXLRG55SkhiuaCeK2VtdUdZFVagq_2Orf2T1G9clXnaDvhbodvfdUWOg2-gfh3-4E7pxON3TxqJnu9jfXFVIxaPncOzp8cYaYhQaPJr_8pxnTYdGWlGo6QwvPFAyxPgNUi9e_54BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:58:32.331Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:58:32.331Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E6PIcpO_cjGkbtU0GbCMgRiy_37deTEQvW9bn_V52y0wRIzjAPUCvY_cd1DDQGYMeHEEqfjlgr8XiA9PQrGzUMCVXaTwBGylTLN3bDjuckNTqr3SulKnL3k7oRspJ7Qs-lIX0OIM9XEvestDThLDFd1AqfioO6hKaaWP5elNV_3Z1AfZOZ1Xkz43aFb31dFgpFsfHpuPuBP6vtvd88qiZze5V64-SCVg4LjtafHGBlISGgPa__J8YEObRppRqG0sT9xRNqT0A3xujjCfAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T14:59:17.590Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T14:59:17.590Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqEppGYxfmSrkJW5lKUCUBEqF8u9z1mkCrXtLfOJz7awQIsYpQLvC6CKPA7QQSE8ePy1BKr654I8V4sORUBwMFHBlG8k_ARsp0-Isa46H3NCVlaqa5ly91_J2RjtRTuhZ9GVTQI8LtCclesMhJ4nhijZQKl7qjm9K1aou69Mf3fnHVr2QXdJlM-lzg25z3xw1RrqN_rH7iDuhG4fDPa8seraz_c1tjlLx6Dnue3q8sYaUhEaP5r8851nTrpEWFGo6wzMPlA0pfQE3a3g0nwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:00:02.944Z",
+          "priceDivine": 15,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:00:02.944Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqKKUaBm_MlXITdzKUoAoBEqF8u9z1qkCrXtLfOJz7awwRozTCM0Kg4889NDASGYKeHEEqfjhgr9WiA9PQrG3UMCVXaTwBGylTIt3bDgeckNbqVJpXavPD3k7o5soJ3Qs-koX0OECzakUveUxJ4nhim6kVLzXVaqudXlS-o-u_rWpN7JzOm8mfW7Qbu6bo8FItyE8dh9xJ_RDf7jnlUXPbnavXH2USsDAcd_T4Y0NpCQ0BrT_5fnAhnaNtKBQ21qeuadsSOkbYRHkBZ8BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:00:48.395Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:00:48.395Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqOoPGZRXmSrkJm5lKUCUBEqF8u5zVm0CrbtLfOLz2VkgRIxjgGaBwUUeemggkB49Xi1BKr654M8F4tORUOwNFHBjG8m_ABsp0-wsa4673NAe1V7VdanOlbyd0I6UEzoW_bEuoMMZmtNe9IZDThLDDW2gVLzXVWV1-CiV-mM7qR_b-Y3tki6rUV8rtKv76qgx0n3wz81PPAjd0O8eeWfRs53sb3J9kIpHz3Hb0-GdNaQkNHo0_-U5z5o2jTSjUNManrinbEjpC3BXbYKgAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:01:33.947Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:01:33.947Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y5g6uepfOYZkbTYCVUutziH975feuKFs963N0zxv0hXGgGEaoVlhcIGHHhoYSU8eL5YgZr9c8PcK4eFIKPYGMriyDeSfgI2UaXGWNYdDamiL6lgpdarqL3k7o50oJXQs-kJl0OECTXkUveExJYnhinakmH3WqTrP1amo1ZuuLP901QfdOZ43sz53aDf3zVFjoNvgH7uvuBO6oT_c09KiZzvbV7LKpeLRc9j3dHhjDTEKDR7Nf3nOs6ZdIy0o1LSGZ-4pGWL8AaHNlImhAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:02:19.599Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:02:19.599Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXobT52dy8yihBs9UicBJjO2lK8LtPXsdIWHdn61jnk7xCiBinAO0Ko4s8DtBCID15_LQEqfjmgj9WiA9HQnEwUMCVbST_BGykTIuzrDkeckNXNsdGqbo5v8vbGe1EOaFn0ZeqgB4XaKuj6A2HnCSGK9pAqXipq8vy7aTOVaX-6OofW_NCdkmXzaTPDbrNfXPUGOk2-sfuI-6EbhwO97yy6NnO9jdXnaTi0XPc9_R4Yw0pCY0ezX95zrOmXSMtKNR0hmceKBtS-gKEtMy_nwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:03:05.353Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:03:05.353Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0WrDMAxF_0XPoSRdzdz8yihBs9UicBJjO2lK8L9PXsdIWPdm61jnSl4hJkxThHaF0SceB2ghkpkCfjqCXH1zwR8rpIcnoThYqODKLlF4ArZSpsU7NpwOpaE7qlppfVLnd3k7o5uoJPQs-qOuoMcF2rda9JZjSRLDFV2kXL3UqXPT1ErV-o_t9CNTL1yXfNkM-lyg29w3R4OJbmN47P7hTujH4XAvG4ue3ex-c3UjlYCB076nxxsbyFloCmj_y_OBDe0aaUGhtrM880DFkPMXIPk8iJ4BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:03:51.199Z",
+          "priceDivine": 0.266,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:03:51.199Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqGIwIOVVpgp5iVtZCj9KAqVCefc56zSB1t0lPvH57GzgA4bZQ7vBOAUeB2jBk54dflqCmH1zwR8bhMdEQnEwkMGVbSD3BGykTOtkWXM4pYauqPJKqffq3MjbBe1MKaFn0Rcqgx5XaMtc9IZ9ShLDFa2nmL3UNWVzzlVd1H9sdf5ja8oXtku87EZ9rtDt7rujxkC30T0OP3EnnMbhdE87i57tYn-T1ZtUHDoOx54eb6whRqHBofkvb3Ks6dBIKwo1neGFB0qGGL8At85geKABAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2505884597\",28,30],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:04:37.116Z",
+          "priceDivine": 0.0067,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:04:37.116Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqIJulMCrTBXyEreyFH6UBEqF8u512mkCrbtLfOLz2VnBBwyTh2aFYQw89NCAJz05_LYEMXtywV8rhPtIQrE3kMGFbSD3AmykTMtoWXM4pIb2WOalUp9lXcnbGe1EKaFj0R9VBh0u0HzkojfsU5IYLmg9xeytrlJ1UVR1rv7YTvmP7VS_sZ3jeTPqa4V2c98cNQa6Du6--4kb4Tj0h1vaWfRsZ_ubrAqpOHQc9j0dXllDjEKDQ_Nf3uhY066RFhRqWsMz95QMMT4APys64aABAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:05:23.134Z",
+          "priceDivine": 9,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:05:23.134Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGqAdYFfmSrkEreyFCBKAqVC-feZdppA694Sn_hcOwuEiHEMUC8wuMhDDzUEakePF0uQsicX_LVAfDgSir2BDK5sI_kXYCNlmp3lluNhbWjyz5PWxUeuK3k7oR1pTehY9NUxgw5nqJWqxG84rFGiuKINlLK3PpWXqlC6OP7RlT-28o3rnM6bSV8bNJv75thipNvgH7uPuBO6oT_c15VFz3ayv7laScWj57jv6fDGLaQkNHo0_-U5zy3tGmlGoaYxPHFPqyGlbx6wmgSfAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T15:06:09.242Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoSxpvTl5lVGCaqtF4PxgO2lK8LtPXsdIWHdn61jnk7xCiBinAM0Kwxh56KGBQGbyeHEEqfjmgj9XiI-RhGJvoYAru0j-CdhKmZbRseF4yA1t9fGu9VFVupa3M7qJckLHoq_fCuhwgaYsa_FbDjlKFFd0gVLx0leqk9JKH6u_vtOPTr2QndN5M-pzhXZz3xwNRroN_rH7iTvhOPSHe95Z9Oxm95urS6l49Bz3PR3e2EBKQqNH-1_e6NnQrpEWFGpbyzP3lA0pfQFYpx9PoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:06:55.456Z",
+          "priceDivine": 10,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:06:55.456Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ226DMAyG38XXqAJ64PAqU4W8xK0sBYiSQKlQ3n3OOk2gdXeJv_j77azgA4bJQ7vCaAOPA7TgSU0OPw1BzL654I8VwtOSUBw0ZHBjE8i9AGsp02INKw6H1NCV1aWuj-eybuTtjGailNCz6Js8gx4XaIuiEb9mn6JEcUPjKWZvfcUlz6u8KqvjH9_pR3d-I7vG62bU1wrd5r45Kgx0H91z9xMPQjsOh0faWfRsZvObWxdSceg47Ht6vLOCGIUGh_q_POtY0a6RFhSqO80zD5QMMX4BE6LpS6ABAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T15:07:41.773Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqCoUusCrTBXyEreyFH6UBEqF8u5z2mkCrbtLfOLz2VnBBwyTh2aFYQw89NCAJz05_LIEMXtywZ8rhMdIQrE3kMGVbSD3AmykTMtoWXM4pIa2-DgrdaoKVcvbGe1EKaFj0dfHDDpcoMnzWvyGfYoSxRWtp5i99xVVWarjqVJ_fOWPrnoju8TLZtTXCu3mvjlqDHQb3GP3E3fCcegP97Sz6NnO9jdX5VJx6Djsezq8sYYYhQaH5r-80bGmXSMtKNS0hmfuKRli_AZF2HV6oAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:08:28.166Z",
+          "priceDivine": 4,
+          "sampleSize": 7,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:08:28.166Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E3OIKPBXLobUrZomA5ZtIIbsv1-n5gK589vWZ33edgv4gGH00Cww2MBDDw14UqPDiyGI2ZML_l4gPCwJxV5DBlc2gdwLsJYyzdaw4rBLDe3-dKyqotxXtbyd0IyUEjoWff2VQYczNHlei1-zT1GiuKLxFLMPvsMpPx7K8o-uKN-64j_bOZ5Xs752aFf31VFhoNvgHpuvuBPaod_d09KiZzOZ3-Qql4pDx2Hb0-GNFcQoNDjUn_KsY0WbRppRqG41T9xTMsT4A2giEb6hAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:09:14.686Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:09:14.686Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqFpg7RJ-ZaqQR9zKUoAoBEqF8u9z2mkCrXtLfOJz7awwRozTCPUKg4889FDDSO0U8MsRpOLBBX-uEO-ehGJvoYALu0jhCdhKmRbvuOV4yA1N-XHSujqW2sjbGd1EOaFj0Zu3AjpcoFbKiN_ymKNEcUE3Uipe-7RRSr-XRv_xVdWPrzq-0J3TeTPsc4lmc98cW4x0HcJ99xc3Qj_0h1veWvTsZvebrJVUAgaO-54Or9xCSkJjQPtfng_c0q6RFhRqG8sz95QNKX0DginEmqIBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T15:10:01.299Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqBrQdoFfmSrkJW5lKUCUBEqF8u9z1mkCrXtLfOJz7awQIsYpQLvC6CKPA7QQSE8ePy1BKr654I8V4sORUBwMFHBlG8k_ARsp0-Isa46H3NBV72el6lOlGnk7o50oJ_Qs-uatgB4XaMuyEb_hkKNEcUUbKBUvfceqOpeqqWv1x3f80Z1eyC7pshn1uUK3uW-OGiPdRv_Y_cSd0I3D4Z53Fj3b2f7mqlIqHj3HfU-PN9aQktDo0fyX5zxr2jXSgkJNZ3jmgbIhpS-gfV3AoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T15:10:47.984Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCLd6AK_MlXII25lKUCUBEqF8u911mkCrXtLfOJz7awQIsYpQLPC6CKPAzQQqJs8flmCVHxzwZ8rxLsjoTgYKODCNpJ_AjZSpsVZ7jgeckN7_Dhp_VYddS1vZ7QT5YSeRV-XBfS4QKNULX7DIUeJ4oI2UCpe-qpaqbKqSv1H9_5jq164zum8mfS5Qbu5b44dRrqO_r77iBuhG4fDLa8seraz_c3VSioePcd9T49X7iAlodGj-S_Pee5o10gLCjWt4ZkHyoaUHmxm-HOfAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:11:34.837Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:11:34.837Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCqgQuBXpgp5iVtZChCFQKlQ_n3Oqk2gdW-JT3yunQ2mgGGeoN1gdIHHAVqYSM8ePy1BzL654I8NwtORUBwMZHBjG8i_ABsp0-osaw6n1NAVdaVUeSlUI28XtDOlhJ5F35wz6HGFNs8b8RueUpQobmgnitlbX13WzVlVRfVHV_3o6vKN7Rqvu1lfO3S7--6oMdB99M_DVzwI3TicHmlp0bNd7G-yyqXi0XM49vR4Zw0xCg0ezX95zrOmQyOtKNR0hhceKBli_AKvuxxEoQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2768835289\",90,119],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:12:21.742Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:12:21.742Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGo6DRJ-ZaqQR9zKUoAoCZQK5d9rWm0CrXtLfOJz7SwQE6YxQr3A4BMPPdQQqR0DfjuCXDy54K8F0t2TUOwtFHBhlyi8AFsp0-wdt5wOa0NzqkqtPz5P2sjbCd1Ia0LHojfHAjqcoVbKiN9yXKNEcUEXKRdvfZU2SlXmqP_oyh9d-c52zufNrK8dms19c2wx0XUI991X3Aj90B9u69KiZze532StpBIwcNr3dHjlFnIWmgLa__J84JZ2jTSjUNtYnrin1ZDzAydeRt2hAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:13:08.756Z",
+          "priceDivine": 160,
+          "sampleSize": 2,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:13:08.756Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY_CIAyG_0s_L0aUi86_cjFLhWqasI0AmzML__2KmsuW876VPvR5KTPEhGmIcJqh94n7Dk4QyQwBL44gV08u-HuG9PAkFDsLFVzZJQovwFbaNHnHhtOmDDS7-qC1Oihdy90R3UAloWXRq-1XBS1OUqlaAizHkiWOK7pIufooVDut9uq43_7x6bdNf3Cd83nx1NcKzeK8KA0muvXhsfqJO6Hvu8297Cx6dqP7zT0q6QQMnNYzLd7YQM5CU0D7X54PbGg1SBMKtY3lkTsqhpx_AHM4R6agAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:13:55.856Z",
+          "priceDivine": 50,
+          "sampleSize": 7,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:13:55.856Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0WrDMAxF_0XPocydTZP-yihBs9UicBLjOGlK8L9PXsdIWPcm61jnWl5hTJimEc4rDCHx0MMZRrJTxE9PkKtvLvhjhfQIJBR7BxVc2SeKT8BO2rQEz5bToQy0x-aktTop3cjdGf1EJaFj0as3U0GHi1SqkQDHY8kSxxX9SLl6KVRGm9rU78e_Qv2jMy9kl3zZvPW5Q7s5b0qLiW5DfOy-4k4Yhv5wL0uLnv3sf3NrJZ2IkdN-psMbW8hZaIro_ssLkS3tBmlBoa51PHNPxZDzFzVnvnyhAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:14:43.063Z",
+          "priceDivine": 75,
+          "sampleSize": 8,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:14:43.063Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W7DIAxG38XXURW6dCx9lamKXHArS-RHQNJUEe8-s05VonZ3xgefD7NAiBjHAMcF-iFy38ERApnR49kRpOKXC_5eIN4HEoqdhQIu7CL5B2ArbZoHx4bjLg80-1pXldKqquXuhG6knNCy6FV5KKDFWSpVS4DlkLPEcUEXKBVvheqzLHWp9_rjRVj96Q5vZKd0Wr31sUOzOq9Kg5Guvb9vvuJGOPTd7paXFj27yT1zv5R0PHqO25kWr2wgJaHRo_0vb_BsaDNIMwq1jeWJO8qGlH4AfmJIeKEBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:15:30.369Z",
+          "priceDivine": 48,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:15:30.369Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E-O8EcG_cjGkbtU0GbCMgRiy_37deblA1G9dn_V51y0wRIzjAKcFeh-57-AEA5kx4MURpOKXC_5eID48CcXOQgFXdpHCE7CVNs3eseG4ywPNoT5qrY5K13J3QjdSTmhZ9GpfFtDiLJWqJcDykLPEcUU3UCreCw-l1tX-q6xehPpPV76RndN59dbnDs3qvCoNRrr14bH5ijuh77vdPS8tenaT-8-tlHQCBo7bmRZvbCAloTGg_ZTnAxvaDNKMQm1jeeKOsiGlHygY1EmhAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:16:17.776Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:16:17.776Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7DIAxF_8XPUTVWsiz9lamKPHArSyRBQNJUEf8-s2pTonVvxgefi1khJkxThNMKo088DnCCSGYK-OkIcvXNBX-skO6ehOJgoYILu0ThAdhKmxbv2HA6lIHutW20Vo3Srdyd0U1UEnoWvXqpK-hxkUq1EmA5lixxXNBFytVzYaMb9abr-o_v-KM7PrOd83nz2McS3ea8KQ0muo7hvvuLG6Efh8OtbC16drP7TX5X0gkYOO1neryygZyFpoD2vzwf2NBukBYUajvLMw9UDDl_AU2eIY2iAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:17:05.289Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:17:05.289Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E3MTjMy_cjGkbtU0GbCMgRiy_36dmgvkvG9dn_V51y0wRIzjAKcFeh-57-AEA5kx4MURpOLJBX8vEB-ehGJnoYAru0jhBdhKm2bv2HDc5YFmr49VpY6q0nJ3QjdSTmhZ9OrrUECLs1RKS4DlIWeJ44puoFR8FtZaqbra6_qPsCzfvvLwQXdO59VrX1s0q_OqNBjp1ofH5jPuhL7vdve8tujZTe43uVbSCRg4bmdavLGBlITGgPa_PB_Y0GaQZhRqG8sTd5QNKf0Aec3z0aMBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:17:52.974Z",
+          "priceDivine": 50,
+          "sampleSize": 6,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:17:52.974Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W7DIAxG38XXUTVS2iZ9lamKPHArS-RHQNJUEe9es05TonV3xgefD7NAiBjHAOcF-iFy38EZApnR45cjSMU3F_y5QHwMJBQ7CwVc2UXyL8BW2jQPjg3HXR5oyvqktTopXcvdCd1IOaFl0auPQwEtzlKpWgIsh5wljiu6QKl4K9RleVRVvd9Xf4T6R3d4I7uky-qtrx2a1XlVGox06_1j8xV3wqHvdve8tOjZTe43t1LS8eg5bmdavLGBlIRGj_a_vMGzoc0gzSjUNpYn7igbUnoCzb3886EBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:18:40.727Z",
+          "priceDivine": 8,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:18:40.727Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ4arCMAyF3yW_h9jLhs5XuciIbZRAt5W2m5PRdzdVkQ31X5KT852mM4SIcQhwmKF3kfsODhBIDx5PliAVD13k_xnizZGo2Bko4Mw2kn8KbGRMk7OsOW6yofmrd2WpdqqsZXdEO1BOaFnwalsV0OIklaolwHDIWcI4ow2Uiq_AqlZirLb7D175olVfWMd0XDz1eUKz6BelxkiX3t9WP3EldH23ueabBc92tO_cvZKJR89x7WnxwhpSEjV6NL_ynGdNKyNNKKppDI_cUSakdAcB7iXRoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:19:28.582Z",
+          "priceDivine": 10,
+          "sampleSize": 8,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:19:28.582Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E8OUY-JfuRhSWTVNBixjIIbsv1-n5gI571vXZ33edQsMAcM4wGmB3gXuOzjBQM3o8WIJYvbkgr8XCA9HQrEzkMGVbSD_AmykTbOz3HDYpYF6X-miUFoVldyd0I6UEloWvcq_MmhxlkpVEmB4SFniuKIdKGYfhfqgq_xY7ss_vjJ_6_Thg-0cz6vHvpaoV-dV2WCgW-8fm7-4E7q-293T1qJnO9nf5KOSjkfPYTvT4o0biFFo8Gj-y3OeG9oM0oxCTW144o6SIcYfigcsd6IBAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_2974417149\",105,119],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:20:16.544Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:20:16.544Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqCITK6S_MlXIS9zKUoAoBEqF8u912mkCrXtzfOJz46wwRozTCKcVBh956OEEI5kp4LcjSMWTC_5aId49CcXeQgEXdpHCC7CVNi3eseF4yAPth66rStWq0nJ3RjdRTuhY9Kr8LKDDRSqlJcDymLPEcUE3UireCutGK1XrsvnjO5Y_uuM72zmdN499LdFuzpvSYKTrEO67v7gR-qE_3PLWomc3u9_kRkknYOC4n-nwygZSEhoD2v_yfGBDu0FaUKhtLc_cUzak9AAC4nbuogEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:21:04.581Z",
+          "priceDivine": 5,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:21:04.581Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y7DTiedfOYZkbTYCVUutziH975fejkPZ9q3N0zxv0hXGgGEaoVlhcIGHHhoYSU8eL5YgZr9c8PcK4eFIKPYGMriyDeSfgI2UaXGWNYdDamiLXJ2q6iuvTvJ2RjtRSuhY9Mc6gw4XaIpc9IbHlCSGK9qRYvZWp46lKlRd5C-28k9WvnGd43kz6HOBdnPfHDUGug3-sfuHO6Eb-sM9bSx6trP9z62VVDx6DvueDm-sIUahwaP5lOc8a9o10oJCTWt45p6SIcYfrZEipp4BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:21:52.753Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:21:52.753Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y9C5ivOvHENybTYCVUutziH975du41Bu963N0zxv0hXGgGEaoVlhcIGHHhoYSU8evy1BzJ5c8NcK4eFIKPYGMriyDeRfgI2UaXGWNYdDamjLvFBVdc4rJW9ntBOlhI5Ff6wz6HCBpsxFb3hMSWK4oh0pZh91hTqpWtXl8fxHd3rb1AfZJV42k742aDf3zVFjoNvgH7uPuBO6oT_c08qiZzvb39y6kIpHz2Hf0-GNNcQoNHg0_-U5z5p2jbSgUNManrmnZIjxB0_91R2fAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:22:41.040Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:22:41.040Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqAplQMerTBXyEreyFH6UBEqF8u512mkCrbtLfOLz2VnBBwyTh2aFYQw89NCAJz05_LYEMXtywV8rhPtIQrE3kMGFbSD3AmykTMtoWXM4pIa2UHlZVZ-qKuXtjHailNCx6I-nDDpcoCmU6A37lCSGC1pPMXuryyulalUf6-KP7uPHVr6RneN5M-lrg3Zz3xw1BroO7r77iBvhOPSHW1pZ9Gxn-5t7yqXi0HHY93R4ZQ0xCg0OzX95o2NNu0ZaUKhpDc_cUzLE-AAE-CMZnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:23:29.445Z",
+          "priceDivine": 2,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:23:29.445Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqKJAEONXpgq5iVtZChCFQKlQ_n3OOk2gdW-JT3yunQ2mgGGeoN1gdIHHAVqYSM8er5YgZt9c8OcG4elIKA4GMrixDeRfgI2UaXWWNYdTaujK_Kzq-iOvlbxd0M6UEnoWfdFk0OMKbZmL3vCUksRwQztRzN7qikJVVZOXqvmjq35s6o3sEi-7SV8bdLv77qgx0H30z8NHPAjdOJweaWXRs13sb25zlopHz-HY0-OdNcQoNHg0_-U5z5oOjbSiUNMZXnigZIjxC1KCvyifAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:24:17.907Z",
+          "priceDivine": 0.0439,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:24:17.907Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_EwMiqPyViyG9rZomA5ZtIIbsv1-n8QI579vWZ33edgv4gGH00Cww2MBDDw14UqPDb0MQsycX_LVAeFgSir2GDK5sArkXYC1lmq1hxWGXGtoyL6q6Pud1JW8nNCOlhI5Fvz9l0OEMTZmLXrNPSWK4ovEUs4-6_fFwLOpD9ddWVm_b-YPtEi-rUV8rtKv76qgw0G1wj81P3Ant0O_uaWfRs5nMb_KpkIpDx2Hb0-GNFcQoNDjU_-VZx4o2jTSjUN1qnrinZIjxB_VtkD2gAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:25:06.473Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:25:06.473Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqOKnIOBVpgp5iVtZChCFQKlQ3n1Oq06gdXeJT3w-OxtMHv08QbvBaD2PA7QwkZodfhuCkDy54K8N_MOSUBw0JHBl48m9AGsp02oNK_an2NAVaVZWVZNWpbxd0MwUE3oWfV4n0OMKbZGKXvMUk8RwRTNRSD7q8rrJsvqcN_UfXVG8deUH3SVcdrO-duh2991Roafb6B6Hr7gT2nE43ePSomezmN_kOpOKQ8f-2NPjjRWEINQ71P_lWceKDo20olDdaV54oGgI4Qc0R_kUoQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:25:55.174Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:25:55.174Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqOKnIMqrTBXyEreyFCBKAqVCefc56zSB1t0lPvH57GzgA4bZQ7fBZANPI3TgSc0OPw1BzL654I8NwtOSUBw1ZHBjE8i9AGsp02oNKw6n1NBXeVE3zSVvanm7oJkpJQws-rLNYMAVuioXvWafksRwQ-MpZm9157JsivZSVe0f3fnHVr-RXeN1N-lrg3533x0VBrpP7nn4iAehncbTI60sejaL-c1tC6k4dByOPQPeWUGMQoND_V-edazo0EgrCtW95oVHSoYYvwC3J5eSnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:26:43.975Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:26:43.975Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqArrgii_MlXIS9zKUoAoBEqF8u912mkCrXtLfOJz7awwRozTCM0Kg4889NDASGYK-O0IUvHkgr9WiHdPQrG3UMCFXaTwAmylTIt3bDgeckN7VKWuqpOqtLyd0U2UEzoW_UddQIcLNEclestjThLDBd1IqXir06eyVFqr-o_t80em37jO6bwZ9LVAu7lvjgYjXYdw3_3DjdAP_eGWNxY9u9n95talVAIGjvueDq9sICWhMaD9L88HNrRrpAWF2tbyzD1lQ0oP30dA0Z4BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:27:32.879Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:27:32.879Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqEqLGii_MlXIS9zKUoAoBEqF8u9z1mkCrXtLfOJz7awwRozTCM0Kg4889NDASGYK-OkIUvHNBX-sEJ-ehGJvoYAbu0jhBdhKmRbv2HA85Ia2VMez1helz_J2RjdRTuhY9Ke6gA4XaEolestjThLDDd1IqXirq8rqomp90n9sWv3YqvKN7Zqum1FfK7Sb--ZoMNJ9CM_dTzwI_dAfHnln0bOb3W9yfZRKwMBx39PhnQ2kJDQGtP_l-cCGdo20oFDbWp65p2xI6Qsy9J3HoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3015669065\",28,30],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:28:21.891Z",
+          "priceDivine": 0.004,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:28:21.891Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqAqrmgK_MlXITdzKUoAoBEqF8u9z1mkCrXtLfOJz7awwRozTCM0Kg4889NDASGYKeHUEqfjmgj9XiE9PQrG3UMCNXaTwAmylTIt3bDgeckN7VOVJ61rpk7yd0U2UEzoW_UdVQIcLNEclestjThLDDd1IqXirO1d1WZ5rVf2xafVj0_Ub2yVdNqO-Vmg3983RYKT7EJ67n3gQ-qE_PPLOomc3u9_kqpRKwMBx39PhnQ2kJDQGtP_l-cCGdo20oFDbWp65p2xI6Qu6EcdeoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:29:11.026Z",
+          "priceDivine": 6,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:29:11.026Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqGoIWhm_MlXIS9zKUoAoBEqF8u912mkCrXtLfOJz7awwRozTCM0Kg4889NDASGYK-O0IUvHkgr9WiHdPQrG3UMCFXaTwAmylTIt3bDgeckOry1Ot9Mfps5K3M7qJckLHoi_rAjpcoNFH0Vsec5IYLuhGSsVbnSorpVWtj39s1Y-seuM6p_Nm0NcC7ea-ORqMdB3CffcPN0I_9Idb3lj07Gb3m1srqQQMHPc9HV7ZQEpCY0D7X54PbGjXSAsKta3lmXvKhpQe5KVCTZ4BAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:30:00.279Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:30:00.279Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ22rDMAyG30XXoSyn1s2rjBI0Wy0C54DtpCnB7155HSNh3Z2tz_p-ySv4gGHy0KwwjIGHHhrwpCeHX5YgZt9c8OcK4TGSUOwNZHBlG8i9ABsp0zJa1hwOqaEti5PKy-PpXMnbGe1EKaFj0Rcqgw4XaMoP0Rv2KUkMV7SeYvZWl9dVrWpVFuc_uurHVr-RXeJlM-lrg3Zz3xw1BroN7rH7iDvhOPSHe1pZ9Gxn-5urcqk4dBz2PR3eWEOMQoND81_e6FjTrpEWFGpawzP3lAwxPgFPZD4SnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:30:50.005Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:30:50.005Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ22rDMAyG30XXoeTQ1VleZZSg2WoROAdsJ00JfvfK7RgJ6-5sfdb3S17BBwyTh2aFYQw89NCAJz05_LYEMXtywV8rhPtIQrE3kMGFbSD3AmykTMtoWXM4pIa2KlVdVCf1eZS3M9qJUkLHoi_rDDpcoKly0Rv2KUkMF7SeYvZWV5zyXOWqVNUf3fHH9vFGdo7nzaSvDdrNfXPUGOg6uPvuI26E49Afbmll0bOd7W9uXUjFoeOw7-nwyhpiFBocmv_yRseado20oFDTGp65p2SI8QEEYcgWnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:31:39.481Z",
+          "priceDivine": 6,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:31:39.481Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXobT5Wb28yihBs9UicBJjO2lK8LtPXsdIWHdn61jnk7xCiBinAO0Ko4s8DtBCID15_LQEqfjmgj9WiA9HQnEwUMCVbST_BGykTIuzrDkeckNXlWd1qt7O77W8ndFOlBN6Fn2pCuhxgbY6it5wyEliuKINlIqXurJs6lodq0b90dU_tuaF7JIum0mfG3Sb--aoMdJt9I_dR9wJ3Tgc7nll0bOd7W-uOknFo-e47-nxxhpSEho9mv_ynGdNu0ZaUKjpDM88UDak9AVSG1QnnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:32:29.041Z",
+          "priceDivine": 0.0133,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:32:29.041Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQW4rDMAxF96LvUCavJs1WhhJUWy0C54HtpCnBex-5pUPCdP5sHetcySs4j35y0KwwjJ6HHhpwpCaLF0MQkicX_L2Cf4wkFHsNCVzZeLIvwFrKtIyGFftDbGjzrKrT_FidCnk7o5koJnQs-qxOoMMFmvxL9JpdTBLDFY2jkHzUZVVRpceiLP_Y8vJtO32wncN5M-prhXZz3xwVeroN9rH7iTvhOPSHe9xZ9Gxm85tcp1KxaNnvezq8sYIQhHqL-r-80bKiXSMtKFS3mmfuKRpC-AFshp89oAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:33:18.744Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:33:18.744Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqBrQrYFfmSrkJm5lKUCUBEqF8u9zVm0CrXtLfOJz7awQIsYpQLvC6CKPA7QQSE8eL5YgFd9c8OcK8eFIKA4GCriyjeSfgI2UaXGWNcdDbujq6qTK-uPUHOXtjHainNCz6CtVQI8LtPWb6A2HnCSGK9pAqXipq1RTlupYNeqPrq5_dO8vdOd03sz63KHb3DdHjZFuo3_svuJO6MbhcM9Li57tbH-TVSkVj57jvqfHG2tISWj0aP7Lc5417RppQaGmMzzzQNmQ0hc_YyqdoQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:34:58.706Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:34:58.706Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3WrDMAxG30XXoSw_a928yihBs9UicBJjO2lK8LtPXsdIWHdn61jnk7xCiBinAO0Ko4s8DtBCID15_LQEqfjmgj9WiA9HQnEwUMCVbST_BGykTIuzrDkeckNXVydV1sfTuZG3M9qJckLPoq9UAT0u0NZvojcccpIYrmgDpeKlrqmqY6nOda3-6Jof2_sL2SVdNpM-N-g2981RY6Tb6B-7j7gTunE43PPKomc7299cVUrFo-e47-nxxhpSEho9mv_ynGdNu0ZaUKjpDM88UDak9AW3vnydnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:35:48.805Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:35:48.805Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_EwMiJ_JXLobUrZomA5ZtIIbsv193XgxE79vWZ33edgv4gGH00Cww2MBDDw14UqPDiyGI2S8X_L1AeFgSir2GDK5sArknYC1lmq1hxWGXGtpyf6yL8ut4OsjbCc1IKaFj0e_rDDqcoSlz0Wv2KUkMVzSeYvZRV52KIq-qvH6zHf5k1QfXOZ5Xgz4XaFf31VFhoNvgHpt_uBPaod_d08aiZzOZV25dSMWh47Dt6fDGCmIUGhzq__KsY0WbRppRqG41T9xTMsT4A5ZzIDqeAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:36:38.977Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:36:38.977Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYYuDMAyG_0s-y3B2qPOvHENyNhuBqqWtziH975du41Bu963N0zxv0hV8wDB5aFYYbeBxgAY8dZPDb0MQsycX_LVCeFgSioOGDK5sArkXYC1lWqzhjsMhNbSqqOqjKqvzSd7OaCZKCT2Lvqgz6HGBRuWi1-xTkhiuaDzF7KOuUtU5r8ui_GMr87etUh9sl3jZjPpaod3cN8cOA91G99j9xJ3QjsPhnnYWPZvZ_CbXR6k4dBz2PT3euIMYhQaH-r8867ijXSMtKFS3mmceKBli_AGrH5LHoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3278136794\",28,30],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:37:29.247Z",
+          "priceDivine": 0.0067,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "exalted",
+            "rate": 0.0013,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:37:29.247Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W6DMAxF_8XPqIJSQeBXpgp5iVtZChCFQKlQ_n3OOk2gdW-JT3yunQ2mgGGeoN1gdIHHAVqYSM8ePy1BzL654I8NwtORUBwMZHBjG8i_ABsp0-osaw6n1NCV51oVZVU3F3m7oJ0pJfQs-rPKoMcV2jIXveEpJYnhhnaimL3V1aopirrJ1R9blf_YquaN7Rqvu1FfK3S7--6oMdB99M_DTzwI3TicHmln0bNd7G-yKqTi0XM49vR4Zw0xCg0ezX95zrOmQyOtKNR0hhceKBli_AIj-sheoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:38:19.618Z",
+          "priceDivine": 5,
+          "sampleSize": 2,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:38:19.618Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqCKFdsCrTBXyEreyFH6UBEqF8u5z2mkCrbtLfOLz2VnBBwyTh2aFYQw89NCAJz05_LIEMXtywZ8rhMdIQrE3kMGVbSD3AmykTMtoWXM4pIa2ONbqfKryj5O8ndFOlBI6Fn2dZ9DhAo1StfgN-xQliitaTzF761PHUhWqKvI_uvLHVr5xXeJlM-lrg3Zz3xw1BroN7rH7iDvhOPSHe1pZ9Gxn-5tbKak4dBz2PR3eWEOMQoND81_e6FjTrpEWFGpawzP3lAwxfgMPnEmOnwEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T15:39:10.116Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ0W7DIAxF_8XPUVW2siX5lamKPHArSyRBQNJUEf8-s05TonVv4IPPtVkhJkxThHaF0SceB2ghkpkCfjqCXH1zwR8rpLsnoThYqODCLlF4ALZSpsU7NpwOpaF7fWnUm66P71rezugmKgk9i745VtDjAq1SjfgtxxIligu6SLl66lP6pGtdi_aP7_Sj009k53zejPpYodvcN0eDia5juO9-4kbox-FwKzuLnt3sfnNrJZWAgdO-p8crG8hZaApo_8vzgQ3tGmlBobazPPNAxZDzF4ZUJSWgAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "no-listings"
+      },
+      "lastAttemptedAt": "2026-10-04T15:40:00.698Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQYY-CMAyG_0s_E8NURPgrF0N6WzVNBixjIIbsv1-n5gI579vWZ33edgsMAcM4QL1A7wL3HdQwkB49fluCmD254K8FwsORUOwMZHBlG8i_ABsp0-wsaw671NAc9pU6Fee8LOTthHaklNCy6Ks8gxZnqJWqxG94SFGiuKIdKGYffeqU52Ve7svDH9_xrSs-yC7xshr1tUKzuq-OGgPdev_Y_MSd0PXd7p52Fj3byf7mnpVUPHoO254Wb6whRqHBo_kvz3nWtGmkGYWaxvDEHSVDjD_NUdMhoAEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:40:51.439Z",
+          "priceDivine": 15,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:40:51.439Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqAJKNuBVpgp5iVtZCj9KAqVCefc56zSB1t0lPvH57GzgA4bZQ7vBOAUeB2jBk54dflqCmH1zwR8bhMdEQnEwkMGVbSD3BGykTOtkWXM4pYbuXDbFm6rzdyVvF7QzpYSeRd_kGfS4QlsUjfgN-xQliitaTzF76StLVVV1flb1H1_1o1MvZJd42Y36XKHb3XdHjYFuo3scfuJOOI3D6Z52Fj3bxf7m1oVUHDoOx54eb6whRqHBofkvb3Ks6dBIKwo1neGFB0qGGL8AmytPEKABAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:41:42.287Z",
+          "priceDivine": 1,
+          "sampleSize": 4,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:41:42.287Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W7CMAxG38XXFSKUUtpXmVDlJQZZSn-UpKWoyrvPATS1GrtLfOLz2VnABwyjh3qBfgjcd1CDJz06_LYEMXtywV8LhMdAQrEzkMGVbSD3AmykTPNgWXPYpYYmP1TqVJz3ZSFvJ7QjpYSWRV_tM2hxhlqpSvyGfYoSxRWtp5h99B3KY6lOx-KvLi_euvyT7RIvq1lfOzSr--qoMdCtd4_NV9wJh77b3dPSomc72d_ks5KKQ8dh29PijTXEKDQ4NP_lDY41bRppRqGmMTxxR8kQ4w9I5xDfoQEAAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "priced",
+        "observation": {
+          "league": "Forbidden Rites",
+          "observedAt": "2026-10-04T15:42:33.246Z",
+          "priceDivine": 1,
+          "sampleSize": 10,
+          "exchangeObservation": {
+            "currencyId": "divine",
+            "rate": 1,
+            "source": "measured",
+            "league": "Forbidden Rites",
+            "asOf": "2026-09-26T00:00:00Z"
+          }
+        }
+      },
+      "lastAttemptedAt": "2026-10-04T15:42:33.246Z",
+      "lastSearchId": "H4sIAAAAAAAAA3WQ3W6DMAxG38XXqGqgdMCrTBXyEreyFH6UBEqF8u5z2mkCrbtLfOLz2VnBBwyTh2aFYQw89NCAJz05_LIEMXtywZ8rhMdIQrE3kMGVbSD3AmykTMtoWXM4pIa2yGt1LqvjRylvZ7QTpYSORV8fM-hwgUapWvyGfYoSxRWtp5i99eVVrVR1yuvqj68ofnxF-UZ3iZfNsK8l2s19c9QY6Da4x-4v7oTj0B_uaWvRs53tb3KlpOLQcdj3dHhjDTEKDQ7Nf3mjY027RlpQqGkNz9xTMsT4DY8Iy6GiAQAA",
+      "lastSearchLeague": "Forbidden Rites"
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3291658075\",90,119],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_3962278098\",90,119],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"explicit.stat_736967255\",90,119],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_124131830\",4,4]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_1545858329\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_1600707273\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_2254480358\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_274716455\",35,39]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_2891184298\",33,35]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_4226189338\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_591105508\",4,5]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_737908626\",60,73]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
+    },
+    {
+      "entryKey": "[\"crafted\",\"weapon.wand\",\"Wands\",81,[\"hybrid\",[[\"explicit.stat_1050105434\",42,45],[\"explicit.stat_2974417149\",45,49]]],[\"explicit.stat_789117908\",60,69]]",
+      "price": {
+        "state": "not-yet-synced",
+        "reason": "never-synced"
+      }
     },
     {
       "entryKey": "[\"raw\",\"Gold Amulet\",82]",
@@ -4278,28 +7731,28 @@
     {
       "currencyId": "greater-orb-of-transmutation",
       "rate": 0.0023,
-      "source": "dummy, not measured",
+      "source": "measured",
       "league": "Forbidden Rites",
       "asOf": "2026-10-02T00:00:00Z"
     },
     {
       "currencyId": "greater-orb-of-augmentation",
       "rate": 0.0053,
-      "source": "dummy, not measured",
+      "source": "measured",
       "league": "Forbidden Rites",
       "asOf": "2026-10-02T00:00:00Z"
     },
     {
       "currencyId": "perfect-orb-of-transmutation",
       "rate": 0.0186,
-      "source": "dummy, not measured",
+      "source": "measured",
       "league": "Forbidden Rites",
       "asOf": "2026-10-02T00:00:00Z"
     },
     {
       "currencyId": "perfect-orb-of-augmentation",
       "rate": 0.242,
-      "source": "dummy, not measured",
+      "source": "measured",
       "league": "Forbidden Rites",
       "asOf": "2026-10-02T00:00:00Z"
     }

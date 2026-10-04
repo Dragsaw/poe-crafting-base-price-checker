@@ -1,9 +1,37 @@
 [agent]
 persistent_facts = [
-  "For all UX and visual design work, invoke the `impeccable` skill rather than producing design output directly — critique, polish, layout, and visual craft route through impeccable.",
+  "For UX documents, run the CU workflow (bmad-ux). It calls impeccable at its own steps. For direct work on a built UI or a mockup, use impeccable through the menu.",
+  "When you invoke impeccable, pass `--target <file>`. For a doc-level pass, use `--target docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md`. impeccable does not find that file by itself.",
+  "Apply the Accessibility Floor of EXPERIENCE.md and the Review brief of AGENT-WORKFLOW.md to every impeccable finding. Do not edit DESIGN.md, EXPERIENCE.md or the mockups from an impeccable pass without the user's yes.",
+  "For a browser pass with impeccable, use pnpm dev and agent-browser in a named session (AGENTS.md). Stop the server with pnpm dev:stop.",
 ]
 
 [[agent.menu]]
 code = "ID"
-description = "Design, critique, or polish a UI directly using the Impeccable skill"
-skill = "impeccable"
+description = "Run any impeccable command on a built UI or a mockup"
+prompt = "Ask the user for the target file or surface and the impeccable command. Invoke the impeccable skill with that command and `--target <file>`."
+
+[[agent.menu]]
+code = "CR"
+description = "Critique a built UI or a mockup with impeccable (report only)"
+prompt = "Ask the user for the target file or surface. Invoke the impeccable skill with `critique` and `--target <file>`. Do not change files."
+
+[[agent.menu]]
+code = "PL"
+description = "Polish alignment, spacing and consistency with impeccable"
+prompt = "Ask the user for the target file or surface. Invoke the impeccable skill with `polish` and `--target <file>`. Use the newest snapshot in .impeccable/critique/ for priorities when one exists for that target."
+
+[[agent.menu]]
+code = "DI"
+description = "Simplify a crowded surface with impeccable distill"
+prompt = "Ask the user for the target file or surface. Invoke the impeccable skill with `distill` and `--target <file>`."
+
+[[agent.menu]]
+code = "CL"
+description = "Fix UX copy, labels and error messages with impeccable clarify"
+prompt = "Ask the user for the target file or surface. Invoke the impeccable skill with `clarify` and `--target <file>`. DESIGN.md owns the copy. Report each change that departs from DESIGN.md copy before you make it."
+
+[[agent.menu]]
+code = "HA"
+description = "Harden edge cases, overflow and error states with impeccable"
+prompt = "Ask the user for the target file or surface. Invoke the impeccable skill with `harden` and `--target <file>`. EXPERIENCE.md owns the states. Do not add a state that EXPERIENCE.md does not name."

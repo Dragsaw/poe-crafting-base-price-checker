@@ -17,3 +17,10 @@ Save the full markdown report to a new file — never overwrite an existing one;
 - anything else (a bare code diff, epics.md, or content with no owning folder) → {project-root}/docs/reviews/
 Name the file review-<slug of what was reviewed>.md. Tell the user where it was saved.
 """
+
+[[workflow.lenses]]
+code = "impeccable"
+name = "Impeccable Design Review"
+applies_to = "any"
+when = "UI code under packages/web/src/, or a UX mockup."
+instruction = "Read `{project-root}/_bmad/custom/prompts/impeccable-design-review.md` and follow its steps and rules on the content under review. Emit findings in the canonical fields, not in the output form of that file."
