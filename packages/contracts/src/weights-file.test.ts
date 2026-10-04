@@ -9,7 +9,7 @@ type Json = Record<string, unknown>;
 
 function entryOf(overrides: Json = {}): Json {
   return {
-    sourceModifierId: 'prefix\u0000BaseSpirit\u000016\u0000+# to Spirit',
+    sourceModifierId: 'prefix\0BaseSpirit\u{0}16\0+# to Spirit',
     modGroup: 'BaseSpirit',
     itemLevelMin: 16,
     tierLabel: 'T5',

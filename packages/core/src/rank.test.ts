@@ -561,7 +561,7 @@ function permute<T>(items: readonly T[], seed: number): T[] {
   const copy = [...items];
   let state = seed;
   for (let index = copy.length - 1; index > 0; index -= 1) {
-    state = (state * 1103515245 + 12345) % 2147483648;
+    state = (state * 1_103_515_245 + 12_345) % 2_147_483_648;
     const swap = state % (index + 1);
     const held = copy[index] as T;
     copy[index] = copy[swap] as T;
@@ -578,7 +578,7 @@ describe('rank: purity and determinism', () => {
   it('shuffled input gives an identical Ranking', () => {
     const input = matrixInput();
     const expected = rank(input);
-    for (const seed of [1, 7, 42, 1234, 99991]) {
+    for (const seed of [1, 7, 42, 1234, 99_991]) {
       const shuffled: RankInput = {
         ...input,
         tracked: permute(input.tracked, seed),

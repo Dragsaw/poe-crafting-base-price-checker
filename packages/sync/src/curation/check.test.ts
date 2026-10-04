@@ -18,7 +18,7 @@ import { DataFileError } from '../load-data-file.ts';
 import { checkTracked, loadTrackedCheckInputs, main } from './check.ts';
 import type { TrackedCheckInputs } from './check.ts';
 
-const SCRIPT = fileURLToPath(new URL('./check.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('check.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../../data', import.meta.url));
 

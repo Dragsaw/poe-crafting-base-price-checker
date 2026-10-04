@@ -60,7 +60,7 @@ describe('writeArtifact', () => {
     await writeArtifact(fs, PATH, DatasetFileSchema, reversed());
     const text = (await fs.readTextFile(PATH)) ?? '';
     expect(text.charCodeAt(0)).toBe('{'.charCodeAt(0));
-    expect(text).not.toContain('\uFEFF');
+    expect(text).not.toContain('\u{FEFF}');
     expect(text).not.toContain('\r');
     expect(text.endsWith('}\n')).toBe(true);
     expect(text.endsWith('\n\n')).toBe(false);

@@ -24,6 +24,6 @@ describe('plural', () => {
 describe('NBSP', () => {
   it('is U+00A0', () => {
     expect(NBSP).toHaveLength(1);
-    expect(NBSP.codePointAt(0)).toBe(0xa0);
+    expect(NBSP.codePointAt(0)).toBe(0xA0);
   });
 });

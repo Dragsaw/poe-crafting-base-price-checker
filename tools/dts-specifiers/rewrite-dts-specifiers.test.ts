@@ -23,7 +23,7 @@ import {
   TARGET_PACKAGES,
 } from './rewrite-dts-specifiers';
 
-const TOOL = fileURLToPath(new URL('./rewrite-dts-specifiers.ts', import.meta.url));
+const TOOL = fileURLToPath(new URL('rewrite-dts-specifiers.ts', import.meta.url));
 const ROOT_PACKAGE_JSON = fileURLToPath(new URL('../../package.json', import.meta.url));
 const PACKAGES_DIR = fileURLToPath(new URL('../../packages', import.meta.url));
 

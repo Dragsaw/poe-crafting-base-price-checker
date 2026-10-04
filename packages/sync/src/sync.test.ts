@@ -83,7 +83,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
-const SCRIPT = fileURLToPath(new URL('./sync.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('sync.ts', import.meta.url));
 
 const LEAGUE = 'Test League';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -335,9 +335,9 @@ describe('nextWait: the session matrix', () => {
   });
 
   it('penalty: a deferred chunk waits until its notBefore', () => {
-    expect(nextWait(outcome({ ...base, kind: 'deferred', notBefore: at(5_000) }), INITIAL_SESSION_STATE, COLD)).toEqual({
+    expect(nextWait(outcome({ ...base, kind: 'deferred', notBefore: at(5000) }), INITIAL_SESSION_STATE, COLD)).toEqual({
       kind: 'until',
-      until: at(5_000),
+      until: at(5000),
       reason: 'a trade penalty',
       orInputChange: false,
     });
@@ -556,7 +556,7 @@ describe('runWait and the local polls', () => {
 
     await waiting;
 
-    expect(Date.now() - started).toBeLessThan(5_000);
+    expect(Date.now() - started).toBeLessThan(5000);
   });
 });
 
@@ -988,7 +988,7 @@ describe('pnpm sync: the session with injected ports', () => {
     // of iteration 2 spreads the 3 left over 10 s (rounded up to a whole
     // millisecond); its search then leaves 2, so the fetch inside the lock
     // waits 10 000 / 2 − 0.
-    expect(sleeps).toEqual([3_334]);
+    expect(sleeps).toEqual([3334]);
     expect(waits).toEqual([10_000 / 2]);
   });
 

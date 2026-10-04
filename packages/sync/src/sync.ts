@@ -90,7 +90,7 @@ export const COLD_EVEN_INTERVAL_MS = 36_000;
  * How often a wait polls the local input files or the lock file. A local
  * read, never a request: an idle wait sends nothing.
  */
-export const LOCAL_POLL_MS = 5_000;
+export const LOCAL_POLL_MS = 5000;
 
 /**
  * The hand-owned inputs under `data/` a chunk reads and never writes. A change

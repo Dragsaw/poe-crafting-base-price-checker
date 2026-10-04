@@ -42,7 +42,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  * closure over an array, so a test run never touches `data/`.
  */
 
-const SCRIPT = fileURLToPath(new URL('./catalogue-refresh.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('catalogue-refresh.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
 

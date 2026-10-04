@@ -27,7 +27,7 @@ import { CONCURRENT_CASES } from './guard-concurrent-fixture/names';
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
-const CHILD_CONFIG = fileURLToPath(new URL('./guard-concurrent-fixture/vitest.config.ts', import.meta.url));
+const CHILD_CONFIG = fileURLToPath(new URL('guard-concurrent-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
   readonly title: string;

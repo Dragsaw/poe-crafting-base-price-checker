@@ -39,22 +39,22 @@ afterEach(() => {
   failure.badShape = false;
 });
 
-const ROOT = 'E:\\Projects\\poe';
+const ROOT = String.raw`E:\Projects\poe`;
 const NONE = new Set<number>();
 
 /** The chain observed under a background `pnpm dev` on Windows, harness shell included. */
 const CHAIN: readonly ProcessInfo[] = [
-  { pid: 1, ppid: 0, commandLine: 'C:\\Users\\me\\.local\\bin\\claude.exe' },
+  { pid: 1, ppid: 0, commandLine: String.raw`C:\Users\me\.local\bin\claude.exe` },
   { pid: 10, ppid: 1, commandLine: 'bash -c "pnpm dev --port 5199"' },
-  { pid: 11, ppid: 10, commandLine: '"C:\\Program Files\\Git\\usr\\bin\\sh.exe" /c/Users/me/npm/pnpm dev --port 5199' },
-  { pid: 12, ppid: 11, commandLine: 'C:\\Users\\me\\npm\\node_modules\\pnpm\\pnpm.exe dev --port 5199' },
-  { pid: 13, ppid: 12, commandLine: 'cmd.exe /d /c ""C:\\pnpm\\12.5.1\\bin\\pnpm.cmd" dev --port 5199"' },
-  { pid: 14, ppid: 13, commandLine: '"C:\\pnpm\\12.5.1\\pnpm.exe" dev --port 5199' },
+  { pid: 11, ppid: 10, commandLine: String.raw`"C:\Program Files\Git\usr\bin\sh.exe" /c/Users/me/npm/pnpm dev --port 5199` },
+  { pid: 12, ppid: 11, commandLine: String.raw`C:\Users\me\npm\node_modules\pnpm\pnpm.exe dev --port 5199` },
+  { pid: 13, ppid: 12, commandLine: String.raw`cmd.exe /d /c ""C:\pnpm\12.5.1\bin\pnpm.cmd" dev --port 5199"` },
+  { pid: 14, ppid: 13, commandLine: String.raw`"C:\pnpm\12.5.1\pnpm.exe" dev --port 5199` },
   { pid: 15, ppid: 14, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts "--port" "5199"' },
   {
     pid: 16,
     ppid: 15,
-    commandLine: 'node "E:\\Projects\\poe\\node_modules\\.bin\\\\..\\vite\\bin\\vite.js" --config packages/web/vite.config.ts',
+    commandLine: String.raw`node "E:\Projects\poe\node_modules\.bin\\..\vite\bin\vite.js" --config packages/web/vite.config.ts`,
   },
 ];
 
@@ -101,15 +101,15 @@ describe('planStop', () => {
 
   it('reads the real Windows forms: quoted cmd.exe path, extra cmd switches, pnpm store path', () => {
     const real = CHAIN.map((info) => {
-      if (info.pid === 15) {return { ...info, commandLine: '"C:\\WINDOWS\\system32\\cmd.exe" /d /s /c vite --config x' };}
-      if (info.pid === 14) {return { ...info, commandLine: '"C:\\pnpm\\bin\\\\..\\node_modules\\pnpm\\pnpm.exe"   dev --port 5199' };}
+      if (info.pid === 15) {return { ...info, commandLine: String.raw`"C:\WINDOWS\system32\cmd.exe" /d /s /c vite --config x` };}
+      if (info.pid === 14) {return { ...info, commandLine: String.raw`"C:\pnpm\bin\\..\node_modules\pnpm\pnpm.exe"   dev --port 5199` };}
       return info;
     });
     expect(planStop([16], real, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
   });
 
   it('accepts pnpm run dev and node running pnpm.cjs dev as the root', () => {
-    for (const commandLine of ['pnpm run dev', 'node C:\\npm\\pnpm\\bin\\pnpm.cjs dev', 'node --no-warnings pnpm.mjs run dev']) {
+    for (const commandLine of ['pnpm run dev', String.raw`node C:\npm\pnpm\bin\pnpm.cjs dev`, 'node --no-warnings pnpm.mjs run dev']) {
       const chain = CHAIN.map((info) => (info.pid === 14 ? { ...info, commandLine } : info));
       expect(planStop([16], chain, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
     }
@@ -143,7 +143,7 @@ describe('planStop', () => {
   it('does not take a workspace runner such as pnpm -r --parallel dev as the root', () => {
     const recursive: ProcessInfo[] = [
       { pid: 40, ppid: 1, commandLine: 'bash -c "pnpm -r --parallel dev"' },
-      { pid: 41, ppid: 40, commandLine: 'C:\\pnpm\\pnpm.exe -r --parallel dev' },
+      { pid: 41, ppid: 40, commandLine: String.raw`C:\pnpm\pnpm.exe -r --parallel dev` },
       { pid: 15, ppid: 41, commandLine: 'cmd.exe /d /s /c vite --config packages/web/vite.config.ts' },
       CHAIN.find((info) => info.pid === 16)!,
     ];
@@ -184,14 +184,14 @@ describe('planStop', () => {
   });
 
   it("refuses another worktree's Vite", () => {
-    expect(planStop([16], CHAIN, 'E:\\Projects\\poe-other', NONE)).toMatchObject({
+    expect(planStop([16], CHAIN, String.raw`E:\Projects\poe-other`, NONE)).toMatchObject({
       kind: 'refuse',
       reason: expect.stringContaining('PID 16 is not this checkout'),
     });
   });
 
   it('refuses a listener that is not Vite', () => {
-    const other = [{ pid: 50, ppid: 1, commandLine: 'E:\\Projects\\poe\\node_modules\\x\\server.exe' }];
+    const other = [{ pid: 50, ppid: 1, commandLine: String.raw`E:\Projects\poe\node_modules\x\server.exe` }];
     expect(planStop([50], other, ROOT, NONE)).toMatchObject({ kind: 'refuse' });
   });
 

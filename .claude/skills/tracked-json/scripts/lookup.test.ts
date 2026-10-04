@@ -27,7 +27,7 @@ import {
   WEIGHTS_PATH,
 } from './lookup';
 
-const SCRIPT = fileURLToPath(new URL('./lookup.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('lookup.ts', import.meta.url));
 const DATA_DIR = join(REPO_ROOT, 'data');
 
 const STATS = {
@@ -90,7 +90,7 @@ function tier(
   lines: readonly { statId: string | null; ranges: number[][] }[],
 ): Record<string, unknown> {
   return {
-    sourceModifierId: `${slot}\u0000${modGroup}\u0000${String(itemLevelMin)}\u0000${text}`,
+    sourceModifierId: `${slot}\0${modGroup}\0${String(itemLevelMin)}\0${text}`,
     modGroup,
     itemLevelMin,
     tierLabel,

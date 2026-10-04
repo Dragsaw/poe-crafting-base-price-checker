@@ -22,7 +22,7 @@ import { DELAY_ENV, ISSUER_TEST, LATE_URL } from './guard-after-last-file-fixtur
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
-const CHILD_CONFIG = fileURLToPath(new URL('./guard-after-last-file-fixture/vitest.config.ts', import.meta.url));
+const CHILD_CONFIG = fileURLToPath(new URL('guard-after-last-file-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
   readonly title: string;

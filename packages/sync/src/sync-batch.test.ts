@@ -58,7 +58,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
-const SCRIPT = fileURLToPath(new URL('./sync-batch.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('sync-batch.ts', import.meta.url));
 
 const LEAGUE = 'Test League';
 const NOW = '2026-09-26T12:00:00.000Z';

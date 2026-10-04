@@ -827,7 +827,7 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     // A lone unresolvable row makes the list honest-empty, so its EV cell reads state 23's phrase.
     expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
     const health = frame().querySelector('[data-trust-strip] [data-health-line]');
-    expect(health?.textContent?.replaceAll('\u00a0', ' ')).toBe('× 1 unresolvable');
+    expect(health?.textContent?.replaceAll('\u{A0}', ' ')).toBe('× 1 unresolvable');
   });
 
   // Matrix: only unresolvable.
@@ -963,7 +963,7 @@ describe('the list statement', () => {
       first?.click();
     });
     expect(frame().querySelector('[data-expansion-panel] [data-cell="state"]')?.textContent).toBe(
-      '∆ not-yet-synced · league-mismatch',
+      '∆\u{A0}not-yet-synced · league-mismatch',
     );
     expectChromeAround();
   });

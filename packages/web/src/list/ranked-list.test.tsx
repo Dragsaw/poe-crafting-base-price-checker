@@ -320,7 +320,7 @@ describe('the top-20 bound', () => {
 
 describe('the trust mark and the unit glyphs', () => {
   it('separates glyph and word with a U+200A hair space', () => {
-    expect(HAIR_SPACE).toBe(' ');
+    expect(HAIR_SPACE).toBe('\u{200A}');
   });
 
   it('renders the class glyph ≡ in sepia', () => {

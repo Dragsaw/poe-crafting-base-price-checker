@@ -137,7 +137,7 @@ describe('the Raw Base combination row', () => {
       ...priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH),
       lastAttemptedAt: hoursBefore(NOW, 11),
     });
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.priced}\u00a0priced`, '0.80', '10 listings']);
+    expect(line1(row)).toEqual(['no affixes', `${glyphs.priced}\u{A0}priced`, '0.80', '10 listings']);
     expect(line2(row)).toEqual([
       'no affixes — this Base Type priced as it drops, at Item Level 82',
       'priced 11h ago',
@@ -176,7 +176,7 @@ describe('the Raw Base combination row', () => {
   it('prints no-listings: ○, an open question, 0 listings found, the state-2 note, tried only', () => {
     const ring = rawEntry('Coral Ring');
     const row = openOne(ring, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 3), SEARCH));
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.noListings}\u00a0no-listings`, 'an open question', '0 listings found']);
+    expect(line1(row)).toEqual(['no affixes', `${glyphs.noListings}\u{A0}no-listings`, 'an open question', '0 listings found']);
     expect(line2(row)).toEqual([
       'nobody is listing this right now — a jackpot and junk look alike here',
       '',
@@ -193,7 +193,7 @@ describe('the Raw Base combination row', () => {
   it('prints unresolvable: × unresolvable, not valued in rust, no sample, the raw state-4 note, tried only', () => {
     const ring = rawEntry('Lost Ring');
     const row = openOne(ring, unpriced(ring, { state: 'unresolvable' }, hoursBefore(NOW, 5), SEARCH));
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.unresolvable}\u00a0unresolvable`, 'not valued', 'no sample']);
+    expect(line1(row)).toEqual(['no affixes', `${glyphs.unresolvable}\u{A0}unresolvable`, 'not valued', 'no sample']);
     expect(line2(row)).toEqual(['its id is gone from the trade API — a patch did this', '', 'tried 5h ago']);
     const phrase = cell(row, 'figure').querySelector<HTMLElement>('[data-money-phrase]');
     expect(phrase?.style.fontStyle).toBe('italic');
@@ -211,7 +211,7 @@ describe('the Raw Base combination row', () => {
     const row = openOne(belt, undefined);
     expect(line1(row)).toEqual([
       'no affixes',
-      `${glyphs.notYetSynced}\u00a0not-yet-synced · never-synced`,
+      `${glyphs.notYetSynced}\u{A0}not-yet-synced · never-synced`,
       'no figure yet',
       'no sample',
     ]);
@@ -225,7 +225,7 @@ describe('the Raw Base combination row', () => {
   it('prints a league mismatch with its reason and the state-6 note, and blanks an old-league link', () => {
     const amulet = rawEntry('Jade Amulet');
     const row = openOne(amulet, priced(amulet, 3, hoursBefore(NOW, 50), 'Standard', { id: 'old', league: 'Standard' }));
-    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u00a0not-yet-synced · league-mismatch`);
+    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · league-mismatch`);
     expect(line2(row)).toEqual(['the observation belongs to another league', '', 'tried 2d ago']);
     const blank = cell(row, 'trade-link');
     expect(blank.childNodes).toHaveLength(0);
@@ -238,7 +238,7 @@ describe('the Raw Base combination row', () => {
       ring,
       unpriced(ring, { state: 'not-yet-synced', reason: 'no-exchange-rate' }, hoursBefore(NOW, 6), SEARCH),
     );
-    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u00a0not-yet-synced · no-exchange-rate`);
+    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · no-exchange-rate`);
     expect(line2(row)).toEqual(['the listing currency had no rate at sync time', '', 'tried 6h ago']);
     expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
   });

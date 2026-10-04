@@ -140,7 +140,7 @@ it('matches the measured 2026-09-12 shape without compiling any of it in', () =>
   });
 
   expect(parsed.rules[0]?.buckets).toHaveLength(4);
-  expect(parsed.rules[0]?.buckets.at(-1)).toEqual({ hits: 600, seconds: 21600, penalty: 3600 });
+  expect(parsed.rules[0]?.buckets.at(-1)).toEqual({ hits: 600, seconds: 21_600, penalty: 3600 });
 });
 
 describe('ruleNameCount (IMPLEMENTATION-NOTES.md §13.2)', () => {

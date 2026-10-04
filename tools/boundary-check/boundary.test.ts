@@ -6,8 +6,8 @@ import { expect, it } from 'vitest';
 import shippedConfig from '../../.dependency-cruiser.mjs';
 import { rules } from '../../depcruise.rules.mjs';
 
-const FORBIDDEN_FIXTURE = fileURLToPath(new URL('./fixture/forbidden', import.meta.url));
-const ALLOWED_FIXTURE = fileURLToPath(new URL('./fixture/allowed', import.meta.url));
+const FORBIDDEN_FIXTURE = fileURLToPath(new URL('fixture/forbidden', import.meta.url));
+const ALLOWED_FIXTURE = fileURLToPath(new URL('fixture/allowed', import.meta.url));
 
 interface Violation {
   readonly rule: { readonly name: string; readonly severity: string };

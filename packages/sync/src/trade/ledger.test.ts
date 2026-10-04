@@ -200,7 +200,7 @@ it('spreads the remaining capacity of each bucket evenly over its period, the la
 
   expect(decision.delayMs).toBe(43_200);
   expect(decision.cause).toBe('spread');
-  expect(decision.bucket).toEqual({ hits: 600, seconds: 21600, penalty: 3600 });
+  expect(decision.bucket).toEqual({ hits: 600, seconds: 21_600, penalty: 3600 });
   // The batch pacer sees every bucket satisfied and asks nothing.
   expect(paceBeforeNext(ledger, SEARCH_POLICY, AT).delayMs).toBe(0);
 });

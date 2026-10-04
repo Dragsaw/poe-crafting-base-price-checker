@@ -17,7 +17,7 @@ import {
 
 export const THRESHOLD_LABEL = 'Payout Threshold';
 /** A no-break space joins the figure and the unit. */
-export const THRESHOLD_UNIT = `\u00a0${DENOMINATION}`;
+export const THRESHOLD_UNIT = `\u{A0}${DENOMINATION}`;
 export const RANGE_LOW = `${String(THRESHOLD_MIN)} ${DENOMINATION}`;
 export const RANGE_HIGH = `${String(THRESHOLD_MAX)} ${DENOMINATION}`;
 /** About 150ms between a valid parse and the re-rank (UX-DR18). */

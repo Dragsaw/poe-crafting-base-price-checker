@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 /** `pnpm tracked:check` over the live data/ (pnpm test:data). */
-const SCRIPT = fileURLToPath(new URL('./check.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('check.ts', import.meta.url));
 
 describe('pnpm tracked:check over the live data/', () => {
   it('exits 0 and passes the cross-file check', async () => {

@@ -113,7 +113,7 @@ describe('compareByCodeUnit', () => {
 
   it('orders by code point, which is UTF-8 byte order and not UTF-16 order', () => {
     const astral = '\u{1F600}';
-    const bmp = String.fromCodePoint(0xfffd);
+    const bmp = String.fromCodePoint(0xFF_FD);
     expect(compareByCodeUnit(bmp, astral)).toBeLessThan(0);
     expect(bmp < astral).toBe(false);
   });

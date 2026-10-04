@@ -53,7 +53,7 @@ export function Masthead({
     >
       <div style={{ maxWidth: px(spacing.dekMaxWidth) }}>
         <div style={{ ...typeStyle('eyebrow'), color: colors.sepia, textTransform: 'uppercase' }}>
-          {league === undefined ? ' ' : eyebrowText(league)}
+          {league === undefined ? '\u{A0}' : eyebrowText(league)}
         </div>
         <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
           {MASTHEAD_TITLE}

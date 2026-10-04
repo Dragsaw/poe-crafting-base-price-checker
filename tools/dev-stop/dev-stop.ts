@@ -47,7 +47,7 @@ export function parsePort(argv: readonly string[]): number {
   }
   if (raw === undefined) {return DEFAULT_PORT;}
   const port = Number(raw);
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
     throw new Error(`--port needs an integer from 1 to 65535, got "${raw}"`);
   }
   return port;

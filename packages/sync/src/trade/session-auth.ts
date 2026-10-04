@@ -77,7 +77,7 @@ export type SessionAuthState =
  * US-ASCII without controls, whitespace, DQUOTE, comma, semicolon and
  * backslash.
  */
-const COOKIE_OCTETS = '[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*';
+const COOKIE_OCTETS = String.raw`[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*`;
 const COOKIE_VALUE = new RegExp(`^(?:${COOKIE_OCTETS}|"${COOKIE_OCTETS}")$`);
 
 export function isCookieValue(value: string): boolean {

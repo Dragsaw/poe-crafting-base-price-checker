@@ -83,7 +83,7 @@ describe('the panel at rest', () => {
     expect(label.getAttribute('for')).toBe(input().id);
     const unit = part('data-threshold-unit');
     expect(unit.textContent).toBe(THRESHOLD_UNIT);
-    expect(THRESHOLD_UNIT).toBe(' Divine');
+    expect(THRESHOLD_UNIT).toBe('\u{A0}Divine');
     expect(unit.id).not.toBe('');
     expect(input().getAttribute('aria-describedby')).toBe(unit.id);
     expect(unit.contains(input())).toBe(false);

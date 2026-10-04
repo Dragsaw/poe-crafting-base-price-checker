@@ -45,7 +45,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('dry-run.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 const FROZEN_DATA_DIR = fileURLToPath(new URL('../../../test/fixtures/frozen-data', import.meta.url));

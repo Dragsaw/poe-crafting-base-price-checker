@@ -41,7 +41,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  * spawns, because a source scan passes just as happily on an inverted guard.
  */
 
-const SCRIPT = fileURLToPath(new URL('./fixtures-record.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('fixtures-record.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
 

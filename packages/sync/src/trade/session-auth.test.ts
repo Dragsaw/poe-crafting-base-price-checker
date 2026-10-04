@@ -22,7 +22,7 @@ describe('the cookie-value grammar (RFC 6265)', () => {
     expect(isCookieValue(value)).toBe(true);
   });
 
-  it.each(['a b', 'a;b', 'a,b', '"x', 'x"', 'a\\b', 'café', 'a\tb', 'a\u0000b', 'a\u007fb', '"a"b"'])(
+  it.each(['a b', 'a;b', 'a,b', '"x', 'x"', String.raw`a\b`, 'café', 'a\tb', 'a\0b', 'a\u{7F}b', '"a"b"'])(
     'refuses %j',
     (value) => {
       expect(isCookieValue(value)).toBe(false);

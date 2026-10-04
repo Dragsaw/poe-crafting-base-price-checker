@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
  * The dry-run script over the live data/ (pnpm test:data). The copy in
  * dry-run.test.ts keeps only the "writes nothing" guard.
  */
-const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 
 interface Run {

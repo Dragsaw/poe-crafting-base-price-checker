@@ -135,7 +135,7 @@ export function lookupBase(items: unknown, query: string): { matches: BaseMatch[
         continue;
       }
       const type = stringAt(entry, 'type');
-      const key = `${groupId}\u0000${type ?? ''}`;
+      const key = `${groupId}\0${type ?? ''}`;
       if (type === undefined || !contains(type, query) || seen.has(key)) {
         continue;
       }
