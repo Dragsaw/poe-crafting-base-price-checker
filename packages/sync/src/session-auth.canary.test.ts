@@ -230,11 +230,10 @@ function capturing(
       },
     },
     files: async () => {
-      const contents: string[] = [];
-      for (const path of written) {
-        contents.push(path, (await fs.readTextFile(path)) ?? '');
-      }
-      return contents;
+      const pairs = await Promise.all(
+        [...written].map(async (path) => [path, (await fs.readTextFile(path)) ?? ''] as const),
+      );
+      return pairs.flat();
     },
     lockFaults: () => lockFaults,
   };

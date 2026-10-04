@@ -39,9 +39,7 @@ async function temporaryDirectory(): Promise<string> {
 }
 
 afterEach(async () => {
-  for (const directory of temporaryDirectories.splice(0)) {
-    await rm(directory, { recursive: true, force: true });
-  }
+  await Promise.all(temporaryDirectories.splice(0).map((directory) => rm(directory, { recursive: true, force: true })));
 });
 
 it('creates a missing parent directory rather than failing on it', async () => {

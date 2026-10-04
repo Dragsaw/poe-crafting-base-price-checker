@@ -34,7 +34,7 @@ import {
 } from './test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from './load/artifacts';
 import { cssNumber } from './test-support/css-number';
-import { mount as mountNode, mountedContainer, rgb, unmount } from './test-support/dom';
+import { flush, mount as mountNode, mountedContainer, rgb, settleTo, unmount } from './test-support/dom';
 import { blur, pastDebounce, typeInto } from './test-support/threshold-input';
 import { PageProvider } from './theme/PageProvider';
 import { colors } from './theme/tokens';
@@ -58,25 +58,6 @@ function frame(): HTMLElement {
     throw new Error('no frame rendered');
   }
   return found;
-}
-
-/** Lets pending fetches and their continuations run, inside `act`. */
-async function flush(): Promise<void> {
-  await act(async () => {
-    for (let turn = 0; turn < 5; turn += 1) {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    }
-  });
-}
-
-async function settleTo(state: string): Promise<void> {
-  for (let attempt = 0; attempt < 50; attempt += 1) {
-    if (frame().dataset['state'] === state) {
-      return;
-    }
-    await flush();
-  }
-  throw new Error(`frame never reached ${state}; it is ${String(frame().dataset['state'])}`);
 }
 
 /**
@@ -133,6 +114,7 @@ describe('the pending state', () => {
     // Six of the seven arrive, one at a time; the page does not move.
     for (const key of ARTIFACT_ORDER.slice(0, 6)) {
       gates.get(key)?.open();
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the page is asserted unmoved after each single arrival
       await flush();
       expect(mountedContainer()?.outerHTML).toContain(pending);
       expect(frame().outerHTML).toBe(pending);

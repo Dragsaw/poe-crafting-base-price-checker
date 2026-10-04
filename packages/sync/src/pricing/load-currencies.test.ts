@@ -63,13 +63,15 @@ describe('loadActiveLeague', () => {
   });
 
   it('refuses an absent or invalid config file, naming it', async () => {
-    for (const contents of [undefined, JSON.stringify({ schemaVersion: '1.0.0' })]) {
-      const loaded = await loadActiveLeague(fsWith(contents, 'data/config.json'));
-      expect(loaded.ok).toBe(false);
-      if (!loaded.ok) {
-        expect(loaded.error.message).toContain('data/config.json');
-      }
-    }
+    await Promise.all(
+      [undefined, JSON.stringify({ schemaVersion: '1.0.0' })].map(async (contents) => {
+        const loaded = await loadActiveLeague(fsWith(contents, 'data/config.json'));
+        expect(loaded.ok).toBe(false);
+        if (!loaded.ok) {
+          expect(loaded.error.message).toContain('data/config.json');
+        }
+      }),
+    );
   });
 });
 

@@ -144,16 +144,15 @@ async function eslintUncovered(
 ): Promise<string[]> {
   const eslint =
     new ESLint(config === undefined ? { cwd: REPO_ROOT } : { cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
-  const covered: string[] = [];
-  for (const path of files) {
-    const ignored = await eslint.isPathIgnored(path);
-    const calculated: unknown = ignored ? undefined : await eslint.calculateConfigForFile(path);
-    const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
-    if (!ignored && rules?.[MAIN_BLOCK_RULE] !== undefined) {
-      covered.push(path);
-    }
-  }
-  return uncovered(files, covered);
+  const checked = await Promise.all(
+    files.map(async (path) => {
+      const ignored = await eslint.isPathIgnored(path);
+      const calculated: unknown = ignored ? undefined : await eslint.calculateConfigForFile(path);
+      const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
+      return !ignored && rules?.[MAIN_BLOCK_RULE] !== undefined ? [path] : [];
+    }),
+  );
+  return uncovered(files, checked.flat());
 }
 
 const loadEslintConfig = async (): Promise<readonly Linter.Config[]> =>

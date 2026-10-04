@@ -10,7 +10,7 @@ import { expandCopy } from '../list/RankedList';
 import { SHORT_FORMS } from '../list/short-forms';
 import { HAIR_SPACE } from '../list/TrustMark';
 import { serveArtifacts, sharedServer, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
-import { mount as mountNode, mountedContainer, rgb, unmount } from '../test-support/dom';
+import { mount as mountNode, mountedContainer, rgb, settleTo, unmount } from '../test-support/dom';
 import { banded, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
@@ -38,20 +38,6 @@ function frame(): HTMLElement {
     throw new Error('no frame rendered');
   }
   return found;
-}
-
-async function settleTo(state: string): Promise<void> {
-  for (let attempt = 0; attempt < 50; attempt += 1) {
-    if (frame().dataset['state'] === state) {
-      return;
-    }
-    await act(async () => {
-      for (let turn = 0; turn < 5; turn += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-      }
-    });
-  }
-  throw new Error(`frame never reached ${state}; it is ${String(frame().dataset['state'])}`);
 }
 
 // --- the fixture world --------------------------------------------------------
@@ -364,6 +350,7 @@ describe('the Craft Recipe control', () => {
     ]) {
       serveWorld(standardWorld({ recipes }));
       mount();
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one mounted root and one served world at a time
       await settleTo('refused');
       expect(frame().querySelector('[data-artifact]')?.textContent).toBe('recipes.json');
       unmount();

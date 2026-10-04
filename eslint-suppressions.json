@@ -587,12 +587,6 @@
     "max-lines": {
       "count": 1
     },
-    "no-await-in-loop": {
-      "count": 10
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -692,9 +686,6 @@
       "count": 1
     },
     "max-lines": {
-      "count": 1
-    },
-    "no-await-in-loop": {
       "count": 1
     },
     "unicorn/import-style": {
@@ -825,9 +816,6 @@
     }
   },
   "packages/sync/src/pricing/load-currencies.test.ts": {
-    "no-await-in-loop": {
-      "count": 1
-    },
     "vitest/no-conditional-expect": {
       "count": 1
     }
@@ -855,9 +843,6 @@
   "packages/sync/src/pricing/price-entry.fixtures.test.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "no-await-in-loop": {
-      "count": 1
     }
   },
   "packages/sync/src/pricing/price-entry.hybrid.test.ts": {
@@ -932,9 +917,6 @@
     "max-lines": {
       "count": 1
     },
-    "no-await-in-loop": {
-      "count": 1
-    },
     "vitest/no-conditional-expect": {
       "count": 3
     }
@@ -946,9 +928,6 @@
   },
   "packages/sync/src/shell.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "no-await-in-loop": {
       "count": 1
     },
     "unicorn/import-style": {
@@ -1059,9 +1038,6 @@
     "max-lines": {
       "count": 1
     },
-    "no-await-in-loop": {
-      "count": 3
-    },
     "vitest/no-conditional-expect": {
       "count": 2
     }
@@ -1168,9 +1144,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "no-await-in-loop": {
-      "count": 3
     },
     "unicorn/no-thenable": {
       "count": 1
@@ -1499,9 +1472,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "no-await-in-loop": {
-      "count": 3
     },
     "unicorn/no-null": {
       "count": 4
@@ -1869,9 +1839,6 @@
     },
     "local/max-comment-run": {
       "count": 4
-    },
-    "no-await-in-loop": {
-      "count": 2
     },
     "sonarjs/deprecation": {
       "count": 1

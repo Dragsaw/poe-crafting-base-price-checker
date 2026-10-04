@@ -524,12 +524,13 @@ describe('runChunk: the published dataset', () => {
   });
 
   it('re-serialise: the same inputs write byte-identical files', async () => {
-    const texts: (string | undefined)[] = [];
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      const { fs, ports } = harness(undefined, {}, { publication: PUBLISHING });
-      await run(ports, scriptedStep((entry) => ({ kind: 'completed', entry: noListings(entry) })).step);
-      texts.push(await fs.readTextFile(DATASET_PATH));
-    }
+    const texts = await Promise.all(
+      [0, 1].map(async () => {
+        const { fs, ports } = harness(undefined, {}, { publication: PUBLISHING });
+        await run(ports, scriptedStep((entry) => ({ kind: 'completed', entry: noListings(entry) })).step);
+        return fs.readTextFile(DATASET_PATH);
+      }),
+    );
     expect(texts[0]).toBeDefined();
     expect(texts[1]).toBe(texts[0]);
   });
@@ -890,14 +891,16 @@ describe('runChunk: the lock', () => {
   });
 
   it('refuses a later or malformed tracked major with the generic message', async () => {
-    for (const version of ['3.0.0', 'abc']) {
-      const fs = createFakeFilesystemPort({
-        [TRACKED_PATH]: { contents: JSON.stringify({ schemaVersion: version, entries: [] }) },
-      });
-      const failure = run({ fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION }, scriptedStep().step);
-      await expect(failure).rejects.toThrow(`schemaVersion ${version} refused`);
-      await expect(failure).rejects.not.toThrow(/Re-author/);
-    }
+    await Promise.all(
+      ['3.0.0', 'abc'].map(async (version) => {
+        const fs = createFakeFilesystemPort({
+          [TRACKED_PATH]: { contents: JSON.stringify({ schemaVersion: version, entries: [] }) },
+        });
+        const failure = run({ fs, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION }, scriptedStep().step);
+        await expect(failure).rejects.toThrow(`schemaVersion ${version} refused`);
+        await expect(failure).rejects.not.toThrow(/Re-author/);
+      }),
+    );
   });
 });
 
@@ -1121,24 +1124,26 @@ describe('runChunk: the Refresh Rotation', () => {
 
 describe('runChunk: the declared yardstick is never a chunk bound', () => {
   it('runs an identical chunk whatever the player config declares, and never reads it', async () => {
-    const outcomes = [];
-    for (const declared of [1, 3, 1000]) {
-      const { fs, ports } = harness(undefined, {
-        'data/config.json': {
-          contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: 'L', minChunkSearches: declared }),
-        },
-      });
-      const reads: string[] = [];
-      const reading = {
-        ...fs,
-        readTextFile: (path: string) => {
-          reads.push(path);
-          return fs.readTextFile(path);
-        },
-      };
-      outcomes.push(await run({ ...ports, fs: reading }, scriptedStep().step));
-      expect(reads).not.toContain('data/config.json');
-    }
+    const outcomes = await Promise.all(
+      [1, 3, 1000].map(async (declared) => {
+        const { fs, ports } = harness(undefined, {
+          'data/config.json': {
+            contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: 'L', minChunkSearches: declared }),
+          },
+        });
+        const reads: string[] = [];
+        const reading = {
+          ...fs,
+          readTextFile: (path: string) => {
+            reads.push(path);
+            return fs.readTextFile(path);
+          },
+        };
+        const outcome = await run({ ...ports, fs: reading }, scriptedStep().step);
+        expect(reads).not.toContain('data/config.json');
+        return outcome;
+      }),
+    );
     expect(outcomes[0]).toEqual(outcomes[1]);
     expect(outcomes[1]).toEqual(outcomes[2]);
   });
@@ -1653,25 +1658,27 @@ describe('runChunk: the Sync Report', () => {
   });
 
   it('dispossessed: no report write, on a normal finish or on a throw', async () => {
-    for (const throws of [false, true]) {
-      const { fs, ports } = harness([A, B]);
-      const successor = serialiseLock({ pid: 99, startedAt: NOW });
-      const running = run(ports, (entry) => {
-        fs.setFile(LOCK_PATH, { contents: successor });
-        return throws && key(entry) === key(B)
-          ? Promise.reject(new Error('late'))
-          : Promise.resolve({ kind: 'completed' });
-      });
-      if (throws) {
-        await expect(running).rejects.toThrow('late');
-      } else {
-        const outcome = await running;
-        expect(outcome.kind).toBe('dispossessed');
-      }
-      expect(await fs.exists(REPORT_PATH)).toBe(false);
-      expect(await fs.exists(DATASET_PATH)).toBe(false);
-      expect(await fs.readTextFile(LOCK_PATH)).toBe(successor);
-    }
+    await Promise.all(
+      [false, true].map(async (throws) => {
+        const { fs, ports } = harness([A, B]);
+        const successor = serialiseLock({ pid: 99, startedAt: NOW });
+        const running = run(ports, (entry) => {
+          fs.setFile(LOCK_PATH, { contents: successor });
+          return throws && key(entry) === key(B)
+            ? Promise.reject(new Error('late'))
+            : Promise.resolve({ kind: 'completed' });
+        });
+        if (throws) {
+          await expect(running).rejects.toThrow('late');
+        } else {
+          const outcome = await running;
+          expect(outcome.kind).toBe('dispossessed');
+        }
+        expect(await fs.exists(REPORT_PATH)).toBe(false);
+        expect(await fs.exists(DATASET_PATH)).toBe(false);
+        expect(await fs.readTextFile(LOCK_PATH)).toBe(successor);
+      }),
+    );
   });
 
   it('invalid previous: an unknown major refuses loudly and writes nothing', async () => {

@@ -123,13 +123,15 @@ describe('createPricingStep against the recorded captures', () => {
   );
 
   it('takes the lower median of the normalised captures', async () => {
-    const prices: number[] = [];
-    for (const entry of tracked) {
-      const { result } = await priceWithCaptures(entry);
-      if (result.entry?.price.state === 'priced') {
-        prices.push(result.entry.price.observation.priceDivine);
-      }
-    }
+    const results = await Promise.all(
+      tracked.map(async (entry) => {
+        const { result } = await priceWithCaptures(entry);
+        return result;
+      }),
+    );
+    const prices = results.flatMap(({ entry }) =>
+      entry?.price.state === 'priced' ? entry.price.observation.priceDivine : [],
+    );
     // Worked by hand from the six recorded fetches and the pinned rates above:
     // e.g. ten listings → the 5th of 10 is 155 ex × 0.002012 = 0.3119, and the
     // summed-statId entry's 5th of 10 is 2 ex × 0.002012 = 0.004.

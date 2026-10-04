@@ -10,6 +10,7 @@ import {
   laneDelayMs,
   penaltyRetryAfterMs,
   resetPacingState,
+  type TradeClient,
 } from './client.ts';
 import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from './session-auth.ts';
 import { MissingUserAgentError, USER_AGENT_ENV_VAR } from './user-agent.ts';
@@ -387,6 +388,7 @@ it('counts but never refuses when no threshold was declared', async () => {
   });
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: each refusal must reach the governor before the next send
     await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
   }
 
@@ -685,10 +687,11 @@ it('spreads the next search evenly when asked to, and never without', async () =
     userAgent: CONTACT,
   });
 
-  for (let sent = 0; sent < 2; sent += 1) {
-    await spreadGovernor.clients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
-    await batchClients.only.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
-  }
+  const sendTwice = async (client: TradeClient): Promise<void> => {
+    await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+    await client.send({ method: 'POST', url: SEARCH_URL, lane: 'search' });
+  };
+  await Promise.all([sendTwice(spreadGovernor.clients.only), sendTwice(batchClients.only)]);
 
   // Cold first, then max(300 000 / 10, 21 600 000 / 500).
   expect(spread.waits).toEqual([43_200]);

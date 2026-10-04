@@ -248,9 +248,11 @@ describe('dryRun', () => {
     ['stats', 'data/catalogue/stats.json'],
     ['filters', 'data/catalogue/filters.json'],
   ] as const)('refuses an absent or invalid %s file, naming it, before any request', async (key, path) => {
-    for (const contents of [undefined, '{"schemaVersion":"1.0.0"}']) {
-      await expect(dryRun(snapshotOf(entries, { [key]: contents }))).rejects.toThrow(path);
-    }
+    await Promise.all(
+      [undefined, '{"schemaVersion":"1.0.0"}'].map((contents) =>
+        expect(dryRun(snapshotOf(entries, { [key]: contents }))).rejects.toThrow(path),
+      ),
+    );
   });
 
   it('records an absent weights file and runs otherwise unchanged', async () => {
