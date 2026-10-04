@@ -658,9 +658,6 @@
     }
   },
   "packages/sync/src/trade/session-auth.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 16
     }

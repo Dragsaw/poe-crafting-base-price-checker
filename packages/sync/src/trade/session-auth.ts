@@ -325,25 +325,35 @@ function redactWith(thrown: unknown, forms: readonly string[], seen: Set<object>
   const target = thrown as Record<string | symbol, unknown>;
   // `message` and `stack` are own properties of an Error, so this covers them.
   for (const key of Reflect.ownKeys(target)) {
-    let current: unknown;
-    try {
-      current = target[key];
-    } catch {
-      continue;
-    }
-    if (typeof current !== 'string' && (typeof current !== 'object' || current === null)) {
-      continue;
-    }
-    const next = redactWith(current, forms, seen);
-    if (next !== current) {
-      try {
-        target[key] = next;
-      } catch {
-        // A frozen or accessor-only property: nothing more can be done here.
-      }
-    }
+    redactProperty(target, key, forms, seen);
   }
   return thrown;
+}
+
+function redactProperty(
+  target: Record<string | symbol, unknown>,
+  key: string | symbol,
+  forms: readonly string[],
+  seen: Set<object>,
+): void {
+  let current: unknown;
+  try {
+    current = target[key];
+  } catch {
+    return;
+  }
+  if (typeof current !== 'string' && (typeof current !== 'object' || current === null)) {
+    return;
+  }
+  const next = redactWith(current, forms, seen);
+  if (next === current) {
+    return;
+  }
+  try {
+    target[key] = next;
+  } catch {
+    // A frozen or accessor-only property: nothing more can be done here.
+  }
 }
 
 /**
