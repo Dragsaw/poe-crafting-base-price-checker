@@ -521,9 +521,6 @@
     }
   },
   "packages/sync/src/pricing/search-body.ts": {
-    "local/max-comment-run": {
-      "count": 7
-    },
     "max-lines-per-function": {
       "count": 1
     }

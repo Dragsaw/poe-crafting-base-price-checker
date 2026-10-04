@@ -1,31 +1,11 @@
 /**
- * The AD-16 search body, built from the tracked entry alone
- * (`IMPLEMENTATION-NOTES.md` §5.1, §5.2, §5.5, §10.2).
- *
- * Pure: an entry and the committed item catalogue in, a body out. It issues no
- * request and reads no file. The one refusal it can raise on a schema-valid
- * entry — a `jewel`-arm base type the catalogue does not carry — is thrown
- * **before** any request exists, so a wrong class name never becomes a search
- * issued in hope. The pricing step catches it and marks that one entry
- * `unresolvable` (AD-25). A summed `statId` with a valueless operand also
- * throws, but the tracked schema refuses such an entry first (§2.3).
- *
- * The object literals below are written in one fixed key order. The body is
- * serialised with `JSON.stringify`, and a stable order is what makes one entry
- * produce one byte string — which is what the recorded fixtures are keyed on.
+ * The AD-16 search body, pure and built before any request (IMPLEMENTATION-NOTES.md §5.1, §5.2, §5.5, §10.2).
  */
 
 import { canonicalKey, defenceLettersOf, linesOf, summedInterval, summedStatIds } from '@poe/contracts';
 import type { CraftedTrackedEntry, DefenceLetter, ItemCatalogue, NamedLine, TrackedEntry } from '@poe/contracts';
 
-/**
- * The committed item catalogue as the search builder reads it: every
- * `items.json` group id mapped to the base type names that group carries.
- *
- * A group id is read in exactly one place, `discriminatorOf` below, to decide
- * whether a plain class takes the type arm. Base types are never mapped to a
- * category or the other way round.
- */
+/** The `items.json` groups as the builder reads them: group id to base type names, read only by `discriminatorOf`. */
 export type ItemTypes = ReadonlyMap<string, ReadonlySet<string>>;
 
 export function itemTypesOf(catalogue: ItemCatalogue): ItemTypes {
@@ -40,11 +20,7 @@ export function itemTypesOf(catalogue: ItemCatalogue): ItemTypes {
   return types;
 }
 
-/**
- * The `jewel`-arm refusal (`IMPLEMENTATION-NOTES.md` §10.2, AD-25): the base
- * type derived from a plain `className` is not in `catalogue/items.json`. It
- * names the class, and it is raised before any request.
- */
+/** The `jewel`-arm refusal: the derived base type is not in `items.json` (IMPLEMENTATION-NOTES.md §10.2, AD-25). */
 export class UnknownClassBaseTypeError extends Error {
   readonly entryKey: string;
   readonly categoryId: string;
@@ -110,18 +86,7 @@ type Discriminator =
   | { readonly arm: 'type'; readonly baseTypeId: string }
   | { readonly arm: 'none' };
 
-/**
- * `IMPLEMENTATION-NOTES.md` §10.2, arms tried **in order**.
- *
- * Arm 2's condition is the category's composition, never the literal string
- * `"jewel"`. `sync` builds a search without the weights file (AD-5), so the
- * composition is read from the one committed artifact that has it: a
- * `categoryId` that names a whole `items.json` group is a category whose
- * members the catalogue enumerates as base types, and a plain class under it is
- * one of those base types with spaces written as underscores. Every other plain
- * class takes arm 3: its category carries one class, and the category filter is
- * already exact.
- */
+/** Arms tried in order (§10.2); arm 2 reads the category's composition from `items.json`, never the string "jewel" (AD-5). */
 function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Discriminator {
   const letters = defenceLettersOf(entry.className);
   if (letters !== undefined) {
@@ -138,13 +103,7 @@ function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Disc
   return { arm: 'none' };
 }
 
-/**
- * The stat filter of one line a reference names: one for a single-line
- * reference, one per line for a hybrid (AD-16, SPEC-tracked-hybrid-mods
- * CAP-2). A banded edge goes out **exactly** as declared — never rounded to
- * reach an integer — and `disabled: false` is written on every filter (§5.1).
- * A valueless line carries `{}`.
- */
+/** One stat filter per reference line; a banded edge goes out exactly as declared, never rounded (§5.1, AD-16). */
 function statFilterOfLine(line: NamedLine): StatFilter {
   return {
     id: line.statId,
@@ -153,16 +112,7 @@ function statFilterOfLine(line: NamedLine): StatFilter {
   };
 }
 
-/**
- * The entry's stat filters, prefix lines then suffix lines, in one `and`
- * group. The schema already sorted a hybrid's lines by `statId`.
- *
- * A summed `statId` (`summedStatIds`, IMPLEMENTATION-NOTES.md §2.1) goes out
- * as **one** filter, §5.5's sum: it takes its prefix line's place, and the
- * suffix line on it is dropped, so no id repeats. The sum is plain addition
- * and never rounded (AD-16). A valueless operand has no edge to add; the
- * schema refuses one (§2.3), so meeting one here throws.
- */
+/** Prefix lines then suffix lines in one `and` group; a summed `statId` is one filter in its prefix line's place (§5.5). */
 function statFiltersOf(entry: TrackedEntry): StatFilter[] {
   if (entry.kind === 'raw') {
     return [];
@@ -190,24 +140,12 @@ function edgeFor(letters: ReadonlySet<DefenceLetter>, letter: DefenceLetter): Fi
   return letters.has(letter) ? { min: 1 } : { max: 0 };
 }
 
+// One fixed key order: the body is serialised with JSON.stringify and the recorded fixtures key on its bytes.
 const STATUS = { option: 'securable' } as const;
 const TRADE_FILTERS = { filters: { price: { option: 'exalted_divine' } } } as const;
 const SORT = { price: 'asc' } as const;
 
-/**
- * The search body for one tracked entry (AD-16).
- *
- * - A **raw** entry sends `query.type` = its `baseTypeId`, no category, rarity
- *   `normal`.
- * - A **crafted** entry sends `type_filters.category`, rarity `magic`, and its
- *   class discriminator: all three defence keys (arm 1), `query.type` beside
- *   the category (arm 2), or nothing more (arm 3).
- *
- * `acceptedTier` is never read. No `trade_filters.sale_type` is emitted.
- *
- * @throws UnknownClassBaseTypeError where arm 2 derives a base type the
- *   catalogue does not carry.
- */
+/** The AD-16 body for one entry; `acceptedTier` is never read. @throws UnknownClassBaseTypeError on an arm 2 miss. */
 export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): SearchBody {
   const stats = [{ type: 'and', filters: statFiltersOf(entry) }] as const;
   const ilvl = { min: entry.itemLevelMin };
