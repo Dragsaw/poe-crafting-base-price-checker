@@ -32,7 +32,8 @@ it('serves the repo data/ folder as static files under a relative base', () => {
 it('never imports data/** from source', () => {
   const offenders: string[] = [];
   const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const entries = readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
       const full = join(dir, entry.name);
       if (entry.isDirectory()) {
         walk(full);

@@ -33,7 +33,8 @@ const FIXTURES_RECORD_KEY = /^\s*'poesessid',\s*$/;
 
 function sourceFilesUnder(directory: string): string[] {
   const found: string[] = [];
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+  const entries = readdirSync(directory, { withFileTypes: true });
+  for (const entry of entries) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
       found.push(...sourceFilesUnder(path));
@@ -51,7 +52,8 @@ function sourceFilesUnder(directory: string): string[] {
 
 function packageSources(): string[] {
   const sources: string[] = [];
-  for (const entry of readdirSync(PACKAGES_DIR, { withFileTypes: true })) {
+  const entries = readdirSync(PACKAGES_DIR, { withFileTypes: true });
+  for (const entry of entries) {
     if (!entry.isDirectory()) {
       continue;
     }

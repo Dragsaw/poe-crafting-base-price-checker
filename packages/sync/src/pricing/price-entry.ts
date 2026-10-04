@@ -153,7 +153,8 @@ function parseListings(body: string): Listing[] | undefined {
     return undefined;
   }
   const listings: Listing[] = [];
-  for (const item of data['result']) {
+  const items = data['result'];
+  for (const item of items) {
     if (!isRecord(item) || !isRecord(item['listing'])) {
       continue;
     }
@@ -162,7 +163,7 @@ function parseListings(body: string): Listing[] | undefined {
       continue;
     }
     const { amount, currency } = price;
-    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0 || typeof currency !== 'string' || currency === '') {
+    if (typeof amount !== 'number' || typeof currency !== 'string' || currency === '' || !Number.isFinite(amount) || amount <= 0) {
       continue;
     }
     listings.push({ amount, currency });

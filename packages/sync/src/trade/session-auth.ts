@@ -130,7 +130,8 @@ function redactableForms(value: string): string[] {
   const quoted = value.length >= 2 && value.startsWith('"') && value.endsWith('"');
   const forms = new Set(formsOf(value));
   if (quoted && value.length > 2) {
-    for (const form of formsOf(value.slice(1, -1))) {
+    const inner = formsOf(value.slice(1, -1));
+    for (const form of inner) {
       forms.add(form);
     }
   }

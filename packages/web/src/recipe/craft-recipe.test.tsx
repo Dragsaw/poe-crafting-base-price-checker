@@ -1,3 +1,4 @@
+import { compareByCodeUnit } from '@poe/contracts';
 import type { CraftedTrackedEntry, CraftRecipe, CurrencyRate, DatasetEntry, ModifierWeight, TrackedEntry } from '@poe/contracts';
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -615,7 +616,7 @@ describe('the chase cells', () => {
       prefix: {
         kind: 'hybrid',
         acceptedTier: 'T1-T2',
-        lines: statIds.map((statId) => ({ statId, valueMin: 1, valueMax: 10 })).sort((a, b) => (a.statId < b.statId ? -1 : 1)),
+        lines: statIds.toSorted(compareByCodeUnit).map((statId) => ({ statId, valueMin: 1, valueMax: 10 })),
       },
       suffix: banded(COLD_RES, 1, 10, 'T1'),
       status: 'active',

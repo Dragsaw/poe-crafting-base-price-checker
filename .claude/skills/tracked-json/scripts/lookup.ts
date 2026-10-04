@@ -173,7 +173,8 @@ function categoryTexts(filters: unknown): Map<string, string> {
       if (!isRecord(filter) || filter['id'] !== 'category') {
         continue;
       }
-      for (const option of arrayAt(filter['option'], 'options')) {
+      const options = arrayAt(filter['option'], 'options');
+      for (const option of options) {
         if (!isRecord(option)) {
           continue;
         }
@@ -273,7 +274,8 @@ export function lookupMods(
 ): { categoryId: string; className: string; mods: ModRow[] } {
   const resolved = resolveClass(weights, selector);
   const mods: ModRow[] = [];
-  for (const slot of selector.slot === undefined ? SLOTS : [selector.slot]) {
+  const slots = selector.slot === undefined ? SLOTS : [selector.slot];
+  for (const slot of slots) {
     const pool = resolved.pools[slot];
     // A family is (modGroup, line set): a modGroup can hold several mod families, so a hybrid
     // is one row and two families of one modGroup are two rows. `core` owns the line set and
@@ -404,7 +406,7 @@ export function parseCommand(argv: readonly string[]): Command {
       if (query === undefined) {
         throw new UsageError(`${kind}: missing <query>`);
       }
-      if (values.class !== undefined || values.slot !== undefined || category !== undefined) {
+      if (category !== undefined || values.class !== undefined || values.slot !== undefined) {
         throw new UsageError(`${kind}: takes no options`);
       }
       return { kind, query };

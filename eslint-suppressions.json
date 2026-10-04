@@ -58,12 +58,6 @@
     },
     "unicorn/no-unnecessary-array-flat-map": {
       "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 2
-    },
-    "unicorn/prefer-simple-condition-first": {
-      "count": 1
     }
   },
   ".dependency-cruiser.mjs": {
@@ -447,9 +441,6 @@
     },
     "unicorn/no-unnecessary-parameters": {
       "count": 2
-    },
-    "unicorn/prefer-simple-sort-comparator": {
-      "count": 1
     },
     "unicorn/require-array-sort-compare": {
       "count": 9
@@ -868,9 +859,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 2
     }
   },
   "packages/sync/src/dry-run.ts": {
@@ -927,9 +915,6 @@
       "count": 1
     },
     "unicorn/import-style": {
-      "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
       "count": 1
     }
   },
@@ -1107,12 +1092,6 @@
     },
     "max-statements": {
       "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
-    },
-    "unicorn/prefer-simple-condition-first": {
-      "count": 1
     }
   },
   "packages/sync/src/pricing/search-body.test.ts": {
@@ -1153,9 +1132,6 @@
       "count": 1
     },
     "unicorn/no-unnecessary-parameters": {
-      "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
       "count": 1
     },
     "vitest/no-conditional-expect": {
@@ -1317,9 +1293,6 @@
     "unicorn/no-array-sort": {
       "count": 1
     },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
-    },
     "unicorn/prefer-await": {
       "count": 3
     }
@@ -1344,9 +1317,6 @@
     "sonarjs/cognitive-complexity": {
       "count": 1
     },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
-    },
     "unicorn/prefer-iterator-to-array": {
       "count": 1
     }
@@ -1359,9 +1329,6 @@
   "packages/sync/src/trade/rate-limit-headers.ts": {
     "local/max-comment-run": {
       "count": 8
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
     }
   },
   "packages/sync/src/trade/session-auth.test.ts": {
@@ -1387,9 +1354,6 @@
     },
     "unicorn/no-array-sort": {
       "count": 2
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
     }
   },
   "packages/sync/src/trade/transport-failure.ts": {
@@ -1579,9 +1543,6 @@
     },
     "unicorn/no-null": {
       "count": 2
-    },
-    "unicorn/prefer-default-parameters": {
-      "count": 1
     }
   },
   "packages/web/src/list/RankedRow.tsx": {
@@ -1798,15 +1759,12 @@
       "count": 1
     },
     "unicorn/no-array-sort": {
-      "count": 3
+      "count": 2
     },
     "unicorn/no-null": {
       "count": 4
     },
     "unicorn/no-unnecessary-parameters": {
-      "count": 1
-    },
-    "unicorn/prefer-simple-sort-comparator": {
       "count": 1
     },
     "unicorn/require-array-sort-compare": {
@@ -1946,9 +1904,6 @@
     },
     "unicorn/name-replacements": {
       "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
     }
   },
   "packages/web/vite.config.ts": {
@@ -1978,9 +1933,6 @@
       "count": 1
     },
     "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
       "count": 1
     },
     "unicorn/require-array-sort-compare": {
@@ -2231,9 +2183,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 2
     }
   },
   "test/no-network.test.ts": {
@@ -2272,9 +2221,6 @@
     "unicorn/no-array-sort": {
       "count": 7
     },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
-    },
     "unicorn/require-array-sort-compare": {
       "count": 7
     }
@@ -2285,9 +2231,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 2
     }
   },
   "test/setup.ts": {
@@ -2360,9 +2303,6 @@
     },
     "unicorn/no-null": {
       "count": 3
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 1
     }
   },
   "tools/deferred-issues/fixture.ts": {
@@ -2401,12 +2341,6 @@
     },
     "unicorn/no-array-sort": {
       "count": 3
-    },
-    "unicorn/no-unreadable-for-of-expression": {
-      "count": 2
-    },
-    "unicorn/prefer-default-parameters": {
-      "count": 1
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {
@@ -2510,9 +2444,6 @@
       "count": 5
     },
     "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/no-unreadable-for-of-expression": {
       "count": 1
     },
     "unicorn/require-array-sort-compare": {

@@ -33,7 +33,8 @@ export const ALLOWLIST = [
 function filesUnder(dir) {
   const out = [];
   const walk = (current) => {
-    for (const entry of readdirSync(current, { withFileTypes: true })) {
+    const entries = readdirSync(current, { withFileTypes: true });
+    for (const entry of entries) {
       const full = join(current, entry.name);
       if (entry.isDirectory()) {
         walk(full);

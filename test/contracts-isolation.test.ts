@@ -58,7 +58,8 @@ function workspaceEdgesOf(manifest: Manifest): string[] {
   ];
   const edges = new Set<string>();
   for (const field of fields) {
-    for (const name of Object.keys(field ?? {})) {
+    const names = Object.keys(field ?? {});
+    for (const name of names) {
       if (name.startsWith(SCOPE)) {
         edges.add(name);
       }

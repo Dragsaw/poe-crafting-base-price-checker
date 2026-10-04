@@ -36,7 +36,8 @@ function tree(files: readonly string[]): string {
 function filesUnder(dir: string): string[] {
   const out: string[] = [];
   const walk = (current: string): void => {
-    for (const entry of readdirSync(current, { withFileTypes: true })) {
+    const entries = readdirSync(current, { withFileTypes: true });
+    for (const entry of entries) {
       const full = join(current, entry.name);
       if (entry.isDirectory()) {
         walk(full);

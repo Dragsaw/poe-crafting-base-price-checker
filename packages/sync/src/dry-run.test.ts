@@ -407,7 +407,8 @@ describe('dryRun: the dataset snapshot', () => {
     );
     // Every tracked entry was visited, so every entry is this run's, stamped
     // with the default clock: the snapshot's own latest `lastAttemptedAt`.
-    for (const entry of report.dataset?.entries ?? []) {
+    const reported = report.dataset?.entries ?? [];
+    for (const entry of reported) {
       expect(entry.lastAttemptedAt, entry.entryKey).toBe(A_ATTEMPTED_AT);
     }
   });
@@ -421,7 +422,8 @@ describe('dryRun: the dataset snapshot', () => {
   it('an --at option overrides the snapshot’s own latest lastAttemptedAt', async () => {
     const at = '2026-06-01T00:00:00.000Z';
     const report = await dryRun(withDataset, { at });
-    for (const entry of report.dataset?.entries ?? []) {
+    const reported = report.dataset?.entries ?? [];
+    for (const entry of reported) {
       expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
     }
   });

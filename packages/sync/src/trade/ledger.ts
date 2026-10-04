@@ -91,7 +91,8 @@ export function recordObservation(
   }
 
   const merged = new Map<string, ObservedRule>();
-  for (const rule of ledger[parsed.policy]?.rules ?? []) {
+  const existing = ledger[parsed.policy]?.rules ?? [];
+  for (const rule of existing) {
     merged.set(rule.name.toLowerCase(), rule);
   }
   for (const rule of parsed.rules) {

@@ -1,5 +1,6 @@
 import {
   canonicalKey,
+  compareCanonicalKeys,
   parseEnvelope,
   TRACKED_SCHEMA_VERSION,
   TrackedFileSchema,
@@ -451,13 +452,14 @@ describe('unvalidated marks (§2.8)', () => {
     expect(crossFileChecks([a, b], null)).toEqual({
       failures: [],
       unvalidated: [a, b]
-        .map((tracked) => ({
-          entryKey: canonicalKey(tracked),
+        .map((tracked) => canonicalKey(tracked))
+        .toSorted(compareCanonicalKeys)
+        .map((entryKey) => ({
+          entryKey,
           categoryId: 'weapon.bow',
           className: 'Bows',
           reason: 'weights-absent',
-        }))
-        .toSorted((left, right) => (left.entryKey < right.entryKey ? -1 : 1)),
+        })),
     });
   });
 

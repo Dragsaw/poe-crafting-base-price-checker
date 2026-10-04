@@ -140,7 +140,8 @@ export function parseRateLimitHeaders(
   const rules: RateLimitRule[] = [];
   const skips: RateLimitSkip[] = [];
 
-  for (const name of ruleNamesOf(normalised.get(RULES_HEADER))) {
+  const ruleNames = ruleNamesOf(normalised.get(RULES_HEADER));
+  for (const name of ruleNames) {
     const key = `${RULE_HEADER_PREFIX}${name.toLowerCase()}`;
     const policyRawValue = normalised.get(key);
 

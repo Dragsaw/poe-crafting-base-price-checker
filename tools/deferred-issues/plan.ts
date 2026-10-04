@@ -41,7 +41,7 @@ export const LEDGER_PATH = 'docs/stories/deferred-work.md';
 
 /** The id that the first line of an issue body names, or `undefined`. */
 export function readMarker(body: string | null | undefined): string | undefined {
-  const first = (body ?? '').split(/\r?\n/, 1)[0]?.trim() ?? '';
+  const first = body?.split(/\r?\n/, 1)[0]?.trim() ?? '';
   return MARKER.exec(first)?.[1];
 }
 
@@ -65,7 +65,8 @@ export function issueBody(entry: LedgerEntry): string {
 /** Groups the issues by the id of their marker, in number order. */
 function byId(issues: readonly IssueInfo[]): Map<string, IssueInfo[]> {
   const groups = new Map<string, IssueInfo[]>();
-  for (const issue of [...issues].sort((a, b) => a.number - b.number)) {
+  const byNumber = [...issues].sort((a, b) => a.number - b.number);
+  for (const issue of byNumber) {
     const id = readMarker(issue.body);
     if (id === undefined) {
       continue;
@@ -109,7 +110,8 @@ function countIds(entries: readonly LedgerEntry[]): Map<string, number> {
 
 function markerReports(issues: readonly IssueInfo[]): string[] {
   const reports: string[] = [];
-  for (const issue of [...issues].sort((a, b) => a.number - b.number)) {
+  const byNumber = [...issues].sort((a, b) => a.number - b.number);
+  for (const issue of byNumber) {
     if (readMarker(issue.body) === undefined) {
       reports.push(`No marker: #${issue.number} has the label deferred and no valid \`Deferred entry: dw-…\` first line`);
     }

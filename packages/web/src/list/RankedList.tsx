@@ -96,7 +96,7 @@ function Branch({
   onToggle,
   threshold,
   activeLeague,
-  recipeWord,
+  recipeWord = '',
   kind,
 }: {
   readonly rows: readonly ListRow[];
@@ -120,7 +120,7 @@ function Branch({
     return row.unit === 'raw' ? (
       <RawExpansionPanel row={row} threshold={threshold} activeLeague={activeLeague} />
     ) : (
-      <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord ?? ''} activeLeague={activeLeague} />
+      <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord} activeLeague={activeLeague} />
     );
   };
 

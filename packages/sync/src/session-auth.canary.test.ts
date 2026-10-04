@@ -99,7 +99,8 @@ const NEEDLES: readonly string[] = (() => {
     const window = CANARY.slice(start, start + 8);
     found.add(window);
     found.add(encodeURIComponent(window));
-    for (const form of alignedBase64(Buffer.from(window))) {
+    const forms = alignedBase64(Buffer.from(window));
+    for (const form of forms) {
       found.add(form);
       // base64 carries `+` and `/`, which a URL encodes.
       found.add(encodeURIComponent(form));

@@ -385,7 +385,8 @@ async function main(): Promise<void> {
   // builder or league leaves the old names behind. Only after a successful
   // record, remove every pricing fixture this run did not write.
   const written = new Set(outcome.written.map((path) => resolve(path)));
-  for (const name of await readdir(FIXTURES_DIR)) {
+  const names = await readdir(FIXTURES_DIR);
+  for (const name of names) {
     const path = resolve(join(FIXTURES_DIR, name));
     if (!PRICING_FIXTURE_FILE.test(name) || written.has(path)) {
       continue;

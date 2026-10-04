@@ -241,7 +241,8 @@ function laneOf(request: TradeRequest): string {
  */
 function headersFor(request: TradeRequest, userAgent: string): Record<string, string> {
   const headers: Record<string, string> = {};
-  for (const [name, value] of Object.entries(request.headers ?? {})) {
+  const given = Object.entries(request.headers ?? {});
+  for (const [name, value] of given) {
     headers[name.toLowerCase()] = value;
   }
   headers[USER_AGENT_HEADER] = userAgent;
