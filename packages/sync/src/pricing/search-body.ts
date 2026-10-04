@@ -140,6 +140,16 @@ function edgeFor(letters: ReadonlySet<DefenceLetter>, letter: DefenceLetter): Fi
   return letters.has(letter) ? { min: 1 } : { max: 0 };
 }
 
+function equipmentFiltersOf(letters: ReadonlySet<DefenceLetter>) {
+  return {
+    filters: {
+      ar: edgeFor(letters, 'str'),
+      ev: edgeFor(letters, 'dex'),
+      es: edgeFor(letters, 'int'),
+    },
+  };
+}
+
 // One fixed key order: the body is serialised with JSON.stringify and the recorded fixtures key on its bytes.
 const STATUS = { option: 'securable' } as const;
 const TRADE_FILTERS = { filters: { price: { option: 'exalted_divine' } } } as const;
@@ -179,13 +189,7 @@ export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): Sear
           stats,
           filters: {
             type_filters: typeFilters,
-            equipment_filters: {
-              filters: {
-                ar: edgeFor(letters, 'str'),
-                ev: edgeFor(letters, 'dex'),
-                es: edgeFor(letters, 'int'),
-              },
-            },
+            equipment_filters: equipmentFiltersOf(letters),
             trade_filters: TRADE_FILTERS,
           },
         },
