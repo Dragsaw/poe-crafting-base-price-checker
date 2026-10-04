@@ -63,13 +63,7 @@ export function PayoutThreshold({
 }): JSX.Element {
   const id = useId();
   const unitId = useId();
-  const [draft, setDraft] = useState<number | string>(value);
-  const lastValid = useRef(value);
-  const commit = useDebouncedCallback((next: number) => {
-    onChange(next);
-  }, { delay: COMMIT_DEBOUNCE_MS, flushOnUnmount: true });
-
-  const share = `${String((value / THRESHOLD_MAX) * 100)}%`;
+  const { draft, onDraftChange, onBlur } = useThresholdDraft(value, onChange);
 
   return (
     <div
@@ -89,128 +83,174 @@ export function PayoutThreshold({
       >
         {THRESHOLD_LABEL}
       </label>
-      <div
-        data-threshold-value=""
-        style={{
+      <ThresholdFigure id={id} unitId={unitId} draft={draft} onDraftChange={onDraftChange} onBlur={onBlur} />
+      <ThresholdTrack share={`${String((value / THRESHOLD_MAX) * 100)}%`} />
+      <ThresholdRange />
+    </div>
+  );
+}
+
+function useThresholdDraft(value: number, onChange: (value: number) => void) {
+  const [draft, setDraft] = useState<number | string>(value);
+  const lastValid = useRef(value);
+  const commit = useDebouncedCallback(
+    (next: number) => {
+      onChange(next);
+    },
+    { delay: COMMIT_DEBOUNCE_MS, flushOnUnmount: true },
+  );
+  const onDraftChange = (next: number | string): void => {
+    setDraft(next);
+    const parsed = parseDraft(next);
+    if (parsed === undefined) {
+      return;
+    }
+    const threshold = clampThreshold(parsed);
+    lastValid.current = threshold;
+    commit(threshold);
+  };
+  const onBlur = (): void => {
+    commit.flush();
+    setDraft(lastValid.current);
+  };
+  return { draft, onDraftChange, onBlur };
+}
+
+function ThresholdFigure({ id, unitId, draft, onDraftChange, onBlur }: ThresholdFigureProperties): JSX.Element {
+  return (
+    <div
+      data-threshold-value=""
+      style={{
+        ...typeStyle('threshold-value'),
+        color: colors.ink,
+        marginTop: px(spacing.thresholdValueGap),
+        display: 'flex',
+        alignItems: 'baseline',
+      }}
+    >
+      {/* The input sizes to its figure: a hidden twin sets the width, so the rule sits under the figure only. */}
+      <span style={{ position: 'relative', display: 'inline-block' }}>
+        <span
+          aria-hidden="true"
+          style={{
+            display: 'inline-block',
+            visibility: 'hidden',
+            whiteSpace: 'pre',
+            fontVariantNumeric: 'tabular-nums',
+            borderBottom: `${px(spacing.hairline)} solid transparent`,
+          }}
+        >
+          {ghostText(draft)}
+        </span>
+        <ThresholdInput id={id} unitId={unitId} draft={draft} onDraftChange={onDraftChange} onBlur={onBlur} />
+      </span>
+      <span id={unitId} data-threshold-unit="" style={{ ...typeStyle('threshold-value-unit'), color: colors['ink-secondary'] }}>
+        {THRESHOLD_UNIT}
+      </span>
+    </div>
+  );
+}
+
+interface ThresholdFigureProperties {
+  readonly id: string;
+  readonly unitId: string;
+  readonly draft: number | string;
+  readonly onDraftChange: (next: number | string) => void;
+  readonly onBlur: () => void;
+}
+
+function ThresholdInput({ id, unitId, draft, onDraftChange, onBlur }: ThresholdFigureProperties): JSX.Element {
+  return (
+    <NumberInput
+      id={id}
+      // Mantine's Input writes its own `aria-describedby` over a plain prop; the Styles API attributes land last.
+      attributes={{ input: { 'aria-describedby': unitId } }}
+      unstyled
+      hideControls
+      className="fg-threshold"
+      style={{ position: 'absolute', inset: 0 }}
+      styles={{
+        wrapper: { display: 'block', height: '100%' },
+        input: {
           ...typeStyle('threshold-value'),
-          color: colors.ink,
-          marginTop: px(spacing.thresholdValueGap),
-          display: 'flex',
-          alignItems: 'baseline',
-        }}
-      >
-        {/* The input sizes to its figure: a hidden twin sets the width, so the rule sits under the figure only. */}
-        <span style={{ position: 'relative', display: 'inline-block' }}>
-          <span
-            aria-hidden="true"
-            style={{
-              display: 'inline-block',
-              visibility: 'hidden',
-              whiteSpace: 'pre',
-              fontVariantNumeric: 'tabular-nums',
-              borderBottom: `${px(spacing.hairline)} solid transparent`,
-            }}
-          >
-            {ghostText(draft)}
-          </span>
-          <NumberInput
-            id={id}
-            // Mantine's Input writes its own `aria-describedby` over a plain prop; the Styles API attributes land last.
-            attributes={{ input: { 'aria-describedby': unitId } }}
-            unstyled
-            hideControls
-            className="fg-threshold"
-            style={{ position: 'absolute', inset: 0 }}
-            styles={{
-              wrapper: { display: 'block', height: '100%' },
-              input: {
-                ...typeStyle('threshold-value'),
-                fontVariantNumeric: 'tabular-nums',
-                width: '100%',
-                height: '100%',
-                minWidth: 0,
-              },
-            }}
-            min={THRESHOLD_MIN}
-            max={THRESHOLD_MAX}
-            step={THRESHOLD_STEP}
-            decimalScale={THRESHOLD_DECIMALS}
-            fixedDecimalScale
-            clampBehavior="blur"
-            // Blur restores the last valid value below; Mantine's own trim would turn `.00` into a parse of 0.
-            trimLeadingZeroesOnBlur={false}
-            allowNegative={false}
-            value={draft}
-            onChange={(next) => {
-              setDraft(next);
-              const parsed = parseDraft(next);
-              if (parsed === undefined) {
-                return;
-              }
-              const threshold = clampThreshold(parsed);
-              lastValid.current = threshold;
-              commit(threshold);
-            }}
-            onBlur={() => {
-              commit.flush();
-              setDraft(lastValid.current);
-            }}
-          />
-        </span>
-        <span id={unitId} data-threshold-unit="" style={{ ...typeStyle('threshold-value-unit'), color: colors['ink-secondary'] }}>
-          {THRESHOLD_UNIT}
-        </span>
-      </div>
-      <div
-        data-threshold-track=""
-        aria-hidden="true"
+          fontVariantNumeric: 'tabular-nums',
+          width: '100%',
+          height: '100%',
+          minWidth: 0,
+        },
+      }}
+      min={THRESHOLD_MIN}
+      max={THRESHOLD_MAX}
+      step={THRESHOLD_STEP}
+      decimalScale={THRESHOLD_DECIMALS}
+      fixedDecimalScale
+      clampBehavior="blur"
+      // Blur restores the last valid value (`useThresholdDraft`); Mantine's own trim would turn `.00` into a parse of 0.
+      trimLeadingZeroesOnBlur={false}
+      allowNegative={false}
+      value={draft}
+      onChange={onDraftChange}
+      onBlur={onBlur}
+    />
+  );
+}
+
+function ThresholdTrack({ share }: { readonly share: string }): JSX.Element {
+  return (
+    <div
+      data-threshold-track=""
+      aria-hidden="true"
+      style={{
+        position: 'relative',
+        marginTop: px(spacing.thresholdTrackGap),
+        height: px(spacing.thresholdTrackHeight),
+        background: colors['rule-hairline'],
+        pointerEvents: 'none',
+      }}
+    >
+      <i
+        data-threshold-fill=""
         style={{
-          position: 'relative',
-          marginTop: px(spacing.thresholdTrackGap),
+          position: 'absolute',
+          left: 0,
+          top: 0,
           height: px(spacing.thresholdTrackHeight),
-          background: colors['rule-hairline'],
+          width: share,
+          background: colors.sepia,
           pointerEvents: 'none',
         }}
-      >
-        <i
-          data-threshold-fill=""
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            height: px(spacing.thresholdTrackHeight),
-            width: share,
-            background: colors.sepia,
-            pointerEvents: 'none',
-          }}
-        />
-        <b
-          data-threshold-marker=""
-          style={{
-            position: 'absolute',
-            left: share,
-            top: px(-spacing.thresholdMarkerRise),
-            marginLeft: px(-spacing.thresholdMarkerWidth / 2),
-            width: px(spacing.thresholdMarkerWidth),
-            height: px(spacing.thresholdMarkerHeight),
-            background: colors.ink,
-            pointerEvents: 'none',
-          }}
-        />
-      </div>
-      <div
-        data-threshold-range=""
+      />
+      <b
+        data-threshold-marker=""
         style={{
-          ...typeStyle('threshold-range'),
-          color: colors['ink-tertiary'],
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: px(spacing.thresholdRangeGap),
+          position: 'absolute',
+          left: share,
+          top: px(-spacing.thresholdMarkerRise),
+          marginLeft: px(-spacing.thresholdMarkerWidth / 2),
+          width: px(spacing.thresholdMarkerWidth),
+          height: px(spacing.thresholdMarkerHeight),
+          background: colors.ink,
+          pointerEvents: 'none',
         }}
-      >
-        <span>{RANGE_LOW}</span>
-        <span>{RANGE_HIGH}</span>
-      </div>
+      />
+    </div>
+  );
+}
+
+function ThresholdRange(): JSX.Element {
+  return (
+    <div
+      data-threshold-range=""
+      style={{
+        ...typeStyle('threshold-range'),
+        color: colors['ink-tertiary'],
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: px(spacing.thresholdRangeGap),
+      }}
+    >
+      <span>{RANGE_LOW}</span>
+      <span>{RANGE_HIGH}</span>
     </div>
   );
 }

@@ -871,9 +871,6 @@
   "packages/web/src/threshold/PayoutThreshold.tsx": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "max-lines-per-function": {
-      "count": 1
     }
   },
   "packages/web/src/threshold/threshold-storage.ts": {
