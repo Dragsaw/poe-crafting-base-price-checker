@@ -16,7 +16,7 @@ type SyncReport = Parsed<'syncReport'>;
 
 export const UNKNOWN = 'unknown';
 export const NOT_MEASURED = 'not measured';
-export const NOT_COMMITTED_SUFFIX = ' (not committed)';
+const NOT_COMMITTED_SUFFIX = ' (not committed)';
 
 export const WEIGHTS_FILE_LABEL = 'Weights File';
 export const LAST_SYNCED_LABEL = 'Last synced';
@@ -156,7 +156,7 @@ const UNKNOWN_GROUP: FigureGroup = [[missing(UNKNOWN)]];
 export type DiagnosisFailure = Pick<CrossFileFailure, 'check' | 'entryKey' | 'detail'>;
 
 /** One diagnosis line, verbatim: `check · canonical key · detail`. */
-export function diagnosisLine(failure: DiagnosisFailure): string {
+function diagnosisLine(failure: DiagnosisFailure): string {
   return `${failure.check} · ${failure.entryKey} · ${failure.detail}`;
 }
 

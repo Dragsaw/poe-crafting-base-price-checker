@@ -12,7 +12,7 @@ import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
 /** The row mark's word for `uniform-prior`: never the enum value, never a `weightSource` word. */
-export const PRIOR_ONLY = 'prior only';
+const PRIOR_ONLY = 'prior only';
 
 const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 

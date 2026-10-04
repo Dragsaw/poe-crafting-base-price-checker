@@ -205,14 +205,14 @@ export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
  * §13.3): a `write` sets `authHoldOffUntil` to the progress write's `now`
  * plus this.
  */
-export const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
+const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
 
 /**
  * The runner's two narrow ports onto the process auth holder (AD-30,
  * IMPLEMENTATION-NOTES.md §13.1, §13.3), wired in `../compose-chunk.ts`. The
  * runner never sees the holder itself, so it never reaches the cookie.
  */
-export interface ChunkAuth {
+interface ChunkAuth {
   /**
    * Called once, after the lock and the `notBefore` check, with the loaded
    * `authHoldOffUntil` and `now`: while the holder may still probe and the

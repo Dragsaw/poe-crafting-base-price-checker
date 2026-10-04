@@ -27,7 +27,7 @@ const MS_PER_SECOND = 1000;
  * consumption has to age from when *it* was seen, not from when the newer
  * response arrived.
  */
-export interface ObservedRule extends RateLimitRule {
+interface ObservedRule extends RateLimitRule {
   readonly observedAt: string;
 }
 
@@ -49,7 +49,7 @@ export const EMPTY_LEDGER: RateLimitLedger = {};
  * from `spreadBeforeNext` only, why a satisfied bucket still asks for a gap:
  * its remaining capacity spread evenly over its period.
  */
-export type PaceCause = 'penalty' | 'window' | 'spread';
+type PaceCause = 'penalty' | 'window' | 'spread';
 
 export interface PaceDecision {
   /** Milliseconds to wait before issuing. `0` when every bucket is clear. */

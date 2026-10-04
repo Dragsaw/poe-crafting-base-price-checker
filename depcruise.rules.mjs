@@ -75,5 +75,3 @@ export const rules = [
     to: { pathNot: '^packages/', dependencyTypesNot: ['core'] },
   },
 ];
-
-export default rules;

@@ -5,9 +5,9 @@ import { Fragment, type JSX } from 'react';
 import { DENOMINATION } from '../shared/product';
 import { colors, px, spacing, typeStyle } from '../theme/tokens';
 
-export const RECIPE_LABEL = 'Craft Recipe';
+const RECIPE_LABEL = 'Craft Recipe';
 /** The cost line's unit: *Divine* spelled, `/ craft` the one contraction the panel allows. */
-export const RECIPE_COST_UNIT = `${DENOMINATION} / craft`;
+const RECIPE_COST_UNIT = `${DENOMINATION} / craft`;
 
 /** One option: the recipe's id and the one word `recipeWord` derives for it. */
 export interface RecipeOption {

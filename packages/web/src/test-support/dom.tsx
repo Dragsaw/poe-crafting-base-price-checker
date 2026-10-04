@@ -54,7 +54,7 @@ export function unmount(): void {
 }
 
 /** Renders `node` into the kept root, so mounted components keep their state. */
-export function rerender(node: ReactNode): void {
+function rerender(node: ReactNode): void {
   const mounted = root;
   if (mounted === undefined) {
     throw new Error('no mounted root');

@@ -53,7 +53,7 @@ export function isSuccess(status: number): boolean {
   return status >= SUCCESS_MIN && status <= SUCCESS_MAX;
 }
 
-export function policyKeyOf(policy: string | undefined): string {
+function policyKeyOf(policy: string | undefined): string {
   return policy ?? UNGOVERNED_POLICY_KEY;
 }
 

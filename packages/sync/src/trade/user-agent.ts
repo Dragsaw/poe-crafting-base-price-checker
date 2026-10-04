@@ -19,7 +19,7 @@
 
 export const USER_AGENT_ENV_VAR = 'POE_SYNC_USER_AGENT';
 
-export function missingUserAgentMessage(): string {
+function missingUserAgentMessage(): string {
   return (
     `${USER_AGENT_ENV_VAR} is unset or blank, so no request can be issued. ` +
     'NFR-9 requires every request to identify the tool and a contact address, and ' +

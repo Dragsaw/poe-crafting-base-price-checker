@@ -18,7 +18,7 @@ export const FETCH_FAILURE_EYEBROW = 'THE PAGE COULD NOT LOAD ITS DATA';
  * `A required file did not arrive.` until UX reconciles it (deferred-work.md).
  */
 export const FETCH_FAILURE_TITLE = 'One of the data files did not arrive.';
-export const FETCH_FAILURE_RECOVERY =
+const FETCH_FAILURE_RECOVERY =
   'The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.';
 export const TRY_AGAIN = `${glyphs.open} Try again`;
 

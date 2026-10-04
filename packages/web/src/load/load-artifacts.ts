@@ -55,7 +55,7 @@ type Fetched =
   | { readonly kind: 'not-arrived' }
   | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | null };
 
-export type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
+type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
 export interface LoadOptions {
   readonly fetch?: FetchLike;

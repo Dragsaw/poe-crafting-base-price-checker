@@ -8,13 +8,13 @@ import { unitLabel } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
-export const APPENDIX_TITLE = 'Appendix: Unrankable — ';
+const APPENDIX_TITLE = 'Appendix: Unrankable — ';
 
 /** The non-empty appendix's one lead line (Story 2.8, human decision 2026-09-27). */
 export const APPENDIX_LEAD = 'Tracked, but kept out of the ordering.';
 
 /** The mark every `class absent from weights file` row carries, as the mockup shows. */
-export const APPENDIX_MARK_WORD = 'unknown';
+const APPENDIX_MARK_WORD = 'unknown';
 
 /**
  * The quiet note of `class disagrees with weights file`: the pool is published

@@ -74,7 +74,6 @@ export const RequestsBySourceSchema = z
   .preprocess(readLegacyRequestSources, z.record(ChunkRequestSourceSchema, z.int().min(0)))
   .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
 
-export type RequestsBySource = z.infer<typeof RequestsBySourceSchema>;
 
 /**
  * The `sync-report.json` contract version. 1.1.0 narrowed `requestsBySource`

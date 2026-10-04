@@ -36,7 +36,7 @@ export const PrunedReasonSchema = z
   .min(1)
   .describe('Why the entry was pruned. Free-form: carried and shown, never parsed.');
 
-export const CraftedTrackedEntrySchema = z.strictObject({
+const CraftedTrackedEntrySchema = z.strictObject({
   kind: z.literal('crafted'),
   categoryId: CategoryIdSchema,
   className: ClassNameSchema,
@@ -47,7 +47,7 @@ export const CraftedTrackedEntrySchema = z.strictObject({
   prunedReason: PrunedReasonSchema.optional(),
 });
 
-export const RawTrackedEntrySchema = z.strictObject({
+const RawTrackedEntrySchema = z.strictObject({
   kind: z.literal('raw'),
   baseTypeId: BaseTypeIdSchema,
   itemLevelMin: ItemLevelSchema,

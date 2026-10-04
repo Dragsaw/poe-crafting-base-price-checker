@@ -13,7 +13,7 @@ import { PayoutThreshold } from '../threshold/PayoutThreshold';
 export const MASTHEAD_TITLE = 'What is worth picking up';
 export const MASTHEAD_DEK = `Item Classes ranked by expected payout per craft, beside the Base Types worth selling raw. Every figure is in ${DENOMINATION}.`;
 
-export function eyebrowText(league: string): string {
+function eyebrowText(league: string): string {
   return `League ${league}`;
 }
 

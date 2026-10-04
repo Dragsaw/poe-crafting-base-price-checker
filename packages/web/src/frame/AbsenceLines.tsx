@@ -11,11 +11,11 @@ const CONSEQUENCE: Readonly<Record<TolerableKey, string>> = {
 };
 
 /** DESIGN.md `trust-strip.absenceLineCopy`: the lines appear in this order, and only for absent files. */
-export const ABSENCE_ORDER = ['weights', 'recipes', 'syncReport'] as const satisfies readonly TolerableKey[];
+const ABSENCE_ORDER = ['weights', 'recipes', 'syncReport'] as const satisfies readonly TolerableKey[];
 
-export const ABSENCE_LEAD = 'Not published:';
+const ABSENCE_LEAD = 'Not published:';
 
-export function absenceBody(key: TolerableKey): string {
+function absenceBody(key: TolerableKey): string {
   return `${ARTIFACTS[key].path} — ${CONSEQUENCE[key]}`;
 }
 

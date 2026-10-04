@@ -15,7 +15,7 @@ import {
 
 import { TEST_LEAGUE, VALID_BODIES } from './artifact-server';
 
-export const HOUR = 3_600_000;
+const HOUR = 3_600_000;
 
 export function rawEntry(baseTypeId: string, itemLevelMin = 82): RawTrackedEntry {
   return { kind: 'raw', baseTypeId, itemLevelMin, status: 'active' };

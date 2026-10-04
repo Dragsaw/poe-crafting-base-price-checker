@@ -31,7 +31,7 @@ export const DATA_LANE = 'trade-data-get';
 export const TRADE_LEAGUES_URL = `${TRADE_API_BASE}/data/leagues`;
 
 /** `IMPLEMENTATION-NOTES.md` §5.1: the realm segment of every search and fetch path. */
-export const TRADE_REALM = 'poe2';
+const TRADE_REALM = 'poe2';
 
 /**
  * The lane labels the pricing step's two requests travel in. Like

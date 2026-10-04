@@ -7,7 +7,7 @@
 import type { CurrencyRate, LeagueId } from '@poe/contracts';
 
 /** The one currency whose rate is exactly `1` by definition (AD-20). */
-export const DIVINE_CURRENCY_ID = 'divine';
+const DIVINE_CURRENCY_ID = 'divine';
 
 const DIVINE_DECIMALS = 4;
 const DIVINE_SCALE = 10 ** DIVINE_DECIMALS;

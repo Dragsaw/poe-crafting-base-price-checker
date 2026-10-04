@@ -7,7 +7,7 @@ export const MONEY_DECIMALS = 2;
 export const BELOW_PRINTABLE = '< 0.01';
 
 /** A value at the page's money precision, with no floor. A negative that rounds to zero prints `0.00`, never `-0.00`. */
-export function formatTwoDecimals(value: number): string {
+function formatTwoDecimals(value: number): string {
   const text = value.toFixed(MONEY_DECIMALS);
   return Number(text) === 0 ? (0).toFixed(MONEY_DECIMALS) : text;
 }

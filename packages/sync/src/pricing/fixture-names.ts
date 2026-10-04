@@ -23,7 +23,7 @@ const DIGEST_LENGTH = 16;
 
 export type PricingFixtureRequest = Pick<HttpRequest, 'method' | 'url' | 'body'>;
 
-export function requestDigest(request: PricingFixtureRequest): string {
+function requestDigest(request: PricingFixtureRequest): string {
   return createHash('sha256')
     .update(`${request.method} ${request.url}\n${request.body ?? ''}`)
     .digest('hex')

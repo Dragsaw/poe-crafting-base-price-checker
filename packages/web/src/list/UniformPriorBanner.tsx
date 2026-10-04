@@ -4,14 +4,14 @@ import { colors, px, spacing, typeStyle } from '../theme/tokens';
 import type { ActiveRanking } from './active-ranking';
 
 /** The banner's lead (EXPERIENCE.md, *The uniform-prior banner*): something in the pool was invented. */
-export const BANNER_LEAD = 'Some of the weights behind this ranking were invented.';
+const BANNER_LEAD = 'Some of the weights behind this ranking were invented.';
 
 /** The banner's body: it points at per-row freshness and never says the whole pool is invented. */
-export const BANNER_BODY =
+const BANNER_BODY =
   'Every crafted row rests on at least one tier whose weight is a prior, not a measurement, so the order between Item Classes is not evidence-backed. Read each row’s mark and freshness before you trust it.';
 
 /** The dismiss control's text. */
-export const BANNER_DISMISS = 'dismiss for this session';
+const BANNER_DISMISS = 'dismiss for this session';
 
 /**
  * The banner's condition (FR-11, EXPERIENCE.md): the active recipe has at least

@@ -64,12 +64,12 @@ export class UnknownClassBaseTypeError extends Error {
 }
 
 /** A `{min}` / `{max}` edge as the trade site's filters spell it. */
-export interface FilterEdge {
+interface FilterEdge {
   readonly min?: number;
   readonly max?: number;
 }
 
-export interface StatFilter {
+interface StatFilter {
   readonly id: string;
   /** A banded stat carries both edges; a valueless stat carries `{}` (OQ-12). */
   readonly value: FilterEdge;

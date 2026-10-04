@@ -32,7 +32,7 @@ import { isHonestEmpty } from './list-statement';
 export type Tier = 1 | 2 | 3;
 
 /** What an EV cell holds: a figure at 2dp, or the money-slot phrase naming the open question. */
-export type EvCell =
+type EvCell =
   | { readonly kind: 'figure'; readonly text: string }
   | { readonly kind: 'phrase'; readonly text: string };
 
