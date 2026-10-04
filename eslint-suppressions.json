@@ -568,11 +568,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/shell.ts": {
-    "local/max-comment-run": {
-      "count": 7
-    }
-  },
   "packages/sync/src/sync-batch.test.ts": {
     "local/max-comment-run": {
       "count": 4
