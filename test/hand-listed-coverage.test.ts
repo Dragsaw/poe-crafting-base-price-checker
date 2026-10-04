@@ -146,10 +146,10 @@ async function eslintUncovered(
     new ESLint(config === undefined ? { cwd: REPO_ROOT } : { cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
   const checked = await Promise.all(
     files.map(async (path) => {
-      const ignored = await eslint.isPathIgnored(path);
-      const calculated: unknown = ignored ? undefined : await eslint.calculateConfigForFile(path);
+      const isIgnored = await eslint.isPathIgnored(path);
+      const calculated: unknown = isIgnored ? undefined : await eslint.calculateConfigForFile(path);
       const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
-      return !ignored && rules?.[MAIN_BLOCK_RULE] !== undefined ? [path] : [];
+      return !isIgnored && rules?.[MAIN_BLOCK_RULE] !== undefined ? [path] : [];
     }),
   );
   return uncovered(files, checked.flat());

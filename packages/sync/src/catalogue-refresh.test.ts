@@ -121,7 +121,7 @@ interface Harness {
 function harness(
   fixtures: Record<string, HttpResponse>,
   /** Lets one case refuse a write the way a full disk would. */
-  refuseWriteAt?: (path: string) => boolean,
+  shouldRefuseWriteAt?: (path: string) => boolean,
 ): Harness {
   const http = createFakeHttpPort(fixtures);
   const writes: { path: string; contents: string }[] = [];
@@ -145,7 +145,7 @@ function harness(
         },
         userAgent: CONTACT,
         writeCatalogueFile: (path, contents) => {
-          if (refuseWriteAt?.(path) === true) {
+          if (shouldRefuseWriteAt?.(path) === true) {
             return Promise.reject(new Error(`EACCES: permission denied, open '${path}'`));
           }
           writes.push({ path, contents });

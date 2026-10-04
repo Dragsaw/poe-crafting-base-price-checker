@@ -126,11 +126,11 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
   const completed = [...rotationKeys].filter((key) => done.has(key)).toSorted(compareCanonicalKeys);
   const due = [...active, ...unresolvable];
   const isNewPass = due.length > 0 && due.every((item) => done.has(item.key));
-  const open = (item: Placed): boolean => isNewPass || !done.has(item.key);
+  const isOpen = (item: Placed): boolean => isNewPass || !done.has(item.key);
 
   return {
     pinned: entriesOf(pinned),
-    rotation: [...entriesOf(active.filter((item) => open(item))), ...entriesOf(unresolvable.filter((item) => open(item)))],
+    rotation: [...entriesOf(active.filter((item) => isOpen(item))), ...entriesOf(unresolvable.filter((item) => isOpen(item)))],
     completed: isNewPass ? [] : completed,
     newPass: isNewPass,
   };

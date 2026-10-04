@@ -72,7 +72,7 @@ describe('redact', () => {
   const base64 = Buffer.from(CANARY).toString('base64');
   const headerBase64 = Buffer.from(`POESESSID=${CANARY}`).toString('base64');
 
-  function leaks(text: string): boolean {
+  function isLeaking(text: string): boolean {
     return [CANARY, base64, headerBase64].some((form) => text.includes(form)) || text.includes(CANARY.slice(4, 20));
   }
 
@@ -91,10 +91,10 @@ describe('redact', () => {
     expect(outer.cause).toBe(middle);
     expect(middle.cause).toBe(inner);
     for (const error of [outer, middle, inner]) {
-      expect(leaks(error.message)).toBe(false);
-      expect(leaks(error.stack ?? '')).toBe(false);
+      expect(isLeaking(error.message)).toBe(false);
+      expect(isLeaking(error.stack ?? '')).toBe(false);
     }
-    expect(leaks(JSON.stringify(outer))).toBe(false);
+    expect(isLeaking(JSON.stringify(outer))).toBe(false);
     expect(outer.message).toBe('outer Cookie: POESESSID=[redacted]');
   });
 
@@ -105,7 +105,7 @@ describe('redact', () => {
 
     expect(isTransportFailure(holder.redact(fetchFailed))).toBe(true);
     expect(isTransportFailure(holder.redact(timeout))).toBe(true);
-    expect(leaks((fetchFailed.cause as Error).message)).toBe(false);
+    expect(isLeaking((fetchFailed.cause as Error).message)).toBe(false);
   });
 
   it('a string cause, an AggregateError and a cycle', () => {
@@ -114,9 +114,9 @@ describe('redact', () => {
 
     withCookie(CANARY).redact(aggregate);
 
-    expect(leaks(aggregate.message)).toBe(false);
-    expect(leaks(String(aggregate.cause))).toBe(false);
-    expect(aggregate.errors.every((error: Error) => !leaks(error.message))).toBe(true);
+    expect(isLeaking(aggregate.message)).toBe(false);
+    expect(isLeaking(String(aggregate.cause))).toBe(false);
+    expect(aggregate.errors.every((error: Error) => !isLeaking(error.message))).toBe(true);
   });
 
   it('a DQUOTE-wrapped value: the bare inner value is redacted in every form', () => {
@@ -124,9 +124,9 @@ describe('redact', () => {
 
     withCookie(`"${CANARY}"`).redact(error);
 
-    expect(leaks(error.message)).toBe(false);
-    expect(leaks(error.stack ?? '')).toBe(false);
-    expect(leaks((error.cause as Error).message)).toBe(false);
+    expect(isLeaking(error.message)).toBe(false);
+    expect(isLeaking(error.stack ?? '')).toBe(false);
+    expect(isLeaking((error.cause as Error).message)).toBe(false);
   });
 
   it('a thrown string comes back scrubbed', () => {

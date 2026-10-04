@@ -16,7 +16,7 @@ import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
-import { bannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
+import { isBannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
@@ -224,7 +224,7 @@ function ReadyBody({
       }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
-      banner: bannerRaised(active),
+      banner: isBannerRaised(active),
     };
   }, [ranking, recipe, set, now, threshold, stats]);
   return (

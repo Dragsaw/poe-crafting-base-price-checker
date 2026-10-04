@@ -185,9 +185,9 @@ export function contains(reference: ModifierRef, entry: ModifierWeight, summed: 
   if (entry.weight === 0) {
     return false;
   }
-  const coveredBy = (rl: ReferenceLine) =>
+  const isCoveredBy = (rl: ReferenceLine) =>
     entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
-  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => coveredBy(line)) : coveredBy(reference);
+  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
 }
 
 /**
@@ -249,8 +249,8 @@ export function needs(reference: ModifierRef, pool: WeightsPool): number | undef
     return undefined;
   }
   const levels = tier.map((entry) => entry.itemLevelMin);
-  const banded = reference.kind === 'hybrid' ? reference.lines.some((rl) => 'valueMin' in rl) : reference.kind === 'banded';
-  return banded ? Math.max(...levels) : Math.min(...levels);
+  const isBanded = reference.kind === 'hybrid' ? reference.lines.some((rl) => 'valueMin' in rl) : reference.kind === 'banded';
+  return isBanded ? Math.max(...levels) : Math.min(...levels);
 }
 
 /**

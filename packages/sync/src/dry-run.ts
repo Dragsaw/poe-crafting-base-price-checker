@@ -359,9 +359,9 @@ function isInvokedDirectly(): boolean {
   }
 }
 
-const invokedDirectly = isInvokedDirectly();
+const isInvoked = isInvokedDirectly();
 
-if (invokedDirectly) {
+if (isInvoked) {
   try {
     await main();
   } catch (error) {

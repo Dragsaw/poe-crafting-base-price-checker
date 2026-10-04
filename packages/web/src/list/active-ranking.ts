@@ -33,14 +33,14 @@ export interface ActiveRanking extends Ranking {
 export function forRecipe(ranking: Ranking, recipe: ListRecipe | undefined): ActiveRanking {
   const id = recipe?.id;
   const ordering = ranking.ordering.filter((row) => row.kind === 'raw' || row.recipeId === id);
-  const uncostable = id !== undefined && ranking.uncostableRecipes.some((item) => item.recipeId === id);
+  const isUncostable = id !== undefined && ranking.uncostableRecipes.some((item) => item.recipeId === id);
   return {
     ...ranking,
     ordering,
     unrankable: ranking.unrankable.filter((item) => item.recipeId === undefined || item.recipeId === id),
     recipe,
-    uncostable,
+    uncostable: isUncostable,
     // State 23 takes precedence: with nothing priced in the league the list is one canonical sequence.
-    split: uncostable && ranking.pricedInLeague && ordering.some((row) => row.kind === 'crafted'),
+    split: isUncostable && ranking.pricedInLeague && ordering.some((row) => row.kind === 'crafted'),
   };
 }

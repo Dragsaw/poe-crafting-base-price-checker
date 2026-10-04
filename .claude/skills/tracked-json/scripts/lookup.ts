@@ -82,7 +82,7 @@ function stringAt(value: Record<string, unknown>, key: string): string | undefin
   return typeof found === 'string' ? found : undefined;
 }
 
-function contains(haystack: string, needle: string): boolean {
+function isContaining(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase());
 }
 
@@ -108,7 +108,7 @@ export function lookupStat(stats: unknown, query: string): { matches: StatMatch[
       }
       const id = stringAt(entry, 'id');
       const text = stringAt(entry, 'text') ?? '';
-      if (id === undefined || !(contains(text, query) || contains(id, query))) {
+      if (id === undefined || !(isContaining(text, query) || isContaining(id, query))) {
         continue;
       }
       found.push({ id, text, type: stringAt(entry, 'type') ?? '' });
@@ -136,7 +136,7 @@ export function lookupBase(items: unknown, query: string): { matches: BaseMatch[
       }
       const type = stringAt(entry, 'type');
       const key = `${groupId}\0${type ?? ''}`;
-      if (type === undefined || !contains(type, query) || seen.has(key)) {
+      if (type === undefined || !isContaining(type, query) || seen.has(key)) {
         continue;
       }
       seen.add(key);
@@ -197,7 +197,7 @@ export function lookupClass(weights: WeightsFile, filters: unknown, query: strin
   for (const [categoryId, classes] of Object.entries(weights.bases)) {
     const categoryText = texts.get(categoryId) ?? null;
     for (const className of Object.keys(classes)) {
-      if (contains(className, query) || contains(categoryId, query) || contains(categoryText ?? '', query)) {
+      if (isContaining(className, query) || isContaining(categoryId, query) || isContaining(categoryText ?? '', query)) {
         matches.push({ categoryId, categoryText, className });
       }
     }

@@ -29,9 +29,9 @@ export function recipeCostLine(
   recipe: CraftRecipe,
   rates: readonly CurrencyRate[],
   league: string,
-  uncostable: boolean,
+  isUncostable: boolean,
 ): RecipeCost {
-  if (uncostable) {
+  if (isUncostable) {
     return { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
   }
   const cost = craftCost(recipe, rates, league);

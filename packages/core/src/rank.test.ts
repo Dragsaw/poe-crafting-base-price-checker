@@ -865,12 +865,12 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     const target = chase('Bows');
     const prunedTarget = chase('Bows', FILLER, 'pruned');
     const A = raw('A');
-    const pricedIn = (dataset: readonly DatasetEntry[]): boolean =>
+    const isPricedIn = (dataset: readonly DatasetEntry[]): boolean =>
       rankCrafted({ tracked: [target, prunedTarget, A], dataset }).pricedInLeague;
-    expect(pricedIn([published(target, priced(0.01))])).toBe(true);
-    expect(pricedIn([published(A, priced(0.01))])).toBe(true);
-    expect(pricedIn([published(prunedTarget, priced(5))])).toBe(false);
-    expect(pricedIn([published(target, { state: 'no-listings' })])).toBe(false);
+    expect(isPricedIn([published(target, priced(0.01))])).toBe(true);
+    expect(isPricedIn([published(A, priced(0.01))])).toBe(true);
+    expect(isPricedIn([published(prunedTarget, priced(5))])).toBe(false);
+    expect(isPricedIn([published(target, { state: 'no-listings' })])).toBe(false);
   });
 
   it.each([[[]], [undefined]])(

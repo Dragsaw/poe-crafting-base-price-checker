@@ -77,7 +77,7 @@ export function countInvalidRequest(
  * `undefined` is *no declared threshold*, and never refuses — the count is
  * still surfaced on every result, so a caller can see what it is spending.
  */
-export function thresholdReached(
+export function isThresholdReached(
   counts: InvalidRequestCounts,
   policy: string | undefined,
   threshold: number | undefined,

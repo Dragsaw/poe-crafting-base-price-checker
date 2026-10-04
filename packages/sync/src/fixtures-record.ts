@@ -142,13 +142,13 @@ function isIdentifierKey(key: string, parentKey: string | undefined): boolean {
 export function stripPersonalIdentifiers(
   value: unknown,
   parentKey?: string,
-  redact = false,
+  shouldRedact = false,
 ): unknown {
   if (typeof value === 'string') {
-    return redact ? REDACTED : value;
+    return shouldRedact ? REDACTED : value;
   }
   if (Array.isArray(value)) {
-    return value.map((item) => stripPersonalIdentifiers(item, parentKey, redact));
+    return value.map((item) => stripPersonalIdentifiers(item, parentKey, shouldRedact));
   }
   if (typeof value === 'object' && value !== null) {
     const stripped: Record<string, unknown> = {};
@@ -156,7 +156,7 @@ export function stripPersonalIdentifiers(
       stripped[key] = stripPersonalIdentifiers(
         nested,
         key,
-        redact || isIdentifierKey(key, parentKey),
+        shouldRedact || isIdentifierKey(key, parentKey),
       );
     }
     return stripped;

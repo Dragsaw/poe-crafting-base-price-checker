@@ -62,9 +62,9 @@ export function isHonestEmpty(ranking: Ranking): boolean {
  * to say it of — a Raw Base below the threshold, or a crafted row ranked at
  * minus its Craft Cost, whose numeral still prints.
  */
-function nothingClears(ranking: Ranking): boolean {
-  const cleared = ranking.ordering.some((row) => row.kind === 'raw' || row.summands.length > 0);
-  return !cleared && (ranking.belowThreshold.length > 0 || ranking.ordering.length > 0);
+function isNothingClearing(ranking: Ranking): boolean {
+  const hasCleared = ranking.ordering.some((row) => row.kind === 'raw' || row.summands.length > 0);
+  return !hasCleared && (ranking.belowThreshold.length > 0 || ranking.ordering.length > 0);
 }
 
 /**
@@ -74,7 +74,7 @@ function nothingClears(ranking: Ranking): boolean {
  * - Honest-empty (state 23): when `isHonestEmpty` holds.
  * - Uncostable (state 35): the active recipe is uncostable and a crafted row
  *   is on the list.
- * - Nothing-clears (state 25): see `nothingClears`.
+ * - Nothing-clears (state 25): see `isNothingClearing`.
  * - Otherwise, including a partial refresh (state 24) and an empty Tracked
  *   List, the list makes no statement.
  */
@@ -92,5 +92,5 @@ export function listStatement(
   if (ranking.split === true && ranking.recipe !== undefined) {
     return { kind: 'uncostable', text: uncostableCopy(ranking.recipe.word) };
   }
-  return nothingClears(ranking) ? { kind: 'nothing-clears', text: nothingClearsCopy(threshold) } : { kind: 'none' };
+  return isNothingClearing(ranking) ? { kind: 'nothing-clears', text: nothingClearsCopy(threshold) } : { kind: 'none' };
 }

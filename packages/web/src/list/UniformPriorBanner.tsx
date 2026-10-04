@@ -19,7 +19,7 @@ const BANNER_DISMISS = 'dismiss for this session';
  * row of the active recipe, before the top-20 bound. With no crafted row it is
  * not raised: its sentence would be false.
  */
-export function bannerRaised(active: Pick<ActiveRanking, 'ordering'>): boolean {
+export function isBannerRaised(active: Pick<ActiveRanking, 'ordering'>): boolean {
   const crafted = active.ordering.filter((row) => row.kind === 'crafted');
   return crafted.length > 0 && crafted.every((row) => row.provenance === 'uniform-prior');
 }

@@ -38,7 +38,7 @@ import { abortableSleep } from './shell.ts';
 import {
   backoffMs,
   COLD_EVEN_INTERVAL_MS,
-  gateDue,
+  isGateDue,
   INITIAL_SESSION_STATE,
   inputSignature,
   lockIsFree,
@@ -426,10 +426,10 @@ describe('the gate-due pre-wait', () => {
 
   it('is due with no confirmed league, after a completed pass, and after an input change', () => {
     const confirmed: SessionState = { ...INITIAL_SESSION_STATE, confirmedLeague: LEAGUE, confirmedSignature: 's' };
-    expect(gateDue(INITIAL_SESSION_STATE, 's')).toBe(true);
-    expect(gateDue(confirmed, 's')).toBe(false);
-    expect(gateDue({ ...confirmed, passEnded: true }, 's')).toBe(true);
-    expect(gateDue(confirmed, 't')).toBe(true);
+    expect(isGateDue(INITIAL_SESSION_STATE, 's')).toBe(true);
+    expect(isGateDue(confirmed, 's')).toBe(false);
+    expect(isGateDue({ ...confirmed, passEnded: true }, 's')).toBe(true);
+    expect(isGateDue(confirmed, 't')).toBe(true);
   });
 
   it('includes DATA_LANE only when the gate is due', () => {

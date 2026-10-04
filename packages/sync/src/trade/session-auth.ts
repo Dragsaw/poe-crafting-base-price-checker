@@ -127,9 +127,9 @@ function formsOf(value: string): string[] {
  * cookie-octets too: an HTTP stack may quote either. Longest first.
  */
 function redactableForms(value: string): string[] {
-  const quoted = value.length >= 2 && value.startsWith('"') && value.endsWith('"');
+  const isQuoted = value.length >= 2 && value.startsWith('"') && value.endsWith('"');
   const forms = new Set(formsOf(value));
-  if (quoted && value.length > 2) {
+  if (isQuoted && value.length > 2) {
     const inner = formsOf(value.slice(1, -1));
     for (const form of inner) {
       forms.add(form);

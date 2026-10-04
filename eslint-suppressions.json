@@ -32,9 +32,6 @@
     "sonarjs/cognitive-complexity": {
       "count": 2
     },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     },
@@ -324,7 +321,7 @@
       "count": 1
     },
     "unicorn/consistent-boolean-name": {
-      "count": 2
+      "count": 1
     }
   },
   "packages/core/src/coverage.test.ts": {
@@ -383,7 +380,7 @@
       "count": 3
     },
     "unicorn/consistent-boolean-name": {
-      "count": 3
+      "count": 2
     }
   },
   "packages/core/src/index.ts": {
@@ -416,7 +413,7 @@
       "count": 1
     },
     "unicorn/consistent-boolean-name": {
-      "count": 6
+      "count": 4
     }
   },
   "packages/core/src/provenance.ts": {
@@ -432,9 +429,6 @@
       "count": 1
     },
     "max-lines": {
-      "count": 1
-    },
-    "unicorn/consistent-boolean-name": {
       "count": 1
     },
     "unicorn/no-null": {
@@ -475,9 +469,6 @@
       "count": 8
     },
     "max-lines": {
-      "count": 1
-    },
-    "unicorn/consistent-boolean-name": {
       "count": 1
     },
     "unicorn/name-replacements": {
@@ -539,11 +530,6 @@
   },
   "packages/sync/src/chunk/cross-file-gate.ts": {
     "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/chunk/lock.test.ts": {
-    "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
@@ -669,9 +655,6 @@
     "local/max-comment-run": {
       "count": 9
     },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 2
     },
@@ -698,9 +681,6 @@
       "count": 10
     },
     "max-lines-per-function": {
-      "count": 1
-    },
-    "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
@@ -948,7 +928,7 @@
       "count": 2
     },
     "unicorn/consistent-boolean-name": {
-      "count": 5
+      "count": 1
     },
     "unicorn/name-replacements": {
       "count": 3
@@ -980,9 +960,6 @@
     },
     "max-lines-per-function": {
       "count": 2
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 3
     }
   },
   "packages/sync/src/trade/endpoints.ts": {
@@ -993,9 +970,6 @@
   "packages/sync/src/trade/invalid-requests.ts": {
     "local/max-comment-run": {
       "count": 4
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/sync/src/trade/ledger.ts": {
@@ -1019,20 +993,12 @@
       "count": 8
     }
   },
-  "packages/sync/src/trade/session-auth.test.ts": {
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    }
-  },
   "packages/sync/src/trade/session-auth.ts": {
     "complexity": {
       "count": 1
     },
     "local/max-comment-run": {
       "count": 16
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/sync/src/trade/transport-failure.ts": {
@@ -1245,9 +1211,6 @@
   "packages/web/src/list/UniformPriorBanner.tsx": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/web/src/list/UnitGlyph.tsx": {
@@ -1266,9 +1229,6 @@
   "packages/web/src/list/active-ranking.ts": {
     "local/max-comment-run": {
       "count": 3
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/web/src/list/combination-fit.test.ts": {
@@ -1311,9 +1271,6 @@
   "packages/web/src/list/format.ts": {
     "local/max-comment-run": {
       "count": 10
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/web/src/list/list-statement.test.ts": {
@@ -1326,7 +1283,7 @@
       "count": 6
     },
     "unicorn/consistent-boolean-name": {
-      "count": 3
+      "count": 1
     }
   },
   "packages/web/src/list/ranked-list.test.tsx": {
@@ -1408,9 +1365,6 @@
   "packages/web/src/recipe/recipe-view.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/web/src/shared/cell.ts": {
@@ -1718,9 +1672,6 @@
     "sonarjs/deprecation": {
       "count": 1
     },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 3
     },
@@ -1763,9 +1714,6 @@
   "test/setup.ts": {
     "local/max-comment-run": {
       "count": 10
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     },
     "unicorn/name-replacements": {
       "count": 1
@@ -1881,9 +1829,6 @@
     },
     "sonarjs/no-os-command-from-path": {
       "count": 4
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     },
     "unicorn/name-replacements": {
       "count": 1

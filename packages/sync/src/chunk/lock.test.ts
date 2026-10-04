@@ -112,11 +112,11 @@ describe('acquireLock', () => {
     // the marker must see the winner and back off.
     const createExclusive = fs.createExclusive.bind(fs);
     fs.createExclusive = async (path, contents) => {
-      const created = await createExclusive(path, contents);
-      if (created && path === BREAK_MARKER_PATH) {
+      const isCreated = await createExclusive(path, contents);
+      if (isCreated && path === BREAK_MARKER_PATH) {
         fs.setFile(LOCK_PATH, { contents: winner });
       }
-      return created;
+      return isCreated;
     };
 
     expect(await acquireLock(fs, clock, 5)).toEqual({

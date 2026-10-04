@@ -146,10 +146,10 @@ export const BELOW_THRESHOLD_NOTE = 'below the threshold — adds nothing to EV'
  * `core` sums every entry priced in the active league at or above it. Every
  * other state takes its own state note, as a Raw Base's does.
  */
-export function craftedCombinationNote(state: CombinationState, summand: boolean): string {
+export function craftedCombinationNote(state: CombinationState, isSummand: boolean): string {
   switch (state.state) {
     case 'priced': {
-      return summand ? '' : BELOW_THRESHOLD_NOTE;
+      return isSummand ? '' : BELOW_THRESHOLD_NOTE;
     }
     case 'no-listings': {
       return STATE_NOTES['no-listings'];

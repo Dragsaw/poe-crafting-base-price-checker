@@ -175,12 +175,12 @@ afterAll(() => {
   }
 });
 
-/** Removes from the record every request that `matches` accepts, and returns them in record order. */
-function takeEscapedRequests(matches: (entry: EscapedRequest) => boolean): EscapedRequest[] {
+/** Removes from the record every request that `isMatching` accepts, and returns them in record order. */
+function takeEscapedRequests(isMatching: (entry: EscapedRequest) => boolean): EscapedRequest[] {
   const taken: EscapedRequest[] = [];
   for (let index = 0; index < escapedRequests.length; ) {
     const entry = escapedRequests[index];
-    if (entry !== undefined && matches(entry)) {
+    if (entry !== undefined && isMatching(entry)) {
       taken.push(entry);
       escapedRequests.splice(index, 1);
     } else {

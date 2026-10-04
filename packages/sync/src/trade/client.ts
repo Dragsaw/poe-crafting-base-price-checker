@@ -33,7 +33,7 @@ import {
   isInvalidRequest,
   isSuccess,
   NO_INVALID_REQUESTS,
-  thresholdReached,
+  isThresholdReached,
 } from './invalid-requests.ts';
 import {
   parseRateLimitHeaders,
@@ -437,13 +437,13 @@ export function resetPacingState(pacing: PacingState): void {
 
 /**
  * The delay the governor would ask before the next request on `lane`, at
- * `now`. `spread` selects the session's even spread (`spreadBeforeNext`) over
+ * `now`. `isSpread` selects the session's even spread (`spreadBeforeNext`) over
  * the batch pacer (`paceBeforeNext`). A lane whose policy is unknown asks
  * nothing: the request goes out cold.
  */
-export function laneDelayMs(pacing: PacingState, lane: string, now: string, spread: boolean): number {
+export function laneDelayMs(pacing: PacingState, lane: string, now: string, isSpread: boolean): number {
   const policy = pacing.lanePolicies.get(lane);
-  const decision = spread
+  const decision = isSpread
     ? spreadBeforeNext(pacing.ledger, policy, now)
     : paceBeforeNext(pacing.ledger, policy, now);
   // Whole milliseconds, rounded up: the clock reads whole milliseconds, so a
@@ -566,9 +566,9 @@ export function createTradeGovernor<Source extends string>(
    * settled `authenticated` (AD-30). The holder adds the header itself, so the
    * value never passes through this module as a string it keeps.
    */
-  function outboundHeaders(request: TradeRequest, withCookie: boolean): Record<string, string> {
+  function outboundHeaders(request: TradeRequest, hasCookie: boolean): Record<string, string> {
     const headers = headersFor(request, userAgent);
-    return withCookie && auth !== undefined ? auth.holder.withCookie(headers) : headers;
+    return hasCookie && auth !== undefined ? auth.holder.withCookie(headers) : headers;
   }
 
   /**
@@ -579,7 +579,7 @@ export function createTradeGovernor<Source extends string>(
   let isCookieDropped = false;
 
   /** Whether `request` goes out with the cookie: marked, and the holder live. */
-  function carriesCookie(request: TradeRequest): boolean {
+  function shouldCarryCookie(request: TradeRequest): boolean {
     return (
       !isCookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
     );
@@ -720,7 +720,7 @@ export function createTradeGovernor<Source extends string>(
     // Checked before the wait and before the request, because the threshold is
     // the one limit that waiting does not clear: passing it revokes access.
     // Refusing costs a chunk; spending it costs the product.
-    if (thresholdReached(invalidRequests, knownPolicy, invalidRequestThreshold)) {
+    if (isThresholdReached(invalidRequests, knownPolicy, invalidRequestThreshold)) {
       return {
         kind: 'yield',
         lane,
@@ -739,7 +739,7 @@ export function createTradeGovernor<Source extends string>(
     // before this response replaces it.
     const pacedOn = knownPolicy === undefined ? undefined : pacing.ledger[knownPolicy];
 
-    const isWithCookie = carriesCookie(request);
+    const isWithCookie = shouldCarryCookie(request);
     const response = await http.send({
       method: request.method,
       url: request.url,

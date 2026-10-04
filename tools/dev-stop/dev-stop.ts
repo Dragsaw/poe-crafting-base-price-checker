@@ -113,7 +113,7 @@ function isScriptShell(info: ProcessInfo): boolean {
  * an orphan's `ppid` may be unrelated. It started after the child, which the
  * real parent cannot have. Without both creation times, trust the `ppid`.
  */
-function startedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
+function isStartedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
   return parent.started === undefined || child.started === undefined || parent.started <= child.started;
 }
 
@@ -133,7 +133,7 @@ function climbToRoot(
       seen.has(parent.pid) ||
       protectedPids.has(parent.pid) ||
       !(isScriptShell(parent) || isPnpmDevelopment(parent)) ||
-      !startedBefore(parent, top)
+      !isStartedBefore(parent, top)
     ) {
       return top;
     }

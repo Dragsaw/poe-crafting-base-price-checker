@@ -358,11 +358,11 @@ export function coOccur(scoped: ScopedPools): CoOccur {
       return cached;
     }
     const theirs = statIds(y);
-    const answer =
+    const isCoOccurring =
       statIds(x).some((statId) => theirs.includes(statId)) &&
       scoped[slot].some((entry) => contains(x, entry, summed) && contains(y, entry, summed));
-    cache.set(key, answer);
-    return answer;
+    cache.set(key, isCoOccurring);
+    return isCoOccurring;
   };
 }
 

@@ -361,28 +361,28 @@ export function nextState(
 }
 
 /** The gate is due when no league is confirmed, a new pass starts, or an input changed since it was. */
-export function gateDue(state: SessionState, signature: string): boolean {
+export function isGateDue(state: SessionState, signature: string): boolean {
   return (
     state.confirmedLeague === undefined || state.passEnded || signature !== state.confirmedSignature
   );
 }
 
-function entryLanes(withGate: boolean): readonly string[] {
-  return withGate ? [DATA_LANE, SEARCH_LANE, FETCH_LANE] : [SEARCH_LANE, FETCH_LANE];
+function entryLanes(hasGate: boolean): readonly string[] {
+  return hasGate ? [DATA_LANE, SEARCH_LANE, FETCH_LANE] : [SEARCH_LANE, FETCH_LANE];
 }
 
 /** The pre-wait before the next chunk: the largest spread delay over the lanes it will spend on. */
-export function preWaitMs(pacing: PacingState, now: string, withGate: boolean): number {
-  return Math.max(0, ...entryLanes(withGate).map((lane) => laneDelayMs(pacing, lane, now, true)));
+export function preWaitMs(pacing: PacingState, now: string, hasGate: boolean): number {
+  return Math.max(0, ...entryLanes(hasGate).map((lane) => laneDelayMs(pacing, lane, now, true)));
 }
 
 /**
  * The tightest even interval over the lanes an entry spends on; a lane whose
  * policy is unread counts as `COLD_EVEN_INTERVAL_MS`.
  */
-export function sessionEvenIntervalMs(pacing: PacingState, withGate: boolean): number {
+export function sessionEvenIntervalMs(pacing: PacingState, hasGate: boolean): number {
   return Math.max(
-    ...entryLanes(withGate).map(
+    ...entryLanes(hasGate).map(
       (lane) => evenIntervalMs(pacing.ledger, pacing.lanePolicies.get(lane)) ?? COLD_EVEN_INTERVAL_MS,
     ),
   );
@@ -582,7 +582,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise
     /* eslint-disable no-await-in-loop -- sequential on purpose: one chunk per pass, and each pass reads the state the last one left */
     while (!signal.aborted) {
       const signature = await inputSignature(fs);
-      const isWithGate = gateDue(state, signature);
+      const isWithGate = isGateDue(state, signature);
 
       const delayMs = preWaitMs(pacing, clock.now(), isWithGate);
       if (delayMs > 0) {
