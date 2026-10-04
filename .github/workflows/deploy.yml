@@ -4,9 +4,10 @@
 # site has no server and no secrets; the eight AD-24 artifacts are fetched at
 # runtime from the same Pages copy, relative to `base: './'`.
 #
-# `pnpm check` and `pnpm test` gate the build. `pnpm test` reads a frozen
-# fixture set, not `data/`, so a player's data-only push cannot turn it red.
-# The invariants of the live `data/` are `pnpm test:data`, not run here.
+# `pnpm check:fast` (the static checks of `pnpm check`) and `pnpm test` gate the
+# build. `pnpm test` reads a frozen fixture set, not `data/`, so a player's
+# data-only push cannot turn it red. `pnpm check` also runs `pnpm test:data`,
+# the invariants of the live `data/`, so it is not run here.
 #
 # One-time setup: Settings > Pages > Source must be "GitHub Actions".
 name: Deploy to Pages
@@ -44,7 +45,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm check
+      - run: pnpm check:fast
 
       - run: pnpm test
 

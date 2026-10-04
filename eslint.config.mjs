@@ -127,6 +127,7 @@ export default tseslint.config(
       '.dependency-cruiser.mjs',
       // A node script with no extension, so no glob by extension reaches it.
       '.githooks/commit-msg',
+      '.githooks/pre-push',
     ],
     extends: [
       js.configs.recommended,
@@ -195,7 +196,7 @@ export default tseslint.config(
     },
   },
   {
-    // CLIs and the commit-msg hook print to the terminal by design.
+    // CLIs and the git hooks print to the terminal by design.
     files: ['tools/**', '.githooks/**'],
     rules: { 'no-console': 'off' },
   },
