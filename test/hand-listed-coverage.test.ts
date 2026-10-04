@@ -75,6 +75,7 @@ const TARGETS: readonly Target[] = [
     negation: `!${TRACKED_JSON_SCRIPTS}/`,
   }),
   directoryTarget('tools/boundary-check'),
+  directoryTarget('tools/check'),
   directoryTarget('tools/deferred-issues'),
   directoryTarget('tools/dev-stop'),
   directoryTarget('tools/dts-specifiers'),

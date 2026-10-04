@@ -13,6 +13,7 @@
   "include": [
     "test/**/*.ts",
     "tools/boundary-check/*.ts",
+    "tools/check/*.ts",
     "tools/deferred-issues/*.ts",
     "tools/dev-stop/*.ts",
     "tools/dts-specifiers/*.ts",
