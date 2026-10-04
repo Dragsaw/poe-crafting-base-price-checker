@@ -13,8 +13,8 @@ const tier = (weight: number): ModifierWeight => ({
   lines: [{ statId: 'explicit.stat_1', ranges: [[1, 2]] }],
 });
 
-const pool = (weight: number, poolCoverage: 'complete' | 'partial' = 'complete'): WeightsPool => ({
-  poolCoverage,
+const pool = (weight: number, coverage: 'complete' | 'partial' = 'complete'): WeightsPool => ({
+  poolCoverage: coverage,
   entries: [tier(weight)],
 });
 

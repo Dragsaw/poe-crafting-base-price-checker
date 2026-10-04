@@ -456,18 +456,18 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     // The real inputs, with the fixture workload for the tracked list. The
     // real dataset, report and progress describe the real list, so they are
     // left out: every workload entry is never attempted.
-    const snapshot: DryRunSnapshot = {
+    const workload: DryRunSnapshot = {
       ...(await readRepositorySnapshot(FROZEN_DATA_DIR)),
       tracked: readFileSync(join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
       dataset: undefined,
       report: undefined,
       progress: undefined,
     };
-    const tracked = JSON.parse(snapshot.tracked ?? '{"entries":[]}') as { entries: TrackedEntry[] };
+    const tracked = JSON.parse(workload.tracked ?? '{"entries":[]}') as { entries: TrackedEntry[] };
     const active = tracked.entries.filter((entry) => entry.status !== 'pruned');
     expect(active.length).toBeGreaterThan(0);
 
-    const report = await dryRun(snapshot);
+    const report = await dryRun(workload);
 
     expect(report.outcome).toBe('completed');
     expect(report.entries).toHaveLength(active.length);

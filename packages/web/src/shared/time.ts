@@ -22,7 +22,8 @@ export function exactAge(clock: string, now: number): string {
 }
 
 function unitAgo(count: number, unit: string): string {
-  return `${String(count)} ${plural(count, unit, `${unit}s`)} ago`;
+  const units = `${unit}s`;
+  return `${String(count)} ${plural(count, unit, units)} ago`;
 }
 
 /** A relative age: `< 1 minute ago`, then whole minutes under 1h, hours under 24h, then days. */

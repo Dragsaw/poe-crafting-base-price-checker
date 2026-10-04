@@ -180,6 +180,9 @@ export const TrackedFileSchema = z
 /** The kind a tracked line declares: both edges make it banded, none makes it valueless (§4.1). */
 type LineKind = 'banded' | 'valueless';
 
+/** The recipe grade prefixes, as the mixed-grade refusal prints them. */
+const GRADE_PREFIXES = RECIPE_GRADES.map((grade) => `${grade}-`).join(', ');
+
 /**
  * `data/recipes.json` — the Craft Recipes (AD-20). Absent-tolerable (AD-24).
  *
@@ -208,7 +211,7 @@ export const RecipesFileSchema = z
           context.addIssue({
             code: 'custom',
             path: ['recipes', index],
-            message: `recipe ${recipe.id} mixes grades across its currencies; every currency id shares one grade prefix (${RECIPE_GRADES.map((grade) => `${grade}-`).join(', ')}) or none`,
+            message: `recipe ${recipe.id} mixes grades across its currencies; every currency id shares one grade prefix (${GRADE_PREFIXES}) or none`,
           });
           return;
         }

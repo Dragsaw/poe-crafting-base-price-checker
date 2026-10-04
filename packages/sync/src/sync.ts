@@ -514,12 +514,12 @@ function describeWait(wait: Exclude<SessionWait, { kind: 'none' }>): string {
 }
 
 function describeOutcome(outcome: ChunkOutcome): string {
-  const kind: string =
-    outcome.kind === 'deferred'
-      ? `deferred until ${outcome.notBefore}`
-      : (outcome.kind === 'bounded'
-        ? `bounded by ${outcome.bound}`
-        : outcome.kind);
+  let kind: string = outcome.kind;
+  if (outcome.kind === 'deferred') {
+    kind = `deferred until ${outcome.notBefore}`;
+  } else if (outcome.kind === 'bounded') {
+    kind = `bounded by ${outcome.bound}`;
+  }
   const keys = outcome.completed.length === 0 ? '' : `: ${outcome.completed.join(', ')}`;
   return `${kind}, ${String(outcome.completed.length)} completed${keys}`;
 }

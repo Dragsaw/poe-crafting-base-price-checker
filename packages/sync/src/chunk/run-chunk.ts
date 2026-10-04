@@ -494,6 +494,14 @@ function notBeforeAfterAbort(now: string): string {
   return new Date(Date.parse(now) + STALE_LOCK_AFTER_MS).toISOString();
 }
 
+/** The hold-off a failed run publishes: after an abort, after a latched 429, or none. */
+function failureNotBefore(now: string, isRejected: boolean, latchedMs: number | undefined): string | undefined {
+  if (isRejected) {
+    return notBeforeAfterAbort(now);
+  }
+  return latchedMs === undefined ? undefined : notBeforeAfter429(now, latchedMs);
+}
+
 function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound | undefined {
   if (step.searchRemaining !== undefined && step.searchRemaining < 1) {
     return 'search';
@@ -740,12 +748,12 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // from this write's `now`, `clear` removes it, and none carries the
       // loaded value forward.
       const holdOff = ports.auth?.pendingHoldOff();
-      const authHoldOffUntil =
-        holdOff === 'write'
-          ? new Date(Date.parse(clock.now()) + AUTH_HOLD_OFF_MS).toISOString()
-          : (holdOff === 'clear'
-            ? undefined
-            : progress?.authHoldOffUntil);
+      let authHoldOffUntil = progress?.authHoldOffUntil;
+      if (holdOff === 'write') {
+        authHoldOffUntil = new Date(Date.parse(clock.now()) + AUTH_HOLD_OFF_MS).toISOString();
+      } else if (holdOff === 'clear') {
+        authHoldOffUntil = undefined;
+      }
       const progressFile: SyncProgressFile = {
         schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
         completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
@@ -1007,11 +1015,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           await publish(
             setup.publication,
             failing === undefined ? stepEntries : [...stepEntries, failing],
-            isRejected
-              ? notBeforeAfterAbort(clock.now())
-              : (latchedMs === undefined
-                ? undefined
-                : notBeforeAfter429(clock.now(), latchedMs)),
+            failureNotBefore(clock.now(), isRejected, latchedMs),
           );
         } catch (error_) {
           secondary('publishing the dataset and progress', error_);

@@ -333,7 +333,7 @@ function describe429(
   const rateHeaders = Object.entries(headers)
     .map(([name, value]): [string, string] => [name.toLowerCase(), value])
     .filter(([name]) => name === RETRY_AFTER_HEADER || name.startsWith(RATE_LIMIT_HEADER_PREFIX))
-    .sort(([left], [right]) => (left < right ? -1 : (left > right ? 1 : 0)));
+    .sort(([left], [right]) => compareCodeUnits(left, right));
   const reading =
     pacedOn === undefined
       ? 'no reading'
@@ -350,6 +350,14 @@ function describe429(
     `(policy ${exchange.policy ?? 'unknown'}) after waiting ${String(exchange.waitedMs)} ms; ` +
     `response headers ${JSON.stringify(Object.fromEntries(rateHeaders))}; paced on ${reading}`
   );
+}
+
+/** Orders two strings by code unit, as the relational operators do. */
+function compareCodeUnits(left: string, right: string): number {
+  if (left < right) {
+    return -1;
+  }
+  return left > right ? 1 : 0;
 }
 
 function declaredYieldFloorMs(parsed: RateLimitHeaders): number {

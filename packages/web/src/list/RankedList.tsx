@@ -74,11 +74,19 @@ export function RankedList({
           threshold={threshold}
           activeLeague={activeLeague}
           recipeWord={recipeWord}
-          kind={shown.length > 1 ? (index === 0 ? 'raw' : 'crafted') : undefined}
+          kind={branchKind(shown.length, index)}
         />
       ))}
     </div>
   );
+}
+
+/** Set only in state 35, where the list holds two branches: the first is raw, the second crafted. */
+function branchKind(count: number, index: number): 'raw' | 'crafted' | undefined {
+  if (count <= 1) {
+    return undefined;
+  }
+  return index === 0 ? 'raw' : 'crafted';
 }
 
 /** One branch of the list: its rows, bounded at the top 20, and its own grow affordance. */
@@ -108,6 +116,13 @@ function Branch({
     setGrown(false);
   }
   const visible = grown ? rows : rows.slice(0, TOP_ROWS);
+  const expansionPanel = (row: ListRow): JSX.Element => {
+    return row.unit === 'raw' ? (
+      <RawExpansionPanel row={row} threshold={threshold} activeLeague={activeLeague} />
+    ) : (
+      <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord ?? ''} activeLeague={activeLeague} />
+    );
+  };
 
   return (
     <div data-list-branch={kind}>
@@ -116,18 +131,7 @@ function Branch({
         return (
           <Fragment key={row.key}>
             <RankedRow row={row} open={isOpen} onToggle={onToggle} />
-            {isOpen ? (
-              row.unit === 'raw' ? (
-                <RawExpansionPanel row={row} threshold={threshold} activeLeague={activeLeague} />
-              ) : (
-                <ClassExpansionPanel
-                  row={row}
-                  threshold={threshold}
-                  recipeWord={recipeWord ?? ''}
-                  activeLeague={activeLeague}
-                />
-              )
-            ) : null}
+            {isOpen ? expansionPanel(row) : null}
           </Fragment>
         );
       })}

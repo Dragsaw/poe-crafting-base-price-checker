@@ -332,13 +332,13 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   });
 
   it('fails co-occur on two suffix hybrids that both contain one scoped suffix tier', () => {
-    const C = 'explicit.stat_7';
+    const E = 'explicit.stat_7';
     const D = 'explicit.stat_8';
-    const S1 = tier([line(C, [10, 20]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
-    const S2 = tier([line(C, [21, 25]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
+    const S1 = tier([line(E, [10, 20]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
+    const S2 = tier([line(E, [21, 25]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
     const prefix = band(43, 56.5);
-    const narrow = entry({ prefix, suffix: hybridReference(bandLine(C, 10, 20), bandLine(D, 5, 6)) });
-    const wide = entry({ prefix, suffix: hybridReference(bandLine(C, 10, 25), bandLine(D, 5, 6)) });
+    const narrow = entry({ prefix, suffix: hybridReference(bandLine(E, 10, 20), bandLine(D, 5, 6)) });
+    const wide = entry({ prefix, suffix: hybridReference(bandLine(E, 10, 25), bandLine(D, 5, 6)) });
     const failures = failuresOf([narrow, wide], bows(pools([T7()], [S1, S2])));
     expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted()).toEqual(
       [

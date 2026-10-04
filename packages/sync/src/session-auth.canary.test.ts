@@ -135,8 +135,9 @@ type Target = 'leagues' | 'search';
 
 /** An error whose message, stack and nested cause all quote the canary. */
 function quotingError(failure: Failure): Error {
-  const cause = new Error(`socket said ${encodeURIComponent(`POESESSID=${CANARY}`)}`, {
-    cause: new Error(`header ${Buffer.from(`POESESSID=${CANARY}`).toString('base64')}`, {
+  const cookie = `POESESSID=${CANARY}`;
+  const cause = new Error(`socket said ${encodeURIComponent(cookie)}`, {
+    cause: new Error(`header ${Buffer.from(cookie).toString('base64')}`, {
       cause: `raw ${CANARY}`,
     }),
   });

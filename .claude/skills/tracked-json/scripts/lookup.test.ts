@@ -591,7 +591,7 @@ describe('the committed data/', () => {
     const incision = found.mods.find((row) => row.modGroup === 'IncisionChance');
 
     expect(incision).toMatchObject({ slot: 'prefix', statIds: [], trackable: false });
-    expect(incision?.untrackable.map((tier) => tier.reason)).toEqual(['not-in-game']);
+    expect(incision?.untrackable.map((item) => item.reason)).toEqual(['not-in-game']);
     const radius = found.mods.find(
       (row) => row.modGroup === 'JewelRadiusLargerRadius' && row.statIds.includes('explicit.stat_3891355829|1'),
     );

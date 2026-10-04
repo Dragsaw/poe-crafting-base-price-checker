@@ -133,11 +133,11 @@ describe('contains (§1)', () => {
   });
 
   it('counts a hybrid entry once, however many of its lines match', () => {
-    const hybrid = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
+    const hybridTier = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
     // Two lines of one statId: the schema refuses it, and the weight still counts once.
     const doubled = tier([line(STAT, [10, 12]), line(STAT, [11, 12])], 50);
     const rest = tier([line(STAT, [20, 30])], 850);
-    const p = pOf(affixProbability(pools([hybrid, doubled, rest], []), 'prefix', band(10, 12), 82, 0));
+    const p = pOf(affixProbability(pools([hybridTier, doubled, rest], []), 'prefix', band(10, 12), 82, 0));
     expect(p).toBe(150 / 1000);
   });
 

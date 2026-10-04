@@ -19,18 +19,19 @@ import {
 const MISSING_CMDLET = 'Get-NoSuchNetTCPConnection';
 const failure = vi.hoisted(() => ({ inject: false, badShape: false }));
 
+function injectedArguments(arguments_: readonly string[]): readonly string[] {
+  if (failure.inject) {
+    return arguments_.map((argument) => argument.replaceAll('Get-NetTCPConnection', () => MISSING_CMDLET));
+  }
+  return failure.badShape
+    ? arguments_.map((argument) => argument.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
+    : arguments_;
+}
+
 vi.mock('node:child_process', async (importOriginal) => {
   const real = await importOriginal<typeof import('node:child_process')>();
   const execFileSync = ((file: string, arguments_: readonly string[] = [], options?: object) =>
-    real.execFileSync(
-      file,
-      failure.inject
-        ? arguments_.map((argument) => argument.replaceAll('Get-NetTCPConnection', () => MISSING_CMDLET))
-        : (failure.badShape
-          ? arguments_.map((argument) => argument.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
-          : arguments_),
-      options,
-    )) as typeof real.execFileSync;
+    real.execFileSync(file, injectedArguments(arguments_), options)) as typeof real.execFileSync;
   return { ...real, execFileSync };
 });
 

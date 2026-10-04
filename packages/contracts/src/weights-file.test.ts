@@ -61,13 +61,13 @@ describe('WeightsFileSchema — conforming files', () => {
       throw new Error(`committed weights.json refused: ${JSON.stringify(result)}`);
     }
     const pools = Object.values(result.value.bases).flatMap((classes) => Object.values(classes));
-    const entries = pools.flatMap((pools) => [...pools.prefix.entries, ...pools.suffix.entries]);
+    const entries = pools.flatMap((classPools) => [...classPools.prefix.entries, ...classPools.suffix.entries]);
     expect(entries).toHaveLength(569);
     expect(entries.every((entry) => entry.lines.length > 0)).toBe(true);
     const nullStatIds = entries.flatMap((entry) => entry.lines).filter((line) => line.statId === null);
     expect(nullStatIds).toHaveLength(1);
     const partialPools = pools
-      .flatMap((pools) => [pools.prefix, pools.suffix])
+      .flatMap((classPools) => [classPools.prefix, classPools.suffix])
       .filter((pool) => pool.poolCoverage === 'partial');
     expect(partialPools).toHaveLength(0);
   });

@@ -78,13 +78,13 @@ function environmentWithoutContact(): NodeJS.ProcessEnv {
 }
 
 function run(arguments_: readonly string[]): Promise<Run> {
-  return new Promise((resolve) => {
+  return new Promise((settle) => {
     const child = execFile(
       process.execPath,
       [...arguments_],
       { encoding: 'utf8', env: environmentWithoutContact() },
       (_error, stdout, stderr) => {
-        resolve({ code: child.exitCode, stdout, stderr });
+        settle({ code: child.exitCode, stdout, stderr });
       },
     );
   });
@@ -257,13 +257,13 @@ it('is referenced by no vitest config and by no setup file', () => {
  */
 it('loads @poe/contracts under bare node, as the command itself must', async () => {
   const packageRoot = fileURLToPath(new URL('../', import.meta.url));
-  const result = await new Promise<Run>((resolve) => {
+  const result = await new Promise<Run>((settle) => {
     const child = execFile(
       process.execPath,
       ['--input-type=module', '-e', "await import('@poe/contracts');"],
       { encoding: 'utf8', cwd: packageRoot, env: environmentWithoutContact() },
       (_error, stdout, stderr) => {
-        resolve({ code: child.exitCode, stdout, stderr });
+        settle({ code: child.exitCode, stdout, stderr });
       },
     );
   });

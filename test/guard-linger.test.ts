@@ -47,7 +47,10 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
       [VITEST_BIN, 'run', '--config', CHILD_CONFIG, '--reporter=json', `--outputFile=${outputFile}`],
       { cwd: REPO_ROOT, env: { ...process.env, CI: '1' } },
       (error, stdout, stderr) => {
-        const code = error === null ? 0 : (typeof error.code === 'number' ? error.code : -1);
+        let code = 0;
+        if (error !== null) {
+          code = typeof error.code === 'number' ? error.code : -1;
+        }
         resolve({ code, output: `${stdout}\n${stderr}` });
       },
     );

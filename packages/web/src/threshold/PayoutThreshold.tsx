@@ -38,6 +38,14 @@ function parseDraft(draft: number | string): number | undefined {
   return PARSEABLE.test(draft) ? Number(draft) : undefined;
 }
 
+/** The hidden sizing ghost's text: the number formatted, an empty draft as `0`, otherwise the typed text. */
+function ghostText(draft: number | string): string {
+  if (typeof draft === 'number') {
+    return formatThreshold(draft);
+  }
+  return draft === '' ? '0' : draft;
+}
+
 /**
  * `{components.payout-threshold}`. The figure IS the input: a borderless
  * Mantine `NumberInput` with no stepper, and `Divine` outside it so it can
@@ -103,7 +111,7 @@ export function PayoutThreshold({
               borderBottom: `${px(spacing.hairline)} solid transparent`,
             }}
           >
-            {typeof draft === 'number' ? formatThreshold(draft) : (draft === '' ? '0' : draft)}
+            {ghostText(draft)}
           </span>
           <NumberInput
             id={id}

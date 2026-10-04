@@ -268,10 +268,11 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
     const { eslint } = target;
     if (eslint !== undefined) {
       describe('ESLint', () => {
+        const ignoresClause = eslint.negation === undefined ? '' : `, ignores ${eslint.negation}`;
         it('eslint.config.mjs lints every file', async () => {
           expect(
             await eslintUncovered(target.files, undefined),
-            `ESLint: eslint.config.mjs (files ${eslint.files}${eslint.negation === undefined ? '' : `, ignores ${eslint.negation}`}) ignores or has no config for`,
+            `ESLint: eslint.config.mjs (files ${eslint.files}${ignoresClause}) ignores or has no config for`,
           ).toEqual([]);
         });
 

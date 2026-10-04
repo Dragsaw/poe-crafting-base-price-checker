@@ -64,7 +64,10 @@ function runChild(
         },
       },
       (error, stdout, stderr) => {
-        const code = error === null ? 0 : (typeof error.code === 'number' ? error.code : -1);
+        let code = 0;
+        if (error !== null) {
+          code = typeof error.code === 'number' ? error.code : -1;
+        }
         resolve({ code, output: `${stdout}\n${stderr}` });
       },
     );

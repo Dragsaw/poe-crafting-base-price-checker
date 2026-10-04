@@ -366,7 +366,7 @@ describe('the cross-file diagnosis (AD-17)', () => {
     const diagnosis = groups[2];
     expect(diagnosis?.style.marginTop).toBe(px(spacing.syncReportGroupGap));
     const lines = [...diagnosis?.querySelectorAll<HTMLElement>('[data-verbatim]') ?? []];
-    expect(lines.map((line) => line.textContent)).toEqual(
+    expect(lines.map((element) => element.textContent)).toEqual(
       FAILURES.map((failure) => `${failure.check} · ${failure.entryKey} · ${failure.detail}`),
     );
     for (const verbatim of lines) {
