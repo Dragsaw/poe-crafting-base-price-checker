@@ -25,10 +25,7 @@ import {
 import type { ActiveRanking } from './active-ranking';
 import { isHonestEmpty } from './list-statement';
 
-/**
- * Ranks 1–5, 6–10, and 11 onward — by position only, never by kind (UX-DR11).
- * In state 35 the position is within the row's own branch (EXPERIENCE.md).
- */
+/** Ranks 1–5, 6–10, 11 onward, by position only, never by kind (UX-DR11); in state 35 within the row's own branch. */
 export type Tier = 1 | 2 | 3;
 
 /** What an EV cell holds: a figure at 2dp, or the money-slot phrase naming the open question. */
@@ -58,13 +55,7 @@ export interface DisplayRow {
   readonly ages: CombinationAges;
 }
 
-/**
- * One crafted `(Item Class, recipe)` row as the view prints it: the class
- * glyph, the Item Class name, its EV. The key is the class key, so a row keeps
- * its open panel across a recipe switch (state 34). Its chase cells and its
- * panel's rows come from `core`'s summands and the tracked list. No age mark
- * yet: the Age cell waits on the architect ruling on AD-10's oldest timestamp.
- */
+/** One crafted (Item Class, recipe) row, keyed by class key so its open panel survives a recipe switch (state 34). No age mark: the Age cell waits on the AD-10 oldest-timestamp ruling. */
 export interface ClassDisplayRow {
   readonly key: string;
   /** The rank numeral, or `undefined` in state 35, where no numeral spans the two branches. */
@@ -79,11 +70,7 @@ export interface ClassDisplayRow {
   readonly age: undefined;
   /** `core`'s label of the pair. Only `uniform-prior` prints a mark; `measured` is silence (FR-11). */
   readonly provenance: CraftedRankedRow['provenance'];
-  /**
-   * The chase cells: the first three of `core`'s summands, in `core`'s order,
-   * each as its Combination's text. Fewer than three leave empty cells
-   * (state 21).
-   */
+  /** The first three of `core`'s summands, in its order, as Combination text; fewer leave empty cells (state 21). */
   readonly chase: readonly (readonly AffixPart[])[];
   /** The expansion's combination rows: the summands in `core`'s order, then every other non-pruned entry by canonical key. */
   readonly combinations: readonly CraftedCombination[];
@@ -142,13 +129,7 @@ function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, r
   );
 }
 
-/**
- * A crafted row's chase cells and panel rows. `web` computes no term here and
- * reorders nothing: the chase cells are `core`'s first three summands, and the
- * panel lists the summands in `core`'s order, then every other non-pruned
- * entry of the class by canonical key. A summand joins its tracked entry by
- * canonical key.
- */
+/** `web` computes and reorders nothing: the panel is `core`'s summands, then every other non-pruned entry of the class by canonical key. */
 function craftedDetail(
   row: CraftedRankedRow,
   {
@@ -286,26 +267,7 @@ function trailingRows(ranking: Ranking, context: RowContext): DisplayRow[] {
   ];
 }
 
-/**
- * The ranking as rows: `ordering` in `core`'s order, numbered by position —
- * a crafted row prints its Item Class name, the class glyph and `core`'s EV,
- * or *no figure yet* for an uncostable recipe; `numbered: false` suppresses
- * every numeral (state 35); then
- * the unpriced Raw Bases trailing in canonical order, `noListings` then
- * `notYetSynced` (decision 2026-09-26, option a) then `unresolvable` (FR-24,
- * EXPERIENCE state 4: shown, not merely omitted), unnumbered and at tier 3.
- * The one exception is the honest-empty state (`isHonestEmpty`, EXPERIENCE
- * state 23): its statement claims canonical order, so the unpriced rows print
- * as one sequence by `compareCanonicalKeys` on `entryKey`, across all three
- * groups, and every EV cell reads *no figure yet*, whatever the row's own Price
- * State (EXPERIENCE state 23, revision 8). Each row keeps its own Price State,
- * so its expansion still prints its own money phrase.
- * `belowThreshold` leaves the list (FR-3). The health line counts the Sync
- * Report's records, not these rows, so a row renders with the report absent.
- * The age reads the row's dataset entry, joined by `entryKey`.
- * Each row also carries what its expansion prints (Story 2.5): the resolved
- * Price State, the Curation Status, the dataset entry and both exact ages.
- */
+/** `ordering` in `core`'s order, then the unpriced Raw Bases at tier 3: noListings, notYetSynced, unresolvable (FR-24, state 4); belowThreshold leaves (FR-3). */
 export function toDisplayRows(
   ranking: Ranking,
   dataset: readonly DatasetEntry[],
@@ -331,13 +293,7 @@ export function toDisplayRows(
   return [...ranked, ...trailing];
 }
 
-/**
- * The list's branches for the active recipe (`forRecipe`). One branch in
- * every state but 35. In state 35 — an uncostable recipe with a crafted row
- * to show — the raw branch, with its trailing unpriced rows, then the crafted
- * branch: each in `core`'s order, tiered by its own position, and no rank
- * numeral on either, because none can span the two (EXPERIENCE.md state 35).
- */
+/** One branch in every state but 35, where an uncostable recipe with a crafted row gives raw then crafted, unnumbered (EXPERIENCE.md state 35). */
 export function toListBranches(
   active: ActiveRanking,
   dataset: readonly DatasetEntry[],

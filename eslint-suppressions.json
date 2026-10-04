@@ -709,11 +709,6 @@
       "count": 6
     }
   },
-  "packages/web/src/list/display-rows.ts": {
-    "local/max-comment-run": {
-      "count": 6
-    }
-  },
   "packages/web/src/list/expansion.test.tsx": {
     "max-lines": {
       "count": 1
