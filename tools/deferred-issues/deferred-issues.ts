@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { parseLedger, type LedgerEntry } from './ledger.ts';
-import { LEDGER_PATH, planDuplicateCloses, planSync, readMarker, type IssueInfo, type SyncPlan } from './plan.ts';
+import { LEDGER_PATH, planDuplicateCloses, planSync, readMarker, type IssueInfo, type PlannedClose, type PlannedCreate, type SyncPlan } from './plan.ts';
 
 /**
  * `pnpm deferred:issues [--dry-run [--ref <ref>]] [--list]` creates one GitHub
@@ -162,7 +162,17 @@ function listEntries(entries: readonly LedgerEntry[], issues: readonly IssueInfo
   }));
 }
 
-export function main(argv: readonly string[], runner: Runner, out: Output, error_: Output): number {
+interface Options {
+  readonly isDryRun: boolean;
+  readonly isList: boolean;
+  readonly reference: string;
+}
+
+function usageError(message: string): { readonly ok: false; readonly error: string } {
+  return { ok: false, error: `${PROGRAM}: ${message}\n${USAGE}` };
+}
+
+function parseOptions(argv: readonly string[]): Read<Options> {
   let values: { 'dry-run'?: boolean; ref?: string; list?: boolean };
   try {
     ({ values } = parseArgs({
@@ -172,70 +182,58 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
       allowPositionals: false,
     }));
   } catch (error) {
-    error_.write(`${PROGRAM}: ${String(error)}\n${USAGE}`);
-    return 1;
+    return usageError(String(error));
   }
   const isDryRun = values['dry-run'] === true;
   if (!isDryRun && values.ref !== undefined) {
-    error_.write(`${PROGRAM}: --ref is allowed only with --dry-run\n${USAGE}`);
-    return 1;
+    return usageError('--ref is allowed only with --dry-run');
   }
   const isList = values.list === true;
-  if (isList && isDryRun) {
-    error_.write(`${PROGRAM}: --list and --dry-run do not combine\n${USAGE}`);
-    return 1;
-  }
-  const reference = values.ref ?? DEFAULT_REF;
+  return isList && isDryRun
+    ? usageError('--list and --dry-run do not combine')
+    : { ok: true, value: { isDryRun, isList, reference: values.ref ?? DEFAULT_REF } };
+}
 
+function readInputs(runner: Runner, reference: string): Read<{ entries: LedgerEntry[]; issues: IssueInfo[] }> {
   const entries = readEntries(runner, reference);
   if (!entries.ok) {
-    error_.write(`${PROGRAM}: ${entries.error}\n`);
-    return 1;
+    return entries;
   }
   const issues = readIssues(runner);
-  if (!issues.ok) {
-    error_.write(`${PROGRAM}: ${issues.error}\n`);
-    return 1;
-  }
+  return issues.ok ? { ok: true, value: { entries: entries.value, issues: issues.value } } : issues;
+}
 
-  if (isList) {
-    out.write(`${JSON.stringify(listEntries(entries.value, issues.value), undefined, 2)}\n`);
-    return 0;
-  }
+function printDryRun(plan: SyncPlan, out: Output): number {
+  printPlan(plan, out);
+  printReports(plan.reports, out);
+  out.write(`dry run: ${plan.creates.length} to create, ${plan.closes.length} to close as duplicate, ${plan.reports.length} reported\n`);
+  return plan.duplicateLedgerIds.length > 0 ? 2 : 0;
+}
 
-  const plan = planSync(entries.value, issues.value, reference);
-  if (isDryRun) {
-    printPlan(plan, out);
-    printReports(plan.reports, out);
-    out.write(`dry run: ${plan.creates.length} to create, ${plan.closes.length} to close as duplicate, ${plan.reports.length} reported\n`);
-    return plan.duplicateLedgerIds.length > 0 ? 2 : 0;
-  }
-
-  const reports = [...plan.reports];
-  let isFailed = plan.duplicateLedgerIds.length > 0;
-
-  // Labels are written only when an issue is: an up-to-date run writes nothing.
-  if (plan.creates.length > 0 || plan.closes.length > 0) {
-    for (const label of LABELS) {
-      const made = runner('gh', [
-        'label',
-        'create',
-        label.name,
-        '--color',
-        label.color,
-        '--description',
-        label.description,
-        '--force',
-      ]);
-      if (made.status !== 0) {
-        error_.write(`${PROGRAM}: gh label create ${label.name} failed: ${firstLine(made.stderr)}\n`);
-        return 1;
-      }
+/** The first failure of a label create, as the line to print, or `undefined` when all succeed. */
+function createLabels(runner: Runner): string | undefined {
+  for (const label of LABELS) {
+    const made = runner('gh', [
+      'label',
+      'create',
+      label.name,
+      '--color',
+      label.color,
+      '--description',
+      label.description,
+      '--force',
+    ]);
+    if (made.status !== 0) {
+      return `${PROGRAM}: gh label create ${label.name} failed: ${firstLine(made.stderr)}\n`;
     }
   }
+  return undefined;
+}
 
+function createIssues(creates: readonly PlannedCreate[], runner: Runner, out: Output): { created: number; failures: string[] } {
   let created = 0;
-  for (const create of plan.creates) {
+  const failures: string[] = [];
+  for (const create of creates) {
     const made = runner(
       'gh',
       ['issue', 'create', '--title', create.title, '--label', 'deferred', '--body-file', '-'],
@@ -245,24 +243,15 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
       created += 1;
       out.write(`created: ${create.id} ${firstLine(made.stdout)}\n`);
     } else {
-      isFailed = true;
-      reports.push(`Create failed: ${create.id}: ${firstLine(made.stderr)}`);
+      failures.push(`Create failed: ${create.id}: ${firstLine(made.stderr)}`);
     }
   }
+  return { created, failures };
+}
 
-  // Race on create: another sync may have created an issue for the same id.
-  let closes = plan.closes;
-  if (created > 0) {
-    const again = readIssues(runner);
-    if (!again.ok) {
-      printReports(reports, out);
-      error_.write(`${PROGRAM}: ${again.error}\n`);
-      return 1;
-    }
-    closes = planDuplicateCloses(again.value);
-  }
-
+function closeDuplicates(closes: readonly PlannedClose[], runner: Runner, out: Output): { closed: number; failures: string[] } {
   let closed = 0;
+  const failures: string[] = [];
   for (const close of closes) {
     const done = runner('gh', [
       'issue',
@@ -277,14 +266,65 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
       closed += 1;
       out.write(`closed: #${close.number} as not planned, Duplicate of #${close.keep}\n`);
     } else {
-      isFailed = true;
-      reports.push(`Close failed: #${close.number}: ${firstLine(done.stderr)}`);
+      failures.push(`Close failed: #${close.number}: ${firstLine(done.stderr)}`);
     }
   }
+  return { closed, failures };
+}
 
+function applyPlan(plan: SyncPlan, runner: Runner, out: Output, error_: Output): number {
+  // Labels are written only when an issue is: an up-to-date run writes nothing.
+  const labelError = plan.creates.length > 0 || plan.closes.length > 0 ? createLabels(runner) : undefined;
+  if (labelError !== undefined) {
+    error_.write(labelError);
+    return 1;
+  }
+
+  const creating = createIssues(plan.creates, runner, out);
+  const reports = [...plan.reports, ...creating.failures];
+
+  // Race on create: another sync may have created an issue for the same id.
+  let closes = plan.closes;
+  if (creating.created > 0) {
+    const again = readIssues(runner);
+    if (!again.ok) {
+      printReports(reports, out);
+      error_.write(`${PROGRAM}: ${again.error}\n`);
+      return 1;
+    }
+    closes = planDuplicateCloses(again.value);
+  }
+
+  const closing = closeDuplicates(closes, runner, out);
+  reports.push(...closing.failures);
   printReports(reports, out);
-  out.write(`${created} created, ${closed} closed as duplicate, ${reports.length} reported\n`);
+  out.write(`${creating.created} created, ${closing.closed} closed as duplicate, ${reports.length} reported\n`);
+  const isFailed = plan.duplicateLedgerIds.length > 0 || creating.failures.length > 0 || closing.failures.length > 0;
   return isFailed ? 2 : 0;
+}
+
+export function main(argv: readonly string[], runner: Runner, out: Output, error_: Output): number {
+  const options = parseOptions(argv);
+  if (!options.ok) {
+    error_.write(options.error);
+    return 1;
+  }
+  const { isDryRun, isList, reference } = options.value;
+
+  const inputs = readInputs(runner, reference);
+  if (!inputs.ok) {
+    error_.write(`${PROGRAM}: ${inputs.error}\n`);
+    return 1;
+  }
+  const { entries, issues } = inputs.value;
+
+  if (isList) {
+    out.write(`${JSON.stringify(listEntries(entries, issues), undefined, 2)}\n`);
+    return 0;
+  }
+
+  const plan = planSync(entries, issues, reference);
+  return isDryRun ? printDryRun(plan, out) : applyPlan(plan, runner, out, error_);
 }
 
 function isInvokedDirectly(): boolean {
