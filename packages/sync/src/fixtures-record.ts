@@ -332,13 +332,36 @@ export async function recordFixtures(
   }
   /* eslint-enable no-await-in-loop -- end of the sequential block above */
 
+  return { ok: true, written: await writeCaptured(ports, captured) };
+}
+
+async function writeCaptured(
+  ports: RecorderPorts,
+  captured: readonly { path: string; contents: string }[],
+): Promise<string[]> {
   const written: string[] = [];
   for (const { path, contents } of captured) {
     // eslint-disable-next-line no-await-in-loop -- sequential on purpose: `written` lists exactly the files written before a failure
     await ports.writeFixture(path, contents);
     written.push(path);
   }
-  return { ok: true, written };
+  return written;
+}
+
+/** Pricing fixtures are named by request digest, so a changed list or builder leaves old names behind. */
+async function removeStalePricingFixtures(writtenPaths: readonly string[]): Promise<void> {
+  const written = new Set(writtenPaths.map((path) => nodePath.resolve(path)));
+  const names = await readdir(FIXTURES_DIR);
+  for (const name of names) {
+    const path = nodePath.resolve(nodePath.join(FIXTURES_DIR, name));
+    if (!PRICING_FIXTURE_FILE.test(name) || written.has(path)) {
+      continue;
+    }
+
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the "removed" lines print in directory order
+    await rm(path);
+    process.stdout.write(`removed ${path}\n`);
+  }
 }
 
 async function main(): Promise<void> {
@@ -384,21 +407,7 @@ async function main(): Promise<void> {
     process.stdout.write(`recorded ${path}\n`);
   }
 
-  // Pricing fixtures are named by request digest, so a changed tracked list,
-  // builder or league leaves the old names behind. Only after a successful
-  // record, remove every pricing fixture this run did not write.
-  const written = new Set(outcome.written.map((path) => nodePath.resolve(path)));
-  const names = await readdir(FIXTURES_DIR);
-  for (const name of names) {
-    const path = nodePath.resolve(nodePath.join(FIXTURES_DIR, name));
-    if (!PRICING_FIXTURE_FILE.test(name) || written.has(path)) {
-      continue;
-    }
-
-    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the "removed" lines print in directory order
-    await rm(path);
-    process.stdout.write(`removed ${path}\n`);
-  }
+  await removeStalePricingFixtures(outcome.written);
 }
 
 /**

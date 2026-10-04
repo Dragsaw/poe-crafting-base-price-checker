@@ -420,14 +420,8 @@
     }
   },
   "packages/sync/src/fixtures-record.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 10
-    },
-    "max-lines-per-function": {
-      "count": 1
     }
   },
   "packages/sync/src/git/read-only-git-port.test.ts": {
