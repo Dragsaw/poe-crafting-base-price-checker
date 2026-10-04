@@ -114,7 +114,7 @@ describe('checkTracked', () => {
   });
 
   it('skips the cross-file checks without a weights file, and reports a refused one', () => {
-    const absent = checkTracked(inputsOf([crafted], { weights: { ok: true, value: null } }));
+    const absent = checkTracked(inputsOf([crafted], { weights: { ok: true, value: undefined } }));
     expect(absent.ok).toBe(true);
     expect(absent.checks).toContainEqual({ check: 'cross-file', status: 'skipped' });
     expect(absent.issues).toEqual([]);

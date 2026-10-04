@@ -15,6 +15,7 @@ import { itemTypesOf } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
 import { NamedError } from '../test-support/named-error.ts';
 import { rejectionOf } from '../test-support/rejection-of.ts';
+import { JSON_NULL } from '../test-support/json-null.ts';
 
 const LEAGUE = 'Forbidden Rites';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -225,7 +226,7 @@ describe('createPricingStep: states by cause', () => {
   it('a fetch with no priceable listing is no-listings, with the search fields set', async () => {
     const { run } = setup({
       results: ids(2),
-      fetch: ok({ result: [null, { id: 'id1', listing: { price: { amount: 0, currency: 'divine' } } }] }),
+      fetch: ok({ result: [JSON_NULL, { id: 'id1', listing: { price: { amount: 0, currency: 'divine' } } }] }),
     });
     expect(await run()).toEqual({
       kind: 'completed',
@@ -244,9 +245,9 @@ describe('createPricingStep: states by cause', () => {
       results: ids(4),
       fetch: ok({
         result: [
-          null,
+          JSON_NULL,
           { id: 'id1', listing: { price: { amount: 1, currency: 'divine' } } },
-          null,
+          JSON_NULL,
           { id: 'id3', listing: { price: { amount: 3, currency: 'divine' } } },
         ],
       }),

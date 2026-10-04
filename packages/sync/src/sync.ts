@@ -400,7 +400,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
   const parts = await Promise.all(
     INPUT_PATHS.map(async (path) => {
       try {
-        return [path, await fs.exists(path), (await fs.lastModifiedAt(path)) ?? null];
+        return [path, await fs.exists(path), await fs.lastModifiedAt(path)];
       } catch {
         return [path, 'error'];
       }

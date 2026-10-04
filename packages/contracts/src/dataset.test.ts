@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DatasetEntrySchema, PriceStateSchema } from './dataset';
 import type { PriceState } from './dataset';
+import { JSON_NULL } from './test-support';
 
 const observation = {
   league: 'Forbidden Rites',
@@ -56,7 +57,7 @@ describe('PriceStateSchema', () => {
   });
 
   it('never spells absence as zero, null or a missing key', () => {
-    expect(PriceStateSchema.safeParse({ state: 'priced', observation: null }).success).toBe(false);
+    expect(PriceStateSchema.safeParse({ state: 'priced', observation: JSON_NULL }).success).toBe(false);
     expect(PriceStateSchema.safeParse({}).success).toBe(false);
   });
 

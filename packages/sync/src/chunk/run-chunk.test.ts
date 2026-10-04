@@ -45,6 +45,7 @@ import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/
 import { createRequestCounter, zeroRequests } from '../request-counter.ts';
 import { createTradeClient } from '../trade/client.ts';
 import { TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
+import { JSON_NULL } from '../test-support/json-null.ts';
 import { InvalidArtifactError } from '../write-artifact.ts';
 import { CrossFileGateError } from './cross-file-gate.ts';
 import { LOCK_PATH, serialiseLock } from './lock.ts';
@@ -377,7 +378,7 @@ async function datasetOf(fs: FakeFilesystemPort): Promise<DatasetFile | undefine
 function previousFile(entries: readonly DatasetEntry[]): string {
   return `${JSON.stringify(
     { schemaVersion: SUPPORTED_SCHEMA_VERSION, league: 'Old League', generatedAt: SEVEN_HOURS_AGO, entries, currencyRates: [] },
-    null,
+    undefined,
     2,
   )}\n`;
 }
@@ -458,7 +459,7 @@ describe('runChunk: the published dataset', () => {
 
     expect(outcome.kind).toBe('bounded');
     const written = (await fs.readTextFile(DATASET_PATH)) ?? '';
-    const block = JSON.stringify(carried, null, 2).split('\n').map((line) => `    ${line}`).join('\n');
+    const block = JSON.stringify(carried, undefined, 2).split('\n').map((line) => `    ${line}`).join('\n');
     expect(previous).toContain(block);
     expect(written).toContain(block);
     const dataset = await datasetOf(fs);
@@ -2025,7 +2026,7 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
       bases: {
         'weapon.bow': {
           Bows: {
-            prefix: weightsPoolOf(weightsEntryOf('p1', weightsLineOf('explicit.w1'), weightsLineOf(null))),
+            prefix: weightsPoolOf(weightsEntryOf('p1', weightsLineOf('explicit.w1'), weightsLineOf(JSON_NULL))),
             suffix: weightsPoolOf(weightsEntryOf('s1', weightsLineOf('explicit.w1')), weightsEntryOf('s2', weightsLineOf('explicit.ok'))),
           },
         },
@@ -2197,7 +2198,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
       entries: [{ entryKey: key(A), price: { state: 'no-listings' }, lastAttemptedAt: SEVEN_HOURS_AGO }],
       currencyRates: [],
     },
-    null,
+    undefined,
     2,
   )}\n`;
   const PREVIOUS_PROGRESS = progressText([key(A)]);

@@ -37,7 +37,7 @@ export const REQUEST_TIMEOUT_MS = 30_000;
  * no diff" a property of the code rather than of two copies agreeing today.
  */
 export function serialiseJsonArtifact(value: unknown): string {
-  return `${JSON.stringify(value, null, 2)}\n`;
+  return `${JSON.stringify(value, undefined, 2)}\n`;
 }
 
 /**

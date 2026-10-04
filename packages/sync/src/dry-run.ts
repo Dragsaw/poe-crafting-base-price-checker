@@ -197,6 +197,7 @@ async function readWritten<T>(
   schema: { parse(data: unknown): T },
 ): Promise<T | null> {
   const text = await fs.readTextFile(path);
+  // eslint-disable-next-line unicorn/no-null -- boundary: the printed report keeps `null` for a file the chunk wrote none of, and `undefined` would drop the key from the JSON.
   return text === undefined ? null : schema.parse(JSON.parse(text));
 }
 
@@ -339,7 +340,7 @@ function parseCliOptions(argv: readonly string[]): DryRunOptions {
 async function main(): Promise<void> {
   const options = parseCliOptions(process.argv.slice(2));
   const report = await dryRun(await readRepositorySnapshot(), options);
-  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify(report, undefined, 2)}\n`);
 }
 
 /**

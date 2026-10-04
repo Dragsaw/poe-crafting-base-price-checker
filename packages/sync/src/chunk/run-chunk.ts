@@ -839,7 +839,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // The cross-file gate (AD-12, AD-17): `core`'s five checks, before the
       // order exists. A failure throws, so nothing is published and progress
       // is untouched; the report carries one record per failure.
-      crossFileGate(entries, weights.kind === 'present' ? weights.file : null);
+      crossFileGate(entries, weights.kind === 'present' ? weights.file : undefined);
 
       const plan = chunkOrder({
         tracked: entries.filter((entry) => !check.excludedKeys.has(canonicalKey(entry))),

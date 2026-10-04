@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { JSON_NULL } from './test-support';
 import {
   FilterCatalogueSchema,
   FilterOptionSchema,
@@ -51,7 +52,7 @@ const statics = {
       ],
     },
     // The live API sends this group with a null label and no entries.
-    { id: 'Misc', label: null, entries: [] },
+    { id: 'Misc', label: JSON_NULL, entries: [] },
   ],
 };
 
@@ -67,7 +68,7 @@ const filters = {
           option: {
             options: [
               // The live API opens every option list with this sentinel.
-              { id: null, text: 'Any' },
+              { id: JSON_NULL, text: 'Any' },
               { id: 'weapon.bow', text: 'Bow' },
               { id: 'armour.chest', text: 'Body Armour' },
               { id: 'jewel', text: 'Jewel' },
@@ -123,13 +124,13 @@ describe('the four catalogue artifacts', () => {
 
   it('admits the null sentinels the API sends, and nothing further', () => {
     // `null` is the "Any" option; `""` is not an id and never was.
-    expect(FilterOptionSchema.safeParse({ id: null, text: 'Any' }).success).toBe(true);
+    expect(FilterOptionSchema.safeParse({ id: JSON_NULL, text: 'Any' }).success).toBe(true);
     expect(FilterOptionSchema.safeParse({ id: '', text: 'Any' }).success).toBe(false);
 
     // A group may omit its label or send it as null; anything else is a shape
     // change worth failing on.
     expect(
-      StaticCatalogueGroupSchema.safeParse({ id: 'Misc', label: null, entries: [] }).success,
+      StaticCatalogueGroupSchema.safeParse({ id: 'Misc', label: JSON_NULL, entries: [] }).success,
     ).toBe(true);
     expect(
       StaticCatalogueGroupSchema.safeParse({ id: 'Misc', label: 7, entries: [] }).success,

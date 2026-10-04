@@ -5,6 +5,7 @@ import { createFakeFilesystemPort } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { DataFileError } from '../load-data-file.ts';
+import { JSON_NULL } from '../test-support/json-null.ts';
 import { CATALOGUE_ITEMS_PATH } from '../pricing/load-item-types.ts';
 import { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH, loadCatalogueIds } from './catalogue-ids.ts';
 
@@ -32,7 +33,7 @@ const FILTERS = {
           id: 'category',
           option: {
             options: [
-              { id: null, text: 'Any' },
+              { id: JSON_NULL, text: 'Any' },
               { id: 'weapon.bow', text: 'Bow' },
             ],
           },

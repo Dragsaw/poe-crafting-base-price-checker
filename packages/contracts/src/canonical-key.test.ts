@@ -8,6 +8,7 @@ import {
   compareTrackedEntries,
   encodeAffix,
 } from './canonical-key';
+import { JSON_NULL } from './test-support';
 import { TrackedEntrySchema } from './tracked-entry';
 import type { TrackedEntry } from './tracked-entry';
 
@@ -36,7 +37,7 @@ describe('canonicalKeyElements', () => {
       'Bows',
       79,
       ['explicit.stat_1', 43, 56.5],
-      ['explicit.stat_2', null, null],
+      ['explicit.stat_2', JSON_NULL, JSON_NULL],
     ]);
     expect(canonicalKeyElements(raw)).toEqual(['raw', 'Advanced Dualstring Bow', 79]);
   });
@@ -57,7 +58,7 @@ describe('canonicalKeyElements', () => {
 
 describe('encodeAffix', () => {
   it('encodes an affix in exactly three elements', () => {
-    expect(encodeAffix({ kind: 'valueless', statId: 's' })).toEqual(['s', null, null]);
+    expect(encodeAffix({ kind: 'valueless', statId: 's' })).toEqual(['s', JSON_NULL, JSON_NULL]);
     expect(encodeAffix({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 })).toEqual([
       's',
       1,
@@ -78,8 +79,8 @@ describe('the banded and valueless affix forms', () => {
     };
 
     const elements = canonicalKeyElements(valueless);
-    expect(elements[4]).toEqual(['explicit.stat_1', null, null]);
-    expect(elements.slice(4)).not.toContain(null);
+    expect(elements[4]).toEqual(['explicit.stat_1', JSON_NULL, JSON_NULL]);
+    expect(elements.slice(4)).not.toContain(JSON_NULL);
     expect(canonicalKey(banded)).not.toBe(canonicalKey(valueless));
   });
 });
@@ -140,7 +141,7 @@ describe('the hybrid affix form (§4.1)', () => {
   it('encodes ["hybrid", [line, …]] in two elements, without acceptedTier', () => {
     const entry = withPrefix({ kind: 'hybrid', lines: [lineB, lineA], acceptedTier: 'T1' });
     const elements = canonicalKeyElements(entry);
-    expect(elements[4]).toEqual(['hybrid', [['explicit.stat_1', 25, 34], ['explicit.stat_2', null, null]]]);
+    expect(elements[4]).toEqual(['hybrid', [['explicit.stat_1', 25, 34], ['explicit.stat_2', JSON_NULL, JSON_NULL]]]);
     expect(canonicalKey(entry)).toBe(canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] })));
   });
 

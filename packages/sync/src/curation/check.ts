@@ -39,13 +39,13 @@ import { parseArgs } from 'node:util';
 
 import { canonicalKey } from '@poe/contracts';
 import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
-import { crossFileChecks } from '@poe/core';
 import type { UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { readWeightsIds } from '../catalogue/weights-ids.ts';
 import { checkCatalogue } from '../chunk/catalogue-check.ts';
+import { runCrossFileChecks } from '../chunk/cross-file-gate.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
 import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
@@ -88,8 +88,8 @@ export interface TrackedCheckInputs {
   readonly tracked: string | undefined;
   readonly config: DataFileResult<ConfigFile>;
   readonly catalogue: DataFileResult<CatalogueIds>;
-  /** The parsed `data/weights.json`; `null` when the file is absent. */
-  readonly weights: DataFileResult<WeightsFile | null>;
+  /** The parsed `data/weights.json`; `undefined` when the file is absent. */
+  readonly weights: DataFileResult<WeightsFile | undefined>;
 }
 
 type SchemaResult =
@@ -199,12 +199,12 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     issues.push({ check: 'cross-file', message: loaded.weights.error.message });
   } else if (entries === undefined) {
     checks.push({ check: 'cross-file', status: 'skipped' });
-  } else if (loaded.weights.value === null) {
+  } else if (loaded.weights.value === undefined) {
     // No check runs without the weights file, but each crafted entry is marked (§2.8).
     checks.push({ check: 'cross-file', status: 'skipped' });
-    unvalidated.push(...markedAt(crossFileChecks(entries, null).unvalidated));
+    unvalidated.push(...markedAt(runCrossFileChecks(entries, undefined).unvalidated));
   } else {
-    const { failures, unvalidated: marks } = crossFileChecks(entries, loaded.weights.value);
+    const { failures, unvalidated: marks } = runCrossFileChecks(entries, loaded.weights.value);
     unvalidated.push(...markedAt(marks));
     checks.push({ check: 'cross-file', status: failures.length === 0 ? 'passed' : 'failed' });
     for (const failure of failures) {
@@ -220,11 +220,11 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   return { ok: issues.length === 0, checks, issues, unvalidated };
 }
 
-/** The weights file as a value: absent is `null`, a refusal is carried rather than thrown. */
-async function loadWeights(fs: FilesystemPort): Promise<DataFileResult<WeightsFile | null>> {
+/** The weights file as a value: absent is `undefined`, a refusal is carried rather than thrown. */
+async function loadWeights(fs: FilesystemPort): Promise<DataFileResult<WeightsFile | undefined>> {
   try {
     const weights = await readWeightsIds(fs);
-    return { ok: true, value: weights.kind === 'present' ? weights.file : null };
+    return { ok: true, value: weights.kind === 'present' ? weights.file : undefined };
   } catch (error) {
     if (error instanceof DataFileError) {
       return { ok: false, error };
@@ -265,7 +265,7 @@ export async function main(
     return 1;
   }
   const report = checkTracked(await loadTrackedCheckInputs(fs));
-  out.write(`${JSON.stringify(report, null, 2)}\n`);
+  out.write(`${JSON.stringify(report, undefined, 2)}\n`);
   return report.ok ? 0 : 1;
 }
 

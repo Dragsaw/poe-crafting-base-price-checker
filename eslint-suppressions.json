@@ -72,17 +72,9 @@
       "count": 1
     }
   },
-  "packages/contracts/src/canonical-key.test.ts": {
-    "unicorn/no-null": {
-      "count": 9
-    }
-  },
   "packages/contracts/src/canonical-key.ts": {
     "local/max-comment-run": {
       "count": 5
-    },
-    "unicorn/no-null": {
-      "count": 4
     }
   },
   "packages/contracts/src/class-name.ts": {
@@ -97,11 +89,6 @@
   },
   "packages/contracts/src/currency-rate.ts": {
     "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/dataset.test.ts": {
-    "unicorn/no-null": {
       "count": 1
     }
   },
@@ -220,11 +207,6 @@
       "count": 4
     }
   },
-  "packages/contracts/src/ranked-row.test.ts": {
-    "unicorn/no-null": {
-      "count": 2
-    }
-  },
   "packages/contracts/src/ranked-row.ts": {
     "local/max-comment-run": {
       "count": 5
@@ -276,11 +258,6 @@
       "count": 2
     }
   },
-  "packages/contracts/src/trade-catalogue.test.ts": {
-    "unicorn/no-null": {
-      "count": 4
-    }
-  },
   "packages/contracts/src/trade-catalogue.ts": {
     "local/max-comment-run": {
       "count": 5
@@ -289,11 +266,6 @@
   "packages/contracts/src/trade-leagues.ts": {
     "local/max-comment-run": {
       "count": 1
-    }
-  },
-  "packages/contracts/src/weights-file.test.ts": {
-    "unicorn/no-null": {
-      "count": 4
     }
   },
   "packages/contracts/src/weights-file.ts": {
@@ -462,11 +434,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/catalogue/catalogue-ids.test.ts": {
-    "unicorn/no-null": {
-      "count": 1
-    }
-  },
   "packages/sync/src/catalogue/catalogue-ids.ts": {
     "local/max-comment-run": {
       "count": 1
@@ -475,11 +442,6 @@
   "packages/sync/src/catalogue/committed-catalogue.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    }
-  },
-  "packages/sync/src/catalogue/weights-ids.test.ts": {
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/sync/src/catalogue/weights-ids.ts": {
@@ -526,9 +488,6 @@
     "max-lines": {
       "count": 1
     },
-    "unicorn/no-null": {
-      "count": 4
-    },
     "vitest/no-conditional-expect": {
       "count": 3
     }
@@ -554,9 +513,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/sync/src/chunk/sync-report.ts": {
@@ -575,9 +531,6 @@
   "packages/sync/src/curation/check.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/sync/src/curation/check.ts": {
@@ -595,9 +548,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 3
     }
   },
   "packages/sync/src/dry-run.data.test.ts": {
@@ -619,9 +569,6 @@
   "packages/sync/src/dry-run.ts": {
     "local/max-comment-run": {
       "count": 9
-    },
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/sync/src/fixtures-record.test.ts": {
@@ -630,9 +577,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 2
     }
   },
   "packages/sync/src/fixtures-record.ts": {
@@ -759,9 +703,6 @@
   "packages/sync/src/pricing/price-entry.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 3
     }
   },
   "packages/sync/src/pricing/price-entry.ts": {
@@ -829,9 +770,6 @@
     },
     "max-lines-per-function": {
       "count": 1
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/sync/src/sync-batch.test.ts": {
@@ -842,9 +780,6 @@
       "count": 4
     },
     "max-lines": {
-      "count": 1
-    },
-    "unicorn/no-null": {
       "count": 1
     }
   },
@@ -885,9 +820,6 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 2
-    },
-    "unicorn/no-null": {
-      "count": 1
     }
   },
   "packages/sync/src/trade/client.test.ts": {

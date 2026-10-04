@@ -493,7 +493,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
         entries: [priced],
         currencyRates: [],
       },
-      null,
+      undefined,
       2,
     )}\n`;
     const { deps, fs, out } = dependenciesFor(LEAGUE, {

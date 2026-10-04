@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { pricingFixtureName } from './pricing/fixture-names.ts';
 import { buildSearchBody, itemTypesOf } from './pricing/search-body.ts';
 import { tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
+import { JSON_NULL } from './test-support/json-null.ts';
 import {
   FIXTURE_INTERACTIONS,
   fixturePathOf,
@@ -350,8 +351,8 @@ it('leaves a catalogue label named `name` alone — only an identity container h
 });
 
 it('leaves a non-string identifier value alone rather than inventing a shape', () => {
-  expect(stripPersonalIdentifiers({ account: { name: null, lastCharacterName: 7 } })).toEqual({
-    account: { name: null, lastCharacterName: 7 },
+  expect(stripPersonalIdentifiers({ account: { name: JSON_NULL, lastCharacterName: 7 } })).toEqual({
+    account: { name: JSON_NULL, lastCharacterName: 7 },
   });
 });
 

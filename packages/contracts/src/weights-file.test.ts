@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { defenceLettersOf } from './class-name';
 import { parseEnvelope } from './envelopes';
 import * as contracts from './index';
+import { JSON_NULL } from './test-support';
 import { WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from './weights-file';
 
 type Json = Record<string, unknown>;
@@ -91,10 +92,10 @@ describe('WeightsFileSchema — conforming files', () => {
     ['two range pairs', fileWithEntries(entryOf({ lines: [{ statId: 'explicit.a', ranges: [[43, 43], [56, 56.5]] }] }))],
     ['weight: 0', fileWithEntries(entryOf({ weight: 0 }))],
     ['an empty entries list', fileWithEntries()],
-    ['a null statId', fileWithEntries(entryOf({ lines: [{ statId: null, ranges: [[10, 20]] }] }))],
-    ['two null statIds in one entry', fileWithEntries(entryOf({ lines: [{ statId: null, ranges: [] }, { statId: null, ranges: [] }] }))],
+    ['a null statId', fileWithEntries(entryOf({ lines: [{ statId: JSON_NULL, ranges: [[10, 20]] }] }))],
+    ['two null statIds in one entry', fileWithEntries(entryOf({ lines: [{ statId: JSON_NULL, ranges: [] }, { statId: JSON_NULL, ranges: [] }] }))],
     ['weightSource absent', fileWithEntries(entryOf({ weightSource: 'absent' }))],
-    ['a not-in-game entry with weight 0 and a null statId (6.1.0)', fileWithEntries(entryOf({ weight: 0, weightSource: 'not-in-game', lines: [{ statId: null, ranges: [[5, 10]] }] }))],
+    ['a not-in-game entry with weight 0 and a null statId (6.1.0)', fileWithEntries(entryOf({ weight: 0, weightSource: 'not-in-game', lines: [{ statId: JSON_NULL, ranges: [[5, 10]] }] }))],
     ['no tierLabel, producer.version or producer.sourceUrl', fileOf(
       { 'accessory.amulet': { Amulets: classOf(poolOf([{ ...entryOf(), tierLabel: undefined }])) } },
       { producer: { id: 'p', generatedAt: '2026-09-26T10:52:22.504Z' } },
