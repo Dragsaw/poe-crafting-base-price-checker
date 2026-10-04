@@ -79,9 +79,6 @@ function weightsWith(...classes: readonly (readonly [string, string, Coverage?, 
   };
 }
 
-
-const UNCOSTABLE = 'uncostable';
-
 /** Every crafted class these tests name by default, both slots `complete`. */
 const WEIGHTS = weightsWith(['accessory.amulet', 'Amulets'], ['weapon.bow', 'Bows']);
 
@@ -857,10 +854,10 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
       currencyRates: RATES.slice(0, 2),
     });
     expect(reset.pricedInLeague).toBe(false);
-    expect(craftedRows(reset.ordering).map((row) => [row.recipeId, row.ev ?? UNCOSTABLE])).toEqual([
-      ['greater', -GREATER_COST],
-      ['perfect', UNCOSTABLE],
-    ]);
+    const resetRows = craftedRows(reset.ordering);
+    expect(resetRows.map((row) => row.recipeId)).toEqual(['greater', 'perfect']);
+    expect(String(resetRows[0]?.ev)).toBe(String(-GREATER_COST));
+    expect(resetRows[1]?.ev).toBeNull();
     expect(reset.uncostableRecipes.map((item) => item.recipeId)).toEqual(['perfect']);
   });
 
@@ -918,10 +915,13 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
       recipes: [GREATER],
       currencyRates: [],
     });
-    expect(craftedRows(result.ordering).map((row) => [row.className, row.grossPayout, row.ev ?? UNCOSTABLE])).toEqual([
-      ['Staves', 0 + 0.1 * 3, UNCOSTABLE],
-      ['Bows', 0 + 0.1 * 1, UNCOSTABLE],
+    const rows = craftedRows(result.ordering);
+    expect(rows.map((row) => [row.className, row.grossPayout])).toEqual([
+      ['Staves', 0 + 0.1 * 3],
+      ['Bows', 0 + 0.1 * 1],
     ]);
+    expect(rows[0]?.ev).toBeNull();
+    expect(rows[1]?.ev).toBeNull();
   });
 
   it('ties break raw first, then the serialised key, then the recipe id', () => {
