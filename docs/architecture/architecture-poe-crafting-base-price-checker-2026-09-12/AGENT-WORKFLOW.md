@@ -156,7 +156,7 @@ Two activities run in sequence and not in parallel. Both activities are easy to 
 
 ## Commit conventions
 
-A commit subject is `type(scope): description` or `type: description`. A `feat`/`fix`/`test` commit scoped to a package (`contracts`, `core`, `sync`, `web`) names its story (`story 1.N`) or retro item (`retro item(s) N`) in the description — a `docs`/`chore` commit, or one with no package scope, does not need to. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`). The `.githooks/pre-push` hook runs `pnpm check` and blocks the push when it fails. It skips a push that only deletes refs. `git push --no-verify` skips it, and CI still runs the gate.
+A commit subject is `type(scope): description` or `type: description`. The type is lowercase and one of the types the hook lists, and the subject has no trailing period (the `deferred` scope is exempt). The subject needs no story or retro item id. The `.githooks/commit-msg` hook checks this and prints a fix when it fails; `pnpm install` wires it in (`prepare` sets `core.hooksPath`). The `.githooks/pre-push` hook runs `pnpm check` and blocks the push when it fails. It skips a push that only deletes refs. `git push --no-verify` skips it, and CI still runs the gate.
 
 ## Review brief
 

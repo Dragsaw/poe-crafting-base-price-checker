@@ -29,7 +29,10 @@ describe('commit-msg hook', () => {
     ['accepts a retro item commit with a known package scope', 'fix(sync): retro item 17, an answered search keeps its fields'],
     ['accepts a docs commit with no scope and no id', 'docs: mark story 1.9 done in sprint status'],
     ['accepts a chore commit with a scope outside the package list', 'chore(depcruise): enforce core import purity'],
-    ['accepts a plural "stories" id on a known package scope', 'feat(sync): stories 1.9 and 1.10 combined change'],
+    ['accepts a feat commit on a known package with no story or retro id', 'feat(sync): tidy up the trade client'],
+    ['accepts a test commit on a known package with no story or retro id', 'test(core): cover the rank tie-break'],
+    ['accepts a refactor commit with no scope', 'refactor: extract the chunk progress write'],
+    ['accepts a multi-package scope with no id', 'fix(core,sync): keep the sort order stable'],
     [
       'accepts the deferred-work-sweep resolve commit, period included',
       'chore(deferred): resolve — Nothing forbids core from importing node builtins.',
@@ -53,11 +56,6 @@ describe('commit-msg hook', () => {
     ],
     ['rejects an unknown commit type', 'feature(sync): story 1.9 structured Sync Report', 'is not one of'],
     ['rejects a subject ending with a period', 'docs: mark story 1.9 done in sprint status.', 'ends with a period'],
-    [
-      'rejects a feat/fix/test commit on a known package with no story or retro id',
-      'feat(sync): tidy up the trade client',
-      'names no story or retro item',
-    ],
     [
       'rejects a capitalized type with a message naming the case problem',
       'Fix(sync): story 1.9 short description',
