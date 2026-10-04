@@ -22,8 +22,8 @@ export type ListStatement =
  * `unresolvable` rows drops "yet", because no sync will bring a price
  * (EXPERIENCE.md revision 9, the paragraph after the State Patterns table).
  */
-export function honestEmptyCopy(league: string, onlyUnresolvable = false): string {
-  return `In canonical order, not ranked: no tracked unit has a price from ${league}${onlyUnresolvable ? '' : ' yet'}.`;
+export function honestEmptyCopy(league: string, isOnlyUnresolvable = false): string {
+  return `In canonical order, not ranked: no tracked unit has a price from ${league}${isOnlyUnresolvable ? '' : ' yet'}.`;
 }
 
 /** State 25's copy (Story 2.7 decision, 2026-09-27): the live threshold at the page's 2dp. */

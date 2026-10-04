@@ -44,7 +44,7 @@ context:
 - `packages/core/src/probability.ts` -- `contains(ref, entry)` (line 110) keeps its signature. Extract `covers(rl, line)` from its body for both arms. Add exported `lineSet(entry)` and `statIds(ref)`, each a `readonly string[]` sorted with `compareByCodeUnit` from `@poe/contracts`. The schema already sorts hybrid lines (§4.1), so set equality is element-wise. Add exported `untrackable(entry, pool: Pick<WeightsPool, 'poolCoverage'>)`. Delete the `assertSingleLine(…, 4)` calls in `contains`, `containedIn`, `affixProbability` and `combinationProbability`. Keep `assertSingleLine` itself: `cross-file.ts` calls it with story 5. Update the module doc.
 - `orderedTerm`/`exclusionSums` -- no change. `g(e) = e.modGroup` equals the family's modGroup on every file that loads: §2.7 (story 5) rejects a containment set that spans more than one.
 - `packages/core/src/index.ts:52-69` -- export `lineSet`, `statIds`, `untrackable`, `covers`.
-- `packages/core/src/probability.test.ts` -- reuse `tier`, `line`, `band`, `pools`, `pOf`, `closeRelative`. Add a `hybrid` helper next to `band`. Replace `describe('a hybrid reference (interim)')` (line 328) with the matrix tests. Pools are built in the test (NFR-2). The committed-file test (line 292) must still pass.
+- `packages/core/src/probability.test.ts` -- reuse `tier`, `line`, `band`, `pools`, `pOf`, `isCloseRelative`. Add a `hybrid` helper next to `band`. Replace `describe('a hybrid reference (interim)')` (line 328) with the matrix tests. Pools are built in the test (NFR-2). The committed-file test (line 292) must still pass.
 - Do not change: `cross-file.ts`, `rank.ts`, `@poe/contracts`.
 
 ## Tasks & Acceptance
@@ -65,7 +65,7 @@ context:
 
 ```ts
 // hybrid arm
-sameIds(lineSet(entry), statIds(ref)) &&
+haveSameIds(lineSet(entry), statIds(ref)) &&
   ref.lines.every((rl) => entry.lines.some((line) => covers(rl, line)))
 ```
 

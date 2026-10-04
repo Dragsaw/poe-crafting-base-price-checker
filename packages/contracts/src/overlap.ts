@@ -20,7 +20,7 @@ import type { HybridLine, ModifierRef as ModifierReference, SingleLineModifierRe
  * `coOccur` (§2.2) is injected, because it needs the weights file, and it takes
  * `S`. Only a slot with a `hybrid` reference reads it. `TrackedFileSchema`
  * evaluates only pairs whose four references are single-line, so it never
- * reads `coOccur` and passes `NEVER_CO_OCCUR`; `core`'s `co-occur` check
+ * reads `coOccur` and passes `CAN_NEVER_CO_OCCUR`; `core`'s `co-occur` check
  * evaluates every pair with a hybrid reference and passes the real pool read
  * (§2.1, *Who evaluates a pair*).
  *
@@ -48,7 +48,7 @@ export interface OverlapAffixes {
 export type CoOccur = (x: ModifierReference, y: ModifierReference, slot: OverlapSlot, summed: ReadonlySet<string>) => boolean;
 
 /** The within-file `coOccur`: the tracked list alone cannot see a pool. */
-export const NEVER_CO_OCCUR: CoOccur = () => false;
+export const CAN_NEVER_CO_OCCUR: CoOccur = () => false;
 
 /**
  * Which §2.1 branch made a slot overlap. `summed` is the first branch: one
@@ -174,7 +174,7 @@ export function overlap(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur):
  * Whether either affix is a `hybrid` reference. A pair is `core`'s when either
  * entry names one, and `contracts`'s otherwise (§2.1, *Who evaluates a pair*).
  */
-export function namesHybrid(affixes: OverlapAffixes): boolean {
+export function hasHybridAffix(affixes: OverlapAffixes): boolean {
   return affixes.prefix.kind === 'hybrid' || affixes.suffix.kind === 'hybrid';
 }
 
@@ -198,7 +198,7 @@ export interface OverlapBranches {
  * entries overlap, or `undefined` when they do not. `S` is computed here, so a
  * caller passes the two entries alone. A payload names the slots and the sums
  * from it. Every pair is evaluated; the caller picks its pairs by
- * `namesHybrid`.
+ * `hasHybridAffix`.
  */
 export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): OverlapBranches | undefined {
   const theirs = summedStatIds(b);

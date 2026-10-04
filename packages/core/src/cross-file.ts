@@ -5,7 +5,7 @@ import {
   defenceLettersOf,
   describeOverlap,
   linesOf,
-  namesHybrid,
+  hasHybridAffix,
   OVERLAP_SLOTS,
   overlapBranches,
 } from '@poe/contracts';
@@ -494,7 +494,7 @@ export function crossFileChecks(entries: readonly TrackedEntry[], weights: Weigh
         if (
           right === undefined ||
           right.entry.itemLevelMin !== left.entry.itemLevelMin ||
-          (!namesHybrid(left.entry) && !namesHybrid(right.entry))
+          (!hasHybridAffix(left.entry) && !hasHybridAffix(right.entry))
         ) {
           continue;
         }

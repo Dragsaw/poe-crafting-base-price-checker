@@ -56,7 +56,7 @@ describe('the contracts barrel', () => {
   });
 
   it('exports record identity and the per-file schema versions', () => {
-    expect(contracts.sameRecord).toBeTypeOf('function');
+    expect(contracts.isSameRecord).toBeTypeOf('function');
     expect(contracts.RECORD_SUBJECTS).toBeDefined();
     expect(contracts.ChunkRequestSourceSchema).toBeDefined();
     expect(contracts.SYNC_REPORT_SCHEMA_VERSION).toBe('1.2.0');

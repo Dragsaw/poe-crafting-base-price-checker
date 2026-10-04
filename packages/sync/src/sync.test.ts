@@ -41,7 +41,7 @@ import {
   isGateDue,
   INITIAL_SESSION_STATE,
   inputSignature,
-  lockIsFree,
+  isLockFree,
   LOCAL_POLL_MS,
   nextState,
   nextWait,
@@ -511,11 +511,11 @@ describe('runWait and the local polls', () => {
     const clock = createFakeClockPort(NOW);
     const { ports } = waitPorts(fs, clock, 3_600_000);
 
-    expect(await lockIsFree(fs, clock)).toBe(false);
+    expect(await isLockFree(fs, clock)).toBe(false);
     await runWait({ kind: 'lock', reason: 'r' }, ports, '');
 
     expect(Date.parse(clock.now()) - Date.parse(NOW)).toBeGreaterThan(STALE_LOCK_AFTER_MS);
-    expect(await lockIsFree(fs, clock)).toBe(true);
+    expect(await isLockFree(fs, clock)).toBe(true);
   });
 
   it('an unreadable lock is free only once its file time is stale', async () => {
@@ -524,10 +524,10 @@ describe('runWait and the local polls', () => {
     const old = createFakeFilesystemPort({ [LOCK_PATH]: { contents: '', modifiedAt: '2026-09-26T05:00:00.000Z' } });
     const untimed = createFakeFilesystemPort({ [LOCK_PATH]: { contents: '' } });
 
-    expect(await lockIsFree(recent, clock)).toBe(false);
-    expect(await lockIsFree(old, clock)).toBe(true);
-    expect(await lockIsFree(untimed, clock)).toBe(false);
-    expect(await lockIsFree(createFakeFilesystemPort(), clock)).toBe(true);
+    expect(await isLockFree(recent, clock)).toBe(false);
+    expect(await isLockFree(old, clock)).toBe(true);
+    expect(await isLockFree(untimed, clock)).toBe(false);
+    expect(await isLockFree(createFakeFilesystemPort(), clock)).toBe(true);
   });
 
   it('a lock read that throws is not free, and an input read that throws still signs', async () => {
@@ -538,7 +538,7 @@ describe('runWait and the local polls', () => {
       lastModifiedAt: () => Promise.reject(new Error('EBUSY')),
     };
 
-    expect(await lockIsFree(broken, createFakeClockPort(NOW))).toBe(false);
+    expect(await isLockFree(broken, createFakeClockPort(NOW))).toBe(false);
     await expect(inputSignature(broken)).resolves.toContain('error');
   });
 

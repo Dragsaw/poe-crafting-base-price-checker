@@ -413,7 +413,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
  * `true` when the lock file is absent, or stale by §7's rule (`isStaleState`).
  * A read that throws answers `false`, so the poll continues.
  */
-export async function lockIsFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
+export async function isLockFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
   try {
     const found = await readLock(fs);
     return found.state === 'absent' ? true : (await isStaleState(fs, found, clock.now(), LOCK_PATH));
@@ -489,7 +489,7 @@ export async function runWait(wait: SessionWait, ports: WaitPorts, signature: st
     }
     case 'lock': {
       for (;;) {
-        if (signal.aborted || (await lockIsFree(fs, clock))) {
+        if (signal.aborted || (await isLockFree(fs, clock))) {
           return;
         }
         await pause(LOCAL_POLL_MS, signal);

@@ -166,8 +166,8 @@ function diagnosisLine(failure: DiagnosisFailure): string {
  * no group — nothing renders, not even a zero. With no weights envelope the
  * checks did not run, and the group is one *unknown* line.
  */
-function diagnosisGroups(failures: readonly DiagnosisFailure[], weightsLoaded: boolean): FigureGroup[] {
-  if (!weightsLoaded) {
+function diagnosisGroups(failures: readonly DiagnosisFailure[], areWeightsLoaded: boolean): FigureGroup[] {
+  if (!areWeightsLoaded) {
     return [UNKNOWN_GROUP];
   }
   return failures.length === 0 ? [] : [failures.map((failure) => [{ kind: 'verbatim', text: diagnosisLine(failure) }])];
@@ -183,10 +183,10 @@ function diagnosisGroups(failures: readonly DiagnosisFailure[], weightsLoaded: b
  */
 export function panelColumns(
   report: SyncReport | null,
-  weightsLoaded: boolean,
+  areWeightsLoaded: boolean,
   crossFileFailures: readonly DiagnosisFailure[] = [],
 ): PanelColumns {
-  const diagnosis = diagnosisGroups(crossFileFailures, weightsLoaded);
+  const diagnosis = diagnosisGroups(crossFileFailures, areWeightsLoaded);
   if (report === null) {
     return [
       [UNKNOWN_GROUP, UNKNOWN_GROUP],
@@ -230,12 +230,12 @@ export function panelColumns(
       text(` ${plural(record.pinnedCount, 'pinned entry', 'pinned entries')} refreshed`),
     ]),
   ];
-  return [[requests, notReached], [unresolvable, starved, ...diagnosis], [coverageGroup(figures, weightsLoaded)]];
+  return [[requests, notReached], [unresolvable, starved, ...diagnosis], [coverageGroup(figures, areWeightsLoaded)]];
 }
 
-function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): FigureGroup {
+function coverageGroup(figures: SyncReport['figures'], areWeightsLoaded: boolean): FigureGroup {
   if (figures.coverage === undefined) {
-    return [[missing(weightsLoaded ? NOT_MEASURED : UNKNOWN)]];
+    return [[missing(areWeightsLoaded ? NOT_MEASURED : UNKNOWN)]];
   }
   const denominator =
     figures.rankableClassCount === undefined ? missing(UNKNOWN) : figure(figures.rankableClassCount);

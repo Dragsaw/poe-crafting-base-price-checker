@@ -37,7 +37,7 @@ context:
 - No new refusal-screen copy.
 
 **Decisions (human, 2026-09-27):**
-- `rank` reads the parsed file now. `weightsLoaded: boolean` becomes `weights: WeightsFile | null`. A crafted entry's class is Unrankable in these cases:
+- `rank` reads the parsed file now. `areWeightsLoaded: boolean` becomes `weights: WeightsFile | null`. A crafted entry's class is Unrankable in these cases:
   - `class absent from weights file`, when the file is null or `bases[categoryId][className]` is missing. This is a direct lookup at both rungs, with no sibling fallback.
   - `pool partial`, when either slot declares `partial`.
   - Otherwise `rank` makes no claim, as today. Crafted EV is Story 3.4.
@@ -68,7 +68,7 @@ context:
 - `packages/web/src/frame/trust-facts.ts:41` -- `weightsFacts` reads `producer.id`, `generatedAt` and `gamePatch` through `Parsed<'weights'>`. It keeps working unchanged.
 - `packages/web/src/test-support/artifact-server.ts:56` -- the weights fixture (`bases: {}`), which already conforms.
 - `docs/stories/deferred-work.md:96-100` -- the Story 2.1 entry "`WeightsFileEnvelopeSchema` ... is a stopgap". This story discharges it.
-- `packages/core/src/rank.ts:55-66,169-176` -- the `weightsLoaded` input, the `UnrankableReason` union and the crafted branch. The callers are `packages/web/src/App.tsx:134`, `packages/web/src/test-support/dom.tsx:69`, `rank.test.ts`, `display-rows.test.ts` and `list-statement.test.ts`. The `weightsLoaded` parameter of `trust-facts.ts` `panelColumns` is a different flag, so leave it.
+- `packages/core/src/rank.ts:55-66,169-176` -- the `areWeightsLoaded` input, the `UnrankableReason` union and the crafted branch. The callers are `packages/web/src/App.tsx:134`, `packages/web/src/test-support/dom.tsx:69`, `rank.test.ts`, `display-rows.test.ts` and `list-statement.test.ts`. The `areWeightsLoaded` parameter of `trust-facts.ts` `panelColumns` is a different flag, so leave it.
 - `packages/web/src/list/UnrankableAppendix.tsx:113` -- prints `item.reason` verbatim, so the new reason needs no web change.
 
 ## Tasks & Acceptance
@@ -80,8 +80,8 @@ context:
 - [x] `packages/sync/src/pricing/search-body.ts` (+ test import) -- import `defenceLettersOf` from `@poe/contracts`.
 - [x] `packages/sync/src/catalogue/weights-ids.ts` (+ test) -- `readWeightsIds` parses through `parseEnvelope(WeightsFileSchema, …, WEIGHTS_SCHEMA_VERSION)`. On `invalid`, it throws `DataFileError('invalid', …)` naming the first issue's path and message. It collects the ids from the typed value. Rewrite the module doc so it no longer calls the schema Story 3.3's. `sync/index.ts` re-exports the `contracts` constant.
 - [x] `packages/web/src/load/artifacts.ts` (+ `load-artifacts.test.ts`) -- `ARTIFACTS.weights` uses `WeightsFileSchema`, and `WEIGHTS_EXPECTED_VERSION` becomes the `contracts` constant. Add a test that a hard-error file refuses the page with cause `content`.
-- [x] `packages/core/src/rank.ts` (+ `rank.test.ts`) -- replace `weightsLoaded` with `weights: WeightsFile | null`, and widen `UnrankableReason` with `'pool partial'`. The crafted branch does the direct lookup from the Decisions and emits one row per class. Update the docs on `RankInput` and `UnrankableReason`, and cover the three Rank matrix rows.
-- [x] `packages/web/src/App.tsx`, `test-support/dom.tsx`, `list/display-rows.test.ts`, `list/list-statement.test.ts` -- pass `weights: set.weights`, or a fixture file, in place of `weightsLoaded`.
+- [x] `packages/core/src/rank.ts` (+ `rank.test.ts`) -- replace `areWeightsLoaded` with `weights: WeightsFile | null`, and widen `UnrankableReason` with `'pool partial'`. The crafted branch does the direct lookup from the Decisions and emits one row per class. Update the docs on `RankInput` and `UnrankableReason`, and cover the three Rank matrix rows.
+- [x] `packages/web/src/App.tsx`, `test-support/dom.tsx`, `list/display-rows.test.ts`, `list/list-statement.test.ts` -- pass `weights: set.weights`, or a fixture file, in place of `areWeightsLoaded`.
 - [x] `docs/stories/deferred-work.md` -- append two notes. A note for the producer: declare `complete` for a pool whose only missing rows are data-mined mods that cannot roll (Emerald, Crossbows). A note for the architect: reword the *placeholder row* bullet of the pool-completeness rule to match. In the branch's last commit, remove the Story 2.1 stopgap entry.
 
 **Acceptance Criteria:**

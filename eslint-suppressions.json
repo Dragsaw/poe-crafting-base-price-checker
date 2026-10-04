@@ -167,7 +167,7 @@
       "count": 2
     },
     "unicorn/consistent-boolean-name": {
-      "count": 9
+      "count": 7
     }
   },
   "packages/contracts/src/ports/clock.ts": {
@@ -257,9 +257,6 @@
   "packages/contracts/src/sync-run-report.ts": {
     "local/max-comment-run": {
       "count": 12
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/contracts/src/test-support.ts": {
@@ -395,9 +392,6 @@
     "max-lines": {
       "count": 1
     },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 2
     },
@@ -413,7 +407,7 @@
       "count": 1
     },
     "unicorn/consistent-boolean-name": {
-      "count": 4
+      "count": 3
     }
   },
   "packages/core/src/provenance.ts": {
@@ -536,9 +530,6 @@
   "packages/sync/src/chunk/lock.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 3
     }
   },
   "packages/sync/src/chunk/publish-dataset.test.ts": {
@@ -927,9 +918,6 @@
     "sonarjs/cognitive-complexity": {
       "count": 2
     },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 3
     },
@@ -1115,9 +1103,6 @@
   "packages/web/src/frame/trust-facts.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 3
     }
   },
   "packages/web/src/frame/trust-strip.test.tsx": {
@@ -1281,9 +1266,6 @@
   "packages/web/src/list/list-statement.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "unicorn/consistent-boolean-name": {
-      "count": 1
     }
   },
   "packages/web/src/list/ranked-list.test.tsx": {

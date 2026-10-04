@@ -50,7 +50,7 @@ import {
  * Each pair is one issue at the later entry's index, naming both canonical
  * keys, each slot's branch and each summed `statId` whose intervals
  * intersect. Only a pair whose four references are single-line is evaluated
- * here, and such a pair never reads `coOccur`, so `NEVER_CO_OCCUR` stands in
+ * here, and such a pair never reads `coOccur`, so `CAN_NEVER_CO_OCCUR` stands in
  * for it. A pair with any `hybrid` reference is `core`'s cross-file
  * `co-occur` check (§2.1, *Who evaluates a pair*).
  *

@@ -4,8 +4,8 @@ import { canonicalKey } from '../canonical-key.ts';
 import {
   describeOverlap,
   linesOf,
-  namesHybrid,
-  NEVER_CO_OCCUR,
+  hasHybridAffix,
+  CAN_NEVER_CO_OCCUR,
   OVERLAP_SLOTS,
   overlapBranches,
   summedStatIds,
@@ -68,10 +68,10 @@ function checkWithinFileOverlap(entries: TrackedEntries, context: z.RefinementCt
     const key = canonicalKey(entry);
     for (const other of earlier) {
       // A twin is the uniqueness rule's issue; a pair with a hybrid is core's (§2.1).
-      if (other.key === key || namesHybrid(other.entry) || namesHybrid(entry)) {
+      if (other.key === key || hasHybridAffix(other.entry) || hasHybridAffix(entry)) {
         continue;
       }
-      const branches = overlapBranches(other.entry, entry, NEVER_CO_OCCUR);
+      const branches = overlapBranches(other.entry, entry, CAN_NEVER_CO_OCCUR);
       if (branches === undefined) {
         continue;
       }

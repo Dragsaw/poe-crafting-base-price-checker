@@ -288,7 +288,7 @@ export const RECORD_SUBJECTS: {
  * subject field is a scalar, so `===` compares it. An absent optional subject
  * is a value: two records that both lack it agree on it.
  */
-export function sameRecord(a: SyncRunRecord, b: SyncRunRecord): boolean {
+export function isSameRecord(a: SyncRunRecord, b: SyncRunRecord): boolean {
   if (a.kind !== b.kind) {
     return false;
   }

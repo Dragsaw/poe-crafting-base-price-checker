@@ -7,7 +7,7 @@ import {
   RECORD_SUBJECTS,
   RequestSourceSchema,
   RequestsBySourceSchema,
-  sameRecord,
+  isSameRecord,
   SYNC_REPORT_SCHEMA_VERSION,
   SyncRunFiguresSchema,
   SyncRunRecordSchema,
@@ -93,7 +93,7 @@ function changed(value: unknown): unknown {
   return typeof value === 'number' ? value + 1 : `${String(value)}-changed`;
 }
 
-describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
+describe('isSameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
   /** One record per kind, plus an observation-only change where the kind has observations. */
   const cases: readonly {
     readonly base: SyncRunRecord;
@@ -161,9 +161,9 @@ describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
 
   for (const { base, observation } of cases) {
     it(`${base.kind}: the same record, ignoring observations`, () => {
-      expect(sameRecord(base, { ...base })).toBe(true);
+      expect(isSameRecord(base, { ...base })).toBe(true);
       if (observation !== undefined) {
-        expect(sameRecord(base, observation)).toBe(true);
+        expect(isSameRecord(base, observation)).toBe(true);
       }
     });
 
@@ -172,7 +172,7 @@ describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
       it(`${base.kind}: a change to ${subjectKey} alone is a new record`, () => {
         const fields = base as Readonly<Record<string, unknown>>;
         const other = { ...fields, [subjectKey]: changed(fields[subjectKey]) } as SyncRunRecord;
-        expect(sameRecord(base, other)).toBe(false);
+        expect(isSameRecord(base, other)).toBe(false);
       });
     }
   }
@@ -180,15 +180,15 @@ describe('sameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
   it('a record of another kind is never the same, whatever its fields', () => {
     const absent: SyncRunRecord = { kind: 'weights-absent', uncheckableClassNames: [] };
     const broken: SyncRunRecord = { kind: 'stale-lock-broken', pid: 1, startedAt: '2026-09-20T01:00:00Z' };
-    expect(sameRecord(absent, broken)).toBe(false);
-    expect(sameRecord(broken, absent)).toBe(false);
+    expect(isSameRecord(absent, broken)).toBe(false);
+    expect(isSameRecord(broken, absent)).toBe(false);
   });
 
   it('treats an absent optional subject on both sides as agreement', () => {
     const a: SyncRunRecord = { kind: 'run-failure', reason: 'unrecoverable-error', message: 'a' };
     const b: SyncRunRecord = { kind: 'run-failure', reason: 'unrecoverable-error', message: 'b' };
-    expect(sameRecord(a, b)).toBe(true);
-    expect(sameRecord(a, { ...b, status: 500 })).toBe(false);
+    expect(isSameRecord(a, b)).toBe(true);
+    expect(isSameRecord(a, { ...b, status: 500 })).toBe(false);
   });
 });
 

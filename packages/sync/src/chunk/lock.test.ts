@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import {
   acquireLock,
   BREAK_MARKER_PATH,
-  holdsLock,
+  isLockHeld,
   isStaleInstant,
   LOCK_PATH,
-  releaseLockIfOwn,
+  isOwnLockReleased,
   serialiseLock,
   STALE_LOCK_AFTER_MS,
 } from './lock.ts';
@@ -137,28 +137,28 @@ describe('acquireLock', () => {
     expect(acquired).toHaveLength(1);
     expect(results.filter((result) => result.kind === 'busy')).toHaveLength(2);
     const [only] = acquired;
-    expect(only?.kind === 'acquired' ? await holdsLock(fs, only.lock) : false).toBe(true);
+    expect(only?.kind === 'acquired' ? await isLockHeld(fs, only.lock) : false).toBe(true);
   });
 });
 
-describe('releaseLockIfOwn', () => {
+describe('isOwnLockReleased', () => {
   it('releases its own lock', async () => {
     const fs = createFakeFilesystemPort();
     const mine = { pid: 5, startedAt: NOW };
     await acquireLock(fs, clock, 5);
-    expect(await releaseLockIfOwn(fs, mine)).toBe(true);
+    expect(await isOwnLockReleased(fs, mine)).toBe(true);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
   });
 
   it("never deletes a successor's lock, even one with the same pid", async () => {
     const successor = serialiseLock({ pid: 5, startedAt: ONE_HOUR_AGO });
     const fs = createFakeFilesystemPort({ [LOCK_PATH]: { contents: successor } });
-    expect(await releaseLockIfOwn(fs, { pid: 5, startedAt: NOW })).toBe(false);
+    expect(await isOwnLockReleased(fs, { pid: 5, startedAt: NOW })).toBe(false);
     expect(await fs.readTextFile(LOCK_PATH)).toBe(successor);
   });
 
   it('is a no-op when no lock exists', async () => {
     const fs = createFakeFilesystemPort();
-    expect(await releaseLockIfOwn(fs, { pid: 5, startedAt: NOW })).toBe(false);
+    expect(await isOwnLockReleased(fs, { pid: 5, startedAt: NOW })).toBe(false);
   });
 });

@@ -92,7 +92,7 @@ function pOf(result: ProbabilityResult): number {
   return result.p;
 }
 
-function closeRelative(actual: number, expected: number): boolean {
+function isCloseRelative(actual: number, expected: number): boolean {
   const tolerance = 1e-12;
   return actual === expected || Math.abs(actual - expected) <= tolerance * Math.max(Math.abs(actual), Math.abs(expected));
 }
@@ -269,8 +269,8 @@ describe('combinationProbability (§11)', () => {
         0,
       ),
     );
-    expect(closeRelative(p, 75 / 1400)).toBe(true);
-    expect(closeRelative(p, (100 / 400) * (400 / 1000))).toBe(false);
+    expect(isCloseRelative(p, 75 / 1400)).toBe(true);
+    expect(isCloseRelative(p, (100 / 400) * (400 / 1000))).toBe(false);
   });
 
   it('gives augment-exhausted, not 0, when a first draw empties the other slot', () => {
@@ -342,7 +342,7 @@ describe('combinationProbability (§11)', () => {
       const pPrefix = pOf(affixProbability(lookup.pools, 'prefix', entry.prefix, entry.itemLevelMin, 0));
       const pSuffix = pOf(affixProbability(lookup.pools, 'suffix', entry.suffix, entry.itemLevelMin, 0));
       const p = pOf(combinationProbability(lookup.pools, entry, 0));
-      if (!closeRelative(p, pPrefix * pSuffix)) {
+      if (!isCloseRelative(p, pPrefix * pSuffix)) {
         throw new Error(`${JSON.stringify(entry)}: ${String(p)} != ${String(pPrefix * pSuffix)}`);
       }
     }
@@ -395,8 +395,8 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
         0,
       ),
     );
-    expect(closeRelative(p, 75 / 1400)).toBe(true);
-    expect(closeRelative(p, (100 / 400) * (400 / 1000))).toBe(false);
+    expect(isCloseRelative(p, 75 / 1400)).toBe(true);
+    expect(isCloseRelative(p, (100 / 400) * (400 / 1000))).toBe(false);
   });
 
   it('contains a weight > 0 tier whose null line is an internal engine line in a complete pool', () => {

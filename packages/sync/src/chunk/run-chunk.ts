@@ -140,7 +140,7 @@ import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
 import { checkCatalogue } from './catalogue-check.ts';
 import { CrossFileGateError, crossFileGate, crossFileGateRecords } from './cross-file-gate.ts';
-import { acquireLock, holdsLock, releaseLockIfOwn, STALE_LOCK_AFTER_MS } from './lock.ts';
+import { acquireLock, isLockHeld, isOwnLockReleased, STALE_LOCK_AFTER_MS } from './lock.ts';
 import { buildDatasetFile } from './publish-dataset.ts';
 import { buildSyncReport } from './sync-report.ts';
 
@@ -597,7 +597,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       );
       // The one write: a broken stale lock's record is the only trace of the
       // crash, so the report carries it alone.
-      if (acquisition.broken !== undefined && (await holdsLock(fs, mine))) {
+      if (acquisition.broken !== undefined && (await isLockHeld(fs, mine))) {
         const previous = await loadEnvelope(fs, REPORT_PATH, (data) =>
           parseEnvelope(SyncReportFileSchema, data),
         );
@@ -861,7 +861,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         isAlreadyConfirmed || ready.gate === undefined ? undefined : await ready.gate({ entries });
       if (gated?.kind === 'yield') {
         // A gate yield is a chunk yield with no entry attempted (AD-8, AD-12).
-        if (!(await holdsLock(fs, mine))) {
+        if (!(await isLockHeld(fs, mine))) {
           log('sync: the lock was taken over during this chunk; writing nothing');
           return { kind: 'dispossessed', completed, entries: stepEntries, records, ...passNow() };
         }
@@ -960,7 +960,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // Re-read immediately before committing. A run dispossessed at the
       // staleness threshold writes nothing, and the `finally` below then
       // releases nothing, because the lock on disk is no longer its own.
-      if (!(await holdsLock(fs, mine))) {
+      if (!(await isLockHeld(fs, mine))) {
         log('sync: the lock was taken over during this chunk; writing nothing');
         return {
           kind: 'dispossessed',
@@ -981,7 +981,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       if (isReportAttempted) {
         throw error;
       }
-      if (!(await holdsLock(fs, mine))) {
+      if (!(await isLockHeld(fs, mine))) {
         log('sync: the lock was taken over during this chunk; writing nothing');
         throw error;
       }
@@ -1030,6 +1030,6 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       throw error;
     }
   } finally {
-    await releaseLockIfOwn(fs, mine);
+    await isOwnLockReleased(fs, mine);
   }
 }

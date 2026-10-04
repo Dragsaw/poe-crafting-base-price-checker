@@ -154,7 +154,7 @@ export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
 /** The empty `S`, for a caller with no pair of entries. */
 const NO_SUMMED: ReadonlySet<string> = new Set();
 
-function sameIds(a: readonly string[], b: readonly string[]): boolean {
+function haveSameIds(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((id, index) => id === b[index]);
 }
 
@@ -187,7 +187,7 @@ export function contains(reference: ModifierRef, entry: ModifierWeight, summed: 
   }
   const isCoveredBy = (rl: ReferenceLine) =>
     entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
-  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
+  return reference.kind === 'hybrid' ? haveSameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
 }
 
 /**

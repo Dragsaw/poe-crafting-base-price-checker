@@ -114,7 +114,7 @@ function busy(found: LockState): LockAcquisition {
 }
 
 /** Deletes `path` only while its text is still `text`. */
-async function deleteIfText(fs: FilesystemPort, path: string, text: string): Promise<boolean> {
+async function isDeletedIfText(fs: FilesystemPort, path: string, text: string): Promise<boolean> {
   if ((await fs.readTextFile(path)) !== text) {
     return false;
   }
@@ -132,7 +132,7 @@ async function clearStaleBreakMarker(fs: FilesystemPort, now: string): Promise<v
     return;
   }
   if (await isStaleState(fs, marker, now, BREAK_MARKER_PATH)) {
-    await deleteIfText(fs, BREAK_MARKER_PATH, marker.text);
+    await isDeletedIfText(fs, BREAK_MARKER_PATH, marker.text);
   }
 }
 
@@ -157,7 +157,7 @@ async function breakAndTake(
     if (again.state !== 'absent' && again.text !== stale.text) {
       return busy(again);
     }
-    if (again.state !== 'absent' && !(await deleteIfText(fs, LOCK_PATH, stale.text))) {
+    if (again.state !== 'absent' && !(await isDeletedIfText(fs, LOCK_PATH, stale.text))) {
       return busy(await readLock(fs));
     }
     if (!(await fs.createExclusive(LOCK_PATH, mineText))) {
@@ -171,7 +171,7 @@ async function breakAndTake(
         }
       : { kind: 'acquired', lock: mine };
   } finally {
-    await deleteIfText(fs, BREAK_MARKER_PATH, mineText);
+    await isDeletedIfText(fs, BREAK_MARKER_PATH, mineText);
   }
 }
 
@@ -204,7 +204,7 @@ export async function acquireLock(
 }
 
 /** `true` while the lock on disk is exactly the one this run took. */
-export async function holdsLock(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
+export async function isLockHeld(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
   const found = await readLock(fs);
   return (
     found.state === 'held' &&
@@ -217,8 +217,8 @@ export async function holdsLock(fs: FilesystemPort, mine: SyncLock): Promise<boo
  * Releases the lock **only while it is still this run's own**. A dispossessed
  * run that released unconditionally would delete its successor's lock.
  */
-export async function releaseLockIfOwn(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
-  if (!(await holdsLock(fs, mine))) {
+export async function isOwnLockReleased(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
+  if (!(await isLockHeld(fs, mine))) {
     return false;
   }
   await fs.deleteFile(LOCK_PATH);

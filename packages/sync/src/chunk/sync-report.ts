@@ -5,7 +5,7 @@
  * stays until the player deletes it from the file by hand, so the report
  * carries forward every record the previous file still holds, in its order,
  * and places this chunk's new records against them (Consistency Conventions,
- * *Logging*). A new record that is `sameRecord` with one already present —
+ * *Logging*). A new record that is `isSameRecord` with one already present —
  * the same kind and the same subject fields (IMPLEMENTATION-NOTES.md §12) —
  * replaces it at its index, so a record that carries a live measurement keeps
  * its position and shows the latest one. Any other new record is appended.
@@ -18,7 +18,7 @@
  * and the file comes out.
  */
 
-import { ChunkRequestSourceSchema, sameRecord, SYNC_REPORT_SCHEMA_VERSION } from '@poe/contracts';
+import { ChunkRequestSourceSchema, isSameRecord, SYNC_REPORT_SCHEMA_VERSION } from '@poe/contracts';
 import type {
   ChunkRequestSource,
   RequestSource,
@@ -45,7 +45,7 @@ export interface SyncReportInputs {
 
 /**
  * The previous records in their order. Each new record replaces the first
- * earlier record it is `sameRecord` with, at that record's index; otherwise it
+ * earlier record it is `isSameRecord` with, at that record's index; otherwise it
  * is appended. A replacement is not a clear: only the player's edit removes a
  * record.
  */
@@ -55,7 +55,7 @@ export function carryRecords(
 ): SyncRunRecord[] {
   const records = [...previous];
   for (const record of newRecords) {
-    const index = records.findIndex((present) => sameRecord(present, record));
+    const index = records.findIndex((present) => isSameRecord(present, record));
     if (index === -1) {
       records.push(record);
     } else {

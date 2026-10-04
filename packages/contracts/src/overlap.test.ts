@@ -5,8 +5,8 @@ import { parseEnvelope, TrackedFileSchema } from './envelopes';
 import type { HybridModifierRef as HybridModifierReference, ModifierRef as ModifierReference, SingleLineModifierRef as SingleLineModifierReference } from './modifier-ref';
 import {
   describeOverlap,
-  namesHybrid,
-  NEVER_CO_OCCUR,
+  hasHybridAffix,
+  CAN_NEVER_CO_OCCUR,
   overlap,
   overlapBranches,
   slotOverlap,
@@ -30,7 +30,7 @@ const ALWAYS: CoOccur = () => true;
 describe('slotOverlap, in §2.1 branch order', () => {
   it('never overlaps two references that share no statId, whatever coOccur says (§2.1 consequence 3)', () => {
     expect(slotOverlapBranch(band('a', 1, 2), band('b', 1, 2), 'suffix', ALWAYS)).toBeUndefined();
-    expect(slotOverlap(band('a', 1, 2), band('b', 1, 2), 'suffix', NEVER_CO_OCCUR)).toBe(false);
+    expect(slotOverlap(band('a', 1, 2), band('b', 1, 2), 'suffix', CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 
   it('never asks coOccur about two single-line references', () => {
@@ -46,29 +46,29 @@ describe('slotOverlap, in §2.1 branch order', () => {
   });
 
   it('overlaps two valueless references on one statId', () => {
-    expect(slotOverlapBranch(valueless('a'), valueless('a'), 'prefix', NEVER_CO_OCCUR)).toBe('both-valueless');
+    expect(slotOverlapBranch(valueless('a'), valueless('a'), 'prefix', CAN_NEVER_CO_OCCUR)).toBe('both-valueless');
   });
 
   it('overlaps intersecting bands, including a shared edge, and not disjoint ones', () => {
-    expect(slotOverlapBranch(band('a', 43, 56.5), band('a', 56, 80), 'prefix', NEVER_CO_OCCUR)).toBe(
+    expect(slotOverlapBranch(band('a', 43, 56.5), band('a', 56, 80), 'prefix', CAN_NEVER_CO_OCCUR)).toBe(
       'bands-intersect',
     );
-    expect(slotOverlap(band('a', 10, 20), band('a', 20, 30), 'prefix', NEVER_CO_OCCUR)).toBe(true);
-    expect(slotOverlap(band('a', 10, 19), band('a', 20, 29), 'prefix', NEVER_CO_OCCUR)).toBe(false);
+    expect(slotOverlap(band('a', 10, 20), band('a', 20, 30), 'prefix', CAN_NEVER_CO_OCCUR)).toBe(true);
+    expect(slotOverlap(band('a', 10, 19), band('a', 20, 29), 'prefix', CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 
   it('does not overlap a band and a valueless reference on one statId', () => {
-    expect(slotOverlap(band('a', 1, 2), valueless('a'), 'prefix', NEVER_CO_OCCUR)).toBe(false);
+    expect(slotOverlap(band('a', 1, 2), valueless('a'), 'prefix', CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 });
 
 describe('overlap, the consequences', () => {
   it('adjacent tiers of one statId in one slot are disjoint; intersecting bands overlap', () => {
     const suffix = band('s', 1, 2);
-    expect(overlap({ prefix: band('a', 10, 19), suffix }, { prefix: band('a', 20, 29), suffix }, NEVER_CO_OCCUR)).toBe(
+    expect(overlap({ prefix: band('a', 10, 19), suffix }, { prefix: band('a', 20, 29), suffix }, CAN_NEVER_CO_OCCUR)).toBe(
       false,
     );
-    expect(overlap({ prefix: band('a', 10, 21), suffix }, { prefix: band('a', 20, 29), suffix }, NEVER_CO_OCCUR)).toBe(
+    expect(overlap({ prefix: band('a', 10, 21), suffix }, { prefix: band('a', 20, 29), suffix }, CAN_NEVER_CO_OCCUR)).toBe(
       true,
     );
   });
@@ -78,7 +78,7 @@ describe('overlap, the consequences', () => {
       overlap(
         { prefix: band('a', 10, 19), suffix: band('s', 1, 2) },
         { prefix: band('a', 10, 19), suffix: band('t', 1, 2) },
-        NEVER_CO_OCCUR,
+        CAN_NEVER_CO_OCCUR,
       ),
     ).toBe(false);
   });
@@ -88,7 +88,7 @@ describe('overlap, the consequences', () => {
       overlapBranches(
         { prefix: band('a', 10, 19), suffix: valueless('s') },
         { prefix: band('a', 15, 25), suffix: valueless('s') },
-        NEVER_CO_OCCUR,
+        CAN_NEVER_CO_OCCUR,
       ),
     ).toEqual({ prefix: 'bands-intersect', suffix: 'both-valueless', sums: [] });
   });
@@ -181,7 +181,7 @@ describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () 
   it('overlaps a single-line reference on a shared line whose bands intersect, when coOccur holds', () => {
     expect(slotOverlapBranch(hybrid(10, 19), band('a', 15, 25), 'prefix', ALWAYS)).toBe('co-occur');
     expect(slotOverlapBranch(band('a', 15, 25), hybrid(10, 19), 'prefix', ALWAYS)).toBe('co-occur');
-    expect(slotOverlap(hybrid(10, 19), band('a', 15, 25), 'prefix', NEVER_CO_OCCUR)).toBe(false);
+    expect(slotOverlap(hybrid(10, 19), band('a', 15, 25), 'prefix', CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 
   it('does not ask coOccur when no shared line intersects, or no statId is shared', () => {
@@ -205,17 +205,17 @@ describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () 
       false,
     );
     expect(slotOverlap(hybrid(10, 19, { statId: 'b' }), hybrid(10, 19, { statId: 'b' }), 'prefix', ALWAYS)).toBe(true);
-    expect(slotOverlap(hybrid(10, 19), hybrid(15, 25), 'prefix', NEVER_CO_OCCUR)).toBe(false);
+    expect(slotOverlap(hybrid(10, 19), hybrid(15, 25), 'prefix', CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 
-  it('overlapBranches evaluates a pair with a hybrid reference, and namesHybrid picks it out', () => {
+  it('overlapBranches evaluates a pair with a hybrid reference, and hasHybridAffix picks it out', () => {
     const single = { prefix: band('a', 10, 19), suffix: valueless('s') };
     const withHybrid = { ...single, prefix: hybrid(10, 19) };
     expect(overlapBranches(withHybrid, single, ALWAYS)).toEqual({ prefix: 'co-occur', suffix: 'both-valueless', sums: [] });
-    expect(overlapBranches(withHybrid, single, NEVER_CO_OCCUR)).toBeUndefined();
-    expect(namesHybrid(single)).toBe(false);
-    expect(namesHybrid(withHybrid)).toBe(true);
-    expect(namesHybrid({ ...single, suffix: hybrid(1, 2) })).toBe(true);
+    expect(overlapBranches(withHybrid, single, CAN_NEVER_CO_OCCUR)).toBeUndefined();
+    expect(hasHybridAffix(single)).toBe(false);
+    expect(hasHybridAffix(withHybrid)).toBe(true);
+    expect(hasHybridAffix({ ...single, suffix: hybrid(1, 2) })).toBe(true);
   });
 });
 
@@ -276,7 +276,7 @@ describe('overlap with summed statIds (§2.1 S)', () => {
 
   it('gives the summed branch to a slot whose reference names nothing outside S', () => {
     const summed = new Set(['a']);
-    expect(slotOverlapBranch(band('a', 1, 2), band('a', 50, 60), 'prefix', NEVER_CO_OCCUR, summed)).toBe('summed');
+    expect(slotOverlapBranch(band('a', 1, 2), band('a', 50, 60), 'prefix', CAN_NEVER_CO_OCCUR, summed)).toBe('summed');
     const hybrid: HybridModifierReference = {
       kind: 'hybrid',
       lines: [
@@ -284,7 +284,7 @@ describe('overlap with summed statIds (§2.1 S)', () => {
         { statId: 'b', valueMin: 1, valueMax: 2 },
       ],
     };
-    expect(slotOverlapBranch(hybrid, band('a', 50, 60), 'prefix', NEVER_CO_OCCUR, summed)).toBe('summed');
+    expect(slotOverlapBranch(hybrid, band('a', 50, 60), 'prefix', CAN_NEVER_CO_OCCUR, summed)).toBe('summed');
   });
 
   it('compares shared statIds outside S only, and passes S to coOccur', () => {
@@ -300,7 +300,7 @@ describe('overlap with summed statIds (§2.1 S)', () => {
   });
 
   it('overlaps two rarity entries whose per-slot bands are disjoint but whose sums intersect', () => {
-    const branches = overlapBranches(rarity(16, 19, 15, 18), rarity(12, 15, 21, 24), NEVER_CO_OCCUR);
+    const branches = overlapBranches(rarity(16, 19, 15, 18), rarity(12, 15, 21, 24), CAN_NEVER_CO_OCCUR);
     expect(branches).toEqual({
       prefix: 'summed',
       suffix: 'summed',
@@ -315,8 +315,8 @@ describe('overlap with summed statIds (§2.1 S)', () => {
   });
 
   it('does not overlap two rarity entries whose sums are disjoint, though per-slot bands intersect', () => {
-    expect(overlap(rarity(16, 19, 15, 18), rarity(16, 19, 6, 10), NEVER_CO_OCCUR)).toBe(false);
-    expect(overlap(rarity(16, 19, 15, 18), rarity(16, 19, 11, 14), NEVER_CO_OCCUR)).toBe(true);
+    expect(overlap(rarity(16, 19, 15, 18), rarity(16, 19, 6, 10), CAN_NEVER_CO_OCCUR)).toBe(false);
+    expect(overlap(rarity(16, 19, 15, 18), rarity(16, 19, 11, 14), CAN_NEVER_CO_OCCUR)).toBe(true);
   });
 
   it('compares a statId per slot when only one entry sums it', () => {
@@ -334,7 +334,7 @@ describe('overlap with summed statIds (§2.1 S)', () => {
 
   it('never overlaps on a sum with a valueless operand, which the schema refuses', () => {
     const valuelessSum = { prefix: valueless('s'), suffix: band('s', 1, 2) };
-    expect(overlap(valuelessSum, valuelessSum, NEVER_CO_OCCUR)).toBe(false);
+    expect(overlap(valuelessSum, valuelessSum, CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 });
 
