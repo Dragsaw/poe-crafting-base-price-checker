@@ -1,105 +1,6 @@
 /**
- * One bounded, resumable, single-instance chunk (AD-7, FR-19).
- *
- * One call runs one chunk and returns. The chunk stops at whichever comes
- * first: the step reports a search allowance below `1`, the step reports a
- * fetch allowance below `1`, the step yields, or the order runs out. The
- * allowances are whatever the step read from live headers; this module holds
- * no rate and no floor of its own.
- *
- * **The run-start sequence is AD-12's cost order**, under the lock, free
- * before costly:
- *
- * 1. the lock (`./lock.ts`), then AD-8's `notBefore` check, before every
- *    other load (IMPLEMENTATION-NOTES.md §5.3). While the clock is before it
- *    the run is `deferred`: it sends nothing and writes nothing, except the
- *    report alone where it broke a stale lock;
- * 2. the loads and their load-time validation: the previous report, progress,
- *    `data/tracked.json`, `data/dataset.json`, then the shell's `load` hook
- *    (config, rates, item types and IMPLEMENTATION-NOTES.md §6's pinned-cap
- *    inequality; it returns the publication, the starvation record, the
- *    league gate and the pricing step, built on the dataset loaded here),
- *    then the committed catalogue and `data/weights.json`;
- * 3. the weights records (`../catalogue/weights-ids.ts`: absent is a
- *    `weights-absent` record, present has its ids checked report-only) and
- *    the run-start catalogue check (`./catalogue-check.ts`, AD-9, AD-25): a
- *    miss is marked `unresolvable`, reported, published with the step
- *    entries and kept out of the order; nothing is stamped. The report lists
- *    the `unresolvable` records before the weights records;
- * 3b. the cross-file gate (`./cross-file-gate.ts`, AD-17): `core`'s five
- *    checks over the tracked list and a present weights file. Any failure
- *    throws `CrossFileGateError` before the order exists, so the run
- *    publishes nothing, leaves `sync-progress.json` untouched and writes the
- *    report alone, with one `cross-file-gate-failure` record per failure
- *    after the run-start records, then exits non-zero. An absent file skips
- *    the gate;
- * 4. the order, from `core` (the Refresh Rotation, AD-7), recomputed on every
- *    run from the tracked list, the dataset, the completed keys and the
- *    clock, so a resumed chunk never replays a frozen plan;
- * 5. the league gate (`../league/league-gate.ts`, AD-19), the only check
- *    that costs a request;
- * 6. the rotation.
- *
- * `sync-progress.json` records only what was **completed**, and only in rows
- * 2–3: row 1 is exempt from the pass. A pinned entry that is `unresolvable`
- * sits in row 3, so its key is recorded like any other row 3 key.
- *
- * The runtime half of the pinned cap lives here: after each pinned step that
- * reports a search allowance, `pinnedToKeep` may cut the rest of row 1 so the
- * rotation keeps at least one search. A shortfall surfaces as
- * `pinnedStarvation` on the outcome; the kind is unchanged. The load-time
- * half, which reads the player's declared yardstick, runs inside the shell's
- * `load` (`../pinned-cap.ts`).
- *
- * Under the lock, a `completed`, `bounded` or `yielded` chunk writes
- * `data/dataset.json` (`./publish-dataset.ts`), then `sync-progress.json`,
- * then `data/sync-report.json` (`./sync-report.ts`), all through
- * `writeArtifact`. The dataset goes first, so progress never records a
- * completion the dataset does not publish. `busy` and `dispossessed` write
- * nothing. A chunk that ends on a `429` (a step's or the gate's) writes
- * `notBefore = now + min(retryAfter, staleLockAfter)`; a malformed-request
- * abort or a gate 4xx writes `now + staleLockAfter`; every other ending that writes
- * progress clears it.
- *
- * **A gate yield is an ordinary yielded chunk** with no entry attempted: it
- * publishes the dataset (the catalogue marks only), progress, and the report
- * with `runFinishedAt`, and its not-reached figure is every entry the order
- * made eligible (AD-7, AD-12). Until the gate passes, a publish keeps the
- * dataset's previously published league label (the configured league only
- * where no dataset exists), since the gate never confirmed it.
- *
- * The report carries this chunk's figures (requests per source, the
- * not-reached count, the tracked-list edit date) and its records after every
- * record the previous report still holds. A previous report this build cannot
- * read is refused before anything is written (NFR-8).
- *
- * **A throw** writes the report with a failure record, leaves
- * `runFinishedAt` absent, and is rethrown; the lock is released in a
- * `finally`. What else it writes depends on where it came from:
- *
- * - before the order exists (a load refusal, a pinned-cap excess, a
- *   catalogue or weights refusal): the report only;
- * - a league mismatch: the report only, carrying this chunk's lock record and
- *   the `league-mismatch` record; the catalogue check's marks and records and
- *   the weights records are discarded, since the next run that passes the
- *   gate recomputes them (AD-12);
- * - any other throw once the order exists: first the dataset and progress
- *   for the step entries so far and the marks, then the report. The failing
- *   entry, as the step left it, is published too for a `MalformedRequestError`
- *   (a non-429 4xx, AD-9) and for an `UnexpectedTradeResponseError` that
- *   carries one (a 2xx body of the wrong shape on the search or the fetch).
- *   Only a `MalformedRequestError` and the gate's `LeagueRequestRejectedError` (a
- *   non-429 4xx on the leagues request) write the abort `notBefore`; every
- *   other throw clears it.
- *
- * **Under a session** (`ChunkPorts.session`, `../sync.ts`) the chunk is the
- * same chunk with four differences: it attempts at most `maxEntries` entries
- * (`bounded` by `'entries'`), its order keeps only stale pinned entries, and
- * it skips the gate while the session's confirmed league still holds. Its
- * `requestsBySource` figure covers the session's current pass.
- *
- * A publish or report write that was already attempted on the normal path is
- * never attempted again on the failure path.
+ * One bounded, resumable, single-instance chunk (AD-7, FR-19). The run-start sequence under the lock is AD-12's cost order.
+ * A throw writes the report, and the dataset and progress once the order exists (AD-12, IMPLEMENTATION-NOTES.md §5.3).
  */
 
 import {
@@ -146,32 +47,12 @@ import { buildSyncReport } from './sync-report.ts';
 
 export const TRACKED_PATH = 'data/tracked.json';
 export const PROGRESS_PATH = 'data/sync-progress.json';
-/**
- * The published Dataset (AD-19). Read at the start of a chunk for the
- * rotation's `lastAttemptedAt` and price state, and written under the lock at
- * its end, by explicit path, with this chunk's step entries merged in.
- */
+/** The published Dataset (AD-19), written under the lock by explicit path with this chunk's step entries merged in. */
 export const DATASET_PATH = 'data/dataset.json';
-/**
- * The Sync Report (FR-25, AD-12). Read under the lock before anything else,
- * for the records it still carries, and written after progress by explicit
- * path (`./sync-report.ts`).
- */
+/** The Sync Report (FR-25, AD-12), read under the lock before anything else and written after progress by explicit path. */
 export const REPORT_PATH = 'data/sync-report.json';
 
-/**
- * What one step reports for one entry. `completed` carries the allowances the
- * step observed in the live headers of its last search and fetch; an absent
- * allowance bounds nothing, because nothing was observed. `yielded` means the
- * entry was **not** completed and the chunk must stop now — a `429`, or the
- * client's invalid-request refusal, or a 5xx or timeout from the pricing step.
- *
- * Either kind may carry the step's updated `DatasetEntry`: a completed entry
- * with its new price state, or a yielded one stamped with `lastAttemptedAt`
- * (and, after an answered search, carrying its search fields).
- * The runner publishes them into `data/dataset.json` and reports them on the
- * outcome.
- */
+/** What one step reports for one entry: an absent allowance bounds nothing, and `yielded` stops the chunk now. */
 export type StepResult =
   | {
       readonly kind: 'completed';
@@ -184,40 +65,20 @@ export type StepResult =
   | {
       readonly kind: 'yielded';
       readonly entry?: DatasetEntry;
-      /**
-       * Set only when the yield was a `429`: the delay the client's yield
-       * carried. The chunk writes it into `notBefore` (IMPLEMENTATION-NOTES.md
-       * §5.3). Absent on a 5xx, a timeout or a threshold refusal.
-       */
+      /** Set only on a `429`: the delay the chunk writes into `notBefore` (IMPLEMENTATION-NOTES.md §5.3). */
       readonly retryAfterMs?: number;
-      /**
-       * Set only when the yield was AD-30's downgrade, the `session-expired`
-       * yield (IMPLEMENTATION-NOTES.md §13.4). It writes no `notBefore`; the
-       * outcome carries it to the session, which waits `backoff(1)`.
-       */
+      /** Set only on AD-30's `session-expired` downgrade: no `notBefore`, and the session waits `backoff(1)` (IMPLEMENTATION-NOTES.md §13.4). */
       readonly sessionExpired?: true;
     };
 
 export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
 
-/**
- * How long a failed session cookie is held off (AD-30, IMPLEMENTATION-NOTES.md
- * §13.3): a `write` sets `authHoldOffUntil` to the progress write's `now`
- * plus this.
- */
+/** How long a failed session cookie is held off (AD-30, IMPLEMENTATION-NOTES.md §13.3). */
 const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
 
-/**
- * The runner's two narrow ports onto the process auth holder (AD-30,
- * IMPLEMENTATION-NOTES.md §13.1, §13.3), wired in `../compose-chunk.ts`. The
- * runner never sees the holder itself, so it never reaches the cookie.
- */
+/** The runner's two narrow ports onto the process auth holder, so it never reaches the cookie (AD-30, IMPLEMENTATION-NOTES.md §13.1). */
 interface ChunkAuth {
-  /**
-   * Called once, after the lock and the `notBefore` check, with the loaded
-   * `authHoldOffUntil` and `now`: while the holder may still probe and the
-   * hold-off is due, it settles `held-off` and no probe goes out.
-   */
+  /** Called once after the lock and the `notBefore` check: a due hold-off settles `held-off` and no probe goes out. */
   settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void;
   /** The hold-off action the next progress write applies, or `undefined` to carry the field. */
   pendingHoldOff(): 'write' | 'clear' | undefined;
@@ -230,14 +91,7 @@ export interface GateContext {
   readonly entries: readonly TrackedEntry[];
 }
 
-/**
- * What the run-start gate answers. `pass` lets the chunk go on. `yield` is a
- * chunk yield (AD-8): the gate got no answer to check against (a 429, the
- * invalid-request threshold, a 5xx, a timeout or a network failure), so the
- * chunk attempts no entry and publishes like any yielded chunk: the dataset
- * (the catalogue marks only), progress (`notBefore` set after a 429, cleared
- * otherwise) and the report.
- */
+/** `yield` is a chunk yield with no entry attempted (AD-8): the gate got no answer to check against. */
 export type GateResult =
   | { readonly kind: 'pass' }
   | {
@@ -265,18 +119,9 @@ export interface ChunkLoadContext {
 /** What the shell's `load` hook answers: everything the chunk needs from config. */
 export interface ChunkSetup {
   readonly publication: ChunkPublication;
-  /**
-   * Turns the chunk's starvation into a report record. The shell supplies it
-   * with the declared yardstick (`pinnedStarvationRecord` in
-   * `../pinned-cap.ts`), which this directory never reads. Required, so a
-   * shell cannot silently drop the record (FR-25).
-   */
+  /** Turns starvation into a report record with the declared yardstick, which this directory never reads (FR-25). */
   readonly starvationRecord: (starvation: ChunkStarvation) => SyncRunRecord;
-  /**
-   * The run-start league gate. It runs after the order and before any step.
-   * A throw aborts the chunk; a `yield` ends it `yielded` with no entry
-   * attempted.
-   */
+  /** The run-start league gate, after the order and before any step: a throw aborts, a `yield` ends the chunk `yielded`. */
   readonly gate?: (context: GateContext) => Promise<GateResult>;
   /** The pricing step, built on the dataset the runner loaded. */
   readonly step: ChunkStep;
@@ -289,66 +134,29 @@ export interface ChunkPorts {
   readonly pid: number;
   /** Read-only: the tracked list's last commit author date (`resolveTrackedListAge`). */
   readonly git: GitPort;
-  /**
-   * The per-source request counter the shell wrapped its `HttpPort` with
-   * (`../request-counter.ts`). The report carries what it counted between
-   * taking the lock and writing the report.
-   */
+  /** The shell's per-source request counter (`../request-counter.ts`); the report carries what it counted since the lock. */
   readonly requests: { snapshot(): RequestsBySource };
-  /**
-   * The shell's loads (AD-12): config, rates, item types and the pinned-cap
-   * inequality. Called under the lock, after the tracked list and the
-   * dataset, and before the catalogue. A throw aborts the chunk with a
-   * failure record and nothing else written, before any request.
-   */
+  /** The shell's loads under the lock (AD-12), after the dataset and before the catalogue; a throw aborts before any request. */
   readonly load: (context: ChunkLoadContext) => Promise<ChunkSetup>;
-  /**
-   * Loads the committed catalogue's id sets (`../catalogue/catalogue-ids.ts`).
-   * Called under the lock, after `load` and before the order. A refusal
-   * aborts the chunk with a `run-failure` record, before any request.
-   */
+  /** The committed catalogue's id sets, loaded after `load`; a refusal aborts with a `run-failure` record before any request. */
   readonly catalogue: () => Promise<DataFileResult<CatalogueIds>>;
-  /**
-   * The retry delay of a probe `429` the chunk's governor latched, or
-   * `undefined` (IMPLEMENTATION-NOTES.md §13.3). Read after the step loop,
-   * just before `publish`: a latched penalty makes the chunk a `429` yield,
-   * whatever bound ended it, and writes `notBefore` by §5.3's after-a-429
-   * row. Omitted, nothing is latched.
-   */
+  /** The retry delay of a latched probe `429`, read after the step loop: it makes the chunk a `429` yield (IMPLEMENTATION-NOTES.md §13.3). */
   readonly latchedRetryAfterMs?: () => number | undefined;
-  /**
-   * The live shells only: the auth holder's narrow ports (`ChunkAuth`).
-   * Omitted, nothing settles `held-off` and every progress write carries
-   * `authHoldOffUntil` forward unchanged.
-   */
+  /** The live shells' auth holder ports; omitted, nothing settles `held-off` and progress carries the hold-off forward. */
   readonly auth?: ChunkAuth;
   /** One line of operator output. Defaults to stderr. */
   readonly log?: (line: string) => void;
-  /**
-   * Set only by the long-running `pnpm sync` session (`../sync.ts`), which
-   * runs one chunk per entry (AD-7). Absent, the chunk is the batch chunk of
-   * `pnpm sync:batch` and `pnpm sync:dry`, unchanged.
-   */
+  /** Set only by the `pnpm sync` session (`../sync.ts`), one chunk per entry (AD-7); absent, the chunk is the batch chunk. */
   readonly session?: ChunkSession;
 }
 
 /** What the session tells each of its chunks. Every field is optional. */
 export interface ChunkSession {
-  /**
-   * The chunk attempts at most this many entries. Reaching it with an entry
-   * left ends the chunk `bounded` by `'entries'`.
-   */
+  /** The chunk attempts at most this many entries; reaching it with an entry left ends the chunk `bounded` by `'entries'`. */
   readonly maxEntries?: number;
-  /**
-   * The request counter's snapshot at the start of the current pass. The
-   * report's `requestsBySource` then covers the pass, not only this chunk. A
-   * chunk that starts a new pass (`newPass`) counts from its own start.
-   */
+  /** The request counter's snapshot at the pass start, so `requestsBySource` covers the pass; a new pass counts from its own start. */
   readonly requestsSince?: RequestsBySource;
-  /**
-   * The league an earlier chunk of this session confirmed. The gate is skipped
-   * while it equals the configured league and the order is not a new pass.
-   */
+  /** The league an earlier chunk confirmed: the gate is skipped while it equals the configured league within the same pass. */
   readonly confirmedLeague?: string;
   /** Row 1's stale-pinned rule (`chunkOrder`'s `pinnedMaxAgeMs`). */
   readonly pinnedMaxAgeMs?: number;
@@ -358,39 +166,17 @@ export interface ChunkSession {
 export type ChunkBound = 'search' | 'fetch' | 'entries';
 
 interface ChunkOutcomeBase {
-  /**
-   * Canonical keys this chunk completed, in visiting order, row 1 (pinned)
-   * included. Progress records only the rows 2–3 subset of these.
-   */
+  /** Canonical keys this chunk completed in visiting order, row 1 included; progress records only rows 2–3. */
   readonly completed: readonly string[];
-  /**
-   * The dataset entries the steps returned, in visiting order — completed and
-   * yielded alike. `completed`, `bounded` and `yielded` publish them into the
-   * dataset; `busy` and `dispossessed` write nothing.
-   */
+  /** The dataset entries the steps returned in visiting order; `busy` and `dispossessed` publish nothing. */
   readonly entries: readonly DatasetEntry[];
-  /**
-   * The lock records this chunk produced (a broken stale lock). The report
-   * adds the starvation record through `starvationRecord`.
-   */
+  /** The lock records this chunk produced; the report adds the starvation record through `starvationRecord`. */
   readonly records: readonly SyncRunRecord[];
-  /**
-   * Present only when a pinned step reported an allowance below the pinned
-   * entries left plus one while rows 2–3 had work waiting, whether or not any
-   * pinned entry was left to cut (AD-7, IMPLEMENTATION-NOTES.md §6). It is not an error and does not
-   * change the outcome kind. `pinnedStarvationRecord` in `../pinned-cap.ts`
-   * adds the declared yardstick to make the report record.
-   */
+  /** Present when a pinned step reported an allowance below the pinned entries left plus one while rotation work waited (AD-7, IMPLEMENTATION-NOTES.md §6); the kind is unchanged. */
   readonly pinnedStarvation?: ChunkStarvation;
-  /**
-   * A session's chunk only (`ChunkPorts.session`), once the order exists:
-   * `true` when this chunk's order started a new pass.
-   */
+  /** A session's chunk only, once the order exists: `true` when this chunk's order started a new pass. */
   readonly newPass?: boolean;
-  /**
-   * A session's chunk only: the configured league, present when this chunk
-   * confirmed it — the gate passed, or the session's earlier confirmation held.
-   */
+  /** A session's chunk only: the configured league, present when this chunk confirmed it. */
   readonly confirmedLeague?: string;
 }
 
@@ -411,21 +197,11 @@ export type ChunkOutcome =
   | (ChunkOutcomeBase & { readonly kind: 'bounded'; readonly bound: ChunkBound })
   | (ChunkOutcomeBase & {
       readonly kind: 'yielded';
-      /**
-       * `true` only when the chunk ended on AD-30's downgrade, the
-       * `session-expired` yield (IMPLEMENTATION-NOTES.md §13.4). The downgrade
-       * reset the pacing state in place, so the session cannot read it from the
-       * ledger: it waits `backoff(1)` on this signal.
-       */
+      /** `true` only on AD-30's `session-expired` yield, which reset the pacing state in place, so the session waits `backoff(1)` (IMPLEMENTATION-NOTES.md §13.4). */
       readonly sessionExpired?: true;
     })
   | (ChunkOutcomeBase & { readonly kind: 'busy' })
-  /**
-   * A previous chunk ended on a `429` or a malformed-request abort and wrote a
-   * `notBefore` still in the future (AD-8, IMPLEMENTATION-NOTES.md §5.3). The
-   * run released the lock, sent nothing and wrote nothing — except the report
-   * alone where it broke a stale lock to get here.
-   */
+  /** A previous 429 or malformed-request abort wrote a `notBefore` still ahead: nothing sent or written (AD-8, IMPLEMENTATION-NOTES.md §5.3). */
   | (ChunkOutcomeBase & { readonly kind: 'deferred'; readonly notBefore: string })
   | (ChunkOutcomeBase & { readonly kind: 'dispossessed' });
 
@@ -481,11 +257,7 @@ async function loadEnvelope<T>(
   return result.value;
 }
 
-/**
- * The two `notBefore` formulas (IMPLEMENTATION-NOTES.md §5.3). The cap is
- * `staleLockAfter`, so no `Retry-After` defers a run past the window that
- * clears a crashed run's lock.
- */
+/** The two `notBefore` formulas (IMPLEMENTATION-NOTES.md §5.3), capped at `staleLockAfter` so no `Retry-After` outlasts a crashed run's lock. */
 function notBeforeAfter429(now: string, retryAfterMs: number): string {
   return new Date(Date.parse(now) + Math.min(retryAfterMs, STALE_LOCK_AFTER_MS)).toISOString();
 }
@@ -509,15 +281,7 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
   return step.fetchRemaining !== undefined && step.fetchRemaining < 1 ? 'fetch' : undefined;
 }
 
-/**
- * The records a throw leaves in the report. A cross-file gate failure leaves
- * one `cross-file-gate-failure` record per failing (check, entry); every
- * other throw leaves one record. A league mismatch is its own
- * record, with the list the player corrects the configured league from
- * (AD-19). A non-429 4xx names its status, and its entry where it was on one:
- * the league gate's request names none. Any other throw names the entry the
- * step was on, where it was on one.
- */
+/** The records a throw leaves in the report: one per failing check of a cross-file gate failure, otherwise one (AD-19 for a league mismatch). */
 function failureRecords(error: unknown, current: TrackedEntry | undefined): SyncRunRecord[] {
   return error instanceof CrossFileGateError ? crossFileGateRecords(error) : [failureRecord(error, current)];
 }
@@ -577,10 +341,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
   const records: SyncRunRecord[] = acquisition.broken === undefined ? [] : [acquisition.broken];
 
   try {
-    // The penalty memory (AD-8, IMPLEMENTATION-NOTES.md §5.3) is read between
-    // the lock and every other load. A progress file this build cannot read
-    // is thrown at its usual place below, so it still fails the run with a
-    // report; it can defer nothing.
+    // The penalty memory (AD-8, IMPLEMENTATION-NOTES.md §5.3) is read before every other load; an unreadable progress file is thrown later, so it still fails the run with a report.
     let progress: SyncProgressFile | undefined;
     let progressFault: { readonly error: unknown } | undefined;
     try {
@@ -672,19 +433,13 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
     let discoveredAllowance: number | undefined;
     let isTruncated = false;
 
-    /**
-     * Where the report's request figure counts from: this chunk's start, or,
-     * inside a session pass this chunk did not start, the pass's start.
-     */
+    /** Where the request figure counts from: this chunk's start, or the session pass's start when this chunk did not start the pass. */
     const countFrom = (): RequestsBySource =>
       order !== undefined && !order.newPass && session?.requestsSince !== undefined
         ? session.requestsSince
         : requestsAtStart;
 
-    /**
-     * The session fields of an outcome reached once the order exists. Only a
-     * session's chunk carries them, so a batch outcome is unchanged.
-     */
+    /** The session fields of an outcome reached once the order exists; a batch outcome carries none. */
     const passNow = (): { readonly newPass?: boolean; readonly confirmedLeague?: string } =>
       session === undefined
         ? {}
@@ -705,10 +460,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           }
         : {};
 
-    /**
-     * This chunk's records: the broken lock, the run-start check, the steps,
-     * then the starvation, then any failure.
-     */
+    /** This chunk's records: the lock, the run-start check, the steps, the starvation, then any failure. */
     const newRecords = (failure: readonly SyncRunRecord[] = []): SyncRunRecord[] => {
       const { pinnedStarvation } = starvationNow();
       return [
@@ -723,11 +475,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       ];
     };
 
-    /**
-     * Dataset first, then progress, so progress never records a completion the
-     * dataset does not publish. `until` is the `notBefore` this ending writes;
-     * absent clears the field. Called once per run at most.
-     */
+    /** Dataset first, so progress never records a completion the dataset does not publish; `until` is the `notBefore` written, absent clears it. */
     const publish = async (
       publication: ChunkPublication,
       published: readonly DatasetEntry[],
@@ -997,13 +745,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         throw error;
       }
       if (order !== undefined && setup !== undefined && !isPublishAttempted) {
-        // Once the order exists a throw publishes what the chunk has: the
-        // step entries so far and the marks. A rejected request also
-        // publishes the failing entry as the step left it and remembers the
-        // abort as `notBefore` (AD-9, §5.3); every other throw clears it. An
-        // unexpected search or fetch body also publishes the failing entry with
-        // `lastAttemptedAt` stamped; after a fetch it keeps the answered
-        // search's fields (AD-9).
+        // A throw once the order exists publishes the step entries and the marks, plus the failing entry for a rejected
+        // request or an unexpected body, which keeps an answered search's fields (AD-9, IMPLEMENTATION-NOTES.md §5.3).
         const isMalformed = error instanceof MalformedRequestError;
         // The gate's non-429 4xx is a rejected request too, and would be
         // refused again on the next tick: it writes the same abort `notBefore`.
