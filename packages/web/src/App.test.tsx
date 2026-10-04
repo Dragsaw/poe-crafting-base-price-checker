@@ -142,7 +142,7 @@ describe('the pending state', () => {
     expect(stripSlot?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     expect(stripSlot?.textContent).toBe('');
     expect(frame().querySelector('[data-trust-strip]')).toBeNull();
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
   });
 
   it('changes nothing rendered while any artifact is still outstanding, then moves in one transition', async () => {
@@ -365,7 +365,7 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(ALL);
     expect(frame().querySelector('[data-column-header]')?.textContent).toContain('Item Class / Base Type');
     expect(frame().textContent).toContain(ASKING_PRICE_COPY);
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
   });
 
   it('renders the chrome in order around the ranked rows when ready', async () => {
@@ -603,7 +603,7 @@ describe('the payout threshold', () => {
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(thresholdInput().value).toBe('0.25');
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
     await settleTo('ready');
     expect(thresholdInput().value).toBe('0.25');
 
@@ -1301,7 +1301,7 @@ describe('the Unrankable appendix', () => {
     expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
     expect(tailOrder()).toEqual(['keyBlock', 'runningFoot']);
     expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
     await settleTo('ready');
   });
 

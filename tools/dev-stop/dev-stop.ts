@@ -42,10 +42,10 @@ export function parsePort(argv: readonly string[]): number {
   let raw: string | undefined;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
-    if (arg === '--port') raw = argv[i + 1] ?? '';
-    else if (arg.startsWith('--port=')) raw = arg.slice('--port='.length);
+    if (arg === '--port') {raw = argv[i + 1] ?? '';}
+    else if (arg.startsWith('--port=')) {raw = arg.slice('--port='.length);}
   }
-  if (raw === undefined) return DEFAULT_PORT;
+  if (raw === undefined) {return DEFAULT_PORT;}
   const port = Number(raw);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error(`--port needs an integer from 1 to 65535, got "${raw}"`);
@@ -81,7 +81,7 @@ function isPnpmDev(info: ProcessInfo): boolean {
     args = tokens.slice(1);
   } else if (programName(tokens[0]) === 'node') {
     const entry = tokens.findIndex((token, i) => i > 0 && !token.startsWith('-'));
-    if (entry === -1 || !/^pnpm\.[cm]?js$/.test(programName(tokens[entry]))) return false;
+    if (entry === -1 || !/^pnpm\.[cm]?js$/.test(programName(tokens[entry]))) {return false;}
     args = tokens.slice(entry + 1);
   } else {
     return false;
@@ -99,9 +99,9 @@ const SHELLS = new Set(['cmd', 'sh', 'bash', 'dash', 'zsh', 'powershell', 'pwsh'
  */
 function isScriptShell(info: ProcessInfo): boolean {
   const tokens = tokenize(info.commandLine);
-  if (!SHELLS.has(programName(tokens[0]))) return false;
+  if (!SHELLS.has(programName(tokens[0]))) {return false;}
   const flag = tokens.findIndex((token) => /^[/-]c$/i.test(token));
-  if (flag === -1) return false;
+  if (flag === -1) {return false;}
   // Test separators on the raw text: tokenize drops a newline between commands.
   const command = /\s[/-]c\s([\s\S]*)$/i.exec(info.commandLine)?.[1] ?? '';
   return programName(tokens[flag + 1]) === 'vite' && !/[&|;\n`]|\$\(/.test(command);
@@ -136,7 +136,7 @@ export function planStop(
   repoRoot: string,
   protectedPids: ReadonlySet<number>,
 ): StopPlan {
-  if (listeners.length === 0) return { kind: 'idle' };
+  if (listeners.length === 0) {return { kind: 'idle' };}
   const byPid = new Map(processes.map((info) => [info.pid, info]));
   const ownVite = normalize(`${repoRoot}/node_modules/`);
   const roots = new Set<number>();
@@ -168,7 +168,7 @@ export function planStop(
       }
       seen.add(parent.pid);
       top = parent;
-      if (isPnpmDev(top)) break;
+      if (isPnpmDev(top)) {break;}
     }
     roots.add(top.pid);
   }
@@ -206,9 +206,9 @@ function listenerScript(port: number): string {
  * answer must never read as a free port.
  */
 export function parseListenerJson(value: unknown): number[] {
-  if (value === null) return [];
-  if (Number.isInteger(value)) return [value as number];
-  if (Array.isArray(value) && value.every((item) => Number.isInteger(item))) return [...(value as number[])];
+  if (value === null) {return [];}
+  if (Number.isInteger(value)) {return [value as number];}
+  if (Array.isArray(value) && value.every((item) => Number.isInteger(item))) {return [...(value as number[])];}
   throw new Error(`unexpected listener query result: ${JSON.stringify(value)}`);
 }
 
@@ -234,7 +234,7 @@ function listenersPosix(port: number): number[] {
   } catch (error) {
     // lsof exits 1 when nothing matches. Any other failure, such as a missing
     // lsof, must not read as a free port.
-    if ((error as { status?: unknown }).status !== 1) throw error;
+    if ((error as { status?: unknown }).status !== 1) {throw error;}
     return [];
   }
 }
@@ -270,7 +270,7 @@ export function ownAncestry(processes: readonly ProcessInfo[], selfPid: number):
   let pid: number | undefined = selfPid;
   while (pid !== undefined) {
     const next: number | undefined = byPid.get(pid)?.ppid;
-    if (next === undefined || out.has(next)) break;
+    if (next === undefined || out.has(next)) {break;}
     out.add(next);
     pid = next;
   }
@@ -287,7 +287,7 @@ function killTree(pid: number, processes: readonly ProcessInfo[]): void {
     }
     return;
   }
-  for (const child of processes.filter((info) => info.ppid === pid)) killTree(child.pid, processes);
+  for (const child of processes.filter((info) => info.ppid === pid)) {killTree(child.pid, processes);}
   try {
     process.kill(pid, 'SIGTERM');
   } catch {
@@ -308,7 +308,7 @@ async function main(): Promise<number> {
     process.stderr.write(`dev-stop: ${plan.reason}\n`);
     return 1;
   }
-  for (const root of plan.roots) killTree(root, before.processes);
+  for (const root of plan.roots) {killTree(root, before.processes);}
   // taskkill returns before the socket is released, so poll. Each query
   // starts a shell and can take seconds, so bound the wait by time, not attempts.
   const deadline = Date.now() + STOP_TIMEOUT_MS;
@@ -317,7 +317,7 @@ async function main(): Promise<number> {
       process.stdout.write(`dev-stop: stopped PID ${plan.roots.join(', ')}; port ${port} is free.\n`);
       return 0;
     }
-    if (Date.now() >= deadline) break;
+    if (Date.now() >= deadline) {break;}
     await new Promise((done) => setTimeout(done, 250));
   }
   process.stderr.write(`dev-stop: port ${port} is still taken after killing PID ${plan.roots.join(', ')}.\n`);
@@ -331,7 +331,7 @@ async function main(): Promise<number> {
  */
 function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
-  if (entry === undefined) return false;
+  if (entry === undefined) {return false;}
   try {
     return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {

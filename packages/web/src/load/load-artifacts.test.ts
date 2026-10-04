@@ -65,7 +65,7 @@ describe('loadArtifacts', () => {
     serveArtifacts(server);
     const outcome = await loadArtifacts({ baseUrl: '/' });
     expect(outcome.kind).toBe('ready');
-    if (outcome.kind !== 'ready') return;
+    if (outcome.kind !== 'ready') {return;}
     expect(outcome.absent).toEqual([]);
     expect(outcome.set.config.league).toBe(TEST_LEAGUE);
     expect(outcome.set.weights).toEqual(VALID_BODIES.weights);
@@ -244,7 +244,7 @@ describe('loadArtifacts', () => {
     });
     const outcome = await loadArtifacts({ baseUrl: '/' });
     expect(outcome.kind).toBe('ready');
-    if (outcome.kind !== 'ready') return;
+    if (outcome.kind !== 'ready') {return;}
     expect(outcome.absent).toEqual(['syncReport', 'recipes']);
     expect(outcome.set.recipes).toBeNull();
     expect(outcome.set.syncReport).toBeNull();
@@ -292,7 +292,7 @@ describe('the frozen data fixture set', () => {
     serveArtifacts(server, answers);
     const outcome = await loadArtifacts({ baseUrl: '/' });
     expect(outcome.kind).toBe('ready');
-    if (outcome.kind !== 'ready') return;
+    if (outcome.kind !== 'ready') {return;}
     expect(missing.every((key) => ARTIFACTS[key].class === 'tolerable')).toBe(true);
     expect(outcome.absent).toEqual(missing);
     expect(outcome.absent).toEqual([]);

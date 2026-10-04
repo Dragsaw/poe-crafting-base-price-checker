@@ -42,7 +42,7 @@ function makeScratch(): string {
 }
 
 afterEach(() => {
-  for (const dir of scratch.splice(0)) rmSync(dir, { recursive: true, force: true });
+  for (const dir of scratch.splice(0)) {rmSync(dir, { recursive: true, force: true });}
 });
 
 function messagesOf(diagnostics: readonly ts.Diagnostic[]): string[] {
@@ -238,9 +238,9 @@ describe('rewriteDtsSpecifiersIn', () => {
 function resolveCompilerOptions(dir: string): ts.CompilerOptions {
   const configPath = join(dir, 'tsconfig.json');
   const read = ts.readConfigFile(configPath, ts.sys.readFile);
-  if (read.error !== undefined) throw new Error(messagesOf([read.error]).join('\n'));
+  if (read.error !== undefined) {throw new Error(messagesOf([read.error]).join('\n'));}
   const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, dir, undefined, configPath);
-  if (parsed.errors.length > 0) throw new Error(messagesOf(parsed.errors).join('\n'));
+  if (parsed.errors.length > 0) {throw new Error(messagesOf(parsed.errors).join('\n'));}
   return parsed.options;
 }
 

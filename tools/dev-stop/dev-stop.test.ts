@@ -101,8 +101,8 @@ describe('planStop', () => {
 
   it('reads the real Windows forms: quoted cmd.exe path, extra cmd switches, pnpm store path', () => {
     const real = CHAIN.map((info) => {
-      if (info.pid === 15) return { ...info, commandLine: '"C:\\WINDOWS\\system32\\cmd.exe" /d /s /c vite --config x' };
-      if (info.pid === 14) return { ...info, commandLine: '"C:\\pnpm\\bin\\\\..\\node_modules\\pnpm\\pnpm.exe"   dev --port 5199' };
+      if (info.pid === 15) {return { ...info, commandLine: '"C:\\WINDOWS\\system32\\cmd.exe" /d /s /c vite --config x' };}
+      if (info.pid === 14) {return { ...info, commandLine: '"C:\\pnpm\\bin\\\\..\\node_modules\\pnpm\\pnpm.exe"   dev --port 5199' };}
       return info;
     });
     expect(planStop([16], real, ROOT, NONE)).toEqual({ kind: 'kill', roots: [14] });
@@ -258,7 +258,7 @@ describe('listenerPids', () => {
   afterEach(async () => {
     const open = server;
     server = undefined;
-    if (open?.listening) await new Promise<void>((done) => open.close(() => done()));
+    if (open?.listening) {await new Promise<void>((done) => open.close(() => done()));}
   });
 
   it.skipIf(!canQuery)(
