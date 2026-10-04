@@ -408,7 +408,7 @@
   },
   "packages/sync/src/chunk/run-chunk.ts": {
     "complexity": {
-      "count": 2
+      "count": 1
     },
     "local/max-comment-run": {
       "count": 1

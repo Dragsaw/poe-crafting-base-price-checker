@@ -5,11 +5,8 @@
 
 import {
   canonicalKey,
-  compareCanonicalKeys,
   DatasetFileSchema,
   parseEnvelope,
-  resolveTrackedListAge,
-  SYNC_PROGRESS_SCHEMA_VERSION,
   SyncProgressFileSchema,
   SyncReportFileSchema,
 } from '@poe/contracts';
@@ -17,7 +14,6 @@ import type {
   ClockPort,
   CurrencyRate,
   DatasetEntry,
-  DatasetFile,
   FilesystemPort,
   GitPort,
   SyncProgressFile,
@@ -25,7 +21,6 @@ import type {
   TrackedEntry,
 } from '@poe/contracts';
 import { chunkOrder, pinnedToKeep, poolCoverage } from '@poe/core';
-import type { ChunkOrder } from '@poe/core';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord } from '../catalogue/weights-ids.ts';
@@ -33,20 +28,21 @@ import { LeagueMismatchError, LeagueRequestRejectedError } from '../league/leagu
 import { explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
 import type { DataFileResult } from '../load-data-file.ts';
 import { MalformedRequestError, UnexpectedTradeResponseError } from '../pricing/price-entry.ts';
-import { requestsBetween } from '../request-counter.ts';
 import type { RequestsBySource } from '../request-counter.ts';
 import { writeArtifact } from '../write-artifact.ts';
 import { checkCatalogue } from './catalogue-check.ts';
 import { crossFileGate } from './cross-file-gate.ts';
 import { acquireLock, isLockHeld, isOwnLockReleased } from './lock.ts';
-import { buildDatasetFile } from './publish-dataset.ts';
 import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './run-chunk/data-paths.ts';
 import { failureRecords } from './run-chunk/failure-records.ts';
 import { loadEnvelope } from './run-chunk/load-envelope.ts';
 import { failureNotBefore, notBeforeAfter429 } from './run-chunk/not-before.ts';
+import { publish } from './run-chunk/publish-artifacts.ts';
+import { carriedCoverage, createRunState, newRecords, passNow, starvationNow } from './run-chunk/run-state.ts';
+import { writeReport } from './run-chunk/write-report.ts';
 import { buildSyncReport } from './sync-report.ts';
 
-
+export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './run-chunk/data-paths.ts';
 
 /** What one step reports for one entry: an absent allowance bounds nothing, and `yielded` stops the chunk now. */
 export type StepResult =
@@ -68,9 +64,6 @@ export type StepResult =
     };
 
 export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
-
-/** How long a failed session cookie is held off (AD-30, IMPLEMENTATION-NOTES.md §13.3). */
-const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
 
 /** The runner's two narrow ports onto the process auth holder, so it never reaches the cookie (AD-30, IMPLEMENTATION-NOTES.md §13.1). */
 interface ChunkAuth {
@@ -216,7 +209,7 @@ function boundOf(step: Extract<StepResult, { kind: 'completed' }>): ChunkBound |
 }
 
 export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
-  const { fs, clock, pid, git, requests, session } = ports;
+  const { fs, clock, pid, requests, session } = ports;
   const log = ports.log ?? writeStderr;
   // The original error is always the one rethrown: a fault in a
   // failure-path write goes to the log, and the report is still attempted
@@ -273,11 +266,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
               requestsBySource: {},
               notReachedCount: 0,
               // The pause is no re-read of the weights file: the figure stays.
-              ...(!(previous?.figures.coverage === undefined ||
-              previous.figures.rankableClassCount === undefined) && {
-                    coverage: previous.figures.coverage,
-                    rankableClassCount: previous.figures.rankableClassCount,
-                  }),
+              ...carriedCoverage(previous),
             },
             runStartedAt,
             runFinishedAt: clock.now(),
@@ -299,171 +288,24 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       parseEnvelope(SyncReportFileSchema, data),
     );
 
-    // State the failure path reads as well as the normal one.
-    let dataset: DatasetFile | undefined;
-    let setup: ChunkSetup | undefined;
-    let order: ChunkOrder | undefined;
-    let entries: readonly TrackedEntry[] = [];
-    /** Both fields or neither (AD-27); set once the weights file is read. */
-    let coverageFigures: { coverage?: number; rankableClassCount?: number } =
-      previousReport?.figures.coverage === undefined || previousReport.figures.rankableClassCount === undefined
-        ? {}
-        : {
-            // A failure before the weights read is no re-read: the figure stays, as on the pause.
-            coverage: previousReport.figures.coverage,
-            rankableClassCount: previousReport.figures.rankableClassCount,
-          };
-    let current: TrackedEntry | undefined;
-    let attempted = 0;
-    let isPublishAttempted = false;
-    /** Set once the league gate passed (or there is none): only then is the configured league confirmed. */
-    let isGatePassed = false;
-    let isReportAttempted = false;
-    const completed: string[] = [];
-    const stepEntries: DatasetEntry[] = [];
-    /** The run-start check's offline marks (AD-9). They publish beneath the step entries. */
-    let marked: readonly DatasetEntry[] = [];
-    /** The run-start records: `unresolvable`, then `weights-absent` or `uncatalogued-weights-id`. */
-    const checkRecords: SyncRunRecord[] = [];
-    /** The records the steps raised, in visiting order. */
-    const stepRecords: SyncRunRecord[] = [];
-    // Only rotation completions enter the pass: row 1 is exempt (AD-7).
-    const rotationCompleted: string[] = [];
-    let pinnedVisited = 0;
-    let discoveredAllowance: number | undefined;
-    let isTruncated = false;
-
-    /** Where the request figure counts from: this chunk's start, or the session pass's start when this chunk did not start the pass. */
-    const countFrom = (): RequestsBySource =>
-      order !== undefined && !order.newPass && session?.requestsSince !== undefined
-        ? session.requestsSince
-        : requestsAtStart;
-
-    /** The session fields of an outcome reached once the order exists; a batch outcome carries none. */
-    const passNow = (): { readonly newPass?: boolean; readonly confirmedLeague?: string } =>
-      session === undefined
-        ? {}
-        : {
-            ...(order !== undefined && { newPass: order.newPass }),
-            ...(isGatePassed && setup !== undefined && { confirmedLeague: setup.publication.league }),
-          };
-
-    const starvationNow = (): { readonly pinnedStarvation?: ChunkStarvation } =>
-      isTruncated
-        ? {
-            pinnedStarvation: {
-              discoveredAllowance: discoveredAllowance ?? 0,
-              pinnedCount: entries.filter((entry) => entry.status === 'pinned').length,
-              pinnedRefreshed: pinnedVisited,
-              activeRefreshed: rotationCompleted.length,
-            },
-          }
-        : {};
-
-    /** This chunk's records: the lock, the run-start check, the steps, the starvation, then any failure. */
-    const newRecords = (failure: readonly SyncRunRecord[] = []): SyncRunRecord[] => {
-      const { pinnedStarvation } = starvationNow();
-      return [
-        ...records,
-        ...checkRecords,
-        ...stepRecords,
-        // Truncation happens only in the rotation, which runs only after `load`.
-        ...(pinnedStarvation === undefined || setup === undefined
-          ? []
-          : [setup.starvationRecord(pinnedStarvation)]),
-        ...failure,
-      ];
-    };
-
-    /** Dataset first, so progress never records a completion the dataset does not publish; `until` is the `notBefore` written, absent clears it. */
-    const publish = async (
-      publication: ChunkPublication,
-      published: readonly DatasetEntry[],
-      until: string | undefined,
-    ): Promise<void> => {
-      isPublishAttempted = true;
-      await writeArtifact(
-        fs,
-        DATASET_PATH,
-        DatasetFileSchema,
-        buildDatasetFile({
-          tracked: entries,
-          previous: dataset?.entries ?? [],
-          // A step entry for the same key wins over an offline mark.
-          stepEntries: [...marked, ...published],
-          // An unconfirmed league never relabels the dataset: before the gate
-          // passed, the previously published label stands (AD-19).
-          league: isGatePassed ? publication.league : (dataset?.league ?? publication.league),
-          currencyRates: publication.currencyRates,
-          now: clock.now(),
-        }),
-      );
-      // The holder's pending hold-off action (§13.3): `write` sets the field
-      // from this write's `now`, `clear` removes it, and none carries the
-      // loaded value forward.
-      const holdOff = ports.auth?.pendingHoldOff();
-      let authHoldOffUntil = progress?.authHoldOffUntil;
-      if (holdOff === 'write') {
-        authHoldOffUntil = new Date(Date.parse(clock.now()) + AUTH_HOLD_OFF_MS).toISOString();
-      } else if (holdOff === 'clear') {
-        authHoldOffUntil = undefined;
-      }
-      const progressFile: SyncProgressFile = {
-        schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
-        completed: [...new Set([...(order?.completed ?? []), ...rotationCompleted])].toSorted(
-          compareCanonicalKeys,
-        ),
-        ...(until !== undefined && { notBefore: until }),
-        ...(authHoldOffUntil !== undefined && { authHoldOffUntil }),
-      };
-      await writeArtifact(fs, PROGRESS_PATH, SyncProgressFileSchema, progressFile);
-      if (holdOff !== undefined) {
-        ports.auth?.holdOffApplied(holdOff);
-      }
-    };
-
-    const writeReport = async (
-      chunkRecords: readonly SyncRunRecord[],
-      runFinishedAt?: string,
-    ): Promise<void> => {
-      // Every entry the order made eligible that the chunk did not attempt (AD-7).
-      const eligible = order === undefined ? 0 : order.pinned.length + order.rotation.length;
-      const trackedListEditedAt = await resolveTrackedListAge({
-        git,
-        filesystem: fs,
-        path: TRACKED_PATH,
-      });
-      const report = buildSyncReport({
-        previous: previousReport,
-        newRecords: chunkRecords,
-        figures: {
-          requestsBySource: requestsBetween(countFrom(), requests.snapshot()),
-          notReachedCount: Math.max(0, eligible - attempted),
-          ...(trackedListEditedAt !== undefined && { trackedListEditedAt }),
-          ...coverageFigures,
-        },
-        runStartedAt,
-        runFinishedAt,
-      });
-      isReportAttempted = true;
-      await writeArtifact(fs, REPORT_PATH, SyncReportFileSchema, report);
-    };
+    const state = createRunState({ ports, log, mine, requestsAtStart, records, progress, previousReport });
 
     try {
       if (progressFault !== undefined) {
         throw progressFault.error;
       }
       const tracked = await loadEnvelope(fs, TRACKED_PATH, parseTrackedFile, explainTrackedVersion);
-      entries = tracked?.entries ?? [];
+      state.entries = tracked?.entries ?? [];
+      const { entries } = state;
       // Absent means every entry is never attempted.
-      dataset = await loadEnvelope(fs, DATASET_PATH, (data) =>
+      state.dataset = await loadEnvelope(fs, DATASET_PATH, (data) =>
         parseEnvelope(DatasetFileSchema, data),
       );
       // The shell's loads: config, rates, item types and the pinned cap. The
       // step and the gate need config values, so the shell builds them here,
       // on the dataset loaded under this lock.
-      const ready = await ports.load({ entries, dataset: dataset?.entries ?? [] });
-      setup = ready;
+      const ready = await ports.load({ entries, dataset: state.dataset?.entries ?? [] });
+      state.setup = ready;
       const catalogue = await ports.catalogue();
       if (!catalogue.ok) {
         throw catalogue.error;
@@ -471,14 +313,14 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       // An absent file is recorded and the run goes on (AD-12); a present one
       // has its ids checked, report-only (AD-9); an unknown major throws.
       const weights = await readWeightsIds(fs);
-      coverageFigures = (weights.kind === 'present' ? poolCoverage(entries, weights.file) : undefined) ?? {};
+      state.coverageFigures = (weights.kind === 'present' ? poolCoverage(entries, weights.file) : undefined) ?? {};
 
       // The run-start catalogue check (AD-9, AD-25): offline, before any
       // request, and never a stamp. A miss is marked, reported and kept out of
       // this order; a recovered entry enters it as an ordinary entry (AD-7).
-      const check = checkCatalogue(entries, dataset?.entries ?? [], catalogue.value);
-      marked = check.marked;
-      checkRecords.push(
+      const check = checkCatalogue(entries, state.dataset?.entries ?? [], catalogue.value);
+      state.marked = check.marked;
+      state.checkRecords.push(
         ...check.records,
         ...(weights.kind === 'absent'
           ? [weightsAbsentRecord(entries)]
@@ -496,7 +338,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         now: clock.now(),
         ...(session?.pinnedMaxAgeMs !== undefined && { pinnedMaxAgeMs: session.pinnedMaxAgeMs }),
       });
-      order = plan;
+      state.order = plan;
 
       // The league gate, the only run-start check that costs a request (AD-12).
       // A session skips it while an earlier chunk's confirmation still holds:
@@ -511,20 +353,21 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // A gate yield is a chunk yield with no entry attempted (AD-8, AD-12).
         if (!(await isLockHeld(fs, mine))) {
           log('sync: the lock was taken over during this chunk; writing nothing');
-          return { kind: 'dispossessed', completed, entries: stepEntries, records, ...passNow() };
+          return { kind: 'dispossessed', completed: state.completed, entries: state.stepEntries, records, ...passNow(state) };
         }
         log('sync: the league check got no answer; the chunk yields with no entry attempted');
         await publish(
+          state,
           ready.publication,
           [],
           gated.retryAfterMs === undefined
             ? undefined
             : notBeforeAfter429(clock.now(), gated.retryAfterMs),
         );
-        await writeReport(newRecords(), clock.now());
-        return { kind: 'yielded', completed, entries: stepEntries, records, ...passNow() };
+        await writeReport(state, newRecords(state), clock.now());
+        return { kind: 'yielded', completed: state.completed, entries: state.stepEntries, records, ...passNow(state) };
       }
-      isGatePassed = true;
+      state.isGatePassed = true;
 
       let ending:
         | { readonly kind: 'completed' }
@@ -538,21 +381,21 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
       let rotationVisited = 0;
 
       for (;;) {
-        const isInPinned = pinnedVisited < pinnedLimit;
-        const entry = isInPinned ? plan.pinned[pinnedVisited] : plan.rotation[rotationVisited];
+        const isInPinned = state.pinnedVisited < pinnedLimit;
+        const entry = isInPinned ? plan.pinned[state.pinnedVisited] : plan.rotation[rotationVisited];
         if (entry === undefined) {
           break;
         }
-        current = entry;
-        attempted += 1;
+        state.current = entry;
+        state.attempted += 1;
         // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one step per entry in plan order, each step's pacing and bounds depend on the last
         const result = await ready.step(entry);
-        current = undefined;
+        state.current = undefined;
         if (result.entry !== undefined) {
-          stepEntries.push(result.entry);
+          state.stepEntries.push(result.entry);
         }
         if (result.kind === 'completed' && result.records !== undefined) {
-          stepRecords.push(...result.records);
+          state.stepRecords.push(...result.records);
         }
         if (result.kind === 'yielded') {
           // A downgrade writes no `notBefore` and tells the session (§13.4).
@@ -563,33 +406,33 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
           break;
         }
         const key = canonicalKey(entry);
-        completed.push(key);
+        state.completed.push(key);
 
         if (isInPinned) {
-          pinnedVisited += 1;
+          state.pinnedVisited += 1;
           const remaining = result.searchRemaining;
           if (remaining !== undefined) {
             // Every step so far spent one search, the reporting one included.
-            discoveredAllowance ??= remaining + completed.length;
-            const left = pinnedLimit - pinnedVisited;
+            state.discoveredAllowance ??= remaining + state.completed.length;
+            const left = pinnedLimit - state.pinnedVisited;
             // R < P + 1 with rows 2–3 waiting is starvation, even when nothing is left to cut.
             if (isRotationWaiting && remaining < left + 1) {
-              isTruncated = true;
+              state.isTruncated = true;
             }
-            pinnedLimit = pinnedVisited + pinnedToKeep(left, remaining, isRotationWaiting);
+            pinnedLimit = state.pinnedVisited + pinnedToKeep(left, remaining, isRotationWaiting);
           }
         } else {
           rotationVisited += 1;
-          rotationCompleted.push(key);
+          state.rotationCompleted.push(key);
         }
 
-        const hasNext = pinnedVisited < pinnedLimit || rotationVisited < plan.rotation.length;
+        const hasNext = state.pinnedVisited < pinnedLimit || rotationVisited < plan.rotation.length;
         const bound = boundOf(result);
         if (bound !== undefined && hasNext) {
           ending = { kind: 'bounded', bound };
           break;
         }
-        if (hasNext && session?.maxEntries !== undefined && attempted >= session.maxEntries) {
+        if (hasNext && session?.maxEntries !== undefined && state.attempted >= session.maxEntries) {
           ending = { kind: 'bounded', bound: 'entries' };
           break;
         }
@@ -603,7 +446,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         until = notBeforeAfter429(clock.now(), latchedMs);
       }
 
-      const starvation = starvationNow();
+      const starvation = starvationNow(state);
 
       // Re-read immediately before committing. A run dispossessed at the
       // staleness threshold writes nothing, and the `finally` below then
@@ -612,21 +455,21 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         log('sync: the lock was taken over during this chunk; writing nothing');
         return {
           kind: 'dispossessed',
-          completed,
-          entries: stepEntries,
+          completed: state.completed,
+          entries: state.stepEntries,
           records,
           ...starvation,
-          ...passNow(),
+          ...passNow(state),
         };
       }
 
-      await publish(ready.publication, stepEntries, until);
-      await writeReport(newRecords(), clock.now());
+      await publish(state, ready.publication, state.stepEntries, until);
+      await writeReport(state, newRecords(state), clock.now());
 
-      return { ...ending, completed, entries: stepEntries, records, ...starvation, ...passNow() };
+      return { ...ending, completed: state.completed, entries: state.stepEntries, records, ...starvation, ...passNow(state) };
     } catch (error) {
       // A report that could not be written is not written again.
-      if (isReportAttempted) {
+      if (state.isReportAttempted) {
         throw error;
       }
       if (!(await isLockHeld(fs, mine))) {
@@ -638,13 +481,13 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // record and the mismatch; the check's marks and records are discarded
         // with the dataset write (AD-12).
         try {
-          await writeReport([...records, ...failureRecords(error, current)]);
+          await writeReport(state, [...records, ...failureRecords(error, state.current)]);
         } catch (error_) {
           secondary('writing the report', error_);
         }
         throw error;
       }
-      if (order !== undefined && setup !== undefined && !isPublishAttempted) {
+      if (state.order !== undefined && state.setup !== undefined && !state.isPublishAttempted) {
         // A throw once the order exists publishes the step entries and the marks, plus the failing entry for a rejected
         // request or an unexpected body, which keeps an answered search's fields (AD-9, IMPLEMENTATION-NOTES.md §5.3).
         const isMalformed = error instanceof MalformedRequestError;
@@ -657,8 +500,9 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         const latchedMs = isRejected ? undefined : ports.latchedRetryAfterMs?.();
         try {
           await publish(
-            setup.publication,
-            failing === undefined ? stepEntries : [...stepEntries, failing],
+            state,
+            state.setup.publication,
+            failing === undefined ? state.stepEntries : [...state.stepEntries, failing],
             failureNotBefore(clock.now(), isRejected, latchedMs),
           );
         } catch (error_) {
@@ -666,7 +510,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         }
       }
       try {
-        await writeReport(newRecords(failureRecords(error, current)));
+        await writeReport(state, newRecords(state, failureRecords(error, state.current)));
       } catch (error_) {
         secondary('writing the report', error_);
       }
@@ -676,5 +520,3 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
     await isOwnLockReleased(fs, mine);
   }
 }
-
-export {DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH} from './run-chunk/data-paths.ts';
