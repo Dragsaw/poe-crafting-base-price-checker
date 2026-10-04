@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import { createSessionAuth, isCookieValue, SESSION_COOKIE_ENV_VAR } from './session-auth.ts';
 import { isTransportFailure } from './transport-failure.ts';
+import { NamedError } from '../test-support/named-error.ts';
+import { SelfCausedError } from '../test-support/self-caused-error.ts';
 
 /** IMPLEMENTATION-NOTES.md §13.1, §13.5, §13.6. */
 
@@ -13,7 +15,7 @@ const withCookie = (value: string | undefined) => createSessionAuth({ [SESSION_C
 /** A holder built with an `onSettle` listener, and the §13.5 lines it received. */
 const withLines = (value: string | undefined) => {
   const lines: string[] = [];
-  const holder = createSessionAuth({ [SESSION_COOKIE_ENV_VAR]: value }, { onSettle: (line) => lines.push(line) });
+  const holder = createSessionAuth({ [SESSION_COOKIE_ENV_VAR]: value }, { onSettle: (line) => { lines.push(line); } });
   return { holder, lines };
 };
 
@@ -98,7 +100,7 @@ describe('redact', () => {
 
   it('keeps a transport failure classified', () => {
     const fetchFailed = new TypeError('fetch failed', { cause: new Error(`connect to ?id=${CANARY}`) });
-    const timeout = Object.assign(new Error(`timed out ${CANARY}`), { name: 'TimeoutError' });
+    const timeout = new NamedError('TimeoutError', `timed out ${CANARY}`);
     const holder = withCookie(CANARY);
 
     expect(isTransportFailure(holder.redact(fetchFailed))).toBe(true);
@@ -107,8 +109,7 @@ describe('redact', () => {
   });
 
   it('a string cause, an AggregateError and a cycle', () => {
-    const cyclic = new Error(`a ${CANARY}`);
-    Object.assign(cyclic, { cause: cyclic });
+    const cyclic = new SelfCausedError(`a ${CANARY}`);
     const aggregate = new AggregateError([cyclic, new Error(base64)], `agg ${CANARY}`, { cause: `str ${CANARY}` });
 
     withCookie(CANARY).redact(aggregate);

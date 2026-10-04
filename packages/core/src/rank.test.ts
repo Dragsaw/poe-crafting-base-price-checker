@@ -980,7 +980,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
 
   it('a threshold change re-ranks the committed cross product in under 100 ms (NFR-6)', async () => {
     // A non-literal specifier: the files sit outside this package's `rootDir`.
-    const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
+    const here = (import.meta as { readonly dirname: string }).dirname;
     const load = async (name: string): Promise<unknown> =>
       ((await import(/* @vite-ignore */ `${here}/../../../test/fixtures/frozen-data/${name}`)) as { default: unknown }).default;
     const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'), TRACKED_SCHEMA_VERSION);

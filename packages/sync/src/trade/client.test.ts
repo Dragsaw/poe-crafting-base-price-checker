@@ -780,7 +780,9 @@ it('logs one line on a 429, naming the response headers and the reading it was p
     wait,
     userAgent: CONTACT,
     invalidRequestThreshold: 1,
-    log: (line) => lines.push(line),
+    log: (line) => {
+      lines.push(line);
+    },
   });
 
   const outcome = await client.send({ method: 'POST', url: SEARCH_URL });
@@ -823,7 +825,9 @@ it('logs a cold 429 as paced on no reading', async () => {
     clock: createFakeClockPort(NOW),
     wait,
     userAgent: CONTACT,
-    log: (line) => lines.push(line),
+    log: (line) => {
+      lines.push(line);
+    },
   });
 
   await client.send({ method: 'POST', url: SEARCH_URL });
@@ -906,7 +910,7 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
     const logs: string[] = [];
     const holder = createSessionAuth(
       { [SESSION_COOKIE_ENV_VAR]: options.value ?? VALUE },
-      { onSettle: (line) => lines.push(line) },
+      { onSettle: (line) => { lines.push(line); } },
     );
     const { waits, wait } = recordingWait();
     const governor = createTradeGovernor({
@@ -915,7 +919,9 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
       wait,
       userAgent: CONTACT,
       invalidRequestThreshold: 1,
-      log: (line) => logs.push(line),
+      log: (line) => {
+        logs.push(line);
+      },
       auth: { holder, probe },
     });
     const { pricing, league } = governor.clients;

@@ -53,7 +53,7 @@ describe('WeightsFileSchema — conforming files', () => {
   it('parses the frozen weights.json fixture, every entry keeping its lines nested', async () => {
     // A non-literal specifier: the file sits outside this package's `rootDir`,
     // so the compiler must not resolve it; Vitest resolves it from this file.
-    const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
+    const here = (import.meta as { readonly dirname: string }).dirname;
     const specifier = `${here}/../../../test/fixtures/frozen-data/weights.json`;
     const committed = ((await import(/* @vite-ignore */ specifier)) as { default: unknown }).default;
     const result = parse(committed);

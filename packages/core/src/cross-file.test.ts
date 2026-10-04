@@ -538,7 +538,7 @@ describe('crossFileChecks scope', () => {
   });
 
   it('finds no failure on the committed files', async () => {
-    const here = (import.meta as ImportMeta & { readonly dirname: string }).dirname;
+    const here = (import.meta as { readonly dirname: string }).dirname;
     const load = async (name: string): Promise<unknown> =>
       ((await import(/* @vite-ignore */ `${here}/../../../test/fixtures/frozen-data/${name}`)) as { default: unknown }).default;
     const tracked = parseEnvelope(TrackedFileSchema, await load('tracked.json'), TRACKED_SCHEMA_VERSION);

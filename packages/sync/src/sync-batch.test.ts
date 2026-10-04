@@ -163,7 +163,9 @@ function dependenciesFor(league: string, setup: Setup = {}) {
     pid: 4242,
     log: () => {},
     env: environment,
-    stdout: (line) => out.push(line),
+    stdout: (line) => {
+      out.push(line);
+    },
     stderr: (line) => {
       if (AUTH_LINE.test(line)) {
         auth.push({ line, requestsBefore: http.requests.length });
@@ -341,7 +343,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const { deps } = dependenciesFor(LEAGUE, { answers: { leagues: THROTTLED } });
     const lines: string[] = [];
 
-    expect(await syncCommand({ ...deps, log: (line) => lines.push(line) })).toBe(0);
+    expect(await syncCommand({ ...deps, log: (line) => { lines.push(line); } })).toBe(0);
 
     expect(lines.filter((line) => line.includes('answered 429'))).toEqual([
       expect.stringContaining('response headers {"retry-after":"60"}; paced on no reading'),

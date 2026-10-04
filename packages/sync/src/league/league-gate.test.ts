@@ -11,6 +11,7 @@ import {
   LeagueRequestRejectedError,
   UnexpectedLeaguesResponseError,
 } from './league-gate.ts';
+import { NamedError } from '../test-support/named-error.ts';
 
 const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
 
@@ -53,9 +54,7 @@ function rejectingPort(error: Error): HttpPort & { readonly sent: () => number }
 
 /** What `AbortSignal.timeout` rejects with (`shell.ts`). */
 function timeoutError(): Error {
-  const error = new Error('The operation was aborted due to timeout');
-  error.name = 'TimeoutError';
-  return error;
+  return new NamedError('TimeoutError', 'The operation was aborted due to timeout');
 }
 
 const ok = (body: unknown): HttpResponse => ({ status: 200, headers: {}, body: JSON.stringify(body) });

@@ -51,7 +51,7 @@ function closeServer(server: Server): Promise<void> {
 function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((done, fail) => {
     const chunks: Buffer[] = [];
-    request.on('data', (chunk: Buffer) => chunks.push(chunk));
+    request.on('data', (chunk: Buffer) => { chunks.push(chunk); });
     request.on('end', () => done(Buffer.concat(chunks).toString('utf8')));
     request.on('error', fail);
   });

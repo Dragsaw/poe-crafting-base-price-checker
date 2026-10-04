@@ -13,6 +13,7 @@ import { tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { createPricingStep, MalformedRequestError, UnexpectedTradeResponseError } from './price-entry.ts';
 import { itemTypesOf } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
+import { NamedError } from '../test-support/named-error.ts';
 
 const LEAGUE = 'Forbidden Rites';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -75,9 +76,7 @@ interface Setup {
 
 /** What `AbortSignal.timeout` rejects with (`shell.ts`). */
 function timeoutError(): Error {
-  const error = new Error('The operation was aborted due to timeout');
-  error.name = 'TimeoutError';
-  return error;
+  return new NamedError('TimeoutError', 'The operation was aborted due to timeout');
 }
 
 function setup(options: Setup) {

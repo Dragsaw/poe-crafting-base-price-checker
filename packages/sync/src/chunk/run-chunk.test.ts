@@ -181,7 +181,9 @@ function harness(
     clock: createFakeClockPort(NOW),
     pid: PID,
     ...shellPorts(),
-    log: (line) => logs.push(line),
+    log: (line) => {
+      logs.push(line);
+    },
     ...rest,
     publication,
   };
@@ -726,13 +728,12 @@ describe('runChunk: the lock', () => {
       [LOCK_PATH]: { contents: stale },
     });
     const clock = createFakeClockPort(NOW);
-    const logs: string[] = [];
     const first = scriptedStep();
     const second = scriptedStep();
 
     const outcomes = await Promise.all([
-      run({ fs, clock, pid: 1, ...shellPorts(), publication: PUBLICATION, log: (line) => logs.push(line) }, first.step),
-      run({ fs, clock, pid: 2, ...shellPorts(), publication: PUBLICATION, log: (line) => logs.push(line) }, second.step),
+      run({ fs, clock, pid: 1, ...shellPorts(), publication: PUBLICATION, log: () => {} }, first.step),
+      run({ fs, clock, pid: 2, ...shellPorts(), publication: PUBLICATION, log: () => {} }, second.step),
     ]);
 
     const kinds = outcomes.map((outcome) => outcome.kind).toSorted();

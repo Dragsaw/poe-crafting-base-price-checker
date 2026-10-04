@@ -421,9 +421,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
-    "sonarjs/no-useless-intersection": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 4
     },
@@ -502,9 +499,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 9
     },
-    "sonarjs/no-useless-intersection": {
-      "count": 1
-    },
     "unicorn/consistent-function-scoping": {
       "count": 3
     },
@@ -571,9 +565,6 @@
     "sonarjs/no-floating-point-equality": {
       "count": 6
     },
-    "sonarjs/no-useless-intersection": {
-      "count": 1
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -627,9 +618,6 @@
     },
     "sonarjs/no-floating-point-equality": {
       "count": 6
-    },
-    "sonarjs/no-useless-intersection": {
-      "count": 1
     },
     "unicorn/consistent-boolean-name": {
       "count": 1
@@ -721,9 +709,6 @@
     },
     "unicorn/no-array-sort": {
       "count": 4
-    },
-    "unicorn/no-return-array-push": {
-      "count": 3
     },
     "unicorn/require-array-sort-compare": {
       "count": 4
@@ -873,9 +858,6 @@
     },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/no-return-array-push": {
-      "count": 3
     },
     "unicorn/no-unnecessary-parameters": {
       "count": 1
@@ -1111,9 +1093,6 @@
     "no-await-in-loop": {
       "count": 5
     },
-    "unicorn/no-error-property-assignment": {
-      "count": 1
-    },
     "unicorn/prefer-await": {
       "count": 2
     }
@@ -1244,9 +1223,6 @@
     "max-lines": {
       "count": 1
     },
-    "unicorn/no-error-property-assignment": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 3
     },
@@ -1323,12 +1299,6 @@
     "unicorn/consistent-function-scoping": {
       "count": 1
     },
-    "unicorn/no-error-property-assignment": {
-      "count": 2
-    },
-    "unicorn/no-return-array-push": {
-      "count": 4
-    },
     "unicorn/no-unnecessary-parameters": {
       "count": 1
     },
@@ -1344,9 +1314,6 @@
       "count": 1
     },
     "unicorn/no-array-callback-reference": {
-      "count": 1
-    },
-    "unicorn/no-return-array-push": {
       "count": 1
     }
   },
@@ -1396,9 +1363,6 @@
     },
     "unicorn/no-null": {
       "count": 1
-    },
-    "unicorn/no-return-array-push": {
-      "count": 2
     },
     "unicorn/prefer-await": {
       "count": 2
@@ -1486,9 +1450,6 @@
     "no-await-in-loop": {
       "count": 3
     },
-    "unicorn/no-return-array-push": {
-      "count": 4
-    },
     "vitest/no-conditional-expect": {
       "count": 2
     }
@@ -1567,12 +1528,6 @@
   },
   "packages/sync/src/trade/session-auth.test.ts": {
     "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
-    "unicorn/no-error-property-assignment": {
-      "count": 2
-    },
-    "unicorn/no-return-array-push": {
       "count": 1
     },
     "unicorn/no-useless-coercion": {

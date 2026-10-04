@@ -377,7 +377,7 @@ it('counts its requests: four on success, and the count printed (AD-12)', async 
   expect(outcome).toMatchObject({ ok: true, requests: 4 });
   const stdout: string[] = [];
   const stderr: string[] = [];
-  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: (line) => stderr.push(line) })).toBe(0);
+  expect(printRefreshOutcome(outcome, { stdout: (line) => { stdout.push(line); }, stderr: (line) => { stderr.push(line); } })).toBe(0);
   expect(stdout[0]).toBe('requests: 4');
   expect(stderr).toEqual([]);
 });
@@ -394,7 +394,7 @@ it('counts the requests sent before a failure, and prints the count beside it', 
 
   expect(outcome).toMatchObject({ ok: false, requests: 2 });
   const stdout: string[] = [];
-  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: () => {} })).toBe(1);
+  expect(printRefreshOutcome(outcome, { stdout: (line) => { stdout.push(line); }, stderr: () => {} })).toBe(1);
   expect(stdout).toEqual(['requests: 2']);
 });
 

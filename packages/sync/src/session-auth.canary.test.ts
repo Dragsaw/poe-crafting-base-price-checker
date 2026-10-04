@@ -19,6 +19,7 @@ import { syncSessionCommand } from './sync.ts';
 import { TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
 import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
+import { NamedError } from './test-support/named-error.ts';
 
 /**
  * SPEC-poesessid-sync CAP-4, IMPLEMENTATION-NOTES.md §13.6: with a known
@@ -145,9 +146,7 @@ function quotingError(failure: Failure): Error {
   if (failure === 'transport') {
     error = new TypeError('fetch failed', { cause });
   } else if (failure === 'timeout') {
-    error = Object.assign(new Error(`The operation timed out (Cookie: POESESSID=${CANARY})`, { cause }), {
-      name: 'TimeoutError',
-    });
+    error = new NamedError('TimeoutError', `The operation timed out (Cookie: POESESSID=${CANARY})`, { cause });
   } else {
     error = new Error(`unexpected Cookie: POESESSID=${CANARY}`, { cause });
   }
@@ -250,10 +249,16 @@ async function runBatch(captured: Captured, http: HttpPort): Promise<ShellRun> {
     git: createFakeGitPort(),
     wait: () => Promise.resolve(),
     pid: 4242,
-    log: (line) => lines.push(line),
+    log: (line) => {
+      lines.push(line);
+    },
     env: ENV,
-    stdout: (line) => lines.push(line),
-    stderr: (line) => lines.push(line),
+    stdout: (line) => {
+      lines.push(line);
+    },
+    stderr: (line) => {
+      lines.push(line);
+    },
   });
   return { code, lines };
 }
@@ -296,7 +301,9 @@ async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun>
     wait: advance,
     sleep: advance,
     pid: 4242,
-    log: (text) => lines.push(text),
+    log: (text) => {
+      lines.push(text);
+    },
     env: ENV,
     argv: [],
     signal: controller.signal,
@@ -454,9 +461,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     if (failure === 'transport') {
       error = new TypeError('fetch failed', { cause });
     } else if (failure === 'timeout') {
-      error = Object.assign(new Error(`The operation timed out (Cookie: ${header})`, { cause }), {
-        name: 'TimeoutError',
-      });
+      error = new NamedError('TimeoutError', `The operation timed out (Cookie: ${header})`, { cause });
     } else {
       error = new Error(`unexpected Cookie: ${header}`, { cause });
     }
