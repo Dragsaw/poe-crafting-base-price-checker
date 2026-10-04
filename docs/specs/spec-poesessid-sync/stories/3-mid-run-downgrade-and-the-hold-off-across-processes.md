@@ -17,7 +17,7 @@ context:
 
 **Problem:** After story 2, an `authenticated` holder keeps the cookie on every request, even after the cookie stops working. Every run also sends a new probe, so a dead cookie costs a counted request on each scheduled run.
 
-**Approach:** The governor tests each response to a request that carried the cookie. A 401, a 403 or a not-live 2xx is a downgrade (§13.4). The governor drops the cookie, resets the process pacing state to cold in place, settles the holder `expired` and returns a `session-expired` yield with no response. The pricing step treats that yield as AD-9's request with no answer. The holder records a pending hold-off `write` or `clear` for each settle. The runner applies the action in the chunk's `sync-progress.json` write (`1.2.0`, `authHoldOffUntil`). After the lock and the `notBefore` check, the runner settles a valid value as `held-off` while the hold-off is due (AD-30, AD-7, AD-8, §13.1, §13.3, §13.4, §13.7).
+**Approach:** The governor tests each response to a request that carried the cookie. A 401, a 403 or a `tested` not-live 2xx is a downgrade (§13.2, §13.4). The governor drops the cookie, resets the process pacing state to cold in place, settles the holder `expired` and returns a `session-expired` yield with no response. The pricing step treats that yield as AD-9's request with no answer. The holder records a pending hold-off `write` or `clear` for each settle. The runner applies the action in the chunk's `sync-progress.json` write (`1.2.0`, `authHoldOffUntil`). After the lock and the `notBefore` check, the runner settles a valid value as `held-off` while the hold-off is due (AD-30, AD-7, AD-8, §13.1, §13.3, §13.4, §13.7).
 
 ## Boundaries & Constraints
 
@@ -44,8 +44,9 @@ context:
 | Scenario | Input / State | Expected Output / Behavior |
 |----------|--------------|---------------------------|
 | Expired, 401 or 403 | authenticated; a cookie search or fetch gets a 401 or 403 | one `unauthenticated (expired)` line; cold pacing; entry stamped; `yielded`, no `notBefore`; hold-off written; no later `Cookie` |
-| Expired, 2xx | authenticated; a cookie 2xx has no more rule names than the baseline | same as above, and the answer is discarded |
-| Still live | authenticated; a cookie 2xx is live | no line; the answer is used |
+| Expired, 2xx | authenticated; a `tested` cookie 2xx (§13.2) has no more rule names than the baseline | same as above, and the answer is discarded |
+| Still live | authenticated; a `tested` cookie 2xx is live | no line; the answer is used |
+| Not tested | authenticated; a cookie 2xx is not `tested`, for example a fetch under its own policy | no line; the answer is used (§13.4) |
 | Cookie 429 or 5xx | authenticated | the existing 429 or no-answer yield; no downgrade |
 | Held off | valid value; `now < authHoldOffUntil` | `unauthenticated (held-off)`; no probe; the field is unchanged |
 | Hold-off past | valid value; `now >= authHoldOffUntil` | probes; `live` clears the field |
@@ -92,6 +93,9 @@ context:
 - `run-chunk.ts` sees `ChunkAuth` (three narrow functions) wired in `compose-chunk.ts`; the hold-off length is `AUTH_HOLD_OFF_MS` in `run-chunk.ts`.
 
 ## Spec Change Log
+
+- 2026-10-04, poesessid retro item 2 (finding R3), sanctioned by the operator: the Approach and the I/O matrix rows "Expired, 2xx" and "Still live" now limit the 2xx liveness test to a `tested` response, and a "Not tested" row is added. This reconciles them to spine rev 28 (0ce556e), which had already edited the Always line on the liveness test. The rows had described every cookie 2xx, so a fetch read as tested against the search baseline. KEEP: the "Expired, 401 or 403" row, which still holds for a search and a fetch. This also answers Review Triage Log row 2: a fetch 2xx is not `tested`.
+- 2026-10-03, 0ce556e (spine rev 28), recorded 2026-10-04 by retro finding R4: the Always line on the liveness test was edited inside the frozen block to keep the baseline's policy and apply the test only to a `tested` response. The operator ruled the edit sanctioned (retro O2).
 
 ## Review Triage Log
 
