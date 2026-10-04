@@ -614,10 +614,7 @@
   },
   "packages/sync/src/trade/client.ts": {
     "local/max-comment-run": {
-      "count": 37
-    },
-    "max-lines": {
-      "count": 1
+      "count": 21
     }
   },
   "packages/sync/src/trade/endpoints.ts": {
