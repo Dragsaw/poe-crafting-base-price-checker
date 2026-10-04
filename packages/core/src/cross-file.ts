@@ -2,7 +2,6 @@ import {
   canonicalKey,
   compareByCodeUnit,
   compareCanonicalKeys,
-  defenceLettersOf,
   describeOverlap,
   linesOf,
   hasHybridAffix,
@@ -19,12 +18,20 @@ import type {
   WeightsClassPools,
   WeightsFile,
   WeightsLine,
-  WeightsPool,
 } from '@poe/contracts';
 
 import { craftedClassesOf } from './crafted-classes.ts';
-import { containedIn, contains, covers, eligible, interval, lineSet, poolOf, statIds, untrackable } from './probability.ts';
+import { classDiscriminability } from './cross-file/class-discriminability.ts';
+import { COMPLETE } from './cross-file/complete-pool.ts';
+import { edgeAlignment } from './cross-file/edge-alignment.ts';
+import { emptyContainment } from './cross-file/empty-containment.ts';
+import { formatLine, formatReference, setText } from './cross-file/reference-text.ts';
+import { containedIn, contains, eligible, interval, lineSet, poolOf, statIds, untrackable } from './probability.ts';
 import type { ReferenceLine, Slot } from './probability.ts';
+
+export { classDiscriminability } from './cross-file/class-discriminability.ts';
+export { edgeAlignment } from './cross-file/edge-alignment.ts';
+export { emptyContainment } from './cross-file/empty-containment.ts';
 
 /**
  * The six cross-file checks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.7) and the
@@ -93,141 +100,6 @@ export type ScopedPools = Readonly<Record<Slot, readonly ModifierWeight[]>>;
 /** Both slots scoped to the class floor (§2.4): `eligible(pool, floor, 0)`. */
 export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPools {
   return { prefix: eligible(pools.prefix, floor, 0), suffix: eligible(pools.suffix, floor, 0) };
-}
-
-/**
- * A pool check runs on a `complete` pool only (§2.8), where `untrackable`
- * reduces to `not-in-game` (§1). The checks pass this coverage to it.
- */
-const COMPLETE: Pick<WeightsPool, 'poolCoverage'> = { poolCoverage: 'complete' };
-
-function lineText(rl: ReferenceLine): string {
-  return 'valueMin' in rl
-    ? `${rl.statId} band [${String(rl.valueMin)}, ${String(rl.valueMax)}]`
-    : `${rl.statId} valueless`;
-}
-
-/** A reference as a payload names it: the slot, then each line's `statId` and band or kind. */
-function formatReference(slot: Slot, reference: ModifierRef): string {
-  return reference.kind === 'hybrid' ? `${slot} hybrid (${reference.lines.map((line) => lineText(line)).join(', ')})` : `${slot} ${lineText(reference)}`;
-}
-
-/** One line of a reference, as a per-line payload names it (§2.3, §2.4). */
-function formatLine(slot: Slot, reference: ModifierRef, rl: ReferenceLine): string {
-  return reference.kind === 'hybrid' ? `${slot} hybrid line ${lineText(rl)}` : `${slot} ${lineText(rl)}`;
-}
-
-function tierIds(entries: readonly ModifierWeight[]): string {
-  return entries.map((entry) => entry.sourceModifierId).join(', ');
-}
-
-function setText(ids: readonly string[]): string {
-  return `{${ids.join(', ')}}`;
-}
-
-/**
- * §2.4, per banded line. Over the reference's containment set, the detail
- * when a banded line's edges are not exactly the extremes of the contained
- * entries' lines **on that line's own `statId`**; `undefined` when every
- * banded line aligns, when no line is banded, and for an empty set (that is
- * §2.5's). A contained entry's foreign lines never enter the extremes.
- */
-export function edgeAlignment(
-  slot: Slot,
-  reference: ModifierRef,
-  scoped: readonly ModifierWeight[],
-  floor: number,
-): string | undefined {
-  const contained = containedIn(reference, scoped);
-  if (contained.length === 0) {
-    return undefined;
-  }
-  const parts: string[] = [];
-  for (const rl of linesOf(reference)) {
-    if (!('valueMin' in rl)) {
-      continue;
-    }
-    const { min, max } = extremesOn(rl.statId, contained);
-    if (rl.valueMin === min && rl.valueMax === max) {
-      continue;
-    }
-    parts.push(
-      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: its edges are not the extremes [${String(min)}, ${String(max)}] of the tiers it contains (${tierIds(contained)})`,
-    );
-  }
-  return parts.length === 0 ? undefined : parts.join('; ');
-}
-
-/** The lowest and highest interval edge among the contained entries' lines on one `statId`. */
-function extremesOn(statId: string, contained: readonly ModifierWeight[]): { readonly min: number; readonly max: number } {
-  let min = Infinity;
-  let max = -Infinity;
-  const lines = contained.flatMap((entry) => entry.lines);
-  for (const line of lines) {
-    if (line.statId !== statId) {
-      continue;
-    }
-    const derived = interval(line);
-    min = Math.min(min, derived.min);
-    max = Math.max(max, derived.max);
-  }
-  return { min, max };
-}
-
-/**
- * The entries §1 excluded from a hybrid reference's containment set, as §2.5
- * lists them: covering every line under another line set, or `not-in-game`
- * while carrying every named `statId`.
- */
-function hybridExclusions(reference: ModifierRef, scoped: readonly ModifierWeight[]): string[] {
-  const named = statIds(reference);
-  const lines = linesOf(reference);
-  const excluded: string[] = [];
-  for (const entry of scoped) {
-    const tierSet = lineSet(entry);
-    if (untrackable(entry, COMPLETE)) {
-      if (named.every((statId) => tierSet.includes(statId))) {
-        excluded.push(`${entry.sourceModifierId} (not-in-game)`);
-      }
-      continue;
-    }
-    if (lines.some((rl) => entry.lines.every((line) => !covers(rl, line)))) {
-      continue;
-    }
-    // Covering every line means carrying every named statId, so only the tier's extra lines differ.
-    const differ = tierSet.filter((statId) => !named.includes(statId));
-    if (differ.length > 0) {
-      excluded.push(`${entry.sourceModifierId} (line set ${setText(tierSet)} differs on ${differ.join(', ')})`);
-    }
-  }
-  return excluded;
-}
-
-/**
- * §2.5. The detail when the reference contains no scoped entry — never a
- * `P = 0`. A weight-0 tier is never contained (§1), so a band over only
- * weight-0 tiers fails here. The detail names the reference, its floor and
- * the absence, and no file. For a hybrid reference it also lists what §1
- * excluded.
- */
-export function emptyContainment(
-  slot: Slot,
-  reference: ModifierRef,
-  scoped: readonly ModifierWeight[],
-  floor: number,
-): string | undefined {
-  if (scoped.some((entry) => contains(reference, entry))) {
-    return undefined;
-  }
-  const head = `${formatReference(slot, reference)} at floor ${String(floor)}: no scoped entry contains it`;
-  if (reference.kind === 'hybrid') {
-    const excluded = hybridExclusions(reference, scoped);
-    return excluded.length === 0 ? head : `${head}; excluded: ${excluded.join(', ')}`;
-  }
-  const carrying = scoped.filter(
-    (entry) => entry.weight > 0 && entry.lines.some((line) => line.statId === reference.statId),
-  ).length;
-  return `${head} (${String(carrying)} scoped ${carrying === 1 ? 'entry carries' : 'entries carry'} that statId)`;
 }
 
 /** `disagrees(rl, line)` (§2.3): a valueless reference line beside a banded weights line on its `statId`. */
@@ -377,30 +249,6 @@ export function coOccur(scoped: ScopedPools): CoOccur {
     cache.set(key, isCoOccurring);
     return isCoOccurring;
   };
-}
-
-/**
- * §2.6: `fansOut ∧ ¬discriminable`. `fansOut` is more than one class under
- * the entry's `categoryId`. `discriminable` is §10.2 arm 1 (a defence
- * suffix), arm 2 (every class under the category is plain) or arm 3 (one
- * class). No catalogue is read. The detail when it fails, else `undefined`.
- */
-export function classDiscriminability(
-  entry: Pick<CraftedTrackedEntry, 'categoryId' | 'className'>,
-  weights: WeightsFile,
-): string | undefined {
-  const classes = Object.hasOwn(weights.bases, entry.categoryId) ? Object.keys(weights.bases[entry.categoryId] ?? {}) : [];
-  if (classes.length <= 1) {
-    return undefined;
-  }
-  if (defenceLettersOf(entry.className) !== undefined) {
-    return undefined;
-  }
-  if (classes.every((className) => defenceLettersOf(className) === undefined)) {
-    return undefined;
-  }
-  const siblings = classes.filter((className) => className !== entry.className).length;
-  return `className ${entry.className}, categoryId ${entry.categoryId}, ${String(siblings)} sibling ${siblings === 1 ? 'class' : 'classes'}: class not discriminable`;
 }
 
 type ReferenceCheck = (slot: Slot, reference: ModifierRef, scoped: readonly ModifierWeight[], floor: number) => string | undefined;

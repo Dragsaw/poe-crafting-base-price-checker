@@ -293,10 +293,7 @@
   },
   "packages/core/src/cross-file.ts": {
     "local/max-comment-run": {
-      "count": 10
-    },
-    "max-lines": {
-      "count": 1
+      "count": 5
     },
     "unicorn/consistent-boolean-name": {
       "count": 2
