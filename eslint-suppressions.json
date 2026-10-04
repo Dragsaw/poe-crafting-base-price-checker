@@ -389,20 +389,8 @@
     }
   },
   "packages/sync/src/curation/check.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 3
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "max-statements": {
-      "count": 1
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 1
     }
   },
   "packages/sync/src/dry-run.data.test.ts": {
