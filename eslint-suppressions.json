@@ -649,11 +649,6 @@
       "count": 2
     }
   },
-  "packages/web/src/list/CombinationRow.tsx": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
   "packages/web/src/list/ExpansionPanel.tsx": {
     "local/max-comment-run": {
       "count": 4
