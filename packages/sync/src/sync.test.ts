@@ -76,11 +76,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-/**
- * The `pnpm sync` session, driven with injected ports and a fake clock that
- * each session wait advances. Nothing here runs the command itself, touches
- * the network, or writes under `data/`.
- */
+/** The `pnpm sync` session, driven with injected ports and a fake clock each wait advances: no network, no writes under `data/`. */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const SCRIPT = fileURLToPath(new URL('sync.ts', import.meta.url));
@@ -679,20 +675,12 @@ describe('pnpm sync: the session with injected ports', () => {
       body: NO_RESULTS,
     };
 
-    /**
-     * Answers each cookie-carrying search from `answers` in turn while any
-     * are left: those are the probes, because nothing else carries the cookie
-     * before an `authenticated` settle. The fake records every request.
-     */
+    /** Answers each cookie-carrying search from `answers` in turn: those are the probes, before any `authenticated` settle. */
     function probing(...answers: (HttpResponse | Error)[]) {
       return probingThen(answers);
     }
 
-    /**
-     * As `probing`, and every later cookie request is answered by `after`: by
-     * default the fake's answer with the live rule set added, so the cookie
-     * stays live (§13.4).
-     */
+    /** As `probing`; every later cookie request is answered by `after`, live by default so the cookie stays live (§13.4). */
     function probingThen(
       answers: (HttpResponse | Error)[],
       after: (request: HttpRequest, answer: HttpResponse) => HttpResponse = (_request, answer) => ({
@@ -995,10 +983,8 @@ describe('pnpm sync: the session with injected ports', () => {
 
     expect(await syncSessionCommand(deps)).toBe(0);
 
-    // Iteration 1: search (1 used), fetch on a cold lane (2 used). The pre-wait
-    // of iteration 2 spreads the 3 left over 10 s (rounded up to a whole
-    // millisecond); its search then leaves 2, so the fetch inside the lock
-    // waits 10 000 / 2 − 0.
+    // Iteration 2's pre-wait spreads the 3 left over 10 s (rounded up to a millisecond);
+    // its search leaves 2, so the fetch inside the lock waits 10 000 / 2.
     expect(sleeps).toEqual([3334]);
     expect(waits).toEqual([10_000 / 2]);
   });

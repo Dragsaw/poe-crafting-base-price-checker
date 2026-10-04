@@ -429,9 +429,6 @@
     }
   },
   "packages/sync/src/sync.test.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    },
     "max-lines": {
       "count": 1
     }
