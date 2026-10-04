@@ -26,24 +26,11 @@ import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
 
-/**
- * A ready outcome carries the "now" its ages are read against, taken once when
- * the load resolved, and the cross-file failures, run once per load (AD-17).
- */
+/** A ready outcome holds the "now" its ages read against and its cross-file failures, both taken once per load (AD-17). */
 type ViewState =
   Exclude<LoadOutcome, ReadyOutcome> | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] }) | { readonly kind: 'pending' };
 
-/**
- * The page's substrate. It paints the masthead and twenty skeleton slots at
- * once, then moves to exactly one outcome in a single state transition — a
- * whole set, the refusal screen or the fetch-failure screen — never row by row
- * (AD-24, FR-33). `+ Try again` re-runs all seven fetches.
- *
- * The resting chrome, in order: masthead, trust strip, asking-price line, the
- * list statement when the ranking makes one (states 23 and 25), column header,
- * list, then the Unrankable appendix, the key block and the running foot. The skeleton paints the same
- * chrome around its slots, with a blank trust-strip slot of the strip's height; the two failure screens paint none of it.
- */
+/** One state transition from skeleton to a single outcome, never row by row (AD-24, FR-33); failure screens paint no chrome. */
 export function App(): JSX.Element {
   const [view, retry] = useLoadedView();
   const [threshold, changeThreshold] = usePersistedThreshold();
@@ -235,15 +222,7 @@ function renderReady({
   );
 }
 
-/**
- * `core` ranks the whole loaded set at the player's threshold, with the
- * load's cross-file failures excluding their classes (AD-17); `web` renders
- * what it returns and orders nothing itself (AD-4). The ranking is memoised
- * on the set and the threshold; the active recipe only narrows it, so a click
- * re-renders in the same pass with no re-rank (state 34). Renders the ready body below the asking-price
- * line: the list statement, the ranked list, and the page tail led by the
- * Unrankable appendix — all from one ranking.
- */
+/** `web` renders the one ranking and orders nothing (AD-4); a recipe click only narrows it, no re-rank (state 34). */
 function ReadyBody({
   set,
   now,
@@ -290,12 +269,7 @@ function ReadyBody({
   );
 }
 
-/**
- * What closes every state but the two failure screens, pushed to the frame's
- * foot by `margin-top: auto`: the Unrankable appendix (ready only — while
- * pending no count is known), then the key block and the running foot. One
- * arrangement in every data state; more rows grow the document.
- */
+/** Pushed to the frame's foot by `margin-top: auto`; the appendix is ready only, as no count is known while pending. */
 function PageTail({ appendix }: { readonly appendix?: ReactNode }): JSX.Element {
   return (
     <div data-page-tail="" style={{ marginTop: 'auto' }}>

@@ -596,11 +596,6 @@
       "count": 1
     }
   },
-  "packages/web/src/App.tsx": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
   "packages/web/src/frame/AbsenceLines.tsx": {
     "local/max-comment-run": {
       "count": 1
