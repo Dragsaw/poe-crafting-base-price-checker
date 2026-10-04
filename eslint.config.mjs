@@ -5,7 +5,7 @@ import sonarjs from 'eslint-plugin-sonarjs';
 import unicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
 
-import local from './tools/eslint-local/index.ts';
+import local from './tools/eslint-rules/index.ts';
 
 /**
  * ESM, not TypeScript: ESLint 10 needs `jiti` to load a `.ts` config, and `.mjs`
