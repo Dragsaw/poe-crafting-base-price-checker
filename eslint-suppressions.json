@@ -516,11 +516,6 @@
       "count": 6
     }
   },
-  "packages/web/src/frame/trust-strip.test.tsx": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/web/src/list/AskingPriceLine.tsx": {
     "local/max-comment-run": {
       "count": 1
