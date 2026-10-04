@@ -256,14 +256,8 @@
     }
   },
   "packages/core/src/chunk-order.ts": {
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 4
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 1
     },
     "sonarjs/no-selector-parameter": {
       "count": 1

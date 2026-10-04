@@ -87,15 +87,39 @@ function isStalePinned(attemptedAt: number | undefined, now: number, maxAgeMs: n
   return maxAgeMs === undefined || attemptedAt === undefined || now - attemptedAt > maxAgeMs;
 }
 
-export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
-  const now = Date.parse(input.now);
-  const byKey = new Map(input.dataset.map((entry) => [entry.entryKey, entry]));
+type Bucket = 'pinned' | 'active' | 'unresolvable';
 
-  const pinned: Placed[] = [];
-  const active: Placed[] = [];
-  const unresolvable: Placed[] = [];
-  /** Every key a pass may hold: rows 2–3, due or not. */
-  const rotationKeys = new Set<string>();
+interface Classified {
+  /** Whether the key belongs to a pass: rows 2–3, due or not. */
+  readonly inRotation: boolean;
+  /** The row the entry is visited in now, or `undefined` when none. */
+  readonly bucket: Bucket | undefined;
+}
+
+function classify(
+  entry: TrackedEntry,
+  published: DatasetEntry | undefined,
+  attemptedAt: number | undefined,
+  clock: { readonly now: number; readonly pinnedMaxAgeMs: number | undefined },
+): Classified {
+  const { now, pinnedMaxAgeMs } = clock;
+  if (published?.price.state === 'unresolvable') {
+    const isDue = attemptedAt === undefined || now - attemptedAt >= UNRESOLVABLE_RETRY_MS;
+    return { inRotation: true, bucket: isDue ? 'unresolvable' : undefined };
+  }
+  if (entry.status === 'pinned') {
+    return { inRotation: false, bucket: isStalePinned(attemptedAt, now, pinnedMaxAgeMs) ? 'pinned' : undefined };
+  }
+  return { inRotation: true, bucket: 'active' };
+}
+
+interface Buckets extends Record<Bucket, Placed[]> {
+  readonly rotationKeys: Set<string>;
+}
+
+function bucketTracked(input: ChunkOrderInput, now: number): Buckets {
+  const byKey = new Map(input.dataset.map((entry) => [entry.entryKey, entry]));
+  const buckets: Buckets = { pinned: [], active: [], unresolvable: [], rotationKeys: new Set<string>() };
 
   for (const entry of input.tracked) {
     if (entry.status === 'pruned') {
@@ -105,22 +129,19 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
     const published = byKey.get(key);
     const attemptedAt =
       published?.lastAttemptedAt === undefined ? undefined : Date.parse(published.lastAttemptedAt);
-    const placed: Placed = { entry, key, attemptedAt };
-
-    if (published?.price.state === 'unresolvable') {
-      rotationKeys.add(key);
-      if (attemptedAt === undefined || now - attemptedAt >= UNRESOLVABLE_RETRY_MS) {
-        unresolvable.push(placed);
-      }
-    } else if (entry.status === 'pinned') {
-      if (isStalePinned(attemptedAt, now, input.pinnedMaxAgeMs)) {
-        pinned.push(placed);
-      }
-    } else {
-      rotationKeys.add(key);
-      active.push(placed);
+    const { inRotation, bucket } = classify(entry, published, attemptedAt, { now, pinnedMaxAgeMs: input.pinnedMaxAgeMs });
+    if (inRotation) {
+      buckets.rotationKeys.add(key);
+    }
+    if (bucket !== undefined) {
+      buckets[bucket].push({ entry, key, attemptedAt });
     }
   }
+  return buckets;
+}
+
+export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
+  const { pinned, active, unresolvable, rotationKeys } = bucketTracked(input, Date.parse(input.now));
 
   const done = new Set(input.completed);
   const completed = [...rotationKeys].filter((key) => done.has(key)).toSorted(compareCanonicalKeys);
