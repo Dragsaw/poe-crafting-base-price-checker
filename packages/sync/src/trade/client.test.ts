@@ -15,11 +15,7 @@ import {
 import { createSessionAuth, SESSION_COOKIE_ENV_VAR } from './session-auth.ts';
 import { MissingUserAgentError, USER_AGENT_ENV_VAR } from './user-agent.ts';
 
-/**
- * Every rule name, policy name and bucket figure in this file is a **fixture**,
- * asserted as the shape a live response carried on 2026-09-12. None of it is
- * compiled into the client, which learns all of it from these headers.
- */
+/** Every rule name, policy name and bucket figure here is a fixture of a live response (2026-09-12), never compiled in. */
 const SEARCH_POLICY = 'trade-search-request-limit';
 const FETCH_POLICY = 'trade-fetch-request-limit';
 
@@ -411,10 +407,8 @@ it('paces two different lanes off one another when they report the same policy',
   await client.send({ method: 'GET', url: DATA_URL, lane: 'data' });
   expect(waits).toEqual([]);
 
-  // Now the second lane paces off the consumption the first lane recorded,
-  // because the ledger keys on the policy value and not on the lane. The
-  // `Client` rule survives from the first response even though the second
-  // response named only `Ip`.
+  // The ledger keys on the policy value, not the lane, so this lane paces off the first one's
+  // consumption; the `Client` rule survives although this response named only `Ip`.
   await client.send({ method: 'GET', url: DATA_URL, lane: 'data' });
   expect(waits).toEqual([300_000]);
 });

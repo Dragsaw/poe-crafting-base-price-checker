@@ -434,9 +434,6 @@
     }
   },
   "packages/sync/src/trade/client.test.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    },
     "max-lines": {
       "count": 1
     }
