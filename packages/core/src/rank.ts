@@ -1,15 +1,11 @@
 import { canonicalKey, compareCanonicalKeys } from '@poe/contracts';
 import type {
-  CraftedRankedRow,
-  CraftedSummand,
   CraftedTrackedEntry,
   CraftRecipe,
   CurrencyRate,
   DatasetEntry,
-  NotYetSyncedReason,
   RankedRow,
   RawRankedRow,
-  RawTrackedEntry,
   TrackedEntry,
   WeightsClassPools,
   WeightsFile,
@@ -18,8 +14,13 @@ import type {
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
-import { combinationProbability, isEmptyPool, poolOf } from './probability.ts';
-import { foldPair, oldestOf, weakest } from './provenance.ts';
+import { isEmptyPool, poolOf } from './probability.ts';
+import { compareOrdering } from './rank-order.ts';
+import { craftedRow } from './rank-crafted-row.ts';
+import { groupRawEntries, type NotYetSyncedEntry, type UnrankedEntry } from './rank-raw-groups.ts';
+
+export { compareRankedRows } from './rank-order.ts';
+export type { NotYetSyncedEntry, UnrankedEntry } from './rank-raw-groups.ts';
 
 /**
  * The ranking, both branches (AD-17, AD-9, AD-19, AD-20, IMPLEMENTATION-NOTES.md
@@ -135,17 +136,6 @@ export interface UnrankableClass {
   readonly recipeId?: string;
 }
 
-/** An entry that contributes nothing to the ordering — not zero, nothing (AD-9). */
-export interface UnrankedEntry {
-  readonly entry: RawTrackedEntry;
-  readonly entryKey: string;
-  /** Present where the dataset entry carries it, for the view's *tried* clock. */
-  readonly lastAttemptedAt?: string;
-}
-
-export interface NotYetSyncedEntry extends UnrankedEntry {
-  readonly reason: NotYetSyncedReason;
-}
 
 export interface Ranking {
   /**
@@ -199,51 +189,6 @@ export interface UncostableRecipe {
  */
 export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
 
-/** Raw before crafted at an equal EV (AD-17). */
-const KIND_ORDER: Readonly<Record<RankedRow['kind'], number>> = { raw: 0, crafted: 1 };
-
-/** The serialised key a row breaks ties on: a raw row's canonical key, a crafted row's class key. */
-function rowKey(row: RankedRow): string {
-  return row.kind === 'raw' ? row.entryKey : row.classKey;
-}
-
-/**
- * The tie-break at an equal EV (AD-17, decision 2026-09-26): kind first, raw
- * before crafted; then the serialised key by `compareCanonicalKeys`, within
- * the kind — a raw row's canonical key, a crafted row's class key; then the
- * recipe id, by the same comparison. The canonical key's own leading kind tag
- * sorts `crafted` first, which is why the kind is compared explicitly before it.
- */
-export function compareRankedRows(left: RankedRow, right: RankedRow): number {
-  const byKind = KIND_ORDER[left.kind] - KIND_ORDER[right.kind];
-  if (byKind !== 0) {
-    return byKind;
-  }
-  const byKey = compareCanonicalKeys(rowKey(left), rowKey(right));
-  return byKey !== 0 || left.kind !== 'crafted' || right.kind !== 'crafted' ? byKey : compareCanonicalKeys(left.recipeId, right.recipeId);
-}
-
-/**
- * The one ordering (AD-17). Comparable rows first, by EV descending; then the
- * rows of an uncostable recipe, whose EV is `null`, by gross payout descending
- * (EXPERIENCE.md state 35). `compareRankedRows` breaks every tie.
- */
-function compareOrdering(left: RankedRow, right: RankedRow): number {
-  const leftEvent = left.ev;
-  const rightEvent = right.ev;
-  if ((leftEvent === null) !== (rightEvent === null)) {
-    return leftEvent === null ? 1 : -1;
-  }
-  const leftFigure = leftEvent ?? (left.kind === 'crafted' ? left.grossPayout : 0);
-  const rightFigure = rightEvent ?? (right.kind === 'crafted' ? right.grossPayout : 0);
-  return leftFigure === rightFigure ? compareRankedRows(left, right) : rightFigure - leftFigure;
-}
-
-/** Contribution descending, then the entry's canonical key (AD-17). */
-function compareSummands(left: CraftedSummand, right: CraftedSummand): number {
-  return left.contribution === right.contribution ? compareCanonicalKeys(left.entryKey, right.entryKey) : right.contribution - left.contribution;
-}
-
 const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): number =>
   compareCanonicalKeys(left.entryKey, right.entryKey);
 
@@ -273,99 +218,6 @@ function unrankableReasonOf(
   }
   // One definition with `poolCoverage` (IN §3): an empty slot makes the class unrankable under every recipe.
   return isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix) ? RECIPE_UNREACHABLE : undefined;
-}
-
-function unranked(
-  entry: RawTrackedEntry,
-  entryKey: string,
-  published: DatasetEntry | undefined,
-): UnrankedEntry {
-  return published?.lastAttemptedAt === undefined
-    ? { entry, entryKey }
-    : { entry, entryKey, lastAttemptedAt: published.lastAttemptedAt };
-}
-
-type LiveRawEntry = RawTrackedEntry & { readonly status: RawRankedRow['status'] };
-
-function isLiveRaw(entry: TrackedEntry): entry is LiveRawEntry {
-  return entry.kind === 'raw' && entry.status !== 'pruned';
-}
-
-interface RawGroups {
-  readonly surviving: RankedRow[];
-  readonly belowThreshold: RawRankedRow[];
-  readonly noListings: UnrankedEntry[];
-  readonly notYetSynced: NotYetSyncedEntry[];
-  readonly unresolvable: UnrankedEntry[];
-}
-
-function rawRankedRow(
-  entry: LiveRawEntry,
-  base: UnrankedEntry,
-  observation: RawRankedRow['observation'],
-): RawRankedRow {
-  return {
-    kind: 'raw',
-    entryKey: base.entryKey,
-    baseTypeId: entry.baseTypeId,
-    itemLevelMin: entry.itemLevelMin,
-    status: entry.status,
-    ev: observation.priceDivine,
-    craftCost: 0,
-    observation,
-    ...(base.lastAttemptedAt !== undefined && { lastAttemptedAt: base.lastAttemptedAt }),
-  };
-}
-
-function groupRawEntry(
-  entry: LiveRawEntry,
-  input: RankInput,
-  byKey: ReadonlyMap<string, DatasetEntry>,
-  groups: RawGroups,
-): void {
-  const entryKey = canonicalKey(entry);
-  const published = byKey.get(entryKey);
-  const base = unranked(entry, entryKey, published);
-
-  if (published === undefined) {
-    groups.notYetSynced.push({ ...base, reason: 'never-synced' });
-    return;
-  }
-
-  const { price } = published;
-  if (price.state === 'no-listings') {
-    groups.noListings.push(base);
-    return;
-  }
-  if (price.state === 'unresolvable') {
-    groups.unresolvable.push(base);
-    return;
-  }
-  if (price.state === 'not-yet-synced') {
-    groups.notYetSynced.push({ ...base, reason: price.reason });
-    return;
-  }
-  const { observation } = price;
-  if (observation.league !== input.activeLeague) {
-    groups.notYetSynced.push({ ...base, reason: 'league-mismatch' });
-    return;
-  }
-  const row = rawRankedRow(entry, base, observation);
-  if (observation.priceDivine < input.threshold) {
-    groups.belowThreshold.push(row);
-  } else {
-    groups.surviving.push(row);
-  }
-}
-
-function groupRawEntries(input: RankInput, byKey: ReadonlyMap<string, DatasetEntry>): RawGroups {
-  const groups: RawGroups = { surviving: [], belowThreshold: [], noListings: [], notYetSynced: [], unresolvable: [] };
-  for (const entry of input.tracked) {
-    if (isLiveRaw(entry)) {
-      groupRawEntry(entry, input, byKey, groups);
-    }
-  }
-  return groups;
 }
 
 interface RankableClass {
@@ -452,7 +304,7 @@ function rankCraftedClass(
     return;
   }
   for (const { recipe, cost } of costed) {
-    const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, input });
+    const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold });
     if (row === undefined) {
       unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
         categoryId: first.categoryId,
@@ -499,7 +351,7 @@ export function rank(input: RankInput): Ranking {
     cost: craftCost(recipe, rates, input.activeLeague),
   }));
 
-  const raw = groupRawEntries(input, byKey);
+  const raw = groupRawEntries(input.tracked, byKey, input);
   const { unrankable, rankable } = sortCraftedClasses(input);
   for (const crafted of rankable.values()) {
     rankCraftedClass(crafted, { costed, byKey, input }, raw.surviving, unrankable);
@@ -514,86 +366,5 @@ export function rank(input: RankInput): Ranking {
     unrankable: [...unrankable.values()].toSorted(byItemClass),
     uncostableRecipes: uncostableOf(costed),
     pricedInLeague: hasPricedInLeague(input, byKey),
-  };
-}
-
-interface CraftedRowOptions {
-  readonly first: CraftedTrackedEntry;
-  readonly recipe: CraftRecipe;
-  readonly cost: CraftCostResult;
-  readonly pools: WeightsClassPools;
-  readonly keyed: readonly { readonly entry: CraftedTrackedEntry; readonly entryKey: string }[];
-  readonly byKey: ReadonlyMap<string, DatasetEntry>;
-  readonly input: RankInput;
-}
-
-interface SummandScan {
-  readonly summands: CraftedSummand[];
-  readonly stamps: string[];
-}
-
-/** `undefined`: the recipe cannot reach the class. P is computed for priced and unpriced entries alike, so the verdict ignores the threshold. */
-function scanSummands({ recipe, pools, keyed, byKey, input }: CraftedRowOptions): SummandScan | undefined {
-  const summands: CraftedSummand[] = [];
-  // Summands only: the rates' asOf is not a timestamp input (AD-10).
-  const stamps: string[] = [];
-  for (const { entry, entryKey } of keyed) {
-    const probability = combinationProbability(pools, entry, recipe.modifierLevelMin);
-    if (!probability.ok) {
-      return undefined;
-    }
-    const price = byKey.get(entryKey)?.price;
-    if (
-      price?.state !== 'priced' ||
-      price.observation.league !== input.activeLeague ||
-      price.observation.priceDivine < input.threshold
-    ) {
-      continue;
-    }
-    const priceDivine = price.observation.priceDivine;
-    stamps.push(price.observation.observedAt);
-    summands.push({ entryKey, probability: probability.p, priceDivine, contribution: probability.p * priceDivine });
-  }
-  return { summands, stamps };
-}
-
-function weakestProvenance({ first, recipe, pools, keyed }: CraftedRowOptions): CraftedRankedRow['provenance'] {
-  let provenance = foldPair(pools, first, recipe.modifierLevelMin);
-  for (const { entry } of keyed.slice(1)) {
-    provenance = weakest(provenance, foldPair(pools, entry, recipe.modifierLevelMin));
-  }
-  return provenance;
-}
-
-/** One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe cannot reach it (IN §9, §11). */
-function craftedRow(options: CraftedRowOptions): CraftedRankedRow | undefined {
-  const { first, recipe, cost, keyed, byKey } = options;
-  const scan = scanSummands(options);
-  if (scan === undefined) {
-    return undefined;
-  }
-  const ordered = scan.summands.toSorted(compareSummands);
-  const asOf = oldestOf(scan.stamps);
-  // No summand: fall back to the oldest attempt among the class's entries (AD-10).
-  const lastAttemptedAt =
-    asOf === undefined
-      ? oldestOf(keyed.flatMap(({ entryKey }) => byKey.get(entryKey)?.lastAttemptedAt ?? []))
-      : undefined;
-  const grossPayout = ordered.reduce((sum, summand) => sum + summand.contribution, 0);
-  return {
-    kind: 'crafted',
-    classKey: classKeyOf(first.categoryId, first.className),
-    categoryId: first.categoryId,
-    className: first.className,
-    itemLevelMin: first.itemLevelMin,
-    recipeId: recipe.id,
-    grossPayout,
-    craftCost: cost.ok ? cost.divine : { kind: 'uncostable', currencyId: cost.reason.currencyId },
-    // eslint-disable-next-line unicorn/no-null -- boundary: `RankedRow.ev` is `z.number().nullable()` in the contracts schema.
-    ev: cost.ok ? grossPayout - cost.divine : null,
-    summands: ordered,
-    provenance: weakestProvenance(options),
-    ...(asOf !== undefined && { asOf }),
-    ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
   };
 }
