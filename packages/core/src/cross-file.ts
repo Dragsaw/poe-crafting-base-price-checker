@@ -147,18 +147,7 @@ export function edgeAlignment(
     if (!('valueMin' in rl)) {
       continue;
     }
-    let min = Infinity;
-    let max = -Infinity;
-    for (const entry of contained) {
-      for (const line of entry.lines) {
-        if (line.statId !== rl.statId) {
-          continue;
-        }
-        const derived = interval(line);
-        min = Math.min(min, derived.min);
-        max = Math.max(max, derived.max);
-      }
-    }
+    const { min, max } = extremesOn(rl.statId, contained);
     if (rl.valueMin === min && rl.valueMax === max) {
       continue;
     }
@@ -167,6 +156,22 @@ export function edgeAlignment(
     );
   }
   return parts.length === 0 ? undefined : parts.join('; ');
+}
+
+/** The lowest and highest interval edge among the contained entries' lines on one `statId`. */
+function extremesOn(statId: string, contained: readonly ModifierWeight[]): { readonly min: number; readonly max: number } {
+  let min = Infinity;
+  let max = -Infinity;
+  const lines = contained.flatMap((entry) => entry.lines);
+  for (const line of lines) {
+    if (line.statId !== statId) {
+      continue;
+    }
+    const derived = interval(line);
+    min = Math.min(min, derived.min);
+    max = Math.max(max, derived.max);
+  }
+  return { min, max };
 }
 
 /**
@@ -245,29 +250,37 @@ export function kindAgreement(
 ): string | undefined {
   const parts: string[] = [];
   for (const rl of linesOf(reference)) {
-    let disagreeing = 0;
-    let first: ModifierWeight | undefined;
-    for (const entry of scoped) {
-      if (entry.weight === 0) {
-        continue;
-      }
-      for (const line of entry.lines) {
-        if (!disagrees(rl, line)) {
-          continue;
-        }
-
-        disagreeing += 1;
-        first ??= entry;
-      }
-    }
-    if (first === undefined) {
+    const found = disagreementsOn(rl, scoped);
+    if (found === undefined) {
       continue;
     }
+    const { count, first } = found;
     parts.push(
-      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: ${String(disagreeing)} scoped ${disagreeing === 1 ? 'line' : 'lines'} on that statId ${disagreeing === 1 ? 'is' : 'are'} banded (e.g. ${first.sourceModifierId})`,
+      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: ${String(count)} scoped ${count === 1 ? 'line' : 'lines'} on that statId ${count === 1 ? 'is' : 'are'} banded (e.g. ${first.sourceModifierId})`,
     );
   }
   return parts.length === 0 ? undefined : parts.join('; ');
+}
+
+/** How many positive-weight scoped lines disagree with `rl`, and the first tier that does; `undefined` for none. */
+function disagreementsOn(
+  rl: ReferenceLine,
+  scoped: readonly ModifierWeight[],
+): { readonly count: number; readonly first: ModifierWeight } | undefined {
+  let count = 0;
+  let first: ModifierWeight | undefined;
+  for (const entry of scoped) {
+    if (entry.weight === 0) {
+      continue;
+    }
+    const here = entry.lines.filter((line) => disagrees(rl, line)).length;
+    if (here === 0) {
+      continue;
+    }
+    count += here;
+    first ??= entry;
+  }
+  return first === undefined ? undefined : { count, first };
 }
 
 /** `meets(rl, line)` (§2.7): the search for `rl` can match a roll of `line`. */
@@ -403,6 +416,127 @@ function isPoolCheckable(pools: WeightsClassPools): boolean {
   return pools.prefix.poolCoverage !== 'partial' && pools.suffix.poolCoverage !== 'partial';
 }
 
+interface Keyed {
+  readonly entry: CraftedTrackedEntry;
+  readonly key: string;
+}
+
+interface Scope {
+  readonly scoped: ScopedPools;
+  readonly coOccur: CoOccur;
+}
+
+type ScopeOf = (floor: number) => Scope;
+
+/** One failure for `(check, entry)`, or none when no part names a problem. */
+function failureOf({ entry, key }: Keyed, check: CrossFileCheck, parts: readonly string[]): CrossFileFailure[] {
+  return parts.length === 0
+    ? []
+    : [{ check, entryKey: key, categoryId: entry.categoryId, className: entry.className, detail: parts.join('; ') }];
+}
+
+/** One scope per floor: AD-17 gives a class one, but the list may not yet agree. */
+function scopeCache(pools: WeightsClassPools): ScopeOf {
+  const scopes = new Map<number, Scope>();
+  return (floor) => {
+    const known = scopes.get(floor);
+    if (known !== undefined) {
+      return known;
+    }
+    const scoped = scopedPools(pools, floor);
+    const made = { scoped, coOccur: coOccur(scoped) };
+    scopes.set(floor, made);
+    return made;
+  };
+}
+
+function markClass(keyed: readonly Keyed[], reason: UnvalidatedMark['reason']): UnvalidatedMark[] {
+  return keyed.map(({ entry, key }) => ({ entryKey: key, categoryId: entry.categoryId, className: entry.className, reason }));
+}
+
+function discriminabilityFailures(keyed: readonly Keyed[], weights: WeightsFile): CrossFileFailure[] {
+  return keyed.flatMap((item) => {
+    const detail = classDiscriminability(item.entry, weights);
+    return failureOf(item, 'class-discriminability', detail === undefined ? [] : [detail]);
+  });
+}
+
+function referenceFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFileFailure[] {
+  const failures: CrossFileFailure[] = [];
+  for (const item of keyed) {
+    const { entry } = item;
+    const { scoped } = scopeOf(entry.itemLevelMin);
+    for (const [check, run] of REF_CHECKS) {
+      const parts = OVERLAP_SLOTS.map((slot) => run(slot, entry[slot], scoped[slot], entry.itemLevelMin)).filter(
+        (part) => part !== undefined,
+      );
+      failures.push(...failureOf(item, check, parts));
+    }
+  }
+  return failures;
+}
+
+/** The pair's overlap text, or `undefined` when the pair is not evaluated or does not overlap. */
+function pairOverlap(left: Keyed, right: Keyed, scopeOf: ScopeOf): string | undefined {
+  if (
+    right.entry.itemLevelMin !== left.entry.itemLevelMin ||
+    (!hasHybridAffix(left.entry) && !hasHybridAffix(right.entry))
+  ) {
+    return undefined;
+  }
+  const branches = overlapBranches(left.entry, right.entry, scopeOf(left.entry.itemLevelMin).coOccur);
+  return branches === undefined ? undefined : `at floor ${String(left.entry.itemLevelMin)} on ${describeOverlap(branches)}`;
+}
+
+function appendPartner(partners: Map<string, string[]>, key: string, text: string): void {
+  partners.set(key, [...(partners.get(key) ?? []), text]);
+}
+
+/** §2.1, *Who evaluates a pair*: every pair in which either entry names a hybrid reference. Each entry of the pair names the other. */
+function coOccurFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFileFailure[] {
+  const partners = new Map<string, string[]>();
+  for (const [index, left] of keyed.entries()) {
+    const later = keyed.slice(index + 1);
+    for (const right of later) {
+      const on = pairOverlap(left, right, scopeOf);
+      if (on === undefined) {
+        continue;
+      }
+      appendPartner(partners, left.key, `overlaps ${right.key} ${on}`);
+      appendPartner(partners, right.key, `overlaps ${left.key} ${on}`);
+    }
+  }
+  return keyed.flatMap((item) => failureOf(item, 'co-occur', partners.get(item.key) ?? []));
+}
+
+interface ClassChecked {
+  readonly failures: readonly CrossFileFailure[];
+  readonly unvalidated: readonly UnvalidatedMark[];
+}
+
+function checkClass(members: readonly CraftedTrackedEntry[], weights: WeightsFile | undefined): ClassChecked {
+  // One failure per (check, entry): a twin, which the schema refuses anyway, is checked once.
+  const keyed = [...new Map(members.map((entry) => [canonicalKey(entry), entry]))].map(([key, entry]) => ({ entry, key }));
+  if (weights === undefined) {
+    return { failures: [], unvalidated: markClass(keyed, 'weights-absent') };
+  }
+  const discriminability = discriminabilityFailures(keyed, weights);
+
+  const [first] = members;
+  if (first === undefined) {
+    return { failures: discriminability, unvalidated: [] };
+  }
+  const lookup = poolOf(weights, first.categoryId, first.className);
+  if (!lookup.ok || !isPoolCheckable(lookup.pools)) {
+    return { failures: discriminability, unvalidated: markClass(keyed, 'partial-pool') };
+  }
+  const scopeOf = scopeCache(lookup.pools);
+  return {
+    failures: [...discriminability, ...referenceFailures(keyed, scopeOf), ...coOccurFailures(keyed, scopeOf)],
+    unvalidated: [],
+  };
+}
+
 /**
  * Every failure of the six checks over the tracked list against the parsed
  * weights file, sorted by canonical key, then by check, and every unvalidated
@@ -410,106 +544,13 @@ function isPoolCheckable(pools: WeightsClassPools): boolean {
  * there is no failure and every crafted entry is marked `weights-absent`.
  */
 export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
-  const byClass = craftedClassesOf(entries);
-
   const failures: CrossFileFailure[] = [];
   const unvalidated: UnvalidatedMark[] = [];
-  const fail = (entry: CraftedTrackedEntry, entryKey: string, check: CrossFileCheck, parts: readonly string[]): void => {
-    if (parts.length > 0) {
-      failures.push({
-        check,
-        entryKey,
-        categoryId: entry.categoryId,
-        className: entry.className,
-        detail: parts.join('; '),
-      });
-    }
-  };
 
-  for (const members of byClass.values()) {
-    // One failure per (check, entry): a twin, which the schema refuses anyway, is checked once.
-    const keyed = [...new Map(members.map((entry) => [canonicalKey(entry), entry]))].map(
-      ([key, entry]) => ({ entry, key }),
-    );
-    const mark = (reason: UnvalidatedMark['reason']): void => {
-      for (const { entry, key } of keyed) {
-        unvalidated.push({ entryKey: key, categoryId: entry.categoryId, className: entry.className, reason });
-      }
-    };
-    if (weights === undefined) {
-      mark('weights-absent');
-      continue;
-    }
-    for (const { entry, key } of keyed) {
-      const discriminability = classDiscriminability(entry, weights);
-      fail(entry, key, 'class-discriminability', discriminability === undefined ? [] : [discriminability]);
-    }
-
-    const [first] = members;
-    if (first === undefined) {
-      continue;
-    }
-    const lookup = poolOf(weights, first.categoryId, first.className);
-    if (!lookup.ok || !isPoolCheckable(lookup.pools)) {
-      mark('partial-pool');
-      continue;
-    }
-    /** One scope per floor: AD-17 gives a class one, but the list may not yet agree. */
-    const scopes = new Map<number, { readonly scoped: ScopedPools; readonly coOccur: CoOccur }>();
-    const scopeOf = (floor: number) => {
-      const known = scopes.get(floor);
-      if (known !== undefined) {
-        return known;
-      }
-      const scoped = scopedPools(lookup.pools, floor);
-      const made = { scoped, coOccur: coOccur(scoped) };
-      scopes.set(floor, made);
-      return made;
-    };
-
-    for (const { entry, key } of keyed) {
-      const { scoped } = scopeOf(entry.itemLevelMin);
-      for (const [check, run] of REF_CHECKS) {
-        const parts: string[] = [];
-        for (const slot of OVERLAP_SLOTS) {
-          const part = run(slot, entry[slot], scoped[slot], entry.itemLevelMin);
-          if (part !== undefined) {
-            parts.push(part);
-          }
-        }
-        fail(entry, key, check, parts);
-      }
-    }
-
-    // §2.1, *Who evaluates a pair*: core takes every pair in which either
-    // entry names a hybrid reference. Each entry of the pair names the other.
-    const partners = new Map<string, string[]>();
-    for (let index = 0; index < keyed.length; index += 1) {
-      const left = keyed[index];
-      if (left === undefined) {
-        continue;
-      }
-      for (let index_ = index + 1; index_ < keyed.length; index_ += 1) {
-        const right = keyed[index_];
-        if (
-          right === undefined ||
-          right.entry.itemLevelMin !== left.entry.itemLevelMin ||
-          (!hasHybridAffix(left.entry) && !hasHybridAffix(right.entry))
-        ) {
-          continue;
-        }
-        const branches = overlapBranches(left.entry, right.entry, scopeOf(left.entry.itemLevelMin).coOccur);
-        if (branches === undefined) {
-          continue;
-        }
-        const on = `at floor ${String(left.entry.itemLevelMin)} on ${describeOverlap(branches)}`;
-        partners.set(left.key, [...(partners.get(left.key) ?? []), `overlaps ${right.key} ${on}`]);
-        partners.set(right.key, [...(partners.get(right.key) ?? []), `overlaps ${left.key} ${on}`]);
-      }
-    }
-    for (const { entry, key } of keyed) {
-      fail(entry, key, 'co-occur', partners.get(key) ?? []);
-    }
+  for (const members of craftedClassesOf(entries).values()) {
+    const checked = checkClass(members, weights);
+    failures.push(...checked.failures);
+    unvalidated.push(...checked.unvalidated);
   }
 
   return {

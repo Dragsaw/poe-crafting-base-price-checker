@@ -292,26 +292,11 @@
     }
   },
   "packages/core/src/cross-file.ts": {
-    "complexity": {
-      "count": 2
-    },
     "local/max-comment-run": {
       "count": 10
     },
-    "max-depth": {
-      "count": 6
-    },
     "max-lines": {
       "count": 1
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "max-statements": {
-      "count": 1
-    },
-    "sonarjs/cognitive-complexity": {
-      "count": 3
     },
     "unicorn/consistent-boolean-name": {
       "count": 2
