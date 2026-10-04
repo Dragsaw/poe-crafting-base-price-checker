@@ -732,9 +732,6 @@
   "packages/web/src/list/display-rows.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "max-lines-per-function": {
-      "count": 1
     }
   },
   "packages/web/src/list/expansion.test.tsx": {

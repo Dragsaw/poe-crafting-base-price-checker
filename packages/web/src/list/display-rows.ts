@@ -198,6 +198,94 @@ function craftedDetail(
   };
 }
 
+interface RowContext {
+  readonly byKey: ReadonlyMap<string, DatasetEntry>;
+  readonly now: number;
+}
+
+function rowDetail(
+  { byKey, now }: RowContext,
+  entryKey: string,
+  state: CombinationState,
+): Pick<DisplayRow, 'age' | 'state' | 'entry' | 'ages'> {
+  const entry = byKey.get(entryKey);
+  return {
+    age: ageMark(state, entry?.lastAttemptedAt, now),
+    state,
+    entry,
+    ages: combinationAges(state, entry?.lastAttemptedAt, now),
+  };
+}
+
+function rankedRows(
+  ranking: Ranking,
+  context: RowContext,
+  crafted: CraftedContext,
+  isNumbered: boolean,
+): ListRow[] {
+  const classes = trackedByClass(crafted.tracked);
+  return ranking.ordering.map((row, index): ListRow => {
+    const position = { numeral: isNumbered ? index + 1 : undefined, tier: tierOf(index + 1) };
+    if (row.kind === 'crafted') {
+      return {
+        key: row.classKey,
+        ...position,
+        unit: 'class',
+        label: unitLabel(row.className),
+        itemLevel: row.itemLevelMin,
+        ev:
+          row.ev === null
+            ? { kind: 'phrase', text: MONEY_PHRASES.notYetSynced }
+            : { kind: 'figure', text: formatDivine(row.ev) },
+        age: undefined,
+        provenance: row.provenance,
+        ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey: context.byKey, crafted, now: context.now }),
+      };
+    }
+    return {
+      key: row.entryKey,
+      ...position,
+      unit: 'raw',
+      label: row.baseTypeId,
+      itemLevel: row.itemLevelMin,
+      ev: { kind: 'figure', text: formatDivine(row.ev) },
+      status: row.status,
+      ...rowDetail(context, row.entryKey, {
+        state: 'priced',
+        priceDivine: row.observation.priceDivine,
+        sampleSize: row.observation.sampleSize,
+        observedAt: row.observation.observedAt,
+      }),
+    };
+  });
+}
+
+function unpricedRow(context: RowContext, entry: UnrankedEntry, phrase: string, state: CombinationState): DisplayRow {
+  return {
+    key: entry.entryKey,
+    numeral: undefined,
+    tier: 3,
+    unit: 'raw',
+    label: entry.entry.baseTypeId,
+    itemLevel: entry.entry.itemLevelMin,
+    ev: { kind: 'phrase', text: phrase },
+    status: entry.entry.status,
+    ...rowDetail(context, entry.entryKey, state),
+  };
+}
+
+function trailingRows(ranking: Ranking, context: RowContext): DisplayRow[] {
+  return [
+    ...ranking.noListings.map((entry) => unpricedRow(context, entry, MONEY_PHRASES.noListings, { state: 'no-listings' })),
+    ...ranking.notYetSynced.map((entry) =>
+      unpricedRow(context, entry, MONEY_PHRASES.notYetSynced, { state: 'not-yet-synced', reason: entry.reason }),
+    ),
+    ...ranking.unresolvable.map((entry) =>
+      unpricedRow(context, entry, MONEY_PHRASES.unresolvable, { state: 'unresolvable' }),
+    ),
+  ];
+}
+
 /**
  * The ranking as rows: `ordering` in `core`'s order, numbered by position —
  * a crafted row prints its Item Class name, the class glyph and `core`'s EV,
@@ -228,76 +316,9 @@ export function toDisplayRows(
     crafted = NO_CRAFTED_CONTEXT,
   }: { readonly numbered?: boolean; readonly honestEmpty?: boolean; readonly crafted?: CraftedContext } = {},
 ): ListRow[] {
-  const byKey = new Map(dataset.map((entry) => [entry.entryKey, entry]));
-  const classes = trackedByClass(crafted.tracked);
-
-  const detail = (
-    entryKey: string,
-    state: CombinationState,
-  ): Pick<DisplayRow, 'age' | 'state' | 'entry' | 'ages'> => {
-    const entry = byKey.get(entryKey);
-    return {
-      age: ageMark(state, entry?.lastAttemptedAt, now),
-      state,
-      entry,
-      ages: combinationAges(state, entry?.lastAttemptedAt, now),
-    };
-  };
-
-  const ranked = ranking.ordering.map((row, index): ListRow => {
-    const position = { numeral: numbered ? index + 1 : undefined, tier: tierOf(index + 1) };
-    if (row.kind === 'crafted') {
-      return {
-        key: row.classKey,
-        ...position,
-        unit: 'class',
-        label: unitLabel(row.className),
-        itemLevel: row.itemLevelMin,
-        ev:
-          row.ev === null
-            ? { kind: 'phrase', text: MONEY_PHRASES.notYetSynced }
-            : { kind: 'figure', text: formatDivine(row.ev) },
-        age: undefined,
-        provenance: row.provenance,
-        ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey, crafted, now }),
-      };
-    }
-    return {
-      key: row.entryKey,
-      ...position,
-      unit: 'raw',
-      label: row.baseTypeId,
-      itemLevel: row.itemLevelMin,
-      ev: { kind: 'figure', text: formatDivine(row.ev) },
-      status: row.status,
-      ...detail(row.entryKey, {
-        state: 'priced',
-        priceDivine: row.observation.priceDivine,
-        sampleSize: row.observation.sampleSize,
-        observedAt: row.observation.observedAt,
-      }),
-    };
-  });
-
-  const unpriced = (entry: UnrankedEntry, phrase: string, state: CombinationState): DisplayRow => ({
-    key: entry.entryKey,
-    numeral: undefined,
-    tier: 3,
-    unit: 'raw',
-    label: entry.entry.baseTypeId,
-    itemLevel: entry.entry.itemLevelMin,
-    ev: { kind: 'phrase', text: phrase },
-    status: entry.entry.status,
-    ...detail(entry.entryKey, state),
-  });
-
-  const trailing = [
-    ...ranking.noListings.map((entry) => unpriced(entry, MONEY_PHRASES.noListings, { state: 'no-listings' })),
-    ...ranking.notYetSynced.map((entry) =>
-      unpriced(entry, MONEY_PHRASES.notYetSynced, { state: 'not-yet-synced', reason: entry.reason }),
-    ),
-    ...ranking.unresolvable.map((entry) => unpriced(entry, MONEY_PHRASES.unresolvable, { state: 'unresolvable' })),
-  ];
+  const context: RowContext = { byKey: new Map(dataset.map((entry) => [entry.entryKey, entry])), now };
+  const ranked = rankedRows(ranking, context, crafted, numbered);
+  const trailing = trailingRows(ranking, context);
 
   // State 23 prints "In canonical order": one sequence across the crafted rows and all three
   // unpriced groups, by key (a class key or a canonical key), with no numeral and one EV phrase.
