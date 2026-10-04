@@ -663,7 +663,7 @@
   },
   "packages/sync/src/sync.ts": {
     "complexity": {
-      "count": 3
+      "count": 2
     },
     "local/max-comment-run": {
       "count": 15

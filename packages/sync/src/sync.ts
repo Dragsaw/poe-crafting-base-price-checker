@@ -252,23 +252,12 @@ function plus(now: string, ms: number): string {
  * the state before it and what the session read around the chunk go in.
  */
 export function nextWait(result: ChunkResult, state: SessionState, context: ChunkContext): SessionWait {
-  const { now, notBefore } = context;
+  const { now } = context;
   const backoffUntil = (): string =>
     plus(now, backoffMs(context.evenIntervalMs, backoffCountFor(state, context, result)));
 
   if (result.kind === 'error') {
-    const { error } = result;
-    if (notBefore !== undefined) {
-      // A malformed request, or the gate's 4xx: the abort `notBefore` (§5.3).
-      // An edit may fix a request `sync` built wrong, so that wait also ends on one.
-      return {
-        kind: 'until',
-        until: notBefore,
-        reason: 'a rejected request',
-        orInputChange: error instanceof MalformedRequestError,
-      };
-    }
-    return isRefusal(error) ? { kind: 'input-change', reason: 'a refused input or a league mismatch' } : { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
+    return waitAfterError(result.error, context, backoffUntil);
   }
 
   const { outcome } = result;
@@ -283,33 +272,62 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
       return { kind: 'until', until: outcome.notBefore, reason: 'a trade penalty', orInputChange: false };
     }
     case 'yielded': {
-      if (notBefore !== undefined) {
-        return { kind: 'until', until: notBefore, reason: 'a 429', orInputChange: false };
-      }
-      if (outcome.sessionExpired === true) {
-        // The downgrade wrote no `notBefore` and reset the pacing: backoff(1) (§13.4).
-        return { kind: 'until', until: backoffUntil(), reason: 'the session cookie expired', orInputChange: false };
-      }
-      if (context.freshReading) {
-        // A 5xx or a timeout that still carried headers: the spread paces the retry.
-        return NO_WAIT;
-      }
-      return { kind: 'until', until: backoffUntil(), reason: 'no answer', orInputChange: false };
+      return waitAfterYield(outcome, context, backoffUntil);
     }
     case 'completed': {
-      if (outcome.completed.length === 0 && outcome.entries.length === 0) {
-        return {
-          kind: 'input-change',
-          reason: 'nothing due',
-          until: plus(now, UNRESOLVABLE_RETRY_MS),
-        };
-      }
-      return NO_WAIT;
+      return waitAfterCompleted(outcome, now);
     }
     case 'bounded': {
       return NO_WAIT;
     }
   }
+}
+
+function waitAfterError(error: unknown, context: ChunkContext, backoffUntil: () => string): SessionWait {
+  const { notBefore } = context;
+  if (notBefore !== undefined) {
+    // A malformed request, or the gate's 4xx: the abort `notBefore` (§5.3).
+    // An edit may fix a request `sync` built wrong, so that wait also ends on one.
+    return {
+      kind: 'until',
+      until: notBefore,
+      reason: 'a rejected request',
+      orInputChange: error instanceof MalformedRequestError,
+    };
+  }
+  return isRefusal(error)
+    ? { kind: 'input-change', reason: 'a refused input or a league mismatch' }
+    : { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
+}
+
+function waitAfterYield(
+  outcome: Extract<ChunkOutcome, { kind: 'yielded' }>,
+  context: ChunkContext,
+  backoffUntil: () => string,
+): SessionWait {
+  if (context.notBefore !== undefined) {
+    return { kind: 'until', until: context.notBefore, reason: 'a 429', orInputChange: false };
+  }
+  if (outcome.sessionExpired === true) {
+    // The downgrade wrote no `notBefore` and reset the pacing: backoff(1) (§13.4).
+    return { kind: 'until', until: backoffUntil(), reason: 'the session cookie expired', orInputChange: false };
+  }
+  if (context.freshReading) {
+    // A 5xx or a timeout that still carried headers: the spread paces the retry.
+    return NO_WAIT;
+  }
+  return { kind: 'until', until: backoffUntil(), reason: 'no answer', orInputChange: false };
+}
+
+function waitAfterCompleted(outcome: Extract<ChunkOutcome, { kind: 'completed' }>, now: string): SessionWait {
+  if (outcome.completed.length === 0 && outcome.entries.length === 0) {
+    return {
+      kind: 'input-change',
+      reason: 'nothing due',
+      until: plus(now, UNRESOLVABLE_RETRY_MS),
+    };
+  }
+  return NO_WAIT;
 }
 
 /** The state with no confirmed league: the next chunk runs the gate. */
