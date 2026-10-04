@@ -75,8 +75,8 @@ describe('prunePages', () => {
     const data = tree([...SEVEN, ...UNFETCHED]);
     const distribution = tree([...BUNDLE, ...SEVEN, ...UNFETCHED]);
     const result = prunePages(distribution, data);
-    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].sort());
-    expect(result.removed.sort()).toEqual([...UNFETCHED].sort());
+    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].toSorted());
+    expect(result.removed.toSorted()).toEqual([...UNFETCHED].sort());
     expect(result.kept).toEqual(SEVEN);
   });
 

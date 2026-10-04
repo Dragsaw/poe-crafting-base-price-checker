@@ -59,7 +59,7 @@ describe('createSessionAuth: the shell-edge settle', () => {
 describe('the holder is opaque', () => {
   it('JSON, String and inspect show the state, never the value', () => {
     const holder = withCookie(CANARY);
-    for (const shown of [JSON.stringify(holder), String(holder), `${holder}`, inspect(holder), inspect(holder, { showHidden: true, depth: 10 })]) {
+    for (const shown of [JSON.stringify(holder), String(holder), inspect(holder), inspect(holder, { showHidden: true, depth: 10 })]) {
       expect(shown).not.toContain(CANARY.slice(0, 8));
       expect(shown).toContain('unsettled');
     }
@@ -105,7 +105,7 @@ describe('redact', () => {
 
     expect(isTransportFailure(holder.redact(fetchFailed))).toBe(true);
     expect(isTransportFailure(holder.redact(timeout))).toBe(true);
-    expect(leaks(String((fetchFailed.cause as Error).message))).toBe(false);
+    expect(leaks((fetchFailed.cause as Error).message)).toBe(false);
   });
 
   it('a string cause, an AggregateError and a cycle', () => {

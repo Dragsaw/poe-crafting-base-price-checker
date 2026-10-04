@@ -141,7 +141,7 @@ interface Setup {
   readonly env?: Record<string, string | undefined>;
   readonly answers?: Answers;
   /** Files seeded beside the inputs, e.g. a published dataset or a live lock. */
-  readonly seeded?: Parameters<typeof createFakeFilesystemPort>[0];
+  readonly seeded?: NonNullable<Parameters<typeof createFakeFilesystemPort>[0]>;
   /** The tracked entries; one `ENTRY` by default. */
   readonly tracked?: readonly TrackedEntry[];
   readonly wait?: (ms: number) => Promise<void>;

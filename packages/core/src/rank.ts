@@ -489,6 +489,10 @@ function craftedRow(
     asOf === undefined
       ? oldestOf(keyed.flatMap(({ entryKey }) => byKey.get(entryKey)?.lastAttemptedAt ?? []))
       : undefined;
+  let provenance = foldPair(pools, first, recipe.modifierLevelMin);
+  for (const { entry } of keyed.slice(1)) {
+    provenance = weakest(provenance, foldPair(pools, entry, recipe.modifierLevelMin));
+  }
   const grossPayout = ordered.reduce((sum, summand) => sum + summand.contribution, 0);
   return {
     kind: 'crafted',
@@ -501,7 +505,7 @@ function craftedRow(
     craftCost: cost.ok ? cost.divine : { kind: 'uncostable', currencyId: cost.reason.currencyId },
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
-    provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce((left, right) => weakest(left, right)),
+    provenance,
     ...(asOf !== undefined && { asOf }),
     ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
   };

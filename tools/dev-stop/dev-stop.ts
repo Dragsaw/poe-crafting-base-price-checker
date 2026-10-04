@@ -276,12 +276,10 @@ export function listenerPids(port: number): number[] {
 export function ownAncestry(processes: readonly ProcessInfo[], selfPid: number): Set<number> {
   const byPid = new Map(processes.map((info) => [info.pid, info]));
   const out = new Set<number>([selfPid]);
-  let pid: number | undefined = selfPid;
-  while (pid !== undefined) {
-    const next: number | undefined = byPid.get(pid)?.ppid;
-    if (next === undefined || out.has(next)) {break;}
+  let next = byPid.get(selfPid)?.ppid;
+  while (next !== undefined && !out.has(next)) {
     out.add(next);
-    pid = next;
+    next = byPid.get(next)?.ppid;
   }
   return out;
 }

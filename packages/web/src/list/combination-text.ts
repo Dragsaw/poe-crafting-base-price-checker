@@ -99,13 +99,13 @@ function hybridText(reference: HybridModifierRef, stats: StatTexts): AffixPart {
     forms.push(form);
   }
   if (reference.acceptedTier !== undefined && forms.length === reference.lines.length) {
-    return { text: `${reference.acceptedTier} ${forms.sort(compareByCodeUnit).join(LINE_JOIN)}`, verbatim: false };
+    return { text: `${reference.acceptedTier} ${forms.toSorted(compareByCodeUnit).join(LINE_JOIN)}`, verbatim: false };
   }
   const lines = reference.lines.map((line) => {
     const catalogued = stats.get(line.statId) ?? line.statId;
     return 'valueMin' in line ? bandedFallback(catalogued, line.valueMin, line.valueMax) : catalogued;
   });
-  return { text: lines.sort(compareByCodeUnit).join(LINE_JOIN), verbatim: true };
+  return { text: lines.toSorted(compareByCodeUnit).join(LINE_JOIN), verbatim: true };
 }
 
 /** A crafted entry's Combination: the prefix, then the suffix. */

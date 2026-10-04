@@ -143,7 +143,7 @@ function headers(policy: string, rule: string, state: string): Record<string, st
 interface SessionSetup {
   readonly tracked?: readonly TrackedEntry[];
   readonly minChunkSearches?: number;
-  readonly seeded?: Parameters<typeof createFakeFilesystemPort>[0];
+  readonly seeded?: NonNullable<Parameters<typeof createFakeFilesystemPort>[0]>;
   readonly fixtures?: Readonly<Record<string, HttpResponse>>;
   /** Replaces the fake http port, e.g. to fail with a network error. */
   readonly http?: (fake: ReturnType<typeof createFakeHttpPort>) => HttpPort;

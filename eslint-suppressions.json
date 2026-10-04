@@ -134,9 +134,6 @@
   "packages/contracts/src/envelopes.test.ts": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/explicit-length-check": {
-      "count": 1
     }
   },
   "packages/contracts/src/envelopes.ts": {
@@ -546,12 +543,6 @@
     "sonarjs/cognitive-complexity": {
       "count": 1
     },
-    "sonarjs/reduce-initial-value": {
-      "count": 1
-    },
-    "unicorn/no-array-reduce": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 1
     },
@@ -701,9 +692,6 @@
       "count": 10
     },
     "sonarjs/no-alphabetical-sort": {
-      "count": 1
-    },
-    "sonarjs/no-redundant-optional": {
       "count": 1
     },
     "unicorn/consistent-boolean-name": {
@@ -1148,9 +1136,6 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-redundant-optional": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1180,9 +1165,6 @@
       "count": 4
     },
     "max-lines": {
-      "count": 1
-    },
-    "sonarjs/no-redundant-optional": {
       "count": 1
     },
     "unicorn/import-style": {
@@ -1303,12 +1285,6 @@
   },
   "packages/sync/src/trade/session-auth.test.ts": {
     "unicorn/consistent-boolean-name": {
-      "count": 1
-    },
-    "unicorn/no-useless-coercion": {
-      "count": 1
-    },
-    "unicorn/no-useless-template-literals": {
       "count": 1
     }
   },
@@ -1582,12 +1558,6 @@
   "packages/web/src/list/combination-text.ts": {
     "local/max-comment-run": {
       "count": 6
-    },
-    "sonarjs/no-misleading-array-reverse": {
-      "count": 2
-    },
-    "unicorn/no-array-sort": {
-      "count": 2
     }
   },
   "packages/web/src/list/display-rows.test.ts": {
@@ -2162,9 +2132,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 7
     },
-    "sonarjs/no-misleading-array-reverse": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -2172,7 +2139,7 @@
       "count": 3
     },
     "unicorn/no-array-sort": {
-      "count": 7
+      "count": 5
     },
     "unicorn/require-array-sort-compare": {
       "count": 7
@@ -2321,9 +2288,6 @@
       "count": 9
     },
     "no-await-in-loop": {
-      "count": 1
-    },
-    "sonarjs/different-types-comparison": {
       "count": 1
     },
     "sonarjs/no-os-command-from-path": {

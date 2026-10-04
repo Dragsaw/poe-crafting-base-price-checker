@@ -114,7 +114,7 @@ describe('parseEnvelope', () => {
     const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, entries: [{ kind: 'raw' }] }, TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(false);
     expect(!result.ok && result.reason).toBe('invalid');
-    expect(!result.ok && result.reason === 'invalid' && result.issues.length).toBeGreaterThan(0);
+    expect(!result.ok && result.reason === 'invalid' && result.issues.length > 0).toBe(true);
   });
 
   it('reports a malformed version apart from an unknown major', () => {

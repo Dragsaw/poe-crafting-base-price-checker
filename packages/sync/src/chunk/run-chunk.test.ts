@@ -65,7 +65,7 @@ import type {
 type TestPorts = Omit<ChunkPorts, 'load'> & {
   readonly publication?: ChunkPublication;
   readonly starvationRecord?: ChunkSetup['starvationRecord'];
-  readonly gate?: ChunkSetup['gate'];
+  readonly gate?: NonNullable<ChunkSetup['gate']>;
   /** Replaces the `load` the adapter builds, e.g. to count its calls. */
   readonly load?: ChunkPorts['load'];
 };
