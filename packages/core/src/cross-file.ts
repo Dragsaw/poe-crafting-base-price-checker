@@ -33,42 +33,7 @@ export { classDiscriminability } from './cross-file/class-discriminability.ts';
 export { edgeAlignment } from './cross-file/edge-alignment.ts';
 export { emptyContainment } from './cross-file/empty-containment.ts';
 
-/**
- * The six cross-file checks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.7) and the
- * unvalidated marks (§2.8), defined once. Pure (AD-1). `web` runs them at load
- * and excludes each affected Item Class; `sync` runs them as its run-start
- * gate; `pnpm tracked:check` lists them. None of the three re-implements one.
- *
- * **What they see.** Non-`pruned` `crafted` entries only; a `raw` entry
- * carries no reference and needs no discriminator (AD-17). With the weights
- * file absent, no check runs and each entry is marked `weights-absent`. A
- * class absent from the file, or with a `partial` slot, gets no pool check and
- * each of its entries is marked `partial-pool`; class discriminability reads
- * the category's fan-out, not a pool, and still runs (§2.8). A mark is never a
- * failure.
- *
- * **The scope.** Every pool check reads `eligible(pool, entry.itemLevelMin, 0)`
- * — the class's own crafted floor, with no recipe floor. Containment is
- * `contains` and every interval is `interval`, from `./probability.ts`; no
- * range pair is divided here.
- *
- * **Per line.** Kind agreement and edge alignment run once per line of a
- * `hybrid` reference (§2.3, §2.4); `linesOf` gives a single-line reference as
- * its one line.
- *
- * **Pairs.** `contracts` refuses an overlap of two all-single-line entries.
- * The `co-occur` check evaluates every pair in which either entry names a
- * `hybrid` reference, with the whole §2.1 predicate: `overlapBranches` computes
- * `S` from the pair, compares each summed `statId` as a sum and passes `S` to
- * `coOccur` (§2.1, *Who evaluates a pair*).
- *
- * **One failure per (check, entry)**, which is the record identity
- * `check` + `entryKey` (§12). A failure's `detail` names every slot,
- * reference, line, floor, partner, tier or sibling count its § asks for. No
- * detail names a file as at fault, because `core` cannot tell which file is
- * wrong (§2.5) — except line-set completeness's mixed-modGroup half, which
- * blames `weights.json` (§2.7).
- */
+/** The six cross-file checks and the unvalidated marks (AD-17, IMPLEMENTATION-NOTES.md §2). Pure (AD-1): `web`, `sync` and `pnpm tracked:check` share them. */
 
 export interface CrossFileFailure {
   readonly check: CrossFileCheck;
@@ -107,13 +72,7 @@ function disagrees(rl: ReferenceLine, line: WeightsLine): boolean {
   return line.statId === rl.statId && !('valueMin' in rl) && line.ranges.length > 0;
 }
 
-/**
- * §2.3, universal and per line. The detail when a valueless line of the
- * reference meets **any** banded scoped line on its `statId`, naming the line,
- * its kind and one disagreeing tier. A banded line never disagrees: a
- * valueless weights line reads as `[1, 1]` (§2.3). A weight-0 tier moves no
- * kind verdict (§1).
- */
+/** §2.3, universal and per line: the detail when a valueless reference line meets any banded scoped line on its `statId`. */
 export function kindAgreement(
   slot: Slot,
   reference: ModifierRef,
@@ -167,14 +126,7 @@ function meets(rl: ReferenceLine, line: WeightsLine): boolean {
   return derived.min <= rl.valueMax && rl.valueMin <= derived.max;
 }
 
-/**
- * §2.7: `incomplete(ref) ∨ mixedGroup(ref)`. `incomplete` holds when a scoped,
- * positive-weight, trackable tier that every line of the reference meets has
- * a line set strictly wider than the reference's `statId`s: a hybrid that
- * names a subset of a tier's lines, or a single-line band that reaches into a
- * hybrid tier. `mixedGroup` holds when a hybrid's contained tiers span more
- * than one `modGroup`, and its detail blames `weights.json`.
- */
+/** §2.7: `incomplete(ref) ∨ mixedGroup(ref)`; the `mixedGroup` detail blames `weights.json`. */
 export function lineSetCompleteness(
   slot: Slot,
   reference: ModifierRef,
@@ -226,14 +178,7 @@ export function lineSetCompleteness(
   return parts.length === 0 ? undefined : parts.join('; ');
 }
 
-/**
- * §2.2: `coOccur(x, y, S)` on one slot ⇔ `x` and `y` share a `statId` ∧ one
- * scoped entry of that slot contains both under `contains_S` (`contains`
- * with `summed`, which admits no weight-0 tier). A reference line on a
- * `statId` in `S` keeps its place in the line-set test and drops out of the
- * band test, so the sum alone judges it (§2.1). Memoised per reference pair
- * and `S`, since one class's pairs repeat refs.
- */
+/** §2.2: `coOccur(x, y, S)` on one slot, memoised per reference pair and `S` since one class's pairs repeat refs. */
 export function coOccur(scoped: ScopedPools): CoOccur {
   const cache = new Map<string, boolean>();
   return (x, y, slot, summed) => {
@@ -385,12 +330,7 @@ function checkClass(members: readonly CraftedTrackedEntry[], weights: WeightsFil
   };
 }
 
-/**
- * Every failure of the six checks over the tracked list against the parsed
- * weights file, sorted by canonical key, then by check, and every unvalidated
- * mark, one per entry, sorted by canonical key (§2.8). With `weights` `undefined`
- * there is no failure and every crafted entry is marked `weights-absent`.
- */
+/** Every failure of the six checks and every unvalidated mark, each sorted by canonical key (§2.8); without `weights`, every crafted entry is `weights-absent`. */
 export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
   const failures: CrossFileFailure[] = [];
   const unvalidated: UnvalidatedMark[] = [];

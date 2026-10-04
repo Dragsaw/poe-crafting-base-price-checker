@@ -1,32 +1,7 @@
 import { canonicalKey, compareCanonicalKeys, compareTrackedEntries } from '@poe/contracts';
 import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
 
-/**
- * The chunk runner's selection order: the Refresh Rotation (AD-7, FR-17).
- *
- * Pure. The tracked list, the dataset entries, the pass's completed keys and
- * the instant go in; the order comes out. Nothing is read from anywhere else,
- * so a dry run and a live run given the same inputs visit the same keys.
- *
- * Rows, in order:
- *
- * 1. `pinned` entries whose dataset price state is not `unresolvable` — with
- *    `pinnedMaxAgeMs`, only the stale ones (no `lastAttemptedAt`, or one older
- *    than the maximum age).
- * 2. `active` entries whose dataset price state is not `unresolvable`, less
- *    the pass's completed keys.
- * 3. every non-pruned entry whose dataset price state is `unresolvable` and
- *    that is due — no `lastAttemptedAt`, or at least 24 h since it — less the
- *    pass's completed keys.
- *
- * `pruned` is never selected. Within a row: oldest `lastAttemptedAt` first,
- * compared as instants; an absent one sorts before any present one; ties by
- * `compareTrackedEntries`. The key is the field's absence, never the
- * `not-yet-synced` state.
- *
- * The pass covers rows 2–3 only. `pinned` is exempt from rotation, so row 1
- * never consults or produces completed keys.
- */
+/** The chunk runner's selection order: the Refresh Rotation rows and their ordering (AD-7, FR-17). Pure (AD-1). */
 
 /** The bounded retry interval for row 3 (AD-7). */
 export const UNRESOLVABLE_RETRY_MS = 24 * 60 * 60 * 1000;
@@ -39,11 +14,7 @@ export interface ChunkOrderInput {
   readonly completed: readonly string[];
   /** The current instant, ISO-8601 UTC. */
   readonly now: string;
-  /**
-   * The `pnpm sync` session's stale-pinned rule (AD-7): row 1 keeps only the
-   * pinned entries whose `lastAttemptedAt` is absent or more than this many
-   * milliseconds before `now`. Absent, row 1 keeps every pinned entry.
-   */
+  /** The `pnpm sync` session's stale-pinned rule (AD-7): row 1 keeps only the pinned entries older than this many milliseconds. */
   readonly pinnedMaxAgeMs?: number;
 }
 
@@ -52,11 +23,7 @@ export interface ChunkOrder {
   readonly pinned: readonly TrackedEntry[];
   /** Rows 2 then 3, in visiting order. */
   readonly rotation: readonly TrackedEntry[];
-  /**
-   * The completed keys that remain in force, in canonical-key order. It is
-   * empty when a new pass started, and it drops any key that no longer names a
-   * rotation (rows 2–3) entry.
-   */
+  /** The completed keys still in force, in canonical-key order; empty when a new pass started. */
   readonly completed: readonly string[];
   /** `true` when every due row 2–3 entry was complete, so the pass restarted. */
   readonly newPass: boolean;
@@ -157,13 +124,7 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
   };
 }
 
-/**
- * The runtime `pinned` truncation (AD-7, IMPLEMENTATION-NOTES.md §6). After a
- * pinned step reports `remaining` searches with `left` pinned entries still
- * unvisited: when the rotation has work waiting and `remaining < left + 1`,
- * visit only `max(remaining − 1, 0)` more, reserving a search for the rotation.
- * Otherwise visit all `left`.
- */
+/** The runtime `pinned` truncation (AD-7, IMPLEMENTATION-NOTES.md §6): it reserves one search for waiting rotation work. */
 export function pinnedToKeep(left: number, remaining: number, rotationWaiting: boolean): number {
   return !rotationWaiting || remaining >= left + 1 ? left : Math.min(left, Math.max(remaining - 1, 0));
 }
