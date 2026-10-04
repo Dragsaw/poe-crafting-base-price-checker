@@ -32,7 +32,7 @@ pnpm sync:dry       # run the sync pipeline against fixtures, write nowhere (nev
 
 `pnpm check` is the point that enforces the package boundaries. `dependency-cruiser` fails the build on an import in the wrong direction (AD-1). An agent that imports from `core` into `sync` therefore learns about the fault in seconds, and no reviewer is necessary.
 
-**The gate runs in three places.** The `.githooks/pre-push` hook runs `pnpm check` (see Commit conventions). `.github/workflows/test.yml` runs it on a pull request. For an agent, a PostToolUse hook (`tools/lint-on-edit`) lints, typechecks and dependency-cruises each file after the agent edits it, so a fault shows on the edit and not at the end. `deploy.yml` runs `pnpm check:fast` and `pnpm test`, not `pnpm test:data`: a player's data-only push must still deploy.
+**The gate runs in four places.** The `.githooks/pre-push` hook runs `pnpm check` (see Commit conventions). `.github/workflows/test.yml` runs it on a pull request, and `.github/workflows/deploy.yml` runs it before the build. For an agent, a PostToolUse hook (`tools/lint-on-edit`) lints, typechecks and dependency-cruises each file after the agent edits it, so a fault shows on the edit and not at the end.
 
 **The lint baseline is a ratchet.** `eslint-suppressions.json` records the violations that existed when the type-aware rules arrived. A new violation fails `pnpm lint`. When a change fixes a baselined violation, its suppression is stale and `pnpm lint` fails until `pnpm lint:prune` removes it. An agent never runs `eslint --suppress-*`, and never edits `eslint-suppressions.json` upward: the only permitted change to the file is `pnpm lint:prune`. `LINT_FAST=1` skips the type-aware rules. Only the PostToolUse hook sets it.
 
