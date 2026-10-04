@@ -26,11 +26,7 @@ export const COMMIT_DEBOUNCE_MS = 150;
 /** A leading digit is required: `fixedDecimalScale` pads a lone `.` to `.00`, which is not a parse. */
 const PARSEABLE = /^\d+(\.\d*)?$/;
 
-/**
- * The draft as a threshold, or `undefined` when it does not parse. Mantine
- * hands a string for `""`, `"."` and for figures with trailing zeros (`0.10`),
- * so a string is parsed here rather than discarded.
- */
+/** Mantine hands a string for `""`, `"."` and trailing zeros (`0.10`), so a string is parsed here rather than discarded. */
 function parseDraft(draft: number | string): number | undefined {
   if (typeof draft === 'number') {
     return Number.isFinite(draft) ? draft : undefined;
@@ -46,14 +42,7 @@ function ghostText(draft: number | string): string {
   return draft === '' ? '0' : draft;
 }
 
-/**
- * `{components.payout-threshold}`. The figure IS the input: a borderless
- * Mantine `NumberInput` with no stepper, and `Divine` outside it so it can
- * never be typed over. Each valid parse re-ranks after ~150ms; an empty or
- * unparseable draft does not, and blur restores the last valid value at 2dp.
- * The track and the marker are a readout of the ranking threshold, never a
- * slider: no pointer events, no handlers (UX-DR18, UX-DR35, UX-DR44).
- */
+/** `{components.payout-threshold}`: the figure is the input, `Divine` sits outside it so it is never typed over; the track and marker are a readout, never a slider (UX-DR18, UX-DR35, UX-DR44). */
 export function PayoutThreshold({
   value,
   onChange,
