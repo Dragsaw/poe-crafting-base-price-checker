@@ -59,6 +59,32 @@ const TEST_FILES = ['**/*.test.{ts,tsx,mts,cts,mjs}', 'test/**'];
 
 const sizeLimits = { skipBlankLines: true, skipComments: true };
 
+/**
+ * Type-aware rules need the TypeScript program, which costs far more than the
+ * syntactic rules. Scoped to files a tsconfig already covers: the packages,
+ * `test/**` and the `tools/**` TypeScript. Config files and `.mjs` scripts stay
+ * untyped, so they never hit "file not found in project".
+ */
+const typeAwareBlock = {
+  files: ['packages/**/*.{ts,tsx,mts,cts}', 'test/**/*.ts', 'tools/**/*.ts', '.claude/skills/tracked-json/scripts/*.ts'],
+  ignores: ['**/*.config.*'],
+  languageOptions: {
+    parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+  },
+  rules: {
+    '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/no-misused-promises': 'error',
+    '@typescript-eslint/await-thenable': 'error',
+    '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+    '@typescript-eslint/no-unsafe-argument': 'error',
+    '@typescript-eslint/no-unsafe-assignment': 'error',
+    '@typescript-eslint/no-unsafe-call': 'error',
+    '@typescript-eslint/no-unsafe-member-access': 'error',
+    '@typescript-eslint/no-unsafe-return': 'error',
+    '@typescript-eslint/no-unsafe-enum-comparison': 'error',
+  },
+};
+
 export default tseslint.config(
   {
     // An unused `eslint-disable` is a finding, so a suppression cannot outlive
@@ -221,6 +247,9 @@ export default tseslint.config(
       'vitest/valid-expect': ['error', { maxArgs: 2 }],
     },
   },
+  // `LINT_FAST=1` (the post-edit hook) skips the whole type-aware block for speed;
+  // `pnpm lint` and CI run it.
+  ...(process.env.LINT_FAST === '1' ? [] : [typeAwareBlock]),
   {
     // AD-1 purity for `core` (see `coreRestrictedGlobals`). `Date` itself stays
     // legal: `Date.parse(s)` and `new Date(s)` are pure, and `chunk-order.ts`
