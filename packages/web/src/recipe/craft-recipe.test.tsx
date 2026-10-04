@@ -84,11 +84,7 @@ type Pools = readonly [readonly ModifierWeight[], readonly ModifierWeight[]];
 
 /** At floor 44 the target is half the prefix pool; at floor 70 it is all of it. */
 const BOWS: Pools = [[tier(TARGET, 10, 75), tier(FILLER, 10, 50), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
-/**
- * At floor 44 the target is half the prefix pool; at floor 70 only its small
- * tier is in reach, a quarter of the pool. (A target with no tier in reach is
- * a reason, not P = 0: IMPLEMENTATION-NOTES.md §9.)
- */
+/** At floor 44 the target is half the prefix pool; at floor 70 a quarter. No tier in reach is a reason, not P = 0 (IMPLEMENTATION-NOTES.md §9). */
 const STAVES: Pools = [[tier(TARGET, 50, 50), tier(TARGET, 25, 75), tier(FILLER, 75, 75)], [tier(SUFFIX, 10, 80)]];
 /** Every tier below both floors: no recipe reaches it (state 36). */
 const WANDS: Pools = [[tier(TARGET, 10, 1)], [tier(SUFFIX, 10, 1)]];
@@ -170,10 +166,8 @@ function serveWorld(world: World): void {
   });
 }
 
-/**
- * greater: Staves 0.5 × 2 − 0.03 = 0.97, Bows 0.5 × 1 − 0.03 = 0.47, Wide Belt 0.40, Gold Amulet 0.30.
- * perfect: Bows 1 × 1 − 0.3 = 0.70, Wide Belt 0.40, Gold Amulet 0.30, Staves 0.25 × 2 − 0.3 = 0.20.
- */
+// greater: Staves 0.5 × 2 − 0.03 = 0.97, Bows 0.5 × 1 − 0.03 = 0.47, Wide Belt 0.40, Gold Amulet 0.30.
+// perfect: Bows 1 × 1 − 0.3 = 0.70, Wide Belt 0.40, Gold Amulet 0.30, Staves 0.25 × 2 − 0.3 = 0.20.
 function standardWorld(overrides: Partial<World> = {}): World {
   const now = Date.now();
   return {

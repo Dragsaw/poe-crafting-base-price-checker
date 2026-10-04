@@ -61,11 +61,7 @@ function frame(): HTMLElement {
   return found;
 }
 
-/**
- * The refusal body sentence, after checking the parts every cause shares: the
- * eyebrow, the title, the named artifact beside `× unresolvable`, the recovery
- * sentence, and no retry.
- */
+/** The refusal body sentence, after checking the parts every cause shares (eyebrow, title, artifact, recovery, no retry). */
 function refusalBody(path: string): string {
   const text = frame().textContent;
   expect(text).toContain(REFUSAL_EYEBROW);
@@ -1018,11 +1014,7 @@ describe('the list statement', () => {
   });
 });
 
-/**
- * Twenty-nine distinct crafted Item Classes, the absent-weights world's
- * fixture, served out of order (a stride-7 walk) so the page's order can only
- * come from `core`'s sort.
- */
+/** Served out of order (a stride-7 walk) so the page's order can only come from `core`'s sort. */
 function twentyNineClasses(): ReturnType<typeof craftedEntry>[] {
   return Array.from({ length: 29 }, (_, index) => {
     const n = String(((index * 7) % 29) + 1).padStart(2, '0');

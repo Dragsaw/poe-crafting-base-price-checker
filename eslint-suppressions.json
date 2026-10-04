@@ -477,9 +477,6 @@
     }
   },
   "packages/web/src/App.test.tsx": {
-    "local/max-comment-run": {
-      "count": 2
-    },
     "max-lines": {
       "count": 1
     }
@@ -520,9 +517,6 @@
     }
   },
   "packages/web/src/frame/trust-strip.test.tsx": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "max-lines": {
       "count": 1
     }
@@ -643,9 +637,6 @@
     }
   },
   "packages/web/src/recipe/craft-recipe.test.tsx": {
-    "local/max-comment-run": {
-      "count": 2
-    },
     "max-lines": {
       "count": 1
     }

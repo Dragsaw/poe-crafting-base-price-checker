@@ -27,11 +27,7 @@ const COMMITTED_REPORT: SyncReport = {
   records: [],
 };
 
-/**
- * A loaded curation of 5 pinned entries and `minChunkSearches: 8`, which the
- * 5/8 starvation fixtures describe. Two active entries prove only pinned
- * entries count toward M.
- */
+/** 5 pinned entries and `minChunkSearches: 8`; the two active entries prove only pinned ones count toward M. */
 const CURATION_5_OF_8: Partial<ArtifactSet> = {
   tracked: {
     ...BASE_SET.tracked,
