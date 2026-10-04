@@ -65,8 +65,8 @@ export interface SyncCommandDeps extends Omit<SyncPorts, 'userAgent' | 'auth'> {
 }
 
 /** The command: the exit code it should end with. `0` on any outcome, `1` on a refusal or a throw. */
-export async function syncCommand(deps: SyncCommandDeps): Promise<number> {
-  const { env, stdout, stderr, ...ports } = deps;
+export async function syncCommand(dependencies: SyncCommandDeps): Promise<number> {
+  const { env, stdout, stderr, ...ports } = dependencies;
   const contact = resolveUserAgent(env);
   if (!contact.ok) {
     // Refused before anything is issued (NFR-9).
@@ -125,9 +125,11 @@ function isInvokedDirectly(): boolean {
 }
 
 if (isInvokedDirectly()) {
-  main().catch((error: unknown) => {
+  try {
+    await main();
+  } catch (error) {
     process.stderr.write(`pnpm sync:batch: ${String(error)}\n`);
     // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a piped stderr write.
     process.exitCode = 1;
-  });
+  }
 }

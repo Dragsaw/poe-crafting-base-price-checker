@@ -38,7 +38,7 @@ describe('readMarker', () => {
 describe('issueBody', () => {
   it('starts with the marker line that readMarker reads back', () => {
     const body = issueBody(FIRST!);
-    expect(body.split('\n')[0]).toBe(`Deferred entry: ${FIRST!.id}`);
+    expect(body.split('\n', 1)[0]).toBe(`Deferred entry: ${FIRST!.id}`);
     expect(readMarker(body)).toBe(FIRST!.id);
     expect(body).toContain(`- summary: ${FIRST!.summary}`);
   });

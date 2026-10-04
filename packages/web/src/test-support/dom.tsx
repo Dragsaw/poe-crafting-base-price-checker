@@ -21,7 +21,7 @@ export const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
 /** A token hex as the `rgb(...)` jsdom reports for an inline colour. */
 export const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
+  `rgb(${[1, 3, 5].map((index) => String(Number.parseInt(hex.slice(index, index + 2), 16))).join(', ')})`;
 
 let container: HTMLDivElement | undefined;
 let root: Root | undefined;
@@ -54,7 +54,7 @@ export function unmount(): void {
 }
 
 /** Renders `node` into the kept root, so mounted components keep their state. */
-export function rerender(node: ReactNode): void {
+function rerender(node: ReactNode): void {
   const mounted = root;
   if (mounted === undefined) {
     throw new Error('no mounted root');
@@ -90,7 +90,7 @@ export function rerenderList(
 
 /** The ranked rows under `within`, in document order. */
 export function rowsIn(within: HTMLElement): HTMLElement[] {
-  return Array.from(within.querySelectorAll<HTMLElement>('[data-ranked-row]'));
+  return [...within.querySelectorAll<HTMLElement>('[data-ranked-row]')];
 }
 
 /** The one `[data-cell=name]` under `within`; throws when there is none. */

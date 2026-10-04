@@ -31,9 +31,7 @@ type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
  * the load resolved, and the cross-file failures, run once per load (AD-17).
  */
 type ViewState =
-  | { readonly kind: 'pending' }
-  | Exclude<LoadOutcome, ReadyOutcome>
-  | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] });
+  Exclude<LoadOutcome, ReadyOutcome> | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] }) | { readonly kind: 'pending' };
 
 /**
  * The page's substrate. It paints the masthead and twenty skeleton slots at
@@ -51,10 +49,10 @@ export function App(): JSX.Element {
   const [view, setView] = useState<ViewState>({ kind: 'pending' });
 
   useEffect(() => {
-    let live = true;
+    let isLive = true;
     const controller = new AbortController();
     void loadArtifacts({ signal: controller.signal }).then((outcome) => {
-      if (live) {
+      if (isLive) {
         // "Now" is read once, as the set resolves, and held: ages never tick.
         setView(
           outcome.kind === 'ready'
@@ -68,7 +66,7 @@ export function App(): JSX.Element {
       }
     });
     return () => {
-      live = false;
+      isLive = false;
       controller.abort();
     };
   }, [attempt]);
@@ -113,7 +111,7 @@ export function App(): JSX.Element {
   }, []);
 
   switch (view.kind) {
-    case 'pending':
+    case 'pending': {
       return (
         <Frame state="pending">
           <Masthead league={undefined} threshold={threshold} onThresholdChange={changeThreshold} />
@@ -123,6 +121,7 @@ export function App(): JSX.Element {
           <PageTail />
         </Frame>
       );
+    }
     case 'ready': {
       if (ranking === undefined) {
         throw new Error('a ready view always has a ranking');
@@ -165,7 +164,7 @@ export function App(): JSX.Element {
         </Frame>
       );
     }
-    case 'refused':
+    case 'refused': {
       return (
         <Frame state="refused">
           <FailureScreen
@@ -177,12 +176,14 @@ export function App(): JSX.Element {
           />
         </Frame>
       );
-    case 'failed':
+    }
+    case 'failed': {
       return (
         <Frame state="failed">
           <FailureScreen variant="failed" path={view.path} onRetry={retry} />
         </Frame>
       );
+    }
   }
 }
 

@@ -18,8 +18,5 @@ export type TradeLinkEntry = Pick<DatasetEntry, 'lastSearchId' | 'lastSearchLeag
  */
 export function tradeSearchHref(entry: TradeLinkEntry, activeLeague: string): string | undefined {
   const { lastSearchId, lastSearchLeague, status } = entry;
-  if (status === 'pruned' || lastSearchId === undefined || lastSearchLeague !== activeLeague) {
-    return undefined;
-  }
-  return `${TRADE_SEARCH_ROOT}/${encodeURIComponent(lastSearchLeague)}/${lastSearchId}`;
+  return status === 'pruned' || lastSearchId === undefined || lastSearchLeague !== activeLeague ? undefined : `${TRADE_SEARCH_ROOT}/${encodeURIComponent(lastSearchLeague)}/${lastSearchId}`;
 }

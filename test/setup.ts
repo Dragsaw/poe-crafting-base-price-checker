@@ -99,7 +99,7 @@ const recordDir = inject('noNetworkRecordDir');
  * the request.
  */
 function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undefined): void {
-  if (guard.fileOpen || recordDir === undefined) {
+  if (recordDir === undefined || guard.fileOpen) {
     return;
   }
   appendFileSync(
@@ -235,13 +235,14 @@ export function assertNoEscapedRequests(owner?: Pick<TestIdentity, 'id'>): void 
   }
 
   const escaped = takeEscapedRequests(() => true);
-  if (escaped.length > 0) {
-    const lines = escaped.map((entry) => `${entry.described} (${describeIssuer(entry.issuedBy)})`);
-    throw new Error(
-      `[no-network] ${String(escaped.length)} request(s) had no fixture and were blocked. ` +
-        `No test's afterEach reported these requests:\n  ${lines.join('\n  ')}`,
-    );
+  if (escaped.length === 0) {
+    return;
   }
+  const lines = escaped.map((entry) => `${entry.described} (${describeIssuer(entry.issuedBy)})`);
+  throw new Error(
+    `[no-network] ${String(escaped.length)} request(s) had no fixture and were blocked. ` +
+      `No test's afterEach reported these requests:\n  ${lines.join('\n  ')}`,
+  );
 }
 
 export { server };

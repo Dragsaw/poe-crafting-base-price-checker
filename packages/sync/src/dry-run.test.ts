@@ -45,7 +45,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('dry-run.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 const FROZEN_DATA_DIR = fileURLToPath(new URL('../../../test/fixtures/frozen-data', import.meta.url));
@@ -94,7 +94,7 @@ function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
 
 function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: Partial<DryRunSnapshot> = {}): DryRunSnapshot {
   return {
-    ...(entries === undefined ? {} : { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
+    ...(entries !== undefined && { tracked: JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries }) }),
     config: CONFIG,
     currencies: CURRENCIES,
     items: ITEMS,
@@ -382,7 +382,7 @@ describe('dryRun: the dataset snapshot', () => {
               return Promise.resolve({ kind: 'completed' });
             },
           }),
-        log: () => undefined,
+        log: () => {},
         catalogue: () =>
           Promise.resolve({
             ok: true,
@@ -456,18 +456,18 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     // The real inputs, with the fixture workload for the tracked list. The
     // real dataset, report and progress describe the real list, so they are
     // left out: every workload entry is never attempted.
-    const snapshot: DryRunSnapshot = {
+    const workload: DryRunSnapshot = {
       ...(await readRepositorySnapshot(FROZEN_DATA_DIR)),
       tracked: readFileSync(join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
       dataset: undefined,
       report: undefined,
       progress: undefined,
     };
-    const tracked = JSON.parse(snapshot.tracked ?? '{"entries":[]}') as { entries: TrackedEntry[] };
+    const tracked = JSON.parse(workload.tracked ?? '{"entries":[]}') as { entries: TrackedEntry[] };
     const active = tracked.entries.filter((entry) => entry.status !== 'pruned');
     expect(active.length).toBeGreaterThan(0);
 
-    const report = await dryRun(snapshot);
+    const report = await dryRun(workload);
 
     expect(report.outcome).toBe('completed');
     expect(report.entries).toHaveLength(active.length);
@@ -492,7 +492,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     const report = await dryRun(await readRepositorySnapshot(FROZEN_DATA_DIR));
 
     expect(report.outcome).toBe('completed');
-    const unrecorded = new Set(report.unrecorded ?? []);
+    const unrecorded = new Set(report.unrecorded);
     const priced = report.entries.map((entry) => entry.entryKey);
     expect(priced.filter((key) => unrecorded.has(key))).toEqual([]);
     expect(new Set([...priced, ...unrecorded])).toEqual(new Set(report.completed));
@@ -506,9 +506,9 @@ interface Run {
 }
 
 /** Spawns the script the way `pnpm sync:dry` does, with both streams piped. */
-function runScript(args: readonly string[] = []): Promise<Run> {
+function runScript(arguments_: readonly string[] = []): Promise<Run> {
   return new Promise((resolve) => {
-    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       resolve({ code: child.exitCode, stdout, stderr });
     });
   });

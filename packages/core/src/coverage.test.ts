@@ -13,8 +13,8 @@ const tier = (weight: number): ModifierWeight => ({
   lines: [{ statId: 'explicit.stat_1', ranges: [[1, 2]] }],
 });
 
-const pool = (weight: number, poolCoverage: 'complete' | 'partial' = 'complete'): WeightsPool => ({
-  poolCoverage,
+const pool = (weight: number, coverage: 'complete' | 'partial' = 'complete'): WeightsPool => ({
+  poolCoverage: coverage,
   entries: [tier(weight)],
 });
 
@@ -26,23 +26,22 @@ const weightsOf = (
     gamePatch: '0.5.5',
     producer: { id: 'test', generatedAt: '2026-09-26T10:52:22.504Z' },
     bases,
-  }) as WeightsFile;
+  });
 
 const crafted = (
   className: string,
   status: 'active' | 'pruned' = 'active',
-  categoryId = 'armour.chest',
 ): TrackedEntry =>
   ({
     kind: 'crafted',
-    categoryId,
+    categoryId: 'armour.chest',
     className,
     itemLevelMin: 80,
     prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
     suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     status,
-    ...(status === 'pruned' ? { prunedReason: 'gone' } : {}),
-  }) as TrackedEntry;
+    ...((status === 'pruned') && { prunedReason: 'gone' }),
+  });
 
 const full = { prefix: pool(10), suffix: pool(10) };
 

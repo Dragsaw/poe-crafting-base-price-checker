@@ -12,15 +12,15 @@ import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
 
 /** The row mark's word for `uniform-prior`: never the enum value, never a `weightSource` word. */
-export const PRIOR_ONLY = 'prior only';
+const PRIOR_ONLY = 'prior only';
 
 const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
 /** Rank-numeral colour per tier; tier 1 also sets the numeral, name and EV at 700 (DESIGN.md `ranked-row-tier-*`). */
 const RANK_COLOR = { 1: colors.sepia, 2: colors['ink-secondary'], 3: colors['ink-tertiary'] } as const;
 
-const [rank, unit, ev, provenance, age, chase] = rankedRowColumns;
-const COLUMNS = { rank, unit, ev, provenance, age, chase } as const;
+const [rank, unit, event, provenance, age, chase] = rankedRowColumns;
+const COLUMNS = { rank, unit, ev: event, provenance, age, chase } as const;
 
 /** The three chase slots. An unused slot stays an empty cell (state 21). */
 const CHASE_SLOTS = Array.from({ length: CHASE_CELLS }, (_, slot) => slot);
@@ -48,14 +48,14 @@ export function RankedRow({
   readonly onToggle: (key: string) => void;
 }): JSX.Element {
   const strong = row.tier === 1 ? 700 : 400;
-  const raw = row.unit === 'raw';
+  const isRaw = row.unit === 'raw';
   const marker = open ? spacing.openRowMarker : 0;
 
   return (
     <div
       data-ranked-row=""
       data-tier={row.tier}
-      data-raw={raw ? '' : undefined}
+      data-raw={isRaw ? '' : undefined}
       data-open={open ? '' : undefined}
       className="fg-row"
       onClick={() => {
@@ -98,7 +98,7 @@ export function RankedRow({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             fontWeight: strong,
-            fontStyle: raw ? 'italic' : 'normal',
+            fontStyle: isRaw ? 'italic' : 'normal',
           }}
         >
           {row.label}
@@ -138,10 +138,10 @@ export function RankedRow({
           ...typeStyle('row-chase'),
           overflow: 'hidden',
           // A crafted row's three cells carry `pad-chase-cell-right` each, so the column pads nothing more.
-          ...(raw ? {} : { display: 'flex', paddingRight: undefined }),
+          ...(!isRaw && { display: 'flex', paddingRight: undefined }),
         }}
       >
-        {raw ? (
+        {isRaw ? (
           <span
             data-raw-note=""
             style={{

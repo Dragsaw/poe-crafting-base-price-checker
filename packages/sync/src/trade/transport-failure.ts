@@ -10,8 +10,5 @@
  * unrecorded fixture, a programming error — is rethrown and fails loudly.
  */
 export function isTransportFailure(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-  return error.name === 'TimeoutError' || (error instanceof TypeError && error.message === 'fetch failed');
+  return error instanceof Error && (error.name === 'TimeoutError' || (error instanceof TypeError && error.message === 'fetch failed'));
 }

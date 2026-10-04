@@ -182,11 +182,11 @@ describe('toDisplayRows', () => {
   });
 
   it('gives ranks 21 and beyond tier 3, and a tiny price < 0.01', () => {
-    const entries = Array.from({ length: 25 }, (_, i) => rawEntry(`Base ${String(i).padStart(2, '0')}`));
+    const entries = Array.from({ length: 25 }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
     const rows = toDisplayRows(
       rank({
         tracked: entries,
-        dataset: entries.map((entry, i) => priced(entry, 30 - i, hoursBefore(NOW, 1))),
+        dataset: entries.map((entry, index) => priced(entry, 30 - index, hoursBefore(NOW, 1))),
         activeLeague: TEST_LEAGUE,
         threshold: 0,
         weights: null,

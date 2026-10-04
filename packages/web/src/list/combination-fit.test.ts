@@ -112,11 +112,9 @@ describe('the frozen Combination texts', () => {
     const [cell] = combinationLine1Columns;
     const available = cell.width - cell.padRight;
     const fontSize = Number.parseFloat(typeRoles['detail-row'].fontSize);
-    const longest = texts
-      .map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`)
-      .reduce((left, right) => (right.length > left.length ? right : left));
+    const longest = Math.max(...texts.map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`.length));
     expect(available).toBe(448);
-    expect(longest.length * ADVANCE_EM * fontSize).toBeLessThanOrEqual(available);
+    expect(longest * ADVANCE_EM * fontSize).toBeLessThanOrEqual(available);
   });
 
   it('lists every chase pairing over the 27-character budget as a pruning candidate', () => {

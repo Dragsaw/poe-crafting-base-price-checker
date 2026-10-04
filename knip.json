@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "tools/**/*.{ts,mjs}",
+        ".claude/skills/tracked-json/scripts/*.ts",
+        "test/**/*.ts",
+        "depcruise.rules.mjs"
+      ],
+      "project": [
+        "tools/**/*.{ts,mjs}",
+        ".claude/skills/tracked-json/scripts/*.ts",
+        "test/**/*.ts",
+        "*.{ts,mjs}"
+      ]
+    },
+    "packages/contracts": {},
+    "packages/core": {},
+    "packages/sync": {},
+    "packages/web": {}
+  },
+  "ignoreIssues": {
+    "packages/contracts/src/schema-version.ts": ["duplicates"]
+  },
+  "rules": {
+    "exports": "error",
+    "types": "error",
+    "duplicates": "error",
+    "enumMembers": "error"
+  }
+}

@@ -18,7 +18,7 @@ import { DataFileError } from '../load-data-file.ts';
 import { checkTracked, loadTrackedCheckInputs, main } from './check.ts';
 import type { TrackedCheckInputs } from './check.ts';
 
-const SCRIPT = fileURLToPath(new URL('./check.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('check.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../../data', import.meta.url));
 
@@ -291,9 +291,9 @@ interface Run {
   readonly stderr: string;
 }
 
-function runScript(args: readonly string[] = []): Promise<Run> {
+function runScript(arguments_: readonly string[] = []): Promise<Run> {
   return new Promise((done) => {
-    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       done({ code: child.exitCode, stdout, stderr });
     });
   });

@@ -87,7 +87,7 @@ function run(ports: TestPorts, step: ChunkStep): Promise<ChunkOutcome> {
   return runChunk({
     ...base,
     load:
-      load ?? (() => Promise.resolve({ publication, starvationRecord, step, ...(gate ? { gate } : {}) })),
+      load ?? (() => Promise.resolve({ publication, starvationRecord, step, ...(gate && { gate }) })),
   });
 }
 
@@ -102,6 +102,10 @@ const B = raw('B');
 const C = raw('C');
 const PRUNED = raw('P', 'pruned');
 const key = canonicalKey;
+
+function noListingsEntry(entry: TrackedEntry): DatasetEntry {
+  return { entryKey: key(entry), price: { state: 'no-listings' }, lastAttemptedAt: NOW };
+}
 
 function trackedText(entries: readonly TrackedEntry[]): string {
   return JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries });
@@ -291,7 +295,7 @@ describe('runChunk: the three bounds and the yield', () => {
   it('yield: the yielded entry is not completed, and the outcome is a value, not a throw', async () => {
     const { fs, ports } = harness();
     const { visited, step } = scriptedStep((entry) =>
-      key(entry) === key(B) ? { kind: 'yielded' } : { kind: 'completed' },
+      ({ kind: key(entry) === key(B) ? 'yielded' : 'completed' }),
     );
 
     const outcome = await run(ports, step);
@@ -415,7 +419,7 @@ describe('runChunk: the published dataset', () => {
     await run(ports, scriptedStep().step);
 
     const text = (await fs.readTextFile(DATASET_PATH)) ?? '';
-    expect(text.charCodeAt(0)).not.toBe(0xfeff);
+    expect(text.codePointAt(0)).not.toBe(0xFE_FF);
     expect(text).not.toContain('\r');
     expect(text.endsWith('}\n')).toBe(true);
     expect(text.endsWith('\n\n')).toBe(false);
@@ -737,7 +741,7 @@ describe('runChunk: the lock', () => {
     const outcomes = await Promise.all(
       [1, 2, 3, 4].map((pid) =>
         run(
-          { fs, clock, pid, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+          { fs, clock, pid, ...shellPorts(), publication: PUBLICATION, log: () => {} },
           scriptedStep().step,
         ),
       ),
@@ -893,7 +897,7 @@ function datasetText(entries: readonly { key: string; at?: string; unresolvable?
     entries: entries.map(({ key: entryKey, at, unresolvable }) => ({
       entryKey,
       price: { state: unresolvable === true ? 'unresolvable' : 'no-listings' },
-      ...(at === undefined ? {} : { lastAttemptedAt: at }),
+      ...(at !== undefined && { lastAttemptedAt: at }),
     })),
     currencyRates: [],
   });
@@ -1028,9 +1032,7 @@ describe('runChunk: the Refresh Rotation', () => {
   it('a rotation step reporting a low allowance never truncates or records', async () => {
     const { ports } = harness([P1, A, B]);
     const { visited, step } = scriptedStep((entry) =>
-      entry.status === 'pinned'
-        ? { kind: 'completed', searchRemaining: 5 }
-        : { kind: 'completed', searchRemaining: 0 },
+      ({ kind: 'completed', searchRemaining: entry.status === 'pinned' ? 5 : 0 }),
     );
 
     const outcome = await run(ports, step);
@@ -1317,7 +1319,7 @@ describe('runChunk: the Sync Report', () => {
     const { fs, ports } = harness([A, B, C]);
     await run(
       ports,
-      scriptedStep((entry) => (key(entry) === key(B) ? { kind: 'yielded' } : { kind: 'completed' })).step,
+      scriptedStep((entry) => (({ kind: key(entry) === key(B) ? 'yielded' : 'completed' }))).step,
     );
     expect((await reportOf(fs))?.figures.notReachedCount).toBe(1);
   });
@@ -1351,7 +1353,7 @@ describe('runChunk: the Sync Report', () => {
     const { fs, ports } = harness([A], {}, { git: createFakeGitPort(commits) });
     fs.setFile(TRACKED_PATH, {
       contents: trackedText([A]),
-      ...(modifiedAt === undefined ? {} : { modifiedAt }),
+      ...(modifiedAt !== undefined && { modifiedAt }),
     });
 
     await run(ports, scriptedStep().step);
@@ -1369,24 +1371,19 @@ describe('runChunk: the Sync Report', () => {
       lastAttemptedAt: NOW,
     };
     const failure = new MalformedRequestError(key(C), 'search', 400, stamped);
-    const done = (entry: TrackedEntry): DatasetEntry => ({
-      entryKey: key(entry),
-      price: { state: 'no-listings' },
-      lastAttemptedAt: NOW,
-    });
 
     await expect(
       run(ports, (entry) =>
         key(entry) === key(C)
           ? Promise.reject(failure)
-          : Promise.resolve({ kind: 'completed', entry: done(entry) }),
+          : Promise.resolve({ kind: 'completed', entry: noListingsEntry(entry) }),
       ),
     ).rejects.toBe(failure);
 
     const dataset = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
     const byKey = new Map(dataset.entries.map((entry) => [entry.entryKey, entry]));
-    expect(byKey.get(key(A))).toEqual(done(A));
-    expect(byKey.get(key(B))).toEqual(done(B));
+    expect(byKey.get(key(A))).toEqual(noListingsEntry(A));
+    expect(byKey.get(key(B))).toEqual(noListingsEntry(B));
     expect(byKey.get(key(C))).toEqual(stamped);
     expect(byKey.get(key(D))).toEqual({
       entryKey: key(D),
@@ -1428,24 +1425,19 @@ describe('runChunk: the Sync Report', () => {
       lastSearchLeague: 'Standard',
     };
     const failure = new UnexpectedTradeResponseError(key(C), 'fetch', 'no top-level `result` array', searched);
-    const done = (entry: TrackedEntry): DatasetEntry => ({
-      entryKey: key(entry),
-      price: { state: 'no-listings' },
-      lastAttemptedAt: NOW,
-    });
 
     await expect(
       run(ports, (entry) =>
         key(entry) === key(C)
           ? Promise.reject(failure)
-          : Promise.resolve({ kind: 'completed', entry: done(entry) }),
+          : Promise.resolve({ kind: 'completed', entry: noListingsEntry(entry) }),
       ),
     ).rejects.toBe(failure);
 
     const dataset = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
     const byKey = new Map(dataset.entries.map((entry) => [entry.entryKey, entry]));
-    expect(byKey.get(key(A))).toEqual(done(A));
-    expect(byKey.get(key(B))).toEqual(done(B));
+    expect(byKey.get(key(A))).toEqual(noListingsEntry(A));
+    expect(byKey.get(key(B))).toEqual(noListingsEntry(B));
     expect(byKey.get(key(C))).toEqual(searched);
     expect(byKey.get(key(D))).toEqual({
       entryKey: key(D),
@@ -1472,24 +1464,19 @@ describe('runChunk: the Sync Report', () => {
       lastSearchLeague: 'Standard',
     };
     const failure = new UnexpectedTradeResponseError(key(C), 'search', 'no top-level `id` and `result`', stamped);
-    const done = (entry: TrackedEntry): DatasetEntry => ({
-      entryKey: key(entry),
-      price: { state: 'no-listings' },
-      lastAttemptedAt: NOW,
-    });
 
     await expect(
       run(ports, (entry) =>
         key(entry) === key(C)
           ? Promise.reject(failure)
-          : Promise.resolve({ kind: 'completed', entry: done(entry) }),
+          : Promise.resolve({ kind: 'completed', entry: noListingsEntry(entry) }),
       ),
     ).rejects.toBe(failure);
 
     const dataset = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
     const byKey = new Map(dataset.entries.map((entry) => [entry.entryKey, entry]));
-    expect(byKey.get(key(A))).toEqual(done(A));
-    expect(byKey.get(key(B))).toEqual(done(B));
+    expect(byKey.get(key(A))).toEqual(noListingsEntry(A));
+    expect(byKey.get(key(B))).toEqual(noListingsEntry(B));
     expect(byKey.get(key(C))).toEqual(stamped);
     // Only a rejected request writes the abort notBefore.
     expect(await progressOf(fs)).toEqual({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [key(A), key(B)] });
@@ -1713,23 +1700,18 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
     return file?.entries.find((published) => published.entryKey === key(entry));
   }
 
-  const noListingsOf = (entry: TrackedEntry): DatasetEntry => ({
-    entryKey: key(entry),
-    price: { state: 'no-listings' },
-    lastAttemptedAt: NOW,
-  });
 
   it('unknown stat: marked unresolvable and recorded, never searched, and the others are priced', async () => {
     const X = craftedEntry('weapon.bow', STAT_GONE);
     const { fs, ports } = harness([A, X, B], {}, withCatalogue(STAT_GONE));
-    const { visited, step } = scriptedStep((entry) => ({ kind: 'completed', entry: noListingsOf(entry) }));
+    const { visited, step } = scriptedStep((entry) => ({ kind: 'completed', entry: noListingsEntry(entry) }));
 
     const outcome = await run(ports, step);
 
     expect(outcome.kind).toBe('completed');
     expect(visited).toEqual([key(A), key(B)]);
     expect(await publishedOf(fs, X)).toEqual({ entryKey: key(X), price: { state: 'unresolvable' } });
-    expect(await publishedOf(fs, A)).toEqual(noListingsOf(A));
+    expect(await publishedOf(fs, A)).toEqual(noListingsEntry(A));
     expect((await reportOf(fs))?.records).toEqual([
       { kind: 'unresolvable', entryKey: key(X), identifier: STAT_GONE, identifierKind: 'statId' },
     ]);
@@ -1888,7 +1870,7 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
   it('empty search: zero results stay no-listings, never unresolvable', async () => {
     const { fs, ports } = harness([A]);
 
-    await run(ports, scriptedStep((entry) => ({ kind: 'completed', entry: noListingsOf(entry) })).step);
+    await run(ports, scriptedStep((entry) => ({ kind: 'completed', entry: noListingsEntry(entry) })).step);
 
     expect((await publishedOf(fs, A))?.price).toEqual({ state: 'no-listings' });
     expect((await reportOf(fs))?.records).toEqual([]);
@@ -2552,8 +2534,8 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     const progress = progressWithNotBefore([key(A)], until);
     const built = harness([A, B], { [PROGRESS_PATH]: { contents: progress } });
     const { fs, writes } = recording(built.fs);
-    let gateCalled = false;
-    let catalogueCalled = false;
+    let isGateCalled = false;
+    let isCatalogueCalled = false;
     let loads = 0;
     const { visited, step } = scriptedStep();
 
@@ -2566,11 +2548,11 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
           return Promise.reject(new Error('load must not run on a deferred chunk'));
         },
         gate: () => {
-          gateCalled = true;
+          isGateCalled = true;
           return Promise.resolve({ kind: 'pass' });
         },
         catalogue: () => {
-          catalogueCalled = true;
+          isCatalogueCalled = true;
           return Promise.resolve({ ok: true, value: RESOLVES_ALL });
         },
       },
@@ -2579,8 +2561,8 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
 
     expect(outcome).toEqual({ kind: 'deferred', completed: [], entries: [], records: [], notBefore: until });
     expect(visited).toEqual([]);
-    expect(gateCalled).toBe(false);
-    expect(catalogueCalled).toBe(false);
+    expect(isGateCalled).toBe(false);
+    expect(isCatalogueCalled).toBe(false);
     expect(loads).toBe(0);
     // The lock is the only file touched, and it is gone again.
     expect(writes.filter((path) => path !== LOCK_PATH)).toEqual([]);
@@ -2723,7 +2705,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     });
     const chunk = (remaining: number) =>
       run(
-        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => {} },
         scriptedStep(() => ({ kind: 'completed', searchRemaining: remaining })).step,
       );
 
@@ -2748,7 +2730,7 @@ describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.
     });
     const chunk = () =>
       run(
-        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => undefined },
+        { fs: fsShared, clock: createFakeClockPort(NOW), pid: PID, ...shellPorts(), publication: PUBLICATION, log: () => {} },
         scriptedStep(() => ({ kind: 'completed', searchRemaining: 0 })).step,
       );
 
@@ -2992,23 +2974,18 @@ describe('runChunk: the AD-12 run-start sequence and the failure path', () => {
   it('a plain step throw on the third entry: the two entries and the mark published, no notBefore, the failure reported', async () => {
     const { fs, ports } = harness([A, B, D, X], {}, MISSING_X);
     const failure = new Error('step exploded');
-    const noListingsNow = (entry: TrackedEntry): DatasetEntry => ({
-      entryKey: key(entry),
-      price: { state: 'no-listings' },
-      lastAttemptedAt: NOW,
-    });
 
     await expect(
       run(ports, (entry) =>
         key(entry) === key(D)
           ? Promise.reject(failure)
-          : Promise.resolve({ kind: 'completed', entry: noListingsNow(entry) }),
+          : Promise.resolve({ kind: 'completed', entry: noListingsEntry(entry) }),
       ),
     ).rejects.toBe(failure);
 
     const published = await datasetEntriesOf(fs);
-    expect(published?.find((entry) => entry.entryKey === key(A))).toEqual(noListingsNow(A));
-    expect(published?.find((entry) => entry.entryKey === key(B))).toEqual(noListingsNow(B));
+    expect(published?.find((entry) => entry.entryKey === key(A))).toEqual(noListingsEntry(A));
+    expect(published?.find((entry) => entry.entryKey === key(B))).toEqual(noListingsEntry(B));
     expect(published?.find((entry) => entry.entryKey === key(X))?.price).toEqual({ state: 'unresolvable' });
     expect(await progressOf(fs)).toEqual({
       schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
@@ -3375,7 +3352,7 @@ describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () =>
     const { fs, ports } = harness([A]);
     const { step } = scriptedStep();
 
-    const outcome = await run({ ...ports, latchedRetryAfterMs: () => undefined }, step);
+    const outcome = await run({ ...ports, latchedRetryAfterMs: () => {} }, step);
 
     expect(outcome.kind).toBe('completed');
     expect(await progressOf(fs)).toEqual({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [key(A)] });

@@ -53,7 +53,7 @@ export function statTexts(catalogue: StatCatalogue): StatTexts {
  */
 export function bandedFallback(text: string, valueMin: number, valueMax: number): string {
   const band = `${String(valueMin)}–${String(valueMax)}`;
-  return text.split('#').length === 2 ? text.replace('#', band) : `${text} ${band}`;
+  return text.split('#').length === 2 ? text.replace('#', () => band) : `${text} ${band}`;
 }
 
 /**
@@ -64,19 +64,16 @@ export function bandedFallback(text: string, valueMin: number, valueMax: number)
  * fallback: the catalogue text, with the band on a banded reference. A
  * hybrid reference is one affix (`hybridText`).
  */
-export function affixText(ref: ModifierRef, stats: StatTexts): AffixPart {
-  if (ref.kind === 'hybrid') {
-    return hybridText(ref, stats);
+export function affixText(reference: ModifierRef, stats: StatTexts): AffixPart {
+  if (reference.kind === 'hybrid') {
+    return hybridText(reference, stats);
   }
-  const form = shortForm(ref.statId);
-  const catalogued = stats.get(ref.statId) ?? ref.statId;
-  if (ref.kind === 'valueless') {
+  const form = shortForm(reference.statId);
+  const catalogued = stats.get(reference.statId) ?? reference.statId;
+  if (reference.kind === 'valueless') {
     return form === undefined ? { text: catalogued, verbatim: true } : { text: form, verbatim: false };
   }
-  if (form !== undefined && ref.acceptedTier !== undefined) {
-    return { text: `${ref.acceptedTier} ${form}`, verbatim: false };
-  }
-  return { text: bandedFallback(catalogued, ref.valueMin, ref.valueMax), verbatim: true };
+  return form !== undefined && reference.acceptedTier !== undefined ? { text: `${reference.acceptedTier} ${form}`, verbatim: false } : { text: bandedFallback(catalogued, reference.valueMin, reference.valueMax), verbatim: true };
 }
 
 /** The comma that joins the lines of one hybrid affix: `T1 % Phys, Accuracy`. */
@@ -92,19 +89,19 @@ const LINE_JOIN = ', ';
  * curated label, the fallback string in the fallback), not by `statId`, so
  * `% ES` precedes `% Evasion` and the label never reads `weights.json`.
  */
-function hybridText(ref: HybridModifierRef, stats: StatTexts): AffixPart {
+function hybridText(reference: HybridModifierRef, stats: StatTexts): AffixPart {
   const forms: string[] = [];
-  for (const line of ref.lines) {
+  for (const line of reference.lines) {
     const form = 'valueMin' in line ? shortForm(line.statId) : undefined;
     if (form === undefined) {
       break;
     }
     forms.push(form);
   }
-  if (ref.acceptedTier !== undefined && forms.length === ref.lines.length) {
-    return { text: `${ref.acceptedTier} ${forms.sort(compareByCodeUnit).join(LINE_JOIN)}`, verbatim: false };
+  if (reference.acceptedTier !== undefined && forms.length === reference.lines.length) {
+    return { text: `${reference.acceptedTier} ${forms.sort(compareByCodeUnit).join(LINE_JOIN)}`, verbatim: false };
   }
-  const lines = ref.lines.map((line) => {
+  const lines = reference.lines.map((line) => {
     const catalogued = stats.get(line.statId) ?? line.statId;
     return 'valueMin' in line ? bandedFallback(catalogued, line.valueMin, line.valueMax) : catalogued;
   });

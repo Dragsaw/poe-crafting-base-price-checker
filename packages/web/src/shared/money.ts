@@ -7,7 +7,7 @@ export const MONEY_DECIMALS = 2;
 export const BELOW_PRINTABLE = '< 0.01';
 
 /** A value at the page's money precision, with no floor. A negative that rounds to zero prints `0.00`, never `-0.00`. */
-export function formatTwoDecimals(value: number): string {
+function formatTwoDecimals(value: number): string {
   const text = value.toFixed(MONEY_DECIMALS);
   return Number(text) === 0 ? (0).toFixed(MONEY_DECIMALS) : text;
 }
@@ -19,8 +19,5 @@ export function formatThreshold(value: number): string {
 
 /** EV and price at 2dp. A value `0 < v < 0.005` would print `0.00`, so it prints `< 0.01`. */
 export function formatDivine(value: number): string {
-  if (value > 0 && value < 0.005) {
-    return BELOW_PRINTABLE;
-  }
-  return formatTwoDecimals(value);
+  return value > 0 && value < 0.005 ? BELOW_PRINTABLE : formatTwoDecimals(value);
 }

@@ -232,7 +232,7 @@ describe('TrackedFileSchema shared floor (AD-17, FR-22)', () => {
     prefix: { kind: 'valueless', statId },
     suffix: { kind: 'valueless', statId: 'explicit.suffix' },
     status,
-    ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'no market' }),
   });
 
   const parse = (entries: readonly unknown[]) =>
@@ -616,7 +616,7 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands (§2
     prefix,
     suffix,
     status,
-    ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'no market' }),
   });
   const parse = (entries: readonly unknown[]) =>
     parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);

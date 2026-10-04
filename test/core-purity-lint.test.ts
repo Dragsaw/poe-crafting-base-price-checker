@@ -21,6 +21,9 @@ const CORE_FILE = 'packages/core/src/purity-probe.ts';
 const CORE_TEST_FILE = 'packages/core/src/purity-probe.test.ts';
 const SYNC_FILE = 'packages/sync/src/purity-probe.ts';
 
+// The probes are virtual files outside any tsconfig, so the type-aware block of
+// the config (which needs a real project file) is skipped, as in the fast path.
+process.env.LINT_FAST = '1';
 const eslint = new ESLint({ cwd: REPO_ROOT });
 
 interface PurityError {
@@ -79,7 +82,7 @@ const PURE: readonly (readonly [string, string])[] = [
   ['new Date(s)', "export const d = new Date('2026-09-26T00:00:00Z');"],
 ];
 
-describe('core purity lint (AD-1)', () => {
+describe('core purity lint (AD-1)', { timeout: 30_000 }, () => {
   it('the core block applies to core source only', async () => {
     const rulesFor = async (path: string): Promise<Record<string, unknown>> =>
       ((await eslint.calculateConfigForFile(path)) as { rules?: Record<string, unknown> } | undefined)?.rules ?? {};

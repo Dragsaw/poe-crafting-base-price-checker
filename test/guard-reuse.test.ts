@@ -21,7 +21,7 @@ import { BYSTANDER_TEST, ISSUER_TEST, LATE_URL } from './guard-reuse-fixture/nam
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
-const CHILD_CONFIG = fileURLToPath(new URL('./guard-reuse-fixture/vitest.config.ts', import.meta.url));
+const CHILD_CONFIG = fileURLToPath(new URL('guard-reuse-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
   readonly title: string;
@@ -48,7 +48,10 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
       [VITEST_BIN, 'run', '--config', CHILD_CONFIG, '--reporter=json', `--outputFile=${outputFile}`],
       { cwd: REPO_ROOT, env: { ...process.env, CI: '1' } },
       (error, stdout, stderr) => {
-        const code = error === null ? 0 : typeof error.code === 'number' ? error.code : -1;
+        let code = 0;
+        if (error !== null) {
+          code = typeof error.code === 'number' ? error.code : -1;
+        }
         resolve({ code, output: `${stdout}\n${stderr}` });
       },
     );

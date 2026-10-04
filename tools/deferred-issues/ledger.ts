@@ -33,12 +33,13 @@ const TOP_BULLET = /^- ([a-z_]+):(.*)$/;
 
 /** `dw-` and the first 10 hex characters of `sha256(sourceSpec + "\n" + summary)`. */
 export function entryId(sourceSpec: string, summary: string): string {
-  return `dw-${createHash('sha256').update(`${sourceSpec}\n${summary}`).digest('hex').slice(0, 10)}`;
+  const text = `${sourceSpec}\n${summary}`;
+  return `dw-${createHash('sha256').update(text).digest('hex').slice(0, 10)}`;
 }
 
 /** The summary with each `"` removed, cut at a word boundary to at most 70 characters. */
 export function issueTitle(summary: string): string {
-  const text = summary.replaceAll('"', '').replace(/\s+/g, ' ').trim();
+  const text = summary.replaceAll('"', '').replaceAll(/\s+/g, ' ').trim();
   if (text.length <= TITLE_MAX) {
     return text;
   }

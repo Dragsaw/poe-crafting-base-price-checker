@@ -85,15 +85,12 @@ export function listStatement(
 ): ListStatement {
   if (isHonestEmpty(ranking)) {
     // Every row the list shows is `unresolvable` when no crafted row and neither other unpriced group remains.
-    const onlyUnresolvable =
+    const isOnlyUnresolvable =
       ranking.ordering.length === 0 && ranking.noListings.length === 0 && ranking.notYetSynced.length === 0;
-    return { kind: 'honest-empty', text: honestEmptyCopy(league, onlyUnresolvable) };
+    return { kind: 'honest-empty', text: honestEmptyCopy(league, isOnlyUnresolvable) };
   }
   if (ranking.split === true && ranking.recipe !== undefined) {
     return { kind: 'uncostable', text: uncostableCopy(ranking.recipe.word) };
   }
-  if (nothingClears(ranking)) {
-    return { kind: 'nothing-clears', text: nothingClearsCopy(threshold) };
-  }
-  return { kind: 'none' };
+  return nothingClears(ranking) ? { kind: 'nothing-clears', text: nothingClearsCopy(threshold) } : { kind: 'none' };
 }

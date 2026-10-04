@@ -15,7 +15,7 @@ import {
 
 import { TEST_LEAGUE, VALID_BODIES } from './artifact-server';
 
-export const HOUR = 3_600_000;
+const HOUR = 3_600_000;
 
 export function rawEntry(baseTypeId: string, itemLevelMin = 82): RawTrackedEntry {
   return { kind: 'raw', baseTypeId, itemLevelMin, status: 'active' };
@@ -36,8 +36,8 @@ export function craftedEntry(className: string, categoryId: string, itemLevelMin
 
 /** A banded reference, with an Accepted Tier when one is given. */
 export function banded(statId: string, valueMin: number, valueMax: number, acceptedTier?: string): BandedModifierRef {
-  const ref = { kind: 'banded', statId, valueMin, valueMax } as const;
-  return acceptedTier === undefined ? ref : { ...ref, acceptedTier };
+  const reference = { kind: 'banded', statId, valueMin, valueMax } as const;
+  return acceptedTier === undefined ? reference : { ...reference, acceptedTier };
 }
 
 /** An ISO timestamp `hours` before `now`. */

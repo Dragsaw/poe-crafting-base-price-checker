@@ -21,7 +21,7 @@ export const COLUMN_LABELS: Readonly<Record<ColumnName, string>> = {
 };
 
 /** Columns whose content sits against the right edge: the numeral and the figure. */
-export const RIGHT_ALIGNED: ReadonlySet<ColumnName> = new Set(['rank', 'ev']);
+const RIGHT_ALIGNED: ReadonlySet<ColumnName> = new Set(['rank', 'ev']);
 
 /** One fixed-width flex cell of the six-column contract, shared by the header, the rows and the skeleton. */
 export function cellStyle(column: (typeof rankedRowColumns)[number]): CSSProperties {

@@ -27,12 +27,14 @@ describe('loadCurrencies', () => {
   it('refuses an absent file with a typed error naming it', async () => {
     const loaded = await loadCurrencies(fsWith(undefined));
     expect(loaded.ok).toBe(false);
-    if (!loaded.ok) {
-      expect(loaded.error).toBeInstanceOf(DataFileError);
-      expect(loaded.error.reason).toBe('absent');
-      expect(loaded.error.path).toBe(CURRENCIES_PATH);
-      expect(loaded.error.message).toContain(CURRENCIES_PATH);
+    if (loaded.ok) {
+      return;
     }
+
+    expect(loaded.error).toBeInstanceOf(DataFileError);
+    expect(loaded.error.reason).toBe('absent');
+    expect(loaded.error.path).toBe(CURRENCIES_PATH);
+    expect(loaded.error.message).toContain(CURRENCIES_PATH);
   });
 
   it.each([
@@ -42,10 +44,12 @@ describe('loadCurrencies', () => {
   ])('refuses %s', async (_label, contents, reason) => {
     const loaded = await loadCurrencies(fsWith(contents));
     expect(loaded.ok).toBe(false);
-    if (!loaded.ok) {
-      expect(loaded.error.reason).toBe(reason);
-      expect(loaded.error.message).toContain(CURRENCIES_PATH);
+    if (loaded.ok) {
+      return;
     }
+
+    expect(loaded.error.reason).toBe(reason);
+    expect(loaded.error.message).toContain(CURRENCIES_PATH);
   });
 });
 

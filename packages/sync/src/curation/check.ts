@@ -253,13 +253,13 @@ export async function main(
   argv: readonly string[],
   fs: FilesystemPort,
   out: { write(text: string): unknown },
-  err: { write(text: string): unknown },
+  error_: { write(text: string): unknown },
 ): Promise<number> {
   try {
     // No arguments: any argument is a usage error.
     parseArgs({ args: [...argv], options: {}, strict: true, allowPositionals: false });
   } catch (error) {
-    err.write(`pnpm tracked:check: ${String(error)}\nusage: pnpm tracked:check\n`);
+    error_.write(`pnpm tracked:check: ${String(error)}\nusage: pnpm tracked:check\n`);
     return 1;
   }
   const report = checkTracked(await loadTrackedCheckInputs(fs));
@@ -287,13 +287,10 @@ function isInvokedDirectly(): boolean {
 if (isInvokedDirectly()) {
   // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a
   // piped write.
-  main(process.argv.slice(2), createNodeFilesystemPort(REPO_ROOT), process.stdout, process.stderr).then(
-    (code) => {
-      process.exitCode = code;
-    },
-    (error: unknown) => {
-      process.stderr.write(`pnpm tracked:check: ${String(error)}\n`);
-      process.exitCode = 1;
-    },
-  );
+  try {
+    process.exitCode = await main(process.argv.slice(2), createNodeFilesystemPort(REPO_ROOT), process.stdout, process.stderr);
+  } catch (error) {
+    process.stderr.write(`pnpm tracked:check: ${String(error)}\n`);
+    process.exitCode = 1;
+  }
 }

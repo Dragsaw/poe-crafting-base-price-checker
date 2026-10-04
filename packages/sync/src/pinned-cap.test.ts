@@ -30,10 +30,12 @@ describe('checkPinnedCap', () => {
         minChunkSearches: 5,
       }) as unknown,
     });
-    if (!result.ok) {
-      expect(result.error.message).toContain('3');
-      expect(result.error.message).toContain('2.5');
+    if (result.ok) {
+      return;
     }
+
+    expect(result.error.message).toContain('3');
+    expect(result.error.message).toContain('2.5');
   });
 
   it('passes at the boundary: count(pinned) equal to 0.5 × minChunkSearches', () => {

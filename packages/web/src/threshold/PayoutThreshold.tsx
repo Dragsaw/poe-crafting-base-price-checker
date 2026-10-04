@@ -17,7 +17,7 @@ import {
 
 export const THRESHOLD_LABEL = 'Payout Threshold';
 /** A no-break space joins the figure and the unit. */
-export const THRESHOLD_UNIT = `\u00a0${DENOMINATION}`;
+export const THRESHOLD_UNIT = `\u{A0}${DENOMINATION}`;
 export const RANGE_LOW = `${String(THRESHOLD_MIN)} ${DENOMINATION}`;
 export const RANGE_HIGH = `${String(THRESHOLD_MAX)} ${DENOMINATION}`;
 /** About 150ms between a valid parse and the re-rank (UX-DR18). */
@@ -36,6 +36,14 @@ function parseDraft(draft: number | string): number | undefined {
     return Number.isFinite(draft) ? draft : undefined;
   }
   return PARSEABLE.test(draft) ? Number(draft) : undefined;
+}
+
+/** The hidden sizing ghost's text: the number formatted, an empty draft as `0`, otherwise the typed text. */
+function ghostText(draft: number | string): string {
+  if (typeof draft === 'number') {
+    return formatThreshold(draft);
+  }
+  return draft === '' ? '0' : draft;
 }
 
 /**
@@ -103,7 +111,7 @@ export function PayoutThreshold({
               borderBottom: `${px(spacing.hairline)} solid transparent`,
             }}
           >
-            {typeof draft === 'number' ? formatThreshold(draft) : draft === '' ? '0' : draft}
+            {ghostText(draft)}
           </span>
           <NumberInput
             id={id}
@@ -136,11 +144,12 @@ export function PayoutThreshold({
             onChange={(next) => {
               setDraft(next);
               const parsed = parseDraft(next);
-              if (parsed !== undefined) {
-                const threshold = clampThreshold(parsed);
-                lastValid.current = threshold;
-                commit(threshold);
+              if (parsed === undefined) {
+                return;
               }
+              const threshold = clampThreshold(parsed);
+              lastValid.current = threshold;
+              commit(threshold);
             }}
             onBlur={() => {
               commit.flush();

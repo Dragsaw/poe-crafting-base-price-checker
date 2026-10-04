@@ -48,7 +48,7 @@ describe('canonicalKeyElements', () => {
 
   it('leaves acceptedTier out of the key entirely', () => {
     const labelled: TrackedEntry = {
-      ...(crafted as Extract<TrackedEntry, { kind: 'crafted' }>),
+      ...(crafted),
       prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 43, valueMax: 56.5, acceptedTier: 'T7' },
     };
     expect(canonicalKey(labelled)).toBe(canonicalKey(crafted));
@@ -69,11 +69,11 @@ describe('encodeAffix', () => {
 describe('the banded and valueless affix forms', () => {
   it('keeps a banded and a valueless affix on one statId apart, and never encodes null', () => {
     const banded: TrackedEntry = {
-      ...(crafted as Extract<TrackedEntry, { kind: 'crafted' }>),
+      ...(crafted),
       prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 1, valueMax: 1 },
     };
     const valueless: TrackedEntry = {
-      ...(crafted as Extract<TrackedEntry, { kind: 'crafted' }>),
+      ...(crafted),
       prefix: { kind: 'valueless', statId: 'explicit.stat_1' },
     };
 
@@ -113,7 +113,7 @@ describe('compareByCodeUnit', () => {
 
   it('orders by code point, which is UTF-8 byte order and not UTF-16 order', () => {
     const astral = '\u{1F600}';
-    const bmp = String.fromCodePoint(0xfffd);
+    const bmp = String.fromCodePoint(0xFF_FD);
     expect(compareByCodeUnit(bmp, astral)).toBeLessThan(0);
     expect(bmp < astral).toBe(false);
   });

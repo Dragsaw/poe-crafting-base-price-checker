@@ -9,7 +9,7 @@ type Json = Record<string, unknown>;
 
 function entryOf(overrides: Json = {}): Json {
   return {
-    sourceModifierId: 'prefix\u0000BaseSpirit\u000016\u0000+# to Spirit',
+    sourceModifierId: 'prefix\0BaseSpirit\u{0}16\0+# to Spirit',
     modGroup: 'BaseSpirit',
     itemLevelMin: 16,
     tierLabel: 'T5',
@@ -20,15 +20,17 @@ function entryOf(overrides: Json = {}): Json {
   };
 }
 
-function poolOf(entries: readonly Json[] = [entryOf()], poolCoverage = 'complete'): Json {
-  return { poolCoverage, entries };
+function poolOf(entries: readonly Json[] = [entryOf()]): Json {
+  return { poolCoverage: 'complete', entries };
 }
 
 function classOf(prefix: Json = poolOf(), suffix: Json = poolOf([])): Json {
   return { prefix, suffix };
 }
 
-function fileOf(bases: Json = { 'accessory.amulet': { Amulets: classOf() } }, overrides: Json = {}): Json {
+const DEFAULT_BASES: Json = { 'accessory.amulet': { Amulets: classOf() } };
+
+function fileOf(bases: Json = DEFAULT_BASES, overrides: Json = {}): Json {
   return {
     schemaVersion: '6.0.0',
     gamePatch: '0.5.5',
@@ -59,13 +61,13 @@ describe('WeightsFileSchema — conforming files', () => {
       throw new Error(`committed weights.json refused: ${JSON.stringify(result)}`);
     }
     const pools = Object.values(result.value.bases).flatMap((classes) => Object.values(classes));
-    const entries = pools.flatMap((pools) => [...pools.prefix.entries, ...pools.suffix.entries]);
+    const entries = pools.flatMap((classPools) => [...classPools.prefix.entries, ...classPools.suffix.entries]);
     expect(entries).toHaveLength(569);
     expect(entries.every((entry) => entry.lines.length > 0)).toBe(true);
     const nullStatIds = entries.flatMap((entry) => entry.lines).filter((line) => line.statId === null);
     expect(nullStatIds).toHaveLength(1);
     const partialPools = pools
-      .flatMap((pools) => [pools.prefix, pools.suffix])
+      .flatMap((classPools) => [classPools.prefix, classPools.suffix])
       .filter((pool) => pool.poolCoverage === 'partial');
     expect(partialPools).toHaveLength(0);
   });
@@ -126,13 +128,13 @@ describe('WeightsFileSchema — refusals', () => {
     delete entry[key];
     return entry;
   };
-  const noModGroup = entryWithout('modGroup');
+  const noModuleGroup = entryWithout('modGroup');
 
   it.each([
     ...(['sourceModifierId', 'itemLevelMin', 'weight', 'lines'] as const).map(
       (key) => [`a missing ${key}`, fileWithEntries(entryWithout(key)), [...ENTRY_PATH, key], 'received undefined'] as const,
     ),
-    ['a missing modGroup', fileWithEntries(noModGroup), [...ENTRY_PATH, 'modGroup'], 'modGroup is missing'],
+    ['a missing modGroup', fileWithEntries(noModuleGroup), [...ENTRY_PATH, 'modGroup'], 'modGroup is missing'],
     ['an empty modGroup', fileWithEntries(entryOf({ modGroup: '' })), [...ENTRY_PATH, 'modGroup'], 'modGroup'],
     ['a non-string modGroup', fileWithEntries(entryOf({ modGroup: 7 })), [...ENTRY_PATH, 'modGroup'], 'not a string'],
     ['a negative weight', fileWithEntries(entryOf({ weight: -1 })), [...ENTRY_PATH, 'weight'], 'weight'],

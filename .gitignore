@@ -17,6 +17,7 @@ coverage/
 .vite/
 .eslintcache
 .cache/
+.jscpd-report/
 
 # --- Local environment ------------------------------------------------------
 # AD-8 / Config: sync reads data/config.json plus a small env overlay for the

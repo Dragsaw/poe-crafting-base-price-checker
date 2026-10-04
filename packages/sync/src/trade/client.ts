@@ -228,17 +228,11 @@ function defaultLaneOf(request: TradeRequest): string {
     return `${request.method} ${request.url}`;
   }
   const segments = pathname.split('/').filter((segment) => segment !== '');
-  if (segments.length <= 1) {
-    return `${request.method} ${pathname}`;
-  }
-  return `${request.method} /${segments.slice(0, -1).join('/')}`;
+  return segments.length <= 1 ? `${request.method} ${pathname}` : `${request.method} /${segments.slice(0, -1).join('/')}`;
 }
 
 function laneOf(request: TradeRequest): string {
-  if (request.lane !== undefined && request.lane.trim() !== '') {
-    return request.lane;
-  }
-  return defaultLaneOf(request);
+  return request.lane !== undefined && request.lane.trim() !== '' ? request.lane : defaultLaneOf(request);
 }
 
 /**
@@ -339,7 +333,7 @@ function describe429(
   const rateHeaders = Object.entries(headers)
     .map(([name, value]): [string, string] => [name.toLowerCase(), value])
     .filter(([name]) => name === RETRY_AFTER_HEADER || name.startsWith(RATE_LIMIT_HEADER_PREFIX))
-    .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0));
+    .sort(([left], [right]) => compareCodeUnits(left, right));
   const reading =
     pacedOn === undefined
       ? 'no reading'
@@ -356,6 +350,14 @@ function describe429(
     `(policy ${exchange.policy ?? 'unknown'}) after waiting ${String(exchange.waitedMs)} ms; ` +
     `response headers ${JSON.stringify(Object.fromEntries(rateHeaders))}; paced on ${reading}`
   );
+}
+
+/** Orders two strings by code unit, as the relational operators do. */
+function compareCodeUnits(left: string, right: string): number {
+  if (left < right) {
+    return -1;
+  }
+  return left > right ? 1 : 0;
 }
 
 function declaredYieldFloorMs(parsed: RateLimitHeaders): number {
@@ -508,7 +510,7 @@ export function createTradeGovernor<Source extends string>(
   if (userAgent.trim() === '') {
     throw new MissingUserAgentError();
   }
-  const spread = options.spread === true;
+  const isSpread = options.spread === true;
   const pacing = options.pacing ?? createPacingState();
   const { lanePolicies } = pacing;
 
@@ -552,12 +554,12 @@ export function createTradeGovernor<Source extends string>(
    * cookie is dropped first (§13.4 step 1). The holder's `expired` state then
    * keeps it dropped for every later governor of the process.
    */
-  let cookieDropped = false;
+  let isCookieDropped = false;
 
   /** Whether `request` goes out with the cookie: marked, and the holder live. */
   function carriesCookie(request: TradeRequest): boolean {
     return (
-      !cookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
+      !isCookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
     );
   }
 
@@ -589,7 +591,7 @@ export function createTradeGovernor<Source extends string>(
    * queues, so only this call's own responses move it.
    */
   async function paceLane(lane: string): Promise<number> {
-    const delayMs = laneDelayMs(pacing, lane, clock.now(), spread);
+    const delayMs = laneDelayMs(pacing, lane, clock.now(), isSpread);
     if (delayMs <= 0) {
       return 0;
     }
@@ -673,8 +675,8 @@ export function createTradeGovernor<Source extends string>(
       // policy is tested against it (§13.4).
       const baselineCount = ruleNameCount(baseline.headers);
       holder.rememberBaseline(baselineCount, rateLimitPolicyOf(baseline.headers));
-      const live = ruleNameCount(response.headers) > baselineCount;
-      holder.settle(live ? 'authenticated' : 'not-elevated');
+      const isLive = ruleNameCount(response.headers) > baselineCount;
+      holder.settle(isLive ? 'authenticated' : 'not-elevated');
       return;
     }
     if (isInvalidRequest(status)) {
@@ -736,11 +738,11 @@ export function createTradeGovernor<Source extends string>(
     // before this response replaces it.
     const pacedOn = knownPolicy === undefined ? undefined : pacing.ledger[knownPolicy];
 
-    const withCookie = carriesCookie(request);
+    const isWithCookie = carriesCookie(request);
     const response = await http.send({
       method: request.method,
       url: request.url,
-      headers: outboundHeaders(request, withCookie),
+      headers: outboundHeaders(request, isWithCookie),
       body: request.body,
     });
 
@@ -748,10 +750,10 @@ export function createTradeGovernor<Source extends string>(
 
     // The downgrade (§13.4), before the invalid-request count: the
     // downgrading 401 or 403 is not counted, and its answer is not returned.
-    if (withCookie && auth !== undefined && isDowngrade(auth.holder, response)) {
+    if (isWithCookie && auth !== undefined && isDowngrade(auth.holder, response)) {
       // 1. Drop the cookie. 2. Reset the pacing to cold, in place. 3. The
       // holder settles `expired` and records the hold-off write. 4. Yield.
-      cookieDropped = true;
+      isCookieDropped = true;
       resetPacingState(pacing);
       auth.holder.expire();
       return {
@@ -782,7 +784,7 @@ export function createTradeGovernor<Source extends string>(
         waitedMs,
         skips: parsed.skips,
         invalidRequests: counted,
-        ...(remaining === undefined ? {} : { remaining }),
+        ...(remaining !== undefined && { remaining }),
         response,
         ...penaltyOf(response, parsed, policy),
       };
@@ -805,7 +807,7 @@ export function createTradeGovernor<Source extends string>(
       waitedMs,
       skips: parsed.skips,
       invalidRequests: counted,
-      ...(remaining === undefined ? {} : { remaining }),
+      ...(remaining !== undefined && { remaining }),
       response,
     };
   }
@@ -827,7 +829,7 @@ export function createTradeGovernor<Source extends string>(
       );
       // The queue must survive a rejected exchange, or one failure would wedge
       // every later request behind it.
-      tail = issued.catch(() => undefined);
+      tail = issued.catch(() => {});
       return issued;
     },
   });
@@ -842,7 +844,7 @@ export function createTradeGovernor<Source extends string>(
   return {
     clients,
     pacing,
-    delayBeforeMs: (lane) => laneDelayMs(pacing, lane, clock.now(), spread),
+    delayBeforeMs: (lane) => laneDelayMs(pacing, lane, clock.now(), isSpread),
     latchedRetryAfterMs: () => latched?.retryAfterMs,
   };
 }

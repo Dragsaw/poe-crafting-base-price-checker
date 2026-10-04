@@ -200,10 +200,7 @@ export async function acquireLock(
       : busy(await readLock(fs));
   }
 
-  if (!(await isStaleState(fs, found, now, LOCK_PATH))) {
-    return busy(found);
-  }
-  return breakAndTake(fs, found, mine, now);
+  return (await isStaleState(fs, found, now, LOCK_PATH)) ? breakAndTake(fs, found, mine, now) : busy(found);
 }
 
 /** `true` while the lock on disk is exactly the one this run took. */

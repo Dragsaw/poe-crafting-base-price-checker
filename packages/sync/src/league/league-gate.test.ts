@@ -29,7 +29,7 @@ function gateOver(http: HttpPort, league: string, invalidRequestThreshold?: numb
     clock: createFakeClockPort('2026-09-26T00:00:00.000Z'),
     wait: () => Promise.resolve(),
     userAgent: CONTACT,
-    ...(invalidRequestThreshold === undefined ? {} : { invalidRequestThreshold }),
+    ...(invalidRequestThreshold !== undefined && { invalidRequestThreshold }),
   });
   return createLeagueGate({ client, league });
 }
@@ -65,8 +65,8 @@ const YIELD: GateResult = { kind: 'yield' };
 
 async function mismatchOf(promise: Promise<GateResult>): Promise<LeagueMismatchError> {
   const error: unknown = await promise.then(
-    () => undefined,
-    (thrown: unknown) => thrown,
+    () => {},
+    (error_: unknown) => error_,
   );
   expect(error).toBeInstanceOf(LeagueMismatchError);
   return error as LeagueMismatchError;
@@ -112,7 +112,7 @@ describe('createLeagueGate', () => {
     for (const status of [404, 403, 302]) {
       const { gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
 
-      const error: unknown = await gate({ entries: [] }).catch((thrown: unknown) => thrown);
+      const error: unknown = await gate({ entries: [] }).catch((error_: unknown) => error_);
 
       expect(error).toBeInstanceOf(LeagueRequestRejectedError);
       expect((error as LeagueRequestRejectedError).status).toBe(status);

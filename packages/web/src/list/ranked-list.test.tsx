@@ -15,14 +15,14 @@ import { UnitGlyph } from './UnitGlyph';
 afterEach(unmount);
 
 function many(count: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntry[] } {
-  const tracked = Array.from({ length: count }, (_, i) => rawEntry(`Base ${String(i).padStart(2, '0')}`));
-  return { tracked, dataset: tracked.map((entry, i) => priced(entry, 40 - i, hoursBefore(NOW, 1))) };
+  const tracked = Array.from({ length: count }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
+  return { tracked, dataset: tracked.map((entry, index) => priced(entry, 40 - index, hoursBefore(NOW, 1))) };
 }
 
 describe('the column header', () => {
   it('prints the six final labels in six fixed flex cells', () => {
     const view = mountList([], []);
-    const cells = Array.from(view.querySelectorAll<HTMLElement>('[data-column-header] [data-header-cell]'));
+    const cells = [...view.querySelectorAll<HTMLElement>('[data-column-header] [data-header-cell]')];
     expect(cells.map((c) => c.textContent)).toEqual([
       '',
       'Item Class / Base Type',
@@ -68,7 +68,7 @@ describe('a ranked row', () => {
   it('sums its six cells to 1012 at a 28px height', () => {
     const belt = rawEntry('Wide Belt');
     const [row] = rowsIn(mountList([belt], [priced(belt, 0.5, hoursBefore(NOW, 3))]));
-    const widths = rankedRowColumns.map((c) => parseFloat(cell(row, c.name).style.width));
+    const widths = rankedRowColumns.map((c) => Number.parseFloat(cell(row, c.name).style.width));
     expect(widths.reduce((a, b) => a + b, 0)).toBe(spacing.contentWidth);
     expect(row?.style.height).toBe('28px');
     expect(row?.style.width).toBe('1012px');
@@ -124,7 +124,7 @@ describe('a ranked row', () => {
     expect(third?.style.marginLeft).toBe('-3px');
     expect(third?.style.width).toBe('1015px');
     expect(third?.style.borderBottom).toContain(rgb(colors['rule-strong']));
-    expect(rowsIn(view).filter((r) => r.hasAttribute('data-open'))).toHaveLength(1);
+    expect(rowsIn(view).filter((r) => r.dataset['open'] !== undefined)).toHaveLength(1);
     act(() => {
       third?.click();
     });
@@ -183,7 +183,7 @@ describe('the unpriced trail', () => {
     expect(cell(rows[5], 'age').childNodes).toHaveLength(0);
     for (const r of rows.slice(2)) {
       expect(r.dataset['tier']).toBe('3');
-      expect(r.hasAttribute('data-raw')).toBe(true);
+      expect(r.dataset['raw']).toBeDefined();
       expect(r.querySelector('[data-raw-note]')).not.toBeNull();
     }
   });
@@ -320,7 +320,7 @@ describe('the top-20 bound', () => {
 
 describe('the trust mark and the unit glyphs', () => {
   it('separates glyph and word with a U+200A hair space', () => {
-    expect(HAIR_SPACE).toBe(' ');
+    expect(HAIR_SPACE).toBe('\u{200A}');
   });
 
   it('renders the class glyph ≡ in sepia', () => {
@@ -334,7 +334,7 @@ describe('the trust mark and the unit glyphs', () => {
 describe('the key block', () => {
   it('holds three columns, the first being Silence means healthy, and no curation marks', () => {
     const container = mount(<KeyBlock />);
-    const columns = Array.from(container.querySelectorAll('[data-key-column]'));
+    const columns = [...container.querySelectorAll('[data-key-column]')];
     expect(columns).toHaveLength(3);
     expect(columns.map((c) => c.firstElementChild?.textContent)).toEqual([...KEY_TITLES]);
     expect(KEY_TITLES[0]).toBe('Silence means healthy');

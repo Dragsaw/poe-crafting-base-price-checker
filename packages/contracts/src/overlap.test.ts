@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { canonicalKey } from './canonical-key';
 import { parseEnvelope, TrackedFileSchema } from './envelopes';
-import type { HybridModifierRef, ModifierRef, SingleLineModifierRef } from './modifier-ref';
+import type { HybridModifierRef as HybridModifierReference, ModifierRef as ModifierReference, SingleLineModifierRef as SingleLineModifierReference } from './modifier-ref';
 import {
   describeOverlap,
   namesHybrid,
@@ -17,13 +17,13 @@ import {
 } from './overlap';
 import { TRACKED_SCHEMA_VERSION } from './schema-version';
 
-const band = (statId: string, valueMin: number, valueMax: number): SingleLineModifierRef => ({
+const band = (statId: string, valueMin: number, valueMax: number): SingleLineModifierReference => ({
   kind: 'banded',
   statId,
   valueMin,
   valueMax,
 });
-const valueless = (statId: string): SingleLineModifierRef => ({ kind: 'valueless', statId });
+const valueless = (statId: string): SingleLineModifierReference => ({ kind: 'valueless', statId });
 
 const ALWAYS: CoOccur = () => true;
 
@@ -97,7 +97,7 @@ describe('overlap, the consequences', () => {
 describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
   const S = valueless('s');
   const crafted = (
-    affixes: { prefix: ModifierRef; suffix: ModifierRef },
+    affixes: { prefix: ModifierReference; suffix: ModifierReference },
     status: 'active' | 'pruned' = 'active',
   ) => ({
     kind: 'crafted' as const,
@@ -106,7 +106,7 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
     itemLevelMin: 82,
     ...affixes,
     status,
-    ...(status === 'pruned' ? { prunedReason: 'no market' } : {}),
+    ...((status === 'pruned') && { prunedReason: 'no market' }),
   });
   const parse = (entries: readonly unknown[]) =>
     parseEnvelope(TrackedFileSchema, { schemaVersion: TRACKED_SCHEMA_VERSION, entries }, TRACKED_SCHEMA_VERSION);
@@ -165,11 +165,12 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
 });
 
 describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () => {
+  const defaultB: HybridModifierReference['lines'][number] = { statId: 'b', valueMin: 1, valueMax: 2 };
   const hybrid = (
     aMin: number,
     aMax: number,
-    b: HybridModifierRef['lines'][number] = { statId: 'b', valueMin: 1, valueMax: 2 },
-  ): HybridModifierRef => ({
+    b: HybridModifierReference['lines'][number] = defaultB,
+  ): HybridModifierReference => ({
     kind: 'hybrid',
     lines: [{ statId: 'a', valueMin: aMin, valueMax: aMax }, b],
   });
@@ -217,7 +218,7 @@ describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () 
 
 describe('summed statIds (§2.1 summed(e), sum(e, s))', () => {
   const RARITY = 'explicit.stat_3917489142';
-  const lines = (...entries: HybridModifierRef['lines']): HybridModifierRef => ({ kind: 'hybrid', lines: entries });
+  const lines = (...entries: HybridModifierReference['lines']): HybridModifierReference => ({ kind: 'hybrid', lines: entries });
 
   it('names the statIds both slots name, pure line or hybrid line, either side', () => {
     expect([...summedStatIds({ prefix: band(RARITY, 16, 19), suffix: band(RARITY, 15, 18) })]).toEqual([RARITY]);
@@ -256,7 +257,7 @@ describe('summed statIds (§2.1 summed(e), sum(e, s))', () => {
 
 describe('overlap with summed statIds (§2.1 S)', () => {
   const RARITY = 'explicit.stat_3917489142';
-  const lines = (...entries: HybridModifierRef['lines']): HybridModifierRef => ({ kind: 'hybrid', lines: entries });
+  const lines = (...entries: HybridModifierReference['lines']): HybridModifierReference => ({ kind: 'hybrid', lines: entries });
   const rarity = (prefixMin: number, prefixMax: number, suffixMin: number, suffixMax: number) => ({
     prefix: band(RARITY, prefixMin, prefixMax),
     suffix: band(RARITY, suffixMin, suffixMax),
@@ -265,7 +266,7 @@ describe('overlap with summed statIds (§2.1 S)', () => {
   it('gives the summed branch to a slot whose reference names nothing outside S', () => {
     const summed = new Set(['a']);
     expect(slotOverlapBranch(band('a', 1, 2), band('a', 50, 60), 'prefix', NEVER_CO_OCCUR, summed)).toBe('summed');
-    const hybrid: HybridModifierRef = {
+    const hybrid: HybridModifierReference = {
       kind: 'hybrid',
       lines: [
         { statId: 'a', valueMin: 1, valueMax: 2 },
@@ -281,7 +282,7 @@ describe('overlap with summed statIds (§2.1 S)', () => {
       asked.push([...summed]);
       return true;
     };
-    const hybrid = (aMin: number, aMax: number): HybridModifierRef => ({
+    const hybrid = (aMin: number, aMax: number): HybridModifierReference => ({
       kind: 'hybrid',
       lines: [
         { statId: 'a', valueMin: aMin, valueMax: aMax },

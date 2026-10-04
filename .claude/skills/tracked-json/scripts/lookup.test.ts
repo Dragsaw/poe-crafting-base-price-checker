@@ -27,7 +27,7 @@ import {
   WEIGHTS_PATH,
 } from './lookup';
 
-const SCRIPT = fileURLToPath(new URL('./lookup.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('lookup.ts', import.meta.url));
 const DATA_DIR = join(REPO_ROOT, 'data');
 
 const STATS = {
@@ -83,15 +83,15 @@ const FILTERS = {
 
 function tier(
   slot: string,
-  modGroup: string,
+  moduleGroup: string,
   itemLevelMin: number,
   tierLabel: string,
   text: string,
   lines: readonly { statId: string | null; ranges: number[][] }[],
 ): Record<string, unknown> {
   return {
-    sourceModifierId: `${slot}\u0000${modGroup}\u0000${String(itemLevelMin)}\u0000${text}`,
-    modGroup,
+    sourceModifierId: `${slot}\0${moduleGroup}\0${String(itemLevelMin)}\0${text}`,
+    modGroup: moduleGroup,
     itemLevelMin,
     tierLabel,
     weight: 500,
@@ -417,13 +417,13 @@ describe('the null-line rule in lookupMods and lookupTiers', () => {
   const rings = { className: 'Rings', slot: 'prefix' } as const;
 
   it('offers a hybrid as one row with its sorted line set, and an internal line is not a second family', () => {
-    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((mod) => mod.modGroup === 'Hybrid');
+    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((module_) => module_.modGroup === 'Hybrid');
 
     expect(row).toMatchObject({ statIds: [A, B], trackable: true, untrackable: [], tierCount: 2, tierLabels: ['T2', 'T1'] });
   });
 
   it('reports a not-in-game tier with no line set, untrackable, and its reason', () => {
-    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((mod) => mod.modGroup === 'Dead');
+    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((module_) => module_.modGroup === 'Dead');
 
     expect(row).toMatchObject({
       statIds: [],
@@ -433,8 +433,8 @@ describe('the null-line rule in lookupMods and lookupTiers', () => {
   });
 
   it('makes a {A, null} tier untrackable only in a partial pool, naming the reason', () => {
-    const complete = lookupMods(nullLineWeights('complete'), rings).mods.find((mod) => mod.modGroup === 'Mixed');
-    const partial = lookupMods(nullLineWeights('partial'), rings).mods.find((mod) => mod.modGroup === 'Mixed');
+    const complete = lookupMods(nullLineWeights('complete'), rings).mods.find((module_) => module_.modGroup === 'Mixed');
+    const partial = lookupMods(nullLineWeights('partial'), rings).mods.find((module_) => module_.modGroup === 'Mixed');
 
     expect(complete).toMatchObject({ statIds: [A], trackable: true, untrackable: [], tierCount: 2 });
     // One family, one untrackable tier: the family is not trackable, and only that tier is listed.
@@ -591,7 +591,7 @@ describe('the committed data/', () => {
     const incision = found.mods.find((row) => row.modGroup === 'IncisionChance');
 
     expect(incision).toMatchObject({ slot: 'prefix', statIds: [], trackable: false });
-    expect(incision?.untrackable.map((tier) => tier.reason)).toEqual(['not-in-game']);
+    expect(incision?.untrackable.map((item) => item.reason)).toEqual(['not-in-game']);
     const radius = found.mods.find(
       (row) => row.modGroup === 'JewelRadiusLargerRadius' && row.statIds.includes('explicit.stat_3891355829|1'),
     );
@@ -613,9 +613,9 @@ interface Run {
   readonly stderr: string;
 }
 
-function runScript(args: readonly string[]): Promise<Run> {
+function runScript(arguments_: readonly string[]): Promise<Run> {
   return new Promise((done) => {
-    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       done({ code: child.exitCode, stdout, stderr });
     });
   });

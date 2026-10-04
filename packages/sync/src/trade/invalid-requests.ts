@@ -53,7 +53,7 @@ export function isSuccess(status: number): boolean {
   return status >= SUCCESS_MIN && status <= SUCCESS_MAX;
 }
 
-export function policyKeyOf(policy: string | undefined): string {
+function policyKeyOf(policy: string | undefined): string {
   return policy ?? UNGOVERNED_POLICY_KEY;
 }
 
@@ -82,8 +82,5 @@ export function thresholdReached(
   policy: string | undefined,
   threshold: number | undefined,
 ): boolean {
-  if (threshold === undefined) {
-    return false;
-  }
-  return invalidRequestsFor(counts, policy) >= threshold;
+  return threshold !== undefined && invalidRequestsFor(counts, policy) >= threshold;
 }

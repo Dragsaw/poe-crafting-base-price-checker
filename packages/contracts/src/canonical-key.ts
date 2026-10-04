@@ -1,4 +1,4 @@
-import type { ModifierRef } from './modifier-ref.ts';
+import type { ModifierRef as ModifierReference } from './modifier-ref.ts';
 import type { TrackedEntry } from './tracked-entry.ts';
 
 /**
@@ -37,19 +37,22 @@ export type CanonicalKeyElements =
   | readonly ['raw', string, number];
 
 /** The lines are already sorted by `statId`: the schema sorts them on parse (§4.1). */
-export function encodeAffix(ref: ModifierRef): CanonicalAffix {
-  switch (ref.kind) {
-    case 'banded':
-      return [ref.statId, ref.valueMin, ref.valueMax];
-    case 'valueless':
-      return [ref.statId, null, null];
-    case 'hybrid':
+export function encodeAffix(reference: ModifierReference): CanonicalAffix {
+  switch (reference.kind) {
+    case 'banded': {
+      return [reference.statId, reference.valueMin, reference.valueMax];
+    }
+    case 'valueless': {
+      return [reference.statId, null, null];
+    }
+    case 'hybrid': {
       return [
         'hybrid',
-        ref.lines.map((line): CanonicalLine =>
+        reference.lines.map((line): CanonicalLine =>
           'valueMin' in line ? [line.statId, line.valueMin, line.valueMax] : [line.statId, null, null],
         ),
       ];
+    }
   }
 }
 
@@ -60,7 +63,7 @@ export function encodeAffix(ref: ModifierRef): CanonicalAffix {
  */
 export function canonicalKeyElements(entry: TrackedEntry): CanonicalKeyElements {
   switch (entry.kind) {
-    case 'crafted':
+    case 'crafted': {
       return [
         'crafted',
         entry.categoryId,
@@ -69,8 +72,10 @@ export function canonicalKeyElements(entry: TrackedEntry): CanonicalKeyElements 
         encodeAffix(entry.prefix),
         encodeAffix(entry.suffix),
       ];
-    case 'raw':
+    }
+    case 'raw': {
       return ['raw', entry.baseTypeId, entry.itemLevelMin];
+    }
   }
 }
 

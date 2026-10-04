@@ -47,7 +47,7 @@ function filesUnder(dir) {
 }
 
 /** Removes `dir` and its parents up to (not including) `stop`, while each is empty. */
-function removeEmptyDirs(dir, stop) {
+function removeEmptyDirectories(dir, stop) {
   let current = dir;
   while (current !== stop && current.startsWith(stop) && existsSync(current) && readdirSync(current).length === 0) {
     rmdirSync(current);
@@ -71,11 +71,13 @@ export function prunePages(distDir, dataDir) {
       continue;
     }
     const target = join(distDir, ...path.split('/'));
-    if (existsSync(target)) {
-      rmSync(target);
-      removed.push(path);
-      removeEmptyDirs(resolve(target, '..'), resolve(distDir));
+    if (!existsSync(target)) {
+      continue;
     }
+
+    rmSync(target);
+    removed.push(path);
+    removeEmptyDirectories(resolve(target, '..'), resolve(distDir));
   }
   const missing = ALLOWLIST.filter((artifact) => artifact.required && !existsSync(join(distDir, ...artifact.path.split('/'))));
   if (missing.length > 0) {

@@ -28,7 +28,7 @@ it('refuses, naming the variable, when the overlay is unset', () => {
 
 it('refuses on a blank or whitespace-only overlay rather than sending it', () => {
   expect(resolveUserAgent({ [USER_AGENT_ENV_VAR]: '' }).ok).toBe(false);
-  expect(resolveUserAgent({ [USER_AGENT_ENV_VAR]: '   ' }).ok).toBe(false);
+  expect(resolveUserAgent({ [USER_AGENT_ENV_VAR]: ' '.repeat(3) }).ok).toBe(false);
 });
 
 it('trims the value it accepts', () => {

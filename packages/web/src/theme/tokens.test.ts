@@ -48,9 +48,9 @@ describe('colour tokens', () => {
   it('has no green and no success colour', () => {
     for (const [name, hex] of Object.entries(colors)) {
       expect(name).not.toMatch(/green|success|ok/i);
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
+      const r = Number.parseInt(hex.slice(1, 3), 16);
+      const g = Number.parseInt(hex.slice(3, 5), 16);
+      const b = Number.parseInt(hex.slice(5, 7), 16);
       // green-dominant: the green channel above both others by a visible margin
       expect(g - Math.max(r, b), `${name} ${hex} reads green`).toBeLessThan(8);
     }
@@ -170,7 +170,7 @@ describe('the vertical budget', () => {
 
 describe('the trust strip and the sync report panel', () => {
   it('rests at 68px: two 11.5px × 1.85 lines inside 11/12 padding and two hairlines', () => {
-    const line = parseFloat(typeRoles['trust-strip'].fontSize) * parseFloat(typeRoles['trust-strip'].lineHeight);
+    const line = Number.parseFloat(typeRoles['trust-strip'].fontSize) * Number.parseFloat(typeRoles['trust-strip'].lineHeight);
     const height = 2 * spacing.hairline + spacing.trustStripPadTop + spacing.trustStripPadBottom + 2 * line;
     expect(Math.round(height)).toBe(68);
     expect(committedChrome.find((block) => block.block === 'trust strip')?.px).toBe(68);

@@ -5,7 +5,7 @@ import { colors, glyphs } from '../theme/tokens';
 export type TrustMarkKind = 'prior' | 'unknown' | 'stale' | 'never' | 'unresolvable';
 
 /** The hair space between a mark's glyph and its word (DESIGN.md, Trust mark). */
-export const HAIR_SPACE = ' ';
+export const HAIR_SPACE = '\u{200A}';
 
 const MARKS: Readonly<
   Record<TrustMarkKind, { readonly glyph: string; readonly color: string; readonly weight: 600 | 700 }>

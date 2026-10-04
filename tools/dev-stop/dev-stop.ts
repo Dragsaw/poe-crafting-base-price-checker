@@ -40,14 +40,14 @@ export type StopPlan =
 /** The port from `--port <n>` or `--port=<n>`, else the default. */
 export function parsePort(argv: readonly string[]): number {
   let raw: string | undefined;
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i]!;
-    if (arg === '--port') raw = argv[i + 1] ?? '';
-    else if (arg.startsWith('--port=')) raw = arg.slice('--port='.length);
+  for (let index = 0; index < argv.length; index++) {
+    const argument = argv[index]!;
+    if (argument === '--port') {raw = argv[index + 1] ?? '';}
+    else if (argument.startsWith('--port=')) {raw = argument.slice('--port='.length);}
   }
-  if (raw === undefined) return DEFAULT_PORT;
+  if (raw === undefined) {return DEFAULT_PORT;}
   const port = Number(raw);
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+  if (!Number.isSafeInteger(port) || port < 1 || port > 65_535) {
     throw new Error(`--port needs an integer from 1 to 65535, got "${raw}"`);
   }
   return port;
@@ -55,7 +55,7 @@ export function parsePort(argv: readonly string[]): number {
 
 /** Lowercase, forward slashes, collapsed repeats: Windows paths compare case-insensitively. */
 function normalize(text: string): string {
-  return text.replaceAll('\\', '/').replace(/\/+/g, '/').toLowerCase();
+  return text.replaceAll('\\', '/').replaceAll(/\/+/g, '/').toLowerCase();
 }
 
 /** The arguments of a command line. Double quotes group, and backslashes are literal (Windows paths). */
@@ -64,8 +64,8 @@ function tokenize(commandLine: string): string[] {
 }
 
 /** The program name of a path: last segment, lowercase, no Windows executable extension. */
-function programName(token: string | undefined): string {
-  return (normalize(token ?? '').split('/').pop() ?? '').replace(/\.(exe|cmd|bat|ps1)$/, '');
+function programName(token = ''): string {
+  return (normalize(token).split('/').pop() ?? '').replace(/\.(exe|cmd|bat|ps1)$/, '');
 }
 
 /**
@@ -74,19 +74,19 @@ function programName(token: string | undefined): string {
  * An option before the script (`pnpm -r --parallel dev`, `pnpm --filter x dev`)
  * makes it some other invocation.
  */
-function isPnpmDev(info: ProcessInfo): boolean {
+function isPnpmDevelopment(info: ProcessInfo): boolean {
   const tokens = tokenize(info.commandLine);
-  let args: string[];
+  let arguments_: string[];
   if (programName(tokens[0]) === 'pnpm') {
-    args = tokens.slice(1);
+    arguments_ = tokens.slice(1);
   } else if (programName(tokens[0]) === 'node') {
-    const entry = tokens.findIndex((token, i) => i > 0 && !token.startsWith('-'));
-    if (entry === -1 || !/^pnpm\.[cm]?js$/.test(programName(tokens[entry]))) return false;
-    args = tokens.slice(entry + 1);
+    const entry = tokens.findIndex((token, index) => index > 0 && !token.startsWith('-'));
+    if (entry === -1 || !/^pnpm\.[cm]?js$/.test(programName(tokens[entry]))) {return false;}
+    arguments_ = tokens.slice(entry + 1);
   } else {
     return false;
   }
-  return args[0] === 'dev' || ((args[0] === 'run' || args[0] === 'run-script') && args[1] === 'dev');
+  return arguments_[0] === 'dev' || ((arguments_[0] === 'run' || arguments_[0] === 'run-script') && arguments_[1] === 'dev');
 }
 
 const SHELLS = new Set(['cmd', 'sh', 'bash', 'dash', 'zsh', 'powershell', 'pwsh']);
@@ -99,9 +99,9 @@ const SHELLS = new Set(['cmd', 'sh', 'bash', 'dash', 'zsh', 'powershell', 'pwsh'
  */
 function isScriptShell(info: ProcessInfo): boolean {
   const tokens = tokenize(info.commandLine);
-  if (!SHELLS.has(programName(tokens[0]))) return false;
+  if (!SHELLS.has(programName(tokens[0]))) {return false;}
   const flag = tokens.findIndex((token) => /^[/-]c$/i.test(token));
-  if (flag === -1) return false;
+  if (flag === -1) {return false;}
   // Test separators on the raw text: tokenize drops a newline between commands.
   const command = /\s[/-]c\s([\s\S]*)$/i.exec(info.commandLine)?.[1] ?? '';
   return programName(tokens[flag + 1]) === 'vite' && !/[&|;\n`]|\$\(/.test(command);
@@ -133,12 +133,12 @@ function startedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
 export function planStop(
   listeners: readonly number[],
   processes: readonly ProcessInfo[],
-  repoRoot: string,
+  repositoryRoot: string,
   protectedPids: ReadonlySet<number>,
 ): StopPlan {
-  if (listeners.length === 0) return { kind: 'idle' };
+  if (listeners.length === 0) {return { kind: 'idle' };}
   const byPid = new Map(processes.map((info) => [info.pid, info]));
-  const ownVite = normalize(`${repoRoot}/node_modules/`);
+  const ownVite = normalize(`${repositoryRoot}/node_modules/`);
   const roots = new Set<number>();
   for (const pid of listeners) {
     const listener = byPid.get(pid);
@@ -161,14 +161,14 @@ export function planStop(
         parent === undefined ||
         seen.has(parent.pid) ||
         protectedPids.has(parent.pid) ||
-        !(isScriptShell(parent) || isPnpmDev(parent)) ||
+        !(isScriptShell(parent) || isPnpmDevelopment(parent)) ||
         !startedBefore(parent, top)
       ) {
         break;
       }
       seen.add(parent.pid);
       top = parent;
-      if (isPnpmDev(top)) break;
+      if (isPnpmDevelopment(top)) {break;}
     }
     roots.add(top.pid);
   }
@@ -206,9 +206,9 @@ function listenerScript(port: number): string {
  * answer must never read as a free port.
  */
 export function parseListenerJson(value: unknown): number[] {
-  if (value === null) return [];
-  if (Number.isInteger(value)) return [value as number];
-  if (Array.isArray(value) && value.every((item) => Number.isInteger(item))) return [...(value as number[])];
+  if (value === null) {return [];}
+  if (Number.isSafeInteger(value)) {return [value as number];}
+  if (Array.isArray(value) && value.every((item) => Number.isSafeInteger(item))) {return [...(value as number[])];}
   throw new Error(`unexpected listener query result: ${JSON.stringify(value)}`);
 }
 
@@ -234,7 +234,7 @@ function listenersPosix(port: number): number[] {
   } catch (error) {
     // lsof exits 1 when nothing matches. Any other failure, such as a missing
     // lsof, must not read as a free port.
-    if ((error as { status?: unknown }).status !== 1) throw error;
+    if ((error as { status?: unknown }).status !== 1) {throw error;}
     return [];
   }
 }
@@ -248,7 +248,7 @@ function snapshotPosix(port: number): Snapshot {
   const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
   const processes = ps
     .split('\n')
-    .map((line) => /^\s*(\d+)\s+(\d+)\s+(.*)$/.exec(line))
+    .map((line) => /^\s*(\d+)\s+(\d+)\s+(\S.*)$/.exec(line))
     .filter((match) => match !== null)
     .map((match) => ({ pid: Number(match[1]), ppid: Number(match[2]), commandLine: match[3]! }));
   return { listeners, processes };
@@ -270,7 +270,7 @@ export function ownAncestry(processes: readonly ProcessInfo[], selfPid: number):
   let pid: number | undefined = selfPid;
   while (pid !== undefined) {
     const next: number | undefined = byPid.get(pid)?.ppid;
-    if (next === undefined || out.has(next)) break;
+    if (next === undefined || out.has(next)) {break;}
     out.add(next);
     pid = next;
   }
@@ -287,7 +287,9 @@ function killTree(pid: number, processes: readonly ProcessInfo[]): void {
     }
     return;
   }
-  for (const child of processes.filter((info) => info.ppid === pid)) killTree(child.pid, processes);
+  for (const child of processes) {
+    if (child.ppid === pid) {killTree(child.pid, processes);}
+  }
   try {
     process.kill(pid, 'SIGTERM');
   } catch {
@@ -297,9 +299,9 @@ function killTree(pid: number, processes: readonly ProcessInfo[]): void {
 
 async function main(): Promise<number> {
   const port = parsePort(process.argv.slice(2));
-  const repoRoot = resolve(import.meta.dirname, '../..');
+  const repositoryRoot = resolve(import.meta.dirname, '../..');
   const before = snapshot(port);
-  const plan = planStop(before.listeners, before.processes, repoRoot, ownAncestry(before.processes, process.pid));
+  const plan = planStop(before.listeners, before.processes, repositoryRoot, ownAncestry(before.processes, process.pid));
   if (plan.kind === 'idle') {
     process.stdout.write(`dev-stop: nothing listens on port ${port}.\n`);
     return 0;
@@ -308,7 +310,7 @@ async function main(): Promise<number> {
     process.stderr.write(`dev-stop: ${plan.reason}\n`);
     return 1;
   }
-  for (const root of plan.roots) killTree(root, before.processes);
+  for (const root of plan.roots) {killTree(root, before.processes);}
   // taskkill returns before the socket is released, so poll. Each query
   // starts a shell and can take seconds, so bound the wait by time, not attempts.
   const deadline = Date.now() + STOP_TIMEOUT_MS;
@@ -317,7 +319,7 @@ async function main(): Promise<number> {
       process.stdout.write(`dev-stop: stopped PID ${plan.roots.join(', ')}; port ${port} is free.\n`);
       return 0;
     }
-    if (Date.now() >= deadline) break;
+    if (Date.now() >= deadline) {break;}
     await new Promise((done) => setTimeout(done, 250));
   }
   process.stderr.write(`dev-stop: port ${port} is still taken after killing PID ${plan.roots.join(', ')}.\n`);
@@ -331,7 +333,7 @@ async function main(): Promise<number> {
  */
 function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
-  if (entry === undefined) return false;
+  if (entry === undefined) {return false;}
   try {
     return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
@@ -340,13 +342,10 @@ function isInvokedDirectly(): boolean {
 }
 
 if (isInvokedDirectly()) {
-  main().then(
-    (code) => {
-      process.exitCode = code;
-    },
-    (error: unknown) => {
-      process.stderr.write(`dev-stop: ${error instanceof Error ? error.message : String(error)}\n`);
-      process.exitCode = 1;
-    },
-  );
+  try {
+    process.exitCode = await main();
+  } catch (error) {
+    process.stderr.write(`dev-stop: ${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  }
 }

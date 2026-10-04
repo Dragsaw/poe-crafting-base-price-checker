@@ -22,7 +22,7 @@ afterEach(() => {
 describe('the persisted Craft Recipe', () => {
   it('sits beside the threshold under its own key', () => {
     expect(RECIPE_STORAGE_KEY).toBe('poe-cbpc.craftRecipe');
-    expect(RECIPE_STORAGE_KEY.split('.')[0]).toBe(THRESHOLD_STORAGE_KEY.split('.')[0]);
+    expect(RECIPE_STORAGE_KEY.split('.', 1)[0]).toBe(THRESHOLD_STORAGE_KEY.split('.', 1)[0]);
   });
 
   it('round-trips an id, and reads nothing stored as undefined', () => {

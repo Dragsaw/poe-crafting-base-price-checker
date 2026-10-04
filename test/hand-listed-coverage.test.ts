@@ -54,9 +54,11 @@ interface Target {
   readonly eslint?: { readonly files: string; readonly negation?: string };
 }
 
+const DEFAULT_ESLINT: Target['eslint'] = { files: 'tools/**/*.ts' };
+
 const directoryTarget = (
   dir: string,
-  eslint: Target['eslint'] = { files: 'tools/**/*.ts' },
+  eslint: Target['eslint'] = DEFAULT_ESLINT,
 ): Target => ({
   path: dir,
   files: directoryFiles(dir),
@@ -73,9 +75,11 @@ const TARGETS: readonly Target[] = [
     negation: `!${TRACKED_JSON_SCRIPTS}/`,
   }),
   directoryTarget('tools/boundary-check'),
+  directoryTarget('tools/check'),
   directoryTarget('tools/deferred-issues'),
   directoryTarget('tools/dev-stop'),
   directoryTarget('tools/dts-specifiers'),
+  directoryTarget('tools/lint-on-edit'),
   // Only `tsconfig.tools.json` lists it: its test lives in `test/`, and no
   // ESLint `files` glob names `.mjs` under `tools/`.
   { path: 'tools/prune-pages.mjs', files: [abs('tools/prune-pages.mjs')], tsInclude: 'tools/prune-pages.mjs' },
@@ -124,20 +128,27 @@ function tsUncovered(files: readonly string[], json: Record<string, unknown>): s
 
 // --- ESLint -----------------------------------------------------------------
 
-/** Files that the flat config ignores, or that match no config block. */
+/**
+ * A rule that only the main lint block sets, which `files` lists by glob. Later
+ * blocks scope rule overrides to `tools/**`, test globs and `*.config.*`, so a
+ * file can match some block and still miss the main block. Such a file is not
+ * linted by the repo's rules, so it counts as uncovered.
+ */
+const MAIN_BLOCK_RULE = 'max-lines';
+
+/** Files that the flat config ignores, or that the main lint block does not reach. */
 async function eslintUncovered(
   files: readonly string[],
   config: readonly Linter.Config[] | undefined,
 ): Promise<string[]> {
   const eslint =
-    config === undefined
-      ? new ESLint({ cwd: REPO_ROOT })
-      : new ESLint({ cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
+    new ESLint(config === undefined ? { cwd: REPO_ROOT } : { cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
   const covered: string[] = [];
   for (const path of files) {
     const ignored = await eslint.isPathIgnored(path);
     const calculated: unknown = ignored ? undefined : await eslint.calculateConfigForFile(path);
-    if (!ignored && calculated !== undefined) {
+    const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
+    if (!ignored && rules?.[MAIN_BLOCK_RULE] !== undefined) {
       covered.push(path);
     }
   }
@@ -259,10 +270,11 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
     const { eslint } = target;
     if (eslint !== undefined) {
       describe('ESLint', () => {
+        const ignoresClause = eslint.negation === undefined ? '' : `, ignores ${eslint.negation}`;
         it('eslint.config.mjs lints every file', async () => {
           expect(
             await eslintUncovered(target.files, undefined),
-            `ESLint: eslint.config.mjs (files ${eslint.files}${eslint.negation === undefined ? '' : `, ignores ${eslint.negation}`}) ignores or has no config for`,
+            `ESLint: eslint.config.mjs (files ${eslint.files}${ignoresClause}) ignores or has no config for`,
           ).toEqual([]);
         });
 

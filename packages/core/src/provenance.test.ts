@@ -3,12 +3,12 @@ import { describe, expect, it } from 'vitest';
 
 import { foldPair, oldestOf, provenanceOfTier, weakest } from './provenance.ts';
 
-function tier(weightSource: ModifierWeight['weightSource'], itemLevelMin: number, weight = 10): ModifierWeight {
+function tier(weightSource: ModifierWeight['weightSource'], itemLevelMin: number): ModifierWeight {
   return {
     sourceModifierId: `m-${weightSource}-${String(itemLevelMin)}`,
     modGroup: `g-${weightSource}-${String(itemLevelMin)}`,
     itemLevelMin,
-    weight: weightSource === 'not-in-game' ? 0 : weight,
+    weight: weightSource === 'not-in-game' ? 0 : 10,
     weightSource,
     lines: [],
   };
@@ -18,7 +18,7 @@ function pools(prefix: ModifierWeight[], suffix: ModifierWeight[]): WeightsClass
   return {
     prefix: { poolCoverage: 'complete', entries: prefix },
     suffix: { poolCoverage: 'complete', entries: suffix },
-  } as WeightsClassPools;
+  };
 }
 
 describe('provenance (AD-10)', () => {

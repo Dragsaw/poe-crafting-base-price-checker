@@ -81,10 +81,12 @@ describe('loadCatalogueIds', () => {
       for (const contents of [undefined, '{"schemaVersion":"1.0.0"}', '{"schemaVersion":"2.0.0","result":[]}']) {
         const loaded = await loadCatalogueIds(fsWith({ [path]: contents }));
         expect(loaded.ok).toBe(false);
-        if (!loaded.ok) {
-          expect(loaded.error).toBeInstanceOf(DataFileError);
-          expect(loaded.error.path).toBe(path);
+        if (loaded.ok) {
+          continue;
         }
+
+        expect(loaded.error).toBeInstanceOf(DataFileError);
+        expect(loaded.error.path).toBe(path);
       }
     },
   );
@@ -100,10 +102,12 @@ describe('loadCatalogueIds', () => {
       }),
     );
     expect(loaded.ok).toBe(true);
-    if (loaded.ok) {
-      expect(loaded.value.statIds.size).toBeGreaterThan(0);
-      expect(loaded.value.baseTypeIds.size).toBeGreaterThan(0);
-      expect(loaded.value.categoryIds.has('jewel')).toBe(true);
+    if (!loaded.ok) {
+      return;
     }
+
+    expect(loaded.value.statIds.size).toBeGreaterThan(0);
+    expect(loaded.value.baseTypeIds.size).toBeGreaterThan(0);
+    expect(loaded.value.categoryIds.has('jewel')).toBe(true);
   });
 });

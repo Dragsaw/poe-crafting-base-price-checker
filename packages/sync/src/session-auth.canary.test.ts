@@ -135,8 +135,9 @@ type Target = 'leagues' | 'search';
 
 /** An error whose message, stack and nested cause all quote the canary. */
 function quotingError(failure: Failure): Error {
-  const cause = new Error(`socket said ${encodeURIComponent(`POESESSID=${CANARY}`)}`, {
-    cause: new Error(`header ${Buffer.from(`POESESSID=${CANARY}`).toString('base64')}`, {
+  const cookie = `POESESSID=${CANARY}`;
+  const cause = new Error(`socket said ${encodeURIComponent(cookie)}`, {
+    cause: new Error(`header ${Buffer.from(cookie).toString('base64')}`, {
       cause: `raw ${CANARY}`,
     }),
   });
@@ -278,11 +279,13 @@ async function runSession(captured: Captured, http: HttpPort): Promise<ShellRun>
   };
   const line = (text: string): void => {
     lines.push(text);
-    if (/^pnpm sync: (?!unauthenticated|authenticated|waiting)/.test(text)) {
-      chunks += 1;
-      if (chunks >= 2) {
-        controller.abort();
-      }
+    if (!/^pnpm sync: (?!unauthenticated|authenticated|waiting)/.test(text)) {
+      return;
+    }
+
+    chunks += 1;
+    if (chunks >= 2) {
+      controller.abort();
     }
   };
   const code = await syncSessionCommand({
@@ -350,7 +353,7 @@ describe('CAP-4: the canary never leaves the holder', () => {
         wait: () => Promise.resolve(),
         userAgent: CONTACT,
         pid: 4242,
-        log: () => undefined,
+        log: () => {},
       }).run();
     } catch (error) {
       thrown = error;
@@ -413,7 +416,7 @@ describe('CAP-4: the canary never leaves the holder', () => {
         wait: () => Promise.resolve(),
         userAgent: CONTACT,
         pid: 4242,
-        log: () => undefined,
+        log: () => {},
         auth: createSessionAuth(ENV),
       }).run();
     } catch (error) {
@@ -468,7 +471,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
    */
   function cookieThrowingHttp(target: 'probe' | 'fetch', failure: Failure): ThrowingHttp {
     let threw = 0;
-    let probed = false;
+    let isProbed = false;
     const fake = createFakeHttpPort({
       [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
       [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: {}, body: SEARCHED },
@@ -482,8 +485,8 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
             return fake.send(request);
           }
           expect(cookie).toBe(`POESESSID=${CANARY}`);
-          const isProbe = request.method === 'POST' && !probed;
-          probed = true;
+          const isProbe = request.method === 'POST' && !isProbed;
+          isProbed = true;
           if ((target === 'probe' && isProbe) || (target === 'fetch' && request.method === 'GET')) {
             threw += 1;
             return Promise.reject(quotingRequestError(request, failure));
@@ -565,7 +568,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
         wait: () => Promise.resolve(),
         userAgent: CONTACT,
         pid: 4242,
-        log: () => undefined,
+        log: () => {},
         auth: createSessionAuth(ENV),
       }).run();
     } catch (error) {
@@ -620,7 +623,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
    */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;
-    let probed = false;
+    let isProbed = false;
     const fake = createFakeHttpPort({
       [`GET ${TRADE_LEAGUES_URL}`]: { status: 200, headers: {}, body: LEAGUES_BODY },
       [`POST ${tradeSearchUrl(LEAGUE)}`]: { status: 200, headers: SEARCH_HEADERS, body: SEARCHED },
@@ -633,8 +636,8 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
           if (cookie === undefined) {
             return fake.send(request);
           }
-          if (request.method === 'POST' && !probed) {
-            probed = true;
+          if (!isProbed && request.method === 'POST') {
+            isProbed = true;
             return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
           }
           const echo = quoting(cookie);
@@ -695,7 +698,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
       wait: () => Promise.resolve(),
       userAgent: CONTACT,
       pid: 4242,
-      log: () => undefined,
+      log: () => {},
       auth: createSessionAuth(ENV),
     }).run();
 

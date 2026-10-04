@@ -80,20 +80,25 @@ export interface RecordedRequest {
 
 function respond(answer: ArtifactAnswer): Response | Promise<Response> {
   switch (answer.kind) {
-    case 'json':
+    case 'json': {
       return new HttpResponse(JSON.stringify(answer.body), {
         headers: { 'Content-Type': 'application/json' },
       });
-    case 'text':
+    }
+    case 'text': {
       return new HttpResponse(answer.body, {
         headers: { 'Content-Type': answer.contentType ?? 'text/html' },
       });
-    case 'status':
+    }
+    case 'status': {
       return new HttpResponse(null, { status: answer.status });
-    case 'network-error':
+    }
+    case 'network-error': {
       return HttpResponse.error();
-    case 'gated':
+    }
+    case 'gated': {
       return answer.gate.then(() => respond(answer.then ?? { kind: 'json', body: null }));
+    }
   }
 }
 
@@ -129,7 +134,7 @@ export function serveArtifacts(
 
 /** A promise and the function that settles it. */
 export function gate(): { readonly promise: Promise<void>; readonly open: () => void } {
-  let open: () => void = () => undefined;
+  let open: () => void = () => {};
   const promise = new Promise<void>((resolve) => {
     open = resolve;
   });

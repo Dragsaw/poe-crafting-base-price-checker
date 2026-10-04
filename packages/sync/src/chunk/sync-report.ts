@@ -40,7 +40,7 @@ export interface SyncReportInputs {
   readonly figures: SyncReportFigures;
   readonly runStartedAt: string;
   /** Only a normal finish passes it. The failure path leaves it absent. */
-  readonly runFinishedAt?: string | undefined;
+  readonly runFinishedAt?: string;
 }
 
 /**
@@ -83,7 +83,7 @@ export function buildSyncReport({
 }: SyncReportInputs): SyncReportFile {
   return {
     runStartedAt,
-    ...(runFinishedAt === undefined ? {} : { runFinishedAt }),
+    ...(runFinishedAt !== undefined && { runFinishedAt }),
     figures: {
       ...figures,
       requestsBySource: chunkRequests(figures.requestsBySource),

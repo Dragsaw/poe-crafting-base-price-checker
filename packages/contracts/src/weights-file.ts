@@ -58,9 +58,9 @@ export const ModifierWeightSchema = z
     }),
     lines: z.array(WeightsLineSchema).min(1, { message: 'lines is empty; an entry carries at least one line' }),
   })
-  .superRefine((entry, ctx) => {
+  .superRefine((entry, context) => {
     if (entry.weightSource === 'not-in-game' && entry.weight !== 0) {
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['weight'],
         message: `weight is ${String(entry.weight)} on a not-in-game entry; a not-in-game tier carries weight 0`,
@@ -76,7 +76,7 @@ export const ModifierWeightSchema = z
         firstIndexByStatId.set(line.statId, index);
         return;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['lines', index, 'statId'],
         message: `statId ${line.statId} repeats lines.${String(first)}; a statId may appear once among one entry's lines`,
@@ -92,7 +92,7 @@ export const WeightsPoolSchema = z
     }),
     entries: z.array(ModifierWeightSchema),
   })
-  .superRefine((pool, ctx) => {
+  .superRefine((pool, context) => {
     const firstIndexById = new Map<string, number>();
     pool.entries.forEach((entry, index) => {
       const first = firstIndexById.get(entry.sourceModifierId);
@@ -100,7 +100,7 @@ export const WeightsPoolSchema = z
         firstIndexById.set(entry.sourceModifierId, index);
         return;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['entries', index, 'sourceModifierId'],
         message: `sourceModifierId repeats entries.${String(first)}; a sourceModifierId may appear once per slot`,
@@ -127,7 +127,7 @@ function familyOf(className: string, letterCount: number): string {
  */
 const WeightsCategorySchema = z
   .record(ClassNameSchema, WeightsClassPoolsSchema)
-  .superRefine((classes, ctx) => {
+  .superRefine((classes, context) => {
     const plain: string[] = [];
     const defence: string[] = [];
     const firstByLetterSet = new Map<string, string>();
@@ -138,7 +138,7 @@ const WeightsCategorySchema = z
         continue;
       }
       if (familyOf(className, letters.size) === '') {
-        ctx.addIssue({
+        context.addIssue({
           code: 'custom',
           path: [className],
           message: `className ${className} matches neither grammar; a defence-suffixed key is <family>_<letters> with a non-empty family`,
@@ -152,7 +152,7 @@ const WeightsCategorySchema = z
         firstByLetterSet.set(letterSet, className);
         continue;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: [className],
         message: `className ${className} carries the letter set of ${first}; the defence-suffixed classes of one categoryId carry distinct letter sets`,
@@ -161,7 +161,7 @@ const WeightsCategorySchema = z
     const [firstDefence] = defence;
     const [firstPlain] = plain;
     if (firstDefence !== undefined && firstPlain !== undefined) {
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: [],
         message: `defence-suffixed ${firstDefence} and plain ${firstPlain} share a categoryId; one categoryId never mixes the two grammars`,

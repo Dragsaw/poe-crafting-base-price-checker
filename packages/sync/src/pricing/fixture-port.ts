@@ -54,14 +54,11 @@ export function createFixtureHttpPort(fixtures: PricingFixtures): FixtureHttpPor
       requests.push(request);
       const name = servedFixtureName(request);
       const body = fixtures.get(name);
-      if (body === undefined) {
-        return Promise.reject(
+      return body === undefined ? Promise.reject(
           new Error(
             `[fixture-http] no recorded fixture ${name} for ${request.method} ${request.url} — run pnpm fixtures:record (NFR-2)`,
           ),
-        );
-      }
-      return Promise.resolve({ status: 200, headers: {}, body });
+        ) : Promise.resolve({ status: 200, headers: {}, body });
     },
   };
 }

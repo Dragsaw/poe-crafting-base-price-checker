@@ -40,12 +40,11 @@ const SPECIFIER =
 
 /** Rewrites each relative `.ts`/`.tsx`/`.mts`/`.cts` specifier in declaration text. */
 export function rewriteDtsSpecifiers(text: string): string {
-  return text.replace(
+  return text.replaceAll(
     SPECIFIER,
     (match, lead: string, quote: string, stem: string, extension: string) => {
       // `./types.d.ts` names a declaration file and is left as written.
-      if (stem.endsWith('.d')) return match;
-      return `${lead}${quote}${stem}.${EXTENSION_MAP[extension]}${quote}`;
+      return stem.endsWith('.d') ? match : `${lead}${quote}${stem}.${EXTENSION_MAP[extension]}${quote}`;
     },
   );
 }
@@ -54,8 +53,8 @@ function collectDeclarationFiles(dir: string): string[] {
   const files: string[] = [];
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
-    if (statSync(path).isDirectory()) files.push(...collectDeclarationFiles(path));
-    else if (/\.d\.[mc]?ts$/.test(name)) files.push(path);
+    if (statSync(path).isDirectory()) {files.push(...collectDeclarationFiles(path));}
+    else if (/\.d\.[mc]?ts$/.test(name)) {files.push(path);}
   }
   return files;
 }
@@ -72,10 +71,12 @@ export function rewriteDtsSpecifiersIn(dir: string): string[] {
   for (const file of collectDeclarationFiles(dir)) {
     const before = readFileSync(file, 'utf8');
     const after = rewriteDtsSpecifiers(before);
-    if (after !== before) {
-      writeFileSync(file, after);
-      changed.push(file);
+    if (after === before) {
+      continue;
     }
+
+    writeFileSync(file, after);
+    changed.push(file);
   }
   return changed;
 }
@@ -92,8 +93,8 @@ export const TARGET_PACKAGES: readonly string[] = ['contracts', 'core', 'sync'];
  * The directories the post-emit step rewrites: the `dist` of each
  * `TARGET_PACKAGES` entry, which its `exports["."].types` names.
  */
-const TARGET_DIRS = TARGET_PACKAGES.map((pkg) =>
-  fileURLToPath(new URL(`../../packages/${pkg}/dist`, import.meta.url)),
+const TARGET_DIRS = TARGET_PACKAGES.map((package_) =>
+  fileURLToPath(new URL(`../../packages/${package_}/dist`, import.meta.url)),
 );
 
 /**
@@ -105,7 +106,7 @@ const TARGET_DIRS = TARGET_PACKAGES.map((pkg) =>
  */
 function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
-  if (entry === undefined) return false;
+  if (entry === undefined) {return false;}
   try {
     return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
@@ -115,7 +116,7 @@ function isInvokedDirectly(): boolean {
 
 if (isInvokedDirectly()) {
   try {
-    for (const dir of TARGET_DIRS) rewriteDtsSpecifiersIn(dir);
+    for (const dir of TARGET_DIRS) {rewriteDtsSpecifiersIn(dir);}
   } catch (error: unknown) {
     process.stderr.write(`rewrite-dts-specifiers: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;

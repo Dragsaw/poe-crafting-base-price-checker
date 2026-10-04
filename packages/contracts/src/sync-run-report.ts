@@ -64,7 +64,7 @@ function readLegacyRequestSources(value: unknown): unknown {
     return value;
   }
   const entries = Object.entries(value).filter(([key]) => key !== LEGACY_REQUEST_SOURCE_KEY);
-  if (!(SESSION_PROBE_SOURCE_KEY in value)) {
+  if (!Object.hasOwn(value, SESSION_PROBE_SOURCE_KEY)) {
     entries.push([SESSION_PROBE_SOURCE_KEY, 0]);
   }
   return Object.fromEntries(entries);
@@ -74,7 +74,6 @@ export const RequestsBySourceSchema = z
   .preprocess(readLegacyRequestSources, z.record(ChunkRequestSourceSchema, z.int().min(0)))
   .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
 
-export type RequestsBySource = z.infer<typeof RequestsBySourceSchema>;
 
 /**
  * The `sync-report.json` contract version. 1.1.0 narrowed `requestsBySource`

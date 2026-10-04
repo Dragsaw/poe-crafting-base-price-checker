@@ -84,9 +84,7 @@ function setup(options: Setup) {
   const results = options.results ?? ids(10);
   const fake = createFakeHttpPort({
     [`POST ${SEARCH_URL}`]: options.search ?? ok({ id: SEARCH_ID, complexity: 1, result: results, total: results.length }),
-    ...(options.fetch === undefined || options.rejectFetch === true
-      ? {}
-      : { [`GET ${tradeFetchUrl(results.slice(0, 10), SEARCH_ID)}`]: options.fetch }),
+    ...(!(options.fetch === undefined || options.rejectFetch === true) && { [`GET ${tradeFetchUrl(results.slice(0, 10), SEARCH_ID)}`]: options.fetch }),
   });
   const http = {
     requests: fake.requests,
@@ -319,8 +317,8 @@ describe('createPricingStep: unanswered and refused requests', () => {
     const { run } = setup({ search: status(400), dataset: [PREVIOUS] });
 
     const error = await run().then(
-      () => undefined,
-      (thrown: unknown) => thrown,
+      () => {},
+      (error_: unknown) => error_,
     );
 
     expect(error).toBeInstanceOf(MalformedRequestError);
@@ -336,8 +334,8 @@ describe('createPricingStep: unanswered and refused requests', () => {
     const { run } = setup({ results: ids(1), fetch: status(404), dataset: [PREVIOUS] });
 
     const error = await run().then(
-      () => undefined,
-      (thrown: unknown) => thrown,
+      () => {},
+      (error_: unknown) => error_,
     );
 
     expect(error).toBeInstanceOf(MalformedRequestError);
@@ -372,8 +370,8 @@ describe('createPricingStep: unanswered and refused requests', () => {
   it('a search answered 200 with {} throws UnexpectedTradeResponseError with lastAttemptedAt stamped, the search fields and the price state kept, and sends no fetch', async () => {
     const { http, run } = setup({ search: ok({}), dataset: [PREVIOUS] });
     const error = await run().then(
-      () => undefined,
-      (thrown: unknown) => thrown,
+      () => {},
+      (error_: unknown) => error_,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
@@ -389,8 +387,8 @@ describe('createPricingStep: unanswered and refused requests', () => {
   it('a search answered 200 with {} for a never-published entry carries a stamped never-synced entry', async () => {
     const { http, run } = setup({ search: ok({}) });
     const error = await run().then(
-      () => undefined,
-      (thrown: unknown) => thrown,
+      () => {},
+      (error_: unknown) => error_,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
@@ -405,8 +403,8 @@ describe('createPricingStep: unanswered and refused requests', () => {
   it('a fetch answered 200 with {} throws UnexpectedTradeResponseError with the answered search fields and the price state kept', async () => {
     const { run } = setup({ results: ids(1), fetch: ok({}), dataset: [PREVIOUS] });
     const error = await run().then(
-      () => undefined,
-      (thrown: unknown) => thrown,
+      () => {},
+      (error_: unknown) => error_,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch' });

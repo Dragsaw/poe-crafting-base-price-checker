@@ -127,7 +127,7 @@ describe('the pending state', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
@@ -142,7 +142,7 @@ describe('the pending state', () => {
     expect(stripSlot?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     expect(stripSlot?.textContent).toBe('');
     expect(frame().querySelector('[data-trust-strip]')).toBeNull();
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
   });
 
   it('changes nothing rendered while any artifact is still outstanding, then moves in one transition', async () => {
@@ -339,9 +339,9 @@ describe('the outcomes', () => {
 describe('the resting chrome', () => {
   function chrome(): Record<string, boolean> {
     return Object.fromEntries(
-      ['data-asking-price-line', 'data-column-header', 'data-key-block', 'data-running-foot'].map((attr) => [
-        attr,
-        frame().querySelector(`[${attr}]`) !== null,
+      ['data-asking-price-line', 'data-column-header', 'data-key-block', 'data-running-foot'].map((attribute) => [
+        attribute,
+        frame().querySelector(`[${attribute}]`) !== null,
       ]),
     );
   }
@@ -358,14 +358,14 @@ describe('the resting chrome', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(chrome()).toEqual(ALL);
     expect(frame().querySelector('[data-column-header]')?.textContent).toContain('Item Class / Base Type');
     expect(frame().textContent).toContain(ASKING_PRICE_COPY);
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
   });
 
   it('renders the chrome in order around the ranked rows when ready', async () => {
@@ -436,7 +436,7 @@ describe('the resting chrome', () => {
     serveArtifacts(server, { tracked: { kind: 'json', body: tracked }, dataset: { kind: 'json', body: dataset } });
     mount();
     await settleTo('ready');
-    const rows = Array.from(frame().querySelectorAll('[data-ranked-row]'));
+    const rows = [...frame().querySelectorAll('[data-ranked-row]')];
     expect(rows.map((row) => row.querySelector('[data-unit-name]')?.textContent)).toEqual(['Gold Amulet']);
     expect(frame().textContent).not.toContain('Solar Amulet');
     expect(frame().textContent).not.toContain('Utility Belt');
@@ -454,12 +454,12 @@ describe('the resting chrome', () => {
     mount();
     await settleTo('ready');
     const fetched = requests.length;
-    const rows = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'));
+    const rows = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')];
     act(() => {
       rows[0]?.click();
     });
     await flush();
-    const panels = Array.from(frame().querySelectorAll<HTMLElement>('[data-expansion-panel]'));
+    const panels = [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel]')];
     expect(panels).toHaveLength(1);
     expect(panels.map((panel) => panel.previousElementSibling)).toEqual(rows.slice(0, 1));
     const links = panels.map((panel) => panel.querySelector<HTMLAnchorElement>('[data-cell="trade-link"] a'));
@@ -515,14 +515,6 @@ describe('the payout threshold', () => {
     localStorage.clear();
   });
 
-  function thresholdInput(): HTMLInputElement {
-    const found = frame().querySelector<HTMLInputElement>('[data-payout-threshold] input');
-    if (found === null) {
-      throw new Error('no threshold input rendered');
-    }
-    return found;
-  }
-
   function rankedNames(): (string | null)[] {
     return Array.from(frame().querySelectorAll('[data-ranked-row] [data-unit-name]'), (node) => node.textContent);
   }
@@ -544,14 +536,14 @@ describe('the payout threshold', () => {
     const low = rawEntry('Low Belt');
     const mid = rawEntry('Mid Belt');
     const high = rawEntry('High Belt');
-    const filler = Array.from({ length: 20 }, (_, i) => rawEntry(`Filler Ring ${String(i + 1).padStart(2, '0')}`));
+    const filler = Array.from({ length: 20 }, (_, index) => rawEntry(`Filler Ring ${String(index + 1).padStart(2, '0')}`));
     const bodies = bodiesWith(
       [low, mid, high, ...filler],
       [
         priced(low, 0.1268, hoursBefore(now, 1)),
         priced(mid, 0.5, hoursBefore(now, 1)),
         priced(high, 0.8, hoursBefore(now, 1)),
-        ...filler.map((entry, i) => priced(entry, 2 + i, hoursBefore(now, 1))),
+        ...filler.map((entry, index) => priced(entry, 2 + index, hoursBefore(now, 1))),
       ],
     );
     const answers: Partial<Record<ArtifactKey, ArtifactAnswer>> = {
@@ -565,7 +557,7 @@ describe('the payout threshold', () => {
     return serveArtifacts(
       server,
       Object.fromEntries(
-        ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: held, then: answers[key] } as ArtifactAnswer]),
+        ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: held, then: answers[key] }]),
       ),
     );
   }
@@ -584,7 +576,7 @@ describe('the payout threshold', () => {
     const group = frame().querySelector<HTMLElement>('[data-control-group]');
     expect(group?.style.width).toBe('508px');
     expect(group?.style.gap).toBe('16px');
-    const [recipe, threshold] = Array.from(group?.children ?? []) as HTMLElement[];
+    const [recipe, threshold] = [...group?.children ?? []] as HTMLElement[];
     expect(recipe?.dataset['recipeSlot']).toBe('');
     expect(recipe?.style.width).toBe('216px');
     expect(threshold?.dataset['payoutThreshold']).toBe('');
@@ -598,14 +590,14 @@ describe('the payout threshold', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
-    expect(thresholdInput().value).toBe('0.25');
-    for (const g of gates) g.open();
+    expect(payoutField().value).toBe('0.25');
+    for (const g of gates) {g.open();}
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
 
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
     reload();
@@ -629,7 +621,7 @@ describe('the payout threshold', () => {
     expect(rankedNames()).toContain('High Belt');
     expect(rankedNames()).not.toContain('Low Belt');
 
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     // Before the debounce the ranking has not moved.
     expect(rankedNames()).toContain('Mid Belt');
     await pastDebounce();
@@ -641,7 +633,7 @@ describe('the payout threshold', () => {
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
     const marker = frame().querySelector<HTMLElement>('[data-threshold-marker]');
-    expect(parseFloat(marker?.style.left ?? '')).toBeCloseTo(20, 5);
+    expect(Number.parseFloat(marker?.style.left ?? '')).toBeCloseTo(20, 5);
   });
 
   it('keeps a threshold typed while pending through the move to ready, and ranks at it', async () => {
@@ -649,12 +641,12 @@ describe('the payout threshold', () => {
     serveLadder(held.promise);
     mount();
     expect(frame().dataset['state']).toBe('pending');
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     // The set arrives before the debounce elapses.
     held.open();
     await settleTo('ready');
     await pastDebounce();
-    expect(thresholdInput().value).toBe('0.60');
+    expect(payoutField().value).toBe('0.60');
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
     growList();
     expect(rankedNames()).not.toContain('Mid Belt');
@@ -668,7 +660,7 @@ describe('the payout threshold', () => {
     await settleTo('ready');
     growList();
     expect(rankedNames()).not.toContain('Low Belt');
-    typeInto(thresholdInput(), '0.1');
+    typeInto(payoutField(), '0.1');
     await pastDebounce();
     expect(rankedNames().at(-1)).toBe('Low Belt');
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
@@ -681,11 +673,11 @@ describe('the payout threshold', () => {
     await settleTo('ready');
     growList();
     const before = rankedNames();
-    typeInto(thresholdInput(), '');
+    typeInto(payoutField(), '');
     await pastDebounce();
     expect(rankedNames()).toEqual(before);
-    blur(thresholdInput());
-    expect(thresholdInput().value).toBe('0.25');
+    blur(payoutField());
+    expect(payoutField().value).toBe('0.25');
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBeNull();
   });
 
@@ -694,7 +686,7 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     await pastDebounce();
     growList();
     const firstRow = frame().querySelector<HTMLElement>('[data-ranked-row]');
@@ -707,7 +699,7 @@ describe('the payout threshold', () => {
     serveLadder();
     reload();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.60');
+    expect(payoutField().value).toBe('0.60');
     expect(frame().querySelectorAll('[data-ranked-row][data-open]')).toHaveLength(0);
     expect(frame().querySelector('[data-expand-affordance]')?.getAttribute('aria-expanded')).toBe('false');
     growList();
@@ -719,7 +711,7 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.60');
+    expect(payoutField().value).toBe('0.60');
     growList();
     expect(rankedNames()).not.toContain('Mid Belt');
     expect(rankedNames()).toContain('High Belt');
@@ -731,7 +723,7 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     growList();
     expect(rankedNames()).toContain('Mid Belt');
     expect(rankedNames()).not.toContain('Low Belt');
@@ -748,9 +740,9 @@ describe('the payout threshold', () => {
     serveLadder();
     mount();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     growList();
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     await pastDebounce();
     expect(rankedNames()).not.toContain('Mid Belt');
     expect(rankedNames()).toContain('High Belt');
@@ -762,18 +754,18 @@ describe('the payout threshold', () => {
     mount();
     await settleTo('ready');
     const atRest = frame().outerHTML;
-    typeInto(thresholdInput(), '0.6');
+    typeInto(payoutField(), '0.6');
     await pastDebounce();
-    blur(thresholdInput());
+    blur(payoutField());
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
 
     localStorage.clear();
     serveLadder();
     reload();
     await settleTo('ready');
-    expect(thresholdInput().value).toBe('0.25');
+    expect(payoutField().value).toBe('0.25');
     // React's generated ids differ per mount; everything else must match byte for byte.
-    const strip = (html: string): string => html.replace(/\s(id|for|aria-describedby)="[^"]*"/g, '');
+    const strip = (html: string): string => html.replaceAll(/\s(id|for|aria-describedby)="[^"]*"/g, '');
     expect(strip(frame().outerHTML)).toBe(strip(atRest));
   });
 });
@@ -783,7 +775,7 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
   const bodies = bodiesWith([lost], [unpriced(lost, { state: 'unresolvable' }, hoursBefore(Date.now(), 1))]);
 
   function lostRow(): HTMLElement {
-    const rows = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'));
+    const rows = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')];
     expect(rows).toHaveLength(1);
     const [row] = rows;
     if (row === undefined) {
@@ -827,7 +819,7 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     // A lone unresolvable row makes the list honest-empty, so its EV cell reads state 23's phrase.
     expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
     const health = frame().querySelector('[data-trust-strip] [data-health-line]');
-    expect(health?.textContent?.replaceAll('\u00a0', ' ')).toBe('× 1 unresolvable');
+    expect(health?.textContent?.replaceAll('\u{A0}', ' ')).toBe('× 1 unresolvable');
   });
 
   // Matrix: only unresolvable.
@@ -915,13 +907,13 @@ describe('the list statement', () => {
     return Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="rank"]'), (node) => node.textContent ?? '');
   }
 
-  function evCells(): string[] {
+  function eventCells(): string[] {
     return Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="ev"]'), (node) => node.textContent ?? '');
   }
 
   function expectChromeAround(): void {
-    for (const attr of ['data-asking-price-line', 'data-unrankable-appendix', 'data-key-block', 'data-running-foot']) {
-      expect(frame().querySelector(`[${attr}]`), attr).not.toBeNull();
+    for (const attribute of ['data-asking-price-line', 'data-unrankable-appendix', 'data-key-block', 'data-running-foot']) {
+      expect(frame().querySelector(`[${attribute}]`), attribute).not.toBeNull();
     }
   }
 
@@ -954,7 +946,7 @@ describe('the list statement', () => {
     // Canonical key order: for three iLvl-82 raw bases, the base type ids in order.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(evCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    expect(eventCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
     // None of last league's figures, anywhere on the list.
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
@@ -963,7 +955,7 @@ describe('the list statement', () => {
       first?.click();
     });
     expect(frame().querySelector('[data-expansion-panel] [data-cell="state"]')?.textContent).toBe(
-      '∆ not-yet-synced · league-mismatch',
+      '∆\u{A0}not-yet-synced · league-mismatch',
     );
     expectChromeAround();
   });
@@ -993,7 +985,7 @@ describe('the list statement', () => {
     // Canonical key order across the groups, not no-listings first.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(evCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    expect(eventCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
     // The no-listings row's expansion keeps its own state and phrase.
@@ -1022,7 +1014,7 @@ describe('the list statement', () => {
     expect(statement()).toBeNull();
     expect(unitNames()).toEqual(['Wide Belt', 'Coral Ring']);
     expect(numerals()).toEqual(['1', '']);
-    expect(evCells()).toEqual(['1.50', 'no figure yet']);
+    expect(eventCells()).toEqual(['1.50', 'no figure yet']);
     expect(frame().textContent).not.toMatch(/stale/i);
     expectChromeAround();
   });
@@ -1047,7 +1039,7 @@ describe('the list statement', () => {
     expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     // Not a money-slot phrase: the trail row keeps its own phrase, as it was.
     expect(unitNames()).toEqual(['Lost Belt']);
-    expect(evCells()).toEqual(['no figure yet']);
+    expect(eventCells()).toEqual(['no figure yet']);
     expectChromeAround();
 
     typeInto(payoutField(), '1');
@@ -1093,15 +1085,15 @@ describe('the list statement', () => {
  * come from `core`'s sort.
  */
 function twentyNineClasses(): ReturnType<typeof craftedEntry>[] {
-  return Array.from({ length: 29 }, (_, i) => {
-    const n = String(((i * 7) % 29) + 1).padStart(2, '0');
+  return Array.from({ length: 29 }, (_, index) => {
+    const n = String(((index * 7) % 29) + 1).padStart(2, '0');
     return craftedEntry(`Class ${n}`, `fixture.class${n}`);
   });
 }
 
 /** The fixture's class names in the order the page must show them. */
 function sortedClassNames(): string[] {
-  return Array.from({ length: 29 }, (_, i) => `Class ${String(i + 1).padStart(2, '0')}`);
+  return Array.from({ length: 29 }, (_, index) => `Class ${String(index + 1).padStart(2, '0')}`);
 }
 
 const ABSENT_REASON = 'class absent from weights file';
@@ -1120,7 +1112,7 @@ describe('the Unrankable appendix', () => {
   }
 
   function appendixRows(): HTMLElement[] {
-    return Array.from(frame().querySelectorAll<HTMLElement>('[data-appendix-row]'));
+    return [...frame().querySelectorAll<HTMLElement>('[data-appendix-row]')];
   }
 
   /** The page tail's children, by their first data attribute. */
@@ -1294,14 +1286,14 @@ describe('the Unrankable appendix', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
     expect(tailOrder()).toEqual(['keyBlock', 'runningFoot']);
     expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
-    for (const g of gates) g.open();
+    for (const g of gates) {g.open();}
     await settleTo('ready');
   });
 
@@ -1335,12 +1327,12 @@ describe('the interaction surface', () => {
       setItem.call(this, key, value);
     });
     const now = Date.now();
-    const filler = Array.from({ length: 22 }, (_, i) => rawEntry(`Filler Ring ${String(i + 1).padStart(2, '0')}`));
+    const filler = Array.from({ length: 22 }, (_, index) => rawEntry(`Filler Ring ${String(index + 1).padStart(2, '0')}`));
     // weights.json absent, so the appendix holds rows the guard covers too.
     const bodies = bodiesWith(
       [...filler, craftedEntry('Bows', 'weapon.bow'), craftedEntry('Wands', 'weapon.wand')],
-      filler.map((entry, i) =>
-        priced(entry, 1 + i / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(i)}`, league: TEST_LEAGUE }),
+      filler.map((entry, index) =>
+        priced(entry, 1 + index / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(index)}`, league: TEST_LEAGUE }),
       ),
     );
     const requests = serveArtifacts(server, {
@@ -1352,7 +1344,7 @@ describe('the interaction surface', () => {
     await settleTo('ready');
 
     // An appendix row does nothing on a click: no expansion, no change to the page.
-    const appendixRows = Array.from(frame().querySelectorAll<HTMLElement>('[data-appendix-row]'));
+    const appendixRows = [...frame().querySelectorAll<HTMLElement>('[data-appendix-row]')];
     expect(appendixRows).toHaveLength(2);
     const beforeAppendix = frame().innerHTML;
     for (const row of appendixRows) {
@@ -1386,7 +1378,7 @@ describe('the interaction surface', () => {
     // A header click sorts nothing, and the header holds nothing clickable.
     const header = frame().querySelector<HTMLElement>('[data-column-header]');
     const before = unitNames();
-    for (const label of Array.from(header?.children ?? []) as HTMLElement[]) {
+    for (const label of [...header?.children ?? []] as HTMLElement[]) {
       act(() => {
         label.click();
       });
@@ -1425,11 +1417,11 @@ describe('the chase cells on the frozen data fixture', () => {
           frame().querySelector<HTMLElement>('[data-recipe-option="perfect"]')?.click();
         });
       }
-      const crafted = Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]:not([data-raw])'));
+      const crafted = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]:not([data-raw])')];
       expect(crafted.length, recipeId).toBeGreaterThan(0);
       let filled = 0;
       for (const row of crafted) {
-        const slots = Array.from(row.querySelectorAll<HTMLElement>('[data-chase-cell]'));
+        const slots = [...row.querySelectorAll<HTMLElement>('[data-chase-cell]')];
         expect(slots, recipeId).toHaveLength(3);
         for (const cell of slots) {
           expect(cell.querySelector('[data-verbatim]'), cell.textContent).toBeNull();

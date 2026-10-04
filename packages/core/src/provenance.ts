@@ -42,7 +42,11 @@ export function foldPair(
     ...eligible(pools.prefix, entry.itemLevelMin, modifierLevelMin),
     ...eligible(pools.suffix, entry.itemLevelMin, modifierLevelMin),
   ];
-  return inputs.reduce<RankedProvenance>((label, tier) => weakest(label, provenanceOfTier(tier)), 'measured');
+  let label: RankedProvenance = 'measured';
+  for (const tier of inputs) {
+    label = weakest(label, provenanceOfTier(tier));
+  }
+  return label;
 }
 
 /** The oldest of the given ISO timestamps, or `undefined` when there are none. */

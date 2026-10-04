@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
  * The dry-run script over the live data/ (pnpm test:data). The copy in
  * dry-run.test.ts keeps only the "writes nothing" guard.
  */
-const SCRIPT = fileURLToPath(new URL('./dry-run.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 
 interface Run {
@@ -21,9 +21,9 @@ interface Run {
 }
 
 /** Spawns the script the way `pnpm sync:dry` does, with both streams piped. */
-function runScript(args: readonly string[] = []): Promise<Run> {
+function runScript(arguments_: readonly string[] = []): Promise<Run> {
   return new Promise((resolve) => {
-    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       resolve({ code: child.exitCode, stdout, stderr });
     });
   });
@@ -75,7 +75,7 @@ describe('pnpm sync:dry over the live data/', () => {
       'dataset',
       'records',
       'report',
-      ...['unrecorded', 'pinnedStarvation', 'notBefore'].filter((key) => key in report),
+      ...['unrecorded', 'pinnedStarvation', 'notBefore'].filter((key) => Object.hasOwn(report, key)),
     ]);
     expect(report['outcome']).toBe('completed');
     // Printed as written: the schema accepts it and its keys are in declared order.
@@ -115,7 +115,10 @@ describe('pnpm sync:dry over the live data/', () => {
     const report = JSON.parse(run.stdout) as { entries: DatasetEntry[]; dataset: DatasetFile };
     // Only the entries this run priced are stamped; a skipped one keeps its stamp.
     const stamped = new Set(report.entries.map((entry) => entry.entryKey));
-    for (const entry of report.dataset.entries.filter((published) => stamped.has(published.entryKey))) {
+    for (const entry of report.dataset.entries) {
+      if (!stamped.has(entry.entryKey)) {
+        continue;
+      }
       expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
     }
     expect(snapshot(DATA_DIR)).toEqual(before);

@@ -15,17 +15,15 @@ export const DAY_MS = 24 * HOUR_MS;
  */
 export function exactAge(clock: string, now: number): string {
   const hours = (now - Date.parse(clock)) / HOUR_MS;
-  if (!(hours >= 1)) {
-    return '< 1h';
+  if (hours >= 1) {
+    return hours < 24 ? `${String(Math.floor(hours))}h` : `${String(Math.floor(hours / 24))}d`;
   }
-  if (hours < 24) {
-    return `${String(Math.floor(hours))}h`;
-  }
-  return `${String(Math.floor(hours / 24))}d`;
+  return '< 1h';
 }
 
 function unitAgo(count: number, unit: string): string {
-  return `${String(count)} ${plural(count, unit, `${unit}s`)} ago`;
+  const units = `${unit}s`;
+  return `${String(count)} ${plural(count, unit, units)} ago`;
 }
 
 /** A relative age: `< 1 minute ago`, then whole minutes under 1h, hours under 24h, then days. */
@@ -36,8 +34,5 @@ export function relativeAge(ageMs: number): string {
   if (ageMs < HOUR_MS) {
     return unitAgo(Math.floor(ageMs / MINUTE_MS), 'minute');
   }
-  if (ageMs < DAY_MS) {
-    return unitAgo(Math.floor(ageMs / HOUR_MS), 'hour');
-  }
-  return unitAgo(Math.floor(ageMs / DAY_MS), 'day');
+  return ageMs < DAY_MS ? unitAgo(Math.floor(ageMs / HOUR_MS), 'hour') : unitAgo(Math.floor(ageMs / DAY_MS), 'day');
 }

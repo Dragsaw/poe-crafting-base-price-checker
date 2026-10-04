@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 function panelsIn(within: HTMLElement): HTMLElement[] {
-  return Array.from(within.querySelectorAll<HTMLElement>('[data-expansion-panel]'));
+  return [...within.querySelectorAll<HTMLElement>('[data-expansion-panel]')];
 }
 
 function click(target: HTMLElement | null | undefined): void {
@@ -31,7 +31,7 @@ function click(target: HTMLElement | null | undefined): void {
 function openOne(entry: RawTrackedEntry, published: DatasetEntry | undefined, threshold = DEFAULT_THRESHOLD): HTMLElement {
   const view = mountList([entry], published === undefined ? [] : [published], threshold);
   click(rowsIn(view)[0]);
-  const rows = Array.from(view.querySelectorAll<HTMLElement>('[data-combination-row]'));
+  const rows = [...view.querySelectorAll<HTMLElement>('[data-combination-row]')];
   expect(rows).toHaveLength(1);
   const [only] = rows;
   if (only === undefined) {
@@ -49,8 +49,8 @@ function line2(row: HTMLElement): string[] {
 }
 
 function many(count: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntry[] } {
-  const tracked = Array.from({ length: count }, (_, i) => rawEntry(`Base ${String(i).padStart(2, '0')}`));
-  return { tracked, dataset: tracked.map((entry, i) => priced(entry, 40 - i, hoursBefore(NOW, 1))) };
+  const tracked = Array.from({ length: count }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
+  return { tracked, dataset: tracked.map((entry, index) => priced(entry, 40 - index, hoursBefore(NOW, 1))) };
 }
 
 describe('the expansion panel', () => {
@@ -104,7 +104,7 @@ describe('the expansion panel', () => {
     const belt = rawEntry('Wide Belt');
     const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH));
     const widths = (line: string): number[] =>
-      Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => parseFloat(c.style.width));
+      Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => Number.parseFloat(c.style.width));
     expect(widths('1')).toEqual([...columnSums.combinationLine1]);
     expect(widths('2')).toEqual([...columnSums.combinationLine2]);
     expect(row.style.minHeight).toBe(`${String(spacing.combinationRowHeight)}px`);
@@ -137,7 +137,7 @@ describe('the Raw Base combination row', () => {
       ...priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH),
       lastAttemptedAt: hoursBefore(NOW, 11),
     });
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.priced}\u00a0priced`, '0.80', '10 listings']);
+    expect(line1(row)).toEqual(['no affixes', `${glyphs.priced}\u{A0}priced`, '0.80', '10 listings']);
     expect(line2(row)).toEqual([
       'no affixes — this Base Type priced as it drops, at Item Level 82',
       'priced 11h ago',
@@ -176,7 +176,7 @@ describe('the Raw Base combination row', () => {
   it('prints no-listings: ○, an open question, 0 listings found, the state-2 note, tried only', () => {
     const ring = rawEntry('Coral Ring');
     const row = openOne(ring, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 3), SEARCH));
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.noListings}\u00a0no-listings`, 'an open question', '0 listings found']);
+    expect(line1(row)).toEqual(['no affixes', `${glyphs.noListings}\u{A0}no-listings`, 'an open question', '0 listings found']);
     expect(line2(row)).toEqual([
       'nobody is listing this right now — a jackpot and junk look alike here',
       '',
@@ -193,7 +193,7 @@ describe('the Raw Base combination row', () => {
   it('prints unresolvable: × unresolvable, not valued in rust, no sample, the raw state-4 note, tried only', () => {
     const ring = rawEntry('Lost Ring');
     const row = openOne(ring, unpriced(ring, { state: 'unresolvable' }, hoursBefore(NOW, 5), SEARCH));
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.unresolvable}\u00a0unresolvable`, 'not valued', 'no sample']);
+    expect(line1(row)).toEqual(['no affixes', `${glyphs.unresolvable}\u{A0}unresolvable`, 'not valued', 'no sample']);
     expect(line2(row)).toEqual(['its id is gone from the trade API — a patch did this', '', 'tried 5h ago']);
     const phrase = cell(row, 'figure').querySelector<HTMLElement>('[data-money-phrase]');
     expect(phrase?.style.fontStyle).toBe('italic');
@@ -211,7 +211,7 @@ describe('the Raw Base combination row', () => {
     const row = openOne(belt, undefined);
     expect(line1(row)).toEqual([
       'no affixes',
-      `${glyphs.notYetSynced}\u00a0not-yet-synced · never-synced`,
+      `${glyphs.notYetSynced}\u{A0}not-yet-synced · never-synced`,
       'no figure yet',
       'no sample',
     ]);
@@ -225,7 +225,7 @@ describe('the Raw Base combination row', () => {
   it('prints a league mismatch with its reason and the state-6 note, and blanks an old-league link', () => {
     const amulet = rawEntry('Jade Amulet');
     const row = openOne(amulet, priced(amulet, 3, hoursBefore(NOW, 50), 'Standard', { id: 'old', league: 'Standard' }));
-    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u00a0not-yet-synced · league-mismatch`);
+    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · league-mismatch`);
     expect(line2(row)).toEqual(['the observation belongs to another league', '', 'tried 2d ago']);
     const blank = cell(row, 'trade-link');
     expect(blank.childNodes).toHaveLength(0);
@@ -238,7 +238,7 @@ describe('the Raw Base combination row', () => {
       ring,
       unpriced(ring, { state: 'not-yet-synced', reason: 'no-exchange-rate' }, hoursBefore(NOW, 6), SEARCH),
     );
-    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u00a0not-yet-synced · no-exchange-rate`);
+    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · no-exchange-rate`);
     expect(line2(row)).toEqual(['the listing currency had no rate at sync time', '', 'tried 6h ago']);
     expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
   });
@@ -286,7 +286,7 @@ describe('the open set', () => {
     click(rowsIn(view)[21]);
     const openNames = (): (string | null)[] =>
       rowsIn(view)
-        .filter((r) => r.hasAttribute('data-open'))
+        .filter((r) => r.dataset['open'] !== undefined)
         .map((r) => r.querySelector('[data-unit-name]')?.textContent ?? null);
     expect(openNames()).toEqual(['Base 02', 'Base 21']);
     expect(panelsIn(view)).toHaveLength(2);
@@ -322,7 +322,7 @@ describe('the open set', () => {
 describe('the trade link', () => {
   it('does not toggle the row on a click, and no request fires on expand or on the click', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const openSpy = vi.spyOn(globalThis, 'open').mockImplementation(() => null);
     const belt = rawEntry('Wide Belt');
     const view = mountList([belt], [priced(belt, 0.8, hoursBefore(NOW, 1), TEST_LEAGUE, SEARCH)]);
     click(rowsIn(view)[0]);

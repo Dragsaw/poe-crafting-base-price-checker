@@ -1,12 +1,13 @@
-# Runs the checks and the test suite on a pull request that changes code or
-# the config that code builds with.
+# Runs the full gate on a pull request that changes code or the config that
+# code builds with.
 #
 # The workflow starts on every pull request and the filter step skips the rest
 # when nothing relevant changed. A `paths:` trigger would skip the whole run, and
 # a required check that never reports leaves the pull request unmergeable.
 #
-# `pnpm test` reads a frozen fixture set, not `data/`, so it is the same gate
-# that `deploy.yml` runs before a build. `pnpm test:data` is not run here.
+# `pnpm check` is the done gate of AGENT-WORKFLOW.md, the same command the
+# pre-push hook runs. It includes `pnpm test:data`, which `deploy.yml` does not
+# run, so a player's data-only push still deploys.
 name: Tests
 
 on:
@@ -43,6 +44,10 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - '**/tsconfig*.json'
+              - 'eslint-suppressions.json'
+              - 'knip.json'
+              - '.jscpd.json'
+              - '.githooks/**'
               - '.github/workflows/test.yml'
 
       # Reads the version from `packageManager` in package.json.
@@ -60,6 +65,3 @@ jobs:
 
       - if: steps.changes.outputs.code == 'true'
         run: pnpm check
-
-      - if: steps.changes.outputs.code == 'true'
-        run: pnpm test

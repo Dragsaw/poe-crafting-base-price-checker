@@ -74,10 +74,7 @@ function compareOldestFirst(left: Placed, right: Placed): number {
     if (left.attemptedAt === undefined) {
       return -1;
     }
-    if (right.attemptedAt === undefined) {
-      return 1;
-    }
-    return left.attemptedAt - right.attemptedAt;
+    return right.attemptedAt === undefined ? 1 : left.attemptedAt - right.attemptedAt;
   }
   return compareTrackedEntries(left.entry, right.entry);
 }
@@ -128,14 +125,14 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
   const done = new Set(input.completed);
   const completed = [...rotationKeys].filter((key) => done.has(key)).toSorted(compareCanonicalKeys);
   const due = [...active, ...unresolvable];
-  const newPass = due.length > 0 && due.every((item) => done.has(item.key));
-  const open = (item: Placed): boolean => newPass || !done.has(item.key);
+  const isNewPass = due.length > 0 && due.every((item) => done.has(item.key));
+  const open = (item: Placed): boolean => isNewPass || !done.has(item.key);
 
   return {
     pinned: entriesOf(pinned),
     rotation: [...entriesOf(active.filter(open)), ...entriesOf(unresolvable.filter(open))],
-    completed: newPass ? [] : completed,
-    newPass,
+    completed: isNewPass ? [] : completed,
+    newPass: isNewPass,
   };
 }
 
@@ -147,8 +144,5 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
  * Otherwise visit all `left`.
  */
 export function pinnedToKeep(left: number, remaining: number, rotationWaiting: boolean): number {
-  if (!rotationWaiting || remaining >= left + 1) {
-    return left;
-  }
-  return Math.min(left, Math.max(remaining - 1, 0));
+  return !rotationWaiting || remaining >= left + 1 ? left : Math.min(left, Math.max(remaining - 1, 0));
 }

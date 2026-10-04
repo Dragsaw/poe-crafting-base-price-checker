@@ -115,7 +115,7 @@ function describeIssues(issues: EnvelopeIssues): string {
   if (first === undefined) {
     return 'the schema refused it without naming an issue';
   }
-  const path = first.path.map((segment) => String(segment)).join('.');
+  const path = first.path.map(String).join('.');
   return path === '' ? first.message : `${path}: ${first.message}`;
 }
 
@@ -351,11 +351,13 @@ export function printRefreshOutcome(
  * importing the module — which the co-located test does — runs nothing.
  */
 const entry = process.argv[1];
-const invokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
+const isInvokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
 
-if (invokedDirectly) {
-  main().catch((error: unknown) => {
+if (isInvokedDirectly) {
+  try {
+    await main();
+  } catch (error) {
     process.stderr.write(`pnpm catalogue:refresh: ${String(error)}\n`);
     process.exitCode = 1;
-  });
+  }
 }

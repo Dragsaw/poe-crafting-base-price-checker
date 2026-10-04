@@ -77,7 +77,7 @@ export type SessionAuthState =
  * US-ASCII without controls, whitespace, DQUOTE, comma, semicolon and
  * backslash.
  */
-const COOKIE_OCTETS = '[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*';
+const COOKIE_OCTETS = String.raw`[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*`;
 const COOKIE_VALUE = new RegExp(`^(?:${COOKIE_OCTETS}|"${COOKIE_OCTETS}")$`);
 
 export function isCookieValue(value: string): boolean {
@@ -104,7 +104,7 @@ function formsOf(value: string): string[] {
   const bytes = Buffer.from(value, 'utf8');
   const forms = new Set<string>([value, encodeURIComponent(value), bytes.toString('base64')]);
   for (const encoding of ['base64', 'base64url'] as const) {
-    forms.add(bytes.toString(encoding).replace(/=+$/, ''));
+    forms.add(bytes.toString(encoding).replace(/={1,2}$/, ''));
     for (let offset = 0; offset < 3; offset += 1) {
       const shifted = Buffer.concat([Buffer.alloc(offset), bytes]);
       // Only whole 3-byte groups are stable whatever follows the value, and
@@ -172,6 +172,14 @@ export class SessionAuth {
     this.#onSettle = onSettle;
   }
 
+  #moveTo(state: SessionAuthState, action: HoldOffAction | undefined): void {
+    this.#state = state;
+    if (action !== undefined) {
+      this.#pendingHoldOff = action;
+    }
+    this.#onSettle?.(describeState(state));
+  }
+
   get state(): SessionAuthState {
     return this.#state;
   }
@@ -192,10 +200,7 @@ export class SessionAuth {
    * probe and, after an `authenticated` settle, on a cookie-eligible request.
    */
   withCookie(headers: Readonly<Record<string, string>>): Record<string, string> {
-    if (this.#value === undefined) {
-      return { ...headers };
-    }
-    return { ...headers, [COOKIE_HEADER]: `${SESSION_COOKIE_ENV_VAR}=${this.#value}` };
+    return this.#value === undefined ? { ...headers } : { ...headers, [COOKIE_HEADER]: `${SESSION_COOKIE_ENV_VAR}=${this.#value}` };
   }
 
   /**
@@ -262,7 +267,7 @@ export class SessionAuth {
    * so the run sends no probe. Records no action: the field carries forward.
    */
   settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void {
-    if (!this.canProbe || holdOffUntil === undefined) {
+    if (holdOffUntil === undefined || !this.canProbe) {
       return;
     }
     if (Date.parse(now) < Date.parse(holdOffUntil)) {
@@ -285,14 +290,6 @@ export class SessionAuth {
     }
   }
 
-  #moveTo(state: SessionAuthState, action: HoldOffAction | undefined): void {
-    this.#state = state;
-    if (action !== undefined) {
-      this.#pendingHoldOff = action;
-    }
-    this.#onSettle?.(describeState(state));
-  }
-
   /**
    * Removes every form of the value from `thrown`, in place, and returns it.
    * An `Error` keeps its identity, class and `name`: its message, stack and
@@ -300,10 +297,7 @@ export class SessionAuth {
    * `AggregateError`'s `errors`. A thrown string comes back scrubbed.
    */
   redact<T>(thrown: T): T {
-    if (this.#forms.length === 0) {
-      return thrown;
-    }
-    return redactWith(thrown, this.#forms, new Set()) as T;
+    return this.#forms.length === 0 ? thrown : (redactWith(thrown, this.#forms, new Set()) as T);
   }
 
   toJSON(): { readonly state: SessionAuthState } {
@@ -376,11 +370,11 @@ function describeState(state: SessionAuthState): string {
  * here for an edge state, later from `settle`.
  */
 export function createSessionAuth(
-  env: Readonly<Record<string, string | undefined>>,
+  environment: Readonly<Record<string, string | undefined>>,
   options: SessionAuthOptions = {},
 ): SessionAuth {
   const { onSettle } = options;
-  const value = (env[SESSION_COOKIE_ENV_VAR] ?? '').trim();
+  const value = (environment[SESSION_COOKIE_ENV_VAR] ?? '').trim();
   if (value === '' || !isCookieValue(value)) {
     const state: SessionAuthState = {
       kind: 'unauthenticated',

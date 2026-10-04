@@ -21,7 +21,7 @@ import type { parseEnvelope } from '@poe/contracts';
  */
 
 /** The weights contract major the page reads (WEIGHTS-FILE-SCHEMA.md), defined once in `contracts`; only the major is compared. */
-export const WEIGHTS_EXPECTED_VERSION = WEIGHTS_SCHEMA_VERSION;
+const WEIGHTS_EXPECTED_VERSION = WEIGHTS_SCHEMA_VERSION;
 
 /** Whatever `parseEnvelope` accepts; `web` takes no direct `zod` dependency. */
 export type EnvelopeSchema = Parameters<typeof parseEnvelope>[0];
@@ -75,7 +75,7 @@ type OutputOf<S> = S extends { readonly _zod: { readonly output: infer O } } ? O
 /** What `parseEnvelope` yields for artifact `K`. */
 export type Parsed<K extends ArtifactKey> = OutputOf<(typeof ARTIFACTS)[K]['schema']>;
 
-export type RequiredKey = {
+type RequiredKey = {
   [K in ArtifactKey]: (typeof ARTIFACTS)[K]['class'] extends 'required' ? K : never;
 }[ArtifactKey];
 export type TolerableKey = Exclude<ArtifactKey, RequiredKey>;

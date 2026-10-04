@@ -48,10 +48,7 @@ export type SchemaVersionCheck = SchemaVersionAccepted | SchemaVersionRefused;
 /** The major component, or `undefined` where the string is not a semver. */
 export function majorOf(version: string): number | undefined {
   const match = SEMVER.exec(version);
-  if (match === null) {
-    return undefined;
-  }
-  return Number(match[1]);
+  return match === null ? undefined : Number(match[1]);
 }
 
 /**
@@ -66,10 +63,7 @@ export function checkSchemaVersion(found: string, expected: string): SchemaVersi
   if (foundMajor === undefined || expectedMajor === undefined) {
     return { ok: false, reason: 'malformed', expected, found };
   }
-  if (foundMajor !== expectedMajor) {
-    return { ok: false, reason: 'unknown-major', expected, found };
-  }
-  return { ok: true, expected, found };
+  return foundMajor === expectedMajor ? { ok: true, expected, found } : { ok: false, reason: 'unknown-major', expected, found };
 }
 
 /**
@@ -88,13 +82,10 @@ export const TRACKED_SCHEMA_VERSION = '2.0.0';
  */
 export function trackedEarlierMajorMessage(found: string): string | undefined {
   // The explanation names the 1 → 2 change, so it fits a 1.x file only.
-  if (majorOf(found) !== 1) {
-    return undefined;
-  }
-  return (
+  return majorOf(found) === 1 ? (
     `schemaVersion ${found} refused (unknown-major; this build reads ${TRACKED_SCHEMA_VERSION}): ` +
     `the tracked schema's major version changed to ${TRACKED_SCHEMA_VERSION}: crafted entries now require ` +
     'both a prefix and a suffix, and an affix accepts the "hybrid" kind. Re-author the file against ' +
     `schemaVersion ${TRACKED_SCHEMA_VERSION}; retrying will not help.`
-  );
+  ) : undefined;
 }

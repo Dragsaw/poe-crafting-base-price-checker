@@ -22,7 +22,7 @@ describe('the cookie-value grammar (RFC 6265)', () => {
     expect(isCookieValue(value)).toBe(true);
   });
 
-  it.each(['a b', 'a;b', 'a,b', '"x', 'x"', 'a\\b', 'café', 'a\tb', 'a\u0000b', 'a\u007fb', '"a"b"'])(
+  it.each(['a b', 'a;b', 'a,b', '"x', 'x"', String.raw`a\b`, 'café', 'a\tb', 'a\0b', 'a\u{7F}b', '"a"b"'])(
     'refuses %j',
     (value) => {
       expect(isCookieValue(value)).toBe(false);
@@ -31,7 +31,7 @@ describe('the cookie-value grammar (RFC 6265)', () => {
 });
 
 describe('createSessionAuth: the shell-edge settle', () => {
-  it.each([[undefined], [''], ['   '], ['\t\n']])('%j is absent', (value) => {
+  it.each([[undefined], [''], [' '.repeat(3)], ['\t\n']])('%j is absent', (value) => {
     const { holder, lines } = withLines(value);
     expect(holder.state).toEqual({ kind: 'unauthenticated', reason: 'absent' });
     expect(lines).toEqual(['unauthenticated (absent)']);
@@ -140,14 +140,8 @@ describe('redact', () => {
 });
 
 describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () => {
-  const settled = (value: string | undefined) => {
-    const lines: string[] = [];
-    const holder = createSessionAuth({ [SESSION_COOKIE_ENV_VAR]: value }, { onSettle: (line) => lines.push(line) });
-    return { holder, lines };
-  };
-
   it('an unsettled valid value can probe and is not authenticated', () => {
-    const { holder, lines } = settled(CANARY);
+    const { holder, lines } = withLines(CANARY);
     expect(holder.canProbe).toBe(true);
     expect(holder.isAuthenticated).toBe(false);
     expect(lines).toEqual([]);
@@ -156,7 +150,7 @@ describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () =>
   it.each([[undefined, 'absent'], ['a b', 'malformed']])(
     'an edge state %j prints its line through onSettle at once, and can never probe',
     (value, reason) => {
-      const { holder, lines } = settled(value);
+      const { holder, lines } = withLines(value);
       expect(lines).toEqual([`unauthenticated (${reason})`]);
       expect(holder.canProbe).toBe(false);
       holder.settle('authenticated');
@@ -168,7 +162,7 @@ describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () =>
   );
 
   it('settle authenticated: one line, the state moves once, and withCookie adds the header', () => {
-    const { holder, lines } = settled(CANARY);
+    const { holder, lines } = withLines(CANARY);
     holder.settle('authenticated');
     holder.settle('not-elevated');
     holder.settle('not-probed');
@@ -185,7 +179,7 @@ describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () =>
   it.each(['not-elevated', 'probe-rejected', 'probe-failed', 'not-probed'] as const)(
     'settle %s: one unauthenticated line, never the value',
     (reason) => {
-      const { holder, lines } = settled(CANARY);
+      const { holder, lines } = withLines(CANARY);
       holder.settle(reason);
       holder.settle('authenticated');
       expect(holder.state).toEqual({ kind: 'unauthenticated', reason });
@@ -197,7 +191,7 @@ describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () =>
   );
 
   it('the probe header keeps the DQUOTE form of a quoted value', () => {
-    const { holder } = settled(`"${CANARY}"`);
+    const { holder } = withLines(`"${CANARY}"`);
     expect(holder.withCookie({})).toEqual({ cookie: `POESESSID="${CANARY}"` });
   });
 });

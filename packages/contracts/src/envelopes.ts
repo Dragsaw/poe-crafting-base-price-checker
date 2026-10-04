@@ -80,7 +80,7 @@ export const TrackedFileSchema = z
     schemaVersion: SchemaVersionSchema,
     entries: z.array(TrackedEntrySchema),
   })
-  .superRefine((file, ctx) => {
+  .superRefine((file, context) => {
     const firstIndexByKey = new Map<string, number>();
     file.entries.forEach((entry, index) => {
       const key = canonicalKey(entry);
@@ -89,7 +89,7 @@ export const TrackedFileSchema = z
         firstIndexByKey.set(key, index);
         return;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['entries', index],
         message: `canonical key ${key} repeats entries.${String(first)}; a key may appear once in the tracked list`,
@@ -109,7 +109,7 @@ export const TrackedFileSchema = z
       if (first.floor === entry.itemLevelMin) {
         return;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['entries', index, 'itemLevelMin'],
         message: `item class ${entry.categoryId}/${entry.className} declares itemLevelMin ${String(entry.itemLevelMin)} here and ${String(first.floor)} at entries.${String(first.index)}; the crafted entries of one item class share one floor (AD-17)`,
@@ -132,7 +132,7 @@ export const TrackedFileSchema = z
         if (branches === undefined) {
           continue;
         }
-        ctx.addIssue({
+        context.addIssue({
           code: 'custom',
           path: ['entries', index],
           message: `entries ${other.key} (entries.${String(other.index)}) and ${key} overlap on ${describeOverlap(branches)}; one item satisfies both and would be counted twice (AD-17)`,
@@ -148,13 +148,13 @@ export const TrackedFileSchema = z
       }
       const summed = summedStatIds(entry);
       for (const slot of OVERLAP_SLOTS) {
-        const ref = entry[slot];
-        linesOf(ref).forEach((line, lineIndex) => {
-          const path = ref.kind === 'hybrid' ? ['entries', index, slot, 'lines', lineIndex] : ['entries', index, slot];
+        const reference = entry[slot];
+        linesOf(reference).forEach((line, lineIndex) => {
+          const path = reference.kind === 'hybrid' ? ['entries', index, slot, 'lines', lineIndex] : ['entries', index, slot];
           const at = path.join('.');
           const kind: LineKind = 'valueMin' in line ? 'banded' : 'valueless';
           if (kind === 'valueless' && summed.has(line.statId)) {
-            ctx.addIssue({
+            context.addIssue({
               code: 'custom',
               path,
               message: `entry ${canonicalKey(entry)} sums statId ${line.statId} across its prefix and suffix, and its ${slot} line on it is valueless; a summed operand needs both edges (IMPLEMENTATION-NOTES.md §2.3, §5.5)`,
@@ -166,7 +166,7 @@ export const TrackedFileSchema = z
             return;
           }
           if (first.kind !== kind) {
-            ctx.addIssue({
+            context.addIssue({
               code: 'custom',
               path,
               message: `statId ${line.statId} is ${kind} at ${at} and ${first.kind} at ${first.at}; every tracked line on one statId takes one kind (IMPLEMENTATION-NOTES.md §2.3)`,
@@ -179,6 +179,9 @@ export const TrackedFileSchema = z
 
 /** The kind a tracked line declares: both edges make it banded, none makes it valueless (§4.1). */
 type LineKind = 'banded' | 'valueless';
+
+/** The recipe grade prefixes, as the mixed-grade refusal prints them. */
+const GRADE_PREFIXES = RECIPE_GRADES.map((grade) => `${grade}-`).join(', ');
 
 /**
  * `data/recipes.json` — the Craft Recipes (AD-20). Absent-tolerable (AD-24).
@@ -196,7 +199,7 @@ export const RecipesFileSchema = z
     schemaVersion: SchemaVersionSchema,
     recipes: z.array(CraftRecipeSchema),
   })
-  .superRefine((file, ctx) => {
+  .superRefine((file, context) => {
     const firstIndexById = new Map<string, number>();
     const firstIndexByWord = new Map<string, number>();
     file.recipes.forEach((recipe, index) => {
@@ -205,10 +208,10 @@ export const RecipesFileSchema = z
         firstIndexById.set(recipe.id, index);
         const word = recipeWord(recipe);
         if (word === undefined) {
-          ctx.addIssue({
+          context.addIssue({
             code: 'custom',
             path: ['recipes', index],
-            message: `recipe ${recipe.id} mixes grades across its currencies; every currency id shares one grade prefix (${RECIPE_GRADES.map((grade) => `${grade}-`).join(', ')}) or none`,
+            message: `recipe ${recipe.id} mixes grades across its currencies; every currency id shares one grade prefix (${GRADE_PREFIXES}) or none`,
           });
           return;
         }
@@ -217,14 +220,14 @@ export const RecipesFileSchema = z
           firstIndexByWord.set(word, index);
           return;
         }
-        ctx.addIssue({
+        context.addIssue({
           code: 'custom',
           path: ['recipes', index],
           message: `recipe ${recipe.id} reads ${word}, as recipes.${String(firstWithWord)} does; two recipes may not derive one word`,
         });
         return;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['recipes', index],
         message: `recipe id ${recipe.id} repeats recipes.${String(first)}; an id may appear once in recipes.json`,
@@ -274,7 +277,7 @@ export const DatasetFileSchema = z
         'The current rate set, carried here rather than in a ninth artifact so AD-24’s fetch set stays closed. `core` costs recipes from it (AD-20).',
       ),
   })
-  .superRefine((file, ctx) => {
+  .superRefine((file, context) => {
     const firstIndexByEntryKey = new Map<string, number>();
     file.entries.forEach((entry, index) => {
       const first = firstIndexByEntryKey.get(entry.entryKey);
@@ -282,7 +285,7 @@ export const DatasetFileSchema = z
         firstIndexByEntryKey.set(entry.entryKey, index);
         return;
       }
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['entries', index],
         message: `entry key ${entry.entryKey} repeats entries.${String(first)}; a key may appear once in dataset.json`,
@@ -381,26 +384,25 @@ export function parseEnvelope<S extends z.ZodType>(
     // switch with a code path that returns nothing, which is a compile error
     // rather than a silent relabelling as `malformed-version`.
     switch (version.reason) {
-      case 'unknown-major':
+      case 'unknown-major': {
         return {
           ok: false,
           reason: 'unknown-major',
           expected: version.expected,
           found: version.found,
         };
-      case 'malformed':
+      }
+      case 'malformed': {
         return {
           ok: false,
           reason: 'malformed-version',
           expected: version.expected,
           found: version.found,
         };
+      }
     }
   }
 
   const parsed = schema.safeParse(data);
-  if (!parsed.success) {
-    return { ok: false, reason: 'invalid', issues: parsed.error.issues };
-  }
-  return { ok: true, value: parsed.data as z.infer<S> };
+  return parsed.success ? { ok: true, value: parsed.data } : { ok: false, reason: 'invalid', issues: parsed.error.issues };
 }

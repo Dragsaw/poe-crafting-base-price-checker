@@ -19,7 +19,7 @@
 
 export const USER_AGENT_ENV_VAR = 'POE_SYNC_USER_AGENT';
 
-export function missingUserAgentMessage(): string {
+function missingUserAgentMessage(): string {
   return (
     `${USER_AGENT_ENV_VAR} is unset or blank, so no request can be issued. ` +
     'NFR-9 requires every request to identify the tool and a contact address, and ' +
@@ -60,12 +60,9 @@ export type UserAgentResult = UserAgentResolved | UserAgentRefused;
  * literally; the default is the single `process.env` read this package makes.
  */
 export function resolveUserAgent(
-  env: Readonly<Record<string, string | undefined>> = process.env,
+  environment: Readonly<Record<string, string | undefined>> = process.env,
 ): UserAgentResult {
-  const raw = env[USER_AGENT_ENV_VAR];
+  const raw = environment[USER_AGENT_ENV_VAR];
   const userAgent = raw === undefined ? '' : raw.trim();
-  if (userAgent === '') {
-    return { ok: false, variable: USER_AGENT_ENV_VAR, message: missingUserAgentMessage() };
-  }
-  return { ok: true, userAgent };
+  return userAgent === '' ? { ok: false, variable: USER_AGENT_ENV_VAR, message: missingUserAgentMessage() } : { ok: true, userAgent };
 }

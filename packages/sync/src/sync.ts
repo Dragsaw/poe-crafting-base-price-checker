@@ -90,7 +90,7 @@ export const COLD_EVEN_INTERVAL_MS = 36_000;
  * How often a wait polls the local input files or the lock file. A local
  * read, never a request: an idle wait sends nothing.
  */
-export const LOCAL_POLL_MS = 5_000;
+export const LOCAL_POLL_MS = 5000;
 
 /**
  * The hand-owned inputs under `data/` a chunk reads and never writes. A change
@@ -122,13 +122,13 @@ export type ParsedArgs =
 export function parseArgs(argv: readonly string[]): ParsedArgs {
   let hours = DEFAULT_PINNED_MAX_AGE_HOURS;
   for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === '--') {
+    const argument = argv[index];
+    if (argument === '--') {
       continue;
     }
-    if (arg === '--pinned-max-age') {
+    if (argument === '--pinned-max-age') {
       const value = argv[index + 1];
-      const parsed = value === undefined ? Number.NaN : Number(value);
+      const parsed = value === undefined ? NaN : Number(value);
       if (value === undefined || value.trim() === '' || !Number.isFinite(parsed) || parsed <= 0) {
         return { ok: false, message: '--pinned-max-age needs a positive number of hours' };
       }
@@ -136,7 +136,7 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
       index += 1;
       continue;
     }
-    return { ok: false, message: `unknown argument ${JSON.stringify(arg)}` };
+    return { ok: false, message: `unknown argument ${JSON.stringify(argument)}` };
   }
   return { ok: true, options: { pinnedMaxAgeMs: hours * MS_PER_HOUR } };
 }
@@ -213,10 +213,7 @@ function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   if (context.notBefore !== undefined) {
     return false;
   }
-  if (result.kind === 'outcome') {
-    return result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result));
-  }
-  return !isRefusal(result.error);
+  return result.kind === 'outcome' ? result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result)) : !isRefusal(result.error);
 }
 
 /**
@@ -271,21 +268,21 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
         orInputChange: error instanceof MalformedRequestError,
       };
     }
-    if (isRefusal(error)) {
-      return { kind: 'input-change', reason: 'a refused input or a league mismatch' };
-    }
-    return { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
+    return isRefusal(error) ? { kind: 'input-change', reason: 'a refused input or a league mismatch' } : { kind: 'input-change', reason: 'an unexpected failure', until: backoffUntil() };
   }
 
   const { outcome } = result;
   switch (outcome.kind) {
-    case 'busy':
+    case 'busy': {
       return { kind: 'lock', reason: 'another run holds the lock' };
-    case 'dispossessed':
+    }
+    case 'dispossessed': {
       return { kind: 'lock', reason: 'the lock was taken over' };
-    case 'deferred':
+    }
+    case 'deferred': {
       return { kind: 'until', until: outcome.notBefore, reason: 'a trade penalty', orInputChange: false };
-    case 'yielded':
+    }
+    case 'yielded': {
       if (notBefore !== undefined) {
         return { kind: 'until', until: notBefore, reason: 'a 429', orInputChange: false };
       }
@@ -298,7 +295,8 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
         return NO_WAIT;
       }
       return { kind: 'until', until: backoffUntil(), reason: 'no answer', orInputChange: false };
-    case 'completed':
+    }
+    case 'completed': {
       if (outcome.completed.length === 0 && outcome.entries.length === 0) {
         return {
           kind: 'input-change',
@@ -307,8 +305,10 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
         };
       }
       return NO_WAIT;
-    case 'bounded':
+    }
+    case 'bounded': {
       return NO_WAIT;
+    }
   }
 }
 
@@ -317,7 +317,7 @@ function withoutLeague(state: SessionState): SessionState {
   return {
     passEnded: state.passEnded,
     backoffCount: state.backoffCount,
-    ...(state.passStart === undefined ? {} : { passStart: state.passStart }),
+    ...(state.passStart !== undefined && { passStart: state.passStart }),
   };
 }
 
@@ -347,15 +347,15 @@ export function nextState(
   }
   const passStart =
     outcome.newPass || state.passStart === undefined ? iteration.before : state.passStart;
-  const passEnded = outcome.kind === 'completed';
+  const isPassEnded = outcome.kind === 'completed';
   if (outcome.confirmedLeague === undefined) {
-    return { ...withoutLeague(state), passStart, passEnded, backoffCount };
+    return { ...withoutLeague(state), passStart, passEnded: isPassEnded, backoffCount };
   }
   return {
     confirmedLeague: outcome.confirmedLeague,
     confirmedSignature: iteration.signature,
     passStart,
-    passEnded,
+    passEnded: isPassEnded,
     backoffCount,
   };
 }
@@ -416,10 +416,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
 export async function lockIsFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
   try {
     const found = await readLock(fs);
-    if (found.state === 'absent') {
-      return true;
-    }
-    return await isStaleState(fs, found, clock.now(), LOCK_PATH);
+    return found.state === 'absent' ? true : (await isStaleState(fs, found, clock.now(), LOCK_PATH));
   } catch {
     return false;
   }
@@ -459,9 +456,10 @@ function remainingMs(until: string, clock: ClockPort): number {
 export async function runWait(wait: SessionWait, ports: WaitPorts, signature: string): Promise<void> {
   const { fs, clock, sleep: pause, signal } = ports;
   switch (wait.kind) {
-    case 'none':
+    case 'none': {
       return;
-    case 'until':
+    }
+    case 'until': {
       for (;;) {
         const left = remainingMs(wait.until, clock);
         if (left <= 0 || signal.aborted) {
@@ -475,7 +473,8 @@ export async function runWait(wait: SessionWait, ports: WaitPorts, signature: st
           return;
         }
       }
-    case 'input-change':
+    }
+    case 'input-change': {
       for (;;) {
         const left = wait.until === undefined ? LOCAL_POLL_MS : remainingMs(wait.until, clock);
         if (left <= 0 || signal.aborted) {
@@ -486,36 +485,41 @@ export async function runWait(wait: SessionWait, ports: WaitPorts, signature: st
           return;
         }
       }
-    case 'lock':
+    }
+    case 'lock': {
       for (;;) {
         if (signal.aborted || (await lockIsFree(fs, clock))) {
           return;
         }
         await pause(LOCAL_POLL_MS, signal);
       }
+    }
   }
 }
 
 function describeWait(wait: Exclude<SessionWait, { kind: 'none' }>): string {
   switch (wait.kind) {
-    case 'until':
+    case 'until': {
       return `waiting until ${wait.until} (${wait.reason}${wait.orInputChange ? ', or an input file change' : ''})`;
-    case 'input-change':
+    }
+    case 'input-change': {
       return `waiting for an input file under data/ to change (${wait.reason}${
         wait.until === undefined ? '' : `, at most until ${wait.until}`
       })`;
-    case 'lock':
+    }
+    case 'lock': {
       return `waiting for the lock to be free (${wait.reason})`;
+    }
   }
 }
 
 function describeOutcome(outcome: ChunkOutcome): string {
-  const kind: string =
-    outcome.kind === 'deferred'
-      ? `deferred until ${outcome.notBefore}`
-      : outcome.kind === 'bounded'
-        ? `bounded by ${outcome.bound}`
-        : outcome.kind;
+  let kind: string = outcome.kind;
+  if (outcome.kind === 'deferred') {
+    kind = `deferred until ${outcome.notBefore}`;
+  } else if (outcome.kind === 'bounded') {
+    kind = `bounded by ${outcome.bound}`;
+  }
   const keys = outcome.completed.length === 0 ? '' : `: ${outcome.completed.join(', ')}`;
   return `${kind}, ${String(outcome.completed.length)} completed${keys}`;
 }
@@ -546,13 +550,13 @@ export interface SyncSessionDeps extends SyncSessionPorts {
 }
 
 /** The session: runs until `signal` aborts, then exits `0`. `1` only on a refusal before any request. */
-export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number> {
-  const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = deps;
+export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise<number> {
+  const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = dependencies;
   const { fs, clock } = ports;
 
-  const args = parseArgs(argv);
-  if (!args.ok) {
-    stderr(`${PREFIX} ${args.message}`);
+  const arguments_ = parseArgs(argv);
+  if (!arguments_.ok) {
+    stderr(`${PREFIX} ${arguments_.message}`);
     return 1;
   }
   const contact = resolveUserAgent(env);
@@ -575,9 +579,9 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
   try {
     while (!signal.aborted) {
       const signature = await inputSignature(fs);
-      const withGate = gateDue(state, signature);
+      const isWithGate = gateDue(state, signature);
 
-      const delayMs = preWaitMs(pacing, clock.now(), withGate);
+      const delayMs = preWaitMs(pacing, clock.now(), isWithGate);
       if (delayMs > 0) {
         stdout(`${PREFIX} waiting until ${plus(clock.now(), delayMs)} (spreading requests over the rate-limit buckets)`);
         await pause(delayMs, signal);
@@ -599,16 +603,16 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
           requests,
           session: {
             maxEntries: 1,
-            pinnedMaxAgeMs: args.options.pinnedMaxAgeMs,
-            ...(state.passStart === undefined ? {} : { requestsSince: state.passStart }),
-            ...(state.confirmedLeague === undefined ? {} : { confirmedLeague: state.confirmedLeague }),
+            pinnedMaxAgeMs: arguments_.options.pinnedMaxAgeMs,
+            ...(state.passStart !== undefined && { requestsSince: state.passStart }),
+            ...(state.confirmedLeague !== undefined && { confirmedLeague: state.confirmedLeague }),
           },
         }).run();
         result = { kind: 'outcome', outcome };
         stdout(`${PREFIX} ${describeOutcome(outcome)}`);
-      } catch (thrown) {
+      } catch (error_) {
         // The governor already redacted what it passed on; this covers the rest (§13.6).
-        const error = auth.redact(thrown);
+        const error = auth.redact(error_);
         result = { kind: 'error', error };
         stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -617,19 +621,21 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
       const notBefore = await pendingNotBefore(fs, now);
       const context: ChunkContext = {
         now,
-        ...(notBefore === undefined ? {} : { notBefore }),
+        ...(notBefore !== undefined && { notBefore }),
         // The downgrade's in-place reset gives the ledger a new reference; it
         // is no State reading (§13.4).
         freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
-        evenIntervalMs: sessionEvenIntervalMs(pacing, withGate),
+        evenIntervalMs: sessionEvenIntervalMs(pacing, isWithGate),
       };
       const wait = nextWait(result, state, context);
       state = nextState(state, result, context, { signature, before });
 
-      if (wait.kind !== 'none' && !signal.aborted) {
-        stdout(`${PREFIX} ${describeWait(wait)}`);
-        await runWait(wait, waitPorts, signature);
+      if (wait.kind === 'none' || signal.aborted) {
+        continue;
       }
+
+      stdout(`${PREFIX} ${describeWait(wait)}`);
+      await runWait(wait, waitPorts, signature);
     }
   } finally {
     // Runs on a throw too, so the process never ends unsettled without its
@@ -684,9 +690,11 @@ function isInvokedDirectly(): boolean {
 }
 
 if (isInvokedDirectly()) {
-  main().catch((error: unknown) => {
+  try {
+    await main();
+  } catch (error) {
     process.stderr.write(`${PREFIX} ${String(error)}\n`);
     // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a piped stderr write.
     process.exitCode = 1;
-  });
+  }
 }

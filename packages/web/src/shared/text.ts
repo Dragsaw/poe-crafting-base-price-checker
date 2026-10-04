@@ -4,7 +4,7 @@
  * The no-break space that joins a strip label to its value and a glyph to its
  * word: a Price State glyph never parts from its word (mockup `.ps-*::before`).
  */
-export const NBSP = String.fromCodePoint(0xa0);
+export const NBSP = String.fromCodePoint(0xA0);
 
 /**
  * The form of a word that agrees with `count`: `singular` at exactly one,

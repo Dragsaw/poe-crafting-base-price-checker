@@ -234,16 +234,16 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   const H1 = tier([line(A, [30, 40]), line(B, [100, 150])], { itemLevelMin: 75, modGroup: 'hybrid-ab' });
   const H2 = tier([line(A, [20, 29]), line(B, [60, 99])], { itemLevelMin: 50, modGroup: 'hybrid-ab' });
   const PURE_A = tier([line(A, [70, 80])], { itemLevelMin: 60 });
-  const hybridRef = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
+  const hybridReference = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
   const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
-  const T1_REF = hybridRef(bandLine(A, 30, 40), bandLine(B, 100, 150));
+  const T1_REF = hybridReference(bandLine(A, 30, 40), bandLine(B, 100, 150));
 
   it('passes a correct hybrid at T1’s edges', () => {
     expect(failuresOf([entry({ prefix: T1_REF })], bows(pools([H1, H2, PURE_A])))).toEqual([]);
   });
 
   it('fails a misaligned line: line B covers T1 only and line A spans T1–T2', () => {
-    const tracked = entry({ prefix: hybridRef(bandLine(A, 20, 40), bandLine(B, 100, 150)) });
+    const tracked = entry({ prefix: hybridReference(bandLine(A, 20, 40), bandLine(B, 100, 150)) });
     const failures = failuresOf([tracked], bows(pools([H1, H2, PURE_A])));
     expect(failures.map((failure) => failure.check)).toEqual(['edge-alignment']);
     const detail = failures[0]?.detail ?? '';
@@ -286,7 +286,7 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
 
   it('fails contained tiers in two modGroups, blaming weights.json', () => {
     const split = tier([line(A, [20, 29]), line(B, [60, 99])], { itemLevelMin: 50, modGroup: 'hybrid-ab-2' });
-    const tracked = entry({ prefix: hybridRef(bandLine(A, 20, 40), bandLine(B, 60, 150)) });
+    const tracked = entry({ prefix: hybridReference(bandLine(A, 20, 40), bandLine(B, 60, 150)) });
     const failures = failuresOf([tracked], bows(pools([H1, split])));
     expect(failures.map((failure) => failure.check)).toEqual(['line-set-completeness']);
     const detail = failures[0]?.detail ?? '';
@@ -297,7 +297,7 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   });
 
   it('fails kind agreement on a valueless hybrid line beside a banded line, naming the line and one tier', () => {
-    const tracked = entry({ prefix: hybridRef(bandLine(A, 30, 40), { statId: B }) });
+    const tracked = entry({ prefix: hybridReference(bandLine(A, 30, 40), { statId: B }) });
     const failures = failuresOf([tracked], bows(pools([H1])));
     const kind = failures.find((failure) => failure.check === 'kind-agreement');
     expect(kind?.detail).toContain(`prefix hybrid line ${B} valueless`);
@@ -332,13 +332,13 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   });
 
   it('fails co-occur on two suffix hybrids that both contain one scoped suffix tier', () => {
-    const C = 'explicit.stat_7';
+    const E = 'explicit.stat_7';
     const D = 'explicit.stat_8';
-    const S1 = tier([line(C, [10, 20]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
-    const S2 = tier([line(C, [21, 25]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
+    const S1 = tier([line(E, [10, 20]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
+    const S2 = tier([line(E, [21, 25]), line(D, [5, 6])], { modGroup: 'hybrid-cd' });
     const prefix = band(43, 56.5);
-    const narrow = entry({ prefix, suffix: hybridRef(bandLine(C, 10, 20), bandLine(D, 5, 6)) });
-    const wide = entry({ prefix, suffix: hybridRef(bandLine(C, 10, 25), bandLine(D, 5, 6)) });
+    const narrow = entry({ prefix, suffix: hybridReference(bandLine(E, 10, 20), bandLine(D, 5, 6)) });
+    const wide = entry({ prefix, suffix: hybridReference(bandLine(E, 10, 25), bandLine(D, 5, 6)) });
     const failures = failuresOf([narrow, wide], bows(pools([T7()], [S1, S2])));
     expect(failures.map((failure) => [failure.check, failure.entryKey]).toSorted()).toEqual(
       [
@@ -394,11 +394,11 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
     const SL2 = suffixTier(21, 40);
     const weights = bows(pools([H1], [SL_HIGH, SL1, SL2]));
     const withSuffix = (bMin: number, bMax: number) =>
-      entry({ prefix: T1_REF, suffix: hybridRef(bandLine(B, bMin, bMax), bandLine(L, 15, 15)) });
+      entry({ prefix: T1_REF, suffix: hybridReference(bandLine(B, bMin, bMax), bandLine(L, 15, 15)) });
 
     it('memoises coOccur per S: one instance answers the same pair differently under an empty and a summed S', () => {
-      const x = hybridRef(bandLine(B, 41, 60), bandLine(L, 15, 15));
-      const y = hybridRef(bandLine(B, 50, 55), bandLine(L, 15, 15));
+      const x = hybridReference(bandLine(B, 41, 60), bandLine(L, 15, 15));
+      const y = hybridReference(bandLine(B, 50, 55), bandLine(L, 15, 15));
       const scoped = { prefix: [], suffix: [SL1] };
       const summedB = new Set([B]);
 

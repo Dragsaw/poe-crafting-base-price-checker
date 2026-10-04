@@ -13,7 +13,7 @@ describe('the Mantine override layer', () => {
       expect(roleValues, key).toContain(value);
     }
     for (const [key, value] of Object.entries(merged.lineHeights)) {
-      expect(value, key).not.toBe(DEFAULT_THEME.lineHeights[key as keyof typeof DEFAULT_THEME.lineHeights]);
+      expect(value, key).not.toBe(DEFAULT_THEME.lineHeights[key]);
     }
   });
 

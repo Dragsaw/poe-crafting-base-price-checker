@@ -42,7 +42,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  * closure over an array, so a test run never touches `data/`.
  */
 
-const SCRIPT = fileURLToPath(new URL('./catalogue-refresh.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('catalogue-refresh.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
 
@@ -71,20 +71,20 @@ interface Run {
 }
 
 /** The environment the refresher must refuse in: the overlay removed. */
-function envWithoutContact(): NodeJS.ProcessEnv {
-  const env = { ...process.env };
-  delete env[USER_AGENT_ENV_VAR];
-  return env;
+function environmentWithoutContact(): NodeJS.ProcessEnv {
+  const environment = { ...process.env };
+  delete environment[USER_AGENT_ENV_VAR];
+  return environment;
 }
 
-function run(args: readonly string[]): Promise<Run> {
-  return new Promise((resolve) => {
+function run(arguments_: readonly string[]): Promise<Run> {
+  return new Promise((settle) => {
     const child = execFile(
       process.execPath,
-      [...args],
-      { encoding: 'utf8', env: envWithoutContact() },
+      [...arguments_],
+      { encoding: 'utf8', env: environmentWithoutContact() },
       (_error, stdout, stderr) => {
-        resolve({ code: child.exitCode, stdout, stderr });
+        settle({ code: child.exitCode, stdout, stderr });
       },
     );
   });
@@ -257,13 +257,13 @@ it('is referenced by no vitest config and by no setup file', () => {
  */
 it('loads @poe/contracts under bare node, as the command itself must', async () => {
   const packageRoot = fileURLToPath(new URL('../', import.meta.url));
-  const result = await new Promise<Run>((resolve) => {
+  const result = await new Promise<Run>((settle) => {
     const child = execFile(
       process.execPath,
       ['--input-type=module', '-e', "await import('@poe/contracts');"],
-      { encoding: 'utf8', cwd: packageRoot, env: envWithoutContact() },
+      { encoding: 'utf8', cwd: packageRoot, env: environmentWithoutContact() },
       (_error, stdout, stderr) => {
-        resolve({ code: child.exitCode, stdout, stderr });
+        settle({ code: child.exitCode, stdout, stderr });
       },
     );
   });
@@ -394,7 +394,7 @@ it('counts the requests sent before a failure, and prints the count beside it', 
 
   expect(outcome).toMatchObject({ ok: false, requests: 2 });
   const stdout: string[] = [];
-  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: () => undefined })).toBe(1);
+  expect(printRefreshOutcome(outcome, { stdout: (line) => stdout.push(line), stderr: () => {} })).toBe(1);
   expect(stdout).toEqual(['requests: 2']);
 });
 

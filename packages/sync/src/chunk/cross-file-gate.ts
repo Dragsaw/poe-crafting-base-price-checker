@@ -20,10 +20,10 @@ export class CrossFileGateError extends Error {
 
   constructor(failures: readonly CrossFileFailure[]) {
     const [first] = failures;
+    const verdict = failures.length === 1 ? 'check fails' : 'checks fail';
+    const firstClause = first === undefined ? '' : `, first ${first.check} on ${first.entryKey}: ${first.detail}`;
     super(
-      `the tracked list disagrees with the weights file: ${String(failures.length)} cross-file ${
-        failures.length === 1 ? 'check fails' : 'checks fail'
-      }${first === undefined ? '' : `, first ${first.check} on ${first.entryKey}: ${first.detail}`}`,
+      `the tracked list disagrees with the weights file: ${String(failures.length)} cross-file ${verdict}${firstClause}`,
     );
     this.name = 'CrossFileGateError';
     this.failures = failures;

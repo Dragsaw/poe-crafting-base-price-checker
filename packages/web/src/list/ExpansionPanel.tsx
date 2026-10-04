@@ -13,7 +13,7 @@ import { UnitGlyph, type Unit } from './UnitGlyph';
  * affixes (FR-8, FR-3). A priced entry takes the raw note; an unpriced one
  * takes its state's note in its place (decision 2026-09-26).
  */
-export function rawCombination(row: DisplayRow, activeLeague: string): Combination {
+function rawCombination(row: DisplayRow, activeLeague: string): Combination {
   return {
     key: row.key,
     text: [{ text: NO_AFFIXES, verbatim: false }],
@@ -31,7 +31,7 @@ export function rawCombination(row: DisplayRow, activeLeague: string): Combinati
  * figure, the sample, the trade link and `* pinned` follow the raw path; the
  * text is its tier + short form, or the verbatim fallback.
  */
-export function craftedCombination(combination: CraftedCombination, className: string, activeLeague: string): Combination {
+function craftedCombination(combination: CraftedCombination, className: string, activeLeague: string): Combination {
   return {
     key: combination.key,
     text: combination.text,
@@ -51,7 +51,7 @@ export function craftedCombination(combination: CraftedCombination, className: s
  * Inside: the unit glyph and name, the context sub-line, then one
  * `{components.combination-row}` per Tracked Entry.
  */
-export function ExpansionPanel({
+function ExpansionPanel({
   unit,
   label,
   subLine,

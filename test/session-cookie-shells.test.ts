@@ -74,16 +74,12 @@ it('only the sync shells and the holder name the session cookie or import the ho
     const lines = readFileSync(path, 'utf8').split(/\r?\n/);
     lines.forEach((line, index) => {
       const where = `${name}:${String(index + 1)}`;
-      if (NAMES_VARIABLE.test(line) && !MAY_NAME.has(name)) {
-        if (!(name === FIXTURES_RECORD && FIXTURES_RECORD_KEY.test(line))) {
+      if (NAMES_VARIABLE.test(line) && !MAY_NAME.has(name) && !(name === FIXTURES_RECORD && FIXTURES_RECORD_KEY.test(line))) {
           offences.push(`${where} names the session cookie: ${line.trim()}`);
         }
-      }
-      if (IMPORTS_HOLDER.test(line) && !MAY_IMPORT.has(name)) {
-        if (!(MAY_IMPORT_TYPE.has(name) && TYPE_IMPORT.test(line))) {
+      if (IMPORTS_HOLDER.test(line) && !MAY_IMPORT.has(name) && !(MAY_IMPORT_TYPE.has(name) && TYPE_IMPORT.test(line))) {
           offences.push(`${where} imports the auth holder: ${line.trim()}`);
         }
-      }
     });
   }
   expect(offences).toEqual([]);

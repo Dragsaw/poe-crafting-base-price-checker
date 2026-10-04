@@ -45,13 +45,13 @@ import {
   LOCAL_POLL_MS,
   nextState,
   nextWait,
-  parseArgs,
+  parseArgs as parseArguments,
   preWaitMs,
   runWait,
   sessionEvenIntervalMs,
   syncSessionCommand,
 } from './sync.ts';
-import type { ChunkContext, ChunkResult, SessionState, SyncSessionDeps } from './sync.ts';
+import type { ChunkContext, ChunkResult, SessionState, SyncSessionDeps as SyncSessionDependencies } from './sync.ts';
 import { createPacingState } from './trade/client.ts';
 import type * as TradeClientModule from './trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE, TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
@@ -83,7 +83,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
-const SCRIPT = fileURLToPath(new URL('./sync.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('sync.ts', import.meta.url));
 
 const LEAGUE = 'Test League';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -170,7 +170,7 @@ function sessionFor(setup: SessionSetup = {}) {
   const http = setup.http === undefined ? fake : setup.http(fake);
   const controller = new AbortController();
   const out: { readonly line: string; readonly at: string }[] = [];
-  const err: string[] = [];
+  const error: string[] = [];
   const auth: { readonly line: string; readonly requestsBefore: number }[] = [];
   /** The session's waits, in order. Each advances the fake clock. */
   const sleeps: number[] = [];
@@ -184,7 +184,7 @@ function sessionFor(setup: SessionSetup = {}) {
       controller.abort();
     }
   };
-  const deps: SyncSessionDeps = {
+  const dependencies: SyncSessionDependencies = {
     fs,
     clock,
     http,
@@ -204,7 +204,7 @@ function sessionFor(setup: SessionSetup = {}) {
       return Promise.resolve();
     },
     pid: 4242,
-    log: () => undefined,
+    log: () => {},
     env: setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT },
     argv: setup.argv ?? [],
     signal: controller.signal,
@@ -220,11 +220,11 @@ function sessionFor(setup: SessionSetup = {}) {
         auth.push({ line, requestsBefore: fake.requests.length });
         return;
       }
-      err.push(line);
+      error.push(line);
       countChunk();
     },
   };
-  return { deps, fs, clock, http: fake, out, err, auth, sleeps, waits, controller };
+  return { deps: dependencies, fs, clock, http: fake, out, err: error, auth, sleeps, waits, controller };
 }
 
 async function reportOf(fs: FakeFilesystemPort): Promise<SyncReportFile | undefined> {
@@ -252,11 +252,11 @@ const networkDown = (): HttpPort => ({
 
 describe('parseArgs', () => {
   it('defaults the pinned maximum age to 4 hours', () => {
-    expect(parseArgs([])).toEqual({ ok: true, options: { pinnedMaxAgeMs: 4 * 3_600_000 } });
+    expect(parseArguments([])).toEqual({ ok: true, options: { pinnedMaxAgeMs: 4 * 3_600_000 } });
   });
 
   it('reads --pinned-max-age in hours and skips a literal --', () => {
-    expect(parseArgs(['--', '--pinned-max-age', '2'])).toEqual({
+    expect(parseArguments(['--', '--pinned-max-age', '2'])).toEqual({
       ok: true,
       options: { pinnedMaxAgeMs: 2 * 3_600_000 },
     });
@@ -265,7 +265,7 @@ describe('parseArgs', () => {
   it.each([[['--pinned-max-age']], [['--pinned-max-age', '0']], [['--pinned-max-age', 'x']], [['--nope']]])(
     'refuses %j',
     (argv) => {
-      expect(parseArgs(argv)).toMatchObject({ ok: false });
+      expect(parseArguments(argv)).toMatchObject({ ok: false });
     },
   );
 });
@@ -335,9 +335,9 @@ describe('nextWait: the session matrix', () => {
   });
 
   it('penalty: a deferred chunk waits until its notBefore', () => {
-    expect(nextWait(outcome({ ...base, kind: 'deferred', notBefore: at(5_000) }), INITIAL_SESSION_STATE, COLD)).toEqual({
+    expect(nextWait(outcome({ ...base, kind: 'deferred', notBefore: at(5000) }), INITIAL_SESSION_STATE, COLD)).toEqual({
       kind: 'until',
-      until: at(5_000),
+      until: at(5000),
       reason: 'a trade penalty',
       orInputChange: false,
     });
@@ -556,7 +556,7 @@ describe('runWait and the local polls', () => {
 
     await waiting;
 
-    expect(Date.now() - started).toBeLessThan(5_000);
+    expect(Date.now() - started).toBeLessThan(5000);
   });
 });
 
@@ -632,7 +632,7 @@ describe('pnpm sync: the session with injected ports', () => {
   });
 
   it('a blank contact is refused before the auth line is printed', async () => {
-    const { deps, auth } = sessionFor({ env: { [SESSION_COOKIE_ENV_VAR]: '   ' } });
+    const { deps, auth } = sessionFor({ env: { [SESSION_COOKIE_ENV_VAR]: ' '.repeat(3) } });
 
     expect(await syncSessionCommand(deps)).toBe(1);
 
@@ -679,10 +679,7 @@ describe('pnpm sync: the session with injected ports', () => {
             return sent;
           }
           const answer = request.method === 'POST' ? answers.shift() : undefined;
-          if (answer === undefined) {
-            return sent.then((fakeAnswer) => after(request, fakeAnswer));
-          }
-          return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+          return answer === undefined ? sent.then((fakeAnswer) => after(request, fakeAnswer)) : sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
         },
       });
     }
@@ -724,9 +721,9 @@ describe('pnpm sync: the session with injected ports', () => {
     });
 
     it.each([
-      ['not-elevated', { status: 200, headers: {}, body: NO_RESULTS } as HttpResponse],
-      ['probe-rejected', { status: 403, headers: {}, body: 'forbidden' } as HttpResponse],
-      ['probe-failed', { status: 503, headers: {}, body: '' } as HttpResponse],
+      ['not-elevated', { status: 200, headers: {}, body: NO_RESULTS }],
+      ['probe-rejected', { status: 403, headers: {}, body: 'forbidden' }],
+      ['probe-failed', { status: 503, headers: {}, body: '' }],
       ['probe-failed', new TypeError('fetch failed')],
     ])('%s: one line after the probe, no later request carries the cookie, exit 0', async (reason, answer) => {
       const { deps, auth, err, http } = sessionFor({
@@ -759,7 +756,7 @@ describe('pnpm sync: the session with injected ports', () => {
       // the progress file, and the instant the wait ends.
       let first: { readonly persisted: unknown; readonly until: string } | undefined;
       const sleep = deps.sleep;
-      const watched: SyncSessionDeps = {
+      const watched: SyncSessionDependencies = {
         ...deps,
         sleep: async (ms, signal) => {
           if (first === undefined) {
@@ -886,7 +883,7 @@ describe('pnpm sync: the session with injected ports', () => {
   it('a transient fs fault on a local read does not end the session', async () => {
     const { deps, out } = sessionFor();
     let faults = 0;
-    const flaky: SyncSessionDeps = {
+    const flaky: SyncSessionDependencies = {
       ...deps,
       fs: {
         ...deps.fs,
@@ -988,7 +985,7 @@ describe('pnpm sync: the session with injected ports', () => {
     // of iteration 2 spreads the 3 left over 10 s (rounded up to a whole
     // millisecond); its search then leaves 2, so the fetch inside the lock
     // waits 10 000 / 2 − 0.
-    expect(sleeps).toEqual([3_334]);
+    expect(sleeps).toEqual([3334]);
     expect(waits).toEqual([10_000 / 2]);
   });
 
@@ -1054,7 +1051,7 @@ describe('pnpm sync: the session with injected ports', () => {
     });
     let polls = 0;
     const sleep = deps.sleep;
-    const edited: SyncSessionDeps = {
+    const edited: SyncSessionDependencies = {
       ...deps,
       sleep: async (ms, signal) => {
         await sleep(ms, signal);
@@ -1086,7 +1083,7 @@ describe('pnpm sync: the session with injected ports', () => {
     });
     let polls = 0;
     const sleep = deps.sleep;
-    const released: SyncSessionDeps = {
+    const released: SyncSessionDependencies = {
       ...deps,
       sleep: async (ms, signal) => {
         await sleep(ms, signal);
@@ -1108,7 +1105,7 @@ describe('pnpm sync: the session with injected ports', () => {
 
   it('an abort during a chunk lets the entry finish, releases the lock and exits 0', async () => {
     const { deps, fs, http, out, controller } = sessionFor({ stopAfter: 100 });
-    const aborting: SyncSessionDeps = {
+    const aborting: SyncSessionDependencies = {
       ...deps,
       http: {
         send: (request) => {

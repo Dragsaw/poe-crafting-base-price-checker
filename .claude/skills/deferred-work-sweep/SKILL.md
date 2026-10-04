@@ -210,7 +210,7 @@ Steps:
    - If a conflict interrupts the rebase, and the only conflicted path is `LEDGER`, the conflict is in the removal commit. Rebuild that commit: run `git checkout --ours -- docs/stories/deferred-work.md` (during a rebase, "ours" is `BASE`). Do sub-steps 3 and 4 of step 4.1 again on that file. Then run `git add -- docs/stories/deferred-work.md` and `git -c core.editor=true rebase --continue`.
    - If a conflict touches any other path, the step fails.
 
-    If `git diff --quiet <START_SHA> HEAD -- pnpm-lock.yaml` fails, run `pnpm install --frozen-lockfile --offline` again. Then run `pnpm check` and `pnpm test`. Both must pass. Always run them, also when `BASE` did not move. `pnpm test` includes `test/deferred-ledger.test.ts`, which fails on a duplicate entry id in `LEDGER`.
+    If `git diff --quiet <START_SHA> HEAD -- pnpm-lock.yaml` fails, run `pnpm install --frozen-lockfile --offline` again. Then run `pnpm check` (the done gate of `AGENT-WORKFLOW.md`). It must pass. Always run it, also when `BASE` did not move. `pnpm check` runs `pnpm test`, which includes `test/deferred-ledger.test.ts`, which fails on a duplicate entry id in `LEDGER`.
 3. **Push.** Set `COMMITS` = the output of `git rev-list origin/master..HEAD`. Run `git push origin HEAD:refs/heads/<WT_BRANCH>`. This is the only work-push form. The PR head is the branch of the Orca worktree, so Orca links the PR to the worktree. Do not rename the branch.
 4. **Open the PR.** The body:
    ```
@@ -222,7 +222,7 @@ Steps:
    - source_spec: <ITEM_SOURCE_SPEC>
    - evidence: <ITEM_EVIDENCE>
    - spec: `<SPEC_FILE>`
-   - checks: `pnpm check` and `pnpm test` passed on <the sha of HEAD>
+   - checks: `pnpm check` passed on <the sha of HEAD>
    - follow-up review: <"recommended by build-auto — review before merge", or "not recommended">
    - new ledger entries: <each summary that step 4.1.4 appended, or none>
 

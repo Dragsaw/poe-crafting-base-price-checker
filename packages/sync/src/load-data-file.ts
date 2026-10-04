@@ -91,12 +91,13 @@ export async function loadDataFile<T>(
   }
   switch (result.reason) {
     case 'unknown-major':
-    case 'malformed-version':
+    case 'malformed-version': {
       return {
         ok: false,
         error: new DataFileError(path, result.reason, describeVersionRefusal(result, explainVersion)),
       };
-    case 'invalid':
+    }
+    case 'invalid': {
       return {
         ok: false,
         error: new DataFileError(
@@ -107,5 +108,6 @@ export async function loadDataFile<T>(
             .join('; ')}`,
         ),
       };
+    }
   }
 }

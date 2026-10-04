@@ -117,9 +117,9 @@ export const CraftedRankedRowSchema = z
 
 export const RankedRowSchema = z
   .discriminatedUnion('kind', [RawRankedRowSchema, CraftedRankedRowSchema])
-  .superRefine((row, ctx) => {
+  .superRefine((row, context) => {
     if (row.kind === 'crafted' && (row.ev === null) !== (typeof row.craftCost !== 'number')) {
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['ev'],
         message: 'a crafted ev is null exactly when its craftCost is uncostable (AD-20)',

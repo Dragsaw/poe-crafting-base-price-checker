@@ -9,7 +9,7 @@ declare global {
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(globalThis, 'matchMedia', {
   writable: true,
   configurable: true,
   value: (query: string): MediaQueryList =>
@@ -17,18 +17,18 @@ Object.defineProperty(window, 'matchMedia', {
       matches: false,
       media: query,
       onchange: null,
-      addListener: () => undefined,
-      removeListener: () => undefined,
-      addEventListener: () => undefined,
-      removeEventListener: () => undefined,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
       dispatchEvent: () => false,
-    }) as unknown as MediaQueryList,
+    }),
 });
 
 globalThis.ResizeObserver = class {
   observe(): void {}
   unobserve(): void {}
   disconnect(): void {}
-} as unknown as typeof ResizeObserver;
+};
 
 export {};

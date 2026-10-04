@@ -37,14 +37,11 @@ export function createFakeHttpPort(fixtures: HttpFixtures = {}): FakeHttpPort {
     send(request) {
       requests.push(request);
       const response = responses.get(keyOf(request.method, request.url));
-      if (response === undefined) {
-        return Promise.reject(
+      return response === undefined ? Promise.reject(
           new Error(
             `[fake-http] no fixture for ${keyOf(request.method, request.url)} — record one rather than letting the request escape (NFR-1)`,
           ),
-        );
-      }
-      return Promise.resolve(response);
+        ) : Promise.resolve(response);
     },
   };
 }

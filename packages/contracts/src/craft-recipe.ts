@@ -23,7 +23,7 @@ export const CraftRecipeSchema = z.strictObject({
       }),
     )
     .min(1, 'a recipe spends at least one currency; an empty list would cost nothing (AD-20)')
-    .superRefine((lines, ctx) => {
+    .superRefine((lines, context) => {
       const firstIndexById = new Map<string, number>();
       lines.forEach((line, index) => {
         const first = firstIndexById.get(line.currencyId);
@@ -31,7 +31,7 @@ export const CraftRecipeSchema = z.strictObject({
           firstIndexById.set(line.currencyId, index);
           return;
         }
-        ctx.addIssue({
+        context.addIssue({
           code: 'custom',
           path: [index],
           message: `currency id ${line.currencyId} repeats currencies.${String(first)}; an id may appear once in one recipe`,

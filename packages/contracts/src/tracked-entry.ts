@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { BaseTypeIdSchema } from './base-type.ts';
 import { CategoryIdSchema, ClassNameSchema } from './item-class.ts';
-import { ModifierRefSchema } from './modifier-ref.ts';
+import { ModifierRefSchema as ModifierReferenceSchema } from './modifier-ref.ts';
 import { ItemLevelSchema } from './primitives.ts';
 
 /**
@@ -36,18 +36,18 @@ export const PrunedReasonSchema = z
   .min(1)
   .describe('Why the entry was pruned. Free-form: carried and shown, never parsed.');
 
-export const CraftedTrackedEntrySchema = z.strictObject({
+const CraftedTrackedEntrySchema = z.strictObject({
   kind: z.literal('crafted'),
   categoryId: CategoryIdSchema,
   className: ClassNameSchema,
   itemLevelMin: ItemLevelSchema,
-  prefix: ModifierRefSchema,
-  suffix: ModifierRefSchema,
+  prefix: ModifierReferenceSchema,
+  suffix: ModifierReferenceSchema,
   status: CurationStatusSchema,
   prunedReason: PrunedReasonSchema.optional(),
 });
 
-export const RawTrackedEntrySchema = z.strictObject({
+const RawTrackedEntrySchema = z.strictObject({
   kind: z.literal('raw'),
   baseTypeId: BaseTypeIdSchema,
   itemLevelMin: ItemLevelSchema,
@@ -64,16 +64,16 @@ export const RawTrackedEntrySchema = z.strictObject({
  */
 export const TrackedEntrySchema = z
   .discriminatedUnion('kind', [CraftedTrackedEntrySchema, RawTrackedEntrySchema])
-  .superRefine((entry, ctx) => {
+  .superRefine((entry, context) => {
     if (entry.status === 'pruned' && entry.prunedReason === undefined) {
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['prunedReason'],
         message: 'a pruned entry is a tombstone carrying its reason (AD-12, FR-15)',
       });
     }
     if (entry.status !== 'pruned' && entry.prunedReason !== undefined) {
-      ctx.addIssue({
+      context.addIssue({
         code: 'custom',
         path: ['prunedReason'],
         message: 'only a pruned entry carries a prune reason (AD-12)',

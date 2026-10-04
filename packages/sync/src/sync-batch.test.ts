@@ -30,7 +30,7 @@ import { LOCK_PATH, serialiseLock } from './chunk/lock.ts';
 import { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './chunk/run-chunk.ts';
 import { LeagueMismatchError } from './league/league-gate.ts';
 import { runSync, syncCommand } from './sync-batch.ts';
-import type { SyncCommandDeps } from './sync-batch.ts';
+import type { SyncCommandDeps as SyncCommandDependencies } from './sync-batch.ts';
 import type * as TradeClientModule from './trade/client.ts';
 import { TRADE_LEAGUES_URL, tradeFetchUrl, tradeSearchUrl } from './trade/endpoints.ts';
 import { SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
@@ -58,7 +58,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
-const SCRIPT = fileURLToPath(new URL('./sync-batch.ts', import.meta.url));
+const SCRIPT = fileURLToPath(new URL('sync-batch.ts', import.meta.url));
 
 const LEAGUE = 'Test League';
 const NOW = '2026-09-26T12:00:00.000Z';
@@ -146,33 +146,33 @@ interface Setup {
 
 const AUTH_LINE = /^pnpm sync:batch: (authenticated|unauthenticated \()/;
 
-function depsFor(league: string, setup: Setup = {}) {
-  const env = setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT };
+function dependenciesFor(league: string, setup: Setup = {}) {
+  const environment = setup.env ?? { [USER_AGENT_ENV_VAR]: CONTACT };
   const recorded = recording(createFakeFilesystemPort({ ...inputs(league, setup.tracked), ...setup.seeded }));
   const http = httpFor(league, setup.answers);
   const out: string[] = [];
-  const err: string[] = [];
+  const error: string[] = [];
   /** The §13.5 auth lines, kept apart from `err`, with the requests sent before each. */
   const auth: { readonly line: string; readonly requestsBefore: number }[] = [];
-  const deps: SyncCommandDeps = {
+  const dependencies: SyncCommandDependencies = {
     fs: recorded.fs,
     clock: createFakeClockPort(NOW),
     http,
     git: createFakeGitPort(),
     wait: setup.wait ?? (() => Promise.resolve()),
     pid: 4242,
-    log: () => undefined,
-    env,
+    log: () => {},
+    env: environment,
     stdout: (line) => out.push(line),
     stderr: (line) => {
       if (AUTH_LINE.test(line)) {
         auth.push({ line, requestsBefore: http.requests.length });
         return;
       }
-      err.push(line);
+      error.push(line);
     },
   };
-  return { deps, fs: recorded.fs, writes: recorded.writes, http, out, err, auth };
+  return { deps: dependencies, fs: recorded.fs, writes: recorded.writes, http, out, err: error, auth };
 }
 
 async function reportOf(fs: FilesystemPort): Promise<SyncReportFile | undefined> {
@@ -182,7 +182,7 @@ async function reportOf(fs: FilesystemPort): Promise<SyncReportFile | undefined>
 
 describe('pnpm sync:batch: the live composition with injected ports', () => {
   it('runs the gate first, then the pricing step as the chunk step, and exits 0', async () => {
-    const { deps, fs, http, out } = depsFor(LEAGUE);
+    const { deps, fs, http, out } = dependenciesFor(LEAGUE);
 
     expect(await syncCommand(deps)).toBe(0);
 
@@ -211,7 +211,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('a league mismatch: exit 1, the report is the only write, the lock is released', async () => {
-    const { deps, fs, writes, http, err } = depsFor('Nope League');
+    const { deps, fs, writes, http, err } = dependenciesFor('Nope League');
 
     expect(await syncCommand(deps)).toBe(1);
 
@@ -228,7 +228,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('runSync rethrows the gate throw after the report is written', async () => {
-    const { deps } = depsFor('Nope League');
+    const { deps } = dependenciesFor('Nope League');
     const { fs, clock, http, git, wait, pid, log } = deps;
 
     await expect(
@@ -238,7 +238,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('refuses a blank contact before any request or write, with exit 1', async () => {
-    const { deps, http, writes, err } = depsFor(LEAGUE, { env: {} });
+    const { deps, http, writes, err } = dependenciesFor(LEAGUE, { env: {} });
 
     expect(await syncCommand(deps)).toBe(1);
 
@@ -248,7 +248,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('refuses an absent config under the lock, naming it: no request, the report is the only write', async () => {
-    const { deps, fs, http, writes, err } = depsFor(LEAGUE);
+    const { deps, fs, http, writes, err } = dependenciesFor(LEAGUE);
     await fs.deleteFile('data/config.json');
 
     expect(await syncCommand(deps)).toBe(1);
@@ -264,7 +264,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
   it('refuses a pinned set over the cap: exit 1, no request, a run-failure naming data/tracked.json', async () => {
     // One pinned entry against a yardstick of 1: 1 > 0.5 × 1 (IMPLEMENTATION-NOTES.md §6).
-    const { deps, fs, http, writes, err } = depsFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
+    const { deps, fs, http, writes, err } = dependenciesFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
 
     expect(await syncCommand(deps)).toBe(1);
 
@@ -280,7 +280,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('reports a pinned-cap excess ahead of a later load refusal (the currencies file absent)', async () => {
-    const { deps, fs, http } = depsFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
+    const { deps, fs, http } = dependenciesFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
     await fs.deleteFile('data/currencies.json');
 
     expect(await syncCommand(deps)).toBe(1);
@@ -292,7 +292,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('publishes the priced entry under the configured league', async () => {
-    const { deps, fs } = depsFor(LEAGUE);
+    const { deps, fs } = dependenciesFor(LEAGUE);
 
     await syncCommand(deps);
 
@@ -307,7 +307,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('a gate 429 yields the chunk: exit 0, no search, dataset, progress and the report, no run-failure', async () => {
-    const { deps, fs, writes, http, out } = depsFor(LEAGUE, { answers: { leagues: THROTTLED } });
+    const { deps, fs, writes, http, out } = dependenciesFor(LEAGUE, { answers: { leagues: THROTTLED } });
 
     expect(await syncCommand(deps)).toBe(0);
 
@@ -333,7 +333,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it("a 429's diagnostic line reaches the chunk's operator log", async () => {
-    const { deps } = depsFor(LEAGUE, { answers: { leagues: THROTTLED } });
+    const { deps } = dependenciesFor(LEAGUE, { answers: { leagues: THROTTLED } });
     const lines: string[] = [];
 
     expect(await syncCommand({ ...deps, log: (line) => lines.push(line) })).toBe(0);
@@ -346,7 +346,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   it('a gate 429 publishes the catalogue marks, and the not-reached count is every eligible entry', async () => {
     const ghost: TrackedEntry = { kind: 'raw', baseTypeId: 'Ghost Amulet', itemLevelMin: 82, status: 'active' };
     const others: TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }, { ...ENTRY, itemLevelMin: 84 }];
-    const { deps, fs, http } = depsFor(LEAGUE, {
+    const { deps, fs, http } = dependenciesFor(LEAGUE, {
       tracked: [ghost, ...others],
       answers: { leagues: THROTTLED },
     });
@@ -387,7 +387,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     };
     const waits: number[] = [];
     const second: TrackedEntry = { ...ENTRY, itemLevelMin: 83 };
-    const { deps, http } = depsFor(LEAGUE, {
+    const { deps, http } = dependenciesFor(LEAGUE, {
       tracked: [ENTRY, second],
       wait: (ms) => {
         waits.push(ms);
@@ -414,7 +414,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
   it('builds its trade clients with the invalid-request threshold of 1 (§5.3)', async () => {
     tradeClientOptions.length = 0;
-    const { deps } = depsFor(LEAGUE);
+    const { deps } = dependenciesFor(LEAGUE);
 
     expect(await syncCommand(deps)).toBe(0);
 
@@ -430,7 +430,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       completed: [],
       notBefore: '2026-09-26T12:30:00.000Z',
     });
-    const { deps, fs, writes, http, out } = depsFor(LEAGUE, {
+    const { deps, fs, writes, http, out } = dependenciesFor(LEAGUE, {
       seeded: { [PROGRESS_PATH]: { contents: progress } },
     });
 
@@ -444,7 +444,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
   it('a live lock is busy: exit 0, no request, no write', async () => {
     const lock = serialiseLock({ pid: 99, startedAt: NOW });
-    const { deps, fs, writes, http, out } = depsFor(LEAGUE, { seeded: { [LOCK_PATH]: { contents: lock } } });
+    const { deps, fs, writes, http, out } = dependenciesFor(LEAGUE, { seeded: { [LOCK_PATH]: { contents: lock } } });
 
     expect(await syncCommand(deps)).toBe(0);
 
@@ -486,7 +486,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       null,
       2,
     )}\n`;
-    const { deps, fs, out } = depsFor(LEAGUE, {
+    const { deps, fs, out } = dependenciesFor(LEAGUE, {
       seeded: { [DATASET_PATH]: { contents: published } },
       answers: { search: THROTTLED },
     });
@@ -503,7 +503,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('a malformed published dataset: exit 1, no request, a run-failure naming it, the dataset untouched', async () => {
-    const { deps, fs, writes, http, err } = depsFor(LEAGUE, {
+    const { deps, fs, writes, http, err } = dependenciesFor(LEAGUE, {
       seeded: { [DATASET_PATH]: { contents: '{ not json' } },
     });
 
@@ -523,7 +523,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const VALID = 'a'.repeat(16) + '0123456789abcdef0123';
 
     it('an absent value: one unauthenticated (absent) line before the first request, exit unchanged', async () => {
-      const { deps, http, auth, out } = depsFor(LEAGUE);
+      const { deps, http, auth, out } = dependenciesFor(LEAGUE);
 
       expect(await syncCommand(deps)).toBe(0);
 
@@ -533,7 +533,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('a blank value trims to absent', async () => {
-      const { deps, auth } = depsFor(LEAGUE, { env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: '   ' } });
+      const { deps, auth } = dependenciesFor(LEAGUE, { env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: ' '.repeat(3) } });
 
       expect(await syncCommand(deps)).toBe(0);
 
@@ -541,7 +541,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it.each(['a b', 'a;b', 'a,b', '"x', 'café'])('a malformed value %j: one malformed line without the value', async (value) => {
-      const { deps, auth, http } = depsFor(LEAGUE, {
+      const { deps, auth, http } = dependenciesFor(LEAGUE, {
         env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: value },
       });
 
@@ -554,7 +554,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('a blank contact is still refused first: exit 1 and no auth line', async () => {
-      const { deps, auth, err } = depsFor(LEAGUE, { env: { [SESSION_COOKIE_ENV_VAR]: 'a b' } });
+      const { deps, auth, err } = dependenciesFor(LEAGUE, { env: { [SESSION_COOKIE_ENV_VAR]: 'a b' } });
 
       expect(await syncCommand(deps)).toBe(1);
 
@@ -564,7 +564,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     it('a valid value prints no line at the edge, and the holder reaches the chunk governor with a probe port', async () => {
       tradeClientOptions.length = 0;
-      const { deps, auth } = depsFor(LEAGUE, {
+      const { deps, auth } = dependenciesFor(LEAGUE, {
         env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALID },
         answers: { search: THROTTLED },
       });
@@ -631,8 +631,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
      * left: those are the probes, because nothing else carries the cookie
      * before an `authenticated` settle. The fake records every request.
      */
-    function probing(deps: SyncCommandDeps, ...answers: (HttpResponse | Error)[]): SyncCommandDeps {
-      return probingThen(deps, answers);
+    function probing(dependencies: SyncCommandDependencies, ...answers: (HttpResponse | Error)[]): SyncCommandDependencies {
+      return probingThen(dependencies, answers);
     }
 
     /**
@@ -641,14 +641,14 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
      * answer under its own policy, so the cookie stays live (§13.4).
      */
     function probingThen(
-      deps: SyncCommandDeps,
+      dependencies: SyncCommandDependencies,
       answers: (HttpResponse | Error)[],
       after: (answer: HttpResponse, request: HttpRequest) => HttpResponse = (answer, request) =>
         request.method === 'POST' ? { ...answer, headers: { ...answer.headers, ...LIVE.headers } } : answer,
-    ): SyncCommandDeps {
-      const fake = deps.http;
+    ): SyncCommandDependencies {
+      const fake = dependencies.http;
       return {
-        ...deps,
+        ...dependencies,
         http: {
           send(request) {
             const sent = fake.send(request);
@@ -656,10 +656,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
               return sent;
             }
             const answer = request.method === 'POST' ? answers.shift() : undefined;
-            if (answer === undefined) {
-              return sent.then((response) => after(response, request));
-            }
-            return sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
+            return answer === undefined ? sent.then((response) => after(response, request)) : sent.then(() => (answer instanceof Error ? Promise.reject(answer) : answer));
           },
         },
       };
@@ -676,7 +673,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     function withResults(setup: Setup = {}) {
-      const built = depsFor(LEAGUE, { env: COOKIE_ENV, answers: { search: SEARCH_WITH_RESULTS }, ...setup });
+      const built = dependenciesFor(LEAGUE, { env: COOKIE_ENV, answers: { search: SEARCH_WITH_RESULTS }, ...setup });
       built.http.respondTo('GET', tradeFetchUrl(RESULTS, 'S1'), FETCHED);
       return built;
     }
@@ -714,10 +711,10 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     it.each([
       ['not-elevated', { ...SEARCH_WITH_RESULTS, body: JSON.stringify({ id: 'PROBE', result: RESULTS }) }],
-      ['probe-rejected', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
-      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' } as HttpResponse],
-      ['probe-rejected', { status: 400, headers: {}, body: 'bad' } as HttpResponse],
-      ['probe-failed', { status: 503, headers: {}, body: '' } as HttpResponse],
+      ['probe-rejected', { status: 401, headers: {}, body: 'unauthorized' }],
+      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' }],
+      ['probe-rejected', { status: 400, headers: {}, body: 'bad' }],
+      ['probe-failed', { status: 503, headers: {}, body: '' }],
       ['probe-failed', new TypeError('fetch failed')],
     ])('%s: one line, the fetch goes without the cookie, the exit code is unchanged', async (reason, answer) => {
       const { deps, http, auth, err, out, fs } = withResults();
@@ -738,7 +735,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('a probe 429 on an entry with 0 results: the chunk yields, notBefore is persisted, not-probed at the end', async () => {
-      const { deps, http, auth, out, fs } = depsFor(LEAGUE, { env: COOKIE_ENV });
+      const { deps, http, auth, out, fs } = dependenciesFor(LEAGUE, { env: COOKIE_ENV });
 
       expect(await syncCommand(probing(deps, { status: 429, headers: { 'retry-after': '60' }, body: '' }))).toBe(0);
 
@@ -769,7 +766,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('a baseline 4xx: no probe, the existing malformed abort, and not-probed after the throw', async () => {
-      const { deps, http, auth, err } = depsFor(LEAGUE, {
+      const { deps, http, auth, err } = dependenciesFor(LEAGUE, {
         env: COOKIE_ENV,
         answers: { search: { status: 400, headers: {}, body: 'bad' } },
       });
@@ -782,8 +779,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it.each([
-      ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' } as HttpResponse],
-      ['a 401', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
+      ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' }],
+      ['a 401', { status: 401, headers: {}, body: 'unauthorized' }],
     ])('CAP-3, %s on the cookie fetch: one expired line, the entry stamped, yielded, the hold-off written, exit 0', async (_label, downgrading) => {
       const { deps, http, auth, err, out, fs } = withResults();
 
@@ -865,7 +862,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     it.each([
       ['not-elevated', { ...SEARCH_WITH_RESULTS, body: JSON.stringify({ id: 'PROBE', result: RESULTS }) }],
-      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' } as HttpResponse],
+      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' }],
     ])('CAP-5, %s writes the hold-off in the chunk’s progress write', async (_reason, answer) => {
       const { deps, fs } = withResults();
 
@@ -875,12 +872,12 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it.each([
-      ['probe-failed', COOKIE_ENV, [{ status: 503, headers: {}, body: '' } as HttpResponse]],
-      ['a probe 429', COOKIE_ENV, [{ status: 429, headers: { 'retry-after': '60' }, body: '' } as HttpResponse]],
+      ['probe-failed', COOKIE_ENV, [{ status: 503, headers: {}, body: '' }]],
+      ['a probe 429', COOKIE_ENV, [{ status: 429, headers: { 'retry-after': '60' }, body: '' }]],
       ['absent', { [USER_AGENT_ENV_VAR]: CONTACT }, []],
       ['malformed', { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: 'a b' }, []],
-    ])('CAP-5, %s carries the field forward unchanged', async (_label, env, answers) => {
-      const { deps, fs } = withResults({ env, seeded: progressSeed({ authHoldOffUntil: PAST_HOLD_OFF }) });
+    ])('CAP-5, %s carries the field forward unchanged', async (_label, environment, answers) => {
+      const { deps, fs } = withResults({ env: environment, seeded: progressSeed({ authHoldOffUntil: PAST_HOLD_OFF }) });
 
       expect(await syncCommand(probing(deps, ...answers))).toBe(0);
 
@@ -888,7 +885,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('CAP-5, not-probed (no 2xx search) carries the field forward unchanged', async () => {
-      const { deps, auth, fs } = depsFor(LEAGUE, {
+      const { deps, auth, fs } = dependenciesFor(LEAGUE, {
         env: COOKIE_ENV,
         answers: { search: { status: 503, headers: {}, body: '' } },
         seeded: progressSeed({ authHoldOffUntil: PAST_HOLD_OFF }),
@@ -901,7 +898,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('no entry attempted (a gate 429): no probe, not-probed at the end, exit 0', async () => {
-      const { deps, http, auth } = depsFor(LEAGUE, { env: COOKIE_ENV, answers: { leagues: THROTTLED } });
+      const { deps, http, auth } = dependenciesFor(LEAGUE, { env: COOKIE_ENV, answers: { leagues: THROTTLED } });
 
       expect(await syncCommand(deps)).toBe(0);
 

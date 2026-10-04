@@ -22,7 +22,7 @@ import { DESCRIBE_FIRST, DESCRIBE_SECOND, IT_FIRST, IT_SECOND } from './names';
 /** Returns a function that resolves for each caller once `parties` callers have arrived. */
 function barrier(parties: number): () => Promise<void> {
   let arrived = 0;
-  let open: () => void = () => undefined;
+  let open: () => void = () => {};
   const opened = new Promise<void>((resolve) => {
     open = resolve;
   });
@@ -41,7 +41,7 @@ async function meetThenFetchFromTimer(meet: () => Promise<void>, url: string): P
     setTimeout(() => {
       // The rejection is swallowed: only the guard's `afterEach` may fail the test.
       void fetch(url)
-        .catch(() => undefined)
+        .catch(() => {})
         .finally(() => {
           settle();
         });

@@ -330,12 +330,12 @@ describe('rank: the threshold domain', () => {
 
   it('a NaN threshold throws a RangeError that names the threshold and the value', () => {
     const A = raw('A');
-    const call = (): Ranking => ranked({ tracked: [A], dataset: [published(A, priced(0.5))], threshold: Number.NaN });
+    const call = (): Ranking => ranked({ tracked: [A], dataset: [published(A, priced(0.5))], threshold: NaN });
     expect(call).toThrow(RangeError);
     expect(call).toThrow(/threshold.*NaN/);
   });
 
-  it.each([-0.01, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+  it.each([-0.01, Infinity, -Infinity])(
     'threshold %s throws a RangeError and returns no Ranking',
     (threshold) => {
       const A = raw('A');
@@ -561,7 +561,7 @@ function permute<T>(items: readonly T[], seed: number): T[] {
   const copy = [...items];
   let state = seed;
   for (let index = copy.length - 1; index > 0; index -= 1) {
-    state = (state * 1103515245 + 12345) % 2147483648;
+    state = (state * 1_103_515_245 + 12_345) % 2_147_483_648;
     const swap = state % (index + 1);
     const held = copy[index] as T;
     copy[index] = copy[swap] as T;
@@ -578,7 +578,7 @@ describe('rank: purity and determinism', () => {
   it('shuffled input gives an identical Ranking', () => {
     const input = matrixInput();
     const expected = rank(input);
-    for (const seed of [1, 7, 42, 1234, 99991]) {
+    for (const seed of [1, 7, 42, 1234, 99_991]) {
       const shuffled: RankInput = {
         ...input,
         tracked: permute(input.tracked, seed),
@@ -595,7 +595,7 @@ describe('rank: purity and determinism', () => {
       result = rank(input);
     }).not.toThrow();
     const rows: RankedRow[] = [...(result?.ordering ?? []), ...(result?.belowThreshold ?? [])];
-    expect(rows.length).toBe(6);
+    expect(rows).toHaveLength(6);
     for (const row of rows) {
       expect(RankedRowSchema.parse(row)).toEqual(row);
     }
@@ -646,11 +646,11 @@ const SUFFIX_STAT = 'explicit.stat_suffix';
 let tierSerial = 0;
 
 /** One weights tier, built in the test, never read from a fixture file (NFR-2). */
-function tierOf(statId: string, weight: number, itemLevelMin = 1, modGroup?: string): ModifierWeight {
+function tierOf(statId: string, weight: number, itemLevelMin = 1, moduleGroup?: string): ModifierWeight {
   tierSerial += 1;
   return {
     sourceModifierId: `t${String(tierSerial)}`,
-    modGroup: modGroup ?? `g${String(tierSerial)}`,
+    modGroup: moduleGroup ?? `g${String(tierSerial)}`,
     itemLevelMin,
     weight,
     weightSource: 'published',

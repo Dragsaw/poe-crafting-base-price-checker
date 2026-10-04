@@ -112,7 +112,7 @@ describe('bandedFallback', () => {
 
 /** A hybrid reference built through its schema, so its lines arrive sorted by `statId` as in production. */
 function hybrid(lines: readonly object[], acceptedTier?: string): ModifierRef {
-  return HybridModifierRefSchema.parse({ kind: 'hybrid', lines, ...(acceptedTier === undefined ? {} : { acceptedTier }) });
+  return HybridModifierRefSchema.parse({ kind: 'hybrid', lines, ...(acceptedTier !== undefined && { acceptedTier }) });
 }
 
 function line(statId: string, valueMin: number, valueMax: number): object {
@@ -129,7 +129,7 @@ describe('affixText: a hybrid reference', () => {
 
   it('orders the lines by printed text, not by statId, whatever the file order', () => {
     // MANA sorts before PHYS by statId; `% Phys` sorts before `Mana` by code unit.
-    expect(MANA < PHYS).toBe(true);
+    expect(MANA.localeCompare(PHYS)).toBeLessThan(0);
     for (const lines of [
       [line(PHYS, 1, 2), line(MANA, 3, 4)],
       [line(MANA, 3, 4), line(PHYS, 1, 2)],

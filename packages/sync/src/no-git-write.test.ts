@@ -43,12 +43,18 @@ function exemptionKey(file: string): string {
   return relative(ROOT, file).split(sep).join('/');
 }
 
+const GIT_SUBCOMMANDS = [
+  'add', 'commit', 'push', 'pull', 'fetch', 'merge', 'rebase', 'reset', 'checkout', 'switch', 'tag', 'stash',
+  'rm', 'mv', 'clone', 'init', 'restore', 'apply', 'am', 'cherry-pick', 'revert', 'branch', 'update-ref',
+  'config', 'worktree', 'notes', 'commit-tree', 'write-tree', 'update-index', 'gc',
+].join('|');
+
 const FORBIDDEN: readonly [string, RegExp][] = [
   ['a process spawn', /child_process/],
   ['a git library', /['"](?:simple-git|isomorphic-git|nodegit|execa)['"]/],
   [
     'a git subcommand',
-    /\bgit\b(?:[\s'"`,[\]]|-[-\w=%]*(?![-\w=%]))*(?:add|commit|push|pull|fetch|merge|rebase|reset|checkout|switch|tag|stash|rm|mv|clone|init|restore|apply|am|cherry-pick|revert|branch|update-ref|config|worktree|notes|commit-tree|write-tree|update-index|gc)\b/,
+    new RegExp(String.raw`\bgit\b(?:[\s'"\`,[\]]|-[-\w=%]*(?![-\w=%]))*(?:${GIT_SUBCOMMANDS})\b`),
   ],
 ];
 

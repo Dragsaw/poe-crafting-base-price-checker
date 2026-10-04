@@ -18,7 +18,7 @@ export const FETCH_FAILURE_EYEBROW = 'THE PAGE COULD NOT LOAD ITS DATA';
  * `A required file did not arrive.` until UX reconciles it (deferred-work.md).
  */
 export const FETCH_FAILURE_TITLE = 'One of the data files did not arrive.';
-export const FETCH_FAILURE_RECOVERY =
+const FETCH_FAILURE_RECOVERY =
   'The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.';
 export const TRY_AGAIN = `${glyphs.open} Try again`;
 
@@ -65,7 +65,7 @@ function RefusalCauseSentence({
   readonly expected: string;
 }): JSX.Element {
   switch (cause) {
-    case 'version':
+    case 'version': {
       return (
         <>
           {declared === null ? (
@@ -78,14 +78,17 @@ function RefusalCauseSentence({
           ; {REFUSAL_VERSION_EXPECTS} <span data-expected="">{expected}</span>.
         </>
       );
-    case 'content':
+    }
+    case 'content': {
       return (
         <>
           {REFUSAL_CONTENT} <span data-expected="">{expected}</span>.
         </>
       );
-    case 'missing':
+    }
+    case 'missing': {
       return <>{REFUSAL_MISSING}</>;
+    }
   }
 }
 
@@ -94,26 +97,26 @@ function RefusalCauseSentence({
  * the whole page — no masthead, no list, nothing stale served. No card, no
  * icon, no illustration: the failure is set like the rest of the page.
  */
-export function FailureScreen(props: FailureScreenProps): JSX.Element {
-  const refused = props.variant === 'refused';
+export function FailureScreen(properties: FailureScreenProps): JSX.Element {
+  const isRefused = properties.variant === 'refused';
   return (
-    <section data-failure={props.variant} role="alert" style={{ paddingTop: px(spacing.gutter) }}>
+    <section data-failure={properties.variant} role="alert" style={{ paddingTop: px(spacing.gutter) }}>
       <div style={{ ...typeStyle('eyebrow'), color: colors.rust }}>
-        {refused ? REFUSAL_EYEBROW : FETCH_FAILURE_EYEBROW}
+        {isRefused ? REFUSAL_EYEBROW : FETCH_FAILURE_EYEBROW}
       </div>
       <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
-        {refused ? REFUSAL_TITLE : FETCH_FAILURE_TITLE}
+        {isRefused ? REFUSAL_TITLE : FETCH_FAILURE_TITLE}
       </h1>
-      {props.variant === 'refused' ? (
+      {properties.variant === 'refused' ? (
         <>
           <p style={bodyStyle}>
             <span data-artifact="" style={{ color: colors.ink }}>
-              {props.path}
+              {properties.path}
             </span>{' '}
             <span style={{ ...typeStyle('row-mark'), fontSize: 'inherit', lineHeight: 'inherit', fontWeight: 700, color: colors.rust }}>
               {glyphs.unresolvable} unresolvable
             </span>
-            . <RefusalCauseSentence cause={props.cause} declared={props.declared} expected={props.expected} />
+            . <RefusalCauseSentence cause={properties.cause} declared={properties.declared} expected={properties.expected} />
           </p>
           <p style={bodyStyle}>{REFUSAL_RECOVERY}</p>
         </>
@@ -121,13 +124,13 @@ export function FailureScreen(props: FailureScreenProps): JSX.Element {
         <>
           <p style={bodyStyle}>
             <span data-artifact="" style={{ color: colors.ink }}>
-              {props.path}
+              {properties.path}
             </span>{' '}
             did not arrive.
           </p>
           <p style={bodyStyle}>{FETCH_FAILURE_RECOVERY}</p>
           <p style={{ margin: `${px(spacing.s4)} 0 0` }}>
-            <button type="button" className="fg-affordance" style={typeStyle('expand-affordance')} onClick={props.onRetry}>
+            <button type="button" className="fg-affordance" style={typeStyle('expand-affordance')} onClick={properties.onRetry}>
               {TRY_AGAIN}
             </button>
           </p>

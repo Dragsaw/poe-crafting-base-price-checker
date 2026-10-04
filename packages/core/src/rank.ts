@@ -220,10 +220,7 @@ export function compareRankedRows(left: RankedRow, right: RankedRow): number {
     return byKind;
   }
   const byKey = compareCanonicalKeys(rowKey(left), rowKey(right));
-  if (byKey !== 0 || left.kind !== 'crafted' || right.kind !== 'crafted') {
-    return byKey;
-  }
-  return compareCanonicalKeys(left.recipeId, right.recipeId);
+  return byKey !== 0 || left.kind !== 'crafted' || right.kind !== 'crafted' ? byKey : compareCanonicalKeys(left.recipeId, right.recipeId);
 }
 
 /**
@@ -232,25 +229,19 @@ export function compareRankedRows(left: RankedRow, right: RankedRow): number {
  * (EXPERIENCE.md state 35). `compareRankedRows` breaks every tie.
  */
 function compareOrdering(left: RankedRow, right: RankedRow): number {
-  const leftEv = left.ev;
-  const rightEv = right.ev;
-  if ((leftEv === null) !== (rightEv === null)) {
-    return leftEv === null ? 1 : -1;
+  const leftEvent = left.ev;
+  const rightEvent = right.ev;
+  if ((leftEvent === null) !== (rightEvent === null)) {
+    return leftEvent === null ? 1 : -1;
   }
-  const leftFigure = leftEv ?? (left.kind === 'crafted' ? left.grossPayout : 0);
-  const rightFigure = rightEv ?? (right.kind === 'crafted' ? right.grossPayout : 0);
-  if (leftFigure !== rightFigure) {
-    return rightFigure - leftFigure;
-  }
-  return compareRankedRows(left, right);
+  const leftFigure = leftEvent ?? (left.kind === 'crafted' ? left.grossPayout : 0);
+  const rightFigure = rightEvent ?? (right.kind === 'crafted' ? right.grossPayout : 0);
+  return leftFigure === rightFigure ? compareRankedRows(left, right) : rightFigure - leftFigure;
 }
 
 /** Contribution descending, then the entry's canonical key (AD-17). */
 function compareSummands(left: CraftedSummand, right: CraftedSummand): number {
-  if (left.contribution !== right.contribution) {
-    return right.contribution - left.contribution;
-  }
-  return compareCanonicalKeys(left.entryKey, right.entryKey);
+  return left.contribution === right.contribution ? compareCanonicalKeys(left.entryKey, right.entryKey) : right.contribution - left.contribution;
 }
 
 const byEntryKey = (left: { entryKey: string }, right: { entryKey: string }): number =>
@@ -281,10 +272,7 @@ function unrankableReasonOf(
     return 'pool partial';
   }
   // One definition with `poolCoverage` (IN §3): an empty slot makes the class unrankable under every recipe.
-  if (isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix)) {
-    return RECIPE_UNREACHABLE;
-  }
-  return undefined;
+  return isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix) ? RECIPE_UNREACHABLE : undefined;
 }
 
 function unranked(
@@ -321,10 +309,7 @@ export function rank(input: RankInput): Ranking {
   const rankableClasses = new Map<string, { readonly pools: WeightsClassPools; readonly entries: CraftedTrackedEntry[] }>();
 
   for (const entry of input.tracked) {
-    if (entry.status === 'pruned') {
-      continue;
-    }
-    if (entry.kind === 'crafted') {
+    if ((entry.status === 'pruned') || (entry.kind === 'crafted')) {
       continue;
     }
     const entryKey = canonicalKey(entry);
@@ -338,15 +323,18 @@ export function rank(input: RankInput): Ranking {
 
     const price = published.price;
     switch (price.state) {
-      case 'no-listings':
+      case 'no-listings': {
         noListings.push(base);
         break;
-      case 'unresolvable':
+      }
+      case 'unresolvable': {
         unresolvable.push(base);
         break;
-      case 'not-yet-synced':
+      }
+      case 'not-yet-synced': {
         notYetSynced.push({ ...base, reason: price.reason });
         break;
+      }
       case 'priced': {
         const { observation } = price;
         if (observation.league !== input.activeLeague) {
@@ -362,7 +350,7 @@ export function rank(input: RankInput): Ranking {
           ev: observation.priceDivine,
           craftCost: 0,
           observation,
-          ...(base.lastAttemptedAt === undefined ? {} : { lastAttemptedAt: base.lastAttemptedAt }),
+          ...(base.lastAttemptedAt !== undefined && { lastAttemptedAt: base.lastAttemptedAt }),
         };
         if (observation.priceDivine < input.threshold) {
           belowThreshold.push(row);
@@ -519,7 +507,7 @@ function craftedRow(
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
     provenance: keyed.map(({ entry }) => foldPair(pools, entry, recipe.modifierLevelMin)).reduce(weakest),
-    ...(asOf === undefined ? {} : { asOf }),
-    ...(lastAttemptedAt === undefined ? {} : { lastAttemptedAt }),
+    ...(asOf !== undefined && { asOf }),
+    ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
   };
 }

@@ -29,10 +29,10 @@ function report(overrides: Partial<SyncReport> = {}, figures: Partial<SyncReport
 }
 
 const unresolvable = (n: number): SyncReport['records'] =>
-  Array.from({ length: n }, (_, i) => ({
+  Array.from({ length: n }, (_, index) => ({
     kind: 'unresolvable' as const,
-    entryKey: `raw:Base ${String(i)}`,
-    identifier: `Base ${String(i)}`,
+    entryKey: `raw:Base ${String(index)}`,
+    identifier: `Base ${String(index)}`,
     identifierKind: 'baseTypeId' as const,
   }));
 
@@ -182,7 +182,7 @@ describe('the panel copy', () => {
 
   // Matrix: one not reached, one unresolvable, one starvation record; zero and many unchanged.
   it('agrees each count with its noun and verb: singular at one, plural at zero and many', () => {
-    const first = (group: FigureGroup): string => groupText(group).split('\n')[0] ?? '';
+    const first = (group: FigureGroup): string => groupText(group).split('\n', 1)[0] ?? '';
 
     const [oneRun, oneBroken] = panelColumns(report({ records: [...unresolvable(1), starvation] }, { notReachedCount: 1 }), true);
     expect(oneRun.map(first)[1]).toBe('1 tracked entry was not reached in the last sync pass.');
@@ -206,7 +206,7 @@ describe('the panel copy', () => {
     );
     expect(groupText(pinnedBroken[1] ?? [])).toBe('1 pinned-starvation record.\n1 of 1 pinned entry refreshed');
     expect(oneCover.map(groupText)).toEqual(['100% of 1 tracked Item Class.']);
-    const [, , unknownCover] = panelColumns(report({}, { coverage: 0.5 }), true);
+    const unknownCover = panelColumns(report({}, { coverage: 0.5 }), true)[2];
     expect(unknownCover.map(groupText)).toEqual(['50% of unknown tracked Item Classes.']);
 
     const [zeroRun] = panelColumns(
@@ -240,13 +240,13 @@ describe('the panel copy', () => {
     [1 - 1e-12, '99%'],
     [0.01, '1%'],
   ])('prints coverage %s as %s', (coverage, percent) => {
-    const [, , cover] = panelColumns(report({}, { coverage, rankableClassCount: 29 }), true);
+    const cover = panelColumns(report({}, { coverage, rankableClassCount: 29 }), true)[2];
     expect(cover.map(groupText)).toEqual([`${percent} of 29 tracked Item Classes.`]);
   });
 
   it('reads omitted coverage as not measured with weights loaded, unknown without, never 0', () => {
-    const [, , loaded] = panelColumns(report(), true);
-    const [, , absent] = panelColumns(report(), false);
+    const loaded = panelColumns(report(), true)[2];
+    const absent = panelColumns(report(), false)[2];
     expect(loaded).toEqual([[[{ kind: 'missing', text: NOT_MEASURED }]]]);
     expect(absent).toEqual([[[{ kind: 'missing', text: UNKNOWN }]]]);
   });

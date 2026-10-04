@@ -55,7 +55,7 @@ type Fetched =
   | { readonly kind: 'not-arrived' }
   | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | null };
 
-export type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
+type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
 export interface LoadOptions {
   readonly fetch?: FetchLike;
@@ -68,7 +68,7 @@ export interface LoadOptions {
 /** The file's `schemaVersion` string, or `null` where it is missing or not a string. */
 function declaredVersion(data: unknown): string | null {
   if (typeof data === 'object' && data !== null && 'schemaVersion' in data) {
-    const version = (data as { schemaVersion: unknown }).schemaVersion;
+    const version = data.schemaVersion;
     if (typeof version === 'string') {
       return version;
     }
@@ -121,15 +121,18 @@ async function fetchOne(
   // `never` default at compile time rather than becoming a silent `version`.
   switch (result.reason) {
     case 'unknown-major':
-    case 'malformed-version':
+    case 'malformed-version': {
       return { kind: 'invalid', cause: 'version', declared };
-    case 'invalid':
+    }
+    case 'invalid': {
       // Covers both a failed version probe (no string version declared) and a
       // failed shape parse at the expected major. A non-object body or a
       // non-string version reads as `version` on purpose (item 22 review).
       return { kind: 'invalid', cause: declared === null ? 'version' : 'content', declared };
-    default:
+    }
+    default: {
       return result satisfies never;
+    }
   }
 }
 

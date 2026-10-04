@@ -16,7 +16,7 @@ type SyncReport = Parsed<'syncReport'>;
 
 export const UNKNOWN = 'unknown';
 export const NOT_MEASURED = 'not measured';
-export const NOT_COMMITTED_SUFFIX = ' (not committed)';
+const NOT_COMMITTED_SUFFIX = ' (not committed)';
 
 export const WEIGHTS_FILE_LABEL = 'Weights File';
 export const LAST_SYNCED_LABEL = 'Last synced';
@@ -156,7 +156,7 @@ const UNKNOWN_GROUP: FigureGroup = [[missing(UNKNOWN)]];
 export type DiagnosisFailure = Pick<CrossFileFailure, 'check' | 'entryKey' | 'detail'>;
 
 /** One diagnosis line, verbatim: `check · canonical key · detail`. */
-export function diagnosisLine(failure: DiagnosisFailure): string {
+function diagnosisLine(failure: DiagnosisFailure): string {
   return `${failure.check} · ${failure.entryKey} · ${failure.detail}`;
 }
 
@@ -253,7 +253,7 @@ function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): 
  */
 function coveragePercent(coverage: number): number {
   const floored = Math.floor(coverage * 100 + 1e-9);
-  if (coverage > 0 && floored === 0) {
+  if (floored === 0 && coverage > 0) {
     return 1;
   }
   return coverage < 1 ? Math.min(floored, 99) : floored;

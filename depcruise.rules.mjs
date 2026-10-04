@@ -63,7 +63,7 @@ export const rules = [
     severity: 'error',
     comment:
       'Forbidden edge core -> Node builtin (`node:fs`, `fs`, ...). `core` performs no I/O; I/O belongs in the imperative shell (AD-1). Test files are exempt.',
-    from: { path: '^packages/core/src/', pathNot: '\\.test\\.ts$' },
+    from: { path: '^packages/core/src/', pathNot: String.raw`\.test\.ts$` },
     to: { dependencyTypes: ['core'] },
   },
   {
@@ -71,9 +71,7 @@ export const rules = [
     severity: 'error',
     comment:
       'Forbidden edge core -> npm package. `core` is pure and imports nothing outside `packages/`; workspace edges are left to the direction rules (AD-1). Path-based, so an undeclared package (npm-no-pkg, unknown) is caught too; builtins are left to no-core-to-node-builtin. Test files are exempt.',
-    from: { path: '^packages/core/src/', pathNot: '\\.test\\.ts$' },
+    from: { path: '^packages/core/src/', pathNot: String.raw`\.test\.ts$` },
     to: { pathNot: '^packages/', dependencyTypesNot: ['core'] },
   },
 ];
-
-export default rules;

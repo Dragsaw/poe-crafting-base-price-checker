@@ -61,9 +61,9 @@ export function createFetchHttpPort(options: { timeoutMs?: number } = {}): HttpP
         signal: AbortSignal.timeout(timeoutMs),
       });
       const headers: Record<string, string> = {};
-      response.headers.forEach((headerValue, headerName) => {
+      for (const [headerName, headerValue] of response.headers.entries()) {
         headers[headerName.toLowerCase()] = headerValue;
-      });
+      }
       return { status: response.status, headers, body: await response.text() };
     },
   };
@@ -125,7 +125,7 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
         return await readFile(at(path), { encoding: 'utf8' });
       } catch (error) {
         if (hasErrorCode(error, 'ENOENT')) {
-          return undefined;
+          return;
         }
         throw error;
       }
@@ -178,7 +178,7 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
         return (await stat(at(path))).mtime.toISOString();
       } catch (error) {
         if (hasErrorCode(error, 'ENOENT')) {
-          return undefined;
+          return;
         }
         throw error;
       }

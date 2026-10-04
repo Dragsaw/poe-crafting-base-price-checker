@@ -59,8 +59,8 @@ describe('writeArtifact', () => {
     const fs = createFakeFilesystemPort();
     await writeArtifact(fs, PATH, DatasetFileSchema, reversed());
     const text = (await fs.readTextFile(PATH)) ?? '';
-    expect(text.charCodeAt(0)).toBe('{'.charCodeAt(0));
-    expect(text).not.toContain('\uFEFF');
+    expect(text.codePointAt(0)).toBe('{'.codePointAt(0));
+    expect(text).not.toContain('\u{FEFF}');
     expect(text).not.toContain('\r');
     expect(text.endsWith('}\n')).toBe(true);
     expect(text.endsWith('\n\n')).toBe(false);
@@ -82,7 +82,7 @@ describe('writeArtifact', () => {
     const refusal = writeArtifact(fs, PATH, DatasetFileSchema, invalid);
 
     await expect(refusal).rejects.toBeInstanceOf(InvalidArtifactError);
-    const error = (await refusal.catch((caught: unknown) => caught)) as InvalidArtifactError;
+    const error = (await refusal.catch((error_: unknown) => error_)) as InvalidArtifactError;
     expect(error.path).toBe(PATH);
     expect(error.issues.map((issue) => issue.path)).toContainEqual(['generatedAt']);
     expect(error.message).toContain(PATH);

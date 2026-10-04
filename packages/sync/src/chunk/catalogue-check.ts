@@ -54,9 +54,9 @@ export function markUnresolvable(entryKey: string, before: DatasetEntry | undefi
   return {
     entryKey,
     price: { state: 'unresolvable' },
-    ...(before?.lastAttemptedAt === undefined ? {} : { lastAttemptedAt: before.lastAttemptedAt }),
-    ...(before?.lastSearchId === undefined ? {} : { lastSearchId: before.lastSearchId }),
-    ...(before?.lastSearchLeague === undefined ? {} : { lastSearchLeague: before.lastSearchLeague }),
+    ...(before?.lastAttemptedAt !== undefined && { lastAttemptedAt: before.lastAttemptedAt }),
+    ...(before?.lastSearchId !== undefined && { lastSearchId: before.lastSearchId }),
+    ...(before?.lastSearchLeague !== undefined && { lastSearchLeague: before.lastSearchLeague }),
   };
 }
 
@@ -73,9 +73,9 @@ function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
   if (!ids.categoryIds.has(entry.categoryId)) {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
   }
-  for (const ref of [entry.prefix, entry.suffix]) {
+  for (const reference of [entry.prefix, entry.suffix]) {
     // A hybrid reference names one statId per line, in its sorted line order.
-    for (const statId of statIds(ref)) {
+    for (const statId of statIds(reference)) {
       if (!ids.statIds.has(statId)) {
         misses.push({ identifier: statId, identifierKind: 'statId' });
       }
@@ -102,8 +102,8 @@ export function checkCatalogue(
     const entryKey = canonicalKey(entry);
     const misses = missesOf(entry, ids);
     if (misses.length === 0) {
-      const undecidable = entry.kind === 'crafted' && entry.categoryId === 'jewel';
-      if (!undecidable && published.get(entryKey)?.price.state === 'unresolvable') {
+      const isUndecidable = entry.kind === 'crafted' && entry.categoryId === 'jewel';
+      if (!isUndecidable && published.get(entryKey)?.price.state === 'unresolvable') {
         recovered.add(entryKey);
       }
       continue;

@@ -6,8 +6,8 @@
 import { readFileSync } from 'node:fs';
 
 const KNOWN_TYPES = ['feat', 'fix', 'test', 'docs', 'chore', 'wip', 'refactor', 'perf', 'build', 'ci'];
-const ID_TYPES = ['feat', 'fix', 'test'];
-const KNOWN_PACKAGES = ['contracts', 'core', 'sync', 'web'];
+const ID_TYPES = new Set(['feat', 'fix', 'test']);
+const KNOWN_PACKAGES = new Set(['contracts', 'core', 'sync', 'web']);
 const SUBJECT_PATTERN = /^([a-z]+)(\(([a-z0-9,\- ]+)\))?: (.+)$/;
 // The deferred-work-sweep skill's own automation commits carry a full,
 // period-terminated ledger `summary:`/`evidence:` sentence after the dash
@@ -23,7 +23,7 @@ function fail(reason, fix) {
 function readSubject(messagePath) {
   const message = readFileSync(messagePath, 'utf8');
   const firstLine = message.split('\n', 1)[0];
-  return firstLine.replace(/\s+$/, '');
+  return firstLine.trimEnd();
 }
 
 function lint(subject) {
@@ -54,16 +54,16 @@ function lint(subject) {
     );
   }
 
-  if (subject.endsWith('.') && scope !== PERIOD_EXEMPT_SCOPE) {
+  if (scope !== PERIOD_EXEMPT_SCOPE && subject.endsWith('.')) {
     fail(`the subject ends with a period.`, `Remove the trailing period.`);
   }
 
-  if (!ID_TYPES.includes(type)) {
+  if (!ID_TYPES.has(type)) {
     return;
   }
 
   const scopedPackages = scope ? scope.split(',').map((s) => s.trim()) : [];
-  const scopesAllKnown = scopedPackages.length > 0 && scopedPackages.every((s) => KNOWN_PACKAGES.includes(s));
+  const scopesAllKnown = scopedPackages.length > 0 && scopedPackages.every((s) => KNOWN_PACKAGES.has(s));
   if (!scopesAllKnown) {
     return;
   }

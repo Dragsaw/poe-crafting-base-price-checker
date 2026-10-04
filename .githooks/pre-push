@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+// Runs the full gate (`pnpm check`) before a push, per AGENT-WORKFLOW.md.
+// Git passes `<remote> <url>` as arguments and one line per ref on stdin:
+// `<local ref> <local sha> <remote ref> <remote sha>`. A push that only
+// deletes refs (local sha all zeros) carries no commits to check, so the gate
+// is skipped. `git push --no-verify` is the escape hatch.
+// Installed via `core.hooksPath .githooks` (see package.json "prepare").
+
+import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+
+const ZERO_SHA = /^0+$/;
+// Test seam: a path to a node script that replaces `pnpm check`. Only
+// test/pre-push-hook.test.ts sets it.
+const COMMAND_OVERRIDE_VARIABLE = 'PRE_PUSH_HOOK_COMMAND_FOR_TEST';
+
+function readStdin() {
+  try {
+    return readFileSync(0, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function isDeleteLine(line) {
+  const [, localSha] = line.split(/\s+/, 2);
+  return localSha !== undefined && ZERO_SHA.test(localSha);
+}
+
+function onlyDeletesReferences(stdin) {
+  const lines = stdin.split('\n').filter((line) => line.trim() !== '');
+  return lines.every((line) => isDeleteLine(line));
+}
+
+function runGate() {
+  const override = process.env[COMMAND_OVERRIDE_VARIABLE];
+  if (override) {
+    return spawnSync(process.execPath, [override], { stdio: 'inherit' });
+  }
+  // On Windows pnpm is a .cmd shim, which spawn only runs through a shell.
+  // eslint-disable-next-line sonarjs/no-os-command-from-path -- pnpm resolves through PATH by design: the hook runs the developer's own toolchain.
+  return spawnSync('pnpm', ['check'], { stdio: 'inherit', shell: process.platform === 'win32' });
+}
+
+if (onlyDeletesReferences(readStdin())) {
+  process.exit(0);
+}
+
+const result = runGate();
+if (result.status !== 0) {
+  console.error(
+    'pre-push hook: `pnpm check` failed, so the push is blocked.\n\n' +
+      'Fix: fix the reported failures and push again. `git push --no-verify` skips this gate.',
+  );
+}
+process.exit(result.status ?? 1);

@@ -23,13 +23,17 @@ const STATUS = { option: 'securable' };
 const TRADE_FILTERS = { filters: { price: { option: 'exalted_divine' } } };
 const SORT = { price: 'asc' };
 
+type Affixes = Pick<Extract<TrackedEntry, { kind: 'crafted' }>, 'prefix' | 'suffix'>;
+
+const DEFAULT_AFFIXES: Affixes = {
+  prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 47, valueMax: 50.5, acceptedTier: 'T5' },
+  suffix: { kind: 'valueless', statId: 'explicit.stat_2', acceptedTier: 'T5' },
+};
+
 function crafted(
   categoryId: string,
   className: string,
-  affixes: Pick<Extract<TrackedEntry, { kind: 'crafted' }>, 'prefix' | 'suffix'> = {
-    prefix: { kind: 'banded', statId: 'explicit.stat_1', valueMin: 47, valueMax: 50.5, acceptedTier: 'T5' },
-    suffix: { kind: 'valueless', statId: 'explicit.stat_2', acceptedTier: 'T5' },
-  },
+  affixes: Affixes = DEFAULT_AFFIXES,
 ): TrackedEntry {
   return { kind: 'crafted', categoryId, className, itemLevelMin: 75, ...affixes, status: 'active' };
 }

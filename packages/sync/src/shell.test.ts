@@ -75,7 +75,7 @@ it('writes UTF-8 with no BOM and keeps LF as it was given', async () => {
   await writeTextFile(path, contents);
 
   const raw = await readFile(path);
-  expect(raw.subarray(0, 3)).not.toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
+  expect(raw.subarray(0, 3)).not.toEqual(Buffer.from([0xEF, 0xBB, 0xBF]));
   expect(raw.includes(Buffer.from('\r\n'))).toBe(false);
   expect(raw.toString('utf8')).toBe(contents);
 });
@@ -156,7 +156,7 @@ describe('abortableSleep', () => {
     controller.abort();
 
     await expect(waiting).resolves.toBeUndefined();
-    expect(Date.now() - started).toBeLessThan(5_000);
+    expect(Date.now() - started).toBeLessThan(5000);
   });
 
   it('returns at once when the signal is already aborted', async () => {

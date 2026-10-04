@@ -135,7 +135,7 @@ export function lookupBase(items: unknown, query: string): { matches: BaseMatch[
         continue;
       }
       const type = stringAt(entry, 'type');
-      const key = `${groupId}\u0000${type ?? ''}`;
+      const key = `${groupId}\0${type ?? ''}`;
       if (type === undefined || !contains(type, query) || seen.has(key)) {
         continue;
       }
@@ -174,12 +174,14 @@ function categoryTexts(filters: unknown): Map<string, string> {
         continue;
       }
       for (const option of arrayAt(filter['option'], 'options')) {
-        if (isRecord(option)) {
-          const id = stringAt(option, 'id');
-          const text = stringAt(option, 'text');
-          if (id !== undefined && text !== undefined) {
-            texts.set(id, text);
-          }
+        if (!isRecord(option)) {
+          continue;
+        }
+
+        const id = stringAt(option, 'id');
+        const text = stringAt(option, 'text');
+        if (id !== undefined && text !== undefined) {
+          texts.set(id, text);
         }
       }
     }
@@ -206,7 +208,7 @@ export function lookupClass(weights: WeightsFile, filters: unknown, query: strin
 
 export interface ClassSelector {
   readonly className: string;
-  readonly category?: string | undefined;
+  readonly category?: string;
 }
 
 interface ResolvedClass {
@@ -267,7 +269,7 @@ export interface ModRow {
 /** One row per mod family (a modGroup and one statId set) of the class and slot (both slots when `slot` is absent). */
 export function lookupMods(
   weights: WeightsFile,
-  selector: ClassSelector & { readonly slot?: Slot | undefined },
+  selector: ClassSelector & { readonly slot?: Slot },
 ): { categoryId: string; className: string; mods: ModRow[] } {
   const resolved = resolveClass(weights, selector);
   const mods: ModRow[] = [];
@@ -370,11 +372,9 @@ export type Command =
   | { readonly kind: 'mods'; readonly className: string; readonly slot?: Slot; readonly category?: string }
   | { readonly kind: 'tiers'; readonly statId: string; readonly className: string; readonly category?: string };
 
-/** Parses the arguments after the script name. Throws `UsageError`. */
-export function parseCommand(argv: readonly string[]): Command {
-  let parsed;
+function parseOptions(argv: readonly string[]) {
   try {
-    parsed = parseArgs({
+    return parseArgs({
       args: [...argv],
       allowPositionals: true,
       strict: true,
@@ -387,7 +387,11 @@ export function parseCommand(argv: readonly string[]): Command {
   } catch (error) {
     throw new UsageError(error instanceof Error ? error.message : String(error));
   }
-  const { positionals, values } = parsed;
+}
+
+/** Parses the arguments after the script name. Throws `UsageError`. */
+export function parseCommand(argv: readonly string[]): Command {
+  const { positionals, values } = parseOptions(argv);
   const [kind, query, ...extra] = positionals;
   if (extra.length > 0) {
     throw new UsageError(`unexpected argument ${extra.join(' ')}`);
@@ -419,8 +423,8 @@ export function parseCommand(argv: readonly string[]): Command {
       return {
         kind,
         className: values.class,
-        ...(slot === undefined ? {} : { slot }),
-        ...(category === undefined ? {} : { category }),
+        ...(slot !== undefined && { slot }),
+        ...(category !== undefined && { category }),
       };
     }
     case 'tiers': {
@@ -437,13 +441,15 @@ export function parseCommand(argv: readonly string[]): Command {
         kind,
         statId: query,
         className: values.class,
-        ...(category === undefined ? {} : { category }),
+        ...(category !== undefined && { category }),
       };
     }
-    case undefined:
+    case undefined: {
       throw new UsageError('missing <subcommand>');
-    default:
+    }
+    default: {
       throw new UsageError(`unknown subcommand ${kind}`);
+    }
   }
 }
 
@@ -453,16 +459,21 @@ export type ReadJson = (path: string) => unknown;
 /** Runs one command over the files `read` returns. Pure apart from `read`. */
 export function runCommand(command: Command, read: ReadJson): unknown {
   switch (command.kind) {
-    case 'stat':
+    case 'stat': {
       return lookupStat(read(STATS_PATH), command.query);
-    case 'base':
+    }
+    case 'base': {
       return lookupBase(read(ITEMS_PATH), command.query);
-    case 'class':
+    }
+    case 'class': {
       return lookupClass(loadWeights(read), read(FILTERS_PATH), command.query);
-    case 'mods':
+    }
+    case 'mods': {
       return lookupMods(loadWeights(read), command);
-    case 'tiers':
+    }
+    case 'tiers': {
       return lookupTiers(loadWeights(read), command.statId, command);
+    }
   }
 }
 

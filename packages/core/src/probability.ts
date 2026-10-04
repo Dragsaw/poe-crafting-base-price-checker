@@ -89,10 +89,7 @@ export function interval(line: WeightsLine): Interval {
   if (first === undefined) {
     return { min: 1, max: 1 };
   }
-  if (second === undefined) {
-    return { min: first[0], max: first[1] };
-  }
-  return { min: (first[0] + second[0]) / 2, max: (first[1] + second[1]) / 2 };
+  return second === undefined ? { min: first[0], max: first[1] } : { min: (first[0] + second[0]) / 2, max: (first[1] + second[1]) / 2 };
 }
 
 /**
@@ -118,10 +115,7 @@ export function untrackableReason(
   if (entry.weightSource === 'not-in-game') {
     return 'not-in-game';
   }
-  if (pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null)) {
-    return 'partial-pool-null-line';
-  }
-  return undefined;
+  return pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null) ? 'partial-pool-null-line' : undefined;
 }
 
 /**
@@ -133,8 +127,8 @@ export function lineSet(entry: ModifierWeight): readonly string[] {
 }
 
 /** `statIds(ref)` (§1): the `statId`s a reference names, sorted by code unit. */
-export function statIds(ref: ModifierRef): readonly string[] {
-  return ref.kind === 'hybrid' ? ref.lines.map((rl) => rl.statId).sort(compareByCodeUnit) : [ref.statId];
+export function statIds(reference: ModifierRef): readonly string[] {
+  return reference.kind === 'hybrid' ? reference.lines.map((rl) => rl.statId).sort(compareByCodeUnit) : [reference.statId];
 }
 
 /** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */
@@ -187,16 +181,13 @@ function sameIds(a: readonly string[], b: readonly string[]): boolean {
  * is empty, and this is §1's `contains`, wherever the caller has no pair of
  * entries.
  */
-export function contains(ref: ModifierRef, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
+export function contains(reference: ModifierRef, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
   if (entry.weight === 0) {
     return false;
   }
   const coveredBy = (rl: ReferenceLine) =>
     entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
-  if (ref.kind === 'hybrid') {
-    return sameIds(lineSet(entry), statIds(ref)) && ref.lines.every(coveredBy);
-  }
-  return coveredBy(ref);
+  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every(coveredBy) : coveredBy(reference);
 }
 
 /**
@@ -207,10 +198,7 @@ export function contains(ref: ModifierRef, entry: ModifierWeight, summed: Readon
 export function poolOf(weights: WeightsFile, categoryId: string, className: string): PoolLookup {
   const classes = Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
   const pools = classes !== undefined && Object.hasOwn(classes, className) ? classes[className] : undefined;
-  if (pools === undefined) {
-    return { ok: false, reason: { kind: 'class-absent' } };
-  }
-  return { ok: true, pools };
+  return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
 /**
@@ -244,8 +232,8 @@ export function isEmptyPool(pool: WeightsPool): boolean {
 }
 
 /** `C = contained(ref) ∩ E` (§11). */
-export function containedIn(ref: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
-  return eligibleSet.filter((entry) => contains(ref, entry));
+export function containedIn(reference: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
+  return eligibleSet.filter((entry) => contains(reference, entry));
 }
 
 /**
@@ -255,13 +243,13 @@ export function containedIn(ref: ModifierRef, eligibleSet: readonly ModifierWeig
  * the reference names any banded line, a minimum when every line is
  * valueless, and `undefined`, never `0`, when it contains nothing.
  */
-export function needs(ref: ModifierRef, pool: WeightsPool): number | undefined {
-  const tier = containedIn(ref, pool.entries).filter((entry) => !untrackable(entry, pool));
+export function needs(reference: ModifierRef, pool: WeightsPool): number | undefined {
+  const tier = containedIn(reference, pool.entries).filter((entry) => !untrackable(entry, pool));
   if (tier.length === 0) {
     return undefined;
   }
   const levels = tier.map((entry) => entry.itemLevelMin);
-  const banded = ref.kind === 'hybrid' ? ref.lines.some((rl) => 'valueMin' in rl) : ref.kind === 'banded';
+  const banded = reference.kind === 'hybrid' ? reference.lines.some((rl) => 'valueMin' in rl) : reference.kind === 'banded';
   return banded ? Math.max(...levels) : Math.min(...levels);
 }
 
@@ -273,16 +261,13 @@ export function needs(ref: ModifierRef, pool: WeightsPool): number | undefined {
 export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
-  ref: ModifierRef,
+  reference: ModifierRef,
   itemLevelMin: number,
   modifierLevelMin: number,
 ): ProbabilityResult {
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
   const total = totalWeight(eligibleSet);
-  if (total === 0) {
-    return { ok: false, reason: { kind: 'empty-eligible-pool', slot } };
-  }
-  return { ok: true, p: totalWeight(containedIn(ref, eligibleSet)) / total };
+  return total === 0 ? { ok: false, reason: { kind: 'empty-eligible-pool', slot } } : { ok: true, p: totalWeight(containedIn(reference, eligibleSet)) / total };
 }
 
 interface SlotSets {
@@ -347,9 +332,9 @@ export function combinationProbability(
   combination: CombinationInput,
   modifierLevelMin: number,
 ): ProbabilityResult {
-  const setsOf = (slot: Slot, ref: ModifierRef): SlotSets => {
+  const setsOf = (slot: Slot, reference: ModifierRef): SlotSets => {
     const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
-    return { slot, eligibleSet, contained: containedIn(ref, eligibleSet), total: totalWeight(eligibleSet) };
+    return { slot, eligibleSet, contained: containedIn(reference, eligibleSet), total: totalWeight(eligibleSet) };
   };
   const prefix = setsOf('prefix', combination.prefix);
   const suffix = setsOf('suffix', combination.suffix);
@@ -368,8 +353,5 @@ export function combinationProbability(
     return prefixFirst;
   }
   const suffixFirst = orderedTerm(suffix, prefix);
-  if (!suffixFirst.ok) {
-    return suffixFirst;
-  }
-  return { ok: true, p: (prefixFirst.sum + suffixFirst.sum) / (prefix.total + suffix.total) };
+  return suffixFirst.ok ? { ok: true, p: (prefixFirst.sum + suffixFirst.sum) / (prefix.total + suffix.total) } : suffixFirst;
 }

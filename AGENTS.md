@@ -25,6 +25,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 - `pnpm dev` binds port 5173 with `strictPort`. A taken port gives a loud bind failure, and Vite does not move to the next port. To use a different port, run `pnpm dev --port <n>`. Do not edit `packages/web/vite.config.ts`.
 - `pnpm dev` runs until you stop it. Start it with the background facility of your runtime. The repository ships no supervisor.
 - Stop it with `pnpm dev:stop`, and give `--port <n>` if you started it on another port. Run this even after you stop the background task. On Windows, a task stop kills only the top process, and Vite keeps the port. `pnpm dev:stop` kills the whole `pnpm dev` process tree and exits 1 if the port stays taken. It refuses a listener that is not the Vite of this checkout, for example the server of another worktree.
+- `pnpm check` is the done gate. A PostToolUse hook (`tools/lint-on-edit`) lints each edited file. Never run `eslint --suppress-*`. Use `pnpm lint:prune` for the lint baseline. Details: `AGENT-WORKFLOW.md`.
 
 ## Conventions that differ from defaults
 
@@ -33,6 +34,7 @@ A crafting base price checker for Path of Exile. The repository is a pnpm worksp
 
 ## Known pitfalls
 
+- A comment states only a non-obvious why, in at most three lines, and the same holds for JSDoc blocks. Never narrate what the code does, how it got there, or the story of a decision. Put rationale in its owner document and cite it by id (`AD-n`, `FR-n`). Observed 2026-10-04: comment runs of 103 and 48 lines in `packages/sync/src/chunk/run-chunk.ts` and `packages/core/src/rank.ts`.
 - Each planning fact has one owner document. Write the fact there. Cite it elsewhere by stable id (`FR-n`, `AD-n`, `OQ-n`, companion `§n`). Do not restate the text of the owner. A citation stays correct when the source changes, and a copy drifts without a signal. The owners are:
   - `prd.md` owns what the player gets, and why. This covers capabilities, player-observable behavior, scope, risks and metrics. It holds no formulas, predicates, field names, file paths, schema versions, filter shapes or revision narrative.
   - `ARCHITECTURE-SPINE.md` owns decisions (ADs). `IMPLEMENTATION-NOTES.md` owns formulas, predicates, report field identifiers and error payloads. `WEIGHTS-FILE-SCHEMA.md` owns the weights contract and its version. `AGENT-WORKFLOW.md` owns command-level rules. UX `EXPERIENCE.md` owns view treatments. The PRD keeps the requirement, and UX owns the appearance.

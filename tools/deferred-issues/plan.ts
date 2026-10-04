@@ -41,7 +41,7 @@ export const LEDGER_PATH = 'docs/stories/deferred-work.md';
 
 /** The id that the first line of an issue body names, or `undefined`. */
 export function readMarker(body: string | null | undefined): string | undefined {
-  const first = (body ?? '').split(/\r?\n/)[0]?.trim() ?? '';
+  const first = (body ?? '').split(/\r?\n/, 1)[0]?.trim() ?? '';
   return MARKER.exec(first)?.[1];
 }
 
@@ -99,24 +99,35 @@ export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[
   return closes.sort((a, b) => a.number - b.number);
 }
 
-export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], ref: string): SyncPlan {
-  const creates: PlannedCreate[] = [];
-  const reports: string[] = [];
-
+function countIds(entries: readonly LedgerEntry[]): Map<string, number> {
   const counts = new Map<string, number>();
   for (const entry of entries) {
     counts.set(entry.id, (counts.get(entry.id) ?? 0) + 1);
   }
-  const duplicateLedgerIds = [...counts].filter(([, n]) => n > 1).map(([id]) => id);
-  for (const id of duplicateLedgerIds) {
-    reports.push(`Duplicate ledger id: ${counts.get(id)} entries give ${id}; no issue is created for it`);
-  }
+  return counts;
+}
 
+function markerReports(issues: readonly IssueInfo[]): string[] {
+  const reports: string[] = [];
   for (const issue of [...issues].sort((a, b) => a.number - b.number)) {
     if (readMarker(issue.body) === undefined) {
       reports.push(`No marker: #${issue.number} has the label deferred and no valid \`Deferred entry: dw-…\` first line`);
     }
   }
+  return reports;
+}
+
+export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], reference: string): SyncPlan {
+  const creates: PlannedCreate[] = [];
+  const reports: string[] = [];
+
+  const counts = countIds(entries);
+  const duplicateLedgerIds = [...counts].filter(([, n]) => n > 1).map(([id]) => id);
+  for (const id of duplicateLedgerIds) {
+    reports.push(`Duplicate ledger id: ${counts.get(id)} entries give ${id}; no issue is created for it`);
+  }
+
+  reports.push(...markerReports(issues));
 
   const groups = byId(issues);
   const seen = new Set<string>();
@@ -131,7 +142,7 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
     const group = groups.get(entry.id);
     if (group === undefined) {
       creates.push({ id: entry.id, title: entry.title, body: issueBody(entry) });
-    } else if (!group.some((issue) => issue.state === 'OPEN')) {
+    } else if (group.every((issue) => issue.state !== 'OPEN')) {
       const numbers = group.map((issue) => `#${issue.number}`).join(', ');
       reports.push(`Closed, still listed: ${entry.id} is in the ledger, and its issue ${numbers} is closed`);
     }
@@ -144,7 +155,7 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
     }
     for (const issue of group) {
       if (issue.state === 'OPEN') {
-        reports.push(`Entry gone: #${issue.number} names ${id}, which is not in ${LEDGER_PATH} on ${ref}`);
+        reports.push(`Entry gone: #${issue.number} names ${id}, which is not in ${LEDGER_PATH} on ${reference}`);
       }
     }
   }

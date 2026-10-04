@@ -29,7 +29,7 @@ afterEach(() => {
   container = undefined;
 });
 
-function mountPanel(value: number, onChange: (value: number) => void = () => undefined): HTMLDivElement {
+function mountPanel(value: number, onChange: (value: number) => void = () => {}): HTMLDivElement {
   container = document.createElement('div');
   document.body.append(container);
   const mounted = createRoot(container);
@@ -52,10 +52,10 @@ function input(): HTMLInputElement {
   return found;
 }
 
-function part(attr: string): HTMLElement {
-  const found = container?.querySelector<HTMLElement>(`[${attr}]`);
+function part(attribute: string): HTMLElement {
+  const found = container?.querySelector<HTMLElement>(`[${attribute}]`);
   if (found === null || found === undefined) {
-    throw new Error(`no ${attr}`);
+    throw new Error(`no ${attribute}`);
   }
   return found;
 }
@@ -67,7 +67,7 @@ describe('the panel at rest', () => {
     expect(input().value).toBe('0.25');
     expect(part('data-threshold-marker').style.left).toBe(`${String((0.25 / 3) * 100)}%`);
     expect(part('data-threshold-fill').style.width).toBe(`${String((0.25 / 3) * 100)}%`);
-    expect(parseFloat(part('data-threshold-marker').style.left)).toBeCloseTo(8.33, 2);
+    expect(Number.parseFloat(part('data-threshold-marker').style.left)).toBeCloseTo(8.33, 2);
   });
 
   it('prints 3.00, not 3', () => {
@@ -83,7 +83,7 @@ describe('the panel at rest', () => {
     expect(label.getAttribute('for')).toBe(input().id);
     const unit = part('data-threshold-unit');
     expect(unit.textContent).toBe(THRESHOLD_UNIT);
-    expect(THRESHOLD_UNIT).toBe(' Divine');
+    expect(THRESHOLD_UNIT).toBe('\u{A0}Divine');
     expect(unit.id).not.toBe('');
     expect(input().getAttribute('aria-describedby')).toBe(unit.id);
     expect(unit.contains(input())).toBe(false);
@@ -113,11 +113,11 @@ describe('the panel at rest', () => {
 
   it('draws a non-interactive readout: no pointer events, no handlers, and the range endpoints', () => {
     mountPanel(0.25);
-    for (const attr of ['data-threshold-track', 'data-threshold-fill', 'data-threshold-marker']) {
-      const node = part(attr);
-      expect(node.style.pointerEvents, attr).toBe('none');
-      const props = Object.entries(node).find(([key]) => key.startsWith('__reactProps'))?.[1] as Record<string, unknown>;
-      expect(Object.keys(props).filter((key) => key.startsWith('on')), attr).toEqual([]);
+    for (const attribute of ['data-threshold-track', 'data-threshold-fill', 'data-threshold-marker']) {
+      const node = part(attribute);
+      expect(node.style.pointerEvents, attribute).toBe('none');
+      const properties = Object.entries(node).find(([key]) => key.startsWith('__reactProps'))?.[1] as Record<string, unknown>;
+      expect(Object.keys(properties).filter((key) => key.startsWith('on')), attribute).toEqual([]);
     }
     const marker = part('data-threshold-marker');
     expect([marker.style.width, marker.style.height]).toEqual(['11px', '14px']);

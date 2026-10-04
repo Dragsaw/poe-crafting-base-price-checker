@@ -22,7 +22,7 @@ import { createReadOnlyGitPort, parseAuthorDate } from './read-only-git-port.ts'
 const run = promisify(execFile);
 
 let base: string;
-let repo: string;
+let repository: string;
 let plain: string;
 
 function isolate(): void {
@@ -31,30 +31,30 @@ function isolate(): void {
   vi.stubEnv('GIT_CEILING_DIRECTORIES', base);
 }
 
-async function git(args: string[], env: Record<string, string> = {}): Promise<void> {
-  await run('git', args, { cwd: repo, env: { ...process.env, ...env }, windowsHide: true });
+async function git(arguments_: string[], environment: Record<string, string> = {}): Promise<void> {
+  await run('git', arguments_, { cwd: repository, env: { ...process.env, ...environment }, windowsHide: true });
 }
 
 async function commitFile(name: string, content: string, authorDate: string): Promise<void> {
-  await writeFile(join(repo, name), content);
+  await writeFile(join(repository, name), content);
   await git(['add', '--', name]);
   await git(['commit', '-q', '-m', `edit ${name}`], { GIT_AUTHOR_DATE: authorDate, GIT_COMMITTER_DATE: authorDate });
 }
 
 beforeAll(async () => {
   base = await realpath(await mkdtemp(join(tmpdir(), 'poe-git-port-')));
-  repo = join(base, 'repo');
+  repository = join(base, 'repo');
   plain = join(base, 'plain');
   await writeFile(join(base, 'empty.gitconfig'), '');
   isolate();
-  await run('git', ['init', '-q', repo], { env: process.env, windowsHide: true });
+  await run('git', ['init', '-q', repository], { env: process.env, windowsHide: true });
   await mkdir(plain);
   await git(['config', 'commit.gpgsign', 'false']);
   await git(['config', 'user.name', 'Test']);
   await git(['config', 'user.email', 'test@example.invalid']);
   await commitFile('tracked.json', '{"v":1}\n', '2026-09-20T14:00:00+02:00');
   await commitFile('other.json', '{"v":1}\n', '2026-09-22T09:30:00+00:00');
-  await mkdir(join(repo, 'data'));
+  await mkdir(join(repository, 'data'));
   await commitFile('data/tracked.json', '{"v":1}\n', '2026-09-24T08:15:00-05:00');
   vi.unstubAllEnvs();
 });
@@ -73,21 +73,21 @@ afterAll(async () => {
 
 describe('createReadOnlyGitPort', () => {
   it('returns the author date of the last commit touching the path, in UTC', async () => {
-    await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('tracked.json')).resolves.toBe(
+    await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
       '2026-09-20T12:00:00.000Z',
     );
   });
 
   it('ignores a later commit that does not touch the path', async () => {
-    const port = createReadOnlyGitPort(repo);
+    const port = createReadOnlyGitPort(repository);
     await expect(port.lastCommitAuthorDate('other.json')).resolves.toBe('2026-09-22T09:30:00.000Z');
     await expect(port.lastCommitAuthorDate('tracked.json')).resolves.toBe('2026-09-20T12:00:00.000Z');
   });
 
   it('keeps the commit date when the working tree has an uncommitted edit (AD-12)', async () => {
-    await writeFile(join(repo, 'tracked.json'), '{"v":2}\n');
+    await writeFile(join(repository, 'tracked.json'), '{"v":2}\n');
     try {
-      await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('tracked.json')).resolves.toBe(
+      await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
         '2026-09-20T12:00:00.000Z',
       );
     } finally {
@@ -96,11 +96,11 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('returns undefined for an untracked file', async () => {
-    await writeFile(join(repo, 'untracked.json'), '{}\n');
+    await writeFile(join(repository, 'untracked.json'), '{}\n');
     try {
-      await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('untracked.json')).resolves.toBeUndefined();
+      await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('untracked.json')).resolves.toBeUndefined();
     } finally {
-      await rm(join(repo, 'untracked.json'));
+      await rm(join(repository, 'untracked.json'));
     }
   });
 
@@ -113,7 +113,7 @@ describe('createReadOnlyGitPort', () => {
   it('still reads the date when the repository sets log.showSignature', async () => {
     await git(['config', 'log.showSignature', 'true']);
     try {
-      await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('tracked.json')).resolves.toBe(
+      await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
         '2026-09-20T12:00:00.000Z',
       );
     } finally {
@@ -124,8 +124,8 @@ describe('createReadOnlyGitPort', () => {
   it('dates a nested repo-relative path through resolveTrackedListAge as git-author-date', async () => {
     await expect(
       resolveTrackedListAge({
-        git: createReadOnlyGitPort(repo),
-        filesystem: createNodeFilesystemPort(repo),
+        git: createReadOnlyGitPort(repository),
+        filesystem: createNodeFilesystemPort(repository),
         path: 'data/tracked.json',
       }),
     ).resolves.toEqual({ source: 'git-author-date', at: '2026-09-24T13:15:00.000Z' });
@@ -133,7 +133,7 @@ describe('createReadOnlyGitPort', () => {
 
   it('returns undefined when no git binary is found', async () => {
     vi.stubEnv('PATH', join(base, 'no-such-bin'));
-    await expect(createReadOnlyGitPort(repo).lastCommitAuthorDate('tracked.json')).resolves.toBeUndefined();
+    await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBeUndefined();
   });
 });
 

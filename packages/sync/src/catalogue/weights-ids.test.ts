@@ -41,8 +41,8 @@ function fsWith(contents: string | undefined) {
 }
 
 /** The last BMP code point and the first astral one: code-unit and code-point order disagree on them. */
-const BMP_LAST = String.fromCodePoint(0xffff);
-const ASTRAL = String.fromCodePoint(0x10000);
+const BMP_LAST = String.fromCodePoint(0xFF_FF);
+const ASTRAL = String.fromCodePoint(0x1_00_00);
 
 describe('readWeightsIds', () => {
   it('reads the outer categoryIds and every non-null line statId, and carries the parsed file', async () => {
@@ -155,8 +155,8 @@ describe('weightsAbsentRecord', () => {
       prefix: { kind: 'valueless', statId: 's' },
       suffix: { kind: 'valueless', statId: 't' },
       status,
-      ...(status === 'pruned' ? { prunedReason: 'x' } : {}),
-    }) as TrackedEntry;
+      ...((status === 'pruned') && { prunedReason: 'x' }),
+    });
 
   it('names the distinct classNames of non-pruned crafted entries, sorted by code point', () => {
     expect(
