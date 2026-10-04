@@ -1,30 +1,5 @@
 /**
- * `pnpm catalogue:refresh` — the explicit, human-invoked catalogue refresh
- * (AD-25, AGENT-WORKFLOW §Fixtures).
- *
- * The four trade data endpoints are the only authority for what a `statId`, a
- * `baseTypeId` or a `categoryId` means. This command issues **exactly four
- * GETs** through the one governed client, validates each response against its
- * `contracts` schema, stamps `schemaVersion`, and writes
- * `data/catalogue/{items,stats,filters,static}.json`. Its output is a git diff:
- * a GGG patch that renames a stat id arrives as one reviewable line rather
- * than as a silent behaviour change.
- *
- * **All-or-nothing across fetch and validation**, which is the failure mode
- * that matters: no byte is written until all four have arrived and parsed, so
- * a mid-run 503 cannot commit a new `stats.json` beside a stale `items.json`.
- * The write loop itself is **not** transactional — nothing here can roll a
- * completed `writeFile` back — so a filesystem failure part way down leaves a
- * mixed tree and says so, naming the path that refused and how many landed.
- *
- * **No test runs this against the network.** It is referenced by no vitest
- * config and by no setup file; the entry guard at the bottom means importing
- * the module — which `catalogue-refresh.test.ts` does, to drive
- * `refreshCatalogue` against the fakes — issues nothing and writes nothing.
- *
- * What it is not: no chunk, no lock, no progress file, no `sync-report.json`
- * entry, no league gate, no schedule, and no id validation. This story writes
- * the authority; Story 1.10 reads it.
+ * `pnpm catalogue:refresh`: four GETs, validated, then written all-or-nothing (AD-25, AGENT-WORKFLOW §Fixtures).
  */
 
 import nodePath from 'node:path';
@@ -65,12 +40,7 @@ import { resolveUserAgent } from './trade/user-agent.ts';
 /** The repository root, three levels up from `src/`. */
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
-/**
- * The narrowest thing this module needs of a schema: parse an unknown value and
- * report issues. Typing it structurally keeps `zod` out of `sync`'s imports —
- * `sync` declares `@poe/contracts` and `@poe/core` and nothing else, and the
- * schemas arrive through `contracts` as values.
- */
+/** Structural, so `zod` stays out of `sync`'s imports: the schemas arrive through `contracts` as values. */
 interface CatalogueParser {
   safeParse(
     value: unknown,
@@ -84,11 +54,7 @@ interface ArtifactSchemas {
   readonly file: CatalogueParser;
 }
 
-/**
- * Both schemas per artifact. The payload is checked first so a shape failure is
- * reported against what arrived, rather than as a puzzling envelope error; the
- * envelope is then checked as the last gate before any byte is written.
- */
+/** The payload is checked first, so a shape failure names what arrived, not an envelope error. */
 const SCHEMAS: Readonly<Record<CatalogueArtifact, ArtifactSchemas>> = {
   items: { payload: ItemCatalogueSchema, file: CatalogueItemsFileSchema },
   stats: { payload: StatCatalogueSchema, file: CatalogueStatsFileSchema },
@@ -101,13 +67,7 @@ export function catalogueFilePathOf(endpoint: CatalogueEndpoint): string {
   return nodePath.join(REPO_ROOT, endpoint.outputPath);
 }
 
-/**
- * The shell's one serialisation, re-exported under this command's name.
- *
- * It is **the same function** `serialiseFixture` calls, not a second copy with
- * the same body: the "empty second diff" criterion rests on byte identity, and
- * two copies are only identical until one of them is edited.
- */
+/** The same function `serialiseFixture` calls, not a copy: the empty-second-diff check rests on byte identity. */
 export const serialiseCatalogue = serialiseJsonArtifact;
 
 /** The first issue, pointed at by its path, so a failure names a field. */
@@ -126,27 +86,15 @@ export interface CatalogueRefreshPorts {
   readonly clock: ClockPort;
   readonly wait: (ms: number) => Promise<void>;
   readonly userAgent: string;
-  /**
-   * Injected exactly as `RecorderPorts.writeFixture` is, so the whole
-   * four-endpoint path is exercised with no filesystem — which is also what
-   * keeps a test run from ever touching `data/`.
-   */
+  /** Injected, as `RecorderPorts.writeFixture` is, so a test run never touches `data/`. */
   readonly writeCatalogueFile: (path: string, contents: string) => Promise<void>;
 }
 
-/**
- * A discriminated union rather than `{ok, failure?}`: on the failure side the
- * reason is **always** present, so no caller needs a fallback for a string that
- * cannot be missing, and no caller can read `failure` off a success.
- */
 export type CatalogueRefreshOutcome =
   | {
       readonly ok: true;
       readonly written: readonly string[];
-      /**
-       * The requests this refresh sent, counted as `catalogue-refresh` (AD-12).
-       * The command prints it: no chunk report carries this source.
-       */
+      /** Counted as `catalogue-refresh` (AD-12); the command prints it, no chunk report carries it. */
       readonly requests: number;
     }
   | {
@@ -253,14 +201,7 @@ async function writeCaptured(
   return { ok: true, written, requests: requests() };
 }
 
-/**
- * Issues the four GETs, **buffers every artifact, and writes only once all four
- * have been fetched and validated.**
- *
- * A mid-run failure would otherwise leave a commit mixing a new `stats.json`
- * with a stale `items.json` — a catalogue that no single response ever
- * described, and the one state a validation authority must never be in.
- */
+/** Buffers all four artifacts and writes only after every one is fetched and validated, so a mid-run failure cannot mix new and stale files. */
 export async function refreshCatalogue(
   ports: CatalogueRefreshPorts,
 ): Promise<CatalogueRefreshOutcome> {
@@ -319,11 +260,7 @@ async function main(): Promise<void> {
   });
 }
 
-/**
- * Prints an outcome and answers the exit code. The request count is printed on
- * both arms: `catalogue-refresh` is the one declared source no chunk report
- * carries, so this line is where its spend is seen (AD-12).
- */
+/** Prints an outcome and answers the exit code; the request count shows on both arms (AD-12). */
 export function printRefreshOutcome(
   outcome: CatalogueRefreshOutcome,
   out: { readonly stdout: (line: string) => void; readonly stderr: (line: string) => void },
@@ -331,8 +268,7 @@ export function printRefreshOutcome(
   out.stdout(`requests: ${String(outcome.requests)}`);
   if (!outcome.ok) {
     out.stderr(`pnpm catalogue:refresh: ${outcome.failure}`);
-    // The count in the failure says how many landed; only this says which. A
-    // human staring at a mixed `data/catalogue/` needs the names, not a number.
+    // The failure counts what landed; only this names which files.
     for (const path of outcome.written) {
       out.stderr(`  already written: ${path}`);
     }
@@ -345,10 +281,7 @@ export function printRefreshOutcome(
   return 0;
 }
 
-/**
- * The entry guard. `node packages/sync/src/catalogue-refresh.ts` runs `main`;
- * importing the module — which the co-located test does — runs nothing.
- */
+/** Entry guard: running this file runs `main`; importing it, as the test does, runs nothing. */
 const entry = process.argv[1];
 const isInvokedDirectly = entry !== undefined && nodePath.resolve(entry) === fileURLToPath(import.meta.url);
 

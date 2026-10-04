@@ -340,11 +340,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/catalogue-refresh.ts": {
-    "local/max-comment-run": {
-      "count": 10
-    }
-  },
   "packages/sync/src/catalogue/catalogue-ids.ts": {
     "local/max-comment-run": {
       "count": 1
