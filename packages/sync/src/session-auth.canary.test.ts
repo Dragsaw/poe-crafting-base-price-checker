@@ -74,6 +74,23 @@ function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof c
   };
 }
 
+/**
+ * The base64 and base64url characters that encode `bytes` inside any longer
+ * value. A 3-byte group of the encoding starts at the window's byte 0, 1 or 2,
+ * depending on where the window sits. From that byte, each whole group made
+ * of the window's own bytes encodes the same characters whatever surrounds it.
+ */
+function alignedBase64(bytes: Buffer): string[] {
+  const forms: string[] = [];
+  for (const encoding of ['base64', 'base64url'] as const) {
+    for (let lead = 0; lead < 3; lead += 1) {
+      const groups = Math.floor((bytes.length - lead) / 3);
+      forms.push(bytes.subarray(lead, lead + groups * 3).toString(encoding));
+    }
+  }
+  return forms;
+}
+
 /** Every 8-character window of the canary, in each form a leak could take. */
 const NEEDLES: readonly string[] = (() => {
   const found = new Set<string>();
@@ -81,8 +98,11 @@ const NEEDLES: readonly string[] = (() => {
     const window = CANARY.slice(start, start + 8);
     found.add(window);
     found.add(encodeURIComponent(window));
-    found.add(Buffer.from(window).toString('base64').replace(/=+$/, ''));
-    found.add(Buffer.from(window).toString('base64url'));
+    for (const form of alignedBase64(Buffer.from(window))) {
+      found.add(form);
+      // base64 carries `+` and `/`, which a URL encodes.
+      found.add(encodeURIComponent(form));
+    }
   }
   return [...found];
 })();
@@ -301,6 +321,21 @@ describe('CAP-4: the canary never leaves the holder', () => {
   it('the needles are the canary windows (a self-check of the scan)', () => {
     expect(leaksIn(`x ${CANARY.slice(3, 12)} y`)).not.toEqual([]);
     expect(leaksIn(Buffer.from(CANARY.slice(0, 9)).toString('base64'))).not.toEqual([]);
+  });
+
+  it.each(['', 'x', 'xy'])('every 8 characters of the canary, base64 behind %j, are caught at the end of a value or before more bytes', (prefix) => {
+    const missed: string[] = [];
+    for (let start = 0; start + 8 <= CANARY.length; start += 1) {
+      for (const suffix of ['', '!']) {
+        for (const encoding of ['base64', 'base64url'] as const) {
+          const leak = Buffer.from(`${prefix}${CANARY.slice(start, start + 8)}${suffix}`).toString(encoding);
+          if (leaksIn(leak).length === 0) {
+            missed.push(`${encoding} at ${start}${suffix === '' ? ', at the end' : ''}`);
+          }
+        }
+      }
+    }
+    expect(missed).toEqual([]);
   });
 
   it('control: a chunk built with no holder passes the canary on, so the scan can see a leak', async () => {

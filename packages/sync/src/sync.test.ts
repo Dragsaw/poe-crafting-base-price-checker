@@ -749,14 +749,31 @@ describe('pnpm sync: the session with injected ports', () => {
     });
 
     it('a probe 429: no line, notBefore persisted, and the next chunk probes again', async () => {
-      const { deps, auth, http } = sessionFor({
+      const { deps, auth, http, fs, clock } = sessionFor({
         env: COOKIE_ENV,
         tracked: [ENTRY, SECOND, THIRD],
         stopAfter: 2,
         http: probing({ status: 429, headers: { 'retry-after': '60' }, body: '' }, LIVE),
       });
+      // At the session's first wait: the notBefore the probe-429 chunk left in
+      // the progress file, and the instant the wait ends.
+      let first: { readonly persisted: unknown; readonly until: string } | undefined;
+      const sleep = deps.sleep;
+      const watched: SyncSessionDeps = {
+        ...deps,
+        sleep: async (ms, signal) => {
+          if (first === undefined) {
+            const progress = JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '{}') as Record<string, unknown>;
+            first = { persisted: progress['notBefore'], until: new Date(Date.parse(clock.now()) + ms).toISOString() };
+          }
+          await sleep(ms, signal);
+        },
+      };
 
-      expect(await syncSessionCommand(deps)).toBe(0);
+      expect(await syncSessionCommand(watched)).toBe(0);
+
+      // retry-after: 60 from the probe at NOW.
+      expect(first).toEqual({ persisted: '2026-09-26T12:01:00.000Z', until: '2026-09-26T12:01:00.000Z' });
 
       expect(cookies(http)).toEqual([
         ['GET', undefined],
