@@ -250,6 +250,7 @@ describe('parseListenerJson', () => {
 });
 
 /** The POSIX reader needs lsof; Windows always has the PowerShell query. */
+// eslint-disable-next-line sonarjs/no-os-command-from-path -- boundary: the probe asks whether lsof is on PATH, the same lookup the tool under test makes
 const canQuery = process.platform === 'win32' || spawnSync('lsof', ['-v']).error === undefined;
 
 describe('listenerPids', () => {

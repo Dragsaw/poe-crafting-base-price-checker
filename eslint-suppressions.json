@@ -566,9 +566,6 @@
   "packages/sync/src/git/read-only-git-port.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "sonarjs/no-os-command-from-path": {
-      "count": 1
     }
   },
   "packages/sync/src/index.ts": {
@@ -1432,9 +1429,6 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-os-command-from-path": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     }
@@ -1442,9 +1436,6 @@
   "tools/dev-stop/dev-stop.ts": {
     "local/max-comment-run": {
       "count": 9
-    },
-    "sonarjs/no-os-command-from-path": {
-      "count": 4
     },
     "unicorn/name-replacements": {
       "count": 1
@@ -1483,9 +1474,6 @@
   },
   "tools/setup-git-hooks.mjs": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "sonarjs/no-os-command-from-path": {
       "count": 1
     }
   },

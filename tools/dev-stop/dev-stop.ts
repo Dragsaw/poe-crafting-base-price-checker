@@ -188,8 +188,15 @@ export interface Snapshot {
   readonly processes: readonly ProcessInfo[];
 }
 
+/** A Windows system tool by absolute path, so a directory early on PATH cannot shadow it. */
+function windowsTool(...segments: string[]): string {
+  const root = process.env.SystemRoot;
+  if (root === undefined) {throw new Error('SystemRoot is not set');}
+  return nodePath.join(root, 'System32', ...segments);
+}
+
 function powershell(script: string): string {
-  return execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+  return execFileSync(windowsTool('WindowsPowerShell', 'v1.0', 'powershell.exe'), ['-NoProfile', '-NonInteractive', '-Command', script], {
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   });
@@ -235,9 +242,14 @@ function snapshotWindows(port: number): Snapshot {
   return { listeners: parseListenerJson(parsed.listeners), processes: parsed.processes };
 }
 
+function posixTool(command: 'lsof' | 'ps', arguments_: string[]): string {
+  // lsof and ps sit in /usr/bin, /usr/sbin or /bin by platform, so only PATH finds them.
+  return execFileSync(command, arguments_, { encoding: 'utf8' });
+}
+
 function listenersPosix(port: number): number[] {
   try {
-    const out = execFileSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' });
+    const out = posixTool('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t']);
     return [...new Set(out.split('\n').filter(Boolean).map(Number))];
   } catch (error) {
     // lsof exits 1 when nothing matches. Any other failure, such as a missing
@@ -253,7 +265,7 @@ function listenersPosix(port: number): number[] {
  */
 function snapshotPosix(port: number): Snapshot {
   const listeners = listenersPosix(port);
-  const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
+  const ps = posixTool('ps', ['-A', '-o', 'pid=,ppid=,args=']);
   const processes: ProcessInfo[] = [];
   for (const line of ps.split('\n')) {
     const [, pid, ppid, commandLine] = /^\s*(\d+)\s+(\d+)\s+(\S.*)$/.exec(line) ?? [];
@@ -289,7 +301,7 @@ export function ownAncestry(processes: readonly ProcessInfo[], selfPid: number):
 function killTree(pid: number, processes: readonly ProcessInfo[]): void {
   if (process.platform === 'win32') {
     try {
-      execFileSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' });
+      execFileSync(windowsTool('taskkill.exe'), ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' });
     } catch {
       // The root already exited, or one descendant would not end. The port poll decides.
     }

@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process';
 const HOOKS_PATH = '.githooks';
 
 function git(arguments_) {
+  // eslint-disable-next-line sonarjs/no-os-command-from-path -- boundary: git is resolved from PATH because its install location differs per platform and user, and this repo has no git resolver
   return execFileSync('git', arguments_, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 }
 

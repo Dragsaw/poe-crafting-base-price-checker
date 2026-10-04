@@ -58,6 +58,7 @@ export function createReadOnlyGitPort(root: string): GitPort {
   return {
     lastCommitAuthorDate(path) {
       return new Promise<string | undefined>((settle, fail) => {
+        /* eslint-disable sonarjs/no-os-command-from-path -- boundary: git is resolved from PATH because its install location differs per platform and user, and this repo has no git resolver */
         execFile(
           'git',
           ['--no-optional-locks', 'log', '--no-show-signature', '-1', '--format=%at', '--', path],
@@ -78,6 +79,7 @@ export function createReadOnlyGitPort(root: string): GitPort {
             }
           },
         );
+        /* eslint-enable sonarjs/no-os-command-from-path -- end of the git call above */
       });
     },
   };
