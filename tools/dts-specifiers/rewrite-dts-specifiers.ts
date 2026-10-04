@@ -6,7 +6,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
@@ -52,7 +52,7 @@ export function rewriteDtsSpecifiers(text: string): string {
 function collectDeclarationFiles(dir: string): string[] {
   const files: string[] = [];
   for (const name of readdirSync(dir)) {
-    const path = join(dir, name);
+    const path = nodePath.join(dir, name);
     if (statSync(path).isDirectory()) {files.push(...collectDeclarationFiles(path));}
     else if (/\.d\.[mc]?ts$/.test(name)) {files.push(path);}
   }
@@ -108,7 +108,7 @@ function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
   if (entry === undefined) {return false;}
   try {
-    return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
+    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
     return false;
   }

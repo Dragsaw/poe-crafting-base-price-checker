@@ -1,6 +1,6 @@
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 
 import type { TestProject } from 'vitest/node';
 
@@ -31,7 +31,7 @@ declare module 'vitest' {
  * write into this run's record.
  */
 export default function setup(project: TestProject): void {
-  const dir = mkdtempSync(join(tmpdir(), 'no-network-'));
+  const dir = mkdtempSync(nodePath.join(tmpdir(), 'no-network-'));
   project.provide('noNetworkRecordDir', dir);
   // Async, so a throw becomes a rejection: Vitest calls every project's
   // callback before it awaits them, and a synchronous throw would skip the rest.
@@ -45,7 +45,7 @@ function assertNoLateRequests(dir: string): void {
   try {
     lines = readdirSync(dir)
       .filter((name) => name.endsWith('.log'))
-      .flatMap((name) => readFileSync(join(dir, name), 'utf8').split('\n'))
+      .flatMap((name) => readFileSync(nodePath.join(dir, name), 'utf8').split('\n'))
       .filter((line) => line !== '');
   } finally {
     rmSync(dir, { recursive: true, force: true });

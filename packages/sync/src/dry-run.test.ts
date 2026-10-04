@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -462,7 +462,7 @@ describe('dryRun: the repository snapshot and its recorded fixtures', () => {
     // left out: every workload entry is never attempted.
     const workload: DryRunSnapshot = {
       ...(await readRepositorySnapshot(FROZEN_DATA_DIR)),
-      tracked: readFileSync(join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
+      tracked: readFileSync(nodePath.join(REPO_ROOT, FIXTURE_WORKLOAD_PATH), 'utf8'),
       dataset: undefined,
       report: undefined,
       progress: undefined,
@@ -528,7 +528,7 @@ function snapshot(directory: string): Record<string, string> {
     return found;
   }
   for (const name of names) {
-    const path = join(directory, name);
+    const path = nodePath.join(directory, name);
     const stats = statSync(path);
     if (stats.isDirectory()) {
       Object.assign(found, snapshot(path));

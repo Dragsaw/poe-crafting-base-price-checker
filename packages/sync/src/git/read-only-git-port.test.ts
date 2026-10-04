@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import nodePath from 'node:path';
 import { promisify } from 'node:util';
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -21,12 +21,12 @@ import { createReadOnlyGitPort, parseAuthorDate } from './read-only-git-port.ts'
 
 const run = promisify(execFile);
 
-const base = await realpath(await mkdtemp(join(tmpdir(), 'poe-git-port-')));
-const repository = join(base, 'repo');
-const plain = join(base, 'plain');
+const base = await realpath(await mkdtemp(nodePath.join(tmpdir(), 'poe-git-port-')));
+const repository = nodePath.join(base, 'repo');
+const plain = nodePath.join(base, 'plain');
 
 function isolate(): void {
-  vi.stubEnv('GIT_CONFIG_GLOBAL', join(base, 'empty.gitconfig'));
+  vi.stubEnv('GIT_CONFIG_GLOBAL', nodePath.join(base, 'empty.gitconfig'));
   vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1');
   vi.stubEnv('GIT_CEILING_DIRECTORIES', base);
 }
@@ -36,13 +36,13 @@ async function git(arguments_: string[], environment: Record<string, string> = {
 }
 
 async function commitFile(name: string, authorDate: string): Promise<void> {
-  await writeFile(join(repository, name), '{"v":1}\n');
+  await writeFile(nodePath.join(repository, name), '{"v":1}\n');
   await git(['add', '--', name]);
   await git(['commit', '-q', '-m', `edit ${name}`], { GIT_AUTHOR_DATE: authorDate, GIT_COMMITTER_DATE: authorDate });
 }
 
 beforeAll(async () => {
-  await writeFile(join(base, 'empty.gitconfig'), '');
+  await writeFile(nodePath.join(base, 'empty.gitconfig'), '');
   isolate();
   await run('git', ['init', '-q', repository], { env: process.env, windowsHide: true });
   await mkdir(plain);
@@ -51,7 +51,7 @@ beforeAll(async () => {
   await git(['config', 'user.email', 'test@example.invalid']);
   await commitFile('tracked.json', '2026-09-20T14:00:00+02:00');
   await commitFile('other.json', '2026-09-22T09:30:00+00:00');
-  await mkdir(join(repository, 'data'));
+  await mkdir(nodePath.join(repository, 'data'));
   await commitFile('data/tracked.json', '2026-09-24T08:15:00-05:00');
   vi.unstubAllEnvs();
 });
@@ -84,7 +84,7 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('keeps the commit date when the working tree has an uncommitted edit (AD-12)', async () => {
-    await writeFile(join(repository, 'tracked.json'), '{"v":2}\n');
+    await writeFile(nodePath.join(repository, 'tracked.json'), '{"v":2}\n');
     try {
       await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
         '2026-09-20T12:00:00.000Z',
@@ -95,17 +95,17 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('returns undefined for an untracked file', async () => {
-    await writeFile(join(repository, 'untracked.json'), '{}\n');
+    await writeFile(nodePath.join(repository, 'untracked.json'), '{}\n');
     try {
       await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('untracked.json')).resolves.toBeUndefined();
     } finally {
-      await rm(join(repository, 'untracked.json'));
+      await rm(nodePath.join(repository, 'untracked.json'));
     }
   });
 
   it('returns undefined when the root is not a repository', async () => {
-    await writeFile(join(plain, 'tracked.json'), '{}\n');
-    expect(dirname(plain)).toBe(base);
+    await writeFile(nodePath.join(plain, 'tracked.json'), '{}\n');
+    expect(nodePath.dirname(plain)).toBe(base);
     await expect(createReadOnlyGitPort(plain).lastCommitAuthorDate('tracked.json')).resolves.toBeUndefined();
   });
 
@@ -131,7 +131,7 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('returns undefined when no git binary is found', async () => {
-    vi.stubEnv('PATH', join(base, 'no-such-bin'));
+    vi.stubEnv('PATH', nodePath.join(base, 'no-such-bin'));
     await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBeUndefined();
   });
 });

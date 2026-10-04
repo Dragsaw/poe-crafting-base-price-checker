@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -1155,7 +1155,7 @@ describe('runChunk: the declared yardstick is never a chunk bound', () => {
     );
     expect(sources.length).toBeGreaterThan(0);
     for (const name of sources) {
-      const text = readFileSync(join(directory, name), 'utf8');
+      const text = readFileSync(nodePath.join(directory, name), 'utf8');
       expect(text, name).not.toMatch(/minChunkSearches/);
       expect(text, name).not.toMatch(/config\.json/);
       expect(text, name).not.toMatch(/currencies\.json/);

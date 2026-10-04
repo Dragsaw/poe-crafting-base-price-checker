@@ -1,4 +1,4 @@
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 
 import { defineConfig } from 'vitest/config';
 
@@ -20,7 +20,7 @@ export default defineConfig({
   // The seven AD-24 artifacts are served, never bundled: `publicDir` is the repo
   // `data/` folder, copied verbatim into `dist/` by the build and fetched at
   // runtime. Source never imports `data/**`.
-  publicDir: resolve(import.meta.dirname, '../../data'),
+  publicDir: nodePath.resolve(import.meta.dirname, '../../data'),
   // Relative asset and fetch URLs, so the static site works under any Pages path.
   base: './',
   // No SPA fallback: a missing artifact must answer 404 (absent), never

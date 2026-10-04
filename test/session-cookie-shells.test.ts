@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
@@ -35,7 +35,7 @@ function sourceFilesUnder(directory: string): string[] {
   const found: string[] = [];
   const entries = readdirSync(directory, { withFileTypes: true });
   for (const entry of entries) {
-    const path = join(directory, entry.name);
+    const path = nodePath.join(directory, entry.name);
     if (entry.isDirectory()) {
       found.push(...sourceFilesUnder(path));
       continue;
@@ -58,7 +58,7 @@ function packageSources(): string[] {
       continue;
     }
     try {
-      sources.push(...sourceFilesUnder(join(PACKAGES_DIR, entry.name, 'src')));
+      sources.push(...sourceFilesUnder(nodePath.join(PACKAGES_DIR, entry.name, 'src')));
     } catch (error) {
       // A package with no `src` yet is not a failure; any other read fault is.
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -72,7 +72,7 @@ function packageSources(): string[] {
 it('only the sync shells and the holder name the session cookie or import the holder', () => {
   const offences: string[] = [];
   for (const path of packageSources()) {
-    const name = relative(PACKAGES_DIR, path).split(sep).join('/');
+    const name = nodePath.relative(PACKAGES_DIR, path).split(nodePath.sep).join('/');
     const lines = readFileSync(path, 'utf8').split(/\r?\n/);
     for (const [index, line] of lines.entries()) {
       const where = `${name}:${String(index + 1)}`;
@@ -89,7 +89,7 @@ it('only the sync shells and the holder name the session cookie or import the ho
 
 it('the two shells do read the variable through the holder', () => {
   for (const shell of ['sync/src/sync.ts', 'sync/src/sync-batch.ts']) {
-    const text = readFileSync(join(PACKAGES_DIR, shell), 'utf8');
+    const text = readFileSync(nodePath.join(PACKAGES_DIR, shell), 'utf8');
     expect(text, shell).toMatch(/createSessionAuth\(env[,)]/);
   }
 });

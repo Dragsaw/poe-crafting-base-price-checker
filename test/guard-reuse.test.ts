@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
@@ -20,7 +20,7 @@ import { BYSTANDER_TEST, ISSUER_TEST, LATE_URL } from './guard-reuse-fixture/nam
  */
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-reuse-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -63,9 +63,9 @@ function fileEndingWith(report: JsonReport, suffix: string): FileResult | undefi
 }
 
 it('blocks a request that fires between files of a reused worker, and names its issuer', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-reuse-'));
+  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-reuse-'));
   try {
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(dir, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 

@@ -1,16 +1,16 @@
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const HOOK_PATH = fileURLToPath(new URL('../.githooks/commit-msg', import.meta.url));
 
 function runHook(subject: string) {
-  const workDir = mkdtempSync(join(tmpdir(), 'commit-msg-hook-'));
+  const workDir = mkdtempSync(nodePath.join(tmpdir(), 'commit-msg-hook-'));
   try {
-    const messagePath = join(workDir, 'MSG');
+    const messagePath = nodePath.join(workDir, 'MSG');
     writeFileSync(messagePath, `${subject}\n`);
     return spawnSync(process.execPath, [HOOK_PATH, messagePath], { encoding: 'utf8' });
   } finally {

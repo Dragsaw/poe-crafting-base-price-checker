@@ -1,7 +1,7 @@
 import { Buffer } from 'node:buffer';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -33,7 +33,7 @@ import {
 const temporaryDirectories: string[] = [];
 
 async function temporaryDirectory(): Promise<string> {
-  const directory = await mkdtemp(join(tmpdir(), 'poe-shell-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'poe-shell-'));
   temporaryDirectories.push(directory);
   return directory;
 }
@@ -46,7 +46,7 @@ it('creates a missing parent directory rather than failing on it', async () => {
   const root = await temporaryDirectory();
   // Two levels that do not exist, mirroring `data/catalogue/` on a fresh
   // checkout, where neither `data` nor `catalogue` is present.
-  const path = join(root, 'data', 'catalogue', 'items.json');
+  const path = nodePath.join(root, 'data', 'catalogue', 'items.json');
 
   await writeTextFile(path, '{}\n');
 
@@ -55,7 +55,7 @@ it('creates a missing parent directory rather than failing on it', async () => {
 
 it('overwrites an existing file rather than appending to it', async () => {
   const root = await temporaryDirectory();
-  const path = join(root, 'stats.json');
+  const path = nodePath.join(root, 'stats.json');
   await writeFile(path, 'a much longer stale artifact\n', { encoding: 'utf8' });
 
   await writeTextFile(path, '{}\n');
@@ -67,7 +67,7 @@ it('overwrites an existing file rather than appending to it', async () => {
 
 it('writes UTF-8 with no BOM and keeps LF as it was given', async () => {
   const root = await temporaryDirectory();
-  const path = join(root, 'static.json');
+  const path = nodePath.join(root, 'static.json');
   const contents = serialiseJsonArtifact({ text: 'Gebänderter Amulett — ✦', nested: { a: 1 } });
 
   await writeTextFile(path, contents);
@@ -112,7 +112,7 @@ describe('createNodeFilesystemPort', () => {
     await expect(filesystem.lastModifiedAt('data/x.json')).resolves.toBeUndefined();
 
     await filesystem.writeTextFile('data/x.json', '{}\n');
-    expect(await readFile(join(root, 'data', 'x.json'), 'utf8')).toBe('{}\n');
+    expect(await readFile(nodePath.join(root, 'data', 'x.json'), 'utf8')).toBe('{}\n');
     await expect(filesystem.readTextFile('data/x.json')).resolves.toBe('{}\n');
     await expect(filesystem.exists('data/x.json')).resolves.toBe(true);
     await expect(filesystem.lastModifiedAt('data/x.json')).resolves.toMatch(/Z$/);
@@ -133,7 +133,7 @@ describe('createNodeFilesystemPort', () => {
 
     expect(outcomes.filter(Boolean)).toHaveLength(1);
     const winner = ['a', 'b', 'c', 'd'][outcomes.indexOf(true)];
-    expect(await readFile(join(root, 'data', 'sync.lock'), 'utf8')).toBe(winner);
+    expect(await readFile(nodePath.join(root, 'data', 'sync.lock'), 'utf8')).toBe(winner);
   });
 
   it('leaves an existing file untouched when an exclusive create loses', async () => {
@@ -142,7 +142,7 @@ describe('createNodeFilesystemPort', () => {
     await filesystem.writeTextFile('data/sync.lock', 'held');
 
     await expect(filesystem.createExclusive('data/sync.lock', 'mine')).resolves.toBe(false);
-    expect(await readFile(join(root, 'data', 'sync.lock'), 'utf8')).toBe('held');
+    expect(await readFile(nodePath.join(root, 'data', 'sync.lock'), 'utf8')).toBe('held');
   });
 });
 

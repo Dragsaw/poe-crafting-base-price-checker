@@ -12,7 +12,7 @@
  */
 
 import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 
 import type { HttpPort, HttpRequest } from '@poe/contracts';
 
@@ -34,7 +34,7 @@ export async function readPricingFixtures(directory: string): Promise<PricingFix
   const read = await Promise.allSettled(
     names.map(async (file) => {
       const name = PRICING_FIXTURE_FILE.exec(file)?.[1];
-      return name === undefined ? undefined : ([name, await readFile(join(directory, file), { encoding: 'utf8' })] as const);
+      return name === undefined ? undefined : ([name, await readFile(nodePath.join(directory, file), { encoding: 'utf8' })] as const);
     }),
   );
   for (const settled of read) {

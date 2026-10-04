@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -940,7 +940,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     expect(script).toBeDefined();
     const entry = (script ?? '').split(/\s+/).at(-1);
-    expect(resolve(REPO_ROOT, entry ?? '')).toBe(SCRIPT);
+    expect(nodePath.resolve(REPO_ROOT, entry ?? '')).toBe(SCRIPT);
     expect(script).toContain('--env-file-if-exists=.env');
   });
 });

@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { appendFileSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, inject } from 'vitest';
@@ -103,7 +103,7 @@ function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undef
     return;
   }
   appendFileSync(
-    join(recordDir, `${String(process.pid)}.log`),
+    nodePath.join(recordDir, `${String(process.pid)}.log`),
     `${described} (${describeIssuer(issuedBy)})\n`,
   );
 }

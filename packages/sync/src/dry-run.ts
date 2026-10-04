@@ -48,7 +48,7 @@
 
 import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
@@ -293,7 +293,7 @@ const FIXTURES_DIR = fileURLToPath(new URL('../../../fixtures/', import.meta.url
 /** A read-only snapshot; an absent file is `undefined`. */
 async function readSnapshot(path: string, dataDir?: string): Promise<string | undefined> {
   try {
-    const location = dataDir === undefined ? resolve(REPO_ROOT, path) : resolve(dataDir, path.slice('data/'.length));
+    const location = dataDir === undefined ? nodePath.resolve(REPO_ROOT, path) : nodePath.resolve(dataDir, path.slice('data/'.length));
     return await readFile(location, { encoding: 'utf8' });
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
@@ -353,7 +353,7 @@ function isInvokedDirectly(): boolean {
     return false;
   }
   try {
-    return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
+    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
     return false;
   }

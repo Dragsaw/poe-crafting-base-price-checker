@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -303,7 +303,7 @@ function runScript(arguments_: readonly string[] = []): Promise<Run> {
 function snapshot(directory: string): Record<string, string> {
   const found: Record<string, string> = {};
   for (const name of readdirSync(directory)) {
-    const path = join(directory, name);
+    const path = nodePath.join(directory, name);
     const stats = statSync(path);
     if (stats.isDirectory()) {
       Object.assign(found, snapshot(path));
@@ -365,12 +365,12 @@ describe('pnpm tracked:check', () => {
   });
 
   it('is reachable at the script name', () => {
-    const manifest = JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8')) as {
+    const manifest = JSON.parse(readFileSync(nodePath.join(REPO_ROOT, 'package.json'), 'utf8')) as {
       scripts: Record<string, string>;
     };
     const script = manifest.scripts['tracked:check'];
 
     expect(script).toBe('node packages/sync/src/curation/check.ts');
-    expect(resolve(REPO_ROOT, (script ?? '').split(/\s+/).at(-1) ?? '')).toBe(SCRIPT);
+    expect(nodePath.resolve(REPO_ROOT, (script ?? '').split(/\s+/).at(-1) ?? '')).toBe(SCRIPT);
   });
 });

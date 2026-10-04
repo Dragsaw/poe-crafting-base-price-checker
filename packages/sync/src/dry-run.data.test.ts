@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { DatasetFileSchema, SyncReportFileSchema } from '@poe/contracts';
@@ -39,7 +39,7 @@ function snapshot(directory: string): Record<string, string> {
     return found;
   }
   for (const name of names) {
-    const path = join(directory, name);
+    const path = nodePath.join(directory, name);
     const stats = statSync(path);
     if (stats.isDirectory()) {
       Object.assign(found, snapshot(path));

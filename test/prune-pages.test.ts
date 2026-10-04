@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative, sep } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -25,11 +25,11 @@ afterEach(() => {
 });
 
 function tree(files: readonly string[]): string {
-  const dir = mkdtempSync(join(tmpdir(), 'prune-pages-'));
+  const dir = mkdtempSync(nodePath.join(tmpdir(), 'prune-pages-'));
   scratch.push(dir);
   for (const file of files) {
-    const full = join(dir, ...file.split('/'));
-    mkdirSync(dirname(full), { recursive: true });
+    const full = nodePath.join(dir, ...file.split('/'));
+    mkdirSync(nodePath.dirname(full), { recursive: true });
     writeFileSync(full, '{}');
   }
   return dir;
@@ -40,11 +40,11 @@ function filesUnder(dir: string): string[] {
   const walk = (current: string): void => {
     const entries = readdirSync(current, { withFileTypes: true });
     for (const entry of entries) {
-      const full = join(current, entry.name);
+      const full = nodePath.join(current, entry.name);
       if (entry.isDirectory()) {
         walk(full);
       } else {
-        out.push(relative(dir, full).split(sep).join('/'));
+        out.push(nodePath.relative(dir, full).split(nodePath.sep).join('/'));
       }
     }
   };
@@ -108,7 +108,7 @@ describe('prunePages', () => {
 
   it('fails when there is no build output', () => {
     const data = tree(SEVEN);
-    expect(() => prunePages(join(data, 'no-such-dist'), data)).toThrow(/no build output/);
+    expect(() => prunePages(nodePath.join(data, 'no-such-dist'), data)).toThrow(/no build output/);
   });
 });
 
@@ -123,16 +123,16 @@ describe('the CLI and the build script', () => {
       ...BUNDLE.map((file) => `packages/web/dist/${file}`),
       ...dataFiles.map((file) => `packages/web/dist/${file}`),
     ]);
-    const script = join(root, 'tools', 'prune-pages.mjs');
-    mkdirSync(dirname(script), { recursive: true });
+    const script = nodePath.join(root, 'tools', 'prune-pages.mjs');
+    mkdirSync(nodePath.dirname(script), { recursive: true });
     copyFileSync(SCRIPT, script);
-    return { root, script, dist: join(root, 'packages', 'web', 'dist') };
+    return { root, script, dist: nodePath.join(root, 'packages', 'web', 'dist') };
   }
 
   it('prunes packages/web/dist when run directly', () => {
     const { script, dist } = repository([...SEVEN, 'sync-progress.json']);
     execFileSync(process.execPath, [script], { stdio: 'pipe' });
-    expect(existsSync(join(dist, 'sync-progress.json'))).toBe(false);
+    expect(existsSync(nodePath.join(dist, 'sync-progress.json'))).toBe(false);
     expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].toSorted(byCodeUnit));
   });
 

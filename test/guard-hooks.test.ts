@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
@@ -26,7 +26,7 @@ import {
  */
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-hooks-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -65,9 +65,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('fails the issuer through the real hooks, and never the innocent test', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-hooks-'));
+  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-hooks-'));
   try {
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(dir, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 

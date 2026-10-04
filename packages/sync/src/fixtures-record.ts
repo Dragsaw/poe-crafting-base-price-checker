@@ -26,7 +26,7 @@
  */
 
 import { readdir, rm } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { canonicalKey } from '@poe/contracts';
@@ -166,7 +166,7 @@ export function stripPersonalIdentifiers(
 
 /** The fixture file one interaction writes. */
 export function fixturePathOf(interaction: Pick<FixtureInteraction, 'name'>): string {
-  return join(FIXTURES_DIR, `${interaction.name}.json`);
+  return nodePath.join(FIXTURES_DIR, `${interaction.name}.json`);
 }
 
 /**
@@ -387,10 +387,10 @@ async function main(): Promise<void> {
   // Pricing fixtures are named by request digest, so a changed tracked list,
   // builder or league leaves the old names behind. Only after a successful
   // record, remove every pricing fixture this run did not write.
-  const written = new Set(outcome.written.map((path) => resolve(path)));
+  const written = new Set(outcome.written.map((path) => nodePath.resolve(path)));
   const names = await readdir(FIXTURES_DIR);
   for (const name of names) {
-    const path = resolve(join(FIXTURES_DIR, name));
+    const path = nodePath.resolve(nodePath.join(FIXTURES_DIR, name));
     if (!PRICING_FIXTURE_FILE.test(name) || written.has(path)) {
       continue;
     }
@@ -406,7 +406,7 @@ async function main(): Promise<void> {
  * importing the module — which the co-located test does — runs nothing.
  */
 const entry = process.argv[1];
-const isInvokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
+const isInvokedDirectly = entry !== undefined && nodePath.resolve(entry) === fileURLToPath(import.meta.url);
 
 if (isInvokedDirectly) {
   try {

@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
@@ -31,7 +31,7 @@ const EXEMPTIONS: Readonly<Record<string, readonly string[]>> = {
 function sources(directory: string): string[] {
   const found: string[] = [];
   for (const name of readdirSync(directory)) {
-    const path = join(directory, name);
+    const path = nodePath.join(directory, name);
     if (statSync(path).isDirectory()) {
       found.push(...sources(path));
     } else if (/\.[cm]?[jt]sx?$/.test(name) && !name.includes('.test.')) {
@@ -43,7 +43,7 @@ function sources(directory: string): string[] {
 
 /** The exemption key for `file`: relative to `ROOT`, `/`-separated on every platform. */
 function exemptionKey(file: string): string {
-  return relative(ROOT, file).split(sep).join('/');
+  return nodePath.relative(ROOT, file).split(nodePath.sep).join('/');
 }
 
 const GIT_SUBCOMMANDS = [
@@ -78,11 +78,11 @@ it('no source under packages/sync/src spawns a process or names a git subcommand
 
 it('the one exemption names an existing file and lifts only the spawn rule', () => {
   expect(Object.entries(EXEMPTIONS)).toEqual([[READ_ONLY_GIT_PORT, ['a process spawn']]]);
-  expect(existsSync(join(ROOT, READ_ONLY_GIT_PORT))).toBe(true);
+  expect(existsSync(nodePath.join(ROOT, READ_ONLY_GIT_PORT))).toBe(true);
 });
 
 it('the exempted file makes only the read-only git log call', () => {
-  const text = readFileSync(join(ROOT, READ_ONLY_GIT_PORT), 'utf8');
+  const text = readFileSync(nodePath.join(ROOT, READ_ONLY_GIT_PORT), 'utf8');
   const childProcessImports = [...text.matchAll(/^import\b[^;]*?from\s+['"]([^'"]+)['"]/gm)]
     .filter(([, from]) => from?.includes('child_process'))
     .map(([statement]) => statement);

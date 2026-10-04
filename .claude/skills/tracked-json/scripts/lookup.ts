@@ -20,7 +20,7 @@
  */
 
 import { readFileSync, realpathSync } from 'node:fs';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
@@ -488,7 +488,7 @@ export function createJsonReader(root: string): ReadJson {
 function readJsonAt(root: string, path: string): unknown {
   let text: string;
   try {
-    text = readFileSync(resolve(root, path), { encoding: 'utf8' });
+    text = readFileSync(nodePath.resolve(root, path), { encoding: 'utf8' });
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       throw new LookupError(`${path}: the file is absent`);
@@ -534,7 +534,7 @@ function isInvokedDirectly(): boolean {
     return false;
   }
   try {
-    return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
+    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
     return false;
   }

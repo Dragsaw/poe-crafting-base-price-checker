@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
@@ -46,7 +46,7 @@ function sourceFilesUnder(directory: string): string[] {
   const found: string[] = [];
   const entries = readdirSync(directory, { withFileTypes: true });
   for (const entry of entries) {
-    const path = join(directory, entry.name);
+    const path = nodePath.join(directory, entry.name);
     if (entry.isDirectory()) {
       found.push(...sourceFilesUnder(path));
       continue;
@@ -70,7 +70,7 @@ function packageSources(): string[] {
       continue;
     }
     try {
-      sources.push(...sourceFilesUnder(join(PACKAGES_DIR, entry.name, 'src')));
+      sources.push(...sourceFilesUnder(nodePath.join(PACKAGES_DIR, entry.name, 'src')));
     } catch {
       // A package with no `src` yet is not a failure.
       continue;

@@ -1,5 +1,5 @@
 import { readdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { ESLint, type Linter } from 'eslint';
@@ -18,15 +18,15 @@ import { createVitest } from 'vitest/node';
  * in-memory copy of its config with one named entry removed, which proves it
  * is not vacuous.
  */
-const REPO_ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const TOOLS_TSCONFIG = join(REPO_ROOT, 'tsconfig.tools.json');
-const SOLUTION_TSCONFIG = join(REPO_ROOT, 'tsconfig.json');
+const REPO_ROOT = nodePath.resolve(fileURLToPath(new URL('..', import.meta.url)));
+const TOOLS_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.tools.json');
+const SOLUTION_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.json');
 
 /** JS too: a `.mjs` helper in a guarded directory is not covered by `<dir>/*.ts`, so it must be reported. */
 const SOURCE = /\.[cm]?[jt]sx?$/;
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 
-const abs = (rel: string): string => join(REPO_ROOT, ...rel.split('/'));
+const abs = (rel: string): string => nodePath.join(REPO_ROOT, ...rel.split('/'));
 
 /**
  * Source files directly in `rel`, read at run time so a new file is guarded
@@ -38,7 +38,7 @@ function directoryFiles(rel: string): string[] {
     .filter((entry) => entry.isFile() && SOURCE.test(entry.name))
     .map((entry) => entry.name)
     .toSorted((a, b) => Number(a > b) - Number(a < b))
-    .map((name) => join(abs(rel), name));
+    .map((name) => nodePath.join(abs(rel), name));
 }
 
 interface Target {
@@ -94,13 +94,13 @@ const testFiles = (target: Target): string[] => target.files.filter((path) => TE
  * list (TS6307) or reject the `.ts` extension (TS5097).
  */
 async function importDefault(file: string): Promise<unknown> {
-  const module = (await import(pathToFileURL(join(REPO_ROOT, file)).href)) as { default: unknown };
+  const module = (await import(pathToFileURL(nodePath.join(REPO_ROOT, file)).href)) as { default: unknown };
   return module.default;
 }
 
 /** Compares paths across tools: TypeScript and Vitest print `/`, `node:path` prints `\` on Windows. */
 const key = (path: string): string => {
-  const normalized = resolve(path).replaceAll('\\', '/');
+  const normalized = nodePath.resolve(path).replaceAll('\\', '/');
   return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
 };
 

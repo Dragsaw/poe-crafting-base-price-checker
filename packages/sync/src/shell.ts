@@ -20,7 +20,7 @@
  */
 
 import { mkdir, open, readFile, rm, stat, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 import type { ClockPort, FilesystemPort, HttpPort } from '@poe/contracts';
@@ -103,7 +103,7 @@ export async function abortableSleep(ms: number, signal: AbortSignal): Promise<v
  * work rather than fail on a missing directory.
  */
 export async function writeTextFile(path: string, contents: string): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
+  await mkdir(nodePath.dirname(path), { recursive: true });
   await writeFile(path, contents, { encoding: 'utf8' });
 }
 
@@ -117,7 +117,7 @@ function hasErrorCode(error: unknown, code: string): boolean {
  * exactly as the fakes do.
  */
 export function createNodeFilesystemPort(root: string): FilesystemPort {
-  const at = (path: string): string => resolve(root, path);
+  const at = (path: string): string => nodePath.resolve(root, path);
 
   return {
     async readTextFile(path) {
@@ -142,7 +142,7 @@ export function createNodeFilesystemPort(root: string): FilesystemPort {
      */
     async createExclusive(path, contents) {
       const target = at(path);
-      await mkdir(dirname(target), { recursive: true });
+      await mkdir(nodePath.dirname(target), { recursive: true });
       let handle;
       try {
         handle = await open(target, 'wx');

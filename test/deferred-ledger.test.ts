@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
@@ -11,7 +11,7 @@ import { parseLedger } from '../tools/deferred-issues/ledger.ts';
  * id, and an old-style sweep marker brings run state back into the ledger;
  * either fails `pnpm test`. Run state lives in the GitHub issues.
  */
-const LEDGER = readFileSync(resolve(import.meta.dirname, '..', 'docs/stories/deferred-work.md'), 'utf8');
+const LEDGER = readFileSync(nodePath.resolve(import.meta.dirname, '..', 'docs/stories/deferred-work.md'), 'utf8');
 
 describe('docs/stories/deferred-work.md', () => {
   const entries = parseLedger(LEDGER);

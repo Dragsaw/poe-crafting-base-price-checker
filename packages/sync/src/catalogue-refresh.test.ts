@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
-import { isAbsolute, relative, resolve, sep } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createFakeClockPort, createFakeHttpPort, SUPPORTED_SCHEMA_VERSION } from '@poe/contracts';
 import type { HttpResponse } from '@poe/contracts';
@@ -330,7 +330,7 @@ it('is reachable at the script name the human is told to run', () => {
 
   expect(script).toBeDefined();
   const entry = (script ?? '').split(/\s+/).at(-1);
-  expect(resolve(REPO_ROOT, entry ?? '')).toBe(SCRIPT);
+  expect(nodePath.resolve(REPO_ROOT, entry ?? '')).toBe(SCRIPT);
   // The recorder's precedent, and what lets `.env` supply the contact overlay.
   expect(script).toContain('--env-file-if-exists=.env');
 });
@@ -503,16 +503,16 @@ it('writes every artifact under the repository root, in data/catalogue', async (
 
   expect(instance.writes).toHaveLength(4);
   for (const { path } of instance.writes) {
-    expect(isAbsolute(path)).toBe(true);
+    expect(nodePath.isAbsolute(path)).toBe(true);
     // Resolved against the repository root the test computes for itself, not
     // against `catalogueFilePathOf` — which is the thing under test. A root
     // one level too shallow would land these in `packages/data/catalogue/`.
-    const within = relative(REPO_ROOT, path);
+    const within = nodePath.relative(REPO_ROOT, path);
     expect(within.startsWith('..')).toBe(false);
-    expect(within.split(sep)).not.toContain('packages');
-    expect(within.split(sep).slice(0, 2)).toEqual(['data', 'catalogue']);
+    expect(within.split(nodePath.sep)).not.toContain('packages');
+    expect(within.split(nodePath.sep).slice(0, 2)).toEqual(['data', 'catalogue']);
   }
-  expect(instance.writes.map(({ path }) => relative(REPO_ROOT, path).split(sep).join('/')).toSorted(byCodeUnit)).toEqual(
+  expect(instance.writes.map(({ path }) => nodePath.relative(REPO_ROOT, path).split(nodePath.sep).join('/')).toSorted(byCodeUnit)).toEqual(
     CATALOGUE_ENDPOINTS.map((endpoint) => endpoint.outputPath).toSorted(byCodeUnit),
   );
 });

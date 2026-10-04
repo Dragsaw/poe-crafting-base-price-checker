@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { realpathSync } from 'node:fs';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
@@ -306,7 +306,7 @@ function killTree(pid: number, processes: readonly ProcessInfo[]): void {
 
 async function main(): Promise<number> {
   const port = parsePort(process.argv.slice(2));
-  const repositoryRoot = resolve(import.meta.dirname, '../..');
+  const repositoryRoot = nodePath.resolve(import.meta.dirname, '../..');
   const before = snapshot(port);
   const plan = planStop(before.listeners, before.processes, repositoryRoot, ownAncestry(before.processes, process.pid));
   if (plan.kind === 'idle') {
@@ -343,7 +343,7 @@ function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
   if (entry === undefined) {return false;}
   try {
-    return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
+    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
     return false;
   }

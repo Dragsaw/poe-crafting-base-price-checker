@@ -33,7 +33,7 @@
  */
 
 import { realpathSync } from 'node:fs';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { parseEnvelope, SyncProgressFileSchema } from '@poe/contracts';
@@ -687,7 +687,7 @@ function isInvokedDirectly(): boolean {
     return false;
   }
   try {
-    return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
+    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
     return false;
   }

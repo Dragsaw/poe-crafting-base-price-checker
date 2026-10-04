@@ -27,7 +27,7 @@
  * the authority; Story 1.10 reads it.
  */
 
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -97,7 +97,7 @@ const SCHEMAS: Readonly<Record<CatalogueArtifact, ArtifactSchemas>> = {
 
 /** Where one artifact is committed. */
 export function catalogueFilePathOf(endpoint: CatalogueEndpoint): string {
-  return join(REPO_ROOT, endpoint.outputPath);
+  return nodePath.join(REPO_ROOT, endpoint.outputPath);
 }
 
 /**
@@ -353,7 +353,7 @@ export function printRefreshOutcome(
  * importing the module — which the co-located test does — runs nothing.
  */
 const entry = process.argv[1];
-const isInvokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
+const isInvokedDirectly = entry !== undefined && nodePath.resolve(entry) === fileURLToPath(import.meta.url);
 
 if (isInvokedDirectly) {
   try {

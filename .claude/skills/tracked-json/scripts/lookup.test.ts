@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { type WeightsFile, WeightsFileSchema } from '@poe/contracts';
@@ -28,7 +28,7 @@ import {
 } from './lookup';
 
 const SCRIPT = fileURLToPath(new URL('lookup.ts', import.meta.url));
-const DATA_DIR = join(REPO_ROOT, 'data');
+const DATA_DIR = nodePath.join(REPO_ROOT, 'data');
 
 const STATS = {
   schemaVersion: '1.0.0',
@@ -237,12 +237,12 @@ describe('lookupClass', () => {
   });
 
   it('refuses an unreadable or non-JSON weights file, naming it', () => {
-    const root = mkdtempSync(join(tmpdir(), 'tracked-lookup-'));
+    const root = mkdtempSync(nodePath.join(tmpdir(), 'tracked-lookup-'));
     try {
-      mkdirSync(join(root, WEIGHTS_PATH), { recursive: true });
+      mkdirSync(nodePath.join(root, WEIGHTS_PATH), { recursive: true });
       expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(`${WEIGHTS_PATH}: not readable`);
-      rmSync(join(root, WEIGHTS_PATH), { recursive: true });
-      writeFileSync(join(root, WEIGHTS_PATH), '{ not json');
+      rmSync(nodePath.join(root, WEIGHTS_PATH), { recursive: true });
+      writeFileSync(nodePath.join(root, WEIGHTS_PATH), '{ not json');
       expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(LookupError);
       expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(`${WEIGHTS_PATH}: not valid JSON`);
     } finally {
@@ -251,7 +251,7 @@ describe('lookupClass', () => {
   });
 
   it('refuses an absent weights file, naming it', () => {
-    const read = createJsonReader(join(REPO_ROOT, 'no-such-directory'));
+    const read = createJsonReader(nodePath.join(REPO_ROOT, 'no-such-directory'));
 
     expect(() => runCommand({ kind: 'class', query: 'amul' }, read)).toThrow(LookupError);
     expect(() => runCommand({ kind: 'class', query: 'amul' }, read)).toThrow(`${WEIGHTS_PATH}: the file is absent`);
@@ -625,7 +625,7 @@ function runScript(arguments_: readonly string[]): Promise<Run> {
 function snapshot(directory: string): Record<string, string> {
   const found: Record<string, string> = {};
   for (const name of readdirSync(directory)) {
-    const path = join(directory, name);
+    const path = nodePath.join(directory, name);
     const stats = statSync(path);
     if (stats.isDirectory()) {
       Object.assign(found, snapshot(path));
@@ -681,12 +681,12 @@ describe('pnpm tracked:lookup', () => {
   });
 
   it('is reachable at the script name', () => {
-    const manifest = JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8')) as {
+    const manifest = JSON.parse(readFileSync(nodePath.join(REPO_ROOT, 'package.json'), 'utf8')) as {
       scripts: Record<string, string>;
     };
     const script = manifest.scripts['tracked:lookup'];
 
     expect(script).toBe('node .claude/skills/tracked-json/scripts/lookup.ts');
-    expect(resolve(REPO_ROOT, (script ?? '').split(/\s+/).at(-1) ?? '')).toBe(SCRIPT);
+    expect(nodePath.resolve(REPO_ROOT, (script ?? '').split(/\s+/).at(-1) ?? '')).toBe(SCRIPT);
   });
 });

@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
@@ -21,7 +21,7 @@ import { DELAY_ENV, ISSUER_TEST, LATE_URL } from './guard-after-last-file-fixtur
  */
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-after-last-file-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -83,11 +83,11 @@ interface ChildRun {
 }
 
 async function runWithDelay(delayMs: number): Promise<ChildRun> {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-after-last-file-'));
+  const dir = await mkdtemp(nodePath.join(tmpdir(), 'guard-after-last-file-'));
   try {
-    const childTemporary = join(dir, 'tmp');
+    const childTemporary = nodePath.join(dir, 'tmp');
     await mkdir(childTemporary);
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(dir, 'report.json');
     const { code, output } = await runChild(outputFile, delayMs, childTemporary);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
     const temporaryEntries = await readdir(childTemporary);

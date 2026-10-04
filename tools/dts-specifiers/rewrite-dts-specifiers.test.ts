@@ -11,7 +11,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import ts from 'typescript';
@@ -36,7 +36,7 @@ const RELATIVE_TS_SPECIFIER = /(['"])\.{1,2}\/[^'"]*\.(ts|tsx|mts|cts)\1/;
 const scratch: string[] = [];
 
 function makeScratch(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'dts-specifiers-'));
+  const dir = mkdtempSync(nodePath.join(tmpdir(), 'dts-specifiers-'));
   scratch.push(dir);
   return dir;
 }
@@ -54,18 +54,18 @@ function messagesOf(diagnostics: readonly ts.Diagnostic[]): string[] {
  * `allowImportingTsExtensions` project under `dir`, and returns its `outDir`.
  */
 function emitScratchProject(dir: string): string {
-  const source = join(dir, 'src');
-  const outDir = join(dir, 'dist');
-  mkdirSync(join(source, 'nested'), { recursive: true });
+  const source = nodePath.join(dir, 'src');
+  const outDir = nodePath.join(dir, 'dist');
+  mkdirSync(nodePath.join(source, 'nested'), { recursive: true });
   // ESM scope, so the NodeNext consumer reads `dist` as ES modules.
-  writeFileSync(join(dir, 'package.json'), '{ "type": "module" }\n');
-  writeFileSync(join(source, 'a.ts'), 'export const a = 1;\n');
+  writeFileSync(nodePath.join(dir, 'package.json'), '{ "type": "module" }\n');
+  writeFileSync(nodePath.join(source, 'a.ts'), 'export const a = 1;\n');
   writeFileSync(
-    join(source, 'nested', 'b.ts'),
+    nodePath.join(source, 'nested', 'b.ts'),
     "import type { A } from '../index.ts';\nexport const b = (x: A): A => x;\n",
   );
   writeFileSync(
-    join(source, 'index.ts'),
+    nodePath.join(source, 'index.ts'),
     [
       "export { a } from './a.ts';",
       "export { b } from './nested/b.ts';",
@@ -75,7 +75,7 @@ function emitScratchProject(dir: string): string {
   );
 
   const program = ts.createProgram({
-    rootNames: ['a.ts', 'index.ts', join('nested', 'b.ts')].map((name) => join(source, name)),
+    rootNames: ['a.ts', 'index.ts', nodePath.join('nested', 'b.ts')].map((name) => nodePath.join(source, name)),
     options: {
       target: ts.ScriptTarget.ES2023,
       module: ts.ModuleKind.ESNext,
@@ -148,7 +148,7 @@ describe('rewriteDtsSpecifiers', () => {
 describe('rewriteDtsSpecifiersIn', () => {
   it('does not rewrite a file whose content is already rewritten', () => {
     const dir = makeScratch();
-    const file = join(dir, 'index.d.ts');
+    const file = nodePath.join(dir, 'index.d.ts');
     writeFileSync(file, "export { a } from './a.js';\n");
     const before = statSync(file).mtimeMs;
 
@@ -158,7 +158,7 @@ describe('rewriteDtsSpecifiersIn', () => {
 
   it('walks .d.mts output', () => {
     const dir = makeScratch();
-    const file = join(dir, 'index.d.mts');
+    const file = nodePath.join(dir, 'index.d.mts');
     writeFileSync(file, "export { a } from './a.mts';\n");
 
     expect(rewriteDtsSpecifiersIn(dir)).toEqual([file]);
@@ -169,18 +169,18 @@ describe('rewriteDtsSpecifiersIn', () => {
     'rewrites the tsc declaration output of an emitDeclarationOnly project',
     () => {
       const outDir = emitScratchProject(makeScratch());
-      const emitted = ['index.d.ts', 'a.d.ts', join('nested', 'b.d.ts')].map((name) =>
-        join(outDir, name),
+      const emitted = ['index.d.ts', 'a.d.ts', nodePath.join('nested', 'b.d.ts')].map((name) =>
+        nodePath.join(outDir, name),
       );
       // The premise: tsc keeps the `.ts` specifiers in declaration output.
-      expect(readFileSync(join(outDir, 'index.d.ts'), 'utf8')).toMatch(RELATIVE_TS_SPECIFIER);
+      expect(readFileSync(nodePath.join(outDir, 'index.d.ts'), 'utf8')).toMatch(RELATIVE_TS_SPECIFIER);
 
       rewriteDtsSpecifiersIn(outDir);
 
       for (const file of emitted) {
         expect(readFileSync(file, 'utf8')).not.toMatch(RELATIVE_TS_SPECIFIER);
       }
-      expect(readFileSync(join(outDir, 'index.d.ts'), 'utf8')).toContain("from './a.js'");
+      expect(readFileSync(nodePath.join(outDir, 'index.d.ts'), 'utf8')).toContain("from './a.js'");
     },
     COMPILE_TIMEOUT,
   );
@@ -193,7 +193,7 @@ describe('rewriteDtsSpecifiersIn', () => {
     (_name, module, moduleResolution) => {
       const dir = makeScratch();
       rewriteDtsSpecifiersIn(emitScratchProject(dir));
-      const consumer = join(dir, 'consumer.ts');
+      const consumer = nodePath.join(dir, 'consumer.ts');
       writeFileSync(
         consumer,
         "import { a, b, type A } from './dist/index.js';\nexport const x: A = b(a);\n",
@@ -219,7 +219,7 @@ describe('rewriteDtsSpecifiersIn', () => {
   );
 
   it('throws and names the directory when it is missing', () => {
-    const missing = join(makeScratch(), 'dist');
+    const missing = nodePath.join(makeScratch(), 'dist');
     expect(() => rewriteDtsSpecifiersIn(missing)).toThrow(missing);
   });
 });
@@ -229,7 +229,7 @@ describe('rewriteDtsSpecifiersIn', () => {
  * comments and `extends` are honoured, and returns its compiler options.
  */
 function resolveCompilerOptions(dir: string): ts.CompilerOptions {
-  const configPath = join(dir, 'tsconfig.json');
+  const configPath = nodePath.join(dir, 'tsconfig.json');
   const read = ts.readConfigFile(configPath, ts.sys.readFile);
   if (read.error !== undefined) {throw new Error(messagesOf([read.error]).join('\n'));}
   const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, dir, undefined, configPath);
@@ -242,8 +242,8 @@ describe('TARGET_PACKAGES', () => {
     const emitDeclarationOnly = readdirSync(PACKAGES_DIR, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
-      .filter((package_) => existsSync(join(PACKAGES_DIR, package_, 'tsconfig.json')))
-      .filter((package_) => resolveCompilerOptions(join(PACKAGES_DIR, package_)).emitDeclarationOnly === true)
+      .filter((package_) => existsSync(nodePath.join(PACKAGES_DIR, package_, 'tsconfig.json')))
+      .filter((package_) => resolveCompilerOptions(nodePath.join(PACKAGES_DIR, package_)).emitDeclarationOnly === true)
       .toSorted((a, b) => Number(a > b) - Number(a < b));
 
     expect([...TARGET_PACKAGES].toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(emitDeclarationOnly);
@@ -257,19 +257,19 @@ describe('TARGET_PACKAGES', () => {
  */
 function copyToolIntoScratch(): { root: string; script: string } {
   const root = makeScratch();
-  writeFileSync(join(root, 'package.json'), '{ "type": "module" }\n');
-  const toolDir = join(root, 'tools', 'dts-specifiers');
+  writeFileSync(nodePath.join(root, 'package.json'), '{ "type": "module" }\n');
+  const toolDir = nodePath.join(root, 'tools', 'dts-specifiers');
   mkdirSync(toolDir, { recursive: true });
-  const script = join(toolDir, 'rewrite-dts-specifiers.ts');
+  const script = nodePath.join(toolDir, 'rewrite-dts-specifiers.ts');
   copyFileSync(TOOL, script);
   return { root, script };
 }
 
 /** Creates `<root>/packages/<pkg>/dist/index.d.ts` holding a `./a.ts` re-export. */
 function seedDistribution(root: string, package_: string): string {
-  const distribution = join(root, 'packages', package_, 'dist');
+  const distribution = nodePath.join(root, 'packages', package_, 'dist');
   mkdirSync(distribution, { recursive: true });
-  const file = join(distribution, 'index.d.ts');
+  const file = nodePath.join(distribution, 'index.d.ts');
   writeFileSync(file, "export { a } from './a.ts';\n");
   return file;
 }
@@ -300,7 +300,7 @@ describe('the post-emit step', () => {
     const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
 
     expect(run.status).not.toBe(0);
-    expect(run.stderr).toContain(join(root, 'packages', 'contracts', 'dist'));
+    expect(run.stderr).toContain(nodePath.join(root, 'packages', 'contracts', 'dist'));
   });
 
   it('exits non-zero and names the directory when the core dist is missing', () => {
@@ -311,6 +311,6 @@ describe('the post-emit step', () => {
     const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
 
     expect(run.status).not.toBe(0);
-    expect(run.stderr).toContain(join(root, 'packages', 'core', 'dist'));
+    expect(run.stderr).toContain(nodePath.join(root, 'packages', 'core', 'dist'));
   });
 });

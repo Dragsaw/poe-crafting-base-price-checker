@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 
 import { expect, it } from 'vitest';
 
@@ -23,7 +23,7 @@ it('binds one explicit port and fails rather than moving', () => {
  * every URL relative so the built site works under any Pages path.
  */
 it('serves the repo data/ folder as static files under a relative base', () => {
-  expect(config.publicDir).toBe(resolve(import.meta.dirname, '../../data'));
+  expect(config.publicDir).toBe(nodePath.resolve(import.meta.dirname, '../../data'));
   expect(config.base).toBe('./');
   // A missing artifact must be a 404, never the SPA fallback's index.html.
   expect(config.appType).toBe('mpa');
@@ -34,7 +34,7 @@ it('never imports data/** from source', () => {
   const walk = (dir: string): void => {
     const entries = readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
-      const full = join(dir, entry.name);
+      const full = nodePath.join(dir, entry.name);
       if (entry.isDirectory()) {
         walk(full);
       } else if (/\.(ts|tsx)$/.test(entry.name)) {
@@ -45,6 +45,6 @@ it('never imports data/** from source', () => {
       }
     }
   };
-  walk(resolve(import.meta.dirname, 'src'));
+  walk(nodePath.resolve(import.meta.dirname, 'src'));
   expect(offenders).toEqual([]);
 });

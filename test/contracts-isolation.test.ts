@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
@@ -38,7 +38,7 @@ function readManifests(): { directory: string; manifest: Manifest }[] {
     .map((entry) => ({
       directory: entry.name,
       manifest: JSON.parse(
-        readFileSync(join(PACKAGES_DIR, entry.name, 'package.json'), 'utf8'),
+        readFileSync(nodePath.join(PACKAGES_DIR, entry.name, 'package.json'), 'utf8'),
       ) as Manifest,
     }));
 }
