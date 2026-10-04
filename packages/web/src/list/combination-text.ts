@@ -1,4 +1,11 @@
-import { flattenStatCatalogue, type CraftedTrackedEntry, type ModifierRef, type StatCatalogue } from '@poe/contracts';
+import {
+  compareByCodeUnit,
+  flattenStatCatalogue,
+  type CraftedTrackedEntry,
+  type HybridModifierRef,
+  type ModifierRef,
+  type StatCatalogue,
+} from '@poe/contracts';
 
 import { shortForm } from './short-forms';
 
@@ -54,12 +61,12 @@ export function bandedFallback(text: string, valueMin: number, valueMax: number)
  * prints `<acceptedTier> <form>`, the tier verbatim. A valueless reference
  * prints its form alone, with no tier. Anything else — no form (a product
  * gap) or a banded reference with no tier (a curation gap) — is the verbatim
- * fallback: the catalogue text, with the band on a banded reference.
+ * fallback: the catalogue text, with the band on a banded reference. A
+ * hybrid reference is one affix (`hybridText`).
  */
 export function affixText(ref: ModifierRef, stats: StatTexts): AffixPart {
   if (ref.kind === 'hybrid') {
-    // Interim: the committed data holds no hybrid. Story 8 renders its label.
-    throw new Error('hybrid references are not supported yet (SPEC-tracked-hybrid-mods story 8)');
+    return hybridText(ref, stats);
   }
   const form = shortForm(ref.statId);
   const catalogued = stats.get(ref.statId) ?? ref.statId;
@@ -70,6 +77,38 @@ export function affixText(ref: ModifierRef, stats: StatTexts): AffixPart {
     return { text: `${ref.acceptedTier} ${form}`, verbatim: false };
   }
   return { text: bandedFallback(catalogued, ref.valueMin, ref.valueMax), verbatim: true };
+}
+
+/** The comma that joins the lines of one hybrid affix: `T1 % Phys, Accuracy`. */
+const LINE_JOIN = ', ';
+
+/**
+ * One hybrid affix (EXPERIENCE.md, *A Hybrid Modifier affix is the tier
+ * label, then its lines*; CAP-7). The entry's Accepted Tier, then each line's
+ * short form, comma-joined. Short forms are all or none: a missing tier, any
+ * line with no form, or any valueless line prints every line as the verbatim
+ * fallback, its catalogue text with its band where it has one. The lines
+ * sort by their printed text in code-unit order (the short form in the
+ * curated label, the fallback string in the fallback), not by `statId`, so
+ * `% ES` precedes `% Evasion` and the label never reads `weights.json`.
+ */
+function hybridText(ref: HybridModifierRef, stats: StatTexts): AffixPart {
+  const forms: string[] = [];
+  for (const line of ref.lines) {
+    const form = 'valueMin' in line ? shortForm(line.statId) : undefined;
+    if (form === undefined) {
+      break;
+    }
+    forms.push(form);
+  }
+  if (ref.acceptedTier !== undefined && forms.length === ref.lines.length) {
+    return { text: `${ref.acceptedTier} ${forms.sort(compareByCodeUnit).join(LINE_JOIN)}`, verbatim: false };
+  }
+  const lines = ref.lines.map((line) => {
+    const catalogued = stats.get(line.statId) ?? line.statId;
+    return 'valueMin' in line ? bandedFallback(catalogued, line.valueMin, line.valueMax) : catalogued;
+  });
+  return { text: lines.sort(compareByCodeUnit).join(LINE_JOIN), verbatim: true };
 }
 
 /** A crafted entry's Combination: the prefix, then the suffix. */
