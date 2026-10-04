@@ -1,36 +1,5 @@
-/**
- * `pnpm tracked:check` — the check half of the tracked-json skill's loop
- * (lookup → edit → check).
- *
- * Read-only. It reads `data/tracked.json`, `data/config.json`, the
- * committed catalogue and `data/weights.json`, runs the production
- * validators over them, and prints `{ok, checks, issues, unvalidated}` as JSON to stdout. It writes no file and
- * issues no request. Exit 0 when every check passes, 1 otherwise.
- *
- * Four checks, each the production code a sync run uses:
- *
- * - `schema`: `TrackedFileSchema` through `parseEnvelope` at
- *   `TRACKED_SCHEMA_VERSION`, which includes the canonical-key uniqueness
- *   rule. One issue per schema issue. An earlier major prints the
- *   IMPLEMENTATION-NOTES §4.1 re-author message.
- * - `pinned-cap`: `checkPinnedCap` against `config.minChunkSearches`
- *   (IMPLEMENTATION-NOTES.md §6).
- * - `catalogue`: AD-9 resolvability through `checkCatalogue` with an empty
- *   dataset. One issue per `records` entry.
- * - `cross-file`: `core`'s six cross-file checks (AD-17) against
- *   `data/weights.json`, the same call the sync run-start gate makes. One
- *   issue per failure. `skipped` when the weights file is absent, since no
- *   check runs without it (AD-24).
- *
- * `unvalidated` lists each crafted entry that no pool check covered, with its
- * reason — `weights-absent` or `partial-pool` (IMPLEMENTATION-NOTES §2.8). The
- * same `crossFileChecks` call gives it, also when the weights file is absent.
- * A mark is never an issue: it neither fails a check nor moves `ok` or the
- * exit code.
- *
- * A pass still does not confirm that a floor is the one IMPLEMENTATION-NOTES.md
- * §8 derives: a floor declared too high passes every mechanical check (AD-5).
- */
+// `pnpm tracked:check`: read-only, exit 1 on any issue. A pass does not confirm a floor is the one
+// IMPLEMENTATION-NOTES.md §8 derives: a floor declared too high passes every mechanical check (AD-5).
 
 import { realpathSync } from 'node:fs';
 import nodePath from 'node:path';
@@ -278,11 +247,7 @@ export async function loadTrackedCheckInputs(fs: FilesystemPort): Promise<Tracke
 /** `packages/sync/src/curation/` → the repository root. */
 const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 
-/**
- * The command over `fs`: prints the report to `out` and returns the exit code,
- * 0 on a pass and 1 on a failure. A usage error goes to `err` with the usage
- * line, and returns 1.
- */
+/** Prints the report to `out` and returns the exit code; a usage error goes to `err` and returns 1. */
 export async function main(
   argv: readonly string[],
   fs: FilesystemPort,
@@ -301,11 +266,7 @@ export async function main(
   return report.ok ? 0 : 1;
 }
 
-/**
- * Importing the module, as the co-located test does, runs nothing. Node
- * realpaths the main module's URL but not `argv[1]`, so both sides are
- * realpathed.
- */
+// Node realpaths the main module's URL but not `argv[1]`, so both sides are realpathed.
 function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
   if (entry === undefined) {

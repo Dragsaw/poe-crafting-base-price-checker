@@ -388,11 +388,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/curation/check.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
   "packages/sync/src/dry-run.data.test.ts": {
     "local/max-comment-run": {
       "count": 1
