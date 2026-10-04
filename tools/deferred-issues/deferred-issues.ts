@@ -70,7 +70,7 @@ export const run: Runner = (cmd, args, stdin) => {
 };
 
 function firstLine(text: string): string {
-  return text.trim().split(/\r?\n/)[0] ?? '';
+  return text.trim().split(/\r?\n/, 1)[0] ?? '';
 }
 
 type Read<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: string };

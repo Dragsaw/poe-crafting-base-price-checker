@@ -38,7 +38,7 @@ export function entryId(sourceSpec: string, summary: string): string {
 
 /** The summary with each `"` removed, cut at a word boundary to at most 70 characters. */
 export function issueTitle(summary: string): string {
-  const text = summary.replaceAll('"', '').replace(/\s+/g, ' ').trim();
+  const text = summary.replaceAll('"', '').replaceAll(/\s+/g, ' ').trim();
   if (text.length <= TITLE_MAX) {
     return text;
   }

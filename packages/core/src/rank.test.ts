@@ -330,12 +330,12 @@ describe('rank: the threshold domain', () => {
 
   it('a NaN threshold throws a RangeError that names the threshold and the value', () => {
     const A = raw('A');
-    const call = (): Ranking => ranked({ tracked: [A], dataset: [published(A, priced(0.5))], threshold: Number.NaN });
+    const call = (): Ranking => ranked({ tracked: [A], dataset: [published(A, priced(0.5))], threshold: NaN });
     expect(call).toThrow(RangeError);
     expect(call).toThrow(/threshold.*NaN/);
   });
 
-  it.each([-0.01, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+  it.each([-0.01, Infinity, Number.NEGATIVE_INFINITY])(
     'threshold %s throws a RangeError and returns no Ranking',
     (threshold) => {
       const A = raw('A');

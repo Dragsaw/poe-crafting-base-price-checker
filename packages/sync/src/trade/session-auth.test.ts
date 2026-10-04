@@ -31,7 +31,7 @@ describe('the cookie-value grammar (RFC 6265)', () => {
 });
 
 describe('createSessionAuth: the shell-edge settle', () => {
-  it.each([[undefined], [''], ['   '], ['\t\n']])('%j is absent', (value) => {
+  it.each([[undefined], [''], [' '.repeat(3)], ['\t\n']])('%j is absent', (value) => {
     const { holder, lines } = withLines(value);
     expect(holder.state).toEqual({ kind: 'unauthenticated', reason: 'absent' });
     expect(lines).toEqual(['unauthenticated (absent)']);

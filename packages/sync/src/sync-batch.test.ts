@@ -533,7 +533,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it('a blank value trims to absent', async () => {
-      const { deps, auth } = depsFor(LEAGUE, { env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: '   ' } });
+      const { deps, auth } = depsFor(LEAGUE, { env: { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: ' '.repeat(3) } });
 
       expect(await syncCommand(deps)).toBe(0);
 

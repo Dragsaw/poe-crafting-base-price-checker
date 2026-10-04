@@ -982,8 +982,8 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         // with the dataset write (AD-12).
         try {
           await writeReport([...records, ...failureRecords(error, current)]);
-        } catch (fault) {
-          secondary('writing the report', fault);
+        } catch (error_) {
+          secondary('writing the report', error_);
         }
         throw error;
       }
@@ -1013,14 +1013,14 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
                 ? undefined
                 : notBeforeAfter429(clock.now(), latchedMs)),
           );
-        } catch (fault) {
-          secondary('publishing the dataset and progress', fault);
+        } catch (error_) {
+          secondary('publishing the dataset and progress', error_);
         }
       }
       try {
         await writeReport(newRecords(failureRecords(error, current)));
-      } catch (fault) {
-        secondary('writing the report', fault);
+      } catch (error_) {
+        secondary('writing the report', error_);
       }
       throw error;
     }

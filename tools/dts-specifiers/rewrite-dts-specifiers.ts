@@ -40,7 +40,7 @@ const SPECIFIER =
 
 /** Rewrites each relative `.ts`/`.tsx`/`.mts`/`.cts` specifier in declaration text. */
 export function rewriteDtsSpecifiers(text: string): string {
-  return text.replace(
+  return text.replaceAll(
     SPECIFIER,
     (match, lead: string, quote: string, stem: string, extension: string) => {
       // `./types.d.ts` names a declaration file and is left as written.

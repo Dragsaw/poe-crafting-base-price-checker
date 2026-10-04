@@ -82,7 +82,7 @@ describe('writeArtifact', () => {
     const refusal = writeArtifact(fs, PATH, DatasetFileSchema, invalid);
 
     await expect(refusal).rejects.toBeInstanceOf(InvalidArtifactError);
-    const error = (await refusal.catch((caught: unknown) => caught)) as InvalidArtifactError;
+    const error = (await refusal.catch((error_: unknown) => error_)) as InvalidArtifactError;
     expect(error.path).toBe(PATH);
     expect(error.issues.map((issue) => issue.path)).toContainEqual(['generatedAt']);
     expect(error.message).toContain(PATH);

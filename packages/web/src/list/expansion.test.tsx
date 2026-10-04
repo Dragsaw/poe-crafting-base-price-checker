@@ -104,7 +104,7 @@ describe('the expansion panel', () => {
     const belt = rawEntry('Wide Belt');
     const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH));
     const widths = (line: string): number[] =>
-      Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => parseFloat(c.style.width));
+      Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => Number.parseFloat(c.style.width));
     expect(widths('1')).toEqual([...columnSums.combinationLine1]);
     expect(widths('2')).toEqual([...columnSums.combinationLine2]);
     expect(row.style.minHeight).toBe(`${String(spacing.combinationRowHeight)}px`);
@@ -322,7 +322,7 @@ describe('the open set', () => {
 describe('the trade link', () => {
   it('does not toggle the row on a click, and no request fires on expand or on the click', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const openSpy = vi.spyOn(globalThis, 'open').mockImplementation(() => null);
     const belt = rawEntry('Wide Belt');
     const view = mountList([belt], [priced(belt, 0.8, hoursBefore(NOW, 1), TEST_LEAGUE, SEARCH)]);
     click(rowsIn(view)[0]);

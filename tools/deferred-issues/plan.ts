@@ -41,7 +41,7 @@ export const LEDGER_PATH = 'docs/stories/deferred-work.md';
 
 /** The id that the first line of an issue body names, or `undefined`. */
 export function readMarker(body: string | null | undefined): string | undefined {
-  const first = (body ?? '').split(/\r?\n/)[0]?.trim() ?? '';
+  const first = (body ?? '').split(/\r?\n/, 1)[0]?.trim() ?? '';
   return MARKER.exec(first)?.[1];
 }
 
@@ -131,7 +131,7 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
     const group = groups.get(entry.id);
     if (group === undefined) {
       creates.push({ id: entry.id, title: entry.title, body: issueBody(entry) });
-    } else if (!group.some((issue) => issue.state === 'OPEN')) {
+    } else if (group.every((issue) => !(issue.state === 'OPEN'))) {
       const numbers = group.map((issue) => `#${issue.number}`).join(', ');
       reports.push(`Closed, still listed: ${entry.id} is in the ledger, and its issue ${numbers} is closed`);
     }

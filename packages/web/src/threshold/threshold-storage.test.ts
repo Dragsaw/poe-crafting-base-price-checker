@@ -49,7 +49,7 @@ describe('the persisted threshold', () => {
   });
 
   // Matrix: bad stored value.
-  it.each(['abc', '7', '-1', '', '   ', 'NaN', 'Infinity', '3.01', '0x1'])('falls back to the default for %j', (raw) => {
+  it.each(['abc', '7', '-1', '', ' '.repeat(3), 'NaN', 'Infinity', '3.01', '0x1'])('falls back to the default for %j', (raw) => {
     expect(readStoredThreshold(storageHolding(raw))).toBe(DEFAULT_THRESHOLD);
   });
 

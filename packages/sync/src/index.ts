@@ -1,4 +1,4 @@
-import { INITIAL_SCHEMA_VERSION } from '@poe/contracts';
+
 import { CORE_PLACEHOLDER } from '@poe/core';
 
 /**
@@ -8,7 +8,7 @@ import { CORE_PLACEHOLDER } from '@poe/core';
  */
 export const SYNC_PLACEHOLDER = `${CORE_PLACEHOLDER}:sync`;
 
-export const SYNC_CONTRACTS_SCHEMA_VERSION = INITIAL_SCHEMA_VERSION;
+
 
 /**
  * The one governed trade request path (FR-20, AD-8). `createTradeClient`, and
@@ -157,7 +157,7 @@ export { checkCatalogue, markUnresolvable } from './chunk/catalogue-check';
 export type { CatalogueCheck } from './chunk/catalogue-check';
 export { checkWeightsIds, readWeightsIds, WEIGHTS_PATH, weightsAbsentRecord } from './catalogue/weights-ids';
 /** The weights contract this build reads, defined once in `contracts`. */
-export { WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
+export { WEIGHTS_SCHEMA_VERSION, INITIAL_SCHEMA_VERSION as SYNC_CONTRACTS_SCHEMA_VERSION } from '@poe/contracts';
 export type { WeightsIds } from './catalogue/weights-ids';
 
 /**

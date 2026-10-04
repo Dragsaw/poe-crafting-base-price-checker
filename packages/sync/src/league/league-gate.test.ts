@@ -66,7 +66,7 @@ const YIELD: GateResult = { kind: 'yield' };
 async function mismatchOf(promise: Promise<GateResult>): Promise<LeagueMismatchError> {
   const error: unknown = await promise.then(
     () => {},
-    (thrown: unknown) => thrown,
+    (error_: unknown) => error_,
   );
   expect(error).toBeInstanceOf(LeagueMismatchError);
   return error as LeagueMismatchError;
@@ -112,7 +112,7 @@ describe('createLeagueGate', () => {
     for (const status of [404, 403, 302]) {
       const { gate } = gateAnswering({ status, headers: {}, body: '' }, 'Standard');
 
-      const error: unknown = await gate({ entries: [] }).catch((thrown: unknown) => thrown);
+      const error: unknown = await gate({ entries: [] }).catch((error_: unknown) => error_);
 
       expect(error).toBeInstanceOf(LeagueRequestRejectedError);
       expect((error as LeagueRequestRejectedError).status).toBe(status);

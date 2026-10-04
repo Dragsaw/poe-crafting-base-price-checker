@@ -207,7 +207,7 @@ export interface PricingWorkload {
 type Capture = (
   name: string,
   request: TradeRequest,
-) => Promise<{ readonly payload: unknown } | string>;
+) => Promise<string | { readonly payload: unknown }>;
 
 /** The search id and result ids of a captured search payload, if it has them. */
 function searchAnswerOf(payload: unknown): { id: string; result: string[] } | undefined {
@@ -282,7 +282,7 @@ export async function recordFixtures(
   async function capture(
     name: string,
     request: TradeRequest,
-  ): Promise<{ readonly payload: unknown } | string> {
+  ): Promise<string | { readonly payload: unknown }> {
     const result = await client.send(request);
 
     if (result.kind === 'yield') {

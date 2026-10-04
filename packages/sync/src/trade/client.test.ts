@@ -143,7 +143,7 @@ it('refuses at construction when the contact User-Agent is blank', () => {
     });
 
   expect(() => build('')).toThrow(USER_AGENT_ENV_VAR);
-  expect(() => build('   ')).toThrow(USER_AGENT_ENV_VAR);
+  expect(() => build(' '.repeat(3))).toThrow(USER_AGENT_ENV_VAR);
   expect(http.requests).toEqual([]);
 });
 

@@ -55,7 +55,7 @@ export function parsePort(argv: readonly string[]): number {
 
 /** Lowercase, forward slashes, collapsed repeats: Windows paths compare case-insensitively. */
 function normalize(text: string): string {
-  return text.replaceAll('\\', '/').replace(/\/+/g, '/').toLowerCase();
+  return text.replaceAll('\\', '/').replaceAll(/\/+/g, '/').toLowerCase();
 }
 
 /** The arguments of a command line. Double quotes group, and backslashes are literal (Windows paths). */

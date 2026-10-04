@@ -67,7 +67,7 @@ describe('the panel at rest', () => {
     expect(input().value).toBe('0.25');
     expect(part('data-threshold-marker').style.left).toBe(`${String((0.25 / 3) * 100)}%`);
     expect(part('data-threshold-fill').style.width).toBe(`${String((0.25 / 3) * 100)}%`);
-    expect(parseFloat(part('data-threshold-marker').style.left)).toBeCloseTo(8.33, 2);
+    expect(Number.parseFloat(part('data-threshold-marker').style.left)).toBeCloseTo(8.33, 2);
   });
 
   it('prints 3.00, not 3', () => {

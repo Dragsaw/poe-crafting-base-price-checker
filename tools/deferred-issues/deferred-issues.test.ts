@@ -108,7 +108,7 @@ describe('pnpm deferred:issues', () => {
     const creates = calls.filter((call) => call.args[0] === 'issue' && call.args[1] === 'create');
     expect(creates).toHaveLength(ENTRIES.length);
     expect(creates[0]?.args).toEqual(['issue', 'create', '--title', ENTRIES[0]?.title, '--label', 'deferred', '--body-file', '-']);
-    expect(creates[0]?.stdin?.split('\n')[0]).toBe(`Deferred entry: ${ENTRIES[0]?.id}`);
+    expect(creates[0]?.stdin?.split('\n', 1)[0]).toBe(`Deferred entry: ${ENTRIES[0]?.id}`);
     expect(out).toContain(`${ENTRIES.length} created, 0 closed as duplicate, 0 reported`);
   });
 
@@ -189,7 +189,7 @@ describe('pnpm deferred:issues', () => {
   });
 
   it('Duplicate ledger id: reports it, creates no issue for that id, and exits 2', () => {
-    const block = FIXTURE_LEDGER.split('\n## ')[1] ?? '';
+    const block = FIXTURE_LEDGER.split('\n## ', 2)[1] ?? '';
     const ledger = `${FIXTURE_LEDGER}\n## ${block}`;
     const others = ALL_OPEN.filter((each) => each.number !== 1);
     const { code, calls, out } = exec([], { ledger, lists: [others] });

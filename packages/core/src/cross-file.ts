@@ -147,7 +147,7 @@ export function edgeAlignment(
     if (!('valueMin' in rl)) {
       continue;
     }
-    let min = Number.POSITIVE_INFINITY;
+    let min = Infinity;
     let max = Number.NEGATIVE_INFINITY;
     for (const entry of contained) {
       for (const line of entry.lines) {
@@ -186,7 +186,7 @@ function hybridExclusions(ref: ModifierRef, scoped: readonly ModifierWeight[]): 
       }
       continue;
     }
-    if (!lines.every((rl) => entry.lines.some((line) => covers(rl, line)))) {
+    if (lines.some((rl) => entry.lines.every((line) => !covers(rl, line)))) {
       continue;
     }
     // Covering every line means carrying every named statId, so only the tier's extra lines differ.
@@ -302,7 +302,7 @@ export function lineSetCompleteness(
   const parts: string[] = [];
 
   const wider = scoped.filter((entry) => {
-    if (entry.weight === 0 || untrackable(entry, COMPLETE) || !lines.every((rl) => entry.lines.some((line) => meets(rl, line)))) {
+    if (entry.weight === 0 || untrackable(entry, COMPLETE) || lines.some((rl) => entry.lines.every((line) => !meets(rl, line)))) {
       return false;
     }
     const tierSet = lineSet(entry);

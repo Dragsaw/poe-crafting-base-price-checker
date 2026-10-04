@@ -182,7 +182,7 @@ describe('the panel copy', () => {
 
   // Matrix: one not reached, one unresolvable, one starvation record; zero and many unchanged.
   it('agrees each count with its noun and verb: singular at one, plural at zero and many', () => {
-    const first = (group: FigureGroup): string => groupText(group).split('\n')[0] ?? '';
+    const first = (group: FigureGroup): string => groupText(group).split('\n', 1)[0] ?? '';
 
     const [oneRun, oneBroken] = panelColumns(report({ records: [...unresolvable(1), starvation] }, { notReachedCount: 1 }), true);
     expect(oneRun.map(first)[1]).toBe('1 tracked entry was not reached in the last sync pass.');

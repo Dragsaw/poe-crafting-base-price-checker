@@ -318,7 +318,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
 
     const error = await run().then(
       () => {},
-      (thrown: unknown) => thrown,
+      (error_: unknown) => error_,
     );
 
     expect(error).toBeInstanceOf(MalformedRequestError);
@@ -335,7 +335,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
 
     const error = await run().then(
       () => {},
-      (thrown: unknown) => thrown,
+      (error_: unknown) => error_,
     );
 
     expect(error).toBeInstanceOf(MalformedRequestError);
@@ -371,7 +371,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
     const { http, run } = setup({ search: ok({}), dataset: [PREVIOUS] });
     const error = await run().then(
       () => {},
-      (thrown: unknown) => thrown,
+      (error_: unknown) => error_,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
@@ -388,7 +388,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
     const { http, run } = setup({ search: ok({}) });
     const error = await run().then(
       () => {},
-      (thrown: unknown) => thrown,
+      (error_: unknown) => error_,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'search' });
@@ -404,7 +404,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
     const { run } = setup({ results: ids(1), fetch: ok({}), dataset: [PREVIOUS] });
     const error = await run().then(
       () => {},
-      (thrown: unknown) => thrown,
+      (error_: unknown) => error_,
     );
     expect(error).toBeInstanceOf(UnexpectedTradeResponseError);
     expect(error).toMatchObject({ entryKey: KEY, requestKind: 'fetch' });

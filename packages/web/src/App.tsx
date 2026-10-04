@@ -31,9 +31,7 @@ type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
  * the load resolved, and the cross-file failures, run once per load (AD-17).
  */
 type ViewState =
-  | { readonly kind: 'pending' }
-  | Exclude<LoadOutcome, ReadyOutcome>
-  | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] });
+  Exclude<LoadOutcome, ReadyOutcome> | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] }) | { readonly kind: 'pending' };
 
 /**
  * The page's substrate. It paints the masthead and twenty skeleton slots at

@@ -21,7 +21,7 @@ describe('docs/stories/deferred-work.md', () => {
   });
 
   it('parses every top-level source_spec bullet as an entry, so none is dropped for a missing or mis-indented field', () => {
-    const bullets = LEDGER.split(/\r?\n/).filter((line) => /^- source_spec:/.test(line)).length;
+    const bullets = LEDGER.split(/\r?\n/).filter((line) => line.startsWith('- source_spec:')).length;
     expect(entries.length).toBe(bullets);
   });
 

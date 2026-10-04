@@ -128,7 +128,7 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
     }
     if (arg === '--pinned-max-age') {
       const value = argv[index + 1];
-      const parsed = value === undefined ? Number.NaN : Number(value);
+      const parsed = value === undefined ? NaN : Number(value);
       if (value === undefined || value.trim() === '' || !Number.isFinite(parsed) || parsed <= 0) {
         return { ok: false, message: '--pinned-max-age needs a positive number of hours' };
       }
@@ -610,9 +610,9 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
         }).run();
         result = { kind: 'outcome', outcome };
         stdout(`${PREFIX} ${describeOutcome(outcome)}`);
-      } catch (thrown) {
+      } catch (error_) {
         // The governor already redacted what it passed on; this covers the rest (§13.6).
-        const error = auth.redact(thrown);
+        const error = auth.redact(error_);
         result = { kind: 'error', error };
         stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
       }

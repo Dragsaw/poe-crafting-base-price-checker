@@ -641,7 +641,7 @@ describe('the payout threshold', () => {
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
     const marker = frame().querySelector<HTMLElement>('[data-threshold-marker]');
-    expect(parseFloat(marker?.style.left ?? '')).toBeCloseTo(20, 5);
+    expect(Number.parseFloat(marker?.style.left ?? '')).toBeCloseTo(20, 5);
   });
 
   it('keeps a threshold typed while pending through the move to ready, and ranks at it', async () => {
@@ -773,7 +773,7 @@ describe('the payout threshold', () => {
     await settleTo('ready');
     expect(thresholdInput().value).toBe('0.25');
     // React's generated ids differ per mount; everything else must match byte for byte.
-    const strip = (html: string): string => html.replace(/\s(id|for|aria-describedby)="[^"]*"/g, '');
+    const strip = (html: string): string => html.replaceAll(/\s(id|for|aria-describedby)="[^"]*"/g, '');
     expect(strip(frame().outerHTML)).toBe(strip(atRest));
   });
 });

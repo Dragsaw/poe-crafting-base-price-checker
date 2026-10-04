@@ -632,7 +632,7 @@ describe('pnpm sync: the session with injected ports', () => {
   });
 
   it('a blank contact is refused before the auth line is printed', async () => {
-    const { deps, auth } = sessionFor({ env: { [SESSION_COOKIE_ENV_VAR]: '   ' } });
+    const { deps, auth } = sessionFor({ env: { [SESSION_COOKIE_ENV_VAR]: ' '.repeat(3) } });
 
     expect(await syncSessionCommand(deps)).toBe(1);
 

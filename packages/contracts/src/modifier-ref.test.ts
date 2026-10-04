@@ -189,8 +189,8 @@ describe('ModifierRefSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () =>
   it.each([
     ['min > max', { valueMin: 3, valueMax: 2 }],
     ['a negative edge', { valueMin: -1, valueMax: 2 }],
-    ['an infinite edge', { valueMin: 1, valueMax: Number.POSITIVE_INFINITY }],
-    ['a NaN edge', { valueMin: Number.NaN, valueMax: 2 }],
+    ['an infinite edge', { valueMin: 1, valueMax: Infinity }],
+    ['a NaN edge', { valueMin: NaN, valueMax: 2 }],
     ['one edge only', { valueMin: 1 }],
   ])('rejects a line band with %s at the line', (_name, band) => {
     expect(issuePaths(hybrid([{ statId: 'explicit.stat_1', ...band }, { statId: 'explicit.stat_2' }]))).toEqual(['lines.0']);
