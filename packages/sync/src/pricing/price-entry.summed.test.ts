@@ -83,9 +83,9 @@ const fetchPort: HttpPort = {
       body: request.body,
     });
     const headers: Record<string, string> = {};
-    response.headers.forEach((value, name) => {
+    for (const [name, value] of response.headers.entries()) {
       headers[name.toLowerCase()] = value;
-    });
+    }
     return { status: response.status, headers, body: await response.text() };
   },
 };
