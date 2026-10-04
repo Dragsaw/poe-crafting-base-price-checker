@@ -71,7 +71,7 @@ export type ArtifactAnswer =
   | { readonly kind: 'text'; readonly body: string; readonly contentType?: string }
   | { readonly kind: 'status'; readonly status: number }
   | { readonly kind: 'network-error' }
-  | { readonly kind: 'gated'; readonly gate: Promise<void>; readonly then?: ArtifactAnswer };
+  | { readonly kind: 'gated'; readonly gate: Promise<void>; readonly afterGate?: ArtifactAnswer };
 
 export interface RecordedRequest {
   readonly url: URL;
@@ -80,7 +80,7 @@ export interface RecordedRequest {
 
 async function respondWhenOpen(answer: Extract<ArtifactAnswer, { kind: 'gated' }>): Promise<Response> {
   await answer.gate;
-  return respond(answer.then ?? { kind: 'text', body: 'null', contentType: 'application/json' });
+  return respond(answer.afterGate ?? { kind: 'text', body: 'null', contentType: 'application/json' });
 }
 
 function respond(answer: ArtifactAnswer): Response | Promise<Response> {
@@ -123,8 +123,8 @@ export function serveArtifacts(
         requests.push({ url: new URL(request.url), cache: request.cache });
         const answer = answers[key] ?? { kind: 'json', body: VALID_BODIES[key] };
         const resolved =
-          answer.kind === 'gated' && answer.then === undefined
-            ? { ...answer, then: { kind: 'json', body: VALID_BODIES[key] } as const }
+          answer.kind === 'gated' && answer.afterGate === undefined
+            ? { ...answer, afterGate: { kind: 'json', body: VALID_BODIES[key] } as const }
             : answer;
         return respond(resolved);
       }),

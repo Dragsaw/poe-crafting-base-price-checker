@@ -495,7 +495,7 @@ function serveLadder(held?: Promise<void>): ReturnType<typeof serveArtifacts> {
   return serveArtifacts(
     server,
     Object.fromEntries(
-      ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: held, then: answers[key] }]),
+      ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: held, afterGate: answers[key] }]),
     ),
   );
 }

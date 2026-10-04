@@ -849,9 +849,6 @@
     },
     "max-lines": {
       "count": 1
-    },
-    "unicorn/no-thenable": {
-      "count": 1
     }
   },
   "packages/web/src/App.tsx": {
@@ -1134,9 +1131,6 @@
   "packages/web/src/test-support/artifact-server.ts": {
     "local/max-comment-run": {
       "count": 4
-    },
-    "unicorn/no-thenable": {
-      "count": 1
     },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 1
