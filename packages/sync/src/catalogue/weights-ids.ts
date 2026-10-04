@@ -1,22 +1,4 @@
-/**
- * The weights ids against the catalogue (AD-9, AD-12, AD-25).
- *
- * `data/weights.json` loads through `parseEnvelope` with the `contracts`
- * `WeightsFileSchema`, the one definition of the weights contract
- * (WEIGHTS-FILE-SCHEMA.md). The ids are then collected from the typed value:
- * the outer `bases` keys (each a `categoryId`) and every line's `statId`.
- *
- * - An absent file is `absent`. The run records it and goes on (AD-12).
- * - A file that does not parse, declares a major this build does not know, or
- *   breaks any hard error of the contract is refused as a whole with a typed
- *   `DataFileError` naming the file, before any request (NFR-8). An `invalid`
- *   refusal names the first issue's path and message.
- * - A `null` `statId` is the producer's own unresolved marker: it is skipped,
- *   never reported.
- *
- * A miss against the catalogue is a report record only: the file is never
- * rewritten, and a miss never refuses it.
- */
+/** The weights ids against the catalogue (AD-9, AD-12, AD-25). A miss is a report record only and never refuses the file. */
 
 import { compareCanonicalKeys, parseEnvelope, WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from '@poe/contracts';
 import type {
@@ -93,10 +75,7 @@ function collectStatIds(bases: WeightsFile['bases']): Set<string> {
   return statIds;
 }
 
-/**
- * Reads the weights ids and the parsed file. Absent is a value; an unreadable, unknown-major or
- * non-conforming file throws a `DataFileError`.
- */
+/** Absent is a value; an unreadable, unknown-major or non-conforming file throws a `DataFileError` (NFR-8). */
 export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   const text = await fs.readTextFile(WEIGHTS_PATH);
   if (text === undefined) {
@@ -107,11 +86,7 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   return { kind: 'present', statIds: collectStatIds(bases), categoryIds: new Set(Object.keys(bases)), file };
 }
 
-/**
- * One `uncatalogued-weights-id` record per distinct id the catalogue does not
- * expose, sorted by `identifierKind`, then by `identifier`, with
- * `compareCanonicalKeys` (Consistency Conventions, *Entity keys*).
- */
+/** One record per id the catalogue lacks, sorted by kind then id with `compareCanonicalKeys` (*Entity keys*). */
 export function checkWeightsIds(
   weights: Pick<Extract<WeightsIds, { kind: 'present' }>, 'kind' | 'statIds' | 'categoryIds'>,
   catalogue: CatalogueIds,
@@ -131,13 +106,7 @@ export function checkWeightsIds(
   );
 }
 
-/**
- * The record an absent `weights.json` leaves (AD-12, AD-25): the distinct
- * `className` values of the non-pruned `crafted` entries, sorted with
- * `compareCanonicalKeys` (Consistency Conventions, *Entity keys*).
- * Without the file those classes are uncheckable, and they are reported so
- * rather than passed as clean.
- */
+/** Without the file the non-pruned `crafted` classes are uncheckable, so they are reported, not passed as clean (AD-12, AD-25). */
 export function weightsAbsentRecord(tracked: readonly TrackedEntry[]): WeightsAbsentRecord {
   const classNames = new Set<string>();
   for (const entry of tracked) {

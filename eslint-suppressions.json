@@ -350,11 +350,6 @@
       "count": 1
     }
   },
-  "packages/sync/src/catalogue/weights-ids.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
   "packages/sync/src/chunk/catalogue-check.ts": {
     "local/max-comment-run": {
       "count": 2
