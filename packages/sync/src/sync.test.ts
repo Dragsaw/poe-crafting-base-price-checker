@@ -624,7 +624,7 @@ describe('pnpm sync: the session with injected ports', () => {
     // Each chunk: the spread pacer, the shared pacing state and the threshold of 1.
     expect(governorOptions).toHaveLength(1);
     expect(governorOptions[0]).toMatchObject({ spread: true, invalidRequestThreshold: 1 });
-    expect(governorOptions[0]?.['pacing']).toBeTypeOf("object");
+    expect(governorOptions[0]?.['pacing']).toBeTypeOf('object');
     expect(governorOptions[0]?.['pacing']).not.toBeNull();
   });
 
