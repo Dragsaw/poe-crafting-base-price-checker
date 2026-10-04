@@ -1,0 +1,1945 @@
+{
+  ".claude/skills/tracked-json/scripts/lookup.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "max-params": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 9
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  ".claude/skills/tracked-json/scripts/lookup.ts": {
+    "complexity": {
+      "count": 3
+    },
+    "max-classes-per-file": {
+      "count": 1
+    },
+    "max-depth": {
+      "count": 2
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/max-nested-calls": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 7
+    },
+    "unicorn/no-unnecessary-array-flat-map": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 2
+    },
+    "unicorn/prefer-simple-condition-first": {
+      "count": 1
+    }
+  },
+  ".githooks/commit-msg": {
+    "complexity": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/canonical-key.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 3
+    },
+    "unicorn/no-null": {
+      "count": 9
+    }
+  },
+  "packages/contracts/src/canonical-key.ts": {
+    "unicorn/no-null": {
+      "count": 4
+    }
+  },
+  "packages/contracts/src/craft-recipe.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/craft-recipe.ts": {
+    "unicorn/max-nested-calls": {
+      "count": 3
+    },
+    "unicorn/no-for-each": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/dataset.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/envelopes.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 12
+    },
+    "unicorn/explicit-length-check": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/envelopes.ts": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-for-each": {
+      "count": 7
+    }
+  },
+  "packages/contracts/src/modifier-ref.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/modifier-ref.ts": {
+    "unicorn/name-replacements": {
+      "count": 10
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-for-each": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/overlap.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 6
+    }
+  },
+  "packages/contracts/src/overlap.ts": {
+    "max-params": {
+      "count": 2
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 9
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/ports/fakes/filesystem.ts": {
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/primitives.test.ts": {
+    "sonarjs/no-floating-point-equality": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/ranked-row.test.ts": {
+    "unicorn/no-null": {
+      "count": 2
+    }
+  },
+  "packages/contracts/src/sync-run-report.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 5
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 5
+    },
+    "vitest/no-conditional-expect": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/sync-run-report.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/tracked-entry.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/contracts/src/trade-catalogue.test.ts": {
+    "unicorn/no-null": {
+      "count": 4
+    }
+  },
+  "packages/contracts/src/weights-file.test.ts": {
+    "unicorn/no-null": {
+      "count": 4
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 2
+    }
+  },
+  "packages/contracts/src/weights-file.ts": {
+    "unicorn/no-for-each": {
+      "count": 2
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/core/src/chunk-order.test.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 2
+    }
+  },
+  "packages/core/src/chunk-order.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 2
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 2
+    }
+  },
+  "packages/core/src/coverage.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 3
+    }
+  },
+  "packages/core/src/crafted-classes.test.ts": {
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/core/src/cross-file.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 3
+    },
+    "unicorn/no-null": {
+      "count": 2
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 2
+    },
+    "unicorn/prefer-simple-sort-comparator": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 9
+    }
+  },
+  "packages/core/src/cross-file.ts": {
+    "complexity": {
+      "count": 2
+    },
+    "max-depth": {
+      "count": 6
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 3
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 2
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    }
+  },
+  "packages/core/src/probability.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "sonarjs/no-floating-point-equality": {
+      "count": 6
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 2
+    },
+    "unicorn/no-null": {
+      "count": 6
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    }
+  },
+  "packages/core/src/probability.ts": {
+    "max-params": {
+      "count": 1
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 4
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 2
+    }
+  },
+  "packages/core/src/provenance.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "packages/core/src/rank.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "sonarjs/no-floating-point-equality": {
+      "count": 6
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 4
+    },
+    "unicorn/no-null": {
+      "count": 16
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/core/src/rank.ts": {
+    "complexity": {
+      "count": 2
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-params": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    },
+    "unicorn/no-array-reduce": {
+      "count": 1
+    },
+    "unicorn/no-break-in-nested-loop": {
+      "count": 5
+    },
+    "unicorn/no-for-each": {
+      "count": 2
+    },
+    "unicorn/no-null": {
+      "count": 1
+    },
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/catalogue-refresh.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 4
+    },
+    "unicorn/no-return-array-push": {
+      "count": 3
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 4
+    }
+  },
+  "packages/sync/src/catalogue-refresh.ts": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 2
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/catalogue/catalogue-ids.test.ts": {
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/catalogue/committed-catalogue.test.ts": {
+    "unicorn/no-array-sort": {
+      "count": 2
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/catalogue/weights-ids.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/catalogue/weights-ids.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-depth": {
+      "count": 2
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/chunk/catalogue-check.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/chunk/lock.test.ts": {
+    "unicorn/no-await-expression-member": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/chunk/lock.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 3
+    }
+  },
+  "packages/sync/src/chunk/publish-dataset.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/chunk/publish-dataset.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/chunk/run-chunk.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 10
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 24
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 78
+    },
+    "unicorn/no-null": {
+      "count": 4
+    },
+    "unicorn/no-return-array-push": {
+      "count": 3
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    },
+    "vitest/no-conditional-expect": {
+      "count": 3
+    }
+  },
+  "packages/sync/src/chunk/run-chunk.ts": {
+    "complexity": {
+      "count": 2
+    },
+    "max-depth": {
+      "count": 13
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/chunk/sync-report.test.ts": {
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/compose-chunk.ts": {
+    "max-lines-per-function": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/curation/check.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/curation/check.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-for-each": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 3
+    }
+  },
+  "packages/sync/src/dry-run.data.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/dry-run.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 4
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/dry-run.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 2
+    },
+    "unicorn/no-null": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/fixtures-record.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 2
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/fixtures-record.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 4
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/git/read-only-git-port.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 3
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/git/read-only-git-port.ts": {
+    "sonarjs/no-os-command-from-path": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/league/league-gate.test.ts": {
+    "no-await-in-loop": {
+      "count": 5
+    },
+    "unicorn/no-error-property-assignment": {
+      "count": 1
+    },
+    "unicorn/prefer-await": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/league/league-gate.ts": {
+    "max-classes-per-file": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/no-git-write.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/fixture-port.test.ts": {
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/fixture-port.ts": {
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/load-currencies.test.ts": {
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "vitest/no-conditional-expect": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/normalise.test.ts": {
+    "sonarjs/no-floating-point-equality": {
+      "count": 3
+    },
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/normalise.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/price-entry.fixtures.test.ts": {
+    "no-await-in-loop": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/price-entry.hybrid.test.ts": {
+    "unicorn/no-for-each": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/price-entry.summed.test.ts": {
+    "unicorn/no-for-each": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/price-entry.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/no-error-property-assignment": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 3
+    },
+    "unicorn/prefer-await": {
+      "count": 5
+    }
+  },
+  "packages/sync/src/pricing/price-entry.ts": {
+    "complexity": {
+      "count": 2
+    },
+    "max-classes-per-file": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 2
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "unicorn/prefer-simple-condition-first": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/pricing/search-body.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 2
+    },
+    "vitest/no-conditional-expect": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/pricing/search-body.ts": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/session-auth.canary.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-error-property-assignment": {
+      "count": 2
+    },
+    "unicorn/no-return-array-push": {
+      "count": 4
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "vitest/no-conditional-expect": {
+      "count": 3
+    }
+  },
+  "packages/sync/src/shell-fetch.test.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    },
+    "unicorn/no-return-array-push": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/shell.test.ts": {
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/shell.ts": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 1
+    },
+    "unicorn/no-for-each": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/sync-batch.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 9
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 16
+    },
+    "unicorn/no-null": {
+      "count": 1
+    },
+    "unicorn/no-return-array-push": {
+      "count": 2
+    },
+    "unicorn/prefer-await": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/sync-batch.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/sync.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 3
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 5
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 4
+    },
+    "unicorn/prefer-await": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/sync.ts": {
+    "complexity": {
+      "count": 3
+    },
+    "max-depth": {
+      "count": 1
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 11
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 2
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 5
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 3
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/trade/client.test.ts": {
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 3
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 1
+    },
+    "unicorn/no-return-array-push": {
+      "count": 4
+    },
+    "vitest/no-conditional-expect": {
+      "count": 2
+    }
+  },
+  "packages/sync/src/trade/client.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 2
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 3
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-for-each": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "unicorn/prefer-await": {
+      "count": 3
+    }
+  },
+  "packages/sync/src/trade/invalid-requests.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/trade/ledger.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/trade/rate-limit-headers.ts": {
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/trade/session-auth.test.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/no-error-property-assignment": {
+      "count": 2
+    },
+    "unicorn/no-return-array-push": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/trade/session-auth.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 2
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    }
+  },
+  "packages/sync/src/write-artifact.test.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "unicorn/prefer-await": {
+      "count": 1
+    }
+  },
+  "packages/web/src/App.test.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 6
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 3
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 14
+    },
+    "unicorn/no-thenable": {
+      "count": 1
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 6
+    },
+    "unicorn/prefer-dom-node-html-methods": {
+      "count": 3
+    },
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "packages/web/src/App.tsx": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/AbsenceLines.tsx": {
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/FailureScreen.tsx": {
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/Masthead.tsx": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/TrustStrip.tsx": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 3
+    }
+  },
+  "packages/web/src/frame/trust-facts.test.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 15
+    },
+    "unicorn/no-null": {
+      "count": 7
+    }
+  },
+  "packages/web/src/frame/trust-facts.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 3
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 1
+    }
+  },
+  "packages/web/src/frame/trust-strip.test.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 8
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 5
+    }
+  },
+  "packages/web/src/list/CombinationRow.tsx": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 5
+    }
+  },
+  "packages/web/src/list/ListStatement.tsx": {
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/RankedList.tsx": {
+    "unicorn/no-null": {
+      "count": 2
+    },
+    "unicorn/prefer-default-parameters": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/RankedRow.tsx": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 4
+    }
+  },
+  "packages/web/src/list/UniformPriorBanner.tsx": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/UnrankableAppendix.tsx": {
+    "unicorn/no-null": {
+      "count": 2
+    }
+  },
+  "packages/web/src/list/combination-fit.test.ts": {
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 2
+    }
+  },
+  "packages/web/src/list/combination-text.ts": {
+    "unicorn/no-array-sort": {
+      "count": 2
+    }
+  },
+  "packages/web/src/list/display-rows.test.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 4
+    }
+  },
+  "packages/web/src/list/display-rows.ts": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-params": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/expansion.test.tsx": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 2
+    },
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/format.test.ts": {
+    "unicorn/no-array-callback-reference": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/format.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/list-statement.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 3
+    }
+  },
+  "packages/web/src/list/list-statement.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 2
+    }
+  },
+  "packages/web/src/list/ranked-list.test.tsx": {
+    "max-lines": {
+      "count": 1
+    },
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/tracked.data.test.ts": {
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "packages/web/src/list/unrankable-appendix.test.tsx": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 4
+    },
+    "unicorn/prefer-dom-node-html-methods": {
+      "count": 2
+    }
+  },
+  "packages/web/src/load/load-artifacts.test.ts": {
+    "unicorn/no-array-sort": {
+      "count": 2
+    },
+    "unicorn/no-null": {
+      "count": 4
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 2
+    }
+  },
+  "packages/web/src/load/load-artifacts.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 4
+    }
+  },
+  "packages/web/src/load/prune-allowlist.test.ts": {
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    }
+  },
+  "packages/web/src/recipe/CraftRecipe.tsx": {
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/recipe/craft-recipe.test.tsx": {
+    "max-lines": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 3
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 3
+    },
+    "unicorn/no-array-sort": {
+      "count": 3
+    },
+    "unicorn/no-null": {
+      "count": 4
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 9
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 1
+    },
+    "unicorn/prefer-simple-sort-comparator": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    },
+    "vitest/no-conditional-expect": {
+      "count": 1
+    }
+  },
+  "packages/web/src/recipe/recipe-view.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    }
+  },
+  "packages/web/src/test-setup.ts": {
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/test-support/artifact-server.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 2
+    },
+    "unicorn/no-thenable": {
+      "count": 1
+    },
+    "unicorn/prefer-await": {
+      "count": 1
+    },
+    "unicorn/prefer-promise-with-resolvers": {
+      "count": 1
+    }
+  },
+  "packages/web/src/test-support/dom.tsx": {
+    "unicorn/no-null": {
+      "count": 1
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 4
+    }
+  },
+  "packages/web/src/test-support/list-fixtures.ts": {
+    "max-params": {
+      "count": 1
+    }
+  },
+  "packages/web/src/theme/theme.test.ts": {
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/theme/theme.ts": {
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "packages/web/src/theme/tokens.test.ts": {
+    "unicorn/prefer-number-coercion": {
+      "count": 2
+    }
+  },
+  "packages/web/src/theme/tokens.ts": {
+    "max-params": {
+      "count": 1
+    }
+  },
+  "packages/web/src/threshold/PayoutThreshold.tsx": {
+    "max-lines-per-function": {
+      "count": 1
+    }
+  },
+  "packages/web/src/threshold/payout-threshold.test.tsx": {
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 4
+    },
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "packages/web/src/threshold/threshold-storage.test.ts": {
+    "sonarjs/no-floating-point-equality": {
+      "count": 5
+    },
+    "unicorn/no-null": {
+      "count": 3
+    }
+  },
+  "packages/web/vite.config.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    }
+  },
+  "packages/web/vite.config.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    }
+  },
+  "test/commit-msg-hook.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 2
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    }
+  },
+  "test/contracts-isolation.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "test/core-purity-lint.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 3
+    }
+  },
+  "test/deferred-ledger.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    }
+  },
+  "test/global-setup.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 2
+    }
+  },
+  "test/guard-after-last-file-fixture/late.fixture.ts": {
+    "sonarjs/assertions-in-tests": {
+      "count": 1
+    },
+    "unicorn/prefer-await": {
+      "count": 1
+    }
+  },
+  "test/guard-after-last-file.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-await-expression-member": {
+      "count": 1
+    }
+  },
+  "test/guard-concurrent-fixture/concurrent.fixture.ts": {
+    "sonarjs/assertions-in-tests": {
+      "count": 2
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-unnecessary-parameters": {
+      "count": 1
+    },
+    "unicorn/prefer-promise-with-resolvers": {
+      "count": 1
+    }
+  },
+  "test/guard-concurrent.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "vitest/no-conditional-expect": {
+      "count": 1
+    }
+  },
+  "test/guard-hooks-fixture/late-request.fixture.ts": {
+    "sonarjs/assertions-in-tests": {
+      "count": 3
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 2
+    },
+    "unicorn/prefer-promise-with-resolvers": {
+      "count": 2
+    }
+  },
+  "test/guard-hooks.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "test/guard-linger-fixture/linger.fixture.ts": {
+    "sonarjs/assertions-in-tests": {
+      "count": 2
+    },
+    "unicorn/prefer-await": {
+      "count": 1
+    }
+  },
+  "test/guard-linger.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "test/guard-reuse-fixture/a-issuer.fixture.ts": {
+    "sonarjs/assertions-in-tests": {
+      "count": 1
+    },
+    "unicorn/prefer-await": {
+      "count": 1
+    }
+  },
+  "test/guard-reuse-fixture/vitest.config.ts": {
+    "unicorn/no-array-sort": {
+      "count": 1
+    }
+  },
+  "test/guard-reuse.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "test/hand-listed-coverage.test.ts": {
+    "no-await-in-loop": {
+      "count": 2
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 3
+    },
+    "unicorn/no-array-callback-reference": {
+      "count": 4
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    },
+    "vitest/no-conditional-expect": {
+      "count": 1
+    }
+  },
+  "test/no-hardcoded-rate-limits.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 2
+    }
+  },
+  "test/no-network.test.ts": {
+    "sonarjs/assertions-in-tests": {
+      "count": 2
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 2
+    },
+    "unicorn/no-top-level-assignment-in-function": {
+      "count": 2
+    },
+    "unicorn/prefer-await": {
+      "count": 1
+    },
+    "unicorn/prefer-promise-with-resolvers": {
+      "count": 3
+    },
+    "vitest/expect-expect": {
+      "count": 2
+    }
+  },
+  "test/prune-pages.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 3
+    },
+    "unicorn/no-array-sort": {
+      "count": 7
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 7
+    }
+  },
+  "test/session-cookie-shells.test.ts": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-for-each": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 2
+    }
+  },
+  "test/setup.ts": {
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "tools/boundary-check/boundary.test.ts": {
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    }
+  },
+  "tools/deferred-issues/deferred-issues.test.ts": {
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 5
+    }
+  },
+  "tools/deferred-issues/deferred-issues.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "max-lines-per-function": {
+      "count": 1
+    },
+    "max-statements": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-null": {
+      "count": 3
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    }
+  },
+  "tools/deferred-issues/ledger.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "tools/deferred-issues/plan.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 24
+    },
+    "unicorn/no-null": {
+      "count": 1
+    }
+  },
+  "tools/deferred-issues/plan.ts": {
+    "complexity": {
+      "count": 1
+    },
+    "sonarjs/cognitive-complexity": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 3
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 2
+    },
+    "unicorn/prefer-default-parameters": {
+      "count": 1
+    }
+  },
+  "tools/dev-stop/dev-stop.test.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 3
+    },
+    "max-lines": {
+      "count": 1
+    },
+    "sonarjs/no-os-command-from-path": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    }
+  },
+  "tools/dev-stop/dev-stop.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 2
+    },
+    "complexity": {
+      "count": 1
+    },
+    "no-await-in-loop": {
+      "count": 1
+    },
+    "sonarjs/no-os-command-from-path": {
+      "count": 4
+    },
+    "unicorn/consistent-boolean-name": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 1
+    },
+    "unicorn/no-break-in-nested-loop": {
+      "count": 2
+    },
+    "unicorn/prefer-iterator-to-array": {
+      "count": 1
+    }
+  },
+  "tools/dts-specifiers/rewrite-dts-specifiers.test.ts": {
+    "unicorn/consistent-function-scoping": {
+      "count": 2
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 10
+    },
+    "unicorn/no-array-sort": {
+      "count": 2
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 2
+    }
+  },
+  "tools/dts-specifiers/rewrite-dts-specifiers.ts": {
+    "max-params": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 3
+    }
+  },
+  "tools/prune-pages.mjs": {
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/name-replacements": {
+      "count": 5
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-unreadable-for-of-expression": {
+      "count": 1
+    },
+    "unicorn/require-array-sort-compare": {
+      "count": 1
+    }
+  },
+  "tools/setup-git-hooks.mjs": {
+    "sonarjs/no-os-command-from-path": {
+      "count": 1
+    }
+  }
+}
