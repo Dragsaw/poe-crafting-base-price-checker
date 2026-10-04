@@ -210,10 +210,10 @@ describe('tsconfig.json references tsconfig.tools.json', () => {
   });
 });
 
-describe('TARGETS lists every hand-listed tools/ and .claude/ entry', () => {
-  const handListed = (entries: readonly string[]): string[] =>
-    entries.filter((entry) => entry.startsWith('tools/') || entry.startsWith('.claude/'));
+const handListed = (entries: readonly string[]): string[] =>
+  entries.filter((entry) => entry.startsWith('tools/') || entry.startsWith('.claude/'));
 
+describe('TARGETS lists every hand-listed tools/ and .claude/ entry', () => {
   it('each tsconfig.tools.json include entry under tools/ or .claude/ is some target tsInclude', () => {
     const include = readJsonConfig(TOOLS_TSCONFIG)['include'] as string[];
     const known = new Set(TARGETS.map((target) => target.tsInclude));

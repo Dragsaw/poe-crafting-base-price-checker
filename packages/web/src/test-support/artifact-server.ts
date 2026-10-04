@@ -132,9 +132,11 @@ export function serveArtifacts(
   return requests;
 }
 
+const noop = (): void => {};
+
 /** A promise and the function that settles it. */
 export function gate(): { readonly promise: Promise<void>; readonly open: () => void } {
-  let open: () => void = () => {};
+  let open: () => void = noop;
   const promise = new Promise<void>((resolve) => {
     open = resolve;
   });

@@ -1279,9 +1279,6 @@
     "sonarjs/no-redundant-optional": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -1390,9 +1387,6 @@
     },
     "unicorn/consistent-boolean-name": {
       "count": 3
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
     },
     "unicorn/no-array-sort": {
       "count": 1
@@ -1513,9 +1507,6 @@
     },
     "sonarjs/deprecation": {
       "count": 2
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 14
     },
     "unicorn/no-thenable": {
       "count": 1
@@ -1789,9 +1780,6 @@
     "max-lines": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 2
     }
@@ -1810,9 +1798,6 @@
     }
   },
   "packages/web/src/list/list-statement.test.ts": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-null": {
       "count": 3
     }
@@ -1854,9 +1839,6 @@
     }
   },
   "packages/web/src/list/unrankable-appendix.test.tsx": {
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-top-level-assignment-in-function": {
       "count": 4
     }
@@ -1932,9 +1914,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 3
-    },
     "unicorn/no-array-sort": {
       "count": 3
     },
@@ -2004,9 +1983,6 @@
     },
     "sonarjs/deprecation": {
       "count": 4
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
     },
     "unicorn/no-null": {
       "count": 2
@@ -2145,9 +2121,6 @@
   "test/core-purity-lint.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
     }
   },
   "test/core-rank-purity.test.ts": {
@@ -2213,9 +2186,6 @@
     "sonarjs/assertions-in-tests": {
       "count": 2
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/no-unnecessary-parameters": {
       "count": 1
     },
@@ -2253,9 +2223,6 @@
     },
     "sonarjs/assertions-in-tests": {
       "count": 3
-    },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
     },
     "unicorn/no-top-level-assignment-in-function": {
       "count": 2
@@ -2376,9 +2343,6 @@
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
-    "unicorn/consistent-function-scoping": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },
@@ -2417,9 +2381,6 @@
       "count": 1
     },
     "sonarjs/assertions-in-tests": {
-      "count": 2
-    },
-    "unicorn/consistent-function-scoping": {
       "count": 2
     },
     "unicorn/no-top-level-assignment-in-function": {
@@ -2651,9 +2612,6 @@
       "count": 3
     },
     "sonarjs/no-alphabetical-sort": {
-      "count": 2
-    },
-    "unicorn/consistent-function-scoping": {
       "count": 2
     },
     "unicorn/import-style": {

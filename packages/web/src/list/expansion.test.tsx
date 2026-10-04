@@ -320,6 +320,11 @@ describe('the open set', () => {
   });
 });
 
+// jsdom does not navigate; keep it from trying.
+const stop = (event: Event): void => {
+  event.preventDefault();
+};
+
 describe('the trade link', () => {
   it('does not toggle the row on a click, and no request fires on expand or on the click', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
@@ -328,10 +333,6 @@ describe('the trade link', () => {
     const view = mountList([belt], [priced(belt, 0.8, hoursBefore(NOW, 1), TEST_LEAGUE, SEARCH)]);
     click(rowsIn(view)[0]);
     const link = view.querySelector<HTMLAnchorElement>('[data-cell="trade-link"] a');
-    // jsdom does not navigate; keep it from trying.
-    const stop = (event: Event): void => {
-      event.preventDefault();
-    };
     document.addEventListener('click', stop);
     try {
       click(link);

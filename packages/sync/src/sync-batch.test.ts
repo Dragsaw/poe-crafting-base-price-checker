@@ -119,6 +119,9 @@ function httpFor(league: string, answers: Answers = {}) {
   });
 }
 
+const cookies = (http: ReturnType<typeof httpFor>) =>
+  http.requests.map((request) => [request.method, request.headers['cookie']]);
+
 /** A fake filesystem that records every path written through it. */
 function recording(fs: FakeFilesystemPort): { readonly fs: FakeFilesystemPort; readonly writes: string[] } {
   const writes: string[] = [];
@@ -686,9 +689,6 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       built.http.respondTo('GET', tradeFetchUrl(RESULTS, 'S1'), FETCHED);
       return built;
     }
-
-    const cookies = (http: ReturnType<typeof httpFor>) =>
-      http.requests.map((request) => [request.method, request.headers['cookie']]);
 
     it('live: the baseline without the cookie, the probe with it, the fetch with it, the league request without it', async () => {
       const { deps, http, auth, err, out, fs } = withResults();

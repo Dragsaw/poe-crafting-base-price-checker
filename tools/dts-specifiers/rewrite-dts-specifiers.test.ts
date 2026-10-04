@@ -250,6 +250,30 @@ describe('TARGET_PACKAGES', () => {
   });
 });
 
+/**
+ * A copy of the tool at `<scratch>/tools/dts-specifiers/`: its target is
+ * relative to `import.meta.url`, so it then rewrites
+ * `<scratch>/packages/{contracts,core,sync}/dist`.
+ */
+function copyToolIntoScratch(): { root: string; script: string } {
+  const root = makeScratch();
+  writeFileSync(join(root, 'package.json'), '{ "type": "module" }\n');
+  const toolDir = join(root, 'tools', 'dts-specifiers');
+  mkdirSync(toolDir, { recursive: true });
+  const script = join(toolDir, 'rewrite-dts-specifiers.ts');
+  copyFileSync(TOOL, script);
+  return { root, script };
+}
+
+/** Creates `<root>/packages/<pkg>/dist/index.d.ts` holding a `./a.ts` re-export. */
+function seedDistribution(root: string, package_: string): string {
+  const distribution = join(root, 'packages', package_, 'dist');
+  mkdirSync(distribution, { recursive: true });
+  const file = join(distribution, 'index.d.ts');
+  writeFileSync(file, "export { a } from './a.ts';\n");
+  return file;
+}
+
 describe('the post-emit step', () => {
   it('runs after tsc -b in the root typecheck script', () => {
     const package_ = JSON.parse(readFileSync(ROOT_PACKAGE_JSON, 'utf8')) as {
@@ -257,30 +281,6 @@ describe('the post-emit step', () => {
     };
     expect(package_.scripts.typecheck).toBe('tsc -b && node tools/dts-specifiers/rewrite-dts-specifiers.ts');
   });
-
-  /**
-   * A copy of the tool at `<scratch>/tools/dts-specifiers/`: its target is
-   * relative to `import.meta.url`, so it then rewrites
-   * `<scratch>/packages/{contracts,core,sync}/dist`.
-   */
-  function copyToolIntoScratch(): { root: string; script: string } {
-    const root = makeScratch();
-    writeFileSync(join(root, 'package.json'), '{ "type": "module" }\n');
-    const toolDir = join(root, 'tools', 'dts-specifiers');
-    mkdirSync(toolDir, { recursive: true });
-    const script = join(toolDir, 'rewrite-dts-specifiers.ts');
-    copyFileSync(TOOL, script);
-    return { root, script };
-  }
-
-  /** Creates `<root>/packages/<pkg>/dist/index.d.ts` holding a `./a.ts` re-export. */
-  function seedDistribution(root: string, package_: string): string {
-    const distribution = join(root, 'packages', package_, 'dist');
-    mkdirSync(distribution, { recursive: true });
-    const file = join(distribution, 'index.d.ts');
-    writeFileSync(file, "export { a } from './a.ts';\n");
-    return file;
-  }
 
   it('rewrites the contracts, core and sync dists when run by bare node', () => {
     const { root, script } = copyToolIntoScratch();

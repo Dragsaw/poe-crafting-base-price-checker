@@ -121,25 +121,26 @@ describe('listStatement', () => {
   });
 });
 
+const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow => ({
+  kind: 'crafted',
+  classKey: '["crafted","weapon.bow","Bows"]',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
+  itemLevelMin: 82,
+  recipeId,
+  provenance: 'measured',
+  grossPayout: summands,
+  craftCost: 0.03,
+  ev: summands - 0.03,
+  summands: Array.from({ length: summands }, (_, index) => ({
+    entryKey: `k${String(index)}`,
+    probability: 1,
+    priceDivine: 1,
+    contribution: 1,
+  })),
+});
+
 describe('listStatement with crafted rows (Story 3.4)', () => {
-  const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow => ({
-    kind: 'crafted',
-    classKey: '["crafted","weapon.bow","Bows"]',
-    categoryId: 'weapon.bow',
-    className: 'Bows',
-    itemLevelMin: 82,
-    recipeId,
-    provenance: 'measured',
-    grossPayout: summands,
-    craftCost: 0.03,
-    ev: summands - 0.03,
-    summands: Array.from({ length: summands }, (_, index) => ({
-      entryKey: `k${String(index)}`,
-      probability: 1,
-      priceDivine: 1,
-      contribution: 1,
-    })),
-  });
   const empty: Ranking = {
     ordering: [],
     belowThreshold: [],

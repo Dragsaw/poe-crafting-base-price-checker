@@ -19,10 +19,12 @@ import { DESCRIBE_FIRST, DESCRIBE_SECOND, IT_FIRST, IT_SECOND } from './names';
  * for: the request must still be charged to the test that started the timer.
  */
 
+const noop = (): void => {};
+
 /** Returns a function that resolves for each caller once `parties` callers have arrived. */
 function barrier(parties: number): () => Promise<void> {
   let arrived = 0;
-  let open: () => void = () => {};
+  let open: () => void = noop;
   const opened = new Promise<void>((resolve) => {
     open = resolve;
   });

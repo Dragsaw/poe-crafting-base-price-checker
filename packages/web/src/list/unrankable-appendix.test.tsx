@@ -154,9 +154,10 @@ describe('the non-empty appendix', () => {
   });
 });
 
+const note = (item: UnrankableClass): string =>
+  mountAppendix([item]).querySelector('[data-cell="note"]')?.textContent ?? '';
+
 describe('the note cell', () => {
-  const note = (item: UnrankableClass): string =>
-    mountAppendix([item]).querySelector('[data-cell="note"]')?.textContent ?? '';
 
   it('says the pool is published and complete and the disagreement is in the Tracked List, naming no check', () => {
     const text = note({ categoryId: 'c.bows', className: 'Bows', reason: 'class disagrees with weights file' });

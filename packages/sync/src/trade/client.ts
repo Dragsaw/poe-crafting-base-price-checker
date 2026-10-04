@@ -450,6 +450,27 @@ export function laneDelayMs(pacing: PacingState, lane: string, now: string, spre
   return Math.max(0, Math.ceil(decision.delayMs));
 }
 
+/**
+ * A downgrade (§13.4): the answer to a request that carried the cookie is a
+ * `401` or a `403` (a Cloudflare `403` too; no rule reads the body or a
+ * header), or a 2xx under the baseline's policy whose rule-name count is not
+ * above the baseline's. Counts only, as the probe's test (§13.2). A 2xx under
+ * another policy (a fetch) is not: the search baseline's count says nothing
+ * about it. A `429`, a `5xx` and any other `4xx` are not.
+ */
+function isDowngrade(holder: SessionAuth, response: HttpResponse): boolean {
+  if (response.status === UNAUTHORIZED || response.status === FORBIDDEN) {
+    return true;
+  }
+  const baseline = holder.baselineRuleCount;
+  return (
+    isSuccess(response.status) &&
+    baseline !== undefined &&
+    rateLimitPolicyOf(response.headers) === holder.baselinePolicy &&
+    ruleNameCount(response.headers) <= baseline
+  );
+}
+
 export interface TradeGovernorOptions<Source extends string> extends TradeClientsOptions<Source> {
   /** Shared pacing memory. Omitted, the governor starts cold with its own. */
   readonly pacing?: PacingState;
@@ -560,27 +581,6 @@ export function createTradeGovernor<Source extends string>(
   function carriesCookie(request: TradeRequest): boolean {
     return (
       !isCookieDropped && request.cookieEligible === true && auth?.holder.isAuthenticated === true
-    );
-  }
-
-  /**
-   * A downgrade (§13.4): the answer to a request that carried the cookie is a
-   * `401` or a `403` (a Cloudflare `403` too; no rule reads the body or a
-   * header), or a 2xx under the baseline's policy whose rule-name count is not
-   * above the baseline's. Counts only, as the probe's test (§13.2). A 2xx under
-   * another policy (a fetch) is not: the search baseline's count says nothing
-   * about it. A `429`, a `5xx` and any other `4xx` are not.
-   */
-  function isDowngrade(holder: SessionAuth, response: HttpResponse): boolean {
-    if (response.status === UNAUTHORIZED || response.status === FORBIDDEN) {
-      return true;
-    }
-    const baseline = holder.baselineRuleCount;
-    return (
-      isSuccess(response.status) &&
-      baseline !== undefined &&
-      rateLimitPolicyOf(response.headers) === holder.baselinePolicy &&
-      ruleNameCount(response.headers) <= baseline
     );
   }
 

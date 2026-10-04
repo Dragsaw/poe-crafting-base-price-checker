@@ -860,15 +860,16 @@ describe('the crafted panel', () => {
 
 // --- Provenance marks and the uniform-prior banner (Story 3.6) -------------------
 
+const banner = (): HTMLElement | null => frame().querySelector<HTMLElement>('[data-uniform-prior-banner]');
+const priorMarks = (): string[] =>
+  Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="provenance"]'), (node) => node.textContent ?? '');
+
+const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSource: 'absent' });
+
 describe('Provenance marks and the banner', () => {
-  const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSource: 'absent' });
   /** An invented tier at floor 50 sits in the greater recipe's eligible set (floor 44) and under the perfect floor (70). */
   const priorBows: Pools = [[tier(TARGET, 10, 75), invented(tier(FILLER, 10, 50)), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
   const priorStaves: Pools = [[tier(TARGET, 50, 50), invented(tier(FILLER, 50, 50))], [tier(SUFFIX, 10, 80)]];
-
-  const banner = (): HTMLElement | null => frame().querySelector<HTMLElement>('[data-uniform-prior-banner]');
-  const priorMarks = (): string[] =>
-    Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="provenance"]'), (node) => node.textContent ?? '');
 
   it('prints prior only on a pair with an invented tier, raises the banner, and follows a recipe switch', async () => {
     serveWorld(standardWorld({ classes: [['weapon.bow', 'Bows', priorBows], ['weapon.staff', 'Staves', priorStaves]] }));

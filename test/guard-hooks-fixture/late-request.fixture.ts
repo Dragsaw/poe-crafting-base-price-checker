@@ -8,7 +8,8 @@ import { INNOCENT_TEST, LATE_ISSUER, LATE_URL, OWN_TEST, OWN_URL } from './names
  * never runs it directly: two of its outcomes are deliberate failures.
  */
 
-let releaseLateRequest: () => void = () => {};
+const noop = (): void => {};
+let releaseLateRequest: () => void = noop;
 let lateRequestSettled: Promise<void> = Promise.resolve();
 
 it(OWN_TEST, async () => {
@@ -19,7 +20,7 @@ it(LATE_ISSUER, () => {
   const gate = new Promise<void>((resolve) => {
     releaseLateRequest = resolve;
   });
-  let settle: () => void = () => {};
+  let settle: () => void = noop;
   lateRequestSettled = new Promise<void>((resolve) => {
     settle = resolve;
   });
