@@ -106,7 +106,7 @@ const HybridLinesSchema = z
   .min(2, { message: 'A hybrid reference names at least two lines (§4.1).' })
   .superRefine((lines, context) => {
     const seen = new Set<string>();
-    lines.forEach((line, index) => {
+    for (const [index, line] of lines.entries()) {
       if (seen.has(line.statId)) {
         context.addIssue({
           code: 'custom',
@@ -115,7 +115,7 @@ const HybridLinesSchema = z
         });
       }
       seen.add(line.statId);
-    });
+    }
   })
   .transform((lines) => [...lines].sort((a, b) => compareByCodeUnit(a.statId, b.statId)));
 

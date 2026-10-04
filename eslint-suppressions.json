@@ -129,9 +129,6 @@
     },
     "unicorn/max-nested-calls": {
       "count": 3
-    },
-    "unicorn/no-for-each": {
-      "count": 1
     }
   },
   "packages/contracts/src/currency-rate.ts": {
@@ -163,12 +160,6 @@
   "packages/contracts/src/envelopes.ts": {
     "local/max-comment-run": {
       "count": 8
-    },
-    "max-lines-per-function": {
-      "count": 1
-    },
-    "unicorn/no-for-each": {
-      "count": 7
     }
   },
   "packages/contracts/src/index.test.ts": {
@@ -202,9 +193,6 @@
       "count": 10
     },
     "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/no-for-each": {
       "count": 1
     }
   },
@@ -401,9 +389,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
-    "unicorn/no-for-each": {
-      "count": 2
-    },
     "unicorn/require-array-sort-compare": {
       "count": 1
     }
@@ -593,12 +578,6 @@
     },
     "unicorn/no-array-reduce": {
       "count": 1
-    },
-    "unicorn/no-break-in-nested-loop": {
-      "count": 5
-    },
-    "unicorn/no-for-each": {
-      "count": 2
     },
     "unicorn/no-null": {
       "count": 1
@@ -854,9 +833,6 @@
       "count": 1
     },
     "unicorn/import-style": {
-      "count": 1
-    },
-    "unicorn/no-for-each": {
       "count": 1
     },
     "unicorn/no-null": {
@@ -1339,9 +1315,6 @@
       "count": 3
     },
     "unicorn/no-array-sort": {
-      "count": 1
-    },
-    "unicorn/no-for-each": {
       "count": 1
     },
     "unicorn/no-unreadable-for-of-expression": {
@@ -2313,9 +2286,6 @@
     "unicorn/import-style": {
       "count": 1
     },
-    "unicorn/no-for-each": {
-      "count": 1
-    },
     "unicorn/no-unreadable-for-of-expression": {
       "count": 2
     }
@@ -2460,9 +2430,6 @@
     "@typescript-eslint/no-non-null-assertion": {
       "count": 2
     },
-    "complexity": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 9
     },
@@ -2483,9 +2450,6 @@
     },
     "unicorn/name-replacements": {
       "count": 1
-    },
-    "unicorn/no-break-in-nested-loop": {
-      "count": 2
     },
     "unicorn/prefer-iterator-to-array": {
       "count": 1

@@ -322,43 +322,38 @@ export function rank(input: RankInput): Ranking {
     }
 
     const price = published.price;
-    switch (price.state) {
-      case 'no-listings': {
-        noListings.push(base);
-        break;
-      }
-      case 'unresolvable': {
-        unresolvable.push(base);
-        break;
-      }
-      case 'not-yet-synced': {
-        notYetSynced.push({ ...base, reason: price.reason });
-        break;
-      }
-      case 'priced': {
-        const { observation } = price;
-        if (observation.league !== input.activeLeague) {
-          notYetSynced.push({ ...base, reason: 'league-mismatch' });
-          break;
-        }
-        const row: RawRankedRow = {
-          kind: 'raw',
-          entryKey,
-          baseTypeId: entry.baseTypeId,
-          itemLevelMin: entry.itemLevelMin,
-          status: entry.status,
-          ev: observation.priceDivine,
-          craftCost: 0,
-          observation,
-          ...(base.lastAttemptedAt !== undefined && { lastAttemptedAt: base.lastAttemptedAt }),
-        };
-        if (observation.priceDivine < input.threshold) {
-          belowThreshold.push(row);
-        } else {
-          surviving.push(row);
-        }
-        break;
-      }
+    if (price.state === 'no-listings') {
+      noListings.push(base);
+      continue;
+    }
+    if (price.state === 'unresolvable') {
+      unresolvable.push(base);
+      continue;
+    }
+    if (price.state === 'not-yet-synced') {
+      notYetSynced.push({ ...base, reason: price.reason });
+      continue;
+    }
+    const { observation } = price;
+    if (observation.league !== input.activeLeague) {
+      notYetSynced.push({ ...base, reason: 'league-mismatch' });
+      continue;
+    }
+    const row: RawRankedRow = {
+      kind: 'raw',
+      entryKey,
+      baseTypeId: entry.baseTypeId,
+      itemLevelMin: entry.itemLevelMin,
+      status: entry.status,
+      ev: observation.priceDivine,
+      craftCost: 0,
+      observation,
+      ...(base.lastAttemptedAt !== undefined && { lastAttemptedAt: base.lastAttemptedAt }),
+    };
+    if (observation.priceDivine < input.threshold) {
+      belowThreshold.push(row);
+    } else {
+      surviving.push(row);
     }
   }
 
@@ -383,12 +378,12 @@ export function rank(input: RankInput): Ranking {
 
   const costs = recipes.map((recipe) => craftCost(recipe, rates, input.activeLeague));
   const uncostableRecipes: UncostableRecipe[] = [];
-  recipes.forEach((recipe, index) => {
+  for (const [index, recipe] of recipes.entries()) {
     const cost = costs[index];
     if (cost !== undefined && !cost.ok) {
       uncostableRecipes.push({ recipeId: recipe.id, currencyId: cost.reason.currencyId });
     }
-  });
+  }
 
   for (const { pools, entries } of rankableClasses.values()) {
     // Canonical key order, so the summation order and so the figure never depend on the input order.
@@ -408,10 +403,10 @@ export function rank(input: RankInput): Ranking {
       });
       continue;
     }
-    recipes.forEach((recipe, index) => {
+    for (const [index, recipe] of recipes.entries()) {
       const cost = costs[index];
       if (cost === undefined) {
-        return;
+        continue;
       }
       const row = craftedRow(first, recipe, cost, pools, keyed, byKey, input);
       if (row === undefined) {
@@ -421,10 +416,10 @@ export function rank(input: RankInput): Ranking {
           reason: RECIPE_UNREACHABLE,
           recipeId: recipe.id,
         });
-        return;
+        continue;
       }
       surviving.push(row);
-    });
+    }
   }
 
   return {

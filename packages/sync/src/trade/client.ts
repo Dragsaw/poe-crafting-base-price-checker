@@ -293,11 +293,11 @@ const MINIMUM_YIELD_MS = 1000;
 function remainingAllowance(parsed: RateLimitHeaders): number | undefined {
   let remaining: number | undefined;
   for (const rule of parsed.rules) {
-    rule.buckets.forEach((bucket, index) => {
+    for (const [index, bucket] of rule.buckets.entries()) {
       const used = rule.state[index]?.hits ?? 0;
       const left = Math.max(0, bucket.hits - used);
       remaining = remaining === undefined ? left : Math.min(remaining, left);
-    });
+    }
   }
   return remaining;
 }

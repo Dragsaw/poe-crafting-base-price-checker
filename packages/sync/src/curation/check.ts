@@ -149,9 +149,11 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   }
   const entries = schema.ok ? schema.entries : undefined;
   const indexByKey = new Map<string, number>();
-  entries?.forEach((entry, index) => {
-    indexByKey.set(canonicalKey(entry), index);
-  });
+  if (entries !== undefined) {
+    for (const [index, entry] of entries.entries()) {
+      indexByKey.set(canonicalKey(entry), index);
+    }
+  }
   const pathOf = (entryKey: string): { readonly path?: string } => {
     const index = indexByKey.get(entryKey);
     return index === undefined ? {} : { path: `entries.${String(index)}` };

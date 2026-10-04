@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import { canonicalKey } from './canonical-key.ts';
 import { CraftRecipeSchema, RECIPE_GRADES, recipeWord } from './craft-recipe.ts';
 import { CurrencyRateSchema } from './currency-rate.ts';
 import { DatasetEntrySchema } from './dataset.ts';
@@ -12,17 +11,8 @@ import {
 } from './schema-version.ts';
 import { SyncProgressSchema } from './sync-progress.ts';
 import { SyncRunReportSchema } from './sync-run-report.ts';
-import {
-  describeOverlap,
-  linesOf,
-  namesHybrid,
-  NEVER_CO_OCCUR,
-  OVERLAP_SLOTS,
-  overlapBranches,
-  summedStatIds,
-} from './overlap.ts';
 import { TrackedEntrySchema } from './tracked-entry.ts';
-import type { CraftedTrackedEntry } from './tracked-entry.ts';
+import { checkTrackedEntries } from './envelopes/tracked-file-checks.ts';
 import {
   FilterCatalogueSchema,
   ItemCatalogueSchema,
@@ -81,104 +71,8 @@ export const TrackedFileSchema = z
     entries: z.array(TrackedEntrySchema),
   })
   .superRefine((file, context) => {
-    const firstIndexByKey = new Map<string, number>();
-    file.entries.forEach((entry, index) => {
-      const key = canonicalKey(entry);
-      const first = firstIndexByKey.get(key);
-      if (first === undefined) {
-        firstIndexByKey.set(key, index);
-        return;
-      }
-      context.addIssue({
-        code: 'custom',
-        path: ['entries', index],
-        message: `canonical key ${key} repeats entries.${String(first)}; a key may appear once in the tracked list`,
-      });
-    });
-    const firstFloorByClass = new Map<string, { readonly index: number; readonly floor: number }>();
-    file.entries.forEach((entry, index) => {
-      if (entry.kind !== 'crafted' || entry.status === 'pruned') {
-        return;
-      }
-      const classKey = JSON.stringify([entry.categoryId, entry.className]);
-      const first = firstFloorByClass.get(classKey);
-      if (first === undefined) {
-        firstFloorByClass.set(classKey, { index, floor: entry.itemLevelMin });
-        return;
-      }
-      if (first.floor === entry.itemLevelMin) {
-        return;
-      }
-      context.addIssue({
-        code: 'custom',
-        path: ['entries', index, 'itemLevelMin'],
-        message: `item class ${entry.categoryId}/${entry.className} declares itemLevelMin ${String(entry.itemLevelMin)} here and ${String(first.floor)} at entries.${String(first.index)}; the crafted entries of one item class share one floor (AD-17)`,
-      });
-    });
-    const earlierByClass = new Map<string, { readonly index: number; readonly key: string; readonly entry: CraftedTrackedEntry }[]>();
-    file.entries.forEach((entry, index) => {
-      if (entry.kind !== 'crafted' || entry.status === 'pruned') {
-        return;
-      }
-      const classKey = JSON.stringify([entry.categoryId, entry.className]);
-      const earlier = earlierByClass.get(classKey) ?? [];
-      const key = canonicalKey(entry);
-      for (const other of earlier) {
-        // A twin is the uniqueness rule's issue; a pair with a hybrid is core's (§2.1).
-        if (other.key === key || namesHybrid(other.entry) || namesHybrid(entry)) {
-          continue;
-        }
-        const branches = overlapBranches(other.entry, entry, NEVER_CO_OCCUR);
-        if (branches === undefined) {
-          continue;
-        }
-        context.addIssue({
-          code: 'custom',
-          path: ['entries', index],
-          message: `entries ${other.key} (entries.${String(other.index)}) and ${key} overlap on ${describeOverlap(branches)}; one item satisfies both and would be counted twice (AD-17)`,
-        });
-      }
-      earlier.push({ index, key, entry });
-      earlierByClass.set(classKey, earlier);
-    });
-    const firstKindByStatId = new Map<string, { readonly kind: LineKind; readonly at: string }>();
-    file.entries.forEach((entry, index) => {
-      if (entry.kind !== 'crafted' || entry.status === 'pruned') {
-        return;
-      }
-      const summed = summedStatIds(entry);
-      for (const slot of OVERLAP_SLOTS) {
-        const reference = entry[slot];
-        linesOf(reference).forEach((line, lineIndex) => {
-          const path = reference.kind === 'hybrid' ? ['entries', index, slot, 'lines', lineIndex] : ['entries', index, slot];
-          const at = path.join('.');
-          const kind: LineKind = 'valueMin' in line ? 'banded' : 'valueless';
-          if (kind === 'valueless' && summed.has(line.statId)) {
-            context.addIssue({
-              code: 'custom',
-              path,
-              message: `entry ${canonicalKey(entry)} sums statId ${line.statId} across its prefix and suffix, and its ${slot} line on it is valueless; a summed operand needs both edges (IMPLEMENTATION-NOTES.md §2.3, §5.5)`,
-            });
-          }
-          const first = firstKindByStatId.get(line.statId);
-          if (first === undefined) {
-            firstKindByStatId.set(line.statId, { kind, at });
-            return;
-          }
-          if (first.kind !== kind) {
-            context.addIssue({
-              code: 'custom',
-              path,
-              message: `statId ${line.statId} is ${kind} at ${at} and ${first.kind} at ${first.at}; every tracked line on one statId takes one kind (IMPLEMENTATION-NOTES.md §2.3)`,
-            });
-          }
-        });
-      }
-    });
+    checkTrackedEntries(file.entries, context);
   });
-
-/** The kind a tracked line declares: both edges make it banded, none makes it valueless (§4.1). */
-type LineKind = 'banded' | 'valueless';
 
 /** The recipe grade prefixes, as the mixed-grade refusal prints them. */
 const GRADE_PREFIXES = RECIPE_GRADES.map((grade) => `${grade}-`).join(', ');
@@ -202,7 +96,7 @@ export const RecipesFileSchema = z
   .superRefine((file, context) => {
     const firstIndexById = new Map<string, number>();
     const firstIndexByWord = new Map<string, number>();
-    file.recipes.forEach((recipe, index) => {
+    for (const [index, recipe] of file.recipes.entries()) {
       const first = firstIndexById.get(recipe.id);
       if (first === undefined) {
         firstIndexById.set(recipe.id, index);
@@ -213,26 +107,26 @@ export const RecipesFileSchema = z
             path: ['recipes', index],
             message: `recipe ${recipe.id} mixes grades across its currencies; every currency id shares one grade prefix (${GRADE_PREFIXES}) or none`,
           });
-          return;
+          continue;
         }
         const firstWithWord = firstIndexByWord.get(word);
         if (firstWithWord === undefined) {
           firstIndexByWord.set(word, index);
-          return;
+          continue;
         }
         context.addIssue({
           code: 'custom',
           path: ['recipes', index],
           message: `recipe ${recipe.id} reads ${word}, as recipes.${String(firstWithWord)} does; two recipes may not derive one word`,
         });
-        return;
+        continue;
       }
       context.addIssue({
         code: 'custom',
         path: ['recipes', index],
         message: `recipe id ${recipe.id} repeats recipes.${String(first)}; an id may appear once in recipes.json`,
       });
-    });
+    }
   });
 
 /** `data/currencies.json` — hand-maintained rates, read and never fetched (AD-20). */
@@ -279,18 +173,18 @@ export const DatasetFileSchema = z
   })
   .superRefine((file, context) => {
     const firstIndexByEntryKey = new Map<string, number>();
-    file.entries.forEach((entry, index) => {
+    for (const [index, entry] of file.entries.entries()) {
       const first = firstIndexByEntryKey.get(entry.entryKey);
       if (first === undefined) {
         firstIndexByEntryKey.set(entry.entryKey, index);
-        return;
+        continue;
       }
       context.addIssue({
         code: 'custom',
         path: ['entries', index],
         message: `entry key ${entry.entryKey} repeats entries.${String(first)}; a key may appear once in dataset.json`,
       });
-    });
+    }
   });
 
 /** `data/sync-report.json` — figures and records (FR-25). */

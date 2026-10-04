@@ -67,21 +67,21 @@ export const ModifierWeightSchema = z
       });
     }
     const firstIndexByStatId = new Map<string, number>();
-    entry.lines.forEach((line, index) => {
+    for (const [index, line] of entry.lines.entries()) {
       if (line.statId === null) {
-        return;
+        continue;
       }
       const first = firstIndexByStatId.get(line.statId);
       if (first === undefined) {
         firstIndexByStatId.set(line.statId, index);
-        return;
+        continue;
       }
       context.addIssue({
         code: 'custom',
         path: ['lines', index, 'statId'],
         message: `statId ${line.statId} repeats lines.${String(first)}; a statId may appear once among one entry's lines`,
       });
-    });
+    }
   });
 
 /** One `(categoryId, className, slot)` pool. A `sourceModifierId` appears once per slot. */
@@ -94,18 +94,18 @@ export const WeightsPoolSchema = z
   })
   .superRefine((pool, context) => {
     const firstIndexById = new Map<string, number>();
-    pool.entries.forEach((entry, index) => {
+    for (const [index, entry] of pool.entries.entries()) {
       const first = firstIndexById.get(entry.sourceModifierId);
       if (first === undefined) {
         firstIndexById.set(entry.sourceModifierId, index);
-        return;
+        continue;
       }
       context.addIssue({
         code: 'custom',
         path: ['entries', index, 'sourceModifierId'],
         message: `sourceModifierId repeats entries.${String(first)}; a sourceModifierId may appear once per slot`,
       });
-    });
+    }
   });
 
 /** One item class's two pools. */

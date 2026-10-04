@@ -117,6 +117,32 @@ function startedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
   return parent.started === undefined || child.started === undefined || parent.started <= child.started;
 }
 
+/** The highest process of the listener's chain that planStop may kill. */
+function climbToRoot(
+  listener: ProcessInfo,
+  byPid: ReadonlyMap<number, ProcessInfo>,
+  protectedPids: ReadonlySet<number>,
+): ProcessInfo {
+  let top = listener;
+  // A reused PID can close a `ppid` cycle; the seen set ends the climb there.
+  const seen = new Set<number>([top.pid]);
+  for (;;) {
+    const parent = byPid.get(top.ppid);
+    if (
+      parent === undefined ||
+      seen.has(parent.pid) ||
+      protectedPids.has(parent.pid) ||
+      !(isScriptShell(parent) || isPnpmDevelopment(parent)) ||
+      !startedBefore(parent, top)
+    ) {
+      return top;
+    }
+    seen.add(parent.pid);
+    top = parent;
+    if (isPnpmDevelopment(top)) {return top;}
+  }
+}
+
 /**
  * What to kill for the given listener PIDs. Each listener must be Vite run from
  * `repoRoot`'s `node_modules`. From each listener, climb while the parent is
@@ -152,24 +178,7 @@ export function planStop(
         reason: `PID ${pid} is not this checkout's Vite, so it is left running: ${listener.commandLine}`,
       };
     }
-    let top = listener;
-    // A reused PID can close a `ppid` cycle; the seen set ends the climb there.
-    const seen = new Set<number>([top.pid]);
-    for (;;) {
-      const parent = byPid.get(top.ppid);
-      if (
-        parent === undefined ||
-        seen.has(parent.pid) ||
-        protectedPids.has(parent.pid) ||
-        !(isScriptShell(parent) || isPnpmDevelopment(parent)) ||
-        !startedBefore(parent, top)
-      ) {
-        break;
-      }
-      seen.add(parent.pid);
-      top = parent;
-      if (isPnpmDevelopment(top)) {break;}
-    }
+    const top = climbToRoot(listener, byPid, protectedPids);
     roots.add(top.pid);
   }
   return { kind: 'kill', roots: [...roots] };
