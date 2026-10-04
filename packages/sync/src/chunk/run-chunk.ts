@@ -663,7 +663,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
      * inside a session pass this chunk did not start, the pass's start.
      */
     const countFrom = (): RequestsBySource =>
-      session?.requestsSince !== undefined && order !== undefined && !order.newPass
+      order !== undefined && !order.newPass && session?.requestsSince !== undefined
         ? session.requestsSince
         : requestsAtStart;
 
@@ -844,7 +844,7 @@ export async function runChunk(ports: ChunkPorts): Promise<ChunkOutcome> {
         !plan.newPass &&
         session.confirmedLeague === ready.publication.league;
       const gated =
-        ready.gate === undefined || isAlreadyConfirmed ? undefined : await ready.gate({ entries });
+        isAlreadyConfirmed || ready.gate === undefined ? undefined : await ready.gate({ entries });
       if (gated?.kind === 'yield') {
         // A gate yield is a chunk yield with no entry attempted (AD-8, AD-12).
         if (!(await holdsLock(fs, mine))) {

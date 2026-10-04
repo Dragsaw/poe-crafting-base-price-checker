@@ -25,7 +25,7 @@ vi.mock('node:child_process', async (importOriginal) => {
     real.execFileSync(
       file,
       failure.inject
-        ? arguments_.map((argument) => argument.replaceAll('Get-NetTCPConnection', MISSING_CMDLET))
+        ? arguments_.map((argument) => argument.replaceAll('Get-NetTCPConnection', () => MISSING_CMDLET))
         : (failure.badShape
           ? arguments_.map((argument) => argument.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
           : arguments_),

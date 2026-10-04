@@ -287,7 +287,9 @@ function killTree(pid: number, processes: readonly ProcessInfo[]): void {
     }
     return;
   }
-  for (const child of processes.filter((info) => info.ppid === pid)) {killTree(child.pid, processes);}
+  for (const child of processes) {
+    if (child.ppid === pid) {killTree(child.pid, processes);}
+  }
   try {
     process.kill(pid, 'SIGTERM');
   } catch {

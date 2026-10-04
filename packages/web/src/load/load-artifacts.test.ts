@@ -282,7 +282,7 @@ describe('the frozen data fixture set', () => {
     const answers = Object.fromEntries(
       ARTIFACT_ORDER.map((key): [ArtifactKey, ArtifactAnswer] => {
         const file = `../../../../test/fixtures/frozen-data/${ARTIFACTS[key].path}`;
-        if (!(file in committed)) {
+        if (!Object.hasOwn(committed, file)) {
           missing.push(key);
           return [key, { kind: 'status', status: 404 }];
         }

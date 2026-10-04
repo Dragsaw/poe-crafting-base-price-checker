@@ -56,7 +56,10 @@ describe('buildDatasetFile', () => {
     expect(file.entries.filter((entry) => entry.price.state === 'no-listings')).toEqual(
       [attempted(e, NOW), attempted(c, NOW)].toSorted(byKey),
     );
-    for (const entry of file.entries.filter((candidate) => candidate.price.state !== 'no-listings')) {
+    for (const entry of file.entries) {
+      if (entry.price.state === 'no-listings') {
+        continue;
+      }
       // AD-9: no placeholder timestamps on a never-synced entry.
       expect(Object.keys(entry)).toEqual(['entryKey', 'price']);
       expect(entry.price).toEqual({ state: 'not-yet-synced', reason: 'never-synced' });

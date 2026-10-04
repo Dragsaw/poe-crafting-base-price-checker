@@ -143,7 +143,6 @@ export function parseRateLimitHeaders(
   for (const name of ruleNamesOf(normalised.get(RULES_HEADER))) {
     const key = `${RULE_HEADER_PREFIX}${name.toLowerCase()}`;
     const policyRawValue = normalised.get(key);
-    const stateRawValue = normalised.get(`${key}${STATE_HEADER_SUFFIX}`);
 
     if (policyRawValue === undefined) {
       skips.push({
@@ -153,6 +152,7 @@ export function parseRateLimitHeaders(
       });
       continue;
     }
+    const stateRawValue = normalised.get(`${key}${STATE_HEADER_SUFFIX}`);
     if (stateRawValue === undefined) {
       skips.push({
         rule: name,

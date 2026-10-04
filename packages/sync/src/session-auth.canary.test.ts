@@ -635,7 +635,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
           if (cookie === undefined) {
             return fake.send(request);
           }
-          if (request.method === 'POST' && !isProbed) {
+          if (!isProbed && request.method === 'POST') {
             isProbed = true;
             return Promise.resolve({ status: 200, headers: LIVE_HEADERS, body: SEARCHED });
           }

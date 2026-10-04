@@ -172,11 +172,11 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
     return 1;
   }
   const isDryRun = values['dry-run'] === true;
-  const isList = values.list === true;
-  if (values.ref !== undefined && !isDryRun) {
+  if (!isDryRun && values.ref !== undefined) {
     error_.write(`${PROGRAM}: --ref is allowed only with --dry-run\n${USAGE}`);
     return 1;
   }
+  const isList = values.list === true;
   if (isList && isDryRun) {
     error_.write(`${PROGRAM}: --list and --dry-run do not combine\n${USAGE}`);
     return 1;

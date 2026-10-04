@@ -99,7 +99,7 @@ const recordDir = inject('noNetworkRecordDir');
  * the request.
  */
 function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undefined): void {
-  if (guard.fileOpen || recordDir === undefined) {
+  if (recordDir === undefined || guard.fileOpen) {
     return;
   }
   appendFileSync(

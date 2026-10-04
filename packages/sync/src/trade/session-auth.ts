@@ -259,7 +259,7 @@ export class SessionAuth {
    * so the run sends no probe. Records no action: the field carries forward.
    */
   settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void {
-    if (!this.canProbe || holdOffUntil === undefined) {
+    if (holdOffUntil === undefined || !this.canProbe) {
       return;
     }
     if (Date.parse(now) < Date.parse(holdOffUntil)) {

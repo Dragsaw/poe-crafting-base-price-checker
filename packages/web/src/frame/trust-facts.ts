@@ -253,7 +253,7 @@ function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): 
  */
 function coveragePercent(coverage: number): number {
   const floored = Math.floor(coverage * 100 + 1e-9);
-  if (coverage > 0 && floored === 0) {
+  if (floored === 0 && coverage > 0) {
     return 1;
   }
   return coverage < 1 ? Math.min(floored, 99) : floored;

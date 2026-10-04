@@ -54,7 +54,7 @@ function lint(subject) {
     );
   }
 
-  if (subject.endsWith('.') && scope !== PERIOD_EXEMPT_SCOPE) {
+  if (scope !== PERIOD_EXEMPT_SCOPE && subject.endsWith('.')) {
     fail(`the subject ends with a period.`, `Remove the trailing period.`);
   }
 

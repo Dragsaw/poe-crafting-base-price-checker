@@ -64,7 +64,7 @@ function readLegacyRequestSources(value: unknown): unknown {
     return value;
   }
   const entries = Object.entries(value).filter(([key]) => key !== LEGACY_REQUEST_SOURCE_KEY);
-  if (!(SESSION_PROBE_SOURCE_KEY in value)) {
+  if (!Object.hasOwn(value, SESSION_PROBE_SOURCE_KEY)) {
     entries.push([SESSION_PROBE_SOURCE_KEY, 0]);
   }
   return Object.fromEntries(entries);

@@ -53,7 +53,7 @@ export function statTexts(catalogue: StatCatalogue): StatTexts {
  */
 export function bandedFallback(text: string, valueMin: number, valueMax: number): string {
   const band = `${String(valueMin)}–${String(valueMax)}`;
-  return text.split('#').length === 2 ? text.replace('#', band) : `${text} ${band}`;
+  return text.split('#').length === 2 ? text.replace('#', () => band) : `${text} ${band}`;
 }
 
 /**

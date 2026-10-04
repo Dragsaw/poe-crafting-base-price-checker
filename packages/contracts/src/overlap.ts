@@ -116,10 +116,10 @@ function linesIntersect(x: ModifierReference, y: ModifierReference, shared: read
     }
     const isLeftBanded = 'valueMin' in left;
     const isRightBanded = 'valueMin' in right;
-    if (!isLeftBanded && !isRightBanded) {
-      return true;
-    }
-    return isLeftBanded && isRightBanded && left.valueMin <= right.valueMax && right.valueMin <= left.valueMax;
+    return (
+      (!isLeftBanded && !isRightBanded) ||
+      (isLeftBanded && isRightBanded && left.valueMin <= right.valueMax && right.valueMin <= left.valueMax)
+    );
   });
 }
 

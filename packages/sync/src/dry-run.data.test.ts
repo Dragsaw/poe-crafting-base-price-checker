@@ -75,7 +75,7 @@ describe('pnpm sync:dry over the live data/', () => {
       'dataset',
       'records',
       'report',
-      ...['unrecorded', 'pinnedStarvation', 'notBefore'].filter((key) => key in report),
+      ...['unrecorded', 'pinnedStarvation', 'notBefore'].filter((key) => Object.hasOwn(report, key)),
     ]);
     expect(report['outcome']).toBe('completed');
     // Printed as written: the schema accepts it and its keys are in declared order.
@@ -115,7 +115,10 @@ describe('pnpm sync:dry over the live data/', () => {
     const report = JSON.parse(run.stdout) as { entries: DatasetEntry[]; dataset: DatasetFile };
     // Only the entries this run priced are stamped; a skipped one keeps its stamp.
     const stamped = new Set(report.entries.map((entry) => entry.entryKey));
-    for (const entry of report.dataset.entries.filter((published) => stamped.has(published.entryKey))) {
+    for (const entry of report.dataset.entries) {
+      if (!stamped.has(entry.entryKey)) {
+        continue;
+      }
       expect(entry.lastAttemptedAt, entry.entryKey).toBe(at);
     }
     expect(snapshot(DATA_DIR)).toEqual(before);
