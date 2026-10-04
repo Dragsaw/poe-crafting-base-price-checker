@@ -68,7 +68,7 @@ export interface LoadOptions {
 /** The file's `schemaVersion` string, or `null` where it is missing or not a string. */
 function declaredVersion(data: unknown): string | null {
   if (typeof data === 'object' && data !== null && 'schemaVersion' in data) {
-    const version = (data as { schemaVersion: unknown }).schemaVersion;
+    const version = data.schemaVersion;
     if (typeof version === 'string') {
       return version;
     }

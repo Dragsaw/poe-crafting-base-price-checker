@@ -21,6 +21,9 @@ const CORE_FILE = 'packages/core/src/purity-probe.ts';
 const CORE_TEST_FILE = 'packages/core/src/purity-probe.test.ts';
 const SYNC_FILE = 'packages/sync/src/purity-probe.ts';
 
+// The probes are virtual files outside any tsconfig, so the type-aware block of
+// the config (which needs a real project file) is skipped, as in the fast path.
+process.env.LINT_FAST = '1';
 const eslint = new ESLint({ cwd: REPO_ROOT });
 
 interface PurityError {

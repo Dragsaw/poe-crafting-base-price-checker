@@ -721,9 +721,9 @@ describe('pnpm sync: the session with injected ports', () => {
     });
 
     it.each([
-      ['not-elevated', { status: 200, headers: {}, body: NO_RESULTS } as HttpResponse],
-      ['probe-rejected', { status: 403, headers: {}, body: 'forbidden' } as HttpResponse],
-      ['probe-failed', { status: 503, headers: {}, body: '' } as HttpResponse],
+      ['not-elevated', { status: 200, headers: {}, body: NO_RESULTS }],
+      ['probe-rejected', { status: 403, headers: {}, body: 'forbidden' }],
+      ['probe-failed', { status: 503, headers: {}, body: '' }],
       ['probe-failed', new TypeError('fetch failed')],
     ])('%s: one line after the probe, no later request carries the cookie, exit 0', async (reason, answer) => {
       const { deps, auth, err, http } = sessionFor({

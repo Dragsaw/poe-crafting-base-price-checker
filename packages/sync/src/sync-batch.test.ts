@@ -711,10 +711,10 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     it.each([
       ['not-elevated', { ...SEARCH_WITH_RESULTS, body: JSON.stringify({ id: 'PROBE', result: RESULTS }) }],
-      ['probe-rejected', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
-      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' } as HttpResponse],
-      ['probe-rejected', { status: 400, headers: {}, body: 'bad' } as HttpResponse],
-      ['probe-failed', { status: 503, headers: {}, body: '' } as HttpResponse],
+      ['probe-rejected', { status: 401, headers: {}, body: 'unauthorized' }],
+      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' }],
+      ['probe-rejected', { status: 400, headers: {}, body: 'bad' }],
+      ['probe-failed', { status: 503, headers: {}, body: '' }],
       ['probe-failed', new TypeError('fetch failed')],
     ])('%s: one line, the fetch goes without the cookie, the exit code is unchanged', async (reason, answer) => {
       const { deps, http, auth, err, out, fs } = withResults();
@@ -779,8 +779,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it.each([
-      ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' } as HttpResponse],
-      ['a 401', { status: 401, headers: {}, body: 'unauthorized' } as HttpResponse],
+      ['a 403', { status: 403, headers: { 'content-type': 'text/html' }, body: 'cloudflare' }],
+      ['a 401', { status: 401, headers: {}, body: 'unauthorized' }],
     ])('CAP-3, %s on the cookie fetch: one expired line, the entry stamped, yielded, the hold-off written, exit 0', async (_label, downgrading) => {
       const { deps, http, auth, err, out, fs } = withResults();
 
@@ -862,7 +862,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
     it.each([
       ['not-elevated', { ...SEARCH_WITH_RESULTS, body: JSON.stringify({ id: 'PROBE', result: RESULTS }) }],
-      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' } as HttpResponse],
+      ['probe-rejected', { status: 403, headers: {}, body: 'cloudflare' }],
     ])('CAP-5, %s writes the hold-off in the chunk’s progress write', async (_reason, answer) => {
       const { deps, fs } = withResults();
 
@@ -872,8 +872,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     });
 
     it.each([
-      ['probe-failed', COOKIE_ENV, [{ status: 503, headers: {}, body: '' } as HttpResponse]],
-      ['a probe 429', COOKIE_ENV, [{ status: 429, headers: { 'retry-after': '60' }, body: '' } as HttpResponse]],
+      ['probe-failed', COOKIE_ENV, [{ status: 503, headers: {}, body: '' }]],
+      ['a probe 429', COOKIE_ENV, [{ status: 429, headers: { 'retry-after': '60' }, body: '' }]],
       ['absent', { [USER_AGENT_ENV_VAR]: CONTACT }, []],
       ['malformed', { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: 'a b' }, []],
     ])('CAP-5, %s carries the field forward unchanged', async (_label, environment, answers) => {

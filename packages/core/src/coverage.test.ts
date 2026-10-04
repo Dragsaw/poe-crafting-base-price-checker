@@ -26,7 +26,7 @@ const weightsOf = (
     gamePatch: '0.5.5',
     producer: { id: 'test', generatedAt: '2026-09-26T10:52:22.504Z' },
     bases,
-  }) as WeightsFile;
+  });
 
 const crafted = (
   className: string,
@@ -41,7 +41,7 @@ const crafted = (
     suffix: { kind: 'valueless', statId: 'explicit.stat_2' },
     status,
     ...((status === 'pruned') && { prunedReason: 'gone' }),
-  }) as TrackedEntry;
+  });
 
 const full = { prefix: pool(10), suffix: pool(10) };
 

@@ -156,7 +156,7 @@ describe('weightsAbsentRecord', () => {
       suffix: { kind: 'valueless', statId: 't' },
       status,
       ...((status === 'pruned') && { prunedReason: 'x' }),
-    }) as TrackedEntry;
+    });
 
   it('names the distinct classNames of non-pruned crafted entries, sorted by code point', () => {
     expect(

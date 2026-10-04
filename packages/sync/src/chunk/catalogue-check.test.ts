@@ -29,7 +29,7 @@ function crafted(
     suffix: { kind: 'valueless', statId: suffix },
     status,
     ...((status === 'pruned') && { prunedReason: 'x' }),
-  } as TrackedEntry;
+  };
 }
 
 const PRICED = (entryKey: string): DatasetEntry => ({

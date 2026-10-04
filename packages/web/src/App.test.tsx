@@ -557,7 +557,7 @@ describe('the payout threshold', () => {
     return serveArtifacts(
       server,
       Object.fromEntries(
-        ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: held, then: answers[key] } as ArtifactAnswer]),
+        ARTIFACT_ORDER.map((key) => [key, { kind: 'gated', gate: held, then: answers[key] }]),
       ),
     );
   }

@@ -74,7 +74,7 @@ export function createReadOnlyGitPort(root: string): GitPort {
             try {
               settle(parseAuthorDate(path, stdout));
             } catch (parseError) {
-              fail(parseError as Error);
+              fail(parseError);
             }
           },
         );

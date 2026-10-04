@@ -22,13 +22,13 @@ Object.defineProperty(globalThis, 'matchMedia', {
       addEventListener: () => {},
       removeEventListener: () => {},
       dispatchEvent: () => false,
-    }) as unknown as MediaQueryList,
+    }),
 });
 
 globalThis.ResizeObserver = class {
   observe(): void {}
   unobserve(): void {}
   disconnect(): void {}
-} as unknown as typeof ResizeObserver;
+};
 
 export {};

@@ -18,7 +18,7 @@ function pools(prefix: ModifierWeight[], suffix: ModifierWeight[]): WeightsClass
   return {
     prefix: { poolCoverage: 'complete', entries: prefix },
     suffix: { poolCoverage: 'complete', entries: suffix },
-  } as WeightsClassPools;
+  };
 }
 
 describe('provenance (AD-10)', () => {
