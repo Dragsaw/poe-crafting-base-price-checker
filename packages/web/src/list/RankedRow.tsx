@@ -25,19 +25,7 @@ const COLUMNS = { rank, unit, ev: event, provenance, age, chase } as const;
 /** The three chase slots. An unused slot stays an empty cell (state 21). */
 const CHASE_SLOTS = Array.from({ length: CHASE_CELLS }, (_, slot) => slot);
 
-/**
- * One 28px ranked row in the six-cell contract. The whole row is one toggle
- * target: no per-row control, no tooltip. Hover and pointer-down tones live in
- * `list.css`, so the background is never inline. An open row takes the 3px
- * sepia `openMarker`, bled into the gutter on a negative left margin so no
- * column moves, and promotes its bottom rule to `rule-strong`.
- *
- * A Raw Base row carries three cues — the `paper-raw` tint, the italic name and
- * `▪` — and one full-width italic note in place of the chase cells. Its
- * Provenance cell is empty, as a healthy crafted row's is (state 12a). A
- * crafted row holds three fixed 164px chase cells, each ellipsising on one
- * line in `ink-secondary`, `ink-chase-emphasis` on tier 1.
- */
+/** Hover tones live in `list.css`, so the background is never inline; an open row's marker bleeds into the gutter, so no column moves. */
 export function RankedRow({
   row,
   open,
