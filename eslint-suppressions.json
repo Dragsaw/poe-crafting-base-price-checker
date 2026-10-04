@@ -1,9 +1,4 @@
 {
-  ".claude/skills/tracked-json/scripts/lookup.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   ".dependency-cruiser.mjs": {
     "local/max-comment-run": {
       "count": 1
