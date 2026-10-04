@@ -31,7 +31,7 @@ describe('LeagueIdSchema', () => {
 
 describe('DivineAmountSchema', () => {
   it('is a number, so a 4dp value survives unchanged', () => {
-    expect(DivineAmountSchema.parse(0.0001)).toBe(0.0001);
+    expect(DivineAmountSchema.parse(0.0001)).toBeCloseTo(0.0001, 10);
     expect(DivineAmountSchema.safeParse('1').success).toBe(false);
   });
 

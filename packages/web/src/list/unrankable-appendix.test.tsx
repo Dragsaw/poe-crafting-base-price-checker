@@ -145,11 +145,11 @@ describe('the non-empty appendix', () => {
     for (const row of panel.querySelectorAll<HTMLElement>('[data-appendix-row]')) {
       expect(row.className).toBe('');
       expect(row.style.cursor).toBe('');
-      const before = panel.innerHTML;
+      const before = panel.outerHTML;
       act(() => {
         row.click();
       });
-      expect(panel.innerHTML).toBe(before);
+      expect(panel.outerHTML).toBe(before);
     }
   });
 });

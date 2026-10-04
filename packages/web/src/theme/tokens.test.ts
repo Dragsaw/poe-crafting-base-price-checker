@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { cssNumber } from '../test-support/css-number';
 import {
   colors,
   columnSums,
@@ -170,7 +171,7 @@ describe('the vertical budget', () => {
 
 describe('the trust strip and the sync report panel', () => {
   it('rests at 68px: two 11.5px × 1.85 lines inside 11/12 padding and two hairlines', () => {
-    const line = Number.parseFloat(typeRoles['trust-strip'].fontSize) * Number.parseFloat(typeRoles['trust-strip'].lineHeight);
+    const line = cssNumber(typeRoles['trust-strip'].fontSize) * cssNumber(typeRoles['trust-strip'].lineHeight);
     const height = 2 * spacing.hairline + spacing.trustStripPadTop + spacing.trustStripPadBottom + 2 * line;
     expect(Math.round(height)).toBe(68);
     expect(committedChrome.find((block) => block.block === 'trust strip')?.px).toBe(68);

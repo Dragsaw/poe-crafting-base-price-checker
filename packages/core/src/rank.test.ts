@@ -176,7 +176,7 @@ describe('rank: the I/O matrix', () => {
     const result = ranked({ tracked: [A], dataset: [published(A, priced(0.1))] });
     expect(result.ordering).toEqual([]);
     expect(keysOf(result.belowThreshold)).toEqual([canonicalKey(A)]);
-    expect(result.belowThreshold[0]?.ev).toBe(0.1);
+    expect(result.belowThreshold[0]?.ev).toBeCloseTo(0.1, 10);
     expect(everyKey(result)).toEqual([canonicalKey(A)]);
   });
 
@@ -284,8 +284,8 @@ describe('rank: the I/O matrix', () => {
   it('passes a 4dp value on exactly, never re-rounded', () => {
     const A = raw('A');
     const result = ranked({ tracked: [A], dataset: [published(A, priced(0.1235))], threshold: 0.1 });
-    expect(result.ordering[0]?.ev).toBe(0.1235);
-    expect(rawRows(result.ordering)[0]?.observation.priceDivine).toBe(0.1235);
+    expect(result.ordering[0]?.ev).toBeCloseTo(0.1235, 10);
+    expect(rawRows(result.ordering)[0]?.observation.priceDivine).toBeCloseTo(0.1235, 10);
   });
 
   it('nothing clears: the ordering is empty and every row is below the threshold', () => {
@@ -759,8 +759,8 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     expect(row?.summands.map((summand) => summand.entryKey)).toEqual([canonicalKey(filler), canonicalKey(target)]);
     expect(row?.summands.map((summand) => summand.probability)).toEqual([0.1, 0.1]);
     expect(row?.summands.map((summand) => summand.contribution)).toEqual([0.1 * 4, 0.1 * 2]);
-    expect(row?.grossPayout).toBe(0 + 0.1 * 4 + 0.1 * 2);
-    expect(row?.ev).toBe(0 + 0.1 * 4 + 0.1 * 2 - GREATER_COST);
+    expect(row?.grossPayout).toBeCloseTo(0 + 0.1 * 4 + 0.1 * 2, 10);
+    expect(row?.ev).toBeCloseTo(0 + 0.1 * 4 + 0.1 * 2 - GREATER_COST, 10);
     expect(RankedRowSchema.parse(row)).toEqual(row);
   });
 
@@ -788,7 +788,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     });
     const [row] = craftedRows(result.ordering);
     expect(row?.summands).toEqual([]);
-    expect(row?.ev).toBe(-GREATER_COST);
+    expect(row?.ev).toBeCloseTo(-GREATER_COST, 10);
     // Crafted entries never enter the raw groups.
     expect(everyKey(result)).toEqual([row?.classKey]);
   });

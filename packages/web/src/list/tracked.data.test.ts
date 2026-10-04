@@ -1,6 +1,7 @@
 import { CatalogueStatsFileSchema, TrackedFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { cssNumber } from '../test-support/css-number';
 import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
 import { shortForm } from './short-forms';
@@ -42,7 +43,7 @@ describe('the live data/tracked.json', () => {
   it('fits the longest combination text inside the combination cell, at line one’s size', () => {
     const [cell] = combinationLine1Columns;
     const available = cell.width - cell.padRight;
-    const fontSize = Number.parseFloat(typeRoles['detail-row'].fontSize);
+    const fontSize = cssNumber(typeRoles['detail-row'].fontSize);
     const overlong = texts
       .map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`)
       .filter((text) => text.length * ADVANCE_EM * fontSize > available);

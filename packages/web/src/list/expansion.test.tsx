@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
+import { cssNumber } from '../test-support/css-number';
 import { cellIn as cell, mountList, NOW, rgb, rowsIn, unmount } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
@@ -104,7 +105,7 @@ describe('the expansion panel', () => {
     const belt = rawEntry('Wide Belt');
     const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, SEARCH));
     const widths = (line: string): number[] =>
-      Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => Number.parseFloat(c.style.width));
+      Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => cssNumber(c.style.width));
     expect(widths('1')).toEqual([...columnSums.combinationLine1]);
     expect(widths('2')).toEqual([...columnSums.combinationLine2]);
     expect(row.style.minHeight).toBe(`${String(spacing.combinationRowHeight)}px`);

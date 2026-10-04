@@ -307,11 +307,6 @@
       "count": 1
     }
   },
-  "packages/contracts/src/primitives.test.ts": {
-    "sonarjs/no-floating-point-equality": {
-      "count": 1
-    }
-  },
   "packages/contracts/src/primitives.ts": {
     "local/max-comment-run": {
       "count": 4
@@ -562,9 +557,6 @@
     "max-lines": {
       "count": 1
     },
-    "sonarjs/no-floating-point-equality": {
-      "count": 6
-    },
     "unicorn/consistent-boolean-name": {
       "count": 1
     },
@@ -615,9 +607,6 @@
     },
     "sonarjs/no-alphabetical-sort": {
       "count": 1
-    },
-    "sonarjs/no-floating-point-equality": {
-      "count": 6
     },
     "unicorn/consistent-boolean-name": {
       "count": 1
@@ -1180,9 +1169,6 @@
     }
   },
   "packages/sync/src/pricing/normalise.test.ts": {
-    "sonarjs/no-floating-point-equality": {
-      "count": 3
-    },
     "unicorn/prefer-iterator-to-array": {
       "count": 1
     }
@@ -1601,12 +1587,6 @@
     },
     "unicorn/no-top-level-assignment-in-function": {
       "count": 6
-    },
-    "unicorn/prefer-dom-node-html-methods": {
-      "count": 3
-    },
-    "unicorn/prefer-number-coercion": {
-      "count": 1
     }
   },
   "packages/web/src/App.tsx": {
@@ -1830,9 +1810,6 @@
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
-    "unicorn/prefer-number-coercion": {
-      "count": 1
-    },
     "unicorn/require-array-sort-compare": {
       "count": 2
     }
@@ -1882,9 +1859,6 @@
     },
     "unicorn/no-null": {
       "count": 2
-    },
-    "unicorn/prefer-number-coercion": {
-      "count": 1
     }
   },
   "packages/web/src/list/format.test.ts": {
@@ -1919,9 +1893,6 @@
   "packages/web/src/list/ranked-list.test.tsx": {
     "max-lines": {
       "count": 1
-    },
-    "unicorn/prefer-number-coercion": {
-      "count": 1
     }
   },
   "packages/web/src/list/short-forms.test.ts": {
@@ -1940,9 +1911,6 @@
     },
     "unicorn/no-unnecessary-array-flat-map": {
       "count": 1
-    },
-    "unicorn/prefer-number-coercion": {
-      "count": 1
     }
   },
   "packages/web/src/list/trade-link.ts": {
@@ -1956,9 +1924,6 @@
     },
     "unicorn/no-top-level-assignment-in-function": {
       "count": 4
-    },
-    "unicorn/prefer-dom-node-html-methods": {
-      "count": 2
     }
   },
   "packages/web/src/load/artifacts.ts": {
@@ -2158,11 +2123,6 @@
       "count": 1
     }
   },
-  "packages/web/src/theme/tokens.test.ts": {
-    "unicorn/prefer-number-coercion": {
-      "count": 2
-    }
-  },
   "packages/web/src/theme/tokens.ts": {
     "local/max-comment-run": {
       "count": 15
@@ -2182,15 +2142,9 @@
   "packages/web/src/threshold/payout-threshold.test.tsx": {
     "unicorn/no-top-level-assignment-in-function": {
       "count": 4
-    },
-    "unicorn/prefer-number-coercion": {
-      "count": 1
     }
   },
   "packages/web/src/threshold/threshold-storage.test.ts": {
-    "sonarjs/no-floating-point-equality": {
-      "count": 5
-    },
     "unicorn/no-null": {
       "count": 3
     }

@@ -3,6 +3,7 @@ import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { cellIn as cell, mount, mountList, NOW, rerenderList, rgb, rowsIn, unmount } from '../test-support/dom';
+import { cssNumber } from '../test-support/css-number';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { colors, glyphs, rankedRowColumns, spacing } from '../theme/tokens';
 import { COLUMN_LABELS } from './ColumnHeader';
@@ -68,7 +69,7 @@ describe('a ranked row', () => {
   it('sums its six cells to 1012 at a 28px height', () => {
     const belt = rawEntry('Wide Belt');
     const [row] = rowsIn(mountList([belt], [priced(belt, 0.5, hoursBefore(NOW, 3))]));
-    const widths = rankedRowColumns.map((c) => Number.parseFloat(cell(row, c.name).style.width));
+    const widths = rankedRowColumns.map((c) => cssNumber(cell(row, c.name).style.width));
     expect(widths.reduce((a, b) => a + b, 0)).toBe(spacing.contentWidth);
     expect(row?.style.height).toBe('28px');
     expect(row?.style.width).toBe('1012px');

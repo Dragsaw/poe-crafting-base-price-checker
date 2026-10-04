@@ -117,7 +117,7 @@ describe('contains (§1)', () => {
     const t8 = tier([line(STAT, [56, 80])], 100);
     const outside = tier([line(STAT, [81, 90])], 700);
     const p = pOf(affixProbability(pools([t7, t8, outside], []), 'prefix', band(43, 80), 82, 0));
-    expect(p).toBe(300 / 1000);
+    expect(p).toBeCloseTo(300 / 1000, 10);
   });
 
   it('contains a valueless line for a valueless ref, and never a banded line of that statId', () => {
@@ -138,7 +138,7 @@ describe('contains (§1)', () => {
     const doubled = tier([line(STAT, [10, 12]), line(STAT, [11, 12])], 50);
     const rest = tier([line(STAT, [20, 30])], 850);
     const p = pOf(affixProbability(pools([hybridTier, doubled, rest], []), 'prefix', band(10, 12), 82, 0));
-    expect(p).toBe(150 / 1000);
+    expect(p).toBeCloseTo(150 / 1000, 10);
   });
 
   it('never contains a null-statId line, whose entry stays in the denominator', () => {
@@ -352,9 +352,9 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const rest = tier([line(THIRD, [1, 2])], 350);
     const classPools = pools([h1, h2, pure1, pure2, rest], []);
     const reference = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
-    expect(pOf(affixProbability(classPools, 'prefix', reference, 82, 0))).toBe(150 / 1000);
+    expect(pOf(affixProbability(classPools, 'prefix', reference, 82, 0))).toBeCloseTo(150 / 1000, 10);
     // The single-line band on the shared statId still admits both families (§1's existential test).
-    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), 82, 0))).toBe(650 / 1000);
+    expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), 82, 0))).toBeCloseTo(650 / 1000, 10);
   });
 
   it('does not contain a tier whose line set is a superset of the reference statIds', () => {
@@ -371,8 +371,8 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const referenceAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
     expect(contains(referenceAB, ac)).toBe(false);
     expect(contains(referenceAC, ab)).toBe(false);
-    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, 82, 0))).toBe(100 / 1000);
-    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, 82, 0))).toBe(300 / 1000);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, 82, 0))).toBeCloseTo(100 / 1000, 10);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, 82, 0))).toBeCloseTo(300 / 1000, 10);
   });
 
   it('computes the two-order sum by hand for a hybrid prefix and a suffix in its modGroup', () => {

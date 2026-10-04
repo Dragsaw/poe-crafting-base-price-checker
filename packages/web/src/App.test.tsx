@@ -35,6 +35,7 @@ import {
   type ArtifactAnswer,
 } from './test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from './load/artifacts';
+import { cssNumber } from './test-support/css-number';
 import { rgb } from './test-support/dom';
 import { blur, pastDebounce, typeInto } from './test-support/threshold-input';
 import { PageProvider } from './theme/PageProvider';
@@ -158,7 +159,7 @@ describe('the pending state', () => {
     for (const key of ARTIFACT_ORDER.slice(0, 6)) {
       gates.get(key)?.open();
       await flush();
-      expect(container?.innerHTML).toContain(pending);
+      expect(container?.outerHTML).toContain(pending);
       expect(frame().outerHTML).toBe(pending);
     }
 
@@ -633,7 +634,7 @@ describe('the payout threshold', () => {
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
     const marker = frame().querySelector<HTMLElement>('[data-threshold-marker]');
-    expect(Number.parseFloat(marker?.style.left ?? '')).toBeCloseTo(20, 5);
+    expect(cssNumber(marker?.style.left ?? '')).toBeCloseTo(20, 5);
   });
 
   it('keeps a threshold typed while pending through the move to ready, and ranks at it', async () => {
@@ -1346,14 +1347,14 @@ describe('the interaction surface', () => {
     // An appendix row does nothing on a click: no expansion, no change to the page.
     const appendixRows = [...frame().querySelectorAll<HTMLElement>('[data-appendix-row]')];
     expect(appendixRows).toHaveLength(2);
-    const beforeAppendix = frame().innerHTML;
+    const beforeAppendix = frame().outerHTML;
     for (const row of appendixRows) {
       act(() => {
         row.click();
       });
     }
     await flush();
-    expect(frame().innerHTML).toBe(beforeAppendix);
+    expect(frame().outerHTML).toBe(beforeAppendix);
     const appendix = frame().querySelector<HTMLElement>('[data-unrankable-appendix]');
     expect(appendix?.querySelectorAll('button, a, input, [role], [tabindex], [title], [class]')).toHaveLength(0);
     for (const row of appendixRows) {
