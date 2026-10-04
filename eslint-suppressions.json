@@ -176,11 +176,6 @@
       "count": 3
     }
   },
-  "packages/contracts/src/sync-run-report.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/contracts/src/sync-run-report.ts": {
     "local/max-comment-run": {
       "count": 12
