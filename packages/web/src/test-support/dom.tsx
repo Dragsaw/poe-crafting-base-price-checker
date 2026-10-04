@@ -21,7 +21,7 @@ export const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 
 /** A token hex as the `rgb(...)` jsdom reports for an inline colour. */
 export const rgb = (hex: string): string =>
-  `rgb(${[1, 3, 5].map((i) => String(Number.parseInt(hex.slice(i, i + 2), 16))).join(', ')})`;
+  `rgb(${[1, 3, 5].map((index) => String(Number.parseInt(hex.slice(index, index + 2), 16))).join(', ')})`;
 
 let container: HTMLDivElement | undefined;
 let root: Root | undefined;

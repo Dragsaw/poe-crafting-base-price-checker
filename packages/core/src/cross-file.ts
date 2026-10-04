@@ -108,13 +108,13 @@ function lineText(rl: ReferenceLine): string {
 }
 
 /** A reference as a payload names it: the slot, then each line's `statId` and band or kind. */
-function formatRef(slot: Slot, ref: ModifierRef): string {
-  return ref.kind === 'hybrid' ? `${slot} hybrid (${ref.lines.map(lineText).join(', ')})` : `${slot} ${lineText(ref)}`;
+function formatReference(slot: Slot, reference: ModifierRef): string {
+  return reference.kind === 'hybrid' ? `${slot} hybrid (${reference.lines.map(lineText).join(', ')})` : `${slot} ${lineText(reference)}`;
 }
 
 /** One line of a reference, as a per-line payload names it (§2.3, §2.4). */
-function formatLine(slot: Slot, ref: ModifierRef, rl: ReferenceLine): string {
-  return ref.kind === 'hybrid' ? `${slot} hybrid line ${lineText(rl)}` : `${slot} ${lineText(rl)}`;
+function formatLine(slot: Slot, reference: ModifierRef, rl: ReferenceLine): string {
+  return reference.kind === 'hybrid' ? `${slot} hybrid line ${lineText(rl)}` : `${slot} ${lineText(rl)}`;
 }
 
 function tierIds(entries: readonly ModifierWeight[]): string {
@@ -134,16 +134,16 @@ function setText(ids: readonly string[]): string {
  */
 export function edgeAlignment(
   slot: Slot,
-  ref: ModifierRef,
+  reference: ModifierRef,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
-  const contained = containedIn(ref, scoped);
+  const contained = containedIn(reference, scoped);
   if (contained.length === 0) {
     return undefined;
   }
   const parts: string[] = [];
-  for (const rl of linesOf(ref)) {
+  for (const rl of linesOf(reference)) {
     if (!('valueMin' in rl)) {
       continue;
     }
@@ -163,7 +163,7 @@ export function edgeAlignment(
       continue;
     }
     parts.push(
-      `${formatLine(slot, ref, rl)} at floor ${String(floor)}: its edges are not the extremes [${String(min)}, ${String(max)}] of the tiers it contains (${tierIds(contained)})`,
+      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: its edges are not the extremes [${String(min)}, ${String(max)}] of the tiers it contains (${tierIds(contained)})`,
     );
   }
   return parts.length === 0 ? undefined : parts.join('; ');
@@ -174,9 +174,9 @@ export function edgeAlignment(
  * lists them: covering every line under another line set, or `not-in-game`
  * while carrying every named `statId`.
  */
-function hybridExclusions(ref: ModifierRef, scoped: readonly ModifierWeight[]): string[] {
-  const named = statIds(ref);
-  const lines = linesOf(ref);
+function hybridExclusions(reference: ModifierRef, scoped: readonly ModifierWeight[]): string[] {
+  const named = statIds(reference);
+  const lines = linesOf(reference);
   const excluded: string[] = [];
   for (const entry of scoped) {
     const tierSet = lineSet(entry);
@@ -207,20 +207,20 @@ function hybridExclusions(ref: ModifierRef, scoped: readonly ModifierWeight[]): 
  */
 export function emptyContainment(
   slot: Slot,
-  ref: ModifierRef,
+  reference: ModifierRef,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
-  if (scoped.some((entry) => contains(ref, entry))) {
+  if (scoped.some((entry) => contains(reference, entry))) {
     return undefined;
   }
-  const head = `${formatRef(slot, ref)} at floor ${String(floor)}: no scoped entry contains it`;
-  if (ref.kind === 'hybrid') {
-    const excluded = hybridExclusions(ref, scoped);
+  const head = `${formatReference(slot, reference)} at floor ${String(floor)}: no scoped entry contains it`;
+  if (reference.kind === 'hybrid') {
+    const excluded = hybridExclusions(reference, scoped);
     return excluded.length === 0 ? head : `${head}; excluded: ${excluded.join(', ')}`;
   }
   const carrying = scoped.filter(
-    (entry) => entry.weight > 0 && entry.lines.some((line) => line.statId === ref.statId),
+    (entry) => entry.weight > 0 && entry.lines.some((line) => line.statId === reference.statId),
   ).length;
   return `${head} (${String(carrying)} scoped ${carrying === 1 ? 'entry carries' : 'entries carry'} that statId)`;
 }
@@ -239,12 +239,12 @@ function disagrees(rl: ReferenceLine, line: WeightsLine): boolean {
  */
 export function kindAgreement(
   slot: Slot,
-  ref: ModifierRef,
+  reference: ModifierRef,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
   const parts: string[] = [];
-  for (const rl of linesOf(ref)) {
+  for (const rl of linesOf(reference)) {
     let disagreeing = 0;
     let first: ModifierWeight | undefined;
     for (const entry of scoped) {
@@ -264,7 +264,7 @@ export function kindAgreement(
       continue;
     }
     parts.push(
-      `${formatLine(slot, ref, rl)} at floor ${String(floor)}: ${String(disagreeing)} scoped ${disagreeing === 1 ? 'line' : 'lines'} on that statId ${disagreeing === 1 ? 'is' : 'are'} banded (e.g. ${first.sourceModifierId})`,
+      `${formatLine(slot, reference, rl)} at floor ${String(floor)}: ${String(disagreeing)} scoped ${disagreeing === 1 ? 'line' : 'lines'} on that statId ${disagreeing === 1 ? 'is' : 'are'} banded (e.g. ${first.sourceModifierId})`,
     );
   }
   return parts.length === 0 ? undefined : parts.join('; ');
@@ -292,13 +292,13 @@ function meets(rl: ReferenceLine, line: WeightsLine): boolean {
  */
 export function lineSetCompleteness(
   slot: Slot,
-  ref: ModifierRef,
+  reference: ModifierRef,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
-  const named = statIds(ref);
-  const lines = linesOf(ref);
-  const at = `${formatRef(slot, ref)} at floor ${String(floor)}`;
+  const named = statIds(reference);
+  const lines = linesOf(reference);
+  const at = `${formatReference(slot, reference)} at floor ${String(floor)}`;
   const parts: string[] = [];
 
   const wider = scoped.filter((entry) => {
@@ -309,7 +309,7 @@ export function lineSetCompleteness(
     return named.every((statId) => tierSet.includes(statId)) && tierSet.some((statId) => !named.includes(statId));
   });
   if (wider.length > 0) {
-    if (ref.kind === 'hybrid') {
+    if (reference.kind === 'hybrid') {
       const tiers = wider.map((entry) => {
         const tierSet = lineSet(entry);
         const omitted = tierSet.filter((statId) => !named.includes(statId));
@@ -318,7 +318,7 @@ export function lineSetCompleteness(
       parts.push(`${at}: reference names a subset of this tier's lines: ${tiers.join(', ')}`);
     } else {
       const tiers = wider.map((entry) => {
-        const line = entry.lines.find((candidate) => candidate.statId === ref.statId);
+        const line = entry.lines.find((candidate) => candidate.statId === reference.statId);
         const on = line === undefined ? '' : ` interval [${String(interval(line).min)}, ${String(interval(line).max)}]`;
         return `${entry.sourceModifierId} ${setText(lineSet(entry))}${on}`;
       });
@@ -326,9 +326,9 @@ export function lineSetCompleteness(
     }
   }
 
-  if (ref.kind === 'hybrid') {
+  if (reference.kind === 'hybrid') {
     const groups = new Map<string, string[]>();
-    for (const entry of containedIn(ref, scoped)) {
+    for (const entry of containedIn(reference, scoped)) {
       groups.set(entry.modGroup, [...(groups.get(entry.modGroup) ?? []), entry.sourceModifierId]);
     }
     if (groups.size > 1) {
@@ -390,9 +390,9 @@ export function classDiscriminability(
   return `className ${entry.className}, categoryId ${entry.categoryId}, ${String(siblings)} sibling ${siblings === 1 ? 'class' : 'classes'}: class not discriminable`;
 }
 
-type RefCheck = (slot: Slot, ref: ModifierRef, scoped: readonly ModifierWeight[], floor: number) => string | undefined;
+type ReferenceCheck = (slot: Slot, reference: ModifierRef, scoped: readonly ModifierWeight[], floor: number) => string | undefined;
 
-const REF_CHECKS: readonly (readonly [CrossFileCheck, RefCheck])[] = [
+const REF_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
   ['empty-containment-set', emptyContainment],
   ['edge-alignment', edgeAlignment],
   ['kind-agreement', kindAgreement],
@@ -484,13 +484,13 @@ export function crossFileChecks(entries: readonly TrackedEntry[], weights: Weigh
     // §2.1, *Who evaluates a pair*: core takes every pair in which either
     // entry names a hybrid reference. Each entry of the pair names the other.
     const partners = new Map<string, string[]>();
-    for (let i = 0; i < keyed.length; i += 1) {
-      const left = keyed[i];
+    for (let index = 0; index < keyed.length; index += 1) {
+      const left = keyed[index];
       if (left === undefined) {
         continue;
       }
-      for (let j = i + 1; j < keyed.length; j += 1) {
-        const right = keyed[j];
+      for (let index_ = index + 1; index_ < keyed.length; index_ += 1) {
+        const right = keyed[index_];
         if (
           right === undefined ||
           right.entry.itemLevelMin !== left.entry.itemLevelMin ||

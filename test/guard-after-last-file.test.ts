@@ -46,7 +46,7 @@ interface JsonReport {
 function runChild(
   outputFile: string,
   delayMs: number,
-  childTmp: string,
+  childTemporary: string,
 ): Promise<{ code: number; output: string }> {
   return new Promise((resolve) => {
     execFile(
@@ -58,9 +58,9 @@ function runChild(
           ...process.env,
           CI: '1',
           [DELAY_ENV]: String(delayMs),
-          TMP: childTmp,
-          TEMP: childTmp,
-          TMPDIR: childTmp,
+          TMP: childTemporary,
+          TEMP: childTemporary,
+          TMPDIR: childTemporary,
         },
       },
       (error, stdout, stderr) => {
@@ -82,13 +82,13 @@ interface ChildRun {
 async function runWithDelay(delayMs: number): Promise<ChildRun> {
   const dir = await mkdtemp(join(tmpdir(), 'guard-after-last-file-'));
   try {
-    const childTmp = join(dir, 'tmp');
-    await mkdir(childTmp);
+    const childTemporary = join(dir, 'tmp');
+    await mkdir(childTemporary);
     const outputFile = join(dir, 'report.json');
-    const { code, output } = await runChild(outputFile, delayMs, childTmp);
+    const { code, output } = await runChild(outputFile, delayMs, childTemporary);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
-    const leftRecordDirs = (await readdir(childTmp)).filter((name) => name.startsWith('no-network-'));
-    return { code, output, report, leftRecordDirs };
+    const leftRecordDirectories = (await readdir(childTemporary)).filter((name) => name.startsWith('no-network-'));
+    return { code, output, report, leftRecordDirs: leftRecordDirectories };
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

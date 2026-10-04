@@ -99,7 +99,7 @@ export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[
   return closes.sort((a, b) => a.number - b.number);
 }
 
-export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], ref: string): SyncPlan {
+export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], reference: string): SyncPlan {
   const creates: PlannedCreate[] = [];
   const reports: string[] = [];
 
@@ -144,7 +144,7 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
     }
     for (const issue of group) {
       if (issue.state === 'OPEN') {
-        reports.push(`Entry gone: #${issue.number} names ${id}, which is not in ${LEDGER_PATH} on ${ref}`);
+        reports.push(`Entry gone: #${issue.number} names ${id}, which is not in ${LEDGER_PATH} on ${reference}`);
       }
     }
   }

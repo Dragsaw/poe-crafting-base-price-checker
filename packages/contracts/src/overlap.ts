@@ -1,5 +1,5 @@
 import { compareByCodeUnit } from './canonical-key.ts';
-import type { HybridLine, ModifierRef, SingleLineModifierRef } from './modifier-ref.ts';
+import type { HybridLine, ModifierRef as ModifierReference, SingleLineModifierRef as SingleLineModifierReference } from './modifier-ref.ts';
 
 /**
  * The overlap predicate (AD-17, IMPLEMENTATION-NOTES.md §2.1), defined once.
@@ -36,8 +36,8 @@ export const OVERLAP_SLOTS: readonly OverlapSlot[] = ['prefix', 'suffix'];
 
 /** The two affixes the predicate reads. A crafted tracked entry satisfies it. */
 export interface OverlapAffixes {
-  readonly prefix: ModifierRef;
-  readonly suffix: ModifierRef;
+  readonly prefix: ModifierReference;
+  readonly suffix: ModifierReference;
 }
 
 /**
@@ -45,7 +45,7 @@ export interface OverlapAffixes {
  * contains both references, with a reference line on a `statId` in `summed`
  * read as covered.
  */
-export type CoOccur = (x: ModifierRef, y: ModifierRef, slot: OverlapSlot, summed: ReadonlySet<string>) => boolean;
+export type CoOccur = (x: ModifierReference, y: ModifierReference, slot: OverlapSlot, summed: ReadonlySet<string>) => boolean;
 
 /** The within-file `coOccur`: the tracked list alone cannot see a pool. */
 export const NEVER_CO_OCCUR: CoOccur = () => false;
@@ -57,23 +57,23 @@ export const NEVER_CO_OCCUR: CoOccur = () => false;
 export type SlotOverlapBranch = 'summed' | 'co-occur' | 'both-valueless' | 'bands-intersect';
 
 /** One line a reference names: the reference itself when single-line, one of its lines when hybrid. */
-export type NamedLine = SingleLineModifierRef | HybridLine;
+export type NamedLine = SingleLineModifierReference | HybridLine;
 
 /** The lines a reference names: `[ref]` when single-line, `ref.lines` when hybrid. */
-export function linesOf(ref: ModifierRef): readonly NamedLine[] {
-  return ref.kind === 'hybrid' ? ref.lines : [ref];
+export function linesOf(reference: ModifierReference): readonly NamedLine[] {
+  return reference.kind === 'hybrid' ? reference.lines : [reference];
 }
 
 /**
  * `statIds(ref)` (§1), local because `contracts` cannot import `core`. Order
  * does not matter to its callers here.
  */
-function statIdsOf(ref: ModifierRef): readonly string[] {
-  return linesOf(ref).map((line) => line.statId);
+function statIdsOf(reference: ModifierReference): readonly string[] {
+  return linesOf(reference).map((line) => line.statId);
 }
 
-function lineOn(ref: ModifierRef, statId: string): NamedLine | undefined {
-  return linesOf(ref).find((line) => line.statId === statId);
+function lineOn(reference: ModifierReference, statId: string): NamedLine | undefined {
+  return linesOf(reference).find((line) => line.statId === statId);
 }
 
 const NO_SUMMED: ReadonlySet<string> = new Set();
@@ -107,7 +107,7 @@ export function summedInterval(affixes: OverlapAffixes, statId: string): SummedI
 }
 
 /** `linesIntersect(x, y, S)` (§2.1) over the shared `statId`s outside `S`, which the caller found non-empty. */
-function linesIntersect(x: ModifierRef, y: ModifierRef, shared: readonly string[]): boolean {
+function linesIntersect(x: ModifierReference, y: ModifierReference, shared: readonly string[]): boolean {
   return shared.every((statId) => {
     const left = lineOn(x, statId);
     const right = lineOn(y, statId);
@@ -133,13 +133,13 @@ function linesIntersect(x: ModifierRef, y: ModifierRef, shared: readonly string[
  * of entries.
  */
 export function slotOverlapBranch(
-  x: ModifierRef,
-  y: ModifierRef,
+  x: ModifierReference,
+  y: ModifierReference,
   slot: OverlapSlot,
   coOccur: CoOccur,
   summed: ReadonlySet<string> = NO_SUMMED,
 ): SlotOverlapBranch | undefined {
-  const outside = (ref: ModifierRef) => statIdsOf(ref).filter((statId) => !summed.has(statId));
+  const outside = (reference: ModifierReference) => statIdsOf(reference).filter((statId) => !summed.has(statId));
   const ours = outside(x);
   const theirs = new Set(outside(y));
   if (ours.length === 0 || theirs.size === 0) {
@@ -156,8 +156,8 @@ export function slotOverlapBranch(
 }
 
 export function slotOverlap(
-  x: ModifierRef,
-  y: ModifierRef,
+  x: ModifierReference,
+  y: ModifierReference,
   slot: OverlapSlot,
   coOccur: CoOccur,
   summed: ReadonlySet<string> = NO_SUMMED,

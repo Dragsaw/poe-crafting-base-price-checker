@@ -291,9 +291,9 @@ interface Run {
   readonly stderr: string;
 }
 
-function runScript(args: readonly string[] = []): Promise<Run> {
+function runScript(arguments_: readonly string[] = []): Promise<Run> {
   return new Promise((done) => {
-    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       done({ code: child.exitCode, stdout, stderr });
     });
   });

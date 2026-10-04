@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { ModifierRefSchema } from './modifier-ref';
-import type { ModifierRef } from './modifier-ref';
+import { ModifierRefSchema as ModifierReferenceSchema } from './modifier-ref';
+import type { ModifierRef as ModifierReference } from './modifier-ref';
 
 function issuePaths(data: unknown): string[] {
-  const result = ModifierRefSchema.safeParse(data);
+  const result = ModifierReferenceSchema.safeParse(data);
   return result.success ? [] : result.error.issues.map((issue) => issue.path.join('.'));
 }
 
 function unrecognisedKeys(data: unknown): string[] {
-  const result = ModifierRefSchema.safeParse(data);
+  const result = ModifierReferenceSchema.safeParse(data);
   return result.success ? [] : result.error.issues.flatMap((issue) =>
     issue.code === 'unrecognized_keys' ? issue.keys : [],
   );
@@ -18,7 +18,7 @@ function unrecognisedKeys(data: unknown): string[] {
 describe('ModifierRefSchema', () => {
   it('accepts a closed band carrying both edges', () => {
     expect(
-      ModifierRefSchema.parse({
+      ModifierReferenceSchema.parse({
         kind: 'banded',
         statId: 'explicit.stat_1509134228',
         valueMin: 43,
@@ -33,7 +33,7 @@ describe('ModifierRefSchema', () => {
   });
 
   it('takes a non-integer edge — band edges are `number`, never `integer`', () => {
-    const parsed = ModifierRefSchema.parse({
+    const parsed = ModifierReferenceSchema.parse({
       kind: 'banded',
       statId: 'explicit.stat_518292764',
       valueMin: 4.5,
@@ -63,7 +63,7 @@ describe('ModifierRefSchema', () => {
   });
 
   it('accepts a valueless reference carrying no edges at all', () => {
-    expect(ModifierRefSchema.parse({ kind: 'valueless', statId: 'explicit.stat_9' })).toEqual({
+    expect(ModifierReferenceSchema.parse({ kind: 'valueless', statId: 'explicit.stat_9' })).toEqual({
       kind: 'valueless',
       statId: 'explicit.stat_9',
     });
@@ -83,7 +83,7 @@ describe('ModifierRefSchema', () => {
 
   it('carries acceptedTier as an optional free string on both arms', () => {
     expect(
-      ModifierRefSchema.parse({
+      ModifierReferenceSchema.parse({
         kind: 'banded',
         statId: 'explicit.stat_1',
         valueMin: 1,
@@ -93,7 +93,7 @@ describe('ModifierRefSchema', () => {
     ).toMatchObject({ acceptedTier: 'not a tier name at all' });
 
     expect(
-      ModifierRefSchema.parse({
+      ModifierReferenceSchema.parse({
         kind: 'valueless',
         statId: 'explicit.stat_1',
         acceptedTier: 'T1',
@@ -103,7 +103,7 @@ describe('ModifierRefSchema', () => {
 
   it('names its own kind, so a reference with no kind does not parse', () => {
     expect(
-      ModifierRefSchema.safeParse({ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }).success,
+      ModifierReferenceSchema.safeParse({ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }).success,
     ).toBe(false);
   });
 
@@ -113,25 +113,25 @@ describe('ModifierRefSchema', () => {
    * without a case here is a compile error, not a runtime surprise.
    */
   it('exhausts every kind with no default arm', () => {
-    function describeRef(ref: ModifierRef): string {
-      switch (ref.kind) {
+    function describeReference(reference: ModifierReference): string {
+      switch (reference.kind) {
         case 'banded': {
-          return `${ref.statId}:${String(ref.valueMin)}-${String(ref.valueMax)}`;
+          return `${reference.statId}:${String(reference.valueMin)}-${String(reference.valueMax)}`;
         }
         case 'valueless': {
-          return `${ref.statId}:valueless`;
+          return `${reference.statId}:valueless`;
         }
         case 'hybrid': {
-          return ref.lines.map((line) => line.statId).join('+');
+          return reference.lines.map((line) => line.statId).join('+');
         }
       }
     }
 
     expect(
-      describeRef({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),
+      describeReference({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),
     ).toBe('s:1-2');
-    expect(describeRef({ kind: 'valueless', statId: 's' })).toBe('s:valueless');
-    expect(describeRef({ kind: 'hybrid', lines: [{ statId: 'a' }, { statId: 'b' }] })).toBe('a+b');
+    expect(describeReference({ kind: 'valueless', statId: 's' })).toBe('s:valueless');
+    expect(describeReference({ kind: 'hybrid', lines: [{ statId: 'a' }, { statId: 'b' }] })).toBe('a+b');
   });
 });
 
@@ -145,7 +145,7 @@ function hybrid(lines: unknown[], extra: Record<string, unknown> = {}): unknown 
 
 describe('ModifierRefSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () => {
   it('accepts a banded hybrid and sorts its lines by statId', () => {
-    const parsed = ModifierRefSchema.parse(
+    const parsed = ModifierReferenceSchema.parse(
       hybrid(
         [
           { statId: ACCURACY, valueMin: 16, valueMax: 20 },
@@ -166,7 +166,7 @@ describe('ModifierRefSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () =>
 
   it('accepts a hybrid that mixes a banded and a valueless line', () => {
     expect(
-      ModifierRefSchema.safeParse(hybrid([{ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }, { statId: 'explicit.stat_2' }]))
+      ModifierReferenceSchema.safeParse(hybrid([{ statId: 'explicit.stat_1', valueMin: 1, valueMax: 2 }, { statId: 'explicit.stat_2' }]))
         .success,
     ).toBe(true);
   });

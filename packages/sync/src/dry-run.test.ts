@@ -506,9 +506,9 @@ interface Run {
 }
 
 /** Spawns the script the way `pnpm sync:dry` does, with both streams piped. */
-function runScript(args: readonly string[] = []): Promise<Run> {
+function runScript(arguments_: readonly string[] = []): Promise<Run> {
   return new Promise((resolve) => {
-    const child = execFile(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
       resolve({ code: child.exitCode, stdout, stderr });
     });
   });

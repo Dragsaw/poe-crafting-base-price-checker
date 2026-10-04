@@ -60,9 +60,9 @@ export type UserAgentResult = UserAgentResolved | UserAgentRefused;
  * literally; the default is the single `process.env` read this package makes.
  */
 export function resolveUserAgent(
-  env: Readonly<Record<string, string | undefined>> = process.env,
+  environment: Readonly<Record<string, string | undefined>> = process.env,
 ): UserAgentResult {
-  const raw = env[USER_AGENT_ENV_VAR];
+  const raw = environment[USER_AGENT_ENV_VAR];
   const userAgent = raw === undefined ? '' : raw.trim();
   return userAgent === '' ? { ok: false, variable: USER_AGENT_ENV_VAR, message: missingUserAgentMessage() } : { ok: true, userAgent };
 }

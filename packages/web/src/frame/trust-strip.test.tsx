@@ -194,10 +194,10 @@ describe('the resting strip', () => {
   // Matrix: broken.
   it('raises one rust 700 health line for unresolvable records and pinned starvation', () => {
     const records: SyncReport['records'] = [
-      ...Array.from({ length: 12 }, (_, i) => ({
+      ...Array.from({ length: 12 }, (_, index) => ({
         kind: 'unresolvable' as const,
-        entryKey: `raw:${String(i)}`,
-        identifier: String(i),
+        entryKey: `raw:${String(index)}`,
+        identifier: String(index),
         identifierKind: 'statId' as const,
       })),
       {

@@ -229,13 +229,13 @@ export function compareRankedRows(left: RankedRow, right: RankedRow): number {
  * (EXPERIENCE.md state 35). `compareRankedRows` breaks every tie.
  */
 function compareOrdering(left: RankedRow, right: RankedRow): number {
-  const leftEv = left.ev;
-  const rightEv = right.ev;
-  if ((leftEv === null) !== (rightEv === null)) {
-    return leftEv === null ? 1 : -1;
+  const leftEvent = left.ev;
+  const rightEvent = right.ev;
+  if ((leftEvent === null) !== (rightEvent === null)) {
+    return leftEvent === null ? 1 : -1;
   }
-  const leftFigure = leftEv ?? (left.kind === 'crafted' ? left.grossPayout : 0);
-  const rightFigure = rightEv ?? (right.kind === 'crafted' ? right.grossPayout : 0);
+  const leftFigure = leftEvent ?? (left.kind === 'crafted' ? left.grossPayout : 0);
+  const rightFigure = rightEvent ?? (right.kind === 'crafted' ? right.grossPayout : 0);
   return leftFigure === rightFigure ? compareRankedRows(left, right) : rightFigure - leftFigure;
 }
 

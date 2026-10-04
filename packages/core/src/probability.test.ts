@@ -120,9 +120,9 @@ describe('contains (§1)', () => {
   });
 
   it('contains a valueless line for a valueless ref, and never a banded line of that statId', () => {
-    const ref: ModifierRef = { kind: 'valueless', statId: STAT };
-    expect(contains(ref, tier([line(STAT)], 1))).toBe(true);
-    expect(contains(ref, tier([line(STAT, [1, 2])], 1))).toBe(false);
+    const reference: ModifierRef = { kind: 'valueless', statId: STAT };
+    expect(contains(reference, tier([line(STAT)], 1))).toBe(true);
+    expect(contains(reference, tier([line(STAT, [1, 2])], 1))).toBe(false);
   });
 
   it('contains a valueless line for a banded ref whose band holds [1, 1] (§2.3)', () => {
@@ -235,11 +235,11 @@ describe('combinationProbability (§11)', () => {
     const high = tier([line(STAT, [20, 30])], 300, { itemLevelMin: 70 });
     const suffix = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 70 });
     const classPools = pools([low, high], [suffix]);
-    const suffixRef = band(1, 2, OTHER);
+    const suffixReference = band(1, 2, OTHER);
     expect(
-      pOf(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix: suffixRef }, 0)),
+      pOf(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix: suffixReference }, 0)),
     ).toBeGreaterThan(0);
-    expect(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix: suffixRef }, 70)).toEqual({
+    expect(combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix: suffixReference }, 70)).toEqual({
       ok: false,
       reason: { kind: 'empty-contained', slot: 'prefix' },
     });
@@ -350,8 +350,8 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const pure2 = tier([line(STAT, [13, 15])], 200);
     const rest = tier([line(THIRD, [1, 2])], 350);
     const classPools = pools([h1, h2, pure1, pure2, rest], []);
-    const ref = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
-    expect(pOf(affixProbability(classPools, 'prefix', ref, 82, 0))).toBe(150 / 1000);
+    const reference = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
+    expect(pOf(affixProbability(classPools, 'prefix', reference, 82, 0))).toBe(150 / 1000);
     // The single-line band on the shared statId still admits both families (§1's existential test).
     expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), 82, 0))).toBe(650 / 1000);
   });
@@ -366,12 +366,12 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const ac = tier([line(STAT, [10, 12]), line(THIRD, [1, 2])], 300);
     const rest = tier([line(OTHER, [20, 30])], 600);
     const classPools = pools([ab, ac, rest], []);
-    const refAB = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
-    const refAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
-    expect(contains(refAB, ac)).toBe(false);
-    expect(contains(refAC, ab)).toBe(false);
-    expect(pOf(affixProbability(classPools, 'prefix', refAB, 82, 0))).toBe(100 / 1000);
-    expect(pOf(affixProbability(classPools, 'prefix', refAC, 82, 0))).toBe(300 / 1000);
+    const referenceAB = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
+    const referenceAC = hybrid(lineBand(10, 12), lineBand(1, 2, THIRD));
+    expect(contains(referenceAB, ac)).toBe(false);
+    expect(contains(referenceAC, ab)).toBe(false);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAB, 82, 0))).toBe(100 / 1000);
+    expect(pOf(affixProbability(classPools, 'prefix', referenceAC, 82, 0))).toBe(300 / 1000);
   });
 
   it('computes the two-order sum by hand for a hybrid prefix and a suffix in its modGroup', () => {
@@ -410,11 +410,11 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const zero = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 0);
     const live = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
     const rest = tier([line(THIRD, [1, 2])], 300);
-    const ref = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
-    expect(contains(ref, zero)).toBe(false);
+    const reference = hybrid(lineBand(10, 12), lineBand(4, 6, OTHER));
+    expect(contains(reference, zero)).toBe(false);
     const classPools = pools([zero, live, rest], []);
     expect(eligible(classPools.prefix, 82, 0)).toContain(zero);
-    expect(pOf(affixProbability(classPools, 'prefix', ref, 82, 0))).toBe(100 / 400);
+    expect(pOf(affixProbability(classPools, 'prefix', reference, 82, 0))).toBe(100 / 400);
   });
 
   it('applies the null-line rule: untrackable reads the entry and its pool coverage alone', () => {
@@ -450,14 +450,14 @@ describe('contains with summed statIds (§2.2 contains_S)', () => {
 
   it('drops the band test of a hybrid line on a summed statId and keeps the line-set test', () => {
     const entry = tier([line(STAT, [10, 12]), line(OTHER, [40, 60])], 100);
-    const ref = hybrid(lineBand(10, 12), lineBand(1, 2, OTHER));
-    expect(contains(ref, entry)).toBe(false);
-    expect(contains(ref, entry, summed)).toBe(true);
+    const reference = hybrid(lineBand(10, 12), lineBand(1, 2, OTHER));
+    expect(contains(reference, entry)).toBe(false);
+    expect(contains(reference, entry, summed)).toBe(true);
     // The line that is not summed keeps its band test.
     expect(contains(hybrid(lineBand(20, 30), lineBand(1, 2, OTHER)), entry, summed)).toBe(false);
     // The line set still has to match exactly.
     const wider = tier([line(STAT, [10, 12]), line(OTHER, [40, 60]), line(THIRD, [1, 2])], 100);
-    expect(contains(ref, wider, summed)).toBe(false);
+    expect(contains(reference, wider, summed)).toBe(false);
   });
 
   it('needs only a line on the summed statId for a single-line reference', () => {

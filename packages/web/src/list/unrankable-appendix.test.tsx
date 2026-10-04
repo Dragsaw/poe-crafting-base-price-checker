@@ -87,7 +87,7 @@ describe('the non-empty appendix', () => {
   });
 
   it('renders every row, in the given order, 29px, in four cells of 292/118/250/310', () => {
-    const classes = Array.from({ length: 29 }, (_, i) => klass(`Class ${String(i).padStart(2, '0')}`));
+    const classes = Array.from({ length: 29 }, (_, index) => klass(`Class ${String(index).padStart(2, '0')}`));
     const panel = mountAppendix(classes);
     const rows = [...panel.querySelectorAll<HTMLElement>('[data-appendix-row]')];
     expect(rows).toHaveLength(29);

@@ -71,18 +71,18 @@ interface Run {
 }
 
 /** The environment the refresher must refuse in: the overlay removed. */
-function envWithoutContact(): NodeJS.ProcessEnv {
-  const env = { ...process.env };
-  delete env[USER_AGENT_ENV_VAR];
-  return env;
+function environmentWithoutContact(): NodeJS.ProcessEnv {
+  const environment = { ...process.env };
+  delete environment[USER_AGENT_ENV_VAR];
+  return environment;
 }
 
-function run(args: readonly string[]): Promise<Run> {
+function run(arguments_: readonly string[]): Promise<Run> {
   return new Promise((resolve) => {
     const child = execFile(
       process.execPath,
-      [...args],
-      { encoding: 'utf8', env: envWithoutContact() },
+      [...arguments_],
+      { encoding: 'utf8', env: environmentWithoutContact() },
       (_error, stdout, stderr) => {
         resolve({ code: child.exitCode, stdout, stderr });
       },
@@ -261,7 +261,7 @@ it('loads @poe/contracts under bare node, as the command itself must', async () 
     const child = execFile(
       process.execPath,
       ['--input-type=module', '-e', "await import('@poe/contracts');"],
-      { encoding: 'utf8', cwd: packageRoot, env: envWithoutContact() },
+      { encoding: 'utf8', cwd: packageRoot, env: environmentWithoutContact() },
       (_error, stdout, stderr) => {
         resolve({ code: child.exitCode, stdout, stderr });
       },

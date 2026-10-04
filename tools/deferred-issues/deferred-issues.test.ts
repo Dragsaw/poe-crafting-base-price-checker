@@ -31,32 +31,32 @@ function fake(options: FakeOptions = {}): { runner: Runner; calls: Call[] } {
   const lists = options.lists ?? [[]];
   let listCall = 0;
   let nextNumber = 900;
-  const runner: Runner = (cmd, args, stdin) => {
-    calls.push({ cmd, args, stdin });
-    if (cmd === 'git' && args[0] === 'show') {
+  const runner: Runner = (command, arguments_, stdin) => {
+    calls.push({ cmd: command, args: arguments_, stdin });
+    if (command === 'git' && arguments_[0] === 'show') {
       const ledger = options.ledger === undefined ? FIXTURE_LEDGER : options.ledger;
       return ledger === null ? FAIL("fatal: invalid object name 'origin/master'") : OK(ledger);
     }
-    if (cmd === 'gh' && args[0] === 'issue' && args[1] === 'list') {
+    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'list') {
       const list = lists[Math.min(listCall, lists.length - 1)];
       listCall += 1;
       return list === null || list === undefined ? FAIL('HTTP 502') : OK(JSON.stringify(list));
     }
-    if (cmd === 'gh' && args[0] === 'label') {
+    if (command === 'gh' && arguments_[0] === 'label') {
       return options.failLabel === true ? FAIL('HTTP 403') : OK();
     }
-    if (cmd === 'gh' && args[0] === 'issue' && args[1] === 'create') {
-      const title = args[args.indexOf('--title') + 1] ?? '';
+    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'create') {
+      const title = arguments_[arguments_.indexOf('--title') + 1] ?? '';
       if (options.failCreate?.(title) === true) {
         return FAIL('HTTP 422: Validation Failed');
       }
       nextNumber += 1;
       return OK(`https://github.com/o/r/issues/${nextNumber}\n`);
     }
-    if (cmd === 'gh' && args[0] === 'issue' && args[1] === 'close') {
+    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'close') {
       return options.failClose === true ? FAIL('HTTP 500') : OK();
     }
-    throw new Error(`unexpected call: ${cmd} ${args.join(' ')}`);
+    throw new Error(`unexpected call: ${command} ${arguments_.join(' ')}`);
   };
   return { runner, calls };
 }
@@ -74,9 +74,9 @@ function capture(): { write(text: string): void; text(): string } {
 function exec(argv: readonly string[], options?: FakeOptions) {
   const { runner, calls } = fake(options);
   const out = capture();
-  const err = capture();
-  const code = main(argv, runner, out, err);
-  return { code, calls, out: out.text(), err: err.text() };
+  const error = capture();
+  const code = main(argv, runner, out, error);
+  return { code, calls, out: out.text(), err: error.text() };
 }
 
 function marked(number: number, state: 'OPEN' | 'CLOSED', id: string): IssueInfo {

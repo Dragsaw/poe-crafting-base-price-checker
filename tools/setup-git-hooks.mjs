@@ -7,8 +7,8 @@ import { execFileSync } from 'node:child_process';
 
 const HOOKS_PATH = '.githooks';
 
-function git(args) {
-  return execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+function git(arguments_) {
+  return execFileSync('git', arguments_, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 }
 
 try {

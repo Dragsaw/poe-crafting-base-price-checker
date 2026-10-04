@@ -93,8 +93,8 @@ export const TARGET_PACKAGES: readonly string[] = ['contracts', 'core', 'sync'];
  * The directories the post-emit step rewrites: the `dist` of each
  * `TARGET_PACKAGES` entry, which its `exports["."].types` names.
  */
-const TARGET_DIRS = TARGET_PACKAGES.map((pkg) =>
-  fileURLToPath(new URL(`../../packages/${pkg}/dist`, import.meta.url)),
+const TARGET_DIRS = TARGET_PACKAGES.map((package_) =>
+  fileURLToPath(new URL(`../../packages/${package_}/dist`, import.meta.url)),
 );
 
 /**

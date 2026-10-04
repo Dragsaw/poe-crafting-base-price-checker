@@ -72,25 +72,25 @@ describe('the allowlist', () => {
 describe('prunePages', () => {
   it('keeps the bundle and the seven artifacts, and deletes every other data/ file', () => {
     const data = tree([...SEVEN, ...UNFETCHED]);
-    const dist = tree([...BUNDLE, ...SEVEN, ...UNFETCHED]);
-    const result = prunePages(dist, data);
-    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].sort());
+    const distribution = tree([...BUNDLE, ...SEVEN, ...UNFETCHED]);
+    const result = prunePages(distribution, data);
+    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].sort());
     expect(result.removed.sort()).toEqual([...UNFETCHED].sort());
     expect(result.kept).toEqual(SEVEN);
   });
 
   it('removes a directory the prune leaves empty', () => {
     const data = tree([...SEVEN, 'extra/deep/file.json']);
-    const dist = tree([...BUNDLE, ...SEVEN, 'extra/deep/file.json']);
-    prunePages(dist, data);
-    expect(readdirSync(dist).sort()).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].sort());
+    const distribution = tree([...BUNDLE, ...SEVEN, 'extra/deep/file.json']);
+    prunePages(distribution, data);
+    expect(readdirSync(distribution).sort()).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].sort());
   });
 
   it('tolerates the three absent-tolerable artifacts being missing', () => {
     const present = SEVEN.filter((path) => !['sync-report.json', 'weights.json', 'recipes.json'].includes(path));
     const data = tree(present);
-    const dist = tree([...BUNDLE, ...present]);
-    expect(prunePages(dist, data).kept).toEqual(present);
+    const distribution = tree([...BUNDLE, ...present]);
+    expect(prunePages(distribution, data).kept).toEqual(present);
   });
 
   it.each(['dataset.json', 'tracked.json', 'config.json', 'catalogue/stats.json'])(
@@ -98,8 +98,8 @@ describe('prunePages', () => {
     (missing) => {
       const present = SEVEN.filter((path) => path !== missing);
       const data = tree(present);
-      const dist = tree([...BUNDLE, ...present]);
-      expect(() => prunePages(dist, data)).toThrow(missing);
+      const distribution = tree([...BUNDLE, ...present]);
+      expect(() => prunePages(distribution, data)).toThrow(missing);
     },
   );
 
@@ -114,7 +114,7 @@ describe('the CLI and the build script', () => {
   const ROOT_MANIFEST = fileURLToPath(new URL('../package.json', import.meta.url));
 
   /** A temp repo root: `tools/prune-pages.mjs`, `data/`, and `packages/web/dist` as `vite build` leaves it. */
-  function repo(dataFiles: readonly string[]): { readonly root: string; readonly script: string; readonly dist: string } {
+  function repository(dataFiles: readonly string[]): { readonly root: string; readonly script: string; readonly dist: string } {
     const root = tree([
       ...dataFiles.map((file) => `data/${file}`),
       ...BUNDLE.map((file) => `packages/web/dist/${file}`),
@@ -127,14 +127,14 @@ describe('the CLI and the build script', () => {
   }
 
   it('prunes packages/web/dist when run directly', () => {
-    const { script, dist } = repo([...SEVEN, 'sync-progress.json']);
+    const { script, dist } = repository([...SEVEN, 'sync-progress.json']);
     execFileSync(process.execPath, [script], { stdio: 'pipe' });
     expect(existsSync(join(dist, 'sync-progress.json'))).toBe(false);
     expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].sort());
   });
 
   it('exits non-zero when a required artifact is missing', () => {
-    const { script } = repo([...SEVEN.filter((path) => path !== 'tracked.json'), 'sync-progress.json']);
+    const { script } = repository([...SEVEN.filter((path) => path !== 'tracked.json'), 'sync-progress.json']);
     expect(() => execFileSync(process.execPath, [script], { stdio: 'pipe' })).toThrow(/tracked\.json/);
   });
 

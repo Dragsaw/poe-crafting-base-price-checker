@@ -37,7 +37,7 @@ export interface RunResult {
   readonly stderr: string;
 }
 
-export type Runner = (cmd: string, args: readonly string[], stdin?: string) => RunResult;
+export type Runner = (command: string, arguments_: readonly string[], stdin?: string) => RunResult;
 
 export interface Output {
   write(text: string): unknown;
@@ -55,8 +55,8 @@ const PROGRAM = 'pnpm deferred:issues';
 const USAGE = `usage: ${PROGRAM} [--dry-run [--ref <ref>]] | [--list]\n`;
 
 /** The one runner of the real command: a process with no shell, stdout and stderr captured. */
-export const run: Runner = (cmd, args, stdin) => {
-  const result = spawnSync(cmd, [...args], {
+export const run: Runner = (command, arguments_, stdin) => {
+  const result = spawnSync(command, [...arguments_], {
     encoding: 'utf8',
     input: stdin,
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -75,13 +75,13 @@ function firstLine(text: string): string {
 
 type Read<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: string };
 
-function readEntries(runner: Runner, ref: string): Read<LedgerEntry[]> {
-  const shown = runner('git', ['show', `${ref}:${LEDGER_PATH}`]);
+function readEntries(runner: Runner, reference: string): Read<LedgerEntry[]> {
+  const shown = runner('git', ['show', `${reference}:${LEDGER_PATH}`]);
   if (shown.status !== 0) {
-    return { ok: false, error: `git show ${ref}:${LEDGER_PATH} failed: ${firstLine(shown.stderr)}` };
+    return { ok: false, error: `git show ${reference}:${LEDGER_PATH} failed: ${firstLine(shown.stderr)}` };
   }
   const entries = parseLedger(shown.stdout);
-  return entries.length === 0 ? { ok: false, error: `0 entries parse from ${LEDGER_PATH} on ${ref}` } : { ok: true, value: entries };
+  return entries.length === 0 ? { ok: false, error: `0 entries parse from ${LEDGER_PATH} on ${reference}` } : { ok: true, value: entries };
 }
 
 export function readIssues(runner: Runner): Read<IssueInfo[]> {
@@ -158,7 +158,7 @@ function listEntries(entries: readonly LedgerEntry[], issues: readonly IssueInfo
   }));
 }
 
-export function main(argv: readonly string[], runner: Runner, out: Output, err: Output): number {
+export function main(argv: readonly string[], runner: Runner, out: Output, error_: Output): number {
   let values: { 'dry-run'?: boolean; ref?: string; list?: boolean };
   try {
     ({ values } = parseArgs({
@@ -168,29 +168,29 @@ export function main(argv: readonly string[], runner: Runner, out: Output, err: 
       allowPositionals: false,
     }));
   } catch (error) {
-    err.write(`${PROGRAM}: ${String(error)}\n${USAGE}`);
+    error_.write(`${PROGRAM}: ${String(error)}\n${USAGE}`);
     return 1;
   }
   const dryRun = values['dry-run'] === true;
   const list = values.list === true;
   if (values.ref !== undefined && !dryRun) {
-    err.write(`${PROGRAM}: --ref is allowed only with --dry-run\n${USAGE}`);
+    error_.write(`${PROGRAM}: --ref is allowed only with --dry-run\n${USAGE}`);
     return 1;
   }
   if (list && dryRun) {
-    err.write(`${PROGRAM}: --list and --dry-run do not combine\n${USAGE}`);
+    error_.write(`${PROGRAM}: --list and --dry-run do not combine\n${USAGE}`);
     return 1;
   }
-  const ref = values.ref ?? DEFAULT_REF;
+  const reference = values.ref ?? DEFAULT_REF;
 
-  const entries = readEntries(runner, ref);
+  const entries = readEntries(runner, reference);
   if (!entries.ok) {
-    err.write(`${PROGRAM}: ${entries.error}\n`);
+    error_.write(`${PROGRAM}: ${entries.error}\n`);
     return 1;
   }
   const issues = readIssues(runner);
   if (!issues.ok) {
-    err.write(`${PROGRAM}: ${issues.error}\n`);
+    error_.write(`${PROGRAM}: ${issues.error}\n`);
     return 1;
   }
 
@@ -199,7 +199,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, err: 
     return 0;
   }
 
-  const plan = planSync(entries.value, issues.value, ref);
+  const plan = planSync(entries.value, issues.value, reference);
   if (dryRun) {
     printPlan(plan, out);
     printReports(plan.reports, out);
@@ -224,7 +224,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, err: 
         '--force',
       ]);
       if (made.status !== 0) {
-        err.write(`${PROGRAM}: gh label create ${label.name} failed: ${firstLine(made.stderr)}\n`);
+        error_.write(`${PROGRAM}: gh label create ${label.name} failed: ${firstLine(made.stderr)}\n`);
         return 1;
       }
     }
@@ -252,7 +252,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, err: 
     const again = readIssues(runner);
     if (!again.ok) {
       printReports(reports, out);
-      err.write(`${PROGRAM}: ${again.error}\n`);
+      error_.write(`${PROGRAM}: ${again.error}\n`);
       return 1;
     }
     closes = planDuplicateCloses(again.value);

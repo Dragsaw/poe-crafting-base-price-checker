@@ -646,11 +646,11 @@ const SUFFIX_STAT = 'explicit.stat_suffix';
 let tierSerial = 0;
 
 /** One weights tier, built in the test, never read from a fixture file (NFR-2). */
-function tierOf(statId: string, weight: number, itemLevelMin = 1, modGroup?: string): ModifierWeight {
+function tierOf(statId: string, weight: number, itemLevelMin = 1, moduleGroup?: string): ModifierWeight {
   tierSerial += 1;
   return {
     sourceModifierId: `t${String(tierSerial)}`,
-    modGroup: modGroup ?? `g${String(tierSerial)}`,
+    modGroup: moduleGroup ?? `g${String(tierSerial)}`,
     itemLevelMin,
     weight,
     weightSource: 'published',

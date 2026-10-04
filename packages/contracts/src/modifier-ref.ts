@@ -104,11 +104,11 @@ export const HybridLineSchema = z.union([BandedHybridLineSchema, ValuelessHybrid
 const HybridLinesSchema = z
   .array(HybridLineSchema)
   .min(2, { message: 'A hybrid reference names at least two lines (§4.1).' })
-  .superRefine((lines, ctx) => {
+  .superRefine((lines, context) => {
     const seen = new Set<string>();
     lines.forEach((line, index) => {
       if (seen.has(line.statId)) {
-        ctx.addIssue({
+        context.addIssue({
           code: 'custom',
           path: [index, 'statId'],
           message: `statId ${line.statId} is repeated within the hybrid reference (§4.1).`,

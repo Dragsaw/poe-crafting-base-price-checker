@@ -370,11 +370,11 @@ function describeState(state: SessionAuthState): string {
  * here for an edge state, later from `settle`.
  */
 export function createSessionAuth(
-  env: Readonly<Record<string, string | undefined>>,
+  environment: Readonly<Record<string, string | undefined>>,
   options: SessionAuthOptions = {},
 ): SessionAuth {
   const { onSettle } = options;
-  const value = (env[SESSION_COOKIE_ENV_VAR] ?? '').trim();
+  const value = (environment[SESSION_COOKIE_ENV_VAR] ?? '').trim();
   if (value === '' || !isCookieValue(value)) {
     const state: SessionAuthState = {
       kind: 'unauthenticated',

@@ -73,9 +73,9 @@ function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
   if (!ids.categoryIds.has(entry.categoryId)) {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
   }
-  for (const ref of [entry.prefix, entry.suffix]) {
+  for (const reference of [entry.prefix, entry.suffix]) {
     // A hybrid reference names one statId per line, in its sorted line order.
-    for (const statId of statIds(ref)) {
+    for (const statId of statIds(reference)) {
       if (!ids.statIds.has(statId)) {
         misses.push({ identifier: statId, identifierKind: 'statId' });
       }

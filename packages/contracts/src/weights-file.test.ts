@@ -126,13 +126,13 @@ describe('WeightsFileSchema — refusals', () => {
     delete entry[key];
     return entry;
   };
-  const noModGroup = entryWithout('modGroup');
+  const noModuleGroup = entryWithout('modGroup');
 
   it.each([
     ...(['sourceModifierId', 'itemLevelMin', 'weight', 'lines'] as const).map(
       (key) => [`a missing ${key}`, fileWithEntries(entryWithout(key)), [...ENTRY_PATH, key], 'received undefined'] as const,
     ),
-    ['a missing modGroup', fileWithEntries(noModGroup), [...ENTRY_PATH, 'modGroup'], 'modGroup is missing'],
+    ['a missing modGroup', fileWithEntries(noModuleGroup), [...ENTRY_PATH, 'modGroup'], 'modGroup is missing'],
     ['an empty modGroup', fileWithEntries(entryOf({ modGroup: '' })), [...ENTRY_PATH, 'modGroup'], 'modGroup'],
     ['a non-string modGroup', fileWithEntries(entryOf({ modGroup: 7 })), [...ENTRY_PATH, 'modGroup'], 'not a string'],
     ['a negative weight', fileWithEntries(entryOf({ weight: -1 })), [...ENTRY_PATH, 'weight'], 'weight'],

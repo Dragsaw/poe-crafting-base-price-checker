@@ -19,8 +19,8 @@ const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 /** Rank-numeral colour per tier; tier 1 also sets the numeral, name and EV at 700 (DESIGN.md `ranked-row-tier-*`). */
 const RANK_COLOR = { 1: colors.sepia, 2: colors['ink-secondary'], 3: colors['ink-tertiary'] } as const;
 
-const [rank, unit, ev, provenance, age, chase] = rankedRowColumns;
-const COLUMNS = { rank, unit, ev, provenance, age, chase } as const;
+const [rank, unit, event, provenance, age, chase] = rankedRowColumns;
+const COLUMNS = { rank, unit, ev: event, provenance, age, chase } as const;
 
 /** The three chase slots. An unused slot stays an empty cell (state 21). */
 const CHASE_SLOTS = Array.from({ length: CHASE_CELLS }, (_, slot) => slot);

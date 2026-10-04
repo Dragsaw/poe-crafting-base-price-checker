@@ -21,14 +21,14 @@ const failure = vi.hoisted(() => ({ inject: false, badShape: false }));
 
 vi.mock('node:child_process', async (importOriginal) => {
   const real = await importOriginal<typeof import('node:child_process')>();
-  const execFileSync = ((file: string, args: readonly string[] = [], options?: object) =>
+  const execFileSync = ((file: string, arguments_: readonly string[] = [], options?: object) =>
     real.execFileSync(
       file,
       failure.inject
-        ? args.map((arg) => arg.replaceAll('Get-NetTCPConnection', MISSING_CMDLET))
+        ? arguments_.map((argument) => argument.replaceAll('Get-NetTCPConnection', MISSING_CMDLET))
         : (failure.badShape
-          ? args.map((arg) => arg.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
-          : args),
+          ? arguments_.map((argument) => argument.replaceAll('ForEach-Object OwningProcess', "ForEach-Object { 'not-a-pid' }"))
+          : arguments_),
       options,
     )) as typeof real.execFileSync;
   return { ...real, execFileSync };

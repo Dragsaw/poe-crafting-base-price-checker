@@ -29,10 +29,10 @@ function report(overrides: Partial<SyncReport> = {}, figures: Partial<SyncReport
 }
 
 const unresolvable = (n: number): SyncReport['records'] =>
-  Array.from({ length: n }, (_, i) => ({
+  Array.from({ length: n }, (_, index) => ({
     kind: 'unresolvable' as const,
-    entryKey: `raw:Base ${String(i)}`,
-    identifier: `Base ${String(i)}`,
+    entryKey: `raw:Base ${String(index)}`,
+    identifier: `Base ${String(index)}`,
     identifierKind: 'baseTypeId' as const,
   }));
 

@@ -122,11 +122,11 @@ export type ParsedArgs =
 export function parseArgs(argv: readonly string[]): ParsedArgs {
   let hours = DEFAULT_PINNED_MAX_AGE_HOURS;
   for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === '--') {
+    const argument = argv[index];
+    if (argument === '--') {
       continue;
     }
-    if (arg === '--pinned-max-age') {
+    if (argument === '--pinned-max-age') {
       const value = argv[index + 1];
       const parsed = value === undefined ? NaN : Number(value);
       if (value === undefined || value.trim() === '' || !Number.isFinite(parsed) || parsed <= 0) {
@@ -136,7 +136,7 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
       index += 1;
       continue;
     }
-    return { ok: false, message: `unknown argument ${JSON.stringify(arg)}` };
+    return { ok: false, message: `unknown argument ${JSON.stringify(argument)}` };
   }
   return { ok: true, options: { pinnedMaxAgeMs: hours * MS_PER_HOUR } };
 }
@@ -550,13 +550,13 @@ export interface SyncSessionDeps extends SyncSessionPorts {
 }
 
 /** The session: runs until `signal` aborts, then exits `0`. `1` only on a refusal before any request. */
-export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number> {
-  const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = deps;
+export async function syncSessionCommand(dependencies: SyncSessionDeps): Promise<number> {
+  const { env, argv, stdout, stderr, signal, sleep: pause, ...ports } = dependencies;
   const { fs, clock } = ports;
 
-  const args = parseArgs(argv);
-  if (!args.ok) {
-    stderr(`${PREFIX} ${args.message}`);
+  const arguments_ = parseArgs(argv);
+  if (!arguments_.ok) {
+    stderr(`${PREFIX} ${arguments_.message}`);
     return 1;
   }
   const contact = resolveUserAgent(env);
@@ -603,7 +603,7 @@ export async function syncSessionCommand(deps: SyncSessionDeps): Promise<number>
           requests,
           session: {
             maxEntries: 1,
-            pinnedMaxAgeMs: args.options.pinnedMaxAgeMs,
+            pinnedMaxAgeMs: arguments_.options.pinnedMaxAgeMs,
             ...(state.passStart !== undefined && { requestsSince: state.passStart }),
             ...(state.confirmedLeague !== undefined && { confirmedLeague: state.confirmedLeague }),
           },

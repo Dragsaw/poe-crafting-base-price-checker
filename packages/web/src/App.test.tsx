@@ -127,7 +127,7 @@ describe('the pending state', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
@@ -339,9 +339,9 @@ describe('the outcomes', () => {
 describe('the resting chrome', () => {
   function chrome(): Record<string, boolean> {
     return Object.fromEntries(
-      ['data-asking-price-line', 'data-column-header', 'data-key-block', 'data-running-foot'].map((attr) => [
-        attr,
-        frame().querySelector(`[${attr}]`) !== null,
+      ['data-asking-price-line', 'data-column-header', 'data-key-block', 'data-running-foot'].map((attribute) => [
+        attribute,
+        frame().querySelector(`[${attribute}]`) !== null,
       ]),
     );
   }
@@ -358,7 +358,7 @@ describe('the resting chrome', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
@@ -544,14 +544,14 @@ describe('the payout threshold', () => {
     const low = rawEntry('Low Belt');
     const mid = rawEntry('Mid Belt');
     const high = rawEntry('High Belt');
-    const filler = Array.from({ length: 20 }, (_, i) => rawEntry(`Filler Ring ${String(i + 1).padStart(2, '0')}`));
+    const filler = Array.from({ length: 20 }, (_, index) => rawEntry(`Filler Ring ${String(index + 1).padStart(2, '0')}`));
     const bodies = bodiesWith(
       [low, mid, high, ...filler],
       [
         priced(low, 0.1268, hoursBefore(now, 1)),
         priced(mid, 0.5, hoursBefore(now, 1)),
         priced(high, 0.8, hoursBefore(now, 1)),
-        ...filler.map((entry, i) => priced(entry, 2 + i, hoursBefore(now, 1))),
+        ...filler.map((entry, index) => priced(entry, 2 + index, hoursBefore(now, 1))),
       ],
     );
     const answers: Partial<Record<ArtifactKey, ArtifactAnswer>> = {
@@ -598,7 +598,7 @@ describe('the payout threshold', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
@@ -915,13 +915,13 @@ describe('the list statement', () => {
     return Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="rank"]'), (node) => node.textContent ?? '');
   }
 
-  function evCells(): string[] {
+  function eventCells(): string[] {
     return Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="ev"]'), (node) => node.textContent ?? '');
   }
 
   function expectChromeAround(): void {
-    for (const attr of ['data-asking-price-line', 'data-unrankable-appendix', 'data-key-block', 'data-running-foot']) {
-      expect(frame().querySelector(`[${attr}]`), attr).not.toBeNull();
+    for (const attribute of ['data-asking-price-line', 'data-unrankable-appendix', 'data-key-block', 'data-running-foot']) {
+      expect(frame().querySelector(`[${attribute}]`), attribute).not.toBeNull();
     }
   }
 
@@ -954,7 +954,7 @@ describe('the list statement', () => {
     // Canonical key order: for three iLvl-82 raw bases, the base type ids in order.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(evCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    expect(eventCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
     // None of last league's figures, anywhere on the list.
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
@@ -993,7 +993,7 @@ describe('the list statement', () => {
     // Canonical key order across the groups, not no-listings first.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(evCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    expect(eventCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
     // The no-listings row's expansion keeps its own state and phrase.
@@ -1022,7 +1022,7 @@ describe('the list statement', () => {
     expect(statement()).toBeNull();
     expect(unitNames()).toEqual(['Wide Belt', 'Coral Ring']);
     expect(numerals()).toEqual(['1', '']);
-    expect(evCells()).toEqual(['1.50', 'no figure yet']);
+    expect(eventCells()).toEqual(['1.50', 'no figure yet']);
     expect(frame().textContent).not.toMatch(/stale/i);
     expectChromeAround();
   });
@@ -1047,7 +1047,7 @@ describe('the list statement', () => {
     expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     // Not a money-slot phrase: the trail row keeps its own phrase, as it was.
     expect(unitNames()).toEqual(['Lost Belt']);
-    expect(evCells()).toEqual(['no figure yet']);
+    expect(eventCells()).toEqual(['no figure yet']);
     expectChromeAround();
 
     typeInto(payoutField(), '1');
@@ -1093,15 +1093,15 @@ describe('the list statement', () => {
  * come from `core`'s sort.
  */
 function twentyNineClasses(): ReturnType<typeof craftedEntry>[] {
-  return Array.from({ length: 29 }, (_, i) => {
-    const n = String(((i * 7) % 29) + 1).padStart(2, '0');
+  return Array.from({ length: 29 }, (_, index) => {
+    const n = String(((index * 7) % 29) + 1).padStart(2, '0');
     return craftedEntry(`Class ${n}`, `fixture.class${n}`);
   });
 }
 
 /** The fixture's class names in the order the page must show them. */
 function sortedClassNames(): string[] {
-  return Array.from({ length: 29 }, (_, i) => `Class ${String(i + 1).padStart(2, '0')}`);
+  return Array.from({ length: 29 }, (_, index) => `Class ${String(index + 1).padStart(2, '0')}`);
 }
 
 const ABSENT_REASON = 'class absent from weights file';
@@ -1294,7 +1294,7 @@ describe('the Unrankable appendix', () => {
     const gates = ARTIFACT_ORDER.map(() => gate());
     serveArtifacts(
       server,
-      Object.fromEntries(ARTIFACT_ORDER.map((key, i) => [key, { kind: 'gated', gate: gates[i]?.promise } as ArtifactAnswer])),
+      Object.fromEntries(ARTIFACT_ORDER.map((key, index) => [key, { kind: 'gated', gate: gates[index]?.promise } as ArtifactAnswer])),
     );
     mount();
     expect(frame().dataset['state']).toBe('pending');
@@ -1335,12 +1335,12 @@ describe('the interaction surface', () => {
       setItem.call(this, key, value);
     });
     const now = Date.now();
-    const filler = Array.from({ length: 22 }, (_, i) => rawEntry(`Filler Ring ${String(i + 1).padStart(2, '0')}`));
+    const filler = Array.from({ length: 22 }, (_, index) => rawEntry(`Filler Ring ${String(index + 1).padStart(2, '0')}`));
     // weights.json absent, so the appendix holds rows the guard covers too.
     const bodies = bodiesWith(
       [...filler, craftedEntry('Bows', 'weapon.bow'), craftedEntry('Wands', 'weapon.wand')],
-      filler.map((entry, i) =>
-        priced(entry, 1 + i / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(i)}`, league: TEST_LEAGUE }),
+      filler.map((entry, index) =>
+        priced(entry, 1 + index / 10, hoursBefore(now, 1), TEST_LEAGUE, { id: `search${String(index)}`, league: TEST_LEAGUE }),
       ),
     );
     const requests = serveArtifacts(server, {

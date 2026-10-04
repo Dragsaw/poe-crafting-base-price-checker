@@ -54,18 +54,18 @@ function messagesOf(diagnostics: readonly ts.Diagnostic[]): string[] {
  * `allowImportingTsExtensions` project under `dir`, and returns its `outDir`.
  */
 function emitScratchProject(dir: string): string {
-  const src = join(dir, 'src');
+  const source = join(dir, 'src');
   const outDir = join(dir, 'dist');
-  mkdirSync(join(src, 'nested'), { recursive: true });
+  mkdirSync(join(source, 'nested'), { recursive: true });
   // ESM scope, so the NodeNext consumer reads `dist` as ES modules.
   writeFileSync(join(dir, 'package.json'), '{ "type": "module" }\n');
-  writeFileSync(join(src, 'a.ts'), 'export const a = 1;\n');
+  writeFileSync(join(source, 'a.ts'), 'export const a = 1;\n');
   writeFileSync(
-    join(src, 'nested', 'b.ts'),
+    join(source, 'nested', 'b.ts'),
     "import type { A } from '../index.ts';\nexport const b = (x: A): A => x;\n",
   );
   writeFileSync(
-    join(src, 'index.ts'),
+    join(source, 'index.ts'),
     [
       "export { a } from './a.ts';",
       "export { b } from './nested/b.ts';",
@@ -75,7 +75,7 @@ function emitScratchProject(dir: string): string {
   );
 
   const program = ts.createProgram({
-    rootNames: ['a.ts', 'index.ts', join('nested', 'b.ts')].map((name) => join(src, name)),
+    rootNames: ['a.ts', 'index.ts', join('nested', 'b.ts')].map((name) => join(source, name)),
     options: {
       target: ts.ScriptTarget.ES2023,
       module: ts.ModuleKind.ESNext,
@@ -86,7 +86,7 @@ function emitScratchProject(dir: string): string {
       allowImportingTsExtensions: true,
       skipLibCheck: true,
       types: [],
-      rootDir: src,
+      rootDir: source,
       outDir,
     },
   });
@@ -249,8 +249,8 @@ describe('TARGET_PACKAGES', () => {
     const emitDeclarationOnly = readdirSync(PACKAGES_DIR, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
-      .filter((pkg) => existsSync(join(PACKAGES_DIR, pkg, 'tsconfig.json')))
-      .filter((pkg) => resolveCompilerOptions(join(PACKAGES_DIR, pkg)).emitDeclarationOnly === true)
+      .filter((package_) => existsSync(join(PACKAGES_DIR, package_, 'tsconfig.json')))
+      .filter((package_) => resolveCompilerOptions(join(PACKAGES_DIR, package_)).emitDeclarationOnly === true)
       .sort();
 
     expect([...TARGET_PACKAGES].sort()).toEqual(emitDeclarationOnly);
@@ -259,10 +259,10 @@ describe('TARGET_PACKAGES', () => {
 
 describe('the post-emit step', () => {
   it('runs after tsc -b in the root typecheck script', () => {
-    const pkg = JSON.parse(readFileSync(ROOT_PACKAGE_JSON, 'utf8')) as {
+    const package_ = JSON.parse(readFileSync(ROOT_PACKAGE_JSON, 'utf8')) as {
       scripts: Record<string, string>;
     };
-    expect(pkg.scripts.typecheck).toBe('tsc -b && node tools/dts-specifiers/rewrite-dts-specifiers.ts');
+    expect(package_.scripts.typecheck).toBe('tsc -b && node tools/dts-specifiers/rewrite-dts-specifiers.ts');
   });
 
   /**
@@ -281,17 +281,17 @@ describe('the post-emit step', () => {
   }
 
   /** Creates `<root>/packages/<pkg>/dist/index.d.ts` holding a `./a.ts` re-export. */
-  function seedDist(root: string, pkg: string): string {
-    const dist = join(root, 'packages', pkg, 'dist');
-    mkdirSync(dist, { recursive: true });
-    const file = join(dist, 'index.d.ts');
+  function seedDistribution(root: string, package_: string): string {
+    const distribution = join(root, 'packages', package_, 'dist');
+    mkdirSync(distribution, { recursive: true });
+    const file = join(distribution, 'index.d.ts');
     writeFileSync(file, "export { a } from './a.ts';\n");
     return file;
   }
 
   it('rewrites the contracts, core and sync dists when run by bare node', () => {
     const { root, script } = copyToolIntoScratch();
-    const files = ['contracts', 'core', 'sync'].map((pkg) => seedDist(root, pkg));
+    const files = ['contracts', 'core', 'sync'].map((package_) => seedDistribution(root, package_));
 
     const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
 
@@ -312,8 +312,8 @@ describe('the post-emit step', () => {
 
   it('exits non-zero and names the directory when the core dist is missing', () => {
     const { root, script } = copyToolIntoScratch();
-    seedDist(root, 'contracts');
-    seedDist(root, 'sync');
+    seedDistribution(root, 'contracts');
+    seedDistribution(root, 'sync');
 
     const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
 

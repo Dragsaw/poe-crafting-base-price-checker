@@ -52,10 +52,10 @@ function input(): HTMLInputElement {
   return found;
 }
 
-function part(attr: string): HTMLElement {
-  const found = container?.querySelector<HTMLElement>(`[${attr}]`);
+function part(attribute: string): HTMLElement {
+  const found = container?.querySelector<HTMLElement>(`[${attribute}]`);
   if (found === null || found === undefined) {
-    throw new Error(`no ${attr}`);
+    throw new Error(`no ${attribute}`);
   }
   return found;
 }
@@ -113,11 +113,11 @@ describe('the panel at rest', () => {
 
   it('draws a non-interactive readout: no pointer events, no handlers, and the range endpoints', () => {
     mountPanel(0.25);
-    for (const attr of ['data-threshold-track', 'data-threshold-fill', 'data-threshold-marker']) {
-      const node = part(attr);
-      expect(node.style.pointerEvents, attr).toBe('none');
-      const props = Object.entries(node).find(([key]) => key.startsWith('__reactProps'))?.[1] as Record<string, unknown>;
-      expect(Object.keys(props).filter((key) => key.startsWith('on')), attr).toEqual([]);
+    for (const attribute of ['data-threshold-track', 'data-threshold-fill', 'data-threshold-marker']) {
+      const node = part(attribute);
+      expect(node.style.pointerEvents, attribute).toBe('none');
+      const properties = Object.entries(node).find(([key]) => key.startsWith('__reactProps'))?.[1] as Record<string, unknown>;
+      expect(Object.keys(properties).filter((key) => key.startsWith('on')), attribute).toEqual([]);
     }
     const marker = part('data-threshold-marker');
     expect([marker.style.width, marker.style.height]).toEqual(['11px', '14px']);

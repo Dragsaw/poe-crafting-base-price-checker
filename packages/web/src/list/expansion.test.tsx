@@ -49,8 +49,8 @@ function line2(row: HTMLElement): string[] {
 }
 
 function many(count: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntry[] } {
-  const tracked = Array.from({ length: count }, (_, i) => rawEntry(`Base ${String(i).padStart(2, '0')}`));
-  return { tracked, dataset: tracked.map((entry, i) => priced(entry, 40 - i, hoursBefore(NOW, 1))) };
+  const tracked = Array.from({ length: count }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
+  return { tracked, dataset: tracked.map((entry, index) => priced(entry, 40 - index, hoursBefore(NOW, 1))) };
 }
 
 describe('the expansion panel', () => {

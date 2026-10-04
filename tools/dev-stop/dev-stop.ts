@@ -40,10 +40,10 @@ export type StopPlan =
 /** The port from `--port <n>` or `--port=<n>`, else the default. */
 export function parsePort(argv: readonly string[]): number {
   let raw: string | undefined;
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i]!;
-    if (arg === '--port') {raw = argv[i + 1] ?? '';}
-    else if (arg.startsWith('--port=')) {raw = arg.slice('--port='.length);}
+  for (let index = 0; index < argv.length; index++) {
+    const argument = argv[index]!;
+    if (argument === '--port') {raw = argv[index + 1] ?? '';}
+    else if (argument.startsWith('--port=')) {raw = argument.slice('--port='.length);}
   }
   if (raw === undefined) {return DEFAULT_PORT;}
   const port = Number(raw);
@@ -74,19 +74,19 @@ function programName(token: string | undefined): string {
  * An option before the script (`pnpm -r --parallel dev`, `pnpm --filter x dev`)
  * makes it some other invocation.
  */
-function isPnpmDev(info: ProcessInfo): boolean {
+function isPnpmDevelopment(info: ProcessInfo): boolean {
   const tokens = tokenize(info.commandLine);
-  let args: string[];
+  let arguments_: string[];
   if (programName(tokens[0]) === 'pnpm') {
-    args = tokens.slice(1);
+    arguments_ = tokens.slice(1);
   } else if (programName(tokens[0]) === 'node') {
-    const entry = tokens.findIndex((token, i) => i > 0 && !token.startsWith('-'));
+    const entry = tokens.findIndex((token, index) => index > 0 && !token.startsWith('-'));
     if (entry === -1 || !/^pnpm\.[cm]?js$/.test(programName(tokens[entry]))) {return false;}
-    args = tokens.slice(entry + 1);
+    arguments_ = tokens.slice(entry + 1);
   } else {
     return false;
   }
-  return args[0] === 'dev' || ((args[0] === 'run' || args[0] === 'run-script') && args[1] === 'dev');
+  return arguments_[0] === 'dev' || ((arguments_[0] === 'run' || arguments_[0] === 'run-script') && arguments_[1] === 'dev');
 }
 
 const SHELLS = new Set(['cmd', 'sh', 'bash', 'dash', 'zsh', 'powershell', 'pwsh']);
@@ -133,12 +133,12 @@ function startedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
 export function planStop(
   listeners: readonly number[],
   processes: readonly ProcessInfo[],
-  repoRoot: string,
+  repositoryRoot: string,
   protectedPids: ReadonlySet<number>,
 ): StopPlan {
   if (listeners.length === 0) {return { kind: 'idle' };}
   const byPid = new Map(processes.map((info) => [info.pid, info]));
-  const ownVite = normalize(`${repoRoot}/node_modules/`);
+  const ownVite = normalize(`${repositoryRoot}/node_modules/`);
   const roots = new Set<number>();
   for (const pid of listeners) {
     const listener = byPid.get(pid);
@@ -161,14 +161,14 @@ export function planStop(
         parent === undefined ||
         seen.has(parent.pid) ||
         protectedPids.has(parent.pid) ||
-        !(isScriptShell(parent) || isPnpmDev(parent)) ||
+        !(isScriptShell(parent) || isPnpmDevelopment(parent)) ||
         !startedBefore(parent, top)
       ) {
         break;
       }
       seen.add(parent.pid);
       top = parent;
-      if (isPnpmDev(top)) {break;}
+      if (isPnpmDevelopment(top)) {break;}
     }
     roots.add(top.pid);
   }
@@ -297,9 +297,9 @@ function killTree(pid: number, processes: readonly ProcessInfo[]): void {
 
 async function main(): Promise<number> {
   const port = parsePort(process.argv.slice(2));
-  const repoRoot = resolve(import.meta.dirname, '../..');
+  const repositoryRoot = resolve(import.meta.dirname, '../..');
   const before = snapshot(port);
-  const plan = planStop(before.listeners, before.processes, repoRoot, ownAncestry(before.processes, process.pid));
+  const plan = planStop(before.listeners, before.processes, repositoryRoot, ownAncestry(before.processes, process.pid));
   if (plan.kind === 'idle') {
     process.stdout.write(`dev-stop: nothing listens on port ${port}.\n`);
     return 0;
