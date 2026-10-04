@@ -519,9 +519,6 @@
     "complexity": {
       "count": 2
     },
-    "local/max-comment-run": {
-      "count": 7
-    },
     "max-classes-per-file": {
       "count": 1
     },

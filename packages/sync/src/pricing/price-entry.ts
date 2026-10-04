@@ -1,25 +1,5 @@
 /**
- * The pricing step: one Divine price estimate for one tracked entry (FR-21,
- * FR-23, AD-16, AD-20).
- *
- * For each entry it builds the AD-16 search from the entry alone, sends **one
- * search** and **at most one fetch** of the cheapest 10 result ids through the
- * governed client, normalises every listing to divine once, and takes the
- * lower median. It returns the updated `DatasetEntry` to the chunk runner and
- * writes nothing.
- *
- * The consequences of a request, by cause (AD-9):
- *
- * | Answer | Entry | Chunk |
- * | --- | --- | --- |
- * | search answered | `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` set, whatever the fetch returns | — |
- * | 429, 5xx, timeout | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | yields |
- * | any other 4xx | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | `MalformedRequestError` thrown |
- * | 2xx, body of the wrong shape | `lastAttemptedAt` stamped, price state kept; the search fields unchanged on the search, set on the fetch | `UnexpectedTradeResponseError` thrown |
- * | none: the `jewel` arm derives a base type `items.json` lacks | `unresolvable`, nothing stamped, a `baseTypeId` record | continues |
- *
- * The league, the rates and the item types arrive as values; this module
- * names no player file.
+ * The pricing step: one Divine price per entry, one search and at most one fetch (FR-21, FR-23, AD-9, AD-16).
  */
 
 import { canonicalKey } from '@poe/contracts';
@@ -48,10 +28,7 @@ export const FETCH_LIMIT = 10;
 export type RequestKind = 'search' | 'fetch';
 
 /**
- * A 4xx other than 429: the request itself was wrong, and repeating it would
- * spend the Invalid Requests Threshold. The chunk aborts; the runner releases
- * the lock and rethrows. `entry` is the dataset entry with `lastAttemptedAt`
- * stamped and the price state unchanged. Story 1.9 turns it into a record.
+ * A 4xx other than 429 would spend the Invalid Requests Threshold if repeated, so the chunk aborts (AD-9).
  */
 export class MalformedRequestError extends Error {
   readonly entryKey: string;
@@ -70,13 +47,7 @@ export class MalformedRequestError extends Error {
 }
 
 /**
- * A 2xx whose body is not the shape the trade site returns. It is not a
- * request fault and not a rate limit, so it is neither counted nor yielded:
- * the chunk aborts loudly and names the entry. `entry` is the dataset entry
- * with `lastAttemptedAt` stamped and the price state unchanged, and the runner
- * publishes it (AD-9). On the fetch it also has the answered search's fields
- * set; on the search no search was answered, so the search fields stay as
- * published before (AD-16).
+ * A 2xx body of the wrong shape aborts the chunk; `entry` has search fields only after an answered search (AD-9).
  */
 export class UnexpectedTradeResponseError extends Error {
   readonly entryKey: string;
@@ -142,11 +113,7 @@ function parseSearchAnswer(body: string): SearchAnswer | undefined {
   return result.every((item): item is string => typeof item === 'string') ? { id, result } : undefined;
 }
 
-/**
- * The priced listings of a fetch answer. A `null` result (a listing gone since
- * the search) or a listing with no readable price is not a priced listing, so
- * it is not counted in `sampleSize`.
- */
+/** A `null` result or a listing with no readable price is not counted in `sampleSize`. */
 function parseListings(body: string): Listing[] | undefined {
   const data = parseJson(body);
   if (!isRecord(data) || !Array.isArray(data['result'])) {
@@ -177,11 +144,7 @@ type Leg =
       readonly kind: 'yield';
       /** Set only on a `429` yield: the delay the client's yield carried (§5.3). */
       readonly retryAfterMs?: number;
-      /**
-       * Set only on AD-30's downgrade (IMPLEMENTATION-NOTES.md §13.4). It is
-       * read like any request with no answer: no `retryAfterMs`, so the entry
-       * is stamped and keeps its earlier search fields and price state.
-       */
+      /** AD-30's downgrade (IMPLEMENTATION-NOTES.md §13.4): read as a request with no answer. */
       readonly sessionExpired?: true;
     }
   | { readonly kind: 'malformed'; readonly status: number };
@@ -201,10 +164,7 @@ function yieldedWith(
 
 const SERVER_ERROR = 500;
 
-/**
- * One request's consequence. A timeout or a lost connection yields exactly as
- * a 429 and a 5xx do: server trouble stops the chunk.
- */
+/** A timeout or a lost connection yields as a 429 and a 5xx do: server trouble stops the chunk. */
 async function sendLeg(send: () => Promise<TradeResult>): Promise<Leg> {
   let result: TradeResult;
   try {
@@ -230,11 +190,7 @@ async function sendLeg(send: () => Promise<TradeResult>): Promise<Leg> {
   return status < 200 || status >= 300 ? { kind: 'malformed', status } : { kind: 'answered', result };
 }
 
-/**
- * The priced state from a set of listings, or `no-exchange-rate` where any one
- * listing's currency has no current rate: no listing is stored unnormalised
- * (AD-20).
- */
+/** `no-exchange-rate` where any listing's currency has no current rate: nothing is stored unnormalised (AD-20). */
 function priceOf(
   listings: readonly Listing[],
   rates: ReadonlyMap<string, CurrencyRate>,
