@@ -36,7 +36,9 @@ export type CanonicalKeyElements =
   | readonly ['crafted', string, string, number, CanonicalAffix, CanonicalAffix]
   | readonly ['raw', string, number];
 
-/* eslint-disable unicorn/no-null -- boundary: §4.1 spells a valueless line `[statId, null, null]`, a serialised key that `undefined` would change. */
+// eslint-disable-next-line unicorn/no-null -- boundary: §4.1 spells a valueless line `[statId, null, null]`, a serialised key that `undefined` would change.
+const VALUELESS_SLOT = null;
+
 /** The lines are already sorted by `statId`: the schema sorts them on parse (§4.1). */
 export function encodeAffix(reference: ModifierReference): CanonicalAffix {
   switch (reference.kind) {
@@ -44,19 +46,18 @@ export function encodeAffix(reference: ModifierReference): CanonicalAffix {
       return [reference.statId, reference.valueMin, reference.valueMax];
     }
     case 'valueless': {
-      return [reference.statId, null, null];
+      return [reference.statId, VALUELESS_SLOT, VALUELESS_SLOT];
     }
     case 'hybrid': {
       return [
         'hybrid',
         reference.lines.map((line): CanonicalLine =>
-          'valueMin' in line ? [line.statId, line.valueMin, line.valueMax] : [line.statId, null, null],
+          'valueMin' in line ? [line.statId, line.valueMin, line.valueMax] : [line.statId, VALUELESS_SLOT, VALUELESS_SLOT],
         ),
       ];
     }
   }
 }
-/* eslint-enable unicorn/no-null -- end of the §4.1 boundary above. */
 
 /**
  * The elements in declared order, kind first. The leading kind tag is not
