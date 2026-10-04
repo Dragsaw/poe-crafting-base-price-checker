@@ -1,8 +1,10 @@
 import {
   canonicalKey,
+  compareByCodeUnit,
   compareCanonicalKeys,
   defenceLettersOf,
   describeOverlap,
+  linesOf,
   namesHybrid,
   OVERLAP_SLOTS,
   overlapBranches,
@@ -49,7 +51,9 @@ import type { ReferenceLine, Slot } from './probability.ts';
  *
  * **Pairs.** `contracts` refuses an overlap of two all-single-line entries.
  * The `co-occur` check evaluates every pair in which either entry names a
- * `hybrid` reference, with no summed `statId` (§2.1, *Who evaluates a pair*).
+ * `hybrid` reference, with the whole §2.1 predicate: `overlapBranches` computes
+ * `S` from the pair, compares each summed `statId` as a sum and passes `S` to
+ * `coOccur` (§2.1, *Who evaluates a pair*).
  *
  * **One failure per (check, entry)**, which is the record identity
  * `check` + `entryKey` (§12). A failure's `detail` names every slot,
@@ -96,11 +100,6 @@ export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPool
  * reduces to `not-in-game` (§1). The checks pass this coverage to it.
  */
 const COMPLETE: Pick<WeightsPool, 'poolCoverage'> = { poolCoverage: 'complete' };
-
-/** `lines of ref` (§2.7): a single-line reference is its own one line; a hybrid one is its `lines`. */
-export function linesOf(ref: ModifierRef): readonly ReferenceLine[] {
-  return ref.kind === 'hybrid' ? ref.lines : [ref];
-}
 
 function lineText(rl: ReferenceLine): string {
   return 'valueMin' in rl
@@ -344,15 +343,17 @@ export function lineSetCompleteness(
 }
 
 /**
- * §2.2 with no summed `statId`: `coOccur(x, y)` on one slot ⇔ `x` and `y`
- * share a `statId` ∧ one scoped entry of that slot contains both (`contains`
- * admits no weight-0 tier). Memoised per reference pair, since one class's
- * pairs repeat refs.
+ * §2.2: `coOccur(x, y, S)` on one slot ⇔ `x` and `y` share a `statId` ∧ one
+ * scoped entry of that slot contains both under `contains_S` (`contains`
+ * with `summed`, which admits no weight-0 tier). A reference line on a
+ * `statId` in `S` keeps its place in the line-set test and drops out of the
+ * band test, so the sum alone judges it (§2.1). Memoised per reference pair
+ * and `S`, since one class's pairs repeat refs.
  */
 export function coOccur(scoped: ScopedPools): CoOccur {
   const cache = new Map<string, boolean>();
-  return (x, y, slot) => {
-    const key = JSON.stringify([slot, x, y]);
+  return (x, y, slot, summed) => {
+    const key = JSON.stringify([slot, x, y, [...summed].sort(compareByCodeUnit)]);
     const cached = cache.get(key);
     if (cached !== undefined) {
       return cached;
@@ -360,7 +361,7 @@ export function coOccur(scoped: ScopedPools): CoOccur {
     const theirs = statIds(y);
     const answer =
       statIds(x).some((statId) => theirs.includes(statId)) &&
-      scoped[slot].some((entry) => contains(x, entry) && contains(y, entry));
+      scoped[slot].some((entry) => contains(x, entry, summed) && contains(y, entry, summed));
     cache.set(key, answer);
     return answer;
   };
