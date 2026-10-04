@@ -20,10 +20,13 @@
     "packages/sync": {},
     "packages/web": {}
   },
+  "ignoreIssues": {
+    "packages/contracts/src/schema-version.ts": ["duplicates"]
+  },
   "rules": {
-    "exports": "warn",
-    "types": "warn",
-    "duplicates": "warn",
-    "enumMembers": "warn"
+    "exports": "error",
+    "types": "error",
+    "duplicates": "error",
+    "enumMembers": "error"
   }
 }
