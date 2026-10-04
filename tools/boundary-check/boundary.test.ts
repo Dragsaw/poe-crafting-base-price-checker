@@ -46,6 +46,9 @@ async function cruiseFixture(baseDirectory: string): Promise<CruiseOutput> {
   return result.output as unknown as CruiseOutput;
 }
 
+/** Matched by package directory, not version, so a dependency bump holds. */
+const NPM_PACKAGE_DIRECTORY = 'node_modules/dependency-cruiser/';
+
 /** One forbidden edge per shipped rule. Keep in step with `depcruise.rules.mjs`. */
 const EXPECTED_VIOLATIONS = [
   {
@@ -57,8 +60,7 @@ const EXPECTED_VIOLATIONS = [
   {
     rule: 'no-core-to-npm-package',
     from: 'packages/core/src/index.ts',
-    // Matched by package directory, not version, so a dependency bump holds.
-    to: expect.stringMatching(/node_modules\/dependency-cruiser\//) as unknown,
+    to: NPM_PACKAGE_DIRECTORY,
   },
   { rule: 'no-core-to-sync', from: 'packages/core/src/index.ts', to: 'packages/sync/src/index.ts' },
   { rule: 'no-core-to-web', from: 'packages/core/src/index.ts', to: 'packages/web/src/index.ts' },
@@ -82,7 +84,7 @@ it('reports every forbidden edge, by rule name and at error severity', async () 
       .map((violation) => ({
         rule: violation.rule.name,
         from: violation.from,
-        to: violation.to,
+        to: violation.to.includes(NPM_PACKAGE_DIRECTORY) ? NPM_PACKAGE_DIRECTORY : violation.to,
       }))
       .toSorted((a, b) => a.rule.localeCompare(b.rule)),
   ).toEqual(EXPECTED_VIOLATIONS);

@@ -37,7 +37,7 @@ import { SESSION_COOKIE_ENV_VAR } from './trade/session-auth.ts';
 import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 
 /** Every option set the shell built its trade clients with, in build order. */
-const tradeClientOptions = vi.hoisted((): unknown[] => []);
+const tradeClientOptions = vi.hoisted((): { readonly auth?: { readonly holder: unknown; readonly probe: unknown } }[] => []);
 
 // A pass-through: the real clients are built, and the options are recorded so
 // a test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
@@ -585,11 +585,12 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
 
       // No 2xx search, so nothing settled until the process end.
       expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync:batch: unauthenticated (not-probed)']);
-      expect(tradeClientOptions).toEqual([
-        expect.objectContaining({
-          auth: expect.objectContaining({ holder: expect.anything() as unknown, probe: expect.anything() as unknown }) as unknown,
-        }),
-      ]);
+      expect(tradeClientOptions).toHaveLength(1);
+      const governorAuth = tradeClientOptions[0]?.auth;
+      expect(governorAuth?.holder).toBeDefined();
+      expect(governorAuth?.holder).not.toBeNull();
+      expect(governorAuth?.probe).toBeDefined();
+      expect(governorAuth?.probe).not.toBeNull();
     });
   });
 

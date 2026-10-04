@@ -186,10 +186,9 @@ describe('planStop', () => {
   });
 
   it("refuses another worktree's Vite", () => {
-    expect(planStop([16], CHAIN, String.raw`E:\Projects\poe-other`, NONE)).toMatchObject({
-      kind: 'refuse',
-      reason: expect.stringContaining('PID 16 is not this checkout') as unknown,
-    });
+    const plan = planStop([16], CHAIN, String.raw`E:\Projects\poe-other`, NONE);
+    expect(plan.kind).toBe('refuse');
+    expect(plan).toHaveProperty('reason', expect.stringContaining('PID 16 is not this checkout'));
   });
 
   it('refuses a listener that is not Vite', () => {
@@ -198,10 +197,9 @@ describe('planStop', () => {
   });
 
   it('refuses a listener missing from the process table', () => {
-    expect(planStop([99], CHAIN, ROOT, NONE)).toMatchObject({
-      kind: 'refuse',
-      reason: expect.stringContaining('PID 99') as unknown,
-    });
+    const plan = planStop([99], CHAIN, ROOT, NONE);
+    expect(plan.kind).toBe('refuse');
+    expect(plan).toHaveProperty('reason', expect.stringContaining('PID 99'));
   });
 });
 

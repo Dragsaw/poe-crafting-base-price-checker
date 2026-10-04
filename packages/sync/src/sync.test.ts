@@ -622,9 +622,10 @@ describe('pnpm sync: the session with injected ports', () => {
     ]);
     expect(await fs.exists(LOCK_PATH)).toBe(false);
     // Each chunk: the spread pacer, the shared pacing state and the threshold of 1.
-    expect(governorOptions).toEqual([
-      expect.objectContaining({ spread: true, pacing: expect.any(Object) as unknown, invalidRequestThreshold: 1 }),
-    ]);
+    expect(governorOptions).toHaveLength(1);
+    expect(governorOptions[0]).toMatchObject({ spread: true, invalidRequestThreshold: 1 });
+    expect(governorOptions[0]?.['pacing']).toBeTypeOf("object");
+    expect(governorOptions[0]?.['pacing']).not.toBeNull();
   });
 
   it('pass-level requestsBySource after two iterations, and the gate runs once', async () => {
