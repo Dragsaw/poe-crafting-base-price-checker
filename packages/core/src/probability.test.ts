@@ -36,7 +36,13 @@ const STAT = 'explicit.stat_1';
 const OTHER = 'explicit.stat_2';
 const THIRD = 'explicit.stat_3';
 
-let serial = 0;
+const nextSerial = ((): (() => number) => {
+  let serial = 0;
+  return () => {
+    serial += 1;
+    return serial;
+  };
+})();
 
 /** One weights tier. Built in the test, never read from a fixture file (NFR-2). */
 function tier(
@@ -44,7 +50,7 @@ function tier(
   weight: number,
   { itemLevelMin = 1, modGroup }: { readonly itemLevelMin?: number; readonly modGroup?: string } = {},
 ): ModifierWeight {
-  serial += 1;
+  const serial = nextSerial();
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: modGroup ?? `g${String(serial)}`,

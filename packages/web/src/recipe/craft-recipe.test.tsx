@@ -1,8 +1,6 @@
 import type { CraftedTrackedEntry, CraftRecipe, CurrencyRate, DatasetEntry, ModifierWeight, TrackedEntry } from '@poe/contracts';
-import type { SetupServerApi } from 'msw/node';
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { App } from '../App';
 import { BELOW_THRESHOLD_NOTE, STATE_NOTES } from '../list/format';
@@ -11,62 +9,30 @@ import { expandCopy } from '../list/RankedList';
 import { SHORT_FORMS } from '../list/short-forms';
 import { HAIR_SPACE } from '../list/TrustMark';
 import { serveArtifacts, sharedServer, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
-import { rgb } from '../test-support/dom';
+import { mount as mountNode, mountedContainer, rgb, unmount } from '../test-support/dom';
 import { banded, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
 import { colors, glyphs, stacks } from '../theme/tokens';
 import { RECIPE_STORAGE_KEY } from './recipe-storage';
 
-let server: SetupServerApi;
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
-
-beforeAll(async () => {
-  server = await sharedServer();
-});
+const server = await sharedServer();
 
 afterEach(() => {
-  if (root !== undefined) {
-    const mounted = root;
-    act(() => {
-      mounted.unmount();
-    });
-    root = undefined;
-  }
-  container?.remove();
-  container = undefined;
+  unmount();
   localStorage.clear();
 });
 
 function mount(): void {
-  container = document.createElement('div');
-  document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
-  act(() => {
-    mounted.render(
-      <PageProvider>
-        <App />
-      </PageProvider>,
-    );
-  });
-}
-
-function unmount(): void {
-  if (root !== undefined) {
-    const mounted = root;
-    act(() => {
-      mounted.unmount();
-    });
-    root = undefined;
-  }
-  container?.remove();
-  container = undefined;
+  mountNode(
+    <PageProvider>
+      <App />
+    </PageProvider>,
+  );
 }
 
 function frame(): HTMLElement {
-  const found = container?.querySelector<HTMLElement>('[data-frame]');
+  const found = mountedContainer()?.querySelector<HTMLElement>('[data-frame]');
   if (found === null || found === undefined) {
     throw new Error('no frame rendered');
   }
@@ -89,10 +55,16 @@ async function settleTo(state: string): Promise<void> {
 
 // --- the fixture world --------------------------------------------------------
 
-let serial = 0;
+const nextSerial = ((): (() => number) => {
+  let serial = 0;
+  return () => {
+    serial += 1;
+    return serial;
+  };
+})();
 
 function tier(statId: string, weight: number, itemLevelMin: number): ModifierWeight {
-  serial += 1;
+  const serial = nextSerial();
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: `g${String(serial)}`,
@@ -105,7 +77,7 @@ function tier(statId: string, weight: number, itemLevelMin: number): ModifierWei
 
 /** One hybrid pool tier: one modifier carrying a line for each `statId`. */
 function hybridTier(statIds: readonly string[], weight: number, itemLevelMin: number): ModifierWeight {
-  serial += 1;
+  const serial = nextSerial();
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: `g${String(serial)}`,

@@ -52,31 +52,33 @@ it('fails a test through the guard, naming every escaped URL', async () => {
 const LATE_URL = 'https://unrouted.invalid/api/trade2/fetch/late';
 const LATE_ISSUER = 'issues an unfixtured request from a timer it does not await';
 const noop = (): void => {};
-let releaseLateRequest: () => void = noop;
-let lateRequestSettled: Promise<void> = Promise.resolve();
+
+function deferred(): { promise: Promise<void>; resolve: () => void } {
+  let resolve = noop;
+  const promise = new Promise<void>((settle) => {
+    resolve = settle;
+  });
+  return { promise, resolve };
+}
+
+const lateGate = deferred();
+const lateSettled = deferred();
 
 it(LATE_ISSUER, () => {
-  const gate = new Promise<void>((resolve) => {
-    releaseLateRequest = resolve;
-  });
-  let settle: () => void = noop;
-  lateRequestSettled = new Promise<void>((resolve) => {
-    settle = resolve;
-  });
   // The timer is scheduled here, so its callback carries this test's identity.
   // The request starts only when B opens the gate, after this test has ended.
   setTimeout(() => {
-    void gate
+    void lateGate.promise
       .then(() => fetch(LATE_URL))
       .finally(() => {
-        settle();
+        lateSettled.resolve();
       });
   }, 0);
 });
 
 it('does not charge a late request to the test running when it settles', async ({ task }) => {
-  releaseLateRequest();
-  await lateRequestSettled;
+  lateGate.resolve();
+  await lateSettled.promise;
 
   // B's drain takes only B's requests. A's late request stays recorded, so a
   // draining test cannot swallow it.

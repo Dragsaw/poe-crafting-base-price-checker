@@ -177,8 +177,10 @@ async function vitestCollected(options: VitestOptions): Promise<string[]> {
 }
 
 /** The committed config's collection, shared by every positive case. */
-let committedCollection: Promise<string[]> | undefined;
-const committedVitestCollected = (): Promise<string[]> => (committedCollection ??= vitestCollected({}));
+const committedVitestCollected = ((): (() => Promise<string[]>) => {
+  let collection: Promise<string[]> | undefined;
+  return () => (collection ??= vitestCollected({}));
+})();
 
 interface RootProject {
   test: { name: string; include: string[] };

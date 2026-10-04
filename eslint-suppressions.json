@@ -468,9 +468,6 @@
     "unicorn/no-null": {
       "count": 2
     },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 1
-    },
     "unicorn/no-unnecessary-parameters": {
       "count": 2
     },
@@ -533,9 +530,6 @@
     },
     "unicorn/no-null": {
       "count": 6
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 1
     }
   },
   "packages/core/src/probability.ts": {
@@ -584,9 +578,6 @@
     },
     "unicorn/no-null": {
       "count": 16
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 1
     },
     "unicorn/require-array-sort-compare": {
       "count": 1
@@ -1001,9 +992,6 @@
     },
     "unicorn/import-style": {
       "count": 1
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 3
     },
     "unicorn/no-unnecessary-parameters": {
       "count": 1
@@ -1505,14 +1493,8 @@
     "no-await-in-loop": {
       "count": 3
     },
-    "sonarjs/deprecation": {
-      "count": 2
-    },
     "unicorn/no-thenable": {
       "count": 1
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 6
     }
   },
   "packages/web/src/App.tsx": {
@@ -1618,9 +1600,6 @@
     },
     "unicorn/no-null": {
       "count": 8
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 5
     }
   },
   "packages/web/src/list/AskingPriceLine.tsx": {
@@ -1838,20 +1817,12 @@
       "count": 1
     }
   },
-  "packages/web/src/list/unrankable-appendix.test.tsx": {
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 4
-    }
-  },
   "packages/web/src/load/artifacts.ts": {
     "local/max-comment-run": {
       "count": 1
     }
   },
   "packages/web/src/load/load-artifacts.test.ts": {
-    "sonarjs/deprecation": {
-      "count": 2
-    },
     "sonarjs/no-alphabetical-sort": {
       "count": 2
     },
@@ -1860,9 +1831,6 @@
     },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 1
     },
     "unicorn/require-array-sort-compare": {
       "count": 2
@@ -1881,9 +1849,6 @@
   },
   "packages/web/src/load/prune-allowlist.test.ts": {
     "local/max-comment-run": {
-      "count": 1
-    },
-    "unicorn/no-top-level-assignment-in-function": {
       "count": 1
     }
   },
@@ -1908,9 +1873,6 @@
     "no-await-in-loop": {
       "count": 3
     },
-    "sonarjs/deprecation": {
-      "count": 2
-    },
     "sonarjs/no-alphabetical-sort": {
       "count": 1
     },
@@ -1919,9 +1881,6 @@
     },
     "unicorn/no-null": {
       "count": 4
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 9
     },
     "unicorn/no-unnecessary-parameters": {
       "count": 1
@@ -2003,9 +1962,6 @@
     },
     "unicorn/no-null": {
       "count": 1
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 4
     }
   },
   "packages/web/src/test-support/list-fixtures.ts": {
@@ -2050,11 +2006,6 @@
       "count": 1
     }
   },
-  "packages/web/src/threshold/payout-threshold.test.tsx": {
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 4
-    }
-  },
   "packages/web/src/threshold/threshold-storage.test.ts": {
     "unicorn/no-null": {
       "count": 3
@@ -2093,9 +2044,6 @@
     },
     "unicorn/name-replacements": {
       "count": 2
-    },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 1
     }
   },
   "test/contracts-isolation.test.ts": {
@@ -2224,11 +2172,8 @@
     "sonarjs/assertions-in-tests": {
       "count": 3
     },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 2
-    },
     "unicorn/prefer-promise-with-resolvers": {
-      "count": 2
+      "count": 1
     }
   },
   "test/guard-hooks-fixture/names.ts": {
@@ -2355,9 +2300,6 @@
     "unicorn/no-array-sort": {
       "count": 1
     },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 1
-    },
     "unicorn/require-array-sort-compare": {
       "count": 1
     },
@@ -2383,14 +2325,11 @@
     "sonarjs/assertions-in-tests": {
       "count": 2
     },
-    "unicorn/no-top-level-assignment-in-function": {
-      "count": 2
-    },
     "unicorn/prefer-await": {
       "count": 1
     },
     "unicorn/prefer-promise-with-resolvers": {
-      "count": 3
+      "count": 2
     },
     "vitest/expect-expect": {
       "count": 2

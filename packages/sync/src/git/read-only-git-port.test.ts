@@ -21,9 +21,9 @@ import { createReadOnlyGitPort, parseAuthorDate } from './read-only-git-port.ts'
 
 const run = promisify(execFile);
 
-let base: string;
-let repository: string;
-let plain: string;
+const base = await realpath(await mkdtemp(join(tmpdir(), 'poe-git-port-')));
+const repository = join(base, 'repo');
+const plain = join(base, 'plain');
 
 function isolate(): void {
   vi.stubEnv('GIT_CONFIG_GLOBAL', join(base, 'empty.gitconfig'));
@@ -42,9 +42,6 @@ async function commitFile(name: string, content: string, authorDate: string): Pr
 }
 
 beforeAll(async () => {
-  base = await realpath(await mkdtemp(join(tmpdir(), 'poe-git-port-')));
-  repository = join(base, 'repo');
-  plain = join(base, 'plain');
   await writeFile(join(base, 'empty.gitconfig'), '');
   isolate();
   await run('git', ['init', '-q', repository], { env: process.env, windowsHide: true });

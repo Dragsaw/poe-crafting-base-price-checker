@@ -1,11 +1,10 @@
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ArtifactSet, Parsed, TolerableKey } from '../load/artifacts';
 import { NBSP } from '../shared/text';
 import { VALID_BODIES } from '../test-support/artifact-server';
-import { rgb } from '../test-support/dom';
+import { mount, mountedContainer, rgb, unmount } from '../test-support/dom';
 import { colors, px, spacing, stacks } from '../theme/tokens';
 import { absenceLine } from './AbsenceLines';
 import { AFFORDANCE_CLOSED, AFFORDANCE_OPEN, PANEL_HEADINGS, type DiagnosisFailure } from './trust-facts';
@@ -54,19 +53,8 @@ const CURATION_5_OF_8: Partial<ArtifactSet> = {
   config: { ...BASE_SET.config, minChunkSearches: 8 },
 };
 
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
-
 afterEach(() => {
-  const mounted = root;
-  if (mounted !== undefined) {
-    act(() => {
-      mounted.unmount();
-    });
-  }
-  root = undefined;
-  container?.remove();
-  container = undefined;
+  unmount();
   vi.restoreAllMocks();
 });
 
@@ -76,18 +64,11 @@ function mountStrip(
   crossFileFailures: readonly DiagnosisFailure[] = [],
 ): HTMLDivElement {
   const set = { ...BASE_SET, syncReport: COMMITTED_REPORT, ...overrides } as ArtifactSet;
-  container = document.createElement('div');
-  document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
-  act(() => {
-    mounted.render(<TrustStrip set={set} absent={absent} now={REPORT_CLOCK} crossFileFailures={crossFileFailures} />);
-  });
-  return container;
+  return mount(<TrustStrip set={set} absent={absent} now={REPORT_CLOCK} crossFileFailures={crossFileFailures} />);
 }
 
 function strip(): HTMLElement {
-  const found = container?.querySelector<HTMLElement>('[data-trust-strip]');
+  const found = mountedContainer()?.querySelector<HTMLElement>('[data-trust-strip]');
   if (found === null || found === undefined) {
     throw new Error('no trust strip rendered');
   }
@@ -96,7 +77,7 @@ function strip(): HTMLElement {
 
 const line = (name: string): string =>
   (strip().querySelector(`[data-trust-line="${name}"]`)?.textContent ?? '').replaceAll(NBSP, ' ');
-const panel = (): HTMLElement | null => container?.querySelector<HTMLElement>('[data-sync-report-panel]') ?? null;
+const panel = (): HTMLElement | null => mountedContainer()?.querySelector<HTMLElement>('[data-sync-report-panel]') ?? null;
 const affordance = (): string | null | undefined => strip().querySelector('[data-strip-affordance]')?.textContent;
 
 function click(target: Element | null | undefined): void {
@@ -347,11 +328,7 @@ describe('the cross-file diagnosis (AD-17)', () => {
   it('leaves the strip unchanged', () => {
     mountStrip();
     const before = strip().textContent;
-    act(() => {
-      root?.unmount();
-    });
-    root = undefined;
-    container?.remove();
+    unmount();
     mountStrip({}, [], FAILURES);
     expect(strip().textContent).toBe(before);
     expect(strip().querySelector('[data-health-line]')).toBeNull();

@@ -9,31 +9,33 @@ import { INNOCENT_TEST, LATE_ISSUER, LATE_URL, OWN_TEST, OWN_URL } from './names
  */
 
 const noop = (): void => {};
-let releaseLateRequest: () => void = noop;
-let lateRequestSettled: Promise<void> = Promise.resolve();
+
+function deferred(): { promise: Promise<void>; resolve: () => void } {
+  let resolve = noop;
+  const promise = new Promise<void>((settle) => {
+    resolve = settle;
+  });
+  return { promise, resolve };
+}
+
+const gate = deferred();
+const settled = deferred();
 
 it(OWN_TEST, async () => {
   await fetch(OWN_URL);
 });
 
 it(LATE_ISSUER, () => {
-  const gate = new Promise<void>((resolve) => {
-    releaseLateRequest = resolve;
-  });
-  let settle: () => void = noop;
-  lateRequestSettled = new Promise<void>((resolve) => {
-    settle = resolve;
-  });
   setTimeout(() => {
-    void gate
+    void gate.promise
       .then(() => fetch(LATE_URL))
       .finally(() => {
-        settle();
+        settled.resolve();
       });
   }, 0);
 });
 
 it(INNOCENT_TEST, async () => {
-  releaseLateRequest();
-  await lateRequestSettled;
+  gate.resolve();
+  await settled.promise;
 });

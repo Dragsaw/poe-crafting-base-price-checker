@@ -1,9 +1,7 @@
-import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { cssNumber } from '../test-support/css-number';
-import { rgb } from '../test-support/dom';
+import { mount, mountedContainer, rgb, unmount } from '../test-support/dom';
 import { blur, pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
 import { colors, spacing } from '../theme/tokens';
@@ -15,38 +13,18 @@ import {
   THRESHOLD_UNIT,
 } from './PayoutThreshold';
 
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
-
-afterEach(() => {
-  const mounted = root;
-  if (mounted !== undefined) {
-    act(() => {
-      mounted.unmount();
-    });
-  }
-  root = undefined;
-  container?.remove();
-  container = undefined;
-});
+afterEach(unmount);
 
 function mountPanel(value: number, onChange: (value: number) => void = () => {}): HTMLDivElement {
-  container = document.createElement('div');
-  document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
-  act(() => {
-    mounted.render(
-      <PageProvider>
-        <PayoutThreshold value={value} onChange={onChange} />
-      </PageProvider>,
-    );
-  });
-  return container;
+  return mount(
+    <PageProvider>
+      <PayoutThreshold value={value} onChange={onChange} />
+    </PageProvider>,
+  );
 }
 
 function input(): HTMLInputElement {
-  const found = container?.querySelector('input');
+  const found = mountedContainer()?.querySelector('input');
   if (found === null || found === undefined) {
     throw new Error('no input rendered');
   }
@@ -54,7 +32,7 @@ function input(): HTMLInputElement {
 }
 
 function part(attribute: string): HTMLElement {
-  const found = container?.querySelector<HTMLElement>(`[${attribute}]`);
+  const found = mountedContainer()?.querySelector<HTMLElement>(`[${attribute}]`);
   if (found === null || found === undefined) {
     throw new Error(`no ${attribute}`);
   }
@@ -105,11 +83,11 @@ describe('the panel at rest', () => {
 
   it('is a number input with no stepper and no slider', () => {
     mountPanel(0.25);
-    expect(container?.querySelectorAll('input')).toHaveLength(1);
+    expect(mountedContainer()?.querySelectorAll('input')).toHaveLength(1);
     expect(input().type).toBe('text');
     expect(input().inputMode).toBe('decimal');
     expect(input().closest('.fg-threshold')).not.toBeNull();
-    expect(container?.querySelector('[role="slider"], input[type="range"], button')).toBeNull();
+    expect(mountedContainer()?.querySelector('[role="slider"], input[type="range"], button')).toBeNull();
   });
 
   it('draws a non-interactive readout: no pointer events, no handlers, and the range endpoints', () => {

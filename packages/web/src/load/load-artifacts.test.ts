@@ -1,5 +1,4 @@
-import type { SetupServerApi } from 'msw/node';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   NEVER_FETCHED_PATH,
@@ -12,11 +11,7 @@ import {
 import { ARTIFACT_ORDER, ARTIFACTS, type ArtifactKey } from './artifacts';
 import { loadArtifacts } from './load-artifacts';
 
-let server: SetupServerApi;
-
-beforeAll(async () => {
-  server = await sharedServer();
-});
+const server = await sharedServer();
 
 describe('the seven artifacts', () => {
   it('lists AD-24’s seven paths in AD-24 order, four required and three tolerable', () => {

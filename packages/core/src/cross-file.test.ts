@@ -25,14 +25,20 @@ const STAT = 'explicit.stat_1';
 const OTHER = 'explicit.stat_2';
 const SUFFIX_STAT = 'explicit.stat_9';
 
-let serial = 0;
+const nextSerial = ((): (() => number) => {
+  let serial = 0;
+  return () => {
+    serial += 1;
+    return serial;
+  };
+})();
 
 /** One weights tier, built in the test (NFR-2). */
 function tier(
   lines: readonly WeightsLine[],
   { itemLevelMin = 1, weight = 100, modGroup }: { itemLevelMin?: number; weight?: number; modGroup?: string } = {},
 ): ModifierWeight {
-  serial += 1;
+  const serial = nextSerial();
   return {
     sourceModifierId: `m${String(serial)}`,
     modGroup: modGroup ?? `g${String(serial)}`,

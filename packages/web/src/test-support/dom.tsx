@@ -23,44 +23,48 @@ export const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 export const rgb = (hex: string): string =>
   `rgb(${[1, 3, 5].map((index) => String(Number.parseInt(hex.slice(index, index + 2), 16))).join(', ')})`;
 
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
+const mounted: { container?: HTMLDivElement; root?: Root } = {};
 
 /** Unmounts any earlier root, renders `node` into a fresh container on `document.body` and returns the container. */
 export function mount(node: ReactNode): HTMLDivElement {
   unmount();
   const host = document.createElement('div');
-  container = host;
+  mounted.container = host;
   document.body.append(host);
-  const mounted = createRoot(host);
-  root = mounted;
+  const created = createRoot(host);
+  mounted.root = created;
   act(() => {
-    mounted.render(node);
+    created.render(node);
   });
   return host;
 }
 
+/** The container of the last `mount`, until `unmount`. */
+export function mountedContainer(): HTMLDivElement | undefined {
+  return mounted.container;
+}
+
 /** Unmounts the mounted root, if any, and removes its container. */
 export function unmount(): void {
-  const mounted = root;
-  if (mounted !== undefined) {
+  const { root, container } = mounted;
+  if (root !== undefined) {
     act(() => {
-      mounted.unmount();
+      root.unmount();
     });
   }
-  root = undefined;
+  mounted.root = undefined;
   container?.remove();
-  container = undefined;
+  mounted.container = undefined;
 }
 
 /** Renders `node` into the kept root, so mounted components keep their state. */
 function rerender(node: ReactNode): void {
-  const mounted = root;
-  if (mounted === undefined) {
+  const { root } = mounted;
+  if (root === undefined) {
     throw new Error('no mounted root');
   }
   act(() => {
-    mounted.render(node);
+    root.render(node);
   });
 }
 

@@ -643,11 +643,17 @@ const TARGET = 'explicit.stat_target';
 const FILLER = 'explicit.stat_filler';
 const SUFFIX_STAT = 'explicit.stat_suffix';
 
-let tierSerial = 0;
+const nextTierSerial = ((): (() => number) => {
+  let tierSerial = 0;
+  return () => {
+    tierSerial += 1;
+    return tierSerial;
+  };
+})();
 
 /** One weights tier, built in the test, never read from a fixture file (NFR-2). */
 function tierOf(statId: string, weight: number, itemLevelMin = 1, moduleGroup?: string): ModifierWeight {
-  tierSerial += 1;
+  const tierSerial = nextTierSerial();
   return {
     sourceModifierId: `t${String(tierSerial)}`,
     modGroup: moduleGroup ?? `g${String(tierSerial)}`,

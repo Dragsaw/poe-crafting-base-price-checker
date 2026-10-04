@@ -1,9 +1,7 @@
 import { canonicalKey } from '@poe/contracts';
 import type { TrackedEntry } from '@poe/contracts';
-import type { SetupServerApi } from 'msw/node';
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from './App';
 import { absenceLine } from './frame/AbsenceLines';
@@ -36,49 +34,26 @@ import {
 } from './test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from './load/artifacts';
 import { cssNumber } from './test-support/css-number';
-import { rgb } from './test-support/dom';
+import { mount as mountNode, mountedContainer, rgb, unmount } from './test-support/dom';
 import { blur, pastDebounce, typeInto } from './test-support/threshold-input';
 import { PageProvider } from './theme/PageProvider';
 import { colors } from './theme/tokens';
 import { THRESHOLD_STORAGE_KEY } from './threshold/threshold-storage';
 
-let server: SetupServerApi;
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
+const server = await sharedServer();
 
-beforeAll(async () => {
-  server = await sharedServer();
-});
-
-afterEach(() => {
-  if (root !== undefined) {
-    const mounted = root;
-    act(() => {
-      mounted.unmount();
-    });
-    root = undefined;
-  }
-  container?.remove();
-  container = undefined;
-});
+afterEach(unmount);
 
 function mount(): HTMLDivElement {
-  container = document.createElement('div');
-  document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
-  act(() => {
-    mounted.render(
-      <PageProvider>
-        <App />
-      </PageProvider>,
-    );
-  });
-  return container;
+  return mountNode(
+    <PageProvider>
+      <App />
+    </PageProvider>,
+  );
 }
 
 function frame(): HTMLElement {
-  const found = container?.querySelector<HTMLElement>('[data-frame]');
+  const found = mountedContainer()?.querySelector<HTMLElement>('[data-frame]');
   if (found === null || found === undefined) {
     throw new Error('no frame rendered');
   }
@@ -159,7 +134,7 @@ describe('the pending state', () => {
     for (const key of ARTIFACT_ORDER.slice(0, 6)) {
       gates.get(key)?.open();
       await flush();
-      expect(container?.outerHTML).toContain(pending);
+      expect(mountedContainer()?.outerHTML).toContain(pending);
       expect(frame().outerHTML).toBe(pending);
     }
 
@@ -515,12 +490,7 @@ const withoutIds = (html: string): string => html.replaceAll(/\s(id|for|aria-des
 
 /** Remounts the page, as a reload does: every view state starts again from rest. */
 function reload(): void {
-  const mounted = root;
-  act(() => {
-    mounted?.unmount();
-  });
-  root = undefined;
-  container?.remove();
+  unmount();
   mount();
 }
 

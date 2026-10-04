@@ -3,24 +3,19 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 const HOOK_PATH = fileURLToPath(new URL('../.githooks/commit-msg', import.meta.url));
 
-let workDir: string;
-
-beforeEach(() => {
-  workDir = mkdtempSync(join(tmpdir(), 'commit-msg-hook-'));
-});
-
-afterEach(() => {
-  rmSync(workDir, { recursive: true, force: true });
-});
-
 function runHook(subject: string) {
-  const messagePath = join(workDir, 'MSG');
-  writeFileSync(messagePath, `${subject}\n`);
-  return spawnSync(process.execPath, [HOOK_PATH, messagePath], { encoding: 'utf8' });
+  const workDir = mkdtempSync(join(tmpdir(), 'commit-msg-hook-'));
+  try {
+    const messagePath = join(workDir, 'MSG');
+    writeFileSync(messagePath, `${subject}\n`);
+    return spawnSync(process.execPath, [HOOK_PATH, messagePath], { encoding: 'utf8' });
+  } finally {
+    rmSync(workDir, { recursive: true, force: true });
+  }
 }
 
 describe('commit-msg hook', () => {
