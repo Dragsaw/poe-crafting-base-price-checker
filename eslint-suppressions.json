@@ -325,11 +325,6 @@
       "count": 9
     }
   },
-  "packages/sync/src/fixtures-record.test.ts": {
-    "max-lines": {
-      "count": 1
-    }
-  },
   "packages/sync/src/git/read-only-git-port.test.ts": {
     "local/max-comment-run": {
       "count": 1
