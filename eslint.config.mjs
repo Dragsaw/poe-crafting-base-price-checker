@@ -151,6 +151,49 @@ export default tseslint.config(
       'no-await-in-loop': 'error',
       'no-shadow': 'off',
       '@typescript-eslint/no-shadow': 'error',
+
+      // Contradicts the repo's JSDoc style (multi-line blocks with a `*` gutter).
+      'unicorn/single-line-block-comment-style': 'off',
+      'unicorn/no-asterisk-prefix-in-documentation-comments': 'off',
+      // Conflicts with unicorn/prefer-await, which the repo follows.
+      'unicorn/prefer-then-catch': 'off',
+      // Kebab-case for every file; React `.tsx` files may also be PascalCase (see below).
+      'unicorn/filename-case': ['error', { cases: { kebabCase: true } }],
+    },
+  },
+  {
+    // React components are named after the component they export.
+    files: ['packages/web/**/*.tsx'],
+    rules: {
+      'unicorn/filename-case': ['error', { cases: { kebabCase: true, pascalCase: true } }],
+    },
+  },
+  {
+    // CLIs and the commit-msg hook print to the terminal by design.
+    files: ['tools/**', '.githooks/**'],
+    rules: { 'no-console': 'off' },
+  },
+  {
+    // Config files, scripts and tests run top-level code and export for their tests by design.
+    files: ['**/*.config.*', 'tools/**/*.mjs', 'packages/web/src/test-setup.ts', ...TEST_FILES],
+    rules: {
+      'unicorn/no-top-level-side-effects': 'off',
+      'unicorn/no-exports-in-scripts': 'off',
+    },
+  },
+  {
+    // Web tests query `document`, not an element, and test-setup assigns to globals by purpose.
+    files: [
+      'packages/web/**/*.test.{ts,tsx}',
+      'packages/web/src/test-setup.ts',
+      'packages/web/src/test-support/**',
+      'test/setup.ts',
+      'test/global-setup.ts',
+    ],
+    rules: {
+      'unicorn/prefer-scoped-selector': 'off',
+      'unicorn/require-css-escape': 'off',
+      'unicorn/no-global-object-property-assignment': 'off',
     },
   },
   {
@@ -161,6 +204,8 @@ export default tseslint.config(
       'max-depth': 'off',
       'max-nested-callbacks': 'off',
       'max-statements': 'off',
+      // Tests nest calls as `expect(await f(g(x)))`.
+      'unicorn/max-nested-calls': 'off',
     },
   },
   {
@@ -172,7 +217,8 @@ export default tseslint.config(
       'vitest/expect-expect': 'error',
       'vitest/no-conditional-expect': 'error',
       'vitest/no-identical-title': 'error',
-      'vitest/valid-expect': 'error',
+      // The repo's `expect(x, 'message')` idiom passes a second argument.
+      'vitest/valid-expect': ['error', { maxArgs: 2 }],
     },
   },
   {
