@@ -272,7 +272,7 @@
   },
   "packages/sync/src/catalogue-refresh.test.ts": {
     "local/max-comment-run": {
-      "count": 8
+      "count": 1
     },
     "max-lines": {
       "count": 1

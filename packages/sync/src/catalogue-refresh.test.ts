@@ -34,15 +34,8 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-/**
- * Importing the refresher is deliberate: the module has an entry guard, so the
- * import runs nothing. That guard is asserted **by behaviour** below, with two
- * spawns, because a source scan passes just as happily on an inverted guard.
- *
- * Every response here is a **real captured payload** from `fixtures/`, recorded
- * by Story 1.3. Nothing in this file writes to disk: the write port is a
- * closure over an array, so a test run never touches `data/`.
- */
+// The entry guard makes the import above run nothing. It is asserted by
+// behaviour below, with spawns, because a source scan passes on an inverted guard.
 
 const SCRIPT = fileURLToPath(new URL('catalogue-refresh.ts', import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -163,12 +156,7 @@ function endpointFor(artifact: string): (typeof CATALOGUE_ENDPOINTS)[number] {
   return endpoint;
 }
 
-/**
- * Narrows an outcome to its failure branch, which is what makes `failure` a
- * plain `string` rather than an optional one. The assertion is the narrowing:
- * `expect(outcome.ok).toBe(false)` reads well but tells the compiler nothing,
- * so a test written that way would silently go back to reading an optional.
- */
+/** Narrows to the failure branch; `expect(outcome.ok).toBe(false)` would not narrow for the compiler. */
 function failureOf(
   outcome: Awaited<ReturnType<typeof refreshCatalogue>>,
 ): { readonly failure: string; readonly written: readonly string[] } {
@@ -202,8 +190,7 @@ it('runs nothing when the module is imported rather than invoked', async () => {
   const importer = `await import(${JSON.stringify(pathToFileURL(SCRIPT).href)});\nprocess.stdout.write('imported');`;
   const result = await run(['--input-type=module', '-e', importer]);
 
-  // Had the guard been inverted, `main` would have run here and written the
-  // refusal to stderr with a non-zero exit — exactly the direct spawn above.
+  // An inverted guard would run `main` here and refuse on stderr, as the direct spawn does.
   expect(result.stdout).toBe('imported');
   expect(result.stderr).toBe('');
   expect(result.code).toBe(0);
@@ -218,10 +205,8 @@ const read = (entryPoint: string): string | undefined => {
 };
 
 it('is referenced by no vitest config and by no setup file', () => {
-  // Split deliberately. A missing *required* entry means a config was renamed
-  // or moved, and a scan that skipped it would pass while saying nothing — the
-  // failure mode of a single list read through a bare `catch { continue }`.
-  // `web` has no suite yet, so its paths are genuinely optional today.
+  // A missing required entry means a config moved; skipping it would pass silently.
+  // `web` has no suite yet, so its paths are optional.
   const required = [
     'vitest.config.ts',
     'test/setup.ts',
@@ -251,11 +236,9 @@ it('is referenced by no vitest config and by no setup file', () => {
 });
 
 /**
- * `@poe/contracts` resolves through `exports.default` to its own `src/index.ts`,
- * and Node's type stripping performs no extension resolution: every relative
- * specifier below `contracts/src` has to carry `.ts` or this command dies at
- * load with `ERR_MODULE_NOT_FOUND`. Vitest resolves either spelling, so only a
- * spawn catches a regression. The spawn lives here, in the package that breaks.
+ * Node's type stripping resolves no extensions, so a relative specifier below
+ * `contracts/src` without `.ts` kills the command at load. Vitest accepts
+ * either spelling, so only a spawn catches it.
  */
 it('loads @poe/contracts under bare node, as the command itself must', async () => {
   const packageRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -275,23 +258,9 @@ it('loads @poe/contracts under bare node, as the command itself must', async () 
 });
 
 it('names the real fetch port in no test file', () => {
-  // The property worth protecting is that **`fetch` never runs in a test**, not
-  // that `shell.ts` is unimportable: the module is already evaluated in every
-  // run, because `catalogue-refresh.ts` imports it. Scanning for the module
-  // specifier therefore forbade the wrong thing — it also forbade testing
-  // `writeTextFile`, whose `mkdir` is what makes the first refresh work, and so
-  // made that gap permanently unclosable in-package. `shell.test.ts` now covers
-  // the safe exports.
-  //
-  // The narrowed property: **the real port runs only against loopback, and only
-  // in `shell-fetch.test.ts`**. That one file starts its own `node:http` server
-  // on `127.0.0.1` and pins the rejections `isTransportFailure` depends on
-  // (AD-8); the MSW guard in `test/setup.ts` still fails any request it makes to
-  // a remote host. Every other test file must not name the port at all.
-  //
-  // A bare identifier scan, not an import-specifier regex: a specifier regex
-  // misses `from './shell'`, a dynamic `await import(...)` and a re-export, all
-  // of which reach the same function.
+  // The real port runs only against loopback, only in `shell-fetch.test.ts` (AD-8);
+  // `test/setup.ts` fails remote requests. A bare identifier scan, because a
+  // specifier regex misses `from './shell'`, dynamic imports and re-exports.
   const sourceDirectory = fileURLToPath(new URL('.', import.meta.url));
   const testFiles = readdirSync(sourceDirectory, { recursive: true, encoding: 'utf8' }).filter((name) =>
     name.endsWith('.test.ts'),
@@ -319,10 +288,8 @@ it('names the real fetch port in no test file', () => {
 });
 
 it('is reachable at the script name the human is told to run', () => {
-  // Every other test here spawns an absolute path this file computes. The one
-  // string a human actually types lives in the root manifest, and a rename or a
-  // typo in it is caught by nothing else — the command simply dies with
-  // ERR_MODULE_NOT_FOUND on the day someone needs it.
+  // The string a human types lives in the root manifest; every other spawn here
+  // uses a path this file computes, so only this test catches a typo in it.
   const manifest = JSON.parse(readFileSync(`${REPO_ROOT}package.json`, 'utf8')) as {
     scripts: Record<string, string>;
   };
@@ -457,10 +424,8 @@ it('writes four artifacts, each the captured payload plus schemaVersion', async 
 });
 
 it('writes the committed catalogue back byte for byte on a second refresh against an unchanged API', async () => {
-  // The criterion "a second refresh leaves no diff", checked against the
-  // committed artifacts rather than against one serialisation compared with
-  // itself. An unchanged API sends each committed file minus `schemaVersion`,
-  // which the envelope appends last, so the payload key order is preserved.
+  // Checked against the committed artifacts, not one serialisation compared with
+  // itself. The envelope appends `schemaVersion` last, so key order is preserved.
   const committed: Record<string, string> = {};
   const fixtures: Record<string, HttpResponse> = {};
   for (const endpoint of CATALOGUE_ENDPOINTS) {
@@ -634,10 +599,8 @@ it('names the artifact and the first issue path when a payload is schema-invalid
 });
 
 it('returns a failure naming the artifact when the request itself rejects', async () => {
-  // A rejection, not a status: the real port rejects on the 30 s abort, on a
-  // DNS failure and on a socket reset, and the fake rejects on an unfixtured
-  // request. Without a catch the human gets a stack trace instead of a
-  // sentence, and `written` is never returned at all.
+  // A rejection, not a status: the real port rejects on abort, DNS failure and
+  // socket reset. Without a catch the human gets a stack trace and no `written`.
   const fixtures = capturedResponses();
   const unreachable = endpointFor('stats');
   delete fixtures[`GET ${unreachable.url}`];
