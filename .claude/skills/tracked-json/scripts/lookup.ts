@@ -1,22 +1,6 @@
 /**
- * `pnpm tracked:lookup stat|base|class|mods|tiers <query>` — the lookup half
- * of the tracked-json skill's loop (lookup → edit → check).
- *
- * Read-only convenience tooling. It reads `data/catalogue/{stats,items,filters}.json`
- * as plain JSON and parses `data/weights.json` with `WeightsFileSchema` from
- * `@poe/contracts`, so the typed weights tree is the contract's own. It prints
- * JSON to stdout, and never writes a file or touches the network.
- *
- * It derives no interval and no floor: `tiers` and `mods` print the weights data
- * verbatim. The interval derivation is `core`'s alone (IMPLEMENTATION-NOTES.md §1),
- * and a second copy here is forbidden. The line set and the null-line verdict are
- * `core`'s too (`lineSet`, `untrackableReason`); `mods` and `tiers` call them and
- * keep no copy.
- *
- * - A lookup error (an absent or unreadable file, a weights file that fails
- *   the schema, an unknown or ambiguous class) prints `{error}` to stdout and exits 1.
- * - A usage error prints the usage text to stderr and exits 1.
- * - Zero matches is not an error.
+ * `pnpm tracked:lookup stat|base|class|mods|tiers <query>`: read-only; prints JSON, never writes or hits the network.
+ * It derives no interval and no line set: `core` owns both (IMPLEMENTATION-NOTES.md §1).
  */
 
 import { readFileSync, realpathSync } from 'node:fs';
@@ -262,10 +246,7 @@ export interface ModifierRow {
   readonly slot: Slot;
   readonly modGroup: string;
   readonly text: string;
-  /**
-   * The family's line set (`core`'s `lineSet`, IMPLEMENTATION-NOTES.md §1): the non-null `statId`s of
-   * its tiers, sorted. More than one means a hybrid. Empty when the tiers carry only `null` lines.
-   */
+  /** The family's line set (`core`'s `lineSet`, IMPLEMENTATION-NOTES.md §1); more than one means a hybrid. */
   readonly statIds: string[];
   /** False when any tier of the family is untrackable (the null-line rule); the tiers are in `untrackable`. */
   readonly trackable: boolean;
