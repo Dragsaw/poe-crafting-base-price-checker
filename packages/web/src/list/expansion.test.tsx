@@ -286,7 +286,7 @@ describe('the open set', () => {
     click(rowsIn(view)[21]);
     const openNames = (): (string | null)[] =>
       rowsIn(view)
-        .filter((r) => r.hasAttribute('data-open'))
+        .filter((r) => r.dataset['open'] !== undefined)
         .map((r) => r.querySelector('[data-unit-name]')?.textContent ?? null);
     expect(openNames()).toEqual(['Base 02', 'Base 21']);
     expect(panelsIn(view)).toHaveLength(2);

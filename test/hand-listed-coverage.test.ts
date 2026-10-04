@@ -54,9 +54,11 @@ interface Target {
   readonly eslint?: { readonly files: string; readonly negation?: string };
 }
 
+const DEFAULT_ESLINT: Target['eslint'] = { files: 'tools/**/*.ts' };
+
 const directoryTarget = (
   dir: string,
-  eslint: Target['eslint'] = { files: 'tools/**/*.ts' },
+  eslint: Target['eslint'] = DEFAULT_ESLINT,
 ): Target => ({
   path: dir,
   files: directoryFiles(dir),

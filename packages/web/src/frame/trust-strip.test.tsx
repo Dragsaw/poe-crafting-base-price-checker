@@ -220,8 +220,8 @@ describe('the resting strip', () => {
       expect(signal.style.fontWeight).toBe('700');
     }
     // The absence line sits before the health line.
-    const children = [...strip().children];
-    const absenceIndex = children.findIndex((child) => child.hasAttribute('data-absence-lines'));
+    const children = [...strip().children] as HTMLElement[];
+    const absenceIndex = children.findIndex((child) => child.dataset['absenceLines'] !== undefined);
     expect(absenceIndex).toBeGreaterThan(-1);
     expect(children.indexOf(health as HTMLElement)).toBe(absenceIndex + 1);
     // The five facts are unaffected.

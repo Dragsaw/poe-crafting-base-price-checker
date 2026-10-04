@@ -20,15 +20,17 @@ function entryOf(overrides: Json = {}): Json {
   };
 }
 
-function poolOf(entries: readonly Json[] = [entryOf()], poolCoverage = 'complete'): Json {
-  return { poolCoverage, entries };
+function poolOf(entries: readonly Json[] = [entryOf()]): Json {
+  return { poolCoverage: 'complete', entries };
 }
 
 function classOf(prefix: Json = poolOf(), suffix: Json = poolOf([])): Json {
   return { prefix, suffix };
 }
 
-function fileOf(bases: Json = { 'accessory.amulet': { Amulets: classOf() } }, overrides: Json = {}): Json {
+const DEFAULT_BASES: Json = { 'accessory.amulet': { Amulets: classOf() } };
+
+function fileOf(bases: Json = DEFAULT_BASES, overrides: Json = {}): Json {
   return {
     schemaVersion: '6.0.0',
     gamePatch: '0.5.5',

@@ -124,7 +124,7 @@ describe('a ranked row', () => {
     expect(third?.style.marginLeft).toBe('-3px');
     expect(third?.style.width).toBe('1015px');
     expect(third?.style.borderBottom).toContain(rgb(colors['rule-strong']));
-    expect(rowsIn(view).filter((r) => r.hasAttribute('data-open'))).toHaveLength(1);
+    expect(rowsIn(view).filter((r) => r.dataset['open'] !== undefined)).toHaveLength(1);
     act(() => {
       third?.click();
     });
@@ -183,7 +183,7 @@ describe('the unpriced trail', () => {
     expect(cell(rows[5], 'age').childNodes).toHaveLength(0);
     for (const r of rows.slice(2)) {
       expect(r.dataset['tier']).toBe('3');
-      expect(r.hasAttribute('data-raw')).toBe(true);
+      expect(r.dataset['raw']).toBeDefined();
       expect(r.querySelector('[data-raw-note]')).not.toBeNull();
     }
   });

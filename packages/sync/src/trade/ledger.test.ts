@@ -175,7 +175,7 @@ it('derives nothing for a policy it has never observed', () => {
 // The spread pacer (AD-8, IMPLEMENTATION-NOTES.md §5.3), on the measured search buckets.
 const MEASURED_SEARCH = '5:10:60,30:300:1800,600:21600:3600';
 
-function searchLedger(state: string, observedAt: string = AT): ReturnType<typeof recordObservation> {
+function searchLedger(state: string): ReturnType<typeof recordObservation> {
   return ledgerFrom(
     {
       'x-rate-limit-policy': SEARCH_POLICY,
@@ -183,7 +183,7 @@ function searchLedger(state: string, observedAt: string = AT): ReturnType<typeof
       'x-rate-limit-ip': MEASURED_SEARCH,
       'x-rate-limit-ip-state': state,
     },
-    observedAt,
+    AT,
   );
 }
 

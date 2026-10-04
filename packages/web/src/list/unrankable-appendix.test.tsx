@@ -25,8 +25,8 @@ afterEach(() => {
   container = undefined;
 });
 
-function klass(className: string, categoryId = `c.${className.toLowerCase()}`): UnrankableClass {
-  return { categoryId, className, reason: REASON };
+function klass(className: string): UnrankableClass {
+  return { categoryId: `c.${className.toLowerCase()}`, className, reason: REASON };
 }
 
 function mountAppendix(classes: readonly UnrankableClass[]): HTMLElement {
@@ -112,7 +112,7 @@ describe('the non-empty appendix', () => {
     const panel = mountAppendix([klass('Bows'), klass('Wands')]);
     for (const row of panel.querySelectorAll<HTMLElement>('[data-appendix-row]')) {
       const first = row.querySelector('[data-cell="class"]');
-      expect(first?.firstElementChild?.getAttribute('data-unit-glyph')).toBe('class');
+      expect((first?.firstElementChild as HTMLElement | null | undefined)?.dataset['unitGlyph']).toBe('class');
       expect(first?.firstElementChild?.textContent).toBe(glyphs.unitClass);
       expect(row.querySelector('[data-unit-glyph="raw"]')).toBeNull();
       const mark = row.querySelector('[data-cell="mark"] [data-trust-mark="unknown"]');

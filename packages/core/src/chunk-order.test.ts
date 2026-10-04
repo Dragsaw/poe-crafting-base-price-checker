@@ -25,10 +25,12 @@ const crafted: TrackedEntry = {
   status: 'active',
 };
 
+const NO_LISTINGS: PriceState = { state: 'no-listings' };
+
 function published(
   entry: TrackedEntry,
   lastAttemptedAt: string | undefined,
-  price: PriceState = { state: 'no-listings' },
+  price: PriceState = NO_LISTINGS,
 ): DatasetEntry {
   return lastAttemptedAt === undefined
     ? { entryKey: canonicalKey(entry), price }

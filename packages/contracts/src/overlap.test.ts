@@ -165,10 +165,11 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
 });
 
 describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () => {
+  const defaultB: HybridModifierReference['lines'][number] = { statId: 'b', valueMin: 1, valueMax: 2 };
   const hybrid = (
     aMin: number,
     aMax: number,
-    b: HybridModifierReference['lines'][number] = { statId: 'b', valueMin: 1, valueMax: 2 },
+    b: HybridModifierReference['lines'][number] = defaultB,
   ): HybridModifierReference => ({
     kind: 'hybrid',
     lines: [{ statId: 'a', valueMin: aMin, valueMax: aMax }, b],

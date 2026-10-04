@@ -31,11 +31,10 @@ const weightsOf = (
 const crafted = (
   className: string,
   status: 'active' | 'pruned' = 'active',
-  categoryId = 'armour.chest',
 ): TrackedEntry =>
   ({
     kind: 'crafted',
-    categoryId,
+    categoryId: 'armour.chest',
     className,
     itemLevelMin: 80,
     prefix: { kind: 'valueless', statId: 'explicit.stat_1' },

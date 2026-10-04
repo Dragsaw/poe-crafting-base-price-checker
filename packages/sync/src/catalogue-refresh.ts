@@ -354,8 +354,10 @@ const entry = process.argv[1];
 const isInvokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
 
 if (isInvokedDirectly) {
-  main().catch((error: unknown) => {
+  try {
+    await main();
+  } catch (error) {
     process.stderr.write(`pnpm catalogue:refresh: ${String(error)}\n`);
     process.exitCode = 1;
-  });
+  }
 }

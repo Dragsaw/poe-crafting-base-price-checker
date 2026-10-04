@@ -287,13 +287,10 @@ function isInvokedDirectly(): boolean {
 if (isInvokedDirectly()) {
   // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a
   // piped write.
-  main(process.argv.slice(2), createNodeFilesystemPort(REPO_ROOT), process.stdout, process.stderr).then(
-    (code) => {
-      process.exitCode = code;
-    },
-    (error: unknown) => {
-      process.stderr.write(`pnpm tracked:check: ${String(error)}\n`);
-      process.exitCode = 1;
-    },
-  );
+  try {
+    process.exitCode = await main(process.argv.slice(2), createNodeFilesystemPort(REPO_ROOT), process.stdout, process.stderr);
+  } catch (error) {
+    process.stderr.write(`pnpm tracked:check: ${String(error)}\n`);
+    process.exitCode = 1;
+  }
 }

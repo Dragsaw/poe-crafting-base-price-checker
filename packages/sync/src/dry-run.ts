@@ -362,10 +362,12 @@ function isInvokedDirectly(): boolean {
 const invokedDirectly = isInvokedDirectly();
 
 if (invokedDirectly) {
-  main().catch((error: unknown) => {
+  try {
+    await main();
+  } catch (error) {
     process.stderr.write(`pnpm sync:dry: ${String(error)}\n`);
     // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a
     // piped stderr write, and a pipe is how an agent runtime captures it.
     process.exitCode = 1;
-  });
+  }
 }

@@ -319,7 +319,7 @@ describe('the Craft Recipe control', () => {
     expect(cells('rank')).toEqual(['1', '2', '3', '4']);
     const glyph = rowNamed('Bows').querySelector<HTMLElement>('[data-unit-glyph]');
     expect(glyph?.dataset['unitGlyph']).toBe('class');
-    expect(rowNamed('Bows').hasAttribute('data-raw')).toBe(false);
+    expect(rowNamed('Bows').dataset['raw']).toBeUndefined();
     expect(statement()).toBeNull();
   });
 
@@ -370,7 +370,7 @@ describe('the Craft Recipe control', () => {
     expect(sub()).toContain('Craft Recipe greater');
     click(option('perfect'));
     expect(frame().querySelectorAll('[data-expansion-panel]')).toHaveLength(1);
-    expect(rowNamed('Bows').hasAttribute('data-open')).toBe(true);
+    expect(rowNamed('Bows').dataset['open']).toBeDefined();
     expect(sub()).toContain('Craft Recipe perfect');
   });
 

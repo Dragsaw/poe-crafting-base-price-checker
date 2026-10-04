@@ -86,7 +86,8 @@ function pOf(result: ProbabilityResult): number {
   return result.p;
 }
 
-function closeRelative(actual: number, expected: number, tolerance = 1e-12): boolean {
+function closeRelative(actual: number, expected: number): boolean {
+  const tolerance = 1e-12;
   return actual === expected || Math.abs(actual - expected) <= tolerance * Math.max(Math.abs(actual), Math.abs(expected));
 }
 

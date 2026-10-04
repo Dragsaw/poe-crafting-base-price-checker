@@ -172,6 +172,14 @@ export class SessionAuth {
     this.#onSettle = onSettle;
   }
 
+  #moveTo(state: SessionAuthState, action: HoldOffAction | undefined): void {
+    this.#state = state;
+    if (action !== undefined) {
+      this.#pendingHoldOff = action;
+    }
+    this.#onSettle?.(describeState(state));
+  }
+
   get state(): SessionAuthState {
     return this.#state;
   }
@@ -280,14 +288,6 @@ export class SessionAuth {
     if (this.#pendingHoldOff === action) {
       this.#pendingHoldOff = undefined;
     }
-  }
-
-  #moveTo(state: SessionAuthState, action: HoldOffAction | undefined): void {
-    this.#state = state;
-    if (action !== undefined) {
-      this.#pendingHoldOff = action;
-    }
-    this.#onSettle?.(describeState(state));
   }
 
   /**
