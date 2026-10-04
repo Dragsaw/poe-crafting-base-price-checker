@@ -894,9 +894,6 @@
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {
-    "max-lines": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     }
