@@ -58,7 +58,7 @@ const EXPECTED_VIOLATIONS = [
     rule: 'no-core-to-npm-package',
     from: 'packages/core/src/index.ts',
     // Matched by package directory, not version, so a dependency bump holds.
-    to: expect.stringMatching(/node_modules\/dependency-cruiser\//),
+    to: expect.stringMatching(/node_modules\/dependency-cruiser\//) as unknown,
   },
   { rule: 'no-core-to-sync', from: 'packages/core/src/index.ts', to: 'packages/sync/src/index.ts' },
   { rule: 'no-core-to-web', from: 'packages/core/src/index.ts', to: 'packages/web/src/index.ts' },

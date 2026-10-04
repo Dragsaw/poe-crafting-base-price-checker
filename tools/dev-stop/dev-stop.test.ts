@@ -188,7 +188,7 @@ describe('planStop', () => {
   it("refuses another worktree's Vite", () => {
     expect(planStop([16], CHAIN, String.raw`E:\Projects\poe-other`, NONE)).toMatchObject({
       kind: 'refuse',
-      reason: expect.stringContaining('PID 16 is not this checkout'),
+      reason: expect.stringContaining('PID 16 is not this checkout') as unknown,
     });
   });
 
@@ -200,7 +200,7 @@ describe('planStop', () => {
   it('refuses a listener missing from the process table', () => {
     expect(planStop([99], CHAIN, ROOT, NONE)).toMatchObject({
       kind: 'refuse',
-      reason: expect.stringContaining('PID 99'),
+      reason: expect.stringContaining('PID 99') as unknown,
     });
   });
 });

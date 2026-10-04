@@ -53,10 +53,10 @@ const FROZEN_DATA_DIR = fileURLToPath(new URL('../../../test/fixtures/frozen-dat
 const LEAGUE = 'Test League';
 /** A yardstick of 2, so the one pinned entry fits the load-time cap (IMPLEMENTATION-NOTES.md §6). */
 const CONFIG = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 2 });
-const CURRENCIES = JSON.stringify({
-  schemaVersion: SUPPORTED_SCHEMA_VERSION,
-  rates: [{ currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' }],
-});
+const CURRENCY_RATES: CurrencyRate[] = [
+  { currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' },
+];
+const CURRENCIES = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, rates: CURRENCY_RATES });
 /** Every base type the synthetic entries below name, in one group no category id matches. */
 const ITEMS_CATALOGUE = {
   result: [
@@ -128,7 +128,7 @@ function datasetOf(published: readonly DatasetEntry[]): DatasetFile {
     league: LEAGUE,
     generatedAt: DRY_RUN_INSTANT,
     entries: [...published],
-    currencyRates: JSON.parse(CURRENCIES).rates as CurrencyRate[],
+    currencyRates: CURRENCY_RATES,
   };
 }
 

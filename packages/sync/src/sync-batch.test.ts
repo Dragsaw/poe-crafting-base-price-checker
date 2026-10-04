@@ -587,7 +587,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(auth.map((entry) => entry.line)).toEqual(['pnpm sync:batch: unauthenticated (not-probed)']);
       expect(tradeClientOptions).toEqual([
         expect.objectContaining({
-          auth: expect.objectContaining({ holder: expect.anything() as unknown, probe: expect.anything() as unknown }),
+          auth: expect.objectContaining({ holder: expect.anything() as unknown, probe: expect.anything() as unknown }) as unknown,
         }),
       ]);
     });

@@ -2,7 +2,7 @@ import { createFakeClockPort } from '@poe/contracts';
 import type { CraftedTrackedEntry, CurrencyRate, HttpPort, ModifierWeight, TrackedEntry } from '@poe/contracts';
 import { contains } from '@poe/core';
 import { http, HttpResponse } from 'msw';
-import type { SetupServerApi } from 'msw/node';
+import type { SetupServer } from 'msw/node';
 import { describe, expect, it } from 'vitest';
 
 import { createTradeClient } from '../trade/client.ts';
@@ -23,8 +23,8 @@ import { itemTypesOf } from './search-body.ts';
 // dynamically, as `web`'s `artifact-server.ts` does.
 const SHARED_SETUP = `${(import.meta as ImportMeta & { readonly dirname: string }).dirname}/../../../../test/setup.ts`;
 
-async function sharedServer(): Promise<SetupServerApi> {
-  const setup = (await import(/* @vite-ignore */ SHARED_SETUP)) as { server: SetupServerApi };
+async function sharedServer(): Promise<SetupServer> {
+  const setup = (await import(/* @vite-ignore */ SHARED_SETUP)) as { server: SetupServer };
   return setup.server;
 }
 

@@ -8,7 +8,7 @@
  */
 
 import { http, HttpResponse } from 'msw';
-import type { SetupServerApi } from 'msw/node';
+import type { SetupServer } from 'msw/node';
 
 import { ARTIFACT_ORDER, ARTIFACTS, type ArtifactKey } from '../load/artifacts';
 import { artifactUrl } from '../load/load-artifacts';
@@ -21,8 +21,8 @@ import { artifactUrl } from '../load/load-artifacts';
 // `import.meta.dirname`, not `import.meta.url`: under jsdom the url is not `file:`.
 const SHARED_SETUP = `${(import.meta as ImportMeta & { readonly dirname: string }).dirname}/../../../../test/setup.ts`;
 
-export async function sharedServer(): Promise<SetupServerApi> {
-  const setup = (await import(/* @vite-ignore */ SHARED_SETUP)) as { server: SetupServerApi };
+export async function sharedServer(): Promise<SetupServer> {
+  const setup = (await import(/* @vite-ignore */ SHARED_SETUP)) as { server: SetupServer };
   return setup.server;
 }
 
@@ -113,7 +113,7 @@ function respond(answer: ArtifactAnswer): Response | Promise<Response> {
  * individual artifacts.
  */
 export function serveArtifacts(
-  server: SetupServerApi,
+  server: SetupServer,
   answers: Partial<Record<ArtifactKey, ArtifactAnswer>> = {},
 ): RecordedRequest[] {
   const requests: RecordedRequest[] = [];

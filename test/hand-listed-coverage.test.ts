@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ESLint, type Linter } from 'eslint';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { createVitest } from 'vitest/node';
+import { type CliOptions, createVitest } from 'vitest/node';
 
 /**
  * Some code sits outside every package: the `tools/` entries and
@@ -114,9 +114,13 @@ function uncovered(expected: readonly string[], covered: Iterable<string>): stri
 // --- TypeScript -------------------------------------------------------------
 
 function readJsonConfig(path: string): Record<string, unknown> {
-  const { config, error } = ts.readConfigFile(path, ts.sys.readFile);
-  if (error !== undefined) {
-    throw new Error(ts.flattenDiagnosticMessageText(error.messageText, '\n'));
+  const result = ts.readConfigFile(path, ts.sys.readFile);
+  if (result.error !== undefined) {
+    throw new Error(ts.flattenDiagnosticMessageText(result.error.messageText, '\n'));
+  }
+  const config: unknown = result.config;
+  if (typeof config !== 'object' || config === null) {
+    throw new Error(`${path} does not hold a JSON object`);
   }
   return config as Record<string, unknown>;
 }
@@ -160,11 +164,11 @@ const loadEslintConfig = async (): Promise<readonly Linter.Config[]> =>
 
 // --- Vitest -----------------------------------------------------------------
 
-type VitestOptions = Parameters<typeof createVitest>[1];
+type VitestOptions = CliOptions;
 
 /** Module ids that Vitest's own glob collects into the `root` project. */
 async function vitestCollected(options: VitestOptions): Promise<string[]> {
-  const vitest = await createVitest('test', { watch: false, run: true, root: REPO_ROOT, ...options });
+  const vitest = await createVitest({ watch: false, run: true, root: REPO_ROOT, ...options });
   try {
     const specifications = await vitest.globTestSpecifications();
     return specifications

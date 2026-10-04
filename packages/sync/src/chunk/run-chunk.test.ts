@@ -872,8 +872,8 @@ describe('runChunk: the lock', () => {
     const report = SyncReportFileSchema.parse(JSON.parse((await fs.readTextFile(REPORT_PATH)) ?? ''));
     const failures = report.records.filter((record) => record.kind === 'run-failure');
     expect(failures).toHaveLength(1);
-    expect(failures[0]).toMatchObject({ message: expect.stringContaining('tracked.json') });
-    expect(failures[0]).toMatchObject({ message: expect.stringContaining(key(A)) });
+    expect(failures[0]?.message).toContain('tracked.json');
+    expect(failures[0]?.message).toContain(key(A));
   });
 
   // Story hybrid-mods 2, I/O matrix "Earlier major": IMPLEMENTATION-NOTES §4.1.

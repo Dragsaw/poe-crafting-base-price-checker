@@ -456,9 +456,6 @@
     }
   },
   "packages/sync/src/chunk/run-chunk.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 2
-    },
     "local/max-comment-run": {
       "count": 4
     },
@@ -530,9 +527,6 @@
     }
   },
   "packages/sync/src/dry-run.test.ts": {
-    "@typescript-eslint/no-unsafe-member-access": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 1
     },
@@ -656,17 +650,11 @@
   "packages/sync/src/pricing/price-entry.hybrid.test.ts": {
     "local/max-comment-run": {
       "count": 1
-    },
-    "sonarjs/deprecation": {
-      "count": 3
     }
   },
   "packages/sync/src/pricing/price-entry.summed.test.ts": {
     "local/max-comment-run": {
       "count": 2
-    },
-    "sonarjs/deprecation": {
-      "count": 3
     }
   },
   "packages/sync/src/pricing/price-entry.test.ts": {
@@ -736,9 +724,6 @@
     }
   },
   "packages/sync/src/sync-batch.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 4
     },
@@ -752,9 +737,6 @@
     }
   },
   "packages/sync/src/sync.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 4
     },
@@ -1153,9 +1135,6 @@
     "local/max-comment-run": {
       "count": 4
     },
-    "sonarjs/deprecation": {
-      "count": 4
-    },
     "unicorn/no-thenable": {
       "count": 1
     },
@@ -1359,14 +1338,8 @@
     }
   },
   "test/hand-listed-coverage.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 4
-    },
-    "sonarjs/deprecation": {
-      "count": 1
     }
   },
   "test/no-hardcoded-rate-limits.test.ts": {
@@ -1398,9 +1371,6 @@
     }
   },
   "tools/boundary-check/boundary.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
     "local/max-comment-run": {
       "count": 1
     }
@@ -1465,9 +1435,6 @@
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 2
-    },
     "max-lines": {
       "count": 1
     },
