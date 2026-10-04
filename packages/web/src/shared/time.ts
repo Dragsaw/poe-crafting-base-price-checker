@@ -15,10 +15,10 @@ export const DAY_MS = 24 * HOUR_MS;
  */
 export function exactAge(clock: string, now: number): string {
   const hours = (now - Date.parse(clock)) / HOUR_MS;
-  if (!(hours >= 1)) {
-    return '< 1h';
+  if (hours >= 1) {
+    return hours < 24 ? `${String(Math.floor(hours))}h` : `${String(Math.floor(hours / 24))}d`;
   }
-  return hours < 24 ? `${String(Math.floor(hours))}h` : `${String(Math.floor(hours / 24))}d`;
+  return '< 1h';
 }
 
 function unitAgo(count: number, unit: string): string {

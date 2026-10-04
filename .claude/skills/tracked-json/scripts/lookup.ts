@@ -208,7 +208,7 @@ export function lookupClass(weights: WeightsFile, filters: unknown, query: strin
 
 export interface ClassSelector {
   readonly className: string;
-  readonly category?: string | undefined;
+  readonly category?: string;
 }
 
 interface ResolvedClass {
@@ -269,7 +269,7 @@ export interface ModRow {
 /** One row per mod family (a modGroup and one statId set) of the class and slot (both slots when `slot` is absent). */
 export function lookupMods(
   weights: WeightsFile,
-  selector: ClassSelector & { readonly slot?: Slot | undefined },
+  selector: ClassSelector & { readonly slot?: Slot },
 ): { categoryId: string; className: string; mods: ModRow[] } {
   const resolved = resolveClass(weights, selector);
   const mods: ModRow[] = [];

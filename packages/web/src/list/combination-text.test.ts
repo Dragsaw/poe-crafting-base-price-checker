@@ -129,7 +129,7 @@ describe('affixText: a hybrid reference', () => {
 
   it('orders the lines by printed text, not by statId, whatever the file order', () => {
     // MANA sorts before PHYS by statId; `% Phys` sorts before `Mana` by code unit.
-    expect(MANA < PHYS).toBe(true);
+    expect(MANA.localeCompare(PHYS)).toBeLessThan(0);
     for (const lines of [
       [line(PHYS, 1, 2), line(MANA, 3, 4)],
       [line(MANA, 3, 4), line(PHYS, 1, 2)],

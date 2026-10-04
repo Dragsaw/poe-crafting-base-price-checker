@@ -17,7 +17,7 @@ try {
   process.exit(0);
 }
 
-let existing = '';
+let existing;
 try {
   existing = git(['config', '--local', 'core.hooksPath']);
 } catch {

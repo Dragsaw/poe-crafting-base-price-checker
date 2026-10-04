@@ -12,5 +12,5 @@ await new Promise<void>((resolve) => {
 });
 
 it(BYSTANDER_TEST, () => {
-  expect(true).toBe(true);
+  expect(BYSTANDER_TEST).toBeTypeOf('string');
 });

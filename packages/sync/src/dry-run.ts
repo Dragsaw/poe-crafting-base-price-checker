@@ -129,29 +129,29 @@ export interface DryRunReport {
 
 /** Every input as text; an absent key is an absent file. */
 export interface DryRunSnapshot {
-  readonly tracked?: string | undefined;
-  readonly dataset?: string | undefined;
-  readonly config?: string | undefined;
-  readonly currencies?: string | undefined;
-  readonly items?: string | undefined;
-  readonly stats?: string | undefined;
-  readonly filters?: string | undefined;
+  readonly tracked?: string;
+  readonly dataset?: string;
+  readonly config?: string;
+  readonly currencies?: string;
+  readonly items?: string;
+  readonly stats?: string;
+  readonly filters?: string;
   /** `data/weights.json`; absent is recorded, never refused. */
-  readonly weights?: string | undefined;
+  readonly weights?: string;
   /** The previous Sync Report, whose records the chunk carries forward. */
-  readonly report?: string | undefined;
+  readonly report?: string;
   /**
    * The real `data/sync-progress.json`. Read only for its `notBefore`
    * (AD-8); never fed into the simulated run, so it cannot defer it.
    */
-  readonly progress?: string | undefined;
+  readonly progress?: string;
   readonly fixtures: PricingFixtures;
 }
 
 /** Additional dry-run behaviour outside the file snapshot. */
 export interface DryRunOptions {
   /** Overrides the default clock (the latest `lastAttemptedAt`, or `DRY_RUN_INSTANT`). */
-  readonly at?: string | undefined;
+  readonly at?: string;
 }
 
 function valueOf<T>(loaded: DataFileResult<T>): T {

@@ -50,11 +50,11 @@ export function ageMark(
     return { kind: 'never', word: NEVER_ATTEMPTED };
   }
   const hours = (now - Date.parse(clock)) / HOUR_MS;
-  if (!(hours >= FRESHNESS_CUTOFF_HOURS)) {
-    return undefined;
+  if (hours >= FRESHNESS_CUTOFF_HOURS) {
+    const days = Math.floor(hours / 24);
+    return { kind: 'stale', word: `${priced === undefined ? 'tried' : 'priced'} ${String(days)}d ago` };
   }
-  const days = Math.floor(hours / 24);
-  return { kind: 'stale', word: `${priced === undefined ? 'tried' : 'priced'} ${String(days)}d ago` };
+  return undefined;
 }
 
 /**

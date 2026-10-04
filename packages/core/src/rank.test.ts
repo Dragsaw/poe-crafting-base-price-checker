@@ -595,7 +595,7 @@ describe('rank: purity and determinism', () => {
       result = rank(input);
     }).not.toThrow();
     const rows: RankedRow[] = [...(result?.ordering ?? []), ...(result?.belowThreshold ?? [])];
-    expect(rows.length).toBe(6);
+    expect(rows).toHaveLength(6);
     for (const row of rows) {
       expect(RankedRowSchema.parse(row)).toEqual(row);
     }
