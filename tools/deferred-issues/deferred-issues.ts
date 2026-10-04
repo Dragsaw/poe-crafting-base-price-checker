@@ -7,29 +7,8 @@ import { parseArgs } from 'node:util';
 import { parseLedger, type LedgerEntry } from './ledger.ts';
 import { LEDGER_PATH, planDuplicateCloses, planSync, readMarker, type IssueInfo, type PlannedClose, type PlannedCreate, type SyncPlan } from './plan.ts';
 
-/**
- * `pnpm deferred:issues [--dry-run [--ref <ref>]] [--list]` creates one GitHub
- * issue, with the label `deferred`, for each entry of
- * `docs/stories/deferred-work.md` on `origin/master`. The issues are the work
- * queue of `deferred-work-sweep` and hold its run state; the ledger stays the
- * list of carved-out work.
- *
- * - The sync closes only a duplicate issue (two issues for one id, from a
- *   race): it keeps the lowest number. It reports every other mismatch.
- * - `--dry-run` prints the plan and writes nothing. `--ref` is allowed only
- *   with it.
- * - `--list` prints JSON, one object for each entry, for section 1 of the
- *   sweep. It writes nothing.
- *
- * Exit 0 on success. Exit 1 when the ledger or the issue list cannot be read
- * before any write (no write happens), or when the re-list after the creates
- * fails: the creates are then already done, and the next sync closes any
- * duplicate. Exit 2 when a write failed or the ledger has a duplicate id.
- *
- * Every `git` and `gh` call goes through one injectable `Runner`, so tests
- * spawn no process. Run by bare `node` (type stripping), so this module
- * imports only builtins and its siblings.
- */
+// Behavior, flags and exit codes: docs/stories/spec-deferred-work-github-issues.md.
+// Run by bare `node` (type stripping): builtins and `.ts` siblings only.
 
 // eslint-disable-next-line unicorn/no-null -- boundary: the `list` output is JSON, and `undefined` would drop the key where the report prints null.
 const LIST_ABSENT = null;
