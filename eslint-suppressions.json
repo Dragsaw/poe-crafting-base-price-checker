@@ -46,37 +46,12 @@
   },
   "packages/contracts/src/ports/git.ts": {
     "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/ports/http.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/price-observation.ts": {
-    "local/max-comment-run": {
       "count": 1
-    }
-  },
-  "packages/contracts/src/primitives.ts": {
-    "local/max-comment-run": {
-      "count": 4
     }
   },
   "packages/contracts/src/ranked-row.ts": {
     "local/max-comment-run": {
-      "count": 5
-    }
-  },
-  "packages/contracts/src/schema-version.ts": {
-    "local/max-comment-run": {
-      "count": 5
-    }
-  },
-  "packages/contracts/src/sync-progress.ts": {
-    "local/max-comment-run": {
-      "count": 3
+      "count": 2
     }
   },
   "packages/contracts/src/sync-run-report.ts": {

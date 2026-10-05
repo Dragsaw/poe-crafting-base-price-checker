@@ -1,13 +1,6 @@
 import { z } from 'zod';
 
-/**
- * Schema versioning at every trust boundary (NFR-8, Consistency Conventions,
- * *Schema versioning*). Every file envelope carries `schemaVersion`; a consumer
- * compares the **major only** and refuses an unknown one rather than guessing.
- *
- * One mechanism, spelled once. Entity schemas that are members of a versioned
- * file do not repeat the field — the envelope carries it for them.
- */
+/** Every envelope carries `schemaVersion`; a consumer compares the major only (NFR-8). */
 
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
@@ -31,11 +24,7 @@ export interface SchemaVersionAccepted {
   readonly found: string;
 }
 
-/**
- * The version was refused, and the refusal **names both versions** — the one
- * the consumer knows and the one the file declared. A refusal that names only
- * one leaves the reader guessing which side moved.
- */
+/** A refusal names both versions, so the reader knows which side moved. */
 export interface SchemaVersionRefused {
   readonly ok: false;
   readonly reason: 'unknown-major' | 'malformed';
@@ -51,12 +40,7 @@ export function majorOf(version: string): number | undefined {
   return match === null ? undefined : Number(match[1]);
 }
 
-/**
- * The one compatibility rule. `core` returns a typed result and never throws
- * for an expected condition (Consistency Conventions, *Error shape*), so a
- * refusal is a value a caller must handle rather than an exception it may
- * ignore.
- */
+/** A refusal is a value, never a throw (Consistency Conventions, *Error shape*). */
 export function checkSchemaVersion(found: string, expected: string): SchemaVersionCheck {
   const foundMajor = majorOf(found);
   const expectedMajor = majorOf(expected);
@@ -66,20 +50,10 @@ export function checkSchemaVersion(found: string, expected: string): SchemaVersi
   return foundMajor === expectedMajor ? { ok: true, expected, found } : { ok: false, reason: 'unknown-major', expected, found };
 }
 
-/**
- * `tracked.json` carries its own contract version, apart from
- * `SUPPORTED_SCHEMA_VERSION`, so that its major bump leaves every other
- * artifact's version untouched (IMPLEMENTATION-NOTES §4.1, §12.1). The pattern
- * is `WEIGHTS_SCHEMA_VERSION`'s.
- */
+/** Versioned apart from `SUPPORTED_SCHEMA_VERSION` (IMPLEMENTATION-NOTES §4.1, §12.1). */
 export const TRACKED_SCHEMA_VERSION = '2.0.0';
 
-/**
- * The refusal for a tracked file at the 1.x major (IMPLEMENTATION-NOTES
- * §4.1), or `undefined` for any other major. A generic
- * unknown-major message is not enough here: the curator must re-author the
- * file, not retry. One spelling for sync and `tracked:check`.
- */
+/** The curator must re-author a 1.x file, not retry (IMPLEMENTATION-NOTES §4.1). */
 export function trackedEarlierMajorMessage(found: string): string | undefined {
   // The explanation names the 1 → 2 change, so it fits a 1.x file only.
   return majorOf(found) === 1 ? (

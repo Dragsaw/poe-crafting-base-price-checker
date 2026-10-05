@@ -1,13 +1,4 @@
-/**
- * The HTTP effect (AD-1). Only `sync` or `web` implements it as an adapter, and
- * exactly one adapter issues every trade request — searches, fetches and
- * catalogue refreshes alike (AD-8).
- *
- * The port is deliberately header-transparent in both directions: AD-8's rate
- * governance reads `X-Rate-Limit-*` **at runtime** and never enumerates rule
- * names in code, so a port that hid response headers would make that impossible
- * to implement.
- */
+/** The HTTP effect (AD-1). Header-transparent: AD-8 rate governance reads `X-Rate-Limit-*`. */
 
 export interface HttpRequest {
   readonly method: 'GET' | 'POST';
@@ -24,11 +15,6 @@ export interface HttpResponse {
 }
 
 export interface HttpPort {
-  /**
-   * Issues one request and returns its response, **including every response
-   * header**. A non-2xx status is a value, not a throw: AD-9 distinguishes a
-   * 429, a 5xx and a 4xx by consequence, and a port that threw would erase the
-   * distinction before the caller saw it.
-   */
+  /** A non-2xx status is a value, not a throw: AD-9 tells 429, 5xx and 4xx apart by consequence. */
   send(request: HttpRequest): Promise<HttpResponse>;
 }
