@@ -14,16 +14,8 @@ import {
   OWN_URL,
 } from './guard-hooks-fixture/names';
 
-/**
- * Observes the **real** hooks of `test/setup.ts`, not the exported helper.
- * `test/no-network.test.ts` calls the helper directly, so deleting the setup
- * file's `afterAll` check, or the owner its `afterEach` passes, left that file
- * green. Here a child Vitest runs a fixture with the real setup file, and this
- * test reads the outcome Vitest reported for each test and for the file.
- *
- * The child needs no network: every fixture URL is under `.invalid`, and the
- * setup file blocks each one before it leaves the process.
- */
+// Observes the real hooks of `test/setup.ts`, not the exported helper: `test/no-network.test.ts`
+// calls that directly, so deleting the `afterAll` check or the `afterEach` owner left it green.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');

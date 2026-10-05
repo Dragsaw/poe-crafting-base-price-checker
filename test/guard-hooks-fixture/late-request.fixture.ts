@@ -3,11 +3,8 @@ import { expect, it } from 'vitest';
 import { drainEscapedRequests } from '../setup';
 import { INNOCENT_TEST, LATE_ISSUER, LATE_URL, OWN_TEST, OWN_URL } from './names';
 
-/**
- * Run only by `test/guard-hooks.test.ts`, in a child Vitest with the real
- * `test/setup.ts`. The root `include` does not match this file, so the suite
- * never runs it directly: two of its outcomes are deliberate failures.
- */
+// Run only by `test/guard-hooks.test.ts` in a child Vitest (the root `include` skips it): two of
+// its outcomes are deliberate failures.
 
 const noop = (): void => {};
 

@@ -82,173 +82,19 @@
       "count": 1
     }
   },
-  "test/contracts-isolation.test.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
-  "test/core-purity-lint.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/core-rank-purity.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/deferred-ledger.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/global-setup.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "test/guard-after-last-file-fixture/late.fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-after-last-file-fixture/names.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-after-last-file-fixture/vitest.config.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-after-last-file.test.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
   "test/guard-concurrent-fixture/concurrent.fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "unicorn/prefer-promise-with-resolvers": {
-      "count": 1
-    }
-  },
-  "test/guard-concurrent-fixture/names.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-concurrent-fixture/vitest.config.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-concurrent.test.ts": {
-    "local/max-comment-run": {
       "count": 1
     }
   },
   "test/guard-hooks-fixture/late-request.fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "unicorn/prefer-promise-with-resolvers": {
-      "count": 1
-    }
-  },
-  "test/guard-hooks-fixture/names.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-hooks-fixture/vitest.config.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-hooks.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-linger-fixture/linger.fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-linger-fixture/names.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-linger-fixture/vitest.config.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-linger.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-reuse-fixture/a-issuer.fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-reuse-fixture/b-bystander.fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-reuse-fixture/names.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-reuse-fixture/vitest.config.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/guard-reuse.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/hand-listed-coverage.test.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
-  "test/no-hardcoded-rate-limits.test.ts": {
-    "local/max-comment-run": {
       "count": 1
     }
   },
   "test/no-network.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "unicorn/prefer-promise-with-resolvers": {
       "count": 2
-    }
-  },
-  "test/prune-pages.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/session-cookie-shells.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "test/setup.ts": {
-    "local/max-comment-run": {
-      "count": 10
     }
   },
   "tools/dev-stop/dev-stop.test.ts": {

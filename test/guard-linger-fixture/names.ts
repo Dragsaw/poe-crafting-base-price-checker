@@ -1,9 +1,5 @@
-/**
- * Shared by the fixture and by `test/guard-linger.test.ts`. A separate module,
- * because importing the fixture itself would register its tests in the parent.
- *
- * Every URL is under `.invalid` (RFC 2606), so nothing can reach a host.
- */
+// Shared by the fixture and `test/guard-linger.test.ts`; separate because importing the fixture
+// would register its tests in the parent. Every URL is under `.invalid` (RFC 2606).
 export const SUITE_ONE_TEST = 'suite one: test';
 export const SUITE_TWO_TEST = 'suite two: test';
 

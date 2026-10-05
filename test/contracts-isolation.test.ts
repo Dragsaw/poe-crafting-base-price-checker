@@ -6,13 +6,8 @@ import { expect, it } from 'vitest';
 const PACKAGES_DIR = fileURLToPath(new URL('../packages', import.meta.url));
 const SCOPE = '@poe/';
 
-/**
- * The declared graph. A manifest that declares only its allowed siblings is the
- * first of the two guards on AD-1's direction — an illegal import does not
- * resolve at all — and `dependency-cruiser` is the second.
- *
- * Read as: package name -> the sibling packages it may declare.
- */
+// Package name -> the sibling packages it may declare. The first of two guards on AD-1's
+// direction: an illegal import does not resolve at all. `dependency-cruiser` is the second.
 const ALLOWED_EDGES: Readonly<Record<string, readonly string[]>> = {
   '@poe/contracts': [],
   '@poe/core': ['@poe/contracts'],
@@ -28,10 +23,7 @@ interface Manifest {
   readonly optionalDependencies?: Record<string, string>;
 }
 
-/**
- * Enumerated from disk, never hardcoded: a fifth package added without a rule
- * here must fail this test rather than slip past it.
- */
+/** Enumerated from disk, so a fifth package added without a rule here fails this test. */
 function readManifests(): { directory: string; manifest: Manifest }[] {
   return readdirSync(PACKAGES_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -43,12 +35,8 @@ function readManifests(): { directory: string; manifest: Manifest }[] {
     }));
 }
 
-/**
- * Every `@poe/*` entry counts, in any dependency field and under any range
- * protocol. `link:../web`, `"*"` and `file:` are workspace edges just as much as
- * `workspace:*` is, and matching only the `workspace:` prefix would have missed
- * all three.
- */
+// Any `@poe/*` entry counts, in any dependency field and under any range protocol: `link:../web`,
+// `"*"` and `file:` are edges as much as `workspace:*`, which a prefix match would miss.
 function workspaceEdgesOf(manifest: Manifest): string[] {
   const fields = [
     manifest.dependencies,

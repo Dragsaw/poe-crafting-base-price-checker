@@ -8,17 +8,9 @@ import { expect, it } from 'vitest';
 
 import { DELAY_ENV, ISSUER_TEST, LATE_URL } from './guard-after-last-file-fixture/names';
 
-/**
- * Observes the guard after the **last** file of a worker. With the default
- * `isolate`, every file is the last file of its worker. A 0 ms timer that the
- * fixture test starts fires after the setup file's `afterAll` and before the
- * worker ends. No hook inside the worker can fail the run then, so the worker
- * writes the request to disk, and the `onClose` check of `test/global-setup.ts`
- * fails the run and names the URL. A 200 ms timer never fires: the main process
- * ends the worker first.
- *
- * The child needs no network: the fixture URL is under `.invalid`.
- */
+// A 0 ms timer from the fixture fires after the setup `afterAll`, where no worker hook can fail the
+// run; the worker writes to disk and the `onClose` check of `test/global-setup.ts` names the URL.
+// A 200 ms timer never fires: the main process ends the worker first.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
@@ -38,11 +30,8 @@ interface JsonReport {
   readonly testResults: readonly FileResult[];
 }
 
-/**
- * Resolves with the child's exit code; a non-zero exit is expected, not an error.
- * The child's temp directory is `childTmp`, so the test can see what the
- * child's global setup leaves there.
- */
+// A non-zero exit is expected. The child's temp directory is `childTemporary`, so the test can
+// see what the child's global setup leaves there.
 function runChild(
   outputFile: string,
   delayMs: number,

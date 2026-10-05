@@ -34,10 +34,8 @@ it('blocks a remote request whose path ends .json', async () => {
 it('fails a test through the guard, naming every escaped URL', async () => {
   await fetch(UNROUTABLE_URL);
 
-  // This calls the guard's no-owner branch, the one the setup file's `afterAll`
-  // runs. The real `afterEach` takes the owner branch, which the owner-path test
-  // below and `test/guard-hooks.test.ts` cover. Calling it directly is what
-  // proves this failing branch is reachable: delete its throw and this fails.
+  // The no-owner branch that the setup `afterAll` runs; the real `afterEach` takes the owner branch
+  // (covered below and by `test/guard-hooks.test.ts`). Delete this branch's throw and this fails.
   expect(() => {
     assertNoEscapedRequests();
   }).toThrow(UNROUTABLE_URL);

@@ -5,15 +5,9 @@ import nodePath from 'node:path';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach, inject } from 'vitest';
 
-/**
- * NFR-1: no test at any level makes a network call.
- *
- * `onUnhandledRequest` is a **callback**, not the `"error"` string. The string
- * mode reports the request and nothing else; the callback lets the escaped URL
- * be recorded, so a global `afterEach` can fail the test *naming every URL that
- * escaped* even when the test body swallowed the rejection. Throwing from the
- * callback is what stops the request before it reaches the network.
- */
+// NFR-1, AD-13: `onUnhandledRequest` is a callback, not the "error" string, so a global
+// `afterEach` can fail the test naming each escaped URL even if the body swallowed the rejection.
+// The throw is what stops the request reaching the network.
 
 /** The test a request is charged to. `id` is unique; `name` is what a message prints. */
 interface TestIdentity {
@@ -28,39 +22,17 @@ interface EscapedRequest {
   readonly issuedBy: TestIdentity | undefined;
 }
 
-/**
- * One guard per worker (process or thread), installed once and never uninstalled.
- *
- * A closed server restores the real `fetch`, `http`/`https` and
- * `XMLHttpRequest`. In a reused worker (`isolate: false`) a timer that one file
- * started can fire after that file's `afterAll`, while the next file imports:
- * with the server closed, that request would reach the network. The worker
- * ends when Vitest is done with it, so an interceptor that stays
- * installed costs nothing — `setupServer` opens no socket.
- *
- * The setup file is evaluated again for each file of a reused worker. A second
- * `setupServer().listen()` would stack a second interceptor, and the first one's
- * closure would still write to the first file's record. So the server, the
- * record and the identity store live in one object on `globalThis`, and the
- * first evaluation creates it.
- */
+// One guard per worker, never uninstalled: a closed server restores the real `fetch`, so a late
+// timer in a reused worker (`isolate: false`) would reach the network. State lives on
+// `globalThis` because the setup file re-evaluates per file and must not stack interceptors.
 interface NoNetworkGuard {
   readonly server: ReturnType<typeof setupServer>;
   readonly escapedRequests: EscapedRequest[];
-  /**
-   * Carries the running test's identity from the test body into the timers and
-   * promise continuations it starts. A request a test does not await is then
-   * charged to that test, not to whichever test happens to be running when MSW
-   * calls `onUnhandledRequest`.
-   */
+  /** Charges a request a test does not await to that test, not to whichever test is running. */
   readonly currentTest: AsyncLocalStorage<TestIdentity>;
   listening: boolean;
-  /**
-   * True from the start of the setup file's `beforeAll` to the end of its
-   * `afterAll`. A request that arrives while it is false came after its file
-   * closed. In the last file of a worker no later hook can report it, so
-   * `recordAfterFileClosed` writes it to disk.
-   */
+  // True from `beforeAll` to `afterAll`. A request arriving while false came after its file closed;
+  // the last file of a worker has no later hook to report it, so `recordAfterFileClosed` writes it.
   fileOpen: boolean;
 }
 
@@ -86,18 +58,10 @@ function processGuard(): NoNetworkGuard {
 const guard = processGuard();
 const { server, escapedRequests, currentTest } = guard;
 
-/**
- * Provided by `test/global-setup.ts`, which fails the run in the main process
- * when this directory holds a record. `undefined` in a project that does not
- * load that global setup: such a project keeps only the in-memory record.
- */
+/** From `test/global-setup.ts`; `undefined` without it, so only the in-memory record is kept. */
 const recordDirectory = inject('noNetworkRecordDir');
 
-/**
- * Writes a request that arrived while no file of this worker was open to the
- * run's record. Synchronous, because the worker can end at any moment after
- * the request.
- */
+/** Synchronous, because the worker can end at any moment after the request. */
 function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undefined): void {
   if (recordDirectory === undefined || guard.fileOpen) {
     return;
@@ -108,13 +72,8 @@ function recordAfterFileClosed(described: string, issuedBy: TestIdentity | undef
   );
 }
 
-/**
- * The only exemption is by **origin**, never by file extension. A callback that
- * returns without throwing is a passthrough — MSW performs the request for
- * real — so exempting `*.json` would have exempted every upstream trade
- * endpoint this project talks to. jsdom and Vite ask for their assets over
- * `file:` or loopback; nothing else is exempt.
- */
+// Exempt by origin, never by extension: a callback that returns is a passthrough, so `*.json`
+// would exempt every upstream trade endpoint. jsdom and Vite use `file:` or loopback.
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
 
 function isNonRemote(url: URL): boolean {
@@ -160,13 +119,9 @@ afterEach((context) => {
 });
 
 afterAll(() => {
-  // A request recorded after the last `afterEach`, or outside any test, fails
-  // the file here instead of passing silently. So does a late request from an
-  // earlier file of a reused worker. The server is never closed (see
-  // `NoNetworkGuard`), so a request that fires after this hook is still blocked.
-  // After the last file of a worker no hook runs to report it, so
-  // `recordAfterFileClosed` writes it to disk and `test/global-setup.ts` fails
-  // the run.
+  // A request after the last `afterEach`, outside any test, or late from an earlier file of a
+  // reused worker fails the file here. After the last file no hook reports it, so
+  // `recordAfterFileClosed` writes it to disk and `test/global-setup.ts` fails the run.
   try {
     assertNoEscapedRequests();
   } finally {
@@ -190,17 +145,9 @@ function takeEscapedRequests(isMatching: (entry: EscapedRequest) => boolean): Es
   return taken;
 }
 
-/**
- * Returns, as `METHOD URL`, the requests that the **running** test issued since
- * the last drain, and removes them from the record. Called outside any test, it
- * takes the requests issued outside any test. A test that *asserts on* the
- * guard (see `test/no-network.test.ts`) calls it first so the guard does not
- * then fail the very test that proved it works.
- *
- * It never takes another test's request. A late request from an earlier test
- * stays recorded, so the file-level check still reports it: a draining test
- * cannot swallow it.
- */
+// Takes the running test's own requests only, so a test asserting on the guard (see
+// `test/no-network.test.ts`) does not fail itself. Another test's late request stays recorded
+// for the file-level check: a draining test cannot swallow it.
 export function drainEscapedRequests(): string[] {
   const runningId = currentTest.getStore()?.id;
   return takeEscapedRequests((entry) => entry.issuedBy?.id === runningId).map(
@@ -212,15 +159,9 @@ function describeIssuer(issuedBy: TestIdentity | undefined): string {
   return issuedBy === undefined ? 'issued outside any test' : `issued by test "${issuedBy.name}"`;
 }
 
-/**
- * The guard itself, exported so a test can execute its failing branch. Inlined
- * in `afterEach` it was unreachable from any assertion: deleting the throw left
- * the suite green.
- *
- * With an `owner`, it drains and fails on that test's requests only, and leaves
- * every other request recorded. With no `owner`, it drains and fails on every
- * request still recorded, and names the test that issued each one.
- */
+// Exported so a test can execute the failing branch: inlined in `afterEach` it was unreachable,
+// and deleting the throw left the suite green. With an `owner` it fails on that test's requests
+// only; without one, on every request still recorded.
 export function assertNoEscapedRequests(owner?: Pick<TestIdentity, 'id'>): void {
   if (owner !== undefined) {
     const own = takeEscapedRequests((entry) => entry.issuedBy?.id === owner.id).map(

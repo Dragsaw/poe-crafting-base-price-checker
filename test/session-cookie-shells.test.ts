@@ -3,14 +3,9 @@ import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
-/**
- * AD-30, IMPLEMENTATION-NOTES.md §13: only the `pnpm sync` and
- * `pnpm sync:batch` shells read the session cookie, and only the auth holder
- * keeps it. `catalogue:refresh`, `fixtures:record` and `sync:dry` cannot reach
- * the holder. This scan keeps that boundary from eroding: in non-test source
- * under `packages/*\/src`, only the files below may name the variable or
- * import the holder module.
- */
+// AD-30, IMPLEMENTATION-NOTES.md §13: this scan keeps the session-cookie boundary from eroding.
+// In non-test source under `packages/*/src`, only the files below may name the variable or
+// import the holder.
 
 const PACKAGES_DIR = fileURLToPath(new URL('../packages', import.meta.url));
 

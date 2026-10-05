@@ -2,13 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
-/**
- * AD-1: no `core` module performs I/O, reads the clock, generates randomness,
- * or reads environment or config. dependency-cruiser sees imports only, so the
- * shipped ESLint config carries a `core`-scoped block that bans the impure
- * globals. These probes lint snippets through that config and prove each ban
- * fires, and that the pure uses `core` depends on stay legal.
- */
+// AD-1: dependency-cruiser sees imports only, so a `core`-scoped ESLint block bans the impure
+// globals. These probes prove each ban fires and that the pure uses `core` needs stay legal.
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 const GLOBALS = 'no-restricted-globals';

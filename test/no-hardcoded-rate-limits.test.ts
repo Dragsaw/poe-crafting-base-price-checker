@@ -3,18 +3,9 @@ import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
-/**
- * AD-8: the trade client learns its rule names, its policy names and every
- * rate from live `X-Rate-Limit-*` headers. **No rule name, policy string or
- * rate constant may appear in non-test source.** An adapter that recognised
- * only the rule it was written against would silently stop pacing the day GGG
- * changed the rule set, and the failure would look exactly like success until
- * the account lost access.
- *
- * The measured 2026-09-12 buckets are an expected shape to assert a fixture
- * against, so a `*.test.ts` file may name them freely. This scan is what keeps
- * that distinction from eroding.
- */
+// AD-8: no rule name, policy string or rate constant in non-test source; they come from live
+// `X-Rate-Limit-*` headers. An adapter tied to one rule set would stop pacing silently when GGG
+// changes it. A `*.test.ts` may name the measured 2026-09-12 buckets; this scan keeps that so.
 
 const PACKAGES_DIR = fileURLToPath(new URL('../packages', import.meta.url));
 

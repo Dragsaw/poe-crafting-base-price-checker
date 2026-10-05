@@ -10,11 +10,8 @@ import { ALLOWLIST, prunePages } from '../tools/prune-pages.mjs';
 
 const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
 
-/**
- * The prune step behind `pnpm build`. That its allowlist equals `ARTIFACTS` is
- * asserted in `packages/web/src/load/prune-allowlist.test.ts`, which can import
- * the web package; this file exercises what the step does to a `dist` tree.
- */
+// The allowlist equals `ARTIFACTS`: asserted in `packages/web/src/load/prune-allowlist.test.ts`,
+// which can import the web package. This file covers what the step does to a `dist` tree.
 
 const scratch: string[] = [];
 

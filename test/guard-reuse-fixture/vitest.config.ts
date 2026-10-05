@@ -10,11 +10,8 @@ class ByPathSequencer extends BaseSequencer {
   }
 }
 
-/**
- * The child run of `test/guard-reuse.test.ts`. One worker runs both fixtures,
- * one after the other, and is reused between them, so a timer from the first
- * file can fire between the files. It loads the **real** setup file.
- */
+// Child run of `test/guard-reuse.test.ts`: one reused worker runs both fixtures in turn, so a timer
+// from the first can fire between the files. Loads the real setup file.
 export default defineConfig({
   test: {
     root: import.meta.dirname,

@@ -2,22 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { DESCRIBE_FIRST, DESCRIBE_SECOND, IT_FIRST, IT_SECOND } from './names';
 
-/**
- * Run only by `test/guard-concurrent.test.ts`, in a child Vitest with the real
- * `test/setup.ts`. The root `include` does not match this file, so the suite
- * never runs it directly: each of its tests fails on purpose.
- *
- * The `describe.concurrent` suite and the top-level `it.concurrent` pair may run
- * at the same time. Each test still meets only its own partner at its barrier,
- * and neither test of a pair sends its request before both have arrived. So
- * both `beforeEach` hooks of the pair have run, and the last `enterWith` need
- * not belong to the issuing test, when each request is recorded.
- *
- * After the barrier, each test starts its fetch from a `setTimeout` callback and
- * does not await the fetch itself. It awaits a promise that settles when the
- * fetch settles. This is the un-awaited path that `AsyncLocalStorage` exists
- * for: the request must still be charged to the test that started the timer.
- */
+// Run only by `test/guard-concurrent.test.ts` in a child Vitest (the root `include` skips it);
+// each test fails on purpose. A pair meets at a barrier before either sends, so both `beforeEach`
+// hooks have run. Each fetch starts un-awaited from a timer: the path `AsyncLocalStorage` is for.
 
 const noop = (): void => {};
 

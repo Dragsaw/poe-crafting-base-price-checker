@@ -6,30 +6,14 @@ import type { TestProject } from 'vitest/node';
 
 declare module 'vitest' {
   interface ProvidedContext {
-    /**
-     * The directory where `test/setup.ts` records a request that arrived while
-     * no test file of its worker was open. `undefined` in a project whose
-     * config does not load this global setup.
-     */
+    /** Where `test/setup.ts` records requests that arrive after its worker's last file closed. */
     noNetworkRecordDir?: string;
   }
 }
 
-/**
- * The main-process half of the no-network guard (NFR-1).
- *
- * A test can start a request it does not await. When that request fires after
- * the setup file's `afterAll` in the last file of a worker, the guard blocks
- * it, but no hook inside the worker can still fail the run. So the worker
- * appends the request to `<directory>/<pid>.log`, and the check below reads the
- * record after every worker has exited.
- *
- * `onClose`, not the teardown this function could return: the teardown runs
- * before Vitest waits for the workers to exit, so it can miss a record written
- * in the last milliseconds of a worker. `provide`, not an environment
- * variable: a child Vitest that a test starts would inherit the variable and
- * write into this run's record.
- */
+// Main-process half of the no-network guard (NFR-1). `onClose`, not a returned teardown: that runs
+// before the workers exit and can miss a late record. `provide`, not an env variable: a child
+// Vitest that a test starts would inherit it and write into this run's record.
 export default function setup(project: TestProject): void {
   const directory = mkdtempSync(nodePath.join(tmpdir(), 'no-network-'));
   project.provide('noNetworkRecordDir', directory);

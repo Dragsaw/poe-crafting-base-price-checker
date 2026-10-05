@@ -8,22 +8,9 @@ import { expect, it } from 'vitest';
 
 import { CONCURRENT_CASES } from './guard-concurrent-fixture/names';
 
-/**
- * Observes how the **real** hooks of `test/setup.ts` charge requests under
- * `describe.concurrent` and `it.concurrent`. Each `beforeEach` sets the store
- * with `enterWith`, and the `beforeEach` hooks of two concurrent tests
- * interleave. The fixture makes both tests of a pair meet at a barrier before
- * either sends its request, so both `beforeEach` hooks have run by then. Each
- * test then starts its fetch from a `setTimeout` callback and does not await
- * the fetch itself, so the request is charged through the store that the timer
- * carries. Each test's `afterEach` must still name its own URL and no other.
- *
- * A sequential run would time out at the barrier, and the failure would then
- * not name the test's URL. So a green run also proves that the pairs ran
- * concurrently.
- *
- * The child needs no network: every fixture URL is under `.invalid`.
- */
+// `beforeEach` sets the store with `enterWith`, and the hooks of concurrent tests interleave. A
+// barrier makes both tests of a pair run `beforeEach` before either requests; each `afterEach`
+// must still name only its own URL. A sequential run times out, so green proves concurrency.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');

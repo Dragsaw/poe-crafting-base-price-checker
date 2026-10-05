@@ -7,17 +7,9 @@ import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { type CliOptions, createVitest } from 'vitest/node';
 
-/**
- * Some code sits outside every package: the `tools/` entries and
- * `.claude/skills/tracked-json/scripts/`. Hand-written entries bring it under
- * `pnpm check` and `pnpm test`: a `tsconfig.tools.json` include, a root Vitest
- * project include, and an `eslint.config.mjs` `files` glob (plus, for the
- * tracked-json scripts, the `.claude/` ignore-negation chain). A dropped entry
- * fails neither command, so this file asks each tool whether it still covers
- * every file of each target in `TARGETS`. Each checker also runs against an
- * in-memory copy of its config with one named entry removed, which proves it
- * is not vacuous.
- */
+// Code outside every package is covered only by hand-written tsconfig, Vitest and ESLint entries,
+// and a dropped entry fails neither command. Each tool is asked whether it still covers every
+// `TARGETS` file; each checker also runs on a config with one entry removed (not vacuous).
 const REPO_ROOT = nodePath.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const TOOLS_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.tools.json');
 const SOLUTION_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.json');
@@ -28,11 +20,8 @@ const TEST = /\.test\.[cm]?[jt]sx?$/;
 
 const abs = (relativePath: string): string => nodePath.join(REPO_ROOT, ...relativePath.split('/'));
 
-/**
- * Source files directly in `relativePath`, read at run time so a new file is guarded
- * with no edit. Subdirectories are skipped: `tools/boundary-check/fixture/` is
- * excluded from every tool on purpose.
- */
+// Read at run time so a new file is guarded with no edit. Subdirectories are skipped on purpose:
+// `tools/boundary-check/fixture/` is excluded from every tool.
 function directoryFiles(relativePath: string): string[] {
   return readdirSync(abs(relativePath), { withFileTypes: true })
     .filter((entry) => entry.isFile() && SOURCE.test(entry.name))
@@ -89,11 +78,8 @@ const TARGETS: readonly Target[] = [
 
 const testFiles = (target: Target): string[] => target.files.filter((path) => TEST.test(path));
 
-/**
- * Loads a committed config's default export. The specifier is computed, so
- * `tsc` does not pull `eslint.config.mjs` into `tsconfig.tools.json`'s file
- * list (TS6307) or reject the `.ts` extension (TS5097).
- */
+// The specifier is computed so `tsc` neither pulls `eslint.config.mjs` into `tsconfig.tools.json`'s
+// file list (TS6307) nor rejects the `.ts` extension (TS5097).
 async function importDefault(file: string): Promise<unknown> {
   const module = (await import(pathToFileURL(nodePath.join(REPO_ROOT, file)).href)) as { default: unknown };
   return module.default;
@@ -134,12 +120,8 @@ function tsUncovered(files: readonly string[], json: Record<string, unknown>): s
 
 // --- ESLint -----------------------------------------------------------------
 
-/**
- * A rule that only the main lint block sets, which `files` lists by glob. Later
- * blocks scope rule overrides to `tools/**`, test globs and `*.config.*`, so a
- * file can match some block and still miss the main block. Such a file is not
- * linted by the repo's rules, so it counts as uncovered.
- */
+// Only the main lint block sets this rule. A file can match a later block (scoped to `tools/**`,
+// tests, `*.config.*`) and still miss the main one, so it is not linted by the repo's rules.
 const MAIN_BLOCK_RULE = 'max-lines';
 
 /** Files that the flat config ignores, or that the main lint block does not reach. */

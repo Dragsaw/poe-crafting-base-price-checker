@@ -8,16 +8,9 @@ import { expect, it } from 'vitest';
 
 import { BYSTANDER_TEST, ISSUER_TEST, LATE_URL } from './guard-reuse-fixture/names';
 
-/**
- * Observes the guard in a **reused** worker (`isolate: false`). A timer that
- * the first fixture file starts fires after that file's `afterAll`, while the
- * second file imports. If the setup file closed its server in `afterAll`, the
- * real `fetch` would be back by then: the request would not be recorded, and
- * the second file would pass. The guard stays installed for the life of the
- * worker, so the request is blocked and the second file's `afterAll` reports it.
- *
- * The child needs no network: the fixture URL is under `.invalid`.
- */
+// Reused worker (`isolate: false`): a timer from the first file fires while the second imports. If
+// `afterAll` closed the server the real `fetch` would be back and the second file would pass; the
+// guard stays installed, so the request is blocked and the second file's `afterAll` reports it.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
