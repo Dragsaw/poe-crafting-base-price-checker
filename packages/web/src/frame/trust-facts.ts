@@ -4,12 +4,8 @@ import type { Parsed } from '../load/artifacts';
 import { plural } from '../shared/text';
 import { relativeAge } from '../shared/time';
 
-/**
- * Pure formatters for `{components.trust-strip}` and
- * `{components.sync-report-panel}`. Every figure is read from the artifact as
- * published; counting records is the only derivation (AD-27). A missing value
- * is `undefined` here, and the view sets it as the italic *unknown*.
- */
+// Every figure is read as published; counting records is the only derivation (AD-27).
+// A missing value is `undefined`, which the view sets as the italic *unknown*.
 
 type WeightsEnvelope = Parsed<'weights'>;
 type SyncReport = Parsed<'syncReport'>;
@@ -83,19 +79,8 @@ export interface Curation {
   readonly minChunkSearches: number;
 }
 
-/**
- * The health line's words, in order (UX-DR21). Exactly two triggers; a healthy
- * run or an absent report raises none, and no trigger ever prints a zero.
- *
- * The starvation trigger reads only the `pinned-starvation` record whose
- * subject matches the loaded curation: its `pinnedCount` equals the pinned-set
- * size and its `declaredMinChunkSearches` equals `minChunkSearches`. The
- * subject is unique, so at most one record matches, whatever its position in
- * the report. No match, or an empty pinned set, raises no starvation signal.
- * With M = `pinnedCount` and N = M − `pinnedRefreshed`, the words are
- * `N of M pinned entries starved`, or
- * `M pinned entries left the rotation no search` when N is 0.
- */
+// The words are DESIGN.md's `healthSignals` (UX-DR21). The starvation trigger reads only the record
+// whose `pinnedCount` and `declaredMinChunkSearches` match the loaded curation, wherever it sits.
 export function healthSignals(report: SyncReport | undefined, curation: Curation): readonly string[] {
   if (report === undefined) {
     return [];
@@ -126,11 +111,7 @@ export function healthSignals(report: SyncReport | undefined, curation: Curation
 
 // --- the panel ------------------------------------------------------------
 
-/**
- * A run of panel prose: plain body text, a figure in ink, a missing figure in
- * italic, or verbatim text in the mono stack with no semantic ink (the
- * cross-file diagnosis).
- */
+/** A run of panel prose; `verbatim` is mono with no semantic ink (the cross-file diagnosis). */
 export type Segment =
   | { readonly kind: 'text'; readonly text: string }
   | { readonly kind: 'figure'; readonly text: string }
@@ -160,12 +141,8 @@ function diagnosisLine(failure: DiagnosisFailure): string {
   return `${failure.check} · ${failure.entryKey} · ${failure.detail}`;
 }
 
-/**
- * The sixth group, under *What is broken* after the pinned-starvation group:
- * one verbatim line per cross-file failure, in `core`'s order. No failure,
- * no group — nothing renders, not even a zero. With no weights envelope the
- * checks did not run, and the group is one *unknown* line.
- */
+// No failure, no group: not even a zero. With no weights envelope the checks did not run,
+// so the group is one *unknown* line.
 function diagnosisGroups(failures: readonly DiagnosisFailure[], areWeightsLoaded: boolean): FigureGroup[] {
   if (!areWeightsLoaded) {
     return [UNKNOWN_GROUP];
@@ -173,14 +150,8 @@ function diagnosisGroups(failures: readonly DiagnosisFailure[], areWeightsLoaded
   return failures.length === 0 ? [] : [failures.map((failure) => [{ kind: 'verbatim', text: diagnosisLine(failure) }])];
 }
 
-/**
- * The five figure groups, from `sync-report.json` as published, and the
- * sixth, the cross-file diagnosis `web` ran at load (AD-17). The panel
- * prints only published figures: no sum, no numerator. Zeros print here; the
- * strip's no-zero rule is the strip's. An absent report leaves every group
- * *unknown*. Omitted coverage reads *not measured* when the page loaded a
- * weights envelope and *unknown* when it did not, never `0` (AD-27).
- */
+// Five groups from `sync-report.json` plus the cross-file diagnosis `web` ran at load (AD-17).
+// Zeros print here; the no-zero rule is the strip's. Omitted coverage never reads `0` (AD-27).
 export function panelColumns(
   report: SyncReport | undefined,
   areWeightsLoaded: boolean,
@@ -244,13 +215,8 @@ function coverageGroup(figures: SyncReport['figures'], areWeightsLoaded: boolean
   return [[figure(`${String(coveragePercent(figures.coverage))}%`), text(' of '), denominator, text(` ${classes}.`)]];
 }
 
-/**
- * The displayed coverage percent, with three guards: it floors the percent;
- * it lifts a non-zero fraction that floors to 0 up to 1%, so non-zero coverage
- * never reads 0%; and it caps partial coverage at 99%, so it never reads 100%.
- * The epsilon absorbs float error such as `0.29 * 100 === 28.999999999999996`,
- * which is why the 99 cap, not the floor, keeps partial coverage below 100%.
- */
+// Non-zero coverage never reads 0% and partial coverage never reads 100%.
+// The epsilon absorbs float error such as `0.29 * 100 === 28.999999999999996`.
 function coveragePercent(coverage: number): number {
   const floored = Math.floor(coverage * 100 + 1e-9);
   if (floored === 0 && coverage > 0) {
