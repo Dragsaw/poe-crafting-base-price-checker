@@ -198,14 +198,10 @@ function snapshotWindows(port: number): Snapshot {
   return { listeners: parseListenerJson(parsed.listeners), processes: parsed.processes };
 }
 
-function posixTool(command: 'lsof' | 'ps', arguments_: string[]): string {
-  // lsof and ps sit in /usr/bin, /usr/sbin or /bin by platform, so only PATH finds them.
-  return execFileSync(command, arguments_, { encoding: 'utf8' });
-}
-
 function listenersPosix(port: number): number[] {
   try {
-    const out = posixTool('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t']);
+    // eslint-disable-next-line sonarjs/no-os-command-from-path -- boundary: lsof sits in /usr/bin or /usr/sbin by distro, so only PATH finds it on every POSIX platform this tool supports
+    const out = execFileSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' });
     return [...new Set(out.split('\n').filter(Boolean).map(Number))];
   } catch (error) {
     // lsof exits 1 when nothing matches. Any other failure, such as a missing
@@ -219,7 +215,8 @@ function listenersPosix(port: number): number[] {
 // names a dead, reusable PID.
 function snapshotPosix(port: number): Snapshot {
   const listeners = listenersPosix(port);
-  const ps = posixTool('ps', ['-A', '-o', 'pid=,ppid=,args=']);
+  // eslint-disable-next-line sonarjs/no-os-command-from-path -- boundary: ps sits in /bin or /usr/bin by platform, so only PATH finds it on every POSIX platform this tool supports
+  const ps = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' });
   const processes: ProcessInfo[] = [];
   for (const line of ps.split('\n')) {
     const [, pid, ppid, commandLine] = /^\s*(\d+)\s+(\d+)\s+(\S.*)$/.exec(line) ?? [];
