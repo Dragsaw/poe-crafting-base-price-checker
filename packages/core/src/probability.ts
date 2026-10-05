@@ -12,7 +12,7 @@ import type {
 } from '@poe/contracts';
 
 /**
- * The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11). No epsilon in an edge comparison (§1, AD-5); the declared floor is trusted (§8).
+ * The probability term (AD-11, AD-17, IN §1, §9, §11): no epsilon in edge comparisons (§1, AD-5).
  */
 
 export type Slot = 'prefix' | 'suffix';
@@ -41,7 +41,7 @@ export type PoolLookup =
 export type CombinationInput = Pick<CraftedTrackedEntry, 'itemLevelMin' | 'prefix' | 'suffix'>;
 
 /**
- * A line's derived interval (§1). Two pairs give the midpoint of each edge, the producer's inference pending OQ-12: change it here only.
+ * A line's derived interval (§1): two pairs give each edge's midpoint, pending OQ-12.
  */
 export function interval(line: WeightsLine): Interval {
   const [first, second] = line.ranges;
@@ -59,7 +59,7 @@ export function untrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'pool
 /** Why `untrackable` holds (§1): `undefined` for a trackable entry. */
 export type UntrackableReason = 'not-in-game' | 'partial-pool-null-line';
 
-/** The null-line rule's verdict with its reason; `core`, the sync gate and `tracked:lookup` share this one rule. */
+/** The null-line rule's verdict and reason, shared by `core`, the sync gate, `tracked:lookup`. */
 export function untrackableReason(
   entry: ModifierWeight,
   pool: Pick<WeightsPool, 'poolCoverage'>,
@@ -70,7 +70,7 @@ export function untrackableReason(
   return pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null) ? 'partial-pool-null-line' : undefined;
 }
 
-/** `lineSet(entry)` (§1): the non-null line `statId`s, sorted by code unit; `untrackable` decides what a `null` line means. */
+/** `lineSet(entry)` (§1): the non-null `statId`s by code unit; `untrackable` decides `null`. */
 export function lineSet(entry: ModifierWeight): readonly string[] {
   return entry.lines.flatMap((line) => line.statId ?? []).toSorted(compareByCodeUnit);
 }
@@ -83,7 +83,7 @@ export function statIds(reference: ModifierRef): readonly string[] {
 /** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */
 export type ReferenceLine = SingleLineModifierRef | HybridLine;
 
-/** `covers(rl, line)` (§1): a banded `rl` needs the derived interval wholly inside the band; a `null`-`statId` line is never covered. */
+/** `covers(rl, line)` (§1): a banded `rl` needs the derived interval inside the band. */
 export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
   if (line.statId !== rl.statId) {
     return false;
@@ -103,7 +103,7 @@ function haveSameIds(a: readonly string[], b: readonly string[]): boolean {
 }
 
 /**
- * Whole-tier containment (§1); `summed` is §2.2's `S`. Precondition: the pool is `complete`; a caller with a `partial` pool calls `untrackable` first.
+ * Whole-tier containment (§1); `summed` is §2.2's `S`. Needs a `complete` pool: else `untrackable`.
  */
 export function contains(reference: ModifierRef, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
   if (entry.weight === 0) {
@@ -114,14 +114,14 @@ export function contains(reference: ModifierRef, entry: ModifierWeight, summed: 
   return reference.kind === 'hybrid' ? haveSameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
 }
 
-/** The class's two pools, by direct lookup at `bases[categoryId][className]`, own keys only, never a sibling (AD-5, AD-17). */
+/** The class's two pools by direct lookup `bases[categoryId][className]`, own keys (AD-5). */
 export function poolOf(weights: WeightsFile, categoryId: string, className: string): PoolLookup {
   const classes = Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
   const pools = classes !== undefined && Object.hasOwn(classes, className) ? classes[className] : undefined;
   return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
-/** The eligible set of one slot (§9): both bounds are one axis, `modifierLevelMin <= w.itemLevelMin <= itemLevelMin`. */
+/** One slot's eligible set (§9): `modifierLevelMin <= w.itemLevelMin <= itemLevelMin`, one axis. */
 export function eligible(
   pool: WeightsPool,
   itemLevelMin: number,
@@ -138,7 +138,7 @@ function totalWeight(entries: readonly ModifierWeight[]): number {
   return total;
 }
 
-/** A pool is empty when its total weight is `0`: the one definition for the coverage figure (IMPLEMENTATION-NOTES.md §3, AD-17). */
+/** A pool is empty when its total weight is `0`: the one definition for coverage (IN §3, AD-17). */
 export function isEmptyPool(pool: WeightsPool): boolean {
   return totalWeight(pool.entries) === 0;
 }
@@ -148,7 +148,7 @@ export function containedIn(reference: ModifierRef, eligibleSet: readonly Modifi
   return eligibleSet.filter((entry) => contains(reference, entry));
 }
 
-/** `needs(ref)` (IMPLEMENTATION-NOTES.md §8), over the unscoped pool: `undefined`, never `0`, when the reference contains nothing. */
+/** `needs(ref)` (IN §8) over the unscoped pool: `undefined`, never `0`, if nothing is contained. */
 export function needs(reference: ModifierRef, pool: WeightsPool): number | undefined {
   const tier = containedIn(reference, pool.entries).filter((entry) => !untrackable(entry, pool));
   if (tier.length === 0) {
@@ -159,7 +159,7 @@ export function needs(reference: ModifierRef, pool: WeightsPool): number | undef
   return isBanded ? Math.max(...levels) : Math.min(...levels);
 }
 
-/** `P(ref | recipe)` for one slot (§9); an empty eligible slot is `empty-eligible-pool`, never `0`. */
+/** `P(ref | recipe)` for one slot (§9); an empty eligible slot is `empty-eligible-pool`. */
 export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
@@ -196,7 +196,7 @@ function exclusionSums(sets: SlotSets): (group: string) => { readonly eligible: 
 }
 
 /**
- * One draw order's numerator (§11). A positive-weight first draw that leaves the other slot nothing is `augment-exhausted`.
+ * One draw order's numerator (§11); a first draw leaving the other slot nothing is exhausted.
  */
 function orderedTerm(
   first: SlotSets,
@@ -219,7 +219,7 @@ function orderedTerm(
 }
 
 /**
- * `P(prefix ∧ suffix | recipe)` (§11): scope, truncate, exclude, renormalise. Reasons are checked as `empty-eligible-pool`, `empty-contained`, `augment-exhausted`.
+ * `P(prefix ∧ suffix | recipe)` (§11): scope, truncate, exclude, renormalise; reasons per slot.
  */
 export function combinationProbability(
   pools: WeightsClassPools,

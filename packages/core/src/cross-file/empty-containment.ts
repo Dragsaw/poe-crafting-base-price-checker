@@ -31,7 +31,7 @@ function hybridExclusions(reference: ModifierRef, scoped: readonly ModifierWeigh
   return excluded;
 }
 
-/** §2.5: the detail when no scoped entry contains the reference, never a `P = 0`; a hybrid reference also lists what §1 excluded. */
+/** §2.5: the detail when no scoped entry contains the reference, never `P = 0` (hybrid: §1). */
 export function emptyContainment(
   slot: Slot,
   reference: ModifierRef,

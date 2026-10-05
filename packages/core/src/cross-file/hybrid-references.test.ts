@@ -15,7 +15,7 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
   const A = STAT;
   const B = OTHER;
   const C = 'explicit.stat_3';
-  /** A Bows-like family {A, B}: T1 and T2 share one modGroup. A pure A tier sits apart from both. */
+  /** A Bows-like family {A, B}: T1 and T2 share one modGroup; a pure A tier sits apart. */
   const H1 = tier([line(A, [30, 40]), line(B, [100, 150])], { itemLevelMin: 75, modGroup: 'hybrid-ab' });
   const H2 = tier([line(A, [20, 29]), line(B, [60, 99])], { itemLevelMin: 50, modGroup: 'hybrid-ab' });
   const PURE_A = tier([line(A, [70, 80])], { itemLevelMin: 60 });
@@ -143,7 +143,7 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
 
   it('leaves weight-0 and not-in-game hybrid tiers out of what a band reaches', () => {
     const zero = tier([line(A, [30, 40]), line(B, [100, 150])], { weight: 0 });
-    // Weight 100, which the weights schema forbids, so only `untrackable` keeps it out of `reached`.
+    // Weight 100, which the schema forbids, so only `untrackable` keeps it out of `reached`.
     const notInGame: ModifierWeight = { ...zero, sourceModifierId: 'not-in-game-ab', weight: 100, weightSource: 'not-in-game' };
     const pure = tier([line(A, [30, 40])]);
     expect(failuresOf([entry({ prefix: band(30, 40, A) })], bows(pools([pure, zero, notInGame])))).toEqual([]);

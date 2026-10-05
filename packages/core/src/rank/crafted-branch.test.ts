@@ -238,7 +238,8 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
   });
 
   it('two recipes over one Tracked List give orderings that differ by more than a constant offset', () => {
-    // Bows: P = 0.1 at floor 0 and 0.5 at floor 70. Staves: P = 0.5 at floor 0, and at floor 70 its reference contains no eligible tier.
+    // Bows: P = 0.1 at floor 0 and 0.5 at floor 70. Staves: P = 0.5 at floor 0, and at floor 70 its
+    // reference contains no eligible tier.
     const staves: Pools = [[tierOf(TARGET, 50, 1), tierOf(FILLER, 50, 75)], [tierOf(SUFFIX_STAT, 10, 80)]];
     const bows = chase('Bows');
     const stavesEntry = chase('Staves', TARGET, 'active', 'weapon.staff');

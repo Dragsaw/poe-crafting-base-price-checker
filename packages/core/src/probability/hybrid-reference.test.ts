@@ -60,7 +60,8 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const c = tier([line(THIRD, [1, 2])], 200, { modGroup: 'H' });
     const d = tier([line(THIRD, [3, 4])], 200, { modGroup: 'D' });
     const tierE = tier([line(THIRD, [5, 9])], 600, { modGroup: 'E' });
-    // Prefix first: h → 100 · 200 / 800 = 25. Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
+    // Prefix first: h → 100 · 200 / 800 = 25.
+    // Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
     const p = pOf(
       combinationProbability(
         pools([h, b], [c, d, tierE]),

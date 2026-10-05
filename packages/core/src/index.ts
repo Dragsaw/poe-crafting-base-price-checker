@@ -1,9 +1,9 @@
 import { INITIAL_SCHEMA_VERSION } from '@poe/contracts';
 
-/** Placeholder export: proves the one workspace edge `core` may have, to `@poe/contracts` (AD-1). */
+/** Placeholder export: proves the one workspace edge `core` may have, to contracts (AD-1). */
 export const CORE_PLACEHOLDER = `contracts@${INITIAL_SCHEMA_VERSION}:core`;
 
-/** The chunk runner's selection order (AD-7). Specifiers carry `.ts`: `pnpm sync:dry` runs this under bare `node`, which resolves no extension. */
+/** The chunk runner's selection order (AD-7); `.ts` specifiers: `sync:dry` runs bare `node`. */
 export { chunkOrder, pinnedToKeep, UNRESOLVABLE_RETRY_MS } from './chunk-order.ts';
 export type { ChunkOrder, ChunkOrderInput } from './chunk-order.ts';
 
@@ -27,7 +27,7 @@ export type { CraftCostResult } from './craft-cost.ts';
 /** Provenance of a crafted pair (AD-10). */
 export { foldPair, oldestOf, provenanceOfTier, weakest } from './provenance.ts';
 
-/** The six cross-file checks and the unvalidated marks (AD-17, IMPLEMENTATION-NOTES.md §2.1–§2.8). */
+/** The six cross-file checks and the unvalidated marks (AD-17, IN §2.1–§2.8). */
 export {
   classDiscriminability,
   coOccur,

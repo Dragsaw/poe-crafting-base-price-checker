@@ -33,7 +33,7 @@ export { classDiscriminability } from './cross-file/class-discriminability.ts';
 export { edgeAlignment } from './cross-file/edge-alignment.ts';
 export { emptyContainment } from './cross-file/empty-containment.ts';
 
-/** The six cross-file checks and the unvalidated marks (AD-17, IMPLEMENTATION-NOTES.md §2). Pure (AD-1): `web`, `sync` and `pnpm tracked:check` share them. */
+/** The six cross-file checks and the unvalidated marks (AD-17, IN §2). Pure (AD-1). */
 
 export interface CrossFileFailure {
   readonly check: CrossFileCheck;
@@ -67,12 +67,12 @@ export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPool
   return { prefix: eligible(pools.prefix, floor, 0), suffix: eligible(pools.suffix, floor, 0) };
 }
 
-/** `disagrees(rl, line)` (§2.3): a valueless reference line beside a banded weights line on its `statId`. */
+/** `disagrees(rl, line)` (§2.3): a valueless reference line beside a banded line, same `statId`. */
 function disagrees(rl: ReferenceLine, line: WeightsLine): boolean {
   return line.statId === rl.statId && !('valueMin' in rl) && line.ranges.length > 0;
 }
 
-/** §2.3, universal and per line: the detail when a valueless reference line meets any banded scoped line on its `statId`. */
+/** §2.3, per line: the detail when a valueless reference line meets a banded scoped line. */
 export function kindAgreement(
   slot: Slot,
   reference: ModifierRef,
@@ -93,7 +93,7 @@ export function kindAgreement(
   return parts.length === 0 ? undefined : parts.join('; ');
 }
 
-/** How many positive-weight scoped lines disagree with `rl`, and the first tier that does; `undefined` for none. */
+/** How many positive-weight scoped lines disagree with `rl`, and the first tier, or `undefined`. */
 function disagreementsOn(
   rl: ReferenceLine,
   scoped: readonly ModifierWeight[],
@@ -178,7 +178,7 @@ export function lineSetCompleteness(
   return parts.length === 0 ? undefined : parts.join('; ');
 }
 
-/** §2.2: `coOccur(x, y, S)` on one slot, memoised per reference pair and `S` since one class's pairs repeat refs. */
+/** §2.2: `coOccur(x, y, S)` on one slot, memoised per reference pair and `S`. */
 export function coOccur(scoped: ScopedPools): CoOccur {
   const cache = new Map<string, boolean>();
   return (x, y, slot, summed) => {
@@ -285,7 +285,7 @@ function appendPartner(partners: Map<string, string[]>, key: string, text: strin
   partners.set(key, [...(partners.get(key) ?? []), text]);
 }
 
-/** §2.1, *Who evaluates a pair*: every pair in which either entry names a hybrid reference. Each entry of the pair names the other. */
+/** §2.1, *Who evaluates a pair*: every pair where either entry names a hybrid reference. */
 function coOccurFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFileFailure[] {
   const partners = new Map<string, string[]>();
   for (const [index, left] of keyed.entries()) {
@@ -330,7 +330,7 @@ function checkClass(members: readonly CraftedTrackedEntry[], weights: WeightsFil
   };
 }
 
-/** Every failure of the six checks and every unvalidated mark, each sorted by canonical key (§2.8); without `weights`, every crafted entry is `weights-absent`. */
+/** Every failure of the six checks and every unvalidated mark, by canonical key (§2.8). */
 export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
   const failures: CrossFileFailure[] = [];
   const unvalidated: UnvalidatedMark[] = [];

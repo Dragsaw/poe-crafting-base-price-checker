@@ -23,7 +23,7 @@ export { compareRankedRows } from './rank-order.ts';
 export type { NotYetSyncedEntry, UnrankedEntry } from './rank-raw-groups.ts';
 
 /**
- * The ranking, both branches (AD-17, AD-9, AD-19, AD-20); a threshold that is not a finite number ≥ 0 is a `RangeError`, never clamped.
+ * The ranking, both branches (AD-17, AD-9, AD-19, AD-20); a threshold not finite or < 0 throws.
  */
 
 export interface RankInput {
@@ -32,20 +32,20 @@ export interface RankInput {
   readonly dataset: readonly DatasetEntry[];
   /** The active league, verbatim from `data/config.json` (AD-19). */
   readonly activeLeague: string;
-  /** The Payout Threshold in divine (FR-7), finite and ≥ 0 (0 is valid); any other value makes `rank` throw a `RangeError`. */
+  /** The Payout Threshold in divine (FR-7), finite and ≥ 0; any other value throws `RangeError`. */
   readonly threshold: number;
-  /** The parsed weights file, or `undefined` when absent (AD-24); an absent or `partial` class is Unrankable (FR-4). */
+  /** Parsed weights, or `undefined` when absent (AD-24); `partial` is Unrankable (FR-4). */
   readonly weights: WeightsFile | undefined;
-  /** Cross-file failures from `crossFileChecks`, computed once per load by the caller; the other two Unrankable reasons take precedence. Absent means none. */
+  /** Cross-file failures from `crossFileChecks`, once per load; other Unrankable reasons win. */
   readonly crossFileFailures?: readonly Pick<CrossFileFailure, 'categoryId' | 'className'>[];
-  /** The Craft Recipes in `recipes.json` file order (AD-3); absent or empty means no crafted row. */
+  /** The Craft Recipes in `recipes.json` order (AD-3); absent or empty means no crafted row. */
   readonly recipes?: readonly CraftRecipe[];
   /** The rate set `core` costs recipes from: `dataset.json`'s `currencyRates` (AD-20). Absent means none. */
   readonly currencyRates?: readonly CurrencyRate[];
 }
 
 /**
- * FR-4's three reasons (PRD-owned) and the provisional fourth: the first two come from the direct pair lookup, the third from any cross-file check.
+ * FR-4's three reasons (PRD-owned) and the provisional fourth: two by lookup, one by cross-file.
  */
 export type UnrankableReason =
   | 'class absent from weights file'
@@ -59,7 +59,7 @@ export interface UnrankableClass {
   readonly className: string;
   readonly reason: UnrankableReason;
   /**
-   * Present only on the recipe-scoped form of `recipe cannot reach this class`; without it the reason holds under every recipe (EXPERIENCE.md, Epic 3 retro item 29).
+   * Only on the recipe-scoped `recipe cannot reach this class`; else it holds under every recipe.
    */
   readonly recipeId?: string;
 }
@@ -67,7 +67,7 @@ export interface UnrankableClass {
 
 export interface Ranking {
   /**
-   * Every ranked row over every recipe (AD-17): comparable rows by EV descending, then `compareRankedRows`; uncostable-recipe rows (EV `null`) after them, ordered among themselves only (EXPERIENCE.md state 35).
+   * Every ranked row over every recipe (AD-17): by EV, uncostable rows (EV `null`) last (state 35).
    */
   readonly ordering: readonly RankedRow[];
   /** Priced raw rows below the threshold, in canonical key order. Never in `ordering`. */
@@ -78,11 +78,11 @@ export interface Ranking {
   readonly notYetSynced: readonly NotYetSyncedEntry[];
   /** In canonical key order. */
   readonly unresolvable: readonly UnrankedEntry[];
-  /** One per Unrankable class and per `(class, recipe)` pair the recipe cannot reach; sorted by `className` (code units), `categoryId`, recipe-free first, `recipeId`. */
+  /** One per Unrankable class and unreachable pair; by `className`, `categoryId`, `recipeId`. */
   readonly unrankable: readonly UnrankableClass[];
   /** The recipes `core` could not cost, in `recipes.json` file order, each naming its first unrated currency (AD-20). */
   readonly uncostableRecipes: readonly UncostableRecipe[];
-  /** Some non-pruned entry has a `priced` observation in the active league; `false` after a league reset (EXPERIENCE.md state 23). */
+  /** Some non-pruned entry has a `priced` observation in the active league; false after a reset. */
   readonly pricedInLeague: boolean;
 }
 
@@ -93,7 +93,7 @@ export interface UncostableRecipe {
 }
 
 /**
- * The reason for a pair with an empty eligible pool or contained set (IMPLEMENTATION-NOTES.md §9) or an exhausted augment (§11). The string lives in code, not in `prd.md`.
+ * The reason for an empty eligible pool or contained set (IN §9) or exhausted augment (§11).
  */
 export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
 
@@ -106,7 +106,7 @@ const byItemClass = (left: UnrankableClass, right: UnrankableClass): number =>
   compareCanonicalKeys(left.categoryId, right.categoryId) ||
   compareCanonicalKeys(left.recipeId ?? '', right.recipeId ?? '');
 
-/** The direct lookup `bases[categoryId][className]` (WEIGHTS-FILE-SCHEMA.md, *`bases` key*); own keys only, so a pair never resolves through the object prototype. */
+/** The direct lookup `bases[categoryId][className]` (WEIGHTS-FILE-SCHEMA.md); own keys only. */
 function unrankableReasonOf(
   weights: WeightsFile | undefined,
   categoryId: string,

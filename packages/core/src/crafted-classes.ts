@@ -6,7 +6,7 @@ export function classKeyOf(categoryId: string, className: string): string {
 }
 
 /**
- * The one grouping of the non-pruned crafted entries by Item Class, keyed on `classKeyOf`, in insertion order.
+ * The one grouping of non-pruned crafted entries by Item Class (`classKeyOf`), in insertion order.
  */
 export function craftedClassesOf(entries: readonly TrackedEntry[]): Map<string, CraftedTrackedEntry[]> {
   const classes = new Map<string, CraftedTrackedEntry[]>();

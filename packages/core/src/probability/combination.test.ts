@@ -36,7 +36,8 @@ describe('combinationProbability (§11)', () => {
     const c = tier([line(OTHER, [1, 2])], 200, { modGroup: 'A' });
     const d = tier([line(OTHER, [3, 4])], 200, { modGroup: 'D' });
     const tierE = tier([line(OTHER, [5, 9])], 600, { modGroup: 'E' });
-    // Prefix first: a → 100 · 200 / 800 = 25. Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
+    // Prefix first: a → 100 · 200 / 800 = 25.
+    // Suffix first: c → 200 · 0 / 300 = 0; d → 200 · 100 / 400 = 50.
     const p = pOf(
       combinationProbability(
         pools([a, b], [c, d, tierE]),

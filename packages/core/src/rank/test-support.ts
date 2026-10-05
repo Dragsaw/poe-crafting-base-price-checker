@@ -42,7 +42,7 @@ function slotOf(coverage: Coverage): WeightsFile['bases'][string][string]['prefi
   return { poolCoverage: coverage, entries: coverage === 'complete' ? [SLOT_FILLER] : [] };
 }
 
-/** A parsed weights file carrying exactly `classes`, each `[categoryId, className, prefix, suffix]` coverage. */
+/** A parsed weights file with exactly `classes`, each `[categoryId, className, prefix, suffix]`. */
 export function weightsWith(...classes: readonly (readonly [string, string, Coverage?, Coverage?])[]): WeightsFile {
   const bases: Record<string, WeightsFile['bases'][string]> = {};
   for (const [categoryId, className, prefix = 'complete', suffix = 'complete'] of classes) {
@@ -168,7 +168,7 @@ export function tierOf(statId: string, weight: number, itemLevelMin = 1, moduleG
 
 export type Pools = readonly [readonly ModifierWeight[], readonly ModifierWeight[]];
 
-/** A weights file whose classes carry real pools: `[categoryId, className, [prefix tiers, suffix tiers]]`. */
+/** A weights file whose classes carry pools: `[categoryId, className, [prefix, suffix tiers]]`. */
 export function poolsFile(...classes: readonly (readonly [string, string, Pools])[]): WeightsFile {
   const file = weightsWith(...classes.map(([categoryId, className]) => [categoryId, className] as const));
   for (const [categoryId, className, [prefix, suffix]] of classes) {
@@ -184,7 +184,7 @@ export function poolsFile(...classes: readonly (readonly [string, string, Pools]
 }
 
 /**
- * A crafted entry on `statId`, banded `[1, 10]`, whose suffix holds the whole suffix pool, so P is the prefix pool's share.
+ * A crafted entry on `statId`, banded [1, 10]; its suffix is the whole pool, so P = prefix share.
  */
 export function chase(
   className: string,

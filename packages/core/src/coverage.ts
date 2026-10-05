@@ -12,7 +12,7 @@ export interface PoolCoverage {
 }
 
 /**
- * Pool coverage (AD-27, IMPLEMENTATION-NOTES.md §3). `undefined` when no class is rankable: the fraction is undefined.
+ * Pool coverage (AD-27, IN §3); `undefined` when no class is rankable.
  */
 export function poolCoverage(
   entries: readonly TrackedEntry[],

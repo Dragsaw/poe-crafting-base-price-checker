@@ -1,7 +1,7 @@
 import { canonicalKey, compareCanonicalKeys, compareTrackedEntries } from '@poe/contracts';
 import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
 
-/** The chunk runner's selection order: the Refresh Rotation rows and their ordering (AD-7, FR-17). Pure (AD-1). */
+/** The chunk runner's selection order: Refresh Rotation rows and ordering (AD-7, FR-17). */
 
 /** The bounded retry interval for row 3 (AD-7). */
 export const UNRESOLVABLE_RETRY_MS = 24 * 60 * 60 * 1000;
@@ -14,7 +14,7 @@ export interface ChunkOrderInput {
   readonly completed: readonly string[];
   /** The current instant, ISO-8601 UTC. */
   readonly now: string;
-  /** The `pnpm sync` session's stale-pinned rule (AD-7): row 1 keeps only the pinned entries older than this many milliseconds. */
+  /** The `pnpm sync` stale-pinned rule (AD-7): row 1 keeps pinned entries older than this (ms). */
   readonly pinnedMaxAgeMs?: number;
 }
 
@@ -124,7 +124,7 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
   };
 }
 
-/** The runtime `pinned` truncation (AD-7, IMPLEMENTATION-NOTES.md §6): it reserves one search for waiting rotation work. */
+/** The runtime `pinned` truncation (AD-7, IN §6): it reserves one search for rotation work. */
 export function pinnedToKeep(left: number, remaining: number, rotationWaiting: boolean): number {
   return !rotationWaiting || remaining >= left + 1 ? left : Math.min(left, Math.max(remaining - 1, 0));
 }

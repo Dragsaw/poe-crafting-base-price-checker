@@ -1,14 +1,14 @@
 import type { CraftRecipe, CurrencyRate } from '@poe/contracts';
 
 /**
- * The Craft Cost of one recipe (AD-20, FR-26): a currency with no active-league rate is uncostable, never `0`; no rounding (IMPLEMENTATION-NOTES.md §4.2).
+ * The Craft Cost of one recipe (AD-20, FR-26): an unrated currency is uncostable, never `0`.
  */
 export type CraftCostResult =
   | {
       readonly ok: true;
       readonly divine: number;
       /**
-       * The `asOf` of each rate used, in recipe order; not a timestamp input of the crafted row (AD-10).
+       * The `asOf` of each rate used, in recipe order; not a timestamp input of the row (AD-10).
        */
       readonly asOf: readonly string[];
     }

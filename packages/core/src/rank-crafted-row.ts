@@ -27,7 +27,7 @@ interface SummandScan {
   readonly stamps: string[];
 }
 
-/** `undefined`: the recipe cannot reach the class. P is computed for priced and unpriced entries alike, so the verdict ignores the threshold. */
+/** `undefined`: the recipe cannot reach the class. P is computed priced or not, so no threshold. */
 function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold }: CraftedRowOptions): SummandScan | undefined {
   const summands: CraftedSummand[] = [];
   // Summands only: the rates' asOf is not a timestamp input (AD-10).
@@ -60,7 +60,7 @@ function weakestProvenance({ first, recipe, pools, keyed }: CraftedRowOptions): 
   return provenance;
 }
 
-/** One `(Item Class, recipe)` pair (AD-17), or `undefined` when the recipe cannot reach it (IN §9, §11). */
+/** One `(Item Class, recipe)` pair (AD-17), or `undefined` if unreachable (IN §9, §11). */
 export function craftedRow(options: CraftedRowOptions): CraftedRankedRow | undefined {
   const { first, recipe, cost, keyed, byKey } = options;
   const scan = scanSummands(options);
