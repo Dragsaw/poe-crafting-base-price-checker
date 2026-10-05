@@ -1,7 +1,14 @@
+import { type CraftRecipe } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { LookupError, lookupMods, lookupTiers } from './lookup';
 import { A, B, EVASION, JSON_NULL, LIFE, MELEE, nullLineWeights, SPELL, SPIRIT, WEIGHTS } from './lookup.test-support';
+
+const recipe = (id: string, modifierLevelMin: number): CraftRecipe => ({
+  id,
+  currencies: [{ currencyId: `${id}-orb-of-transmutation`, quantity: 1 }],
+  modifierLevelMin,
+});
 
 describe('lookupMods', () => {
   it('prints one row per modGroup, a hybrid with all its statIds, verbatim', () => {
@@ -151,6 +158,19 @@ describe('lookupTiers', () => {
       lineSet: [SPIRIT],
       untrackable: JSON_NULL,
     });
+  });
+
+  it('says, per tier and recipe, whether the recipe can roll the tier', () => {
+    const found = lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets', recipes: [recipe('greater', 44), recipe('perfect', 70)] });
+
+    expect(found.tiers.map((row) => [row.itemLevelMin, row.recipes?.map((item) => [item.recipeId, item.reached])])).toEqual([
+      [16, [['greater', false], ['perfect', false]]],
+      [25, [['greater', false], ['perfect', false]]],
+      [54, [['greater', true], ['perfect', false]]],
+      [40, [['greater', false], ['perfect', false]]],
+    ]);
+    expect(found.tiers[2]?.recipes?.[0]).toEqual({ recipeId: 'greater', modifierLevelMin: 44, reached: true });
+    expect(lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets' }).tiers[0]).not.toHaveProperty('recipes');
   });
 
   it('prints every line of a hybrid tier that carries the statId', () => {

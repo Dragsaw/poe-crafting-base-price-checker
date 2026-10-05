@@ -3,3 +3,13 @@
 persistent_facts = [
   "Before you triage, reject or fix any review finding, read the Review brief section of {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md and apply it. It covers the Accessibility Floor ruling and the rule that a reviewer does not edit an owner document.",
 ]
+
+[[workflow.review_layers]]
+id = "impeccable-design-review"
+name = "Impeccable Design Reviewer"
+when = "The diff changes a file under packages/web/src/ or a UX mockup."
+instruction = """
+Launch a context-free subagent with this prompt:
+
+Read `{project-root}/_bmad/custom/prompts/impeccable-design-review.md` and follow it. The diff is at `{diff_file}`. The spec is at `{spec_file}`. If the spec path is empty, there is no spec.
+"""

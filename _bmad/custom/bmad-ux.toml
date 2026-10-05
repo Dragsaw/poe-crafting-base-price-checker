@@ -3,12 +3,22 @@ doc_standards = [
   "skill:asd-ste100",
 ]
 
+persistent_facts = [
+  "impeccable reads PROJECT_ROOT/DESIGN.md only. When you invoke impeccable in this run, pass `--target {doc_workspace}/DESIGN.md` or `--target <mockup path>`.",
+  "PRODUCT.md at the project root is a distillation of the PRD. Do not run `/impeccable init` from this workflow.",
+  "impeccable output is advice. A decision enters DESIGN.md or EXPERIENCE.md only after the user confirms it in .memlog.md.",
+]
+
 creative_tools = [
-  "skill:impeccable",
+  "skill:impeccable: render visual directions or key-screen HTML variants for an Operate-mode surface. Follow the renderer contract in references/creative-tools.md. Write under {doc_workspace}/.working/. Return only the file path and one line for each variant.",
 ]
 
 design_handoffs = [
-  "skill:impeccable",
+  "skill:impeccable: the user runs `/impeccable shape`, then new-work, in a separate session with `--target {doc_workspace}/DESIGN.md`, and saves the outputs to {doc_workspace}/imports/.",
+]
+
+finalize_reviewers = [
+  "skill:impeccable critique: critique each file in {doc_workspace}/mockups/ against {doc_workspace}/DESIGN.md (pass --target). Drop each finding that the Accessibility Floor of EXPERIENCE.md rules out. Write review-impeccable.md in {doc_workspace}/reviews/. Do not edit DESIGN.md, EXPERIENCE.md or the mockups.",
 ]
 
 activation_steps_append = [

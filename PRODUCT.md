@@ -16,7 +16,7 @@ The author, and only the author. This is a single-player, single-operator tool (
 
 ## Product Purpose
 
-A PoE2 (Path of Exile 2) crafting base price checker that answers one question: *is this base worth picking up?* A background sync prices a curated set of base-and-modifier combinations against the official trade API; a static web view ranks Item Classes by expected payout per craft, beside the Base Types worth selling uncrafted, counting only outcomes above a player-set Payout Threshold and net of Craft Cost (PRD §1). It replaces the player's manual memorisation of "what is worth picking up" — knowledge that normally costs weeks to rebuild after every league reset. Success is behavioural: the player stops opening the trade site mid-session, stops keeping a mental top-five list, a league start costs days rather than weeks, the ordering visibly beats a naive rank-by-price, and the tool keeps running for a year with no credential rot and no server to patch (PRD §8, SM-1 to SM-6, SM-4a).
+A PoE2 (Path of Exile 2) crafting base price checker that answers one question: *is this base worth picking up?* A background sync prices a curated set of base-and-modifier combinations against the official trade API; a static web view ranks Item Classes by expected payout per craft, beside the Base Types worth selling uncrafted, counting only outcomes above a player-set Payout Threshold and net of Craft Cost (PRD §1). It replaces the player's manual memorisation of "what is worth picking up" — knowledge that normally costs weeks to rebuild after every league reset. Success is behavioural: the player stops opening the trade site mid-session, stops keeping a mental top-five list, a league start costs days rather than weeks, the ordering visibly beats a naive rank-by-price, and the tool keeps running for a year with no credential it needs and no server to patch (PRD §8, SM-1 to SM-6, SM-4a).
 
 ## Positioning
 
@@ -24,20 +24,20 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Operating Context
 
-- Implementation is under way in a four-package workspace (`contracts`, `core`, `sync`, `web`). The sync pipeline and the raw-branch ranked view are built; the crafted branch (Weights File consumption, crafted EV, Craft Recipe control, Chase Combinations, Provenance banner) and the Unrankable appendix are still in the backlog (`docs/stories/sprint-status.yaml`).
+- v1 is built in a four-package workspace (`contracts`, `core`, `sync`, `web`): all three epics are done (`docs/stories/sprint-status.yaml`). The sync pipeline, both ranking branches, the Craft Recipe control, Chase Combinations, Provenance with its banner, and the Unrankable appendix are live. Open work is the deferred-work ledger (`docs/stories/deferred-work.md`).
 - The player reads the ranked list before a play session or when the economy is worth a look; the list is precomputed and never blocks on a live API call (PRD §1).
 - The Payout Threshold is a number input, re-ranking on every valid parse, and it is the only view state promised to survive a reload (FR-6, FR-7).
 - Curation is hand-edited, committed JSON files (`data/tracked.json`, `data/config.json`) reviewed periodically by the player — not a UI-driven workflow. The view surfaces the Tracked List's age so a list left unattended is visible (FR-18).
-- A background sync process (`sync`) is a separate, unattended package from the web view (`web`). A sync run writes to the player's working tree and commits nothing; what reaches the site is what the player commits and pushes, and the view loads data at runtime without a rebuild (FR-25, FR-33).
+- A background sync process (`sync`) is a separate, unattended package from the web view (`web`). It runs as a long-running session the player starts once, or as a one-Chunk command the player's own scheduler starts again (AD-7). It may use the operator's optional POESESSID session cookie to finish a refresh sooner, and never needs it (FR-20, AD-30). A sync run writes to the player's working tree and commits nothing; what reaches the site is what the player commits and pushes, and the view loads data at runtime without a rebuild (FR-25, FR-33).
 - League resets and PoE2 game patches both invalidate prior data; the product must go honestly empty rather than silently serve stale numbers across a reset (PRD UJ-6, FR-31).
 
 ## Capabilities and Constraints
 
 - Magic items only (at most one prefix, one suffix), tracked per Item Class, plus Raw (uncrafted) Bases at item level 82 — rare items are explicitly out of scope (PRD §2.2, §7.1). A tracked crafted entry always names both a prefix and a suffix (FR-34).
 - A Hybrid Modifier is tracked and priced as one modifier, and a stat that rolls in both affixes (for example % increased Rarity of Items) is priced on its summed value. Conjunctions of separate modifiers stay out of scope (FR-34, PRD §7.2).
-- Two Craft Recipes in v1 (greater transmute + greater augment; perfect transmute + perfect augment). The active recipe changes the ordering, not just the cost, so the ranking is read under one recipe at a time. An uncostable recipe shows each ranked unit in its own order and states that no order across them exists (FR-1, FR-26).
+- Two Craft Recipes in v1 (greater transmute + greater augment; perfect transmute + perfect augment). The active recipe changes the ordering, not just the cost, so the ranking is read under one recipe at a time. Provenance belongs to an Item Class under one recipe, so a recipe switch can change a row's Provenance mark (AD-10). An uncostable recipe shows each ranked unit in its own order and states that no order across them exists (FR-1, FR-26).
 - The ranked list is bounded to the top 20 rows by default, behind an expand control; collapsed crafted rows show at most three Chase Combinations (FR-2, FR-5).
-- No accounts, no backend, no server, no credentials that expire — static bundle delivery only (NFR-7). Any requirement that appears to need a backend is escalated, not implemented (PRD §6).
+- No accounts, no backend, no server, no credential the product requires — static bundle delivery only (NFR-7). The optional sync cookie stays on the operator's machine and is never part of delivery (FR-20, AD-30). Any requirement that appears to need a backend is escalated, not implemented (PRD §6).
 - Zero network calls in the test path; all API interaction is tested against committed, real captured fixtures (NFR-1, NFR-2). Every trade endpoint the product depends on is undocumented, so breakage is made loud and cheap rather than prevented (R-7).
 - A hard external release dependency: the Weights File (pool membership, tier value ranges, item-level availability), produced by a separate scraper project. Without a conforming file every Item Class is Unrankable and the view is a Raw Base price list that names the absence (FR-30, PRD §7.3).
 - Unrankable Item Classes sit in a separate group with a count and one of three reasons, never dropped or ranked anyway (FR-4). Pool coverage is measured and published, but it is reported, not a gate.
@@ -48,11 +48,11 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Brand Commitments
 
-No name, logo, or custom visual identity beyond the working title "PoE2 Crafting Base Price Checker." Visual design beyond an off-the-shelf framework (Mantine defaults) is an explicit non-goal — appearance is not a priority for this product (PRD §6). Future design work should stay close to stock Mantine rather than pursue a custom visual identity.
+No name, logo, or custom visual identity beyond the working title "PoE2 Crafting Base Price Checker." Visual design beyond an off-the-shelf framework (Mantine defaults) is an explicit non-goal — appearance is not a priority for this product (PRD §6). The visual system is owned by `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md` ("Field Guide"), which keeps Mantine's component behaviour and replaces its look; design work follows that file.
 
 ## Evidence on Hand
 
-Real committed data exists in `data/`: a Weights File from the external producer (a mix of `complete` and `partial` pools), a synced Dataset for the current league (mostly `not-yet-synced` while the rotation fills it, some `priced`), the Tracked List, and the Trade Catalogue. Use these files for realistic examples. Do not fabricate sample prices, testimonials, or benchmark data; where the data does not cover a case, use the PRD's worked examples and glossary.
+Real committed data exists in `data/`: a Weights File from the external producer (a mix of `complete` and `partial` pools), a synced Dataset for the current league, filled and refreshed by the rotation, the Tracked List, and the Trade Catalogue. Use these files for realistic examples. Do not fabricate sample prices, testimonials, or benchmark data; where the data does not cover a case, use the PRD's worked examples and glossary.
 
 ## Product Principles
 
@@ -60,7 +60,7 @@ Real committed data exists in `data/`: a Weights File from the external producer
 - Never render a placeholder (uniform-prior) figure with the same visual weight as a measured one; trust must be legible at a glance, months after the fact.
 - Segregate what cannot be honestly priced (no-listings, unresolvable, partial pools) rather than guessing or hiding it.
 - Fail honestly: an empty ranking at league start is correct; last league's numbers served as current are not.
-- Zero ongoing maintenance burden: no credentials, no server, no account system — a tool that must still run untouched in a year.
+- Zero ongoing maintenance burden: no required credential, no server, no account system — a tool that must still run untouched in a year.
 - Domain precision over generic UI polish: correct glossary terms, correct state distinctions, and correct provenance beat visual flourish.
 
 ## Accessibility & Inclusion

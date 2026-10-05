@@ -43,6 +43,7 @@ export type { CrossFileFailure, CrossFileResult, ScopedPools, UnvalidatedMark } 
 /** The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11). */
 export {
   affixProbability,
+  canRecipeRoll,
   combinationProbability,
   isContaining as contains,
   isCovering as covers,

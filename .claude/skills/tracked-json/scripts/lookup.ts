@@ -11,6 +11,7 @@ import { absentAsNull } from './lookup-absent-as-null.ts';
 import { type Command, parseCommand, USAGE } from './lookup-command.ts';
 import { LookupError } from './lookup-error.ts';
 import { lookupMods, lookupTiers } from './lookup-mods.ts';
+import { loadRecipes } from './lookup-recipes.ts';
 import { loadWeights, type ReadJson } from './lookup-weights.ts';
 import { UsageError } from './usage-error.ts';
 
@@ -18,6 +19,7 @@ export { LookupError } from './lookup-error.ts';
 export { UsageError } from './usage-error.ts';
 export { type Command, parseCommand, USAGE } from './lookup-command.ts';
 export { lookupMods, lookupTiers, type ModifierRow, type TierRow } from './lookup-mods.ts';
+export { loadRecipes, RECIPES_PATH } from './lookup-recipes.ts';
 export { type ClassSelector, loadWeights, type ReadJson, resolveClass, SLOTS, type Slot, WEIGHTS_PATH } from './lookup-weights.ts';
 
 export const STATS_PATH = 'data/catalogue/stats.json';
@@ -176,7 +178,7 @@ export function runCommand(command: Command, read: ReadJson): unknown {
       return lookupMods(loadWeights(read), command);
     }
     case 'tiers': {
-      return lookupTiers(loadWeights(read), command.statId, command);
+      return lookupTiers(loadWeights(read), command.statId, { ...command, recipes: loadRecipes(read) });
     }
   }
 }

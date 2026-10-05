@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Redesign: dark rarity palette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ground: trade-site black, neutral (no warm cast) */
+  --ground: #1A1A1D;
+  --surface: #222226;
+  --surface-2: #2C2C31;
+  --line: #2E2E33;
+  --line-strong: #44444B;
+  /* text: neutral greys */
+  --text: #D9D9D9;
+  --text-2: #9A9A9A;
+  --text-3: #8A8A8E;
+  /* the two identity colours, from the game's rarity palette */
+  --normal: #C8C8C8;
+  --magic: #8888FF;
+  --magic-dim: #8C8CCF;
+  /* interactive: the bronze of PoE's UI frame, kept apart from both rarities */
+  --accent: #BFA77A;
+  --accent-soft: rgba(191,167,122,.14);
+  /* trust */
+  --rough: #E0913A;
+  --pending: #9898A0;
+  --broken: #F0756C;
+}
+* { box-sizing: border-box; }
+.ic { width: .9em; height: .9em; vertical-align: -0.12em; flex: 0 0 auto; }
+.ic.sm { width: .8em; height: .8em; }
+body {
+  margin: 0; background: var(--ground); color: var(--text);
+  font: 14px/1.4 Inter, system-ui, "Segoe UI", sans-serif;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+.frame { max-width: 1120px; min-width: 1000px; margin: 0 auto; padding: 0 24px 40px; }
+
+/* ---------- compact header ---------- */
+header {
+  display: flex; align-items: center; gap: 22px;
+  height: 64px; border-bottom: 1px solid var(--line-strong);
+  position: sticky; top: 0; background: var(--ground); z-index: 2;
+}
+header > * { flex-shrink: 0; white-space: nowrap; }
+.brand { display: flex; flex-direction: column; line-height: 1.15; margin-right: auto; }
+.brand .league { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.brand h1 { margin: 0; font-size: 18px; font-weight: 600; color: var(--text); }
+.ctl { display: flex; align-items: center; gap: 10px; }
+.ctl .lbl { font-size: 12px; color: var(--text-2); }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 2px; }
+.seg button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 13px; color: var(--text-2); }
+.seg button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sub { font-size: 13px; color: var(--text-2); }
+.thr .fig { font-size: 15px; font-weight: 600; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 8px; min-width: 64px; text-align: right; }
+.thr .fig small { font-weight: 400; color: var(--text-2); font-size: 12px; }
+.slider { width: 100px; height: 4px; background: var(--line-strong); border-radius: 2px; position: relative; }
+.slider::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 8.3%; background: var(--accent); border-radius: 2px; }
+.slider::after { content: ""; position: absolute; left: 8.3%; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--ground); }
+.sync { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+.sync { white-space: nowrap; cursor: pointer; padding: 4px 8px; border: 1px solid transparent; border-radius: 6px; }
+.sync:hover { border-color: var(--line-strong); color: var(--text); }
+.sync .prob { color: var(--broken); font-weight: 600; }
+.sync .chev { color: var(--accent); font-size: 10px; }
+
+/* ---------- table ---------- */
+.list { margin-top: 16px; }
+.cols, .row { display: grid; grid-template-columns: 32px 220px 96px 1fr; align-items: center; column-gap: 14px; }
+.cols { height: 30px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--line-strong); position: relative; }
+.cols .r { text-align: right; }
+.tip-anchor { border-bottom: 1px dotted var(--text-3); cursor: help; color: var(--text-2); }
+.tip { display: none; text-align: left; position: absolute; top: 30px; left: 200px; z-index: 3; width: 330px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,.6); font-size: 12.5px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text); line-height: 1.45; }
+.ev-h:hover .tip { display: block; }
+.tip b { font-weight: 600; }
+.tip p { margin: 0 0 6px; } .tip p:last-child { margin: 0; color: var(--text-2); }
+.row { height: 38px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.row:hover { background: var(--surface); }
+.row.open { background: var(--surface); box-shadow: inset 2px 0 0 var(--accent); border-bottom-color: transparent; }
+.rank { text-align: right; color: var(--text-3); font-size: 13px; }
+.name { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.name.normal { color: var(--normal); }
+.name.magic { color: var(--magic); }
+.top .name, .top .ev { font-weight: 650; }
+.top .rank { color: var(--text); font-weight: 600; }
+.ev { display: flex; justify-content: flex-end; align-items: center; font-size: 15px; color: var(--text); }
+.mk { width: 18px; flex: 0 0 18px; text-align: right; font-size: 13px; position: relative; cursor: help; }
+.mk.rough { color: var(--rough); } .mk.pending { color: var(--pending); } .mk.broken { color: var(--broken); }
+.mk .bub { display: none; text-align: left; position: absolute; left: 22px; top: -6px; z-index: 4; white-space: nowrap; padding: 6px 9px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.5); font-size: 12.5px; color: var(--text-2); text-align: left; }
+.mk .bub b { font-weight: 600; } .mk.rough .bub b { color: var(--rough); } .mk.pending .bub b { color: var(--pending); }
+.mk:hover .bub, .mk.show .bub { display: block; }
+.cols .ev-h { display: block; text-align: right; padding-right: 18px; }
+.ev .est { color: var(--rough); font-weight: 500; margin-right: 2px; }
+.neg .ev { color: var(--text-3); }
+.trust { font-size: 12.5px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.trust .g { font-size: 13px; width: 12px; text-align: center; }
+.trust.rough { color: var(--rough); }
+.trust.pending { color: var(--pending); }
+.trust.broken { color: var(--broken); }
+.line.below { color: var(--text-3); } .line.below .t { color: var(--text-3); } .line.below .p { color: var(--text-3); font-weight: 400; }
+.trust .why { color: var(--text-2); }
+.chase { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; font-size: 12.5px; color: var(--magic-dim); min-width: 0; }
+.chase span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t { color: var(--text-2); font-weight: 600; font-size: .9em; letter-spacing: .01em; }
+.j { color: var(--text-3); padding: 0 4px; }
+.sell { font-size: 12.5px; color: var(--text-2); }
+.sell b { color: var(--normal); font-weight: 600; }
+
+/* ---------- expansion ---------- */
+.panel { background: var(--surface); border-bottom: 1px solid var(--line); padding: 6px 0 14px 46px; box-shadow: inset 2px 0 0 var(--accent); }
+.panel .ctx { font-size: 12px; color: var(--text-3); padding: 4px 0 8px; }
+.panel .ctx .est { color: var(--rough); }
+.line { display: grid; grid-template-columns: 1fr 90px 270px 24px; column-gap: 14px; align-items: center; height: 32px; border-top: 1px solid var(--line); padding-right: 16px; font-size: 13.5px; color: var(--magic); }
+.line .p { text-align: right; font-weight: 500; color: var(--text); }
+.line .p.none { color: var(--text-3); font-weight: 400; }
+.line a { color: var(--text-3); text-decoration: none; text-align: center; }
+.more { font-size: 12.5px; color: var(--accent); padding-top: 8px; }
+
+/* ---------- state examples ---------- */
+.examples { margin-top: 26px; border: 1px dashed #3E4F66; border-radius: 6px; padding: 8px 12px 10px; }
+.examples h2 { margin: 0 0 4px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #7F95B3; }
+.examples .row { cursor: default; }
+.examples .row:last-child { border-bottom: 0; }
+.examples .note { font-size: 12px; color: var(--text-3); }
+.report { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: var(--surface); border-bottom: 1px solid var(--line-strong); padding: 14px 16px 12px; margin-top: 6px; }
+.report h3 { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); }
+.report p { margin: 0 0 4px; font-size: 13px; color: var(--text-2); line-height: 1.4; } .report b { color: var(--text); font-weight: 500; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--text); }
+.liststmt { font-size: 12px; color: var(--text-2); padding: 12px 0 8px; }
+
+/* ---------- foot ---------- */
+footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); display: flex; gap: 22px; font-size: 12px; color: var(--text-2); flex-wrap: wrap; }
+footer b { font-weight: 600; }
+.rough-c { color: var(--rough); } .pending-c { color: var(--pending); } .broken-c { color: var(--broken); }
+@media (max-width: 1150px) { .row .chase { grid-template-columns: repeat(2, 1fr); } .row .chase > span:nth-child(3) { display: none; } }
+</style>
+</head>
+<body>
+<div class="frame">
+
+<header>
+  <div class="brand">
+    <span class="league">Forbidden Rites</span>
+    <h1>What's worth picking up</h1>
+  </div>
+  <div class="ctl">
+    <span class="lbl">Recipe</span>
+    <div class="seg"><button class="on">greater</button><button>perfect</button></div>
+    <span class="sub">0.01 div / craft</span>
+  </div>
+  <div class="ctl thr">
+    <span class="lbl">Worth ≥</span>
+    <span class="fig">0.25 <small>div</small></span>
+    <div class="slider"></div>
+  </div>
+  <div class="sync">Synced 1m ago <span class="chev"><svg class="ic sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6h8l-4 5z" fill="currentColor"/></svg></span></div>
+</header>
+
+<div class="list">
+  <div class="cols">
+    <span class="r">#</span><span>Item class / base</span><span class="r ev-h"><span class="tip-anchor">EV (Divine)</span>
+      <span class="tip">
+        <p><b>Expected value per craft.</b> What one craft on this item class returns on average, in Divine. It counts only outcomes worth at least <b>0.25 div</b> and subtracts the <b>0.01 div</b> craft cost.</p>
+        <p>For a base you sell as is, it is that base's asking price. Every price is a live asking price, not a sale.</p>
+        <p><span style="color:var(--rough)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span> some roll odds are estimated · <span style="color:var(--rough)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg></span> unreliable price · <span style="color:var(--pending)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span> no price yet. <span style="color:var(--broken)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> broken. Hover a mark for the reason.</p>
+      </span></span><span>Best combinations</span>
+  </div>
+
+  <div class="row top"><span class="rank">1</span><span class="name normal">Gold Amulet</span><span class="ev">2.00<span class="mk"></span></span><span class="sell"><b>Sell as is</b> · item level 82+</span></div>
+
+  <div class="row top open"><span class="rank">2</span><span class="name magic">Bows</span><span class="ev" data-bows><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>0.10<span class="mk rough"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg><span class="bub"><b>rough</b> · 81% of this EV rests on unreliable prices</span></span></span><span class="chase">
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span>
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Extra Arrow</span>
+    <span><span class="t">T1-T2</span> % Phys, +Accuracy<span class="j">·</span><span class="t">T1-T2</span> Proj</span></span></div>
+  <div class="panel">
+    <div class="ctx"><b style="color:var(--magic);font-weight:600">Bows</b> · <span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span> some roll odds are estimated: no published weight for one mod tier. Prices are real listings.</div>
+    <div class="line"><span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span><span class="p">550.00</span><span class="trust rough"><span class="g"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg></span>rough <span class="why">· only 1 listing</span></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Extra Arrow</span><span class="p">220.00</span><span class="trust"></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1</span> +Crit Chance</span><span class="p">125.00</span><span class="trust"></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1</span> +Crit Dmg</span><span class="p">115.00</span><span class="trust"></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1</span> Flat Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span><span class="p">45.00</span><span class="trust"></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1-T2</span> % Phys, +Accuracy<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span><span class="p">27.00</span><span class="trust rough"><span class="g"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg></span>rough <span class="why">· priced 5 days ago</span></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1-T2</span> Flat Cold<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span><span class="p">12.00</span><span class="trust"></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1-T2</span> Flat Lightning<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span><span class="p">10.00</span><span class="trust"></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="more">+ 20 more combinations</div>
+  </div>
+
+  <div class="row top"><span class="rank">3</span><span class="name magic">Wands</span><span class="ev">0.04<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> Extra Cold<span class="j">·</span><span class="t">T1-T2</span> Cold Spell</span>
+    <span><span class="t">T1</span> Spell Dmg<span class="j">·</span><span class="t">T1-T2</span> Phys Spell</span>
+    <span><span class="t">T1</span> Extra Lightning<span class="j">·</span><span class="t">T1-T2</span> Cold</span></span></div>
+  <div class="row top"><span class="rank">4</span><span class="name magic">Spears</span><span class="ev">0.03<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span>
+    <span><span class="t">T1</span> Flat Phys<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span>
+    <span><span class="t">T1-T2</span> % Phys<span class="j">·</span><span class="t">T1-T2</span> Melee Skills</span></span></div>
+  <div class="row top"><span class="rank">5</span><span class="name magic">Amulets</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>0.02<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> Mana<span class="j">·</span><span class="t">T1</span> Spell Skills</span>
+    <span><span class="t">T1</span> ES<span class="j">·</span><span class="t">T1</span> Spell Skills</span>
+    <span><span class="t">T1</span> % ES<span class="j">·</span><span class="t">T1</span> Spell Skills</span></span></div>
+  <div class="row"><span class="rank">6</span><span class="name magic">Sceptres</span><span class="ev">0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> % Spirit, Mana<span class="j">·</span><span class="t">T1</span> Minion Skills</span>
+    <span><span class="t">T1-T2</span> % Spirit<span class="j">·</span><span class="t">T1</span> Minion Skills</span>
+    <span><span class="t">T1-T2</span> Allies Dmg<span class="j">·</span><span class="t">T1</span> Minion</span></span></div>
+  <div class="row"><span class="rank">7</span><span class="name magic">Crossbows</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> % Phys<span class="j">·</span><span class="t">T1</span> Proj Skills</span>
+    <span><span class="t">T1</span> Flat Phys<span class="j">·</span><span class="t">T1</span> Proj Skills</span>
+    <span><span class="t">T1</span> Flat Lightning<span class="j">·</span><span class="t">T1</span> Proj Skills</span></span></div>
+  <div class="row neg"><span class="rank">8</span><span class="name magic">Emerald</span><span class="ev"><span class="est"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>−0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> Atk Dmg<span class="j">·</span><span class="t">T1</span> Atk Spd</span><span></span><span></span></span></div>
+  <div class="row neg"><span class="rank">9</span><span class="name magic">Helmets (Str)</span><span class="ev">−0.01<span class="mk"></span></span><span class="chase">
+    <span><span class="t">T1</span> % Armour, Life<span class="j">·</span><span class="t">T1-T2</span> Chaos Res</span><span></span><span></span></span></div>
+</div>
+
+<div class="examples">
+  <h2>State examples — not in today's data (every price today is under 2 days old) · first mark shown hovered</h2>
+  <div class="row" style="cursor:default"><span class="rank">·</span><span class="name" style="color:var(--text-2);font-size:13px;font-weight:400">Header, problem state</span><span></span><span style="display:flex;gap:12px"><span class="sync" style="display:inline-flex;border-color:var(--line-strong)"><span class="prob"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> 3 problems</span> <span class="chev"><svg class="ic sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6h8l-4 5z" fill="currentColor"/></svg></span></span><span class="sync" style="display:inline-flex;border-color:var(--line-strong)"><span class="prob" style="color:var(--rough)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg> 1 problem</span> <span class="chev"><svg class="ic sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6h8l-4 5z" fill="currentColor"/></svg></span></span><span class="note" style="align-self:center;white-space:nowrap">replaces "Synced Nm ago"; red if anything is broken</span></span></div>
+  <div class="row"><span class="rank">·</span><span class="name magic">Rings</span><span class="ev">0.06<span class="mk rough show"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg><span class="bub"><b>rough</b> · 74% of this EV rests on unreliable prices</span></span></span><span class="chase"><span><span class="t">T1</span> Life<span class="j">·</span><span class="t">T1</span> Cold Res</span><span><span class="t">T1</span> Mana<span class="j">·</span><span class="t">T1-T2</span> Rarity</span><span></span></span></div>
+  <div class="row"><span class="rank">·</span><span class="name normal">Sapphire Ring</span><span class="ev">0.80<span class="mk rough"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg><span class="bub"><b>rough</b> · priced 4 days ago</span></span></span><span class="sell"><b>Sell as is</b> · item level 82+</span></div>
+  <div class="row"><span class="rank">·</span><span class="name normal">Stellar Amulet</span><span class="ev" style="color:var(--text-3)">—<span class="mk pending"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span class="bub"><b>pending</b> · not checked yet</span></span></span><span class="sell"><b>Sell as is</b> · item level 82+</span></div>
+</div>
+
+<div class="examples" style="padding-bottom:4px">
+  <h2>Expansion line variants — lower in a panel, after the top 8</h2>
+  <div class="panel" style="box-shadow:none;padding-left:0;background:transparent">
+    <div class="line"><span><span class="t">T1-T2</span> Phys<span class="j">·</span><span class="t">T1</span> Extra Arrow, +Accuracy</span><span class="p none">—</span><span class="trust pending"><span class="g"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>pending <span class="why">· tried 2 days ago · no listings</span></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1</span> Flat Lightning<span class="j">·</span><span class="t">T1</span> Extra Arrow</span><span class="p none">—</span><span class="trust pending"><span class="g"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>pending <span class="why">· not checked yet</span></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="line"><span><span class="t">T1</span> % Phys<span class="j">·</span><span class="t">T1</span> Bow Atk Spd</span><span class="p none">—</span><span class="trust broken"><span class="g"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>broken <span class="why">· gone after a patch</span></span><span></span></div>
+    <div class="line below"><span><span class="t">T1-T2</span> Flat Fire<span class="j">·</span><span class="t">T1-T2</span> Proj Skills</span><span class="p">0.20</span><span class="trust"><span class="why">below threshold</span></span><a href="#"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6.5 5H11v4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <div class="more">− show fewer</div>
+  </div>
+</div>
+
+<div class="examples">
+  <h2>Sync report panel — opens in place under the header and pushes the list down</h2>
+  <div class="report">
+    <div><h3>Problems</h3>
+      <p><span class="broken-c"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> 2 entries gone after a patch — Bows · T1 % Phys · T1 Bow Atk Spd; Quarterstaves · T1 Melee Skills</p>
+      <p><span class="rough-c"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg></span> 1 pinned entry not reached in 4 syncs: Gold Amulet</p></div>
+    <div><h3>The sync run</h3>
+      <p><b>326</b> requests to the tracked list</p><p><b>1</b> league validation request</p><p><b>12</b> entries not reached this pass</p></div>
+    <div><h3>What the weights cover</h3>
+      <p>Bows <b>41 / 44</b> tiers</p><p>Amulets <b>37 / 40</b> tiers</p><p>Wands <b>38 / 38</b> tiers</p></div>
+    <div><h3>Built from</h3>
+      <p>Weights File by <b>poe-mod-weights-producer</b>, generated 2026-10-03, patch <b>0.5.5</b></p><p>Last synced <b>1 min ago</b></p><p>Tracked List last edited <b>2026-10-04</b></p></div>
+  </div>
+  <div class="liststmt">Nothing clears 3.00 div. Every crafted class is ranked at minus its craft cost. <span class="note">(list statement slot — copy for this state is drafted at build)</span></div>
+  <div class="cols" style="border-top:0"><span class="r">#</span><span>Item class / base</span><span class="r">EV (Divine)</span><span>Best combinations</span></div>
+</div>
+
+<footer>
+  <span><span style="color:var(--magic)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1" fill="currentColor"/></svg></span> craft this class</span>
+  <span><span style="color:var(--normal)"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1" fill="currentColor"/></svg></span> sell this base as is</span>
+  <span>no mark = current price</span>
+  <span class="rough-c"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 2.4a5.6 5.6 0 0 0 0 11.2z" fill="currentColor"/></svg> <b>rough</b> <span style="color:var(--text-2)">price older than 3 days or under 3 listings (a row: 70%+ of its EV)</span></span>
+  <span class="pending-c"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg> <b>pending</b> <span style="color:var(--text-2)">no price yet</span></span>
+  <span class="broken-c"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> <b>broken</b> <span style="color:var(--text-2)">can no longer be priced</span></span>
+  <span>† pruned · * pinned</span>
+  <span><span class="rough-c"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6.2c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0M2.5 10.6c1.8-1.6 3.6-1.6 5.5 0s3.7 1.6 5.5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span> some roll odds estimated</span>
+  <span style="margin-left:auto">Prices are live asking prices, not sales. Read-only. Curation lives in data/tracked.json.</span>
+</footer>
+
+</div>
+</body>
+</html>

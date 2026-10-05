@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,22 +10,23 @@ const COMMAND_OVERRIDE_VARIABLE = 'PRE_PUSH_HOOK_COMMAND_FOR_TEST';
 const SHA = '1111111111111111111111111111111111111111';
 const ZERO_SHA = '0000000000000000000000000000000000000000';
 
-// The override replaces `pnpm check`: it records that it ran, then exits with `exitCode`.
-function runHook(stdin: string, exitCode = 0) {
+// The override replaces `pnpm check`: it records the GIT_DIR it saw, then exits with `exitCode`.
+function runHook(stdin: string, exitCode = 0, environment: Record<string, string> = {}) {
   const directory = mkdtempSync(path.join(tmpdir(), 'pre-push-hook-'));
   try {
     const markerPath = path.join(directory, 'ran');
     const commandPath = path.join(directory, 'fake-check.mjs');
     writeFileSync(
       commandPath,
-      `import { writeFileSync } from 'node:fs';\nwriteFileSync(${JSON.stringify(markerPath)}, 'ran');\nprocess.exit(${exitCode});\n`,
+      `import { writeFileSync } from 'node:fs';\nwriteFileSync(${JSON.stringify(markerPath)}, process.env.GIT_DIR ?? '');\nprocess.exit(${exitCode});\n`,
     );
     const result = spawnSync(process.execPath, [HOOK_PATH, 'origin', 'https://example.invalid/repo.git'], {
       encoding: 'utf8',
       input: stdin,
-      env: { ...process.env, [COMMAND_OVERRIDE_VARIABLE]: commandPath },
+      env: { ...process.env, ...environment, [COMMAND_OVERRIDE_VARIABLE]: commandPath },
     });
-    return { status: result.status, stderr: result.stderr, gateRan: existsSync(markerPath) };
+    const didGateRun = existsSync(markerPath);
+    return { status: result.status, stderr: result.stderr, gateRan: didGateRun, gateGitDirectory: didGateRun ? readFileSync(markerPath, 'utf8') : undefined };
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
@@ -57,6 +58,12 @@ describe('pre-push hook', () => {
     const result = runHook('');
     expect(result.status).toBe(0);
     expect(result.gateRan).toBe(false);
+  });
+
+  it('runs the gate without the GIT_DIR that git exports to the hook', () => {
+    const result = runHook(pushLine, 0, { GIT_DIR: path.join(tmpdir(), 'not-a-repository') });
+    expect(result.gateRan).toBe(true);
+    expect(result.gateGitDirectory).toBe('');
   });
 
   it('runs the gate when a delete is mixed with a real push', () => {

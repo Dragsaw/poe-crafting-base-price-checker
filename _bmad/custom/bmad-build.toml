@@ -18,6 +18,10 @@ Launch a subagent with no prior conversation context, with this prompt:
 > When done, report what you changed, how you verified it, and anything left incomplete or risky.
 """
 
+on_complete = """
+If the diff changed a file under packages/web/src/, offer the user one optional step. Run `/impeccable critique` on the changed surface, with `pnpm dev` and agent-browser in a named session (AGENTS.md). Then run `/impeccable polish` on the findings the user accepts. Apply the Review brief of AGENT-WORKFLOW.md to each finding. Do not start this step without a yes.
+"""
+
 # This layer stops a lost ledger entry. It runs in
 # the review step. The review step always runs before this workflow's one
 # commit (step-05-present.md's Commit and Complete, or step-oneshot.md's
@@ -91,4 +95,24 @@ Do not invoke any skill. Do not start any subagent of your own. You are the revi
 
 Return your findings as text in your final message. Do not send your findings through any findings-reporting tool the host may offer.
 
+"""
+
+[[workflow.review_layers]]
+id = "impeccable-design-review"
+name = "Impeccable Design Reviewer"
+when = "The diff changes a file under packages/web/src/ or a UX mockup."
+instruction = """
+Launch a context-free subagent with this prompt:
+
+Read `{project-root}/_bmad/custom/prompts/impeccable-design-review.md` and follow it. The diff is at `{diff_file}`. The spec is at `{claims_file}`.
+"""
+
+[[workflow.oneshot_review_layers]]
+id = "impeccable-design-review"
+name = "Impeccable Design Reviewer"
+when = "The changed files include a file under packages/web/src/ or a UX mockup."
+instruction = """
+Launch a context-free subagent with this prompt:
+
+Read `{project-root}/_bmad/custom/prompts/impeccable-design-review.md` and follow it. Use the changed files in the current worktree. The spec is at `{spec_file}`.
 """

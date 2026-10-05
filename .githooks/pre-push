@@ -28,14 +28,28 @@ function onlyDeletesReferences(stdin) {
   return lines.every((line) => isDeleteLine(line));
 }
 
+// Git exports GIT_DIR and its kin to hooks. Left in place, a test's git call
+// on a temporary repository writes to this one instead.
+function gateEnvironment() {
+  // eslint-disable-next-line sonarjs/no-os-command-from-path -- git resolves through PATH by design: the hook already runs under the developer's git.
+  const listed = spawnSync('git', ['rev-parse', '--local-env-vars'], { encoding: 'utf8' });
+  const names = (listed.stdout ?? '').split('\n').map((name) => name.trim());
+  const environment = { ...process.env };
+  for (const name of names) {
+    delete environment[name];
+  }
+  return environment;
+}
+
 function runGate() {
+  const environment = gateEnvironment();
   const override = process.env[COMMAND_OVERRIDE_VARIABLE];
   if (override) {
-    return spawnSync(process.execPath, [override], { stdio: 'inherit' });
+    return spawnSync(process.execPath, [override], { stdio: 'inherit', env: environment });
   }
   // On Windows pnpm is a .cmd shim, which spawn only runs through a shell.
   // eslint-disable-next-line sonarjs/no-os-command-from-path -- pnpm resolves through PATH by design: the hook runs the developer's own toolchain.
-  return spawnSync('pnpm', ['check'], { stdio: 'inherit', shell: process.platform === 'win32' });
+  return spawnSync('pnpm', ['check'], { stdio: 'inherit', shell: process.platform === 'win32', env: environment });
 }
 
 if (onlyDeletesReferences(readStdin())) {
