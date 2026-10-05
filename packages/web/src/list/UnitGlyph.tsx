@@ -4,12 +4,7 @@ import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
 
 export type Unit = 'class' | 'raw';
 
-/**
- * The unit glyph that opens every ranked row (FR-3): `≡` an Item Class, `▪` a
- * Base Type. Sepia only, never a semantic ink; no word and no key-block entry.
- * Both centre in one fixed 14px box at `flex: 0 0 auto`, so every name starts
- * at the same x and a long name yields first.
- */
+// FR-3. A fixed `flex: 0 0 auto` box keeps every name at the same x; a long name yields first.
 export function UnitGlyph({ unit }: { readonly unit: Unit }): JSX.Element {
   return (
     <span

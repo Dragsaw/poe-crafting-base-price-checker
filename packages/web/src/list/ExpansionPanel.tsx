@@ -8,11 +8,8 @@ import { classPanelSubLine, NO_AFFIXES, rawCombinationNote, rawPanelSubLine } fr
 import { tradeSearchHref } from './trade-link';
 import { UnitGlyph, type Unit } from './UnitGlyph';
 
-/**
- * A Raw Base's one combination row, for the degenerate Combination of no
- * affixes (FR-8, FR-3). A priced entry takes the raw note; an unpriced one
- * takes its state's note in its place (decision 2026-09-26).
- */
+// A Raw Base is the degenerate Combination of no affixes (FR-8, FR-3). An unpriced one takes its
+// state's note in place of the raw note (decision 2026-09-26).
 function rawCombination(row: DisplayRow, activeLeague: string): Combination {
   return {
     key: row.key,
@@ -26,11 +23,7 @@ function rawCombination(row: DisplayRow, activeLeague: string): Combination {
   };
 }
 
-/**
- * One crafted Tracked Entry's combination row. The note, the ages, the
- * figure, the sample, the trade link and `* pinned` follow the raw path; the
- * text is its tier + short form, or the verbatim fallback.
- */
+// Follows the raw path; the text is its tier + short form, or the verbatim fallback.
 function craftedCombination(combination: CraftedCombination, className: string, activeLeague: string): Combination {
   return {
     key: combination.key,
@@ -44,13 +37,7 @@ function craftedCombination(combination: CraftedCombination, className: string, 
   };
 }
 
-/**
- * `{components.expansion-panel}`: a bordered paper card at the full content
- * width, flush under its row — the row's `rule-strong` bottom is the panel's
- * top edge, so the panel draws no top border. No animation, not a modal.
- * Inside: the unit glyph and name, the context sub-line, then one
- * `{components.combination-row}` per Tracked Entry.
- */
+// `{components.expansion-panel}`: the row's bottom rule is the panel's top edge, so no top border.
 function ExpansionPanel({
   unit,
   label,
@@ -123,12 +110,7 @@ export function RawExpansionPanel({
   );
 }
 
-/**
- * The panel under an open crafted Item Class row: its glyph and name, and the
- * sub-line that repeats the threshold and the active Craft Recipe, then one
- * combination row per non-pruned Tracked Entry of the class: the summands in
- * `core`'s order, then the rest by canonical key.
- */
+// Non-pruned entries only: the summands in `core`'s order, then the rest by canonical key.
 export function ClassExpansionPanel({
   row,
   threshold,

@@ -17,12 +17,7 @@ const MARKS: Readonly<
   unresolvable: { glyph: glyphs.unresolvable, color: colors.rust, weight: 700 },
 };
 
-/**
- * A trust mark: glyph, hair space, word, in a semantic ink at its weight. Inline
- * text with no background, border or capsule, taking the type size of its line.
- * *never attempted* sets its word in italic, so it reads apart from a merely
- * old row with colour removed (NFR-10). A healthy cell renders no mark at all.
- */
+// *never attempted* sets its word in italic, so it differs from an old row without colour (NFR-10).
 export function TrustMark({ kind, word }: { readonly kind: TrustMarkKind; readonly word: string }): JSX.Element {
   const mark = MARKS[kind];
   return (

@@ -9,17 +9,10 @@ import {
 
 import { shortForm } from './short-forms';
 
-/**
- * The one formatter for a Combination's text, shared by the chase cells and
- * the expansion's combination rows (EXPERIENCE.md, *A Combination is written
- * as tier plus short form, never as a value*; UX-DR39, UX-DR40).
- */
+// The one formatter for a Combination's text (EXPERIENCE.md, *A Combination is written as tier plus
+// short form, never as a value*; UX-DR39, UX-DR40).
 
-/**
- * One affix as printed. `verbatim` marks the fallback: text the page quoted
- * from the catalogue rather than wrote, set in the mono verbatim register
- * (EXPERIENCE.md memlog 138, 208).
- */
+/** `verbatim` marks the fallback, set in the mono register (EXPERIENCE.md memlog 138, 208). */
 export interface AffixPart {
   readonly text: string;
   readonly verbatim: boolean;
@@ -31,10 +24,7 @@ export type StatTexts = ReadonlyMap<string, string>;
 /** The middle dot that joins two affixes in one Combination: this affix AND that one. */
 export const AFFIX_JOIN = ' · ';
 
-/**
- * The catalogue's stat texts, flattened from its category groups. The first
- * group to name an id wins; a later duplicate changes nothing.
- */
+/** The first category group to name an id wins; a later duplicate changes nothing. */
 export function statTexts(catalogue: StatCatalogue): StatTexts {
   const texts = new Map<string, string>();
   for (const entry of flattenStatCatalogue(catalogue)) {
@@ -45,25 +35,13 @@ export function statTexts(catalogue: StatCatalogue): StatTexts {
   return texts;
 }
 
-/**
- * The fallback text: the catalogue stat text (or the raw `statId` when the
- * catalogue does not hold it) with the value band. Exactly one `#` takes
- * `min–max` in its place; otherwise the band is appended. The numbers print as
- * the file wrote them, with no rounding.
- */
+// Exactly one `#` takes `min–max` in its place; otherwise the band is appended. No rounding.
 export function bandedFallback(text: string, valueMin: number, valueMax: number): string {
   const band = `${String(valueMin)}–${String(valueMax)}`;
   return text.split('#').length === 2 ? text.replace('#', () => band) : `${text} ${band}`;
 }
 
-/**
- * One affix. A banded reference with both a short form and an Accepted Tier
- * prints `<acceptedTier> <form>`, the tier verbatim. A valueless reference
- * prints its form alone, with no tier. Anything else — no form (a product
- * gap) or a banded reference with no tier (a curation gap) — is the verbatim
- * fallback: the catalogue text, with the band on a banded reference. A
- * hybrid reference is one affix (`hybridText`).
- */
+// No form (a product gap) or a banded reference with no tier (a curation gap): verbatim fallback.
 export function affixText(reference: ModifierRef, stats: StatTexts): AffixPart {
   if (reference.kind === 'hybrid') {
     return hybridText(reference, stats);
@@ -79,16 +57,9 @@ export function affixText(reference: ModifierRef, stats: StatTexts): AffixPart {
 /** The comma that joins the lines of one hybrid affix: `T1 % Phys, Accuracy`. */
 const LINE_JOIN = ', ';
 
-/**
- * One hybrid affix (EXPERIENCE.md, *A Hybrid Modifier affix is the tier
- * label, then its lines*; CAP-7). The entry's Accepted Tier, then each line's
- * short form, comma-joined. Short forms are all or none: a missing tier, any
- * line with no form, or any valueless line prints every line as the verbatim
- * fallback, its catalogue text with its band where it has one. The lines
- * sort by their printed text in code-unit order (the short form in the
- * curated label, the fallback string in the fallback), not by `statId`, so
- * `% ES` precedes `% Evasion` and the label never reads `weights.json`.
- */
+// EXPERIENCE.md, *A Hybrid Modifier affix is the tier label, then its lines* (CAP-7).
+// Short forms are all or none. Lines sort by printed text in code-unit order, not `statId`,
+// so the label never reads `weights.json`.
 function hybridText(reference: HybridModifierRef, stats: StatTexts): AffixPart {
   const forms: string[] = [];
   for (const line of reference.lines) {

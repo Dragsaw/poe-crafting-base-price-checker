@@ -5,17 +5,8 @@ import { cssNumber } from '../test-support/css-number';
 import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
 
-/**
- * The fit check over the frozen data fixture (the Story 2.5 AC, discharged here).
- * The live data/ runs the same fit check in `tracked.data.test.ts`.
- * Line one of a combination row is `nowrap` in fixed cells, so an overlong
- * text would run into the state cell instead of wrapping. jsdom lays out no
- * text, so the width is an estimate, not a guarantee: every character is
- * taken at a full monospace advance, 0.6em, wider than the serif's average
- * advance, though a serif capital, `*` or `·` can exceed it. The real-width
- * evidence is the agent-browser measurement recorded in the spec's
- * Implementation Notes.
- */
+// Line one is `nowrap`, so overlong text would run into the state cell. jsdom lays out no text:
+// the width is an estimate at 0.6em per character. Real widths: Story 2.5 Implementation Notes.
 const committed = import.meta.glob<unknown>('../../../../test/fixtures/frozen-data/{tracked.json,catalogue/stats.json}', {
   eager: true,
   import: 'default',
@@ -30,12 +21,8 @@ const texts = live.map((entry) => combinationText(entry, stats));
 const CHASE_BUDGET = 27;
 const ADVANCE_EM = 0.6;
 
-/**
- * Every committed chase pairing over the 27-character budget: candidates for
- * pruning, not for a shorter coinage (EXPERIENCE.md, *Escape valve*). Listed
- * in `docs/stories/deferred-work.md` (story 3.5). A change here is a change
- * to the Tracked List, so the ledger entry must follow it.
- */
+// Pairings over the 27-character budget: pruning candidates (EXPERIENCE.md, *Escape valve*).
+// Listed in `docs/stories/deferred-work.md` (story 3.5); a change here must follow in that entry.
 const PRUNING_CANDIDATES = [
   'T1 % Evasion · T1 Crit Chance',
   'T1 % Evasion · T1 Mana Regen',

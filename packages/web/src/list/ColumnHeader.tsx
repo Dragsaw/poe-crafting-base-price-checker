@@ -6,11 +6,8 @@ import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/token
 
 type ColumnName = (typeof rankedRowColumns)[number]['name'];
 
-/**
- * The six header labels (DESIGN.md `column-header`). The rank column is blank.
- * The second names both ranked units because the column holds both (FR-3);
- * the fourth is `Provenance`, never `Weight`; the EV header states the unit once.
- */
+// DESIGN.md `column-header`. The second label names both ranked units (FR-3);
+// the fourth is `Provenance`, never `Weight`.
 export const COLUMN_LABELS: Readonly<Record<ColumnName, string>> = {
   rank: '',
   unit: 'Item Class / Base Type',
@@ -31,11 +28,7 @@ export function cellStyle(column: (typeof rankedRowColumns)[number]): CSSPropert
   };
 }
 
-/**
- * Six fixed flex cells on a `rule-strong` rule, never inline-block spans, never
- * ellipsising. Its text depends on no artifact, so the skeleton paints it too.
- * Nothing sorts (UX-DR14).
- */
+// Fixed flex cells, never inline-block spans. No artifact feeds its text: the skeleton paints it.
 export function ColumnHeader(): JSX.Element {
   return (
     <div

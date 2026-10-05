@@ -16,11 +16,7 @@ export const APPENDIX_LEAD = 'Tracked, but kept out of the ordering.';
 /** The mark every `class absent from weights file` row carries, as the mockup shows. */
 const APPENDIX_MARK_WORD = 'unknown';
 
-/**
- * The quiet note of `class disagrees with weights file`: the pool is published
- * and complete, and the disagreement is in the player's Tracked List. It names
- * no check, entry or key (those live in the sync report panel).
- */
+// The note for `class disagrees with weights file`; the sync report panel names the entry.
 export const DISAGREES_NOTE = 'The pool is published and complete; the disagreement is in your Tracked List.';
 
 /** `1 Item Class`, `N Item Classes`. */
@@ -30,16 +26,8 @@ export function appendixCount(count: number): string {
 
 const [baseWidth, markWidth, reasonWidth, noteWidth] = columnSums.appendix;
 
-/**
- * `{components.unrankable-appendix}` (DESIGN.md; `mockups/key-hero-resting.html`).
- * Every row is an Item Class, never a Base Type. It leads the page tail in every
- * ready state, with one arrangement: every row renders and the document grows,
- * so nothing here switches on a count or a measurement (UX-DR53). Rows are not
- * interactive: no handler, no hover tone, no role and no title (UX-DR44).
- *
- * With no rows it is the title alone, the count in `ink`, the bottom padding
- * at the top's 16px, and nothing saying why (state 37).
- */
+// `{components.unrankable-appendix}`: every row renders, nothing switches on a count (UX-DR53).
+// Rows are not interactive (UX-DR44). With no rows it is the title alone (EXPERIENCE.md state 37).
 export function UnrankableAppendix({ classes }: { readonly classes: readonly UnrankableClass[] }): JSX.Element {
   const isEmpty = classes.length === 0;
   return (

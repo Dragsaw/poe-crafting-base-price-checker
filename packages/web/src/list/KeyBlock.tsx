@@ -27,13 +27,8 @@ function Column({ title, last, children }: { readonly title: string; readonly la
   );
 }
 
-/**
- * Three equal columns under a `rule-strong` rule, above the foot (DESIGN.md
- * `key-block`; copy from `mockups/key-hero-resting.html`). Mandatory in every
- * state but the two page-replacing screens: it is what makes an empty cell
- * quiet rather than ambiguous. The unit glyphs take no entry. `† pruned` and
- * `* pinned` are not listed — an open `[NOTE FOR UX]`.
- */
+// DESIGN.md `key-block`; copy from `mockups/key-hero-resting.html`.
+// `† pruned` and `* pinned` are not listed: an open `[NOTE FOR UX]`.
 export function KeyBlock(): JSX.Element {
   const [silence, provenance, age] = KEY_TITLES;
   return (
