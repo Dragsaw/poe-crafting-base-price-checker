@@ -8,7 +8,7 @@ import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 // stale: hence `--pass-on-unpruned-suppressions`. Typecheck keeps only the edited files'
 // diagnostics, so a caller the edit just broke is left for `pnpm check`.
 
-// Run by bare `node` (type stripping), so this module imports only builtins and `.ts` files of the tools.
+// Run by bare `node` (type stripping): imports only builtins and `.ts` files of other tools.
 
 export const CHECK_NAMES = ['lint', 'typecheck', 'depcruise'] as const;
 export type CheckName = (typeof CHECK_NAMES)[number];
