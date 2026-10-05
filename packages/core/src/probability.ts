@@ -127,7 +127,12 @@ export function eligible(
   itemLevelMin: number,
   modifierLevelMin: number,
 ): readonly ModifierWeight[] {
-  return pool.entries.filter((w) => w.itemLevelMin >= modifierLevelMin && w.itemLevelMin <= itemLevelMin);
+  return pool.entries.filter((w) => canRecipeRoll(w.itemLevelMin, modifierLevelMin) && w.itemLevelMin <= itemLevelMin);
+}
+
+/** The recipe-floor half of `eligible` (§9): whether a recipe can roll a tier at all. */
+export function canRecipeRoll(tierItemLevelMin: number, modifierLevelMin: number): boolean {
+  return tierItemLevelMin >= modifierLevelMin;
 }
 
 function totalWeight(entries: readonly ModifierWeight[]): number {
