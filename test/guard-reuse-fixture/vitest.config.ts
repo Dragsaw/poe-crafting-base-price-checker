@@ -6,15 +6,12 @@ import { BaseSequencer, type TestSpecification } from 'vitest/node';
 /** Runs the fixtures in path order, so the issuer always runs before the bystander. */
 class ByPathSequencer extends BaseSequencer {
   override sort(files: TestSpecification[]): Promise<TestSpecification[]> {
-    return Promise.resolve([...files].sort((left, right) => left.moduleId.localeCompare(right.moduleId)));
+    return Promise.resolve(files.toSorted((left, right) => left.moduleId.localeCompare(right.moduleId)));
   }
 }
 
-/**
- * The child run of `test/guard-reuse.test.ts`. One worker runs both fixtures,
- * one after the other, and is reused between them, so a timer from the first
- * file can fire between the files. It loads the **real** setup file.
- */
+// Child run of `test/guard-reuse.test.ts`: one reused worker runs both fixtures in turn, so a timer
+// from the first can fire between the files. Loads the real setup file.
 export default defineConfig({
   test: {
     root: import.meta.dirname,

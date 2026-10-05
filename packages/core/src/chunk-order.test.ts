@@ -39,7 +39,7 @@ function published(
 
 const UNRESOLVABLE: PriceState = { state: 'unresolvable' };
 
-const keysOf = (entries: readonly TrackedEntry[]): string[] => entries.map(canonicalKey);
+const keysOf = (entries: readonly TrackedEntry[]): string[] => entries.map((entry) => canonicalKey(entry));
 
 function order(input: Partial<ChunkOrderInput> & Pick<ChunkOrderInput, 'tracked'>) {
   return chunkOrder({ dataset: [], completed: [], now: NOW, ...input });
@@ -58,7 +58,7 @@ describe('chunkOrder: rows', () => {
 
     expect(keysOf(result.pinned)).toEqual(keysOf([P]));
     expect(keysOf(result.rotation)).toEqual(keysOf([A, U]));
-    expect([...result.pinned, ...result.rotation].map(canonicalKey)).not.toContain(canonicalKey(X));
+    expect([...result.pinned, ...result.rotation].map((entry) => canonicalKey(entry))).not.toContain(canonicalKey(X));
   });
 
   it('never attempted sorts before any attempted entry', () => {
@@ -255,19 +255,19 @@ describe('chunkOrder: determinism', () => {
 
 describe('pinnedToKeep', () => {
   it('keeps every pinned entry when the allowance covers them plus one rotation search', () => {
-    expect(pinnedToKeep(2, 3, true)).toBe(2);
-    expect(pinnedToKeep(2, 10, true)).toBe(2);
+    expect(pinnedToKeep(2, 3)).toBe(2);
+    expect(pinnedToKeep(2, 10)).toBe(2);
   });
 
   it('truncates to max(R − 1, 0) when R < P + 1 and the rotation is waiting', () => {
-    expect(pinnedToKeep(2, 2, true)).toBe(1);
-    expect(pinnedToKeep(2, 1, true)).toBe(0);
-    expect(pinnedToKeep(2, 0, true)).toBe(0);
+    expect(pinnedToKeep(2, 2)).toBe(1);
+    expect(pinnedToKeep(2, 1)).toBe(0);
+    expect(pinnedToKeep(2, 0)).toBe(0);
   });
 
-  it('never truncates when nothing waits in rows 2–3', () => {
-    expect(pinnedToKeep(2, 1, false)).toBe(2);
-    expect(pinnedToKeep(2, 0, false)).toBe(2);
+  it('keeps every pinned entry at the boundary R = P + 1', () => {
+    expect(pinnedToKeep(1, 2)).toBe(1);
+    expect(pinnedToKeep(0, 1)).toBe(0);
   });
 });
 

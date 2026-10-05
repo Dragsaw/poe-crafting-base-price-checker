@@ -116,8 +116,8 @@ deferred: []
   - `[low]` `[reject]` (blind 3) The rust colour matches display text — decision (b) says "take the colour from the phrase shown"; a tone field adds surface for no named divergence.
   - `[low]` `[reject]` (blind 4) No test that an honest-empty row's expansion stays rust — `CombinationRow` builds its phrase from `combinationFigure(row.state)` and never sees the honest-empty swap in `display-rows.ts`; the existing expansion test covers it.
   - `[false]` `[reject]` (blind 5) No test for rust outside honest-empty — `ranked-list.test.tsx:175-179` asserts *not valued* in `colors.rust` under the text rule.
-  - `[low]` `[reject]` (blind 6) `onlyUnresolvable` repeats the group list — no fourth unpriced group exists; a shared helper guards no demonstrated state.
-  - `[low]` `[reject]` (blind 7) The `onlyUnresolvable` boolean is unlabelled — one production call site names it in a local; cosmetic.
+  - `[low]` `[reject]` (blind 6) `isOnlyUnresolvable` repeats the group list — no fourth unpriced group exists; a shared helper guards no demonstrated state.
+  - `[low]` `[reject]` (blind 7) The `isOnlyUnresolvable` boolean is unlabelled — one production call site names it in a local; cosmetic.
   - `[low]` `[reject]` (blind 8) Spec body and Change Log not updated — the fix edits this spec.
   - `[low]` `[reject]` (blind 9) Ticked review items name no closure — the fix edits this spec; this log and the commit trace them.
   - `[low]` `[reject]` (blind 10) Two baselines — the fix edits this spec; `baseline_revision` is the original build, `baseline_commit` this fix pass.

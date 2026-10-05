@@ -11,13 +11,13 @@ import { isHonestEmpty } from './list-statement';
 
 /** A raw-only list, narrowed to Raw Base rows. */
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
-  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: null });
+  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: undefined });
   return toDisplayRows(ranking, dataset, NOW).flatMap((row) => (row.unit === 'raw' ? [row] : []));
 }
 
 describe('tierOf', () => {
   it('is 1 for ranks 1–5, 2 for 6–10 and 3 from 11 on', () => {
-    expect([1, 5, 6, 10, 11, 20, 21, 40].map(tierOf)).toEqual([1, 1, 2, 2, 3, 3, 3, 3]);
+    expect([1, 5, 6, 10, 11, 20, 21, 40].map((position) => tierOf(position))).toEqual([1, 1, 2, 2, 3, 3, 3, 3]);
   });
 });
 
@@ -55,9 +55,9 @@ describe('toDisplayRows', () => {
     const rows = rowsFor(
       [amber, belt, amulet, ring],
       [
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
         unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
-        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
         unpriced(amber, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
@@ -80,7 +80,7 @@ describe('toDisplayRows', () => {
     const rows = rowsFor(
       [lost, amulet, ring],
       [
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
         unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
         unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
       ],
@@ -104,7 +104,7 @@ describe('toDisplayRows', () => {
       [belt, amulet, ring, solar],
       [
         priced(solar, 1.25, hoursBefore(NOW, 1)),
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
         unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
@@ -124,7 +124,7 @@ describe('toDisplayRows', () => {
     const belt = rawEntry('Wide Belt');
     const dataset = [
       priced(cheap, 0.1, hoursBefore(NOW, 1)),
-      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
     ];
     const ranking = rank({
@@ -132,7 +132,7 @@ describe('toDisplayRows', () => {
       dataset,
       activeLeague: TEST_LEAGUE,
       threshold: DEFAULT_THRESHOLD,
-      weights: null,
+      weights: undefined,
     });
     expect(ranking.belowThreshold.length).toBeGreaterThan(0);
     expect(isHonestEmpty(ranking)).toBe(false);
@@ -174,7 +174,7 @@ describe('toDisplayRows', () => {
     const old = rawEntry('Jade Amulet');
     const rows = rowsFor(
       [cheap, old],
-      [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), 'Standard')],
+      [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), { league: 'Standard' })],
     );
     expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.age?.word])).toEqual([
       ['Jade Amulet', undefined, 'no figure yet', 'tried 3d ago'],
@@ -189,7 +189,7 @@ describe('toDisplayRows', () => {
         dataset: entries.map((entry, index) => priced(entry, 30 - index, hoursBefore(NOW, 1))),
         activeLeague: TEST_LEAGUE,
         threshold: 0,
-        weights: null,
+        weights: undefined,
       }),
       [],
       NOW,
@@ -200,7 +200,7 @@ describe('toDisplayRows', () => {
 
     const tiny = rawEntry('Tiny');
     const [only] = toDisplayRows(
-      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weights: null }),
+      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weights: undefined }),
       [],
       NOW,
     );
@@ -212,7 +212,7 @@ describe('the detail each row carries for its expansion', () => {
   it('carries the priced state, status, dataset entry and both exact ages on a ranked row', () => {
     const belt = { ...rawEntry('Wide Belt', 75), status: 'pinned' as const };
     const published = {
-      ...priced(belt, 0.8, hoursBefore(NOW, 11), TEST_LEAGUE, { id: 'abc', league: TEST_LEAGUE }),
+      ...priced(belt, 0.8, hoursBefore(NOW, 11), { search: { id: 'abc', league: TEST_LEAGUE } }),
       lastAttemptedAt: hoursBefore(NOW, 4),
     };
     const [row] = rowsFor([belt], [published]);
@@ -229,7 +229,7 @@ describe('the detail each row carries for its expansion', () => {
     const old = rawEntry('Jade Amulet');
     const rows = rowsFor(
       [never, tried, old],
-      [unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 3)), priced(old, 3, hoursBefore(NOW, 72), 'Standard')],
+      [unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 3)), priced(old, 3, hoursBefore(NOW, 72), { league: 'Standard' })],
     );
     expect(rows.map((row) => [row.label, row.state, row.ages])).toEqual([
       ['Coral Ring', { state: 'no-listings' }, { observed: undefined, attempted: 'tried 3h ago' }],
@@ -257,7 +257,7 @@ describe('the summands in web', () => {
     const allowed = new Set([
       './display-rows.ts: summands.map((summand) => summand.entryKey));',
       './display-rows.ts: summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),',
-      './display-rows.ts: summands.map((summand) => summand.entryKey), ...rest].flatMap(combination),',
+      './display-rows.ts: summands.map((summand) => summand.entryKey), ...rest].flatMap((entryKey) => combination(entryKey)),',
       // State 25 reads whether any summand survives (Story 3.4).
       './list-statement.ts: summands.length > 0);',
     ]);

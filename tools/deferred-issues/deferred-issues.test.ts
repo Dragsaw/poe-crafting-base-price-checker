@@ -14,9 +14,11 @@ interface Call {
 }
 
 interface FakeOptions {
-  readonly ledger?: string | null;
-  /** Each `gh issue list` call takes the next item; the last one repeats. */
-  readonly lists?: readonly (readonly IssueInfo[] | null)[];
+  readonly ledger?: string;
+  /** `git show` fails, so the ledger cannot be read. */
+  readonly gitShowFails?: boolean;
+  /** Each `gh issue list` call takes the next item, `undefined` failing it; the last repeats. */
+  readonly lists?: readonly (readonly IssueInfo[] | undefined)[];
   readonly failCreate?: (title: string) => boolean;
   readonly failLabel?: boolean;
   readonly failClose?: boolean;
@@ -31,32 +33,34 @@ function fake(options: FakeOptions = {}): { runner: Runner; calls: Call[] } {
   const lists = options.lists ?? [[]];
   let listCall = 0;
   let nextNumber = 900;
-  const runner: Runner = (command, arguments_, stdin) => {
-    calls.push({ cmd: command, args: arguments_, stdin });
-    if (command === 'git' && arguments_[0] === 'show') {
-      const ledger = options.ledger === undefined ? FIXTURE_LEDGER : options.ledger;
-      return ledger === null ? FAIL("fatal: invalid object name 'origin/master'") : OK(ledger);
-    }
-    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'list') {
+  const answers: Record<string, (arguments_: readonly string[]) => RunResult> = {
+    'git show': () =>
+      options.gitShowFails === true ? FAIL("fatal: invalid object name 'origin/master'") : OK(options.ledger ?? FIXTURE_LEDGER),
+    'gh issue list': () => {
       const list = lists[Math.min(listCall, lists.length - 1)];
       listCall += 1;
-      return list === null || list === undefined ? FAIL('HTTP 502') : OK(JSON.stringify(list));
-    }
-    if (command === 'gh' && arguments_[0] === 'label') {
-      return options.failLabel === true ? FAIL('HTTP 403') : OK();
-    }
-    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'create') {
+      return list === undefined ? FAIL('HTTP 502') : OK(JSON.stringify(list));
+    },
+    'gh label': () => (options.failLabel === true ? FAIL('HTTP 403') : OK()),
+    'gh issue create': (arguments_) => {
       const title = arguments_[arguments_.indexOf('--title') + 1] ?? '';
       if (options.failCreate?.(title) === true) {
         return FAIL('HTTP 422: Validation Failed');
       }
       nextNumber += 1;
-      return OK(`https://github.com/o/r/issues/${nextNumber}\n`);
+      return OK(`https://github.com/o/r/issues/${nextNumber}
+`);
+    },
+    'gh issue close': () => (options.failClose === true ? FAIL('HTTP 500') : OK()),
+  };
+  const runner: Runner = (command, arguments_, stdin) => {
+    calls.push({ cmd: command, args: arguments_, stdin });
+    const key = command === 'gh' && arguments_[0] === 'issue' ? `gh issue ${arguments_[1]}` : `${command} ${arguments_[0]}`;
+    const answer = answers[key];
+    if (answer === undefined) {
+      throw new Error(`unexpected call: ${command} ${arguments_.join(' ')}`);
     }
-    if (command === 'gh' && arguments_[0] === 'issue' && arguments_[1] === 'close') {
-      return options.failClose === true ? FAIL('HTTP 500') : OK();
-    }
-    throw new Error(`unexpected call: ${command} ${arguments_.join(' ')}`);
+    return answer(arguments_);
   };
   return { runner, calls };
 }
@@ -150,7 +154,7 @@ describe('pnpm deferred:issues', () => {
   });
 
   it('Race on create: a failed re-list after the creates exits 1, after the creates and with no close', () => {
-    const { code, calls } = exec([], { lists: [[], null] });
+    const { code, calls } = exec([], { lists: [[], undefined] });
     expect(code).toBe(1);
     expect(calls.filter((call) => call.args[0] === 'issue' && call.args[1] === 'create')).toHaveLength(ENTRIES.length);
     expect(calls.filter((call) => call.args[1] === 'close')).toEqual([]);
@@ -182,6 +186,7 @@ describe('pnpm deferred:issues', () => {
   });
 
   it('No marker: reports the issue and writes nothing', () => {
+    // eslint-disable-next-line unicorn/no-null -- boundary: `gh issue list --json body` yields null for an issue with an empty body.
     const { code, calls, out } = exec([], { lists: [[...ALL_OPEN, { number: 2, state: 'OPEN', body: null }]] });
     expect(code).toBe(0);
     expect(writes(calls)).toEqual([]);
@@ -200,7 +205,7 @@ describe('pnpm deferred:issues', () => {
 
   describe('Cannot read: no write, exit 1', () => {
     it('when git show fails', () => {
-      const { code, calls, err } = exec([], { ledger: null });
+      const { code, calls, err } = exec([], { gitShowFails: true });
       expect(code).toBe(1);
       expect(calls).toHaveLength(1);
       expect(err).toContain('git show origin/master:docs/stories/deferred-work.md failed');
@@ -214,7 +219,7 @@ describe('pnpm deferred:issues', () => {
     });
 
     it('when the issue list fails', () => {
-      const { code, calls } = exec([], { lists: [null] });
+      const { code, calls } = exec([], { lists: [undefined] });
       expect(code).toBe(1);
       expect(writes(calls)).toEqual([]);
     });
@@ -256,6 +261,13 @@ describe('pnpm deferred:issues', () => {
     expect(err).toContain('--ref is allowed only with --dry-run');
   });
 
+  it('refuses --list with --dry-run, before any call', () => {
+    const { code, calls, err } = exec(['--list', '--dry-run']);
+    expect(code).toBe(1);
+    expect(calls).toEqual([]);
+    expect(err).toContain('--list and --dry-run do not combine');
+  });
+
   it('refuses an unknown argument', () => {
     const { code, calls } = exec(['--force']);
     expect(code).toBe(1);
@@ -281,7 +293,8 @@ describe('pnpm deferred:issues', () => {
     expect(writes(calls)).toEqual([]);
     const listed = JSON.parse(out) as { id: string; retryWhen: string | null; issue: number | null; summary: string }[];
     expect(listed.map((each) => each.id)).toEqual(ENTRIES.map((entry) => entry.id));
-    expect(listed[0]).toMatchObject({ sourceSpec: ENTRIES[0]?.sourceSpec, summary: ENTRIES[0]?.summary, evidence: ENTRIES[0]?.evidence, retryWhen: null, issue: 5 });
+    expect(listed[0]).toMatchObject({ sourceSpec: ENTRIES[0]?.sourceSpec, summary: ENTRIES[0]?.summary, evidence: ENTRIES[0]?.evidence, issue: 5 });
+    expect(listed[0]?.retryWhen).toBeNull();
     expect(listed[1]?.issue).toBeNull();
     expect(listed[2]).toMatchObject({ retryWhen: 'A git remote is configured and `deploy.yml` has run once.', issue: 4 });
   });

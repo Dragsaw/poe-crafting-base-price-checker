@@ -6,10 +6,7 @@ import { plural } from '../shared/text';
 import { exactAge, HOUR_MS } from '../shared/time';
 import { glyphs } from '../theme/tokens';
 
-/**
- * Pure view helpers for the ranked list. `web` computes no ranking term (AD-4):
- * everything here turns a value `core` or the dataset already holds into text.
- */
+// `web` computes no ranking term (AD-4): every helper here turns a held value into text.
 
 /** The freshness cut-off, in hours (AD-10, FR-12). A younger row shows no age. */
 export const FRESHNESS_CUTOFF_HOURS = 48;
@@ -30,15 +27,8 @@ export type AgeMark =
 
 export const NEVER_ATTEMPTED = 'never attempted';
 
-/**
- * The Age cell (FR-12, AD-9, AD-10). The clock follows the row's resolved
- * Price State, not the stored one: `observedAt` only where the row prints
- * `priced`, and `lastAttemptedAt` otherwise. A league-mismatched observation
- * resolves to `not-yet-synced`, so it reads `lastAttemptedAt`, the same clock
- * as the expansion's `tried …` age. Neither clock: *never attempted*.
- * Younger than the cut-off: no mark at all. At or past it: `priced Nd ago` /
- * `tried Nd ago`, N = floor(hours / 24).
- */
+// The Age cell (FR-12, AD-9, AD-10). The clock follows the resolved Price State, not the stored
+// one: a league-mismatched observation resolves to `not-yet-synced`, so it reads `lastAttemptedAt`.
 export function ageMark(
   state: CombinationState,
   lastAttemptedAt: string | undefined,
@@ -57,11 +47,7 @@ export function ageMark(
   return undefined;
 }
 
-/**
- * An Item Class's printed label: each underscore becomes a space and nothing
- * else changes (AD-5). The stored `className` stays the identity; only the
- * label is trimmed.
- */
+/** Only the label changes; the stored `className` stays the identity (AD-5). */
 export function unitLabel(className: string): string {
   return className.replaceAll('_', ' ');
 }
@@ -73,12 +59,7 @@ export function rawNote(itemLevelMin: number): string {
 
 // --- the expansion panel ---------------------------------------------------
 
-/**
- * The Price State a combination row prints: the row's own state as `core`
- * resolved it, not the stored one. A league-mismatched observation is stored
- * `priced` and prints `not-yet-synced · league-mismatch` (FR-31); an entry the
- * dataset does not hold prints `not-yet-synced · never-synced`.
- */
+/** `core`'s resolved state, not the stored one: a league mismatch is `not-yet-synced` (FR-31). */
 export type CombinationState =
   | { readonly state: 'priced'; readonly priceDivine: number; readonly sampleSize: number; readonly observedAt: string }
   | { readonly state: 'no-listings' }
@@ -98,11 +79,7 @@ export function stateWord(state: CombinationState): string {
   return state.state === 'not-yet-synced' ? `${state.state} · ${state.reason}` : state.state;
 }
 
-/**
- * Line two's notes, from EXPERIENCE.md states 2, 4, 5, 6 and 7 verbatim. State
- * 4's note names no id kind, so one wording serves every `unresolvable` row, a
- * Raw Base or a Combination (EXPERIENCE.md revision 9).
- */
+// Verbatim from EXPERIENCE.md states 2, 4, 5, 6 and 7. State 4 names no id kind: one wording.
 export const STATE_NOTES = {
   'no-listings': 'nobody is listing this right now — a jackpot and junk look alike here',
   unresolvable: 'its id is gone from the trade API — a patch did this',
@@ -140,16 +117,11 @@ export function rawCombinationNote(state: CombinationState, itemLevelMin: number
 /** State 20: a priced entry below the threshold. Shown, never hidden, never greyed (EXPERIENCE.md). */
 export const BELOW_THRESHOLD_NOTE = 'below the threshold — adds nothing to EV';
 
-/**
- * Line two's note for a crafted entry. A summand's note is empty. A priced
- * entry that is not a summand is below the threshold (state 20), because
- * `core` sums every entry priced in the active league at or above it. Every
- * other state takes its own state note, as a Raw Base's does.
- */
-export function craftedCombinationNote(state: CombinationState, summand: boolean): string {
+// A priced non-summand is below the threshold (state 20): `core` sums every entry at or above it.
+export function craftedCombinationNote(state: CombinationState, isSummand: boolean): string {
   switch (state.state) {
     case 'priced': {
-      return summand ? '' : BELOW_THRESHOLD_NOTE;
+      return isSummand ? '' : BELOW_THRESHOLD_NOTE;
     }
     case 'no-listings': {
       return STATE_NOTES['no-listings'];
@@ -163,13 +135,7 @@ export function craftedCombinationNote(state: CombinationState, summand: boolean
   }
 }
 
-/**
- * The Price State a crafted entry's combination row prints, resolved as
- * `core` resolves a Raw Base's: no dataset entry is `not-yet-synced ·
- * never-synced`, and an observation from another league is `not-yet-synced ·
- * league-mismatch` (AD-9, AD-19, FR-31). Every other stored state prints as
- * stored. No threshold is read here.
- */
+// Resolved as `core` resolves a Raw Base's (AD-9, AD-19, FR-31). No threshold is read here.
 export function resolvedState(entry: DatasetEntry | undefined, activeLeague: string): CombinationState {
   if (entry === undefined) {
     return { state: 'not-yet-synced', reason: 'never-synced' };
@@ -226,12 +192,7 @@ export function sampleText(state: CombinationState): string {
   }
 }
 
-/**
- * Line two's two labelled ages. `priced …` reads `observedAt` and shows only
- * on a row whose printed state is `priced`; `tried …` reads `lastAttemptedAt`.
- * A missing clock leaves its cell empty, and a never-synced entry leaves both
- * empty — the one row with no age at all (state 5).
- */
+// `priced …` shows only on a printed state of `priced`; a never-synced entry has none (state 5).
 export interface CombinationAges {
   readonly observed: string | undefined;
   readonly attempted: string | undefined;
@@ -257,10 +218,7 @@ export const PANEL_ASKING_SENTENCE = 'Every price here is a current asking price
 /** The Raw Base panel's Craft Recipe sentence (mockup `key-expanded-states.html`, the Raw Base panel). */
 export const RAW_NO_RECIPE_SENTENCE = 'No Craft Recipe applies — a Raw Base is sold, not crafted, so it carries no Craft Cost.';
 
-/**
- * A Raw Base panel's context sub-line (mockup `key-expanded-states.html`, the
- * Raw Base panel), with its Craft Recipe sentence after the threshold.
- */
+/** Mockup `key-expanded-states.html`, the Raw Base panel. */
 export function rawPanelSubLine(itemLevelMin: number, threshold: number): string {
   return [
     `Uncrafted at Item Level ${String(itemLevelMin)}, valued at its own current asking price and not at a craft outcome.`,
@@ -271,14 +229,8 @@ export function rawPanelSubLine(itemLevelMin: number, threshold: number): string
   ].join(' ');
 }
 
-/**
- * A crafted Item Class panel's context sub-line: the two things its figures
- * depend on, the threshold and the active Craft Recipe, then the asking-price
- * framing (EXPERIENCE.md `{components.expansion-panel}`; mockup
- * `key-expanded-states.html`, the Rings panel, whose lead sentence about the
- * Combinations listed waits for Story 3.5's rows). Provisional: the crafted
- * sub-line has no verbatim owner.
- */
+// EXPERIENCE.md `{components.expansion-panel}`; mockup `key-expanded-states.html`, the Rings panel.
+// Provisional: the crafted sub-line has no verbatim owner.
 export function classPanelSubLine(threshold: number, recipeWord: string): string {
   return `Payout Threshold ${formatThreshold(threshold)} ${DENOMINATION} | Craft Recipe ${recipeWord}. ${PANEL_ASKING_SENTENCE}`;
 }

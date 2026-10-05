@@ -1,10 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
-/**
- * `vitest.workspace.ts` does not exist in Vitest 5 — projects are declared here.
- * `packages/*` picks up each package's own config; the inline project carries
- * the workspace-level guards, which belong to no package.
- */
+// Vitest 5 has no `vitest.workspace.ts`: projects are declared here. The inline
+// project carries the workspace-level guards, which belong to no package.
 export default defineConfig({
   test: {
     projects: [
@@ -31,6 +28,7 @@ export default defineConfig({
             'tools/deferred-issues/*.test.ts',
             'tools/dev-stop/*.test.ts',
             'tools/dts-specifiers/*.test.ts',
+            'tools/entry-guard/*.test.ts',
             'tools/eslint-rules/*.test.ts',
             'tools/lint-on-edit/*.test.ts',
             '.claude/skills/tracked-json/scripts/*.test.ts',

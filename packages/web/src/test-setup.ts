@@ -1,7 +1,4 @@
-/**
- * jsdom shims the Mantine + React 19 mount test needs. Runs after the shared
- * MSW setup, which the root Vitest project and every package project share.
- */
+/** jsdom shims for the Mantine + React 19 mount test; runs after the shared MSW setup. */
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean;
@@ -16,6 +13,7 @@ Object.defineProperty(globalThis, 'matchMedia', {
     ({
       matches: false,
       media: query,
+      // eslint-disable-next-line unicorn/no-null -- boundary: `MediaQueryList.onchange` is typed `... | null`; `undefined` and an `as` cast both fail the compiler/lint.
       onchange: null,
       addListener: () => {},
       removeListener: () => {},

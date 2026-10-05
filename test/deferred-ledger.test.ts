@@ -1,17 +1,13 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import nodePath from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 import { parseLedger } from '../tools/deferred-issues/ledger.ts';
 
-/**
- * The committed ledger stays parseable by `pnpm deferred:issues`. A parallel
- * branch that appends an entry another branch also appended gives a duplicate
- * id, and an old-style sweep marker brings run state back into the ledger;
- * either fails `pnpm test`. Run state lives in the GitHub issues.
- */
-const LEDGER = readFileSync(resolve(import.meta.dirname, '..', 'docs/stories/deferred-work.md'), 'utf8');
+// A duplicate id from parallel branches, or an old sweep marker that puts run state back in the
+// ledger (it lives in the GitHub issues), must fail here so `pnpm deferred:issues` keeps parsing.
+const LEDGER = readFileSync(nodePath.resolve(import.meta.dirname, '..', 'docs/stories/deferred-work.md'), 'utf8');
 
 describe('docs/stories/deferred-work.md', () => {
   const entries = parseLedger(LEDGER);

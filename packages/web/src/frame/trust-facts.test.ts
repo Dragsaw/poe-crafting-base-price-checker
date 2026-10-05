@@ -55,7 +55,7 @@ describe('line one', () => {
   });
 
   it('leaves all three unknown when weights.json is absent', () => {
-    expect(weightsFacts(null).map((fact) => fact.value)).toEqual([undefined, undefined, undefined]);
+    expect(weightsFacts(undefined).map((fact) => fact.value)).toEqual([undefined, undefined, undefined]);
   });
 
   it('prints dates in UTC, never local time', () => {
@@ -79,7 +79,7 @@ describe('line two', () => {
     const figures = { ...BASE_REPORT.figures };
     delete figures.trackedListEditedAt;
     expect(trackedListEdit({ ...BASE_REPORT, figures })).toBeUndefined();
-    expect(trackedListEdit(null)).toBeUndefined();
+    expect(trackedListEdit(undefined)).toBeUndefined();
   });
 
   it('reads Last synced from runFinishedAt, else runStartedAt, and unknown with no report', () => {
@@ -89,7 +89,7 @@ describe('line two', () => {
     const started = report({ runStartedAt: '2026-09-26T10:00:00Z' });
     delete started.runFinishedAt;
     expect(lastSynced(started, NOW)).toBe('2 hours ago');
-    expect(lastSynced(null, NOW)).toBeUndefined();
+    expect(lastSynced(undefined, NOW)).toBeUndefined();
   });
 });
 
@@ -99,7 +99,7 @@ describe('the health line', () => {
 
   it('raises nothing on a healthy run or an absent report', () => {
     expect(healthSignals(report(), CURATION)).toEqual([]);
-    expect(healthSignals(null, CURATION)).toEqual([]);
+    expect(healthSignals(undefined, CURATION)).toEqual([]);
   });
 
   it('counts unresolvable records', () => {
@@ -169,15 +169,15 @@ describe('the panel copy', () => {
       { requestsBySource: { 'tracked-list': 10, 'league-validation': 1, 'session-probe': 0 }, notReachedCount: 0, coverage: 0.862, rankableClassCount: 29 },
     );
     const [run, broken, cover] = panelColumns(full, true);
-    expect(run.map(groupText)).toEqual([
+    expect(run.map((group) => groupText(group))).toEqual([
       '10 tracked list · 1 league validation request this pass.',
       '0 tracked entries were not reached in the last sync pass.',
     ]);
-    expect(broken.map(groupText)).toEqual([
+    expect(broken.map((group) => groupText(group))).toEqual([
       '12 entries are unresolvable.',
       '1 pinned-starvation record.\n2 of 5 pinned entries refreshed',
     ]);
-    expect(cover.map(groupText)).toEqual(['86% of 29 tracked Item Classes.']);
+    expect(cover.map((group) => groupText(group))).toEqual(['86% of 29 tracked Item Classes.']);
   });
 
   // Matrix: one not reached, one unresolvable, one starvation record; zero and many unchanged.
@@ -185,8 +185,8 @@ describe('the panel copy', () => {
     const first = (group: FigureGroup): string => groupText(group).split('\n', 1)[0] ?? '';
 
     const [oneRun, oneBroken] = panelColumns(report({ records: [...unresolvable(1), starvation] }, { notReachedCount: 1 }), true);
-    expect(oneRun.map(first)[1]).toBe('1 tracked entry was not reached in the last sync pass.');
-    expect(oneBroken.map(first)).toEqual(['1 entry is unresolvable.', '1 pinned-starvation record.']);
+    expect(oneRun.map((group) => first(group))[1]).toBe('1 tracked entry was not reached in the last sync pass.');
+    expect(oneBroken.map((group) => first(group))).toEqual(['1 entry is unresolvable.', '1 pinned-starvation record.']);
 
     const [manyRun, manyBroken] = panelColumns(
       report(
@@ -195,9 +195,9 @@ describe('the panel copy', () => {
       ),
       true,
     );
-    expect(manyRun.map(first)[0]).toBe('10 tracked list · 2 league validation requests this pass.');
-    expect(manyRun.map(first)[1]).toBe('3 tracked entries were not reached in the last sync pass.');
-    expect(manyBroken.map(first)).toEqual(['3 entries are unresolvable.', '2 pinned-starvation records.']);
+    expect(manyRun.map((group) => first(group))[0]).toBe('10 tracked list · 2 league validation requests this pass.');
+    expect(manyRun.map((group) => first(group))[1]).toBe('3 tracked entries were not reached in the last sync pass.');
+    expect(manyBroken.map((group) => first(group))).toEqual(['3 entries are unresolvable.', '2 pinned-starvation records.']);
 
     const onePinned = { ...starvation, pinnedCount: 1, pinnedRefreshed: 1 };
     const [, pinnedBroken, oneCover] = panelColumns(
@@ -205,21 +205,21 @@ describe('the panel copy', () => {
       true,
     );
     expect(groupText(pinnedBroken[1] ?? [])).toBe('1 pinned-starvation record.\n1 of 1 pinned entry refreshed');
-    expect(oneCover.map(groupText)).toEqual(['100% of 1 tracked Item Class.']);
+    expect(oneCover.map((group) => groupText(group))).toEqual(['100% of 1 tracked Item Class.']);
     const unknownCover = panelColumns(report({}, { coverage: 0.5 }), true)[2];
-    expect(unknownCover.map(groupText)).toEqual(['50% of unknown tracked Item Classes.']);
+    expect(unknownCover.map((group) => groupText(group))).toEqual(['50% of unknown tracked Item Classes.']);
 
     const [zeroRun] = panelColumns(
       report({}, { notReachedCount: 0, requestsBySource: { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 } }),
       true,
     );
-    expect(zeroRun.map(first)[0]).toBe('0 tracked list · 0 league validation requests this pass.');
-    expect(zeroRun.map(first)[1]).toBe('0 tracked entries were not reached in the last sync pass.');
+    expect(zeroRun.map((group) => first(group))[0]).toBe('0 tracked list · 0 league validation requests this pass.');
+    expect(zeroRun.map((group) => first(group))[1]).toBe('0 tracked entries were not reached in the last sync pass.');
   });
 
   it('prints zero unresolvable and zero pinned-starvation records on a healthy run', () => {
     const [, broken] = panelColumns(report(), true);
-    expect(broken.map(groupText)).toEqual(['0 entries are unresolvable.', '0 pinned-starvation records.']);
+    expect(broken.map((group) => groupText(group))).toEqual(['0 entries are unresolvable.', '0 pinned-starvation records.']);
   });
 
   it('never says Chunk', () => {
@@ -241,7 +241,7 @@ describe('the panel copy', () => {
     [0.01, '1%'],
   ])('prints coverage %s as %s', (coverage, percent) => {
     const cover = panelColumns(report({}, { coverage, rankableClassCount: 29 }), true)[2];
-    expect(cover.map(groupText)).toEqual([`${percent} of 29 tracked Item Classes.`]);
+    expect(cover.map((group) => groupText(group))).toEqual([`${percent} of 29 tracked Item Classes.`]);
   });
 
   it('reads omitted coverage as not measured with weights loaded, unknown without, never 0', () => {
@@ -252,7 +252,7 @@ describe('the panel copy', () => {
   });
 
   it('reads every group unknown when sync-report.json is absent', () => {
-    const columns = panelColumns(null, true);
+    const columns = panelColumns(undefined, true);
     expect(columns.map((groups) => groups.length)).toEqual([2, 2, 1]);
     for (const groups of columns) {
       for (const group of groups) {
@@ -263,7 +263,7 @@ describe('the panel copy', () => {
 
   it('does not repeat the Tracked List edit date', () => {
     const edited = report({}, { trackedListEditedAt: { source: 'git-author-date', at: '2026-08-01T10:00:00Z' } });
-    const all = panelColumns(edited, true).flatMap((groups) => groups.map(groupText)).join(' ');
+    const all = panelColumns(edited, true).flatMap((groups) => groups.map((group) => groupText(group))).join(' ');
     expect(all).not.toContain('2026-08-01');
   });
 });
@@ -285,7 +285,7 @@ describe('the cross-file diagnosis group', () => {
   });
 
   it('shows beside an absent report too, since web ran the checks itself', () => {
-    const [, broken] = panelColumns(null, true, [failure]);
+    const [, broken] = panelColumns(undefined, true, [failure]);
     expect(broken).toHaveLength(3);
   });
 
@@ -294,7 +294,7 @@ describe('the cross-file diagnosis group', () => {
   });
 
   it('reads one unknown line when no weights envelope loaded, since the checks did not run', () => {
-    for (const published of [report(), null]) {
+    for (const published of [report(), undefined]) {
       const [, broken] = panelColumns(published, false, []);
       expect(broken).toHaveLength(3);
       expect(broken[2]).toEqual([[{ kind: 'missing', text: UNKNOWN }]]);

@@ -17,7 +17,7 @@ context:
 
 **Problem:** Spine rev 21 ruled three epic 1 retro items that the code does not yet implement. (4) `carryRecords` dedups on deep equality, so a record that carries a live measurement grows the report by one record per tick (L-A2). (8) The client drops `Retry-After` when the process exits, and no shell passes `invalidRequestThreshold`, so a short-cadence invoker spends a request inside every penalty window (R-8, L-A7). (9) `requestsBySource['catalogue-refresh']` is always 0 in every chunk report (R-2).
 
-**Approach:** Contracts first, then sync. (4) Implement IN §12: one `sameRecord` function in contracts, and a `carryRecords` that replaces a matched record in place. (8) Implement IN §5.3: an optional `notBefore` in sync-progress.json, written by a chunk that ends on a 429 or a malformed abort and checked right after the lock. Carry `retryAfterMs` through the leg, step and gate results, and give every shell a sync-side threshold constant of 1. (9) Implement AD-12 rev 21: the report figure keys only the two chunk sources, its reader drops the legacy key, and the refresh command prints its request count.
+**Approach:** Contracts first, then sync. (4) Implement IN §12: one `isSameRecord` function in contracts, and a `carryRecords` that replaces a matched record in place. (8) Implement IN §5.3: an optional `notBefore` in sync-progress.json, written by a chunk that ends on a 429 or a malformed abort and checked right after the lock. Carry `retryAfterMs` through the leg, step and gate results, and give every shell a sync-side threshold constant of 1. (9) Implement AD-12 rev 21: the report figure keys only the two chunk sources, its reader drops the legacy key, and the refresh command prints its request count.
 
 **Decisions (from the user):** The three items ship together in one spec, committed on `master`. The spec stays whole even though it runs over the token guideline. sync:dry gets no `notBefore` handling here. Item 14 owns ignoring and printing it. `DryRunSnapshot` carries no progress file, so until item 14 ships a dry run never reads `notBefore` and never defers.
 
@@ -25,7 +25,7 @@ context:
 
 **Always:**
 - Contracts changes land before the sync changes. Every schema stays strict.
-- `sameRecord` declares a subject list for every record kind. A new kind that declares no subject list fails type-checking.
+- `isSameRecord` declares a subject list for every record kind. A new kind that declares no subject list fails type-checking.
 - `notBefore` = now + min(retryAfterMs, STALE_LOCK_AFTER_MS) after a 429, and = now + STALE_LOCK_AFTER_MS after a malformed abort. Every other ending that writes progress clears the field.
 - The `notBefore` check runs after the lock is taken, or a stale lock is broken, and before every other load. A deferred run releases the lock, sends nothing, writes nothing and exits 0. There is one exception: a run that broke a stale lock writes sync-report.json alone, carrying the `stale-lock-broken` record.
 - `RequestSourceSchema` keeps its three declared sources (AD-12). Only the report figure narrows to `tracked-list` and `league-validation`.
@@ -74,10 +74,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] `packages/contracts/src/sync-run-report.ts` -- Add `RECORD_SUBJECTS`, a map from each kind to its subject keys, typed exhaustively over `SyncRunRecord['kind']`, and `sameRecord(a,b)`. Add `ChunkRequestSourceSchema` (the two chunk sources). Key `RequestsBySourceSchema` on it, and use a `z.preprocess` that deletes only the legacy `catalogue-refresh` key. Add `SYNC_REPORT_SCHEMA_VERSION = '1.1.0'`.
+- [x] `packages/contracts/src/sync-run-report.ts` -- Add `RECORD_SUBJECTS`, a map from each kind to its subject keys, typed exhaustively over `SyncRunRecord['kind']`, and `isSameRecord(a,b)`. Add `ChunkRequestSourceSchema` (the two chunk sources). Key `RequestsBySourceSchema` on it, and use a `z.preprocess` that deletes only the legacy `catalogue-refresh` key. Add `SYNC_REPORT_SCHEMA_VERSION = '1.1.0'`.
 - [x] `packages/contracts/src/sync-progress.ts` -- Add optional `notBefore` (the ISO instant primitive) and `SYNC_PROGRESS_SCHEMA_VERSION = '1.1.0'`. Export the new symbols from `index.ts`.
-- [x] contracts tests -- `sameRecord` per kind: an observation-only change, a subject change, an absent optional subject on both sides. The legacy key is dropped and any other unknown key is refused. `notBefore` is accepted when present and optional.
-- [x] `packages/sync/src/chunk/sync-report.ts` -- `carryRecords`: when a record is `sameRecord` with an earlier one, replace the first match at its index, else append. Remove `isDeepStrictEqual`. Project the figure onto the chunk sources. Stamp `SYNC_REPORT_SCHEMA_VERSION`.
+- [x] contracts tests -- `isSameRecord` per kind: an observation-only change, a subject change, an absent optional subject on both sides. The legacy key is dropped and any other unknown key is refused. `notBefore` is accepted when present and optional.
+- [x] `packages/sync/src/chunk/sync-report.ts` -- `carryRecords`: when a record is `isSameRecord` with an earlier one, replace the first match at its index, else append. Remove `isDeepStrictEqual`. Project the figure onto the chunk sources. Stamp `SYNC_REPORT_SCHEMA_VERSION`.
 - [x] `packages/sync/src/trade/invalid-requests.ts` -- Export `INVALID_REQUEST_THRESHOLD = 1`. Pass it in all four shells.
 - [x] `price-entry.ts`, `league-gate.ts`, `run-chunk.ts` -- Yield results carry `retryAfterMs?`, set only when the client yield reason is `retry-after-header` or `derived-penalty`. `runChunk`: read progress right after the lock and defer when now < `notBefore`, using the new `deferred` outcome kind. Write or clear `notBefore` in `publish()`. On a gate 429, write progress with `completed` unchanged plus `notBefore`. Stamp `SYNC_PROGRESS_SCHEMA_VERSION`. The shells print the deferred outcome and exit 0.
 - [x] `packages/sync/src/catalogue-refresh.ts` -- Count through `createRequestCounter` and return `requests` on both outcome arms. `main` prints `requests: N`.
@@ -122,7 +122,7 @@ context:
   - `[low]` `[reject]` (blind) `buildSyncReport` silently drops a `catalogue-refresh` count — no chunk port is ever counted as `catalogue-refresh`; retyping the input would ripple through the three-source counter the spec keeps.
   - `[low]` `[patch]` (blind) Contracts `RequestsBySource` collides by name with sync's type of the same name — patched: the unused type was removed from the contracts barrel.
   - `[low]` `[reject]` (blind) `RECORD_SUBJECTS` does not restrict keys to scalar fields — no current kind lists a non-scalar subject, and the fix adds type-level complexity.
-  - `[low]` `[patch]` (blind) The `sameRecord` subject-change cases do not vary each subject key — patched: one generated case per key in `RECORD_SUBJECTS`, plus a separate kind-mismatch test.
+  - `[low]` `[patch]` (blind) The `isSameRecord` subject-change cases do not vary each subject key — patched: one generated case per key in `RECORD_SUBJECTS`, plus a separate kind-mismatch test.
   - `[low]` `[patch]` (blind) The new fault paths are untested — grouped with the verification-gap and intent rows; same patches (the unreadable-report deferral is the existing loud failure of NFR-8).
   - `[low]` `[patch]` (blind) The report version comment overstates compatibility — grouped with the edge row; same patch.
   - `[false]` `[reject]` (blind) `sprint-status.yaml` says `done` before the spec closes — the spec and the code are committed together at finalization, with `status: done`.
@@ -146,16 +146,16 @@ The legacy key is dropped in contracts rather than in sync, so that web, the fut
 Status: done
 
 **Summary.** The run implemented epic 1 retro items 4, 8 and 9.
-- Item 4: record identity by subject fields. `sameRecord` and `RECORD_SUBJECTS` are in contracts. `carryRecords` replaces a matched record at its index.
+- Item 4: record identity by subject fields. `isSameRecord` and `RECORD_SUBJECTS` are in contracts. `carryRecords` replaces a matched record at its index.
 - Item 8: AD-8 penalty memory. `notBefore` in progress is written after a 429 or a malformed abort and checked right after the lock. A `deferred` outcome exists. `retryAfterMs` is carried through the leg, step and gate results. `INVALID_REQUEST_THRESHOLD = 1` is passed in all four shells.
 - Item 9: the report figure is keyed on the two chunk sources. The legacy `catalogue-refresh` key is dropped by the contracts reader. `catalogue:refresh` counts its requests and prints them.
 - Both report and progress are stamped 1.1.0.
 
 **Files changed.**
-- `packages/contracts/src/sync-run-report.ts`: adds `ChunkRequestSourceSchema`, the tolerant `RequestsBySourceSchema`, `RECORD_SUBJECTS`, `sameRecord` and `SYNC_REPORT_SCHEMA_VERSION`.
+- `packages/contracts/src/sync-run-report.ts`: adds `ChunkRequestSourceSchema`, the tolerant `RequestsBySourceSchema`, `RECORD_SUBJECTS`, `isSameRecord` and `SYNC_REPORT_SCHEMA_VERSION`.
 - `packages/contracts/src/sync-progress.ts`: adds the optional `notBefore` and `SYNC_PROGRESS_SCHEMA_VERSION`.
 - `packages/contracts/src/index.ts`: exports the new symbols.
-- `packages/contracts/src/{sync-run-report,sync-progress,envelopes,index}.test.ts`: cover `sameRecord` per subject key, the legacy drop, `notBefore` and the barrel.
+- `packages/contracts/src/{sync-run-report,sync-progress,envelopes,index}.test.ts`: cover `isSameRecord` per subject key, the legacy drop, `notBefore` and the barrel.
 - `packages/sync/src/chunk/sync-report.ts`: `carryRecords` replaces in place, and the figure is projected onto the chunk sources.
 - `packages/sync/src/chunk/run-chunk.ts`: reads progress right after the lock, adds the `deferred` outcome, writes or clears `notBefore`, and writes progress on a gate 429.
 - `packages/sync/src/trade/client.ts`: adds `penaltyRetryAfterMs`.

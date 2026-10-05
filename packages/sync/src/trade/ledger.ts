@@ -1,32 +1,12 @@
-/**
- * The per-policy bucket ledger and the tightest-unsatisfied delay computation
- * (AD-8, `IMPLEMENTATION-NOTES.md` §5.3).
- *
- * **Pure.** No clock, no `wait`, no `Date.now()`. Every function here takes the
- * parsed headers and an instant and returns a number, which is what lets a
- * backoff test assert a duration without spending it (NFR-3).
- *
- * The ledger is keyed on the **`X-Rate-Limit-Policy` value the response carried**
- * and never on an operation. The client cannot be told "this is a search"
- * without a caller that knows what a search is, and the header names the bucket
- * in the response itself — so the split between the search bucket and the fetch
- * bucket arrives for free, and survives GGG adding a third policy.
- *
- * The ledger is in memory and per governor (`./client.ts`). The `pnpm sync`
- * session shares one ledger across its chunks through a `PacingState`; nothing
- * here persists across processes.
- */
+// Per-policy bucket ledger (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// Pure: no clock, so a backoff test asserts a duration without spending it (NFR-3).
+// Keyed on the `X-Rate-Limit-Policy` the response carried, never on an operation.
 
 import type { RateLimitBucket, RateLimitHeaders, RateLimitRule } from './rate-limit-headers.ts';
 
 const MS_PER_SECOND = 1000;
 
-/**
- * One rule as last read, carrying **its own** instant. A rule the newest
- * response could not read is kept from the response that could, and its
- * consumption has to age from when *it* was seen, not from when the newer
- * response arrived.
- */
+/** Carries its own instant: a rule kept from an older response must age from when it was seen. */
 interface ObservedRule extends RateLimitRule {
   readonly observedAt: string;
 }
@@ -44,11 +24,7 @@ export type RateLimitLedger = Readonly<Record<string, PolicyObservation>>;
 
 export const EMPTY_LEDGER: RateLimitLedger = {};
 
-/**
- * Why a bucket is unsatisfied — a serving penalty, or a saturated window — or,
- * from `spreadBeforeNext` only, why a satisfied bucket still asks for a gap:
- * its remaining capacity spread evenly over its period.
- */
+/** `spread` only comes from `spreadBeforeNext`: a satisfied bucket still asking for an even gap. */
 type PaceCause = 'penalty' | 'window' | 'spread';
 
 export interface PaceDecision {
@@ -69,18 +45,8 @@ const CLEAR: PaceDecision = {
   cause: undefined,
 };
 
-/**
- * Folds one response's headers into the ledger, returning a new ledger.
- *
- * The merge is **per rule name**, not per policy. A later response whose rule
- * was malformed or absent must not drop what an earlier response said about
- * that rule: replacing the whole entry would discard a saturated bucket and
- * silently widen the allowance, which is the one direction a pacer must never
- * fail in. A rule the new response *could* read replaces its older self.
- *
- * A response carrying no policy, or no readable rule at all, leaves the ledger
- * untouched for the same reason.
- */
+// Merges per rule name: dropping a rule the new response could not read would widen the allowance.
+// A response with no policy or no readable rule leaves the ledger untouched.
 export function recordObservation(
   ledger: RateLimitLedger,
   parsed: RateLimitHeaders,
@@ -91,7 +57,8 @@ export function recordObservation(
   }
 
   const merged = new Map<string, ObservedRule>();
-  for (const rule of ledger[parsed.policy]?.rules ?? []) {
+  const existing = ledger[parsed.policy]?.rules ?? [];
+  for (const rule of existing) {
     merged.set(rule.name.toLowerCase(), rule);
   }
   for (const rule of parsed.rules) {
@@ -100,7 +67,7 @@ export function recordObservation(
 
   return {
     ...ledger,
-    [parsed.policy]: { policy: parsed.policy, observedAt, rules: [...merged.values()] },
+    [parsed.policy]: { policy: parsed.policy, observedAt, rules: merged.values().toArray() },
   };
 }
 
@@ -115,18 +82,36 @@ function elapsedMsSince(observedAt: string, now: string): number {
   return Math.max(0, to - from);
 }
 
-/**
- * The delay before the next request against `policy`, taken as the **maximum**
- * over every unsatisfied bucket of every rule in that policy — the tightest
- * bucket governs, and the tightest is the one that makes you wait longest.
- *
- * A bucket is unsatisfied when it is serving a penalty, or when its consumption
- * has reached its limit. Consumption *below* the limit is satisfied: the state
- * header describes the situation after the response that carried it, so one
- * more request is exactly what the remaining allowance is for. The client
- * issues serially and folds every response back in, so the consumption is never
- * more than one request out of date.
- */
+function paceRule(rule: ObservedRule, policy: string, now: string, from: PaceDecision): PaceDecision {
+  let decision = from;
+  // Each rule ages from its own reading, so a rule carried over from an
+  // earlier response is not credited with time it did not serve.
+  const elapsedMs = elapsedMsSince(rule.observedAt, now);
+  for (const [index, limit] of rule.buckets.entries()) {
+    const used = rule.state[index];
+    if (used === undefined) {
+      continue;
+    }
+
+    const penaltyMs = used.penalty * MS_PER_SECOND - elapsedMs;
+    if (penaltyMs > decision.delayMs) {
+      decision = { delayMs: penaltyMs, policy, rule: rule.name, bucket: limit, cause: 'penalty' };
+    }
+
+    if (used.hits < limit.hits) {
+      continue;
+    }
+
+    const windowMs = limit.seconds * MS_PER_SECOND - elapsedMs;
+    if (windowMs > decision.delayMs) {
+      decision = { delayMs: windowMs, policy, rule: rule.name, bucket: limit, cause: 'window' };
+    }
+  }
+  return decision;
+}
+
+// The maximum delay over every unsatisfied bucket: serving a penalty, or consumption at its limit.
+// Consumption below the limit is satisfied, since the state header is read after the response.
 export function paceBeforeNext(
   ledger: RateLimitLedger,
   policy: string | undefined,
@@ -143,50 +128,14 @@ export function paceBeforeNext(
   }
 
   let decision: PaceDecision = { ...CLEAR, policy };
-
   for (const rule of observation.rules) {
-    // Each rule ages from its own reading, so a rule carried over from an
-    // earlier response is not credited with time it did not serve.
-    const elapsedMs = elapsedMsSince(rule.observedAt, now);
-    for (const [index, limit] of rule.buckets.entries()) {
-      const used = rule.state[index];
-      if (used === undefined) {
-        continue;
-      }
-
-      const penaltyMs = used.penalty * MS_PER_SECOND - elapsedMs;
-      if (penaltyMs > decision.delayMs) {
-        decision = { delayMs: penaltyMs, policy, rule: rule.name, bucket: limit, cause: 'penalty' };
-      }
-
-      if (used.hits < limit.hits) {
-        continue;
-      }
-
-      const windowMs = limit.seconds * MS_PER_SECOND - elapsedMs;
-      if (windowMs > decision.delayMs) {
-        decision = { delayMs: windowMs, policy, rule: rule.name, bucket: limit, cause: 'window' };
-      }
-    }
+    decision = paceRule(rule, policy, now, decision);
   }
-
   return decision;
 }
 
-/**
- * The spread pacer of the long-running `pnpm sync` session (AD-8,
- * IMPLEMENTATION-NOTES.md §5.3): the larger of
- *
- * - `paceBeforeNext` — a restriction, or a full bucket's remaining window; and
- * - the even spread — over every bucket still below its limit, the largest
- *   `seconds × 1000 / (hits − used) − elapsed`.
- *
- * The even spread never spends more than the capacity the last State reading
- * left in any bucket's period, so no bucket fills in normal use, under a
- * rolling or a fixed window alike. Each response replaces the reading, so the
- * spread corrects itself. A policy with no reading asks for no delay: the first
- * request goes out cold and its response seeds the ledger.
- */
+// The larger of `paceBeforeNext` and the even spread of each bucket's remaining capacity over its
+// period, so no bucket fills in normal use (AD-8, IMPLEMENTATION-NOTES.md §5.3).
 export function spreadBeforeNext(
   ledger: RateLimitLedger,
   policy: string | undefined,
@@ -217,13 +166,7 @@ export function spreadBeforeNext(
   return decision;
 }
 
-/**
- * The tightest bucket's even interval on `policy`: the largest
- * `seconds × 1000 / hits` over every bucket of every rule the ledger holds for
- * it, or `undefined` where nothing has been read. It is the sustained gap a
- * policy allows, and the session's first backoff after a request that got no
- * answer (AD-7, IMPLEMENTATION-NOTES.md §5.3).
- */
+/** The largest `seconds × 1000 / hits` of any bucket: the first backoff after no answer (AD-7). */
 export function evenIntervalMs(ledger: RateLimitLedger, policy: string | undefined): number | undefined {
   if (policy === undefined) {
     return undefined;
@@ -245,16 +188,8 @@ export function evenIntervalMs(ledger: RateLimitLedger, policy: string | undefin
   return interval;
 }
 
-/**
- * The delay a `429` implies when the response carried no `Retry-After`.
- *
- * It derives from the penalty the buckets themselves declare: the state's own
- * remaining penalty where the server reported one, the declared penalty of any
- * bucket whose consumption has reached its limit, and — where neither applies,
- * so the ledger cannot say which bucket was overspent — the largest penalty the
- * policy declares at all. Yielding for the longest declared penalty is the
- * conservative reading, and a `429` has already proved the ledger was wrong.
- */
+// The delay a `429` implies without `Retry-After`. Where no bucket can be blamed it falls back to
+// the largest declared penalty: a `429` has already proved the ledger wrong.
 export function derivedYieldDelayMs(
   ledger: RateLimitLedger,
   policy: string | undefined,

@@ -1,39 +1,14 @@
 import { execFile } from 'node:child_process';
-import { existsSync, realpathSync, statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-/**
- * The `PostToolUse` hook that registers in `.claude/settings.json`. After an
- * agent edits a TypeScript file it runs three checks on that file, in
- * parallel, and feeds the findings back:
- *
- * - lint: ESLint with `LINT_FAST=1`, which skips the slow type-aware block
- *   (`pnpm lint` and CI still run it). Findings that the baseline suppresses
- *   look stale without the type-aware rules, so the run passes
- *   `--pass-on-unpruned-suppressions`.
- * - typecheck: TypeScript has no per-file mode. This runs the incremental
- *   build of `pnpm typecheck` (`tsc -b`, then the declaration rewrite, so
- *   `dist` stays what `pnpm check` produces) and keeps only the diagnostics
- *   that sit in the edited files. A caller that the edit just broke is left
- *   for `pnpm check`, so the agent is not told off in the middle of a change.
- * - depcruise: dependency-cruiser follows the imports of the edited files and
- *   keeps the violations whose `from` is an edited file. Files under
- *   `packages/` only: the rules name nothing else.
- *
- * Clean: exit 0 and no output. Findings: grouped by check on stderr, exit 2,
- * which Claude Code returns to the agent. Nothing here fixes a file.
- *
- * The edited file comes from `tool_input.file_path` (Edit, Write, MultiEdit)
- * or the Serena `relative_path`. `rename_symbol` changes other files, and
- * `replace_in_files` may take a directory or no path at all, so those two
- * fall back to the TypeScript files in `git diff --name-only HEAD`.
- *
- * Fallback if a cold `tsc -b` is ever too slow: run typecheck only for files
- * under `packages/` (see `checkedBy`).
- *
- * Run by bare `node` (type stripping), so this module imports only builtins.
- */
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
+
+// Lint runs with `LINT_FAST=1`, which skips the type-aware block, so baselined findings look
+// stale: hence `--pass-on-unpruned-suppressions`. Typecheck keeps only the edited files'
+// diagnostics, so a caller the edit just broke is left for `pnpm check`.
+
+// Run by bare `node` (type stripping): imports only builtins and `.ts` files of other tools.
 
 export const CHECK_NAMES = ['lint', 'typecheck', 'depcruise'] as const;
 export type CheckName = (typeof CHECK_NAMES)[number];
@@ -100,11 +75,7 @@ function wantedFile(candidate: string, dependencies: SelectionDependencies): str
   return dependencies.kindOf(path.resolve(dependencies.root, relativePath)) === 'file' ? relativePath : undefined;
 }
 
-/**
- * Whether the tool can change files other than the one it names. A path that
- * is not one existing file (a directory, or none) means the whole project for
- * `replace_in_files`; a rename always reaches the references.
- */
+// `replace_in_files` may name a directory or no path, and a rename reaches the references.
 function canReachOtherFiles(payload: HookPayload, namedKind: PathKind): boolean {
   const name = payload.toolName.slice(SERENA_PREFIX.length);
   return payload.toolName.startsWith(SERENA_PREFIX) && (name === 'rename_symbol' || (name === 'replace_in_files' && namedKind !== 'file'));
@@ -138,11 +109,7 @@ function samePathKey(text: string): string {
 
 const TSC_DIAGNOSTIC = /^(.+?)\((\d+),(\d+)\): (?:error|warning) TS\d+: /;
 
-/**
- * The diagnostics of a `tsc` run that sit in `files`, with their indented
- * continuation lines. `output` is `tsc --pretty false` output, whose paths
- * are relative to the working directory (the repository root).
- */
+/** `output` is `tsc --pretty false` output, whose paths are relative to the repository root. */
 export function filterTscDiagnostics(output: string, files: readonly string[]): string {
   const wanted = new Set(files.map((file) => samePathKey(file)));
   const kept: string[] = [];
@@ -315,21 +282,7 @@ async function main(): Promise<number> {
   return result.code;
 }
 
-/**
- * The entry guard, as in `tools/dev-stop/dev-stop.ts`: running the file runs
- * the hook, and importing it (the co-located test) runs nothing.
- */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {return false;}
-  try {
-    return realpathSync(path.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     process.exitCode = await main();
   } catch (error) {

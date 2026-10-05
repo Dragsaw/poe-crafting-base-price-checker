@@ -3,17 +3,7 @@ import { z } from 'zod';
 import { PriceObservationSchema } from './price-observation.ts';
 import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 
-/**
- * The dataset entry. It is declared here and not left to Story 1.8, because
- * AD-9 pins `lastSearchId`, `lastSearchLeague`, `lastAttemptedAt` and the four
- * Price States to this shape, and none of the named entity schemas is it —
- * `contracts` would otherwise land with `PriceObservation` beside a hole.
- */
-
-/**
- * The three reasons a `not-yet-synced` state carries. The enum is the PRD's
- * (FR-9); AD-9, AD-19 and AD-20 supply the three causes.
- */
+/** The reasons a `not-yet-synced` state carries (FR-9; AD-9, AD-19, AD-20). */
 export const NotYetSyncedReasonSchema = z
   .enum(['never-synced', 'league-mismatch', 'no-exchange-rate'])
   .describe(
@@ -22,11 +12,7 @@ export const NotYetSyncedReasonSchema = z
 
 export type NotYetSyncedReason = z.infer<typeof NotYetSyncedReasonSchema>;
 
-/**
- * **Price is four-state, and absence is never zero, null or a missing key**
- * (AD-9). The observation lives inside the `priced` arm, so its absence is
- * structural rather than a convention a reader must remember.
- */
+/** Four-state price; the observation sits in the `priced` arm so absence is structural (AD-9). */
 export const PriceStateSchema = z.discriminatedUnion('state', [
   z.strictObject({
     state: z.literal('priced'),
@@ -46,18 +32,7 @@ export const PriceStateSchema = z.discriminatedUnion('state', [
 
 export type PriceState = z.infer<typeof PriceStateSchema>;
 
-/**
- * One entry of `dataset.json`: the latest observation per tracked entry, and
- * nothing historical (AD-19).
- *
- * `lastSearchId` and `lastSearchLeague` sit **beside** `lastAttemptedAt`, on
- * the entry (AD-9). The unit is the request: a request that gets no answer —
- * a 429, a 5xx, a timeout — stamps `lastAttemptedAt` and changes neither
- * search field, so `lastSearchId` may legitimately be older than
- * `lastAttemptedAt`. An answered search sets both, whatever the fetch after it
- * returns. A never-synced entry carries none of the three, and **no component
- * may give it a placeholder**.
- */
+/** Latest observation per entry (AD-19); a failure stamps `lastAttemptedAt` only (AD-9). */
 export const DatasetEntrySchema = z
   .strictObject({
     entryKey: z

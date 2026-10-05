@@ -5,11 +5,7 @@ import { MONEY_PHRASES } from '../list/format';
 import { formatDivine } from '../shared/money';
 import type { RecipeCost, RecipeOption } from './CraftRecipe';
 
-/**
- * Each recipe's id and the one word `recipeWord` derives for it, in file
- * order. `RecipesFileSchema` refuses a set in which a recipe derives no word,
- * so a missing word here is a broken invariant, not data.
- */
+/** Each recipe's id and `recipeWord`, in file order; a missing word breaks a schema invariant. */
 export function recipeOptions(recipes: readonly CraftRecipe[]): RecipeOption[] {
   return recipes.map((recipe) => {
     const word = recipeWord(recipe);
@@ -20,18 +16,14 @@ export function recipeOptions(recipes: readonly CraftRecipe[]): RecipeOption[] {
   });
 }
 
-/**
- * The cost line: `core`'s Craft Cost at the page's 2dp, or *no figure yet*
- * when the recipe is uncostable (FR-26, AD-20). `web` formats; `core` costs.
- * `uncostable` is the verdict of `Ranking.uncostableRecipes`, the one derivation.
- */
+/** Craft Cost at 2dp, or *no figure yet* if uncostable (FR-26, AD-20); `core` costs. */
 export function recipeCostLine(
   recipe: CraftRecipe,
   rates: readonly CurrencyRate[],
   league: string,
-  uncostable: boolean,
+  isUncostable: boolean,
 ): RecipeCost {
-  if (uncostable) {
+  if (isUncostable) {
     return { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
   }
   const cost = craftCost(recipe, rates, league);

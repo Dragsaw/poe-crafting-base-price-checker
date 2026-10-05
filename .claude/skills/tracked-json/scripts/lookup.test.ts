@@ -1,34 +1,24 @@
-import { execFile } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import nodePath from 'node:path';
 
-import { type WeightsFile, WeightsFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
   createJsonReader,
-  FILTERS_PATH,
-  ITEMS_PATH,
   LookupError,
   loadWeights,
   lookupBase,
   lookupClass,
-  lookupMods,
   lookupStat,
-  lookupTiers,
   MATCH_CAP,
   parseCommand,
   REPO_ROOT,
   runCommand,
-  STATS_PATH,
   UsageError,
   WEIGHTS_PATH,
 } from './lookup';
-
-const SCRIPT = fileURLToPath(new URL('lookup.ts', import.meta.url));
-const DATA_DIR = join(REPO_ROOT, 'data');
+import { JSON_NULL, SPIRIT, WEIGHTS } from './lookup.test-support';
 
 const STATS = {
   schemaVersion: '1.0.0',
@@ -70,7 +60,7 @@ const FILTERS = {
           id: 'category',
           option: {
             options: [
-              { id: null, text: 'Any' },
+              { id: JSON_NULL, text: 'Any' },
               { id: 'accessory.amulet', text: 'Amulet' },
               { id: 'armour.chest', text: 'Body Armour' },
             ],
@@ -80,87 +70,6 @@ const FILTERS = {
     },
   ],
 };
-
-function tier(
-  slot: string,
-  moduleGroup: string,
-  itemLevelMin: number,
-  tierLabel: string,
-  text: string,
-  lines: readonly { statId: string | null; ranges: number[][] }[],
-): Record<string, unknown> {
-  return {
-    sourceModifierId: `${slot}\0${moduleGroup}\0${String(itemLevelMin)}\0${text}`,
-    modGroup: moduleGroup,
-    itemLevelMin,
-    tierLabel,
-    weight: 500,
-    weightSource: 'published',
-    lines,
-  };
-}
-
-const SPIRIT = 'explicit.stat_spirit';
-const EVASION = 'explicit.stat_evasion';
-const LIFE = 'explicit.stat_life';
-const SPELL = 'explicit.stat_spell';
-const MELEE = 'explicit.stat_melee';
-
-const WEIGHTS = WeightsFileSchema.parse({
-  schemaVersion: '6.0.0',
-  gamePatch: '0.4.0',
-  producer: { id: 'test', generatedAt: '2026-10-02T00:00:00Z' },
-  bases: {
-    'accessory.amulet': {
-      Amulets: {
-        prefix: {
-          poolCoverage: 'complete',
-          // Out of order on purpose: `tiers` sorts by itemLevelMin.
-          entries: [
-            tier('prefix', 'BaseSpirit', 25, 'T2', '+# to Spirit', [{ statId: SPIRIT, ranges: [[34, 37]] }]),
-            tier('prefix', 'BaseSpirit', 16, 'T3', '+# to Spirit', [{ statId: SPIRIT, ranges: [[30, 33]] }]),
-            tier('prefix', 'BaseSpirit', 54, 'T1', '+# to Spirit', [{ statId: SPIRIT, ranges: [[47, 50]] }]),
-            tier('prefix', 'IncreasedLife', 1, 'T1', '+# to maximum Life', [{ statId: LIFE, ranges: [[10, 19]] }]),
-          ],
-        },
-        suffix: {
-          poolCoverage: 'complete',
-          entries: [
-            tier('suffix', 'SpiritSuffix', 40, 'T1', '+# to Spirit', [{ statId: SPIRIT, ranges: [[5, 6]] }]),
-            // One modGroup, two mod families: two rows, not one hybrid.
-            tier('suffix', 'GemLevel', 41, 'T1', '+# to Level of all Melee Skills', [{ statId: MELEE, ranges: [[2, 2]] }]),
-            tier('suffix', 'GemLevel', 5, 'T2', '+# to Level of all Spell Skills', [{ statId: SPELL, ranges: [[1, 1]] }]),
-            tier('suffix', 'GemLevel', 41, 'T1', '+# to Level of all Spell Skills', [{ statId: SPELL, ranges: [[2, 2]] }]),
-          ],
-        },
-      },
-    },
-    'armour.chest': {
-      Body_Armours_dex: {
-        prefix: {
-          poolCoverage: 'complete',
-          entries: [
-            tier('prefix', 'BaseLocalDefencesAndLife', 33, 'T1', '#% increased Evasion Rating\n+# to maximum Life', [
-              { statId: EVASION, ranges: [[21, 26]] },
-              { statId: LIFE, ranges: [[20, 23]] },
-            ]),
-            tier('prefix', 'BaseLocalDefencesAndLife', 16, 'T2', '#% increased Evasion Rating\n+# to maximum Life', [
-              { statId: EVASION, ranges: [[14, 20]] },
-              { statId: LIFE, ranges: [[11, 19]] },
-            ]),
-            tier('prefix', 'IncreasedLife', 1, 'T1', '+# to maximum Life', [{ statId: LIFE, ranges: [[10, 19]] }]),
-          ],
-        },
-        suffix: {
-          poolCoverage: 'complete',
-          entries: [tier('suffix', 'Thorns', 1, 'T1', '# to # Thorns', [{ statId: null, ranges: [] }])],
-        },
-      },
-    },
-    // A second category with a class of the same name, for the ambiguity row.
-    'armour.shield': { Body_Armours_dex: { prefix: { poolCoverage: 'complete', entries: [] }, suffix: { poolCoverage: 'complete', entries: [] } } },
-  },
-});
 
 describe('lookupStat', () => {
   it('matches case-insensitively over every group', () => {
@@ -232,17 +141,17 @@ describe('lookupClass', () => {
       { categoryId: 'armour.chest', categoryText: 'Body Armour', className: 'Body_Armours_dex' },
     ]);
     expect(lookupClass(WEIGHTS, FILTERS, 'armour.shield').matches).toEqual([
-      { categoryId: 'armour.shield', categoryText: null, className: 'Body_Armours_dex' },
+      { categoryId: 'armour.shield', categoryText: JSON_NULL, className: 'Body_Armours_dex' },
     ]);
   });
 
   it('refuses an unreadable or non-JSON weights file, naming it', () => {
-    const root = mkdtempSync(join(tmpdir(), 'tracked-lookup-'));
+    const root = mkdtempSync(nodePath.join(tmpdir(), 'tracked-lookup-'));
     try {
-      mkdirSync(join(root, WEIGHTS_PATH), { recursive: true });
+      mkdirSync(nodePath.join(root, WEIGHTS_PATH), { recursive: true });
       expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(`${WEIGHTS_PATH}: not readable`);
-      rmSync(join(root, WEIGHTS_PATH), { recursive: true });
-      writeFileSync(join(root, WEIGHTS_PATH), '{ not json');
+      rmSync(nodePath.join(root, WEIGHTS_PATH), { recursive: true });
+      writeFileSync(nodePath.join(root, WEIGHTS_PATH), '{ not json');
       expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(LookupError);
       expect(() => createJsonReader(root)(WEIGHTS_PATH)).toThrow(`${WEIGHTS_PATH}: not valid JSON`);
     } finally {
@@ -251,21 +160,21 @@ describe('lookupClass', () => {
   });
 
   it('refuses an absent weights file, naming it', () => {
-    const read = createJsonReader(join(REPO_ROOT, 'no-such-directory'));
+    const read = createJsonReader(nodePath.join(REPO_ROOT, 'no-such-directory'));
 
     expect(() => runCommand({ kind: 'class', query: 'amul' }, read)).toThrow(LookupError);
     expect(() => runCommand({ kind: 'class', query: 'amul' }, read)).toThrow(`${WEIGHTS_PATH}: the file is absent`);
   });
 });
 
-describe('loadWeights', () => {
-  function readerOf(weights: unknown) {
-    return (path: string): unknown => {
-      expect(path).toBe(WEIGHTS_PATH);
-      return weights;
-    };
-  }
+function readerOf(weights: unknown) {
+  return (path: string): unknown => {
+    expect(path).toBe(WEIGHTS_PATH);
+    return weights;
+  };
+}
 
+describe('loadWeights', () => {
   it('names the file, the path and the message of a schema-invalid weights file', () => {
     const broken = structuredClone(WEIGHTS) as unknown as {
       bases: Record<string, Record<string, { prefix: { entries: Record<string, unknown>[] } }>>;
@@ -292,222 +201,6 @@ describe('loadWeights', () => {
     expect(() => runCommand({ kind: 'class', query: 'amul' }, (path) => (path === WEIGHTS_PATH ? broken : FILTERS))).toThrow(
       `${WEIGHTS_PATH}: bases.accessory.amulet.Amulets.prefix.entries.0.weight: weight is negative`,
     );
-  });
-});
-
-describe('lookupMods', () => {
-  it('prints one row per modGroup, a hybrid with all its statIds, verbatim', () => {
-    const found = lookupMods(WEIGHTS, { className: 'Body_Armours_dex', category: 'armour.chest', slot: 'prefix' });
-
-    expect(found).toEqual({
-      categoryId: 'armour.chest',
-      className: 'Body_Armours_dex',
-      mods: [
-        {
-          slot: 'prefix',
-          modGroup: 'BaseLocalDefencesAndLife',
-          text: 'BaseLocalDefencesAndLife',
-          statIds: [EVASION, LIFE].toSorted(),
-          trackable: true,
-          untrackable: [],
-          tierCount: 2,
-          itemLevelMin: { min: 16, max: 33 },
-          tierLabels: ['T2', 'T1'],
-        },
-        {
-          slot: 'prefix',
-          modGroup: 'IncreasedLife',
-          text: 'IncreasedLife',
-          statIds: [LIFE],
-          trackable: true,
-          untrackable: [],
-          tierCount: 1,
-          itemLevelMin: { min: 1, max: 1 },
-          tierLabels: ['T1'],
-        },
-      ],
-    });
-  });
-
-  it('prints both slots without a slot, and drops a null line from the line set', () => {
-    const found = lookupMods(WEIGHTS, { className: 'Body_Armours_dex', category: 'armour.chest' });
-
-    expect(found.mods.map((row) => [row.slot, row.modGroup])).toEqual([
-      ['prefix', 'BaseLocalDefencesAndLife'],
-      ['prefix', 'IncreasedLife'],
-      ['suffix', 'Thorns'],
-    ]);
-    // A weight-500 tier with only a null line in a complete pool is trackable, with no line to write.
-    expect(found.mods[2]).toMatchObject({ statIds: [], trackable: true, untrackable: [] });
-  });
-
-  it('prints one row per mod family when a modGroup holds several', () => {
-    const found = lookupMods(WEIGHTS, { className: 'Amulets', slot: 'suffix' });
-
-    expect(
-      found.mods
-        .filter((row) => row.modGroup === 'GemLevel')
-        .map((row) => [row.text, row.statIds, row.tierLabels]),
-    ).toEqual([
-      ['GemLevel', [MELEE], ['T1']],
-      ['GemLevel', [SPELL], ['T2', 'T1']],
-    ]);
-  });
-
-  it('refuses an unknown class', () => {
-    expect(() => lookupMods(WEIGHTS, { className: 'Nope' })).toThrow('unknown class Nope');
-    expect(() => lookupMods(WEIGHTS, { className: 'Amulets', category: 'armour.chest' })).toThrow(
-      'unknown class Amulets in category armour.chest',
-    );
-  });
-
-  it('refuses a class in several categories without a category', () => {
-    expect(() => lookupMods(WEIGHTS, { className: 'Body_Armours_dex' })).toThrow(
-      'appears in categories armour.chest, armour.shield; pass --category',
-    );
-  });
-});
-
-const A = 'explicit.stat_a';
-const B = 'explicit.stat_b';
-
-function nullLineWeights(poolCoverage: 'complete' | 'partial'): WeightsFile {
-  const notInGame = {
-    ...tier('prefix', 'Dead', 1, 'T1', 'dead', [{ statId: null, ranges: [] }]),
-    weight: 0,
-    weightSource: 'not-in-game',
-  };
-  return WeightsFileSchema.parse({
-    schemaVersion: '6.0.0',
-    gamePatch: '0.4.0',
-    producer: { id: 'test', generatedAt: '2026-10-02T00:00:00Z' },
-    bases: {
-      'accessory.ring': {
-        Rings: {
-          prefix: {
-            poolCoverage,
-            entries: [
-              // An internal engine line on a weight > 0 tier: one {A, B} family, not a second one.
-              tier('prefix', 'Hybrid', 10, 'T2', 'a b', [
-                { statId: A, ranges: [[1, 2]] },
-                { statId: B, ranges: [[3, 4]] },
-              ]),
-              tier('prefix', 'Hybrid', 20, 'T1', 'a b', [
-                { statId: B, ranges: [[5, 6]] },
-                { statId: A, ranges: [[3, 4]] },
-                { statId: null, ranges: [] },
-              ]),
-              notInGame,
-              // A mixed family: only the {A, null} tier is untrackable, and only in a partial pool.
-              tier('prefix', 'Mixed', 10, 'T2', 'a', [{ statId: A, ranges: [[1, 2]] }]),
-              tier('prefix', 'Mixed', 20, 'T1', 'a', [
-                { statId: A, ranges: [[3, 4]] },
-                { statId: null, ranges: [] },
-              ]),
-            ],
-          },
-          suffix: { poolCoverage: 'complete', entries: [] },
-        },
-      },
-    },
-  });
-}
-
-describe('the null-line rule in lookupMods and lookupTiers', () => {
-  const rings = { className: 'Rings', slot: 'prefix' } as const;
-
-  it('offers a hybrid as one row with its sorted line set, and an internal line is not a second family', () => {
-    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((module_) => module_.modGroup === 'Hybrid');
-
-    expect(row).toMatchObject({ statIds: [A, B], trackable: true, untrackable: [], tierCount: 2, tierLabels: ['T2', 'T1'] });
-  });
-
-  it('reports a not-in-game tier with no line set, untrackable, and its reason', () => {
-    const row = lookupMods(nullLineWeights('complete'), rings).mods.find((module_) => module_.modGroup === 'Dead');
-
-    expect(row).toMatchObject({
-      statIds: [],
-      trackable: false,
-      untrackable: [{ tierLabel: 'T1', itemLevelMin: 1, reason: 'not-in-game' }],
-    });
-  });
-
-  it('makes a {A, null} tier untrackable only in a partial pool, naming the reason', () => {
-    const complete = lookupMods(nullLineWeights('complete'), rings).mods.find((module_) => module_.modGroup === 'Mixed');
-    const partial = lookupMods(nullLineWeights('partial'), rings).mods.find((module_) => module_.modGroup === 'Mixed');
-
-    expect(complete).toMatchObject({ statIds: [A], trackable: true, untrackable: [], tierCount: 2 });
-    // One family, one untrackable tier: the family is not trackable, and only that tier is listed.
-    expect(partial).toMatchObject({
-      statIds: [A],
-      trackable: false,
-      tierCount: 2,
-      untrackable: [{ tierLabel: 'T1', itemLevelMin: 20, reason: 'partial-pool-null-line' }],
-    });
-    expect(partial?.untrackable).toHaveLength(1);
-  });
-
-  it('adds lineSet and untrackable to a tiers row beside the verbatim lines', () => {
-    const complete = lookupTiers(nullLineWeights('complete'), A, { className: 'Rings' }).tiers;
-    const partial = lookupTiers(nullLineWeights('partial'), A, { className: 'Rings' }).tiers;
-
-    const t1 = complete.find((row) => row.modGroup === 'Hybrid' && row.tierLabel === 'T1');
-    expect(t1?.lines).toEqual([
-      { statId: B, ranges: [[5, 6]] },
-      { statId: A, ranges: [[3, 4]] },
-      { statId: null, ranges: [] },
-    ]);
-    expect(t1).toMatchObject({ lineSet: [A, B], untrackable: null });
-    expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T1')).toMatchObject({
-      lineSet: [A],
-      untrackable: 'partial-pool-null-line',
-    });
-    expect(partial.find((row) => row.modGroup === 'Mixed' && row.tierLabel === 'T2')?.untrackable).toBeNull();
-  });
-});
-
-describe('lookupTiers', () => {
-  it('lists, per slot, the tiers carrying the statId in itemLevelMin order, ranges verbatim', () => {
-    const found = lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets' });
-
-    expect(found.categoryId).toBe('accessory.amulet');
-    expect(found.tiers.map((row) => [row.slot, row.tierLabel, row.itemLevelMin])).toEqual([
-      ['prefix', 'T3', 16],
-      ['prefix', 'T2', 25],
-      ['prefix', 'T1', 54],
-      ['suffix', 'T1', 40],
-    ]);
-    expect(found.tiers[0]).toEqual({
-      slot: 'prefix',
-      tierLabel: 'T3',
-      itemLevelMin: 16,
-      weight: 500,
-      weightSource: 'published',
-      modGroup: 'BaseSpirit',
-      lines: [{ statId: SPIRIT, ranges: [[30, 33]] }],
-      lineSet: [SPIRIT],
-      untrackable: null,
-    });
-  });
-
-  it('prints every line of a hybrid tier that carries the statId', () => {
-    const found = lookupTiers(WEIGHTS, EVASION, { className: 'Body_Armours_dex', category: 'armour.chest' });
-
-    expect(found.tiers.map((row) => row.lines)).toEqual([
-      [
-        { statId: EVASION, ranges: [[14, 20]] },
-        { statId: LIFE, ranges: [[11, 19]] },
-      ],
-      [
-        { statId: EVASION, ranges: [[21, 26]] },
-        { statId: LIFE, ranges: [[20, 23]] },
-      ],
-    ]);
-  });
-
-  it('refuses an unknown class, and a class in several categories without a category', () => {
-    expect(() => lookupTiers(WEIGHTS, SPIRIT, { className: 'Nope' })).toThrow(LookupError);
-    expect(() => lookupTiers(WEIGHTS, SPIRIT, { className: 'Body_Armours_dex' })).toThrow('pass --category');
   });
 });
 
@@ -542,151 +235,5 @@ describe('parseCommand', () => {
     [['stat', 'mana', 'extra']],
   ])('refuses %j as a usage error', (argv) => {
     expect(() => parseCommand(argv)).toThrow(UsageError);
-  });
-});
-
-describe('the committed data/', () => {
-  const read = createJsonReader(REPO_ROOT);
-
-  it('finds a stat, a base type and a class in the committed catalogue shape', () => {
-    expect(lookupStat(read(STATS_PATH), 'to Spirit').matches.map((match) => match.id)).toContain(
-      'explicit.stat_3981240776',
-    );
-    expect(lookupBase(read(ITEMS_PATH), 'amulet').matches).toContainEqual({ type: 'Gold Amulet', group: 'accessory' });
-    const classes = lookupClass(loadWeights(read), read(FILTERS_PATH), 'body armour').matches;
-    const dex = classes.find((match) => match.className === 'Body_Armours_dex');
-    expect(dex).toBeDefined();
-    expect(dex?.categoryText).not.toBeNull();
-  });
-
-  it('lists the Body_Armours_dex prefixes: 7 modGroups, the defences-and-life hybrid one row', () => {
-    const found = lookupMods(loadWeights(read), { className: 'Body_Armours_dex', slot: 'prefix' });
-
-    expect(found.mods).toHaveLength(7);
-    const hybrid = found.mods.filter((row) => row.modGroup === 'BaseLocalDefencesAndLife');
-    expect(hybrid).toHaveLength(1);
-    expect(hybrid[0]?.statIds).toHaveLength(2);
-    expect(hybrid[0]?.text).toBe('BaseLocalDefencesAndLife');
-    expect(found.mods.filter((row) => row.text === '')).toEqual([]);
-  });
-
-  it('offers the Bows phys%+accuracy hybrid prefix as one trackable row', () => {
-    const found = lookupMods(loadWeights(read), { className: 'Bows', slot: 'prefix' });
-    const hybrid = found.mods.filter((row) => row.modGroup === 'LocalIncreasedPhysicalDamagePercentAndAccuracyRating');
-
-    expect(hybrid).toHaveLength(1);
-    expect(hybrid[0]).toMatchObject({
-      statIds: ['explicit.stat_1509134228', 'explicit.stat_691932474'],
-      trackable: true,
-      untrackable: [],
-    });
-    const tiers = lookupTiers(loadWeights(read), 'explicit.stat_691932474', { className: 'Bows' }).tiers;
-    const t1 = tiers.find((row) => row.slot === 'prefix' && row.tierLabel === 'T1');
-    expect(t1?.lineSet).toEqual(['explicit.stat_1509134228', 'explicit.stat_691932474']);
-    expect(t1?.untrackable).toBeNull();
-  });
-
-  it('reports the Time-Lost Diamond IncisionChance as untrackable, and offers JewelRadiusLargerRadius as a one-line family', () => {
-    const found = lookupMods(loadWeights(read), { className: 'Time-Lost_Diamond' });
-    const incision = found.mods.find((row) => row.modGroup === 'IncisionChance');
-
-    expect(incision).toMatchObject({ slot: 'prefix', statIds: [], trackable: false });
-    expect(incision?.untrackable.map((item) => item.reason)).toEqual(['not-in-game']);
-    const radius = found.mods.find(
-      (row) => row.modGroup === 'JewelRadiusLargerRadius' && row.statIds.includes('explicit.stat_3891355829|1'),
-    );
-    expect(radius).toMatchObject({ statIds: ['explicit.stat_3891355829|1'], trackable: true, untrackable: [] });
-  });
-
-  it('splits the Amulets gem-level suffix modGroup into its four mod families', () => {
-    const found = lookupMods(loadWeights(read), { className: 'Amulets', slot: 'suffix' });
-    const families = found.mods.filter((row) => row.modGroup === 'IncreaseSocketedGemLevel');
-
-    expect(families.map((row) => row.statIds.length)).toEqual([1, 1, 1, 1]);
-    expect(families.map((row) => row.text)).toEqual(Array.from({ length: 4 }, () => 'IncreaseSocketedGemLevel'));
-  });
-});
-
-interface Run {
-  readonly code: number | null;
-  readonly stdout: string;
-  readonly stderr: string;
-}
-
-function runScript(arguments_: readonly string[]): Promise<Run> {
-  return new Promise((done) => {
-    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
-      done({ code: child.exitCode, stdout, stderr });
-    });
-  });
-}
-
-/** Every path under `data/` with its size and modification time. */
-function snapshot(directory: string): Record<string, string> {
-  const found: Record<string, string> = {};
-  for (const name of readdirSync(directory)) {
-    const path = join(directory, name);
-    const stats = statSync(path);
-    if (stats.isDirectory()) {
-      Object.assign(found, snapshot(path));
-    } else {
-      found[path] = `${String(stats.size)}:${String(stats.mtimeMs)}`;
-    }
-  }
-  return found;
-}
-
-describe('pnpm tracked:lookup', () => {
-  it('prints the Amulets spirit prefix tiers T5 to T1, verbatim, and writes nothing to disk', async () => {
-    const before = snapshot(DATA_DIR);
-
-    const run = await runScript(['tiers', 'explicit.stat_3981240776', '--class', 'Amulets']);
-
-    expect(run.code, run.stderr).toBe(0);
-    expect(run.stderr).toBe('');
-    const printed = JSON.parse(run.stdout) as {
-      tiers: { slot: string; tierLabel: string; itemLevelMin: number; lines: { ranges: unknown }[] }[];
-    };
-    const prefixes = printed.tiers.filter((row) => row.slot === 'prefix');
-    expect(prefixes.map((row) => [row.tierLabel, row.itemLevelMin])).toEqual([
-      ['T5', 16],
-      ['T4', 25],
-      ['T3', 33],
-      ['T2', 46],
-      ['T1', 54],
-    ]);
-    expect(prefixes.map((row) => row.lines[0]?.ranges)).toEqual([
-      [[30, 33]],
-      [[34, 37]],
-      [[38, 42]],
-      [[43, 46]],
-      [[47, 50]],
-    ]);
-    expect(snapshot(DATA_DIR)).toEqual(before);
-  });
-
-  it('prints a lookup error as {error} on stdout with exit 1', async () => {
-    const run = await runScript(['mods', '--class', 'Nope']);
-
-    expect(run.code).toBe(1);
-    expect(JSON.parse(run.stdout)).toEqual({ error: `${WEIGHTS_PATH}: unknown class Nope` });
-  });
-
-  it('prints the usage on stderr with exit 1 on an unknown subcommand', async () => {
-    const run = await runScript(['bogus', 'x']);
-
-    expect(run.code).toBe(1);
-    expect(run.stdout).toBe('');
-    expect(run.stderr).toContain('usage: pnpm tracked:lookup');
-  });
-
-  it('is reachable at the script name', () => {
-    const manifest = JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8')) as {
-      scripts: Record<string, string>;
-    };
-    const script = manifest.scripts['tracked:lookup'];
-
-    expect(script).toBe('node .claude/skills/tracked-json/scripts/lookup.ts');
-    expect(resolve(REPO_ROOT, (script ?? '').split(/\s+/).at(-1) ?? '')).toBe(SCRIPT);
   });
 });

@@ -1,15 +1,6 @@
 import type { HttpPort, HttpRequest, HttpResponse } from '../http.ts';
 
-/**
- * A pure in-memory `HttpPort`. It holds its state in the closure and imports no
- * `node:` builtin, which is what lets Stories 1.3 onward test against the port
- * before its adapter exists.
- *
- * An unfixtured request **rejects** rather than returning a default. NFR-1's
- * whole point is that an unfixtured request fails loudly; a fake that answered
- * `404` would be a quieter version of the network escape the test setup exists
- * to catch.
- */
+/** An in-memory `HttpPort`; an unfixtured request rejects, so a network escape fails (NFR-1). */
 
 /** Keyed `"<METHOD> <url>"`, e.g. `"POST https://example.test/search"`. */
 export type HttpFixtures = Readonly<Record<string, HttpResponse>>;

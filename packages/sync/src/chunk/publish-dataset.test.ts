@@ -15,6 +15,7 @@ function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): Tra
 }
 
 const key = canonicalKey;
+const rotate = <T>(items: readonly T[]): T[] => [...items.slice(1), ...items.slice(0, 1)];
 const byKey = (a: DatasetEntry, b: DatasetEntry): number => compareCanonicalKeys(a.entryKey, b.entryKey);
 
 function attempted(tracked: TrackedEntry, at: string): DatasetEntry {
@@ -48,13 +49,13 @@ function inputs(overrides: Partial<DatasetInputs>): DatasetInputs {
 describe('buildDatasetFile', () => {
   it('first run: 5 tracked, 2 visited → 2 step entries and 3 never-synced, sorted by canonical key', () => {
     const tracked = ['E', 'D', 'C', 'B', 'A'].map((id) => raw(id));
-    const [e, , c] = tracked as [TrackedEntry, TrackedEntry, TrackedEntry];
-    const file = buildDatasetFile(inputs({ tracked, stepEntries: [attempted(e, NOW), attempted(c, NOW)] }));
+    const [entryE, , entryC] = tracked as [TrackedEntry, TrackedEntry, TrackedEntry];
+    const file = buildDatasetFile(inputs({ tracked, stepEntries: [attempted(entryE, NOW), attempted(entryC, NOW)] }));
 
     expect(file.entries).toHaveLength(5);
-    expect(file.entries.map((entry) => entry.entryKey)).toEqual(tracked.map(key).toSorted(compareCanonicalKeys));
+    expect(file.entries.map((entry) => entry.entryKey)).toEqual(tracked.map((entry) => key(entry)).toSorted(compareCanonicalKeys));
     expect(file.entries.filter((entry) => entry.price.state === 'no-listings')).toEqual(
-      [attempted(e, NOW), attempted(c, NOW)].toSorted(byKey),
+      [attempted(entryE, NOW), attempted(entryC, NOW)].toSorted(byKey),
     );
     for (const entry of file.entries) {
       if (entry.price.state === 'no-listings') {
@@ -141,7 +142,6 @@ describe('buildDatasetFile', () => {
     const [a, b, c, d] = tracked as [TrackedEntry, TrackedEntry, TrackedEntry, TrackedEntry];
     const previous = [attempted(a, EARLIER), attempted(b, EARLIER)];
     const stepEntries = [attempted(c, NOW), attempted(d, NOW)];
-    const rotate = <T>(items: readonly T[]): T[] => [...items.slice(1), ...items.slice(0, 1)];
 
     const forward = buildDatasetFile(inputs({ tracked, previous, stepEntries }));
     const reversed = buildDatasetFile(
@@ -153,6 +153,6 @@ describe('buildDatasetFile', () => {
 
     expect(reversed).toEqual(forward);
     expect(rotated).toEqual(forward);
-    expect(forward.entries.map((entry) => entry.entryKey)).toEqual(tracked.map(key).toSorted(compareCanonicalKeys));
+    expect(forward.entries.map((entry) => entry.entryKey)).toEqual(tracked.map((entry) => key(entry)).toSorted(compareCanonicalKeys));
   });
 });

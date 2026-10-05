@@ -1,32 +1,5 @@
 /**
- * The run-start league gate (FR-32, AD-19, AD-12).
- *
- * `runChunk` calls it through `ChunkSetup.gate` (built by
- * `../compose-chunk.ts`), under the lock, after every offline check and the
- * order, and before any search (AD-12's cost order). It sends **exactly one**
- * GET to the trade leagues endpoint through the governed client, which the
- * shell counts as `league-validation`, and checks that the configured league
- * is one of the ids the endpoint answered.
- * The ids compare **byte for byte**: `forbidden rites` is not
- * `Forbidden Rites`, because the search URL addresses the league by that
- * exact string.
- *
- * The consequences, by answer. The classes mirror the pricing step's
- * (`../pricing/price-entry.ts`):
- *
- * | Answer | Gate result | Report (`runChunk`) |
- * | --- | --- | --- |
- * | 2xx, the league is an id | `pass` | no record |
- * | 2xx, the league is not an id | throws `LeagueMismatchError` | `league-mismatch` |
- * | 2xx body that is not the payload shape | throws `UnexpectedLeaguesResponseError` | `run-failure`, `unrecoverable-error` |
- * | a client yield (429, invalid-request threshold), 5xx, timeout, network failure | `yield` | no record; the chunk yields (AD-8) |
- * | any other non-2xx | throws `LeagueRequestRejectedError` | `run-failure`, `trade-request-rejected` |
- * | any other port rejection | rethrown | `run-failure`, `unrecoverable-error` |
- *
- * A yield sends no search: the chunk ends before its first entry, so no
- * budget is spent on a league that was not validated.
- *
- * The league arrives as a value; this module never names `config.json`.
+ * The run-start league gate (FR-32, AD-19, AD-12): one governed GET, ids compared byte for byte.
  */
 
 import { LeaguesPayloadSchema } from '@poe/contracts';
@@ -37,46 +10,13 @@ import { penaltyRetryAfterMs } from '../trade/client.ts';
 import type { TradeClient, TradeResult } from '../trade/client.ts';
 import { DATA_LANE, TRADE_LEAGUES_URL } from '../trade/endpoints.ts';
 import { isTransportFailure } from '../trade/transport-failure.ts';
+import { LeagueMismatchError } from './league-mismatch-error.ts';
+import { LeagueRequestRejectedError } from './league-request-rejected-error.ts';
+
+export { LeagueMismatchError } from './league-mismatch-error.ts';
+export { LeagueRequestRejectedError } from './league-request-rejected-error.ts';
 
 const SERVER_ERROR = 500;
-
-/**
- * The configured league is not among the ids the trade API carries. A routine
- * configuration fault: `runChunk` turns it into a `league-mismatch` record
- * carrying the list the player corrects `config.json` from.
- */
-export class LeagueMismatchError extends Error {
-  readonly configuredLeague: LeagueId;
-  /** Every id the endpoint answered, in endpoint order. */
-  readonly availableLeagues: readonly LeagueId[];
-
-  constructor(configuredLeague: LeagueId, availableLeagues: readonly LeagueId[]) {
-    super(
-      `the configured league ${JSON.stringify(configuredLeague)} is not one the trade API carries (${
-        availableLeagues.length === 0
-          ? 'it listed none'
-          : availableLeagues.map((id) => JSON.stringify(id)).join(', ')
-      }); the run is aborted`,
-    );
-    this.name = 'LeagueMismatchError';
-    this.configuredLeague = configuredLeague;
-    this.availableLeagues = availableLeagues;
-  }
-}
-
-/**
- * The leagues request answered a non-2xx that is neither a 429 nor a 5xx. It
- * names no entry: the gate runs before any entry is visited.
- */
-export class LeagueRequestRejectedError extends Error {
-  readonly status: number;
-
-  constructor(status: number) {
-    super(`the trade leagues request answered ${String(status)}; the run is aborted`);
-    this.name = 'LeagueRequestRejectedError';
-    this.status = status;
-  }
-}
 
 /** A 2xx whose body is not the leagues payload shape. */
 export class UnexpectedLeaguesResponseError extends Error {
@@ -138,6 +78,8 @@ export function createLeagueGate(
     if (status >= SERVER_ERROR) {
       return YIELD;
     }
+    // Any other non-2xx aborts like the pricing step's other 4xx (AD-9); the report reason is
+    // `trade-request-rejected`, and a wrong-shape 2xx body is `unrecoverable-error`.
     if (status < 200 || status >= 300) {
       throw new LeagueRequestRejectedError(status);
     }

@@ -8,24 +8,10 @@ import {
   type TolerableKey,
 } from './artifacts';
 
-/**
- * One load of the seven artifacts, resolved to exactly one outcome (AD-24,
- * FR-33). Each artifact is one plain `fetch` with `cache: 'no-cache'` and no
- * query token: the browser revalidates every load and reuses its copy only on
- * a `304`, so each load is as fresh as a full download. The Pages CDN's
- * `max-age=600` staleness, and a rare set that mixes files across a data
- * commit, are accepted costs (AD-24). The loader never rejects — every failure
- * is a typed outcome.
- */
+/** One load, one outcome, never a rejection; `no-cache` fetches accept CDN staleness (AD-24). */
 
-/**
- * Why a file was refused, so the refusal screen blames the right thing:
- * - `version`: the file declares an unknown major, a malformed version, or no
- *   string `schemaVersion` at all.
- * - `content`: the body is not JSON, or it declares the expected major but its
- *   shape fails the schema.
- * - `missing`: a required file returned 404.
- */
+// `version`: unknown major or bad `schemaVersion`; `content`: invalid body;
+// `missing`: a required artifact answered 404.
 export type RefusalCause = 'version' | 'content' | 'missing';
 
 export type LoadOutcome =
@@ -39,11 +25,8 @@ export type LoadOutcome =
       readonly kind: 'refused';
       readonly path: string;
       readonly cause: RefusalCause;
-      /**
-       * The declared `schemaVersion`, or `null` where the file declares no
-       * string one. A null, not a sentinel string: a file may declare any string.
-       */
-      readonly declared: string | null;
+      /** The declared `schemaVersion`, `undefined` if not a string; a file may declare any one. */
+      readonly declared: string | undefined;
       readonly expected: string;
     }
   | { readonly kind: 'failed'; readonly path: string };
@@ -53,7 +36,7 @@ type Fetched =
   | { readonly kind: 'valid'; readonly value: unknown }
   | { readonly kind: 'absent' }
   | { readonly kind: 'not-arrived' }
-  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | null };
+  | { readonly kind: 'invalid'; readonly cause: 'version' | 'content'; readonly declared: string | undefined };
 
 type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
@@ -65,15 +48,15 @@ export interface LoadOptions {
   readonly signal?: AbortSignal;
 }
 
-/** The file's `schemaVersion` string, or `null` where it is missing or not a string. */
-function declaredVersion(data: unknown): string | null {
+/** The file's `schemaVersion` string, or `undefined` where it is missing or not a string. */
+function declaredVersion(data: unknown): string | undefined {
   if (typeof data === 'object' && data !== null && 'schemaVersion' in data) {
     const version = data.schemaVersion;
     if (typeof version === 'string') {
       return version;
     }
   }
-  return null;
+  return undefined;
 }
 
 /** `BASE_URL + path`, resolved against the document so Node's fetch accepts it in tests too. */
@@ -81,42 +64,33 @@ export function artifactUrl(baseUrl: string, path: string): string {
   return new URL(baseUrl + path, document.baseURI).href;
 }
 
-async function fetchOne(
-  key: ArtifactKey,
-  fetchImpl: FetchLike,
-  baseUrl: string,
-  signal: AbortSignal | undefined,
-): Promise<Fetched> {
-  const descriptor = ARTIFACTS[key];
-  const init: RequestInit = signal === undefined ? { cache: 'no-cache' } : { cache: 'no-cache', signal };
-  let body: string;
+/** The response body, or the terminal `Fetched` where the artifact is absent or did not arrive. */
+async function readBody(baseUrl: string, path: string, fetchImpl: FetchLike, init: RequestInit): Promise<string | Fetched> {
   try {
-    const response = await fetchImpl(artifactUrl(baseUrl, descriptor.path), init);
+    const response = await fetchImpl(artifactUrl(baseUrl, path), init);
     // 404 is absent. Any other non-OK status did not arrive.
     if (response.status === 404) {
       return { kind: 'absent' };
     }
-    if (!response.ok) {
-      return { kind: 'not-arrived' };
-    }
-    body = await response.text();
+    return response.ok ? await response.text() : { kind: 'not-arrived' };
   } catch {
     return { kind: 'not-arrived' };
   }
+}
 
+function parseBody(descriptor: (typeof ARTIFACTS)[ArtifactKey], body: string): Fetched {
   let data: unknown;
   try {
     data = JSON.parse(body);
   } catch {
     // Not JSON at all: nothing declared, and the fault is the content.
-    return { kind: 'invalid', cause: 'content', declared: null };
+    return { kind: 'invalid', cause: 'content', declared: undefined };
   }
-
   const result = parseEnvelope(descriptor.schema, data, descriptor.expected);
-  if (result.ok) {
-    return { kind: 'valid', value: result.value };
-  }
-  const declared = declaredVersion(data);
+  return result.ok ? { kind: 'valid', value: result.value } : refusedFetch(result, declaredVersion(data));
+}
+
+function refusedFetch(result: Extract<ReturnType<typeof parseEnvelope>, { readonly ok: false }>, declared: string | undefined): Fetched {
   // Exhaustive by construction: a new `parseEnvelope` reason fails the
   // `never` default at compile time rather than becoming a silent `version`.
   switch (result.reason) {
@@ -128,7 +102,7 @@ async function fetchOne(
       // Covers both a failed version probe (no string version declared) and a
       // failed shape parse at the expected major. A non-object body or a
       // non-string version reads as `version` on purpose (item 22 review).
-      return { kind: 'invalid', cause: declared === null ? 'version' : 'content', declared };
+      return { kind: 'invalid', cause: declared === undefined ? 'version' : 'content', declared };
     }
     default: {
       return result satisfies never;
@@ -136,13 +110,19 @@ async function fetchOne(
   }
 }
 
-/**
- * Precedence across the seven: any artifact that did not arrive gives the
- * fetch-failure screen; otherwise any invalid (or required-and-absent)
- * artifact gives the refusal screen; otherwise the set is ready. Each screen
- * names the first failing artifact in AD-24 order. A refusal carries its
- * cause: the invalid file's own cause, or `missing` for a required 404.
- */
+async function fetchOne(
+  key: ArtifactKey,
+  fetchImpl: FetchLike,
+  baseUrl: string,
+  signal: AbortSignal | undefined,
+): Promise<Fetched> {
+  const descriptor = ARTIFACTS[key];
+  const init: RequestInit = signal === undefined ? { cache: 'no-cache' } : { cache: 'no-cache', signal };
+  const body = await readBody(baseUrl, descriptor.path, fetchImpl, init);
+  return typeof body === 'string' ? parseBody(descriptor, body) : body;
+}
+
+/** Not-arrived gives the failure screen, then invalid or required-absent the refusal (AD-24). */
 function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome {
   for (const key of ARTIFACT_ORDER) {
     if (results[key].kind === 'not-arrived') {
@@ -167,7 +147,7 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
         kind: 'refused',
         path: descriptor.path,
         cause: 'missing',
-        declared: null,
+        declared: undefined,
         expected: descriptor.expected,
       };
     }
@@ -181,7 +161,7 @@ function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome 
       set[key] = result.value;
     } else {
       // Only a tolerable artifact can reach here absent: the loop above refused the rest.
-      set[key] = null;
+      set[key] = undefined;
       absent.push(key as TolerableKey);
     }
   }

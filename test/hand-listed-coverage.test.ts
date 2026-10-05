@@ -1,44 +1,33 @@
 import { readdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { ESLint, type Linter } from 'eslint';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
-import { createVitest } from 'vitest/node';
+import { type CliOptions, createVitest } from 'vitest/node';
 
-/**
- * Some code sits outside every package: the `tools/` entries and
- * `.claude/skills/tracked-json/scripts/`. Hand-written entries bring it under
- * `pnpm check` and `pnpm test`: a `tsconfig.tools.json` include, a root Vitest
- * project include, and an `eslint.config.mjs` `files` glob (plus, for the
- * tracked-json scripts, the `.claude/` ignore-negation chain). A dropped entry
- * fails neither command, so this file asks each tool whether it still covers
- * every file of each target in `TARGETS`. Each checker also runs against an
- * in-memory copy of its config with one named entry removed, which proves it
- * is not vacuous.
- */
-const REPO_ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const TOOLS_TSCONFIG = join(REPO_ROOT, 'tsconfig.tools.json');
-const SOLUTION_TSCONFIG = join(REPO_ROOT, 'tsconfig.json');
+// Code outside every package is covered only by hand-written tsconfig, Vitest and ESLint entries,
+// and a dropped entry fails neither command. Each tool is asked whether it still covers every
+// `TARGETS` file; each checker also runs on a config with one entry removed (not vacuous).
+const REPO_ROOT = nodePath.resolve(fileURLToPath(new URL('..', import.meta.url)));
+const TOOLS_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.tools.json');
+const SOLUTION_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.json');
 
-/** JS too: a `.mjs` helper in a guarded directory is not covered by `<dir>/*.ts`, so it must be reported. */
+/** JS too: a `.mjs` helper in a guarded directory escapes `<directory>/*.ts`, so it is reported. */
 const SOURCE = /\.[cm]?[jt]sx?$/;
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 
-const abs = (rel: string): string => join(REPO_ROOT, ...rel.split('/'));
+const abs = (relativePath: string): string => nodePath.join(REPO_ROOT, ...relativePath.split('/'));
 
-/**
- * Source files directly in `rel`, read at run time so a new file is guarded
- * with no edit. Subdirectories are skipped: `tools/boundary-check/fixture/` is
- * excluded from every tool on purpose.
- */
-function directoryFiles(rel: string): string[] {
-  return readdirSync(abs(rel), { withFileTypes: true })
+// Read at run time so a new file is guarded with no edit. Subdirectories are skipped on purpose:
+// `tools/boundary-check/fixture/` is excluded from every tool.
+function directoryFiles(relativePath: string): string[] {
+  return readdirSync(abs(relativePath), { withFileTypes: true })
     .filter((entry) => entry.isFile() && SOURCE.test(entry.name))
     .map((entry) => entry.name)
-    .sort()
-    .map((name) => join(abs(rel), name));
+    .toSorted((a, b) => Number(a > b) - Number(a < b))
+    .map((name) => nodePath.join(abs(relativePath), name));
 }
 
 interface Target {
@@ -57,13 +46,13 @@ interface Target {
 const DEFAULT_ESLINT: Target['eslint'] = { files: 'tools/**/*.ts' };
 
 const directoryTarget = (
-  dir: string,
+  directory: string,
   eslint: Target['eslint'] = DEFAULT_ESLINT,
 ): Target => ({
-  path: dir,
-  files: directoryFiles(dir),
-  tsInclude: `${dir}/*.ts`,
-  vitestInclude: `${dir}/*.test.ts`,
+  path: directory,
+  files: directoryFiles(directory),
+  tsInclude: `${directory}/*.ts`,
+  vitestInclude: `${directory}/*.test.ts`,
   eslint,
 });
 
@@ -79,6 +68,7 @@ const TARGETS: readonly Target[] = [
   directoryTarget('tools/deferred-issues'),
   directoryTarget('tools/dev-stop'),
   directoryTarget('tools/dts-specifiers'),
+  directoryTarget('tools/entry-guard'),
   directoryTarget('tools/eslint-rules'),
   directoryTarget('tools/lint-on-edit'),
   // Only `tsconfig.tools.json` lists it: its test lives in `test/`, and no
@@ -88,35 +78,36 @@ const TARGETS: readonly Target[] = [
 
 const testFiles = (target: Target): string[] => target.files.filter((path) => TEST.test(path));
 
-/**
- * Loads a committed config's default export. The specifier is computed, so
- * `tsc` does not pull `eslint.config.mjs` into `tsconfig.tools.json`'s file
- * list (TS6307) or reject the `.ts` extension (TS5097).
- */
+// The specifier is computed so `tsc` neither pulls `eslint.config.mjs` into `tsconfig.tools.json`'s
+// file list (TS6307) nor rejects the `.ts` extension (TS5097).
 async function importDefault(file: string): Promise<unknown> {
-  const module = (await import(pathToFileURL(join(REPO_ROOT, file)).href)) as { default: unknown };
+  const module = (await import(pathToFileURL(nodePath.join(REPO_ROOT, file)).href)) as { default: unknown };
   return module.default;
 }
 
 /** Compares paths across tools: TypeScript and Vitest print `/`, `node:path` prints `\` on Windows. */
 const key = (path: string): string => {
-  const normalized = resolve(path).replaceAll('\\', '/');
+  const normalized = nodePath.resolve(path).replaceAll('\\', '/');
   return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
 };
 
 const relativeLabel = (path: string): string => key(path).slice(key(REPO_ROOT).length + 1);
 
 function uncovered(expected: readonly string[], covered: Iterable<string>): string[] {
-  const seen = new Set([...covered].map(key));
-  return expected.filter((path) => !seen.has(key(path))).map(relativeLabel);
+  const seen = new Set([...covered].map((path) => key(path)));
+  return expected.filter((path) => !seen.has(key(path))).map((path) => relativeLabel(path));
 }
 
 // --- TypeScript -------------------------------------------------------------
 
 function readJsonConfig(path: string): Record<string, unknown> {
-  const { config, error } = ts.readConfigFile(path, ts.sys.readFile);
-  if (error !== undefined) {
-    throw new Error(ts.flattenDiagnosticMessageText(error.messageText, '\n'));
+  const result = ts.readConfigFile(path, ts.sys.readFile);
+  if (result.error !== undefined) {
+    throw new Error(ts.flattenDiagnosticMessageText(result.error.messageText, '\n'));
+  }
+  const config: unknown = result.config;
+  if (typeof config !== 'object' || config === null) {
+    throw new Error(`${path} does not hold a JSON object`);
   }
   return config as Record<string, unknown>;
 }
@@ -129,12 +120,8 @@ function tsUncovered(files: readonly string[], json: Record<string, unknown>): s
 
 // --- ESLint -----------------------------------------------------------------
 
-/**
- * A rule that only the main lint block sets, which `files` lists by glob. Later
- * blocks scope rule overrides to `tools/**`, test globs and `*.config.*`, so a
- * file can match some block and still miss the main block. Such a file is not
- * linted by the repo's rules, so it counts as uncovered.
- */
+// Only the main lint block sets this rule. A file can match a later block (scoped to `tools/**`,
+// tests, `*.config.*`) and still miss the main one, so it is not linted by the repo's rules.
 const MAIN_BLOCK_RULE = 'max-lines';
 
 /** Files that the flat config ignores, or that the main lint block does not reach. */
@@ -144,16 +131,15 @@ async function eslintUncovered(
 ): Promise<string[]> {
   const eslint =
     new ESLint(config === undefined ? { cwd: REPO_ROOT } : { cwd: REPO_ROOT, overrideConfigFile: true, overrideConfig: [...config] });
-  const covered: string[] = [];
-  for (const path of files) {
-    const ignored = await eslint.isPathIgnored(path);
-    const calculated: unknown = ignored ? undefined : await eslint.calculateConfigForFile(path);
-    const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
-    if (!ignored && rules?.[MAIN_BLOCK_RULE] !== undefined) {
-      covered.push(path);
-    }
-  }
-  return uncovered(files, covered);
+  const checked = await Promise.all(
+    files.map(async (path) => {
+      const isIgnored = await eslint.isPathIgnored(path);
+      const calculated: unknown = isIgnored ? undefined : await eslint.calculateConfigForFile(path);
+      const rules = (calculated as { rules?: Record<string, unknown> } | undefined)?.rules;
+      return !isIgnored && rules?.[MAIN_BLOCK_RULE] !== undefined ? [path] : [];
+    }),
+  );
+  return uncovered(files, checked.flat());
 }
 
 const loadEslintConfig = async (): Promise<readonly Linter.Config[]> =>
@@ -161,11 +147,11 @@ const loadEslintConfig = async (): Promise<readonly Linter.Config[]> =>
 
 // --- Vitest -----------------------------------------------------------------
 
-type VitestOptions = Parameters<typeof createVitest>[1];
+type VitestOptions = CliOptions;
 
 /** Module ids that Vitest's own glob collects into the `root` project. */
 async function vitestCollected(options: VitestOptions): Promise<string[]> {
-  const vitest = await createVitest('test', { watch: false, run: true, root: REPO_ROOT, ...options });
+  const vitest = await createVitest({ watch: false, run: true, root: REPO_ROOT, ...options });
   try {
     const specifications = await vitest.globTestSpecifications();
     return specifications
@@ -177,8 +163,10 @@ async function vitestCollected(options: VitestOptions): Promise<string[]> {
 }
 
 /** The committed config's collection, shared by every positive case. */
-let committedCollection: Promise<string[]> | undefined;
-const committedVitestCollected = (): Promise<string[]> => (committedCollection ??= vitestCollected({}));
+const committedVitestCollected = ((): (() => Promise<string[]>) => {
+  let collection: Promise<string[]> | undefined;
+  return () => (collection ??= vitestCollected({}));
+})();
 
 interface RootProject {
   test: { name: string; include: string[] };
@@ -210,10 +198,10 @@ describe('tsconfig.json references tsconfig.tools.json', () => {
   });
 });
 
-describe('TARGETS lists every hand-listed tools/ and .claude/ entry', () => {
-  const handListed = (entries: readonly string[]): string[] =>
-    entries.filter((entry) => entry.startsWith('tools/') || entry.startsWith('.claude/'));
+const handListed = (entries: readonly string[]): string[] =>
+  entries.filter((entry) => entry.startsWith('tools/') || entry.startsWith('.claude/'));
 
+describe('TARGETS lists every hand-listed tools/ and .claude/ entry', () => {
   it('each tsconfig.tools.json include entry under tools/ or .claude/ is some target tsInclude', () => {
     const include = readJsonConfig(TOOLS_TSCONFIG)['include'] as string[];
     const known = new Set(TARGETS.map((target) => target.tsInclude));
@@ -237,13 +225,14 @@ describe('TARGETS lists every hand-listed tools/ and .claude/ entry', () => {
 describe.each(TARGETS.map((target) => [target.path, target] as const))(
   '%s stays under type, lint and test coverage',
   (_path, target) => {
-    const all = target.files.map(relativeLabel);
+    const all = target.files.map((path) => relativeLabel(path));
 
     it('holds at least one source file, and a test file when Vitest lists it', () => {
       expect(target.files.length, `no source file in ${target.path}`).toBeGreaterThan(0);
-      if (target.vitestInclude !== undefined) {
-        expect(testFiles(target).length, `no .test.ts file in ${target.path}`).toBeGreaterThan(0);
-      }
+      expect(
+        target.vitestInclude === undefined || testFiles(target).length > 0,
+        `no .test.ts file in ${target.path}`,
+      ).toBe(true);
     });
 
     describe('TypeScript', () => {
@@ -277,7 +266,7 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
             await eslintUncovered(target.files, undefined),
             `ESLint: eslint.config.mjs (files ${eslint.files}${ignoresClause}) ignores or has no config for`,
           ).toEqual([]);
-        });
+        }, 30_000);
 
         it(`the checker reports every file when files glob ${eslint.files} is dropped`, async () => {
           const config = await loadEslintConfig();
@@ -344,7 +333,7 @@ describe.each(TARGETS.map((target) => [target.path, target] as const))(
           expect(
             uncovered(tests, collected),
             `Vitest: with root include ${vitestInclude} dropped, the checker did not report every test file`,
-          ).toEqual(tests.map(relativeLabel));
+          ).toEqual(tests.map((path) => relativeLabel(path)));
         });
       });
     }

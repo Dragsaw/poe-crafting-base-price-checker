@@ -1,5 +1,4 @@
-import type { SetupServerApi } from 'msw/node';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   NEVER_FETCHED_PATH,
@@ -12,11 +11,7 @@ import {
 import { ARTIFACT_ORDER, ARTIFACTS, type ArtifactKey } from './artifacts';
 import { loadArtifacts } from './load-artifacts';
 
-let server: SetupServerApi;
-
-beforeAll(async () => {
-  server = await sharedServer();
-});
+const server = await sharedServer();
 
 describe('the seven artifacts', () => {
   it('lists AD-24’s seven paths in AD-24 order, four required and three tolerable', () => {
@@ -51,8 +46,8 @@ describe('loadArtifacts', () => {
     expect(requests).toHaveLength(7);
     // The server publishes `catalogue/static.json` as a trap; the page never fetches it.
     expect(requests.map((request) => request.url.pathname)).not.toContain(`/${NEVER_FETCHED_PATH}`);
-    expect(requests.map((request) => request.url.pathname).sort()).toEqual(
-      ARTIFACT_ORDER.map((key) => `/${ARTIFACTS[key].path}`).sort(),
+    expect(requests.map((request) => request.url.pathname).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(
+      ARTIFACT_ORDER.map((key) => `/${ARTIFACTS[key].path}`).toSorted((a, b) => Number(a > b) - Number(a < b)),
     );
     for (const request of requests) {
       expect(request.cache).toBe('no-cache');
@@ -125,21 +120,23 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: missing version.
-  it('declares null when the file carries no schemaVersion, or a non-string one', async () => {
+  it('declares undefined when the file carries no schemaVersion, or a non-string one', async () => {
     serveArtifacts(server, { config: { kind: 'json', body: { league: TEST_LEAGUE, minChunkSearches: 1 } } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
-      declared: null,
+      declared: undefined,
+      expected: '1.0.0',
     });
 
     serveArtifacts(server, { config: { kind: 'json', body: { schemaVersion: 1 } } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'config.json',
       cause: 'version',
-      declared: null,
+      declared: undefined,
+      expected: '1.0.0',
     });
   });
 
@@ -208,13 +205,13 @@ describe('loadArtifacts', () => {
   });
 
   // Matrix: required absent.
-  it('refuses a required artifact that is absent, declaring null', async () => {
+  it('refuses a required artifact that is absent, declaring undefined', async () => {
     serveArtifacts(server, { tracked: { kind: 'status', status: 404 } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'tracked.json',
       cause: 'missing',
-      declared: null,
+      declared: undefined,
       expected: '2.0.0',
     });
   });
@@ -246,18 +243,18 @@ describe('loadArtifacts', () => {
     expect(outcome.kind).toBe('ready');
     if (outcome.kind !== 'ready') {return;}
     expect(outcome.absent).toEqual(['syncReport', 'recipes']);
-    expect(outcome.set.recipes).toBeNull();
-    expect(outcome.set.syncReport).toBeNull();
+    expect(outcome.set.recipes).toBeUndefined();
+    expect(outcome.set.syncReport).toBeUndefined();
   });
 
   // Matrix: non-JSON body.
-  it('refuses a 200 that is not JSON, declaring null', async () => {
+  it('refuses a 200 that is not JSON, declaring undefined', async () => {
     serveArtifacts(server, { weights: { kind: 'text', body: '<!doctype html><html></html>' } });
-    expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
+    expect(await loadArtifacts({ baseUrl: '/' })).toStrictEqual({
       kind: 'refused',
       path: 'weights.json',
       cause: 'content',
-      declared: null,
+      declared: undefined,
       expected: '6.1.0',
     });
   });
@@ -269,6 +266,11 @@ describe('loadArtifacts', () => {
         throw new TypeError('boom');
       },
     });
+    expect(outcome).toEqual({ kind: 'failed', path: 'dataset.json' });
+  });
+
+  it('never rejects on a base URL that cannot form a URL, and fails on the first artifact', async () => {
+    const outcome = await loadArtifacts({ baseUrl: 'https://[', fetch: () => Promise.reject(new Error('unreachable')) });
     expect(outcome).toEqual({ kind: 'failed', path: 'dataset.json' });
   });
 });

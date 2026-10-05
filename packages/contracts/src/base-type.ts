@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-/**
- * A trade-API base type. The identity **is** the API's own `type` string,
- * exactly as `data/items` spells it, and no component re-encodes it or derives
- * it from a `categoryId` (AD-5, Consistency Conventions, *Ids*).
- */
+/** The identity is the API's `type` string, never re-encoded or taken from `categoryId` (AD-5). */
 export const BaseTypeIdSchema = z
   .string()
   .min(1)

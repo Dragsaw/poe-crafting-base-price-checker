@@ -1,25 +1,12 @@
 import { CORE_PLACEHOLDER } from '@poe/core';
 
-/**
- * Placeholder export. `sync` is the imperative shell: trade client, rate
- * governor, chunk runner, lock and writers. It may import `@poe/contracts` and
- * `@poe/core`, and never `@poe/web`.
- */
+/** Placeholder export; `sync` imports `@poe/contracts` and `@poe/core`, never `@poe/web` (AD-1). */
 export const SYNC_PLACEHOLDER = `${CORE_PLACEHOLDER}:sync`;
 
 
 
-/**
- * The one governed trade request path (FR-20, AD-8). `createTradeClient`, and
- * `createTradeClients` for sibling clients that share one governor (one per
- * request source), and `createTradeGovernor`, which makes that governor's
- * pacing memory (`PacingState`) and its pacer explicit for the `pnpm sync`
- * session, are the **only** exported ways to make a trade request,
- * and `HttpPort` is deliberately not re-exported from `sync`: a second call
- * site that wanted to build its own request would have to reach into
- * `@poe/contracts` for the port, which makes the violation visible rather
- * than convenient.
- */
+// The one governed trade request path (FR-20, AD-8): the only exported ways to make a request.
+// `HttpPort` is deliberately not re-exported, so a second call site would have to reach for it.
 export {
   createPacingState,
   createTradeClient,
@@ -43,32 +30,14 @@ export type {
 export { MissingUserAgentError, resolveUserAgent, USER_AGENT_ENV_VAR } from './trade/user-agent';
 export type { UserAgentRefused, UserAgentResolved, UserAgentResult } from './trade/user-agent';
 
-/**
- * The skip record a `TradeResult` carries. The **parser, the ledger and the
- * pacing functions are deliberately not exported**: together they are
- * everything a second call site needs to assemble a parallel pacer against the
- * same budget, which is exactly what withholding `HttpPort` was meant to
- * prevent. They are imported by path inside this package, and by its tests.
- */
+// Parser, ledger and pacing functions are deliberately not exported: with them a second call site
+// could assemble a parallel pacer on the same budget, which withholding `HttpPort` prevents.
 export type { RateLimitSkip, RateLimitSkipReason } from './trade/rate-limit-headers';
 
-/**
- * One bounded, resumable, single-instance chunk (FR-19, AD-7). Under the lock
- * it writes `data/dataset.json`, `data/sync-progress.json` and
- * `data/sync-report.json` by explicit path and performs no git write (AD-3).
- * The report carries requests per source (AD-12, FR-14), the not-reached count
- * and the tracked-list edit date as figures, and every unacknowledged record
- * (FR-25). A throw still writes the report, with a `run-failure` record.
- * `pnpm sync` (`./sync.ts`, a long-running session of one-entry chunks) and
- * `pnpm sync:batch` (`./sync-batch.ts`, one chunk per invocation) drive it
- * live; the tests and `pnpm sync:dry` drive it against in-memory fakes.
- */
+// One bounded, resumable, single-instance chunk (FR-19, AD-7); no git write (AD-3).
+// A throw still writes the report, with a `run-failure` record (FR-25).
 export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, runChunk, TRACKED_PATH } from './chunk/run-chunk';
-/**
- * The one chunk composition `pnpm sync`, `pnpm sync:batch` and `pnpm sync:dry` share: one
- * governor of two counted trade clients, the catalogue loader and the
- * runner's under-lock `load` hook (AD-8, AD-12).
- */
+/** The one chunk composition `pnpm sync`, `sync:batch` and `sync:dry` share (AD-8, AD-12). */
 export { composeChunk } from './compose-chunk';
 export type { ComposeChunkPorts, ComposedChunk } from './compose-chunk';
 export { buildDatasetFile } from './chunk/publish-dataset';
@@ -76,11 +45,7 @@ export type { DatasetInputs } from './chunk/publish-dataset';
 export { buildSyncReport, carryRecords } from './chunk/sync-report';
 export type { SyncReportFigures, SyncReportInputs } from './chunk/sync-report';
 
-/**
- * Per-source request accounting (AD-12, FR-14): a shell wraps each `HttpPort`
- * it hands out with the source it serves, and passes the counter to
- * `runChunk`. The wrapper adds no request path of its own.
- */
+/** Per-source request accounting (AD-12, FR-14); the wrapper adds no request path of its own. */
 export { createRequestCounter, requestsBetween, zeroRequests } from './request-counter';
 export type { RequestCounter, RequestsBySource } from './request-counter';
 export type {
@@ -100,29 +65,16 @@ export type {
 } from './chunk/run-chunk';
 export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';
 
-/**
- * The one validate-then-serialise write for every artifact `sync` writes: the
- * value is parsed with its schema and the parsed value is serialised, so the
- * keys follow the schema's declared order. An invalid artifact is refused with
- * `InvalidArtifactError` and nothing is written.
- */
+/** The one validate-then-serialise write for every artifact `sync` writes; invalid is refused. */
 export { InvalidArtifactError, writeArtifact } from './write-artifact';
 export type { ArtifactSchema } from './write-artifact';
 
-/**
- * The load-time pinned cap and the starvation record (AD-7,
- * IMPLEMENTATION-NOTES.md §6) — the only readers of `minChunkSearches`, kept
- * outside `chunk/` so the yardstick can never bound a chunk.
- */
+// Pinned cap and starvation record (AD-7, IMPLEMENTATION-NOTES.md §6): the only readers of
+// `minChunkSearches`, kept outside `chunk/` so the yardstick can never bound a chunk.
 export { checkPinnedCap, PinnedCapExceededError, pinnedStarvationRecord } from './pinned-cap';
 export type { PinnedCapExceeded, PinnedCapResult } from './pinned-cap';
 
-/**
- * The pricing step (FR-21, FR-23, AD-16, AD-20): one search and at most one
- * fetch per tracked entry through the governed client, normalised to divine
- * once. It plugs into `runChunk` as its `ChunkStep`, and `runChunk` publishes
- * the entries it returns into the dataset.
- */
+/** The pricing step (FR-21, FR-23, AD-16, AD-20): plugs into `runChunk` as its `ChunkStep`. */
 export {
   createPricingStep,
   FETCH_LIMIT,
@@ -143,13 +95,8 @@ export { CONFIG_PATH, loadActiveLeague, loadConfig } from './load-config';
 export { DataFileError } from './load-data-file';
 export type { DataFileRefusal, DataFileResult } from './load-data-file';
 
-/**
- * The run-start catalogue check (FR-24, AD-9, AD-25): the committed
- * catalogue's id sets, the pure check `runChunk` runs under the lock before
- * any request, and the `weights.json` reader, which refuses a file that breaks
- * the weights contract and whose ids are checked report-only. `className` is
- * never checked against the catalogue.
- */
+// The run-start catalogue check (FR-24, AD-9, AD-25): id sets, the pure check, the weights reader.
+// `className` is never checked against the catalogue.
 export { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH, loadCatalogueIds } from './catalogue/catalogue-ids';
 export type { CatalogueIds } from './catalogue/catalogue-ids';
 export { checkCatalogue, markUnresolvable } from './chunk/catalogue-check';
@@ -159,19 +106,10 @@ export { checkWeightsIds, readWeightsIds, WEIGHTS_PATH, weightsAbsentRecord } fr
 export { WEIGHTS_SCHEMA_VERSION, INITIAL_SCHEMA_VERSION as SYNC_CONTRACTS_SCHEMA_VERSION } from '@poe/contracts';
 export type { WeightsIds } from './catalogue/weights-ids';
 
-/**
- * The run-start cross-file gate (AD-12, AD-17): `core`'s five checks, run
- * before the order. A failure throws `CrossFileGateError`, which `runChunk`
- * reports as one `cross-file-gate-failure` record per failure.
- */
+/** The run-start cross-file gate (AD-12, AD-17): a failure throws `CrossFileGateError`. */
 export { CrossFileGateError, crossFileGate, crossFileGateRecords } from './chunk/cross-file-gate';
 
-/**
- * The run-start league gate (FR-32, AD-19): one `league-validation` GET under
- * the lock, before any search. A mismatch throws `LeagueMismatchError`, which
- * `runChunk` reports as a `league-mismatch` record; an unanswered request
- * yields the chunk (AD-8).
- */
+/** The run-start league gate (FR-32, AD-19); an unanswered request yields the chunk (AD-8). */
 export {
   createLeagueGate,
   LeagueMismatchError,

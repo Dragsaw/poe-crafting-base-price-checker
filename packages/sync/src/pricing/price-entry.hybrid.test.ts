@@ -1,7 +1,7 @@
 import { createFakeClockPort } from '@poe/contracts';
 import type { CurrencyRate, HttpPort, TrackedEntry } from '@poe/contracts';
 import { http, HttpResponse } from 'msw';
-import type { SetupServerApi } from 'msw/node';
+import type { SetupServer } from 'msw/node';
 import { describe, expect, it } from 'vitest';
 
 import { createTradeClient } from '../trade/client.ts';
@@ -9,20 +9,15 @@ import { tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
 import { createPricingStep } from './price-entry.ts';
 import { itemTypesOf } from './search-body.ts';
 
-/**
- * SPEC-tracked-hybrid-mods CAP-2 against an MSW fixture: the search a hybrid
- * entry sends, as the trade server receives it. The shared server of
- * `test/setup.ts` answers; its no-network guard still fails any other request.
- * The port below is a plain `fetch` wrapper, so MSW intercepts it. It is not
- * the shell's real port, which only `shell-fetch.test.ts` may name.
- */
+// SPEC-tracked-hybrid-mods CAP-2. The port below is a plain `fetch` wrapper that MSW
+// intercepts, not the shell's real port, which only `shell-fetch.test.ts` may name.
 
 // The shared server lives outside this package's `rootDir`, so it is imported
 // dynamically, as `web`'s `artifact-server.ts` does.
 const SHARED_SETUP = `${(import.meta as ImportMeta & { readonly dirname: string }).dirname}/../../../../test/setup.ts`;
 
-async function sharedServer(): Promise<SetupServerApi> {
-  const setup = (await import(/* @vite-ignore */ SHARED_SETUP)) as { server: SetupServerApi };
+async function sharedServer(): Promise<SetupServer> {
+  const setup = (await import(/* @vite-ignore */ SHARED_SETUP)) as { server: SetupServer };
   return setup.server;
 }
 

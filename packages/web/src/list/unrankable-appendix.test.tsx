@@ -1,42 +1,22 @@
 import type { UnrankableClass } from '@poe/core';
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { rgb } from '../test-support/dom';
+import { mount, rgb, unmount } from '../test-support/dom';
 import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
 import { HAIR_SPACE } from './TrustMark';
 import { APPENDIX_LEAD, appendixCount, DISAGREES_NOTE, UnrankableAppendix } from './UnrankableAppendix';
 
 const REASON = 'class absent from weights file';
 
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
-
-afterEach(() => {
-  const mounted = root;
-  if (mounted !== undefined) {
-    act(() => {
-      mounted.unmount();
-    });
-  }
-  root = undefined;
-  container?.remove();
-  container = undefined;
-});
+afterEach(unmount);
 
 function klass(className: string): UnrankableClass {
   return { categoryId: `c.${className.toLowerCase()}`, className, reason: REASON };
 }
 
 function mountAppendix(classes: readonly UnrankableClass[]): HTMLElement {
-  container = document.createElement('div');
-  document.body.append(container);
-  const mounted = createRoot(container);
-  root = mounted;
-  act(() => {
-    mounted.render(<UnrankableAppendix classes={classes} />);
-  });
+  const container = mount(<UnrankableAppendix classes={classes} />);
   const panel = container.querySelector<HTMLElement>('[data-unrankable-appendix]');
   if (panel === null) {
     throw new Error('no appendix rendered');
@@ -145,18 +125,19 @@ describe('the non-empty appendix', () => {
     for (const row of panel.querySelectorAll<HTMLElement>('[data-appendix-row]')) {
       expect(row.className).toBe('');
       expect(row.style.cursor).toBe('');
-      const before = panel.innerHTML;
+      const before = panel.outerHTML;
       act(() => {
         row.click();
       });
-      expect(panel.innerHTML).toBe(before);
+      expect(panel.outerHTML).toBe(before);
     }
   });
 });
 
+const note = (item: UnrankableClass): string =>
+  mountAppendix([item]).querySelector('[data-cell="note"]')?.textContent ?? '';
+
 describe('the note cell', () => {
-  const note = (item: UnrankableClass): string =>
-    mountAppendix([item]).querySelector('[data-cell="note"]')?.textContent ?? '';
 
   it('says the pool is published and complete and the disagreement is in the Tracked List, naming no check', () => {
     const text = note({ categoryId: 'c.bows', className: 'Bows', reason: 'class disagrees with weights file' });

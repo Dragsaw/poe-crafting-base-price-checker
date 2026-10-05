@@ -1,10 +1,5 @@
-/**
- * Shared by the fixture and by `test/guard-concurrent.test.ts`. A separate
- * module, because importing the fixture itself would register its tests in the
- * parent.
- *
- * Every URL is under `.invalid` (RFC 2606), so nothing can reach a host.
- */
+// Shared by the fixture and `test/guard-concurrent.test.ts`; separate because importing the
+// fixture would register its tests in the parent. Every URL is under `.invalid` (RFC 2606).
 export const DESCRIBE_FIRST = {
   title: 'describe.concurrent: first test',
   url: 'https://unrouted.invalid/api/trade2/fetch/describe-first',

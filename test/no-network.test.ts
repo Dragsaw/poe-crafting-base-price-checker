@@ -34,10 +34,8 @@ it('blocks a remote request whose path ends .json', async () => {
 it('fails a test through the guard, naming every escaped URL', async () => {
   await fetch(UNROUTABLE_URL);
 
-  // This calls the guard's no-owner branch, the one the setup file's `afterAll`
-  // runs. The real `afterEach` takes the owner branch, which the owner-path test
-  // below and `test/guard-hooks.test.ts` cover. Calling it directly is what
-  // proves this failing branch is reachable: delete its throw and this fails.
+  // The no-owner branch that the setup `afterAll` runs; the real `afterEach` takes the owner branch
+  // (covered below and by `test/guard-hooks.test.ts`). Delete this branch's throw and this fails.
   expect(() => {
     assertNoEscapedRequests();
   }).toThrow(UNROUTABLE_URL);
@@ -51,31 +49,27 @@ it('fails a test through the guard, naming every escaped URL', async () => {
 // name A. The two tests run in file order and share this state.
 const LATE_URL = 'https://unrouted.invalid/api/trade2/fetch/late';
 const LATE_ISSUER = 'issues an unfixtured request from a timer it does not await';
-let releaseLateRequest: () => void = () => {};
-let lateRequestSettled: Promise<void> = Promise.resolve();
+const noop = (): void => {};
+
+const lateGate = Promise.withResolvers<void>();
+const lateSettled = Promise.withResolvers<void>();
 
 it(LATE_ISSUER, () => {
-  const gate = new Promise<void>((resolve) => {
-    releaseLateRequest = resolve;
-  });
-  let settle: () => void = () => {};
-  lateRequestSettled = new Promise<void>((resolve) => {
-    settle = resolve;
-  });
   // The timer is scheduled here, so its callback carries this test's identity.
   // The request starts only when B opens the gate, after this test has ended.
   setTimeout(() => {
-    void gate
+    void lateGate.promise
       .then(() => fetch(LATE_URL))
       .finally(() => {
-        settle();
+        lateSettled.resolve();
       });
   }, 0);
+  expect(drainEscapedRequests()).toEqual([]);
 });
 
 it('does not charge a late request to the test running when it settles', async ({ task }) => {
-  releaseLateRequest();
-  await lateRequestSettled;
+  lateGate.resolve();
+  await lateSettled.promise;
 
   // B's drain takes only B's requests. A's late request stays recorded, so a
   // draining test cannot swallow it.
@@ -113,16 +107,19 @@ it("fails a test's own guard for a request it issued", async ({ task }) => {
 describe('a request recorded after the last afterEach of its test', () => {
   const AFTER_LAST_URL = 'https://unrouted.invalid/api/trade2/fetch/after-last';
   const AFTER_LAST_ISSUER = 'issues a request that settles after its afterEach';
-  let release: () => void = () => {};
+  let release: () => void = noop;
   let settled: Promise<void> = Promise.resolve();
 
+  async function fetchWhenReleased(gate: Promise<void>): Promise<void> {
+    await gate;
+    await fetch(AFTER_LAST_URL);
+  }
+
   it(AFTER_LAST_ISSUER, () => {
-    const gate = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    settled = gate.then(async () => {
-      await fetch(AFTER_LAST_URL);
-    });
+    const gate = Promise.withResolvers<void>();
+    release = gate.resolve;
+    settled = fetchWhenReleased(gate.promise);
+    expect(drainEscapedRequests()).toEqual([]);
   });
 
   // Runs after the test's `afterEach`, which found nothing, and before the

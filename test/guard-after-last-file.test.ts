@@ -1,27 +1,19 @@
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
 
 import { DELAY_ENV, ISSUER_TEST, LATE_URL } from './guard-after-last-file-fixture/names';
 
-/**
- * Observes the guard after the **last** file of a worker. With the default
- * `isolate`, every file is the last file of its worker. A 0 ms timer that the
- * fixture test starts fires after the setup file's `afterAll` and before the
- * worker ends. No hook inside the worker can fail the run then, so the worker
- * writes the request to disk, and the `onClose` check of `test/global-setup.ts`
- * fails the run and names the URL. A 200 ms timer never fires: the main process
- * ends the worker first.
- *
- * The child needs no network: the fixture URL is under `.invalid`.
- */
+// A 0 ms timer from the fixture fires after the setup `afterAll`, where no worker hook can fail the
+// run; the worker writes to disk and the `onClose` check of `test/global-setup.ts` names the URL.
+// A 200 ms timer never fires: the main process ends the worker first.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-after-last-file-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -38,11 +30,8 @@ interface JsonReport {
   readonly testResults: readonly FileResult[];
 }
 
-/**
- * Resolves with the child's exit code; a non-zero exit is expected, not an error.
- * The child's temp directory is `childTmp`, so the test can see what the
- * child's global setup leaves there.
- */
+// A non-zero exit is expected. The child's temp directory is `childTemporary`, so the test can
+// see what the child's global setup leaves there.
 function runChild(
   outputFile: string,
   delayMs: number,
@@ -83,17 +72,18 @@ interface ChildRun {
 }
 
 async function runWithDelay(delayMs: number): Promise<ChildRun> {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-after-last-file-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-after-last-file-'));
   try {
-    const childTemporary = join(dir, 'tmp');
+    const childTemporary = nodePath.join(directory, 'tmp');
     await mkdir(childTemporary);
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile, delayMs, childTemporary);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
-    const leftRecordDirectories = (await readdir(childTemporary)).filter((name) => name.startsWith('no-network-'));
+    const temporaryEntries = await readdir(childTemporary);
+    const leftRecordDirectories = temporaryEntries.filter((name) => name.startsWith('no-network-'));
     return { code, output, report, leftRecordDirs: leftRecordDirectories };
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 }
 

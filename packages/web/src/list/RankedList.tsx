@@ -16,19 +16,9 @@ export function expandCopy(remaining: number): string {
 
 export const COLLAPSE_COPY = `${glyphs.close} Show only the top ${String(TOP_ROWS)}`;
 
-/**
- * The column header and the list. `core` ordered the rows, and the caller
- * has already narrowed them to the active Craft Recipe; the top-20 bound is a
- * view slice applied after that filter (FR-5). In state 35 the list holds two
- * branches, raw then crafted, and the bound applies to each, with one
- * affordance under each (EXPERIENCE.md state 35). `+ Read the remaining N
- * rows` grows its branch in place and names no unit; ranks 21 and beyond
- * already carry tier 3. The grown flags and the open-row set are the list's
- * own state and reset on reload. Each open row carries its expansion panel in
- * place beneath it; many may be open, and only a second click on its own row
- * closes one. Growing or collapsing, a threshold change or a recipe switch
- * never changes the open set, so a hidden open row reappears open.
- */
+// The top-20 bound is a view slice after the recipe filter (FR-5), per branch in state 35.
+// Grown flags and the open set reset on reload but survive a threshold change or recipe switch,
+// so a hidden open row reappears open.
 export function RankedList({
   rows,
   branches,
@@ -96,7 +86,7 @@ function Branch({
   onToggle,
   threshold,
   activeLeague,
-  recipeWord,
+  recipeWord = '',
   kind,
 }: {
   readonly rows: readonly ListRow[];
@@ -120,7 +110,7 @@ function Branch({
     return row.unit === 'raw' ? (
       <RawExpansionPanel row={row} threshold={threshold} activeLeague={activeLeague} />
     ) : (
-      <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord ?? ''} activeLeague={activeLeague} />
+      <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord} activeLeague={activeLeague} />
     );
   };
 
@@ -131,7 +121,7 @@ function Branch({
         return (
           <Fragment key={row.key}>
             <RankedRow row={row} open={isOpen} onToggle={onToggle} />
-            {isOpen ? expansionPanel(row) : null}
+            {isOpen ? expansionPanel(row) : undefined}
           </Fragment>
         );
       })}
@@ -150,7 +140,7 @@ function Branch({
             {grown ? COLLAPSE_COPY : expandCopy(remaining)}
           </button>
         </div>
-      ) : null}
+      ) : undefined}
     </div>
   );
 }

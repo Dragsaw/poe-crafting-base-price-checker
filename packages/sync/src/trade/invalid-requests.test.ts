@@ -5,7 +5,7 @@ import {
   invalidRequestsFor,
   isInvalidRequest,
   NO_INVALID_REQUESTS,
-  thresholdReached,
+  isThresholdReached,
   UNGOVERNED_POLICY_KEY,
 } from './invalid-requests.ts';
 
@@ -44,8 +44,8 @@ it('reaches the threshold at the declared count, not one past it', () => {
   const one = countInvalidRequest(NO_INVALID_REQUESTS, SEARCH_POLICY);
   const two = countInvalidRequest(one, SEARCH_POLICY);
 
-  expect(thresholdReached(one, SEARCH_POLICY, 2)).toBe(false);
-  expect(thresholdReached(two, SEARCH_POLICY, 2)).toBe(true);
+  expect(isThresholdReached(one, SEARCH_POLICY, 2)).toBe(false);
+  expect(isThresholdReached(two, SEARCH_POLICY, 2)).toBe(true);
 });
 
 it('never refuses when no threshold was declared', () => {
@@ -54,6 +54,6 @@ it('never refuses when no threshold was declared', () => {
     counts = countInvalidRequest(counts, SEARCH_POLICY);
   }
 
-  expect(thresholdReached(counts, SEARCH_POLICY, undefined)).toBe(false);
+  expect(isThresholdReached(counts, SEARCH_POLICY, undefined)).toBe(false);
   expect(invalidRequestsFor(counts, SEARCH_POLICY)).toBe(50);
 });

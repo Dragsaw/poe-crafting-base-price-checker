@@ -1,18 +1,13 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
 const PACKAGES_DIR = fileURLToPath(new URL('../packages', import.meta.url));
 const SCOPE = '@poe/';
 
-/**
- * The declared graph. A manifest that declares only its allowed siblings is the
- * first of the two guards on AD-1's direction — an illegal import does not
- * resolve at all — and `dependency-cruiser` is the second.
- *
- * Read as: package name -> the sibling packages it may declare.
- */
+// Package name -> the sibling packages it may declare. The first of two guards on AD-1's
+// direction: an illegal import does not resolve at all. `dependency-cruiser` is the second.
 const ALLOWED_EDGES: Readonly<Record<string, readonly string[]>> = {
   '@poe/contracts': [],
   '@poe/core': ['@poe/contracts'],
@@ -28,27 +23,20 @@ interface Manifest {
   readonly optionalDependencies?: Record<string, string>;
 }
 
-/**
- * Enumerated from disk, never hardcoded: a fifth package added without a rule
- * here must fail this test rather than slip past it.
- */
+/** Enumerated from disk, so a fifth package added without a rule here fails this test. */
 function readManifests(): { directory: string; manifest: Manifest }[] {
   return readdirSync(PACKAGES_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => ({
       directory: entry.name,
       manifest: JSON.parse(
-        readFileSync(join(PACKAGES_DIR, entry.name, 'package.json'), 'utf8'),
+        readFileSync(nodePath.join(PACKAGES_DIR, entry.name, 'package.json'), 'utf8'),
       ) as Manifest,
     }));
 }
 
-/**
- * Every `@poe/*` entry counts, in any dependency field and under any range
- * protocol. `link:../web`, `"*"` and `file:` are workspace edges just as much as
- * `workspace:*` is, and matching only the `workspace:` prefix would have missed
- * all three.
- */
+// Any `@poe/*` entry counts, in any dependency field and under any range protocol: `link:../web`,
+// `"*"` and `file:` are edges as much as `workspace:*`, which a prefix match would miss.
 function workspaceEdgesOf(manifest: Manifest): string[] {
   const fields = [
     manifest.dependencies,
@@ -58,13 +46,14 @@ function workspaceEdgesOf(manifest: Manifest): string[] {
   ];
   const edges = new Set<string>();
   for (const field of fields) {
-    for (const name of Object.keys(field ?? {})) {
+    const names = Object.keys(field ?? {});
+    for (const name of names) {
       if (name.startsWith(SCOPE)) {
         edges.add(name);
       }
     }
   }
-  return [...edges].sort();
+  return [...edges].toSorted((a, b) => Number(a > b) - Number(a < b));
 }
 
 it('declares a workspace edge only where the one-way graph allows one', () => {

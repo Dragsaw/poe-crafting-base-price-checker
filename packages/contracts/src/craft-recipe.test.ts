@@ -70,10 +70,11 @@ describe('CraftRecipeSchema', () => {
   });
 });
 
+const recipeOf = (...currencyIds: string[]) => ({
+  currencies: currencyIds.map((currencyId) => ({ currencyId, quantity: 1 })),
+});
+
 describe('recipeWord', () => {
-  const recipeOf = (...currencyIds: string[]) => ({
-    currencies: currencyIds.map((currencyId) => ({ currencyId, quantity: 1 })),
-  });
 
   it('reads the grade every currency id shares', () => {
     expect(recipeWord(recipeOf('greater-orb-of-transmutation', 'greater-orb-of-augmentation'))).toBe('greater');

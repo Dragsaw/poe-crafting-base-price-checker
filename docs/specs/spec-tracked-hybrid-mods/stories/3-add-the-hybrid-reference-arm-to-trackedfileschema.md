@@ -101,5 +101,5 @@ Sorting happens in the schema, so `z.infer` yields sorted lines, and no consumer
 | 15 | edge | One hybrid aborts the whole catalogue check | false | reject | The frozen interim decision: each hybrid branch throws; committed data holds none. |
 | 16 | verification | No gap findings | — | — | Each behavioral change traced to a test. |
 | 17 | verification | The pair-loop `assertSingleLine` in `crossFileChecks` is unreachable | low | patch | Confirmed at `cross-file.ts:282-292`: every keyed entry runs REF_CHECKS (`emptyContainment` asserts both slots) before the pair loop. Same root as part of #7. |
-| 18 | verification | The envelope hybrid-pair test passes without the `overlapBranches` guard | low | reject | With `NEVER_CO_OCCUR` a hybrid falls through to `false` anyway; the guard is pinned by `overlap.test.ts`. No user harm. |
+| 18 | verification | The envelope hybrid-pair test passes without the `overlapBranches` guard | low | reject | With `CAN_NEVER_CO_OCCUR` a hybrid falls through to `false` anyway; the guard is pinned by `overlap.test.ts`. No user harm. |
 | 19 | ledger | No findings | — | — | All carved-out work is owned by stories 4–9 in stories.yaml. |

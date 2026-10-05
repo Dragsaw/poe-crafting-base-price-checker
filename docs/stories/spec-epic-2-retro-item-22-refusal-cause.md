@@ -50,7 +50,7 @@ deferred:
 
 - `packages/web/src/load/load-artifacts.ts` -- `LoadOutcome` (refused arm), `Fetched` (`invalid` arm), `fetchOne` (JSON-parse failure → content; `parseEnvelope` failure → version or content), `classify` (required-absent → missing). `parseEnvelope` returns `reason: 'unknown-major' | 'malformed-version'` for a version fault. It returns `reason: 'invalid'` for both a failed version probe and a failed shape parse. Split these with `declaredVersion(data) === NO_DECLARED_VERSION`: a failed probe means that no string version was declared.
 - `packages/contracts/src/envelopes.ts:239` -- `parseEnvelope`. Read only.
-- `packages/web/src/frame/FailureScreen.tsx` -- `FailureScreenProps` refused arm; body `<p>` at lines 46-55. Keep the `data-artifact`, `data-declared` and `data-expected` spans where the sentence names those values.
+- `packages/web/src/frame/FailureScreen.tsx` -- `FailureScreenProperties` refused arm; body `<p>` at lines 46-55. Keep the `data-artifact`, `data-declared` and `data-expected` spans where the sentence names those values.
 - `packages/web/src/App.tsx:94` -- passes the refused view's fields to `FailureScreen`. `ViewState` reuses `LoadOutcome`, so the new field flows through.
 - `packages/web/src/load/load-artifacts.test.ts:72-190` -- loader matrix. Its `toEqual` refusals need `cause`.
 - `packages/web/src/App.test.tsx:158-262` -- screen matrix: invalid tracked, dataset 2.0.0, config with no version, tracked 404, HTML body.
@@ -77,7 +77,7 @@ deferred:
 
 ### 2026-09-27 — sentinel replaced by declared: null
 
-- Commit `8a47e24` replaced the `NO_DECLARED_VERSION = 'none'` sentinel with `declared: string | null` in `Fetched.invalid` and the `refused` outcome of `LoadOutcome`, and in `FailureScreenProps`. `declaredVersion` returns `null` where the file declares no string version. A declared string, `"none"` included, is kept as declared.
+- Commit `8a47e24` replaced the `NO_DECLARED_VERSION = 'none'` sentinel with `declared: string | null` in `Fetched.invalid` and the `refused` outcome of `LoadOutcome`, and in `FailureScreenProperties`. `declaredVersion` returns `null` where the file declares no string version. A declared string, `"none"` included, is kept as declared.
 - The loader now splits a `reason: 'invalid'` result with `declared === null`: `null` gives `cause: 'version'`, and a string gives `cause: 'content'`.
 - These passages describe the superseded design. They stay as written, and this entry is the record of the change:
   - The Code Map `load-artifacts.ts` predicate "Split these with `declaredVersion(data) === NO_DECLARED_VERSION`".

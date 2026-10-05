@@ -1,11 +1,8 @@
-/**
- * Fixture builders for tracked and dataset entries, for the ranked-list tests.
- * Never imported by the app.
- */
+/** Fixture builders for tracked and dataset entries, for the ranked-list tests. */
 
 import {
   canonicalKey,
-  type BandedModifierRef,
+  type BandedModifierReference,
   type CraftedTrackedEntry,
   type DatasetEntry,
   type PriceState,
@@ -35,7 +32,7 @@ export function craftedEntry(className: string, categoryId: string, itemLevelMin
 }
 
 /** A banded reference, with an Accepted Tier when one is given. */
-export function banded(statId: string, valueMin: number, valueMax: number, acceptedTier?: string): BandedModifierRef {
+export function banded(statId: string, valueMin: number, valueMax: number, acceptedTier?: string): BandedModifierReference {
   const reference = { kind: 'banded', statId, valueMin, valueMax } as const;
   return acceptedTier === undefined ? reference : { ...reference, acceptedTier };
 }
@@ -59,8 +56,7 @@ export function priced(
   entry: TrackedEntry,
   priceDivine: number,
   observedAt: string,
-  league: string = TEST_LEAGUE,
-  search?: StoredSearch,
+  { league = TEST_LEAGUE, search }: { readonly league?: string; readonly search?: StoredSearch } = {},
 ): DatasetEntry {
   return {
     ...searchFields(search),
@@ -98,4 +94,10 @@ export function bodiesWith(
     tracked: { ...(VALID_BODIES.tracked as object), entries: tracked },
     dataset: { ...(VALID_BODIES.dataset as object), entries: dataset },
   };
+}
+
+/** `count` raw entries `Base 00`, `Base 01`, ..., priced best first, seen an hour before `now`. */
+export function many(count: number, now: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntry[] } {
+  const tracked = Array.from({ length: count }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
+  return { tracked, dataset: tracked.map((entry, index) => priced(entry, 40 - index, hoursBefore(now, 1))) };
 }

@@ -13,7 +13,7 @@ function statementFor(
   dataset: readonly DatasetEntry[],
   threshold = 0.25,
 ): ReturnType<typeof listStatement> {
-  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: null }), threshold, TEST_LEAGUE);
+  return listStatement(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: undefined }), threshold, TEST_LEAGUE);
 }
 
 const belt = rawEntry('Wide Belt');
@@ -39,9 +39,9 @@ describe('listStatement', () => {
     const statement = statementFor(
       [belt, ring, amulet],
       [
-        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
-        priced(amulet, 2, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(belt, 1.5, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
+        priced(amulet, 2, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       ],
     );
     expect(statement).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
@@ -58,11 +58,11 @@ describe('listStatement', () => {
   it('is honest-empty when no-listings and not-yet-synced rows mix', () => {
     const tracked = [belt, ring, amulet];
     const dataset = [
-      priced(belt, 1.5, hoursBefore(NOW, 30 * 24), 'Standard'),
-      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+      priced(belt, 1.5, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
+      priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
     ];
-    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weights: null });
+    const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: 0.25, weights: undefined });
     expect(ranking.noListings).toHaveLength(1);
     expect(ranking.notYetSynced).toHaveLength(2);
     expect(isHonestEmpty(ranking)).toBe(true);
@@ -75,7 +75,7 @@ describe('listStatement', () => {
       [belt, ring, amulet],
       [
         priced(belt, 1.5, hoursBefore(NOW, 1)),
-        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), 'Standard'),
+        priced(ring, 0.8, hoursBefore(NOW, 30 * 24), { league: 'Standard' }),
       ],
     );
     expect(statement).toEqual({ kind: 'none' });
@@ -121,25 +121,26 @@ describe('listStatement', () => {
   });
 });
 
+const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow => ({
+  kind: 'crafted',
+  classKey: '["crafted","weapon.bow","Bows"]',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
+  itemLevelMin: 82,
+  recipeId,
+  provenance: 'measured',
+  grossPayout: summands,
+  craftCost: 0.03,
+  ev: summands - 0.03,
+  summands: Array.from({ length: summands }, (_, index) => ({
+    entryKey: `k${String(index)}`,
+    probability: 1,
+    priceDivine: 1,
+    contribution: 1,
+  })),
+});
+
 describe('listStatement with crafted rows (Story 3.4)', () => {
-  const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow => ({
-    kind: 'crafted',
-    classKey: '["crafted","weapon.bow","Bows"]',
-    categoryId: 'weapon.bow',
-    className: 'Bows',
-    itemLevelMin: 82,
-    recipeId,
-    provenance: 'measured',
-    grossPayout: summands,
-    craftCost: 0.03,
-    ev: summands - 0.03,
-    summands: Array.from({ length: summands }, (_, index) => ({
-      entryKey: `k${String(index)}`,
-      probability: 1,
-      priceDivine: 1,
-      contribution: 1,
-    })),
-  });
   const empty: Ranking = {
     ordering: [],
     belowThreshold: [],
@@ -195,6 +196,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
       {
         ...empty,
         pricedInLeague: false,
+        // eslint-disable-next-line unicorn/no-null -- boundary: core's crafted ranking row types `ev` as `number | null`, null being not-yet-synced.
         ordering: [{ ...craftedRow(0), craftCost: { kind: 'uncostable', currencyId: 'x' }, ev: null }],
         uncostableRecipes: [{ recipeId: 'greater', currencyId: 'x' }],
       },

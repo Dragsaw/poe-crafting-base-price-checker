@@ -5,16 +5,9 @@ import path from 'node:path';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
-/**
- * End to end: the real script, real ESLint, `tsc -b` and dependency-cruiser,
- * run against a small repository layout in the temp directory. The layout
- * stands in for the repo through `LINT_ON_EDIT_ROOT`, so the test never writes
- * a violating file into the real source tree, where a parallel test or
- * `pnpm check` would see it. Its `node_modules` is a link to this repo's.
- *
- * The files below hold one violation each. Every run sees all of them in the
- * `tsc -b` output, so a run that stays quiet also proves the per-file filter.
- */
+// The layout stands in for the repo through `LINT_ON_EDIT_ROOT`, so the test never writes a
+// violating file into the real source tree. Every run sees all violations in the `tsc -b`
+// output, so a run that stays quiet also proves the per-file filter.
 const HOOK = path.resolve(import.meta.dirname, 'lint-on-edit.ts');
 const REPO_NODE_MODULES = path.resolve(import.meta.dirname, '../../node_modules');
 const SLOW_MS = 90_000;

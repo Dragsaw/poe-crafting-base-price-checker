@@ -20,15 +20,7 @@ export type RecipeCost =
   | { readonly kind: 'figure'; readonly text: string }
   | { readonly kind: 'phrase'; readonly text: string };
 
-/**
- * `{components.craft-recipe}`: the page's second ranking dial (FR-26). It
- * takes `{components.payout-threshold}`'s chrome exactly. The words are the
- * control: no Mantine form control, no select, no pill. They are divided by
- * the trust strip's pipe, never the middle dot. Only the inactive word is a
- * target; a click on it makes it active at once, with no debounce (state 34).
- * The Craft Cost prints once beneath the options — the page's only printing
- * of it.
- */
+/** `{components.craft-recipe}` (FR-26): the words are the control; the inactive one applies. */
 export function CraftRecipe({
   options,
   activeId,
@@ -59,71 +51,91 @@ export function CraftRecipe({
       >
         {RECIPE_LABEL}
       </div>
-      <div
-        data-recipe-options=""
-        role="group"
-        aria-label={RECIPE_LABEL}
-        style={{ ...typeStyle('recipe-option'), marginTop: px(spacing.recipeOptionsGap), whiteSpace: 'nowrap' }}
-      >
-        {options.map((option, index) => (
-          <Fragment key={option.id}>
-            {index > 0 ? (
-              <span
-                data-separator=""
-                aria-hidden="true"
-                style={{ color: colors['ink-tertiary'], fontWeight: 400, padding: `0 ${px(spacing.trustSeparatorPadX)}` }}
-              >
-                |
-              </span>
-            ) : null}
-            {option.id === activeId ? (
-              <span data-recipe-option={option.id} data-active="" aria-current="true" className="fg-recipe-option">
-                {option.word}
-              </span>
-            ) : (
-              <button
-                type="button"
-                data-recipe-option={option.id}
-                data-inactive=""
-                className="fg-recipe-option"
-                onClick={() => {
-                  onChange(option.id);
-                }}
-              >
-                {option.word}
-              </button>
-            )}
-          </Fragment>
-        ))}
-      </div>
-      <div
-        data-recipe-cost={cost.kind}
-        style={{ marginTop: 'auto', paddingTop: px(spacing.recipeCostGap) }}
-      >
-        {cost.kind === 'figure' ? (
-          <span style={{ ...typeStyle('recipe-cost'), color: colors['ink-secondary'] }}>
+      <RecipeOptions options={options} activeId={activeId} onChange={onChange} />
+      <RecipeCostLine cost={cost} />
+    </div>
+  );
+}
+
+function RecipeOptions({
+  options,
+  activeId,
+  onChange,
+}: {
+  readonly options: readonly RecipeOption[];
+  readonly activeId: string;
+  readonly onChange: (recipeId: string) => void;
+}): JSX.Element {
+  return (
+    <div
+      data-recipe-options=""
+      role="group"
+      aria-label={RECIPE_LABEL}
+      style={{ ...typeStyle('recipe-option'), marginTop: px(spacing.recipeOptionsGap), whiteSpace: 'nowrap' }}
+    >
+      {options.map((option, index) => (
+        <Fragment key={option.id}>
+          {index > 0 ? (
             <span
-              data-recipe-cost-figure=""
-              style={{
-                ...typeStyle('recipe-cost-figure'),
-                color: colors.ink,
-                fontVariantNumeric: 'tabular-nums',
-                marginRight: px(spacing.recipeCostFigureGap),
+              data-separator=""
+              aria-hidden="true"
+              style={{ color: colors['ink-tertiary'], fontWeight: 400, padding: `0 ${px(spacing.trustSeparatorPadX)}` }}
+            >
+              |
+            </span>
+          ) : undefined}
+          {option.id === activeId ? (
+            <span data-recipe-option={option.id} data-active="" aria-current="true" className="fg-recipe-option">
+              {option.word}
+            </span>
+          ) : (
+            <button
+              type="button"
+              data-recipe-option={option.id}
+              data-inactive=""
+              className="fg-recipe-option"
+              onClick={() => {
+                onChange(option.id);
               }}
             >
-              {cost.text}
-            </span>
-            {RECIPE_COST_UNIT}
-          </span>
-        ) : (
+              {option.word}
+            </button>
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+function RecipeCostLine({ cost }: { readonly cost: RecipeCost }): JSX.Element {
+  return (
+    <div
+      data-recipe-cost={cost.kind}
+      style={{ marginTop: 'auto', paddingTop: px(spacing.recipeCostGap) }}
+    >
+      {cost.kind === 'figure' ? (
+        <span style={{ ...typeStyle('recipe-cost'), color: colors['ink-secondary'] }}>
           <span
-            data-money-phrase=""
-            style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}
+            data-recipe-cost-figure=""
+            style={{
+              ...typeStyle('recipe-cost-figure'),
+              color: colors.ink,
+              fontVariantNumeric: 'tabular-nums',
+              marginRight: px(spacing.recipeCostFigureGap),
+            }}
           >
             {cost.text}
           </span>
-        )}
-      </div>
+          {RECIPE_COST_UNIT}
+        </span>
+      ) : (
+        <span
+          data-money-phrase=""
+          style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}
+        >
+          {cost.text}
+        </span>
+      )}
     </div>
   );
 }

@@ -1,33 +1,8 @@
 /**
- * `pnpm catalogue:refresh` — the explicit, human-invoked catalogue refresh
- * (AD-25, AGENT-WORKFLOW §Fixtures).
- *
- * The four trade data endpoints are the only authority for what a `statId`, a
- * `baseTypeId` or a `categoryId` means. This command issues **exactly four
- * GETs** through the one governed client, validates each response against its
- * `contracts` schema, stamps `schemaVersion`, and writes
- * `data/catalogue/{items,stats,filters,static}.json`. Its output is a git diff:
- * a GGG patch that renames a stat id arrives as one reviewable line rather
- * than as a silent behaviour change.
- *
- * **All-or-nothing across fetch and validation**, which is the failure mode
- * that matters: no byte is written until all four have arrived and parsed, so
- * a mid-run 503 cannot commit a new `stats.json` beside a stale `items.json`.
- * The write loop itself is **not** transactional — nothing here can roll a
- * completed `writeFile` back — so a filesystem failure part way down leaves a
- * mixed tree and says so, naming the path that refused and how many landed.
- *
- * **No test runs this against the network.** It is referenced by no vitest
- * config and by no setup file; the entry guard at the bottom means importing
- * the module — which `catalogue-refresh.test.ts` does, to drive
- * `refreshCatalogue` against the fakes — issues nothing and writes nothing.
- *
- * What it is not: no chunk, no lock, no progress file, no `sync-report.json`
- * entry, no league gate, no schedule, and no id validation. This story writes
- * the authority; Story 1.10 reads it.
+ * `pnpm catalogue:refresh`: four GETs, validated, then written all-or-nothing (AD-25).
  */
 
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -52,6 +27,7 @@ import {
 } from './shell.ts';
 import { createRequestCounter } from './request-counter.ts';
 import { createTradeClient } from './trade/client.ts';
+import type { TradeClient, TradeResult } from './trade/client.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 import {
   CATALOGUE_ENDPOINTS,
@@ -64,12 +40,7 @@ import { resolveUserAgent } from './trade/user-agent.ts';
 /** The repository root, three levels up from `src/`. */
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
-/**
- * The narrowest thing this module needs of a schema: parse an unknown value and
- * report issues. Typing it structurally keeps `zod` out of `sync`'s imports —
- * `sync` declares `@poe/contracts` and `@poe/core` and nothing else, and the
- * schemas arrive through `contracts` as values.
- */
+/** Structural, so `zod` stays out of `sync`'s imports: the schemas arrive as values. */
 interface CatalogueParser {
   safeParse(
     value: unknown,
@@ -83,11 +54,7 @@ interface ArtifactSchemas {
   readonly file: CatalogueParser;
 }
 
-/**
- * Both schemas per artifact. The payload is checked first so a shape failure is
- * reported against what arrived, rather than as a puzzling envelope error; the
- * envelope is then checked as the last gate before any byte is written.
- */
+/** The payload is checked first, so a shape failure names what arrived, not an envelope error. */
 const SCHEMAS: Readonly<Record<CatalogueArtifact, ArtifactSchemas>> = {
   items: { payload: ItemCatalogueSchema, file: CatalogueItemsFileSchema },
   stats: { payload: StatCatalogueSchema, file: CatalogueStatsFileSchema },
@@ -97,16 +64,10 @@ const SCHEMAS: Readonly<Record<CatalogueArtifact, ArtifactSchemas>> = {
 
 /** Where one artifact is committed. */
 export function catalogueFilePathOf(endpoint: CatalogueEndpoint): string {
-  return join(REPO_ROOT, endpoint.outputPath);
+  return nodePath.join(REPO_ROOT, endpoint.outputPath);
 }
 
-/**
- * The shell's one serialisation, re-exported under this command's name.
- *
- * It is **the same function** `serialiseFixture` calls, not a second copy with
- * the same body: the "empty second diff" criterion rests on byte identity, and
- * two copies are only identical until one of them is edited.
- */
+/** The function `serialiseFixture` calls, not a copy: the empty-diff check needs byte identity. */
 export const serialiseCatalogue = serialiseJsonArtifact;
 
 /** The first issue, pointed at by its path, so a failure names a field. */
@@ -125,27 +86,15 @@ export interface CatalogueRefreshPorts {
   readonly clock: ClockPort;
   readonly wait: (ms: number) => Promise<void>;
   readonly userAgent: string;
-  /**
-   * Injected exactly as `RecorderPorts.writeFixture` is, so the whole
-   * four-endpoint path is exercised with no filesystem — which is also what
-   * keeps a test run from ever touching `data/`.
-   */
+  /** Injected, as `RecorderPorts.writeFixture` is, so a test run never touches `data/`. */
   readonly writeCatalogueFile: (path: string, contents: string) => Promise<void>;
 }
 
-/**
- * A discriminated union rather than `{ok, failure?}`: on the failure side the
- * reason is **always** present, so no caller needs a fallback for a string that
- * cannot be missing, and no caller can read `failure` off a success.
- */
 export type CatalogueRefreshOutcome =
   | {
       readonly ok: true;
       readonly written: readonly string[];
-      /**
-       * The requests this refresh sent, counted as `catalogue-refresh` (AD-12).
-       * The command prints it: no chunk report carries this source.
-       */
+      /** Counted as `catalogue-refresh` (AD-12); the command prints it, no chunk report has it. */
       readonly requests: number;
     }
   | {
@@ -162,14 +111,97 @@ function refused(failure: string, requests: number): CatalogueRefreshOutcome {
   return { ok: false, failure, written: [], requests };
 }
 
-/**
- * Issues the four GETs, **buffers every artifact, and writes only once all four
- * have been fetched and validated.**
- *
- * A mid-run failure would otherwise leave a commit mixing a new `stats.json`
- * with a stale `items.json` — a catalogue that no single response ever
- * described, and the one state a validation authority must never be in.
- */
+type Step<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly failure: string };
+
+function failed(failure: string): { readonly ok: false; readonly failure: string } {
+  return { ok: false, failure };
+}
+
+async function fetchBody(client: TradeClient, endpoint: CatalogueEndpoint): Promise<Step<string>> {
+  let result: TradeResult;
+  try {
+    result = await client.send({
+      method: 'GET',
+      url: endpoint.url,
+      // One lane over all four: they pace against one ledger entry, not four cold lanes.
+      lane: DATA_LANE,
+    });
+  } catch (error) {
+    // A rejection (timeout, DNS, reset) must also come back as a sentence, never a throw.
+    return failed(`${endpoint.artifact} could not be reached (${String(error)}). Nothing was written.`);
+  }
+
+  if (result.kind === 'yield') {
+    return failed(
+      `rate limited on ${endpoint.artifact}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`,
+    );
+  }
+
+  return result.response.status === 200
+    ? { ok: true, value: result.response.body }
+    : failed(`${endpoint.artifact} answered ${String(result.response.status)}. Nothing was written.`);
+}
+
+function validateBody(endpoint: CatalogueEndpoint, body: string): Step<Record<string, unknown>> {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body);
+  } catch (error) {
+    // A 200 with an HTML interstitial is the usual cause; a bare SyntaxError names no endpoint.
+    return failed(
+      `${endpoint.artifact} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`,
+    );
+  }
+
+  const schemas = SCHEMAS[endpoint.artifact];
+
+  const parsedPayload = schemas.payload.safeParse(payload);
+  if (!parsedPayload.success) {
+    return failed(
+      `${endpoint.artifact} does not match its catalogue schema — ${describeIssues(parsedPayload.error.issues)}. Nothing was written.`,
+    );
+  }
+
+  // The raw parsed JSON, not the schema output: ids reach disk verbatim and unknown fields survive.
+  const envelope = {
+    ...(payload as Record<string, unknown>),
+    schemaVersion: SUPPORTED_SCHEMA_VERSION,
+  };
+
+  // Unreachable today (the envelope is `payload.extend({schemaVersion})`); a gate for a later rule.
+  const parsedFile = schemas.file.safeParse(envelope);
+  return parsedFile.success
+    ? { ok: true, value: envelope }
+    : failed(
+        `${endpoint.artifact} does not match its file envelope — ${describeIssues(parsedFile.error.issues)}. Nothing was written.`,
+      );
+}
+
+async function writeCaptured(
+  ports: CatalogueRefreshPorts,
+  captured: readonly { path: string; contents: string }[],
+  requests: () => number,
+): Promise<CatalogueRefreshOutcome> {
+  const written: string[] = [];
+  for (const { path, contents } of captured) {
+    try {
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the failure message reports how many writes had landed
+      await ports.writeCatalogueFile(path, contents);
+    } catch (error) {
+      // The one place all-or-nothing can break: the failure names how many landed and which path.
+      return {
+        ok: false,
+        failure: `writing ${path} failed (${String(error)}). ${String(written.length)} of ${String(captured.length)} artifacts had already been written; the catalogue is now mixed, so re-run pnpm catalogue:refresh or revert data/catalogue/.`,
+        written,
+        requests: requests(),
+      };
+    }
+    written.push(path);
+  }
+  return { ok: true, written, requests: requests() };
+}
+
+/** Writes only after all four artifacts are validated: no mix of new and stale files. */
 export async function refreshCatalogue(
   ports: CatalogueRefreshPorts,
 ): Promise<CatalogueRefreshOutcome> {
@@ -186,114 +218,22 @@ export async function refreshCatalogue(
   const captured: { path: string; contents: string }[] = [];
 
   for (const endpoint of CATALOGUE_ENDPOINTS) {
-    let result: Awaited<ReturnType<typeof client.send>>;
-    try {
-      result = await client.send({
-        method: 'GET',
-        url: endpoint.url,
-        // One lane over all four, so they pace against one ledger entry rather
-        // than seeding four cold lanes.
-        lane: DATA_LANE,
-      });
-    } catch (error) {
-      // A rejection, not a status: the 30 s `AbortSignal.timeout`, a DNS
-      // failure, a socket reset. "A returned failure, never a throw" has to
-      // hold for these too, or the human gets a stack trace instead of a
-      // sentence naming which endpoint went quiet.
-      return refused(
-        `${endpoint.artifact} could not be reached (${String(error)}). Nothing was written.`,
-        requests(),
-      );
+    // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one lane, requests pace against one ledger entry
+    const body = await fetchBody(client, endpoint);
+    if (!body.ok) {
+      return refused(body.failure, requests());
     }
-
-    if (result.kind === 'yield') {
-      // A yield is a value, never a throw: the client has already decided not
-      // to spend, and the human needs the delay it named to know when to
-      // return.
-      return refused(
-        `rate limited on ${endpoint.artifact}; yielded for ${String(result.retryAfterMs)} ms (${result.reason}). Nothing was written.`,
-        requests(),
-      );
+    const envelope = validateBody(endpoint, body.value);
+    if (!envelope.ok) {
+      return refused(envelope.failure, requests());
     }
-
-    if (result.response.status !== 200) {
-      return refused(
-        `${endpoint.artifact} answered ${String(result.response.status)}. Nothing was written.`,
-        requests(),
-      );
-    }
-
-    let payload: unknown;
-    try {
-      payload = JSON.parse(result.response.body);
-    } catch (error) {
-      // A 200 carrying an HTML interstitial is the usual cause, and a bare
-      // SyntaxError names neither the endpoint nor the fact that it answered.
-      return refused(
-        `${endpoint.artifact} answered 200 but its body is not JSON (${String(error)}). Nothing was written.`,
-        requests(),
-      );
-    }
-
-    const schemas = SCHEMAS[endpoint.artifact];
-
-    const parsedPayload = schemas.payload.safeParse(payload);
-    if (!parsedPayload.success) {
-      return refused(
-        `${endpoint.artifact} does not match its catalogue schema — ${describeIssues(parsedPayload.error.issues)}. Nothing was written.`,
-        requests(),
-      );
-    }
-
-    /**
-     * The payload **as it arrived**, plus `schemaVersion`. The raw parsed JSON
-     * is spread rather than the schema's output value: ids go to disk verbatim,
-     * never trimmed, re-encoded, case-folded, sorted or flattened, and an
-     * unknown field GGG sends survives the round trip.
-     */
-    const envelope = {
-      ...(payload as Record<string, unknown>),
-      schemaVersion: SUPPORTED_SCHEMA_VERSION,
-    };
-
-    // Unreachable today: the envelope is exactly `payload.extend({schemaVersion})`
-    // and the version is a constant, so a payload that parsed cannot fail here.
-    // It is a gate against a future envelope that adds a constraint, not a path
-    // this story can exercise.
-    const parsedFile = schemas.file.safeParse(envelope);
-    if (!parsedFile.success) {
-      return refused(
-        `${endpoint.artifact} does not match its file envelope — ${describeIssues(parsedFile.error.issues)}. Nothing was written.`,
-        requests(),
-      );
-    }
-
     captured.push({
       path: catalogueFilePathOf(endpoint),
-      contents: serialiseCatalogue(envelope),
+      contents: serialiseCatalogue(envelope.value),
     });
   }
 
-  const written: string[] = [];
-  for (const { path, contents } of captured) {
-    try {
-      await ports.writeCatalogueFile(path, contents);
-    } catch (error) {
-      // The one place all-or-nothing can still be broken: a permission or disk
-      // failure part way down leaves new files beside stale ones. Nothing here
-      // can undo the writes that landed, so the failure **says how many did**
-      // and names the path that refused — the human needs both to know what
-      // their working tree now holds.
-      return {
-        ok: false,
-        failure: `writing ${path} failed (${String(error)}). ${String(written.length)} of ${String(captured.length)} artifacts had already been written; the catalogue is now mixed, so re-run pnpm catalogue:refresh or revert data/catalogue/.`,
-        written,
-        requests: requests(),
-      };
-    }
-    written.push(path);
-  }
-  return { ok: true, written, requests: requests() };
+  return writeCaptured(ports, captured, requests);
 }
 
 async function main(): Promise<void> {
@@ -320,11 +260,7 @@ async function main(): Promise<void> {
   });
 }
 
-/**
- * Prints an outcome and answers the exit code. The request count is printed on
- * both arms: `catalogue-refresh` is the one declared source no chunk report
- * carries, so this line is where its spend is seen (AD-12).
- */
+/** Prints an outcome and answers the exit code; the request count shows on both arms (AD-12). */
 export function printRefreshOutcome(
   outcome: CatalogueRefreshOutcome,
   out: { readonly stdout: (line: string) => void; readonly stderr: (line: string) => void },
@@ -332,8 +268,7 @@ export function printRefreshOutcome(
   out.stdout(`requests: ${String(outcome.requests)}`);
   if (!outcome.ok) {
     out.stderr(`pnpm catalogue:refresh: ${outcome.failure}`);
-    // The count in the failure says how many landed; only this says which. A
-    // human staring at a mixed `data/catalogue/` needs the names, not a number.
+    // The failure counts what landed; only this names which files.
     for (const path of outcome.written) {
       out.stderr(`  already written: ${path}`);
     }
@@ -346,12 +281,9 @@ export function printRefreshOutcome(
   return 0;
 }
 
-/**
- * The entry guard. `node packages/sync/src/catalogue-refresh.ts` runs `main`;
- * importing the module — which the co-located test does — runs nothing.
- */
+/** Entry guard: running this file runs `main`; importing it, as the test does, runs nothing. */
 const entry = process.argv[1];
-const isInvokedDirectly = entry !== undefined && resolve(entry) === fileURLToPath(import.meta.url);
+const isInvokedDirectly = entry !== undefined && nodePath.resolve(entry) === fileURLToPath(import.meta.url);
 
 if (isInvokedDirectly) {
   try {

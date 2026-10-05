@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DatasetEntrySchema, PriceStateSchema } from './dataset';
 import type { PriceState } from './dataset';
+import { JSON_NULL } from './test-support';
 
 const observation = {
   league: 'Forbidden Rites',
@@ -16,6 +17,23 @@ const observation = {
     asOf: '2026-09-19T08:00:00Z',
   },
 };
+
+function label(price: PriceState): string {
+  switch (price.state) {
+    case 'priced': {
+      return String(price.observation.priceDivine);
+    }
+    case 'no-listings': {
+      return 'no listings';
+    }
+    case 'not-yet-synced': {
+      return price.reason;
+    }
+    case 'unresolvable': {
+      return 'unresolvable';
+    }
+  }
+}
 
 describe('PriceStateSchema', () => {
   it('carries four states, and the observation lives inside the priced arm alone', () => {
@@ -39,28 +57,11 @@ describe('PriceStateSchema', () => {
   });
 
   it('never spells absence as zero, null or a missing key', () => {
-    expect(PriceStateSchema.safeParse({ state: 'priced', observation: null }).success).toBe(false);
+    expect(PriceStateSchema.safeParse({ state: 'priced', observation: JSON_NULL }).success).toBe(false);
     expect(PriceStateSchema.safeParse({}).success).toBe(false);
   });
 
   it('exhausts all four states with no default arm', () => {
-    function label(price: PriceState): string {
-      switch (price.state) {
-        case 'priced': {
-          return String(price.observation.priceDivine);
-        }
-        case 'no-listings': {
-          return 'no listings';
-        }
-        case 'not-yet-synced': {
-          return price.reason;
-        }
-        case 'unresolvable': {
-          return 'unresolvable';
-        }
-      }
-    }
-
     expect(label({ state: 'not-yet-synced', reason: 'never-synced' })).toBe('never-synced');
   });
 });

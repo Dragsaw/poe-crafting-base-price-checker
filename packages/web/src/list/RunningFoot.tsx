@@ -2,10 +2,7 @@ import type { JSX } from 'react';
 
 import { colors, px, spacing, typeStyle } from '../theme/tokens';
 
-/**
- * One sans line in `ink-tertiary` above a hairline (DESIGN.md `running-foot`;
- * copy from `mockups/key-hero-resting.html`).
- */
+// DESIGN.md `running-foot`; copy from `mockups/key-hero-resting.html`.
 export function RunningFoot(): JSX.Element {
   return (
     <footer

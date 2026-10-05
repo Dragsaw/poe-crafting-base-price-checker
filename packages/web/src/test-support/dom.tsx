@@ -1,10 +1,4 @@
-/**
- * Shared DOM test helpers: the fixed test clock, the colour spelling jsdom
- * reports, and one mounted React root per test. Never imported by the app.
- *
- * A file that mounts through `mount` or `mountList` calls `unmount` in its
- * `afterEach`.
- */
+/** Shared DOM test helpers; a file that mounts calls `unmount` in `afterEach`. */
 
 import { rank } from '@poe/core';
 import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';
@@ -23,50 +17,83 @@ export const NOW = Date.parse('2026-09-26T12:00:00.000Z');
 export const rgb = (hex: string): string =>
   `rgb(${[1, 3, 5].map((index) => String(Number.parseInt(hex.slice(index, index + 2), 16))).join(', ')})`;
 
-let container: HTMLDivElement | undefined;
-let root: Root | undefined;
+const mounted: { container?: HTMLDivElement; root?: Root } = {};
 
 /** Unmounts any earlier root, renders `node` into a fresh container on `document.body` and returns the container. */
 export function mount(node: ReactNode): HTMLDivElement {
   unmount();
   const host = document.createElement('div');
-  container = host;
+  mounted.container = host;
   document.body.append(host);
-  const mounted = createRoot(host);
-  root = mounted;
+  const created = createRoot(host);
+  mounted.root = created;
   act(() => {
-    mounted.render(node);
+    created.render(node);
   });
   return host;
 }
 
+/** The container of the last `mount`, until `unmount`. */
+export function mountedContainer(): HTMLDivElement | undefined {
+  return mounted.container;
+}
+
 /** Unmounts the mounted root, if any, and removes its container. */
 export function unmount(): void {
-  const mounted = root;
-  if (mounted !== undefined) {
+  const { root, container } = mounted;
+  if (root !== undefined) {
     act(() => {
-      mounted.unmount();
+      root.unmount();
     });
   }
-  root = undefined;
+  mounted.root = undefined;
   container?.remove();
-  container = undefined;
+  mounted.container = undefined;
+}
+
+/** Lets pending fetches and their continuations run, inside `act`. */
+export async function flush(): Promise<void> {
+  await act(async () => {
+    for (let turn = 0; turn < 5; turn += 1) {
+      // eslint-disable-next-line no-await-in-loop -- sequential on purpose: each turn is one macrotask, so chained continuations run in order
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  });
+}
+
+/** Flushes until the mounted `[data-frame]` has `data-state` equal to `state`; throws after 50. */
+export async function settleTo(state: string): Promise<void> {
+  const stateOf = (): string | undefined => {
+    const frame = mounted.container?.querySelector<HTMLElement>('[data-frame]');
+    if (frame === null || frame === undefined) {
+      throw new Error('no frame rendered');
+    }
+    return frame.dataset['state'];
+  };
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if (stateOf() === state) {
+      return;
+    }
+    // eslint-disable-next-line no-await-in-loop -- polling: each flush decides whether the next probe runs
+    await flush();
+  }
+  throw new Error(`frame never reached ${state}; it is ${String(stateOf())}`);
 }
 
 /** Renders `node` into the kept root, so mounted components keep their state. */
 function rerender(node: ReactNode): void {
-  const mounted = root;
-  if (mounted === undefined) {
+  const { root } = mounted;
+  if (root === undefined) {
     throw new Error('no mounted root');
   }
   act(() => {
-    mounted.render(node);
+    root.render(node);
   });
 }
 
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: null }), dataset, NOW);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: undefined }), dataset, NOW);
   return <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />;
 }
 

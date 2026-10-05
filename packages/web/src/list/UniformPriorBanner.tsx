@@ -13,22 +13,13 @@ const BANNER_BODY =
 /** The dismiss control's text. */
 const BANNER_DISMISS = 'dismiss for this session';
 
-/**
- * The banner's condition (FR-11, EXPERIENCE.md): the active recipe has at least
- * one ranked crafted row and none is `measured`. It reads every ranked crafted
- * row of the active recipe, before the top-20 bound. With no crafted row it is
- * not raised: its sentence would be false.
- */
-export function bannerRaised(active: Pick<ActiveRanking, 'ordering'>): boolean {
+// FR-11. Reads every ranked crafted row before the top-20 bound; with none it would be false.
+export function isBannerRaised(active: Pick<ActiveRanking, 'ordering'>): boolean {
   const crafted = active.ordering.filter((row) => row.kind === 'crafted');
   return crafted.length > 0 && crafted.every((row) => row.provenance === 'uniform-prior');
 }
 
-/**
- * `{components.uniform-prior-banner}`: `paper-inset`, a 5px ochre left edge, a
- * lead and a body. Dismissible for the session only; the caller holds that in
- * memory.
- */
+/** `{components.uniform-prior-banner}`: dismissal lasts the session, in the caller's memory. */
 export function UniformPriorBanner({ onDismiss }: { readonly onDismiss: () => void }): JSX.Element {
   return (
     <div

@@ -8,6 +8,7 @@ import {
   compareTrackedEntries,
   encodeAffix,
 } from './canonical-key';
+import { JSON_NULL } from './test-support';
 import { TrackedEntrySchema } from './tracked-entry';
 import type { TrackedEntry } from './tracked-entry';
 
@@ -36,7 +37,7 @@ describe('canonicalKeyElements', () => {
       'Bows',
       79,
       ['explicit.stat_1', 43, 56.5],
-      ['explicit.stat_2', null, null],
+      ['explicit.stat_2', JSON_NULL, JSON_NULL],
     ]);
     expect(canonicalKeyElements(raw)).toEqual(['raw', 'Advanced Dualstring Bow', 79]);
   });
@@ -57,7 +58,7 @@ describe('canonicalKeyElements', () => {
 
 describe('encodeAffix', () => {
   it('encodes an affix in exactly three elements', () => {
-    expect(encodeAffix({ kind: 'valueless', statId: 's' })).toEqual(['s', null, null]);
+    expect(encodeAffix({ kind: 'valueless', statId: 's' })).toEqual(['s', JSON_NULL, JSON_NULL]);
     expect(encodeAffix({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 })).toEqual([
       's',
       1,
@@ -78,8 +79,8 @@ describe('the banded and valueless affix forms', () => {
     };
 
     const elements = canonicalKeyElements(valueless);
-    expect(elements[4]).toEqual(['explicit.stat_1', null, null]);
-    expect(elements.slice(4)).not.toContain(null);
+    expect(elements[4]).toEqual(['explicit.stat_1', JSON_NULL, JSON_NULL]);
+    expect(elements.slice(4)).not.toContain(JSON_NULL);
     expect(canonicalKey(banded)).not.toBe(canonicalKey(valueless));
   });
 });
@@ -95,7 +96,7 @@ describe('the two key spaces', () => {
   });
 
   it('sorts every crafted key before every raw key', () => {
-    const keys = [canonicalKey(raw), canonicalKey(crafted)].sort(compareCanonicalKeys);
+    const keys = [canonicalKey(raw), canonicalKey(crafted)].toSorted(compareCanonicalKeys);
     expect(keys[0]).toBe(canonicalKey(crafted));
     expect(compareTrackedEntries(crafted, raw)).toBeLessThan(0);
   });
@@ -104,10 +105,10 @@ describe('the two key spaces', () => {
 describe('compareByCodeUnit', () => {
   // I/O matrix: "Key ordering".
   it('sorts by code unit, not by locale collation', () => {
-    expect(['a', 'B'].sort(compareByCodeUnit)).toEqual(['B', 'a']);
+    expect(['a', 'B'].toSorted(compareByCodeUnit)).toEqual(['B', 'a']);
     expect('B'.localeCompare('a')).toBeGreaterThan(0);
 
-    expect(['é', 'z'].sort(compareByCodeUnit)).toEqual(['z', 'é']);
+    expect(['é', 'z'].toSorted(compareByCodeUnit)).toEqual(['z', 'é']);
     expect('é'.localeCompare('z')).toBeLessThan(0);
   });
 
@@ -125,10 +126,11 @@ describe('compareByCodeUnit', () => {
   });
 });
 
+const withPrefix = (prefix: unknown): TrackedEntry => TrackedEntrySchema.parse({ ...crafted, prefix });
+
 describe('the hybrid affix form (§4.1)', () => {
   const lineA = { statId: 'explicit.stat_1', valueMin: 25, valueMax: 34 };
   const lineB = { statId: 'explicit.stat_2' };
-  const withPrefix = (prefix: unknown): TrackedEntry => TrackedEntrySchema.parse({ ...crafted, prefix });
 
   it('gives two orderings of the same lines one key', () => {
     expect(canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] }))).toBe(
@@ -139,7 +141,7 @@ describe('the hybrid affix form (§4.1)', () => {
   it('encodes ["hybrid", [line, …]] in two elements, without acceptedTier', () => {
     const entry = withPrefix({ kind: 'hybrid', lines: [lineB, lineA], acceptedTier: 'T1' });
     const elements = canonicalKeyElements(entry);
-    expect(elements[4]).toEqual(['hybrid', [['explicit.stat_1', 25, 34], ['explicit.stat_2', null, null]]]);
+    expect(elements[4]).toEqual(['hybrid', [['explicit.stat_1', 25, 34], ['explicit.stat_2', JSON_NULL, JSON_NULL]]]);
     expect(canonicalKey(entry)).toBe(canonicalKey(withPrefix({ kind: 'hybrid', lines: [lineA, lineB] })));
   });
 

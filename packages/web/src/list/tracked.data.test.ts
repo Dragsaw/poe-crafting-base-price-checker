@@ -1,16 +1,12 @@
 import { CatalogueStatsFileSchema, TrackedFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { cssNumber } from '../test-support/css-number';
 import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
 import { shortForm } from './short-forms';
 
-/**
- * The live data/tracked.json against the short-form table and the cell width
- * (pnpm test:data). A player edit that adds a stat with no short form, or a
- * combination that falls back to verbatim text or overruns the cell, fails
- * here and not in pnpm test.
- */
+/** The live data/tracked.json against the short-form table and the cell width (pnpm test:data). */
 const committed = import.meta.glob<unknown>('../../../../data/{tracked.json,catalogue/stats.json}', {
   eager: true,
   import: 'default',
@@ -26,7 +22,7 @@ describe('the live data/tracked.json', () => {
   it('has a short form for every crafted statId', () => {
     const statIds = new Set(
       tracked.entries.flatMap((entry) =>
-        entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((reference) => (reference.kind === 'hybrid' ? reference.lines.map((line) => line.statId) : [reference.statId])) : [],
+        entry.kind === 'crafted' ? [entry.prefix, entry.suffix].flatMap((reference) => (reference.kind === 'hybrid' ? reference.lines.map((line) => line.statId) : reference.statId)) : [],
       ),
     );
     expect(statIds.size).toBeGreaterThan(0);
@@ -42,7 +38,7 @@ describe('the live data/tracked.json', () => {
   it('fits the longest combination text inside the combination cell, at line one’s size', () => {
     const [cell] = combinationLine1Columns;
     const available = cell.width - cell.padRight;
-    const fontSize = Number.parseFloat(typeRoles['detail-row'].fontSize);
+    const fontSize = cssNumber(typeRoles['detail-row'].fontSize);
     const overlong = texts
       .map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`)
       .filter((text) => text.length * ADVANCE_EM * fontSize > available);

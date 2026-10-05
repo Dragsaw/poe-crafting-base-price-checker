@@ -2,13 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
-/**
- * AD-1: no `core` module performs I/O, reads the clock, generates randomness,
- * or reads environment or config. dependency-cruiser sees imports only, so the
- * shipped ESLint config carries a `core`-scoped block that bans the impure
- * globals. These probes lint snippets through that config and prove each ban
- * fires, and that the pure uses `core` depends on stay legal.
- */
+// AD-1: dependency-cruiser sees imports only, so a `core`-scoped ESLint block bans the impure
+// globals. These probes prove each ban fires and that the pure uses `core` needs stay legal.
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 const GLOBALS = 'no-restricted-globals';
@@ -82,13 +77,17 @@ const PURE: readonly (readonly [string, string])[] = [
   ['new Date(s)', "export const d = new Date('2026-09-26T00:00:00Z');"],
 ];
 
+const rulesFor = async (path: string): Promise<Record<string, unknown>> =>
+  ((await eslint.calculateConfigForFile(path)) as { rules?: Record<string, unknown> } | undefined)?.rules ?? {};
+
 describe('core purity lint (AD-1)', { timeout: 30_000 }, () => {
   it('the core block applies to core source only', async () => {
-    const rulesFor = async (path: string): Promise<Record<string, unknown>> =>
-      ((await eslint.calculateConfigForFile(path)) as { rules?: Record<string, unknown> } | undefined)?.rules ?? {};
-    expect((await rulesFor(CORE_FILE))[GLOBALS]).toBeDefined();
-    expect((await rulesFor(CORE_TEST_FILE))[GLOBALS]).toBeUndefined();
-    expect((await rulesFor(SYNC_FILE))[GLOBALS]).toBeUndefined();
+    const coreRules = await rulesFor(CORE_FILE);
+    const coreTestRules = await rulesFor(CORE_TEST_FILE);
+    const syncRules = await rulesFor(SYNC_FILE);
+    expect(coreRules[GLOBALS]).toBeDefined();
+    expect(coreTestRules[GLOBALS]).toBeUndefined();
+    expect(syncRules[GLOBALS]).toBeUndefined();
   });
 
   it.each(IMPURE)('%s in core source is a %s error', async (_label, rule, code) => {

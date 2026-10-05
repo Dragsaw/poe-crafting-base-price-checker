@@ -3,14 +3,7 @@ import { z } from 'zod';
 import { CurrencyRateSchema } from './currency-rate.ts';
 import { DivineAmountSchema, IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 
-/**
- * A `PriceObservation` **exists only where there is an observation** (AD-9). It
- * therefore carries nothing attempt-scoped: `lastSearchId`, `lastSearchLeague`
- * and `lastAttemptedAt` sit on the dataset entry, because `no-listings` and
- * `unresolvable` are two of the states in which the player most wants to open
- * the market himself. The `strictObject` is what makes that a parse failure
- * rather than a convention.
- */
+/** Exists only where there is an observation (AD-9); `strictObject` keeps attempt fields off it. */
 export const PriceObservationSchema = z
   .strictObject({
     league: LeagueIdSchema.describe(

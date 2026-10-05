@@ -12,7 +12,7 @@ function rate(currencyId: string, value: number, league = LEAGUE): CurrencyRate 
 describe('currentRates', () => {
   it('keeps only rates whose own league is the active one', () => {
     const current = currentRates([rate('exalted', 0.002), rate('chaos', 0.13, 'Standard')], LEAGUE);
-    expect([...current.keys()]).toEqual(['exalted']);
+    expect(current.keys().toArray()).toEqual(['exalted']);
   });
 
   it('pins divine at exactly 1', () => {
@@ -22,9 +22,9 @@ describe('currentRates', () => {
 
 describe('toDivine and roundDivine', () => {
   it('normalises with n × rate and rounds once to 4dp', () => {
-    expect(toDivine(3, rate('exalted', 0.002012))).toBe(0.006);
-    expect(toDivine(7, rate('chaos', 0.13078))).toBe(0.9155);
-    expect(roundDivine(1.00005)).toBe(1.0001);
+    expect(toDivine(3, rate('exalted', 0.002012))).toBeCloseTo(0.006, 10);
+    expect(toDivine(7, rate('chaos', 0.13078))).toBeCloseTo(0.9155, 10);
+    expect(roundDivine(1.00005)).toBeCloseTo(1.0001, 10);
     expect(roundDivine(2)).toBe(2);
   });
 });

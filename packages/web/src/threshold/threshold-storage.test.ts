@@ -8,14 +8,17 @@ import {
   writeStoredThreshold,
 } from './threshold-storage';
 
-function storageHolding(value: string | null): Pick<Storage, 'getItem'> {
-  return { getItem: (key) => (key === THRESHOLD_STORAGE_KEY ? value : null) };
+// eslint-disable-next-line unicorn/no-null -- boundary: `Storage.getItem` and `Storage.key` return null for an absent entry.
+const NO_ENTRY: string | null = null;
+
+function storageHolding(value: string | undefined): Pick<Storage, 'getItem'> {
+  return { getItem: (key) => (key === THRESHOLD_STORAGE_KEY ? (value ?? NO_ENTRY) : NO_ENTRY) };
 }
 
 const throwing: Storage = {
   length: 0,
   clear: () => {},
-  key: () => null,
+  key: () => NO_ENTRY,
   removeItem: () => {},
   getItem: () => {
     throw new DOMException('blocked', 'SecurityError');
@@ -37,15 +40,15 @@ describe('the persisted threshold', () => {
   // Matrix: first visit.
   it('gives the 0.25 default when nothing is stored', () => {
     expect(DEFAULT_THRESHOLD).toBe(0.25);
-    expect(readStoredThreshold(storageHolding(null))).toBe(0.25);
+    expect(readStoredThreshold(storageHolding(undefined))).toBe(0.25);
     expect(readStoredThreshold()).toBe(0.25);
   });
 
   it('reads a stored value in range, rounded to 2dp', () => {
-    expect(readStoredThreshold(storageHolding('0.6'))).toBe(0.6);
+    expect(readStoredThreshold(storageHolding('0.6'))).toBeCloseTo(0.6, 10);
     expect(readStoredThreshold(storageHolding('0'))).toBe(0);
     expect(readStoredThreshold(storageHolding('3'))).toBe(3);
-    expect(readStoredThreshold(storageHolding('1.23456'))).toBe(1.23);
+    expect(readStoredThreshold(storageHolding('1.23456'))).toBeCloseTo(1.23, 10);
   });
 
   // Matrix: bad stored value.
@@ -64,7 +67,7 @@ describe('the persisted threshold', () => {
   it('round-trips a write through the real localStorage', () => {
     writeStoredThreshold(0.6);
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
-    expect(readStoredThreshold()).toBe(0.6);
+    expect(readStoredThreshold()).toBeCloseTo(0.6, 10);
   });
 
   // Matrix: cleared storage.
@@ -79,7 +82,7 @@ describe('clampThreshold', () => {
   it('holds a value into [0, 3] at 2dp', () => {
     expect(clampThreshold(5)).toBe(3);
     expect(clampThreshold(-1)).toBe(0);
-    expect(clampThreshold(0.6)).toBe(0.6);
-    expect(clampThreshold(0.125)).toBe(0.13);
+    expect(clampThreshold(0.6)).toBeCloseTo(0.6, 10);
+    expect(clampThreshold(0.125)).toBeCloseTo(0.13, 10);
   });
 });

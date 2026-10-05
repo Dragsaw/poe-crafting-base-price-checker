@@ -1,12 +1,6 @@
-import { execFile } from 'node:child_process';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import {
   ConfigFileSchema,
   createFakeFilesystemPort,
-  TRACKED_SCHEMA_VERSION,
   trackedEarlierMajorMessage,
   WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
@@ -15,15 +9,9 @@ import { describe, expect, it } from 'vitest';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { DataFileError } from '../load-data-file.ts';
-import { checkTracked, loadTrackedCheckInputs, main } from './check.ts';
+import { checkTracked, loadTrackedCheckInputs } from './check.ts';
 import type { TrackedCheckInputs } from './check.ts';
-
-const SCRIPT = fileURLToPath(new URL('check.ts', import.meta.url));
-const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
-const DATA_DIR = fileURLToPath(new URL('../../../../data', import.meta.url));
-
-const PREFIX_STAT = 'explicit.stat_3981240776';
-const SUFFIX_STAT = 'explicit.stat_124131830';
+import { crafted, PREFIX_STAT, SUFFIX_STAT, trackedText } from './check.test-support.ts';
 
 const CATALOGUE: CatalogueIds = {
   statIds: new Set([PREFIX_STAT, SUFFIX_STAT]),
@@ -31,15 +19,6 @@ const CATALOGUE: CatalogueIds = {
   categoryIds: new Set(['accessory.amulet']),
 };
 
-const crafted = {
-  kind: 'crafted',
-  categoryId: 'accessory.amulet',
-  className: 'Amulets',
-  itemLevelMin: 75,
-  prefix: { kind: 'banded', statId: PREFIX_STAT, valueMin: 47, valueMax: 50, acceptedTier: 'T1' },
-  suffix: { kind: 'banded', statId: SUFFIX_STAT, valueMin: 3, valueMax: 3, acceptedTier: 'T1' },
-  status: 'active',
-};
 const gold = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
 const solar = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' };
 
@@ -66,10 +45,6 @@ const WEIGHTS: WeightsFile = {
     },
   },
 };
-
-function trackedText(entries: readonly unknown[], schemaVersion = TRACKED_SCHEMA_VERSION): string {
-  return JSON.stringify({ schemaVersion, entries });
-}
 
 function inputsOf(entries: readonly unknown[], overrides: Partial<TrackedCheckInputs> = {}): TrackedCheckInputs {
   return {
@@ -114,7 +89,7 @@ describe('checkTracked', () => {
   });
 
   it('skips the cross-file checks without a weights file, and reports a refused one', () => {
-    const absent = checkTracked(inputsOf([crafted], { weights: { ok: true, value: null } }));
+    const absent = checkTracked(inputsOf([crafted], { weights: { ok: true, value: undefined } }));
     expect(absent.ok).toBe(true);
     expect(absent.checks).toContainEqual({ check: 'cross-file', status: 'skipped' });
     expect(absent.issues).toEqual([]);
@@ -282,95 +257,5 @@ describe('checkTracked', () => {
       'data/config.json: the file is absent',
       'data/catalogue/stats.json: the file is absent',
     ]);
-  });
-});
-
-interface Run {
-  readonly code: number | null;
-  readonly stdout: string;
-  readonly stderr: string;
-}
-
-function runScript(arguments_: readonly string[] = []): Promise<Run> {
-  return new Promise((done) => {
-    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
-      done({ code: child.exitCode, stdout, stderr });
-    });
-  });
-}
-
-/** Every path under `data/` with its size and modification time. */
-function snapshot(directory: string): Record<string, string> {
-  const found: Record<string, string> = {};
-  for (const name of readdirSync(directory)) {
-    const path = join(directory, name);
-    const stats = statSync(path);
-    if (stats.isDirectory()) {
-      Object.assign(found, snapshot(path));
-    } else {
-      found[path] = `${String(stats.size)}:${String(stats.mtimeMs)}`;
-    }
-  }
-  return found;
-}
-
-describe('pnpm tracked:check', () => {
-  it('exits 1 with an ok:false report on stdout for a failing input', async () => {
-    let stdout = '';
-    let stderr = '';
-    const fs = createFakeFilesystemPort({ 'data/tracked.json': { contents: '{ not json' } });
-
-    const code = await main([], fs, { write: (text: string) => (stdout += text) }, { write: (text: string) => (stderr += text) });
-
-    expect(code).toBe(1);
-    expect(stderr).toBe('');
-    expect(JSON.parse(stdout)).toMatchObject({ ok: false, issues: expect.arrayContaining([expect.objectContaining({ check: 'schema' })]) as unknown });
-  });
-
-  it('exits 1 with a failed cross-file check naming an unparseable weights file', async () => {
-    let stdout = '';
-    let stderr = '';
-    const fs = createFakeFilesystemPort({
-      'data/tracked.json': { contents: trackedText([crafted]) },
-      'data/weights.json': { contents: '{ not json' },
-    });
-
-    const code = await main([], fs, { write: (text: string) => (stdout += text) }, { write: (text: string) => (stderr += text) });
-
-    expect(code).toBe(1);
-    expect(stderr).toBe('');
-    const report = JSON.parse(stdout) as { checks: unknown[]; issues: { check: string; message: string }[] };
-    expect(report.checks).toContainEqual({ check: 'cross-file', status: 'failed' });
-    const issue = report.issues.find((candidate) => candidate.check === 'cross-file');
-    expect(issue?.message).toMatch(/^data\/weights\.json: not valid JSON/);
-  });
-
-  it('writes nothing to disk over the committed data/', async () => {
-    // The exit code over the live files is asserted by pnpm test:data.
-    const before = snapshot(DATA_DIR);
-
-    const run = await runScript();
-
-    // The script ran to an exit: a guard over a script that never started proves nothing.
-    expect(typeof run.code).toBe('number');
-    expect(snapshot(DATA_DIR)).toEqual(before);
-  });
-
-  it('exits 1 with the usage on stderr when given an argument', async () => {
-    const run = await runScript(['extra']);
-
-    expect(run.code).toBe(1);
-    expect(run.stdout).toBe('');
-    expect(run.stderr).toContain('usage: pnpm tracked:check');
-  });
-
-  it('is reachable at the script name', () => {
-    const manifest = JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8')) as {
-      scripts: Record<string, string>;
-    };
-    const script = manifest.scripts['tracked:check'];
-
-    expect(script).toBe('node packages/sync/src/curation/check.ts');
-    expect(resolve(REPO_ROOT, (script ?? '').split(/\s+/).at(-1) ?? '')).toBe(SCRIPT);
   });
 });

@@ -6,13 +6,8 @@ import { colors, px, spacing } from '../theme/tokens';
 
 export type FrameState = 'pending' | 'ready' | 'refused' | 'failed';
 
-/**
- * The fixed frame: a constant, not a breakpoint. Border-box at 1060 with 24px
- * side padding gives a content box of exactly 1012. The edge is a 1px
- * `outline`, which paints outside the box and consumes no width. `min-height`,
- * never `height`: the frame grows and the document scrolls. No
- * `overflow: hidden` — it clipped the third chase cell in the reference render.
- */
+// `outline` and `min-height`, not border and height; no `overflow: hidden`
+// (DESIGN.md, Layout & Spacing).
 export function Frame({ state, children }: { readonly state: FrameState; readonly children: ReactNode }): JSX.Element {
   return (
     <div

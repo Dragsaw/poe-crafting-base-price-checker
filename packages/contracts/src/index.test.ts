@@ -2,17 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import * as contracts from './index';
 
-/**
- * The barrel is what every other package imports, so a module that exists but
- * is not re-exported is invisible to the workspace. This suite asserts the
- * surface rather than re-testing the modules behind it.
- */
+/** The barrel is what other packages import, so assert its surface, not the modules behind it. */
 describe('the contracts barrel', () => {
   it('exports one schema per named concept', () => {
     for (const name of [
       'BaseTypeSchema',
       'ItemClassSchema',
-      'ModifierRefSchema',
+      'ModifierReferenceSchema',
       'TrackedEntrySchema',
       'PriceObservationSchema',
       'CurrencyRateSchema',
@@ -56,7 +52,7 @@ describe('the contracts barrel', () => {
   });
 
   it('exports record identity and the per-file schema versions', () => {
-    expect(contracts.sameRecord).toBeTypeOf('function');
+    expect(contracts.isSameRecord).toBeTypeOf('function');
     expect(contracts.RECORD_SUBJECTS).toBeDefined();
     expect(contracts.ChunkRequestSourceSchema).toBeDefined();
     expect(contracts.SYNC_REPORT_SCHEMA_VERSION).toBe('1.2.0');

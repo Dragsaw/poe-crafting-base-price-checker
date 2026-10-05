@@ -6,41 +6,28 @@ export interface ListRecipe {
   readonly word: string;
 }
 
-/**
- * `core`'s ranking narrowed to the active recipe (AD-17: `core` orders every
- * `(Item Class, recipe)` pair; `web` filters, then bounds). A filter only: no
- * row is re-ordered and no term is computed.
- */
+/** `core`'s ranking narrowed to the active recipe (AD-17): a filter only, no re-order. */
 export interface ActiveRanking extends Ranking {
   /** The active recipe, or `undefined` when `recipes.json` holds none or is absent. */
   readonly recipe: ListRecipe | undefined;
   /** The active recipe is uncostable (AD-20). */
   readonly uncostable: boolean;
-  /**
-   * State 35: the recipe is uncostable, a crafted row is on the list and the
-   * list is not honest-empty (state 23 takes precedence), so the two branches
-   * are shown apart, with no rank numeral (EXPERIENCE.md).
-   */
+  /** EXPERIENCE.md state 35: two branches shown apart; state 23 (honest-empty) takes precedence. */
   readonly split: boolean;
 }
 
-/**
- * Keeps every raw row and the crafted rows of the active recipe, in `core`'s
- * order, and the Unrankable classes that hold under every recipe plus the
- * pairs of the active recipe (state 36). With no recipe, no crafted row is
- * kept.
- */
+/** Keeps Unrankable classes that hold under every recipe plus the active recipe's (state 36). */
 export function forRecipe(ranking: Ranking, recipe: ListRecipe | undefined): ActiveRanking {
   const id = recipe?.id;
   const ordering = ranking.ordering.filter((row) => row.kind === 'raw' || row.recipeId === id);
-  const uncostable = id !== undefined && ranking.uncostableRecipes.some((item) => item.recipeId === id);
+  const isUncostable = id !== undefined && ranking.uncostableRecipes.some((item) => item.recipeId === id);
   return {
     ...ranking,
     ordering,
     unrankable: ranking.unrankable.filter((item) => item.recipeId === undefined || item.recipeId === id),
     recipe,
-    uncostable,
+    uncostable: isUncostable,
     // State 23 takes precedence: with nothing priced in the league the list is one canonical sequence.
-    split: uncostable && ranking.pricedInLeague && ordering.some((row) => row.kind === 'crafted'),
+    split: isUncostable && ranking.pricedInLeague && ordering.some((row) => row.kind === 'crafted'),
   };
 }

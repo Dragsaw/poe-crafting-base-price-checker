@@ -1,32 +1,19 @@
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
 
 import { CONCURRENT_CASES } from './guard-concurrent-fixture/names';
 
-/**
- * Observes how the **real** hooks of `test/setup.ts` charge requests under
- * `describe.concurrent` and `it.concurrent`. Each `beforeEach` sets the store
- * with `enterWith`, and the `beforeEach` hooks of two concurrent tests
- * interleave. The fixture makes both tests of a pair meet at a barrier before
- * either sends its request, so both `beforeEach` hooks have run by then. Each
- * test then starts its fetch from a `setTimeout` callback and does not await
- * the fetch itself, so the request is charged through the store that the timer
- * carries. Each test's `afterEach` must still name its own URL and no other.
- *
- * A sequential run would time out at the barrier, and the failure would then
- * not name the test's URL. So a green run also proves that the pairs ran
- * concurrently.
- *
- * The child needs no network: every fixture URL is under `.invalid`.
- */
+// `beforeEach` sets the store with `enterWith`, and the hooks of concurrent tests interleave. A
+// barrier makes both tests of a pair run `beforeEach` before either requests; each `afterEach`
+// must still name only its own URL. A sequential run times out, so green proves concurrency.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-concurrent-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -65,9 +52,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('charges each request of two concurrent tests to the test that issued it', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-concurrent-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-concurrent-'));
   try {
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -85,10 +72,9 @@ it('charges each request of two concurrent tests to the test that issued it', { 
       expect(result?.status, testCase.title).toBe('failed');
       expect(messages, testCase.title).toContain('[no-network] 1 request(s) had no fixture and were blocked');
       expect(messages, testCase.title).toContain(testCase.url);
-      for (const other of CONCURRENT_CASES) {
-        if (other !== testCase) {
-          expect(messages, testCase.title).not.toContain(other.url);
-        }
+      const others = CONCURRENT_CASES.filter((candidate) => candidate !== testCase);
+      for (const other of others) {
+        expect(messages, testCase.title).not.toContain(other.url);
       }
     }
 
@@ -96,6 +82,6 @@ it('charges each request of two concurrent tests to the test that issued it', { 
     // file-level check found nothing left.
     expect(file?.message ?? '').toBe('');
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

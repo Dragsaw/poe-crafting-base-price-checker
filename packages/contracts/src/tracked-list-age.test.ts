@@ -64,10 +64,7 @@ describe('TrackedListAgeSchema', () => {
     ).toBe(false);
   });
 
-  /**
-   * I/O matrix: "Untagged date" — compile-time, not runtime. `tsc -b` compiles
-   * this file, so removing the `@ts-expect-error` below fails `pnpm check`.
-   */
+  /** Compile-time, not runtime: removing the `@ts-expect-error` below fails `tsc -b`. */
   it('does not type-check a date value constructed without its source tag', () => {
     // @ts-expect-error the tag is not optional: a timestamp cannot be reached without the clock that produced it
     const untagged: TrackedListAge = { at: '2026-09-18T11:00:00Z' };

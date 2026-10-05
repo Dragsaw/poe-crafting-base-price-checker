@@ -1,26 +1,19 @@
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
 
 import { BYSTANDER_TEST, ISSUER_TEST, LATE_URL } from './guard-reuse-fixture/names';
 
-/**
- * Observes the guard in a **reused** worker (`isolate: false`). A timer that
- * the first fixture file starts fires after that file's `afterAll`, while the
- * second file imports. If the setup file closed its server in `afterAll`, the
- * real `fetch` would be back by then: the request would not be recorded, and
- * the second file would pass. The guard stays installed for the life of the
- * worker, so the request is blocked and the second file's `afterAll` reports it.
- *
- * The child needs no network: the fixture URL is under `.invalid`.
- */
+// Reused worker (`isolate: false`): a timer from the first file fires while the second imports. If
+// `afterAll` closed the server the real `fetch` would be back and the second file would pass; the
+// guard stays installed, so the request is blocked and the second file's `afterAll` reports it.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-reuse-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -63,9 +56,9 @@ function fileEndingWith(report: JsonReport, suffix: string): FileResult | undefi
 }
 
 it('blocks a request that fires between files of a reused worker, and names its issuer', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-reuse-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-reuse-'));
   try {
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -88,6 +81,6 @@ it('blocks a request that fires between files of a reused worker, and names its 
     expect(bystander?.status).toBe('failed');
     expect(bystander?.message).toContain(`GET ${LATE_URL} (issued by test "${ISSUER_TEST}")`);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

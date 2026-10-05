@@ -1,52 +1,52 @@
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative, sep } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ALLOWLIST, prunePages } from '../tools/prune-pages.mjs';
 
-/**
- * The prune step behind `pnpm build`. That its allowlist equals `ARTIFACTS` is
- * asserted in `packages/web/src/load/prune-allowlist.test.ts`, which can import
- * the web package; this file exercises what the step does to a `dist` tree.
- */
+const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);
+
+// The allowlist equals `ARTIFACTS`: asserted in `packages/web/src/load/prune-allowlist.test.ts`,
+// which can import the web package. This file covers what the step does to a `dist` tree.
 
 const scratch: string[] = [];
 
 afterEach(() => {
-  for (const dir of scratch.splice(0)) {
-    rmSync(dir, { recursive: true, force: true });
+  for (const directory of scratch.splice(0)) {
+    rmSync(directory, { recursive: true, force: true });
   }
 });
 
 function tree(files: readonly string[]): string {
-  const dir = mkdtempSync(join(tmpdir(), 'prune-pages-'));
-  scratch.push(dir);
+  const directory = mkdtempSync(nodePath.join(tmpdir(), 'prune-pages-'));
+  scratch.push(directory);
   for (const file of files) {
-    const full = join(dir, ...file.split('/'));
-    mkdirSync(dirname(full), { recursive: true });
+    const full = nodePath.join(directory, ...file.split('/'));
+    mkdirSync(nodePath.dirname(full), { recursive: true });
     writeFileSync(full, '{}');
   }
-  return dir;
+  return directory;
 }
 
-function filesUnder(dir: string): string[] {
+function filesUnder(directory: string): string[] {
   const out: string[] = [];
   const walk = (current: string): void => {
-    for (const entry of readdirSync(current, { withFileTypes: true })) {
-      const full = join(current, entry.name);
+    const entries = readdirSync(current, { withFileTypes: true });
+    for (const entry of entries) {
+      const full = nodePath.join(current, entry.name);
       if (entry.isDirectory()) {
         walk(full);
       } else {
-        out.push(relative(dir, full).split(sep).join('/'));
+        out.push(nodePath.relative(directory, full).split(nodePath.sep).join('/'));
       }
     }
   };
-  walk(dir);
-  return out.sort();
+  walk(directory);
+  return out.toSorted(byCodeUnit);
 }
 
 const SEVEN: string[] = ALLOWLIST.map((entry: { readonly path: string }) => entry.path);
@@ -74,8 +74,8 @@ describe('prunePages', () => {
     const data = tree([...SEVEN, ...UNFETCHED]);
     const distribution = tree([...BUNDLE, ...SEVEN, ...UNFETCHED]);
     const result = prunePages(distribution, data);
-    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].sort());
-    expect(result.removed.sort()).toEqual([...UNFETCHED].sort());
+    expect(filesUnder(distribution)).toEqual([...BUNDLE, ...SEVEN].toSorted(byCodeUnit));
+    expect(result.removed.toSorted(byCodeUnit)).toEqual([...UNFETCHED].toSorted(byCodeUnit));
     expect(result.kept).toEqual(SEVEN);
   });
 
@@ -83,7 +83,7 @@ describe('prunePages', () => {
     const data = tree([...SEVEN, 'extra/deep/file.json']);
     const distribution = tree([...BUNDLE, ...SEVEN, 'extra/deep/file.json']);
     prunePages(distribution, data);
-    expect(readdirSync(distribution).sort()).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].sort());
+    expect(readdirSync(distribution).toSorted(byCodeUnit)).toEqual(['assets', 'catalogue', 'index.html', ...SEVEN.filter((p) => !p.includes('/'))].toSorted(byCodeUnit));
   });
 
   it('tolerates the three absent-tolerable artifacts being missing', () => {
@@ -105,7 +105,7 @@ describe('prunePages', () => {
 
   it('fails when there is no build output', () => {
     const data = tree(SEVEN);
-    expect(() => prunePages(join(data, 'no-such-dist'), data)).toThrow(/no build output/);
+    expect(() => prunePages(nodePath.join(data, 'no-such-dist'), data)).toThrow(/no build output/);
   });
 });
 
@@ -120,17 +120,17 @@ describe('the CLI and the build script', () => {
       ...BUNDLE.map((file) => `packages/web/dist/${file}`),
       ...dataFiles.map((file) => `packages/web/dist/${file}`),
     ]);
-    const script = join(root, 'tools', 'prune-pages.mjs');
-    mkdirSync(dirname(script), { recursive: true });
+    const script = nodePath.join(root, 'tools', 'prune-pages.mjs');
+    mkdirSync(nodePath.dirname(script), { recursive: true });
     copyFileSync(SCRIPT, script);
-    return { root, script, dist: join(root, 'packages', 'web', 'dist') };
+    return { root, script, dist: nodePath.join(root, 'packages', 'web', 'dist') };
   }
 
   it('prunes packages/web/dist when run directly', () => {
     const { script, dist } = repository([...SEVEN, 'sync-progress.json']);
     execFileSync(process.execPath, [script], { stdio: 'pipe' });
-    expect(existsSync(join(dist, 'sync-progress.json'))).toBe(false);
-    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].sort());
+    expect(existsSync(nodePath.join(dist, 'sync-progress.json'))).toBe(false);
+    expect(filesUnder(dist)).toEqual([...BUNDLE, ...SEVEN].toSorted(byCodeUnit));
   });
 
   it('exits non-zero when a required artifact is missing', () => {

@@ -1,10 +1,6 @@
 import type { GitPort } from '../git.ts';
 
-/**
- * A pure in-memory `GitPort`. It carries the one read-only operation the real
- * port carries, and no write — a fake that grew a `commit` would make an AD-3
- * violation testable, which is how such violations get written.
- */
+/** An in-memory, read-only `GitPort`: a fake with `commit` would make an AD-3 breach testable. */
 
 /** Keyed by path, valued with that path's last-commit author date (ISO-8601 UTC). */
 export type FakeCommitDates = Readonly<Record<string, string>>;

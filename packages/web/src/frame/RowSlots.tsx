@@ -8,13 +8,7 @@ export const ROW_SLOT_COUNT = 20;
 /** The height of each skeleton bar inside its 28px row. */
 const BAR_HEIGHT = 10;
 
-/**
- * The load state: twenty 28px slots in the final six-column layout. Each cell
- * is a flat `paper-inset` bar at its column width less its right padding —
- * DESIGN.md's treatment (state 22, UX memlog 211), with no shimmer and no
- * animation. The column header paints with its final labels: its text depends
- * on no artifact.
- */
+/** The load state in the final six-column layout (EXPERIENCE.md state 22; memlog 211). */
 export function RowSlots(): JSX.Element {
   return (
     <div data-row-slots="">

@@ -1,10 +1,6 @@
 #!/usr/bin/env node
-// Runs the full gate (`pnpm check`) before a push, per AGENT-WORKFLOW.md.
-// Git passes `<remote> <url>` as arguments and one line per ref on stdin:
-// `<local ref> <local sha> <remote ref> <remote sha>`. A push that only
-// deletes refs (local sha all zeros) carries no commits to check, so the gate
-// is skipped. `git push --no-verify` is the escape hatch.
-// Installed via `core.hooksPath .githooks` (see package.json "prepare").
+// Runs `pnpm check` before a push (AGENT-WORKFLOW.md). Git sends one stdin line per ref;
+// a push that only deletes refs (local sha all zeros) has no commits to check.
 
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';

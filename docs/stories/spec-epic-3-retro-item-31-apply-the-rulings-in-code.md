@@ -19,7 +19,7 @@ context:
 **Approach:** Build the five entries in one branch: (a) the crafted `asOf` comes from the summands only and has the attempted fallback; (b) D5 makes an empty `contained ∩ eligible` set a reason; (c) a valueless tier reads as `[1, 1]`, and the six pruned Crossbows entries come back as banded `[1, 1]` references; (d) the `RECIPE_GRADES` comment cites IN §9.1; (e) the UX ruling on the not-run diagnosis group (Decisions below), written into EXPERIENCE.md and built. Remove the five entries, and the section header with them, in this branch.
 
 **Decisions (player, 2026-10-03):**
-1. **(e) Not-run diagnosis.** When no weights envelope is loaded, the cross-file diagnosis group prints one italic *unknown* line. This is the word the coverage group prints without weights (`UNKNOWN`, keyed on `weightsLoaded`). With weights loaded and no failure, no group renders, as before.
+1. **(e) Not-run diagnosis.** When no weights envelope is loaded, the cross-file diagnosis group prints one italic *unknown* line. This is the word the coverage group prints without weights (`UNKNOWN`, keyed on `areWeightsLoaded`). With weights loaded and no failure, no group renders, as before.
 2. **(c) Tier label.** The six rewritten `[1, 1]` suffixes declare `acceptedTier: "T1"`, as the weights label the tier.
 3. **Scope.** All five entries are in one spec, about 2000 tokens, and the player accepted the size.
 
@@ -53,7 +53,7 @@ context:
 - `packages/contracts/src/craft-recipe.ts:50-55` -- the comment cites IN §9.1.
 - `data/tracked.json` -- the six pruned Crossbows entries (array indexes 36, 41, 46, 51, 56, 61; the suffix is on `explicit.stat_1967051901`). Each suffix becomes `{"kind":"banded","statId":…,"valueMin":1,"valueMax":1,"acceptedTier":"T1"}`. Set `status: "active"` and drop `prunedReason`. This is the only mixed-kind stat in `data/weights.json`.
 - `.claude/skills/tracked-json/SKILL.md` step 4 -- says that `ranges: []` means `valueless`. Add that on a stat with banded lines the reference is banded `[1, 1]` (IN §2.3).
-- `packages/web/src/frame/trust-facts.ts:163-170,180-230` -- `diagnosisGroups` / `panelColumns` (`weightsLoaded` is already a parameter; precedent: `coverageGroup` :232-234). Pass `weightsLoaded` into `diagnosisGroups`. When it is false, return one `UNKNOWN` group (Decision 1).
+- `packages/web/src/frame/trust-facts.ts:163-170,180-230` -- `diagnosisGroups` / `panelColumns` (`areWeightsLoaded` is already a parameter; precedent: `coverageGroup` :232-234). Pass `areWeightsLoaded` into `diagnosisGroups`. When it is false, return one `UNKNOWN` group (Decision 1).
 - `docs/ux-designs/.../EXPERIENCE.md:584` -- write Decision 1 into `{components.sync-report-panel}`. Bump `revision:`.
 - Tests: `rank.test.ts:1014-1027` (the `rated` case flips), `:898-913` (Staves becomes unrankable); `probability.test.ts:71-76`, `:99`, `:176-262` (add empty-contained); `cross-file.test.ts:161-164` (flips to pass), `:277` (committed files stay clean); `trust-facts.test.ts:271-295`, `trust-strip.test.tsx:360-385`.
 
@@ -99,7 +99,7 @@ context:
 | 13 | blind | A wide banded ref on a mixed-kind stat silently contains the valueless tier | false | That is the IN §2.3 ruling; edge alignment still flags a band whose extremes differ. | reject |
 | 14 | edge-case | Shared-modGroup refs can give `ok` with `P = 0` | false | `contained ∩ eligible` is non-empty, so IN §9 does not apply; IN §11 makes only a zero `W_X∖g` a reason. Pre-existing code path. | reject |
 | 15 | edge-case | Schema accepts a crafted row with both `asOf` and `lastAttemptedAt` | low | `core` is the sole producer and never sets both; a refine adds a guard for an undemonstrated state. | reject |
-| 16 | edge-case | `diagnosisGroups` drops failures when `weightsLoaded` is false | false | `crossFileChecks` returns `[]` when weights are `null` (`cross-file.ts:227`), so no failure reaches it. | reject |
+| 16 | edge-case | `diagnosisGroups` drops failures when `areWeightsLoaded` is false | false | `crossFileChecks` returns `[]` when weights are `null` (`cross-file.ts:227`), so no failure reaches it. | reject |
 
 ## Verification
 

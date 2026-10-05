@@ -1,54 +1,38 @@
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 
 import type { TestProject } from 'vitest/node';
 
 declare module 'vitest' {
   interface ProvidedContext {
-    /**
-     * The directory where `test/setup.ts` records a request that arrived while
-     * no test file of its worker was open. `undefined` in a project whose
-     * config does not load this global setup.
-     */
+    /** Where `test/setup.ts` records requests that arrive after its worker's last file closed. */
     noNetworkRecordDir?: string;
   }
 }
 
-/**
- * The main-process half of the no-network guard (NFR-1).
- *
- * A test can start a request it does not await. When that request fires after
- * the setup file's `afterAll` in the last file of a worker, the guard blocks
- * it, but no hook inside the worker can still fail the run. So the worker
- * appends the request to `<dir>/<pid>.log`, and the check below reads the
- * record after every worker has exited.
- *
- * `onClose`, not the teardown this function could return: the teardown runs
- * before Vitest waits for the workers to exit, so it can miss a record written
- * in the last milliseconds of a worker. `provide`, not an environment
- * variable: a child Vitest that a test starts would inherit the variable and
- * write into this run's record.
- */
+// Main-process half of the no-network guard (NFR-1). `onClose`, not a returned teardown: that runs
+// before the workers exit and can miss a late record. `provide`, not an env variable: a child
+// Vitest that a test starts would inherit it and write into this run's record.
 export default function setup(project: TestProject): void {
-  const dir = mkdtempSync(join(tmpdir(), 'no-network-'));
-  project.provide('noNetworkRecordDir', dir);
+  const directory = mkdtempSync(nodePath.join(tmpdir(), 'no-network-'));
+  project.provide('noNetworkRecordDir', directory);
   // Async, so a throw becomes a rejection: Vitest calls every project's
   // callback before it awaits them, and a synchronous throw would skip the rest.
   project.vitest.onClose(async () => {
-    assertNoLateRequests(dir);
+    assertNoLateRequests(directory);
   });
 }
 
-function assertNoLateRequests(dir: string): void {
+function assertNoLateRequests(directory: string): void {
   let lines: string[];
   try {
-    lines = readdirSync(dir)
+    lines = readdirSync(directory)
       .filter((name) => name.endsWith('.log'))
-      .flatMap((name) => readFileSync(join(dir, name), 'utf8').split('\n'))
+      .flatMap((name) => readFileSync(nodePath.join(directory, name), 'utf8').split('\n'))
       .filter((line) => line !== '');
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    rmSync(directory, { recursive: true, force: true });
   }
   if (lines.length > 0) {
     // Vitest prints only the message before the stack, so the message names each URL.

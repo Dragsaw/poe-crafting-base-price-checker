@@ -1,9 +1,4 @@
-/**
- * The inner `className` key's grammar (WEIGHTS-FILE-SCHEMA.md `5.1.0`,
- * IMPLEMENTATION-NOTES.md §10.2 arm 1), defined once. The weights schema's
- * distinctness and no-mixing rule and `sync`'s search-body discriminator both
- * read it from here.
- */
+/** The `className` grammar (IN §10.2 arm 1), defined once for the weights schema and `sync`. */
 
 /** `str` → armour, `dex` → evasion, `int` → energy shield (WEIGHTS-FILE-SCHEMA.md `5.1.0`). */
 export const DEFENCE_OF_LETTER = { str: 'ar', dex: 'ev', int: 'es' } as const;
@@ -13,11 +8,7 @@ function isDefenceLetter(token: string): token is DefenceLetter {
   return Object.hasOwn(DEFENCE_OF_LETTER, token);
 }
 
-/**
- * Arm 1's split: the **maximal trailing run** of `str` / `dex` / `int` tokens,
- * greedy from the right and without repetition, with at least one token before
- * it. `undefined` means the class is plain.
- */
+/** Arm 1's split: the maximal trailing run of defence tokens (§10.2). `undefined` means plain. */
 export function defenceLettersOf(className: string): ReadonlySet<DefenceLetter> | undefined {
   const tokens = className.split('_');
   const letters = new Set<DefenceLetter>();

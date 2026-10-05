@@ -2,9 +2,9 @@ import { compareByCodeUnit } from '@poe/contracts';
 import type {
   CraftedTrackedEntry,
   HybridLine,
-  ModifierRef,
+  ModifierReference,
   ModifierWeight,
-  SingleLineModifierRef,
+  SingleLineModifierReference,
   WeightsClassPools,
   WeightsFile,
   WeightsLine,
@@ -12,45 +12,7 @@ import type {
 } from '@poe/contracts';
 
 /**
- * The probability term (AD-11, AD-17, IMPLEMENTATION-NOTES.md §1, §9, §11).
- *
- * Pure (AD-1). This is the one definition of a tier's interval, of
- * containment, of the eligible set and of `P(combination)`. Every caller that
- * needs one of these calls this module; nothing else re-derives them.
- *
- * **The two-`#` rule is the producer's inference, pending OQ-12** (§1). A line
- * with two range pairs derives the midpoint of each edge. `interval` is the
- * one place that division happens and the one place to change when OQ-12
- * resolves: `contains` calls it, and the edge-alignment check (`cross-file.ts`)
- * calls it too.
- *
- * **Line sets, the null-line rule and containment** are §1's: `lineSet`,
- * `untrackable`, `statIds`, `covers` and `contains` below are the one
- * implementation that §1 has every caller share. A hybrid reference's
- * containment set feeds §11 unchanged; a contained tier counts its whole
- * weight once, and nothing multiplies across a hybrid's lines (AD-17).
- *
- * **Exactness (AD-5, §1).** Edges compare with `>=` and `<=` and exact
- * equality. Two `#` is the most a stat line carries, and the game publishes
- * integer range endpoints, so the sum of two endpoints is exact and halving it
- * is exact in IEEE doubles (IMPLEMENTATION-NOTES.md §1). There is no
- * tolerance, no epsilon and no guard on the division. A three-`#` line is refused by the weights schema and never
- * reaches this module.
- *
- * **A missing figure is a typed reason, never `0`** (§9, §11). An absent
- * class, an empty eligible slot, a reference that contains no eligible tier
- * and an exhausted augment each come back as a `ProbabilityReason`. The tags
- * are machine tags; Story 3.4 maps them.
- *
- * **Trust surface (AD-5, §8).** The entry's `itemLevelMin` is declared in
- * `data/tracked.json`, and no component derives it. This module scopes the
- * pool at the declared floor as given. A floor declared lower than §8 derives
- * fails a cross-file check at load; a floor declared **higher** passes every
- * mechanical check in the system, widens the scoped pool, inflates every
- * denominator and moves the ranking with nothing reported. A clean result here
- * does not confirm that the floor is the one §8 derives.
- *
- * `acceptedTier` is a display label and is never read here (AD-5).
+ * The probability term (AD-11, AD-17, IN §1, §9, §11): no epsilon in edge comparisons (§1, AD-5).
  */
 
 export type Slot = 'prefix' | 'suffix';
@@ -79,10 +41,7 @@ export type PoolLookup =
 export type CombinationInput = Pick<CraftedTrackedEntry, 'itemLevelMin' | 'prefix' | 'suffix'>;
 
 /**
- * A line's derived interval (§1). Empty `ranges` is a valueless line and reads
- * as `[1, 1]` (§2.3). One pair is the interval itself. Two pairs give the
- * midpoint of each edge — the producer's inference, pending OQ-12; change it
- * here and only here.
+ * A line's derived interval (§1): two pairs give each edge's midpoint, pending OQ-12.
  */
 export function interval(line: WeightsLine): Interval {
   const [first, second] = line.ranges;
@@ -92,22 +51,15 @@ export function interval(line: WeightsLine): Interval {
   return second === undefined ? { min: first[0], max: first[1] } : { min: (first[0] + second[0]) / 2, max: (first[1] + second[1]) / 2 };
 }
 
-/**
- * `untrackable(entry)` (§1 *Line sets and the null-line rule*). It reads the
- * weights file alone: the entry and its own pool's coverage.
- */
-export function untrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'poolCoverage'>): boolean {
+/** `untrackable(entry)` (§1 *Line sets and the null-line rule*): reads the weights file alone. */
+export function isUntrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'poolCoverage'>): boolean {
   return untrackableReason(entry, pool) !== undefined;
 }
 
 /** Why `untrackable` holds (§1): `undefined` for a trackable entry. */
 export type UntrackableReason = 'not-in-game' | 'partial-pool-null-line';
 
-/**
- * The null-line rule's verdict with its reason. `untrackable` delegates here,
- * so `core`, the sync gate and `tracked:lookup` share one rule. It reads the
- * entry and its own pool's coverage alone.
- */
+/** The null-line rule's verdict and reason, shared by `core`, the sync gate, `tracked:lookup`. */
 export function untrackableReason(
   entry: ModifierWeight,
   pool: Pick<WeightsPool, 'poolCoverage'>,
@@ -118,29 +70,21 @@ export function untrackableReason(
   return pool.poolCoverage === 'partial' && entry.lines.some((line) => line.statId === null) ? 'partial-pool-null-line' : undefined;
 }
 
-/**
- * `lineSet(entry)` (§1): the entry's non-null line `statId`s, sorted by code
- * unit. A `null` line is dropped here; `untrackable` decides what it means.
- */
+/** `lineSet(entry)` (§1): the non-null `statId`s by code unit; `untrackable` decides `null`. */
 export function lineSet(entry: ModifierWeight): readonly string[] {
-  return entry.lines.flatMap((line) => (line.statId === null ? [] : [line.statId])).sort(compareByCodeUnit);
+  return entry.lines.flatMap((line) => line.statId ?? []).toSorted(compareByCodeUnit);
 }
 
 /** `statIds(ref)` (§1): the `statId`s a reference names, sorted by code unit. */
-export function statIds(reference: ModifierRef): readonly string[] {
-  return reference.kind === 'hybrid' ? reference.lines.map((rl) => rl.statId).sort(compareByCodeUnit) : [reference.statId];
+export function statIds(reference: ModifierReference): readonly string[] {
+  return reference.kind === 'hybrid' ? reference.lines.map((rl) => rl.statId).toSorted(compareByCodeUnit) : [reference.statId];
 }
 
 /** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */
-export type ReferenceLine = SingleLineModifierRef | HybridLine;
+export type ReferenceLine = SingleLineModifierReference | HybridLine;
 
-/**
- * `covers(rl, line)` (§1). A banded `rl` covers a line of its `statId` whose
- * derived interval sits wholly inside the band; a valueless line derives
- * `[1, 1]` (§2.3). A valueless `rl` covers a line of its `statId` with empty
- * `ranges`. A `null`-`statId` line is never covered.
- */
-export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
+/** `covers(rl, line)` (§1): a banded `rl` needs the derived interval inside the band. */
+export function isCovering(rl: ReferenceLine, line: WeightsLine): boolean {
   if (line.statId !== rl.statId) {
     return false;
   }
@@ -154,59 +98,30 @@ export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
 /** The empty `S`, for a caller with no pair of entries. */
 const NO_SUMMED: ReadonlySet<string> = new Set();
 
-function sameIds(a: readonly string[], b: readonly string[]): boolean {
+function haveSameIds(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((id, index) => id === b[index]);
 }
 
 /**
- * Whole-tier containment (§1 *Containment*). A single-line reference contains
- * an entry when one of its lines is covered. A hybrid reference contains an
- * entry whose `lineSet` equals the reference's `statIds` and whose lines cover
- * every reference line; an entry with a different line set is excluded even
- * when every named line is covered. An entry whose `weight` is `0` is never
- * contained, whatever its `weightSource` or lines (§1). It still enters the
- * denominator, where it adds nothing.
- *
- * **Precondition: the entry's pool is `complete`.** §1 writes `¬untrackable`
- * into containment; this function does not take the pool's coverage. The
- * `not-in-game` half is already `weight > 0`, because the weights schema forces
- * weight 0 on such a tier. The `partial` half never reaches here: a class with a
- * `partial` slot gets no pool check (§1) and no probability (`rank.ts` reports
- * it before it computes one). A new caller with a `partial` pool calls
- * `untrackable` first.
- *
- * **`summed` is §2.2's `S`**, and `contains(ref, entry, S)` is `contains_S`: a
- * reference line on a `statId` in `S` drops its band test and keeps the
- * line-set test, so it needs only a line of the entry on that `statId`. `S`
- * is empty, and this is §1's `contains`, wherever the caller has no pair of
- * entries.
+ * Whole-tier containment (§1); `summed` is §2.2's `S`. Needs a `complete` pool: else `untrackable`.
  */
-export function contains(reference: ModifierRef, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
+export function isContaining(reference: ModifierReference, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
   if (entry.weight === 0) {
     return false;
   }
-  const coveredBy = (rl: ReferenceLine) =>
-    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
-  return reference.kind === 'hybrid' ? sameIds(lineSet(entry), statIds(reference)) && reference.lines.every(coveredBy) : coveredBy(reference);
+  const isCoveredBy = (rl: ReferenceLine) =>
+    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : isCovering(rl, line)));
+  return reference.kind === 'hybrid' ? haveSameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
 }
 
-/**
- * The class's two pools, by direct lookup at `bases[categoryId][className]`,
- * own keys only (AD-5, AD-17). A missing class is never looked for among its
- * siblings.
- */
+/** The class's two pools by direct lookup `bases[categoryId][className]`, own keys (AD-5). */
 export function poolOf(weights: WeightsFile, categoryId: string, className: string): PoolLookup {
   const classes = Object.hasOwn(weights.bases, categoryId) ? weights.bases[categoryId] : undefined;
   const pools = classes !== undefined && Object.hasOwn(classes, className) ? classes[className] : undefined;
   return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
-/**
- * The eligible set of one slot (§9): scope to the entry's floor, then
- * truncate at the recipe's floor, on one axis —
- * `modifierLevelMin <= w.itemLevelMin <= itemLevelMin`. A `modifierLevelMin`
- * of `0` runs the same predicate and removes nothing.
- */
+/** One slot's eligible set (§9): `modifierLevelMin <= w.itemLevelMin <= itemLevelMin`, one axis. */
 export function eligible(
   pool: WeightsPool,
   itemLevelMin: number,
@@ -223,47 +138,33 @@ function totalWeight(entries: readonly ModifierWeight[]): number {
   return total;
 }
 
-/**
- * A pool is empty when its total weight is `0` (IMPLEMENTATION-NOTES.md §3,
- * AD-17): the one definition of "empty" for the coverage figure.
- */
+/** A pool is empty when its total weight is `0`: the one definition for coverage (IN §3, AD-17). */
 export function isEmptyPool(pool: WeightsPool): boolean {
   return totalWeight(pool.entries) === 0;
 }
 
 /** `C = contained(ref) ∩ E` (§11). */
-export function containedIn(reference: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
-  return eligibleSet.filter((entry) => contains(reference, entry));
+export function containedIn(reference: ModifierReference, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
+  return eligibleSet.filter((entry) => isContaining(reference, entry));
 }
 
-/**
- * `needs(ref)` (IMPLEMENTATION-NOTES.md §8): the item level a reference
- * requires, over `tier(ref)` — the **unscoped** pool's entries that `contains`
- * admits and that are not `untrackable`. A maximum of `w.itemLevelMin` when
- * the reference names any banded line, a minimum when every line is
- * valueless, and `undefined`, never `0`, when it contains nothing.
- */
-export function needs(reference: ModifierRef, pool: WeightsPool): number | undefined {
-  const tier = containedIn(reference, pool.entries).filter((entry) => !untrackable(entry, pool));
+/** `needs(ref)` (IN §8) over the unscoped pool: `undefined`, never `0`, if nothing is contained. */
+export function needs(reference: ModifierReference, pool: WeightsPool): number | undefined {
+  const tier = containedIn(reference, pool.entries).filter((entry) => !isUntrackable(entry, pool));
   if (tier.length === 0) {
     return undefined;
   }
   const levels = tier.map((entry) => entry.itemLevelMin);
-  const banded = reference.kind === 'hybrid' ? reference.lines.some((rl) => 'valueMin' in rl) : reference.kind === 'banded';
-  return banded ? Math.max(...levels) : Math.min(...levels);
+  const isBanded = reference.kind === 'hybrid' ? reference.lines.some((rl) => 'valueMin' in rl) : reference.kind === 'banded';
+  return isBanded ? Math.max(...levels) : Math.min(...levels);
 }
 
-/**
- * `P(ref | recipe)` for one slot (§9): the contained eligible weight over the
- * eligible weight, each contained entry counted once. An empty eligible slot
- * (`W = 0`) is `empty-eligible-pool`.
- */
+/** `P(ref | recipe)` for one slot (§9); an empty eligible slot is `empty-eligible-pool`. */
 export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
-  reference: ModifierRef,
-  itemLevelMin: number,
-  modifierLevelMin: number,
+  reference: ModifierReference,
+  { itemLevelMin, modifierLevelMin }: { readonly itemLevelMin: number; readonly modifierLevelMin: number },
 ): ProbabilityResult {
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
   const total = totalWeight(eligibleSet);
@@ -295,9 +196,7 @@ function exclusionSums(sets: SlotSets): (group: string) => { readonly eligible: 
 }
 
 /**
- * One draw order's numerator: `Σ_{e ∈ C_first} e.w · ΣC_second∖g(e) / W_second∖g(e)`.
- * A positive-weight first draw that leaves the other slot nothing is
- * `augment-exhausted`.
+ * One draw order's numerator (§11); a first draw leaving the other slot nothing is exhausted.
  */
 function orderedTerm(
   first: SlotSets,
@@ -320,19 +219,14 @@ function orderedTerm(
 }
 
 /**
- * `P(prefix ∧ suffix | recipe)` (§11): the transmute draws from both slots
- * combined by weight, and the augment draws from the other slot with the first
- * affix's `modGroup` removed. The order is scope, truncate, exclude,
- * renormalise. Both slots are checked for `empty-eligible-pool` first, then
- * each affix for `empty-contained` (IN §9), then each draw order for
- * `augment-exhausted`.
+ * `P(prefix ∧ suffix | recipe)` (§11): scope, truncate, exclude, renormalise; reasons per slot.
  */
 export function combinationProbability(
   pools: WeightsClassPools,
   combination: CombinationInput,
   modifierLevelMin: number,
 ): ProbabilityResult {
-  const setsOf = (slot: Slot, reference: ModifierRef): SlotSets => {
+  const setsOf = (slot: Slot, reference: ModifierReference): SlotSets => {
     const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
     return { slot, eligibleSet, contained: containedIn(reference, eligibleSet), total: totalWeight(eligibleSet) };
   };

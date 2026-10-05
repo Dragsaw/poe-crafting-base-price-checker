@@ -60,7 +60,7 @@ context:
 
 ## Code Map
 
-- `packages/core/src/rank.ts` -- `RankInput` (L38), `Ranking` (L60), `rank` (L111). Add `weightsLoaded: boolean` to the input, and `unrankable: readonly UnrankableClass[]` (`categoryId`, `className`, `reason`) to the output. `rank` skips crafted entries today (L119). Keep the raw branch unchanged. Export the new type from `core/src/index.ts`.
+- `packages/core/src/rank.ts` -- `RankInput` (L38), `Ranking` (L60), `rank` (L111). Add `areWeightsLoaded: boolean` to the input, and `unrankable: readonly UnrankableClass[]` (`categoryId`, `className`, `reason`) to the output. `rank` skips crafted entries today (L119). Keep the raw branch unchanged. Export the new type from `core/src/index.ts`.
 - `packages/web/src/App.tsx` -- `ReadyList` (L107) calls `rank`. `PageTail` (L144) owns `marginTop: 'auto'`. The appendix leads it in `ready` and is absent in `pending`. Pass the ranking's `unrankable` up from `ReadyList`, or compute the ranking once in the `ready` branch.
 - `packages/web/src/theme/tokens.ts` -- `spacing.appendixRowHeight` 29, `columnSums.appendix` (L185), and `typeRoles['appendix-title'|'appendix-lead'|'appendix-row']` (L260). `committedChrome` already charges the appendix 306px, so the budget needs no change.
 - `packages/web/src/list/UnitGlyph.tsx` (`unit="class"`), `TrustMark.tsx` (`unknown`) and `KeyBlock.tsx` -- reuse as they are.
@@ -98,7 +98,7 @@ context:
   - `medium` `patch` Intent: the reason and note cells hard-code mockup type (sans 11.5/10.5px) against DESIGN.md "Appendix rows set in `{typography.appendix-row}`" — removed the overrides; both cells inherit `appendix-row`.
   - `false` `reject` Intent: hover and cursor are checked only inline, not computed — the rows are plain classless `div`s and no stylesheet targets them.
   - `false` `reject` Intent: the empty appendix keeps its panel chrome — DESIGN.md `emptyState` says "the panel keeps its place" and the padding is specified.
-  - `false` `reject` Intent: the committed-row result comes from `weightsLoaded`, not from empty recipes — the matrix expectation holds, and Epic 2 does not read recipes by design.
+  - `false` `reject` Intent: the committed-row result comes from `areWeightsLoaded`, not from empty recipes — the matrix expectation holds, and Epic 2 does not read recipes by design.
   - `false` `reject` Intent: the `categoryId` tiebreak extends the stated sort — it only fixes the order of ties that `className` alone leaves undefined; no outcome differs from the cited sort.
   - `low` `patch` Intent: `sprint-status.yaml` reads `ready-for-dev` — set to `done` at finalize.
   - `low` `patch` Blind: `epic-2-context.md` keeps the revoked state-16 note rule — replaced it with the decision and a pointer to the owed edits.
@@ -133,17 +133,17 @@ context:
 Status: done
 Accepted by the human on 2026-09-27.
 
-**Summary.** `core`'s `rank` takes `weightsLoaded` and returns `unrankable`: one `class absent from weights file` entry per distinct non-pruned crafted `(categoryId, className)` when no weights envelope is loaded, and none otherwise. `web` renders `UnrankableAppendix` at the head of `PageTail` in every ready state, in both the empty (state 37) and non-empty treatments. The appendix, key block and foot stay under one `margin-top: auto`.
+**Summary.** `core`'s `rank` takes `areWeightsLoaded` and returns `unrankable`: one `class absent from weights file` entry per distinct non-pruned crafted `(categoryId, className)` when no weights envelope is loaded, and none otherwise. `web` renders `UnrankableAppendix` at the head of `PageTail` in every ready state, in both the empty (state 37) and non-empty treatments. The appendix, key block and foot stay under one `margin-top: auto`.
 
 **Files changed.**
-- `packages/core/src/rank.ts`, `index.ts`: the `weightsLoaded` input, the `UnrankableClass` / `UnrankableReason` types and the `unrankable` output.
+- `packages/core/src/rank.ts`, `index.ts`: the `areWeightsLoaded` input, the `UnrankableClass` / `UnrankableReason` types and the `unrankable` output.
 - `packages/core/src/rank.test.ts`: dedupe, pruned-only, raw-only, weights loaded, a shared className, code-unit sort and shuffle stability.
 - `packages/web/src/list/UnrankableAppendix.tsx` (new) and `unrankable-appendix.test.tsx` (new): the component and its unit tests.
 - `packages/web/src/App.tsx`: `ReadyBody` ranks once and renders the tail with the appendix.
 - `packages/web/src/App.test.tsx`: end-to-end coverage of every matrix row, the failure screens, the list-statement states and the tail's parent.
 - `packages/web/src/theme/tokens.ts`, `tokens.test.ts`: the appendix padding and lead tokens, and a width-sum check.
 - `packages/web/src/test-support/list-fixtures.ts`: `craftedEntry`; `bodiesWith` accepts any `TrackedEntry`.
-- `packages/web/src/list/{display-rows,expansion,list-statement,ranked-list}.test.*`: pass `weightsLoaded: true`.
+- `packages/web/src/list/{display-rows,expansion,list-statement,ranked-list}.test.*`: pass `areWeightsLoaded: true`.
 - `docs/stories/deferred-work.md`: the two story 2.8 entries (the second now names DESIGN.md as well) and a "Resolved by story 2.8" line.
 - `docs/stories/epic-2-context.md`: the recompiled epic context, with review corrections.
 - `docs/stories/sprint-status.yaml`: 2.8 → `done`.
@@ -154,4 +154,4 @@ Accepted by the human on 2026-09-27.
 
 **Verification.** `pnpm check` is clean: tsc, eslint and depcruise. `pnpm test` passes 87 files and 1134 tests, with no escaped request. Before the review patches, agent-browser (a named session) took full-page screenshots. On the committed page, the title alone reads `— 0 Item Classes`. In the absent-weights world (a scratch build, `weights.json` removed, 29 crafted classes), all 29 rows show, and the key block and foot sit below them.
 
-**Residual risks.** `weightsLoaded` is required, so every future `rank` caller must set it. A className wider than 292px would spill into the mark cell, and today's class names do not reach that width.
+**Residual risks.** `areWeightsLoaded` is required, so every future `rank` caller must set it. A className wider than 292px would spill into the mark cell, and today's class names do not reach that width.

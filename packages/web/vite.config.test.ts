@@ -1,29 +1,19 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import nodePath from 'node:path';
 
 import { expect, it } from 'vitest';
 
 import config from './vite.config';
 
-/**
- * The dev-server port contract, asserted rather than trusted. No acceptance
- * criterion may require a running server, so these two settings are otherwise
- * unguarded — delete `strictPort` and the suite would stay green while Vite
- * silently bumped a second worktree onto a free port, which is how an agent
- * ends up reporting on another agent's build.
- */
+/** The dev-server port contract, asserted: deleting `strictPort` would keep the suite green. */
 it('binds one explicit port and fails rather than moving', () => {
   expect(config.server?.strictPort).toBe(true);
   expect(config.server?.port).toBe(5173);
 });
 
-/**
- * The seven AD-24 artifacts are copied static files, never bundle contents
- * (AD-24). `publicDir` is what serves and copies them, and `base: './'` keeps
- * every URL relative so the built site works under any Pages path.
- */
+/** AD-24 artifacts are static files, never bundle contents; `base: './'` keeps URLs relative. */
 it('serves the repo data/ folder as static files under a relative base', () => {
-  expect(config.publicDir).toBe(resolve(import.meta.dirname, '../../data'));
+  expect(config.publicDir).toBe(nodePath.resolve(import.meta.dirname, '../../data'));
   expect(config.base).toBe('./');
   // A missing artifact must be a 404, never the SPA fallback's index.html.
   expect(config.appType).toBe('mpa');
@@ -31,9 +21,10 @@ it('serves the repo data/ folder as static files under a relative base', () => {
 
 it('never imports data/** from source', () => {
   const offenders: string[] = [];
-  const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
+  const walk = (directory: string): void => {
+    const entries = readdirSync(directory, { withFileTypes: true });
+    for (const entry of entries) {
+      const full = nodePath.join(directory, entry.name);
       if (entry.isDirectory()) {
         walk(full);
       } else if (/\.(ts|tsx)$/.test(entry.name)) {
@@ -44,6 +35,6 @@ it('never imports data/** from source', () => {
       }
     }
   };
-  walk(resolve(import.meta.dirname, 'src'));
+  walk(nodePath.resolve(import.meta.dirname, 'src'));
   expect(offenders).toEqual([]);
 });

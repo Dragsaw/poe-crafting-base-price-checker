@@ -1,51 +1,18 @@
-/**
- * `pnpm tracked:check` — the check half of the tracked-json skill's loop
- * (lookup → edit → check).
- *
- * Read-only. It reads `data/tracked.json`, `data/config.json`, the
- * committed catalogue and `data/weights.json`, runs the production
- * validators over them, and prints `{ok, checks, issues, unvalidated}` as JSON to stdout. It writes no file and
- * issues no request. Exit 0 when every check passes, 1 otherwise.
- *
- * Four checks, each the production code a sync run uses:
- *
- * - `schema`: `TrackedFileSchema` through `parseEnvelope` at
- *   `TRACKED_SCHEMA_VERSION`, which includes the canonical-key uniqueness
- *   rule. One issue per schema issue. An earlier major prints the
- *   IMPLEMENTATION-NOTES §4.1 re-author message.
- * - `pinned-cap`: `checkPinnedCap` against `config.minChunkSearches`
- *   (IMPLEMENTATION-NOTES.md §6).
- * - `catalogue`: AD-9 resolvability through `checkCatalogue` with an empty
- *   dataset. One issue per `records` entry.
- * - `cross-file`: `core`'s six cross-file checks (AD-17) against
- *   `data/weights.json`, the same call the sync run-start gate makes. One
- *   issue per failure. `skipped` when the weights file is absent, since no
- *   check runs without it (AD-24).
- *
- * `unvalidated` lists each crafted entry that no pool check covered, with its
- * reason — `weights-absent` or `partial-pool` (IMPLEMENTATION-NOTES §2.8). The
- * same `crossFileChecks` call gives it, also when the weights file is absent.
- * A mark is never an issue: it neither fails a check nor moves `ok` or the
- * exit code.
- *
- * A pass still does not confirm that a floor is the one IMPLEMENTATION-NOTES.md
- * §8 derives: a floor declared too high passes every mechanical check (AD-5).
- */
+// `pnpm tracked:check`: read-only, exit 1 on any issue. A pass does not confirm a floor is the one
+// IN §8 derives: a floor declared too high passes every mechanical check (AD-5).
 
-import { realpathSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { canonicalKey } from '@poe/contracts';
 import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
-import { crossFileChecks } from '@poe/core';
-import type { UnvalidatedMark } from '@poe/core';
+import { crossFileChecks, type UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { readWeightsIds } from '../catalogue/weights-ids.ts';
 import { checkCatalogue } from '../chunk/catalogue-check.ts';
+import { isInvokedDirectly } from '../entry/is-invoked-directly.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
 import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
@@ -88,8 +55,8 @@ export interface TrackedCheckInputs {
   readonly tracked: string | undefined;
   readonly config: DataFileResult<ConfigFile>;
   readonly catalogue: DataFileResult<CatalogueIds>;
-  /** The parsed `data/weights.json`; `null` when the file is absent. */
-  readonly weights: DataFileResult<WeightsFile | null>;
+  /** The parsed `data/weights.json`; `undefined` when the file is absent. */
+  readonly weights: DataFileResult<WeightsFile | undefined>;
 }
 
 type SchemaResult =
@@ -135,94 +102,129 @@ function checkSchema(text: string | undefined): SchemaResult {
   };
 }
 
-/** Pure: the loaded inputs in, the report out. */
-export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
-  const checks: CheckStatus[] = [];
-  const issues: CheckIssue[] = [];
+interface CheckOutcome {
+  readonly status: CheckStatus['status'];
+  readonly issues: readonly CheckIssue[];
+}
 
-  const schema = checkSchema(loaded.tracked);
-  if (schema.ok) {
-    checks.push({ check: 'schema', status: 'passed' });
-  } else {
-    checks.push({ check: 'schema', status: 'failed' });
-    issues.push(...schema.issues);
-  }
-  const entries = schema.ok ? schema.entries : undefined;
+type PathOf = (entryKey: string) => { readonly path?: string };
+
+function entryPathLookup(entries: readonly TrackedEntry[] | undefined): PathOf {
   const indexByKey = new Map<string, number>();
-  entries?.forEach((entry, index) => {
+  const list = entries ?? [];
+  for (const [index, entry] of list.entries()) {
     indexByKey.set(canonicalKey(entry), index);
-  });
-  const pathOf = (entryKey: string): { readonly path?: string } => {
+  }
+  return (entryKey) => {
     const index = indexByKey.get(entryKey);
     return index === undefined ? {} : { path: `entries.${String(index)}` };
   };
-  const unvalidated: CheckUnvalidated[] = [];
-  const markedAt = (marks: readonly UnvalidatedMark[]): CheckUnvalidated[] =>
-    marks.map((mark) => ({ ...mark, ...pathOf(mark.entryKey) }));
-
-  if (!loaded.config.ok) {
-    checks.push({ check: 'pinned-cap', status: 'failed' });
-    issues.push({ check: 'pinned-cap', message: loaded.config.error.message });
-  } else if (entries === undefined) {
-    checks.push({ check: 'pinned-cap', status: 'skipped' });
-  } else {
-    const cap = checkPinnedCap(entries, loaded.config.value);
-    checks.push({ check: 'pinned-cap', status: cap.ok ? 'passed' : 'failed' });
-    if (!cap.ok) {
-      issues.push({ check: 'pinned-cap', message: cap.error.message });
-    }
-  }
-
-  if (!loaded.catalogue.ok) {
-    checks.push({ check: 'catalogue', status: 'failed' });
-    issues.push({ check: 'catalogue', message: loaded.catalogue.error.message });
-  } else if (entries === undefined) {
-    checks.push({ check: 'catalogue', status: 'skipped' });
-  } else {
-    const { records } = checkCatalogue(entries, [], loaded.catalogue.value);
-    checks.push({ check: 'catalogue', status: records.length === 0 ? 'passed' : 'failed' });
-    for (const record of records) {
-      issues.push({
-        check: 'catalogue',
-        ...pathOf(record.entryKey),
-        message:
-          `${record.identifierKind} ${record.identifier} is absent from the committed catalogue ` +
-          `(entry ${record.entryKey})`,
-      });
-    }
-  }
-
-  if (!loaded.weights.ok) {
-    checks.push({ check: 'cross-file', status: 'failed' });
-    issues.push({ check: 'cross-file', message: loaded.weights.error.message });
-  } else if (entries === undefined) {
-    checks.push({ check: 'cross-file', status: 'skipped' });
-  } else if (loaded.weights.value === null) {
-    // No check runs without the weights file, but each crafted entry is marked (§2.8).
-    checks.push({ check: 'cross-file', status: 'skipped' });
-    unvalidated.push(...markedAt(crossFileChecks(entries, null).unvalidated));
-  } else {
-    const { failures, unvalidated: marks } = crossFileChecks(entries, loaded.weights.value);
-    unvalidated.push(...markedAt(marks));
-    checks.push({ check: 'cross-file', status: failures.length === 0 ? 'passed' : 'failed' });
-    for (const failure of failures) {
-      issues.push({
-        check: 'cross-file',
-        ...pathOf(failure.entryKey),
-        message: `${failure.check}: ${failure.detail} (entry ${failure.entryKey})`,
-      });
-    }
-  }
-
-  // A mark never moves `ok` (IMPLEMENTATION-NOTES §2.8).
-  return { ok: issues.length === 0, checks, issues, unvalidated };
 }
 
-/** The weights file as a value: absent is `null`, a refusal is carried rather than thrown. */
-async function loadWeights(fs: FilesystemPort): Promise<DataFileResult<WeightsFile | null>> {
+function pinnedCapOutcome(
+  config: TrackedCheckInputs['config'],
+  entries: readonly TrackedEntry[] | undefined,
+): CheckOutcome {
+  if (!config.ok) {
+    return { status: 'failed', issues: [{ check: 'pinned-cap', message: config.error.message }] };
+  }
+  if (entries === undefined) {
+    return { status: 'skipped', issues: [] };
+  }
+  const cap = checkPinnedCap(entries, config.value);
+  return cap.ok
+    ? { status: 'passed', issues: [] }
+    : { status: 'failed', issues: [{ check: 'pinned-cap', message: cap.error.message }] };
+}
+
+function catalogueOutcome(
+  catalogue: TrackedCheckInputs['catalogue'],
+  entries: readonly TrackedEntry[] | undefined,
+  pathOf: PathOf,
+): CheckOutcome {
+  if (!catalogue.ok) {
+    return { status: 'failed', issues: [{ check: 'catalogue', message: catalogue.error.message }] };
+  }
+  if (entries === undefined) {
+    return { status: 'skipped', issues: [] };
+  }
+  const { records } = checkCatalogue(entries, [], catalogue.value);
+  return {
+    status: records.length === 0 ? 'passed' : 'failed',
+    issues: records.map((record) => ({
+      check: 'catalogue',
+      ...pathOf(record.entryKey),
+      message:
+        `${record.identifierKind} ${record.identifier} is absent from the committed catalogue ` +
+        `(entry ${record.entryKey})`,
+    })),
+  };
+}
+
+function markedAt(marks: readonly UnvalidatedMark[], pathOf: PathOf): CheckUnvalidated[] {
+  return marks.map((mark) => ({ ...mark, ...pathOf(mark.entryKey) }));
+}
+
+function crossFileOutcome(
+  weights: TrackedCheckInputs['weights'],
+  entries: readonly TrackedEntry[] | undefined,
+  pathOf: PathOf,
+): CheckOutcome & { readonly unvalidated: readonly CheckUnvalidated[] } {
+  if (!weights.ok) {
+    return { status: 'failed', issues: [{ check: 'cross-file', message: weights.error.message }], unvalidated: [] };
+  }
+  if (entries === undefined) {
+    return { status: 'skipped', issues: [], unvalidated: [] };
+  }
+  if (weights.value === undefined) {
+    // No check runs without the weights file, but each crafted entry is marked (§2.8).
+    return { status: 'skipped', issues: [], unvalidated: markedAt(crossFileChecks(entries, undefined).unvalidated, pathOf) };
+  }
+  const { failures, unvalidated } = crossFileChecks(entries, weights.value);
+  return {
+    status: failures.length === 0 ? 'passed' : 'failed',
+    issues: failures.map((failure) => ({
+      check: 'cross-file',
+      ...pathOf(failure.entryKey),
+      message: `${failure.check}: ${failure.detail} (entry ${failure.entryKey})`,
+    })),
+    unvalidated: markedAt(unvalidated, pathOf),
+  };
+}
+
+/** Pure: the loaded inputs in, the report out. */
+export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
+  const schema = checkSchema(loaded.tracked);
+  const entries = schema.ok ? schema.entries : undefined;
+  const pathOf = entryPathLookup(entries);
+  const schemaOutcome: CheckOutcome = schema.ok
+    ? { status: 'passed', issues: [] }
+    : { status: 'failed', issues: schema.issues };
+  const cap = pinnedCapOutcome(loaded.config, entries);
+  const catalogue = catalogueOutcome(loaded.catalogue, entries, pathOf);
+  const crossFile = crossFileOutcome(loaded.weights, entries, pathOf);
+
+  const outcomes: readonly (readonly [CheckName, CheckOutcome])[] = [
+    ['schema', schemaOutcome],
+    ['pinned-cap', cap],
+    ['catalogue', catalogue],
+    ['cross-file', crossFile],
+  ];
+  const issues = outcomes.flatMap(([, outcome]) => outcome.issues);
+  // A mark never moves `ok` (IMPLEMENTATION-NOTES §2.8).
+  return {
+    ok: issues.length === 0,
+    checks: outcomes.map(([check, outcome]) => ({ check, status: outcome.status })),
+    issues,
+    unvalidated: crossFile.unvalidated,
+  };
+}
+
+/** The weights file as a value: absent is `undefined`, a refusal is carried rather than thrown. */
+async function loadWeights(fs: FilesystemPort): Promise<DataFileResult<WeightsFile | undefined>> {
   try {
     const weights = await readWeightsIds(fs);
-    return { ok: true, value: weights.kind === 'present' ? weights.file : null };
+    return { ok: true, value: weights.kind === 'present' ? weights.file : undefined };
   } catch (error) {
     if (error instanceof DataFileError) {
       return { ok: false, error };
@@ -244,11 +246,7 @@ export async function loadTrackedCheckInputs(fs: FilesystemPort): Promise<Tracke
 /** `packages/sync/src/curation/` → the repository root. */
 const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 
-/**
- * The command over `fs`: prints the report to `out` and returns the exit code,
- * 0 on a pass and 1 on a failure. A usage error goes to `err` with the usage
- * line, and returns 1.
- */
+/** Prints the report to `out`, returns the exit code; a usage error goes to `err`, exit 1. */
 export async function main(
   argv: readonly string[],
   fs: FilesystemPort,
@@ -263,28 +261,11 @@ export async function main(
     return 1;
   }
   const report = checkTracked(await loadTrackedCheckInputs(fs));
-  out.write(`${JSON.stringify(report, null, 2)}\n`);
+  out.write(`${JSON.stringify(report, undefined, 2)}\n`);
   return report.ok ? 0 : 1;
 }
 
-/**
- * Importing the module, as the co-located test does, runs nothing. Node
- * realpaths the main module's URL but not `argv[1]`, so both sides are
- * realpathed.
- */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {
-    return false;
-  }
-  try {
-    return realpathSync(resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a
   // piped write.
   try {

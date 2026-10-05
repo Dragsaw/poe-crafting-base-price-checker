@@ -128,7 +128,7 @@ describe('the expansion copy', () => {
   it('resolves a stored Price State as core resolves a Raw Base: absent is never-synced, another league is a mismatch', () => {
     const entry = rawEntry('Gold Amulet');
     expect(resolvedState(undefined, TEST_LEAGUE)).toEqual(NEVER);
-    expect(resolvedState(priced(entry, 0.8, PRICED.observedAt, 'Standard'), TEST_LEAGUE)).toEqual(MISMATCH);
+    expect(resolvedState(priced(entry, 0.8, PRICED.observedAt, { league: 'Standard' }), TEST_LEAGUE)).toEqual(MISMATCH);
     expect(resolvedState(priced(entry, 0.8, PRICED.observedAt), TEST_LEAGUE)).toEqual(PRICED);
     expect(resolvedState(unpriced(entry, UNRESOLVABLE), TEST_LEAGUE)).toEqual(UNRESOLVABLE);
     expect(resolvedState(unpriced(entry, NO_RATE), TEST_LEAGUE)).toEqual(NO_RATE);
@@ -157,7 +157,7 @@ describe('the expansion copy', () => {
   });
 
   it('prints the state word, with the reason for not-yet-synced, and a glyph per state', () => {
-    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE, UNRESOLVABLE].map(stateWord)).toEqual([
+    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE, UNRESOLVABLE].map((state) => stateWord(state))).toEqual([
       'priced',
       'no-listings',
       'not-yet-synced · never-synced',

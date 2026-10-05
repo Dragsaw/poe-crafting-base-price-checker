@@ -1,25 +1,19 @@
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
 
 import { HOOK_URLS, TEST_TITLES } from './guard-linger-fixture/names';
 
-/**
- * Observes whether the store that the **real** setup `beforeEach` sets with
- * `enterWith` lingers into hooks that belong to no test: a suite `afterAll`
- * after its test, a later suite's `beforeAll`, and the file-level `afterAll`.
- * Each of those hooks issues an unfixtured request. The file-level check must
- * report each one as issued outside any test, and must never name a test.
- *
- * The child needs no network: every fixture URL is under `.invalid`.
- */
+// Does the store that the real `beforeEach` sets with `enterWith` linger into hooks that belong to
+// no test (suite `afterAll`, a later `beforeAll`, file `afterAll`)? The file-level check must
+// report their requests as issued outside any test and never name a test.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-linger-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -58,9 +52,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('reports a request from a hook that belongs to no test as issued outside any test', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-linger-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-linger-'));
   try {
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -84,6 +78,6 @@ it('reports a request from a hook that belongs to no test as issued outside any 
     }
     expect(message).not.toContain('issued by test');
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

@@ -1,7 +1,4 @@
-/**
- * Drives the Payout Threshold's input the way a keystroke would, for the
- * threshold and App tests. Never imported by the app.
- */
+/** Drives the Payout Threshold's input as a keystroke would, for the threshold and App tests. */
 
 import { act } from 'react';
 

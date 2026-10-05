@@ -66,7 +66,7 @@ deferred:
 ## Code Map
 
 - `packages/sync/src/chunk/run-chunk.ts`:
-  - `runChunk` (L192–322): the dataset write goes after `holdsLock` and beside the progress write at L313. It reuses the loaded `tracked` entries and `dataset` (L221).
+  - `runChunk` (L192–322): the dataset write goes after `isLockHeld` and beside the progress write at L313. It reuses the loaded `tracked` entries and `dataset` (L221).
   - `ChunkPorts`: add a required `publication: {league, currencyRates}`.
   - `DATASET_PATH`: update the doc comment.
   - The module doc (L23) says 1.8 adds to the outcome and does not rewrite the lock path. Keep the `finally` release.
@@ -109,7 +109,7 @@ deferred:
   - `[false]` `[reject]` (intent) `publication` is a new required `ChunkPorts` field — this is what the Code Map specifies.
   - `[low]` `[patch]` (verification-gap) "Later step entry wins" untested; duplicate tracked keys are reachable (no uniqueness refine on tracked) — added a `publish-dataset.test.ts` case with two step entries for one key asserting the later one is published.
   - `[low]` `[reject]` (edge) `tracked.json` absent/empty wipes the dataset to zero entries — false in substance: the intent mandates dropping every key not in `tracked.json`; the previous dataset is git-tracked. Logged low only because the outcome is real; rejecting as intended behaviour.
-  - `[low]` `[reject]` (edge) Lock takeover between the `holdsLock` check and the two writes — a takeover needs a lock older than `STALE_LOCK_AFTER_MS` (6 h) and the window is milliseconds; same single-check pattern as the pre-existing progress write; a fix adds guards.
+  - `[low]` `[reject]` (edge) Lock takeover between the `isLockHeld` check and the two writes — a takeover needs a lock older than `STALE_LOCK_AFTER_MS` (6 h) and the window is milliseconds; same single-check pattern as the pre-existing progress write; a fix adds guards.
   - `[medium]` `[defer]` (edge) Non-atomic `writeFile` can leave a truncated `dataset.json` — pre-existing real-port behaviour (`shell.ts:78`); recorded in `deferred`.
   - `[low]` `[reject]` (edge) Dataset written, then progress write throws — the progress value is built from validated keys, so only I/O can fail; the outcome is the spec's step-throw behaviour (re-search next run).
   - `[low]` `[reject]` (edge) Previous dataset with duplicate entryKeys silently collapses — only a hand-edited file can hold duplicates (the writer deduplicates by key); a fix adds a guard.

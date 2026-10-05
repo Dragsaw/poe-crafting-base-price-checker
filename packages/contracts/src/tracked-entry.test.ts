@@ -26,6 +26,17 @@ function issuesOf(data: unknown) {
   return result.success ? [] : result.error.issues;
 }
 
+function unitOf(entry: TrackedEntry): string {
+  switch (entry.kind) {
+    case 'crafted': {
+      return `${entry.categoryId}/${entry.className}`;
+    }
+    case 'raw': {
+      return entry.baseTypeId;
+    }
+  }
+}
+
 describe('TrackedEntrySchema', () => {
   it('parses both arms', () => {
     expect(TrackedEntrySchema.parse(craftedEntry)).toEqual(craftedEntry);
@@ -49,7 +60,7 @@ describe('TrackedEntrySchema', () => {
       itemLevelMin: 79,
       status: 'active',
     });
-    expect(issues.map((issue) => issue.path.join('.')).sort()).toEqual(['prefix', 'suffix']);
+    expect(issues.map((issue) => issue.path.join('.')).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual(['prefix', 'suffix']);
   });
 
   // Story hybrid-mods 2, I/O matrix "Missing slot": both affixes are required.
@@ -109,17 +120,6 @@ describe('TrackedEntrySchema', () => {
 
   /** AC: an exhaustive `switch` over the two kinds, with no default arm. */
   it('exhausts both kinds with no default arm', () => {
-    function unitOf(entry: TrackedEntry): string {
-      switch (entry.kind) {
-        case 'crafted': {
-          return `${entry.categoryId}/${entry.className}`;
-        }
-        case 'raw': {
-          return entry.baseTypeId;
-        }
-      }
-    }
-
     expect(unitOf(TrackedEntrySchema.parse(craftedEntry))).toBe('weapon.bow/Bows');
     expect(unitOf(TrackedEntrySchema.parse(rawEntry))).toBe('Advanced Dualstring Bow');
   });

@@ -1,21 +1,6 @@
-/**
- * The chunk runner's exclusive, recoverable on-disk lock (AD-7,
- * IMPLEMENTATION-NOTES.md §7).
- *
- * Four operations: take, break-if-stale, verify-own and release-if-own. The
- * file holds `{pid, startedAt}` and nothing else, and it is taken by one
- * atomic exclusive create. Staleness is judged by time alone, never by pid: a
- * pid is reused by the operating system, and the time comparison is what bounds
- * the failure.
- *
- * **Breaking a stale lock is serialised by a second exclusive file**, the break
- * marker. Deleting a stale lock and creating a new one are two steps, and
- * without the marker two breakers can interleave so that the slower one
- * deletes the lock the faster one has just taken. Under the marker, the
- * breaker re-reads the lock and breaks it only if the text is still the stale
- * text it judged, so exactly one run takes the lock and every other reports
- * busy.
- */
+// Chunk lock (AD-7, IMPLEMENTATION-NOTES.md §7): one atomic exclusive create, stale by time alone.
+// A stale break is serialised by a second exclusive file, the break marker, so two breakers cannot
+// interleave; under it the lock is re-read and broken only if it is still the text judged stale.
 
 import { SyncLockSchema } from '@poe/contracts';
 import type {
@@ -33,10 +18,7 @@ export const LOCK_PATH = 'data/sync.lock';
 /** Held only for the instant a stale lock is broken. Also matches `*.lock`. */
 export const BREAK_MARKER_PATH = 'data/sync.break.lock';
 
-/**
- * `staleLockAfter` (IMPLEMENTATION-NOTES.md §7): a ceiling on a chunk, not an
- * estimate of one. A `sync` constant, and deliberately not a player setting.
- */
+/** `staleLockAfter`: a ceiling on a chunk, not a player setting (IMPLEMENTATION-NOTES.md §7). */
 export const STALE_LOCK_AFTER_MS = 6 * 60 * 60 * 1000;
 
 export type LockState =
@@ -85,17 +67,9 @@ export function isStaleInstant(startedAt: string, now: string): boolean {
   return Number.isFinite(age) && age > STALE_LOCK_AFTER_MS;
 }
 
-/**
- * A lock that cannot be parsed is **held**, never free: the real adapter
- * writes the contents just after the exclusive create, so a reader can catch
- * the file empty for an instant. It has no `startedAt`, so its file time is
- * the only clock available, and the same threshold applies to it. Without
- * that, a run that crashed between the create and the write would leave a
- * lock nobody ever clears.
- *
- * Exported for the `pnpm sync` session (`../sync.ts`), which waits for a held
- * lock to be free or stale by this same rule rather than a copy of it.
- */
+// An unparseable lock is held, not free: the adapter writes the contents just after the create.
+// Its file time stands in for the missing `startedAt`, so a crash between the two still clears.
+// Exported so the `pnpm sync` session waits by this same rule (`../sync.ts`).
 export async function isStaleState(
   fs: FilesystemPort,
   found: Exclude<LockState, { state: 'absent' }>,
@@ -114,7 +88,7 @@ function busy(found: LockState): LockAcquisition {
 }
 
 /** Deletes `path` only while its text is still `text`. */
-async function deleteIfText(fs: FilesystemPort, path: string, text: string): Promise<boolean> {
+async function isDeletedIfText(fs: FilesystemPort, path: string, text: string): Promise<boolean> {
   if ((await fs.readTextFile(path)) !== text) {
     return false;
   }
@@ -122,17 +96,14 @@ async function deleteIfText(fs: FilesystemPort, path: string, text: string): Pro
   return true;
 }
 
-/**
- * Clears a break marker left by a run that crashed mid-break, so the next run
- * can proceed. The same threshold applies, so this is as bounded as the lock.
- */
+/** Clears a break marker left by a run that crashed mid-break; the same threshold bounds it. */
 async function clearStaleBreakMarker(fs: FilesystemPort, now: string): Promise<void> {
   const marker = await readLock(fs, BREAK_MARKER_PATH);
   if (marker.state === 'absent') {
     return;
   }
   if (await isStaleState(fs, marker, now, BREAK_MARKER_PATH)) {
-    await deleteIfText(fs, BREAK_MARKER_PATH, marker.text);
+    await isDeletedIfText(fs, BREAK_MARKER_PATH, marker.text);
   }
 }
 
@@ -157,7 +128,7 @@ async function breakAndTake(
     if (again.state !== 'absent' && again.text !== stale.text) {
       return busy(again);
     }
-    if (again.state !== 'absent' && !(await deleteIfText(fs, LOCK_PATH, stale.text))) {
+    if (again.state !== 'absent' && !(await isDeletedIfText(fs, LOCK_PATH, stale.text))) {
       return busy(await readLock(fs));
     }
     if (!(await fs.createExclusive(LOCK_PATH, mineText))) {
@@ -171,14 +142,11 @@ async function breakAndTake(
         }
       : { kind: 'acquired', lock: mine };
   } finally {
-    await deleteIfText(fs, BREAK_MARKER_PATH, mineText);
+    await isDeletedIfText(fs, BREAK_MARKER_PATH, mineText);
   }
 }
 
-/**
- * Takes the lock, breaking it first where it is stale. A live lock is a normal
- * `busy` outcome, never an error.
- */
+/** Takes the lock, breaking a stale one first; a live lock is a normal `busy` outcome. */
 export async function acquireLock(
   fs: FilesystemPort,
   clock: ClockPort,
@@ -204,7 +172,7 @@ export async function acquireLock(
 }
 
 /** `true` while the lock on disk is exactly the one this run took. */
-export async function holdsLock(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
+export async function isLockHeld(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
   const found = await readLock(fs);
   return (
     found.state === 'held' &&
@@ -213,12 +181,9 @@ export async function holdsLock(fs: FilesystemPort, mine: SyncLock): Promise<boo
   );
 }
 
-/**
- * Releases the lock **only while it is still this run's own**. A dispossessed
- * run that released unconditionally would delete its successor's lock.
- */
-export async function releaseLockIfOwn(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
-  if (!(await holdsLock(fs, mine))) {
+/** Releases only a lock still this run's own; otherwise it would delete its successor's (AD-7). */
+export async function isOwnLockReleased(fs: FilesystemPort, mine: SyncLock): Promise<boolean> {
+  if (!(await isLockHeld(fs, mine))) {
     return false;
   }
   await fs.deleteFile(LOCK_PATH);

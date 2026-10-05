@@ -1,26 +1,14 @@
 import type { CraftRecipe, CurrencyRate } from '@poe/contracts';
 
 /**
- * The Craft Cost of one recipe (AD-20, AD-17, FR-26).
- *
- * Pure (AD-1). `Σ quantity × rate` over the recipe's currencies, where `rate`
- * is divine per one unit (`CurrencyRateSchema`). Only a rate whose own
- * `league` is the active league is read. A currency with no rate, or only a
- * rate from another league, makes the recipe **uncostable** — never `0`, which
- * would look free and inflate every crafted EV (AD-20). The first such
- * currency, in the recipe's file order, is named.
- *
- * `core` never rounds (IMPLEMENTATION-NOTES.md §4.2): the rates arrive at 4dp
- * from `sync` and the sum is passed on as computed. `sync` never calls this.
+ * The Craft Cost of one recipe (AD-20, FR-26): an unrated currency is uncostable, never `0`.
  */
 export type CraftCostResult =
   | {
       readonly ok: true;
       readonly divine: number;
       /**
-       * The `asOf` of each rate the cost used, in recipe order. Not a
-       * timestamp input of the crafted row, whose age comes from its
-       * summands only (AD-10).
+       * The `asOf` of each rate used, in recipe order; not a timestamp input of the row (AD-10).
        */
       readonly asOf: readonly string[];
     }

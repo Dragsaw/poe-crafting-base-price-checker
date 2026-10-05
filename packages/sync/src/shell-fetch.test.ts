@@ -3,21 +3,11 @@ import type { AddressInfo, Socket } from 'node:net';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createFetchHttpPort, REQUEST_TIMEOUT_MS } from './shell.ts';
+import { rejectionOf } from './test-support/rejection-of.ts';
 import { isTransportFailure } from './trade/transport-failure.ts';
 
-/**
- * The real `HttpPort` against a real socket (epic-1-retro-item-10, L-V1).
- *
- * The yield-on-timeout contract (AD-8) rests on two literals that only the
- * runtime produces: `AbortSignal.timeout`'s `TimeoutError` and undici's
- * `TypeError('fetch failed')`. A fake cannot pin either one, so every rejection
- * below comes from Node's own `fetch` and goes through `isTransportFailure`.
- *
- * This is the one test file that names the real port — the scan in
- * `catalogue-refresh.test.ts` exempts it by name. Every URL is `127.0.0.1` on a
- * server this file started; the MSW guard in `test/setup.ts` still fails any
- * request to a remote host.
- */
+// AD-8's yield-on-timeout rests on literals only the runtime produces (`TimeoutError`, undici's
+// `fetch failed`), so a fake cannot pin them. `catalogue-refresh.test.ts` exempts this file.
 
 type Handler = (request: IncomingMessage, response: ServerResponse) => void;
 
@@ -51,19 +41,10 @@ function closeServer(server: Server): Promise<void> {
 function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((done, fail) => {
     const chunks: Buffer[] = [];
-    request.on('data', (chunk: Buffer) => chunks.push(chunk));
+    request.on('data', (chunk: Buffer) => { chunks.push(chunk); });
     request.on('end', () => done(Buffer.concat(chunks).toString('utf8')));
     request.on('error', fail);
   });
-}
-
-async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
-  try {
-    await promise;
-  } catch (error) {
-    return error;
-  }
-  throw new Error('expected the request to reject');
 }
 
 afterEach(async () => {
@@ -71,7 +52,7 @@ afterEach(async () => {
     socket.destroy();
   }
   sockets.clear();
-  await Promise.all(servers.splice(0).map(closeServer));
+  await Promise.all(servers.splice(0).map((server) => closeServer(server)));
 });
 
 describe('createFetchHttpPort against a loopback server', () => {

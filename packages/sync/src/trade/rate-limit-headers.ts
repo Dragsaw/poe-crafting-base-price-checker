@@ -1,22 +1,6 @@
-/**
- * Parsing of GGG's `X-Rate-Limit-*` response headers (AD-8,
- * `IMPLEMENTATION-NOTES.md` §5.3).
- *
- * The active rule names arrive in `X-Rate-Limit-Rules` **at runtime**. For each
- * name there are two headers — `X-Rate-Limit-<Name>` (the policy) and
- * `X-Rate-Limit-<Name>-State` (the consumption) — and both are comma-separated
- * `hits:seconds:penalty` triples that pair **positionally**.
- *
- * Nothing in this module names a rule, a policy, a rate, a hit count, a window
- * or a penalty. The measured 2026-09-12 buckets are an expected shape to assert
- * a fixture against, never a constant to compile in: an adapter that recognised
- * only the rule it was written against would silently stop pacing the day GGG
- * changed the rule set.
- *
- * A rule whose headers are absent or malformed is **skipped and recorded**,
- * never thrown and never parsed into `NaN`. Pacing then continues on the rules
- * that did arrive, which is strictly safer than inventing a bucket.
- */
+// Parses GGG's `X-Rate-Limit-*` headers (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// No rule, policy or rate is compiled in: they arrive at runtime, and the policy and state
+// triples pair positionally. An absent or malformed rule is skipped and recorded, never thrown.
 
 /** One `hits:seconds:penalty` triple, read verbatim from a header. */
 export interface RateLimitBucket {
@@ -25,10 +9,7 @@ export interface RateLimitBucket {
   readonly penalty: number;
 }
 
-/**
- * One named rule. `buckets` is the declared policy and `state` the consumption,
- * paired positionally — `state[i]` is the consumption of `buckets[i]`.
- */
+/** `buckets` is the declared policy, `state` the consumption; paired by index. */
 export interface RateLimitRule {
   readonly name: string;
   readonly buckets: readonly RateLimitBucket[];
@@ -50,11 +31,7 @@ export interface RateLimitSkip {
 }
 
 export interface RateLimitHeaders {
-  /**
-   * The value of `X-Rate-Limit-Policy` — the bucket these rules are spent
-   * against. `undefined` when the response carried none, which is how a
-   * non-governed response (or a cold start against a fake) is spelled.
-   */
+  /** The `X-Rate-Limit-Policy` value; `undefined` for a non-governed response or a fake. */
   readonly policy: string | undefined;
   readonly rules: readonly RateLimitRule[];
   readonly skips: readonly RateLimitSkip[];
@@ -68,12 +45,7 @@ const STATE_HEADER_SUFFIX = '-state';
 /** A triple of non-negative integers and nothing else. `banana` does not match. */
 const TRIPLE = /^(\d+):(\d+):(\d+)$/;
 
-/**
- * `HttpPort` documents header names as compared lower-case by every adapter and
- * fake, but a real `fetch` adapter is the only thing enforcing it. Normalising
- * here costs one pass and removes the whole class of "worked against the fake,
- * missed the live header" defect.
- */
+// Only a real `fetch` adapter enforces lower-case names; the fakes would hide a missed live header.
 function lowerCaseHeaders(headers: Readonly<Record<string, string>>): Map<string, string> {
   const normalised = new Map<string, string>();
   for (const [name, value] of Object.entries(headers)) {
@@ -125,10 +97,7 @@ function ruleNamesOf(rulesHeader: string | undefined): readonly string[] {
   return names;
 }
 
-/**
- * Pure. Reads one response's headers into the rules and the policy they
- * describe, with a recorded skip for every named rule that could not be read.
- */
+/** Pure. Records a skip for every named rule that could not be read. */
 export function parseRateLimitHeaders(
   headers: Readonly<Record<string, string>>,
 ): RateLimitHeaders {
@@ -140,7 +109,8 @@ export function parseRateLimitHeaders(
   const rules: RateLimitRule[] = [];
   const skips: RateLimitSkip[] = [];
 
-  for (const name of ruleNamesOf(normalised.get(RULES_HEADER))) {
+  const ruleNames = ruleNamesOf(normalised.get(RULES_HEADER));
+  for (const name of ruleNames) {
     const key = `${RULE_HEADER_PREFIX}${name.toLowerCase()}`;
     const policyRawValue = normalised.get(key);
 
@@ -182,11 +152,8 @@ export function parseRateLimitHeaders(
       continue;
     }
 
-    // Positional pairing is the whole contract between the two headers, so a
-    // length disagreement means the pairing is unknowable. Truncating to the
-    // shorter list would pair a policy bucket with another bucket's
-    // consumption, which paces confidently against a number that is not the
-    // one it thinks it is.
+    // Pairing is positional, so a length mismatch is unknowable: truncating would pair a bucket
+    // with another bucket's consumption.
     if (buckets.length !== state.length) {
       skips.push({
         rule: name,
@@ -202,27 +169,12 @@ export function parseRateLimitHeaders(
   return { policy, rules, skips };
 }
 
-/**
- * `|names(X-Rate-Limit-Rules)|` of IMPLEMENTATION-NOTES.md §13.2: the number of
- * distinct rule names the response declared, each trimmed and case-folded, an
- * empty name dropped. The header name is matched case-insensitively. Pure.
- *
- * The session probe's liveness predicate compares **this count only**. It never
- * compares names, and no name or count is compiled in (AD-8).
- */
+/** `|names(X-Rate-Limit-Rules)|` (IMPLEMENTATION-NOTES.md §13.2); the probe compares only this. */
 export function ruleNameCount(headers: Readonly<Record<string, string>>): number {
   return ruleNamesOf(lowerCaseHeaders(headers).get(RULES_HEADER)).length;
 }
 
-/**
- * `policy(X-Rate-Limit-Policy)` of IMPLEMENTATION-NOTES.md §13.2: the header
- * value, trimmed and case-folded, or `undefined` when it is absent or blank.
- * The header name is matched case-insensitively. Pure.
- *
- * The post-probe liveness test applies only when this equals the baseline's
- * value (§13.4). The two values are compared with each other and never with
- * a policy name compiled in (AD-8).
- */
+/** `policy(X-Rate-Limit-Policy)` of IMPLEMENTATION-NOTES.md §13.2, trimmed and case-folded. */
 export function rateLimitPolicyOf(headers: Readonly<Record<string, string>>): string | undefined {
   const value = lowerCaseHeaders(headers).get(POLICY_HEADER)?.trim().toLowerCase();
   return value === undefined || value === '' ? undefined : value;

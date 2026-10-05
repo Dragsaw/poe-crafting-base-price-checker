@@ -41,18 +41,7 @@ function Value({ value }: { readonly value: string | undefined }): JSX.Element {
   return value === undefined ? <em data-missing="" style={{ fontStyle: 'italic' }}>{UNKNOWN}</em> : <>{value}</>;
 }
 
-/**
- * `{components.trust-strip}`: between the masthead and the asking-price line,
- * always present, never dismissible. Two lines of plain facts — attribution,
- * not health — with no mark and no colour on any of them (FR-10, FR-18). Then
- * one line per absent tolerable artifact, then the rust health line, raised by
- * data only for unresolvable entries or pinned starvation (FR-24, FR-25).
- *
- * The whole strip is the click target for `{components.sync-report-panel}`,
- * which opens in place beneath it and is closed on every load. A cross-file
- * failure changes nothing here: its diagnosis is the panel's sixth group. The request
- * log is untouched: toggling reads what the load already holds.
- */
+/** The strip toggles `{components.sync-report-panel}`, closed on load (FR-18). */
 export function TrustStrip({
   set,
   absent,
@@ -72,7 +61,6 @@ export function TrustStrip({
     pinnedCount: set.tracked.entries.filter((entry) => entry.status === 'pinned').length,
     minChunkSearches: set.config.minChunkSearches,
   });
-  const [producer, generatedAt, gamePatch] = weightsFacts(set.weights);
 
   return (
     <>
@@ -93,12 +81,7 @@ export function TrustStrip({
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div data-trust-line="weights">
-            <Label>{WEIGHTS_FILE_LABEL}</Label>
-            {`${NBSP} `}
-            {producer.name} <Value value={producer.value} /> <Separator /> {generatedAt.name}{' '}
-            <Value value={generatedAt.value} /> <Separator /> {gamePatch.name} <Value value={gamePatch.value} />
-          </div>
+          <WeightsLine facts={weightsFacts(set.weights)} />
           <span
             data-strip-affordance=""
             className="fg-strip-affordance"
@@ -107,44 +90,73 @@ export function TrustStrip({
             {open ? AFFORDANCE_OPEN : AFFORDANCE_CLOSED}
           </span>
         </div>
-        <div data-trust-line="sync">
-          <Label>{LAST_SYNCED_LABEL}</Label>
-          {`${NBSP} `}
-          <Value value={lastSynced(report, now)} /> <Separator /> <Label>{TRACKED_LIST_EDITED_LABEL}</Label>
-          {`${NBSP} `}
-          {edit === undefined ? <Value value={undefined} /> : `${edit.date}${edit.suffix}`}
-        </div>
+        <SyncLine lastSyncedText={lastSynced(report, now)} edit={edit} />
         <AbsenceLines absent={absent} />
-        {signals.length > 0 ? (
-          <div
-            data-health-line=""
-            style={{
-              height: px(spacing.frameReserveHealthLine),
-              lineHeight: px(spacing.frameReserveHealthLine),
-            }}
-          >
-            {signals.map((signal, index) => (
-              <span key={signal}>
-                {index > 0 ? <Separator /> : null}
-                <span data-health-signal="" style={{ color: colors.rust, fontWeight: 700 }}>
-                  <span style={{ fontSize: px(9) }}>{`${glyphs.unresolvable}${NBSP}`}</span>
-                  {signal}
-                </span>
-              </span>
-            ))}
-          </div>
-        ) : null}
+        <HealthLine signals={signals} />
       </div>
-      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== null, crossFileFailures)} /> : null}
+      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== undefined, crossFileFailures)} /> : undefined}
     </>
   );
 }
 
-/**
- * The skeleton's trust strip: the resting strip's rules, padding and two
- * empty lines, so the page below never jumps at the pending → ready
- * transition (EXPERIENCE.md state 22). No text, no affordance, no click.
- */
+type WeightsFacts = ReturnType<typeof weightsFacts>;
+
+function WeightsLine({ facts }: { readonly facts: WeightsFacts }): JSX.Element {
+  const [producer, generatedAt, gamePatch] = facts;
+  return (
+    <div data-trust-line="weights">
+      <Label>{WEIGHTS_FILE_LABEL}</Label>
+      {`${NBSP} `}
+      {producer.name} <Value value={producer.value} /> <Separator /> {generatedAt.name}{' '}
+      <Value value={generatedAt.value} /> <Separator /> {gamePatch.name} <Value value={gamePatch.value} />
+    </div>
+  );
+}
+
+function SyncLine({
+  lastSyncedText,
+  edit,
+}: {
+  readonly lastSyncedText: string | undefined;
+  readonly edit: ReturnType<typeof trackedListEdit>;
+}): JSX.Element {
+  return (
+    <div data-trust-line="sync">
+      <Label>{LAST_SYNCED_LABEL}</Label>
+      {`${NBSP} `}
+      <Value value={lastSyncedText} /> <Separator /> <Label>{TRACKED_LIST_EDITED_LABEL}</Label>
+      {`${NBSP} `}
+      {edit === undefined ? <Value value={undefined} /> : `${edit.date}${edit.suffix}`}
+    </div>
+  );
+}
+
+function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.Element | undefined {
+  if (signals.length === 0) {
+    return undefined;
+  }
+  return (
+    <div
+      data-health-line=""
+      style={{
+        height: px(spacing.frameReserveHealthLine),
+        lineHeight: px(spacing.frameReserveHealthLine),
+      }}
+    >
+      {signals.map((signal, index) => (
+        <span key={signal}>
+          {index > 0 ? <Separator /> : undefined}
+          <span data-health-signal="" style={{ color: colors.rust, fontWeight: 700 }}>
+            <span style={{ fontSize: px(9) }}>{`${glyphs.unresolvable}${NBSP}`}</span>
+            {signal}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** The skeleton's strip: same padding and two empty lines, so the page never jumps (state 22). */
 export function TrustStripSlot(): JSX.Element {
   const role = typeStyle('trust-strip');
   return (

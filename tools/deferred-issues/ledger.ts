@@ -1,18 +1,7 @@
 import { createHash } from 'node:crypto';
 
-/**
- * The pure half of `pnpm deferred:issues`: it parses
- * `docs/stories/deferred-work.md` and gives each entry its content id.
- *
- * An entry is a top-level `- source_spec:` bullet that has `summary:` and
- * `evidence:` fields. A key line is two spaces of indent, then `[a-z_]+:`. A
- * line with more indent continues the field above it. A blank line, a new
- * top-level bullet or any other unindented line ends the entry. Each value is
- * its lines, trimmed and joined with single spaces. Any other bullet is a note
- * and gets no id.
- *
- * Run by bare `node` (type stripping), so this module imports only builtins.
- */
+// Entry format and ids: docs/stories/spec-deferred-work-github-issues.md.
+// Run by bare `node` (type stripping): builtins only.
 
 export interface LedgerEntry {
   readonly id: string;
@@ -48,54 +37,59 @@ export function issueTitle(summary: string): string {
   return (cut > 0 ? head.slice(0, cut) : text.slice(0, TITLE_MAX)).trimEnd();
 }
 
+interface OpenEntry {
+  readonly fields: Map<string, string[]>;
+  current: string[];
+}
+
+function beginEntry(firstLine: string): OpenEntry {
+  const current = [firstLine];
+  return { fields: new Map([['source_spec', current]]), current };
+}
+
+function addLine(open: OpenEntry, line: string): void {
+  const key = KEY_LINE.exec(line);
+  const name = key?.[1];
+  if (name !== undefined && !open.fields.has(name)) {
+    open.current = [key?.[2] ?? ''];
+    open.fields.set(name, open.current);
+  } else {
+    open.current.push(line);
+  }
+}
+
+/** The entry that the next line leaves open, after `emit` takes the entry that the line ends. */
+function applyLine(
+  open: OpenEntry | undefined,
+  line: string,
+  emit: (finished: OpenEntry | undefined) => void,
+): OpenEntry | undefined {
+  const top = TOP_BULLET.exec(line);
+  // A blank line, a bullet, a heading or a paragraph that is not a key line ends the entry.
+  if (top !== null || line.trim() === '' || !line.startsWith('  ')) {
+    emit(open);
+    return top !== null && top[1] === 'source_spec' ? beginEntry(top[2] ?? '') : undefined;
+  }
+  if (open !== undefined) {
+    addLine(open, line);
+  }
+  return open;
+}
+
 /** Every entry of the ledger text, in ledger order. Notes are left out. */
 export function parseLedger(text: string): LedgerEntry[] {
   const entries: LedgerEntry[] = [];
-  let fields: Map<string, string[]> | undefined;
-  let current: string[] | undefined;
-
-  const finish = (): void => {
-    if (fields !== undefined) {
-      const entry = toEntry(fields);
-      if (entry !== undefined) {
-        entries.push(entry);
-      }
+  const collect = (finished: OpenEntry | undefined): void => {
+    const entry = finished === undefined ? undefined : toEntry(finished.fields);
+    if (entry !== undefined) {
+      entries.push(entry);
     }
-    fields = undefined;
-    current = undefined;
   };
-
+  let open: OpenEntry | undefined;
   for (const line of text.split(/\r?\n/)) {
-    if (line.trim() === '') {
-      finish();
-      continue;
-    }
-    const top = TOP_BULLET.exec(line);
-    if (top !== null) {
-      finish();
-      if (top[1] === 'source_spec') {
-        current = [top[2] ?? ''];
-        fields = new Map([['source_spec', current]]);
-      }
-      continue;
-    }
-    if (!line.startsWith('  ')) {
-      // A heading, a paragraph or a bullet that is not a key: not part of an entry.
-      finish();
-      continue;
-    }
-    if (fields === undefined) {
-      continue;
-    }
-    const key = KEY_LINE.exec(line);
-    if (key !== null && key[1] !== undefined && !fields.has(key[1])) {
-      current = [key[2] ?? ''];
-      fields.set(key[1], current);
-    } else {
-      current?.push(line);
-    }
+    open = applyLine(open, line, collect);
   }
-  finish();
+  collect(open);
   return entries;
 }
 

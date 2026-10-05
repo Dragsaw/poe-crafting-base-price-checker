@@ -16,7 +16,7 @@ import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
 import { RunningFoot } from './list/RunningFoot';
-import { bannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
+import { isBannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
@@ -26,143 +26,33 @@ import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
 
-/**
- * A ready outcome carries the "now" its ages are read against, taken once when
- * the load resolved, and the cross-file failures, run once per load (AD-17).
- */
+/** A ready outcome holds the "now" its ages read against and the cross-file failures (AD-17). */
 type ViewState =
   Exclude<LoadOutcome, ReadyOutcome> | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] }) | { readonly kind: 'pending' };
 
-/**
- * The page's substrate. It paints the masthead and twenty skeleton slots at
- * once, then moves to exactly one outcome in a single state transition — a
- * whole set, the refusal screen or the fetch-failure screen — never row by row
- * (AD-24, FR-33). `+ Try again` re-runs all seven fetches.
- *
- * The resting chrome, in order: masthead, trust strip, asking-price line, the
- * list statement when the ranking makes one (states 23 and 25), column header,
- * list, then the Unrankable appendix, the key block and the running foot. The skeleton paints the same
- * chrome around its slots, with a blank trust-strip slot of the strip's height; the two failure screens paint none of it.
- */
+/** One transition from skeleton to one outcome, never row by row (AD-24, FR-33). */
 export function App(): JSX.Element {
-  const [attempt, setAttempt] = useState(0);
-  const [view, setView] = useState<ViewState>({ kind: 'pending' });
-
-  useEffect(() => {
-    let isLive = true;
-    const controller = new AbortController();
-    void loadArtifacts({ signal: controller.signal }).then((outcome) => {
-      if (isLive) {
-        // "Now" is read once, as the set resolves, and held: ages never tick.
-        setView(
-          outcome.kind === 'ready'
-            ? {
-                ...outcome,
-                now: Date.now(),
-                crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights).failures,
-              }
-            : outcome,
-        );
-      }
-    });
-    return () => {
-      isLive = false;
-      controller.abort();
-    };
-  }, [attempt]);
-
-  // The threshold survives a reload (FR-7): read once at mount, written on each change.
-  const [threshold, setThreshold] = useState(() => readStoredThreshold());
-  const changeThreshold = useCallback((value: number) => {
-    setThreshold(value);
-    writeStoredThreshold(value);
-  }, []);
-
-  // The active Craft Recipe survives a reload beside the threshold (EXPERIENCE.md): read once, written on each click.
-  const [storedRecipe, setStoredRecipe] = useState(() => readStoredRecipe());
-  const changeRecipe = useCallback((recipeId: string) => {
-    setStoredRecipe(recipeId);
-    writeStoredRecipe(recipeId);
-  }, []);
-
-  // `core` ranks every (Item Class, recipe) pair at once, so a recipe switch re-filters and never re-ranks.
-  const readySet = view.kind === 'ready' ? view.set : undefined;
-  const readyFailures = view.kind === 'ready' ? view.crossFileFailures : undefined;
-  const ranking = useMemo(
-    () =>
-      readySet === undefined
-        ? undefined
-        : rank({
-            tracked: readySet.tracked.entries,
-            dataset: readySet.dataset.entries,
-            activeLeague: readySet.config.league,
-            threshold,
-            weights: readySet.weights,
-            crossFileFailures: readyFailures,
-            recipes: readySet.recipes?.recipes ?? [],
-            currencyRates: readySet.dataset.currencyRates,
-          }),
-    [readySet, readyFailures, threshold],
-  );
-
-  const retry = useCallback(() => {
-    setView({ kind: 'pending' });
-    setAttempt((count) => count + 1);
-  }, []);
+  const [view, retry] = useLoadedView();
+  const [threshold, changeThreshold] = usePersistedThreshold();
+  const [storedRecipe, changeRecipe] = usePersistedRecipe();
+  const ranking = useRanking(view, threshold);
 
   switch (view.kind) {
     case 'pending': {
-      return (
-        <Frame state="pending">
-          <Masthead league={undefined} threshold={threshold} onThresholdChange={changeThreshold} />
-          <TrustStripSlot />
-          <AskingPriceLine />
-          <RowSlots />
-          <PageTail />
-        </Frame>
-      );
+      return renderPending({ threshold, onThresholdChange: changeThreshold });
     }
     case 'ready': {
       if (ranking === undefined) {
         throw new Error('a ready view always has a ranking');
       }
-      const recipes = view.set.recipes?.recipes ?? [];
-      const recipe = activeRecipe(recipes, storedRecipe);
-      const options = recipeOptions(recipes);
-      const active = options.find((option) => option.id === recipe?.id);
-      return (
-        <Frame state="ready">
-          <Masthead
-            league={view.set.config.league}
-            threshold={threshold}
-            onThresholdChange={changeThreshold}
-            recipe={
-              recipe === undefined
-                ? undefined
-                : {
-                    options,
-                    activeId: recipe.id,
-                    cost: recipeCostLine(
-                      recipe,
-                      view.set.dataset.currencyRates,
-                      view.set.config.league,
-                      ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
-                    ),
-                    onChange: changeRecipe,
-                  }
-            }
-          />
-          <TrustStrip set={view.set} absent={view.absent} now={view.now} crossFileFailures={view.crossFileFailures} />
-          <AskingPriceLine />
-          <ReadyBody
-            set={view.set}
-            now={view.now}
-            threshold={threshold}
-            ranking={ranking}
-            recipe={active}
-          />
-        </Frame>
-      );
+      return renderReady({
+        view,
+        ranking,
+        threshold,
+        storedRecipe,
+        onThresholdChange: changeThreshold,
+        onRecipeChange: changeRecipe,
+      });
     }
     case 'refused': {
       return (
@@ -187,15 +77,152 @@ export function App(): JSX.Element {
   }
 }
 
-/**
- * `core` ranks the whole loaded set at the player's threshold, with the
- * load's cross-file failures excluding their classes (AD-17); `web` renders
- * what it returns and orders nothing itself (AD-4). The ranking is memoised
- * on the set and the threshold; the active recipe only narrows it, so a click
- * re-renders in the same pass with no re-rank (state 34). Renders the ready body below the asking-price
- * line: the list statement, the ranked list, and the page tail led by the
- * Unrankable appendix — all from one ranking.
- */
+/** "Now" is read once, as the set resolves, and held: ages never tick. */
+function resolveView(outcome: LoadOutcome): ViewState {
+  return outcome.kind === 'ready'
+    ? {
+        ...outcome,
+        now: Date.now(),
+        crossFileFailures: crossFileChecks(outcome.set.tracked.entries, outcome.set.weights).failures,
+      }
+    : outcome;
+}
+
+function useLoadedView(): readonly [ViewState, () => void] {
+  const [attempt, setAttempt] = useState(0);
+  const [view, setView] = useState<ViewState>({ kind: 'pending' });
+
+  useEffect(() => {
+    let isLive = true;
+    const controller = new AbortController();
+    void loadArtifacts({ signal: controller.signal }).then((outcome) => {
+      if (isLive) {
+        setView(resolveView(outcome));
+      }
+    });
+    return () => {
+      isLive = false;
+      controller.abort();
+    };
+  }, [attempt]);
+
+  const retry = useCallback(() => {
+    setView({ kind: 'pending' });
+    setAttempt((count) => count + 1);
+  }, []);
+  return [view, retry];
+}
+
+/** The threshold survives a reload (FR-7): read once at mount, written on each change. */
+function usePersistedThreshold(): readonly [number, (value: number) => void] {
+  const [threshold, setThreshold] = useState(() => readStoredThreshold());
+  const changeThreshold = useCallback((value: number) => {
+    setThreshold(value);
+    writeStoredThreshold(value);
+  }, []);
+  return [threshold, changeThreshold];
+}
+
+/** The active Craft Recipe survives a reload beside the threshold (EXPERIENCE.md). */
+function usePersistedRecipe(): readonly [string | undefined, (recipeId: string) => void] {
+  const [storedRecipe, setStoredRecipe] = useState(() => readStoredRecipe());
+  const changeRecipe = useCallback((recipeId: string) => {
+    setStoredRecipe(recipeId);
+    writeStoredRecipe(recipeId);
+  }, []);
+  return [storedRecipe, changeRecipe];
+}
+
+/** `core` ranks every (Item Class, recipe) pair at once: a recipe switch re-filters only. */
+function useRanking(view: ViewState, threshold: number): Ranking | undefined {
+  const readySet = view.kind === 'ready' ? view.set : undefined;
+  const readyFailures = view.kind === 'ready' ? view.crossFileFailures : undefined;
+  return useMemo(
+    () =>
+      readySet === undefined
+        ? undefined
+        : rank({
+            tracked: readySet.tracked.entries,
+            dataset: readySet.dataset.entries,
+            activeLeague: readySet.config.league,
+            threshold,
+            weights: readySet.weights,
+            crossFileFailures: readyFailures,
+            recipes: readySet.recipes?.recipes ?? [],
+            currencyRates: readySet.dataset.currencyRates,
+          }),
+    [readySet, readyFailures, threshold],
+  );
+}
+
+/** A plain call, not a component: the frame and masthead keep their identity into ready. */
+function renderPending({
+  threshold,
+  onThresholdChange,
+}: {
+  readonly threshold: number;
+  readonly onThresholdChange: (value: number) => void;
+}): JSX.Element {
+  return (
+    <Frame state="pending">
+      <Masthead league={undefined} threshold={threshold} onThresholdChange={onThresholdChange} />
+      <TrustStripSlot />
+      <AskingPriceLine />
+      <RowSlots />
+      <PageTail />
+    </Frame>
+  );
+}
+
+function renderReady({
+  view,
+  ranking,
+  threshold,
+  storedRecipe,
+  onThresholdChange,
+  onRecipeChange,
+}: {
+  readonly view: Extract<ViewState, { readonly kind: 'ready' }>;
+  readonly ranking: Ranking;
+  readonly threshold: number;
+  readonly storedRecipe: string | undefined;
+  readonly onThresholdChange: (value: number) => void;
+  readonly onRecipeChange: (recipeId: string) => void;
+}): JSX.Element {
+  const recipes = view.set.recipes?.recipes ?? [];
+  const recipe = activeRecipe(recipes, storedRecipe);
+  const options = recipeOptions(recipes);
+  const active = options.find((option) => option.id === recipe?.id);
+  return (
+    <Frame state="ready">
+      <Masthead
+        league={view.set.config.league}
+        threshold={threshold}
+        onThresholdChange={onThresholdChange}
+        recipe={
+          recipe === undefined
+            ? undefined
+            : {
+                options,
+                activeId: recipe.id,
+                cost: recipeCostLine(
+                  recipe,
+                  view.set.dataset.currencyRates,
+                  view.set.config.league,
+                  ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
+                ),
+                onChange: onRecipeChange,
+              }
+        }
+      />
+      <TrustStrip set={view.set} absent={view.absent} now={view.now} crossFileFailures={view.crossFileFailures} />
+      <AskingPriceLine />
+      <ReadyBody set={view.set} now={view.now} threshold={threshold} ranking={ranking} recipe={active} />
+    </Frame>
+  );
+}
+
+/** `web` renders the one ranking and orders nothing (AD-4); a recipe click narrows it. */
 function ReadyBody({
   set,
   now,
@@ -224,12 +251,12 @@ function ReadyBody({
       }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
-      banner: bannerRaised(active),
+      banner: isBannerRaised(active),
     };
   }, [ranking, recipe, set, now, threshold, stats]);
   return (
     <>
-      {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : null}
+      {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : undefined}
       <ListStatement statement={statement} />
       <RankedList
         branches={branches}
@@ -242,12 +269,7 @@ function ReadyBody({
   );
 }
 
-/**
- * What closes every state but the two failure screens, pushed to the frame's
- * foot by `margin-top: auto`: the Unrankable appendix (ready only — while
- * pending no count is known), then the key block and the running foot. One
- * arrangement in every data state; more rows grow the document.
- */
+/** Pushed to the frame's foot by `margin-top: auto`; the appendix is ready only. */
 function PageTail({ appendix }: { readonly appendix?: ReactNode }): JSX.Element {
   return (
     <div data-page-tail="" style={{ marginTop: 'auto' }}>

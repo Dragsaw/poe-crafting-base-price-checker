@@ -1,16 +1,13 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { DatasetFileSchema, SyncReportFileSchema } from '@poe/contracts';
 import type { DatasetEntry, DatasetFile, SyncReportFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-/**
- * The dry-run script over the live data/ (pnpm test:data). The copy in
- * dry-run.test.ts keeps only the "writes nothing" guard.
- */
+/** The dry-run script over the live data/ (pnpm test:data); dry-run.test.ts has the write guard. */
 const SCRIPT = fileURLToPath(new URL('dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 
@@ -39,7 +36,7 @@ function snapshot(directory: string): Record<string, string> {
     return found;
   }
   for (const name of names) {
-    const path = join(directory, name);
+    const path = nodePath.join(directory, name);
     const stats = statSync(path);
     if (stats.isDirectory()) {
       Object.assign(found, snapshot(path));
@@ -93,7 +90,7 @@ describe('pnpm sync:dry over the live data/', () => {
     expect(SyncReportFileSchema.safeParse(report['report']).success).toBe(true);
     const printed = report['report'] as SyncReportFile;
     expect(Object.keys(printed)).toEqual(['runStartedAt', 'runFinishedAt', 'figures', 'records', 'schemaVersion']);
-    expect(Object.keys(printed.figures.requestsBySource).toSorted()).toEqual([
+    expect(Object.keys(printed.figures.requestsBySource).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual([
       'league-validation',
       'session-probe',
       'tracked-list',

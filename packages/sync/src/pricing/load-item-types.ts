@@ -1,8 +1,4 @@
-/**
- * `data/catalogue/items.json` — the committed item catalogue, read as the
- * search builder's `ItemTypes` (AD-25). Absent or invalid is a typed load
- * error naming the file, refused before any request.
- */
+/** The committed item catalogue, read as the search builder's `ItemTypes` (AD-25). */
 
 import { CatalogueItemsFileSchema, parseEnvelope } from '@poe/contracts';
 import type { FilesystemPort } from '@poe/contracts';

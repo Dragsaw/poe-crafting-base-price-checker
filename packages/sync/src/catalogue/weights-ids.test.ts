@@ -6,6 +6,7 @@ import type { TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { DataFileError } from '../load-data-file.ts';
+import { JSON_NULL } from '../test-support/json-null.ts';
 import type { CatalogueIds } from './catalogue-ids.ts';
 import { checkWeightsIds, readWeightsIds, weightsAbsentRecord, WEIGHTS_PATH } from './weights-ids.ts';
 
@@ -28,10 +29,10 @@ const WEIGHTS = {
   gamePatch: '0.5.5',
   producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' },
   bases: {
-    'weapon.bow': { Bows: { prefix: pool(line('explicit.a'), line(null)), suffix: pool(line('explicit.b')) } },
+    'weapon.bow': { Bows: { prefix: pool(line('explicit.a'), line(JSON_NULL)), suffix: pool(line('explicit.b')) } },
     jewel: {
       Emerald: { prefix: pool(line('explicit.a')), suffix: pool() },
-      Ruby: { prefix: pool(line('explicit.c')), suffix: pool(line(null)) },
+      Ruby: { prefix: pool(line('explicit.c')), suffix: pool(line(JSON_NULL)) },
     },
   },
 };
@@ -145,19 +146,19 @@ describe('checkWeightsIds', () => {
   });
 });
 
-describe('weightsAbsentRecord', () => {
-  const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
-    ({
-      kind: 'crafted',
-      categoryId: 'c',
-      className,
-      itemLevelMin: 1,
-      prefix: { kind: 'valueless', statId: 's' },
-      suffix: { kind: 'valueless', statId: 't' },
-      status,
-      ...((status === 'pruned') && { prunedReason: 'x' }),
-    });
+const craftedOf = (className: string, status: TrackedEntry['status'] = 'active'): TrackedEntry =>
+  ({
+    kind: 'crafted',
+    categoryId: 'c',
+    className,
+    itemLevelMin: 1,
+    prefix: { kind: 'valueless', statId: 's' },
+    suffix: { kind: 'valueless', statId: 't' },
+    status,
+    ...((status === 'pruned') && { prunedReason: 'x' }),
+  });
 
+describe('weightsAbsentRecord', () => {
   it('names the distinct classNames of non-pruned crafted entries, sorted by code point', () => {
     expect(
       weightsAbsentRecord([

@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
@@ -14,19 +14,11 @@ import {
   OWN_URL,
 } from './guard-hooks-fixture/names';
 
-/**
- * Observes the **real** hooks of `test/setup.ts`, not the exported helper.
- * `test/no-network.test.ts` calls the helper directly, so deleting the setup
- * file's `afterAll` check, or the owner its `afterEach` passes, left that file
- * green. Here a child Vitest runs a fixture with the real setup file, and this
- * test reads the outcome Vitest reported for each test and for the file.
- *
- * The child needs no network: every fixture URL is under `.invalid`, and the
- * setup file blocks each one before it leaves the process.
- */
+// Observes the real hooks of `test/setup.ts`, not the exported helper: `test/no-network.test.ts`
+// calls that directly, so deleting the `afterAll` check or the `afterEach` owner left it green.
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const VITEST_BIN = join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
+const VITEST_BIN = nodePath.join(REPO_ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHILD_CONFIG = fileURLToPath(new URL('guard-hooks-fixture/vitest.config.ts', import.meta.url));
 
 interface AssertionResult {
@@ -65,9 +57,9 @@ function runChild(outputFile: string): Promise<{ code: number; output: string }>
 }
 
 it('fails the issuer through the real hooks, and never the innocent test', { timeout: 120_000 }, async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'guard-hooks-'));
+  const directory = await mkdtemp(nodePath.join(tmpdir(), 'guard-hooks-'));
   try {
-    const outputFile = join(dir, 'report.json');
+    const outputFile = nodePath.join(directory, 'report.json');
     const { code, output } = await runChild(outputFile);
     const report = JSON.parse(await readFile(outputFile, 'utf8')) as JsonReport;
 
@@ -95,6 +87,6 @@ it('fails the issuer through the real hooks, and never the innocent test', { tim
     expect(file?.message).toContain("No test's afterEach reported these requests:");
     expect(file?.message).toContain(`GET ${LATE_URL} (issued by test "${LATE_ISSUER}")`);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await rm(directory, { recursive: true, force: true });
   }
 });

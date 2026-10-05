@@ -7,16 +7,9 @@ import tseslint from 'typescript-eslint';
 
 import local from './tools/eslint-rules/index.ts';
 
-/**
- * ESM, not TypeScript: ESLint 10 needs `jiti` to load a `.ts` config, and `.mjs`
- * removes that dependency entirely.
- *
- * The `files` glob has to cover everything `eslint .` should judge. A file that
- * matches no config block is reported as "ignored because no matching
- * configuration was supplied" and passes silently, which makes
- * `--max-warnings=0` vacuous for it — so the root configs, `test/**` and
- * `tools/**` are all named here, not just `packages/**`.
- */
+// ESM, not TypeScript: ESLint 10 needs `jiti` to load a `.ts` config.
+// A file that matches no config block passes silently, so `files` must name every
+// path `eslint .` should judge, not just `packages/**`.
 
 /** Each message names AD-1 and says where the value comes from instead. */
 const pure = (what) => `AD-1: core does not ${what}. The caller passes the value in.`;
@@ -27,13 +20,8 @@ const CLOCK = pure('read the clock');
 const RANDOM = pure('generate randomness');
 const ENV = pure('read environment or config');
 
-/**
- * AD-1: no `core` module performs I/O, reads the clock, generates randomness,
- * or reads environment or config. dependency-cruiser sees imports only, so a
- * `Date.now()` or `fetch(...)` in `core` would otherwise pass `pnpm check`.
- * These bans, applied by the `core` block below, make that purity checkable
- * through globals.
- */
+// AD-1: dependency-cruiser sees imports only, so these bans keep a global such as
+// `Date.now()` or `fetch(...)` out of `core`. The `core` block below applies them.
 const coreRestrictedGlobals = [
   ...[
     'fetch',
@@ -61,12 +49,8 @@ const TEST_FILES = ['**/*.test.{ts,tsx,mts,cts,mjs}', 'test/**'];
 
 const sizeLimits = { skipBlankLines: true, skipComments: true };
 
-/**
- * Type-aware rules need the TypeScript program, which costs far more than the
- * syntactic rules. Scoped to files a tsconfig already covers: the packages,
- * `test/**` and the `tools/**` TypeScript. Config files and `.mjs` scripts stay
- * untyped, so they never hit "file not found in project".
- */
+// Type-aware rules cost far more than syntactic ones. Scoped to files a tsconfig covers;
+// config files and `.mjs` scripts stay untyped, or they hit "file not found in project".
 const typeAwareBlock = {
   files: ['packages/**/*.{ts,tsx,mts,cts}', 'test/**/*.ts', 'tools/**/*.ts', '.claude/skills/tracked-json/scripts/*.ts'],
   ignores: ['**/*.config.*'],
@@ -103,10 +87,9 @@ export default tseslint.config(
       'docs/**',
       'data/**',
       '_bmad/**',
-      // Everything under `.claude/` except the tracked-json skill's scripts,
-      // which are code that `pnpm check` judges. A negation cannot reach inside
-      // an ignored directory, so each level ignores its children with `*` and
-      // un-ignores the one directory on the path.
+      // All of `.claude/` except the tracked-json scripts, which `pnpm check` judges.
+      // A negation cannot reach inside an ignored directory, so each level ignores
+      // its children with `*` and un-ignores the one directory on the path.
       '.claude/*',
       '!.claude/skills/',
       '.claude/skills/*',

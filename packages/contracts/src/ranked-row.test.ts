@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { ProvenanceSchema, RankedRowSchema } from './ranked-row';
-import { without } from './test-support';
+import { JSON_NULL, without } from './test-support';
 
 const observation = {
   league: 'Forbidden Rites',
@@ -77,12 +77,12 @@ describe('RankedRowSchema, the crafted arm', () => {
   });
 
   it('parses an uncostable pair, whose ev is null, and names the currency', () => {
-    const uncostable = { ...craftedRow, craftCost: { kind: 'uncostable', currencyId: 'perfect-orb-of-augmentation' }, ev: null };
+    const uncostable = { ...craftedRow, craftCost: { kind: 'uncostable', currencyId: 'perfect-orb-of-augmentation' }, ev: JSON_NULL };
     expect(RankedRowSchema.parse(uncostable)).toEqual(uncostable);
   });
 
   it('refuses a null ev on a costed pair and a figure on an uncostable one', () => {
-    expect(RankedRowSchema.safeParse({ ...craftedRow, ev: null }).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...craftedRow, ev: JSON_NULL }).success).toBe(false);
     const figure = { ...craftedRow, craftCost: { kind: 'uncostable', currencyId: 'exalted' } };
     expect(RankedRowSchema.safeParse(figure).success).toBe(false);
   });

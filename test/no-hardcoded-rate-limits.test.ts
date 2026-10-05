@@ -1,20 +1,11 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 
-/**
- * AD-8: the trade client learns its rule names, its policy names and every
- * rate from live `X-Rate-Limit-*` headers. **No rule name, policy string or
- * rate constant may appear in non-test source.** An adapter that recognised
- * only the rule it was written against would silently stop pacing the day GGG
- * changed the rule set, and the failure would look exactly like success until
- * the account lost access.
- *
- * The measured 2026-09-12 buckets are an expected shape to assert a fixture
- * against, so a `*.test.ts` file may name them freely. This scan is what keeps
- * that distinction from eroding.
- */
+// AD-8: no rule name, policy string or rate constant in non-test source; they come from live
+// `X-Rate-Limit-*` headers. An adapter tied to one rule set would stop pacing silently when GGG
+// changes it. A `*.test.ts` may name the measured 2026-09-12 buckets; this scan keeps that so.
 
 const PACKAGES_DIR = fileURLToPath(new URL('../packages', import.meta.url));
 
@@ -44,8 +35,9 @@ const FORBIDDEN: readonly Forbidden[] = [
 
 function sourceFilesUnder(directory: string): string[] {
   const found: string[] = [];
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
+  const entries = readdirSync(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const path = nodePath.join(directory, entry.name);
     if (entry.isDirectory()) {
       found.push(...sourceFilesUnder(path));
       continue;
@@ -63,12 +55,13 @@ function sourceFilesUnder(directory: string): string[] {
 
 function packageSources(): string[] {
   const sources: string[] = [];
-  for (const entry of readdirSync(PACKAGES_DIR, { withFileTypes: true })) {
+  const entries = readdirSync(PACKAGES_DIR, { withFileTypes: true });
+  for (const entry of entries) {
     if (!entry.isDirectory()) {
       continue;
     }
     try {
-      sources.push(...sourceFilesUnder(join(PACKAGES_DIR, entry.name, 'src')));
+      sources.push(...sourceFilesUnder(nodePath.join(PACKAGES_DIR, entry.name, 'src')));
     } catch {
       // A package with no `src` yet is not a failure.
       continue;

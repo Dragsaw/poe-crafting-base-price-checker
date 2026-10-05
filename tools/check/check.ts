@@ -1,21 +1,10 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { realpathSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-/**
- * `pnpm check` runs every quality gate in one pass: stage A (static checks)
- * in parallel, then stage B (tests and build) in parallel. It runs each step
- * even when another fails, so one run shows every problem. It buffers each
- * step's output, prints one line per step as it ends, and prints the full
- * output of failed steps only. Exit code 1 means a step failed.
- *
- * Flags: `--fast` (stage A only), `--only a,b` (named steps, stage order
- * kept), `--bail` (after the first failing step, abort the running steps and
- * start no further stage).
- *
- * Run by bare `node` (type stripping), so this module imports only builtins.
- */
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
+
+// Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
+// Every step runs even when another fails, so one run shows every problem.
 
 export type Stage = 'A' | 'B';
 
@@ -122,12 +111,8 @@ async function runStage(
   );
 }
 
-/**
- * Runs the stages in order, the steps of a stage in parallel. A failing step
- * never cancels its siblings, except with `shouldBail`: then the running
- * siblings abort and later stages do not start (their steps report `skipped`).
- * Results come back in the order of `steps`. `onResult` fires as each ends.
- */
+// A failing step never cancels its siblings, except with `shouldBail`: then the running
+// siblings abort and later stages report `skipped`. Results keep the order of `steps`.
 export async function runSteps(
   steps: readonly Step[],
   runner: Runner,
@@ -235,18 +220,7 @@ async function main(argv: readonly string[]): Promise<number> {
   return exitCode(results);
 }
 
-/** The entry guard, as in `tools/dev-stop/dev-stop.ts`: running the file checks, importing it (the test) runs nothing. */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {return false;}
-  try {
-    return realpathSync(path.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     process.exitCode = await main(process.argv.slice(2));
   } catch (error) {

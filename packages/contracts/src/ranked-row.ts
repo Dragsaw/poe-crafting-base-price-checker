@@ -6,26 +6,10 @@ import { PriceObservationSchema } from './price-observation.ts';
 import { DivineAmountSchema, IsoTimestampSchema, ItemLevelSchema } from './primitives.ts';
 import { CurationStatusSchema } from './tracked-entry.ts';
 
-/**
- * The three-value Provenance order (AD-10), weakest first: `absent` <
- * `uniform-prior` < `measured`. `absent` comes only from a `partial` pool and
- * never rides on a ranked row.
- */
+/** Weakest first (AD-10). `absent` never rides on a ranked row. */
 export const ProvenanceSchema = z.enum(['absent', 'uniform-prior', 'measured']);
 
-/**
- * One row of the ranking `core` derives in the browser on every input change
- * (AD-4, AD-17). No artifact persists it: it is a read-time value, and `web`
- * renders it without computing any term of it.
- *
- * A discriminated union on `kind`, one arm per AD-5 arm: `raw` and `crafted`.
- *
- * The `raw` arm: a Raw Base's EV **is** its observed price, unchanged — `sync`
- * rounded it to 4 decimal places once and nothing rounds it again — and its
- * Craft Cost is zero (FR-3, AD-17). A `pruned` entry never becomes a row, and a
- * row always carries the `priced` observation it was valued from. No rank
- * numeral and no display string lives here: display precision is the view's.
- */
+/** Read-time only, never persisted (AD-4, AD-17); a raw EV is the unrounded price (FR-3). */
 export const RawRankedRowSchema = z
   .strictObject({
     kind: z.literal('raw'),
@@ -51,10 +35,7 @@ export const RawRankedRowSchema = z
   })
   .describe('A ranked Raw Base (AD-17).');
 
-/**
- * A recipe `core` could not cost (AD-20): a currency of the recipe has no rate,
- * or only a rate from another league. Never a `0` (FR-26).
- */
+/** A recipe with a currency lacking an active-league rate (AD-20); never a `0` (FR-26). */
 export const UncostableSchema = z
   .strictObject({
     kind: z.literal('uncostable'),
@@ -62,10 +43,6 @@ export const UncostableSchema = z
   })
   .describe('An uncostable recipe: the Craft Cost is unavailable, never zero (AD-20, FR-26).');
 
-/**
- * One term of a crafted EV (AD-17): a priced, unpruned tracked entry of the
- * Item Class whose gross price is at or above the threshold.
- */
 export const CraftedSummandSchema = z
   .strictObject({
     entryKey: z.string().min(1).describe('The tracked entry’s canonical key (IMPLEMENTATION-NOTES.md §4.1).'),
@@ -79,13 +56,7 @@ export const CraftedSummandSchema = z
   })
   .describe('One summand of a crafted EV (AD-17).');
 
-/**
- * The `crafted` arm: one `(Item Class, recipe)` pair (AD-17). `grossPayout` is
- * the sum of the summands' contributions; `ev` is `grossPayout − craftCost`,
- * subtracted once. A class with no surviving summand ranks at `−craftCost` with
- * `summands: []`. An uncostable recipe leaves `ev` `null`: the pair is still
- * ordered within its branch, by `grossPayout` (EXPERIENCE.md state 35).
- */
+/** An uncostable recipe has `ev` null and still orders by `grossPayout` (EXPERIENCE.md 35). */
 export const CraftedRankedRowSchema = z
   .strictObject({
     kind: z.literal('crafted'),

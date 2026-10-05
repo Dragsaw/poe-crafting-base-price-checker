@@ -2,21 +2,11 @@ import { colorsTuple, createTheme, type CSSVariablesResolver } from '@mantine/co
 
 import { colors, stacks, typeRoles } from './tokens';
 
-/**
- * The Mantine 9.6.1 override layer. What is inherited from Mantine is its
- * component behaviour, layout primitives and CSS-variable mechanism — nothing
- * else. `lineHeights` and `headings` are replaced, never extended; radius is
- * zero everywhere; there is no shadow; `Accordion` and `Collapse` lose their
- * chevrons, padding, hover and height animation.
- */
+/** The Mantine override layer: it inherits component behaviour, layout and CSS variables only. */
 
 const NONE = 'none';
 
-/**
- * Mantine's `lineHeights` keys, each replaced with a DESIGN.md role's value, so
- * none keeps Mantine's default for that key. (`xl` is `failure-body`'s 1.55 by
- * DESIGN.md's choice, not by inheritance.)
- */
+/** Each `lineHeights` key takes a DESIGN.md role's value; `xl` is `failure-body`'s 1.55. */
 const lineHeights = {
   xs: typeRoles['row-mark'].lineHeight,
   sm: typeRoles['detail-row'].lineHeight,
@@ -100,6 +90,7 @@ export const theme = createTheme({
     ...shadowless,
     Accordion: {
       defaultProps: {
+        // eslint-disable-next-line unicorn/no-null -- boundary: Mantine Accordion drops the chevron only on an explicit `null`; `undefined` and `false` fall back to the default (Accordion.mjs `chevron === null`).
         chevron: null,
         disableChevronRotation: true,
         transitionDuration: 0,
@@ -121,10 +112,7 @@ export const theme = createTheme({
   },
 });
 
-/**
- * Colour tokens as `--fg-color-<name>` custom properties, plus the body ground
- * and text. Light only: the page has no dark mode.
- */
+/** Colour tokens as `--fg-color-<name>` properties, plus body ground and text. Light only. */
 export const cssVariablesResolver: CSSVariablesResolver = () => {
   const tokens = Object.fromEntries(
     Object.entries(colors).map(([name, hex]) => [`--fg-color-${name}`, hex]),

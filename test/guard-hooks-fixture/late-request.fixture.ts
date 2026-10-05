@@ -1,38 +1,31 @@
-import { it } from 'vitest';
+import { expect, it } from 'vitest';
 
+import { drainEscapedRequests } from '../setup';
 import { INNOCENT_TEST, LATE_ISSUER, LATE_URL, OWN_TEST, OWN_URL } from './names';
 
-/**
- * Run only by `test/guard-hooks.test.ts`, in a child Vitest with the real
- * `test/setup.ts`. The root `include` does not match this file, so the suite
- * never runs it directly: two of its outcomes are deliberate failures.
- */
+// Run only by `test/guard-hooks.test.ts` in a child Vitest (the root `include` skips it): two of
+// its outcomes are deliberate failures.
 
-let releaseLateRequest: () => void = () => {};
-let lateRequestSettled: Promise<void> = Promise.resolve();
+const gate = Promise.withResolvers<void>();
+const settled = Promise.withResolvers<void>();
 
 it(OWN_TEST, async () => {
-  await fetch(OWN_URL);
+  const response = await fetch(OWN_URL);
+  expect(response.ok).toBe(false);
 });
 
 it(LATE_ISSUER, () => {
-  const gate = new Promise<void>((resolve) => {
-    releaseLateRequest = resolve;
-  });
-  let settle: () => void = () => {};
-  lateRequestSettled = new Promise<void>((resolve) => {
-    settle = resolve;
-  });
   setTimeout(() => {
-    void gate
+    void gate.promise
       .then(() => fetch(LATE_URL))
       .finally(() => {
-        settle();
+        settled.resolve();
       });
   }, 0);
+  expect(drainEscapedRequests()).toEqual([]);
 });
 
 it(INNOCENT_TEST, async () => {
-  releaseLateRequest();
-  await lateRequestSettled;
+  gate.resolve();
+  await expect(settled.promise).resolves.toBeUndefined();
 });

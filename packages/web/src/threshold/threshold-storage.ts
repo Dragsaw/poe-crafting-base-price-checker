@@ -1,9 +1,5 @@
-/**
- * The Payout Threshold's bounds and its one persisted value (FR-7, AD-15,
- * UX-DR37). The threshold is the only thing the page writes to the viewer's
- * browser storage. Every read and write is guarded: a storage that is absent,
- * blocked or throwing gives the default, and the page renders the same.
- */
+// The Payout Threshold's bounds and its one persisted value (FR-7, AD-15, UX-DR37), the only thing
+// the page writes to browser storage. Each access is guarded: a failing storage gives the default.
 
 import { MONEY_DECIMALS } from '../shared/money';
 import { DEFAULT_THRESHOLD } from '../shared/product';
@@ -32,11 +28,7 @@ function defaultStorage(): Storage {
   return globalThis.localStorage;
 }
 
-/**
- * The stored threshold, read once at mount. Anything but a finite number in
- * [0, 3] — nothing stored, text, out of range, or a storage that throws — gives
- * `DEFAULT_THRESHOLD`.
- */
+/** Read once at mount; anything but a finite number in [0, 3] gives `DEFAULT_THRESHOLD`. */
 export function readStoredThreshold(storage?: Pick<Storage, 'getItem'>): number {
   try {
     const raw = (storage ?? defaultStorage()).getItem(THRESHOLD_STORAGE_KEY);

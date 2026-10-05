@@ -4,12 +4,8 @@ import type { Parsed } from '../load/artifacts';
 import { plural } from '../shared/text';
 import { relativeAge } from '../shared/time';
 
-/**
- * Pure formatters for `{components.trust-strip}` and
- * `{components.sync-report-panel}`. Every figure is read from the artifact as
- * published; counting records is the only derivation (AD-27). A missing value
- * is `undefined` here, and the view sets it as the italic *unknown*.
- */
+// Every figure is read as published; counting records is the only derivation (AD-27).
+// A missing value is `undefined`, which the view sets as the italic *unknown*.
 
 type WeightsEnvelope = Parsed<'weights'>;
 type SyncReport = Parsed<'syncReport'>;
@@ -40,17 +36,17 @@ export interface WeightsFact {
 }
 
 /** Line one, from the weights header as published (FR-10). An absent file leaves all three *unknown*. */
-export function weightsFacts(weights: WeightsEnvelope | null): readonly [WeightsFact, WeightsFact, WeightsFact] {
+export function weightsFacts(weights: WeightsEnvelope | undefined): readonly [WeightsFact, WeightsFact, WeightsFact] {
   return [
     { name: 'producer', value: weights?.producer.id },
-    { name: 'generatedAt', value: weights === null ? undefined : utcDate(weights.producer.generatedAt) },
+    { name: 'generatedAt', value: weights === undefined ? undefined : utcDate(weights.producer.generatedAt) },
     { name: 'gamePatch', value: weights?.gamePatch },
   ];
 }
 
 /** `Last synced`: the run's finish, or its start on an aborted run, against the load's `now`. */
-export function lastSynced(report: SyncReport | null, now: number): string | undefined {
-  if (report === null) {
+export function lastSynced(report: SyncReport | undefined, now: number): string | undefined {
+  if (report === undefined) {
     return undefined;
   }
   const at = report.runFinishedAt ?? report.runStartedAt;
@@ -63,7 +59,7 @@ export interface TrackedListEdit {
   readonly suffix: string;
 }
 
-export function trackedListEdit(report: SyncReport | null): TrackedListEdit | undefined {
+export function trackedListEdit(report: SyncReport | undefined): TrackedListEdit | undefined {
   const edited = report?.figures.trackedListEditedAt;
   if (edited === undefined) {
     return undefined;
@@ -71,8 +67,8 @@ export function trackedListEdit(report: SyncReport | null): TrackedListEdit | un
   return { date: utcDate(edited.at), suffix: edited.source === 'file-modified' ? NOT_COMMITTED_SUFFIX : '' };
 }
 
-function countOf(report: SyncReport, kind: SyncReport['records'][number]['kind']): number {
-  return report.records.filter((record) => record.kind === kind).length;
+function countUnresolvable(report: SyncReport): number {
+  return report.records.filter((record) => record.kind === 'unresolvable').length;
 }
 
 /** The loaded curation that a `pinned-starvation` record must describe to count on the health line. */
@@ -83,25 +79,14 @@ export interface Curation {
   readonly minChunkSearches: number;
 }
 
-/**
- * The health line's words, in order (UX-DR21). Exactly two triggers; a healthy
- * run or an absent report raises none, and no trigger ever prints a zero.
- *
- * The starvation trigger reads only the `pinned-starvation` record whose
- * subject matches the loaded curation: its `pinnedCount` equals the pinned-set
- * size and its `declaredMinChunkSearches` equals `minChunkSearches`. The
- * subject is unique, so at most one record matches, whatever its position in
- * the report. No match, or an empty pinned set, raises no starvation signal.
- * With M = `pinnedCount` and N = M − `pinnedRefreshed`, the words are
- * `N of M pinned entries starved`, or
- * `M pinned entries left the rotation no search` when N is 0.
- */
-export function healthSignals(report: SyncReport | null, curation: Curation): readonly string[] {
-  if (report === null) {
+// The words are DESIGN.md's `healthSignals` (UX-DR21). The starvation trigger reads only the record
+// whose `pinnedCount` and `declaredMinChunkSearches` match the loaded curation, wherever it sits.
+export function healthSignals(report: SyncReport | undefined, curation: Curation): readonly string[] {
+  if (report === undefined) {
     return [];
   }
   const signals: string[] = [];
-  const unresolvable = countOf(report, 'unresolvable');
+  const unresolvable = countUnresolvable(report);
   if (unresolvable > 0) {
     signals.push(`${unresolvable.toLocaleString('en-US')} unresolvable`);
   }
@@ -126,11 +111,7 @@ export function healthSignals(report: SyncReport | null, curation: Curation): re
 
 // --- the panel ------------------------------------------------------------
 
-/**
- * A run of panel prose: plain body text, a figure in ink, a missing figure in
- * italic, or verbatim text in the mono stack with no semantic ink (the
- * cross-file diagnosis).
- */
+/** A run of panel prose; `verbatim` is mono with no semantic ink (the cross-file diagnosis). */
 export type Segment =
   | { readonly kind: 'text'; readonly text: string }
   | { readonly kind: 'figure'; readonly text: string }
@@ -160,34 +141,24 @@ function diagnosisLine(failure: DiagnosisFailure): string {
   return `${failure.check} · ${failure.entryKey} · ${failure.detail}`;
 }
 
-/**
- * The sixth group, under *What is broken* after the pinned-starvation group:
- * one verbatim line per cross-file failure, in `core`'s order. No failure,
- * no group — nothing renders, not even a zero. With no weights envelope the
- * checks did not run, and the group is one *unknown* line.
- */
-function diagnosisGroups(failures: readonly DiagnosisFailure[], weightsLoaded: boolean): FigureGroup[] {
-  if (!weightsLoaded) {
+// No failure, no group: not even a zero. With no weights envelope the checks did not run,
+// so the group is one *unknown* line.
+function diagnosisGroups(failures: readonly DiagnosisFailure[], areWeightsLoaded: boolean): FigureGroup[] {
+  if (!areWeightsLoaded) {
     return [UNKNOWN_GROUP];
   }
   return failures.length === 0 ? [] : [failures.map((failure) => [{ kind: 'verbatim', text: diagnosisLine(failure) }])];
 }
 
-/**
- * The five figure groups, from `sync-report.json` as published, and the
- * sixth, the cross-file diagnosis `web` ran at load (AD-17). The panel
- * prints only published figures: no sum, no numerator. Zeros print here; the
- * strip's no-zero rule is the strip's. An absent report leaves every group
- * *unknown*. Omitted coverage reads *not measured* when the page loaded a
- * weights envelope and *unknown* when it did not, never `0` (AD-27).
- */
+// Five groups from `sync-report.json` plus the cross-file diagnosis `web` ran at load (AD-17).
+// Zeros print here; the no-zero rule is the strip's. Omitted coverage never reads `0` (AD-27).
 export function panelColumns(
-  report: SyncReport | null,
-  weightsLoaded: boolean,
+  report: SyncReport | undefined,
+  areWeightsLoaded: boolean,
   crossFileFailures: readonly DiagnosisFailure[] = [],
 ): PanelColumns {
-  const diagnosis = diagnosisGroups(crossFileFailures, weightsLoaded);
-  if (report === null) {
+  const diagnosis = diagnosisGroups(crossFileFailures, areWeightsLoaded);
+  if (report === undefined) {
     return [
       [UNKNOWN_GROUP, UNKNOWN_GROUP],
       [UNKNOWN_GROUP, UNKNOWN_GROUP, ...diagnosis],
@@ -213,7 +184,7 @@ export function panelColumns(
       ),
     ],
   ];
-  const unresolvableCount = countOf(report, 'unresolvable');
+  const unresolvableCount = countUnresolvable(report);
   const unresolvable: FigureGroup = [
     [
       figure(unresolvableCount),
@@ -230,12 +201,12 @@ export function panelColumns(
       text(` ${plural(record.pinnedCount, 'pinned entry', 'pinned entries')} refreshed`),
     ]),
   ];
-  return [[requests, notReached], [unresolvable, starved, ...diagnosis], [coverageGroup(figures, weightsLoaded)]];
+  return [[requests, notReached], [unresolvable, starved, ...diagnosis], [coverageGroup(figures, areWeightsLoaded)]];
 }
 
-function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): FigureGroup {
+function coverageGroup(figures: SyncReport['figures'], areWeightsLoaded: boolean): FigureGroup {
   if (figures.coverage === undefined) {
-    return [[missing(weightsLoaded ? NOT_MEASURED : UNKNOWN)]];
+    return [[missing(areWeightsLoaded ? NOT_MEASURED : UNKNOWN)]];
   }
   const denominator =
     figures.rankableClassCount === undefined ? missing(UNKNOWN) : figure(figures.rankableClassCount);
@@ -244,13 +215,8 @@ function coverageGroup(figures: SyncReport['figures'], weightsLoaded: boolean): 
   return [[figure(`${String(coveragePercent(figures.coverage))}%`), text(' of '), denominator, text(` ${classes}.`)]];
 }
 
-/**
- * The displayed coverage percent, with three guards: it floors the percent;
- * it lifts a non-zero fraction that floors to 0 up to 1%, so non-zero coverage
- * never reads 0%; and it caps partial coverage at 99%, so it never reads 100%.
- * The epsilon absorbs float error such as `0.29 * 100 === 28.999999999999996`,
- * which is why the 99 cap, not the floor, keeps partial coverage below 100%.
- */
+// Non-zero coverage never reads 0% and partial coverage never reads 100%.
+// The epsilon absorbs float error such as `0.29 * 100 === 28.999999999999996`.
 function coveragePercent(coverage: number): number {
   const floored = Math.floor(coverage * 100 + 1e-9);
   if (floored === 0 && coverage > 0) {

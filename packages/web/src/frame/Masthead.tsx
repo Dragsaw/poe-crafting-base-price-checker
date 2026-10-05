@@ -5,11 +5,7 @@ import { DENOMINATION } from '../shared/product';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { PayoutThreshold } from '../threshold/PayoutThreshold';
 
-/**
- * The title is the DESIGN mockup string (`mockups/key-hero-resting.html`). The
- * dek is EXPERIENCE.md's masthead copy (*The masthead dek*). It states a
- * capability and is true in every state.
- */
+/** The title is DESIGN's mockup (`mockups/key-hero-resting.html`); the dek: EXPERIENCE.md's. */
 export const MASTHEAD_TITLE = 'What is worth picking up';
 export const MASTHEAD_DEK = `Item Classes ranked by expected payout per craft, beside the Base Types worth selling raw. Every figure is in ${DENOMINATION}.`;
 
@@ -20,12 +16,7 @@ function eyebrowText(league: string): string {
 /** The right-hand control group's width: 216 recipe + 16 gap + 276 threshold. */
 export const CONTROL_GROUP_WIDTH = columnSums.mastheadControls.reduce((a, b) => a + b, 0);
 
-/**
- * The 170px masthead: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42
- * + 20 pad. The eyebrow reads the league alone. The right-hand control group holds
- * the Payout Threshold at the outer edge and the Craft Recipe in the inboard
- * slot, which stays empty at its width while no recipe is loaded.
- */
+/** 170px: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42 + 20 pad. */
 export function Masthead({
   league,
   threshold,
@@ -51,17 +42,7 @@ export function Masthead({
         height: px(170),
       }}
     >
-      <div style={{ maxWidth: px(spacing.dekMaxWidth) }}>
-        <div style={{ ...typeStyle('eyebrow'), color: colors.sepia, textTransform: 'uppercase' }}>
-          {league === undefined ? '\u{A0}' : eyebrowText(league)}
-        </div>
-        <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
-          {MASTHEAD_TITLE}
-        </h1>
-        <p style={{ ...typeStyle('dek'), color: colors['ink-secondary'], margin: `${px(spacing.s2)} 0 0` }}>
-          {MASTHEAD_DEK}
-        </p>
-      </div>
+      <MastheadTitle league={league} />
       <div
         data-control-group=""
         style={{
@@ -72,24 +53,41 @@ export function Masthead({
           flex: '0 0 auto',
         }}
       >
-        {/* The Craft Recipe's inboard slot: the control, or an empty slot of its width. */}
-        <div
-          data-recipe-slot=""
-          aria-hidden={recipe === undefined ? 'true' : undefined}
-          style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto', display: 'flex' }}
-        >
-          {recipe === undefined ? null : (
-            <CraftRecipe
-              options={recipe.options}
-              activeId={recipe.activeId}
-              cost={recipe.cost}
-              onChange={recipe.onChange}
-            />
-          )}
-        </div>
+        <RecipeSlot recipe={recipe} />
         <PayoutThreshold value={threshold} onChange={onThresholdChange} />
       </div>
     </header>
+  );
+}
+
+function MastheadTitle({ league }: { readonly league: string | undefined }): JSX.Element {
+  return (
+    <div style={{ maxWidth: px(spacing.dekMaxWidth) }}>
+      <div style={{ ...typeStyle('eyebrow'), color: colors.sepia, textTransform: 'uppercase' }}>
+        {league === undefined ? '\u{A0}' : eyebrowText(league)}
+      </div>
+      <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
+        {MASTHEAD_TITLE}
+      </h1>
+      <p style={{ ...typeStyle('dek'), color: colors['ink-secondary'], margin: `${px(spacing.s2)} 0 0` }}>
+        {MASTHEAD_DEK}
+      </p>
+    </div>
+  );
+}
+
+/** The Craft Recipe's inboard slot: the control, or an empty slot of its width. */
+function RecipeSlot({ recipe }: { readonly recipe: MastheadRecipe | undefined }): JSX.Element {
+  return (
+    <div
+      data-recipe-slot=""
+      aria-hidden={recipe === undefined ? 'true' : undefined}
+      style={{ width: px(spacing.recipePanelWidth), flex: '0 0 auto', display: 'flex' }}
+    >
+      {recipe === undefined ? undefined : (
+        <CraftRecipe options={recipe.options} activeId={recipe.activeId} cost={recipe.cost} onChange={recipe.onChange} />
+      )}
+    </div>
   );
 }
 

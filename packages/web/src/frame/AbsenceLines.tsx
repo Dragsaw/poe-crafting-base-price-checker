@@ -23,17 +23,11 @@ export function absenceLine(key: TolerableKey): string {
   return `${ABSENCE_LEAD} ${absenceBody(key)}`;
 }
 
-/**
- * One plain line per absent tolerable artifact, inside the trust strip after
- * line two and before the health line (DESIGN.md memlog 213). The lead takes
- * the strip's label style (ink, 600), the file and its consequence the value
- * style (ink-secondary). No mark and no colour: absence is a declared state,
- * not a break. Each line is budgeted at `frameReserveAbsenceLine`.
- */
-export function AbsenceLines({ absent }: { readonly absent: readonly TolerableKey[] }): JSX.Element | null {
+/** Plain, unmarked lines: absence is a declared state, not a break (DESIGN.md `absenceLines`). */
+export function AbsenceLines({ absent }: { readonly absent: readonly TolerableKey[] }): JSX.Element | undefined {
   const shown = ABSENCE_ORDER.filter((key) => absent.includes(key));
   if (shown.length === 0) {
-    return null;
+    return undefined;
   }
   return (
     <div data-absence-lines="">

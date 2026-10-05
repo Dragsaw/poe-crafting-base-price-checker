@@ -1,21 +1,10 @@
-/**
- * The Field Guide token set — one source, transcribed from the frontmatter of
- * `docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md`.
- * Where this file and DESIGN.md disagree, DESIGN.md wins and this file is the
- * bug. Nothing here is inherited from Mantine: its palette, radius, shadow and
- * type ramp are replaced wholesale (see `theme.ts`).
- */
+/** The Field Guide token set, transcribed from DESIGN.md's frontmatter; DESIGN.md wins. */
 
 import type { CSSProperties } from 'react';
 
 // --- colour ---------------------------------------------------------------
 
-/**
- * Five paper tones, four inks, three rules, one decorative sepia and exactly
- * two semantic inks. There is no green and no success colour: silence means
- * healthy. `surround` fills the viewport outside the frame and is not a paper
- * tone.
- */
+/** Paper tones, inks, rules, one sepia, two semantic inks; no green, as silence means healthy. */
 export const colors = {
   surround: '#E8E3D4',
   paper: '#FDFBF3',
@@ -66,12 +55,7 @@ export const spacing = {
   hairline: 1,
   rowHeight: 28,
   appendixRowHeight: 29,
-  /**
-   * `{components.unrankable-appendix}`: padding `16px 20px 10px` inside a
-   * hairline border, so the rows span 1012 − 2 − 40 = 970; the empty panel
-   * pads its bottom at the top's 16. The lead sits 5px under the title and
-   * 12px over the first row, capped at 760 (`mockups/key-hero-resting.html`).
-   */
+  /** `{components.unrankable-appendix}` padding and lead spacing; the rows span 970 (DESIGN.md). */
   appendixPadTop: 16,
   appendixPadX: 20,
   appendixPadBottom: 10,
@@ -86,25 +70,14 @@ export const spacing = {
   frameReserveHealthLine: 21,
   /** One per absent tolerable artifact, inside the trust strip (DESIGN.md memlog 213). */
   frameReserveAbsenceLine: 21,
-  /**
-   * The list's one statement under the asking-price line: honest-empty (state
-   * 23) or nothing-clears (state 25). The two are exclusive, so one slot.
-   */
+  /** The list's one statement slot; states 23, 25 and 35 are exclusive. */
   frameReserveListStatement: 21,
   syncReportMaxHeight: 400,
-  /**
-   * `{components.trust-strip}`: padding 11/12 between a rule-strong top and a
-   * hairline bottom, so two 11.5px × 1.85 lines rest at 68px; the `|` field
-   * separator pads 9px each side (`mockups/key-hero-resting.html`).
-   */
+  /** `{components.trust-strip}` padding and separator, so two lines rest at 68px (DESIGN.md). */
   trustStripPadTop: 11,
   trustStripPadBottom: 12,
   trustSeparatorPadX: 9,
-  /**
-   * `{components.sync-report-panel}`: padding `14px 16px 12px`, three equal
-   * columns with 22px right padding on all but the last, groups 8px apart
-   * (`mockups/key-expanded-states.html`).
-   */
+  /** `{components.sync-report-panel}` padding, column gap and group gap (DESIGN.md). */
   syncReportPadTop: 14,
   syncReportPadX: 16,
   syncReportPadBottom: 12,
@@ -114,23 +87,14 @@ export const spacing = {
   recipePanelWidth: 216,
   mastheadControlGap: 16,
   thresholdPanelWidth: 276,
-  /**
-   * `{components.payout-threshold}` (and its Epic 3 sibling, `craft-recipe`):
-   * padding 13×15, and the 4/10/7px gaps of `mockups/key-hero-resting.html`
-   * between label and figure, figure and track, track and range.
-   */
+  /** `{components.payout-threshold}` and `craft-recipe` panel padding and gaps (DESIGN.md). */
   controlPanelPadY: 13,
   controlPanelPadX: 15,
   thresholdValueGap: 4,
   thresholdTrackGap: 10,
   thresholdRangeGap: 7,
   thresholdTrackHeight: 4,
-  /**
-   * `{components.craft-recipe}`: 9px between the label and the options, and
-   * the cost line held at the panel's foot by `margin-top: auto` over a 10px
-   * floor; the cost figure sits 4px before its unit
-   * (`mockups/key-hero-resting.html`, `.rec`).
-   */
+  /** `{components.craft-recipe}` gaps; `margin-top: auto` holds the cost line at the foot. */
   recipeOptionsGap: 9,
   recipeCostGap: 10,
   recipeCostFigureGap: 4,
@@ -152,10 +116,7 @@ export const spacing = {
   chaseCell: 164,
   /** `{spacing.pad-chase-cell-right}`, on every chase cell. */
   padChaseCellRight: 10,
-  /**
-   * The resting chrome's own gaps, from DESIGN.md's vertical budget and
-   * `mockups/key-hero-resting.html`. Each block's committed height depends on them.
-   */
+  /** Resting chrome gaps from DESIGN.md's vertical budget; block heights depend on them. */
   askingPadTop: 12,
   askingPadBottom: 3,
   columnHeaderMarginTop: 16,
@@ -167,12 +128,7 @@ export const spacing = {
   footMarginTop: 18,
   footPadTop: 10,
   footMarginBottom: 20,
-  /**
-   * `{components.expansion-panel}`: padding 18/22/20 inside a 1px `edge`
-   * border, so the inner width is 1012 − 2 − 44 = 966. The sub-line sits 4px
-   * under the title and 13px above the first combination row
-   * (`mockups/key-expanded-states.html`). `{spacing.4}` follows the panel.
-   */
+  /** `{components.expansion-panel}` padding and sub-line gaps; inner width 966 (DESIGN.md). */
   panelPadTop: 18,
   panelPadX: 22,
   panelPadBottom: 20,
@@ -212,11 +168,7 @@ export const columnSums = {
   appendix: [292, 118, 250, 310],
 } as const;
 
-/**
- * `{components.combination-row}` line one, the figure: `col-combination`,
- * `-state`, `-figure`, `-sample` and `-trade-link`. The trade-link cell takes
- * no right padding: the mockup right-aligns `↗` flush to the panel's inner edge.
- */
+/** `{components.combination-row}` line one; the trade-link cell has no right padding. */
 export const combinationLine1Columns = [
   { name: 'combination', width: 460, padRight: 12 },
   { name: 'state', width: 250, padRight: 12 },
@@ -251,57 +203,62 @@ export interface TypeRole {
   readonly letterSpacing?: string;
 }
 
-function role(
-  stack: keyof typeof stacks,
-  fontSize: string,
-  fontWeight: TypeRole['fontWeight'],
-  lineHeight: string,
-  letterSpacing?: string,
-): TypeRole {
-  const base = { fontFamily: stacks[stack], fontSize, fontWeight, lineHeight };
-  return letterSpacing === undefined ? base : { ...base, letterSpacing };
+function roleIn(stack: keyof typeof stacks) {
+  return (
+    fontSize: string,
+    fontWeight: TypeRole['fontWeight'],
+    lineHeight: string,
+    letterSpacing?: string,
+  ): TypeRole => {
+    const base = { fontFamily: stacks[stack], fontSize, fontWeight, lineHeight };
+    return letterSpacing === undefined ? base : { ...base, letterSpacing };
+  };
 }
 
+const sans = roleIn('sans');
+const serif = roleIn('serif');
+const mono = roleIn('mono');
+
 export const typeRoles = {
-  eyebrow: role('sans', '10px', '600', '1.4', '0.22em'),
-  'masthead-title': role('serif', '38px', '400', '1.15', '-0.012em'),
-  dek: role('serif', '14px', '400', '1.5'),
-  'threshold-label': role('sans', '9.5px', '600', '1.2', '0.16em'),
-  'threshold-value': role('serif', '32px', '400', '1.05'),
-  'threshold-value-unit': role('serif', '13px', '400', '1.2'),
-  'threshold-range': role('sans', '9.5px', '400', '1.2'),
-  'recipe-label': role('sans', '9.5px', '600', '1.2', '0.16em'),
-  'recipe-option': role('serif', '15px', '400', '1.25'),
-  'recipe-cost-figure': role('serif', '13px', '400', '1.2'),
-  'recipe-cost': role('sans', '9.5px', '400', '1.2'),
-  'trust-strip': role('sans', '11.5px', '400', '1.85'),
-  'asking-note': role('serif', '12.5px', '400', '1.4'),
-  'column-header': role('sans', '9.5px', '600', '1.2', '0.2em'),
-  'row-rank': role('serif', '12px', '400', '1.2'),
-  'row-unit-name': role('serif', '14px', '400', '1.2'),
-  'row-unit-glyph': role('sans', '11.5px', '400', '1.2'),
-  'row-ev': role('serif', '14px', '400', '1.2'),
-  'row-mark': role('sans', '10px', '600', '1.2'),
-  'row-chase': role('sans', '10.5px', '400', '1.2'),
-  'money-phrase': role('sans', '10.5px', '400', '1.2'),
-  'appendix-title': role('serif', '18px', '400', '1.2'),
-  'appendix-lead': role('sans', '11.5px', '400', '1.55'),
-  'appendix-row': role('serif', '13px', '400', '1.2'),
-  'key-heading': role('sans', '9.5px', '600', '1.2', '0.18em'),
-  'key-body': role('sans', '10.5px', '400', '1.85'),
+  eyebrow: sans('10px', '600', '1.4', '0.22em'),
+  'masthead-title': serif('38px', '400', '1.15', '-0.012em'),
+  dek: serif('14px', '400', '1.5'),
+  'threshold-label': sans('9.5px', '600', '1.2', '0.16em'),
+  'threshold-value': serif('32px', '400', '1.05'),
+  'threshold-value-unit': serif('13px', '400', '1.2'),
+  'threshold-range': sans('9.5px', '400', '1.2'),
+  'recipe-label': sans('9.5px', '600', '1.2', '0.16em'),
+  'recipe-option': serif('15px', '400', '1.25'),
+  'recipe-cost-figure': serif('13px', '400', '1.2'),
+  'recipe-cost': sans('9.5px', '400', '1.2'),
+  'trust-strip': sans('11.5px', '400', '1.85'),
+  'asking-note': serif('12.5px', '400', '1.4'),
+  'column-header': sans('9.5px', '600', '1.2', '0.2em'),
+  'row-rank': serif('12px', '400', '1.2'),
+  'row-unit-name': serif('14px', '400', '1.2'),
+  'row-unit-glyph': sans('11.5px', '400', '1.2'),
+  'row-ev': serif('14px', '400', '1.2'),
+  'row-mark': sans('10px', '600', '1.2'),
+  'row-chase': sans('10.5px', '400', '1.2'),
+  'money-phrase': sans('10.5px', '400', '1.2'),
+  'appendix-title': serif('18px', '400', '1.2'),
+  'appendix-lead': sans('11.5px', '400', '1.55'),
+  'appendix-row': serif('13px', '400', '1.2'),
+  'key-heading': sans('9.5px', '600', '1.2', '0.18em'),
+  'key-body': sans('10.5px', '400', '1.85'),
   /** The sync report panel's verbatim register: `key-body`'s size, weight and line height in the mono stack. */
-  'sync-report-verbatim': role('mono', '10.5px', '400', '1.85'),
-  'running-foot': role('sans', '11px', '400', '1.5'),
-  'panel-title': role('serif', '20px', '400', '1.2'),
-  'panel-sub': role('sans', '11.5px', '400', '1.5'),
-  'detail-row': role('serif', '12.5px', '400', '1.2'),
-  'detail-meta': role('sans', '10.5px', '400', '1.2'),
-  'combination-line-2': role('sans', '10.5px', '400', '20px'),
-  'tombstone-band-label': role('sans', '9.5px', '600', '1.2', '0.16em'),
-  'expand-affordance': role('sans', '12.5px', '400', '1.5'),
-  'banner-lead': role('serif', '13.5px', '700', '1.35'),
-  'banner-body': role('serif', '12.5px', '400', '1.4'),
-  'failure-body': role('serif', '15px', '400', '1.55'),
+  'sync-report-verbatim': mono('10.5px', '400', '1.85'),
+  'running-foot': sans('11px', '400', '1.5'),
+  'panel-title': serif('20px', '400', '1.2'),
+  'panel-sub': sans('11.5px', '400', '1.5'),
+  'detail-row': serif('12.5px', '400', '1.2'),
+  'detail-meta': sans('10.5px', '400', '1.2'),
+  'combination-line-2': sans('10.5px', '400', '20px'),
+  'tombstone-band-label': sans('9.5px', '600', '1.2', '0.16em'),
+  'expand-affordance': sans('12.5px', '400', '1.5'),
+  'banner-lead': serif('13.5px', '700', '1.35'),
+  'banner-body': serif('12.5px', '400', '1.4'),
+  'failure-body': serif('15px', '400', '1.55'),
 } as const satisfies Record<string, TypeRole>;
 
 export type TypeRoleName = keyof typeof typeRoles;
@@ -313,11 +270,8 @@ export function typeStyle(name: TypeRoleName): CSSProperties {
 
 // --- glyphs ---------------------------------------------------------------
 
-/**
- * The glyph vocabulary. Every mark is resident in Segoe UI Regular, Semibold
- * and Bold — a hard rule (memlog 196) — except `↗`, which is resident in
- * Regular only and is therefore pinned to weight 400.
- */
+// Every mark is resident in Segoe UI Regular, Semibold and Bold (memlog 196) except `↗`, which is
+// Regular only and so pinned to weight 400.
 export const glyphs = {
   unitClass: '≡',
   unitRaw: '▪',
@@ -345,10 +299,7 @@ export interface BudgetLine {
   readonly px: number;
 }
 
-/**
- * DESIGN.md's vertical budget, computed from committed block heights. The
- * appendix carries `margin-top: auto`, so what is left over is `frameSlack`.
- */
+/** DESIGN.md's vertical budget; the appendix's `margin-top: auto` leaves `frameSlack` over. */
 export const committedChrome: readonly BudgetLine[] = [
   { block: 'masthead', px: 170 },
   { block: 'trust strip', px: 68 },
@@ -361,11 +312,7 @@ export const committedChrome: readonly BudgetLine[] = [
   { block: 'running foot', px: 82 },
 ];
 
-/**
- * Chrome charged against the slack by data, not by a click. Each absence line
- * takes a budget line of its own at `frameReserveAbsenceLine` (DESIGN.md
- * memlog 213) — new resting chrome is admissible only that way.
- */
+/** Chrome charged to the slack by data; each absence line gets its own budget line (memlog 213). */
 export const reservedChrome: readonly BudgetLine[] = [
   { block: 'uniform-prior banner', px: spacing.frameReserveBanner },
   { block: 'health line', px: spacing.frameReserveHealthLine },
@@ -375,13 +322,7 @@ export const reservedChrome: readonly BudgetLine[] = [
   { block: 'list statement', px: spacing.frameReserveListStatement },
 ];
 
-/**
- * The reserves that can co-occur (DESIGN.md, Layout & Spacing): the banner
- * needs weights and recipes loaded, the health line needs the sync report
- * loaded, so the largest set is the banner with either the health line or the
- * `sync-report.json` absence line — 95px. The list statement can join any of
- * them (its predicates read the ranking, not the artifact set): 116px.
- */
+/** Reserves that can co-occur: banner, a health or absence line, the list statement (DESIGN.md). */
 export const coOccurringReserve: number =
   spacing.frameReserveBanner +
   Math.max(spacing.frameReserveHealthLine, spacing.frameReserveAbsenceLine) +

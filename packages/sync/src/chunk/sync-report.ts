@@ -1,24 +1,8 @@
-/**
- * The Sync Report a chunk writes to `data/sync-report.json` (FR-25, AD-12).
- *
- * A **figure** describes this chunk and replaces the previous one. A **record**
- * stays until the player deletes it from the file by hand, so the report
- * carries forward every record the previous file still holds, in its order,
- * and places this chunk's new records against them (Consistency Conventions,
- * *Logging*). A new record that is `sameRecord` with one already present —
- * the same kind and the same subject fields (IMPLEMENTATION-NOTES.md §12) —
- * replaces it at its index, so a record that carries a live measurement keeps
- * its position and shows the latest one. Any other new record is appended.
- *
- * The figure keys on the chunk sources only (AD-12): the counter tracks every
- * declared source, and this is where the report narrows to the ones a chunk
- * can spend on, `session-probe` included and always written.
- *
- * Pure: the previous report, the records and the figures come in as values,
- * and the file comes out.
- */
+// Sync Report (FR-25, AD-12): figures replace the previous ones; records carry forward and are
+// replaced by identity at their index (IMPLEMENTATION-NOTES.md §12). Pure.
+// The figure keys on chunk sources only, `session-probe` included and always written (AD-12).
 
-import { ChunkRequestSourceSchema, sameRecord, SYNC_REPORT_SCHEMA_VERSION } from '@poe/contracts';
+import { ChunkRequestSourceSchema, isSameRecord, SYNC_REPORT_SCHEMA_VERSION } from '@poe/contracts';
 import type {
   ChunkRequestSource,
   RequestSource,
@@ -43,19 +27,14 @@ export interface SyncReportInputs {
   readonly runFinishedAt?: string;
 }
 
-/**
- * The previous records in their order. Each new record replaces the first
- * earlier record it is `sameRecord` with, at that record's index; otherwise it
- * is appended. A replacement is not a clear: only the player's edit removes a
- * record.
- */
+/** Previous records in order; a new record replaces its `isSameRecord` twin in place or appends. */
 export function carryRecords(
   previous: readonly SyncRunRecord[],
   newRecords: readonly SyncRunRecord[],
 ): SyncRunRecord[] {
   const records = [...previous];
   for (const record of newRecords) {
-    const index = records.findIndex((present) => sameRecord(present, record));
+    const index = records.findIndex((present) => isSameRecord(present, record));
     if (index === -1) {
       records.push(record);
     } else {

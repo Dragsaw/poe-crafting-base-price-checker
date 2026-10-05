@@ -1,24 +1,6 @@
-/**
- * The canonical short-form table (EXPERIENCE.md, *Chase Combination text uses
- * canonical short forms*; memlog 34, 118, 231). One form per tracked
- * modifier, keyed by its trade `statId`, a product constant kept by hand in
- * `web` source. It is neither written by the curator nor fetched as an
- * artifact, so tracking a new modifier needs a code change here before it
- * reads in short form. Until then it prints the mono fallback
- * (`combination-text.ts`), and the coverage test in `short-forms.test.ts`
- * fails `pnpm test` as soon as the committed `data/tracked.json` names a
- * `statId` with no form, until the form is added here.
- *
- * Every form obeys the five coinage rules of EXPERIENCE.md, *How a short form
- * may be coined*: a Glossary term is never abbreviated; borrow, never invent
- * (each form is game or trade-site usage); unique across the table; written
- * once and never varied per row; and the tier prefix is never part of a form.
- * A Local variant of a stat (`explicit.stat_210067635`, weapon Attack Speed) 
- * shares the form of its global twin: the player does not tell them apart.
- * A form carries no value. A `%` lead marks the percent-increased variant of a
- * flat stat. A `+` lead marks the flat "to" variant of a stat that also rolls
- * as a percent-increased modifier.
- */
+// Short form per `statId` (EXPERIENCE.md, *Chase Combination text uses canonical short forms*).
+// A Local stat shares its global twin's form. A leading % marks the percent-increased variant of
+// a flat stat; a leading + marks the flat "to" variant of a stat that also rolls as percent.
 export const SHORT_FORMS: Readonly<Record<string, string>> = {
   'explicit.stat_3981240776': 'Spirit',
   'explicit.stat_2843214518': 'Atk Dmg',

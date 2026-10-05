@@ -52,15 +52,7 @@ function Group({ group, first }: { readonly group: FigureGroup; readonly first: 
   );
 }
 
-/**
- * `{components.sync-report-panel}`: opens in place under the trust strip and
- * pushes everything below it down. A paper-inset band between two hairlines,
- * capped at `syncReportMaxHeight` and scrolling inside its own band past it —
- * the one capped band on the page. Three equal columns, **one heading per
- * column, never per group**; groups in a column are a vertical stack 8px
- * apart, so the sixth group under *What is broken*, the cross-file diagnosis,
- * takes vertical space alone. No hover state.
- */
+/** `{components.sync-report-panel}`: one heading per column, never per group. */
 export function SyncReportPanel({ columns }: { readonly columns: PanelColumns }): JSX.Element {
   return (
     <div

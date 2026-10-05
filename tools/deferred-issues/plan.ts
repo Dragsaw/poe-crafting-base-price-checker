@@ -1,13 +1,7 @@
 import type { LedgerEntry } from './ledger.ts';
 
-/**
- * The pure diff of `pnpm deferred:issues`: ledger entries against the issues
- * that carry the label `deferred`. It gives the creates, the duplicate closes
- * and the report lines of the spec's I/O & Edge-Case Matrix. It closes only a
- * duplicate issue; every other mismatch is reported and left alone.
- *
- * Run by bare `node` (type stripping), so this module imports only builtins.
- */
+// Diff rules: docs/stories/spec-deferred-work-github-issues.md.
+// Run by bare `node` (type stripping): builtins and `.ts` siblings only.
 
 export interface IssueInfo {
   readonly number: number;
@@ -41,7 +35,7 @@ export const LEDGER_PATH = 'docs/stories/deferred-work.md';
 
 /** The id that the first line of an issue body names, or `undefined`. */
 export function readMarker(body: string | null | undefined): string | undefined {
-  const first = (body ?? '').split(/\r?\n/, 1)[0]?.trim() ?? '';
+  const first = body?.split(/\r?\n/, 1)[0]?.trim() ?? '';
   return MARKER.exec(first)?.[1];
 }
 
@@ -65,7 +59,8 @@ export function issueBody(entry: LedgerEntry): string {
 /** Groups the issues by the id of their marker, in number order. */
 function byId(issues: readonly IssueInfo[]): Map<string, IssueInfo[]> {
   const groups = new Map<string, IssueInfo[]>();
-  for (const issue of [...issues].sort((a, b) => a.number - b.number)) {
+  const byNumber = issues.toSorted((a, b) => a.number - b.number);
+  for (const issue of byNumber) {
     const id = readMarker(issue.body);
     if (id === undefined) {
       continue;
@@ -80,11 +75,7 @@ function byId(issues: readonly IssueInfo[]): Map<string, IssueInfo[]> {
   return groups;
 }
 
-/**
- * Each open issue that shares its id with a lower-numbered open issue. The
- * lowest open issue stays, so the sync never closes the issue that `--list`
- * names. A group with no open issue gets no close.
- */
+/** Each open issue that shares its id with a lower-numbered one: the lowest open issue stays. */
 export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[] {
   const closes: PlannedClose[] = [];
   for (const group of byId(issues).values()) {
@@ -96,7 +87,7 @@ export function planDuplicateCloses(issues: readonly IssueInfo[]): PlannedClose[
       closes.push({ number: issue.number, keep: keep.number });
     }
   }
-  return closes.sort((a, b) => a.number - b.number);
+  return closes.toSorted((a, b) => a.number - b.number);
 }
 
 function countIds(entries: readonly LedgerEntry[]): Map<string, number> {
@@ -109,7 +100,8 @@ function countIds(entries: readonly LedgerEntry[]): Map<string, number> {
 
 function markerReports(issues: readonly IssueInfo[]): string[] {
   const reports: string[] = [];
-  for (const issue of [...issues].sort((a, b) => a.number - b.number)) {
+  const byNumber = issues.toSorted((a, b) => a.number - b.number);
+  for (const issue of byNumber) {
     if (readMarker(issue.body) === undefined) {
       reports.push(`No marker: #${issue.number} has the label deferred and no valid \`Deferred entry: dw-…\` first line`);
     }
@@ -117,19 +109,17 @@ function markerReports(issues: readonly IssueInfo[]): string[] {
   return reports;
 }
 
-export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], reference: string): SyncPlan {
+function duplicateReports(counts: ReadonlyMap<string, number>, ids: readonly string[]): string[] {
+  return ids.map((id) => `Duplicate ledger id: ${counts.get(id)} entries give ${id}; no issue is created for it`);
+}
+
+function planEntries(
+  entries: readonly LedgerEntry[],
+  groups: ReadonlyMap<string, readonly IssueInfo[]>,
+  duplicateLedgerIds: readonly string[],
+): { creates: PlannedCreate[]; reports: string[] } {
   const creates: PlannedCreate[] = [];
   const reports: string[] = [];
-
-  const counts = countIds(entries);
-  const duplicateLedgerIds = [...counts].filter(([, n]) => n > 1).map(([id]) => id);
-  for (const id of duplicateLedgerIds) {
-    reports.push(`Duplicate ledger id: ${counts.get(id)} entries give ${id}; no issue is created for it`);
-  }
-
-  reports.push(...markerReports(issues));
-
-  const groups = byId(issues);
   const seen = new Set<string>();
   for (const entry of entries) {
     if (seen.has(entry.id)) {
@@ -147,8 +137,15 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
       reports.push(`Closed, still listed: ${entry.id} is in the ledger, and its issue ${numbers} is closed`);
     }
   }
+  return { creates, reports };
+}
 
-  const ledgerIds = new Set(counts.keys());
+function entryGoneReports(
+  groups: ReadonlyMap<string, readonly IssueInfo[]>,
+  ledgerIds: ReadonlySet<string>,
+  reference: string,
+): string[] {
+  const reports: string[] = [];
   for (const [id, group] of groups) {
     if (ledgerIds.has(id)) {
       continue;
@@ -159,6 +156,19 @@ export function planSync(entries: readonly LedgerEntry[], issues: readonly Issue
       }
     }
   }
+  return reports;
+}
 
-  return { creates, closes: planDuplicateCloses(issues), reports, duplicateLedgerIds };
+export function planSync(entries: readonly LedgerEntry[], issues: readonly IssueInfo[], reference: string): SyncPlan {
+  const counts = countIds(entries);
+  const duplicateLedgerIds = [...counts].filter(([, n]) => n > 1).map(([id]) => id);
+  const groups = byId(issues);
+  const planned = planEntries(entries, groups, duplicateLedgerIds);
+  const reports = [
+    ...duplicateReports(counts, duplicateLedgerIds),
+    ...markerReports(issues),
+    ...planned.reports,
+    ...entryGoneReports(groups, new Set(counts.keys()), reference),
+  ];
+  return { creates: planned.creates, closes: planDuplicateCloses(issues), reports, duplicateLedgerIds };
 }

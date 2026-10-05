@@ -20,31 +20,21 @@ interface CruiseOutput {
   readonly summary: { readonly violations: Violation[] };
 }
 
-/**
- * The forbidden-edge acceptance criterion cannot be proven by committing a
- * violation into `packages/` — `pnpm check` has to pass on a clean tree, and a
- * violation written at test time would dirty `packages/`, which two agents in
- * parallel worktrees would collide on. Hence a fixture tree outside it.
- *
- * The cruise runs the **shipped** config: `shippedConfig.forbidden` and
- * `shippedConfig.options`, not a local copy. Validating against the rules
- * module alone would have stayed green with `forbidden: []` in the real config
- * — the exact disarming this test exists to catch. The rules module is still
- * imported, for the name-parity assertion below.
- *
- * `baseDir` makes reported module paths relative to the fixture, so the fixture
- * mirroring `packages/<name>/src` is matched by the real `^packages/...`
- * regexes with no parameterisation.
- */
-async function cruiseFixture(baseDir: string): Promise<CruiseOutput> {
+// A fixture tree outside `packages/`: a violation written there at test time would dirty
+// the tree parallel worktrees share. It cruises the shipped config, not the rules module
+// alone, which would stay green with `forbidden: []`.
+async function cruiseFixture(baseDirectory: string): Promise<CruiseOutput> {
   const result = await cruise(['packages'], {
     ...shippedConfig.options,
-    baseDir,
+    baseDir: baseDirectory,
     ruleSet: { forbidden: shippedConfig.forbidden },
     validate: true,
   });
   return result.output as unknown as CruiseOutput;
 }
+
+/** Matched by package directory, not version, so a dependency bump holds. */
+const NPM_PACKAGE_DIRECTORY = 'node_modules/dependency-cruiser/';
 
 /** One forbidden edge per shipped rule. Keep in step with `depcruise.rules.mjs`. */
 const EXPECTED_VIOLATIONS = [
@@ -57,8 +47,7 @@ const EXPECTED_VIOLATIONS = [
   {
     rule: 'no-core-to-npm-package',
     from: 'packages/core/src/index.ts',
-    // Matched by package directory, not version, so a dependency bump holds.
-    to: expect.stringMatching(/node_modules\/dependency-cruiser\//),
+    to: NPM_PACKAGE_DIRECTORY,
   },
   { rule: 'no-core-to-sync', from: 'packages/core/src/index.ts', to: 'packages/sync/src/index.ts' },
   { rule: 'no-core-to-web', from: 'packages/core/src/index.ts', to: 'packages/web/src/index.ts' },
@@ -82,9 +71,9 @@ it('reports every forbidden edge, by rule name and at error severity', async () 
       .map((violation) => ({
         rule: violation.rule.name,
         from: violation.from,
-        to: violation.to,
+        to: violation.to.includes(NPM_PACKAGE_DIRECTORY) ? NPM_PACKAGE_DIRECTORY : violation.to,
       }))
-      .sort((a, b) => a.rule.localeCompare(b.rule)),
+      .toSorted((a, b) => a.rule.localeCompare(b.rule)),
   ).toEqual(EXPECTED_VIOLATIONS);
 
   // Every rule must be the one that stops `pnpm check`, not a warning.

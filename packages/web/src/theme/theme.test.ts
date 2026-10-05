@@ -53,7 +53,8 @@ describe('the Mantine override layer', () => {
 
   it('strips Accordion of its chevron, padding and height animation', () => {
     const accordion = merged.components['Accordion'];
-    expect(accordion?.defaultProps).toMatchObject({ chevron: null, transitionDuration: 0 });
+    expect(accordion?.defaultProps).toMatchObject({ transitionDuration: 0 });
+    expect(Reflect.get(new Object(accordion?.defaultProps), 'chevron')).toBeNull();
     expect(accordion?.styles).toMatchObject({
       chevron: { display: 'none' },
       control: { padding: 0, background: 'transparent' },

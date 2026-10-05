@@ -1,4 +1,4 @@
-import { HybridModifierRefSchema, type CraftedTrackedEntry, type ModifierRef } from '@poe/contracts';
+import { HybridModifierReferenceSchema, type CraftedTrackedEntry, type ModifierReference } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { banded } from '../test-support/list-fixtures';
@@ -30,7 +30,7 @@ const STATS = statTexts({
   ],
 });
 
-function entry(prefix: ModifierRef, suffix: ModifierRef): CraftedTrackedEntry {
+function entry(prefix: ModifierReference, suffix: ModifierReference): CraftedTrackedEntry {
   return { kind: 'crafted', categoryId: 'armour.helmet', className: 'Helmets', itemLevelMin: 82, prefix, suffix, status: 'active' };
 }
 
@@ -111,8 +111,8 @@ describe('bandedFallback', () => {
 });
 
 /** A hybrid reference built through its schema, so its lines arrive sorted by `statId` as in production. */
-function hybrid(lines: readonly object[], acceptedTier?: string): ModifierRef {
-  return HybridModifierRefSchema.parse({ kind: 'hybrid', lines, ...(acceptedTier !== undefined && { acceptedTier }) });
+function hybrid(lines: readonly object[], acceptedTier?: string): ModifierReference {
+  return HybridModifierReferenceSchema.parse({ kind: 'hybrid', lines, ...(acceptedTier !== undefined && { acceptedTier }) });
 }
 
 function line(statId: string, valueMin: number, valueMax: number): object {

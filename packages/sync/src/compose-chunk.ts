@@ -1,25 +1,4 @@
-/**
- * The one chunk composition `pnpm sync`, `pnpm sync:batch` and `pnpm sync:dry`
- * share (AD-7, AD-8, AD-12).
- *
- * From the shell's ports it builds **one governor** of two sibling trade
- * clients (`createTradeGovernor`) over one `HttpPort` counted twice — as
- * `league-validation` for the gate and `tracked-list` for the step — the
- * committed catalogue loader, and the runner's `load` hook. The shells differ
- * only in the ports they pass: the live commands a real filesystem, clock and
- * `fetch`; the dry run in-memory fakes and the recorded fixture port. Only
- * the `pnpm sync` session passes `pacing`, `spread`, `requests` and
- * `session`, so the batch and dry chunks are unchanged.
- *
- * **Every file load runs under the lock**, inside `runChunk`, after AD-8's
- * `notBefore` check. `load` reads `data/config.json`, evaluates
- * IMPLEMENTATION-NOTES.md §6's pinned-cap inequality over the tracked list
- * the runner loaded, reads `data/currencies.json` and the committed item
- * types, and builds the publication, the starvation record, the league gate
- * and the pricing step on the dataset the runner loaded. A refusal names its
- * file and is thrown before any request; the runner turns it into a
- * `run-failure`.
- */
+/** The one chunk composition of the `pnpm sync*` commands; loads run under the lock (AD-7). */
 
 import type { ClockPort, FilesystemPort, GitPort, HttpPort, LeagueId } from '@poe/contracts';
 
@@ -38,7 +17,7 @@ import type { ItemTypes } from './pricing/search-body.ts';
 import { createRequestCounter } from './request-counter.ts';
 import type { RequestCounter } from './request-counter.ts';
 import { createTradeGovernor } from './trade/client.ts';
-import type { PacingState } from './trade/client.ts';
+import type { PacingState, TradeGovernor } from './trade/client.ts';
 import type { SessionAuth } from './trade/session-auth.ts';
 import { INVALID_REQUEST_THRESHOLD } from './trade/invalid-requests.ts';
 
@@ -56,34 +35,17 @@ export interface ComposeChunkPorts {
   readonly pid: number;
   /** One line of operator output. Defaults to stderr inside `runChunk`. */
   readonly log?: (line: string) => void;
-  /**
-   * Wraps the pricing step the load builds. Only the dry run passes one, to
-   * skip an entry whose search has no recorded fixture (`dry-run.ts`).
-   */
+  /** Only the dry run passes one, to skip an entry with no recorded fixture (`dry-run.ts`). */
   readonly wrapStep?: (step: ChunkStep, context: StepContext) => ChunkStep;
-  /**
-   * The `pnpm sync` session only (`./sync.ts`). The pacing memory every chunk
-   * of the session shares: this chunk's fresh governor starts from it rather
-   * than cold (AD-8). Omitted, the governor starts cold, as the batch and dry
-   * compositions do.
-   */
+  /** Session only (`./sync.ts`): the pacing memory a chunk's governor starts from (AD-8). */
   readonly pacing?: PacingState;
   /** The session only: pace with the even spread (`spreadBeforeNext`). */
   readonly spread?: boolean;
-  /**
-   * The session only: the request counter every chunk of the session counts
-   * through, so the report's figure can cover the pass. Omitted, the chunk
-   * builds its own.
-   */
+  /** Session only: the counter shared across chunks, so the report covers the pass. */
   readonly requests?: RequestCounter;
   /** The session only: the chunk's session options (`ChunkSession`). */
   readonly session?: ChunkSession;
-  /**
-   * The live shells only (`./sync.ts`, `./sync-batch.ts`): the process auth
-   * holder (AD-30). Each chunk's governor gets it, as it gets `pacing`, with a
-   * probe port counted as `session-probe`. The governor probes, settles and
-   * attaches through it, and redacts every error it passes on through it.
-   */
+  /** Live shells only: the process auth holder (AD-30), given to each governor. */
   readonly auth?: SessionAuth;
 }
 
@@ -107,13 +69,13 @@ function valueOf<T>(loaded: DataFileResult<T>): T {
   return loaded.value;
 }
 
-export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
-  const { fs, clock, http, git, wait, userAgent, pid, log, wrapStep, pacing, spread, session, auth } = options;
+type ChunkGovernor = TradeGovernor<'league-validation' | 'tracked-list'>;
 
-  const requests = options.requests ?? createRequestCounter();
+function createChunkGovernor(options: ComposeChunkPorts, requests: RequestCounter): ChunkGovernor {
+  const { clock, http, wait, userAgent, log, pacing, spread, auth } = options;
   // A fresh governor per chunk: its invalid-request counts stay per chunk,
   // while a session's pacing memory carries across (AD-8).
-  const governor = createTradeGovernor({
+  return createTradeGovernor({
     http: {
       'league-validation': requests.counted(http, 'league-validation'),
       'tracked-list': requests.counted(http, 'tracked-list'),
@@ -130,7 +92,42 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     // `session-probe` figure is its one trace (AD-12, AD-30).
     ...(auth !== undefined && { auth: { holder: auth, probe: requests.counted(http, 'session-probe') } }),
   });
-  const { clients } = governor;
+}
+
+function createChunkLoad(options: ComposeChunkPorts, clients: ChunkGovernor['clients']): ChunkPorts['load'] {
+  const { fs, clock, wrapStep } = options;
+  return async ({ entries, dataset }) => {
+    const config = valueOf(await loadConfig(fs));
+    // Straight after the config, so a later refusal cannot hide an excess.
+    const cap = checkPinnedCap(entries, config);
+    if (!cap.ok) {
+      throw new PinnedCapExceededError(cap.error);
+    }
+    const rates = valueOf(await loadCurrencies(fs));
+    const itemTypes = valueOf(await loadItemTypes(fs));
+    const { league } = config;
+    const step = createPricingStep({
+      client: clients['tracked-list'],
+      league,
+      rates,
+      itemTypes,
+      dataset,
+      clock,
+    });
+    return {
+      publication: { league, currencyRates: outputRates(rates) },
+      starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
+      gate: createLeagueGate({ client: clients['league-validation'], league }),
+      step: wrapStep === undefined ? step : wrapStep(step, { league, itemTypes }),
+    };
+  };
+}
+
+export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
+  const { fs, clock, git, pid, log, session, auth } = options;
+
+  const requests = options.requests ?? createRequestCounter();
+  const governor = createChunkGovernor(options, requests);
 
   const ports: ChunkPorts = {
     fs,
@@ -138,46 +135,22 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     pid,
     git,
     requests,
-    load: async ({ entries, dataset }) => {
-      const config = valueOf(await loadConfig(fs));
-      // Straight after the config, so a later refusal cannot hide an excess.
-      const cap = checkPinnedCap(entries, config);
-      if (!cap.ok) {
-        throw new PinnedCapExceededError(cap.error);
-      }
-      const rates = valueOf(await loadCurrencies(fs));
-      const itemTypes = valueOf(await loadItemTypes(fs));
-      const { league } = config;
-      const step = createPricingStep({
-        client: clients['tracked-list'],
-        league,
-        rates,
-        itemTypes,
-        dataset,
-        clock,
-      });
-      return {
-        publication: { league, currencyRates: outputRates(rates) },
-        starvationRecord: (starvation) => pinnedStarvationRecord(starvation, config),
-        gate: createLeagueGate({ client: clients['league-validation'], league }),
-        step: wrapStep === undefined ? step : wrapStep(step, { league, itemTypes }),
-      };
-    },
+    load: createChunkLoad(options, governor.clients),
     catalogue: () => loadCatalogueIds(fs),
     latchedRetryAfterMs: () => governor.latchedRetryAfterMs(),
     // The runner sees two narrow ports, never the holder: the run-start
     // hold-off settle and the pending hold-off action (§13.1, §13.3).
     ...(auth !== undefined && {
-          auth: {
-            settleHeldOffIfDue: (holdOffUntil, now) => {
-              auth.settleHeldOffIfDue(holdOffUntil, now);
-            },
-            pendingHoldOff: () => auth.pendingHoldOff(),
-            holdOffApplied: (action) => {
-              auth.holdOffApplied(action);
-            },
-          },
-        }),
+      auth: {
+        settleHeldOffIfDue: (holdOffUntil, now) => {
+          auth.settleHeldOffIfDue(holdOffUntil, now);
+        },
+        pendingHoldOff: () => auth.pendingHoldOff(),
+        holdOffApplied: (action) => {
+          auth.holdOffApplied(action);
+        },
+      },
+    }),
     ...(log !== undefined && { log }),
     ...(session !== undefined && { session }),
   };

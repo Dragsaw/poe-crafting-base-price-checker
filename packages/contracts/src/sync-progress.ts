@@ -6,11 +6,7 @@ import { z } from 'zod';
 
 import { IsoTimestampSchema } from './primitives.ts';
 
-/**
- * `data/sync.lock` — **two fields and no others**. Anything else invites a
- * reader to reason about a run it cannot see. The lock is machine-local runtime
- * state and is not a versioned artifact, so it carries no `schemaVersion`.
- */
+/** `data/sync.lock`: two fields and no others. Not a versioned artifact, so no `schemaVersion`. */
 export const SyncLockSchema = z.strictObject({
   pid: z.int().describe('The holder process id. Never a liveness proof on its own.'),
   startedAt: IsoTimestampSchema.describe(
@@ -20,12 +16,7 @@ export const SyncLockSchema = z.strictObject({
 
 export type SyncLock = z.infer<typeof SyncLockSchema>;
 
-/**
- * The body of `data/sync-progress.json`. It records the canonical keys of the
- * entries the current pass has **completed**, never the ones a chunk intended
- * to visit — a resumed chunk recomputes its order rather than replaying a
- * frozen plan. The envelope in `envelopes.ts` adds `schemaVersion`.
- */
+/** Completed keys only: a resumed chunk recomputes its order. The envelope adds `schemaVersion`. */
 export const SyncProgressSchema = z.strictObject({
   completed: z
     .array(z.string().min(1))
@@ -41,13 +32,7 @@ export const SyncProgressSchema = z.strictObject({
   ),
 });
 
-/**
- * The `sync-progress.json` contract version. 1.1.0 added the optional
- * `notBefore`. 1.2.0 added the optional `authHoldOffUntil` (IMPLEMENTATION-NOTES.md
- * §13.7), so a 1.1.0 file still parses. The schema is strict, so a build older
- * than a change refuses a file carrying the field, which is acceptable because
- * only `sync` reads it.
- */
+/** 1.2.0 adds `authHoldOffUntil` (IMPLEMENTATION-NOTES.md §13.7). */
 export const SYNC_PROGRESS_SCHEMA_VERSION = '1.2.0';
 
 export type SyncProgress = z.infer<typeof SyncProgressSchema>;

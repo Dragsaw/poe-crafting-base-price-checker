@@ -112,9 +112,9 @@ context:
 - findings:
   - `[low]` `[patch]` (verification-gap) A bound on the last entry resolving to `completed` has no test — added a `harness([A, B])` test with `searchRemaining: 0` on B asserting `completed` and full progress.
   - `[low]` `[patch]` (verification-gap, other) A run losing the break-marker race reports the dead stale holder as the live holder — the loser now returns the break-marker holder; the lock test asserts pid 8.
-  - `[low]` `[patch]` (blind) `breakAndTake` deletes the lock unconditionally after the re-read, so a fresh lock taken by a plain create in the gap can be deleted — delete now goes through `deleteIfText(LOCK_PATH, stale.text)`, returning busy on a mismatch.
-  - `[low]` `[reject]` (blind) `releaseLockIfOwn` is check-then-delete — real but needs a compare-and-delete port operation (new public surface); the window requires a >6 h chunk plus a break within one await.
-  - `[low]` `[reject]` (blind) Stale-marker clean-up via `deleteIfText` is read-then-delete — same class; closing it needs a new port primitive, and it requires a crashed breaker plus two concurrent clearers.
+  - `[low]` `[patch]` (blind) `breakAndTake` deletes the lock unconditionally after the re-read, so a fresh lock taken by a plain create in the gap can be deleted — delete now goes through `isDeletedIfText(LOCK_PATH, stale.text)`, returning busy on a mismatch.
+  - `[low]` `[reject]` (blind) `isOwnLockReleased` is check-then-delete — real but needs a compare-and-delete port operation (new public surface); the window requires a >6 h chunk plus a break within one await.
+  - `[low]` `[reject]` (blind) Stale-marker clean-up via `isDeletedIfText` is read-then-delete — same class; closing it needs a new port primitive, and it requires a crashed breaker plus two concurrent clearers.
   - `[low]` `[reject]` (blind) A dispossessed run keeps visiting entries until the loop ends — only reachable after a chunk runs past 6 h; the spec places the check before the progress write, and a per-entry check adds a branch.
   - `[low]` `[reject]` (blind) Progress is lost when the step throws — costs one chunk of repeated searches; 429s and invalid-request refusals yield rather than throw, so throws are exceptional; persisting on the throw path adds a branch.
   - `[low]` `[reject]` (blind) Real `createExclusive` leaves an empty lock if the post-create write fails — ENOSPC/EIO on a tiny write is rare, and the mtime rule clears it after 6 h; the cleanup is an added guard.
@@ -141,9 +141,9 @@ context:
   - `[low]` `[reject]` (intent) The default `log` writes `process.stderr` below the shell — the constraint names the clock and the filesystem; the spec requires the stderr line, and `log` is injectable.
   - `[false]` `[reject]` (intent) `allowImportingTsExtensions` and `.ts` specifiers in core — required for `sync:dry` under bare `node` type stripping, and `pnpm check` passes.
   - `[low]` `[reject]` (edge) A future `startedAt` after clock skew is never stale — rare; treating future instants as stale would break live locks under skew, so the fix is a policy change.
-  - `[low]` `[reject]` (edge) Successor breaks the lock between `holdsLock` and `deleteFile` in release — same as the blind finding.
-  - `[low]` `[reject]` (edge) Takeover between `holdsLock` and the progress write — same check-then-act class; needs a >6 h chunk and a break within one await, and closing it needs a new port primitive.
-  - `[low]` `[reject]` (edge) Marker replaced between the `deleteIfText` read and delete — same as the blind marker finding.
+  - `[low]` `[reject]` (edge) Successor breaks the lock between `isLockHeld` and `deleteFile` in release — same as the blind finding.
+  - `[low]` `[reject]` (edge) Takeover between `isLockHeld` and the progress write — same check-then-act class; needs a >6 h chunk and a break within one await, and closing it needs a new port primitive.
+  - `[low]` `[reject]` (edge) Marker replaced between the `isDeletedIfText` read and delete — same as the blind marker finding.
   - `[maybe-false]` `[reject]` (edge) Windows delete-pending EPERM on a create right after a delete — libuv uses POSIX delete semantics on current Windows, and no handle stays open; settle by reproducing a concurrent open during a delete on Windows 10+; if true it is only low (the run throws once, and the next invocation proceeds).
   - `[maybe-false]` `[reject]` (edge) `open(wx)` throws EPERM rather than resolving false on Windows — same as the previous finding.
   - `[low]` `[patch]` (edge) `lastModifiedAt` hides non-ENOENT errors — same root cause and fix as the blind finding.

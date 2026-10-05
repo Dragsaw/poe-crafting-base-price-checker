@@ -1,12 +1,5 @@
-/**
- * The load-time half of the `pinned` cap (AD-7, IMPLEMENTATION-NOTES.md §6),
- * and the one place outside `chunk/` that reads `config.minChunkSearches`.
- *
- * The chunk runner never reads the declared yardstick, so it can never become
- * a chunk bound. The runtime half — the truncation — is in `chunk/run-chunk.ts`
- * and reports only what it observed; `pinnedStarvationRecord` adds the
- * declared number beside it to make the report record.
- */
+// Load-time half of the `pinned` cap (AD-7, IMPLEMENTATION-NOTES.md §6), the only reader outside
+// `chunk/` of `minChunkSearches`: the runner never reads it, so it can never become a chunk bound.
 
 import type { ConfigFile, PinnedStarvationRecord, TrackedEntry } from '@poe/contracts';
 
@@ -52,11 +45,7 @@ export function checkPinnedCap(
   };
 }
 
-/**
- * A pinned-cap excess as a load refusal (IMPLEMENTATION-NOTES.md §6): the
- * shell's `load` throws it before any request, and the runner reports it as a
- * `run-failure` whose message names `data/tracked.json`.
- */
+/** A pinned-cap excess as a load refusal (IMPLEMENTATION-NOTES.md §6), a `run-failure`. */
 export class PinnedCapExceededError extends Error {
   readonly exceeded: PinnedCapExceeded;
 

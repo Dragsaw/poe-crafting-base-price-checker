@@ -1,13 +1,4 @@
-/**
- * `@poe/contracts` — every concept that crosses a package boundary, defined
- * exactly once as a Zod schema with its static type `z.infer`red from it
- * (AD-3), plus the four external effects as `<Thing>Port` interfaces with a
- * pure in-memory fake beside each (AD-1).
- *
- * This package **depends on nothing in this workspace** and must never gain a
- * `workspace:*` dependency. `verbatimModuleSyntax` is on, so every type
- * re-export below is written `export type { … }`.
- */
+/** `@poe/contracts`: Zod schemas and `z.infer` types (AD-3), `<Thing>Port` interfaces (AD-1). */
 
 export {
   checkSchemaVersion,
@@ -45,31 +36,27 @@ export type { DefenceLetter } from './class-name.ts';
 export {
   AcceptedTierSchema,
   BandedHybridLineSchema,
-  BandedModifierRefSchema,
+  BandedModifierReferenceSchema,
   HybridLineSchema,
-  HybridModifierRefSchema,
-  ModifierRefSchema,
+  HybridModifierReferenceSchema,
+  ModifierReferenceSchema,
   StatIdSchema,
   ValuelessHybridLineSchema,
-  ValuelessModifierRefSchema,
-} from './modifier-ref.ts';
+  ValuelessModifierReferenceSchema,
+} from './modifier-reference.ts';
 export type {
   BandedHybridLine,
-  BandedModifierRef,
+  BandedModifierReference,
   HybridLine,
-  HybridModifierRef,
-  ModifierRef,
-  SingleLineModifierRef,
+  HybridModifierReference,
+  ModifierReference,
+  SingleLineModifierReference,
   StatId,
   ValuelessHybridLine,
-  ValuelessModifierRef,
-} from './modifier-ref.ts';
+  ValuelessModifierReference,
+} from './modifier-reference.ts';
 
-/**
- * The two arm schemas are **not** exported. They carry none of the union's
- * `superRefine` rules, so parsing with an arm accepts a pruned entry with no
- * reason — a row the I/O matrix requires to fail. `TrackedEntrySchema` is the only parse path.
- */
+/** Arm schemas stay unexported: they lack the union's `superRefine` rules. */
 export {
   CurationStatusSchema,
   PrunedReasonSchema,
@@ -95,12 +82,12 @@ export type { CanonicalAffix, CanonicalKeyElements, CanonicalLine } from './cano
 export {
   describeOverlap,
   linesOf,
-  namesHybrid,
-  NEVER_CO_OCCUR,
-  overlap,
+  hasHybridAffix,
+  CAN_NEVER_CO_OCCUR,
+  areOverlapping as overlap,
   OVERLAP_SLOTS,
   overlapBranches,
-  slotOverlap,
+  isSlotOverlapping as slotOverlap,
   slotOverlapBranch,
   summedInterval,
   summedStatIds,
@@ -194,7 +181,7 @@ export {
   RequestsBySourceSchema,
   RunFailureReasonSchema,
   RunFailureRecordSchema,
-  sameRecord,
+  isSameRecord,
   StaleLockBrokenRecordSchema,
   SYNC_REPORT_SCHEMA_VERSION,
   SyncRunFiguresSchema,

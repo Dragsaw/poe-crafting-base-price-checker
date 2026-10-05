@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import nodePath from 'node:path';
 import { promisify } from 'node:util';
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,22 +11,26 @@ import { resolveTrackedListAge } from '@poe/contracts';
 import { createNodeFilesystemPort } from '../shell.ts';
 import { createReadOnlyGitPort, parseAuthorDate } from './read-only-git-port.ts';
 
-/**
- * The real port against a throwaway repository. Git reads no user or system
- * config (`GIT_CONFIG_GLOBAL` points at an empty file, `GIT_CONFIG_NOSYSTEM`),
- * never walks above the temporary directory (`GIT_CEILING_DIRECTORIES`), and
- * every commit carries a fixed author date. The variables are stubbed on
- * `process.env`, so the port under test inherits the same isolation.
- */
+// The real port against a throwaway repository. Stubbed env isolates git: no user or system config,
+// no walk above the temp directory (`GIT_CEILING_DIRECTORIES`), fixed author dates. A hook exports
+// `GIT_DIR` and kin; left set, `git init` and `git config` here would rewrite the real repository.
 
 const run = promisify(execFile);
 
-let base: string;
-let repository: string;
-let plain: string;
+const base = await realpath(await mkdtemp(nodePath.join(tmpdir(), 'poe-git-port-')));
+const repository = nodePath.join(base, 'repo');
+const plain = nodePath.join(base, 'plain');
+const { stdout: localVariables } = await run('git', ['rev-parse', '--local-env-vars'], { windowsHide: true });
+const LOCAL_GIT_VARIABLES = localVariables
+  .split('\n')
+  .map((name) => name.trim())
+  .filter(Boolean);
 
 function isolate(): void {
-  vi.stubEnv('GIT_CONFIG_GLOBAL', join(base, 'empty.gitconfig'));
+  for (const name of LOCAL_GIT_VARIABLES) {
+    vi.stubEnv(name, undefined);
+  }
+  vi.stubEnv('GIT_CONFIG_GLOBAL', nodePath.join(base, 'empty.gitconfig'));
   vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1');
   vi.stubEnv('GIT_CEILING_DIRECTORIES', base);
 }
@@ -35,36 +39,35 @@ async function git(arguments_: string[], environment: Record<string, string> = {
   await run('git', arguments_, { cwd: repository, env: { ...process.env, ...environment }, windowsHide: true });
 }
 
-async function commitFile(name: string, content: string, authorDate: string): Promise<void> {
-  await writeFile(join(repository, name), content);
+async function commitFile(name: string, authorDate: string): Promise<void> {
+  await writeFile(nodePath.join(repository, name), '{"v":1}\n');
   await git(['add', '--', name]);
   await git(['commit', '-q', '-m', `edit ${name}`], { GIT_AUTHOR_DATE: authorDate, GIT_COMMITTER_DATE: authorDate });
 }
 
 beforeAll(async () => {
-  base = await realpath(await mkdtemp(join(tmpdir(), 'poe-git-port-')));
-  repository = join(base, 'repo');
-  plain = join(base, 'plain');
-  await writeFile(join(base, 'empty.gitconfig'), '');
+  await writeFile(nodePath.join(base, 'empty.gitconfig'), '');
   isolate();
   await run('git', ['init', '-q', repository], { env: process.env, windowsHide: true });
   await mkdir(plain);
   await git(['config', 'commit.gpgsign', 'false']);
   await git(['config', 'user.name', 'Test']);
   await git(['config', 'user.email', 'test@example.invalid']);
-  await commitFile('tracked.json', '{"v":1}\n', '2026-09-20T14:00:00+02:00');
-  await commitFile('other.json', '{"v":1}\n', '2026-09-22T09:30:00+00:00');
-  await mkdir(join(repository, 'data'));
-  await commitFile('data/tracked.json', '{"v":1}\n', '2026-09-24T08:15:00-05:00');
+  await commitFile('tracked.json', '2026-09-20T14:00:00+02:00');
+  await commitFile('other.json', '2026-09-22T09:30:00+00:00');
+  await mkdir(nodePath.join(repository, 'data'));
+  await commitFile('data/tracked.json', '2026-09-24T08:15:00-05:00');
   vi.unstubAllEnvs();
 });
+
+function unstubAllEnvironments(): void {
+  vi.unstubAllEnvs();
+}
 
 beforeEach(() => {
   // The suite's `afterEach` may unstub; each test re-applies the isolation.
   isolate();
-  return () => {
-    vi.unstubAllEnvs();
-  };
+  return unstubAllEnvironments;
 });
 
 afterAll(async () => {
@@ -72,6 +75,14 @@ afterAll(async () => {
 });
 
 describe('createReadOnlyGitPort', () => {
+  it('ignores a GIT_DIR exported by a hook', async () => {
+    vi.stubEnv('GIT_DIR', nodePath.join(plain, '.git'));
+    isolate();
+    await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
+      '2026-09-20T12:00:00.000Z',
+    );
+  });
+
   it('returns the author date of the last commit touching the path, in UTC', async () => {
     await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
       '2026-09-20T12:00:00.000Z',
@@ -85,7 +96,7 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('keeps the commit date when the working tree has an uncommitted edit (AD-12)', async () => {
-    await writeFile(join(repository, 'tracked.json'), '{"v":2}\n');
+    await writeFile(nodePath.join(repository, 'tracked.json'), '{"v":2}\n');
     try {
       await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
         '2026-09-20T12:00:00.000Z',
@@ -96,17 +107,17 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('returns undefined for an untracked file', async () => {
-    await writeFile(join(repository, 'untracked.json'), '{}\n');
+    await writeFile(nodePath.join(repository, 'untracked.json'), '{}\n');
     try {
       await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('untracked.json')).resolves.toBeUndefined();
     } finally {
-      await rm(join(repository, 'untracked.json'));
+      await rm(nodePath.join(repository, 'untracked.json'));
     }
   });
 
   it('returns undefined when the root is not a repository', async () => {
-    await writeFile(join(plain, 'tracked.json'), '{}\n');
-    expect(dirname(plain)).toBe(base);
+    await writeFile(nodePath.join(plain, 'tracked.json'), '{}\n');
+    expect(nodePath.dirname(plain)).toBe(base);
     await expect(createReadOnlyGitPort(plain).lastCommitAuthorDate('tracked.json')).resolves.toBeUndefined();
   });
 
@@ -132,7 +143,7 @@ describe('createReadOnlyGitPort', () => {
   });
 
   it('returns undefined when no git binary is found', async () => {
-    vi.stubEnv('PATH', join(base, 'no-such-bin'));
+    vi.stubEnv('PATH', nodePath.join(base, 'no-such-bin'));
     await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBeUndefined();
   });
 });

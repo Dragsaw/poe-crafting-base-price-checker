@@ -182,7 +182,7 @@ describe('the frozen sync-report.json fixture', () => {
       'utf8',
     );
     const parsed = SyncReportFileSchema.parse(JSON.parse(text));
-    expect(Object.keys(parsed.figures.requestsBySource).sort()).toEqual([
+    expect(Object.keys(parsed.figures.requestsBySource).toSorted((a, b) => Number(a > b) - Number(a < b))).toEqual([
       'league-validation',
       'session-probe',
       'tracked-list',

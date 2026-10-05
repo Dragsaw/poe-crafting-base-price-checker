@@ -1,15 +1,5 @@
-/**
- * Per-source request accounting (AD-12, FR-14).
- *
- * The counter wraps an `HttpPort`, one wrapper per declared source, and counts
- * each request the wrapped port is asked to send, before it answers: a request
- * that times out or throws still left the machine, or was meant to. It reads
- * no lane and no URL. The source is whatever the caller wrapped the port for,
- * so the count needs no request tag.
- *
- * Every source is always present in a snapshot, zero where nothing was sent,
- * so a report never has to tell an absent key from a zero.
- */
+// Counts before the wrapped port answers: a request that times out or throws still left the
+// machine. The source is whatever the caller wrapped the port for (AD-12, FR-14).
 
 import { RequestSourceSchema } from '@poe/contracts';
 import type { HttpPort, RequestSource } from '@poe/contracts';
