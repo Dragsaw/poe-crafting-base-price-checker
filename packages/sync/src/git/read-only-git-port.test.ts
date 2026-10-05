@@ -12,15 +12,24 @@ import { createNodeFilesystemPort } from '../shell.ts';
 import { createReadOnlyGitPort, parseAuthorDate } from './read-only-git-port.ts';
 
 // The real port against a throwaway repository. Stubbed env isolates git: no user or system config,
-// no walk above the temp directory (`GIT_CEILING_DIRECTORIES`), fixed author dates.
+// no walk above the temp directory (`GIT_CEILING_DIRECTORIES`), fixed author dates. A hook exports
+// `GIT_DIR` and kin; left set, `git init` and `git config` here would rewrite the real repository.
 
 const run = promisify(execFile);
 
 const base = await realpath(await mkdtemp(nodePath.join(tmpdir(), 'poe-git-port-')));
 const repository = nodePath.join(base, 'repo');
 const plain = nodePath.join(base, 'plain');
+const { stdout: localVariables } = await run('git', ['rev-parse', '--local-env-vars'], { windowsHide: true });
+const LOCAL_GIT_VARIABLES = localVariables
+  .split('\n')
+  .map((name) => name.trim())
+  .filter(Boolean);
 
 function isolate(): void {
+  for (const name of LOCAL_GIT_VARIABLES) {
+    vi.stubEnv(name, undefined);
+  }
   vi.stubEnv('GIT_CONFIG_GLOBAL', nodePath.join(base, 'empty.gitconfig'));
   vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1');
   vi.stubEnv('GIT_CEILING_DIRECTORIES', base);
@@ -66,6 +75,14 @@ afterAll(async () => {
 });
 
 describe('createReadOnlyGitPort', () => {
+  it('ignores a GIT_DIR exported by a hook', async () => {
+    vi.stubEnv('GIT_DIR', nodePath.join(plain, '.git'));
+    isolate();
+    await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
+      '2026-09-20T12:00:00.000Z',
+    );
+  });
+
   it('returns the author date of the last commit touching the path, in UTC', async () => {
     await expect(createReadOnlyGitPort(repository).lastCommitAuthorDate('tracked.json')).resolves.toBe(
       '2026-09-20T12:00:00.000Z',
