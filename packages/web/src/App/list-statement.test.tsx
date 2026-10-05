@@ -188,7 +188,7 @@ describe('the list statement', () => {
     await settleTo('ready');
     expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toHaveLength(2);
     expect(frame().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
-    // The committed dataset now carries an orb rate: the cost line is a figure, not the no-figure phrase.
+    // The committed dataset now has an orb rate: the cost line is a figure, not the no-figure one.
     expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe('0.01Divine / craft');
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(frame().textContent).not.toContain('recipes.json');

@@ -180,7 +180,7 @@ describe('the chase cells', () => {
     const notes = (): string[] => panelRows().map((row) => panelCell(row, 'note'));
     expect(notes()).toEqual(['', '', '', '', '']);
     click(option('perfect'));
-    // Life is mostly out of reach under perfect: its P is small, so it sorts last among the summands.
+    // Life is mostly out of reach under perfect: its P is small, so it sorts last of the summands.
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', 'T1 ES · T1 Cold Res']);
     expect(panelRows().map((row) => panelCell(row, 'combination'))).toEqual([
       '* pinned T1 Atk Dmg · T1 Cold Res',

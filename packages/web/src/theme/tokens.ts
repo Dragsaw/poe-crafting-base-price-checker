@@ -168,7 +168,7 @@ export const columnSums = {
   appendix: [292, 118, 250, 310],
 } as const;
 
-/** `{components.combination-row}` line one; the trade-link cell has no right padding (`↗` flush). */
+/** `{components.combination-row}` line one; the trade-link cell has no right padding. */
 export const combinationLine1Columns = [
   { name: 'combination', width: 460, padRight: 12 },
   { name: 'state', width: 250, padRight: 12 },

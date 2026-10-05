@@ -31,7 +31,7 @@ import { server, mount, frame } from './App/test-support';
 
 afterEach(unmount);
 
-/** The refusal body sentence, after checking the parts every cause shares (eyebrow, title, artifact, recovery, no retry). */
+/** The refusal sentence, after the parts every cause shares (eyebrow, title, artifact). */
 function refusalBody(path: string): string {
   const text = frame().textContent;
   expect(text).toContain(REFUSAL_EYEBROW);

@@ -26,7 +26,7 @@ export const COMMIT_DEBOUNCE_MS = 150;
 /** A leading digit is required: `fixedDecimalScale` pads a lone `.` to `.00`, which is not a parse. */
 const PARSEABLE = /^\d+(\.\d*)?$/;
 
-/** Mantine hands a string for `""`, `"."` and trailing zeros (`0.10`), so a string is parsed here rather than discarded. */
+/** Mantine hands a string for `""`, `"."` and trailing zeros (`0.10`): parse it, do not discard. */
 function parseDraft(draft: number | string): number | undefined {
   if (typeof draft === 'number') {
     return Number.isFinite(draft) ? draft : undefined;
@@ -42,7 +42,7 @@ function ghostText(draft: number | string): string {
   return draft === '' ? '0' : draft;
 }
 
-/** `{components.payout-threshold}`: the figure is the input, `Divine` sits outside it so it is never typed over; the track and marker are a readout, never a slider (UX-DR18, UX-DR35, UX-DR44). */
+/** `{components.payout-threshold}`: `Divine` sits outside the input; a readout (UX-DR18). */
 export function PayoutThreshold({
   value,
   onChange,
@@ -152,7 +152,8 @@ function ThresholdInput({ id, unitId, draft, onDraftChange, onBlur }: ThresholdF
   return (
     <NumberInput
       id={id}
-      // Mantine's Input writes its own `aria-describedby` over a plain prop; the Styles API attributes land last.
+      // Mantine's Input writes its own `aria-describedby` over a plain prop; the Styles API
+      // attributes land last.
       attributes={{ input: { 'aria-describedby': unitId } }}
       unstyled
       hideControls
@@ -174,7 +175,8 @@ function ThresholdInput({ id, unitId, draft, onDraftChange, onBlur }: ThresholdF
       decimalScale={THRESHOLD_DECIMALS}
       fixedDecimalScale
       clampBehavior="blur"
-      // Blur restores the last valid value (`useThresholdDraft`); Mantine's own trim would turn `.00` into a parse of 0.
+      // Blur restores the last valid value (`useThresholdDraft`); Mantine's own trim would turn
+      // `.00` into a parse of 0.
       trimLeadingZeroesOnBlur={false}
       allowNegative={false}
       value={draft}

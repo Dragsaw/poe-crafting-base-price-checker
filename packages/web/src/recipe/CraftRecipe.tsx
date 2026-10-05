@@ -20,7 +20,7 @@ export type RecipeCost =
   | { readonly kind: 'figure'; readonly text: string }
   | { readonly kind: 'phrase'; readonly text: string };
 
-/** `{components.craft-recipe}` (FR-26): the words are the control, not a form control; only the inactive word is a target, and a click applies at once, no debounce (state 34). */
+/** `{components.craft-recipe}` (FR-26): the words are the control; the inactive one applies. */
 export function CraftRecipe({
   options,
   activeId,

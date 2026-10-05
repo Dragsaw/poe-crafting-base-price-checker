@@ -41,7 +41,7 @@ function Value({ value }: { readonly value: string | undefined }): JSX.Element {
   return value === undefined ? <em data-missing="" style={{ fontStyle: 'italic' }}>{UNKNOWN}</em> : <>{value}</>;
 }
 
-/** The whole strip toggles `{components.sync-report-panel}`, closed on every load; a cross-file failure shows only in the panel (FR-10, FR-18, FR-24). */
+/** The strip toggles `{components.sync-report-panel}`, closed on load (FR-18). */
 export function TrustStrip({
   set,
   absent,
@@ -156,7 +156,7 @@ function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.E
   );
 }
 
-/** The skeleton's strip: same rules, padding and two empty lines, so the page never jumps at pending → ready (EXPERIENCE.md state 22). */
+/** The skeleton's strip: same padding and two empty lines, so the page never jumps (state 22). */
 export function TrustStripSlot(): JSX.Element {
   const role = typeStyle('trust-strip');
   return (

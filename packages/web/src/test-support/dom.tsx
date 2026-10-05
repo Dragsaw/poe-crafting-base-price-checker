@@ -61,7 +61,7 @@ export async function flush(): Promise<void> {
   });
 }
 
-/** Flushes until the mounted `[data-frame]` carries `data-state` equal to `state`, and throws after 50 flushes. */
+/** Flushes until the mounted `[data-frame]` has `data-state` equal to `state`; throws after 50. */
 export async function settleTo(state: string): Promise<void> {
   const stateOf = (): string | undefined => {
     const frame = mounted.container?.querySelector<HTMLElement>('[data-frame]');

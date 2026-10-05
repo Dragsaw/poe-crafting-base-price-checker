@@ -8,9 +8,9 @@ import {
   type TolerableKey,
 } from './artifacts';
 
-/** One load resolves to one outcome and never rejects; each fetch is `cache: 'no-cache'` with no query token, so CDN staleness and a mixed-commit set are accepted costs (AD-24, FR-33). */
+/** One load, one outcome, never a rejection; `no-cache` fetches accept CDN staleness (AD-24). */
 
-/** `version`: unknown major or malformed or non-string `schemaVersion`; `content`: not JSON, or fails the schema at the expected major; `missing`: a required 404. */
+/** `version`: unknown major or bad `schemaVersion`; `content`: invalid body; `missing`: a 404. */
 export type RefusalCause = 'version' | 'content' | 'missing';
 
 export type LoadOutcome =
@@ -24,7 +24,7 @@ export type LoadOutcome =
       readonly kind: 'refused';
       readonly path: string;
       readonly cause: RefusalCause;
-      /** The declared `schemaVersion`, or `undefined` for a non-string one: not a sentinel, since a file may declare any string. */
+      /** The declared `schemaVersion`, `undefined` if not a string; a file may declare any one. */
       readonly declared: string | undefined;
       readonly expected: string;
     }
@@ -121,7 +121,7 @@ async function fetchOne(
   return typeof body === 'string' ? parseBody(descriptor, body) : body;
 }
 
-/** Any not-arrived gives the failure screen, then any invalid or required-absent the refusal screen; each names the first failing artifact in AD-24 order. */
+/** Not-arrived gives the failure screen, then invalid or required-absent the refusal (AD-24). */
 function classify(results: Readonly<Record<ArtifactKey, Fetched>>): LoadOutcome {
   for (const key of ARTIFACT_ORDER) {
     if (results[key].kind === 'not-arrived') {

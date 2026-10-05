@@ -7,7 +7,7 @@ import { colors, px, spacing } from '../theme/tokens';
 import { absenceLine } from './AbsenceLines';
 import { BASE_SET, click, COMMITTED_REPORT, line, mountStrip, panel, strip, type SyncReport } from './trust-strip/test-support';
 
-/** 5 pinned entries and `minChunkSearches: 8`; the two active entries prove only pinned ones count toward M. */
+/** 5 pinned entries and `minChunkSearches: 8`; the two active ones prove only pinned count. */
 const CURATION_5_OF_8: Partial<ArtifactSet> = {
   tracked: {
     ...BASE_SET.tracked,

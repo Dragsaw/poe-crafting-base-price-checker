@@ -77,9 +77,9 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    // Producer 6.1.0 declares every pool `complete`, and the Emerald entry tracks the global Attack Speed
-    // stat its tiers carry. Under the default recipe, some reference of an Amulets, a Bows and a Crossbows
-    // entry contains no tier at or above the recipe floor, so those three pairs are unrankable (IN §9).
+    // Producer 6.1.0 declares every pool `complete`; the Emerald entry tracks the global Attack
+    // Speed stat its tiers carry. Under the default recipe, an Amulets, a Bows and a Crossbows
+    // reference has no tier at or above the recipe floor, so those pairs are unrankable (IN §9).
     const rows = appendixRows();
     expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual([
       'Amulets',
@@ -176,7 +176,7 @@ describe('the Unrankable appendix', () => {
 
     const rows = appendixRows();
     expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Amulets', 'Bows']);
-    // Amulets is rankable but no recipe is served (retro item 29), so it takes the recipe-less reason.
+    // Amulets is rankable but no recipe is served (retro item 29): the recipe-less reason.
     expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('recipe cannot reach this class');
     expect(rows[1]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
     expect(appendix().textContent).not.toContain('edge-alignment');

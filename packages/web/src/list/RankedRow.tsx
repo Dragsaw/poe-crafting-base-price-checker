@@ -25,7 +25,7 @@ const COLUMNS = { rank, unit, ev: event, provenance, age, chase } as const;
 /** The three chase slots. An unused slot stays an empty cell (state 21). */
 const CHASE_SLOTS = Array.from({ length: CHASE_CELLS }, (_, slot) => slot);
 
-/** Hover tones live in `list.css`, so the background is never inline; an open row's marker bleeds into the gutter, so no column moves. */
+/** Hover tones live in `list.css`, never inline; an open row's marker bleeds into the gutter. */
 export function RankedRow({
   row,
   open,
@@ -143,7 +143,8 @@ function ExpectedValueCell({ ev, strong }: { readonly ev: ListRow['ev']; readonl
           style={{
             ...typeStyle('money-phrase'),
             fontStyle: 'italic',
-            // The colour follows the phrase shown: an honest-empty `unresolvable` row reads *no figure yet* in ink.
+            // The colour follows the phrase shown: an honest-empty `unresolvable` row reads *no
+            // figure yet* in ink.
             color: ev.text === MONEY_PHRASES.unresolvable ? colors.rust : colors.ink,
           }}
         >
@@ -163,7 +164,7 @@ function ChaseCell({ row }: { readonly row: ListRow }): JSX.Element {
         ...cellStyle(COLUMNS.chase),
         ...typeStyle('row-chase'),
         overflow: 'hidden',
-        // A crafted row's three cells carry `pad-chase-cell-right` each, so the column pads nothing more.
+        // A crafted row's three cells carry `pad-chase-cell-right`, so the column pads no more.
         ...(!isRaw && { display: 'flex', paddingRight: undefined }),
       }}
     >

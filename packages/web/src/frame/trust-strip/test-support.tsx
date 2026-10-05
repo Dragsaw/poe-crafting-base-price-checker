@@ -9,7 +9,7 @@ import { TrustStrip } from '../TrustStrip';
 
 export type SyncReport = Parsed<'syncReport'>;
 
-/** Not the shared `NOW`: this clock mirrors the committed report's run, so Last synced reads the committed copy. */
+/** Not the shared `NOW`: this clock mirrors the committed report's run, so Last synced reads it. */
 const REPORT_CLOCK = Date.parse('2026-09-26T21:32:00.000Z');
 export const BASE_SET = VALID_BODIES as unknown as ArtifactSet;
 export const COMMITTED_REPORT: SyncReport = {

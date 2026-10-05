@@ -35,7 +35,7 @@ const priorMarks = (): string[] =>
 const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSource: 'absent' });
 
 describe('Provenance marks and the banner', () => {
-  /** An invented tier at floor 50 sits in the greater recipe's eligible set (floor 44) and under the perfect floor (70). */
+  /** An invented tier at floor 50: in the greater recipe's set (floor 44), under perfect (70). */
   const priorBows: Pools = [[tier(TARGET, 10, 75), invented(tier(FILLER, 10, 50)), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
   const priorStaves: Pools = [[tier(TARGET, 50, 50), invented(tier(FILLER, 50, 50))], [tier(SUFFIX, 10, 80)]];
 

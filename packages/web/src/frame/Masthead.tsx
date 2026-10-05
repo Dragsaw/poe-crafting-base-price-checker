@@ -5,7 +5,7 @@ import { DENOMINATION } from '../shared/product';
 import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
 import { PayoutThreshold } from '../threshold/PayoutThreshold';
 
-/** The title is the DESIGN mockup string (`mockups/key-hero-resting.html`); the dek is EXPERIENCE.md's masthead copy. */
+/** The title is DESIGN's mockup (`mockups/key-hero-resting.html`); the dek: EXPERIENCE.md's. */
 export const MASTHEAD_TITLE = 'What is worth picking up';
 export const MASTHEAD_DEK = `Item Classes ranked by expected payout per craft, beside the Base Types worth selling raw. Every figure is in ${DENOMINATION}.`;
 
@@ -16,7 +16,7 @@ function eyebrowText(league: string): string {
 /** The right-hand control group's width: 216 recipe + 16 gap + 276 threshold. */
 export const CONTROL_GROUP_WIDTH = columnSums.mastheadControls.reduce((a, b) => a + b, 0);
 
-/** 170px: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42 + 20 pad; the recipe slot stays empty at its width with no recipe. */
+/** 170px: 34 pad + eyebrow 14 + 8 + title 44 + 8 + two-line dek 42 + 20 pad. */
 export function Masthead({
   league,
   threshold,

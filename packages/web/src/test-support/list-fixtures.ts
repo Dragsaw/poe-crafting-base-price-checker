@@ -96,7 +96,7 @@ export function bodiesWith(
   };
 }
 
-/** `count` raw entries named `Base 00`, `Base 01`, ..., priced best first and observed one hour before `now`. */
+/** `count` raw entries `Base 00`, `Base 01`, ..., priced best first, seen an hour before `now`. */
 export function many(count: number, now: number): { tracked: RawTrackedEntry[]; dataset: DatasetEntry[] } {
   const tracked = Array.from({ length: count }, (_, index) => rawEntry(`Base ${String(index).padStart(2, '0')}`));
   return { tracked, dataset: tracked.map((entry, index) => priced(entry, 40 - index, hoursBefore(now, 1))) };

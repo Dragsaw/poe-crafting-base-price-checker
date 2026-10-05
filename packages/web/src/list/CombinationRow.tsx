@@ -23,7 +23,7 @@ import {
   type CombinationState,
 } from './format';
 
-/** One Tracked Entry as its combination row prints it: already text or a resolved state, so the row decides nothing. */
+/** One Tracked Entry as its row prints it: text or a resolved state, so the row decides nothing. */
 export interface Combination {
   readonly key: string;
   /** The Combination, one part per affix (`combinationText`): `no affixes` for a Raw Base. */
@@ -39,7 +39,7 @@ export interface Combination {
   readonly tradeLabel: string;
 }
 
-/** A fallback affix is set in the mono verbatim register only: no ink, mark or glyph (DESIGN.md Typography; EXPERIENCE.md memlog 138, 208). */
+/** A fallback affix is set in the mono verbatim register only: no ink, mark or glyph. */
 export function CombinationText({ parts }: { readonly parts: readonly AffixPart[] }): JSX.Element {
   return (
     <>
@@ -62,7 +62,7 @@ export function CombinationText({ parts }: { readonly parts: readonly AffixPart[
 const [combination, state, figure, sample, tradeLink] = combinationLine1Columns;
 const [note, observed, attempted] = combinationLine2Columns;
 
-/** `{components.combination-row}`: two 966px lines; line two wraps in whole 20px steps, so 48px is a minimum, and nothing truncates. */
+/** `{components.combination-row}`: two 966px lines; line two wraps in 20px steps, no truncation. */
 export function CombinationRow({
   combination: row,
   last,

@@ -26,11 +26,11 @@ import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
 
-/** A ready outcome holds the "now" its ages read against and its cross-file failures, both taken once per load (AD-17). */
+/** A ready outcome holds the "now" its ages read against and the cross-file failures (AD-17). */
 type ViewState =
   Exclude<LoadOutcome, ReadyOutcome> | (ReadyOutcome & { readonly now: number; readonly crossFileFailures: readonly CrossFileFailure[] }) | { readonly kind: 'pending' };
 
-/** One state transition from skeleton to a single outcome, never row by row (AD-24, FR-33); failure screens paint no chrome. */
+/** One transition from skeleton to one outcome, never row by row (AD-24, FR-33). */
 export function App(): JSX.Element {
   const [view, retry] = useLoadedView();
   const [threshold, changeThreshold] = usePersistedThreshold();
@@ -133,7 +133,7 @@ function usePersistedRecipe(): readonly [string | undefined, (recipeId: string) 
   return [storedRecipe, changeRecipe];
 }
 
-/** `core` ranks every (Item Class, recipe) pair at once, so a recipe switch re-filters and never re-ranks. */
+/** `core` ranks every (Item Class, recipe) pair at once: a recipe switch re-filters only. */
 function useRanking(view: ViewState, threshold: number): Ranking | undefined {
   const readySet = view.kind === 'ready' ? view.set : undefined;
   const readyFailures = view.kind === 'ready' ? view.crossFileFailures : undefined;
@@ -155,7 +155,7 @@ function useRanking(view: ViewState, threshold: number): Ranking | undefined {
   );
 }
 
-/** A plain call, not a component: the frame and masthead keep their identity across the move to ready. */
+/** A plain call, not a component: the frame and masthead keep their identity into ready. */
 function renderPending({
   threshold,
   onThresholdChange,
@@ -222,7 +222,7 @@ function renderReady({
   );
 }
 
-/** `web` renders the one ranking and orders nothing (AD-4); a recipe click only narrows it, no re-rank (state 34). */
+/** `web` renders the one ranking and orders nothing (AD-4); a recipe click narrows it. */
 function ReadyBody({
   set,
   now,
@@ -269,7 +269,7 @@ function ReadyBody({
   );
 }
 
-/** Pushed to the frame's foot by `margin-top: auto`; the appendix is ready only, as no count is known while pending. */
+/** Pushed to the frame's foot by `margin-top: auto`; the appendix is ready only. */
 function PageTail({ appendix }: { readonly appendix?: ReactNode }): JSX.Element {
   return (
     <div data-page-tail="" style={{ marginTop: 'auto' }}>
