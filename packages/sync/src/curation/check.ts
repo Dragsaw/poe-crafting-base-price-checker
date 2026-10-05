@@ -1,8 +1,6 @@
 // `pnpm tracked:check`: read-only, exit 1 on any issue. A pass does not confirm a floor is the one
 // IMPLEMENTATION-NOTES.md §8 derives: a floor declared too high passes every mechanical check (AD-5).
 
-import { realpathSync } from 'node:fs';
-import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
@@ -14,6 +12,7 @@ import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
 import { readWeightsIds } from '../catalogue/weights-ids.ts';
 import { checkCatalogue } from '../chunk/catalogue-check.ts';
+import { isInvokedDirectly } from '../entry/is-invoked-directly.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
 import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
@@ -266,20 +265,7 @@ export async function main(
   return report.ok ? 0 : 1;
 }
 
-// Node realpaths the main module's URL but not `argv[1]`, so both sides are realpathed.
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {
-    return false;
-  }
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a
   // piped write.
   try {

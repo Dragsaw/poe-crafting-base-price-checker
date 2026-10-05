@@ -2,7 +2,6 @@
 // writing nothing to disk (AGENT-WORKFLOW.md, NFR-1, NFR-3). Its clock default and the `notBefore`
 // it only prints are in AGENT-WORKFLOW.md. An entry with no recorded search lands in `unrecorded`.
 
-import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,6 +34,7 @@ import { CATALOGUE_FILTERS_PATH, CATALOGUE_STATS_PATH } from './catalogue/catalo
 import { WEIGHTS_PATH } from './catalogue/weights-ids.ts';
 import { composeChunk } from './compose-chunk.ts';
 import type { StepContext } from './compose-chunk.ts';
+import { isInvokedDirectly } from './entry/is-invoked-directly.ts';
 import { CONFIG_PATH } from './load-config.ts';
 import { loadDataFile } from './load-data-file.ts';
 import type { DataFileResult } from './load-data-file.ts';
@@ -274,21 +274,7 @@ async function main(): Promise<void> {
   process.stdout.write(`${JSON.stringify(report, undefined, 2)}\n`);
 }
 
-// Node realpaths the main module's URL but not `argv[1]`: realpath both sides, or a junction or
-// `subst` path prints nothing. Importing the module, as the co-located test does, runs nothing.
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {
-    return false;
-  }
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-const isInvoked = isInvokedDirectly();
+const isInvoked = isInvokedDirectly(import.meta.url);
 
 if (isInvoked) {
   try {

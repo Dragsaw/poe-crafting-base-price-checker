@@ -2,13 +2,12 @@
  * `pnpm sync`: one entry per iteration; the lock is taken per entry and never held across a wait (FR-19, AD-7, AD-8).
  */
 
-import { realpathSync } from 'node:fs';
-import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { ChunkOutcome } from './chunk/run-chunk.ts';
 import { composeChunk } from './compose-chunk.ts';
 import type { ComposeChunkPorts } from './compose-chunk.ts';
+import { isInvokedDirectly } from './entry/is-invoked-directly.ts';
 import { createReadOnlyGitPort } from './git/read-only-git-port.ts';
 import { createRequestCounter } from './request-counter.ts';
 import type { RequestCounter } from './request-counter.ts';
@@ -289,19 +288,7 @@ async function main(): Promise<void> {
 }
 
 /** Realpaths both sides, as `dry-run.ts` does, so a junction path still runs. */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {
-    return false;
-  }
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     await main();
   } catch (error) {
