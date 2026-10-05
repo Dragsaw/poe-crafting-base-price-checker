@@ -22,17 +22,33 @@ interface Run {
 
 const DIRECTIVE = /^\s*(?:eslint(?:-[a-z-]+)?|globals?|exported)\b/;
 
+const BLANK_OPENER = /^\*?\s*$/;
+
+/** Lines of text in a comment; a block comment's delimiter-only first and last lines do not count. */
+function contentLines(value: string): number {
+  const lines = value.split('\n');
+  if (BLANK_OPENER.test(lines[0] ?? '')) {
+    lines.shift();
+  }
+  if (lines.length > 0 && (lines.at(-1) ?? '').trim() === '') {
+    lines.pop();
+  }
+  return lines.length;
+}
+
 /** Runs of comments on adjacent lines. Blank lines, code and directives end a run; trailing comments are skipped. */
 function findRuns(comments: readonly CommentLike[], isOwnLine: (location: Location) => boolean): Run[] {
   const runs: Run[] = [];
   let first: Location | undefined;
   let endLine = 0;
+  let lines = 0;
 
   const flush = (): void => {
     if (first !== undefined) {
-      runs.push({ first, lines: endLine - first.start.line + 1 });
+      runs.push({ first, lines });
     }
     first = undefined;
+    lines = 0;
   };
 
   for (const { value, loc } of comments) {
@@ -45,6 +61,7 @@ function findRuns(comments: readonly CommentLike[], isOwnLine: (location: Locati
     }
     first ??= loc;
     endLine = loc.end.line;
+    lines += contentLines(value);
   }
   flush();
   return runs;
