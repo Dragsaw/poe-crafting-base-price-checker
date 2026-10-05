@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parseRateLimitHeaders, rateLimitPolicyOf, ruleNameCount } from './rate-limit-headers.ts';
 
-/**
- * The rule names below appear **only here**. They are what a live response
- * happened to carry on 2026-09-12, asserted as an expected shape; no
- * non-test module in this repository names a rule, a policy or a rate.
- */
+// Rule names appear only in tests, as an expected shape (AD-8, no-hardcoded-rate-limits test).
 const SEARCH_POLICY = 'trade-search-request-limit';
 
 it('learns every rule named in the rules header, by name, at runtime', () => {

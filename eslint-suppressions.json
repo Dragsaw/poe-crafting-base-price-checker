@@ -87,51 +87,8 @@
       "count": 1
     }
   },
-  "packages/sync/src/trade/endpoints.ts": {
-    "local/max-comment-run": {
-      "count": 7
-    }
-  },
-  "packages/sync/src/trade/invalid-requests.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
   "packages/sync/src/trade/ledger.ts": {
-    "local/max-comment-run": {
-      "count": 8
-    },
     "unicorn/prefer-iterator-to-array": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/trade/rate-limit-headers.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/trade/rate-limit-headers.ts": {
-    "local/max-comment-run": {
-      "count": 8
-    }
-  },
-  "packages/sync/src/trade/session-auth.ts": {
-    "local/max-comment-run": {
-      "count": 16
-    }
-  },
-  "packages/sync/src/trade/transport-failure.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/trade/user-agent.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
-  "packages/sync/src/write-artifact.ts": {
-    "local/max-comment-run": {
       "count": 1
     }
   },

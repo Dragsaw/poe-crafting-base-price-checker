@@ -1,18 +1,5 @@
-/**
- * The one write path for every artifact `sync` writes (AD-3, Consistency
- * Conventions): `data/dataset.json` and `data/sync-progress.json` today, the
- * Sync Report next.
- *
- * The value is parsed with its schema first, and the **parsed** value is what
- * gets serialised. The keys therefore follow the schema's declared order, not
- * the order a caller happened to build its object in, and the bytes are
- * `serialiseJsonArtifact`'s: UTF-8 without BOM, LF, two-space JSON and one
- * trailing newline. An artifact that fails its schema is refused with a typed
- * `InvalidArtifactError` and nothing is written.
- *
- * Fixtures and the catalogue are not artifacts of the chunk and keep their own
- * callers of `serialiseJsonArtifact`.
- */
+// The one write path for every artifact `sync` writes (AD-3). The parsed value is serialised, so
+// keys follow the schema's order. An invalid artifact is refused and nothing is written.
 
 import type { EnvelopeIssues, FilesystemPort } from '@poe/contracts';
 
