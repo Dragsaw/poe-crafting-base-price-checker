@@ -3,7 +3,7 @@ import { type AddressInfo, createServer, type Server } from 'node:net';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_PORT, listenerPids, listenersWindows, snapshot } from './dev-stop';
+import { DEFAULT_PORT, listenerPids, listenersWindows, snapshot } from './development-stop';
 
 /** While set, the mocked execFileSync runs the listener query against a missing cmdlet. */
 const MISSING_CMDLET = 'Get-NoSuchNetTCPConnection';

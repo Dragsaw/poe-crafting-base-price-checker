@@ -340,7 +340,7 @@ never import each other.
 
   Every concept that crosses a package boundary has exactly one Zod schema in
   `contracts` and no parallel definition anywhere: `BaseType`, `TrackedEntry`,
-  `ItemClass`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`,
+  `ItemClass`, `ModifierReference`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`,
   `CurrencyRate`, `SyncRunReport`, `RankedRow`, `TradeCatalogue`. Static types are `z.infer`red from
   those schemas. `CraftRecipe` covers currency composition and the recipe's distribution
   effect — **its currency quantities and its `modifierLevelMin`** (AD-17) — and is
@@ -1363,7 +1363,7 @@ never import each other.
   ```
   scoped(cat, slot, L) = { entry ∈ pool(cat, slot) : entry.itemLevelMin <= L }
 
-                          Σ { e.weight : e ∈ scoped(cat, slot, L) ∧ contains(ref, e) }
+                          Σ { e.weight : e ∈ scoped(cat, slot, L) ∧ isContaining(ref, e) }
   P(ref | cat, slot, L) = ────────────────────────────────────────────────────────────
                                   Σ { e.weight : e ∈ scoped(cat, slot, L) }
   ```
@@ -1375,7 +1375,7 @@ never import each other.
 
   **The denominator is a plain sum over entries** — one entry is one tier is one source
   row, counted once (AD-11), so the double-counting reading is no longer reachable in any
-  shape the file admits. `ModifierRef` itself carries no item level: the scope comes from
+  shape the file admits. `ModifierReference` itself carries no item level: the scope comes from
   the entry's floor and the weights entry's `itemLevelMin`, and from no third source.
   `P(combination)` is the probability that one crafting act lands both references: a
   transmute rolls one affix and an augment adds the other, **and the second draw is
@@ -1943,7 +1943,7 @@ id resolves here.
 
 | Concern | Convention |
 | --- | --- |
-| Naming — entities | `BaseType`, `ItemClass`, `TrackedEntry`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `RankedRow`, `SyncRunReport`, `TradeCatalogue`. Singular, PascalCase, defined once in `contracts` (AD-3). **`ItemClass` is the `(categoryId, className)` pair and is `prd.md` §3's *Item Class* — the pair, never the `className` half alone** (AD-5). **It was `ItemCategory` for one revision**: revision 16 introduced that name against `prd.md` revision 17's noun, and revision 17 renamed it when `prd.md` revision 18 moved the player-facing unit a rung finer. The underlying key never changed, so this is a rename and not a re-keying, and **`ItemCategory` is not reused for anything else**. `RankedRow` was `RankedBase` until revision 16 and was renamed because it ranks two units — an `ItemClass` on the crafted branch, a `BaseType` on the raw one (AD-5, AD-17). |
+| Naming — entities | `BaseType`, `ItemClass`, `TrackedEntry`, `ModifierReference`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `RankedRow`, `SyncRunReport`, `TradeCatalogue`. Singular, PascalCase, defined once in `contracts` (AD-3). **`ItemClass` is the `(categoryId, className)` pair and is `prd.md` §3's *Item Class* — the pair, never the `className` half alone** (AD-5). **It was `ItemCategory` for one revision**: revision 16 introduced that name against `prd.md` revision 17's noun, and revision 17 renamed it when `prd.md` revision 18 moved the player-facing unit a rung finer. The underlying key never changed, so this is a rename and not a re-keying, and **`ItemCategory` is not reused for anything else**. `RankedRow` was `RankedBase` until revision 16 and was renamed because it ranks two units — an `ItemClass` on the crafted branch, a `BaseType` on the raw one (AD-5, AD-17). |
 | Naming — files & modules | kebab-case files; one exported concept per file in `core`; adapters named `<port>-<impl>` (e.g. `trade-client-http`, `trade-client-fixture`). |
 | Naming — ports | Interface `<Thing>Port` in `contracts`; every port ships a fake alongside the real adapter. |
 | Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (§10). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (since `5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
@@ -2057,11 +2057,11 @@ graph TB
 erDiagram
   BaseType ||--o{ TrackedEntry : "has tracked, raw kind"
   ItemClass ||--o{ TrackedEntry : "has tracked, crafted kind"
-  TrackedEntry }o--o| ModifierRef : "prefix reference, crafted kind"
-  TrackedEntry }o--o| ModifierRef : "suffix reference, crafted kind"
+  TrackedEntry }o--o| ModifierReference : "prefix reference, crafted kind"
+  TrackedEntry }o--o| ModifierReference : "suffix reference, crafted kind"
   TrackedEntry ||--o| PriceObservation : "latest, per league"
   ItemClass ||--o{ ModifierWeight : "eligible pool"
-  ModifierWeight }o--|| ModifierRef : "weighs, at itemLevelMin"
+  ModifierWeight }o--|| ModifierReference : "weighs, at itemLevelMin"
   CraftRecipe ||--o{ CurrencyRate : "costed from"
   PriceObservation }o--|| CurrencyRate : "normalised by"
   RankedRow }o--o| ItemClass : "ranks, crafted branch"
@@ -2070,7 +2070,7 @@ erDiagram
   SyncRunReport ||--o{ TrackedEntry : "reports on"
   TradeCatalogue ||--o{ BaseType : "validates"
   TradeCatalogue ||--o{ ItemClass : "validates categoryId only"
-  TradeCatalogue ||--o{ ModifierRef : "validates each line's statId"
+  TradeCatalogue ||--o{ ModifierReference : "validates each line's statId"
 ```
 
 `web` derives `RankedRow` in the browser and no component persists it (AD-4). **A
@@ -2080,7 +2080,7 @@ a `BaseType` and carries no affix members at all (AD-5). Every crafted entry on 
 `ItemClass` shares that class's `itemLevelMin` (AD-17). **An `ItemClass` is the
 pair `(categoryId, className)` and only its `categoryId` half is catalogue-validatable**;
 the `className` half is checked against `weights.json` by the cross-file gate and nowhere
-else (AD-25, AD-12). A `ModifierRef` is a bounded band, a valueless stat reference, or a
+else (AD-25, AD-12). A `ModifierReference` is a bounded band, a valueless stat reference, or a
 hybrid of two or more such lines, optionally carrying a display-only `acceptedTier` on the
 whole reference that only `web` reads (AD-5). A `PriceObservation` exists only where there is an observation, so
 the attempt-scoped `lastSearchId` and `lastSearchLeague` sit on the dataset entry beside

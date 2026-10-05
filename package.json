@@ -20,7 +20,7 @@
     "test": "vitest run --project=!data",
     "test:data": "vitest run --project data",
     "dev": "vite --config packages/web/vite.config.ts",
-    "dev:stop": "node tools/dev-stop/dev-stop.ts",
+    "dev:stop": "node tools/dev-stop/development-stop.ts",
     "deferred:issues": "node tools/deferred-issues/deferred-issues.ts",
     "build": "vite build --config packages/web/vite.config.ts && node tools/prune-pages.mjs",
     "sync": "node --env-file-if-exists=.env packages/sync/src/sync.ts",

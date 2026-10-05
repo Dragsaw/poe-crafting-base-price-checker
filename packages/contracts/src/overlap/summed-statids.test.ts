@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { canonicalKey } from '../canonical-key';
-import type { HybridModifierRef as HybridModifierReference } from '../modifier-ref';
-import { describeOverlap, CAN_NEVER_CO_OCCUR, overlap, overlapBranches, slotOverlapBranch, summedInterval, summedStatIds } from '../overlap';
+import type { HybridModifierReference } from '../modifier-reference';
+import { describeOverlap, CAN_NEVER_CO_OCCUR, areOverlapping, overlapBranches, slotOverlapBranch, summedInterval, summedStatIds } from '../overlap';
 import type { CoOccur } from '../overlap';
 import { ALWAYS, band, parse, valueless } from './test-support';
 
@@ -102,8 +102,8 @@ describe('overlap with summed statIds (§2.1 S)', () => {
   });
 
   it('does not overlap two rarity entries whose sums are disjoint, though per-slot bands intersect', () => {
-    expect(overlap(rarity(16, 19, 15, 18), rarity(16, 19, 6, 10), CAN_NEVER_CO_OCCUR)).toBe(false);
-    expect(overlap(rarity(16, 19, 15, 18), rarity(16, 19, 11, 14), CAN_NEVER_CO_OCCUR)).toBe(true);
+    expect(areOverlapping(rarity(16, 19, 15, 18), rarity(16, 19, 6, 10), CAN_NEVER_CO_OCCUR)).toBe(false);
+    expect(areOverlapping(rarity(16, 19, 15, 18), rarity(16, 19, 11, 14), CAN_NEVER_CO_OCCUR)).toBe(true);
   });
 
   it('compares a statId per slot when only one entry sums it', () => {
@@ -116,12 +116,12 @@ describe('overlap with summed statIds (§2.1 S)', () => {
       suffix: 'co-occur',
       sums: [],
     });
-    expect(overlap(summing, { prefix: band('s', 20, 25), suffix: band('t', 2, 3) }, ALWAYS)).toBe(false);
+    expect(areOverlapping(summing, { prefix: band('s', 20, 25), suffix: band('t', 2, 3) }, ALWAYS)).toBe(false);
   });
 
   it('never overlaps on a sum with a valueless operand, which the schema refuses', () => {
     const valuelessSum = { prefix: valueless('s'), suffix: band('s', 1, 2) };
-    expect(overlap(valuelessSum, valuelessSum, CAN_NEVER_CO_OCCUR)).toBe(false);
+    expect(areOverlapping(valuelessSum, valuelessSum, CAN_NEVER_CO_OCCUR)).toBe(false);
   });
 });
 

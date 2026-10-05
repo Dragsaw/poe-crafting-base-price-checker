@@ -1,50 +1,12 @@
 {
-  ".githooks/commit-msg": {
-    "unicorn/name-replacements": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/modifier-ref.test.ts": {
-    "unicorn/name-replacements": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/modifier-ref.ts": {
-    "unicorn/name-replacements": {
-      "count": 10
-    }
-  },
-  "packages/contracts/src/overlap.ts": {
-    "unicorn/consistent-boolean-name": {
-      "count": 5
-    }
-  },
   "packages/contracts/src/ports/fakes/filesystem.ts": {
     "unicorn/prefer-iterator-to-array": {
-      "count": 1
-    }
-  },
-  "packages/core/src/chunk-order.ts": {
-    "sonarjs/no-selector-parameter": {
-      "count": 1
-    },
-    "unicorn/consistent-boolean-name": {
       "count": 1
     }
   },
   "packages/core/src/crafted-classes.test.ts": {
     "unicorn/prefer-iterator-to-array": {
       "count": 1
-    }
-  },
-  "packages/core/src/cross-file.ts": {
-    "unicorn/consistent-boolean-name": {
-      "count": 2
-    }
-  },
-  "packages/core/src/probability.ts": {
-    "unicorn/consistent-boolean-name": {
-      "count": 3
     }
   },
   "packages/core/src/rank.ts": {
@@ -77,11 +39,6 @@
       "count": 1
     }
   },
-  "test/commit-msg-hook.test.ts": {
-    "unicorn/name-replacements": {
-      "count": 1
-    }
-  },
   "test/guard-concurrent-fixture/concurrent.fixture.ts": {
     "unicorn/prefer-promise-with-resolvers": {
       "count": 1
@@ -95,19 +52,6 @@
   "test/no-network.test.ts": {
     "unicorn/prefer-promise-with-resolvers": {
       "count": 2
-    }
-  },
-  "tools/dev-stop/dev-stop.test.ts": {
-    "unicorn/name-replacements": {
-      "count": 1
-    }
-  },
-  "tools/dev-stop/dev-stop.ts": {
-    "unicorn/name-replacements": {
-      "count": 1
-    },
-    "unicorn/prefer-iterator-to-array": {
-      "count": 1
     }
   }
 }

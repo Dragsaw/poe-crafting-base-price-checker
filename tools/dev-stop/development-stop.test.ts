@@ -10,7 +10,7 @@ import {
   planStop,
   type ProcessInfo,
   windowsTool,
-} from './dev-stop';
+} from './development-stop';
 
 const ROOT = String.raw`E:\Projects\poe`;
 const NONE = new Set<number>();
@@ -190,7 +190,7 @@ describe('ownAncestry', () => {
 
   it('keeps a dev:stop run from inside the chain from killing its caller', () => {
     // dev:stop runs as a child of the pnpm at 14, so the climb stops below it.
-    const inside = [...CHAIN, { pid: 20, ppid: 14, commandLine: 'node tools/dev-stop/dev-stop.ts' }];
+    const inside = [...CHAIN, { pid: 20, ppid: 14, commandLine: 'node tools/dev-stop/development-stop.ts' }];
     expect(planStop([16], inside, ROOT, ownAncestry(inside, 20))).toEqual({ kind: 'kill', roots: [15] });
   });
 });

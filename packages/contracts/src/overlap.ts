@@ -1,5 +1,5 @@
 import { compareByCodeUnit } from './canonical-key.ts';
-import type { HybridLine, ModifierRef as ModifierReference, SingleLineModifierRef as SingleLineModifierReference } from './modifier-ref.ts';
+import type { HybridLine, ModifierReference, SingleLineModifierReference } from './modifier-reference.ts';
 
 /** The overlap predicate (AD-17, IN §2.1); `coOccur` (§2.2) is injected, it needs the weights. */
 
@@ -61,7 +61,7 @@ export function summedInterval(affixes: OverlapAffixes, statId: string): SummedI
 }
 
 /** `linesIntersect(x, y, S)` (§2.1) over the shared `statId`s outside `S`, which the caller found non-empty. */
-function linesIntersect(x: ModifierReference, y: ModifierReference, shared: readonly string[]): boolean {
+function areLinesIntersecting(x: ModifierReference, y: ModifierReference, shared: readonly string[]): boolean {
   return shared.every((statId) => {
     const left = lineOn(x, statId);
     const right = lineOn(y, statId);
@@ -96,7 +96,7 @@ export function slotOverlapBranch(
     return 'summed';
   }
   const shared = ours.filter((statId) => theirs.has(statId));
-  if (shared.length === 0 || !linesIntersect(x, y, shared)) {
+  if (shared.length === 0 || !areLinesIntersecting(x, y, shared)) {
     return undefined;
   }
   if (x.kind !== 'hybrid' && y.kind !== 'hybrid') {
@@ -105,13 +105,13 @@ export function slotOverlapBranch(
   return coOccur(x, y, slot, summed) ? 'co-occur' : undefined;
 }
 
-export function slotOverlap(x: ModifierReference, y: ModifierReference, options: SlotOverlapOptions): boolean {
+export function isSlotOverlapping(x: ModifierReference, y: ModifierReference, options: SlotOverlapOptions): boolean {
   return slotOverlapBranch(x, y, options) !== undefined;
 }
 
 /** `overlap(a, b)` (§2.1): both slots overlap outside `S`, and every sum in `S` intersects. */
-export function overlap(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): boolean {
-  return overlapBranches(a, b, coOccur) !== undefined;
+export function areOverlapping(a: OverlapAffixes, b: OverlapAffixes, isCoOccurring: CoOccur): boolean {
+  return overlapBranches(a, b, isCoOccurring) !== undefined;
 }
 
 /** A pair is `core`'s when either entry names a `hybrid`, else `contracts`'s (§2.1). */
@@ -135,7 +135,7 @@ export interface OverlapBranches {
 }
 
 /** Each slot's branch and summed interval pair when the entries overlap; `S` is computed here. */
-export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): OverlapBranches | undefined {
+export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, isCoOccurring: CoOccur): OverlapBranches | undefined {
   const theirs = summedStatIds(b);
   const summed = new Set([...summedStatIds(a)].filter((statId) => theirs.has(statId)).toSorted(compareByCodeUnit));
   const sums: SummedOverlap[] = [];
@@ -147,11 +147,11 @@ export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: C
     }
     sums.push({ statId, a: left, b: right });
   }
-  const prefix = slotOverlapBranch(a.prefix, b.prefix, { slot: 'prefix', coOccur, summed });
+  const prefix = slotOverlapBranch(a.prefix, b.prefix, { slot: 'prefix', coOccur: isCoOccurring, summed });
   if (prefix === undefined) {
     return undefined;
   }
-  const suffix = slotOverlapBranch(a.suffix, b.suffix, { slot: 'suffix', coOccur, summed });
+  const suffix = slotOverlapBranch(a.suffix, b.suffix, { slot: 'suffix', coOccur: isCoOccurring, summed });
   return suffix === undefined ? undefined : { prefix, suffix, sums };
 }
 

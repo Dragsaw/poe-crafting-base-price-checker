@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { BaseTypeIdSchema } from './base-type.ts';
 import { CategoryIdSchema, ClassNameSchema } from './item-class.ts';
-import { ModifierRefSchema as ModifierReferenceSchema } from './modifier-ref.ts';
+import { ModifierReferenceSchema } from './modifier-reference.ts';
 import { ItemLevelSchema } from './primitives.ts';
 
 /** The kind is what the entry names, never an inference (AD-5); keys: IMPLEMENTATION-NOTES §4.1. */

@@ -8,7 +8,7 @@ describe('the contracts barrel', () => {
     for (const name of [
       'BaseTypeSchema',
       'ItemClassSchema',
-      'ModifierRefSchema',
+      'ModifierReferenceSchema',
       'TrackedEntrySchema',
       'PriceObservationSchema',
       'CurrencyRateSchema',

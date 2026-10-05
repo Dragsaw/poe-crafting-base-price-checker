@@ -66,7 +66,7 @@ load-bearing against the sentinel defect AD-5 exists to close and an epsilon rea
 AD-17 requires one null-line rule that every caller shares. The rule:
 
 ```
-untrackable(entry) ⇔ entry.weightSource == "not-in-game"
+isUntrackable(entry) ⇔ entry.weightSource == "not-in-game"
                    ∨ ( pool(entry).poolCoverage == "partial"
                        ∧ ∃ line ∈ entry.lines : line.statId == null )
 
@@ -90,19 +90,19 @@ classes as hybrids.
 ### Containment (AD-11, AD-17)
 
 ```
-covers(rl, line)     ⇔ line.statId == rl.statId ∧
+isCovering(rl, line)     ⇔ line.statId == rl.statId ∧
                          ( rl is banded:    interval(line).min >= rl.valueMin
                                           ∧ interval(line).max <= rl.valueMax
                            rl is valueless: line.ranges is empty )
 
-contains(ref, entry) ⇔ entry.weight > 0 ∧ ¬untrackable(entry) ∧
+isContaining(ref, entry) ⇔ entry.weight > 0 ∧ ¬isUntrackable(entry) ∧
 
-    ref is banded or valueless:  ∃ line ∈ entry.lines : covers(ref, line)
+    ref is banded or valueless:  ∃ line ∈ entry.lines : isCovering(ref, line)
 
     ref is hybrid:               lineSet(entry) == statIds(ref)
-                               ∧ ∀ rl ∈ ref.lines : ∃ line ∈ entry.lines : covers(rl, line)
+                               ∧ ∀ rl ∈ ref.lines : ∃ line ∈ entry.lines : isCovering(rl, line)
 
-contained(ref)       = { entry ∈ scoped(cat, slot, L) : contains(ref, entry) }
+contained(ref)       = { entry ∈ scoped(cat, slot, L) : isContaining(ref, entry) }
 ```
 
 **The containment set of a hybrid reference** is the same-slot entries with `weight > 0`,
@@ -143,20 +143,20 @@ list has twice been found to miss a case.
 summed(e)  = statIds(e.prefix) ∩ statIds(e.suffix)            -- the summed statIds of one entry
 S          = summed(a) ∩ summed(b)
 
-overlap(a, b)  ⇔  slotOverlap(a.prefix, b.prefix, S)
-               ∧  slotOverlap(a.suffix, b.suffix, S)
+areOverlapping(a, b)  ⇔  isSlotOverlapping(a.prefix, b.prefix, S)
+               ∧  isSlotOverlapping(a.suffix, b.suffix, S)
                ∧  ∀ s ∈ S : sum(a, s) ∩ sum(b, s) ≠ ∅
 
 sum(e, s)  = [ e.prefix[s].valueMin + e.suffix[s].valueMin ,
                e.prefix[s].valueMax + e.suffix[s].valueMax ]
 
-slotOverlap(x, y, S) =
+isSlotOverlapping(x, y, S) =
     true                                    if x or y names no statId outside S
     false                                   if x and y share no statId outside S
-    linesIntersect(x, y, S)                 if x and y are both single-line references
-    linesIntersect(x, y, S) ∧ coOccur(x, y, S) otherwise   -- at least one is hybrid
+    areLinesIntersecting(x, y, S)                 if x and y are both single-line references
+    areLinesIntersecting(x, y, S) ∧ coOccur(x, y, S) otherwise   -- at least one is hybrid
 
-linesIntersect(x, y, S) ⇔ ∀ s ∈ (statIds(x) ∩ statIds(y)) ∖ S :
+areLinesIntersecting(x, y, S) ⇔ ∀ s ∈ (statIds(x) ∩ statIds(y)) ∖ S :
                               both lines on s are valueless
                             ∨ the bands of the two lines on s intersect
 ```
@@ -250,7 +250,7 @@ the valueless tier as that band, and a banded `[1, 1]` reference line contains i
 aligns on it.
 
 ```
-disagrees(rl, line) ⇔ line.statId == rl.statId
+isDisagreeing(rl, line) ⇔ line.statId == rl.statId
                      ∧ rl is valueless
                      ∧ line.ranges is non-empty
 ```
@@ -401,13 +401,13 @@ inside the bands. A tier whose interval **intersects** a band can roll a matchin
 so the test is intersection, not containment.
 
 ```
-meets(rl, line) ⇔ line.statId == rl.statId ∧
+isMeeting(rl, line) ⇔ line.statId == rl.statId ∧
                   ( rl is valueless: line.ranges is empty
                     rl is banded:    interval(line) ∩ [rl.valueMin, rl.valueMax] ≠ ∅ )
 
 reached(ref)    = { entry ∈ scoped(cat, slot, L) :
-                      entry.weight > 0 ∧ ¬untrackable(entry)
-                    ∧ ∀ rl ∈ lines of ref : ∃ line ∈ entry.lines : meets(rl, line) }
+                      entry.weight > 0 ∧ ¬isUntrackable(entry)
+                    ∧ ∀ rl ∈ lines of ref : ∃ line ∈ entry.lines : isMeeting(rl, line) }
 
 incomplete(ref) ⇔ ∃ entry ∈ reached(ref) : lineSet(entry) ⊋ statIds(ref)
 
@@ -1120,7 +1120,7 @@ under *Alignment is monotone upward* below.
 tier(ref)        = over the UNSCOPED pool for the entry's (item class, slot) —
                    every entry at every itemLevelMin —
 
-                   the entries that contains(ref, ·) of §1 admits, for every
+                   the entries that isContaining(ref, ·) of §1 admits, for every
                    kind — so a weight-0 or untrackable tier never sets a floor
 
 needs(ref)       = max { w.itemLevelMin : w ∈ tier(ref) }   if ref is `banded`,

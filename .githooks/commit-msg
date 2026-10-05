@@ -2,6 +2,7 @@
 // Lints a commit subject against AGENT-WORKFLOW.md's Commit conventions.
 // Exit 1 blocks the commit. Installed via `core.hooksPath .githooks` (package.json "prepare").
 
+// eslint-disable-next-line unicorn/name-replacements -- boundary: git runs the hook by the exact name commit-msg
 import { readFileSync } from 'node:fs';
 
 const KNOWN_TYPES = ['feat', 'fix', 'test', 'docs', 'chore', 'wip', 'refactor', 'perf', 'build', 'ci'];

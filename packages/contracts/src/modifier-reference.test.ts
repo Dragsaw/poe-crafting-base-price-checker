@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { ModifierRefSchema as ModifierReferenceSchema } from './modifier-ref';
-import type { ModifierRef as ModifierReference } from './modifier-ref';
+import { ModifierReferenceSchema } from './modifier-reference';
+import type { ModifierReference } from './modifier-reference';
 
 function issuePaths(data: unknown): string[] {
   const result = ModifierReferenceSchema.safeParse(data);
@@ -29,7 +29,7 @@ function describeReference(reference: ModifierReference): string {
   }
 }
 
-describe('ModifierRefSchema', () => {
+describe('ModifierReferenceSchema', () => {
   it('accepts a closed band carrying both edges', () => {
     expect(
       ModifierReferenceSchema.parse({
@@ -139,7 +139,7 @@ function hybrid(lines: unknown[], extra: Record<string, unknown> = {}): unknown 
   return { kind: 'hybrid', lines, ...extra };
 }
 
-describe('ModifierRefSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () => {
+describe('ModifierReferenceSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () => {
   it('accepts a banded hybrid and sorts its lines by statId', () => {
     const parsed = ModifierReferenceSchema.parse(
       hybrid(

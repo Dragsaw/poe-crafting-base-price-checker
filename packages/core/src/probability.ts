@@ -2,9 +2,9 @@ import { compareByCodeUnit } from '@poe/contracts';
 import type {
   CraftedTrackedEntry,
   HybridLine,
-  ModifierRef,
+  ModifierReference,
   ModifierWeight,
-  SingleLineModifierRef,
+  SingleLineModifierReference,
   WeightsClassPools,
   WeightsFile,
   WeightsLine,
@@ -52,7 +52,7 @@ export function interval(line: WeightsLine): Interval {
 }
 
 /** `untrackable(entry)` (§1 *Line sets and the null-line rule*): reads the weights file alone. */
-export function untrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'poolCoverage'>): boolean {
+export function isUntrackable(entry: ModifierWeight, pool: Pick<WeightsPool, 'poolCoverage'>): boolean {
   return untrackableReason(entry, pool) !== undefined;
 }
 
@@ -76,15 +76,15 @@ export function lineSet(entry: ModifierWeight): readonly string[] {
 }
 
 /** `statIds(ref)` (§1): the `statId`s a reference names, sorted by code unit. */
-export function statIds(reference: ModifierRef): readonly string[] {
+export function statIds(reference: ModifierReference): readonly string[] {
   return reference.kind === 'hybrid' ? reference.lines.map((rl) => rl.statId).toSorted(compareByCodeUnit) : [reference.statId];
 }
 
 /** What `covers` tests a weights line against: a single-line reference, or one line of a hybrid one. */
-export type ReferenceLine = SingleLineModifierRef | HybridLine;
+export type ReferenceLine = SingleLineModifierReference | HybridLine;
 
 /** `covers(rl, line)` (§1): a banded `rl` needs the derived interval inside the band. */
-export function covers(rl: ReferenceLine, line: WeightsLine): boolean {
+export function isCovering(rl: ReferenceLine, line: WeightsLine): boolean {
   if (line.statId !== rl.statId) {
     return false;
   }
@@ -105,12 +105,12 @@ function haveSameIds(a: readonly string[], b: readonly string[]): boolean {
 /**
  * Whole-tier containment (§1); `summed` is §2.2's `S`. Needs a `complete` pool: else `untrackable`.
  */
-export function contains(reference: ModifierRef, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
+export function isContaining(reference: ModifierReference, entry: ModifierWeight, summed: ReadonlySet<string> = NO_SUMMED): boolean {
   if (entry.weight === 0) {
     return false;
   }
   const isCoveredBy = (rl: ReferenceLine) =>
-    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : covers(rl, line)));
+    entry.lines.some((line) => (summed.has(rl.statId) ? line.statId === rl.statId : isCovering(rl, line)));
   return reference.kind === 'hybrid' ? haveSameIds(lineSet(entry), statIds(reference)) && reference.lines.every((line) => isCoveredBy(line)) : isCoveredBy(reference);
 }
 
@@ -144,13 +144,13 @@ export function isEmptyPool(pool: WeightsPool): boolean {
 }
 
 /** `C = contained(ref) ∩ E` (§11). */
-export function containedIn(reference: ModifierRef, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
-  return eligibleSet.filter((entry) => contains(reference, entry));
+export function containedIn(reference: ModifierReference, eligibleSet: readonly ModifierWeight[]): readonly ModifierWeight[] {
+  return eligibleSet.filter((entry) => isContaining(reference, entry));
 }
 
 /** `needs(ref)` (IN §8) over the unscoped pool: `undefined`, never `0`, if nothing is contained. */
-export function needs(reference: ModifierRef, pool: WeightsPool): number | undefined {
-  const tier = containedIn(reference, pool.entries).filter((entry) => !untrackable(entry, pool));
+export function needs(reference: ModifierReference, pool: WeightsPool): number | undefined {
+  const tier = containedIn(reference, pool.entries).filter((entry) => !isUntrackable(entry, pool));
   if (tier.length === 0) {
     return undefined;
   }
@@ -163,7 +163,7 @@ export function needs(reference: ModifierRef, pool: WeightsPool): number | undef
 export function affixProbability(
   pools: WeightsClassPools,
   slot: Slot,
-  reference: ModifierRef,
+  reference: ModifierReference,
   { itemLevelMin, modifierLevelMin }: { readonly itemLevelMin: number; readonly modifierLevelMin: number },
 ): ProbabilityResult {
   const eligibleSet = eligible(pools[slot], itemLevelMin, modifierLevelMin);
@@ -226,7 +226,7 @@ export function combinationProbability(
   combination: CombinationInput,
   modifierLevelMin: number,
 ): ProbabilityResult {
-  const setsOf = (slot: Slot, reference: ModifierRef): SlotSets => {
+  const setsOf = (slot: Slot, reference: ModifierReference): SlotSets => {
     const eligibleSet = eligible(pools[slot], combination.itemLevelMin, modifierLevelMin);
     return { slot, eligibleSet, contained: containedIn(reference, eligibleSet), total: totalWeight(eligibleSet) };
   };

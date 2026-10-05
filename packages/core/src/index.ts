@@ -44,8 +44,8 @@ export type { CrossFileFailure, CrossFileResult, ScopedPools, UnvalidatedMark } 
 export {
   affixProbability,
   combinationProbability,
-  contains,
-  covers,
+  isContaining as contains,
+  isCovering as covers,
   eligible,
   interval,
   isEmptyPool,
@@ -53,7 +53,7 @@ export {
   needs,
   poolOf,
   statIds,
-  untrackable,
+  isUntrackable as untrackable,
   untrackableReason,
 } from './probability.ts';
 export type {

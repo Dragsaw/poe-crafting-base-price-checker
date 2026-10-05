@@ -78,7 +78,7 @@ function notePinnedStep(state: RunState, plan: ChunkOrder, cursor: Cursor, resul
   if (isRotationWaiting && remaining < left + 1) {
     state.isTruncated = true;
   }
-  cursor.pinnedLimit = state.pinnedVisited + pinnedToKeep(left, remaining, isRotationWaiting);
+  cursor.pinnedLimit = state.pinnedVisited + (isRotationWaiting ? pinnedToKeep(left, remaining) : left);
 }
 
 function boundAfter(state: RunState, plan: ChunkOrder, cursor: Cursor, result: CompletedStep): ChunkBound | undefined {

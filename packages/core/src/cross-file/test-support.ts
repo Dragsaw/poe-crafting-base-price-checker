@@ -1,6 +1,6 @@
 import type {
   CraftedTrackedEntry,
-  ModifierRef,
+  ModifierReference,
   ModifierWeight,
   TrackedEntry,
   WeightsClassPools,
@@ -24,7 +24,7 @@ export function tier(
   return weightTier(lines, weight, modGroup === undefined ? { itemLevelMin } : { itemLevelMin, modGroup });
 }
 
-export const valueless = (statId = STAT): ModifierRef => ({ kind: 'valueless', statId });
+export const valueless = (statId = STAT): ModifierReference => ({ kind: 'valueless', statId });
 
 /** T7 derives to `[43, 56.5]` (a two-`#` line), T8 to `[56, 80]`. */
 export const T7 = () => tier([line(STAT, [40, 53], [46, 60])], { itemLevelMin: 60 });
@@ -56,7 +56,7 @@ export const bows = (classPools: WeightsClassPools) => weightsOf({ 'weapon.bow':
 
 /** Both affixes are required; the suffix defaults to one that aligns on `SUFFIX_TIER`. */
 export function entry(
-  { prefix, suffix = band(1, 2, SUFFIX_STAT) }: { prefix: ModifierRef; suffix?: ModifierRef },
+  { prefix, suffix = band(1, 2, SUFFIX_STAT) }: { prefix: ModifierReference; suffix?: ModifierReference },
   { itemLevelMin = 82, categoryId = 'weapon.bow', className = 'Bows' } = {},
 ): CraftedTrackedEntry {
   return { kind: 'crafted', categoryId, className, itemLevelMin, prefix, suffix, status: 'active' };

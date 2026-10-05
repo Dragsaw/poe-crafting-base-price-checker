@@ -1,11 +1,11 @@
 import { canonicalKey } from '@poe/contracts';
-import type { HybridLine, ModifierRef, ModifierWeight } from '@poe/contracts';
+import type { HybridLine, ModifierReference, ModifierWeight } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { coOccur } from '../cross-file.ts';
 import { band, bows, byCodeUnit, byPair, entry, failuresOf, line, OTHER, pools, STAT, T7, tier, valueless } from './test-support.ts';
 
-const hybridReference = (...lines: HybridLine[]): ModifierRef => ({ kind: 'hybrid', lines });
+const hybridReference = (...lines: HybridLine[]): ModifierReference => ({ kind: 'hybrid', lines });
 
 const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLine => ({ statId, valueMin, valueMax });
 

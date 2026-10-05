@@ -1,5 +1,5 @@
 import { linesOf } from '@poe/contracts';
-import type { ModifierRef, ModifierWeight } from '@poe/contracts';
+import type { ModifierReference, ModifierWeight } from '@poe/contracts';
 
 import { containedIn, interval } from '../probability.ts';
 import type { Slot } from '../probability.ts';
@@ -8,7 +8,7 @@ import { formatLine, tierIds } from './reference-text.ts';
 /** §2.4, per banded line: the detail when its edges are not the extremes of the contained lines. */
 export function edgeAlignment(
   slot: Slot,
-  reference: ModifierRef,
+  reference: ModifierReference,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {

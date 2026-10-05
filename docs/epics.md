@@ -83,9 +83,9 @@ These requirements come from `ARCHITECTURE-SPINE.md`. They shape the epic and st
 - **Four-package pnpm workspace with a one-way dependency graph**: `contracts` (imports nothing) → `core` → `sync` / `web`. `core` never imports `sync` or `web`. `sync` and `web` never import each other. `dependency-cruiser` fails CI on a violation. Review does not carry that job (AD-1).
 - **Pinned stack versions**, from the spine's Stack table: Node 24.21.0, TypeScript 6.0.3, pnpm 12.5.1, React 19.3.0, Vite 8.3.0, Mantine 9.6.1, Zod 4.6.5, Vitest 5.0.1, MSW 2.15.0, ESLint 10.11.0 with typescript-eslint 8.70.0, and dependency-cruiser 18.4.0. Two peer ranges block TypeScript 7. Do not take TypeScript 7 (spine, *Upgrade trigger*).
 - **Paradigm: functional core and imperative shell, with ports and adapters.** `contracts` declares every external effect as a port interface. The external effects are HTTP, the filesystem, git and time. Only `sync` or `web` implements a port as an adapter. Every port ships a fake beside the real adapter (AD-1, Consistency Conventions).
-- **Eleven Zod schemas live in `contracts`, each defined once.** Every type is `z.infer`red from its schema. The eleven are `BaseType`, `TrackedEntry`, `ItemClass`, `ModifierRef`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `SyncRunReport`, `RankedRow` and `TradeCatalogue` (AD-3).
+- **Eleven Zod schemas live in `contracts`, each defined once.** Every type is `z.infer`red from its schema. The eleven are `BaseType`, `TrackedEntry`, `ItemClass`, `ModifierReference`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `SyncRunReport`, `RankedRow` and `TradeCatalogue` (AD-3).
 - **`contracts` lands alone and first.** Dependent work rebases onto it (AD-1, `AGENT-WORKFLOW.md` *Build order*).
-- **Two discriminated unions are the shapes most likely to be built wrong.** `ModifierRef` is `banded` or `valueless`. A `banded` reference always carries both edges. A `valueless` reference carries no edges at all. `TrackedEntry` is `crafted` or `raw`. A `crafted` entry keys on `(categoryId, className, itemLevelMin, prefix?, suffix?)`. A `raw` entry keys on `(baseTypeId, itemLevelMin)`. The entry names its own kind. No component infers the kind from what the entry omits (AD-5).
+- **Two discriminated unions are the shapes most likely to be built wrong.** `ModifierReference` is `banded` or `valueless`. A `banded` reference always carries both edges. A `valueless` reference carries no edges at all. `TrackedEntry` is `crafted` or `raw`. A `crafted` entry keys on `(categoryId, className, itemLevelMin, prefix?, suffix?)`. A `raw` entry keys on `(baseTypeId, itemLevelMin)`. The entry names its own kind. No component infers the kind from what the entry omits (AD-5).
 - **Five cross-file checks live in `core` as exported pure functions over both loaded files.** Both shells call them. The five are edge alignment, empty containment set, `coOccur`, kind agreement and class discriminability. `web` reports a failure and still renders. `sync` aborts as a run-start gate, before it spends any budget (AD-17, AD-12).
 - **Exactly one governed HTTP client issues every trade request.** Searches, fetches and catalogue refreshes all pass through it. It paces from the live `X-Rate-Limit-*` headers. It hardcodes no rate and names no rule in code (AD-8).
 - **The sync CLI performs one bounded chunk and exits.** It runs under an exclusive recoverable on-disk lock. The lock carries a pid and an ISO-8601 start time. It writes progress into a schema-pinned `sync-progress.json`. It computes a deterministic selection order through `core` (AD-7).
@@ -443,10 +443,10 @@ So that the producer and the consumer of an artifact cannot drift apart while bo
 
 **Given** the `contracts` package
 **When** it defines the schemas this epic needs
-**Then** `BaseType`, `ItemClass`, `ModifierRef`, `TrackedEntry`, `PriceObservation`, `CurrencyRate`, `TradeCatalogue` and `SyncRunReport` each have exactly one Zod schema, with no parallel definition anywhere
+**Then** `BaseType`, `ItemClass`, `ModifierReference`, `TrackedEntry`, `PriceObservation`, `CurrencyRate`, `TradeCatalogue` and `SyncRunReport` each have exactly one Zod schema, with no parallel definition anywhere
 **And** every static type is `z.infer`red from its schema, and no type is declared beside it (AD-3).
 
-**Given** `ModifierRef`
+**Given** `ModifierReference`
 **When** a component constructs a reference
 **Then** a `banded` reference requires `statId`, `valueMin` and `valueMax`, and has no open-top form
 **And** a `valueless` reference carries `statId` and no edges at all, and never sentinel edges
@@ -1811,7 +1811,7 @@ So that two builders cannot produce two different orderings from the same two fi
 **When** `core` makes it
 **Then** it is exact equality, with no tolerance and no epsilon. The comparison is load-bearing against the sentinel defect AD-5 exists to close, and an epsilon readmits that defect (§1, AD-5, AD-17).
 
-**Given** `contains(ref, entry)`
+**Given** `isContaining(ref, entry)`
 **When** `core` evaluates it
 **Then** a `banded` reference matches a line that shares its `statId`, whose `ranges` is non-empty, and whose derived interval lies wholly inside the band
 **And** a `valueless` reference matches a line that shares its `statId` and whose `ranges` is empty (§1, AD-5, AD-11).

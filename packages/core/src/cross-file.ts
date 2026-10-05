@@ -12,7 +12,7 @@ import type {
   CoOccur,
   CraftedTrackedEntry,
   CrossFileCheck,
-  ModifierRef,
+  ModifierReference,
   ModifierWeight,
   TrackedEntry,
   WeightsClassPools,
@@ -26,7 +26,7 @@ import { COMPLETE } from './cross-file/complete-pool.ts';
 import { edgeAlignment } from './cross-file/edge-alignment.ts';
 import { emptyContainment } from './cross-file/empty-containment.ts';
 import { formatLine, formatReference, setText } from './cross-file/reference-text.ts';
-import { containedIn, contains, eligible, interval, lineSet, poolOf, statIds, untrackable } from './probability.ts';
+import { containedIn, isContaining, eligible, interval, lineSet, poolOf, statIds, isUntrackable } from './probability.ts';
 import type { ReferenceLine, Slot } from './probability.ts';
 
 export { classDiscriminability } from './cross-file/class-discriminability.ts';
@@ -68,14 +68,14 @@ export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPool
 }
 
 /** `disagrees(rl, line)` (§2.3): a valueless reference line beside a banded line, same `statId`. */
-function disagrees(rl: ReferenceLine, line: WeightsLine): boolean {
+function isDisagreeing(rl: ReferenceLine, line: WeightsLine): boolean {
   return line.statId === rl.statId && !('valueMin' in rl) && line.ranges.length > 0;
 }
 
 /** §2.3, per line: the detail when a valueless reference line meets a banded scoped line. */
 export function kindAgreement(
   slot: Slot,
-  reference: ModifierRef,
+  reference: ModifierReference,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
@@ -104,7 +104,7 @@ function disagreementsOn(
     if (entry.weight === 0) {
       continue;
     }
-    const here = entry.lines.filter((line) => disagrees(rl, line)).length;
+    const here = entry.lines.filter((line) => isDisagreeing(rl, line)).length;
     if (here === 0) {
       continue;
     }
@@ -115,7 +115,7 @@ function disagreementsOn(
 }
 
 /** `meets(rl, line)` (§2.7): the search for `rl` can match a roll of `line`. */
-function meets(rl: ReferenceLine, line: WeightsLine): boolean {
+function isMeeting(rl: ReferenceLine, line: WeightsLine): boolean {
   if (line.statId !== rl.statId) {
     return false;
   }
@@ -129,7 +129,7 @@ function meets(rl: ReferenceLine, line: WeightsLine): boolean {
 /** §2.7: `incomplete(ref) ∨ mixedGroup(ref)`; the `mixedGroup` detail blames `weights.json`. */
 export function lineSetCompleteness(
   slot: Slot,
-  reference: ModifierRef,
+  reference: ModifierReference,
   scoped: readonly ModifierWeight[],
   floor: number,
 ): string | undefined {
@@ -139,7 +139,7 @@ export function lineSetCompleteness(
   const parts: string[] = [];
 
   const wider = scoped.filter((entry) => {
-    if (entry.weight === 0 || untrackable(entry, COMPLETE) || lines.some((rl) => entry.lines.every((line) => !meets(rl, line)))) {
+    if (entry.weight === 0 || isUntrackable(entry, COMPLETE) || lines.some((rl) => entry.lines.every((line) => !isMeeting(rl, line)))) {
       return false;
     }
     const tierSet = lineSet(entry);
@@ -190,13 +190,13 @@ export function coOccur(scoped: ScopedPools): CoOccur {
     const theirs = statIds(y);
     const isCoOccurring =
       statIds(x).some((statId) => theirs.includes(statId)) &&
-      scoped[slot].some((entry) => contains(x, entry, summed) && contains(y, entry, summed));
+      scoped[slot].some((entry) => isContaining(x, entry, summed) && isContaining(y, entry, summed));
     cache.set(key, isCoOccurring);
     return isCoOccurring;
   };
 }
 
-type ReferenceCheck = (slot: Slot, reference: ModifierRef, scoped: readonly ModifierWeight[], floor: number) => string | undefined;
+type ReferenceCheck = (slot: Slot, reference: ModifierReference, scoped: readonly ModifierWeight[], floor: number) => string | undefined;
 
 const REF_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
   ['empty-containment-set', emptyContainment],

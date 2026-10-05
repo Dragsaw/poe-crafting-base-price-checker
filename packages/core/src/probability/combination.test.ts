@@ -5,7 +5,7 @@ import {
   WEIGHTS_SCHEMA_VERSION,
   WeightsFileSchema,
 } from '@poe/contracts';
-import type { ModifierRef } from '@poe/contracts';
+import type { ModifierReference } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { affixProbability, combinationProbability, eligible, poolOf } from '../probability.ts';
@@ -79,7 +79,7 @@ describe('combinationProbability (§11)', () => {
 
   it('gives the same P with and without acceptedTier', () => {
     const classPools = pools([tier([line(STAT, [10, 12])], 100), tier([line(STAT, [20, 30])], 300)], [tier([line(OTHER)], 5)]);
-    const suffix: ModifierRef = { kind: 'valueless', statId: OTHER };
+    const suffix: ModifierReference = { kind: 'valueless', statId: OTHER };
     const plain = combinationProbability(classPools, { itemLevelMin: 82, prefix: band(10, 12), suffix }, 0);
     const labelled = combinationProbability(
       classPools,

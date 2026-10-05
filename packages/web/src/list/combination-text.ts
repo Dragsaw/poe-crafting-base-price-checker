@@ -2,8 +2,8 @@ import {
   compareByCodeUnit,
   flattenStatCatalogue,
   type CraftedTrackedEntry,
-  type HybridModifierRef,
-  type ModifierRef,
+  type HybridModifierReference,
+  type ModifierReference,
   type StatCatalogue,
 } from '@poe/contracts';
 
@@ -42,7 +42,7 @@ export function bandedFallback(text: string, valueMin: number, valueMax: number)
 }
 
 // No form (a product gap) or a banded reference with no tier (a curation gap): verbatim fallback.
-export function affixText(reference: ModifierRef, stats: StatTexts): AffixPart {
+export function affixText(reference: ModifierReference, stats: StatTexts): AffixPart {
   if (reference.kind === 'hybrid') {
     return hybridText(reference, stats);
   }
@@ -60,7 +60,7 @@ const LINE_JOIN = ', ';
 // EXPERIENCE.md, *A Hybrid Modifier affix is the tier label, then its lines* (CAP-7).
 // Short forms are all or none. Lines sort by printed text in code-unit order, not `statId`,
 // so the label never reads `weights.json`.
-function hybridText(reference: HybridModifierRef, stats: StatTexts): AffixPart {
+function hybridText(reference: HybridModifierReference, stats: StatTexts): AffixPart {
   const forms: string[] = [];
   for (const line of reference.lines) {
     const form = 'valueMin' in line ? shortForm(line.statId) : undefined;

@@ -36,25 +36,25 @@ export type { DefenceLetter } from './class-name.ts';
 export {
   AcceptedTierSchema,
   BandedHybridLineSchema,
-  BandedModifierRefSchema,
+  BandedModifierReferenceSchema,
   HybridLineSchema,
-  HybridModifierRefSchema,
-  ModifierRefSchema,
+  HybridModifierReferenceSchema,
+  ModifierReferenceSchema,
   StatIdSchema,
   ValuelessHybridLineSchema,
-  ValuelessModifierRefSchema,
-} from './modifier-ref.ts';
+  ValuelessModifierReferenceSchema,
+} from './modifier-reference.ts';
 export type {
   BandedHybridLine,
-  BandedModifierRef,
+  BandedModifierReference,
   HybridLine,
-  HybridModifierRef,
-  ModifierRef,
-  SingleLineModifierRef,
+  HybridModifierReference,
+  ModifierReference,
+  SingleLineModifierReference,
   StatId,
   ValuelessHybridLine,
-  ValuelessModifierRef,
-} from './modifier-ref.ts';
+  ValuelessModifierReference,
+} from './modifier-reference.ts';
 
 /** Arm schemas stay unexported: they lack the union's `superRefine` rules. */
 export {
@@ -84,10 +84,10 @@ export {
   linesOf,
   hasHybridAffix,
   CAN_NEVER_CO_OCCUR,
-  overlap,
+  areOverlapping as overlap,
   OVERLAP_SLOTS,
   overlapBranches,
-  slotOverlap,
+  isSlotOverlapping as slotOverlap,
   slotOverlapBranch,
   summedInterval,
   summedStatIds,

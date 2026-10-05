@@ -1,5 +1,5 @@
 import { parseEnvelope, TrackedFileSchema } from '../envelopes';
-import type { SingleLineModifierRef as SingleLineModifierReference } from '../modifier-ref';
+import type { SingleLineModifierReference } from '../modifier-reference';
 import type { CoOccur } from '../overlap';
 import { TRACKED_SCHEMA_VERSION } from '../schema-version';
 

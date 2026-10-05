@@ -1,4 +1,4 @@
-import type { ModifierRef as ModifierReference } from './modifier-ref.ts';
+import type { ModifierReference } from './modifier-reference.ts';
 import type { TrackedEntry } from './tracked-entry.ts';
 
 /** The canonical `TrackedEntry` key (IN §4.1): one serialisation for tie-breaks (AD-7, AD-17). */

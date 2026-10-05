@@ -1,4 +1,4 @@
-import type { ModifierRef, ModifierWeight, WeightsClassPools, WeightsLine } from '@poe/contracts';
+import type { ModifierReference, ModifierWeight, WeightsClassPools, WeightsLine } from '@poe/contracts';
 
 import type { ProbabilityResult } from '../probability.ts';
 
@@ -38,7 +38,7 @@ export const line = (statId: string | null, ...ranges: (readonly [number, number
 // eslint-disable-next-line unicorn/no-null -- boundary: the weights file schema allows a null `statId` for an unresolved line (WEIGHTS-FILE-SCHEMA).
 export const unresolvedLine = (...ranges: (readonly [number, number])[]): WeightsLine => line(null, ...ranges);
 
-export const band = (valueMin: number, valueMax: number, statId = STAT): ModifierRef => ({
+export const band = (valueMin: number, valueMax: number, statId = STAT): ModifierReference => ({
   kind: 'banded',
   statId,
   valueMin,

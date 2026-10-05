@@ -21,7 +21,7 @@ export const AcceptedTierSchema = z
     'A display-only free label such as "T1" or "T1-T2". Nothing validates it, joins it to the weights file, or keys on it (AD-5).',
   );
 
-export const BandedModifierRefSchema = z
+export const BandedModifierReferenceSchema = z
   .strictObject({
     kind: z.literal('banded'),
     statId: StatIdSchema,
@@ -39,7 +39,7 @@ export const BandedModifierRefSchema = z
   })
   .describe('An inclusive, closed band over the value the trade stat filter compares (AD-5).');
 
-export const ValuelessModifierRefSchema = z
+export const ValuelessModifierReferenceSchema = z
   .strictObject({
     kind: z.literal('valueless'),
     statId: StatIdSchema,
@@ -91,7 +91,7 @@ const HybridLinesSchema = z
   })
   .transform((lines) => lines.toSorted((a, b) => compareByCodeUnit(a.statId, b.statId)));
 
-export const HybridModifierRefSchema = z
+export const HybridModifierReferenceSchema = z
   .strictObject({
     kind: z.literal('hybrid'),
     lines: HybridLinesSchema,
@@ -101,18 +101,18 @@ export const HybridModifierRefSchema = z
     'One modifier with several stat lines. `acceptedTier` labels the hybrid as a whole, never a line (AD-5, IMPLEMENTATION-NOTES §4.1).',
   );
 
-export const ModifierRefSchema = z.discriminatedUnion('kind', [
-  BandedModifierRefSchema,
-  ValuelessModifierRefSchema,
-  HybridModifierRefSchema,
+export const ModifierReferenceSchema = z.discriminatedUnion('kind', [
+  BandedModifierReferenceSchema,
+  ValuelessModifierReferenceSchema,
+  HybridModifierReferenceSchema,
 ]);
 
-export type BandedModifierRef = z.infer<typeof BandedModifierRefSchema>;
-export type ValuelessModifierRef = z.infer<typeof ValuelessModifierRefSchema>;
+export type BandedModifierReference = z.infer<typeof BandedModifierReferenceSchema>;
+export type ValuelessModifierReference = z.infer<typeof ValuelessModifierReferenceSchema>;
 export type BandedHybridLine = z.infer<typeof BandedHybridLineSchema>;
 export type ValuelessHybridLine = z.infer<typeof ValuelessHybridLineSchema>;
 export type HybridLine = z.infer<typeof HybridLineSchema>;
-export type HybridModifierRef = z.infer<typeof HybridModifierRefSchema>;
-export type ModifierRef = z.infer<typeof ModifierRefSchema>;
+export type HybridModifierReference = z.infer<typeof HybridModifierReferenceSchema>;
+export type ModifierReference = z.infer<typeof ModifierReferenceSchema>;
 /** A reference that names one `statId`: the kinds whose `.statId` a reader may read. */
-export type SingleLineModifierRef = BandedModifierRef | ValuelessModifierRef;
+export type SingleLineModifierReference = BandedModifierReference | ValuelessModifierReference;

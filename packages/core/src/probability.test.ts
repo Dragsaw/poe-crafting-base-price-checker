@@ -1,8 +1,8 @@
 import { WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
-import type { ModifierRef, WeightsFile } from '@poe/contracts';
+import type { ModifierReference, WeightsFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { affixProbability, combinationProbability, contains, eligible, interval, poolOf } from './probability.ts';
+import { affixProbability, combinationProbability, isContaining, eligible, interval, poolOf } from './probability.ts';
 import { band, line, OTHER, pOf, pools, STAT, tier, unresolvedLine } from './probability/test-support.ts';
 
 describe('interval (§1)', () => {
@@ -15,13 +15,13 @@ describe('interval (§1)', () => {
 
 describe('contains (§1)', () => {
   it('contains a tier whose derived interval sits exactly on the band edges', () => {
-    expect(contains(band(47, 50), tier([line(STAT, [47, 50])], 100))).toBe(true);
+    expect(isContaining(band(47, 50), tier([line(STAT, [47, 50])], 100))).toBe(true);
   });
 
   it('does not contain a clipped tier, which stays in the denominator', () => {
     const clipped = tier([line(STAT, [45, 50])], 100);
     const inside = tier([line(STAT, [51, 55])], 300);
-    expect(contains(band(47, 50), clipped)).toBe(false);
+    expect(isContaining(band(47, 50), clipped)).toBe(false);
     const p = pOf(affixProbability(pools([clipped, inside], [tier([line(OTHER)], 1)]), 'prefix', band(47, 55), { itemLevelMin: 82, modifierLevelMin: 0 }));
     expect(p).toBe(300 / 400);
   });
@@ -35,15 +35,15 @@ describe('contains (§1)', () => {
   });
 
   it('contains a valueless line for a valueless ref, and never a banded line of that statId', () => {
-    const reference: ModifierRef = { kind: 'valueless', statId: STAT };
-    expect(contains(reference, tier([line(STAT)], 1))).toBe(true);
-    expect(contains(reference, tier([line(STAT, [1, 2])], 1))).toBe(false);
+    const reference: ModifierReference = { kind: 'valueless', statId: STAT };
+    expect(isContaining(reference, tier([line(STAT)], 1))).toBe(true);
+    expect(isContaining(reference, tier([line(STAT, [1, 2])], 1))).toBe(false);
   });
 
   it('contains a valueless line for a banded ref whose band holds [1, 1] (§2.3)', () => {
-    expect(contains(band(1, 1), tier([line(STAT)], 1))).toBe(true);
-    expect(contains(band(0, 10), tier([line(STAT)], 1))).toBe(true);
-    expect(contains(band(2, 2), tier([line(STAT)], 1))).toBe(false);
+    expect(isContaining(band(1, 1), tier([line(STAT)], 1))).toBe(true);
+    expect(isContaining(band(0, 10), tier([line(STAT)], 1))).toBe(true);
+    expect(isContaining(band(2, 2), tier([line(STAT)], 1))).toBe(false);
   });
 
   it('counts a hybrid entry once, however many of its lines match', () => {
@@ -58,22 +58,22 @@ describe('contains (§1)', () => {
   it('never contains a null-statId line, whose entry stays in the denominator', () => {
     const unresolved = tier([unresolvedLine([10, 12])], 500);
     const hit = tier([line(STAT, [10, 12])], 500);
-    expect(contains(band(10, 12), unresolved)).toBe(false);
+    expect(isContaining(band(10, 12), unresolved)).toBe(false);
     expect(pOf(affixProbability(pools([unresolved, hit], []), 'prefix', band(10, 12), { itemLevelMin: 82, modifierLevelMin: 0 }))).toBe(0.5);
   });
 
   it('never contains a weight-0 tier, not-in-game or published, whatever its lines carry', () => {
     const notInGame = { ...tier([line(STAT, [10, 12])], 0), weightSource: 'not-in-game' as const };
     const published = tier([line(STAT, [10, 12])], 0);
-    expect(contains(band(10, 12), notInGame)).toBe(false);
-    expect(contains(band(10, 12), published)).toBe(false);
-    expect(contains({ kind: 'valueless', statId: STAT }, tier([line(STAT)], 0))).toBe(false);
+    expect(isContaining(band(10, 12), notInGame)).toBe(false);
+    expect(isContaining(band(10, 12), published)).toBe(false);
+    expect(isContaining({ kind: 'valueless', statId: STAT }, tier([line(STAT)], 0))).toBe(false);
   });
 
   it('gives an empty containment set, not a weight-0 one, for a band that covers only weight-0 tiers', () => {
     const zero = { ...tier([line(STAT, [10, 12])], 0), weightSource: 'not-in-game' as const };
     const other = tier([line(STAT, [20, 30])], 100);
-    expect([zero, other].filter((entry) => contains(band(10, 12), entry))).toEqual([]);
+    expect([zero, other].filter((entry) => isContaining(band(10, 12), entry))).toEqual([]);
   });
 });
 

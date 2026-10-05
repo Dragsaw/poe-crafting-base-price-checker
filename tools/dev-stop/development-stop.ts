@@ -47,7 +47,7 @@ function normalize(text: string): string {
 
 /** The arguments of a command line. Double quotes group, and backslashes are literal (Windows paths). */
 function tokenize(commandLine: string): string[] {
-  return [...commandLine.matchAll(/(?:"[^"]*"|[^\s"])+/g)].map((match) => match[0].replaceAll('"', ''));
+  return Array.from(commandLine.matchAll(/(?:"[^"]*"|[^\s"])+/g), (match) => match[0].replaceAll('"', ''));
 }
 
 /** The program name of a path: last segment, lowercase, no Windows executable extension. */

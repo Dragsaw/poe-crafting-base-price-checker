@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { defenceLettersOf } from './class-name.ts';
 import { CategoryIdSchema, ClassNameSchema } from './item-class.ts';
-import { StatIdSchema } from './modifier-ref.ts';
+import { StatIdSchema } from './modifier-reference.ts';
 import { IsoTimestampSchema } from './primitives.ts';
 import { SchemaVersionSchema } from './schema-version.ts';
 
