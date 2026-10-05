@@ -137,7 +137,8 @@ interface ChunkOutcomeBase {
   readonly entries: readonly DatasetEntry[];
   /** The lock records this chunk produced; the report adds the starvation record separately. */
   readonly records: readonly SyncRunRecord[];
-  /** Set when a pinned step's allowance is below pinned entries left plus one (AD-7, §6). */
+  /** Set when a pinned step's allowance is below pinned entries left plus one while rotation
+   * work waited (AD-7, §6). */
   readonly pinnedStarvation?: ChunkStarvation;
   /** A session's chunk only, once the order exists: `true` when its order started a new pass. */
   readonly newPass?: boolean;
