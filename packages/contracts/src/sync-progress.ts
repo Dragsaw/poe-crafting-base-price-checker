@@ -32,7 +32,7 @@ export const SyncProgressSchema = z.strictObject({
   ),
 });
 
-/** Version history of the additive fields: IMPLEMENTATION-NOTES.md §13.7. */
+/** 1.2.0 adds `authHoldOffUntil` (IMPLEMENTATION-NOTES.md §13.7). */
 export const SYNC_PROGRESS_SCHEMA_VERSION = '1.2.0';
 
 export type SyncProgress = z.infer<typeof SyncProgressSchema>;
