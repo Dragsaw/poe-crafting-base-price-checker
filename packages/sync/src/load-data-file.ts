@@ -1,13 +1,6 @@
-/**
- * One load path for the player-owned and catalogue files `sync` reads but
- * never writes (`data/config.json`, `data/currencies.json`,
- * `data/catalogue/items.json`). Every refusal is a typed `DataFileError` that
- * names the file, and it is raised before any request is issued.
- *
- * `runChunk` raises the same error for the envelopes it reads under the lock
- * (`../chunk/run-chunk.ts`), so the `pnpm sync` session can tell a file
- * refusal, which only an edit clears, from a transient fault (`../sync.ts`).
- */
+// One load path for the files `sync` reads but never writes; a refusal is a typed `DataFileError`
+// naming the file, raised before any request. `runChunk` raises it too, so the `pnpm sync` session
+// can tell a refusal only an edit clears from a transient fault (`../sync.ts`).
 
 import { parseEnvelope, TRACKED_SCHEMA_VERSION, TrackedFileSchema, trackedEarlierMajorMessage } from '@poe/contracts';
 import type { EnvelopeResult, EnvelopeVersionRefused, FilesystemPort, TrackedFile } from '@poe/contracts';
@@ -35,11 +28,7 @@ export type DataFileResult<T> =
   | { readonly ok: true; readonly value: T }
   | { readonly ok: false; readonly error: DataFileError };
 
-/**
- * Explains a version refusal the generic sentence cannot: `undefined` keeps
- * the generic sentence. A file whose major change needs the curator to act
- * passes one (IMPLEMENTATION-NOTES §4.1).
- */
+/** Explains a refusal the generic text cannot; `undefined` keeps it (IMPLEMENTATION-NOTES §4.1). */
 export type VersionRefusalExplainer = (found: string) => string | undefined;
 
 /** The detail of a version refusal: the explainer's text, or the generic sentence naming both versions. */
@@ -53,22 +42,14 @@ export function describeVersionRefusal(
   );
 }
 
-/**
- * `tracked.json` parses against its own contract version
- * (`TRACKED_SCHEMA_VERSION`), never the shared default, and an earlier major
- * is refused with §4.1's re-author message. Every sync-side tracked load uses
- * these two.
- */
+/** Parses `tracked.json` against `TRACKED_SCHEMA_VERSION`; an earlier major gets §4.1's message. */
 export function parseTrackedFile(data: unknown): EnvelopeResult<TrackedFile> {
   return parseEnvelope(TrackedFileSchema, data, TRACKED_SCHEMA_VERSION);
 }
 
 export const explainTrackedVersion: VersionRefusalExplainer = trackedEarlierMajorMessage;
 
-/**
- * Reads and validates one versioned file through `parse` (normally
- * `parseEnvelope` over the file's schema). An absent file is a refusal.
- */
+/** Reads and validates one versioned file through `parse`; an absent file is a refusal. */
 export async function loadDataFile<T>(
   fs: FilesystemPort,
   path: string,

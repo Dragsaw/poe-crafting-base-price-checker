@@ -72,87 +72,9 @@
       "count": 1
     }
   },
-  "packages/sync/src/catalogue/catalogue-ids.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/catalogue/committed-catalogue.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/chunk/catalogue-check.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/chunk/cross-file-gate.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/chunk/lock.ts": {
-    "local/max-comment-run": {
-      "count": 6
-    }
-  },
-  "packages/sync/src/chunk/publish-dataset.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/chunk/sync-report.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/dry-run.data.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/dry-run.ts": {
-    "local/max-comment-run": {
-      "count": 9
-    }
-  },
-  "packages/sync/src/git/read-only-git-port.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/git/read-only-git-port.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/index.ts": {
-    "local/max-comment-run": {
-      "count": 12
-    }
-  },
-  "packages/sync/src/load-config.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/load-data-file.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
   "packages/sync/src/no-git-write.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "unicorn/prefer-iterator-to-array": {
       "count": 1
-    }
-  },
-  "packages/sync/src/pinned-cap.ts": {
-    "local/max-comment-run": {
-      "count": 2
     }
   },
   "packages/sync/src/pricing/fixture-names.ts": {

@@ -11,13 +11,8 @@ import { resolveTrackedListAge } from '@poe/contracts';
 import { createNodeFilesystemPort } from '../shell.ts';
 import { createReadOnlyGitPort, parseAuthorDate } from './read-only-git-port.ts';
 
-/**
- * The real port against a throwaway repository. Git reads no user or system
- * config (`GIT_CONFIG_GLOBAL` points at an empty file, `GIT_CONFIG_NOSYSTEM`),
- * never walks above the temporary directory (`GIT_CEILING_DIRECTORIES`), and
- * every commit carries a fixed author date. The variables are stubbed on
- * `process.env`, so the port under test inherits the same isolation.
- */
+// The real port against a throwaway repository. Stubbed env isolates git: no user or system config,
+// no walk above the temp directory (`GIT_CEILING_DIRECTORIES`), fixed author dates.
 
 const run = promisify(execFile);
 

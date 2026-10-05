@@ -1,10 +1,5 @@
-/**
- * The player config, read from `data/config.json` (`ConfigFileSchema`,
- * read-only, AD-19). Absent or invalid is a typed refusal naming the file.
- *
- * Deliberately outside `chunk/`: the chunk runner and the pricing step receive
- * the league as a value, and nothing in `chunk/` names the config file.
- */
+// Player config from `data/config.json` (read-only, AD-19); absent or invalid is a typed refusal.
+// Outside `chunk/` on purpose: the runner and the pricing step receive the league as a value.
 
 import { ConfigFileSchema, parseEnvelope } from '@poe/contracts';
 import type { ConfigFile, FilesystemPort, LeagueId } from '@poe/contracts';

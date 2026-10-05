@@ -1,12 +1,6 @@
-/**
- * The committed catalogue as the run-start check reads it (AD-9, AD-25): three
- * flat id sets, built from `data/catalogue/stats.json`, `items.json` and
- * `filters.json`. Every endpoint answers in category groups, so each file is
- * flattened before an id is looked up. Absent or invalid is a typed load error
- * naming the file, raised before any request.
- *
- * `className` has no set here: no catalogue endpoint carries a class axis.
- */
+// The committed catalogue as three flat id sets for the run-start check (AD-9, AD-25).
+// Absent or invalid is a typed load error raised before any request. No `className` set:
+// no catalogue endpoint carries a class axis.
 
 import {
   CatalogueFiltersFileSchema,

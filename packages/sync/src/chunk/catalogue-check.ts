@@ -1,30 +1,6 @@
-/**
- * The run-start catalogue check (AD-9, AD-12, AD-25, FR-24).
- *
- * Pure: the tracked list, the published dataset entries and the catalogue id
- * sets go in; the marks, the records and the order's input come out. It issues
- * no request and reads no file, so it never stamps `lastAttemptedAt`. It is
- * validation against the committed catalogue, never inference from a search
- * result.
- *
- * Every non-pruned entry is checked, field by field: the `categoryId` (crafted)
- * or the `baseTypeId` (raw), then the prefix `statId`s, then the suffix
- * `statId`s — one per line of a `hybrid` reference. `className` is never checked: no catalogue endpoint carries a class
- * axis. An entry with any miss is:
- *
- * - **marked** `unresolvable`, keeping `lastAttemptedAt`, `lastSearchId` and
- *   `lastSearchLeague` as published and dropping only the observation;
- * - **reported**, one `unresolvable` record per miss, in field order;
- * - **excluded** from this chunk's order, so no request is issued for it.
- *
- * An entry published as `unresolvable` whose ids all resolve again is
- * **recovered** (AD-7): `orderDataset` carries it with that state stripped, so
- * the rotation places it as an ordinary entry (row 1 or 2) rather than in
- * row 3. Only the order's input changes: the published dataset keeps the entry
- * `unresolvable` until a step prices it. A crafted `jewel` entry is never
- * recovered here: its derived base type is checked only by the pricing step
- * (AD-25), so this check cannot decide it, and it stays in row 3.
- */
+// Run-start catalogue check (AD-9, AD-12, AD-25, FR-24): pure and offline, so it never stamps
+// `lastAttemptedAt`. Recovery (AD-7) changes only the order's input, not the published dataset.
+// A crafted `jewel` is never recovered here: its base type is checked only when priced (AD-25).
 
 import { canonicalKey } from '@poe/contracts';
 import type { DatasetEntry, TrackedEntry, UnresolvableRecord } from '@poe/contracts';
@@ -46,10 +22,7 @@ export interface CatalogueCheck {
 /** The state a recovered entry carries into the order only. Never published. */
 const RECOVERED: DatasetEntry['price'] = { state: 'not-yet-synced', reason: 'never-synced' };
 
-/**
- * An entry marked `unresolvable` with its attempt metadata kept and its
- * observation dropped. Stamps nothing: the mark is offline work (AD-9).
- */
+/** Marks an entry `unresolvable`, keeping its attempt metadata and stamping nothing (AD-9). */
 export function markUnresolvable(entryKey: string, before: DatasetEntry | undefined): DatasetEntry {
   return {
     entryKey,

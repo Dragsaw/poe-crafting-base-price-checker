@@ -1,50 +1,6 @@
-/**
- * `pnpm sync:dry` — the chunk runner, in memory, against the recorded fixtures
- * (AGENT-WORKFLOW.md, NFR-1, NFR-3).
- *
- * It takes read-only snapshots of `data/tracked.json`, `data/dataset.json`
- * (when present), `data/config.json`, `data/currencies.json`,
- * `data/catalogue/{items,stats,filters}.json` and `data/weights.json` (when
- * present) into an in-memory fake filesystem, and runs **the same
- * composition** a live run uses (`./compose-chunk.ts`: the same `runChunk`,
- * the same pricing step, the same league gate and the same under-lock loads),
- * on a fixed pid, with no pacing wait. The
- * gate's GET is served the recorded `fixtures/trade-data-leagues.json` and
- * counted as `league-validation`. The step's requests go to an offline port
- * that serves the recorded `fixtures/trade-{search,fetch}-*.json` back by
- * request digest. The recorded searches cover a small fixed workload
- * (`FIXTURE_WORKLOAD_PATH`), not the whole tracked list, so an entry whose
- * search has no recorded fixture is skipped: it is visited with no request,
- * keeps its dataset state and is listed in `unrecorded`. Every other
- * unrecorded request, such as the fetch leg of a recorded search, fails
- * loudly — the run rejects, naming the missing fixture, and never yields. A
- * league mismatch rejects too. It prints `{outcome, completed, entries,
- * progress, dataset, records, report}` — plus `unrecorded` when an entry was
- * skipped, `pinnedStarvation` when the chunk truncated the pinned
- * set, and `notBefore` when the real `data/sync-progress.json` carries one —
- * as JSON to stdout and writes nothing to disk: the lock,
- * `sync-progress.json`, `dataset.json` and `sync-report.json` land in the
- * fake. `dataset` is the file as the chunk wrote it, with the active league
- * and the output rate set passed in. `report` is the Sync Report as the
- * chunk wrote it: the offline port's pricing requests are counted as
- * `tracked-list`, the git port is a fake with no history, and a snapshot of
- * `data/sync-report.json` (when present) supplies the records it carries
- * forward.
- *
- * **The clock.** By default the clock is the latest `lastAttemptedAt` across
- * the dataset snapshot's entries, so the run predicts the live run that
- * immediately follows the last one; with no such entry it falls back to the
- * fixed instant `DRY_RUN_INSTANT`. `--at <iso>` (or the `at` option) sets it
- * explicitly. The dry run never lets the real `data/sync-progress.json`'s
- * `notBefore` (AD-8's cross-run penalty) defer the simulated run — it is
- * read but never fed into the fake filesystem — and only surfaces it in the
- * printed report (AGENT-WORKFLOW.md).
- *
- * An absent tracked file is an empty workload, and an absent dataset means
- * every entry is never attempted. An absent weights file is a `weights-absent`
- * record, as in a live run. An absent or invalid config, currencies or
- * catalogue file is a typed refusal naming the file.
- */
+// `pnpm sync:dry`: the live composition (`./compose-chunk.ts`) in memory over recorded fixtures,
+// writing nothing to disk (AGENT-WORKFLOW.md, NFR-1, NFR-3). Its clock default and the `notBefore`
+// it only prints are in AGENT-WORKFLOW.md. An entry with no recorded search lands in `unrecorded`.
 
 import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -89,12 +45,7 @@ import { searchFixtureName } from './pricing/fixture-names.ts';
 import { CATALOGUE_ITEMS_PATH } from './pricing/load-item-types.ts';
 import { UnknownClassBaseTypeError } from './pricing/search-body.ts';
 
-/**
- * The clock's fallback when the dataset snapshot carries no `lastAttemptedAt`
- * and `--at` is absent. Fixed, so that case still prints the same bytes on
- * repeat; the default case's determinism instead comes from the snapshot's
- * own latest `lastAttemptedAt`.
- */
+/** Fixed fallback clock when no `lastAttemptedAt` and no `--at` (AGENT-WORKFLOW.md). */
 export const DRY_RUN_INSTANT = '2026-01-01T00:00:00.000Z';
 export const DRY_RUN_PID = 0;
 /** The offline client still refuses a blank contact, so the dry run names itself. */
@@ -112,18 +63,11 @@ export interface DryRunReport {
   readonly records: readonly SyncRunRecord[];
   /** The Sync Report the chunk wrote into the fake, or `null` if none. */
   readonly report: SyncReportFile | null;
-  /**
-   * The entry keys the run skipped, in visiting order, because their search
-   * has no recorded fixture. Present only when there is at least one.
-   */
+/** Entry keys skipped for want of a recorded search fixture, in visiting order; only when any. */
   readonly unrecorded?: readonly string[];
   /** Present only when the chunk truncated the pinned set (AD-7). */
   readonly pinnedStarvation?: ChunkStarvation;
-  /**
-   * The real `data/sync-progress.json`'s `notBefore` (AD-8), when the
-   * snapshot carries one. The dry run never lets it defer the simulated run;
-   * this is surfaced only so an agent can see a pending penalty.
-   */
+/** The real `sync-progress.json`'s `notBefore` (AD-8), surfaced only; it never defers the run. */
   readonly notBefore?: string;
 }
 
@@ -140,10 +84,7 @@ export interface DryRunSnapshot {
   readonly weights?: string;
   /** The previous Sync Report, whose records the chunk carries forward. */
   readonly report?: string;
-  /**
-   * The real `data/sync-progress.json`. Read only for its `notBefore`
-   * (AD-8); never fed into the simulated run, so it cannot defer it.
-   */
+/** The real `sync-progress.json`, read only for `notBefore` (AD-8); never fed into the run. */
   readonly progress?: string;
   readonly fixtures: PricingFixtures;
 }
@@ -175,10 +116,7 @@ function latestAttemptedAt(entries: readonly DatasetEntry[]): string | undefined
   return latest;
 }
 
-/**
- * The real `data/sync-progress.json`'s `notBefore`, when the snapshot carries
- * one — a typed refusal naming the file, as every other input file gets.
- */
+/** The progress snapshot's `notBefore`, if any; invalid text is a typed refusal naming the file. */
 function readProgressNotBefore(text: string | undefined): string | undefined {
   if (text === undefined) {
     return undefined;
@@ -201,12 +139,8 @@ async function readWritten<T>(
   return text === undefined ? null : schema.parse(JSON.parse(text));
 }
 
-/** Pure apart from the fakes it builds: the snapshot in, the report out. */
-/**
- * Whether `entry`'s search has a recorded fixture. An entry whose body cannot
- * be built counts as recorded, so the pricing step handles it as a live run
- * does, with no request.
- */
+// Whether `entry`'s search has a recorded fixture. An unbuildable body counts as recorded,
+// so the pricing step handles it as a live run does, with no request.
 function hasRecordedSearch(fixtures: PricingFixtures, entry: TrackedEntry, context: StepContext): boolean {
   let name: string;
   try {
@@ -304,10 +238,7 @@ async function readSnapshot(path: string, dataDirectory?: string): Promise<strin
   }
 }
 
-/**
- * The repository's own inputs and recorded fixtures, read and never written.
- * `dataDirectory` stands in for `data/`: a test passes the frozen fixture directory.
- */
+/** Inputs and recorded fixtures, read and never written; `dataDirectory` stands in for `data/`. */
 export async function readRepositorySnapshot(dataDirectory?: string): Promise<DryRunSnapshot> {
   return {
     tracked: await readSnapshot(TRACKED_PATH, dataDirectory),
@@ -343,11 +274,8 @@ async function main(): Promise<void> {
   process.stdout.write(`${JSON.stringify(report, undefined, 2)}\n`);
 }
 
-/**
- * Importing the module, as the co-located test does, runs nothing. Node
- * realpaths the main module's URL but not `argv[1]`, so the comparison
- * realpaths both sides; otherwise a junction or `subst` path prints nothing.
- */
+// Node realpaths the main module's URL but not `argv[1]`: realpath both sides, or a junction or
+// `subst` path prints nothing. Importing the module, as the co-located test does, runs nothing.
 function isInvokedDirectly(): boolean {
   const entry = process.argv[1];
   if (entry === undefined) {

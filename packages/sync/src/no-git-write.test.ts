@@ -4,20 +4,9 @@ import { fileURLToPath } from 'node:url';
 
 import { expect, it } from 'vitest';
 
-/**
- * `sync` has no git write path (AD-3): it writes its own files by explicit
- * path, and the player commits and pushes. This scan keeps it that way. It
- * reads every non-test source under `packages/sync/src` and refuses any
- * process spawn and any git subcommand that would change a repository.
- * Test files are exempt: a test may spawn `node` to run a script.
- *
- * One source file is exempt from one rule. `git/read-only-git-port.ts` is the
- * real `GitPort` (AD-12), and reading a commit's author date needs a spawn, so
- * the spawn rule is lifted for that path alone. The git-library and
- * git-subcommand rules still apply to it, and a further test pins it to the
- * one read-only invocation: `execFile` of `git --no-optional-locks log`, with
- * no `exec`, no `spawn`, no `fork` and no shell option.
- */
+// `sync` has no git write path (AD-3): this scan refuses any process spawn and any git subcommand
+// that changes a repository, in non-test sources. Only `git/read-only-git-port.ts` (AD-12) spawns,
+// for the author date; another test pins it to one `execFile` of `git --no-optional-locks log`.
 
 const ROOT = fileURLToPath(new URL('.', import.meta.url));
 

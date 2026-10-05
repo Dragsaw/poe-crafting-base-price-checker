@@ -7,10 +7,7 @@ import { DatasetFileSchema, SyncReportFileSchema } from '@poe/contracts';
 import type { DatasetEntry, DatasetFile, SyncReportFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-/**
- * The dry-run script over the live data/ (pnpm test:data). The copy in
- * dry-run.test.ts keeps only the "writes nothing" guard.
- */
+/** The dry-run script over the live data/ (pnpm test:data); dry-run.test.ts has the write guard. */
 const SCRIPT = fileURLToPath(new URL('dry-run.ts', import.meta.url));
 const DATA_DIR = fileURLToPath(new URL('../../../data', import.meta.url));
 
