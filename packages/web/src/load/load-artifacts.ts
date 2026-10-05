@@ -64,9 +64,9 @@ export function artifactUrl(baseUrl: string, path: string): string {
 }
 
 /** The response body, or the terminal `Fetched` where the artifact is absent or did not arrive. */
-async function readBody(url: string, fetchImpl: FetchLike, init: RequestInit): Promise<string | Fetched> {
+async function readBody(baseUrl: string, path: string, fetchImpl: FetchLike, init: RequestInit): Promise<string | Fetched> {
   try {
-    const response = await fetchImpl(url, init);
+    const response = await fetchImpl(artifactUrl(baseUrl, path), init);
     // 404 is absent. Any other non-OK status did not arrive.
     if (response.status === 404) {
       return { kind: 'absent' };
@@ -117,7 +117,7 @@ async function fetchOne(
 ): Promise<Fetched> {
   const descriptor = ARTIFACTS[key];
   const init: RequestInit = signal === undefined ? { cache: 'no-cache' } : { cache: 'no-cache', signal };
-  const body = await readBody(artifactUrl(baseUrl, descriptor.path), fetchImpl, init);
+  const body = await readBody(baseUrl, descriptor.path, fetchImpl, init);
   return typeof body === 'string' ? parseBody(descriptor, body) : body;
 }
 

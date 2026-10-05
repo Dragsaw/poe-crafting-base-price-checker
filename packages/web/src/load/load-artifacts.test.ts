@@ -268,6 +268,11 @@ describe('loadArtifacts', () => {
     });
     expect(outcome).toEqual({ kind: 'failed', path: 'dataset.json' });
   });
+
+  it('never rejects on a base URL that cannot form a URL, and fails on the first artifact', async () => {
+    const outcome = await loadArtifacts({ baseUrl: 'https://[', fetch: () => Promise.reject(new Error('unreachable')) });
+    expect(outcome).toEqual({ kind: 'failed', path: 'dataset.json' });
+  });
 });
 
 describe('the frozen data fixture set', () => {
