@@ -12,7 +12,7 @@ export const NotYetSyncedReasonSchema = z
 
 export type NotYetSyncedReason = z.infer<typeof NotYetSyncedReasonSchema>;
 
-/** Four-state price; the observation lives inside the `priced` arm so absence is structural (AD-9). */
+/** Four-state price; the observation sits in the `priced` arm so absence is structural (AD-9). */
 export const PriceStateSchema = z.discriminatedUnion('state', [
   z.strictObject({
     state: z.literal('priced'),
@@ -32,7 +32,7 @@ export const PriceStateSchema = z.discriminatedUnion('state', [
 
 export type PriceState = z.infer<typeof PriceStateSchema>;
 
-/** The latest observation per tracked entry (AD-19). A failed request stamps only `lastAttemptedAt`, and a never-synced entry has no placeholder (AD-9). */
+/** Latest observation per entry (AD-19); a failure stamps `lastAttemptedAt` only (AD-9). */
 export const DatasetEntrySchema = z
   .strictObject({
     entryKey: z

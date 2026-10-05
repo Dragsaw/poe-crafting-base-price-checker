@@ -9,7 +9,7 @@ import { CurationStatusSchema } from './tracked-entry.ts';
 /** Weakest first (AD-10). `absent` never rides on a ranked row. */
 export const ProvenanceSchema = z.enum(['absent', 'uniform-prior', 'measured']);
 
-/** Read-time only, never persisted (AD-4, AD-17); a raw EV is the unrounded observed price (FR-3). */
+/** Read-time only, never persisted (AD-4, AD-17); a raw EV is the unrounded price (FR-3). */
 export const RawRankedRowSchema = z
   .strictObject({
     kind: z.literal('raw'),
@@ -56,7 +56,7 @@ export const CraftedSummandSchema = z
   })
   .describe('One summand of a crafted EV (AD-17).');
 
-/** An uncostable recipe has `ev` null and still orders by `grossPayout` (EXPERIENCE.md state 35). */
+/** An uncostable recipe has `ev` null and still orders by `grossPayout` (EXPERIENCE.md 35). */
 export const CraftedRankedRowSchema = z
   .strictObject({
     kind: z.literal('crafted'),

@@ -17,7 +17,7 @@ export const LeagueIdSchema = z
 
 export type LeagueId = z.infer<typeof LeagueIdSchema>;
 
-/** The one unit crossing a package boundary (AD-20). Rounding: Consistency Conventions, *Numeric precision*. */
+/** The one unit crossing a package boundary (AD-20); rounding: Consistency Conventions. */
 export const DivineAmountSchema = z
   .number()
   .positive()

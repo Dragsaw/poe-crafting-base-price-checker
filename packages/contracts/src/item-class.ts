@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** An item class is the pair `(categoryId, className)`, one modifier pool: a search sends `categoryId`, the weights file keys on `className` (AD-5). */
+/** An item class is `(categoryId, className)`: one modifier pool, one weights key (AD-5). */
 
 export const CategoryIdSchema = z
   .string()
@@ -11,7 +11,7 @@ export const CategoryIdSchema = z
 
 export type CategoryId = z.infer<typeof CategoryIdSchema>;
 
-/** The one identifier not from the trade API: a poe2db pool name, never sent to the trade site; `sync` reads its grammar to derive AD-16's class discriminator. */
+/** A poe2db pool name, never sent to the trade site; AD-16's discriminator derives from it. */
 export const ClassNameSchema = z
   .string()
   .min(1)

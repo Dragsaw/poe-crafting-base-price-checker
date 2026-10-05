@@ -121,7 +121,7 @@ describe('ModifierRefSchema', () => {
     ).toBe(false);
   });
 
-  /** An exhaustive `switch` over the three kinds needs no default arm: a fourth kind without a case fails `tsc -b`. */
+  /** An exhaustive `switch` over the three kinds needs no default: a fourth kind fails `tsc -b`. */
   it('exhausts every kind with no default arm', () => {
     expect(
       describeReference({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),

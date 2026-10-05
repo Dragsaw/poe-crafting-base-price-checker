@@ -22,7 +22,7 @@ import {
 
 /** Every file envelope; a member of a versioned file does not repeat `schemaVersion`. */
 
-/** `data/tracked.json`, the curated workload (AD-12). File rules: key uniqueness (IMPLEMENTATION-NOTES.md §4.1), shared floor (AD-17, FR-22), overlap (§2.1), kind agreement (§2.3). */
+/** `data/tracked.json`, the curated workload (AD-12); file rules in IN §4.1, §2.1, §2.3, AD-17. */
 export const TrackedFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -35,7 +35,7 @@ export const TrackedFileSchema = z
 /** The recipe grade prefixes, as the mixed-grade refusal prints them. */
 const GRADE_PREFIXES = RECIPE_GRADES.map((grade) => `${grade}-`).join(', ');
 
-/** `data/recipes.json`, absent-tolerable (AD-20, AD-24). File-level rules: unique `id`, one derived word per recipe, no shared word (AD-3, §9.1). */
+/** `data/recipes.json`, absent-tolerable (AD-20, AD-24); unique `id`, one word each (§9.1). */
 export const RecipesFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -83,7 +83,7 @@ export const CurrenciesFileSchema = z.strictObject({
   rates: z.array(CurrencyRateSchema),
 });
 
-/** `data/config.json`: the active league, `minChunkSearches` and `schemaVersion`, nothing else (AD-19). */
+/** `data/config.json`: active league, `minChunkSearches`, `schemaVersion`, nothing else (AD-19). */
 export const ConfigFileSchema = z.strictObject({
   schemaVersion: SchemaVersionSchema,
   league: LeagueIdSchema.describe('The active league id (AD-19).'),
@@ -95,7 +95,7 @@ export const ConfigFileSchema = z.strictObject({
     ),
 });
 
-/** `data/dataset.json`, the published snapshot (AD-19). Each `entryKey` appears once, compared as an exact string. */
+/** `data/dataset.json`, the published snapshot (AD-19); each `entryKey` appears once. */
 export const DatasetFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -134,7 +134,7 @@ export const SyncProgressFileSchema = SyncProgressSchema.extend({
   schemaVersion: SchemaVersionSchema,
 });
 
-/** `data/catalogue/*.json`: the captured `result` payload with `schemaVersion` beside it, so a refresh diffs the API's own response (AD-25). */
+/** `data/catalogue/*.json`: the captured `result` plus `schemaVersion`, diffable (AD-25). */
 export function catalogueFileEnvelope<
   Shape extends z.ZodRawShape,
   Config extends z.core.$ZodObjectConfig,
@@ -183,7 +183,7 @@ export type EnvelopeResult<T> = EnvelopeAccepted<T> | EnvelopeVersionRefused | E
 
 const VersionProbeSchema = z.object({ schemaVersion: z.string() });
 
-/** The one load path for versioned files: the version is checked before the body parses, so an unknown major is refused, not parsed on (NFR-8). */
+/** The one load path for versioned files: the version is checked before the body parses (NFR-8). */
 export function parseEnvelope<S extends z.ZodType>(
   schema: S,
   data: unknown,

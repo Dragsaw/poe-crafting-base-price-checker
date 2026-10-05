@@ -54,7 +54,7 @@ function gradeOf(currencyId: string): RecipeGrade | undefined {
   return RECIPE_GRADES.find((grade) => currencyId.startsWith(`${grade}-`));
 }
 
-/** The recipe word of IMPLEMENTATION-NOTES.md §9.1; `undefined` for a mixed recipe, which `RecipesFileSchema` refuses. */
+/** The recipe word of IN §9.1; `undefined` for a mixed recipe, which the schema rejects. */
 export function recipeWord(recipe: Pick<CraftRecipe, 'currencies'>): RecipeWord | undefined {
   const grades = new Set(recipe.currencies.map((line) => gradeOf(line.currencyId)));
   if (grades.size > 1) {

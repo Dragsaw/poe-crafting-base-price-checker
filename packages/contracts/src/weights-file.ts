@@ -30,7 +30,7 @@ export const WeightsLineSchema = z.looseObject({
     }),
 });
 
-/** One poe2db tier of one modifier; flattening its lines would lose a hybrid tier's co-occurrence. */
+/** One poe2db tier of one modifier; flattening its lines loses a hybrid tier's co-occurrence. */
 export const ModifierWeightSchema = z
   .looseObject({
     sourceModifierId: z.string(),

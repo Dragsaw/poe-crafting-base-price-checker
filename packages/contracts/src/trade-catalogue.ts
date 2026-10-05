@@ -45,7 +45,7 @@ export const StaticCatalogueEntrySchema = z.looseObject({
   image: z.string().optional(),
 });
 
-/** The live API sends `"label": null` for the `Misc` group; refusing it would refuse the response. */
+/** The live API sends `"label": null` for the `Misc` group; refusing it refuses the response. */
 export const StaticCatalogueGroupSchema = z.looseObject({
   id: z.string(),
   label: z.string().nullable().optional(),
@@ -76,7 +76,7 @@ export const FilterCatalogueGroupSchema = z.looseObject({
   filters: z.array(FilterSchema),
 });
 
-/** `/api/trade2/data/filters`; its category option list is the authority for `categoryId` (AD-5, AD-9). */
+/** `/api/trade2/data/filters`; its category list is the authority for `categoryId` (AD-5, AD-9). */
 export const FilterCatalogueSchema = z.looseObject({
   result: z.array(FilterCatalogueGroupSchema),
 });
@@ -121,7 +121,7 @@ export function flattenFilterCatalogue(catalogue: FilterCatalogue): CatalogueFil
   return catalogue.result.flatMap((group) => group.filters);
 }
 
-/** Drops the null "Any" sentinel: admitting it would make an unfiltered search look validated (AD-9). */
+/** Drops the null "Any" sentinel: admitting it makes an unfiltered search look validated (AD-9). */
 export function filterOptionIds(catalogue: FilterCatalogue, filterId: string): string[] {
   return flattenFilterCatalogue(catalogue)
     .filter((filter) => filter.id === filterId)

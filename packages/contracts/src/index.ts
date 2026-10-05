@@ -1,4 +1,4 @@
-/** `@poe/contracts`: every cross-package concept as a Zod schema and its `z.infer` type (AD-3), and the external effects as `<Thing>Port` interfaces with in-memory fakes (AD-1). Depends on no workspace package. */
+/** `@poe/contracts`: Zod schemas and `z.infer` types (AD-3), `<Thing>Port` interfaces (AD-1). */
 
 export {
   checkSchemaVersion,
@@ -56,7 +56,7 @@ export type {
   ValuelessModifierRef,
 } from './modifier-ref.ts';
 
-/** The arm schemas stay unexported: they lack the union's `superRefine` rules and would accept a pruned entry with no reason. */
+/** Arm schemas stay unexported: they lack the union's `superRefine` rules. */
 export {
   CurationStatusSchema,
   PrunedReasonSchema,

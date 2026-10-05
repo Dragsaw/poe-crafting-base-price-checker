@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Cycle-safe only while canonical-key.ts imports this module as types only.
 import { compareByCodeUnit } from './canonical-key.ts';
 
-/** Three kinds, discriminated by the schema (AD-5): `banded` always has both edges, `valueless` none (no sentinels), `hybrid` names every line (§4.1). */
+/** Three kinds (AD-5): `banded` has both edges, `valueless` none, `hybrid` every line (§4.1). */
 
 export const StatIdSchema = z
   .string()
@@ -14,7 +14,7 @@ export const StatIdSchema = z
 
 export type StatId = z.infer<typeof StatIdSchema>;
 
-/** Display-only on both arms, unused on `valueless`; never read, validated or part of a canonical key (AD-5). */
+/** Display-only on both arms, unused on `valueless`; never validated or keyed (AD-5). */
 export const AcceptedTierSchema = z
   .string()
   .describe(
@@ -49,7 +49,7 @@ export const ValuelessModifierRefSchema = z
     'A modifier that rolls no number. No edges at all, and no component may give it sentinel edges (AD-5).',
   );
 
-/** A banded line of a `hybrid` reference: no `kind` or `acceptedTier`, since a line takes its kind from its edges (§4.1). */
+/** A banded line of a `hybrid` reference: no `kind` or `acceptedTier`, its edges decide (§4.1). */
 export const BandedHybridLineSchema = z
   .strictObject({
     statId: StatIdSchema,
@@ -69,10 +69,10 @@ export const ValuelessHybridLineSchema = z
   })
   .describe('A hybrid line with no edges (IMPLEMENTATION-NOTES §4.1).');
 
-/** Both members are strict, so a line with one edge, a `kind` or an `acceptedTier` fails both (§4.1). */
+/** Both members are strict: a line with one edge, a `kind` or `acceptedTier` fails both (§4.1). */
 export const HybridLineSchema = z.union([BandedHybridLineSchema, ValuelessHybridLineSchema]);
 
-/** Checked against the §4.1 shape rules and sorted on parse; the transform sits on this field so the object stays a `ZodObject` in the `discriminatedUnion`. */
+/** Checked against §4.1 and sorted on parse; the transform sits here to keep a `ZodObject`. */
 const HybridLinesSchema = z
   .array(HybridLineSchema)
   .min(2, { message: 'A hybrid reference names at least two lines (§4.1).' })

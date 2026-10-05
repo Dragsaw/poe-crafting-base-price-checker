@@ -9,7 +9,7 @@ export const CurrencyIdSchema = z
 
 export type CurrencyId = z.infer<typeof CurrencyIdSchema>;
 
-/** `rate` is divine per one unit; the inverse stays schema-valid, so a swap is undetectable downstream. Each rate keeps its own `league` and `asOf` (AD-19, AD-20). */
+/** `rate` is divine per unit; an inverse still parses, so swaps go unseen (AD-19, AD-20). */
 export const CurrencyRateSchema = z
   .strictObject({
     currencyId: CurrencyIdSchema,

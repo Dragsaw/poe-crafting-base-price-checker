@@ -1,6 +1,6 @@
 import type { HttpPort, HttpRequest, HttpResponse } from '../http.ts';
 
-/** A pure in-memory `HttpPort`. An unfixtured request rejects instead of answering a default, so a network escape fails loudly (NFR-1). */
+/** An in-memory `HttpPort`; an unfixtured request rejects, so a network escape fails (NFR-1). */
 
 /** Keyed `"<METHOD> <url>"`, e.g. `"POST https://example.test/search"`. */
 export type HttpFixtures = Readonly<Record<string, HttpResponse>>;

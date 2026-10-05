@@ -1,7 +1,7 @@
 import { compareByCodeUnit } from './canonical-key.ts';
 import type { HybridLine, ModifierRef as ModifierReference, SingleLineModifierRef as SingleLineModifierReference } from './modifier-ref.ts';
 
-/** The overlap predicate (AD-17, IMPLEMENTATION-NOTES.md §2.1), defined once. `coOccur` (§2.2) is injected because it needs the weights file. */
+/** The overlap predicate (AD-17, IN §2.1); `coOccur` (§2.2) is injected, it needs the weights. */
 
 export type OverlapSlot = 'prefix' | 'suffix';
 
@@ -13,13 +13,13 @@ export interface OverlapAffixes {
   readonly suffix: ModifierReference;
 }
 
-/** `coOccur(x, y, S)` (§2.2): one scoped pool entry contains both references; a line on a `statId` in `summed` counts as covered. */
+/** `coOccur(x, y, S)` (§2.2): one scoped pool entry holds both references; `summed` lines count. */
 export type CoOccur = (x: ModifierReference, y: ModifierReference, slot: OverlapSlot, summed: ReadonlySet<string>) => boolean;
 
 /** The within-file `coOccur`: the tracked list alone cannot see a pool. */
 export const CAN_NEVER_CO_OCCUR: CoOccur = () => false;
 
-/** Which §2.1 branch made a slot overlap; `summed` means one reference names no `statId` outside `S`. */
+/** Which §2.1 branch made a slot overlap; `summed`: a reference names no `statId` outside `S`. */
 export type SlotOverlapBranch = 'summed' | 'co-occur' | 'both-valueless' | 'bands-intersect';
 
 /** One line a reference names: the reference itself when single-line, one of its lines when hybrid. */
@@ -41,7 +41,7 @@ function lineOn(reference: ModifierReference, statId: string): NamedLine | undef
 
 const NO_SUMMED: ReadonlySet<string> = new Set();
 
-/** `summed(e)` (§2.1): the `statId`s both slots of one entry name, in prefix line order, which the schema sorted. */
+/** `summed(e)` (§2.1): the `statId`s both slots of one entry name, in prefix line order. */
 export function summedStatIds(affixes: OverlapAffixes): ReadonlySet<string> {
   const suffix = new Set(statIdsOf(affixes.suffix));
   return new Set(statIdsOf(affixes.prefix).filter((statId) => suffix.has(statId)));
@@ -53,7 +53,7 @@ export interface SummedInterval {
   readonly max: number;
 }
 
-/** `sum(e, s)` (§2.1, §5.5): plain addition, never rounded (AD-16); `undefined` when a slot lacks a line on `s` or the line is valueless (§2.3). */
+/** `sum(e, s)` (§2.1, §5.5): plain addition, never rounded (AD-16); `undefined` without a line. */
 export function summedInterval(affixes: OverlapAffixes, statId: string): SummedInterval | undefined {
   const prefix = lineOn(affixes.prefix, statId);
   const suffix = lineOn(affixes.suffix, statId);
@@ -83,7 +83,7 @@ export interface SlotOverlapOptions {
   readonly summed?: ReadonlySet<string>;
 }
 
-/** The branch that made the slot overlap, or `undefined` (§2.1 `slotOverlap`, branches in order); `coOccur` is read only for a hybrid pair. */
+/** The branch that made the slot overlap, or `undefined` (§2.1); `coOccur` only for hybrids. */
 export function slotOverlapBranch(
   x: ModifierReference,
   y: ModifierReference,
@@ -114,7 +114,7 @@ export function overlap(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur):
   return overlapBranches(a, b, coOccur) !== undefined;
 }
 
-/** A pair is `core`'s when either entry names a `hybrid` reference, `contracts`'s otherwise (§2.1, *Who evaluates a pair*). */
+/** A pair is `core`'s when either entry names a `hybrid`, else `contracts`'s (§2.1). */
 export function hasHybridAffix(affixes: OverlapAffixes): boolean {
   return affixes.prefix.kind === 'hybrid' || affixes.suffix.kind === 'hybrid';
 }
@@ -134,7 +134,7 @@ export interface OverlapBranches {
   readonly sums: readonly SummedOverlap[];
 }
 
-/** Each slot's branch and each summed interval pair when the entries overlap; `S` is computed here. Callers pick pairs by `hasHybridAffix`. */
+/** Each slot's branch and summed interval pair when the entries overlap; `S` is computed here. */
 export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): OverlapBranches | undefined {
   const theirs = summedStatIds(b);
   const summed = new Set([...summedStatIds(a)].filter((statId) => theirs.has(statId)).toSorted(compareByCodeUnit));
@@ -166,7 +166,7 @@ function intervalText(interval: SummedInterval): string {
   return `[${String(interval.min)}, ${String(interval.max)}]`;
 }
 
-/** The slots and sums a payload names, e.g. `prefix (bands intersect), suffix (names only summed statIds); sum explicit.stat_X [31, 37] and [33, 39] intersect`. */
+/** The slots and sums a payload names, e.g. `sum explicit.stat_X [31, 37] and [33, 39]`. */
 export function describeOverlap(branches: OverlapBranches): string {
   const slots = OVERLAP_SLOTS.map((slot) => `${slot} (${BRANCH_WORDS[branches[slot]]})`).join(', ');
   const sums = branches.sums.map(

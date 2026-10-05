@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { IsoTimestampSchema, LeagueIdSchema } from './primitives.ts';
 import { TrackedListAgeSchema } from './tracked-list-age.ts';
 
-/** A figure is overwritten by the next chunk; a record survives it (Consistency Conventions, *Logging*). */
+/** A figure is overwritten by the next chunk; a record survives it (Consistency Conventions). */
 
-/** Exactly four sources generate a request (AD-12); `session-probe`: AD-30, IMPLEMENTATION-NOTES.md §13.2. */
+/** Exactly four sources generate a request (AD-12); `session-probe`: AD-30, IN §13.2. */
 export const RequestSourceSchema = z.enum([
   'tracked-list',
   'league-validation',
@@ -15,7 +15,7 @@ export const RequestSourceSchema = z.enum([
 
 export type RequestSource = z.infer<typeof RequestSourceSchema>;
 
-/** Chunk sources (AD-12); `catalogue-refresh` is its own command. `web` hides `session-probe` (AD-30). */
+/** Chunk sources (AD-12); `catalogue-refresh` is its own command; `web` hides `session-probe`. */
 export const ChunkRequestSourceSchema = RequestSourceSchema.extract([
   'tracked-list',
   'league-validation',
@@ -30,7 +30,7 @@ const LEGACY_REQUEST_SOURCE_KEY = 'catalogue-refresh';
 /** The key a report written before 1.2.0 lacks; it reads as `0`. */
 const SESSION_PROBE_SOURCE_KEY = 'session-probe';
 
-/** Lets a 1.0.0 or 1.1.0 report parse and nothing else; here, not in `sync`, so every reader inherits it. */
+/** Lets a 1.0.0 or 1.1.0 report parse and nothing else; here so every reader inherits it. */
 function readLegacyRequestSources(value: unknown): unknown {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return value;
@@ -47,7 +47,7 @@ export const RequestsBySourceSchema = z
   .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
 
 
-/** 1.2.0 adds `session-probe` (IMPLEMENTATION-NOTES.md §13.7); an older build refuses a newer report. */
+/** 1.2.0 adds `session-probe` (IN §13.7); an older build refuses a newer report. */
 export const SYNC_REPORT_SCHEMA_VERSION = '1.2.0';
 
 export const SyncRunFiguresSchema = z
@@ -88,7 +88,7 @@ export const StaleLockBrokenRecordSchema = z.strictObject({
   startedAt: IsoTimestampSchema.describe('The broken lock’s start time.'),
 });
 
-/** Exactly five fields (IMPLEMENTATION-NOTES.md §6): the declared yardstick beside the observed one. */
+/** Exactly five fields (IN §6): the declared yardstick beside the observed one. */
 export const PinnedStarvationRecordSchema = z.strictObject({
   kind: z.literal('pinned-starvation'),
   discoveredAllowance: z
@@ -150,7 +150,7 @@ export const CrossFileGateFailureRecordSchema = z.strictObject({
   detail: z.string().min(1).describe('The failing check’s payload, as its § defines it.'),
 });
 
-/** A record, not a figure: a failed unattended run otherwise leaves only an exit code (FR-25, FR-19). */
+/** A record, not a figure: a failed unattended run otherwise leaves an exit code (FR-25, FR-19). */
 export const RunFailureReasonSchema = z.enum(['trade-request-rejected', 'unrecoverable-error']);
 
 export type RunFailureReason = z.infer<typeof RunFailureReasonSchema>;

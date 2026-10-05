@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** The identity is the API's own `type` string, never re-encoded or derived from a `categoryId` (AD-5). */
+/** The identity is the API's `type` string, never re-encoded or taken from `categoryId` (AD-5). */
 export const BaseTypeIdSchema = z
   .string()
   .min(1)

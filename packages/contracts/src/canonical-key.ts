@@ -1,7 +1,7 @@
 import type { ModifierRef as ModifierReference } from './modifier-ref.ts';
 import type { TrackedEntry } from './tracked-entry.ts';
 
-/** The canonical `TrackedEntry` key (IMPLEMENTATION-NOTES.md §4.1), in `contracts` so every tie-break (AD-7, AD-17) resolves on one serialisation. */
+/** The canonical `TrackedEntry` key (IN §4.1): one serialisation for tie-breaks (AD-7, AD-17). */
 
 /** Always three elements: `[statId, min, max]`, with `null` edges for a `valueless` line (§4.1). */
 export type CanonicalLine = readonly [string, number | null, number | null];
@@ -60,7 +60,7 @@ export function canonicalKey(entry: TrackedEntry): string {
   return JSON.stringify(canonicalKeyElements(entry));
 }
 
-/** Compares code points (UTF-8 byte order), never locale collation or UTF-16 units, which disagree above the BMP (Consistency Conventions, *Entity keys*). */
+/** Code-point order, never locale or UTF-16 units (Consistency Conventions, *Entity keys*). */
 export function compareByCodeUnit(a: string, b: string): number {
   const left = a[Symbol.iterator]();
   const right = b[Symbol.iterator]();

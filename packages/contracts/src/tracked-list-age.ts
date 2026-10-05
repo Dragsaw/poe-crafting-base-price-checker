@@ -28,7 +28,7 @@ export interface TrackedListAgeSources {
   readonly path: string;
 }
 
-/** Git date, else mtime, else `undefined`, never a placeholder (AD-9); one order for every shell. */
+/** Git date, else mtime, else `undefined`, never a placeholder (AD-9); one order for all shells. */
 export async function resolveTrackedListAge({
   git,
   filesystem,
