@@ -5,20 +5,9 @@ import { CategoryIdSchema, ClassNameSchema } from './item-class.ts';
 import { ModifierRefSchema as ModifierReferenceSchema } from './modifier-ref.ts';
 import { ItemLevelSchema } from './primitives.ts';
 
-/**
- * A tracked entry is one of exactly **two kinds, and the kind is what the entry
- * names — never an inference from what it omits** (AD-5).
- *
- * - `crafted` keys on `(categoryId, className, itemLevelMin, prefix, suffix)`;
- *   both affixes are required (IMPLEMENTATION-NOTES §4.1).
- * - `raw` keys on `(baseTypeId, itemLevelMin)` and **carries no affix members
- *   at all** — a stronger guarantee than two nulls, and the reason the arms are
- *   `strictObject`s.
- */
+/** The kind is what the entry names, never an inference (AD-5); keys: IMPLEMENTATION-NOTES §4.1. */
 
-/**
- * Curation Status is a **schema member, not a convention** (AD-12, FR-15).
- */
+/** Curation Status is a schema member, not a convention (AD-12, FR-15). */
 export const CurationStatusSchema = z
   .enum(['active', 'pinned', 'pruned'])
   .describe(
@@ -27,10 +16,7 @@ export const CurationStatusSchema = z
 
 export type CurationStatus = z.infer<typeof CurationStatusSchema>;
 
-/**
- * A free string, deliberately. The PRD requires only that the reason be carried
- * and shown; no enum is invented for it.
- */
+/** A free string on purpose: the PRD requires only that the reason be carried and shown. */
 export const PrunedReasonSchema = z
   .string()
   .min(1)
@@ -55,13 +41,7 @@ const RawTrackedEntrySchema = z.strictObject({
   prunedReason: PrunedReasonSchema.optional(),
 });
 
-/**
- * The prune-reason rule, and no other; the arm schemas carry both required
- * affixes. FR-16's within-file overlap rejection is a rule of the whole list,
- * so it lives in `TrackedFileSchema` (`./overlap.ts`); the six cross-file
- * checks are `core`'s (`cross-file.ts`), because `contracts` sees one file at
- * a time.
- */
+/** The prune-reason rule only: FR-16 overlap is `./overlap.ts`, cross-file checks are `core`'s. */
 export const TrackedEntrySchema = z
   .discriminatedUnion('kind', [CraftedTrackedEntrySchema, RawTrackedEntrySchema])
   .superRefine((entry, context) => {

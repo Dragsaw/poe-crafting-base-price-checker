@@ -6,19 +6,9 @@ import { StatIdSchema } from './modifier-ref.ts';
 import { IsoTimestampSchema } from './primitives.ts';
 import { SchemaVersionSchema } from './schema-version.ts';
 
-/**
- * `data/weights.json` — the weights contract (WEIGHTS-FILE-SCHEMA.md, AD-11).
- * This module is that document's *Validation* section: every hard error it
- * lists is enforced below. A few further constraints are kept from the typed
- * shape, not from *Validation*: a non-empty `producer.id`, an ISO-8601 UTC
- * `producer.generatedAt` (the trust strip prints it as a date), and non-empty
- * `categoryId`, `className` and `statId` through the reused id schemas. Every
- * object is loose, so a later additive `6.x` file still loads; only the major
- * is compared (`parseEnvelope`).
- *
- * The app consumes the file and never writes it. `sourceModifierId` is read
- * only by the duplicate check below, and `gamePatch` is opaque.
- */
+// The weights contract (WEIGHTS-FILE-SCHEMA.md, AD-11); enforces its *Validation* section. Objects
+// are loose so a later additive `6.x` file loads; only the major is compared (`parseEnvelope`).
+// `producer.generatedAt` is ISO-8601 UTC because the trust strip prints it as a date.
 
 /** The weights contract this build reads. Only the major is compared. */
 export const WEIGHTS_SCHEMA_VERSION = '6.1.0';
@@ -40,10 +30,7 @@ export const WeightsLineSchema = z.looseObject({
     }),
 });
 
-/**
- * One entry: one poe2db tier of one modifier. The lines stay nested — a
- * hybrid tier's co-occurrence cannot be rebuilt once they are flattened.
- */
+/** One poe2db tier of one modifier; flattening its lines would lose a hybrid tier's co-occurrence. */
 export const ModifierWeightSchema = z
   .looseObject({
     sourceModifierId: z.string(),
@@ -120,11 +107,7 @@ function familyOf(className: string, letterCount: number): string {
   return tokens.slice(0, tokens.length - letterCount).join('_');
 }
 
-/**
- * The classes of one `categoryId`, with the `5.1.0` grammar rule: every key
- * matches one of the two grammars, defence-suffixed classes carry distinct
- * letter sets, and defence-suffixed and plain classes are never mixed.
- */
+/** The `5.1.0` `className` grammar rule (WEIGHTS-FILE-SCHEMA.md *Validation*). */
 const WeightsCategorySchema = z
   .record(ClassNameSchema, WeightsClassPoolsSchema)
   .superRefine((classes, context) => {

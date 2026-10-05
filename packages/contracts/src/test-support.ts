@@ -1,7 +1,4 @@
-/**
- * Helpers for this package's own suites. Not re-exported from the barrel: it is
- * test scaffolding, not part of the contract.
- */
+/** Test scaffolding for this package's suites, not part of the contract: not re-exported. */
 
 /** A copy of `value` with one key removed, for asserting that a field is required. */
 export function without<T extends object>(value: T, key: keyof T): Partial<T> {

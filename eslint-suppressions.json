@@ -44,56 +44,6 @@
       "count": 1
     }
   },
-  "packages/contracts/src/ports/git.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/ranked-row.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/sync-run-report.ts": {
-    "local/max-comment-run": {
-      "count": 12
-    }
-  },
-  "packages/contracts/src/test-support.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/tracked-entry.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
-  "packages/contracts/src/tracked-list-age.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/tracked-list-age.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/trade-catalogue.ts": {
-    "local/max-comment-run": {
-      "count": 5
-    }
-  },
-  "packages/contracts/src/trade-leagues.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/weights-file.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
   "packages/core/src/chunk-order.ts": {
     "sonarjs/no-selector-parameter": {
       "count": 1

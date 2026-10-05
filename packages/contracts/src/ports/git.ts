@@ -1,9 +1,6 @@
 /** Read-only, one operation (AD-1, AD-3): a git write is an AD-3 amendment. */
 
 export interface GitPort {
-  /**
-   * Author date of the last commit touching `path`, ISO-8601 UTC.
-   * `undefined` is not a failure: a new file has no commit and `tracked-list-age.ts` falls back.
-   */
+  /** `undefined` is not a failure: a new file has no commit, and `tracked-list-age.ts` falls back. */
   lastCommitAuthorDate(path: string): Promise<string | undefined>;
 }
