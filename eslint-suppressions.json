@@ -25,60 +25,23 @@
     }
   },
   "packages/contracts/src/modifier-ref.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    },
     "unicorn/name-replacements": {
       "count": 1
     }
   },
   "packages/contracts/src/modifier-ref.ts": {
-    "local/max-comment-run": {
-      "count": 5
-    },
     "unicorn/name-replacements": {
       "count": 10
     }
   },
   "packages/contracts/src/overlap.ts": {
-    "local/max-comment-run": {
-      "count": 10
-    },
     "unicorn/consistent-boolean-name": {
       "count": 5
     }
   },
-  "packages/contracts/src/ports/clock.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/ports/fakes/clock.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
   "packages/contracts/src/ports/fakes/filesystem.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    },
     "unicorn/prefer-iterator-to-array": {
       "count": 1
-    }
-  },
-  "packages/contracts/src/ports/fakes/git.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/ports/fakes/http.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/ports/filesystem.ts": {
-    "local/max-comment-run": {
-      "count": 4
     }
   },
   "packages/contracts/src/ports/git.ts": {

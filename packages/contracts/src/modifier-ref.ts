@@ -3,18 +3,7 @@ import { z } from 'zod';
 // Cycle-safe only while canonical-key.ts imports this module as types only.
 import { compareByCodeUnit } from './canonical-key.ts';
 
-/**
- * A modifier reference is one of exactly **three kinds, discriminated by the
- * schema** (AD-5). The kind is what the reference names; no component infers it
- * from what the reference omits.
- *
- * - `banded` carries **both** edges, always. There is no open-top form: an
- *   omitted ceiling is a floor, and a floor spans tiers.
- * - `valueless` carries **no** edges at all, and never sentinels. It is not a
- *   degenerate band.
- * - `hybrid` names every stat line of one modifier. Its shape rules and its
- *   line order are IMPLEMENTATION-NOTES §4.1's.
- */
+/** Three kinds, discriminated by the schema (AD-5): `banded` always has both edges, `valueless` none (no sentinels), `hybrid` names every line (§4.1). */
 
 export const StatIdSchema = z
   .string()
@@ -25,12 +14,7 @@ export const StatIdSchema = z
 
 export type StatId = z.infer<typeof StatIdSchema>;
 
-/**
- * Display-only, on **both** arms and unused on `valueless` (AD-5). Four
- * prohibitions ride with it: `core` and `sync` never read it, nothing validates
- * it against a band, nothing validates its spelling, and it is never part of a
- * canonical key.
- */
+/** Display-only on both arms, unused on `valueless`; never read, validated or part of a canonical key (AD-5). */
 export const AcceptedTierSchema = z
   .string()
   .describe(
@@ -65,11 +49,7 @@ export const ValuelessModifierRefSchema = z
     'A modifier that rolls no number. No edges at all, and no component may give it sentinel edges (AD-5).',
   );
 
-/**
- * A banded line of a `hybrid` reference. It carries no `kind` and no
- * `acceptedTier`: a line takes its kind from its edges (IMPLEMENTATION-NOTES
- * §4.1). The §4.1 band rules apply to hybrid lines only.
- */
+/** A banded line of a `hybrid` reference: no `kind` or `acceptedTier`, since a line takes its kind from its edges (§4.1). */
 export const BandedHybridLineSchema = z
   .strictObject({
     statId: StatIdSchema,
@@ -89,18 +69,10 @@ export const ValuelessHybridLineSchema = z
   })
   .describe('A hybrid line with no edges (IMPLEMENTATION-NOTES §4.1).');
 
-/**
- * Both members are strict, so a line with one edge only, a `kind` or an
- * `acceptedTier` fails both (§4.1).
- */
+/** Both members are strict, so a line with one edge, a `kind` or an `acceptedTier` fails both (§4.1). */
 export const HybridLineSchema = z.union([BandedHybridLineSchema, ValuelessHybridLineSchema]);
 
-/**
- * The lines of a `hybrid` reference, checked against the §4.1 shape rules and
- * sorted by `statId` on parse, so no consumer re-sorts. The transform sits on
- * this field and not on the object, so the object stays a `ZodObject` inside
- * the `discriminatedUnion`.
- */
+/** Checked against the §4.1 shape rules and sorted on parse; the transform sits on this field so the object stays a `ZodObject` in the `discriminatedUnion`. */
 const HybridLinesSchema = z
   .array(HybridLineSchema)
   .min(2, { message: 'A hybrid reference names at least two lines (§4.1).' })

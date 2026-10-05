@@ -1,34 +1,7 @@
 import { compareByCodeUnit } from './canonical-key.ts';
 import type { HybridLine, ModifierRef as ModifierReference, SingleLineModifierRef as SingleLineModifierReference } from './modifier-ref.ts';
 
-/**
- * The overlap predicate (AD-17, IMPLEMENTATION-NOTES.md §2.1), defined once.
- *
- * Two crafted entries overlap when one item can satisfy both, so the item is
- * counted twice. The predicate is a conjunction over the two slots and over
- * `S`, the summed `statId`s that both entries share. Each slot runs §2.1's
- * `slotOverlap` branches in order on its `statId`s outside `S`. Each `statId`
- * in `S` is compared once, as the §5.5 sum of the two slots' lines, and never
- * per slot. An entry that names a `statId` in one slot only is compared per
- * slot.
- *
- * `summedStatIds` is §2.1's `summed(e)`, the one definition: the schema's
- * within-file rules, `core`'s `co-occur` check and `sync`'s search body all
- * read it. `summedInterval` is §2.1's `sum(e, s)`, plain addition and never
- * rounded (AD-16).
- *
- * `coOccur` (§2.2) is injected, because it needs the weights file, and it takes
- * `S`. Only a slot with a `hybrid` reference reads it. `TrackedFileSchema`
- * evaluates only pairs whose four references are single-line, so it never
- * reads `coOccur` and passes `CAN_NEVER_CO_OCCUR`; `core`'s `co-occur` check
- * evaluates every pair with a hybrid reference and passes the real pool read
- * (§2.1, *Who evaluates a pair*).
- *
- * One `banded` and one `valueless` line on one `statId` have no two bands to
- * intersect, so they do not intersect. The kind disagreement itself is kind
- * agreement's concern (§2.3), not overlap's. A sum with a `valueless` operand
- * has no edges, so it never intersects; the schema refuses it (§2.3).
- */
+/** The overlap predicate (AD-17, IMPLEMENTATION-NOTES.md §2.1), defined once. `coOccur` (§2.2) is injected because it needs the weights file. */
 
 export type OverlapSlot = 'prefix' | 'suffix';
 
@@ -40,20 +13,13 @@ export interface OverlapAffixes {
   readonly suffix: ModifierReference;
 }
 
-/**
- * `coOccur(x, y, S)` (§2.2): whether one scoped entry of the slot's pool
- * contains both references, with a reference line on a `statId` in `summed`
- * read as covered.
- */
+/** `coOccur(x, y, S)` (§2.2): one scoped pool entry contains both references; a line on a `statId` in `summed` counts as covered. */
 export type CoOccur = (x: ModifierReference, y: ModifierReference, slot: OverlapSlot, summed: ReadonlySet<string>) => boolean;
 
 /** The within-file `coOccur`: the tracked list alone cannot see a pool. */
 export const CAN_NEVER_CO_OCCUR: CoOccur = () => false;
 
-/**
- * Which §2.1 branch made a slot overlap. `summed` is the first branch: one
- * reference names no `statId` outside `S`, so the sums alone judge the slot.
- */
+/** Which §2.1 branch made a slot overlap; `summed` means one reference names no `statId` outside `S`. */
 export type SlotOverlapBranch = 'summed' | 'co-occur' | 'both-valueless' | 'bands-intersect';
 
 /** One line a reference names: the reference itself when single-line, one of its lines when hybrid. */
@@ -64,10 +30,7 @@ export function linesOf(reference: ModifierReference): readonly NamedLine[] {
   return reference.kind === 'hybrid' ? reference.lines : [reference];
 }
 
-/**
- * `statIds(ref)` (§1), local because `contracts` cannot import `core`. Order
- * does not matter to its callers here.
- */
+/** `statIds(ref)` (§1), local because `contracts` cannot import `core`. */
 function statIdsOf(reference: ModifierReference): readonly string[] {
   return linesOf(reference).map((line) => line.statId);
 }
@@ -78,11 +41,7 @@ function lineOn(reference: ModifierReference, statId: string): NamedLine | undef
 
 const NO_SUMMED: ReadonlySet<string> = new Set();
 
-/**
- * `summed(e)` (§2.1): the `statId`s that the prefix and the suffix reference
- * of one entry both name, pure line or hybrid line, either side. In prefix
- * line order, which the schema sorted by `statId`.
- */
+/** `summed(e)` (§2.1): the `statId`s both slots of one entry name, in prefix line order, which the schema sorted. */
 export function summedStatIds(affixes: OverlapAffixes): ReadonlySet<string> {
   const suffix = new Set(statIdsOf(affixes.suffix));
   return new Set(statIdsOf(affixes.prefix).filter((statId) => suffix.has(statId)));
@@ -94,12 +53,7 @@ export interface SummedInterval {
   readonly max: number;
 }
 
-/**
- * `sum(e, s)` (§2.1, §5.5): the sum of the two slots' mins and the sum of
- * their maxes, by plain addition and never rounded (AD-16). `undefined` when
- * either slot names no line on `s`, or either line is valueless, because such
- * an operand has no edge to add (§2.3).
- */
+/** `sum(e, s)` (§2.1, §5.5): plain addition, never rounded (AD-16); `undefined` when a slot lacks a line on `s` or the line is valueless (§2.3). */
 export function summedInterval(affixes: OverlapAffixes, statId: string): SummedInterval | undefined {
   const prefix = lineOn(affixes.prefix, statId);
   const suffix = lineOn(affixes.suffix, statId);
@@ -129,15 +83,7 @@ export interface SlotOverlapOptions {
   readonly summed?: ReadonlySet<string>;
 }
 
-/**
- * The branch that made the slot overlap, or `undefined` when the slot does
- * not overlap (§2.1 `slotOverlap(x, y, S)`, branches in order). A reference
- * that names nothing outside `S` gives `summed`. No shared `statId` outside
- * `S` is `undefined`. Two single-line references give `both-valueless` or
- * `bands-intersect`. A slot with a `hybrid` reference gives `co-occur`, and
- * only then is `coOccur` read. `summed` is empty where the caller has no pair
- * of entries.
- */
+/** The branch that made the slot overlap, or `undefined` (§2.1 `slotOverlap`, branches in order); `coOccur` is read only for a hybrid pair. */
 export function slotOverlapBranch(
   x: ModifierReference,
   y: ModifierReference,
@@ -168,10 +114,7 @@ export function overlap(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur):
   return overlapBranches(a, b, coOccur) !== undefined;
 }
 
-/**
- * Whether either affix is a `hybrid` reference. A pair is `core`'s when either
- * entry names one, and `contracts`'s otherwise (§2.1, *Who evaluates a pair*).
- */
+/** A pair is `core`'s when either entry names a `hybrid` reference, `contracts`'s otherwise (§2.1, *Who evaluates a pair*). */
 export function hasHybridAffix(affixes: OverlapAffixes): boolean {
   return affixes.prefix.kind === 'hybrid' || affixes.suffix.kind === 'hybrid';
 }
@@ -191,13 +134,7 @@ export interface OverlapBranches {
   readonly sums: readonly SummedOverlap[];
 }
 
-/**
- * Each slot's branch and each summed `statId`'s two intervals when the two
- * entries overlap, or `undefined` when they do not. `S` is computed here, so a
- * caller passes the two entries alone. A payload names the slots and the sums
- * from it. Every pair is evaluated; the caller picks its pairs by
- * `hasHybridAffix`.
- */
+/** Each slot's branch and each summed interval pair when the entries overlap; `S` is computed here. Callers pick pairs by `hasHybridAffix`. */
 export function overlapBranches(a: OverlapAffixes, b: OverlapAffixes, coOccur: CoOccur): OverlapBranches | undefined {
   const theirs = summedStatIds(b);
   const summed = new Set([...summedStatIds(a)].filter((statId) => theirs.has(statId)).toSorted(compareByCodeUnit));
@@ -229,11 +166,7 @@ function intervalText(interval: SummedInterval): string {
   return `[${String(interval.min)}, ${String(interval.max)}]`;
 }
 
-/**
- * `prefix (bands intersect), suffix (names only summed statIds); sum
- * explicit.stat_X [31, 37] and [33, 39] intersect`: the slots and the sums a
- * payload names.
- */
+/** The slots and sums a payload names, e.g. `prefix (bands intersect), suffix (names only summed statIds); sum explicit.stat_X [31, 37] and [33, 39] intersect`. */
 export function describeOverlap(branches: OverlapBranches): string {
   const slots = OVERLAP_SLOTS.map((slot) => `${slot} (${BRANCH_WORDS[branches[slot]]})`).join(', ');
   const sums = branches.sums.map(

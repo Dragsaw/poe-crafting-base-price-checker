@@ -1,11 +1,6 @@
 import type { FilesystemPort } from '../filesystem.ts';
 
-/**
- * A pure in-memory `FilesystemPort`. `contracts` has no `node:` types
- * available, which is what forces the fake to hold state rather than touch a
- * real effect — and that is the property that makes it usable in every
- * package's tests.
- */
+/** A pure in-memory `FilesystemPort`: `contracts` has no `node:` types, so the fake holds state and works in every package's tests. */
 
 export interface FakeFile {
   readonly contents: string;
@@ -41,10 +36,8 @@ export function createFakeFilesystemPort(initial: FakeFiles = {}): FakeFilesyste
       return Promise.resolve();
     },
     createExclusive(path, contents) {
-      // The check and the set run in one synchronous turn, before the promise
-      // exists, so no other caller can interleave between them: the fake is
-      // atomic by construction, which is what lets a `Promise.all` race test
-      // prove that exactly one taker wins.
+      // The check and the set run in one synchronous turn, so no caller can interleave: the fake is atomic,
+      // which lets a `Promise.all` race test prove that exactly one taker wins.
       if (files.has(path)) {
         return Promise.resolve(false);
       }

@@ -121,11 +121,7 @@ describe('ModifierRefSchema', () => {
     ).toBe(false);
   });
 
-  /**
-   * AC: an exhaustive `switch` over the three kinds type-checks with **no
-   * default arm**. `tsc -b` compiles this file; a fourth arm added to the union
-   * without a case here is a compile error, not a runtime surprise.
-   */
+  /** An exhaustive `switch` over the three kinds needs no default arm: a fourth kind without a case fails `tsc -b`. */
   it('exhausts every kind with no default arm', () => {
     expect(
       describeReference({ kind: 'banded', statId: 's', valueMin: 1, valueMax: 2 }),
