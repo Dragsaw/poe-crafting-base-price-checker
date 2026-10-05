@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Points git at `.githooks/` for this checkout, unless the checkout has no
-// git repository (a tarball install, a manifest-only CI restore) or the
-// developer already pointed core.hooksPath somewhere else.
+// Points git at `.githooks/` unless there is no git repository (tarball install, CI restore)
+// or the developer already set core.hooksPath.
 
 import { execFileSync } from 'node:child_process';
 

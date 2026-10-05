@@ -3,21 +3,9 @@ import nodePath from 'node:path';
 
 import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 
-/**
- * `pnpm dev:stop [--port <n>]` stops the `pnpm dev` server that listens on a
- * port (default 5173) and checks that the port is free afterwards.
- *
- * It exists because a runtime's "stop background task" can kill only the PID
- * it spawned. On Windows a parent's death does not reach its children, and
- * `pnpm dev` puts Vite five processes below that PID (sh → pnpm → cmd → pnpm →
- * cmd → node), so Vite keeps the port. This tool starts from the listener and
- * climbs to the `pnpm dev` process that runs it, then kills that tree.
- *
- * It refuses a listener that is not this checkout's Vite: another worktree's
- * server, or an unrelated program on the port.
- *
- * Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
- */
+// A runtime's "stop background task" kills only the PID it spawned, and on Windows Vite sits
+// five processes below it. This climbs from the port's listener to `pnpm dev` and kills that tree.
+// Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
 
 export const DEFAULT_PORT = 5173;
 
@@ -67,12 +55,8 @@ function programName(token = ''): string {
   return (normalize(token).split('/').pop() ?? '').replace(/\.(exe|cmd|bat|ps1)$/, '');
 }
 
-/**
- * Whether the process is `pnpm dev` or `pnpm run dev`: a pnpm executable, or
- * node running pnpm's entry script, whose first argument is the `dev` script.
- * An option before the script (`pnpm -r --parallel dev`, `pnpm --filter x dev`)
- * makes it some other invocation.
- */
+// An option before the `dev` script (`pnpm -r --parallel dev`, `pnpm --filter x dev`) makes
+// it some other invocation.
 function isPnpmDevelopment(info: ProcessInfo): boolean {
   const tokens = tokenize(info.commandLine);
   let arguments_: string[];
@@ -90,12 +74,8 @@ function isPnpmDevelopment(info: ProcessInfo): boolean {
 
 const SHELLS = new Set(['cmd', 'sh', 'bash', 'dash', 'zsh', 'powershell', 'pwsh']);
 
-/**
- * Whether the process is the shell that pnpm starts to run the `dev` script: a
- * shell whose `/c` or `-c` command is one `vite` command. A command separator
- * or another command (`bash -c "pnpm dev & pnpm test"`) makes it some other
- * shell, which can own other work.
- */
+// A separator or another command (`bash -c "pnpm dev & pnpm test"`) makes it some other
+// shell, which can own other work.
 function isScriptShell(info: ProcessInfo): boolean {
   const tokens = tokenize(info.commandLine);
   if (!SHELLS.has(programName(tokens[0]))) {return false;}
@@ -106,12 +86,8 @@ function isScriptShell(info: ProcessInfo): boolean {
   return programName(tokens[flag + 1]) === 'vite' && !/[&|;\n`]|\$\(/.test(command);
 }
 
-/**
- * Whether `parent` can be the process that started `child`. Windows keeps a
- * dead parent's PID in `ppid` and reuses PIDs, so the process that now holds
- * an orphan's `ppid` may be unrelated. It started after the child, which the
- * real parent cannot have. Without both creation times, trust the `ppid`.
- */
+// Windows keeps a dead parent's PID in `ppid` and reuses PIDs, so a process that started
+// after the child is not its parent. Without both creation times, trust `ppid`.
 function isStartedBefore(parent: ProcessInfo, child: ProcessInfo): boolean {
   return parent.started === undefined || child.started === undefined || parent.started <= child.started;
 }
@@ -142,19 +118,9 @@ function climbToRoot(
   }
 }
 
-/**
- * What to kill for the given listener PIDs. Each listener must be Vite run from
- * `repoRoot`'s `node_modules`. From each listener, climb while the parent is
- * alive, started before its child, is not one of `protectedPids` (this tool's
- * own ancestors), and is pnpm's script shell for `vite` or `pnpm dev` itself.
- * The climb ends at the first `pnpm dev`. The highest process reached is a root.
- *
- * The root is never above `pnpm dev`. The processes that started it (a
- * runtime's shell, a pnpm shim, `pnpm -r --parallel dev`, `bash -c "pnpm dev &
- * pnpm test"`) can own other work, and a tree kill there ends that work too.
- * They exit on their own when their `pnpm dev` child ends. With no `pnpm dev`
- * in the chain, the root is the listener or its script shell.
- */
+// The root is never above `pnpm dev`: its parents (a runtime's shell, `pnpm -r --parallel dev`)
+// can own other work, and exit on their own when it ends. Without a `pnpm dev` in the
+// chain, the root is the listener or its script shell.
 export function planStop(
   listeners: readonly number[],
   processes: readonly ProcessInfo[],
@@ -202,24 +168,14 @@ function powershell(script: string): string {
   });
 }
 
-/**
- * PowerShell that sets `$l` to the PIDs that listen on the port. With no
- * listener, `Get-NetTCPConnection` raises `CmdletizationQuery_NotFound`, which
- * reads as an empty list. Every other error, such as a missing cmdlet or
- * denied access, is rethrown: PowerShell exits non-zero and `execFileSync`
- * throws, so a failed query never reads as a free port. Match on the error id,
- * not the category: a missing cmdlet is also category `ObjectNotFound`.
- */
+// `CmdletizationQuery_NotFound` (no listener) reads as an empty list; any other error is
+// rethrown, so a failed query never reads as a free port. Match the error id, not the category.
 function listenerScript(port: number): string {
   return `$l = @(try { Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction Stop | ForEach-Object OwningProcess | Sort-Object -Unique } catch { if ($_.FullyQualifiedErrorId -notlike 'CmdletizationQuery_NotFound*') { throw } })`;
 }
 
-/**
- * The listener PIDs from PowerShell's JSON. The real query prints `[]` or
- * `[pid, …]`. `null` and a bare number are accepted defensively, for other
- * invocations or PowerShell versions. Any other shape throws: an unreadable
- * answer must never read as a free port.
- */
+// `null` and a bare number are accepted defensively. Any other shape throws: an unreadable
+// answer must never read as a free port.
 export function parseListenerJson(value: unknown): number[] {
   if (value === null) {return [];}
   if (Number.isSafeInteger(value)) {return [value as number];}
@@ -259,10 +215,8 @@ function listenersPosix(port: number): number[] {
   }
 }
 
-/**
- * POSIX reports no creation time here. It needs none: an orphan is reparented
- * to init or a subreaper, so its `ppid` never names a dead, reusable PID.
- */
+// No creation time needed: an orphan is reparented to init or a subreaper, so `ppid` never
+// names a dead, reusable PID.
 function snapshotPosix(port: number): Snapshot {
   const listeners = listenersPosix(port);
   const ps = posixTool('ps', ['-A', '-o', 'pid=,ppid=,args=']);

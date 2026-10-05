@@ -50,10 +50,7 @@ function messagesOf(diagnostics: readonly ts.Diagnostic[]): string[] {
   return diagnostics.map((d) => ts.flattenDiagnosticMessageText(d.messageText, '\n'));
 }
 
-/**
- * Emits the declarations of a small `emitDeclarationOnly` +
- * `allowImportingTsExtensions` project under `directory`, and returns its output directory.
- */
+/** Emits a small `emitDeclarationOnly` project; returns its output directory. */
 function emitScratchProject(directory: string): string {
   const source = nodePath.join(directory, 'src');
   const outputDirectory = nodePath.join(directory, 'dist');
@@ -225,10 +222,7 @@ describe('rewriteDtsSpecifiersIn', () => {
   });
 });
 
-/**
- * Resolves `<directory>/tsconfig.json` with the TypeScript config API, so JSONC
- * comments and `extends` are honoured, and returns its compiler options.
- */
+// The TypeScript config API honours JSONC comments and `extends`.
 function resolveCompilerOptions(directory: string): ts.CompilerOptions {
   const configPath = nodePath.join(directory, 'tsconfig.json');
   const read = ts.readConfigFile(configPath, ts.sys.readFile);
@@ -251,11 +245,8 @@ describe('TARGET_PACKAGES', () => {
   });
 });
 
-/**
- * A copy of the tool and its entry guard at `<scratch>/tools/`: its target is
- * relative to `import.meta.url`, so it then rewrites
- * `<scratch>/packages/{contracts,core,sync}/dist`.
- */
+// The target is relative to `import.meta.url`, so the copy at `<scratch>/tools/` rewrites
+// `<scratch>/packages/{contracts,core,sync}/dist`.
 function copyToolIntoScratch(): { root: string; script: string } {
   const root = makeScratch();
   writeFileSync(nodePath.join(root, 'package.json'), '{ "type": "module" }\n');

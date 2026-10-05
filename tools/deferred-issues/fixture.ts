@@ -1,9 +1,5 @@
-/**
- * Excerpts copied from `docs/stories/deferred-work.md` (before the 2026-09-27
- * cleanup): a multi-line summary with nested bullets, quoted summaries, a
- * human-written `retry_when:`, notes with no `source_spec`, and a
- * `resolved_by:` note that follows an entry-shaped bullet.
- */
+// Excerpts of `docs/stories/deferred-work.md` from before the 2026-09-27 cleanup: nested
+// bullets, quoted summaries, a human `retry_when:`, no `source_spec`, a `resolved_by:` note.
 export const FIXTURE_LEDGER = `# Deferred work
 
 Each entry names work carved out of a spec. Append new entries.

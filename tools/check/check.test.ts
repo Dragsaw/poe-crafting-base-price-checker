@@ -192,10 +192,8 @@ const interval = (r: StepResult): [number, number] => {
   return [start, end];
 };
 
-/**
- * Real processes with trivial `node -e` commands. Each prints its start and
- * end time, so the assertions compare intervals, not wall-clock budgets.
- */
+// Real `node -e` processes that print their start and end time: the assertions compare
+// intervals, not wall-clock budgets.
 describe('spawnRunner', () => {
   it('runs a stage in parallel, runs stage B after A, and survives a failing step', async () => {
     const steps = [timed('a1', 'A', 400), timed('a2', 'A', 400, 3), timed('b1', 'B', 50)];

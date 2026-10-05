@@ -1,27 +1,7 @@
 {
-  ".dependency-cruiser.mjs": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
   ".githooks/commit-msg": {
     "unicorn/name-replacements": {
       "count": 1
-    }
-  },
-  ".githooks/pre-push": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "depcruise.rules.mjs": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "eslint.config.mjs": {
-    "local/max-comment-run": {
-      "count": 4
     }
   },
   "packages/contracts/src/modifier-ref.test.ts": {
@@ -271,74 +251,16 @@
       "count": 10
     }
   },
-  "tools/boundary-check/boundary.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "tools/check/check.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "tools/check/check.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "tools/deferred-issues/fixture.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
   "tools/dev-stop/dev-stop.test.ts": {
     "unicorn/name-replacements": {
       "count": 1
     }
   },
   "tools/dev-stop/dev-stop.ts": {
-    "local/max-comment-run": {
-      "count": 8
-    },
     "unicorn/name-replacements": {
       "count": 1
     },
     "unicorn/prefer-iterator-to-array": {
-      "count": 1
-    }
-  },
-  "tools/dts-specifiers/rewrite-dts-specifiers.test.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
-  "tools/dts-specifiers/rewrite-dts-specifiers.ts": {
-    "local/max-comment-run": {
-      "count": 5
-    }
-  },
-  "tools/lint-on-edit/lint-on-edit.e2e.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "tools/lint-on-edit/lint-on-edit.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
-  "tools/prune-pages.mjs": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "tools/setup-git-hooks.mjs": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "vitest.config.ts": {
-    "local/max-comment-run": {
       "count": 1
     }
   }

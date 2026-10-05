@@ -1,24 +1,11 @@
 #!/usr/bin/env node
-// Trims the Pages copy of `data/` to the seven AD-24 artifacts.
-//
-// `vite build` copies all of `data/` into `packages/web/dist` (it is the web
-// package's `publicDir`), including files the page never fetches:
-// `sync-progress.json`, `currencies.json`, `catalogue/items.json`,
-// `catalogue/filters.json` and `catalogue/static.json`. This step deletes
-// every file that came from `data/` and is not on the allowlist, then removes
-// any directory that leaves empty.
-// It touches nothing the bundle emitted (`index.html`, `assets/`).
-//
-// A required artifact missing from `dist` fails the build loudly. The three
-// absent-tolerable artifacts may be missing: the page renders and names each.
-//
-// The allowlist mirrors `ARTIFACTS` in `packages/web/src/load/artifacts.ts`;
-// `packages/web/src/load/prune-allowlist.test.ts` asserts the two are equal.
+// Trims the Pages copy of `data/` to the AD-24 artifacts; the bundle's own output stays.
+// A missing required artifact fails the build; the three optional ones may be absent.
 
 import { existsSync, readdirSync, rmdirSync, rmSync, statSync } from 'node:fs';
 import nodePath from 'node:path';
 
-/** The seven artifacts, by published path, in AD-24 order. */
+/** Mirrors `ARTIFACTS` in `packages/web/src/load/artifacts.ts`; a test pins both. */
 export const ALLOWLIST = [
   { path: 'dataset.json', required: true },
   { path: 'sync-report.json', required: false },
@@ -56,11 +43,7 @@ function removeEmptyDirectories(directory, stop) {
   }
 }
 
-/**
- * Prunes `distributionDirectory` of every file that `dataDirectory` published and the allowlist
- * does not name. Returns what it kept and removed. Throws, naming each, when a
- * required artifact is missing from `distributionDirectory`.
- */
+/** Returns what it kept and removed; throws, naming each, when a required artifact is missing. */
 export function prunePages(distributionDirectory, dataDirectory) {
   if (!existsSync(distributionDirectory) || !statSync(distributionDirectory).isDirectory()) {
     throw new Error(`prune-pages: no build output at ${distributionDirectory}; run vite build first.`);

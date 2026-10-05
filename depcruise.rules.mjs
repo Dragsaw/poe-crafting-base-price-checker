@@ -1,21 +1,7 @@
-/**
- * The one-way package graph (AD-1, NFR-4): `contracts` -> `core` -> `sync` / `web`,
- * plus the import purity of `core` (AD-1): a `core` module imports no Node
- * builtin and nothing outside `packages/`. Edges into `packages/` are left to
- * the direction rules above.
- * The purity rules cover `packages/core/src/` only; test files (`*.test.ts`)
- * there are exempt, and package tooling such as `vitest.config.ts` is outside
- * it: neither is a valuation module.
- *
- * This module is the single source of the rules. `.dependency-cruiser.mjs`
- * spreads it into the shipped config, and `tools/boundary-check/boundary.test.ts`
- * cruises a fixture with it **unmodified** — so a `severity: "warn"` or a
- * mistyped rule name here fails that test rather than silently disarming the
- * shipped check.
- *
- * A plain array, deliberately: dependency-cruiser requires the config itself to
- * be an object literal, not a factory, so the composition happens there.
- */
+// Package graph and `core` import purity: AD-1, NFR-4.
+// Single source of the rules: `tools/boundary-check/boundary.test.ts` cruises a fixture
+// with them unmodified, so a weakened rule fails that test.
+
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 export const rules = [
   {

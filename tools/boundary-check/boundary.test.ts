@@ -20,22 +20,9 @@ interface CruiseOutput {
   readonly summary: { readonly violations: Violation[] };
 }
 
-/**
- * The forbidden-edge acceptance criterion cannot be proven by committing a
- * violation into `packages/` — `pnpm check` has to pass on a clean tree, and a
- * violation written at test time would dirty `packages/`, which two agents in
- * parallel worktrees would collide on. Hence a fixture tree outside it.
- *
- * The cruise runs the **shipped** config: `shippedConfig.forbidden` and
- * `shippedConfig.options`, not a local copy. Validating against the rules
- * module alone would have stayed green with `forbidden: []` in the real config
- * — the exact disarming this test exists to catch. The rules module is still
- * imported, for the name-parity assertion below.
- *
- * `baseDir` makes reported module paths relative to the fixture, so the fixture
- * mirroring `packages/<name>/src` is matched by the real `^packages/...`
- * regexes with no parameterisation.
- */
+// A fixture tree outside `packages/`: a violation written there at test time would dirty
+// the tree parallel worktrees share. It cruises the shipped config, not the rules module
+// alone, which would stay green with `forbidden: []`.
 async function cruiseFixture(baseDirectory: string): Promise<CruiseOutput> {
   const result = await cruise(['packages'], {
     ...shippedConfig.options,
