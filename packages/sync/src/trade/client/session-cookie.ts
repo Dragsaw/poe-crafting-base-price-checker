@@ -22,8 +22,8 @@ interface ProbeBaseline {
   readonly response: HttpResponse;
 }
 
-// A downgrade (§13.4): a cookie request answered 401 or 403 (a Cloudflare 403 too), or a 2xx under the
-// baseline's policy whose rule-name count is not above the baseline's. A 429, a 5xx and other 4xx are not.
+// A downgrade (§13.4): a cookie request answered 401 or 403 (a Cloudflare 403 too), or a 2xx under
+// the baseline's policy whose rule-name count is not above the baseline's. 429, 5xx, other 4xx: no.
 export function isDowngrade(holder: AuthHolder, response: HttpResponse): boolean {
   if (response.status === UNAUTHORIZED || response.status === FORBIDDEN) {
     return true;
@@ -37,7 +37,7 @@ export function isDowngrade(holder: AuthHolder, response: HttpResponse): boolean
   );
 }
 
-/** The standing headers, plus the cookie on a marked request once the holder settled `authenticated` (AD-30). */
+/** The standing headers, plus the cookie on a marked request once `authenticated` (AD-30). */
 export function outboundHeaders(
   context: GovernorContext,
   request: TradeRequest,
@@ -62,7 +62,7 @@ export function shouldProbe(
   return auth !== undefined && request.cookieEligible === true && auth.holder.canProbe && isSuccess(response.status);
 }
 
-// 1. Drop the cookie, 2. reset the pacing to cold in place, 3. the holder settles `expired`, 4. yield (§13.4).
+// Drop the cookie, reset pacing to cold in place, settle the holder `expired`, yield (§13.4).
 // The downgrading answer is neither counted nor returned.
 export function expireSession(
   context: GovernorContext,
@@ -89,7 +89,8 @@ export function expireSession(
 function settleProbeStatus(holder: AuthHolder, baseline: HttpResponse, response: HttpResponse): void {
   const { status } = response;
   if (isSuccess(status)) {
-    // Kept by the holder: every later cookie answer under the baseline's policy is tested against it (§13.4).
+    // Kept by the holder: every later cookie answer under the baseline's policy is tested against
+    // it (§13.4).
     const baselineCount = ruleNameCount(baseline.headers);
     holder.rememberBaseline(baselineCount, rateLimitPolicyOf(baseline.headers));
     holder.settle(ruleNameCount(response.headers) > baselineCount ? 'authenticated' : 'not-elevated');
@@ -102,8 +103,8 @@ function settleProbeStatus(holder: AuthHolder, baseline: HttpResponse, response:
   }
 }
 
-// The one session probe (IMPLEMENTATION-NOTES.md §13.2, §13.3): the baseline's request, once, with the cookie.
-// It never counts toward the invalid-request count, and its answer and error are never returned.
+// The one session probe (IN §13.2, §13.3): the baseline's request, once, with the cookie. It never
+// counts toward the invalid-request count, and its answer and error are never returned.
 export async function probe(context: GovernorContext, auth: TradeGovernorAuth, baseline: ProbeBaseline): Promise<void> {
   const { request, lane } = baseline;
   const knownPolicy = context.pacing.lanePolicies.get(lane);
@@ -119,7 +120,7 @@ export async function probe(context: GovernorContext, auth: TradeGovernorAuth, b
       body: request.body,
     });
   } catch {
-    // The error may quote the request, so it goes nowhere. Pricing continues unauthenticated (§13.3).
+    // The error may quote the request, so it goes nowhere. Pricing goes on unauthenticated (§13.3).
     auth.holder.settle('probe-failed');
     return;
   }

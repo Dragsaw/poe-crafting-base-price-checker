@@ -1,6 +1,6 @@
-// `pnpm fixtures:record` (NFR-2, AD-13): the explicit, human-invoked recorder. No test runs it, and the entry guard
-// below keeps importing it side-effect free. Request bodies come from `buildSearchBody`, never hand-written: a fixture
-// must record what the API takes, not what the team believes it takes.
+// `pnpm fixtures:record` (NFR-2, AD-13): the explicit, human-invoked recorder; no test runs it, and
+// the entry guard keeps importing it side-effect free. Request bodies come from `buildSearchBody`,
+// never hand-written: a fixture records what the API takes, not what the team believes it takes.
 
 import { readdir, rm } from 'node:fs/promises';
 import nodePath from 'node:path';
@@ -56,7 +56,8 @@ export interface FixtureInteraction {
   readonly url: string;
 }
 
-// Both spellings come from `endpoints.ts`, so a fixture and the `catalogue:refresh` artifact cannot describe two URLs.
+// Both spellings come from `endpoints.ts`, so a fixture and the `catalogue:refresh` artifact cannot
+// describe two URLs.
 export const FIXTURE_INTERACTIONS: readonly FixtureInteraction[] = [
   { name: 'trade-data-leagues', method: 'GET', url: TRADE_LEAGUES_URL },
   ...CATALOGUE_ENDPOINTS.map((endpoint) => ({
@@ -68,8 +69,8 @@ export const FIXTURE_INTERACTIONS: readonly FixtureInteraction[] = [
 
 export const REDACTED = '[redacted]';
 
-// Account and character names are personal identifiers (AGENT-WORKFLOW, Fixture hygiene); a whisper template and
-// its token carry the character name.
+// Account and character names are personal identifiers (AGENT-WORKFLOW, Fixture hygiene); a whisper
+// template and its token carry the character name.
 const IDENTIFIER_KEYS = new Set([
   'accountname',
   'charactername',
@@ -92,9 +93,9 @@ function isIdentifierKey(key: string, parentKey: string | undefined): boolean {
   );
 }
 
-// Keeps the key and replaces the value: the loss of a field is itself a signal (AGENT-WORKFLOW, Fixture hygiene).
-// Redaction propagates into an identifier key's value, so a list of names is stripped per element. A bare `name`
-// is an identifier only inside an identity container.
+// Keeps the key and replaces the value: the loss of a field is itself a signal (AGENT-WORKFLOW,
+// Fixture hygiene). Redaction propagates into an identifier key's value, so a list of names is
+// stripped per element. A bare `name` is an identifier only inside an identity container.
 export function stripPersonalIdentifiers(
   value: unknown,
   parentKey?: string,
@@ -125,7 +126,7 @@ export function fixturePathOf(interaction: Pick<FixtureInteraction, 'name'>): st
   return nodePath.join(FIXTURES_DIR, `${interaction.name}.json`);
 }
 
-/** UTF-8 without BOM, LF, two-space JSON, trailing newline (Consistency Conventions): a re-record diffs as data. */
+/** UTF-8 no BOM, LF, two-space JSON, trailing newline (Consistency Conventions). */
 export function serialiseFixture(payload: unknown): string {
   return serialiseJsonArtifact(payload);
 }
@@ -167,7 +168,8 @@ function searchAnswerOf(payload: unknown): { id: string; result: string[] } | un
   return typeof id !== 'string' || !Array.isArray(result) ? undefined : { id, result: result.filter((item): item is string => typeof item === 'string') };
 }
 
-// Each interaction is named for its own request (`pricing/fixture-names.ts`), which lets the dry run serve it back.
+// Each interaction is named for its own request (`pricing/fixture-names.ts`), which lets the dry
+// run serve it back.
 async function recordPricing(
   entry: TrackedEntry,
   workload: PricingWorkload,
@@ -201,8 +203,8 @@ async function recordPricing(
   return typeof fetched === 'string' ? fetched : undefined;
 }
 
-// Buffers every payload and writes only once all succeeded: a mid-loop failure would leave `fixtures/` half re-recorded,
-// an unreviewable mix of today's capture and last month's.
+// Buffers every payload and writes only once all succeeded: a mid-loop failure would leave
+// `fixtures/` half re-recorded, an unreviewable mix of today's capture and last month's.
 export async function recordFixtures(
   ports: RecorderPorts,
   workload?: PricingWorkload,
@@ -287,7 +289,7 @@ async function writeCaptured(
   return written;
 }
 
-/** Pricing fixtures are named by request digest, so a changed list or builder leaves old names behind. */
+/** Pricing fixtures are named by request digest, so a changed list or builder strands old names. */
 async function removeStalePricingFixtures(writtenPaths: readonly string[]): Promise<void> {
   const written = new Set(writtenPaths.map((path) => nodePath.resolve(path)));
   const names = await readdir(FIXTURES_DIR);

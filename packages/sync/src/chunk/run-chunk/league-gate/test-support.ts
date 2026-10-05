@@ -46,7 +46,7 @@ export const PREVIOUS_DATASET = `${JSON.stringify(
 )}\n`;
 export const PREVIOUS_PROGRESS = progressText([key(A)]);
 
-/** The composition every shell builds: the gate counts as `league-validation`, the step as `tracked-list`. */
+/** The composition every shell builds: the gate is `league-validation`, the step `tracked-list`. */
 export function gated(
   league: string,
   answer: HttpResponse,

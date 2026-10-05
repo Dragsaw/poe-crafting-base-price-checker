@@ -12,7 +12,7 @@ import type { RunContext } from './run-state.ts';
 
 export interface ProgressLoad {
   readonly progress: SyncProgressFile | undefined;
-  /** An unreadable progress file is thrown later, at its usual place, so it still fails the run with a report. */
+  /** An unreadable progress file throws later, at its usual place, so the run still reports. */
   readonly fault: { readonly error: unknown } | undefined;
 }
 
@@ -49,7 +49,7 @@ function isBefore(now: string, notBefore: string): boolean {
   return Date.parse(now) < Date.parse(notBefore);
 }
 
-/** While the clock is before `notBefore` the run sends nothing and writes nothing, except a broken lock's record (AD-8). */
+/** Before `notBefore` the run sends and writes nothing, except a broken lock's record (AD-8). */
 export async function deferIfPaused(
   context: RunContext,
   progress: SyncProgressFile | undefined,

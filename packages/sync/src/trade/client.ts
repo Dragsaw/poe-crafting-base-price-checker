@@ -75,7 +75,7 @@ export interface TradeYieldResult extends TradeExchange {
   /** `0` where no wait recovers: a threshold or `session-expired` yield. */
   readonly retryAfterMs: number;
   readonly reason: TradeYieldReason;
-  /** Absent where nothing came back: a threshold refusal or a discarded `session-expired` answer. */
+  /** Absent where nothing came back: a threshold refusal or a discarded `session-expired`. */
   readonly response?: HttpResponse;
 }
 
@@ -124,7 +124,7 @@ export interface TradeGovernorOptions<Source extends string> extends TradeClient
 
 /** The session-cookie half of a governor (AD-30). */
 export interface TradeGovernorAuth {
-  /** Owns the value and state (§13.2); every error the governor passes on goes through it (§13.6). */
+  /** Owns the value and state (§13.2); every error the governor passes on goes through it. */
   readonly holder: SessionAuth;
   /** Counted as `session-probe` (AD-12); shares this governor's pacing and serial queue. */
   readonly probe: HttpPort;

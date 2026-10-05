@@ -9,7 +9,7 @@ import { CONFIG_PATH } from '../load-config.ts';
 import { CURRENCIES_PATH } from '../pricing/load-currencies.ts';
 import { CATALOGUE_ITEMS_PATH } from '../pricing/load-item-types.ts';
 
-/** Hand-owned inputs a chunk reads and never writes: a change ends an input wait and makes the league gate due. */
+/** Hand-owned inputs a chunk reads, never writes: a change ends an input wait, the gate is due. */
 export const INPUT_PATHS: readonly string[] = [
   TRACKED_PATH,
   CONFIG_PATH,
@@ -20,7 +20,7 @@ export const INPUT_PATHS: readonly string[] = [
   CATALOGUE_FILTERS_PATH,
 ];
 
-/** Presence and `modifiedAt` of every input as one string; a transient fs fault marks its path and never throws. */
+/** Presence and `modifiedAt` of every input as one string; a transient fs fault marks its path. */
 export async function inputSignature(fs: FilesystemPort): Promise<string> {
   const parts = await Promise.all(
     INPUT_PATHS.map(async (path) => {
@@ -34,7 +34,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
   return JSON.stringify(parts);
 }
 
-/** `true` when the lock file is absent or stale (§7); a read that throws is `false`, so the poll continues. */
+/** `true` when the lock file is absent or stale (§7); a read that throws is `false`: poll on. */
 export async function isLockFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
   try {
     const found = await readLock(fs);

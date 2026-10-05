@@ -13,7 +13,7 @@ const CLEAR_SEARCH_HEADERS = {
   'x-rate-limit-ip-state': '1:10:0',
 };
 
-// The 429 operator line: the response's governance headers beside the reading the wait was paced on.
+// The 429 operator line: the response's governance headers beside the reading the wait used.
 it('logs one line on a 429, naming the response headers and the reading it was paced on', async () => {
   const OTHER_SEARCH_URL = 'https://trade.test/api/trade2/search/poe2/Other';
   const http = createFakeHttpPort({

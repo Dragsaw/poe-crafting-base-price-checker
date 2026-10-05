@@ -11,7 +11,7 @@ import { logLockTakenOver, newRecords } from './run-state.ts';
 import type { RunState } from './run-state.ts';
 import { writeReport } from './write-report.ts';
 
-/** The original error is always the one rethrown: a fault in a failure-path write goes to the log. */
+/** The original error is always the one rethrown: a failure-path write fault goes to the log. */
 async function attempt(state: RunState, what: string, write: () => Promise<void>): Promise<void> {
   try {
     await write();
@@ -20,14 +20,14 @@ async function attempt(state: RunState, what: string, write: () => Promise<void>
   }
 }
 
-/** The entry a `MalformedRequestError` or an unexpected search or fetch body carries, as the step left it (AD-9). */
+/** The entry a `MalformedRequestError` or unexpected body carries, as the step left it (AD-9). */
 function failingEntry(error: unknown): DatasetEntry | undefined {
   return error instanceof MalformedRequestError || error instanceof UnexpectedTradeResponseError
     ? error.entry
     : undefined;
 }
 
-/** Publishes the step entries, the marks and the failing entry; a rejected request remembers the abort as `notBefore` (AD-9, §5.3). */
+/** Publishes step entries, marks and the failing entry; a rejected request records `notBefore`. */
 async function publishOnFailure(state: RunState, setup: ChunkSetup, error: unknown): Promise<void> {
   // The gate's non-429 4xx is a rejected request too, and would be refused again on the next tick.
   const isRejected = error instanceof MalformedRequestError || error instanceof LeagueRequestRejectedError;
@@ -44,7 +44,7 @@ async function publishOnFailure(state: RunState, setup: ChunkSetup, error: unkno
   );
 }
 
-/** Writes what a throw leaves behind, then rethrows it; a report or publish already attempted is not attempted again. */
+/** Writes what a throw leaves, then rethrows; a report or publish already tried is not retried. */
 export async function failRun(state: RunState, error: unknown): Promise<never> {
   if (state.isReportAttempted) {
     throw error;
@@ -54,7 +54,7 @@ export async function failRun(state: RunState, error: unknown): Promise<never> {
     throw error;
   }
   if (error instanceof LeagueMismatchError) {
-    // The run's premise is wrong: the report alone, with this chunk's lock record and the mismatch (AD-12).
+    // The premise is wrong: the report alone, with this chunk's lock record and mismatch (AD-12).
     await attempt(state, 'writing the report', () =>
       writeReport(state, [...state.records, ...failureRecords(error, state.current)]),
     );

@@ -6,7 +6,8 @@ const REQUESTED_WITH_VALUE = 'XMLHttpRequest';
 const CONTENT_TYPE_HEADER = 'content-type';
 const JSON_CONTENT_TYPE = 'application/json';
 
-// Drops the final path segment, where a trade URL varies: keeping it makes every fetch its own lane, unpaced.
+// Drops the final path segment, where a trade URL varies: keeping it makes every fetch its own
+// lane, unpaced.
 function defaultLaneOf(request: TradeRequest): string {
   let pathname: string;
   try {
@@ -22,7 +23,7 @@ export function laneOf(request: TradeRequest): string {
   return request.lane !== undefined && request.lane.trim() !== '' ? request.lane : defaultLaneOf(request);
 }
 
-/** The standing headers of IMPLEMENTATION-NOTES.md §5.1, applied last so a caller cannot drop them. */
+/** The standing headers of IN §5.1, applied last so a caller cannot drop them. */
 export function headersFor(request: TradeRequest, userAgent: string): Record<string, string> {
   const headers: Record<string, string> = {};
   const given = Object.entries(request.headers ?? {});

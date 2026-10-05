@@ -15,14 +15,15 @@ import type { RunState } from './run-state.ts';
 type CatalogueCheck = ReturnType<typeof checkCatalogue>;
 type GateYield = Extract<GateResult, { kind: 'yield' }>;
 
-/** The tracked list, the dataset, the shell's `load` and the committed catalogue, in AD-12's cost order. */
+/** The tracked list, dataset, shell `load` and committed catalogue, in AD-12's cost order. */
 export async function loadRunInputs(state: RunState): Promise<{ ready: ChunkSetup; ids: CatalogueIds }> {
   const { fs } = state.ports;
   const tracked = await loadEnvelope(fs, TRACKED_PATH, parseTrackedFile, explainTrackedVersion);
   state.entries = tracked?.entries ?? [];
   // Absent means every entry is never attempted.
   state.dataset = await loadEnvelope(fs, DATASET_PATH, (data) => parseEnvelope(DatasetFileSchema, data));
-  // The step and the gate need config values, so the shell builds them here, on the dataset loaded under this lock.
+  // The step and the gate need config values, so the shell builds them here, on the dataset loaded
+  // under this lock.
   const ready = await state.ports.load({ entries: state.entries, dataset: state.dataset?.entries ?? [] });
   state.setup = ready;
   const catalogue = await state.ports.catalogue();
@@ -32,10 +33,11 @@ export async function loadRunInputs(state: RunState): Promise<{ ready: ChunkSetu
   return { ready, ids: catalogue.value };
 }
 
-/** The offline checks (AD-9, AD-25) and the cross-file gate (AD-17): a failure throws before the order exists, so nothing is published. */
+/** The offline checks (AD-9, AD-25) and cross-file gate (AD-17): a failure throws pre-order. */
 export async function checkRunStart(state: RunState, ids: CatalogueIds): Promise<CatalogueCheck> {
   const { entries } = state;
-  // An absent file is recorded and the run goes on (AD-12); a present one has its ids checked, report-only (AD-9).
+  // An absent file is recorded and the run goes on (AD-12); a present one has its ids checked,
+  // report-only (AD-9).
   const weights = await readWeightsIds(state.ports.fs);
   state.coverageFigures = (weights.kind === 'present' ? poolCoverage(entries, weights.file) : undefined) ?? {};
   const check = checkCatalogue(entries, state.dataset?.entries ?? [], ids);
@@ -61,7 +63,7 @@ export function planOrder(state: RunState, check: CatalogueCheck): ChunkOrder {
   return plan;
 }
 
-/** The league gate, the only run-start check that costs a request (AD-12); a session skips it while its confirmation holds. */
+/** The league gate, the one run-start check that costs a request (AD-12); a session may skip it. */
 export async function runLeagueGate(
   state: RunState,
   ready: ChunkSetup,

@@ -1,5 +1,5 @@
 /**
- * The run-start league gate (FR-32, AD-19, AD-12): one governed GET, ids compared byte for byte as the search URL uses them.
+ * The run-start league gate (FR-32, AD-19, AD-12): one governed GET, ids compared byte for byte.
  */
 
 import { LeaguesPayloadSchema } from '@poe/contracts';

@@ -1,4 +1,4 @@
-/** One bounded, resumable, single-instance chunk (AD-7, FR-19): the run-start sequence is AD-12's cost order, and a throw writes what AD-12 and IMPLEMENTATION-NOTES.md §5.3 specify. */
+/** One bounded, resumable, single-instance chunk (AD-7, FR-19); failures: AD-12, IN §5.3. */
 
 import { parseEnvelope, SyncReportFileSchema } from '@poe/contracts';
 import type { ClockPort, CurrencyRate, DatasetEntry, FilesystemPort, GitPort, SyncLock, SyncRunRecord, TrackedEntry } from '@poe/contracts';
@@ -20,7 +20,7 @@ import { runSteps } from './run-chunk/step-loop.ts';
 
 export { DATASET_PATH, PROGRESS_PATH, REPORT_PATH, TRACKED_PATH } from './run-chunk/data-paths.ts';
 
-/** What one step reports for one entry: an absent allowance bounds nothing, and `yielded` stops the chunk now. */
+/** What one step reports for one entry: an absent allowance bounds nothing; `yielded` stops now. */
 export type StepResult =
   | {
       readonly kind: 'completed';
@@ -33,17 +33,17 @@ export type StepResult =
   | {
       readonly kind: 'yielded';
       readonly entry?: DatasetEntry;
-      /** Set only on a `429`: the delay the chunk writes into `notBefore` (IMPLEMENTATION-NOTES.md §5.3). */
+      /** Set only on a `429`: the delay the chunk writes into `notBefore` (IN §5.3). */
       readonly retryAfterMs?: number;
-      /** Set only on AD-30's `session-expired` downgrade: no `notBefore`, and the session waits `backoff(1)` (IMPLEMENTATION-NOTES.md §13.4). */
+      /** Set only on AD-30's `session-expired` downgrade: no `notBefore`, `backoff(1)` (§13.4). */
       readonly sessionExpired?: true;
     };
 
 export type ChunkStep = (entry: TrackedEntry) => Promise<StepResult>;
 
-/** The runner's two narrow ports onto the process auth holder, so it never reaches the cookie (AD-30, IMPLEMENTATION-NOTES.md §13.1). */
+/** The runner's two narrow ports onto the process auth holder, never the cookie (AD-30, §13.1). */
 interface ChunkAuth {
-  /** Called once after the lock and the `notBefore` check: a due hold-off settles `held-off` and no probe goes out. */
+  /** Called once after the lock and `notBefore` check: a due hold-off settles `held-off`. */
   settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void;
   /** The hold-off action the next progress write applies, or `undefined` to carry the field. */
   pendingHoldOff(): 'write' | 'clear' | undefined;
@@ -56,7 +56,7 @@ export interface GateContext {
   readonly entries: readonly TrackedEntry[];
 }
 
-/** `yield` is a chunk yield with no entry attempted (AD-8): the gate got no answer to check against. */
+/** `yield` is a chunk yield with no entry attempted (AD-8): the gate got no answer to check. */
 export type GateResult =
   | { readonly kind: 'pass' }
   | {
@@ -84,9 +84,9 @@ export interface ChunkLoadContext {
 /** What the shell's `load` hook answers: everything the chunk needs from config. */
 export interface ChunkSetup {
   readonly publication: ChunkPublication;
-  /** Turns starvation into a report record with the declared yardstick, which this directory never reads (FR-25). */
+  /** Turns starvation into a report record with the declared yardstick (FR-25), unread here. */
   readonly starvationRecord: (starvation: ChunkStarvation) => SyncRunRecord;
-  /** The run-start league gate, after the order and before any step: a throw aborts, a `yield` ends the chunk `yielded`. */
+  /** The run-start league gate, after the order, before any step: a throw aborts. */
   readonly gate?: (context: GateContext) => Promise<GateResult>;
   /** The pricing step, built on the dataset the runner loaded. */
   readonly step: ChunkStep;
@@ -99,29 +99,29 @@ export interface ChunkPorts {
   readonly pid: number;
   /** Read-only: the tracked list's last commit author date (`resolveTrackedListAge`). */
   readonly git: GitPort;
-  /** The shell's per-source request counter (`../request-counter.ts`); the report carries what it counted since the lock. */
+  /** The shell's per-source request counter (`../request-counter.ts`); counted since the lock. */
   readonly requests: { snapshot(): RequestsBySource };
-  /** The shell's loads under the lock (AD-12), after the dataset and before the catalogue; a throw aborts before any request. */
+  /** The shell's loads under the lock (AD-12), after the dataset, before the catalogue. */
   readonly load: (context: ChunkLoadContext) => Promise<ChunkSetup>;
-  /** The committed catalogue's id sets, loaded after `load`; a refusal aborts with a `run-failure` record before any request. */
+  /** The committed catalogue's id sets, after `load`; a refusal aborts with a `run-failure`. */
   readonly catalogue: () => Promise<DataFileResult<CatalogueIds>>;
-  /** The retry delay of a latched probe `429`, read after the step loop: it makes the chunk a `429` yield (IMPLEMENTATION-NOTES.md §13.3). */
+  /** The retry delay of a latched probe `429`, read after the step loop: a `429` yield (§13.3). */
   readonly latchedRetryAfterMs?: () => number | undefined;
-  /** The live shells' auth holder ports; omitted, nothing settles `held-off` and progress carries the hold-off forward. */
+  /** The live shells' auth holder ports; omitted, nothing settles `held-off`. */
   readonly auth?: ChunkAuth;
   /** One line of operator output. Defaults to stderr. */
   readonly log?: (line: string) => void;
-  /** Set only by the `pnpm sync` session (`../sync.ts`), one chunk per entry (AD-7); absent, the chunk is the batch chunk. */
+  /** Set only by the `pnpm sync` session (`../sync.ts`), one chunk per entry (AD-7). */
   readonly session?: ChunkSession;
 }
 
 /** What the session tells each of its chunks. Every field is optional. */
 export interface ChunkSession {
-  /** The chunk attempts at most this many entries; reaching it with an entry left ends the chunk `bounded` by `'entries'`. */
+  /** The chunk attempts at most this many entries; reaching it with one left ends it `bounded`. */
   readonly maxEntries?: number;
-  /** The request counter's snapshot at the pass start, so `requestsBySource` covers the pass; a new pass counts from its own start. */
+  /** The request counter's snapshot at the pass start, so `requestsBySource` covers the pass. */
   readonly requestsSince?: RequestsBySource;
-  /** The league an earlier chunk confirmed: the gate is skipped while it equals the configured league within the same pass. */
+  /** The league an earlier chunk confirmed: the gate is skipped while it equals the configured. */
   readonly confirmedLeague?: string;
   /** Row 1's stale-pinned rule (`chunkOrder`'s `pinnedMaxAgeMs`). */
   readonly pinnedMaxAgeMs?: number;
@@ -131,15 +131,15 @@ export interface ChunkSession {
 export type ChunkBound = 'search' | 'fetch' | 'entries';
 
 interface ChunkOutcomeBase {
-  /** Canonical keys this chunk completed in visiting order, row 1 included; progress records only rows 2–3. */
+  /** Canonical keys this chunk completed in visiting order, row 1 too; progress keeps rows 2–3. */
   readonly completed: readonly string[];
-  /** The dataset entries the steps returned in visiting order; `busy` and `dispossessed` publish nothing. */
+  /** The dataset entries the steps returned in visiting order; `busy` publishes none. */
   readonly entries: readonly DatasetEntry[];
-  /** The lock records this chunk produced; the report adds the starvation record through `starvationRecord`. */
+  /** The lock records this chunk produced; the report adds the starvation record separately. */
   readonly records: readonly SyncRunRecord[];
-  /** Present when a pinned step reported an allowance below the pinned entries left plus one while rotation work waited (AD-7, IMPLEMENTATION-NOTES.md §6); the kind is unchanged. */
+  /** Set when a pinned step's allowance is below pinned entries left plus one (AD-7, §6). */
   readonly pinnedStarvation?: ChunkStarvation;
-  /** A session's chunk only, once the order exists: `true` when this chunk's order started a new pass. */
+  /** A session's chunk only, once the order exists: `true` when its order started a new pass. */
   readonly newPass?: boolean;
   /** A session's chunk only: the configured league, present when this chunk confirmed it. */
   readonly confirmedLeague?: string;
@@ -162,11 +162,11 @@ export type ChunkOutcome =
   | (ChunkOutcomeBase & { readonly kind: 'bounded'; readonly bound: ChunkBound })
   | (ChunkOutcomeBase & {
       readonly kind: 'yielded';
-      /** `true` only on AD-30's `session-expired` yield, which reset the pacing state in place, so the session waits `backoff(1)` (IMPLEMENTATION-NOTES.md §13.4). */
+      /** `true` only on AD-30's `session-expired` yield, which reset pacing (§13.4). */
       readonly sessionExpired?: true;
     })
   | (ChunkOutcomeBase & { readonly kind: 'busy' })
-  /** A previous 429 or malformed-request abort wrote a `notBefore` still ahead: nothing sent or written (AD-8, IMPLEMENTATION-NOTES.md §5.3). */
+  /** A prior 429 or malformed-request abort left a `notBefore` ahead: nothing sent (AD-8, §5.3). */
   | (ChunkOutcomeBase & { readonly kind: 'deferred'; readonly notBefore: string })
   | (ChunkOutcomeBase & { readonly kind: 'dispossessed' });
 
@@ -206,9 +206,10 @@ async function runUnderLock(context: RunContext): Promise<ChunkOutcome> {
   if (paused !== undefined) {
     return paused;
   }
-  // After the lock and the `notBefore` check, a due hold-off settles `held-off`, so this run sends no probe (§13.1).
+  // After the lock and the `notBefore` check, a due hold-off settles `held-off`, so this run sends
+  // no probe (§13.1).
   ports.auth?.settleHeldOffIfDue(progress?.authHoldOffUntil, ports.clock.now());
-  // Read outside the failure path: a report this build cannot read is refused with nothing written (NFR-8).
+  // Read outside the failure path: an unreadable report is refused with nothing written (NFR-8).
   const previousReport = await loadEnvelope(ports.fs, REPORT_PATH, (data) =>
     parseEnvelope(SyncReportFileSchema, data),
   );

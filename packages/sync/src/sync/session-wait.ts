@@ -18,7 +18,7 @@ function remainingMs(until: string, clock: ClockPort): number {
   return Date.parse(until) - Date.parse(clock.now());
 }
 
-/** Spends one wait. Returns early on an abort. `signature` is the input signature the wait compares against. */
+/** Spends one wait; returns early on an abort. `signature` is what the wait compares against. */
 export async function runWait(wait: SessionWait, ports: WaitPorts, signature: string): Promise<void> {
   switch (wait.kind) {
     case 'none': {

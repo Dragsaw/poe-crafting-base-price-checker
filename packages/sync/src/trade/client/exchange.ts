@@ -18,8 +18,8 @@ import {
 import { penaltyOf, TOO_MANY_REQUESTS } from './yield-penalty.ts';
 import type { YieldPenalty } from './yield-penalty.ts';
 
-// Nothing is sent on a latched probe `429` or a reached threshold. The threshold is checked before the
-// wait, because waiting does not clear it and passing it revokes access.
+// Nothing is sent on a latched probe `429` or a reached threshold. The threshold is checked before
+// the wait, because waiting does not clear it and passing it revokes access.
 function refusalOf(context: GovernorContext, policy: string | undefined): YieldPenalty | undefined {
   if (context.latched !== undefined) {
     return context.latched;
@@ -50,7 +50,7 @@ function refusalYield(
   };
 }
 
-/** Folds the answer into the ledger, then turns it into a downgrade yield, a `429` yield or a response. */
+/** Folds the answer into the ledger, then makes a downgrade yield, a `429` yield or a response. */
 function settleAnswer(context: GovernorContext, issued: IssuedExchange): TradeResult {
   const { lane, knownPolicy, waitedMs, pacedOn, isWithCookie, response } = issued;
   const folded = fold(context, lane, knownPolicy, response);

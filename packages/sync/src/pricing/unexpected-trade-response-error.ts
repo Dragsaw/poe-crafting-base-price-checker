@@ -3,7 +3,7 @@ import type { DatasetEntry } from '@poe/contracts';
 import type { RequestKind } from './price-entry.ts';
 
 /**
- * A 2xx body of the wrong shape aborts the chunk; `entry` has search fields only after an answered search (AD-9).
+ * A 2xx body of the wrong shape aborts the chunk; `entry` has search fields after a search (AD-9).
  */
 export class UnexpectedTradeResponseError extends Error {
   readonly entryKey: string;

@@ -1,5 +1,5 @@
-// The imperative shell's real effects (AD-1): `fetch`, the clock, delays and the filesystem live here and nowhere else
-// in `sync`, so the request timeout is written once. `createFetchHttpPort` runs only against loopback, in
+// The imperative shell's real effects (AD-1): `fetch`, clock, delays and filesystem live here only,
+// so the request timeout is written once. `createFetchHttpPort` runs only against loopback, in
 // `shell-fetch.test.ts`, which pins the rejections `isTransportFailure` depends on (AD-8).
 
 import { mkdir, open, readFile, rm, stat, writeFile } from 'node:fs/promises';
@@ -11,8 +11,8 @@ import type { ClockPort, FilesystemPort, HttpPort } from '@poe/contracts';
 /** How long a single live request may take before it is abandoned. */
 export const REQUEST_TIMEOUT_MS = 30_000;
 
-// UTF-8 without BOM, LF, two-space JSON, one trailing newline (Consistency Conventions), so a fixture and an
-// artifact cannot diverge by a byte.
+// UTF-8 without BOM, LF, two-space JSON, one trailing newline (Consistency Conventions), so a
+// fixture and an artifact cannot diverge by a byte.
 export function serialiseJsonArtifact(value: unknown): string {
   return `${JSON.stringify(value, undefined, 2)}\n`;
 }
@@ -48,7 +48,8 @@ export const sleep = (ms: number): Promise<void> =>
     setTimeout(done, ms);
   });
 
-// Resolves, never rejects, on abort: `pnpm sync` reads `signal.aborted` afterwards and exits 0 on the first SIGINT or SIGTERM.
+// Resolves, never rejects, on abort: `pnpm sync` reads `signal.aborted` afterwards and exits 0 on
+// the first SIGINT or SIGTERM.
 export async function abortableSleep(ms: number, signal: AbortSignal): Promise<void> {
   if (signal.aborted) {
     return;
@@ -63,7 +64,8 @@ export async function abortableSleep(ms: number, signal: AbortSignal): Promise<v
   }
 }
 
-// The `mkdir` is what makes the first refresh work on a fresh checkout, where `data/catalogue/` does not exist.
+// The `mkdir` is what makes the first refresh work on a fresh checkout, where `data/catalogue/`
+// does not exist.
 export async function writeTextFile(path: string, contents: string): Promise<void> {
   await mkdir(nodePath.dirname(path), { recursive: true });
   await writeFile(path, contents, { encoding: 'utf8' });
@@ -73,8 +75,9 @@ function hasErrorCode(error: unknown, code: string): boolean {
   return error instanceof Error && 'code' in error && error.code === code;
 }
 
-// `wx` is `O_CREAT | O_EXCL`: of two concurrent takers exactly one succeeds. The contents land after the create, so a
-// reader can see the file empty for an instant; the lock reader treats an unreadable lock as held, never as free.
+// `wx` is `O_CREAT | O_EXCL`: of two concurrent takers exactly one succeeds. The contents land
+// after the create, so a reader can see the file empty for an instant; the lock reader treats an
+// unreadable lock as held, never as free.
 async function didCreateExclusive(target: string, contents: string): Promise<boolean> {
   await mkdir(nodePath.dirname(target), { recursive: true });
   let handle;
@@ -94,7 +97,7 @@ async function didCreateExclusive(target: string, contents: string): Promise<boo
   return true;
 }
 
-// Every path is resolved against `root`, so the code below names `data/...` exactly as the fakes do.
+// Every path is resolved against `root`, so the code below names `data/...` as the fakes do.
 export function createNodeFilesystemPort(root: string): FilesystemPort {
   const at = (path: string): string => nodePath.resolve(root, path);
 

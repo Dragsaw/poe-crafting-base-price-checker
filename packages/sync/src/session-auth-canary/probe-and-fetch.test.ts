@@ -44,7 +44,7 @@ describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §
     return error;
   }
 
-  /** `probe`: the first cookie-carrying search throws. `fetch`: the probe is live, then the fetch throws. */
+  /** `probe`: the first cookie search throws. `fetch`: the probe is live, the fetch throws. */
   function cookieThrowingHttp(target: 'probe' | 'fetch', failure: Failure): ThrowingHttp {
     let threw = 0;
     let isProbed = false;

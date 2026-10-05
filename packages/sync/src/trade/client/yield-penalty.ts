@@ -26,7 +26,7 @@ function retryAfterMsOf(headers: Readonly<Record<string, string>>): number | und
     }
     const trimmed = value.trim();
     if (!DELTA_SECONDS.test(trimmed)) {
-      // An HTTP-date form, or garbage: the ledger's own penalty beats a `NaN` the caller would guard against.
+      // An HTTP-date form, or garbage: the ledger's own penalty beats a `NaN` the caller guards.
       return undefined;
     }
     const delayMs = Number(trimmed) * MS_PER_SECOND;
@@ -36,7 +36,8 @@ function retryAfterMsOf(headers: Readonly<Record<string, string>>): number | und
   return undefined;
 }
 
-// A floor on a refusal, not a rate: the ledger can be empty and a yield of 0 ms would send the caller straight back.
+// A floor on a refusal, not a rate: the ledger can be empty and a yield of 0 ms would send the
+// caller straight back.
 function declaredYieldFloorMs(parsed: RateLimitHeaders): number {
   let floor = 0;
   for (const rule of parsed.rules) {

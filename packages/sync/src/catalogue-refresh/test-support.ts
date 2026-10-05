@@ -90,7 +90,7 @@ export function endpointFor(artifact: string): (typeof CATALOGUE_ENDPOINTS)[numb
   return endpoint;
 }
 
-/** Narrows to the failure branch; `expect(outcome.ok).toBe(false)` would not narrow for the compiler. */
+/** Narrows to the failure branch; `expect(outcome.ok).toBe(false)` does not narrow for tsc. */
 export function failureOf(
   outcome: Awaited<ReturnType<typeof refreshCatalogue>>,
 ): { readonly failure: string; readonly written: readonly string[] } {

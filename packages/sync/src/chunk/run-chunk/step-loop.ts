@@ -15,7 +15,7 @@ type ChunkEnding =
   | { readonly kind: 'yielded'; readonly sessionExpired?: true }
   | { readonly kind: 'bounded'; readonly bound: ChunkBound };
 
-/** How the step loop ended, and the `notBefore` this ending writes: set only by a step's 429 (§5.3). */
+/** How the step loop ended, and the `notBefore` it writes: set only by a step's 429 (§5.3). */
 export interface ChunkStop {
   readonly ending: ChunkEnding;
   readonly until: string | undefined;

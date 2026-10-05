@@ -10,7 +10,7 @@ import { LEAGUES_FIXTURE_NAME, searchFixtureName } from '../pricing/fixture-name
 import { itemTypesOf } from '../pricing/search-body.ts';
 
 export const LEAGUE = 'Test League';
-/** A yardstick of 2, so the one pinned entry fits the load-time cap (IMPLEMENTATION-NOTES.md §6). */
+/** A yardstick of 2, so the one pinned entry fits the load-time cap (IN §6). */
 const CONFIG = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 2 });
 export const CURRENCY_RATES: CurrencyRate[] = [
   { currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' },
@@ -35,7 +35,7 @@ const WEIGHTS = JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatc
 /** The league gate's answer: the synthetic league is one the API carries. */
 const LEAGUES_ANSWER = JSON.stringify({ result: [{ id: 'Standard' }, { id: LEAGUE }] });
 
-/** An in-memory empty search per entry: the ordering tests need synthetic entries, not recorded captures. */
+/** An in-memory empty search per entry: ordering tests need synthetic entries, not captures. */
 export function emptySearches(entries: readonly TrackedEntry[]): Map<string, string> {
   const itemTypes = itemTypesOf(ITEMS_CATALOGUE);
   return new Map([

@@ -3,7 +3,7 @@ import { laneDelayMs } from '../trade/client.ts';
 import { DATA_LANE, FETCH_LANE, SEARCH_LANE } from '../trade/endpoints.ts';
 import { evenIntervalMs } from '../trade/ledger.ts';
 
-/** First backoff on a lane with no policy read yet: the even interval of the `600:21600` search bucket (§5.3). */
+/** First backoff on a lane with no policy read yet: the even interval of the `600:21600` bucket. */
 export const COLD_EVEN_INTERVAL_MS = 36_000;
 
 function entryLanes(hasGate: boolean): readonly string[] {
@@ -15,7 +15,7 @@ export function preWaitMs(pacing: PacingState, now: string, hasGate: boolean): n
   return Math.max(0, ...entryLanes(hasGate).map((lane) => laneDelayMs(pacing, lane, now, true)));
 }
 
-/** The tightest even interval over the lanes an entry spends on; an unread policy counts as `COLD_EVEN_INTERVAL_MS`. */
+/** The tightest even interval over an entry's lanes; an unread policy is the cold interval. */
 export function sessionEvenIntervalMs(pacing: PacingState, hasGate: boolean): number {
   return Math.max(
     ...entryLanes(hasGate).map(

@@ -1,5 +1,5 @@
 // `pnpm tracked:check`: read-only, exit 1 on any issue. A pass does not confirm a floor is the one
-// IMPLEMENTATION-NOTES.md §8 derives: a floor declared too high passes every mechanical check (AD-5).
+// IN §8 derives: a floor declared too high passes every mechanical check (AD-5).
 
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -246,7 +246,7 @@ export async function loadTrackedCheckInputs(fs: FilesystemPort): Promise<Tracke
 /** `packages/sync/src/curation/` → the repository root. */
 const REPO_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 
-/** Prints the report to `out` and returns the exit code; a usage error goes to `err` and returns 1. */
+/** Prints the report to `out`, returns the exit code; a usage error goes to `err`, exit 1. */
 export async function main(
   argv: readonly string[],
   fs: FilesystemPort,

@@ -28,7 +28,7 @@ function inputs(entries: readonly TrackedEntry[] = [ENTRY]): Parameters<typeof c
   return shellDataInputs({ tracked: entries });
 }
 
-/** The base64 characters of `bytes` that survive inside a longer value: whole 3-byte groups from byte 0, 1 or 2. */
+/** The base64 characters of `bytes` that survive in a longer value: groups from byte 0, 1, 2. */
 function alignedBase64(bytes: Buffer): string[] {
   const forms: string[] = [];
   for (const encoding of ['base64', 'base64url'] as const) {
@@ -101,7 +101,7 @@ export interface Captured {
   readonly lockFaults: () => number;
 }
 
-/** A fake filesystem that records every write. `lockFault` rejects the lock create: a throw outside the governor. */
+/** A fake filesystem recording every write; `lockFault` rejects the lock create. */
 export function capturing(
   options: { readonly lockFault?: () => Error; readonly tracked?: readonly TrackedEntry[] } = {},
 ): Captured {

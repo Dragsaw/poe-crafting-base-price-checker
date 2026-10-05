@@ -29,7 +29,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
     'x-rate-limit-ip-state': '1:300:0',
   };
   const FETCH_HEADERS = { ...SEARCH_HEADERS, 'x-rate-limit-policy': 'trade-fetch-request-limit' };
-  /** The search policy with one rule more than the baseline: a live probe. The rule name and bucket are illustrative. */
+  /** The search policy with one more rule than the baseline: a live probe; names illustrative. */
   const LIVE_HEADERS = {
     ...SEARCH_HEADERS,
     'x-rate-limit-rules': 'Ip,Account',
@@ -40,7 +40,7 @@ describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => 
   const TRACKED: readonly TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }];
   type Downgrade = '401' | '403' | 'not-live';
 
-  /** A live probe, then a downgrade quoting the cookie: a `401` or `403` answers the fetch, `not-live` the next search. */
+  /** A live probe, then a downgrade quoting the cookie: `401`/`403` answers the fetch. */
   function downgradingHttp(kind: Downgrade): { readonly port: HttpPort; readonly downgraded: () => number } {
     let downgraded = 0;
     let isProbed = false;

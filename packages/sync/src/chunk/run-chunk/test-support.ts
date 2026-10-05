@@ -30,7 +30,7 @@ import type {
   StepResult,
 } from '../run-chunk.ts';
 
-/** `run` builds the shell's `load` hook from the `publication`, `starvationRecord` and `gate` overrides. */
+/** `run` builds the shell's `load` hook from the `publication`, `starvationRecord`, `gate`. */
 export type TestPorts = Omit<ChunkPorts, 'load'> & {
   readonly publication?: ChunkPublication;
   readonly starvationRecord?: ChunkSetup['starvationRecord'];

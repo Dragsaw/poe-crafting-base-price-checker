@@ -18,8 +18,8 @@ function compareCodeUnits(left: string, right: string): number {
   return left > right ? 1 : 0;
 }
 
-// `pacedOn` is the reading the wait was paced on: a 429 means it was wrong, and each rule's `observedAt`
-// against `at` gives its age. Both halves are JSON, because header values carry commas.
+// `pacedOn` is the reading the wait was paced on: a 429 means it was wrong, and each rule's
+// `observedAt` against `at` gives its age. Both halves are JSON: header values carry commas.
 export function describe429(
   exchange: {
     readonly at: string;

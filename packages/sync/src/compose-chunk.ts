@@ -1,4 +1,4 @@
-/** The one chunk composition the three `pnpm sync*` commands share. Every file load runs under the lock (AD-7, AD-8, AD-12). */
+/** The one chunk composition of the `pnpm sync*` commands; loads run under the lock (AD-7). */
 
 import type { ClockPort, FilesystemPort, GitPort, HttpPort, LeagueId } from '@poe/contracts';
 
@@ -37,7 +37,7 @@ export interface ComposeChunkPorts {
   readonly log?: (line: string) => void;
   /** Only the dry run passes one, to skip an entry with no recorded fixture (`dry-run.ts`). */
   readonly wrapStep?: (step: ChunkStep, context: StepContext) => ChunkStep;
-  /** Session only (`./sync.ts`): the pacing memory the chunk's fresh governor starts from, else cold (AD-8). */
+  /** Session only (`./sync.ts`): the pacing memory a chunk's governor starts from (AD-8). */
   readonly pacing?: PacingState;
   /** The session only: pace with the even spread (`spreadBeforeNext`). */
   readonly spread?: boolean;
@@ -45,7 +45,7 @@ export interface ComposeChunkPorts {
   readonly requests?: RequestCounter;
   /** The session only: the chunk's session options (`ChunkSession`). */
   readonly session?: ChunkSession;
-  /** Live shells only: the process auth holder (AD-30), passed to each chunk's governor with a `session-probe` port. */
+  /** Live shells only: the process auth holder (AD-30), given to each governor. */
   readonly auth?: SessionAuth;
 }
 

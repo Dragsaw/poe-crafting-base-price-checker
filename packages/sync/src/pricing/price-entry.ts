@@ -1,5 +1,5 @@
 /**
- * The pricing step: one Divine price per entry, one search and at most one fetch (FR-21, FR-23, AD-9, AD-16).
+ * The pricing step: one Divine price per entry, one search, one fetch at most (FR-21, FR-23, AD-9).
  */
 
 import { canonicalKey } from '@poe/contracts';
@@ -30,7 +30,7 @@ export const FETCH_LIMIT = 10;
 export type RequestKind = 'search' | 'fetch';
 
 /**
- * A 4xx other than 429 would spend the Invalid Requests Threshold if repeated, so the chunk aborts (AD-9).
+ * A 4xx other than 429 would spend the Invalid Requests Threshold if repeated: abort (AD-9).
  */
 export class MalformedRequestError extends Error {
   readonly entryKey: string;
@@ -120,7 +120,7 @@ function parseListings(body: string): Listing[] | undefined {
   return items.flatMap((item) => listingOf(item) ?? []);
 }
 
-/** `no-exchange-rate` where any listing's currency has no current rate: nothing is stored unnormalised (AD-20). */
+/** `no-exchange-rate` where a listing's currency has no rate: nothing unnormalised (AD-20). */
 function priceOf(
   listings: readonly Listing[],
   rates: ReadonlyMap<string, CurrencyRate>,

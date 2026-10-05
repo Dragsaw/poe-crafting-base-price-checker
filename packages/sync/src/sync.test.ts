@@ -32,7 +32,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-/** The `pnpm sync` session, driven with injected ports and a fake clock each wait advances: no network, no writes under `data/`. */
+/** The `pnpm sync` session with injected ports and a fake clock each wait advances: no network. */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const SCRIPT = fileURLToPath(new URL('sync.ts', import.meta.url));

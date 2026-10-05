@@ -17,7 +17,7 @@ export type ChunkResult =
   | { readonly kind: 'error'; readonly error: unknown };
 
 export interface SessionState {
-  /** The league the last chunk confirmed; absent until one does, and after a throw or a gate yield. */
+  /** The league the last chunk confirmed; absent until one does, and after a throw or yield. */
   readonly confirmedLeague?: string;
   /** The input signature at the chunk that last confirmed the league. */
   readonly confirmedSignature?: string;
@@ -54,7 +54,7 @@ export type SessionWait =
 
 const NO_WAIT: SessionWait = { kind: 'none' };
 
-/** A throw only an edit to an input file clears; a refused sync-owned file is not in `INPUT_PATHS`, so it backs off. */
+/** A throw only an input-file edit clears; a refused sync-owned file is no input: backoff. */
 function isRefusal(error: unknown): boolean {
   return (
     (error instanceof DataFileError && INPUT_PATHS.includes(error.path)) ||
@@ -65,7 +65,7 @@ function isRefusal(error: unknown): boolean {
   );
 }
 
-/** Decisions 5 and 6: no `notBefore`, and a yield with no State reading or a throw that is no refusal. */
+/** Decisions 5 and 6: no `notBefore`, and a yield with no State reading or a non-refusal throw. */
 function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   if (context.notBefore !== undefined) {
     return false;
@@ -73,17 +73,17 @@ function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   return result.kind === 'outcome' ? result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result)) : !isRefusal(result.error);
 }
 
-/** AD-30's downgrade (§13.4) resets the pacing in place, so only the outcome tells it from a State reading. */
+/** AD-30's downgrade (§13.4) resets pacing in place, so only the outcome tells it apart. */
 export function isSessionExpired(result: ChunkResult): boolean {
   return result.kind === 'outcome' && result.outcome.kind === 'yielded' && result.outcome.sessionExpired === true;
 }
 
-/** `1` after a State reading or a downgrade (the pacing is cold again), else one more than the last. */
+/** `1` after a State reading or a downgrade (pacing is cold again), else one more than the last. */
 function backoffCountFor(state: SessionState, context: ChunkContext, result: ChunkResult): number {
   return context.freshReading || isSessionExpired(result) ? 1 : state.backoffCount + 1;
 }
 
-/** The even interval doubled per consecutive backoff, capped at the 6 h stale threshold (`STALE_LOCK_AFTER_MS`). */
+/** The even interval doubled per consecutive backoff, capped at the 6 h stale threshold. */
 export function backoffMs(evenInterval: number, count: number): number {
   const doubled = evenInterval * 2 ** Math.max(0, count - 1);
   return Math.min(doubled, STALE_LOCK_AFTER_MS);
@@ -182,7 +182,7 @@ function withoutLeague(state: SessionState): SessionState {
   };
 }
 
-/** The state after one chunk. `signature` and `before` are the iteration's, read before the chunk. */
+/** The state after one chunk; `signature` and `before` are the iteration's, read pre-chunk. */
 export function nextState(
   state: SessionState,
   result: ChunkResult,
@@ -221,7 +221,7 @@ export function nextState(
   };
 }
 
-/** The gate is due when no league is confirmed, a new pass starts, or an input changed since it was. */
+/** The gate is due when no league is confirmed, a new pass starts, or an input changed since. */
 export function isGateDue(state: SessionState, signature: string): boolean {
   return (
     state.confirmedLeague === undefined || state.passEnded || signature !== state.confirmedSignature

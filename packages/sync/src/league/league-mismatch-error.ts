@@ -1,6 +1,6 @@
 import type { LeagueId } from '@poe/contracts';
 
-/** The configured league is not among the trade API's ids; `runChunk` reports it as `league-mismatch`. */
+/** The configured league is not among the trade API's ids; `runChunk` reports `league-mismatch`. */
 export class LeagueMismatchError extends Error {
   readonly configuredLeague: LeagueId;
   /** Every id the endpoint answered, in endpoint order. */

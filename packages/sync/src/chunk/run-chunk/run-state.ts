@@ -18,7 +18,7 @@ export interface CoverageFigures {
   rankableClassCount?: number;
 }
 
-/** What the failure path reads as well as the normal one; the run-start stages and the step loop mutate it in order. */
+/** What the failure path reads as well as the normal one; stages and the loop mutate it. */
 export interface RunState {
   readonly ports: ChunkPorts;
   readonly log: (line: string) => void;
@@ -36,7 +36,7 @@ export interface RunState {
   current: TrackedEntry | undefined;
   attempted: number;
   isPublishAttempted: boolean;
-  /** Set once the league gate passed (or there is none): only then is the configured league confirmed. */
+  /** Set once the league gate passed (or there is none): only then is the league confirmed. */
   isGatePassed: boolean;
   isReportAttempted: boolean;
   readonly completed: string[];
@@ -95,7 +95,7 @@ export function createRunState(input: RunStateInput): RunState {
   };
 }
 
-/** Where the request figure counts from: this chunk's start, or the session pass's start when this chunk did not start the pass. */
+/** Where the request figure counts from: this chunk's start, or the session pass's start. */
 export function countFrom(state: RunState): RequestsBySource {
   const { order, ports, requestsAtStart } = state;
   return order !== undefined && !order.newPass && ports.session?.requestsSince !== undefined
@@ -127,7 +127,7 @@ export function starvationNow(state: RunState): { readonly pinnedStarvation?: Ch
     : {};
 }
 
-/** This chunk's records: the lock, the run-start check, the steps, the starvation, then any failure. */
+/** This chunk's records: lock, run-start check, steps, starvation, then any failure. */
 export function newRecords(state: RunState, failure: readonly SyncRunRecord[] = []): SyncRunRecord[] {
   const { pinnedStarvation } = starvationNow(state);
   return [

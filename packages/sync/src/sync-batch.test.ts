@@ -31,7 +31,7 @@ vi.mock('./trade/client.ts', async (importOriginal) => {
   };
 });
 
-/** The `pnpm sync:batch` composition, driven with injected ports: no network, no writes under `data/`. */
+/** The `pnpm sync:batch` composition with injected ports: no network, no writes under `data/`. */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const SCRIPT = fileURLToPath(new URL('sync-batch.ts', import.meta.url));

@@ -1,4 +1,4 @@
-/** A non-2xx that is neither 429 nor 5xx; it names no entry because the gate runs before any entry. */
+/** A non-2xx that is neither 429 nor 5xx; it names no entry, the gate runs before any entry. */
 export class LeagueRequestRejectedError extends Error {
   readonly status: number;
 

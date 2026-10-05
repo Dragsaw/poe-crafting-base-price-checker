@@ -1,4 +1,4 @@
-/** An `Error` carrying a runtime-assigned `name`, such as the `TimeoutError` of `AbortSignal.timeout` (`shell.ts`). */
+/** An `Error` with a runtime-assigned `name`, like `AbortSignal.timeout`'s (`shell.ts`). */
 export class NamedError extends Error {
   override readonly name: string;
 

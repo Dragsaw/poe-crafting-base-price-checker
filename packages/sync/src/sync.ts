@@ -1,5 +1,5 @@
 /**
- * `pnpm sync`: one entry per iteration; the lock is taken per entry and never held across a wait (FR-19, AD-7, AD-8).
+ * `pnpm sync`: one entry per iteration; the lock is never held across a wait (FR-19, AD-7, AD-8).
  */
 
 import { fileURLToPath } from 'node:url';
@@ -184,7 +184,7 @@ async function readChunkContext(
   };
 }
 
-/** One pass of the session loop: pre-wait, one chunk, then the wait it earned. Returns the state after it. */
+/** One pass of the session loop: pre-wait, one chunk, then the wait it earned. */
 async function runIteration(runtime: SessionRuntime, state: SessionState): Promise<SessionState> {
   const { waitPorts, requests, pacing, stdout } = runtime;
   const signature = await inputSignature(waitPorts.fs);
@@ -227,7 +227,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDependencies):
     return 1;
   }
 
-  // One holder per process: each settle prints one line, once, when it settles (§13.1–§13.3, §13.5).
+  // One holder per process: each settle prints one line, once (§13.1–§13.3, §13.5).
   const auth = createSessionAuth(env, { onSettle: (line) => stderr(`${PREFIX} ${line}`) });
   const runtime: SessionRuntime = {
     ports,

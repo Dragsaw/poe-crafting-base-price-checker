@@ -48,12 +48,12 @@ describe('pnpm sync: the session with injected ports', () => {
       body: NO_RESULTS,
     };
 
-    /** Answers each cookie-carrying search from `answers` in turn: those are the probes, before any `authenticated` settle. */
+    /** Answers each cookie-carrying search from `answers` in turn: the probes. */
     function probing(...answers: (HttpResponse | Error)[]) {
       return probingThen(answers);
     }
 
-    /** As `probing`; every later cookie request is answered by `after`, live by default so the cookie stays live (§13.4). */
+    /** As `probing`; later cookie requests are answered by `after`, live by default (§13.4). */
     function probingThen(
       answers: (HttpResponse | Error)[],
       after: (request: HttpRequest, answer: HttpResponse) => HttpResponse = (_request, answer) => ({

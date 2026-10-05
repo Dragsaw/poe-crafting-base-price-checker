@@ -4,7 +4,8 @@ import type { TradeGovernorAuth, TradeRequest, TradeResult } from '../client.ts'
 import { runExchange } from './exchange.ts';
 import type { GovernorContext } from './governor-context.ts';
 
-// Requests go one at a time, chained onto the previous call, so the ledger is at most one request out of date.
+// Requests go one at a time, chained onto the previous call, so the ledger is at most one request
+// out of date.
 export function createSerialSender(
   context: GovernorContext,
 ): (http: HttpPort, request: TradeRequest) => Promise<TradeResult> {
@@ -27,7 +28,8 @@ export function createSerialSender(
   const redacted = (http: HttpPort, request: TradeRequest): Promise<TradeResult> =>
     context.auth === undefined ? runExchange(context, http, request) : redactedExchange(context.auth, http, request);
 
-  // The queue must survive a rejected exchange, or one failure would wedge every later request behind it.
+  // The queue must survive a rejected exchange, or one failure would wedge every later request
+  // behind it.
   const settle = async (promise: Promise<unknown>): Promise<void> => {
     try {
       await promise;

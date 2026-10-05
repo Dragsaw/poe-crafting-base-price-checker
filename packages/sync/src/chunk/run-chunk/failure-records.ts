@@ -5,7 +5,7 @@ import { LeagueMismatchError, LeagueRequestRejectedError } from '../../league/le
 import { MalformedRequestError } from '../../pricing/price-entry.ts';
 import { CrossFileGateError, crossFileGateRecords } from '../cross-file-gate.ts';
 
-/** The records a throw leaves in the report: one per failing check of a cross-file gate failure, otherwise one (AD-19 for a league mismatch). */
+/** The records a throw leaves: one per failing cross-file check, else one (AD-19). */
 export function failureRecords(error: unknown, current: TrackedEntry | undefined): SyncRunRecord[] {
   return error instanceof CrossFileGateError ? crossFileGateRecords(error) : [failureRecord(error, current)];
 }

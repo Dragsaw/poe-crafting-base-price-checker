@@ -5,7 +5,7 @@ import { createTradeClient } from './client.ts';
 import { CONTACT, DATA_URL, FETCH_URL, harness, NOW, recordingWait, response, SEARCH_URL } from './client/test-support.ts';
 import { USER_AGENT_ENV_VAR } from './user-agent.ts';
 
-/** Every rule name, policy name and bucket figure here is a fixture of a live response (2026-09-12), never compiled in. */
+/** Every rule, policy and bucket figure is a fixture of a live response (2026-09-12). */
 
 const SEARCH_POLICY = 'trade-search-request-limit';
 const FETCH_POLICY = 'trade-fetch-request-limit';

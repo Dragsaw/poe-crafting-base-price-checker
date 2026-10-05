@@ -1,5 +1,5 @@
 /**
- * `pnpm catalogue:refresh`: four GETs, validated, then written all-or-nothing (AD-25, AGENT-WORKFLOW §Fixtures).
+ * `pnpm catalogue:refresh`: four GETs, validated, then written all-or-nothing (AD-25).
  */
 
 import nodePath from 'node:path';
@@ -40,7 +40,7 @@ import { resolveUserAgent } from './trade/user-agent.ts';
 /** The repository root, three levels up from `src/`. */
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
-/** Structural, so `zod` stays out of `sync`'s imports: the schemas arrive through `contracts` as values. */
+/** Structural, so `zod` stays out of `sync`'s imports: the schemas arrive as values. */
 interface CatalogueParser {
   safeParse(
     value: unknown,
@@ -67,7 +67,7 @@ export function catalogueFilePathOf(endpoint: CatalogueEndpoint): string {
   return nodePath.join(REPO_ROOT, endpoint.outputPath);
 }
 
-/** The same function `serialiseFixture` calls, not a copy: the empty-second-diff check rests on byte identity. */
+/** The function `serialiseFixture` calls, not a copy: the empty-diff check needs byte identity. */
 export const serialiseCatalogue = serialiseJsonArtifact;
 
 /** The first issue, pointed at by its path, so a failure names a field. */
@@ -94,7 +94,7 @@ export type CatalogueRefreshOutcome =
   | {
       readonly ok: true;
       readonly written: readonly string[];
-      /** Counted as `catalogue-refresh` (AD-12); the command prints it, no chunk report carries it. */
+      /** Counted as `catalogue-refresh` (AD-12); the command prints it, no chunk report has it. */
       readonly requests: number;
     }
   | {
@@ -168,7 +168,7 @@ function validateBody(endpoint: CatalogueEndpoint, body: string): Step<Record<st
     schemaVersion: SUPPORTED_SCHEMA_VERSION,
   };
 
-  // Unreachable today (the envelope is `payload.extend({schemaVersion})`); a gate for a future constraint.
+  // Unreachable today (the envelope is `payload.extend({schemaVersion})`); a gate for a later rule.
   const parsedFile = schemas.file.safeParse(envelope);
   return parsedFile.success
     ? { ok: true, value: envelope }
@@ -188,7 +188,7 @@ async function writeCaptured(
       // eslint-disable-next-line no-await-in-loop -- sequential on purpose: the failure message reports how many writes had landed
       await ports.writeCatalogueFile(path, contents);
     } catch (error) {
-      // The one place all-or-nothing can break: the failure says how many landed and which path refused.
+      // The one place all-or-nothing can break: the failure names how many landed and which path.
       return {
         ok: false,
         failure: `writing ${path} failed (${String(error)}). ${String(written.length)} of ${String(captured.length)} artifacts had already been written; the catalogue is now mixed, so re-run pnpm catalogue:refresh or revert data/catalogue/.`,
@@ -201,7 +201,7 @@ async function writeCaptured(
   return { ok: true, written, requests: requests() };
 }
 
-/** Buffers all four artifacts and writes only after every one is fetched and validated, so a mid-run failure cannot mix new and stale files. */
+/** Writes only after all four artifacts are validated: no mix of new and stale files. */
 export async function refreshCatalogue(
   ports: CatalogueRefreshPorts,
 ): Promise<CatalogueRefreshOutcome> {

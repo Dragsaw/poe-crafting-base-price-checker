@@ -20,7 +20,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     const COOKIE = `POESESSID=${VALUE}`;
     const COOKIE_ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALUE };
     const RESULTS = ['r1', 'r2'];
-    /** Every answer names its policy, and a search and a fetch differ (§13.2); the baseline search answers one rule. */
+    /** Every answer names its policy; a search and a fetch differ (§13.2). */
     const SEARCH_HEADERS = {
       'x-rate-limit-policy': 'trade-search-request-limit',
       'x-rate-limit-rules': 'Ip',
@@ -44,7 +44,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       headers: FETCH_HEADERS,
       body: JSON.stringify({ result: [{ listing: { price: { amount: 2, currency: 'divine' } } }] }),
     };
-    /** The search policy with one rule more than the baseline: a live cookie. The rule name and bucket are illustrative. */
+    /** The search policy with one more rule than the baseline: a live cookie; names invented. */
     const LIVE: HttpResponse = {
       status: 200,
       headers: {
@@ -56,12 +56,12 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       body: SEARCH_WITH_RESULTS.body,
     };
 
-    /** Answers each cookie-carrying search from `answers` in turn: those are the probes, before any `authenticated` settle. */
+    /** Answers each cookie-carrying search from `answers` in turn: the probes. */
     function probing(dependencies: SyncCommandDependencies, ...answers: (HttpResponse | Error)[]): SyncCommandDependencies {
       return probingThen(dependencies, answers);
     }
 
-    /** As `probing`; every later cookie request is answered by `after`, live by default so the cookie stays live (§13.4). */
+    /** As `probing`; later cookie requests are answered by `after`, live by default (§13.4). */
     function probingThen(
       dependencies: SyncCommandDependencies,
       answers: (HttpResponse | Error)[],
@@ -119,7 +119,8 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
         ['GET', COOKIE],
       ]);
       expect(http.requests[3]?.url).toBe(tradeFetchUrl(RESULTS, 'S1'));
-      // The fetch answers fewer rules than the probe, under its own policy: not tested, no downgrade (§13.4).
+      // The fetch answers fewer rules than the probe, under its own policy: not tested, no
+      // downgrade (§13.4).
       expect(auth).toEqual([{ line: 'pnpm sync:batch: authenticated', requestsBefore: 3 }]);
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: completed, 1 completed']);
@@ -221,7 +222,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect(out).toEqual(['pnpm sync:batch: yielded, 0 completed']);
       const progress = await progressOf(fs);
       expect(progress).toEqual({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed: [], authHoldOffUntil: NOW_PLUS_24H });
-      // The entry is stamped and keeps the search fields from this entry's search; the price is unchanged.
+      // The entry is stamped and keeps this entry's search fields; the price is unchanged.
       const dataset = JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? '{}') as { entries: DatasetEntry[] };
       expect(dataset.entries[0]).toMatchObject({
         lastAttemptedAt: NOW,

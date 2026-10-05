@@ -46,7 +46,7 @@ export async function gateYieldOutcome(
   };
 }
 
-/** A probe 429 settles nothing and ends the chunk as a 429 yield, also when no further request followed it (§13.3). */
+/** A probe 429 settles nothing and ends the chunk as a 429 yield, even with no later request. */
 function withLatchedPenalty(state: RunState, stop: ChunkStop): ChunkStop {
   const latchedMs = state.ports.latchedRetryAfterMs?.();
   return latchedMs === undefined
@@ -57,8 +57,9 @@ function withLatchedPenalty(state: RunState, stop: ChunkStop): ChunkStop {
 export async function finishChunk(state: RunState, ready: ChunkSetup, stop: ChunkStop): Promise<ChunkOutcome> {
   const { ending, until } = withLatchedPenalty(state, stop);
   const starvation = starvationNow(state);
-  // Re-read immediately before committing: a run dispossessed at the staleness threshold writes nothing, and the
-  // `finally` of `runChunk` then releases nothing, because the lock on disk is no longer its own.
+  // Re-read immediately before committing: a run dispossessed at the staleness threshold writes
+  // nothing, and the `finally` of `runChunk` then releases nothing, because the lock on disk is no
+  // longer its own.
   if (!(await isLockHeld(state.ports.fs, state.mine))) {
     return dispossessedOutcome(state);
   }

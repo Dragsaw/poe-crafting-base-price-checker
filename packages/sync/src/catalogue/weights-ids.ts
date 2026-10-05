@@ -1,4 +1,4 @@
-/** The weights ids against the catalogue (AD-9, AD-12, AD-25). A miss is a report record only and never refuses the file. */
+/** The weights ids against the catalogue (AD-9, AD-12, AD-25); a miss is a report record only. */
 
 import { compareCanonicalKeys, parseEnvelope, WEIGHTS_SCHEMA_VERSION, WeightsFileSchema } from '@poe/contracts';
 import type {
@@ -75,7 +75,7 @@ function collectStatIds(bases: WeightsFile['bases']): Set<string> {
   return statIds;
 }
 
-/** Absent is a value; an unreadable, unknown-major or non-conforming file throws a `DataFileError` (NFR-8). */
+/** Absent is a value; an unreadable, unknown-major or invalid file throws (NFR-8). */
 export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   const text = await fs.readTextFile(WEIGHTS_PATH);
   if (text === undefined) {
@@ -86,7 +86,7 @@ export async function readWeightsIds(fs: FilesystemPort): Promise<WeightsIds> {
   return { kind: 'present', statIds: collectStatIds(bases), categoryIds: new Set(Object.keys(bases)), file };
 }
 
-/** One record per id the catalogue lacks, sorted by kind then id with `compareCanonicalKeys` (*Entity keys*). */
+/** One record per id the catalogue lacks, by kind then id with `compareCanonicalKeys`. */
 export function checkWeightsIds(
   weights: Pick<Extract<WeightsIds, { kind: 'present' }>, 'kind' | 'statIds' | 'categoryIds'>,
   catalogue: CatalogueIds,
@@ -106,7 +106,7 @@ export function checkWeightsIds(
   );
 }
 
-/** Without the file the non-pruned `crafted` classes are uncheckable, so they are reported, not passed as clean (AD-12, AD-25). */
+/** Without the file the non-pruned `crafted` classes are unchecked: reported, not clean (AD-12). */
 export function weightsAbsentRecord(tracked: readonly TrackedEntry[]): WeightsAbsentRecord {
   const classNames = new Set<string>();
   for (const entry of tracked) {

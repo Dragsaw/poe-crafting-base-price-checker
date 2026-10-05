@@ -15,7 +15,7 @@ import type { RunState } from './run-state.ts';
 /** How long a failed session cookie is held off (AD-30, IMPLEMENTATION-NOTES.md §13.3). */
 const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
 
-/** `write` sets the field from this write's `now`, `clear` removes it, and none carries the loaded value forward (§13.3). */
+/** `write` sets the field from this write's `now`, `clear` removes it, none keeps the old. */
 function nextHoldOff(state: RunState, holdOff: 'write' | 'clear' | undefined): string | undefined {
   if (holdOff === 'write') {
     return new Date(Date.parse(state.ports.clock.now()) + AUTH_HOLD_OFF_MS).toISOString();
@@ -38,7 +38,7 @@ function progressFileOf(
   };
 }
 
-/** Dataset first, so progress never records a completion the dataset does not publish; `until` is the `notBefore` written, absent clears it. */
+/** Dataset first, so progress never records an unpublished completion; `until` is `notBefore`. */
 export async function publish(
   state: RunState,
   publication: ChunkPublication,
@@ -56,7 +56,8 @@ export async function publish(
       previous: state.dataset?.entries ?? [],
       // A step entry for the same key wins over an offline mark.
       stepEntries: [...state.marked, ...published],
-      // An unconfirmed league never relabels the dataset: before the gate passed, the previous label stands (AD-19).
+      // An unconfirmed league never relabels the dataset: before the gate passed, the previous
+      // label stands (AD-19).
       league: state.isGatePassed ? publication.league : (state.dataset?.league ?? publication.league),
       currencyRates: publication.currencyRates,
       now: clock.now(),

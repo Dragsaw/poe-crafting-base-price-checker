@@ -23,9 +23,9 @@ export interface GovernorContext {
   readonly auth: TradeGovernorAuth | undefined;
   readonly isSpread: boolean;
   readonly pacing: PacingState;
-  /** Per governor: a count shared across chunks would refuse a policy for the rest of the session. */
+  /** Per governor: a count shared across chunks would refuse a policy for the whole session. */
   invalidRequests: InvalidRequestCounts;
-  /** A probe `429`'s penalty (IMPLEMENTATION-NOTES.md §13.3): once set, every later `send` yields it. */
+  /** A probe `429`'s penalty (IN §13.3): once set, every later `send` yields it. */
   latched: YieldPenalty | undefined;
   /** Set before the holder hears of a downgrade, so the cookie is dropped first (§13.4 step 1). */
   isCookieDropped: boolean;
@@ -36,7 +36,7 @@ export interface IssuedExchange {
   readonly lane: string;
   readonly knownPolicy: string | undefined;
   readonly waitedMs: number;
-  /** The reading the wait was paced on, kept for a `429`'s operator line before the response replaces it. */
+  /** The reading the wait was paced on, kept for a `429`'s operator line. */
   readonly pacedOn: PolicyObservation | undefined;
   readonly isWithCookie: boolean;
   readonly response: HttpResponse;
@@ -50,7 +50,8 @@ export interface FoldedResponse {
 
 function rememberPolicy(pacing: PacingState, lane: string, policy: string): void {
   const { lanePolicies } = pacing;
-  // Delete-then-set moves the lane to the end of insertion order, so eviction drops the least recently used.
+  // Delete-then-set moves the lane to the end of insertion order, so eviction drops the least
+  // recently used.
   lanePolicies.delete(lane);
   lanePolicies.set(lane, policy);
   while (lanePolicies.size > MAX_REMEMBERED_LANES) {
@@ -62,8 +63,8 @@ function rememberPolicy(pacing: PacingState, lane: string, policy: string): void
   }
 }
 
-// Computed once and waited once: recomputing after the wait would not terminate under a fixed test clock,
-// and `send` queues, so only this call's own responses move the ledger.
+// Computed once and waited once: recomputing after the wait would not terminate under a fixed test
+// clock, and `send` queues, so only this call's own responses move the ledger.
 export async function paceLane(context: GovernorContext, lane: string): Promise<number> {
   const delayMs = laneDelayMs(context.pacing, lane, context.clock.now(), context.isSpread);
   if (delayMs <= 0) {

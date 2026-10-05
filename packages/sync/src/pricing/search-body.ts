@@ -1,11 +1,11 @@
 /**
- * The AD-16 search body, pure and built before any request (IMPLEMENTATION-NOTES.md §5.1, §5.2, §5.5, §10.2).
+ * The AD-16 search body, pure and built before any request (IN §5.1, §5.2, §5.5, §10.2).
  */
 
 import { canonicalKey, defenceLettersOf, linesOf, summedInterval, summedStatIds } from '@poe/contracts';
 import type { CraftedTrackedEntry, DefenceLetter, ItemCatalogue, NamedLine, TrackedEntry } from '@poe/contracts';
 
-/** The `items.json` groups as the builder reads them: group id to base type names, read only by `discriminatorOf`. */
+/** The `items.json` groups as the builder reads them: group id to base type names. */
 export type ItemTypes = ReadonlyMap<string, ReadonlySet<string>>;
 
 export function itemTypesOf(catalogue: ItemCatalogue): ItemTypes {
@@ -20,7 +20,7 @@ export function itemTypesOf(catalogue: ItemCatalogue): ItemTypes {
   return types;
 }
 
-/** The `jewel`-arm refusal: the derived base type is not in `items.json` (IMPLEMENTATION-NOTES.md §10.2, AD-25). */
+/** The `jewel`-arm refusal: the derived base type is not in `items.json` (IN §10.2, AD-25). */
 export class UnknownClassBaseTypeError extends Error {
   readonly entryKey: string;
   readonly categoryId: string;
@@ -86,7 +86,7 @@ type Discriminator =
   | { readonly arm: 'type'; readonly baseTypeId: string }
   | { readonly arm: 'none' };
 
-/** Arms tried in order (§10.2); arm 2 reads the category's composition from `items.json`, never the string "jewel" (AD-5). */
+/** Arms tried in order (§10.2); arm 2 reads the category's composition from `items.json` (AD-5). */
 function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Discriminator {
   const letters = defenceLettersOf(entry.className);
   if (letters !== undefined) {
@@ -103,7 +103,7 @@ function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Disc
   return { arm: 'none' };
 }
 
-/** One stat filter per reference line; a banded edge goes out exactly as declared, never rounded (§5.1, AD-16). */
+/** One stat filter per reference line; a banded edge goes out as declared (§5.1, AD-16). */
 function statFilterOfLine(line: NamedLine): StatFilter {
   return {
     id: line.statId,
@@ -112,7 +112,7 @@ function statFilterOfLine(line: NamedLine): StatFilter {
   };
 }
 
-/** Prefix lines then suffix lines in one `and` group; a summed `statId` is one filter in its prefix line's place (§5.5). */
+/** Prefix lines then suffix lines in one `and` group; a summed `statId` is one filter (§5.5). */
 function statFiltersOf(entry: TrackedEntry): StatFilter[] {
   if (entry.kind === 'raw') {
     return [];
@@ -150,12 +150,12 @@ function equipmentFiltersOf(letters: ReadonlySet<DefenceLetter>) {
   };
 }
 
-// One fixed key order: the body is serialised with JSON.stringify and the recorded fixtures key on its bytes.
+// One fixed key order: the body goes through JSON.stringify and fixtures key on its bytes.
 const STATUS = { option: 'securable' } as const;
 const TRADE_FILTERS = { filters: { price: { option: 'exalted_divine' } } } as const;
 const SORT = { price: 'asc' } as const;
 
-/** The AD-16 body for one entry; `acceptedTier` is never read. @throws UnknownClassBaseTypeError on an arm 2 miss. */
+/** The AD-16 body for one entry; `acceptedTier` is never read. @throws UnknownClassBaseTypeError */
 export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): SearchBody {
   const stats = [{ type: 'and', filters: statFiltersOf(entry) }] as const;
   const ilvl = { min: entry.itemLevelMin };
