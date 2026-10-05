@@ -12,9 +12,9 @@ export interface ModifierRow {
   readonly slot: Slot;
   readonly modGroup: string;
   readonly text: string;
-  /** The family's line set (`core`'s `lineSet`, IMPLEMENTATION-NOTES.md §1); more than one means a hybrid. */
+  /** The family's line set (`core`'s `lineSet`, IN §1); more than one means a hybrid. */
   readonly statIds: string[];
-  /** False when any tier of the family is untrackable (the null-line rule); the tiers are in `untrackable`. */
+  /** False when any tier is untrackable (the null-line rule); `untrackable` lists the tiers. */
   readonly trackable: boolean;
   /** Each untrackable tier of the family, with `core`'s reason. Empty when `trackable`. */
   readonly untrackable: { readonly tierLabel: unknown; readonly itemLevelMin: number; readonly sourceModifierId: string; readonly reason: UntrackableReason }[];
@@ -24,7 +24,7 @@ export interface ModifierRow {
   readonly tierLabels: unknown[];
 }
 
-/** One row per mod family (a modGroup and one statId set) of the class and slot (both slots when `slot` is absent). */
+/** One row per mod family (modGroup plus one statId set); both slots without `slot`. */
 export function lookupMods(
   weights: WeightsFile,
   selector: ClassSelector & { readonly slot?: Slot },
@@ -47,7 +47,8 @@ interface ModifierFamily {
   readonly tiers: ModifierWeight[];
 }
 
-// A family is (modGroup, line set): a hybrid is one row, two families of one modGroup are two. `core` owns the line set.
+// A family is (modGroup, line set): a hybrid is one row, two families of one modGroup are two.
+// `core` owns the line set.
 function modifierFamilies(entries: readonly ModifierWeight[]): Map<string, ModifierFamily> {
   const families = new Map<string, ModifierFamily>();
   for (const entry of entries) {
@@ -102,7 +103,7 @@ export interface TierRow {
   readonly lines: readonly unknown[];
   /** `core`'s line set of the entry: its non-null `statId`s, sorted. */
   readonly lineSet: readonly string[];
-  /** `core`'s null-line verdict: the reason the tier is untrackable, or `null` when it is trackable. */
+  /** `core`'s null-line verdict: why the tier is untrackable, or `null` when it is trackable. */
   readonly untrackable: UntrackableReason | null;
 }
 

@@ -14,7 +14,7 @@ const REPO_ROOT = nodePath.resolve(fileURLToPath(new URL('..', import.meta.url))
 const TOOLS_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.tools.json');
 const SOLUTION_TSCONFIG = nodePath.join(REPO_ROOT, 'tsconfig.json');
 
-/** JS too: a `.mjs` helper in a guarded directory is not covered by `<directory>/*.ts`, so it must be reported. */
+/** JS too: a `.mjs` helper in a guarded directory escapes `<directory>/*.ts`, so it is reported. */
 const SOURCE = /\.[cm]?[jt]sx?$/;
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 

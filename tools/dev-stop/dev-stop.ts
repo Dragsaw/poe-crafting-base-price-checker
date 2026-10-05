@@ -154,7 +154,7 @@ export interface Snapshot {
   readonly processes: readonly ProcessInfo[];
 }
 
-/** A Windows system tool by absolute path, so a directory early on PATH cannot shadow it; the bare name where SystemRoot is unset. */
+/** A Windows system tool by absolute path, so PATH cannot shadow it; bare without SystemRoot. */
 export function windowsTool(name: string, directory = ''): string {
   const root = process.env.SystemRoot;
   return root === undefined || root === '' ? name : nodePath.join(root, 'System32', directory, name);

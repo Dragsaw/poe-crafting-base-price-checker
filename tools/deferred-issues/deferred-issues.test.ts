@@ -17,7 +17,7 @@ interface FakeOptions {
   readonly ledger?: string;
   /** `git show` fails, so the ledger cannot be read. */
   readonly gitShowFails?: boolean;
-  /** Each `gh issue list` call takes the next item, `undefined` failing it; the last one repeats. */
+  /** Each `gh issue list` call takes the next item, `undefined` failing it; the last repeats. */
   readonly lists?: readonly (readonly IssueInfo[] | undefined)[];
   readonly failCreate?: (title: string) => boolean;
   readonly failLabel?: boolean;

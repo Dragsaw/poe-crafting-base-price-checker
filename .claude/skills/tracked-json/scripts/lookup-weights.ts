@@ -7,10 +7,10 @@ export const WEIGHTS_PATH = 'data/weights.json';
 export const SLOTS = ['prefix', 'suffix'] as const;
 export type Slot = (typeof SLOTS)[number];
 
-/** Reads one data file as plain JSON. An absent or unparseable file throws `LookupError` naming it. */
+/** Reads one data file as plain JSON; an absent or unparseable file throws `LookupError`. */
 export type ReadJson = (path: string) => unknown;
 
-/** Parses the weights file with the contract schema. A failure throws `LookupError` naming the file and the first issue. */
+/** Parses the weights file with the contract schema; a failure throws `LookupError`. */
 export function loadWeights(read: ReadJson): WeightsFile {
   const parsed = WeightsFileSchema.safeParse(read(WEIGHTS_PATH));
   if (parsed.success) {

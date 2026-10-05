@@ -130,7 +130,7 @@ afterAll(() => {
   }
 });
 
-/** Removes from the record every request that `isMatching` accepts, and returns them in record order. */
+/** Removes every request `isMatching` accepts from the record and returns them in record order. */
 function takeEscapedRequests(isMatching: (entry: EscapedRequest) => boolean): EscapedRequest[] {
   const taken: EscapedRequest[] = [];
   for (let index = 0; index < escapedRequests.length; ) {

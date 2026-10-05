@@ -5,10 +5,10 @@ import { describe, expect, it } from 'vitest';
 
 import { run } from '../tools/deferred-issues/deferred-issues.ts';
 
-/** File-placement rules that ESLint and dependency-cruiser cannot count: a directory cap, catch-all names, nested barrels. */
+/** Placement rules ESLint and dependency-cruiser cannot count: cap, catch-all names, barrels. */
 const CAP = 25;
 
-/** Directories above `CAP` today. A number only goes down, and an entry goes once its directory holds `CAP` or fewer. */
+/** Directories above `CAP` today: a number only goes down, an entry goes at `CAP` or fewer. */
 const OVER_CAP: Readonly<Record<string, number>> = {
   'packages/contracts/src': 44,
   'packages/sync/src': 27,
@@ -85,7 +85,7 @@ function barrelViolations(file: string): string[] {
   return isNestedBarrel ? [`${file}: a barrel is allowed only as packages/<package>/src/index.ts`] : [];
 }
 
-/** Returns one message per violation of the file-placement rules, for a repo-relative list of files. */
+/** One message per violation of the file-placement rules, for a repo-relative file list. */
 function checkStructure(files: readonly string[], overCap: Readonly<Record<string, number>>): string[] {
   const scoped = files.filter((file) => isInScope(file));
   return [...capViolations(scoped, overCap), ...scoped.flatMap((file) => [...nameViolations(file), ...barrelViolations(file)])];

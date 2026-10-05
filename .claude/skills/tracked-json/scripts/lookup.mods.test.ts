@@ -45,7 +45,7 @@ describe('lookupMods', () => {
       ['prefix', 'IncreasedLife'],
       ['suffix', 'Thorns'],
     ]);
-    // A weight-500 tier with only a null line in a complete pool is trackable, with no line to write.
+    // A weight-500 tier with a lone null line in a complete pool is trackable; no line to write.
     expect(found.mods[2]).toMatchObject({ statIds: [], trackable: true, untrackable: [] });
   });
 

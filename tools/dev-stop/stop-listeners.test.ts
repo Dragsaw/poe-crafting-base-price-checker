@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_PORT, listenerPids, listenersWindows, snapshot } from './dev-stop';
 
-/** While set, the mocked execFileSync runs the listener query against a cmdlet that does not exist. */
+/** While set, the mocked execFileSync runs the listener query against a missing cmdlet. */
 const MISSING_CMDLET = 'Get-NoSuchNetTCPConnection';
 const failure = vi.hoisted(() => ({ inject: false, badShape: false }));
 
@@ -149,7 +149,7 @@ describe.runIf(process.platform === 'win32')('listenersWindows', () => {
       } catch (error) {
         thrown = error;
       }
-      // stderr, not the message: the message quotes the script, which names the cmdlet even on a parse error.
+      // stderr, not the message: it quotes the script, which names the cmdlet on a parse error.
       const stderr = String((thrown as { stderr?: unknown } | undefined)?.stderr);
       expect(stderr).toContain(MISSING_CMDLET);
       expect(stderr).toContain('CommandNotFoundException');
