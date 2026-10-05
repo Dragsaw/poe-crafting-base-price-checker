@@ -267,7 +267,7 @@ export function rank(input: RankInput): Ranking {
     noListings: raw.noListings.toSorted(byEntryKey),
     notYetSynced: raw.notYetSynced.toSorted(byEntryKey),
     unresolvable: raw.unresolvable.toSorted(byEntryKey),
-    unrankable: [...unrankable.values()].toSorted(byItemClass),
+    unrankable: unrankable.values().toArray().toSorted(byItemClass),
     uncostableRecipes: uncostableOf(costed),
     pricedInLeague: hasPricedInLeague(input, byKey),
   };

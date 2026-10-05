@@ -35,7 +35,7 @@ describe('the offline fixture port', () => {
       readFileSync(`${FIXTURES_DIR}trade-data-leagues.json`, 'utf8'),
     );
     // The catalogue captures are not pricing answers and stay unserved.
-    expect([...fixtures.keys()].filter((name) => name.startsWith('trade-data-'))).toEqual([
+    expect(fixtures.keys().filter((name) => name.startsWith('trade-data-')).toArray()).toEqual([
       LEAGUES_FIXTURE_NAME,
     ]);
   });

@@ -72,9 +72,11 @@ it('the one exemption names an existing file and lifts only the spawn rule', () 
 
 it('the exempted file makes only the read-only git log call', () => {
   const text = readFileSync(nodePath.join(ROOT, READ_ONLY_GIT_PORT), 'utf8');
-  const childProcessImports = [...text.matchAll(/^import\b[^;]*?from\s+['"]([^'"]+)['"]/gm)]
+  const childProcessImports = text
+    .matchAll(/^import\b[^;]*?from\s+['"]([^'"]+)['"]/gm)
     .filter(([, from]) => from?.includes('child_process'))
-    .map(([statement]) => statement);
+    .map(([statement]) => statement)
+    .toArray();
   expect(childProcessImports).toEqual(["import { execFile } from 'node:child_process'"]);
   // A dynamic `import()` or a `createRequire` call would name it a second time.
   expect(text.match(/child_process/g)).toHaveLength(1);

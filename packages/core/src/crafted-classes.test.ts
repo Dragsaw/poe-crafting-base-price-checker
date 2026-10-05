@@ -24,7 +24,7 @@ describe('craftedClassesOf', () => {
 
     const groups = craftedClassesOf([a1, raw, bows, pruned, a2]);
 
-    expect([...groups.keys()]).toEqual([classKeyOf('c.Amulets', 'Amulets'), classKeyOf('c.Bows', 'Bows')]);
+    expect(groups.keys().toArray()).toEqual([classKeyOf('c.Amulets', 'Amulets'), classKeyOf('c.Bows', 'Bows')]);
     expect(groups.get(classKeyOf('c.Amulets', 'Amulets'))).toEqual([a1, a2]);
   });
 

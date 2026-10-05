@@ -67,7 +67,7 @@ export function recordObservation(
 
   return {
     ...ledger,
-    [parsed.policy]: { policy: parsed.policy, observedAt, rules: [...merged.values()] },
+    [parsed.policy]: { policy: parsed.policy, observedAt, rules: merged.values().toArray() },
   };
 }
 

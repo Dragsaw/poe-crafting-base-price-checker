@@ -6,17 +6,12 @@ import { DESCRIBE_FIRST, DESCRIBE_SECOND, IT_FIRST, IT_SECOND } from './names';
 // each test fails on purpose. A pair meets at a barrier before either sends, so both `beforeEach`
 // hooks have run. Each fetch starts un-awaited from a timer: the path `AsyncLocalStorage` is for.
 
-const noop = (): void => {};
-
 const PARTIES = 2;
 
 /** Returns a function that resolves for each caller once both parties have arrived. */
 function barrier(): () => Promise<void> {
   let arrived = 0;
-  let open: () => void = noop;
-  const opened = new Promise<void>((resolve) => {
-    open = resolve;
-  });
+  const { promise: opened, resolve: open } = Promise.withResolvers<void>();
   return () => {
     arrived += 1;
     if (arrived === PARTIES) {

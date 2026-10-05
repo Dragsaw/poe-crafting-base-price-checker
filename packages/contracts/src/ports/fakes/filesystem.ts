@@ -25,7 +25,7 @@ export function createFakeFilesystemPort(initial: FakeFiles = {}): FakeFilesyste
       files.set(path, file);
     },
     paths() {
-      return [...files.keys()].toSorted((a, b) => Number(a > b) - Number(a < b));
+      return files.keys().toArray().toSorted((a, b) => Number(a > b) - Number(a < b));
     },
     readTextFile(path) {
       return Promise.resolve(files.get(path)?.contents);

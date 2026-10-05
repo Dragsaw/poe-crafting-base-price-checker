@@ -51,16 +51,8 @@ const LATE_URL = 'https://unrouted.invalid/api/trade2/fetch/late';
 const LATE_ISSUER = 'issues an unfixtured request from a timer it does not await';
 const noop = (): void => {};
 
-function deferred(): { promise: Promise<void>; resolve: () => void } {
-  let resolve = noop;
-  const promise = new Promise<void>((settle) => {
-    resolve = settle;
-  });
-  return { promise, resolve };
-}
-
-const lateGate = deferred();
-const lateSettled = deferred();
+const lateGate = Promise.withResolvers<void>();
+const lateSettled = Promise.withResolvers<void>();
 
 it(LATE_ISSUER, () => {
   // The timer is scheduled here, so its callback carries this test's identity.
@@ -124,10 +116,9 @@ describe('a request recorded after the last afterEach of its test', () => {
   }
 
   it(AFTER_LAST_ISSUER, () => {
-    const gate = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    settled = fetchWhenReleased(gate);
+    const gate = Promise.withResolvers<void>();
+    release = gate.resolve;
+    settled = fetchWhenReleased(gate.promise);
     expect(drainEscapedRequests()).toEqual([]);
   });
 
