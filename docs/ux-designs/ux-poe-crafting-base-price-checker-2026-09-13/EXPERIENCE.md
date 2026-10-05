@@ -1,17 +1,16 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 19
+revision: 24
 created: 2026-09-13
-updated: 2026-10-03
+updated: 2026-10-04
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
-  - docs/sprint-change-proposal-2026-09-13.md
-  - docs/sprint-change-proposal-2026-09-19.md
-peer-contract: DESIGN.md — the visual identity and token source. This document
+  - .memlog.md (rows 239-279 hold the visual redesign)
+peer-contract: DESIGN.md — the look and the token source. This document
   references its tokens by name and never restates their values.
 ---
 
@@ -19,61 +18,82 @@ peer-contract: DESIGN.md — the visual identity and token source. This document
 
 ## Foundation
 
-One page, read-only, for one player. There is no second route, no *internal*
-navigation, no account and no write path from the browser. The page fetches
-the artifact set AD-24 names, ranks against it locally, and then sits still on
-a second monitor for the length of a play session.
+The product is one read-only page for one player. It has no second route, no
+internal navigation, no account and no write path from the browser. The page
+fetches the artifact set that AD-24 names and ranks against it locally. Then it
+sits still on a second monitor, beside a dark game, for the length of a play
+session.
 
-**One outbound link is the sole exception.** `{components.trade-link}` opens
-the trade site's own search for a Combination, in a new tab, where the entry
-carries a stored `lastSearchId` from a search run in the active league. It
-leaves the page. It adds no route, writes nothing, and changes nothing the page
-shows. The player can close the tab and return to the exact page he left.
+**One outbound link is the sole exception.** `{components.trade-link}` opens the
+trade site's own search for a Combination in a new tab (Interaction 6). It adds no
+route, writes nothing and changes nothing on the page. It is not the runtime call
+that FR-33 forbids (AD-15, AD-25). The click is the player's own navigation, and
+the page makes no request of its own. The page may not call the trade site. Thus
+the link can only point at a search that the syncer already issued and stored.
 
-**This is not the runtime call FR-33 forbids.** FR-33 (AD-15, AD-25) bars the
-page itself from calling pathofexile.com at runtime — the page reads the
-catalogue files instead, so a `statId` renders as text without that call. A
-`{components.trade-link}` click is a different thing: the player's own click
-tells the browser to open a new tab, and the page makes no request of its own
-either before or after. **The PRD now states this distinction itself** (FR-33,
-AD-15): the prohibition binds a request the page makes on its own behalf and
-depends on for rendering, and not a navigation the player chooses. **The
-consequence runs the other way too.** Because `web` may not make the call,
-`web` cannot mint a trade-site search of its own, so the link can only ever
-point at a search the syncer already issued and stored.
+**This document writes each on-screen string once** (memlog 250, 251). These are
+the labels, state words, reasons, tooltip text and footer text. All of them are in
+the Copy Deck or in Epistemics, *Price trust*. This document also writes each fixed
+value that the page prints or judges by: the 3-day, 3-listing and 70% price-trust
+thresholds, the 8 lines an expansion opens on, and the 0.25 cold start. The PRD
+keeps the capability and the player-level promise, and it cites this document.
+Mechanism stays with the architecture spine and `IMPLEMENTATION-NOTES.md`.
 
-**Substrate: Mantine v9 (`@mantine/core` + `@mantine/hooks` 9.6.1)**
-`[ASSUMPTION — memlog 8]`. Mantine's component *behaviour*, layout primitives
-and CSS-variable theming are inherited. Only the behavioural deltas from
-Mantine's defaults are recorded here:
+**Substrate: Mantine v9** (`@mantine/core` + `@mantine/hooks` 9.6.1)
+`[ASSUMPTION — memlog 8]`. The page inherits Mantine's component behaviour. This
+document records only the behavioural deltas. DESIGN.md records the visual ones.
 
 | Mantine default | Delta |
 |---|---|
-| `Collapse` animates height on open | Every expansion opens **in place, instantly** — no height animation. Memlog 14 says animations are fast. The fastest transition on a 28px row is none. |
-| `Accordion` ships chevrons, control padding and its own hover background | All three stripped, per `DESIGN.md`'s theme deltas. An affordance here is sepia text and a sign, with no button chrome. |
-| `NumberInput` is controlled and fires `onChange` on **every keystroke** | The keystroke behaviour is kept — it is what FR-6 needs. The delta is twofold. Re-ranking is debounced ~150ms behind the keystroke `[ASSUMPTION — memlog 38]`. And the input takes the chrome and constraints `{components.payout-threshold}` declares: no field, no box, the figure itself is the input, with `min`, `max`, `step`, `decimalScale` and `clampBehavior` tokenised there. |
-| `theme.primaryColor` defaults to blue | Repointed off blue, per `DESIGN.md`. Blue would tint carets, selections and every input focus on a page that contains no blue. |
-| `theme.lineHeights` and `theme.headings` supply their own ramps | Both **replaced, not extended**. Every type role declares its own `lineHeight`. The 28px row, the 1920px fit and `{spacing.frame-slack}` are all computed against those declared values. |
-| Font sizes resolved through `--mantine-scale`'s rem conversion | Sizes are passed as literal px, so the 9.5 / 10.5 / 11.5 / 12.5 / 13.5px roles cannot be rounded away. |
-| `Skeleton` animated shimmer | The load state is skeleton rows in the final layout (memlog 50). **No shimmer and no animation** `[decision — memlog 211]`: flat bars, whose treatment `DESIGN.md` owns under Components. |
-| Focus ring and keyboard traversal | Out of scope — see Accessibility Floor. |
+| `Collapse` animates height on open | Every expansion and the sync report open **in place, instantly** (memlog 14). |
+| `Accordion` ships chevrons, padding and its own hover | Not used. A ranked row opens on its own click (Interaction 2). |
+| `SegmentedControl` animates its indicator | `{components.recipe-toggle}` is a segmented control (memlog 243). Its indicator moves instantly or by a fast linear step (memlog 14). |
+| `NumberInput` fires `onChange` on every keystroke | Kept, because FR-6 needs it. Re-ranking is debounced (Interaction 1). |
+| `Slider` shows a floating value label while dragged | Off. The typed figure beside the slider shows the value. Snapping: Interaction 1. |
+| `Tooltip` may wrap any element | Three kinds only (Interaction 8). A tooltip never holds a control. |
+| `Skeleton` animated shimmer | Flat bars, no shimmer, no animation (memlog 211; state 22). |
+| Focus ring and keyboard traversal | Out of scope (Accessibility Floor). |
 
-Two rules that are not Mantine deltas but read like them, recorded so nobody
-adds them back: there is **no virtualisation and no windowing** — twenty rows
-paint at once, and a grown list paints in full — and there are **no tooltips**,
-on truncated text or anywhere else. Truncation is resolved one click down.
+Two rules read like Mantine deltas but are not. First, there is **no
+virtualisation and no windowing**. Twenty rows paint at once, and a grown list
+paints in full. Second, **the full text of cut text is one click down**. A tooltip
+shows cut text only on a chase cell (memlog 273), and that full text is also one
+click down.
 
-`DESIGN.md` is the visual identity reference. This document is the behaviour.
+DESIGN.md is the look. This document is the behaviour and the words.
+[`mockups/key-redesign-dark.html`](mockups/key-redesign-dark.html) shows one
+dataset in one state. It also holds a box of state specimens, which is annotation,
+not product UI. Its sample text does not ship. **Where a mockup and a spine
+disagree, the spine wins.** The two earlier paper mockups, `key-hero-resting.html`
+and `key-expanded-states.html`, show a retired theme. They illustrate nothing
+current.
 
-**Both spines win on conflict with any mock.** This rule holds for the two
-mockups rendered from the final spines —
-[`mockups/key-hero-resting.html`](mockups/key-hero-resting.html) and
-[`mockups/key-expanded-states.html`](mockups/key-expanded-states.html) — and for
-the superseded exploratory directions in `.working/`. The mockups show one
-dataset in one state. Where a mockup and a spine disagree, the spine is correct
-and the mockup is out of date.
+**Tags and citations.** `[OPEN]`: the inputs do not decide it. `[ASSUMPTION]`:
+held until the user confirms it. `[OVERRIDE]`: a deliberate departure from the
+PRD or the brief. `[NOTE FOR ARCHITECT]`: mechanism this document needs from the
+architecture side. `[NOTE FOR UX]`: a standing UX question. `(memlog N)` cites the
+row of this folder's `.memlog.md` that holds the decision.
 
-Open items are tagged `[NOTE FOR UX]` in place through the document.
+**Open items.** This document resolves none of them by invention.
+
+- The share-of-EV formula and the stale-patch data source (`[NOTE FOR ARCHITECT]`
+  in Epistemics; memlog 265).
+- Strings drafted at build (Copy Deck).
+- Two Combinations that read identically (`[NOTE FOR UX]`, Domain Vocabulary;
+  memlog 143).
+- The reason string that a recipe-scoped Unrankable would need (state 36). The PRD
+  owns that extension.
+
+**Known gaps for the build stories** (memlog 279). Nobody ruled on these. The
+build story that meets a gap rules on it. This document does not invent an answer
+now.
+
+- The failure paths of UJ-3, UJ-4 and UJ-5.
+- The page when `sync-report.json` is absent.
+- State 35's branch boundary and the look of its suppressed ranks.
+- The show-more affordance when the list has 20 rows or fewer.
+- An expansion panel whose every line is pruned.
+- A non-numeric threshold entry.
 
 ## Information Architecture
 
@@ -81,193 +101,370 @@ One surface. Everything below is a region of it, in fixed vertical order.
 
 | Region | Reached from | Purpose |
 |---|---|---|
-| Masthead + `{components.craft-recipe}` + `{components.payout-threshold}` | Always visible | Names the league. Holds **both** controls on the page, as one right-floated group |
-| `{components.trust-strip}` | Always visible | What the ranking rests on, as five plain facts: Weights File producer, `generatedAt`, `gamePatch`, last synced, tracked-list edit date (FR-10, FR-18). Names each absent tolerable artifact on a plain line of its own (state 38). Raises a rust line when something is broken. The whole strip is a click target |
-| `{components.sync-report-panel}` | Click `{components.trust-strip}` | The full Sync Report, opened in place beneath the strip (FR-24, FR-25, FR-4) |
-| `{components.asking-price-line}` | Always visible | FR-13's framing, above the list, never below the fold |
-| `{components.uniform-prior-banner}` | Raised by data condition | The whole-ranking warning (FR-11) |
-| `{components.column-header}` + twenty `{components.ranked-row}` | Always visible | The product. Crafted rows name an **Item Class** (FR-3). UJ-1, UJ-2, UJ-4 |
-| `{components.raw-base-row}` | Interleaved in the same list | Raw Bases — single **Base Types**, ranked at their own asking price (FR-3) |
-| `{components.expand-affordance}` (list) | Below row 20 | Reads the remainder of the ranked list (FR-5) |
-| `{components.expansion-panel}` | Click a ranked row | Every Tracked Entry on that Item Class, or the one entry a Raw Base names. UJ-3, UJ-5 |
-| `{components.tombstone-band}` | `+ N pruned` inside the expansion | `pruned` tombstones with their reasons (FR-8, FR-15) |
-| `{components.unrankable-appendix}` | Foot of the frame | **Item Classes** kept out of the ordering, with their reason and count (FR-4) |
-| `{components.key-block}` | Above the foot | How to read the page — required, see Epistemics |
-| `{components.running-foot}` | Foot | What is read-only, and where curation actually happens |
+| `{components.header-bar}` | Always visible, sticky | League eyebrow and title on the left. On the right: `{components.recipe-toggle}` with Craft Cost beside it, `{components.threshold-control}` and `{components.sync-button}` (memlog 243). It never grows a second line. Problems speak through the sync button (memlog 254) |
+| `{components.sync-report-panel}` | Interaction 5 | The Sync Report, the attribution facts and any absence lines (FR-24, FR-25, FR-4, FR-18; memlog 258 N-7, N-8). Content: Epistemics, *The sync report* |
+| `{components.list-statement}` | States 23, 25 and 35 | One plain declarative above the column header |
+| `{components.column-header}` + twenty `{components.ranked-row}` | Always visible | The product. Crafted rows name an **Item Class**, and Raw Base rows name a **Base Type**, in one list (FR-3). UJ-1, UJ-2, UJ-4 |
+| `{components.expansion-panel}` | Interaction 2 | Every Tracked Entry on that Item Class, or the one entry that a Raw Base names. UJ-3, UJ-5 |
+| `{components.show-more}` (list) | Below row 20 | The remainder of the ranked list (FR-5; Interaction 4) |
+| `{components.unrankable-appendix}` | Foot, above the footer | **Item Classes** kept out of the ordering, with their reason and count (FR-4). Every row is an Item Class. A Raw Base needs no Eligible Pool and ranks regardless |
+| `{components.footer-legend}` | Foot | How to read the marks, the asking-price sentence, and where curation happens. It is the only place where the page says where curation happens. It renders in every state except the failure screens |
 
-Expansion opens **in place**, pushing the regions below it down inside the
-frame. It is not a modal, not a drawer and not a second route. There is no
-navigation to lose your place in.
+The header bar is the only pinned region. The sync report and every expansion open
+**in place** and push the content below them down. Neither is a modal, a drawer,
+an overlay, a dropdown or a second route.
 
-Two screens sit outside that order and replace the page entirely rather than
-joining it: `{components.refusal-screen}` and
-`{components.fetch-failure-screen}`. When either is up, none of the regions
-above render — the page shows nothing rather than a partial set.
+`{components.failure-screen}` sits outside that order and replaces the whole page
+(states 26, 28). While it shows, none of the regions above render. The page shows
+nothing rather than a partial set.
 
-→ Composition reference, both rendered from the final spines:
-[`mockups/key-hero-resting.html`](mockups/key-hero-resting.html) shows the
-resting order at 1060x1920, 1:1.
-[`mockups/key-expanded-states.html`](mockups/key-expanded-states.html) shows
-what the two expandable regions do to that order —
-`{components.expansion-panel}` open below its row, and
-`{components.sync-report-panel}` open below the strip. The exploratory
-directions in `.working/` are superseded and are kept only as the record of how
-the register was chosen.
+**One list, two ranked units** (memlog 180, 241, 242). The list is mixed by design.
+A crafted row names an Item Class, and a Raw Base row names a Base Type (FR-3).
+They are peers. A row states which it is in two ways. First, its name takes the
+game's rarity colour: `{colors.rarity-magic}` for a crafted Item Class and
+`{colors.rarity-normal}` for a Raw Base, as the trade site prints magic and normal
+items. Second, for a reader who cannot see colour, a Raw Base row prints the
+sell-as-is line where a crafted row prints its Best combinations
+(memlog 258 N-13). `{components.column-header}` names both units (Copy Deck).
 
-**One list, two ranked units** `[decision — memlog 180]`. The ranked list is
-mixed by design: a crafted row names an **Item Class** and a raw row names a
-**Base Type** (FR-3). They are peers — neither is the default kind of row — and
-every row states which it is by carrying `{components.unit-glyph-class}` or
-`{components.unit-glyph-raw}` before its name. `{components.column-header}` names
-both, because a header describes what a column can hold and a glyph describes
-what this row is.
+**The appendix stays at the foot** (memlog 185). FR-4 leaves its prominence to UX.
+**The page never switches layout on a data measurement.** It has one arrangement in
+every data state. The count is readable without expanding anything (FR-4). The
+coverage fraction with its denominator is one click down, in the sync report.
 
-*This changed at revision 3 and it is not a rename.* Through PRD revision 16 the
-crafted branch ranked Base Types, so the list held one unit in two treatments.
-It now holds two units, and the places that assumed one — the expansion's
-contents, the appendix's rows, the Provenance mark's granularity, the list
-affordance's copy — were each re-derived rather than swept.
+### The ranked list
 
-**The appendix stays at the foot, now as a decision rather than a band**
-`[change — memlog 185]`. A `[NOTE FOR UX]` stood here through revision 2: FR-4's
-50–80% coverage band was said to require `{components.unrankable-appendix}` to
-become a first-class surface, and this IA described the ≥80% treatment only.
-**PRD revision 18 withdrew the bands** — coverage is "reported, not a gate: no
-threshold and no layout binds to it, and how prominently the Unrankable group
-sits beside the ranking is UX's" (FR-4). So the note closes by removal, and the
-prominence question is now this document's outright. The reasoning for the foot
-is in `DESIGN.md`, Layout & Spacing. Behaviourally what it fixes is this: **the
-page never switches layout on a measurement.** There is one arrangement in every
-data state, the count is readable without expanding anything (FR-4), and the
-fraction with its denominator lives one click down in
-`{components.sync-report-panel}`.
+- **Order.** EV under the active threshold and the active recipe (FR-1, FR-26).
+  Columns are not sortable. The list shows the active recipe's rows only. `core`
+  orders the cross product, FR-5's bound applies after the recipe filter, and a
+  Raw Base renders under every recipe (AD-17). A Raw Base under the Payout
+  Threshold leaves the ranking. It is absent from the top 20 and from the grown
+  list.
+- **Emphasis.** Ranks 1–5 are emphasised, and the rest are plain (memlog 258
+  N-20). Emphasis depends on rank position only, never on branch. Under state 35
+  it runs per branch.
+- **The EV cell** reads, left to right: ≈ when it applies (Epistemics,
+  *Estimated odds*), the figure, then the mark slot. The mark slot holds the row's
+  trust mark or nothing (Epistemics, *Price trust*). A negative EV is dimmed and
+  still printed as a real figure (state 21). For a missing figure, see
+  Epistemics, *Missing figures*.
+- **Best combinations, crafted.** The Combinations that contribute most to EV
+  under the active threshold and recipe. Each prints as tier plus short form, one
+  per cell, in three cells or two (Responsive & Platform). Fewer qualifying
+  Combinations leave cells empty. None leaves every cell empty (state 21).
+- **Raw Base rows.** The sell-as-is line replaces the chase cells. The EV is the
+  base's own asking price, and the row never carries ≈.
+- **The row** is one click target, with no per-row controls and no hidden actions
+  (Interaction 2). Hover shows only a mark's reason and a cut chase cell's text
+  (Interaction 8).
+
+### The expansion
+
+- **Context line.** Every panel opens with a context line that leads with the
+  row's full name. Thus a name that the row cut has a full-text home (memlog 265).
+  When the row carries ≈, the line continues with the ≈ sentence (Copy Deck).
+  There is no title and no sub-line, because the sticky header always shows the
+  threshold and the recipe that the figures depend on (memlog 258 N-11).
+- **Lines.** One line per Combination (memlog 258 N-3). The line holds the
+  Combination (tier plus short form, led by `* pinned` when pinned), the price in
+  Divine or `—`, the trust cell, then the trade link (Interaction 6). An age
+  prints only when there is a problem, inside the reason. Only a pruned line takes
+  a second line, for its prune reason. Line treatments: states 1–10 and 20.
+- **Line order** (memlog 265). Priced lines come first, by their contribution to
+  EV, largest first. Then come below-threshold lines, then pending, then broken.
+  Pruned lines come last, behind `+ N pruned` (Interaction 3).
+- **Top lines.** The panel opens on the top 8 lines of that order (state 39).
+- **A Raw Base** expands to one line (memlog 265). The line has no Combination
+  text, because the context line names the base. It holds the price or `—`, the
+  trust cell and the trade link.
 
 ## Domain Vocabulary
 
-The PRD's §3 Glossary is binding and states that **a synonym introduced
-anywhere is a discipline violation**. These terms appear on screen verbatim,
-spelled exactly as below. No UI copy may substitute a friendlier word.
+**On-screen words are this document's** (memlog 250, 251, 258 N-17). The PRD's §3
+Glossary is the vocabulary of the contracts and of this document's prose. On
+screen, the page speaks the player's words. The Copy Deck or Epistemics, *Price
+trust*, writes every string that the page prints. A string not written there does
+not ship.
 
-**Player-facing terms, used verbatim:** Item Class · Base Type · Raw Base ·
-Combination · Chase Combination · Tracked Entry · Tracked List · Curation
-Status · Price State · Payout Threshold · Craft Recipe · Craft Cost · Expected
-Value (EV) · Provenance · Unrankable · Divine · `gamePatch` · Weights File ·
-Item Level Floor · Sync Report.
+### Mapping
 
-***Item Class* joined this group at revision 3** `[decision — memlog 180]`, when
-the crafted branch began ranking it (FR-3). It carries a display rule of its own,
-and the rule is the PRD's rather than this document's: **the page names a class
-by its own name — *Bows* — and never prefixes it with the word *class***
-(§3 *Item Class*, PRD-owned). So a ranked row reads `Bows`, never `Bows class`
-and never `Class: Bows`. The two words *Item Class* are printed only where the page
-is naming the **kind of thing** rather than an instance of it — the column
-header and the appendix title — exactly as *Base Type* has always worked.
+| Glossary or internal term | On screen |
+|---|---|
+| Item Class | Its label (*Item Class labels*). As a kind, in the column header |
+| Base Type, Raw Base | The base name, the sell-as-is line on its row, and the Raw Base item of the footer legend |
+| Chase Combination | The Best combinations column |
+| Payout Threshold | The threshold label, figure and unit |
+| Craft Recipe | The recipe label and the option word (*Recipe option words*) |
+| Craft Cost | The Craft Cost figure beside the recipe |
+| Expected Value (EV) | The EV column header and the EV tooltip |
+| Divine | Spelled out in the EV header. `div` after a figure in the header bar and the tooltip. A row figure carries no unit |
+| Item Level Floor | The floor that FR-3 fixes, inside the sell-as-is line |
+| Price State and its `not-yet-synced` reasons | A price-trust mark and a reason (Epistemics, *Price trust*). The enum values never print |
+| Provenance (AD-10; internal only) | Never printed. `measured` prints nothing. `uniform-prior` prints ≈. `absent` prints its appendix reason and nothing else |
+| Curation Status | `* pinned` and `† pruned`. `active` prints nothing |
+| Sync Report | Opened by the sync button |
+| Weights File, `generatedAt`, `gamePatch`, Tracked List edit date | Inside the sync report (Copy Deck) |
+| Unrankable | The appendix title |
 
-**An Item Class label is its source name, trimmed, with a defence-type suffix
-spelled as defence words** `[decision — memlog 230]`. §3's own `[ASSUMPTION]`
-flags classes of one broad kind that differ only in defence type, and hands the
-fix to this document — *"that is a display fix in `EXPERIENCE.md`, never a
-change of unit"*. Each underscore prints as a space. A trailing defence-type
-suffix prints as a capitalised, slash-joined parenthetical: `Gloves_dex_int`
-reads `Gloves (Dex/Int)`, and `Body_Armours_str_dex_int` reads
-`Body Armours (Str/Dex/Int)`. The plural stays: `Amulets`, `Bows`. There is no
-per-class name table. The label is display only, and **the unit is never
-renamed**.
+**Never printed as a word, but on screen** (memlog 139): *Dataset*, *Price
+Observation*, *Trade Catalogue*, `lastAttemptedAt` and *Accepted Tier*. The Dataset
+is what the page renders. A Price Observation shows as a price, and as an age only
+when that age is a problem. The Trade Catalogue is why a `statId` reads as human
+text. `lastAttemptedAt` prints as *tried N days ago*. An Accepted Tier is the bare
+`T1` that opens every Combination.
 
-*Sync Report* is player-facing: it names what `{components.sync-report-panel}`
-shows, and the affordance that opens it says so.
+**Back-end only, never on the page:** Modifier Reference, Stat Line, Source
+Modifier, Eligible Pool, Modifier Weight, Chunk, Workload, Refresh Rotation,
+`weightSource`, `lines`, `ranges`, `sourceModifierId`, `poolCoverage`,
+`tierLabel`, the Price State enum values and AD-10's three values. These may appear
+only in the cross-file diagnosis. They are allowed there because the diagnosis
+quotes a file, not because another person reads it (memlog 206; Epistemics, *Two
+registers in one panel*). The page never reads `tierLabel` either. The tier it
+prints is the curator's declaration (memlog 135).
 
-***Accepted Tier* moved groups** `[decision — memlog 139]`. It was listed here
-as player-facing. It is now the fifth member of the group below: after memlog
-134 its substance is on **every** row, as `T1`, and after memlog 139 the page
-explains the vocabulary nowhere, so the two words themselves are never printed.
-
-**Never printed as a word, but the concept is on screen:** *Dataset*, *Price
-Observation*, *Trade Catalogue*, `lastAttemptedAt` and *Accepted Tier*. These
-five are real Glossary terms whose *substance* the page shows and whose *name*
-it does not:
-the Dataset is simply what the page renders. A Price Observation appears as a
-price with a sample size and an age. The Trade Catalogue is why a `statId`
-reads as human text. `lastAttemptedAt` is spoken as *tried Nh ago* — FR-12
-requires the page to label the **kind** of age, not the field that holds it. And
-an Accepted Tier is spoken as the bare `T1` that opens every Combination.
-Printing any of the five as a bare noun would be jargon without a job.
-
-**Enum values shown as written, never translated.** Four sets:
-
-- Price State — `priced`, `no-listings`, `not-yet-synced`, `unresolvable`.
-- `not-yet-synced` reason — `never-synced`, `league-mismatch`,
-  `no-exchange-rate`.
-- Curation Status — `active`, `pinned`, `pruned`.
-- Provenance — `measured`, `uniform-prior`, `absent`.
-
-**Reason strings shown verbatim from FR-4:** `pool partial`, `class absent from
-weights file`, `class disagrees with weights file`. *The second was `base absent
-from weights file` through PRD revision 16. The third was added when D-2 closed:
-a class failing any of AD-17's five cross-file checks has a `complete`,
-published pool, so neither of the first two is true of it.* The enum has exactly
-three members, and **one string covers all five checks** — which check, which
-entry and its canonical key are diagnosis and never reach the appendix.
-**Standing check:** this enum is PRD-owned and has now moved in three
-consecutive PRD revisions, so re-read FR-4 on every absorption rather than
-trusting the copy here.
-
-**Back-end only — must not appear on the page:** Modifier Reference, Stat Line,
-Source Modifier, Eligible Pool, Modifier Weight, Chunk, Workload, Refresh
-Rotation, `weightSource`, `lines`, `ranges`, `sourceModifierId`, `poolCoverage`,
-`tierLabel`. These may appear in **diagnosis**, and the licence is one of
-**register, not of audience** `[decision — memlog 206]`. It read *"where the
-reader is the person fixing the file"* until then, which does not discriminate in
-this product: there is exactly one user, he wrote the Tracked List, and he is the
-person fixing the file. The same one-reader fact retires the word on the unit
-glyphs (memlog 184). What still discriminates is **what kind of thing the text
-is**. A figure-group label is read at a glance, in the page's voice. A canonical
-key is a string he copies into an editor. Both are legitimate for this reader;
-they are not legitimate in the same typographic breath — see *Two registers in
-one panel*.
-`weightSource` is on this list for a second reason as well: its own enum spells
-`"absent"`, and Provenance spells `absent` for a different thing entirely, so
-printing the field's words beside a Provenance mark would invite the reader to
-read one as the other (PRD FR-10, §3 *`weightSource`*).
-`tierLabel` is on this list for a second reason as well: the page must never
-**read** it either. The tier it prints comes from the curator's declaration, not
-from the Weights File `[decision — memlog 135]`.
-
-**Four wordings an earlier draft had wrong. Do not reintroduce them**
-`[decision — memlog 84]`:
+**Fixed wordings. Do not reintroduce the alternatives** (memlog 84, 258 N-17):
 
 | Write this | Never this | Why |
 |---|---|---|
-| The fourth column header and the key block's middle group read **Provenance** | "Weight" | A synonym for one Glossary term and a collision with *Modifier Weight*, which is banned from the page. It also misleads: `◊ prior only` under a `WEIGHT` header reads as a claim about how rarely a modifier rolls, not about where the figure came from |
-| The EV column header reads **`EV (Divine)`** and the cell holds the figure alone | `div` after every figure | *Divine* is verbatim-only, so the page spells it or states it once in a header. Twenty repetitions of an invariant unit is noise in an 84px column |
-| The item level is spelled out in the Raw Base row's note — *uncrafted at Item Level 82* | `ILVL 82` | *Item Level Floor* is verbatim-only. `ILVL` is an abbreviation the Glossary does not license. *This row said "the Raw Base tag reads `RAW BASE`" until revision 3; the tag retired, but the rule it protected did not — the item level was never in the tag, and it is still spelled in the note* |
-| **entries not reached in the last sync pass** | "in this Chunk" | *Chunk* is back-end-only, and this is a **figure-group label** — read at a glance, in the page's voice. The rule stood on audience until memlog 206 and now stands on register: the same panel carries diagnosis in the file's words, and the two may not be written as one |
+| The EV header carries the unit, and the row cell holds the figure alone | `div` after every row figure | Twenty copies of an invariant unit are noise in `{spacing.col-ev}` |
+| `item level 82+` | `ilvl 82`, `ILVL` | An abbreviation that the player must decode at a glance |
+| **entries not reached in the last sync pass** | "in this Chunk" | *Chunk* is back-end only |
+| `no published weight for one mod tier` | "prior", "uniform prior", "weight source" | The cue speaks about roll odds in the player's words (memlog 246) |
+| No `Price trust` label | a `PRICE TRUST` column header or legend heading | The marks sit in the EV slot, and the legend names each one by its word (memlog 247) |
 
-**The trust strip's five labels, verbatim.** On-screen
-wording is binding here as everywhere, so these are the strings and not a
-description of them:
+**The page never explains this vocabulary** (memlog 139). The page has one user,
+and that user wrote the Tracked List. An explanation in the footer legend adds
+nothing for them.
+
+### Item Class labels
+
+**An Item Class label is its source name, trimmed, with a defence-type suffix
+spelled as defence words** (memlog 230, 249). Each underscore prints as a space. A
+trailing defence-type suffix prints as a capitalised, slash-joined parenthetical.
+`Helmets_str` reads `Helmets (Str)`, `Gloves_dex_int` reads `Gloves (Dex/Int)`, and
+`Body_Armours_str_dex_int` reads `Body Armours (Str/Dex/Int)`. The plural stays:
+`Amulets`, `Bows`. There is no per-class name table, and the label is for display
+only. **The unit is never renamed.** The page names a class by its own name:
+`Bows`, never `Bows class`.
+
+### Recipe option words
+
+The two v1 recipes differ only by orb grade. Thus each option prints that one word,
+**derived from the grade prefix that the recipe's currency ids share**
+(memlog 233). When every currency of a recipe carries the same grade prefix, the
+word is that grade (`greater`, `perfect`). When no currency carries a grade
+prefix, the word is `regular`. Two conditions make the recipe set invalid: mixed
+grades within one recipe, or two recipes that derive the same word. An invalid
+recipe set takes the refusal treatment (state 26). The control never shows an
+invented name. The architect decides which prefixes count as grades and where the
+derivation lives (memlog 233).
+
+### Money
+
+**Money figures read at 2 decimal places** (memlog 85): EV, price, Craft Cost and
+the threshold alike. `core` stores figures at 4 decimal places, and the page
+rounds each figure once, for display. A figure that is present and non-zero but
+rounds to `0.00` prints **`< 0.01`**. That is a quantity, not a missing figure. A
+negative figure takes the minus sign U+2212, not a hyphen.
+
+**Craft Cost prints once**, beside the recipe (memlog 182, 258 N-16; FR-26). The
+player checks every crafted EV against it. Where the recipe is **uncostable**, the
+slot holds the uncostable phrase and never a number (FR-26, AD-20; state 35).
+
+### Combinations and short forms
+
+**A Combination is written as tier plus short form, never as a value**
+(memlog 134). `T1 Cold Res · T1 Mana`, not `+35% Cold Res · +180 Mana`. The player
+operates on tiers, so the tier is the comparison that the page makes. This rule
+governs the chase cells and the expansion lines. Thus an exact value band appears
+nowhere except in the fallback below.
+
+**The tier is the Accepted Tier, declared by the curator** (memlog 135). The page
+reads it from `acceptedTier` on the Modifier Reference, beside its band (PRD §3
+*Accepted Tier*, FR-22; AD-5). It is for display only. It is never derived from
+the band, never joined to the Weights File's `tierLabel` and never part of a
+canonical key. `T1` names the tier that the player chose to chase. It is not a
+claim about any item that a search returned.
+
+**A label may name a mixture** (memlog 137). `T1–T2` is legal. For a multi-`#`
+modifier, the value axis does not partition the tier axis (AD-28). Thus the page
+prints what the curator accepted.
+
+**Chase Combination text uses canonical short forms** (memlog 34). Each tracked
+modifier has one short form, so the same modifier reads the same way on every row.
+**The table is a product constant in `web`, keyed by `statId`** (memlog 231). A new
+tracked modifier needs a code change before it reads in short form. Short forms are
+never invented per row and never truncated ad hoc. The table is written against a
+budget of about **27 characters** per chase cell (memlog 104, 140). That figure is
+the working budget until the build measurement replaces it (DESIGN.md, *Measure at
+build*; memlog 268). The same measurement sets how many chase cells a row shows
+(Responsive & Platform). A form that still overruns ends in an ellipsis, and the
+full text is one click down.
+
+**How to coin a short form** (memlog 118):
+
+1. **A Glossary term is never abbreviated.** This rule governs modifier text only.
+2. **Borrow, never invent.** A coined form must be one that the player already
+   reads in the game or on the trade site (`ES` for Energy Shield).
+3. **Unique across the whole table.** Two modifiers never share a short form.
+4. **Written once, never varied per row.**
+5. **The tier prefix is never abbreviated or varied** (memlog 141). `T1`, never
+   `1`, `t1` or `Tier 1`. A mixture takes an en dash: `T1–T2`.
+
+**Escape valve.** A modifier whose shortest legitimate form still overruns the
+budget when paired is a **candidate for pruning, not for a shorter coinage**.
+
+**The fallback covers two gaps** (memlog 138, 231). A tracked modifier can have no
+short-form entry or no declared Accepted Tier. Then it falls to the Trade Catalogue
+stat name **plus the value band**, with numerals and units in full (`+35%`,
+`+180`). A missing short form is a **product gap**, which the `web` table fills. A
+missing Accepted Tier is a **curation gap**, which the Tracked List fills. The
+fallback is set in the **verbatim register** (memlog 208). That register means
+*the page quoted this text out of a file*, and it is reserved for that meaning. The
+fallback takes no trust colour, because it states nothing about a price
+(DESIGN.md, Typography, owns the treatment).
+
+**A Hybrid Modifier affix is the tier label, then its lines** (PRD FR-34; CAP-7).
+One affix has one Accepted Tier label, then the short form of each line,
+comma-separated: `T1 % ES, % Evasion`. The `·` that joins two affixes is unchanged.
+**Short forms are all or none** within one affix. If the tier, any line's short
+form or any line's band is missing, every line prints in the fallback register.
+The joined label obeys the chase-cell budget and ends in an ellipsis there. An
+expansion line never cuts it. Three or more lines take the same rules. **The page
+accepts the ambiguity with two separate affixes** (FR-34). It adds no glyph,
+bracket or explanation.
+
+`[NOTE FOR UX]` (memlog 143) **Two Combinations can still read identically.** The
+page prints the curator's declared `acceptedTier`. Nothing requires two tracked
+bands of one modifier on one Item Class to declare different tiers. Rule 3 makes
+the short-form table unique, but it does not reach this case. Nobody ruled on what
+the second Combination prints.
+
+### What may be cut
+
+Truncation is legitimate only where the text has somewhere to go (memlog 103).
+
+- **On a ranked row, the name and the chase cells may end in an ellipsis.** The
+  open expansion holds the same text in full. Its context line leads with the
+  row's full name (memlog 265), and its lines hold every Combination. A cut chase
+  cell also shows its full text on hover (memlog 273).
+- **Nothing in an expansion line is cut.** There is no ellipsis, and no tooltip
+  stands in for text that did not fit. The trust cell is wide enough for the
+  longest reason to clear the ↗ (memlog 261).
+- **Never cut:** a trust mark, ≈, the EV figure and a column-header label
+  (memlog 119). Each mark *is* its non-colour cue. A long name yields before the EV
+  cell does.
+- **An expansion hides whole lines** behind `+ N more combinations` (state 39) and
+  never cuts one. Thus every Tracked Entry stays one click away (FR-8).
+
+## Voice and Tone
+
+Microcopy rules. DESIGN.md holds the aesthetic posture.
+
+The page speaks the way the brief speaks: plainly, to one player, about one
+decision. Use short declaratives. Use no exclamation, no encouragement and no
+celebration of a good number. State words are lower case. A reason is a fragment
+with no full stop. A tooltip and the footer use sentences.
+
+**An age names its clock**, the event it counts from. `priced` counts from the
+price observation, and `tried` counts from the last attempt to price (FR-12). The
+Tracked List edit date says whether it came from a commit (Copy Deck).
+
+**Ages** (memlog 265, 275). Round N down.
+
+- **In a reason:** `N min ago` under an hour, `N hours ago` under a day, and
+  `N days ago` from one day.
+- **On the sync button, compact** (memlog 279): `just now` under a minute, `Nm ago`
+  under an hour, `Nh ago` under a day, and `Nd ago` from one day. The button reads
+  `Synced just now`, `Synced Nm ago`, `Synced Nh ago` or `Synced Nd ago`. The
+  compact forms keep the header inside its width budget (DESIGN.md, Layout &
+  Spacing).
+
+| Do | Don't |
+|---|---|
+| `Prices are live asking prices, not sales.` | "sells for", "sold for", "market value", or anything implying an observed sale (FR-13) |
+| `no listings found` | "no value", "worthless", "nothing here": a jackpot and junk look alike when nobody lists |
+| `rough · priced 5 days ago` | an unlabelled "5d" in a reason, or an age without its clock |
+| `pending · not checked yet` | "unknown", "n/a", `0` |
+| `broken · gone after a patch` | "error", "invalid", a raw id |
+| `Some roll odds are estimated` | "prior", "uniform prior", "weight source", "data quality: low" |
+| `—` beside a mark and its word | `—`, `0` or `0.00` for a missing price where no mark and word sit beside it |
+| `Synced 1m ago ▾` and nothing else when healthy | a green dot, "All good", "0 problems" |
+| `Read-only. Curation lives in data/tracked.json.` | "Editing is disabled" |
+
+**`worth` carries the threshold's meaning only** (memlog 243, 270, 275). It
+appears in the title, in the threshold label, and in the EV tooltip's count of
+outcomes worth at least the threshold. No copy says that a figure *is worth* an
+amount or *sells for* it.
+
+**FR-13's asking-price framing prints twice** (memlog 243, 258 N-19): as the
+footer sentence and as a sentence in the EV tooltip (Copy Deck). The footer sits at
+the end of the page. Thus the tooltip keeps the framing one hover from every
+figure. Do not shorten either one further.
+
+## Copy Deck
+
+This section holds every fixed string that the page prints, by place. Epistemics,
+*Price trust*, holds the reasons and their variants. A mark character
+(◐ ○ ✕ ≈ ▾ ↗ ■ ≥) in a string is shorthand for its drawing (DESIGN.md,
+Typography). `N` stands for a count, and `N.NN` stands for a figure at 2 decimal
+places. **Placeholders** are in angle brackets inside code:
+
+| Placeholder | Stands for |
+|---|---|
+| `<league>` | the active league's name |
+| `<age>` | a compact sync-button age (Voice and Tone, *Ages*) |
+| `<threshold>` | the live threshold, at 2 decimal places |
+| `<craft cost>` | the active recipe's Craft Cost, at 2 decimal places |
+| `<name>` | the row's full name |
+| `<word>`, `<reason>` | a trust word and its reason (Epistemics, *Price trust*) |
+| `<file>` | an artifact's file name |
+
+Braces in this document always mean a DESIGN.md token, never a placeholder.
+
+### Header, list and tooltips
+
+| Place | String |
+|---|---|
+| Header eyebrow | `<league>` alone, e.g. `Forbidden Rites` (memlog 243). A control never sits in the eyebrow (memlog 181) |
+| Header title | `What's worth picking up` |
+| Recipe | `Recipe` · the option word (`greater`, `perfect`, `regular`). One recipe published: `Recipe` · its word, as plain text (state 42). None published: nothing (state 43) |
+| Craft Cost | `N.NN div / craft`; uncostable: `no figure yet` (state 35) |
+| Threshold | `Worth ≥` · `N.NN div` (memlog 270) |
+| Sync button, healthy | `Synced <age> ▾` |
+| Sync button, sync time unknown | `Not synced yet ▾` (memlog 265) |
+| Sync button, a problem holds | `✕ N problems ▾` (`✕ 1 problem ▾`) or `◐ N problems ▾` (`◐ 1 problem ▾`), in place of the age (Epistemics, *Loud when wrong*) |
+| Column headers | `#` · `Item class / base` · `EV (Divine)` · `Best combinations` |
+| EV tooltip | ¶1 `Expected value per craft.` `What one craft on this item class returns on average, in Divine. It counts only outcomes worth at least <threshold> div and subtracts the <craft cost> div craft cost.` ¶2 `For a base you sell as is, it is that base's asking price. Every price is a live asking price, not a sale.` ¶3 `≈ some roll odds are estimated · ◐ unreliable price · ○ no price yet · ✕ broken. Hover a mark for the reason.` |
+| EV tooltip, recipe uncostable | ¶1's last sentence ends at `<threshold> div.` and is followed by `Craft cost is unknown for this recipe, so crafted rows have no figure yet.` (memlog 268, 278). ¶2 and ¶3 are unchanged |
+| EV tooltip, no recipe published | ¶1's last sentence ends at `<threshold> div.` and is followed by `No recipe is published, so crafted rows have no figure yet.` ¶2 and ¶3 are unchanged |
+| Raw Base row, chase slot | `Sell as is · item level 82+` |
+| Mark tooltip | `<word> · <reason>`, e.g. `rough · 74% of this EV rests on unreliable prices` |
+| Chase cell, cut | the cell's full Combination text on hover; no other string |
+| Expansion context line | `<name>`, e.g. `Body Armours (Str/Dex/Int)` (memlog 265). With ≈ it continues: `<name> · ≈ Some roll odds are estimated: no published weight for one mod tier. All prices below are real listings.` |
+| Expansion line, below threshold | `below threshold` |
+| Curation marks | `* pinned` · `† pruned` |
+| `{components.show-more}` | `+ N more combinations` / `− show fewer` (memlog 264) · `+ N pruned` · `+ Read the remaining N rows` / `− Show only the top 20` · `+ Try again` |
+| Footer legend | Nine items, in this order: (1) `■ craft this class` (2) `■ sell this base as is` (3) `no mark = current price` (memlog 275) (4) `◐ rough unreliable price (a row: 70%+ of its EV)` (5) `○ pending no price yet` (6) `✕ broken can no longer be priced` (7) `† pruned · * pinned` (8) `≈ some roll odds estimated` (9) `Prices are live asking prices, not sales. Read-only. Curation lives in data/tracked.json.` |
+| List statement, state 23 | `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (without `yet` when every listed row is broken) |
+
+### Sync report
+
+The attribution lines (memlog 243). A `|` separates the fields on a line.
 
 | Line | Lead | Fields |
 |---|---|---|
 | 1 | `Weights File` | `producer` · `generatedAt` · `gamePatch` |
 | 2 | `Last synced` | `Tracked List last edited` |
 
-Line one prints its three field names as FR-10 and the Glossary spell them —
-they identify a file, and this strip is the one place on the page where that
-spelling is licensed. Line two is plain English using *Tracked List* verbatim.
-Fields on a line are separated by `|`.
+Line one prints its three field names as FR-10 spells them. These names identify a
+file, and this is the one place on the page that allows that spelling. A committed
+Tracked List date prints bare. A date read from the file's last change prints with
+the suffix `(not committed)` (memlog 209). With neither date, the field reads
+`unknown` (FR-18, AD-12, AD-9).
 
-**The edit date says which clock it came from** `[decision — memlog 209]`. A
-committed date prints bare. A date read from the file's last change, because the
-Tracked List has no commit history, prints with the suffix `(not committed)`,
-verbatim. The suffix is plain text in the fact's own ink, with no mark and no
-colour: it is still attribution, not a health signal. With neither date, the
-field reads *unknown* (FR-18, AD-12, AD-9).
-
-**A missing file is named in the strip** `[decision — memlog 213]`. Each absent
-tolerable artifact (AD-24) adds one line inside the strip, after line two and
-before the health line. The lead is `Not published`, and the three bodies are
-verbatim:
+The page prints one absence line per absent tolerable file (memlog 213, 258 N-8;
+state 38). The lead is `Not published`, and the bodies are:
 
 | Absent file | Body |
 |---|---|
@@ -275,1398 +472,780 @@ verbatim:
 | `recipes.json` | `recipes.json — no crafted rows can be ranked.` |
 | `sync-report.json` | `sync-report.json — the sync report is unavailable.` |
 
-The lines carry no mark and no colour, like the five facts above them. AD-24
-makes each file absent-tolerable, so its absence is attribution and not a health
-signal, and a marked line would read as a fault in a state the page is built to
-tolerate. The line gives the reason once, and nothing else on the page repeats
-it: not the appendix (state 37) and not the *unknown* fields. The committed
-deploy publishes `recipes.json` with no recipe in it (story 2.7 Decisions), so
-no absence line prints there. When `recipes.json` is absent, the absence line
-says why. The dek does not explain an empty crafted branch: it states what the
-page ranks (a capability), and the absence line states which file is missing (a
-cause). `DESIGN.md`, Components, owns the treatment and the budget line.
+A coverage figure that the report omits reads `not measured` while a weights
+envelope is loaded. Without an envelope, it reads `unknown` (memlog 212).
 
-**The masthead eyebrow** reads `League {activeLeague}` and nothing else. **The
-Craft Recipe left it at revision 3** `[decision — memlog 181]`, and the open item
-memlog 107 recorded is resolved rather than carried.
+The headings, figure groups and diagnosis lead (memlog 278):
 
-Through revision 2 the eyebrow printed the single recipe as its composition, with
-a note saying that would "not survive a second" recipe. FR-26 now ships two and
-the player chooses between them, so the recipe is a **control** and the eyebrow
-is **attribution** — the line that states what the page was built from. The same
-argument that keeps the tracked-list edit date out of the health signals keeps a
-control out of the eyebrow: a thing the player turns does not belong in a line
-that describes what he was given.
-
-**The masthead dek** reads `Item Classes ranked by expected payout per craft,
-beside the Base Types worth selling raw. Every figure is in Divine.` This
-document owns that text `[decision — human, 2026-10-03,
-spec-epic-3-retro-item-27, Approach]`. It is the copy of the key-hero mockup. The
-copy states a capability, not which files are published, so it is true in every
-state, including with `recipes.json` absent or holding no recipe. The dek never
-names a file and never explains an empty crafted branch: a rankable crafted
-class with no recipe is a separate open item (Epic 3 retro item 29). It
-replaces the Epic 2 dek, which denied a crafted ranking.
-
-**What `{components.craft-recipe}` prints, and why nothing is invented.** Memlog
-107's problem was real — `recipes.json` declares no display string — and it turns
-out not to need one. v1's two recipes are *one greater transmute + one greater
-augment* and *one perfect transmute + one perfect augment*, so the orb grade is
-the whole difference between them. The control prints that one distinguishing
-word, `greater · perfect`, with the active one set solid. **The word is derived
-from the grade prefix the recipe's currency ids share** `[decision — memlog
-233]`. When every currency of a recipe carries the same grade prefix, the word
-is that grade (`greater`, `perfect`). When none carries a grade prefix, the word
-is `regular`. So no name is coined and no contract field is added. **The limit
-travels with the rule:** mixed grades within one recipe, or two recipes that
-derive the same word, make the recipe set invalid, and it takes the existing
-refusal treatment. Which prefixes count as grades, and where the derivation and
-its validity check live, are the architect's (memlog 233). It must not be
-settled by inventing a name.
-
-**Money figures read at 2 decimal places** `[decision — memlog 85]` — EV, price
-and the threshold alike. `core` persists 4dp and the page never re-rounds
-anything it passes on. A figure that is genuinely present, non-zero, and rounds
-to `0.00` renders **`< 0.01`** — that is a quantity, not a missing figure, so it
-is never a money-slot phrase.
-
-**Craft Cost is printed once, and its copy is fixed** `[decision — memlog 182]`.
-The line under `{components.craft-recipe}`'s options reads `N.NN Divine / craft`
-at the page's 2dp — the page's only printing of Craft Cost (FR-26). *Divine* is
-spelled, because it is a Glossary term and the page either spells it or does not
-print it. *per craft* is written `/ craft` because the cell is 216px wide and the
-slash is the one abbreviation the page's own rule allows: it shortens no Glossary
-term. Where the recipe is **uncostable** the line holds the money-slot phrase
-*no figure yet* and never a number (FR-26, AD-20).
-
-**The figure is set apart from its unit** `[decision — memlog 194]`. The figure
-takes `{typography.recipe-cost-figure}` — 13px serif — and `Divine / craft`
-stays at `{typography.recipe-cost}` in `{colors.ink-secondary}`, borrowing
-`{components.payout-threshold}`'s figure-plus-quiet-unit anatomy. The whole line
-was 9.5px sans through revision 3's first draft, which made **the figure that
-validates every EV on the page less legible than a rank numeral**. Craft Cost is
-subtracted once per Item Class and sits under every crafted EV in the ranking, so
-if it is wrong or stale the whole crafted branch is wrong — and this is
-deliberately the only place it is printed. The *no figure yet* fallback keeps its
-italic sans treatment: a serif figure against an italic sans phrase is itself the
-signal that one is a quantity and the other is an open question.
-
-**Provenance is spoken twice.** The enum value is the contract. The mark carries
-a plain-English word beside it — `uniform-prior` reads *prior only*, `absent`
-reads *unknown*. The word is not a
-synonym replacing the term. It is the term's gloss, and the enum value still
-appears in the `{components.key-block}` and in the expansion.
-
-**A Combination is written as tier plus short form, never as a value**
-`[decision — memlog 134]`. `T1 Cold Res · T1 Mana`, not
-`+35% Cold Res · +180 Mana`. The player operates on tiers and does not carry the
-value spreads in their head, so the tier is the comparison the page should be
-making. This governs **both** surfaces — the ranked list's chase cells and the
-expansion's `{components.combination-row}` — so an exact value band appears
-nowhere in the product, except in the fallback below.
-
-**The tier is the Accepted Tier, declared by the curator** `[decision — memlog
-135]`. The page reads it from a declared field on the Tracked List, written
-beside the Modifier Reference's band. It is never derived from the band, and
-never joined to the Weights File's display-only `tierLabel`. Choosing the tier
-and choosing the band are one curation act (PRD memlog 13), so the label is a
-fact somebody wrote down. That is what makes it honest: `T1` names the tier the
-player chose to chase. It is not a claim about any item the search returned, and
-the page never makes it one.
-
-The declared field is `acceptedTier`, on the Modifier Reference beside its band
-(PRD §3 *Accepted Tier*, FR-22; AD-5). It is display-only: never derived from
-the band, never joined to the Weights File's `tierLabel`, and never part of a
-Tracked Entry's canonical key. A reference missing the label renders in the
-fallback form below, and never fails to load.
-
-**A label may name a mixture** `[decision — memlog 137]`. `T1–T2` is legal. For
-a modifier whose text carries more than one `#` — 53 of 63 item classes — AD-28
-establishes that the value axis does not partition the tier axis, so a band near
-a boundary necessarily includes the neighbouring tier's tail and the curator may
-be accepting a range. The Weights File contract already names `"T7–T8"` as an
-acceptable spelling. The page prints what the curator accepted, rather than
-rounding to a single tier the band cannot isolate.
-
-**The page never explains this vocabulary** `[decision — memlog 139]`. There is
-one user and they wrote the Tracked List. The `{components.key-block}` gains
-nothing, for the same reason it gained nothing in memlog 114.
-
-**Chase Combination text uses canonical short forms** (memlog 34). One short
-form per tracked modifier, from a hand-maintained abbreviation table, so the
-same modifier always reads the same way on every row — that stability is what
-makes a glance work. **The table is a product constant in `web`, keyed by
-`statId`** `[decision — memlog 231]`, maintained in source rather than written
-by the curator or fetched as an artifact. Tracking a new modifier therefore
-needs a code change before it reads in short form. Short forms are never
-invented per row and never truncated ad hoc. The table is written against a budget of roughly **27 characters** per
-chase cell `[memlog 104]`. A short form that still overruns it ellipsises, and
-the full text is one click down. The budget did not loosen when the values went
-`[memlog 140]`: the modifier **name** was always the long part, and the longest
-pairing still runs to 26 characters.
-
-**How a short form may be coined** `[decision — memlog 118]` — a rule rather
-than a list, because the table grows every time a modifier is tracked:
-
-1. **A Glossary term is never abbreviated.** This rule governs modifier text
-   only. *Divine*, *Item Level*, *Base Type* and every other §3 term are spelled.
-2. **Borrow, never invent.** A coined form must be one the player already reads
-   in the game or on the trade site. That ratifies `ES` for Energy Shield and
-   rejects anything that exists only in this table — a form the player has to
-   learn here is slower than the words it replaced.
-3. **Unique across the whole table.** Two modifiers never share a short form.
-4. **Written once, never varied per row.** Stability is the entire argument for
-   having a table. A form that changes by context gives up the benefit.
-5. **The tier prefix is never abbreviated or varied** `[decision — memlog 141]`.
-   `T1`, never `1`, `t1` or `Tier 1`. A mixture takes an en dash: `T1–T2`. The
-   tier is the comparison the row exists to make, so it is the one part of the
-   cell that may never be shortened. This replaces the earlier rule protecting
-   numerals and units, which assumed the quantity was what the player compared.
-   That clause now lives in the fallback below, where numerals are the point.
-
-**Escape valve.** A modifier whose shortest legitimate form still overruns 27
-characters when paired is a **candidate for pruning, not for a shorter
-coinage**. Never cut a word to make it fit. If it is worth tracking it is worth
-reading, and if it cannot be read it is evidence about the Tracked List rather
-than about the column.
-
-**The fallback, and it covers two gaps rather than one** `[decision — memlog
-138]`. A tracked modifier missing either piece — no entry in the short-form
-table, or no declared Accepted Tier — falls back to the Trade Catalogue stat
-name **plus the value band**. The fallback must be identifiable as a fallback,
-so the gap gets noticed and filled `[ASSUMPTION — memlog 35]`. One treatment
-covers both, because both look the same to the player: a modifier the page
-cannot yet print in its curated form. **The two gaps have different owners**
-`[decision — memlog 231]`. A missing short form is a **product gap**, filled by
-a code change to the `web` table. A missing Accepted Tier is a **curation gap**,
-filled in the Tracked List. In the fallback, and only there, numerals and units
-keep their full symbols — `+35%`, `+180`, `118%`. That makes it the one place in the product
-where a numeral from modifier text survives, which is what makes it
-recognisable once it is read. **What makes it recognisable *before* it is read is
-the mono verbatim register** `[decision — memlog 208]`, which sets text the page
-quoted out of a file rather than wrote, and which this fallback shares with the
-cross-file diagnosis below. It takes no ink: an ink states that a figure's
-footing is degraded or broken, and a fallback entry states nothing about the
-figure (`DESIGN.md`, Typography and Colors, which own the treatment).
-
-**A Hybrid Modifier affix is the tier label, then its lines** `[decision — rev 17]`
-(PRD FR-34; CAP-7). A hybrid is one affix, so it carries one Accepted Tier label,
-the `acceptedTier` of the entry as a whole, followed by the short form of each of
-its lines, separated by commas: `T1 % ES, % Evasion`. This holds in every place an
-affix shows today — the ranked list's chase cells and the expansion's
-`{components.combination-row}`. The `·` that joins the two affixes of a
-Combination is unchanged, so `T1 % ES, % Evasion · T1 Mana` is a hybrid prefix and
-a single-line suffix. The rules above apply to each line unchanged:
-
-- **One entry per `statId`, shared.** The short-form table stays keyed by `statId`
-  and a hybrid has no entry of its own. A line reads the same alone and inside a
-  hybrid, so rules 3 and 4 hold per line. Tracking a hybrid whose lines lack a
-  table entry is a product gap, as for a single line.
-- **Short forms are all or none.** An affix prints short forms only when **every**
-  line has one. If the tier, any line's short form or any line's band is missing,
-  **every** line prints its Trade Catalogue text, with its band where it has one,
-  in the fallback's mono verbatim register. Short and catalog forms never mix
-  inside one affix. The two gaps keep their owners from the fallback paragraph.
-- **The joined label obeys the 27-character budget.** The budget is per chase
-  cell, so the comma-joined label ellipsises when it overruns and the full text is
-  one click down. An expansion never cuts it (*What may be cut*).
-- **Three or more lines take no separate rule.** They use the same join, budget
-  and escape valve: a hybrid whose short forms cannot be read in the budget is a
-  candidate for pruning, never for a shorter coinage. The expansion is where it
-  reads in full.
-
-**The ambiguity with two separate affixes is accepted** `[decision — rev 17]`.
-`T1 % ES, % Evasion` can read as two affixes. The PRD accepts this (FR-34) and the
-page adds no glyph, bracket or explanation to separate them. The player wrote the
-Tracked List and knows which is which, as for the rest of this vocabulary
-(*The page never explains this vocabulary*).
-
-`[NOTE FOR UX]` `[memlog 143, re-derived]` **Two Combinations can still read
-identically.** The note was written on the `4.x` reading, in which FR-22 had the
-curator track an **interior cell** and one tier could hold several. Contract
-`5.0.0` withdrew that mechanism: an entry is a tier again, and FR-22 now has the
-curator track a whole tier or a run of adjacent tiers. **The hazard survives the
-mechanism that produced it.** The page prints the curator's declared
-`acceptedTier`, and nothing requires two tracked bands of the same modifier on
-the same Item Class to declare different ones. The value text used to tell them
-apart, and the tier does not. Rule 3 above guarantees uniqueness across the
-short-form **table**,
-which does not reach this case. The specimen data avoids it only because every
-band in it landed in a distinct tier. Nobody has ruled on what the second one
-prints.
-
-**What may be cut, and what may not** `[decision — memlog 103]`. Truncation is
-legitimate only where the text has somewhere to go. A chase cell and a unit name
-sit above an expansion holding the same content in full, so an ellipsis there
-costs a click and nothing else. **The expansion is the bottom of the page**:
-nothing sits beneath a `{components.combination-row}`, so nothing in one may be
-cut — no ellipsis, no truncation, and no tooltip standing in for text that did
-not fit. **A trust mark and a unit glyph may not be cut either**, for the same
-reason and one more: in each case the mark *is* the non-colour cue (memlog 41,
-184), so a shortened one fails the legibility rule rather than merely reading
-badly. In the unit cell that has a concrete consequence — the glyph is
-`flex: 0 0 auto` and **the name yields first**, so a long Item Class or Base Type
-name ellipsises while the glyph never does. This principle governs every
-truncation question this document does not answer directly.
-
-## Voice and Tone
-
-Microcopy rules. Aesthetic posture lives in `DESIGN.md`.
-
-The page speaks the way the brief speaks: plainly, to one player, about one
-decision. Short declaratives. No exclamation, no encouragement, no second
-person plural, no celebration of a good number.
-
-| Do | Don't |
+| Place | String |
 |---|---|
-| "Every price here is a current asking price from a live instant-buyout listing." | "sells for", "worth", "market value", or anything implying an observed sale (FR-13) |
-| "nobody is listing this right now — a jackpot and junk look alike here" | "no value", "worthless", "nothing here" |
-| "The whole ranking rests on a uniform prior." | "Data quality: low" |
-| "someone invented this weight" | "estimated weight" |
-| "priced 5d ago" / "tried 9d ago" | an unlabelled "5d" |
-| "never attempted" | "—", "n/a", "0" |
-| "Read-only while you play." | "Editing is disabled" |
-| Name the open question: *an open question*, *no figure yet*, *not valued*, *unknown* | Fill the gap with a number-shaped placeholder |
+| Sync report column headings | `Problems` · `Sync run` · `Weights coverage` · `Built from` (set uppercase) |
+| Sync run figures | `Requests` · `price searches N` \| `league checks N`, for the `tracked-list` and `league-validation` sources; then `N entries not reached in the last sync pass` |
+| Weights coverage figure | `Pool coverage` · `N% of N tracked Item Classes` (memlog 235) |
+| Diagnosis lead | `Disagreements with the weights file` |
 
-FR-13's asking-price sentence is the **only** mitigation in the whole system for
-Risk R-1. It is not chrome, it does not move below the ranked list, and it is
-not shortened.
+### Appendix and failure screens
+
+| Place | String |
+|---|---|
+| Appendix title | `Appendix: Unrankable — N Item Classes` |
+| Appendix reasons | `pool partial` · `class absent from weights file` · `class disagrees with weights file`, verbatim from FR-4. One string covers all five cross-file checks. FR-4 owns this enum, so re-read FR-4 on every absorption rather than trusting this copy |
+| Appendix lead | `Tracked, but kept out of the ordering.` (memlog 278) |
+| Appendix note, state 14 | `ranks once the weights file covers its whole pool` |
+| Appendix note, state 15 | `may return after the next weights run` |
+| Appendix note, state 15a | `fixable in data/tracked.json · the sync report has the detail` |
+| Appendix note, state 16 | `some of its bases still rank, sold as is` |
+| Refusal eyebrow | `✕ The page will not render this` (set uppercase; memlog 278) |
+| Refusal title | `A required file cannot be used.` (memlog 220) |
+| Refusal, fixed sentence | `The page renders again as soon as a valid set is published, and serves nothing old in the meantime.` |
+| Fetch-failure eyebrow | `✕ The page could not load its data` (set uppercase; memlog 278) |
+| Fetch-failure title | `One of the data files did not arrive.` (memlog 237) |
+| Fetch-failure body | `<file> did not arrive.` then `The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.` |
+
+**Strings drafted at build** (memlog 265): the list statements of states 25 and
+35, the sync report's problem-list lines, and the refusal screen's per-cause body
+sentences. The build drafts them under Voice and Tone. Their review happens in
+the PR that builds them, and that PR writes them into this deck. Thus the rule still
+holds: a string not written here does not ship.
 
 ## Component Patterns
 
-Behavioural only. Visual specs live in `DESIGN.md.Components`.
+This section is an index. Each component's behaviour is written once, in the home
+that this table names. DESIGN.md, Components, owns its look under the same name.
 
-→ [`mockups/key-hero-resting.html`](mockups/key-hero-resting.html) shows every
-component of the resting page. [`mockups/key-expanded-states.html`](mockups/key-expanded-states.html)
-shows `{components.expansion-panel}`, `{components.combination-row}` in both its
-lines, `{components.tombstone-band}` closed and open, the Raw Base one-row
-expansion, and `{components.sync-report-panel}`.
-
-| Component | Use | Behavioural rules |
+| Component | Use | Behaviour lives in |
 |---|---|---|
-| `{components.ranked-row}` | Ranked list | The whole row is the target and it **toggles**: click anywhere opens `{components.expansion-panel}` for that row's unit, click the same row again closes it. No per-row controls, no hidden actions, nothing revealed on hover. An open row keeps `{components.ranked-row}`'s `openMarker` while any other row is hovered, so the source of an open panel is identifiable at all times. **Every row opens with its unit glyph** — `{components.unit-glyph-class}` on a crafted row, `{components.unit-glyph-raw}` on a raw one — and the glyph is never omitted and never truncated (FR-3). Rank, EV and the Chase Combination set are all recomputed when the Payout Threshold changes **and when the active Craft Recipe changes** (FR-1, FR-26). EV displays at 2dp, or `< 0.01` for a real figure too small to print. |
-| `{components.ranked-row-tier-1}`, `{components.ranked-row-tier-2}`, `{components.ranked-row-tier-3}` | Ranked list | Purely a function of rank position after a ranking pass. Tiers move when the list reorders. They are not sticky to a unit, and they say nothing about which branch a row is on — a Raw Base can hold rank 1 and take tier 1 like any other row. |
-| `{components.unit-glyph-class}`, `{components.unit-glyph-raw}` | Every ranked row · appendix rows · expansion titles | Inline text, not interactive, no tooltip, no click target — the same rules a trust mark takes. **They are not trust marks**: they carry `{colors.sepia}` and say which unit the row names, never that something is wrong. Unlike a trust mark, a unit glyph is **never absent** — silence-means-healthy governs health signals, and a unit is not one, so there is no such thing as a row quiet about which unit it is. **They are the page's only wordless glyphs, and they carry no key-block entry** — see below. Both sit in one **fixed 14px box** so every unit name starts at the same x whatever branch the row is on; without it the two glyphs' different advances left a 3.3px ragged edge down the page's primary scan column `[decision — memlog 195]`. |
-
-**The unit glyphs stand without a word, and that is a departure worth stating**
-`[decision — memlog 184]`. Every other glyph on this page comes with a word: a
-trust mark is *glyph, hair space, word*, and a `{components.price-state-glyph}`
-never appears without its Price State spelled beside it. These two do not, and
-they get no `{components.key-block}` entry either.
-
-Three reasons, and the first is the user's own. **The player knows the
-difference** — that was the direction, and it is not a guess about an audience:
-there is exactly one user, he wrote the Tracked List, and telling him that *Bows*
-is a class and *Stellar Amulet* is a base is telling him something he authored.
-Second, **a word here would undo what the glyph bought.** The point of retiring
-`RAW BASE` was to stop spending a cell on a fact the player reads instantly;
-pairing the glyph with `ITEM CLASS` would reinstate the cost and add one to the
-crafted rows that never had it. Third, **the key block earns its place on
-ambiguity, and there is none here.** It exists because silence-means-healthy
-makes an *empty* cell ambiguous (memlog 42). A unit glyph is never empty and
-never optional — every row carries exactly one of two marks — so there is no
-silence to disambiguate and nothing a legend would resolve.
-
-*What this does not license.* It is not permission to drop the word from any
-other glyph. Every remaining glyph on the page marks a **state**, and a state is
-exactly the kind of thing a reader cannot infer from the row it sits on. A unit
-can be inferred from the name beside it; the glyph makes that instant rather than
-making it possible. That is the whole distinction, and a glyph that fails it
-takes its word.
-| `{components.raw-base-row}` | Ranked list | Ranks in the same list as crafted rows (FR-3) but at its own asking price, not a craft outcome, and it names a **Base Type** where a crafted row names an Item Class. Three cues, none load-bearing alone: the `{colors.paper-raw}` tint, the italic name, and `{components.unit-glyph-raw}`. *The `RAW BASE` word tag retired at revision 3 and the glyph took its job* `[decision — memlog 184]` — the count of cues is unchanged and NFR-10 still holds, because a glyph survives the removal of colour and colour-coding would not. **A Raw Base carries no Provenance mark**, and that is not an omission: it needs no Eligible Pool (FR-4), so there is no pool for a Provenance value to come from, and the cell is empty exactly as a healthy crafted row's is. **Expanding it shows one `{components.combination-row}`** `[decision — memlog 71]`, for the degenerate Combination of no affixes. Line one carries the same Price State and listing sample count as any other entry. Line two carries both labelled ages, each in its own cell. Its note is declared `[decision — memlog 117]`: `no affixes — this Base Type priced as it drops, at Item Level 82`. A Raw Base is a Tracked Entry and it has a Combination. An empty expansion would strand its exact ages, and those ages are what the FR-12 override promised to put here. **Below-threshold Raw Bases:** a Raw Base whose asking price is under the Payout Threshold leaves the *ranking* altogether. It is not ranked at its price, so it is absent from the top 20 **and** from the grown list behind the list affordance. Truncation is not what hides it, and it does not reappear further down. |
-| `{components.column-header}` | Above the list | Static. Columns are **not** sortable — the one ordering is EV under the active threshold **and the active Craft Recipe**, and a second ordering would make the page a spreadsheet. The second header reads `Item Class / Base Type` and names both units, because the column holds both (FR-3). **A column header never ellipsises and is never trimmed to fit** `[decision — memlog 119]`. `PROVENANCE` is the **tightest fit** — it sits inside the widened `{spacing.col-provenance}` with room to spare, and the letter-space trim that used to buy it room is dropped. `ITEM CLASS / BASE TYPE` is the **longest label** and clears `{spacing.col-unit}` comfortably; the two are different measurements and revision 3 separated them. |
-| Trust marks — `{components.trust-mark-prior}`, `{components.trust-mark-unknown}`, `{components.trust-mark-stale}`, `{components.trust-mark-never}`, `{components.trust-mark-unresolvable}` | Rows, appendix, expansion | Inline text, not interactive, no tooltip, no click target. A healthy row renders **no mark element at all** — the cell is empty, not filled. Five marks exist. A sixth needs a decision — and the two unit glyphs do not make a sixth and a seventh, because they carry no ink and mark no state. A Provenance mark carries **one label per `(Item Class, recipe)` pair** and belongs to the ranked row: every combination row inside one expansion carries that same label, so the mark is never repeated there (FR-10, FR-11; AD-10). |
-| `{components.price-state-glyph}` | Expansion rows | Always accompanied by the Price State's name in words. The glyph never appears alone and never substitutes for the word. |
-| `{components.money-slot}` | Any cell where a figure is missing | Holds a short phrase naming which question is open, never a number-shaped placeholder. See Epistemics. |
-| `{components.craft-recipe}` | Masthead, inboard of the threshold | The page's **second ranking dial** (FR-26) `[decision — memlog 181]`. Two options on one line, each the single word derived from the grade prefix its currencies share `[decision — memlog 233]` — `greater | perfect`, divided by the trust strip's pipe rather than the page's middle dot, which joins two affixes in every chase cell and would carry the opposite operator here. **Both words carry a rule at rest and they carry different ones** `[decision — memlog 191]`: the inactive word takes the page's dotted sepia *this is clickable* mark **at rest**, going solid on hover exactly as `{components.expand-affordance}` does; the active word takes a 2px solid sepia rule, doubled so it cannot be read as `{components.payout-threshold}`'s 1px solid *you are hovering this* on the sibling panel 16px away. **Clicking the inactive option makes it active**; the active option is not a click target, because there is nothing to switch to, and it carries no dotted rule because dotted means *you can click this*. The switch re-ranks synchronously against the already-loaded artifacts, exactly as a threshold change does: no network request, no sync (FR-1, AD-24). It is **not debounced** — a click is a discrete, deliberate act, where a keystroke is one of several on the way to a value. A recipe change reorders the list *and* rewrites every crafted row's Chase Combination set, because a recipe changes which outcomes are reachable rather than only what an attempt costs (FR-26). **A Raw Base row does not move** relative to its own price, since a Raw Base has no Craft Cost — but its *rank* can change as crafted rows move around it. Craft Cost for the active recipe prints beneath the options, at 2dp, in Divine — the page's only printing of it (FR-26). An **uncostable** recipe (no current rate for a currency in the active league) shows *no figure yet* there and never a zero (FR-26, AD-20). **The active recipe persists across a reload** — see *What survives a reload*. |
-| `{components.payout-threshold}` | Masthead | **The figure is the input** `[decision — memlog 73]` — click the large serif number and type over it. No field, no box, no form chrome. The `Divine` suffix sits outside the editable region and cannot be typed over. Re-ranks on every valid parse. Constraints `[decision — memlog 74]`: min `0`, max `3`, step `0.05`, two decimals, clamped on blur — a negative threshold is not enterable. **The track and marker survive as a non-interactive readout**: they answer "where does 0.50 sit in the range I have", the marker cannot be dragged, and the track cannot be clicked. |
-| `{components.trust-strip}` | Under the masthead | Carries **five plain facts, unconditionally**, with no mark and no colour on any of them. Line one carries `producer.id`, `generatedAt` and `gamePatch` (FR-10). Line two carries the last-synced time and the **tracked-list edit date** (FR-18) `[decision — memlog 89]`. Always present, never dismissible. `[ASSUMPTION — memlog 59]` Otherwise silent while fine — no counts of nothing, no "0 unresolvable", no green tick. **Loud when wrong** `[decision — memlog 70/88]`: it raises a third line carrying a rust mark with its glyph, its word **and its count**, on exactly two triggers that share the one line — `× N unresolvable` (FR-24) and `× N of M pinned entries starved` (FR-17, FR-25). **The starvation count** `[decision — memlog 216]`: M is the pinned set's size (`pinnedCount`) and N is the pinned entries the truncation left out (`pinnedCount` less `pinnedRefreshed`), both from **the record of the current curation** `[decision — memlog 222]`: the one pinned-starvation record whose `pinnedCount` and `declaredMinChunkSearches` match the loaded Tracked List's pinned-set size and `config.minChunkSearches`. That subject makes it unique (`IMPLEMENTATION-NOTES.md` §6). **When no record matches, no starvation line is raised**: the curation changed after the starvation, and the record stays in `{components.sync-report-panel}` as diagnosis. **When N is 0** `[decision — memlog 223]`, every pinned entry was refreshed and the pinned set left the rotation no search. The signal then reads `× M pinned entries left the rotation no search`, so it prints no zero. The line does not say *this run*: a record survives until the player's edit (AD-12), so a carried record may not have starved in the latest run. The line costs `{spacing.frame-reserve-health-line}` and is charged to the resting budget, because data raises it and no click does. **An absent tolerable artifact adds a plain `Not published` line** after line two and before the health line, with no mark and no colour `[decision — memlog 213]` (state 38). **The whole strip is the click target** and it toggles `{components.sync-report-panel}`. |
-| `{components.sync-report-panel}` | Opened from the strip | The full Sync Report — **six groups in three columns** `[decision — memlog 206]`: *the sync run* (requests per source, **except the `session-probe` source, which the page never renders** (AD-30), and entries not reached **in the last sync pass**), *what is broken* (the unresolvable count, FR-24; the pinned-starvation records, FR-17/FR-25; **and the cross-file check diagnosis**, state 27), *what the weights cover* (pool coverage as a fraction **with its denominator**, FR-4). *It was five groups until revision 4.* The sixth is the only one that is not a figure — it is a list, one line per failing check, and it is therefore the only group whose length is unbounded, which is why the panel's cap is what makes it placeable at all. **Each line reads `check · canonical key · detail`, and when no check fails there is no group**: nothing renders, not even a zero line `[decision — rev 18]`. **When no weights envelope is loaded, the checks did not run, and the group is one italic *unknown* line**, the word the coverage group prints without weights `[decision — rev 19]`. The first column is what the run did, the second what broke, the third how much of the Tracked List the weights can speak to. **One heading per column, never per group** (`columnHeadingRule`): a column carrying two groups prints its heading once and separates the groups by vertical space — no second heading, no rule, no bullet. **The tracked-list edit date is not repeated here** `[decision — memlog 89]`. It is a resting fact on the strip two lines above. This panel holds what the resting page cannot show, so it does not restate what is already on screen. `[ASSUMPTION — memlog 59]` Opens **in place**, pushing the asking-price line, the list and the appendix down — not a modal, not a drawer, not a second surface. Closed on every load. Figures are read from `sync-report.json` and never recomputed by the page. A coverage figure the report omits reads *not measured* while a weights envelope is loaded, and *unknown* without one `[decision — memlog 212]`. |
-| `{components.asking-price-line}` | Under the trust strip | Always rendered, in every state including the honest-empty one. Never dismissible. |
-| `{components.uniform-prior-banner}` | Above the list | Raised by a data condition, never by a build flag (FR-11). Dismiss is per session only — it returns on the next page load while the condition holds, and it lowers itself the moment any `measured` figure appears. |
-| `{components.unrankable-appendix}` | Foot | The count is readable without expanding anything (FR-4). Rows are not interactive and do not expand — an Unrankable Item Class has no ranking to explain. **Every row here is an Item Class**: unrankability governs the crafted branch only, a Raw Base needs no Eligible Pool and ranks regardless (FR-4), so a Base Type never appears in this appendix. An Item Class sitting here may still have Base Types ranking on the raw branch; where it does, its note **names that fact and not a rank** — a class holds several Base Types, they do not rank together, and there is no single position to point at. The appendix's prominence is a UX decision as of revision 3, not a coverage band: the page never switches layout on a measurement `[change — memlog 185]`. **With no rows it shows its title alone**, the count in ink, and says nothing about why `[decision — memlog 214]` (state 37). |
-| `{components.key-block}` | Above the foot | Always rendered, in every state. It is what makes an empty cell mean something (memlog 42) and is not an optional legend. **It covers the resting page only** `[decision — memlog 114]`. It is deliberately not extended to the expansion's four Price State glyphs. Every glyph always appears beside its word, so nothing there is unreadable without a legend. Four more marks on the resting page, to explain a surface one click away, would cost quiet for no gain. The block exists because silent-when-fine makes an empty cell ambiguous, and that ambiguity belongs to the ranked list alone. |
-| `{components.expansion-panel}` | Click a ranked row | Lists **every** Tracked Entry on the Item Class, priced or not, above or below the threshold, including `pruned` tombstones (FR-8). A Raw Base row expands to the single entry it names. Its title carries the row's unit name led by the same glyph the row carries. Repeats the active threshold **and the active Craft Recipe**, plus the asking-price framing, so a panel read on its own cannot be misread — from revision 3 the recipe is the second thing the figures depend on, and naming only the threshold would repeat half the panel's own context. |
-| `{components.combination-row}` | Inside the expansion | **Two lines under one hairline** `[decision — memlog 101]`, and the two-line shape exists in the expansion only — the 28px ranked row is untouched. *Line one, the figure:* the Combination — **tier plus short form, never the value**, the same reading as the chase cell `[decision — memlog 134]` — the Price State with its glyph **and** its word, the price in Divine or a money phrase, and the listing sample count. *Line two, the evidence:* the note, then **both labelled ages in their own cells** — the observation age (*priced 11h ago*) and the last-attempted age (*tried 4h ago*). Each says which clock it reads, so the two are never collapsed (FR-12). Line two is **always present**, so rows scan evenly down the expansion. It **wraps rather than truncating**: a long note grows the row by whole `{spacing.combination-row-line-2-height}` lines, which is why `{spacing.combination-row-height}` is a minimum and not a height. That arithmetic holds only because line two is set in `{typography.combination-line-2}` `[decision — memlog 115]`, whose `lineHeight` is **absolute**. The wrap quantum equals the declared token, so a builder never has to compute it and the spine's `48 + 20n` stays literally true. Below-threshold entries are marked by the note reading *below the threshold — adds nothing to EV*. They are never greyed out and never hidden. |
-| `{components.trade-link}` | Inside a `{components.combination-row}`, including the Raw Base's | The ↗ glyph, and only the glyph, is the click target. A click opens that Combination's trade-site search in a new tab. **It appears where the entry carries a stored `lastSearchId` and that search ran against the active league** (PRD FR-33, FR-21; AD-9, AD-24). The test reads the stored field, never the Price State. Most `priced`, `no-listings` and `unresolvable` rows therefore carry it. A row the syncer never issued a search for has no id, and a row whose last search ran in a previous league has an id the page will not use. Absence is absence: the cell is blank, not greyed and not disabled-looking. It never appears inside `{components.tombstone-band}` — a pruned entry has no market worth checking. It does not affect page state. The page is unchanged when the tab closes. |
-| `{components.tombstone-band}` | Inside the expansion | Collapsed by default behind a `+ N pruned` toggle (memlog 25). Toggling is local to that panel and resets when the panel closes. A tombstone row keeps line one's shape — Combination struck through, `† pruned`, *not tracked* in the money slot. It takes **its own line-two contract** `[decision — memlog 116]`: the prune reason alone, in one cell across the full line-two width. It prints no removal date `[decision — memlog 234]`. It does **not** borrow the two age cells. A prune is a decision somebody made, not a reading of `observedAt` or `lastAttemptedAt`, and a cell whose whole contract is *say which clock this is* would make it look like one. |
-| `{components.expand-affordance}` | Below row 20 · tombstone toggle · trust strip · fetch-failure retry | Plain text affordance, one vocabulary everywhere it appears — and from revision 3 that is literally true rather than nearly true `[decision — memlog 196]`. Every openable thing on the page opens with `+` and closes with `−` (U+2212, not an em dash). The tombstone toggle used a `▸`/`▾` disclosure triangle until then, which was both a second vocabulary and a glyph that fell out of the page's typeface. **The list affordance** reads `+ Read the remaining N rows` closed and `− Show only the top 20` open, so the player knows the size of what is behind it and can put it back. **It names no unit**: the remainder holds Item Classes and Base Types together (FR-3), so either noun would misdescribe half of it. It read `N Base Types` until revision 3. It **grows the list in place** to the full ranked length — it does not replace ranks 1–20 and it does not page. Ranks 21 and beyond all take `{components.ranked-row-tier-3}`. The three tiers describe the top ten and nothing below needs a fourth. `{components.unrankable-appendix}`, `{components.key-block}` and `{components.running-foot}` stay below the grown list in the same order. This growth is clicked, so it may push the page into scrolling. |
-| `{components.refusal-screen}` | Replaces the whole page | Shown when a fetched artifact is schema-invalid, declares a version the page does not read, or is required and not published (FR-33, NFR-8). Names **which** artifact, then why, in the per-cause body sentence of DESIGN.md `refusal-screen.bodyByCause`, with the artifact beside a `{components.trust-mark-unresolvable}` glyph and word. No list, no masthead, nothing stale served. There is no retry — a refusal is fixed by publishing a valid set, and the page says so. |
-| `{components.fetch-failure-screen}` | Replaces the whole page | Shown when an artifact the page fetches (AD-24) does not arrive. The title reads `One of the data files did not arrive.` `[decision — memlog 237]`, and the body names which one. It carries a `{components.expand-affordance}` reading `+ Try again` that re-attempts the whole fetch, never a partial one. One sentence explains that the page shows nothing rather than a partial set, because FR-33 requires a single consistent set and half a ranking is worse than no ranking. |
-| `{components.running-foot}` | Foot | States that the page is read-only while playing, that exact ages sit one click down, and that pruning and pinning happen in `data/tracked.json` followed by a commit. This is the only place the page tells the player where curation actually happens. |
+| `{components.header-bar}` | Top of the page, sticky | Information Architecture |
+| `{components.recipe-toggle}` | Header bar | Interaction 1a; states 34, 35, 42 and 43; *What survives a reload*; Domain Vocabulary, *Recipe option words* |
+| `{components.threshold-control}` | Header bar | Interaction 1 |
+| `{components.sync-button}` | Header bar, right end | Epistemics, *Loud when wrong*; states 30 and 31; Interaction 5 |
+| `{components.sync-report-panel}` | Under the header, when open | Epistemics, *The sync report*; Interaction 5; state 32 |
+| `{components.list-statement}` | Above the column header | States 23, 25 and 35; Copy Deck. Not interactive |
+| `{components.column-header}` | Above the list | Information Architecture, *The ranked list*; Copy Deck. Static and not sortable |
+| `{components.ev-tooltip}` | Hover on the EV header | Interaction 8; Copy Deck |
+| `{components.ranked-row}` | Ranked list | Information Architecture, *The ranked list*; Interaction 2; states 17, 18, 21, 40 and 41 |
+| `{components.trust-mark}` | Ranked rows and expansion lines | Epistemics, *Price trust* |
+| `{components.estimate-mark}` | Before a crafted row's EV | Epistemics, *Estimated odds* |
+| `{components.mark-tooltip}` | Hover on a row's trust mark | Interaction 8; Copy Deck |
+| `{components.chase-cell}` | Crafted rows | Information Architecture, *The ranked list*; Responsive & Platform; Interaction 8 |
+| `{components.expansion-panel}` | Below an open row | Information Architecture, *The expansion*; Interactions 2 and 7; state 39 |
+| `{components.expansion-line}` | Inside the expansion | Information Architecture, *The expansion*; states 1–10 and 20 |
+| `{components.show-more}` | List foot, expansion, pruned lines and retry | Interactions 3, 4 and 7; state 28 |
+| `{components.trade-link}` | Expansion lines | Interaction 6 |
+| `{components.unrankable-appendix}` | Foot, above the footer | States 13–16, 36 and 37 |
+| `{components.footer-legend}` | Foot | Information Architecture; Copy Deck |
+| `{components.failure-screen}` | Replaces the whole page | States 26 and 28 |
 
 ## Epistemics
 
-Half of this product is the ranking. The other half is being honest about what
-the ranking rests on. The rules below are load-bearing and are not to be traded
-for tidiness.
+Half of this product is the ranking. The other half is honesty about what the
+ranking rests on. The rules below are load-bearing.
 
 ### Silence means healthy
 
-A row whose weight is `measured`, whose pool is `complete`, and whose price was
-observed inside the freshness cut-off carries **no glyph, no word and no
-colour**. Its Provenance and Age cells are empty (memlog 32). Fourteen of twenty
-rows are silent in the reference render, which is why the six that are not can
-be read at an angle from across the desk.
+A row whose price is current and whose roll odds are measured carries **nothing**
+in its mark slot and no ≈ before its EV. Silence is the statement. A healthy sync
+puts nothing on the sync button but its age.
 
-There is deliberately no success mark. A green *measured* badge would put a
-colour on nineteen rows in twenty and bury the one row that matters — the exact
-failure FR-11 describes.
+There is deliberately no success mark. A success colour on nineteen rows in twenty
+would bury the one row that matters. The footer legend's `no mark = current price`
+keeps the silence legible. Thus an empty slot reads as *current* and not as *not
+computed*.
 
-**The `{components.key-block}` is therefore mandatory.** Without its *Silence
-means healthy* column an empty cell is ambiguous rather than quiet. It renders
-in every state.
+### Loud when wrong
 
-### And loud when wrong
+Silence is only half the rule (memlog 70). A real problem must be visible without
+anyone going to look for it. A page that is silent when broken looks exactly like a
+page that is silent because it is fine.
 
-Silence is only half the rule `[decision — memlog 70]`. The other half is that a
-real problem has to be visible without anyone going to look for it. **Reading
-silent-when-fine as *silent, always* is the failure mode of this rule** — a page
-that says nothing when the list is broken looks exactly like a page that says
-nothing because the list is fine, and the player cannot tell the two apart.
+**The sync button carries the alarm** (memlog 254, 265, 270). While any problem
+holds, the problem count replaces the sync age on the button. The count leads with
+✕ when any counted entry is broken, and with ◐ otherwise (Copy Deck). The player
+then reads the age in the sync report. The button never holds the age and the
+count at once, so the header never widens. Data raises the count, never a click.
+Three things are problems:
 
-That is why `{components.trust-strip}` raises a rust line at rest, on exactly
-two triggers `[decision — memlog 88]`: unresolvable entries exist (FR-24), and
-pinned entries starved (FR-17, FR-25). Each carries its glyph, its word
-*and* its count, because both requirements ask for a figure rather than a flag.
-Both mean something actually broke. A healthy sync raises no line at all.
+1. **Broken entries exist.** At least one entry is `unresolvable` (FR-24). Its
+   problem-list line leads with ✕.
+2. **Pinned entries are starved** (FR-17, FR-25). This is unreliable, not broken,
+   so its problem-list line leads with ◐ (memlog 265). The count comes from the
+   pinned-starvation record that matches the loaded curation
+   (`IMPLEMENTATION-NOTES.md` §6; memlog 216, 222). M is the size of the pinned
+   set. N is the number of pinned entries that the truncation left out. **When no
+   record matches**, no problem is raised. The curation changed after the
+   starvation, and the record stays in the sync report as diagnosis. **When N is
+   0** (memlog 223), the pinned set left the rotation no search. That is still a
+   problem, with its own wording. A record survives until the player's edit
+   (AD-12), so the line never says *this run*.
+3. **The game patch is stale.** This is unreliable, not broken, so its
+   problem-list line leads with ◐ (memlog 265).
 
-### Attribution is not a health signal
+`[NOTE FOR ARCHITECT: memlog 254 counts a stale game patch as a problem, but the
+page makes no call to the game and has no live patch to compare against
+(state 29). The predicate needs a data source the page can read, for example a
+patch the sync run records beside the Weights File's `gamePatch`. None exists yet,
+so this problem cannot fire (memlog 265).]`
 
-The tracked-list edit date is **not** one of those triggers, and there is no age
-at which it turns red `[decision — memlog 88/89]`. It is attribution — the same
-class of thing as the producer, the `generatedAt` and the `gamePatch`: a
-statement of what this page was built from and when anyone last touched it.
+**The count is of affected entries, not of problem kinds** (memlog 265). Every
+broken entry, and every pinned entry that the starvation left out, counts once. A
+starvation that left out no entry counts as one. A stale game patch counts as one
+(memlog 268).
 
-That distinction is what governs the resting strip. **Silent-when-fine governs
-health signals. It has never governed the strip's unconditional facts**, which
-is exactly why the other four are always shown. So the edit date is printed
-plainly as a fifth fact, which satisfies FR-18 as written — *the player does not
-have to search for the date* — and does it without a staleness threshold nobody
-could defend. A cut-off would have had to be invented, and inventing one would
-have turned an honest fact into a judgement the data cannot support.
+A problem never comes from an age threshold on attribution, from an absent
+tolerable file, or from a cross-file check failure. The player already sees that
+failure as Unrankable rows (FR-4). The sync report lists its diagnosis but does not
+count it (memlog 275).
 
-### Freshness
+### Attribution is not a problem
 
-The cut-off is **48 hours** (memlog 47), roughly two play sessions, chosen
-against the ~15-hour partial refresh cycle so that normal rotation never marks a
-row.
+The Tracked List edit date, the Weights File producer, `generatedAt` and
+`gamePatch` are attribution. They state what the page was built from and when
+anyone last touched it (memlog 88, 89). They print plainly in the sync report, with
+no mark and no colour. No age turns any of them red. An honest fact does not become
+a judgement that the data cannot support.
 
-A row younger than the cut-off shows **no age at all**. This began as a
-departure from FR-12 `[memlog 46]`, and **FR-12 now states the rule itself**:
-where an age appears is a freshness cut-off rather than a blanket rule, the
-cut-off is 48 hours, and the obligation is discharged per row rather than per
-surface (PRD FR-12; AD-10). The intent FR-12 protects — that the player can
-always tell an observation age from a last-attempted age — is carried in the
-expansion, where both are labelled for every entry, and a **stale** row is never
-silent on either surface.
+### Price trust
 
-At or beyond the cut-off the row carries a rust mark that **says which clock it
-reads**. *priced 5d ago* means the price is old. *tried 9d ago* means nothing
-has been found here since. The two are never collapsed into one unlabelled age.
-**A league-mismatched observation is not a price on either surface**
-`[decision — memlog 217]`. The row reads the attempted clock, as the expansion
-does (state 6), so it prints *tried Nd ago* and never *priced Nd ago* for
-another league's observation. One entry has one age reading on both surfaces.
-A never-synced row is the one row with no age at all and reads *never
-attempted*, set in italic so it is distinct from a merely old row without
-needing a fourth colour.
+The player asks one question of a price: *can I trust it?* The page answers with
+one verdict per price, in four states (memlog 244, 253, 257). This section owns
+the states, their thresholds and their words. DESIGN.md owns each mark's colour.
 
-**A crafted row's Age cell is the age of its figure** `[decision — memlog 232]`.
-Its inputs are the priced entries the EV rests on, and it prints *priced Nd ago*
-from the oldest of them, at the cut-off or beyond. Unpriced entries cannot move
-the figure, so they appear only in the expansion. When no entry of the class is
-priced, the row reads *tried Nd ago* from the oldest attempted entry. When every
-entry is `never-synced`, it reads *never attempted*. So a rust age mark on a
-crafted row always means *this figure is old*.
-
-### Provenance
-
-Three values, weakest first, and two of them are visible:
-
-| Provenance | On a ranked row | Why it must not collapse |
+| State | Mark | Means |
 |---|---|---|
-| `measured` | Nothing at all | See *Silence means healthy* |
-| `uniform-prior` | `{components.trust-mark-prior}` — *prior only* | Someone invented this weight, and the page says so |
-| `absent` | `{components.trust-mark-unknown}` — *unknown* | An upper bound, not an estimate. It renders as an unknown and never as a number (FR-4) |
+| Current | none (the slot is empty) | the price is current |
+| Rough | ◐ `rough` | the price is unreliable |
+| Pending | ○ `pending` | there is no price yet |
+| Broken | ✕ `broken` | the entry can no longer be priced |
 
-**There were four, and the fourth was removed rather than merged.**
-`modelled-split` — *split by model*, a measured weight a model had spread across
-a value interval — had exactly one source, the producer's value decomposition.
-Weights contract `5.0.0` withdrew that decomposition, so the value became
-unreachable (PRD §3 *Provenance*, FR-10; AD-10). **It was not folded into
-`uniform-prior`.** The two say opposite things about where a number came from:
-`prior only` says somebody invented this weight, and a `modelled-split` weight
-was measured and then redistributed. Merging them would have had the page accuse
-a measured weight of being invented, which is a worse lie than the one the mark
-existed to prevent. The value retired, and the `trust-mark-split` component and
-its ink retired with it — both are gone from `DESIGN.md`, so neither resolves as
-a token any more. If consumer-side pro-rating is ever adopted, a middle
-value must return in that same change (AD-10's revisit condition).
+**A price is unreliable (◐ rough) on either of two triggers:**
 
-`absent` cannot occur on a ranked row: a `partial` pool makes the **Item Class**
-Unrankable, so `absent` is exercised only inside
-`{components.unrankable-appendix}`, with the same mark vocabulary (memlog 44).
+1. **It is old**: 3 days old or older, 72 hours from its observation (memlog 244,
+   258 N-17). The 3-day threshold sits above the partial refresh cycle of about
+   15 hours. Thus normal rotation never marks a row.
+2. **It is thin**: it rests on fewer than 3 listings (memlog 263).
 
-**A Raw Base row has no Provenance at all**, which is a third case and not a
-fourth value. A Raw Base needs no Eligible Pool (FR-4), so nothing propagates to
-it and its Provenance cell is empty — indistinguishable on screen from a healthy
-crafted row's, and correctly so. Both empties mean *nothing here is degraded*.
-The `{components.key-block}`'s *Silence means healthy* column is what keeps that
-legible, and it is one more reason the block is mandatory rather than a legend.
+**Listing counts print only as the thin reason**, `only 1 listing` or
+`only 2 listings`, and nowhere else on the page (memlog 263). **A price that is
+both old and thin prints both reasons**, age first (memlog 268).
 
-`core` propagates the weakest Provenance and the oldest timestamp of every input
-into each derived figure, **with no exception**. The numerator-only rule retired
-with the value it governed. The page displays what it is given and computes no
-ranking term itself (AD-4).
+**One entry's verdict and reason** (memlog 257, 263). N is whole days, rounded
+down.
 
-**The mark discriminates between ranked rows, never within one**
-`[decision — memlog 238, superseding memlog 180]`. A probability's inputs are
-the recipe's eligible set, numerator and denominator alike, so one tier carrying
-an invented weight in that set makes **every** probability of that
-`(Item Class, recipe)` pair read `uniform-prior`, however many of the set's other
-tiers were published (PRD FR-10, FR-11; AD-10). One pair carries one label, and
-two recipes on one Item Class can carry different labels. The `absent` rank is
-not scoped this way: a `partial` pool gives `absent` under every recipe (AD-10,
-AD-17). The comparison the mark supports — this ranked row rests on measured
-weights, that one does not — is the comparison the ranking already asks the
-player to make.
+| Entry condition | Mark · word | Reason on an expansion line | Reason in a Raw Base row's tooltip |
+|---|---|---|---|
+| `priced`, under 3 days, 3 listings or more | none | none, and no age prints | none |
+| `priced`, 3 days or older | ◐ `rough` | `priced N days ago` | `priced N days ago` |
+| `priced`, on 1 listing | ◐ `rough` | `only 1 listing` | `only 1 listing` |
+| `priced`, on 2 listings | ◐ `rough` | `only 2 listings` | `only 2 listings` |
+| `priced`, 3 days or older, on 1 or 2 listings | ◐ `rough` | `priced N days ago · only 1 listing` / `priced N days ago · only 2 listings` | the same |
+| `no-listings` | ○ `pending` | `tried N days ago · no listings` | `no listings found` |
+| `not-yet-synced` · `never-synced` | ○ `pending` | `not checked yet` | `not checked yet` |
+| `not-yet-synced` · `league-mismatch` | ○ `pending` | `price from last league` | `price from last league` |
+| `not-yet-synced` · `no-exchange-rate` | ○ `pending` | `no Divine rate for its currency` | `no Divine rate for its currency` |
+| `unresolvable` | ✕ `broken` | `gone after a patch` | `gone after a patch` |
 
-**A recipe switch swaps the mark silently** `[decision — memlog 238]`. When the
-new pair's label differs, the Provenance cell re-renders in the same synchronous
-pass as rank, EV and chase cells (state 34). No transition, highlight or note
-marks the change, and the mark never names the other recipe. The mark describes
-the figure on screen, and state 34 announces no other changed cell either.
+*Pending* covers two FR-9 Price States with one mark. Its reason text keeps all
+four causes apart (memlog 257). After a league reset every row may read pending,
+and that is honest (state 23).
 
-Two consequences the builder must not get wrong:
+**A Raw Base row's verdict is its one entry's verdict.** The row has one price, so
+its own entry decides. Its tooltip carries that entry's reason.
 
-- **The mark is never repeated inside an expansion.** Every combination row in
-  one panel carries the same label by construction, so a per-row Provenance mark
-  there would repeat one fact eight times and discriminate nothing — the failure
-  FR-11 exists to prevent, one surface further down.
-- **A `prior only` badge does not mean the pool is invented.** It states the
-  **weakest** input and never the pool's general condition. The honest reading is
-  the literal one: something in this pool was invented, and the figure inherits
-  it. The page must not word the mark, the key block or the banner in a way that
-  says more.
+**A crafted row's verdict** (memlog 245, 257, 265). The first rule that applies
+decides:
 
-### The uniform-prior banner
+- **No recipe is published** → ○ `pending`, EV cell `—`, reason
+  `no recipe published` (state 43; memlog 275).
+- **The active recipe is uncostable** → ○ `pending`, EV cell `—`, reason
+  `no figure yet — craft cost unknown` (state 35). This rule takes precedence over
+  every rule below, all-broken included (memlog 268).
+- **Every entry is broken** → ✕ `broken`, EV cell `—`, reason
+  `all combinations gone after a patch` (state 41).
+- **No priced combination** → ○ `pending`, EV cell `—`, reason `no prices yet`
+  (state 18).
+- **At least 70% of the row's EV rests on unreliable prices** → ◐ `rough`.
+  - *Unreliable:* either trigger. Thus a thin line counts as an old one does
+    (memlog 263).
+  - *Measured on* gross outcome value, before Craft Cost is subtracted. Pending
+    lines are left out of both the part and the whole. Thus a row whose EV is at
+    or below zero still has a defined verdict.
+  - *Reason:* `N% of this EV rests on unreliable prices`. N is in whole percent,
+    rounded down, so the printed figure never contradicts the rule.
+  - *When gross outcome value is zero:* the measure is the share of the row's
+    priced lines that are unreliable, against the same 70% (memlog 265). Reason:
+    `N% of its priced combinations are unreliable` (memlog 268).
+- **Otherwise** → no mark.
 
-Raised while **no probability in the loaded set carries `measured`** — that is,
-while every probability is `uniform-prior` or `absent`. It states that the
-entire ranking rests on a uniform prior and that relative ordering between Item
-Classes is not evidence-backed, and it points the player at per-row freshness
-instead. It lowers itself when the condition stops holding, so nobody has to
-remember to take it down. The per-row mark is required either way (FR-11), and a
-`prior only` row still carries its mark while the banner is up.
+`[NOTE FOR ARCHITECT: the share-of-EV formula belongs in IMPLEMENTATION-NOTES,
+including whether below-threshold outcomes count in the gross value and which
+lines the zero-value fallback counts as priced (memlog 265). State 25 puts every
+crafted row on the fallback.]`
 
-**It needs a ranking to speak about** `[decision — memlog 213]`. The condition
-above is vacuously true when no crafted row is ranked, which happens when
-`weights.json` or `recipes.json` is absent, and in the committed state, where
-`recipes.json` is published with no recipe. The banner is not raised then. Its
-sentence would be false, because no ranking rests on a prior when no crafted
-ranking exists. When a file is absent, the trust strip's absence line already
-says why. The banner stays down in every case. This also sets the
-co-occurrence bound in `DESIGN.md`'s vertical budget.
+A crafted row carries ✕ only when every entry is broken. Otherwise the ranking
+excludes broken entries (FR-24), and they show on their own expansion lines.
 
-**It reads the active recipe only** `[decision — memlog 238]`. The condition
-counts the probabilities of the active recipe's pairs, because the banner
-describes the ranking on screen. A recipe switch therefore can raise or lower
-it, in the same pass that re-ranks the list (state 34).
+**Where the verdict shows** (memlog 247). On a ranked row, the mark stands alone in
+the mark slot after the EV figure. Thus the glance from the game still sees it, and
+only the reason waits for a hover. On an expansion line, the mark, the word and the
+reason are inline. The cue is shape plus colour, never colour alone (NFR-10). The
+mark is not a click target.
 
-**What lowers it is one wholly published eligible set, and the page claims
-nothing about how likely that is.** A pair reads `measured` only when **every**
-entry in its recipe's eligible set was published (AD-10) — a single invented
-tier in each set is enough to hold the banner up across the whole ranking. So
-the banner is not a build-time placeholder that the first real file will
-obviously clear, and it is not the rarity a per-tier reading of `weightSource`
-would have suggested. It is a function of the data with a stated condition, and
-what the first conforming file does to it is unknown until one lands. The page
-reads the condition and says nothing else `[ASSUMPTION — the banner's frequency
-is unmeasured; only its condition is specified]`.
+### Estimated odds
 
-### Money slots — the FR-9 / FR-4 resolution
+**≈ means the roll odds are estimated, and the price is real** (memlog 246). ≈
+prints before the EV of a crafted row whose `(Item Class, recipe)` pair carries
+AD-10's `uniform-prior` value. In that pair, at least one tier in the recipe's
+eligible set has no published weight. Thus the pair's odds rest on at least one
+invented weight (AD-10; memlog 275). On screen the cue keeps its words: *some roll
+odds are estimated*. ≈ and ◐ share one colour and differ in shape (DESIGN.md).
 
-`[decision — memlog 43]` A slot with no figure never holds a number-shaped
-placeholder. It holds a short phrase naming **which** question is open:
+- **It is not a price-trust state.** Price trust speaks about price only. A row can
+  carry ≈ and ◐ at once, because they answer different questions.
+- **One cue per `(Item Class, recipe)` pair** (memlog 238). Two recipes on one Item
+  Class can differ. A recipe switch swaps the ≈ silently, in the same synchronous
+  pass as rank, EV and chase cells. There is no transition, no highlight and no
+  note.
+- **Per row only, with no global banner** (memlog 256). ≈ stays on every affected
+  row, even when every crafted row carries it. A mark that is true on every row
+  still states a true fact. ≈ has no tooltip of its own. The EV tooltip and the
+  footer legend explain it.
+- **Stated once inside the expansion**, as the context line at the top of the
+  panel. It is never repeated per line. Every line in one panel shares the pair's
+  odds, so a per-line cue would repeat one fact and discriminate nothing.
+- **≈ does not mean the pool is invented.** It states that something in the set is
+  estimated. The cue, the context line and the tooltip must not say more.
+- **A Raw Base never carries ≈**, because it rests on no modifier pool (FR-4).
+- AD-10's `absent` value cannot reach a ranked row. A `partial` pool makes the Item
+  Class Unrankable, and the appendix prints its reason alone (state 13).
 
-| Condition | Phrase | Reading |
-|---|---|---|
-| `no-listings` | *an open question* | nobody is asking, today |
-| `not-yet-synced` | *no figure yet* | the tool has not looked |
-| `unresolvable` | *not valued* (in `{colors.rust}`) | the tool cannot look any more |
-| Provenance `absent` | *unknown* | the pool cannot answer |
-| `pruned` tombstone | *not tracked* | deliberately excluded |
+`core` carries the weakest odds value and the oldest timestamp of every input into
+each derived figure (AD-4). The page shows what it is given and computes no ranking
+term itself.
 
-Never `0`, never `0.00%`, never blank, never an em dash. FR-9 forbids a mark
-that reads as a quantity of zero. A word is not a quantity, so one slot
-satisfies FR-9 and FR-4 together.
+### Missing figures
 
-`no-listings` is presented as an open question and not as an answer. The page
-never implies a Combination is junk — listings cannot tell a jackpot from junk,
-and the page says exactly that.
+A missing price never holds a number-shaped placeholder (memlog 43, 258 N-5).
 
-One exception: while the list is honest-empty (state 23), every list-row EV cell
-reads *no figure yet*, `no-listings` rows included. The expansion keeps the
-table's phrase.
+- **`—` stands for a missing price wherever a mark and its word sit beside it.**
+  This covers an expansion line's price cell, beside its trust cell or
+  `† pruned`. It also covers the EV cell of a pending or broken row, Raw Base or
+  crafted. That includes every crafted row while the recipe is uncostable or none
+  is published (its mark, with the word one hover away; memlog 265). The mark says
+  *which* question is open, so the dash cannot read as worthless (FR-9).
+- **Where no mark sits beside the slot, a phrase holds it.** The Craft Cost slot of
+  an uncostable recipe reads `no figure yet` (state 35).
+- Never `0`, never `0.00`, never blank. `< 0.01` is a quantity. A negative EV is a
+  known figure, dimmed but printed (state 21).
+- `no-listings` is an open question, never an answer that a Combination is junk.
+  Listings cannot tell a jackpot from junk.
 
-### Sync health — quiet, but on the page
+### The sync report
 
-`[decision — memlog 57, superseding 26]` Sync health is two states, not two
-places. **At rest** the strip carries five plain facts — `producer.id`,
-`generatedAt`, `gamePatch`, last synced, and the tracked-list edit date — plus
-the health line above when something is broken. **One click** opens
-`{components.sync-report-panel}` with the figures behind those signals:
-per-source request counts, entries not reached in the last sync pass, the
-pinned-starvation records, the unresolvable count (FR-24) and the measured
-pool-coverage fraction with its denominator (FR-4).
+Interaction 5 opens `{components.sync-report-panel}`, and the panel starts closed
+on every load. The panel reads its figures from `sync-report.json` and never
+recomputes them. It prints only what the report publishes, with no figure, total or
+class name of its own (memlog 235). Thus a coverage drop across a game patch is
+visible in the product and not only in the file. The panel has four columns, in
+this order. The Copy Deck holds the headings, and DESIGN.md owns the layout and the
+height cap.
 
-**A missing coverage figure** `[decision — memlog 212]`. When `weights.json` is
-loaded but `sync-report.json` carries no coverage figure, the panel reads *not
-measured*. When `weights.json` is absent, it reads *unknown*. It is never `0`
-and never marked. The page tells the two apart by the weights envelope it
-loaded. The first case lasts only until `sync` measures coverage (Story 3.6).
-
-This is what satisfies FR-25's own argument that "a report field that nothing
-renders is a field that nobody reads", without putting operational counts in
-front of a player who is trying to read a ranking. `[event — memlog 58]` The
-coverage fraction therefore has an on-screen home again, which means a coverage
-drop across a game patch is visible in the product rather than only in
-`sync-report.json`.
-
-Nothing in the panel is computed by the page. It renders `sync-report.json` as
-published.
+1. **Problems** (memlog 254, 275). Broken entries (FR-24), starved pinned entries
+   (FR-17, FR-25) and a stale game patch. Each is a counted problem (*Loud when
+   wrong*). The cross-file diagnosis follows them, listed and **not counted**
+   (state 27). It has one line per failing check:
+   `check · canonical key · detail`. With no failing check, the diagnosis is
+   absent. With no weights envelope loaded, it is one `unknown` line.
+2. **Sync run.** Requests per source, and entries not reached in the last sync pass
+   (FR-25). The page never renders the `session-probe` source (AD-30).
+3. **Weights coverage.** Pool coverage as a fraction **with its denominator**
+   (FR-4), or its missing-figure phrase (Copy Deck).
+4. **Built from.** The two attribution lines, and one `Not published` line per
+   absent tolerable file (state 38).
 
 ### Two registers in one panel
 
-`[decision — memlog 206]` State 27's cross-file diagnosis lands here, and that
-makes `{components.sync-report-panel}` the one region on the page carrying **two
-registers at once**. The boundary is drawn here so a builder does not have to
-guess at it, and so the vocabulary rules above stay coherent.
+(memlog 206, 208) The cross-file diagnosis makes the sync report the one region
+that carries two registers.
 
-**The page's voice** — every figure group. Counts, fractions with their
-denominators, and labels written as the player would say them: *entries not
-reached in the last sync pass*, never *in this Chunk*. This is the register the
-whole rest of the document is written in.
+**The page's voice**: every figure group and every attribution line. These are
+counts, fractions with their denominators, and labels written as the player would
+say them.
 
-**The file's voice** — the cross-file diagnosis, and nothing else, in the line
-format that `{components.sync-report-panel}` sets. Here
-the back-end-only nouns are licensed, because the text is a string he copies into
-an editor rather than a sentence he reads.
-
-**The rule.** The two are visibly different kinds of thing, and the cue is **not
-a semantic ink.** An ink states that a *figure's* footing is degraded or broken
-(`DESIGN.md`, Colors); a failing cross-file check says nothing about any figure
-on this page — the affected Item Classes are already in
-`{components.unrankable-appendix}` carrying their reason. So the boundary takes a
-**non-colour** cue, and it is settled `[decision — memlog 208]`: **the diagnosis
-alone is set in the mono verbatim register**, which means *the page did not write
-this text* and is reserved to that meaning. Every figure group keeps the page's
-voice and its existing face. The register takes the panel's own size, weight and
-line height, so nothing in the panel's cap or its internal scroll moves
-(`DESIGN.md`, Typography, which owns the treatment).
-
-*One cue, because it was one question.* This was held open jointly with the
-Chase Combination fallback's, for the identical reason, so that it could not be
-answered twice with two different cues (memlog 138). It is answered once, and the two
-surfaces now carry the same register because they print the same kind of thing:
-machine text, quoted. **The diagnosis is the case that proves the cue** — it is
-there to be selected and pasted into an editor, and mono is the form that says
-so, while also making a serialised canonical key legible in a way a proportional
-face does not.
-
-One consequence that is settled: the diagnosis is never promoted out of this
-panel. It does not reach `{components.trust-strip}` — the strip has exactly two
-health triggers (memlog 88) and a cross-file failure is not a third, because the
-player already sees its result as Unrankable rows he can count without expanding
-anything (FR-4).
+**The file's voice**: the cross-file diagnosis, and nothing else. The back-end-only
+nouns are allowed here, because the text is a string that the player copies into
+an editor. **The diagnosis alone is set in the verbatim register.** It is the same
+non-colour cue that the Combination fallback takes, because both print text that
+the page did not write. The diagnosis takes the panel's own size and line height,
+so the panel's cap and internal scroll do not move. The diagnosis is never promoted
+out of the panel.
 
 ## State Patterns
 
-→ [`mockups/key-hero-resting.html`](mockups/key-hero-resting.html) shows states
-11, 12, 17, 30 and 31 together on one page, which is the point: the marked
-rows have to be findable among the silent ones. State 18 appears there only in
-the key block: under memlog 232 a crafted row with a figure never reads *never
-attempted*.
-[`mockups/key-expanded-states.html`](mockups/key-expanded-states.html) shows
-states 1 to 7, 10, 20 and 32. The remaining states are specified here and
-nowhere else, by decision — see memlog 98.
-
-**Both mockups were re-rendered at revision 3** against these spines, unlike the
-revision-2 pass which deliberately left them stale (memlog 178). They now carry
-the Item Class unit, both unit glyphs, `{components.craft-recipe}` with its Craft
-Cost line, and the corrected reason string, and they no longer depict the retired
-`modelled-split` mark. The standing rule is unchanged and still governs: **the
-spine wins on conflict with any mockup**, because a mockup illustrates one
-dataset in one state at one moment.
+→ [`mockups/key-redesign-dark.html`](mockups/key-redesign-dark.html) shows states
+1, 2, 4, 5, 11, 12, 17, 18, 20, 21, 30 and 39. Its specimen box shows state 31, the
+row tooltips, state 32's panel and the list-statement slot (memlog 269). This
+section specifies the remaining states, and no other place does (memlog 98).
+**State numbers are stable identifiers** (memlog 189). A state is never
+renumbered. A retired state keeps its number, and a new state takes the next free
+number.
 
 | # | State | Where | Treatment |
 |---|---|---|---|
-| 1 | Price State `priced` | `{components.combination-row}` | **Line one:** `●` plus the word `priced`, the figure in Divine at 2dp, the listing sample count. **Line two:** both clocks in their own cells — *priced Nh ago* and *tried Nh ago* |
-| 2 | Price State `no-listings` | Combination row | **Line one:** `○` plus the word, `{components.money-slot}` *an open question*, `0 listings found`. **Line two:** note *nobody is listing this right now — a jackpot and junk look alike here*, then *tried Nh ago* alone, as states 4, 6 and 7 read. A `no-listings` entry carries no observation, so there is no *priced* clock to print |
-| 3 | Price State `not-yet-synced` | Combination row | **Line one:** `∆` plus the word **and its reason**, money slot *no figure yet*, `no sample`. **Line two:** the reason's note (states 5–7), then whichever clocks exist |
-| 4 | Price State `unresolvable` | Combination row, and surfaced not omitted | **Line one:** `×` in `{colors.rust}` plus the word, money slot *not valued*, `no sample`. **Line two:** note *its id is gone from the trade API — a patch did this*, then *tried Nh ago*. `[decision — revision 9, 2026-09-27]` One wording for every `unresolvable` row, a Raw Base (its Base Type or category id) or a Combination (a stat id). The note does not name the id kind, because the row already names what it prices |
-| 5 | reason `never-synced` | Combination row | Rendered *never attempted* — **the one row with no age at all**, so both age cells on line two are empty rather than filled. Note: *no request was ever issued for this entry* |
-| 6 | reason `league-mismatch` | Combination row | Note: *the observation belongs to another league*. Treated as absent, never as stale-but-usable. The attempted clock still shows, **on the row's Age cell as well as in the expansion** `[decision — memlog 217]` |
-| 7 | reason `no-exchange-rate` | Combination row | Note: *the listing currency had no rate at sync time*. There is no "priced but not convertible" state. The attempted clock still shows |
+| 1 | Price State `priced` | `{components.expansion-line}` | The price in Divine at 2 decimal places. The trust cell follows *Price trust*: empty under 3 days on 3 listings or more, ◐ when old or thin |
+| 2 | Price State `no-listings` | Expansion line | Price `—`. ○ `pending` with its reason (*Price trust*). A `no-listings` entry carries no observation, so its clock is the attempt's |
+| 3 | Price State `not-yet-synced` | Expansion line | Price `—`. ○ `pending` with the reason of states 5–7, so the three causes never collapse in words (FR-9) |
+| 4 | Price State `unresolvable` | Expansion line, surfaced not omitted | Price `—`. ✕ `broken` with one reason for every broken entry, Raw Base or Combination, because the line already names what it prices. Excluded from the ranking (FR-24) and counted as a problem (state 31) |
+| 5 | reason `never-synced` | Expansion line | ○ `pending`. No age, because no request was ever issued |
+| 6 | reason `league-mismatch` | Expansion line | ○ `pending`. Treated as absent, never as stale-but-usable (FR-31) |
+| 7 | reason `no-exchange-rate` | Expansion line | ○ `pending`. There is no "priced but not convertible" state |
 | 8 | Curation Status `active` | Expansion | No marking. It is the ordinary case |
-| 9 | Curation Status `pinned` | Expansion | `[decision — memlog 199]` Marked on its `{components.combination-row}` by `{components.curation-status-pinned}` — `* pinned`, **leading** line one ahead of tier plus short form. It takes no semantic ink and no sepia: an ink states that a figure's footing is degraded or broken and a Curation Status states nothing about the figure, and sepia carries operator choice, which this is not (`DESIGN.md`, Colors). **It is a lookup key, not a badge.** `{components.trust-strip}` raises `× N of M pinned entries starved` (FR-17, FR-25) and names no entries, so this mark is what the player scans open expansions for afterwards — which is why it leads the cell and sits at `600` rather than being quieted to a tertiary decoration |
-| 10 | Curation Status `pruned` | `{components.tombstone-band}` | Collapsed behind `+ N pruned`. Opened: line one is the Combination struck through with `† pruned` and *not tracked* in the money slot. Line two is the prune reason alone, across the full line-two width `[decision — memlog 234]` — **not** the two age cells `[decision — memlog 116]`, because a prune is not a reading of either clock |
-| 11 | Provenance `measured` | Ranked row | Nothing. The empty cell is the statement |
-| 12 | Provenance `uniform-prior` | Ranked row | `{components.trust-mark-prior}`, carried by **every** crafted row whose `(Item Class, recipe)` pair has one invented tier in the active recipe's eligible set (AD-10) |
-| 12a | Provenance, Raw Base row | Ranked row | **Nothing** — the cell is empty, as on a healthy crafted row. A Raw Base needs no Eligible Pool (FR-4), so no Provenance propagates to it. Not a fourth value and not a gap |
-| 13 | Provenance `absent` | Appendix only | `{components.trust-mark-unknown}` |
-| 14 | Unrankable — `pool partial` | Appendix | Reason verbatim, plus a quiet note where one is known (e.g. which slot's pool has no entry for that stat) |
-| 15 | Unrankable — `class absent from weights file` | Appendix | Reason verbatim. A freshly scraped class may carry a note that it may return after the next weights run. *This literal moved at revision 3 — see Domain Vocabulary's standing check* |
-| 15a | Unrankable — `class disagrees with weights file` | Appendix | Reason verbatim, and **one string for all five cross-file checks** (state 27, FR-4). The distinguishing fact for the player is that this class's pool is `complete` and published — the disagreement is in his own Tracked List, so this is the one Unrankable row he can fix himself. The quiet note may say so; it may **not** name the check, the entry or its key, which are diagnosis and belong in `{components.sync-report-panel}`'s second column (state 27, memlog 206). Lettered rather than numbered, as 12a was, because the state numbers are stable identifiers others cite |
-| 16 | Unrankable class whose Base Types still rank | Appendix + ranked list | The Item Class sits in the appendix with its reason. Its note **names the fact, not a rank**: *some of its Base Types rank on the raw branch*. A class holds several Base Types, they do not rank together, and pointing at one position would invent a relationship the list does not have. Those Base Types rank normally in the list, each carrying `{components.unit-glyph-raw}` |
-| 17 | Stale row (≥48h) | Ranked row | `{components.trust-mark-stale}`, with the clock said in words |
-| 18 | Never attempted | Ranked row | `{components.trust-mark-never}`, italic |
-| 19 | Uniform-prior condition true | Banner | `{components.uniform-prior-banner}` above the list, dismissible for the session only |
-| 20 | Below-threshold entry | Combination row | Note *below the threshold — adds nothing to EV*. Shown, never hidden, never greyed |
-| 21 | Item Class with no Chase Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and is shown as such, at 2dp, as a real quantity. A negative EV is never a money-slot phrase — the figure is known, and it is bad news rather than missing news. It is **ranked, not Unrankable** (FR-1): a threshold that excludes every outcome is an answer about that class, not an absence of data |
-| 22 | Cold load / skeleton | Whole page | Masthead and twenty row slots paint immediately as placeholders in the final layout. The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` Every artifact AD-24 fetches resolves in a **single transition** — never row by row, because a partly filled list would show a ranking computed from an incomplete dataset. `[decision — memlog 211]` Flat `{colors.paper-inset}` bars with no shimmer, and the column header painted with its final labels. `DESIGN.md`, Components, owns the treatment |
-| 23 | Honest empty — league reset | Whole list | `[decision — memlog 48]` Every tracked unit renders in **canonical order** — every Item Class and every Raw Base, each with its glyph — refilling over the following day. After a pure reset every unit carries Price State `not-yet-synced` reason `league-mismatch`. After a **mixed reset** some units already carry a new-league state, such as `no-listings`, and they sit among the others in the same canonical order. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed** and the list states that the order is canonical and not ranked. Without that the page asserts a ranking it does not have, which is the failure FR-31's honest-empty rule exists to prevent. `[decision — memlog 83]` **The EV cell is not blank.** `[decision — revision 8, 2026-09-27]` **Every EV cell holds *no figure yet*, whatever the row's own Price State.** This includes a row that already reads `no-listings` in the new league. In this state the EV column answers one question for the whole list: the ranking has no figure yet. The row's expansion keeps its own Price State and money phrase (state 2 for `no-listings`), so the observation is one click down and is never lost. This is the only exception to *Money slots*, and it holds only while the list is honest-empty. When one row ranks, every row reads its own phrase again. Assumption 49's "empty rather than zero" was aimed at the zero. Blank is the other thing the money slot forbids. `[decision — memlog 218]` The Raw Base note reads *valued at its own current asking price*, not *ranked*, so it stays true while the list states it is not ranked |
-| 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row freshness is what makes that honest. No global "stale" treatment |
-| 25 | Nothing clears the threshold | Whole list | Distinct from state 24 and from state 23, and **it is the one state in this table the player typed** `[decision — memlog 204]`. Every crafted Item Class is still ranked, at an EV of minus its Craft Cost (FR-1) — so this is not an empty list, it is twenty rows carrying the same figure. Raw Bases under the threshold leave the ranking altogether, so the raw branch may be empty while the crafted one is full. **Rank numerals stay.** State 23 suppresses them because its order is canonical rather than ranked; here the order *is* computed and the figures merely tie, and hiding a computed result because it is flat would be the page editing its own answer. A plain declarative sits above the list, under `{components.asking-price-line}`, naming the live Payout Threshold figure at the page's 2dp — the condition, not an instruction. It is not `{components.uniform-prior-banner}`, which is raised by a data condition; this is not one. It is not a `{components.money-slot}` phrase either, because no figure is missing. **A tie of this size needs a declared tiebreak** or the order shifts between loads; AD-17 declares it, so the printed order is fully determined and identical across loads (AD-17) |
-| 26 | Refused artifact | Whole page | `{components.refusal-screen}` replaces everything (FR-33, NFR-8) when a fetched artifact is schema-invalid, declares a version the page does not read, or is required and not published `[decision — memlog 221]`. Its title names no cause (DESIGN.md `refusal-screen.titleRule`). It names which artifact and why, in the per-cause body sentence of DESIGN.md `refusal-screen.bodyByCause`. The player can do nothing here and is not offered a retry — a refusal is fixed by publishing a valid set. One sentence says the page renders again as soon as one exists, and that nothing old is served meanwhile |
-| 27 | Cross-file policy check failure | Report, never refusal | **Five checks** — edge alignment, empty containment set, `coOccur` overlap, kind agreement, class discriminability — reported at load (AD-17). *Revision 3 read "four checks, not five", which was a correction aimed at the retired **straddle rule** — tiers overlap freely in the raw data and no band could satisfy it (AD-18, FR-29) — and not at class discriminability, which spine revision 17 added afterwards into the slot that sentence had emptied. Read as a rejection of the fifth check it was not, it argued against a binding rule, so it is struck rather than renumbered.* The page still renders, the affected Item Classes shown as Unrankable (FR-33). **The reason string is `"class disagrees with weights file"`**, FR-4's third, printed verbatim per `{components.unrankable-appendix}` — one string for all five checks, because such a class has a `complete`, published pool and neither of FR-4's other two strings is true of it. **Which check failed, which entry failed it and that entry's canonical key are diagnosis and never appear in the appendix.** **The diagnosis lands in `{components.sync-report-panel}`, as a third group in its second column** `[decision — memlog 206]` — under the existing *what is broken* heading, separated from the unresolvable count and the pinned-starvation records by vertical space alone, per `columnHeadingRule`. It is neither a global region nor inline on the Item Class. The panel is the only home that works: the diagnosis is the one piece of content on the page whose length is genuinely unbounded — one entry per failing check, across as many as every tracked Item Class — and the panel is the one region permitted to cap itself at `{spacing.sync-report-max-height}` and scroll inside its own band. Everywhere else, an unbounded list moves the page. See *Two registers in one panel* below, which is what this ruling costs |
-| 28 | Artifact fetch failure (as against invalid) | Whole page | `{components.fetch-failure-screen}` replaces everything under the title `One of the data files did not arrive.` `[decision — memlog 237]`, and its body names which file (AD-24) did not arrive. The player can click `+ Try again`, which re-attempts the whole set. **A partial set is never rendered** — FR-33 requires a single consistent set, and half a ranking is worse than no ranking |
-| 29 | Stale Weights File after a patch | `{components.trust-strip}` | The page is static and makes no call to the game or the trade API, so it has **no live patch to compare against** and claims none. What it does is show the `gamePatch` the loaded Weights File declares, beside its producer and `generatedAt`, so the player — who knows which patch he is playing — can see the mismatch himself. Neither a stale weights file nor a stale catalogue breaks the page |
-| 30 | Trust strip at rest, healthy | `{components.trust-strip}` | Two lines carrying five plain facts — producer, `generatedAt`, `gamePatch`. Last synced, tracked-list edit date — with no mark or colour on any of them `[decision — memlog 89]`, and nothing else `[ASSUMPTION — memlog 59]`. Affordance reads `+ the full sync report`, right-aligned. This is the state on every load |
-| 31 | Trust strip at rest, something broken | `{components.trust-strip}` | `[decision — memlog 70/88]` A third line appears, carrying a rust mark, its word and its count. There are exactly two triggers and they share the one line: unresolvable entries exist (FR-24), and pinned entries starved (FR-17, FR-25), which reads *N of M* `[decision — memlog 216]`. It is counted from the record of the current curation only, and it has its own wording when N is 0 `[decision — memlog 222/223]`, per `{components.trust-strip}`. Data raises the line, never a click, and `{spacing.frame-reserve-health-line}` budgets it. The five resting facts are unaffected — an old edit date never turns red |
-| 32 | Trust strip expanded | `{components.sync-report-panel}` | Opens in place beneath the strip, pushing the regions below it down `[ASSUMPTION — memlog 59]`. Affordance reads `− the full sync report`. Capped at `{spacing.sync-report-max-height}` (400px) and scrolls inside its own band past that. Because that cap sits inside the worst-case resting budget, the strip alone never makes the page scroll, in any data state |
-| 33 | Ranked list grown past 20 | Ranked list | `{components.expand-affordance}` reads `− Show only the top 20` and the list holds every ranked unit — Item Classes and Raw Bases alike. Ranks 21+ all take `{components.ranked-row-tier-3}`. The appendix, key block and foot stay below in the same order. Clicked growth, so it may scroll the page. Clicking again restores the top 20 exactly |
-| 34 | Craft Recipe switched | Whole list + `{components.craft-recipe}` | `[decision — memlog 181]` The clicked word becomes solid and takes the sepia rule; the other goes `{colors.ink-secondary}` with the dotted rule at rest `[decision — memlog 191]`. The list **re-ranks synchronously** against loaded artifacts — no network, no sync (FR-1, AD-24) — and it is **not debounced**, because a click is one deliberate act where a keystroke is one of several. Ranks, EV figures **and Chase Combination sets** all change, since a recipe changes which outcomes are reachable and not only what an attempt costs (FR-26). The Craft Cost line updates with it. A row's Provenance mark swaps silently when the new pair's label differs, and the uniform-prior banner re-reads its condition against the new recipe `[decision — memlog 238]`. Open panels stay open and re-render against the new recipe; nothing closes. Raw Base rows keep their own prices — they have no Craft Cost — but their **ranks** can move as crafted rows reorder around them |
-| 35 | Active recipe uncostable | `{components.craft-recipe}` + ranked list | A recipe naming a currency with no current rate for the active league is **uncostable**, never costed at zero (FR-26, AD-20). The Craft Cost line holds the money-slot phrase *no figure yet*. **The note that stood here is closed** `[decision — memlog 205]`, and PRD revision 19 now carries the player-visible half of it (FR-26, FR-5). **Every row stays.** No row leaves the list and no Item Class becomes Unrankable — the appendix would print an FR-4 reason that is false of a class whose pool is complete and agrees with the Weights File. **Each branch keeps its own order and neither is ordered against the other.** Craft Cost is one figure subtracted equally from every crafted row, so the crafted order and the Chase Combination sets are exactly what they would have been — the Payout Threshold compares against a Combination's gross price and never touches the cost (FR-1). What is unavailable is the *distance* between a crafted row and a Raw Base row, which is the missing figure itself. **So no rank numeral spans the two.** Numerals are suppressed, as in state 23 and for the same reason — a numeral is an explicit claim about position and the line below cannot retract it, where vertical adjacency under a stated limit is not a claim. `{components.ranked-row-tier-1/2/3}` run **per branch**, so two tier-1 rows is the correct render and is the only thing left saying *this is the strong end of its order*. A plain declarative sits above the list in state 25's register, naming the active recipe and stating that the two branches are not comparable while it holds. Every EV cell on a crafted row holds *no figure yet*, never `0.00`. **FR-5's bound applies per branch** — up to 20 rows of each, one `{components.expand-affordance}` under each, still naming no unit. The resting page can therefore hold 40 rows and scroll; `DESIGN.md`, Layout & Spacing carries that as an accepted overrun rather than a rule breach. Per PRD addendum revision 19 this state fires disproportionately on the costlier recipe, so it is a routine state and not a defensive one |
-| 36 | An Item Class unrankable under one recipe only | Appendix or list | AD-17 truncates the Eligible Pool below a recipe's `modifierLevelMin`, and an empty surviving pool makes that `(Item Class, recipe)` pair unrankable. Under the one-recipe-at-a-time reading (see *A note on the recipe axis* below), the class is simply Unrankable while that recipe is active and ranks normally under the other. **FR-4's reason enum is not extended** — PRD memlog 151 declines a third string on the ground that no base is tracked below item level 70, so the case is defensive rather than live. `[NOTE FOR UX]` If it ever does fire, neither existing string describes it and the enum is the PRD's to extend, not this document's |
-| 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | `[decision — memlog 214]` The committed state: `weights.json` present and `recipes.json` published with no recipe (story 2.7 Decisions), so no `(itemClass, recipe)` pair exists and no class is Unrankable in FR-4's sense (AD-24). The same holds when `recipes.json` is absent. The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with the count in ink rather than rust. No lead and no rows. **It does not say why it is empty.** In the committed state no absence line prints, and the empty appendix does not fill that silence. When `recipes.json` is absent, state 38's absence line says so. The empty appendix must not say it again or contradict it. It never prints `class absent from weights file` while a weights envelope is loaded |
-| 38 | A tolerable artifact absent | `{components.trust-strip}` | `[decision — memlog 213]` One plain `Not published` line per absent file, inside the strip after line two, with no mark and no colour. The strings are verbatim under Domain Vocabulary. Each line is budgeted at `{spacing.frame-reserve-absence-line}`. An absent `weights.json` also turns the strip's three line-one fields to *unknown*. An absent `weights.json` or `recipes.json` holds the uniform-prior banner down, because there is no crafted ranking for it to describe |
-
-`{components.asking-price-line}`, `{components.key-block}` and
-`{components.running-foot}` render in every state above except **26 and 28**, the
-two screens that replace the page. A page that has no numbers still has to say
-what its numbers would mean. A page that has no data at all should say only
-that.
-
-*Those two numbers were wrong until revision 3, and so were three more.* Memlog
-170 renumbered rows 13–34 to 12–33 by script and the prose references to them
-were not swept, so this sentence pointed at 27 and 29 — the cross-file check and
-the stale-weights strip — while UJ-1's failure path and UJ-2's both pointed one
-row past the state they meant. All five are corrected here. The numbers are
-stable identifiers that other documents and reviews cite, so **a renumbering is a
-sweep and not a script**.
-
-**The recipe axis, ratified** `[decision — memlog 186]`. This document's
-revision-3 reconciliation — `core` computes every `(Item Class, recipe)` pair and
-the view renders the active recipe's pairs only — was written to PRD FR-1 by
-directive and stated nowhere. **AD-17 now states it**, so the reading this
-document was built on is the binding one and nothing here changes: the list does
-not double, `{components.craft-recipe}` is a filter, and no row names its recipe.
-The cross product is ordering-internal and never reaches the page. Two
-consequences of AD-17's ruling bind this document: FR-5's bound is applied
-**after** the recipe filter, and a Raw Base — carrying no recipe — renders under
-both recipes, so a switch re-interleaves the mixed list without moving the raw
-rows relative to each other.
-
-**FR-30's world is specified, and the note is closed** `[decision — memlog 203]`,
-superseding memlog 72 and its re-derivation at memlog 185. Until a conforming
-Weights File exists, every **Item Class** is Unrankable and the product is a
-white-base price list with an appendix holding the crafted branch entire — one
-row per Item Class, on the order of 29 against a committed budget of 7.
-
-Three rules were read as colliding there: the appendix is a *footer*, truncating
-it is forbidden, and nothing unclicked may push the page past 1920px. **The first
-two are mechanism and they hold; the third was a sentence, and `DESIGN.md` has
-now split it into the two clauses it always contained.** Budgeted chrome still
-may not overrun the frame. A resting row count above the twenty-row target
-releases into scroll instead. So the behaviour in FR-30's world is the ordinary
-behaviour: the appendix sits at the foot, holds every row untruncated, and the
-document grows and scrolls beneath it.
-
-Nothing here is deferred to implementation any more. The earlier acceptance of
-designing it later is discharged, not still standing.
-
-**A list of only `unresolvable` rows drops "yet"** `[decision — revision 9,
-2026-09-27]`. State 23's statement holds whenever nothing is priced in the
-active league, and `unresolvable` rows count toward it. Its copy ends in *yet*:
-`In canonical order, not ranked: no tracked unit has a price from <league> yet.`
-When every row the list shows is `unresolvable`, no sync will bring a price, so
-the statement ends without the word:
-`In canonical order, not ranked: no tracked unit has a price from <league>.`
-When at least one row is `no-listings` or `not-yet-synced`, the statement keeps
-*yet*, because it is true of those rows. The statement does not name the cause:
-the trust strip's health line already carries `× N unresolvable` (state 31).
+| 9 | Curation Status `pinned` | Expansion line | `* pinned` **leads** the line, ahead of tier plus short form (memlog 199). **It is a lookup key, not a badge.** The starvation problem names no entries, so this mark is what the player scans open panels for |
+| 10 | Curation Status `pruned` | Inside the expansion, behind `+ N pruned` | Collapsed by default (memlog 25; Interaction 3). When opened: the Combination struck through, `† pruned`, price `—`, and a **second line that carries the prune reason alone** (memlog 116, 234, 258 N-3). No age, because a prune is a decision, not a reading of either clock. No trade link |
+| 11 | Odds `measured` | Ranked row | Nothing before the EV. The absence is the statement |
+| 12 | Odds `uniform-prior` | Ranked row + expansion | ≈ before the EV (*Estimated odds*). Its expansion opens with the ≈ context line (Copy Deck) |
+| 12a | Raw Base odds | Ranked row | **Nothing.** A Raw Base needs no Eligible Pool (FR-4), so no odds value reaches it. Not a gap |
+| 13 | Odds `absent` | Appendix only | The row prints its FR-4 reason and **no mark** (memlog 258 N-9) |
+| 14 | Unrankable, `pool partial` | Appendix | Reason verbatim, plus its note (Copy Deck) |
+| 15 | Unrankable, `class absent from weights file` | Appendix | Reason verbatim. A freshly scraped class carries its note (Copy Deck) |
+| 15a | Unrankable, `class disagrees with weights file` | Appendix | Reason verbatim, **one string for all five cross-file checks** (state 27, FR-4). This class's pool is `complete` and published. Thus this is the Unrankable row that the player can fix without help, and its note says so (Copy Deck). The note never names the check, the entry or its key, which are diagnosis (memlog 206) |
+| 16 | Unrankable class whose Base Types still rank | Appendix + ranked list | The class sits in the appendix with its reason. Its note **names the fact, not a rank** (Copy Deck). Those Base Types rank normally as Raw Base rows |
+| 17 | Rough row | Ranked row | ◐ in the mark slot, and the reason in `{components.mark-tooltip}`. Crafted: the 70% rule. Raw Base: its own price is old or thin (*Price trust*) |
+| 18 | Pending row | Ranked row | ○ in the mark slot, EV `—`. Raw Base: its entry is pending, and the tooltip carries the entry's reason. Crafted: no combination is priced, reason `no prices yet`. This holds in every state, not only in state 23 (memlog 265). States 35 and 43 take their own reasons (*Price trust*) |
+| 19 | Retired (memlog 256) | — | The global estimated-odds banner, its dismiss control and its copy are retired. ≈ is per row only (state 12) |
+| 20 | Below-threshold entry | Expansion line | **Dimmed**, with `below threshold` in the trust cell and no mark (memlog 258 N-3). Shown, never hidden (FR-8). **It prints only `below threshold`**, even when its price is also unreliable (memlog 265) |
+| 21 | Item Class with no qualifying Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and prints at 2 decimal places, **dimmed** (memlog 258 N-20). It is a known figure and bad news, not missing news. Thus it is never `—` and never a phrase. It is **ranked, not Unrankable** (FR-1) |
+| 22 | Cold load / skeleton | Whole page | `{components.header-bar}`, the column header with its final labels, and twenty skeleton rows paint at once in the final layout. The eyebrow stays blank until the league is known (memlog 211). The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` Every artifact resolves in a **single transition**, never row by row |
+| 23 | Honest empty: league reset | Whole list | (memlog 48) Every tracked unit, every Item Class and every Raw Base, renders in **canonical order**. The list refills over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed**, and the list statement says that the order is canonical (Copy Deck). Every row reads ○ pending, or ✕ broken for a broken entry, and every EV cell reads `—` (memlog 257). After a pure reset, the pending reason is `price from last league`. After a mixed reset, some rows carry a new-league reason such as `no listings found`. Each expansion keeps its entries' own reasons. The statement drops `yet` when every listed row is broken, and keeps it while one row is pending. It names no cause, because the sync button's count already carries broken entries |
+| 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row price trust makes that honest. No global "stale" treatment |
+| 25 | Nothing clears the threshold | Whole list | **The one state the player typed** (memlog 204). Every crafted Item Class is still ranked, at minus its Craft Cost (FR-1), and dimmed (state 21). Raw Bases under the threshold leave the ranking. **Rank numerals stay.** The order is computed and the figures tie, so AD-17's declared tiebreak orders them. Thus the order is identical across loads. A plain list statement names the live threshold at 2 decimal places. It states the condition with no instruction, because the remedy is on screen in the header. It is not a missing figure, so it is not a phrase in any cell |
+| 26 | Refused artifact | Whole page | The refusal variant of `{components.failure-screen}` replaces everything (FR-33, NFR-8; memlog 221). The cause is one of three: a fetched artifact is schema-invalid, declares a version that the page does not read, or is required and not published. The title names no cause (memlog 220). The body names which artifact and why. No retry: the fix for a refusal is a valid published set, and the fixed sentence says so (Copy Deck). An invalid recipe set takes this treatment (*Recipe option words*) |
+| 27 | Cross-file policy check failure | Report, never refusal | Five cross-file checks run at load (AD-17). The page still renders. The affected Item Classes are Unrankable with `class disagrees with weights file` (state 15a). **The sync report's Problems column lists the diagnosis**, in the file's register, and **does not count it** (memlog 206, 275) |
+| 28 | Artifact fetch failure | Whole page | The fetch-failure variant of `{components.failure-screen}`, shown when an artifact does not arrive (AD-24). Its title and body name the file (Copy Deck). `+ Try again` re-attempts the whole set, never a partial one. **A partial set is never rendered** (FR-33) |
+| 29 | Stale Weights File after a patch | `{components.sync-report-panel}` | The page makes no call to the game. It shows the `gamePatch` that the Weights File declares, in the sync report (memlog 258 N-8). The player knows which patch they play. When the page can tell that the patch is stale, it is a counted problem (*Loud when wrong* and its `[NOTE FOR ARCHITECT]`). Neither a stale weights file nor a stale catalogue breaks the page |
+| 30 | Sync button at rest, healthy | `{components.sync-button}` | `Synced <age> ▾` and nothing else: no dot, no colour, no count (memlog 254). This is the state on most loads |
+| 31 | Sync button, a problem holds | `{components.sync-button}` | The count in place of the age (*Loud when wrong*; Copy Deck). Attribution never raises it |
+| 32 | Sync report open | `{components.sync-report-panel}` | Interaction 5 opens it. Its content follows *The sync report*. It caps its height and scrolls inside past the cap (DESIGN.md) |
+| 33 | Ranked list grown past 20 | Ranked list | Interaction 4 grows it. The list holds every ranked unit. Ranks 21+ are plain. The appendix and footer stay below. A click caused the growth, so it may scroll the page |
+| 34 | Craft Recipe switched | Whole list + `{components.recipe-toggle}` | Interaction 1a. A row's ≈ swaps silently when the new pair differs (memlog 238) |
+| 35 | Active recipe uncostable | `{components.recipe-toggle}` + ranked list | A recipe that names a currency with no current rate is **uncostable**. It is never costed at zero (FR-26, AD-20). Craft Cost reads `no figure yet`. **Every row stays** (memlog 205), and no class becomes Unrankable. **Each branch keeps its own order, and no rank numeral spans the two.** Rank numerals are suppressed, and the top-five emphasis runs **per branch**. A list statement names the active recipe. It says that the two branches are not comparable while the state holds. Every crafted row reads ○ with EV `—` (*Price trust*). **FR-5's bound applies per branch**: up to 20 rows of each, with one list affordance under each. Thus the resting page can hold 40 rows and scroll |
+| 36 | An Item Class unrankable under one recipe only | Appendix or list | AD-17 truncates the Eligible Pool below a recipe's `modifierLevelMin`. An empty surviving pool makes that pair unrankable. The class is Unrankable while that recipe is active, and it ranks under the other. **FR-4's reason enum is not extended** (the PRD's memlog, row 151). `[NOTE FOR UX]` If it ever fires, neither string describes it, and the enum is the PRD's to extend |
+| 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | (memlog 214) No recipe published (state 43), or `recipes.json` absent. The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with a neutral count. **It does not say why it is empty.** It never prints `class absent from weights file` while a weights envelope is loaded |
+| 38 | A tolerable file absent | `{components.sync-report-panel}` | (memlog 213, 258 N-8) One plain `Not published` line per absent file in the Built from column, with no mark and no colour. **Not a counted problem.** The line gives the reason once. Nothing else on the page repeats it: not the appendix (state 37) and not the `unknown` fields. An absent `weights.json` also turns the *Weights File* fields to `unknown`. An absent `recipes.json` also gives state 43 |
+| 39 | Expansion on its top lines | `{components.expansion-panel}` | (memlog 264) A panel opens on the **top 8 lines** of its line order (Information Architecture, *The expansion*). It ends with `+ N more combinations`, where N counts the hidden lines without the pruned lines. Interaction 7 shows the rest and hides them again. A panel of 8 lines or fewer shows them all, with no affordance. Every Tracked Entry stays one click away (FR-8, by reachability) |
+| 40 | Broken Raw Base row | Ranked row | A listed Raw Base whose entry is broken (always under state 23). It shows ✕ in the mark slot, EV `—`, and the entry's reason in the tooltip |
+| 41 | Broken crafted row | Ranked row | (memlog 265) A crafted row whose every entry is broken: ✕ in the mark slot, EV `—`, reason per *Price trust*. Its expansion shows each broken line (state 4). Under state 35 or 43 the row reads as that state instead (memlog 268) |
+| 42 | One recipe published | `{components.recipe-toggle}` + ranked list | (memlog 275) The header prints `Recipe` and the one option word as plain text, with no toggle, and Craft Cost beside them. There is nothing to switch (Interaction 1a). The list ranks as usual |
+| 43 | No recipe published | `{components.recipe-toggle}` + ranked list | (memlog 275) The published recipe set is empty, or `recipes.json` is absent (state 38). The recipe label, the toggle and Craft Cost are hidden. Raw Bases rank normally, with rank numerals (memlog 279). Crafted rows sit below them, unranked, in canonical order. Each crafted row reads ○ with EV `—`, reason `no recipe published`. The EV tooltip takes its no-recipe sentence (Copy Deck). The appendix shows its title alone (state 37) |
 
 ## Interaction Primitives
 
-Mouse only. There are **seven** interactions on the whole page — six stay on it,
-one leaves it. *It was six until revision 3, when the Craft Recipe became a
-control (FR-26).*
+Mouse only. Interactions 1–7 are clicks or a drag, and 6 is the only one that
+leaves the page. Interaction 8 is the one hover. The numbers are stable
+identifiers.
 
-→ [`mockups/key-expanded-states.html`](mockups/key-expanded-states.html) shows
-the result of interactions 2, 3 and 5 — an open Item Class, the tombstone band
-opened, and the sync report open.
+1. **Set the Payout Threshold** (memlog 255, 275). There are two ways onto one
+   value, and each moves the other:
+   - **Drag the slider.** The thumb snaps to steps of 0.05. The ranking sweeps
+     **live**. It re-ranks at each step that the thumb crosses, with no debounce,
+     because every step is a valid value. The figure follows the thumb. **A click
+     on the track jumps the value** to the nearest step under the pointer, and the
+     list re-ranks once (memlog 265).
+   - **Click the figure and type**, to 0.01. The `div` unit is outside the
+     editable region. Re-ranking fires on every valid parse, debounced about
+     150 ms `[ASSUMPTION — memlog 38]`. Thus typing `0.25` does not re-rank at `0`
+     and again at `0.2`. Out-of-range input is clamped on blur. The slider follows
+     the typed value. Its thumb sits between steps when the value does.
+   - **Constraints, shared by both** (memlog 74): min `0`, max `3`, 2 decimal
+     places. The slider is linear across that range. A negative threshold cannot
+     be entered.
+   - **Cold start is `0.25` Divine** (memlog 258 N-17).
+   - Each pass is synchronous, local and under 100 ms (NFR-6), and makes no
+     network request. The threshold also changes which Combinations reach the
+     chase cells and which expansion lines read `below threshold`.
 
-1. **Set the Payout Threshold.** `[decision — memlog 73]` **The figure is the
-   input.** Click the large serif number in `{components.payout-threshold}` and
-   type over it — there is no field and no form chrome, and the resting dotted
-   sepia underline is what makes it read as editable rather than as a label. The
-   `Divine` suffix sits outside the editable region and cannot be typed over.
-   `[OVERRIDE — memlog 36/37]` This departs from UJ-2, which narrates the player
-   *dragging* the threshold. The continuous sweep is given up for exactness and
-   for masthead width. FR-6 still binds: the list reorders immediately,
-   satisfied by re-ranking on input change rather than on commit.
-   `[ASSUMPTION — memlog 38]` Re-ranking fires on every valid parse, debounced
-   ~150ms, so typing `0.25` does not re-rank at `0` and again at `0.2`. The pass
-   is synchronous, local, under 100ms, and triggers no network request. The
-   threshold also changes which Chase Combinations appear, since only
-   Combinations at or above it are shown.
-   *Constraints* `[decision — memlog 74]`: min `0`, max `3`, step `0.05`, two
-   decimals, clamped on blur. A negative threshold is not enterable. **The track
-   and marker survive as a non-interactive readout** — they answer where the
-   current value sits in the range, which a bare number cannot show. The marker
-   cannot be dragged and the track cannot be clicked. Cold start is `0.25`
-   Divine `[ASSUMPTION — PRD FR-7]`.
-1a. **Switch the Craft Recipe.** `[decision — memlog 181]` Click the inactive
-   word in `{components.craft-recipe}` — `greater` or `perfect`, whichever is
-   not currently solid. The active word is **not** a click target: there is
-   nothing to switch to, and a target that does nothing teaches the wrong thing.
-   The ranking re-runs synchronously against the already-loaded artifacts, with
-   **no debounce**, because a click is one deliberate act where a keystroke is
-   one of several on the way to a value. Ranks, EV figures and Chase Combination
-   sets all change together — a recipe changes which outcomes are *reachable*
-   and not only what an attempt costs (FR-26), so this is a genuinely different
-   ordering rather than the same ordering shifted by a constant. The Craft Cost
-   line beneath updates with it. **Open panels stay open** and re-render against
-   the new recipe, for the same reason a threshold change leaves them open: the
-   player is comparing, and closing his comparison to answer his question would
-   be the page taking his place away.
+1a. **Switch the Craft Recipe** (memlog 181, 243). The recipe toggle is the page's
+   **second ranking dial** (FR-26). Click the inactive segment. The active segment
+   is not a target. The ranking re-runs synchronously against the loaded artifacts,
+   with no network and no sync (FR-1, AD-24). It is **not debounced**, because a
+   click is one deliberate act. Ranks, EV figures, trust verdicts **and Best
+   combinations** change together, because a recipe changes which outcomes are
+   reachable (FR-26). Craft Cost updates. A Raw Base keeps its own price, but its
+   rank can move as crafted rows move around it. **Open panels stay open** and
+   re-render. The player is comparing, and closing their comparison would take
+   their place away. With one recipe published, there is nothing to switch
+   (state 42). With none, there is no toggle (state 43).
 
-2. **Expand a ranked row.** Click anywhere on `{components.ranked-row}`. Click
-   the same row again to close it. The panel opens in place, instantly, below
-   the row. **Many panels may be open at once** — they are read against each
-   other, and a page that closed one to open another would make comparison
-   impossible on a surface whose whole argument is comparison. Nothing closes a
-   panel except a second click on its own row.
-3. **Toggle the tombstone band.** `+ N pruned` inside an open panel. Local to
-   that panel, and it resets when the panel closes.
-4. **Read the remainder of the list.** `{components.expand-affordance}` below
-   row 20, reading `+ Read the remaining N rows` closed and `— Show only
-   the top 20` open. It names no unit, because the remainder holds both (FR-3).
-   It is reversible and it grows the list in place rather than paging. `core`
-   ranks the full Tracked List. The page truncates, so the threshold and the
-   recipe still reorder across everything (FR-5).
-5. **Open the full sync report.** Click anywhere on `{components.trust-strip}`
-   `[decision — memlog 62]`. The whole strip is the target — the player is
-   mouse-only and there is no keyboard affordance to add. The affordance text
-   sits right-aligned on the strip's first line and reads
-   `+ the full sync report` closed, `− the full sync report` open, in
-   `{colors.sepia}`, taking a dotted sepia underline on hover. It reuses the
-   `{components.expand-affordance}` vocabulary exactly rather than inventing a
-   second one. Clicking again closes it. The panel starts closed on every load.
+2. **Expand a ranked row.** Click anywhere on `{components.ranked-row}`. Click it
+   again to close. The panel opens in place, instantly, below the row. **Many
+   panels may be open at once**, because the player reads them against each other.
+   Nothing closes a panel except a second click on its own row.
 
-6. **Open a Combination's trade-site search.** Click the ↗ glyph on a
-   `{components.combination-row}` (ordinary or the Raw Base's). It opens that
-   Combination's search on the trade site, in a new tab — the only outbound
-   navigation on the page. The glyph is the whole click target. The rest of
-   the row does nothing when clicked. It appears where the entry carries a
-   stored `lastSearchId` **and** that search ran against the active league
-   (PRD FR-33, FR-21; AD-9, AD-24). The test is on the stored field, never on
-   Price State. In practice that means most `priced`, `no-listings` and
-   `unresolvable` rows carry it, and two kinds of row do not. A row the syncer
-   never issued a search for has no id — a `never-synced` row, and also an
-   entry found `unresolvable` before any request was issued, since that
-   detection is offline (PRD FR-24). A row whose last search ran in a previous
-   league has an id the page will not use, because a link into last league's
-   search is the stale answer the honest-empty state exists to prevent
-   (PRD FR-31). See Component Patterns.
+3. **Show the pruned lines.** `+ N pruned` inside an open panel. It is local to
+   that panel and resets when the panel closes.
 
-   **A stale search id is covered rather than open** (finding T4, closed). An
-   id is exactly as old as the attempt that produced it, and FR-12 already puts
-   that attempt's age on the row. A player following a link from a row marked
-   stale was told how old it was before the click. Expiry is stronger still:
-   GGG expires a trade search roughly six months after its last use, and a
-   temporary league is shorter-lived than that, so an id that passes the league
-   test above is younger than the expiry window (PRD FR-33, AD-24). Only a
-   **permanent** league reaches expiry. That case is accepted rather than
-   handled. The cost is one wasted click onto the trade site's own explicit
-   *"search is no longer valid"* page, which misleads nobody.
+4. **Read the remainder of the list.** The list affordance below row 20 is
+   `+ Read the remaining N rows` / `− Show only the top 20`. It names no unit,
+   because the remainder holds both units. It is reversible. It grows the list in
+   place to the full ranked length, and a second click restores the top 20
+   exactly. `core` ranks the full Tracked List and the page truncates. Thus the
+   threshold and the recipe reorder across everything (FR-5).
 
-   **Finding T3 is closed, and it was a misreading rather than a tension**
-   (review-prd-conformance-trade-link.md). It held that SM-1 sat in tension with
-   the page's one link back to the trade site. **PRD SM-1 now rules it**, and
-   this document does not restate the ruling: cite SM-1. What binds here is only
-   the consequence — the link is not a metric failure, so nothing about it needs
-   hiding or defending.
+5. **Open the sync report.** Click `{components.sync-button}` (memlog 254,
+   258 N-7). The panel opens in place under the header bar and pushes the list
+   down. It opens **on the problem list when one holds**. If the page is scrolled
+   at the click, the page scrolls to the top, so the panel opens in view
+   (memlog 265). Click again to close.
 
-Plus one dismissal: the uniform-prior banner's *dismiss for this session ×*.
+6. **Open a Combination's trade-site search.** Click the ↗ on an expansion line,
+   including a Raw Base's line. It opens that search in a new tab. This is the only
+   outbound navigation, and the mark is the whole target. **The ↗ appears where the
+   entry carries a stored `lastSearchId` and that search ran against the active
+   league** (PRD FR-33, FR-21; AD-9, AD-24). The test reads the stored field, never
+   the Price State. Two kinds of entry have no id: a never-synced entry, and an
+   entry found `unresolvable` before any request was issued (FR-24). The page does
+   not use an id from a previous league. A link into last league's search is the
+   stale answer that FR-31 exists to prevent. The ↗ never appears on a pruned line.
+   Where it does not appear, the cell is empty.
 
-**What survives a reload, decided rather than left to silence** (FR-7). **The
-Payout Threshold and the active Craft Recipe** persist, in the viewer's own
-browser storage (FR-7, AD-15). Everything else resets: open panels, the
-tombstone toggles inside them, the grown list, and the sync report all start
-closed on every load, and the banner dismissal lasts the session only.
+   **A stale search id is covered.** An id is exactly as old as the attempt that
+   produced it. GGG expires a search about six months after its last use, and a
+   temporary league is shorter. Thus an id that passes the league test is inside
+   the window. Only a permanent league reaches expiry. The cost is one wasted click
+   onto the trade site's own *"search is no longer valid"* page. PRD SM-1 rules
+   that this is not a metric failure.
 
-*The test is deliberate setting against reading position*, and it has not
-changed — only the number of things that pass it. A value the player **sets**, and
-would be annoyed to set twice, persists. A value that records **where he had got
-to** does not, because a page that reopened four panels from last night would not
-be the resting state the whole design is tuned for. The threshold passed that
-test from the start. **The Craft Recipe passes it identically**
-`[decision — memlog 183]`: FR-26 makes it a choice the player declares about how
-he crafts, not a place he had scrolled to, and it changes the ordering he reads
-in exactly the way the threshold does.
+7. **Reveal the rest of a panel** (memlog 264; state 39). `+ N more combinations`
+   at the foot of an open panel's top 8 lines shows the rest. `− show fewer` hides
+   them again. It is local to that panel and resets when the panel closes.
 
-*FR-7 permits this and does not require it.* FR-7 promises persistence to the
-threshold alone — "no other view state is promised persistence" — and then hands
-the rest to this document by name: *"whether any of them survives is UX's
-decision (`EXPERIENCE.md`)"*. So this is UX exercising a delegation, not an
-overreach. A builder should still not persist **panel** state in order to satisfy
-FR-7; the rule gained one member and did not loosen.
+8. **Read an explanation on hover** (memlog 247, 273). There are three kinds, and
+   nothing else on the page has a tooltip:
+   - a ranked row's trust mark opens `{components.mark-tooltip}`, with its word and
+     reason
+   - `EV (Divine)` opens `{components.ev-tooltip}`
+   - a chase cell that its width cut shows its full text, in the shared tooltip
+     look (memlog 279)
 
-**Hover and active states.** `DESIGN.md` flagged these as open and has since
-settled them. The behaviour is recorded here, and nothing lifts, glows or
-rounds:
+   Pointer leave closes them. A tooltip explains. It never holds a control.
 
-| Target | Hover | Active (pointer down) | Persistent |
-|---|---|---|---|
-| `{components.ranked-row}` | Background to `{colors.paper-inset}`. Cursor pointer. Nothing is revealed, nothing moves, no row changes height | Background to `{colors.paper-deep}` | A row **whose panel is open** takes the `openMarker` — a `{spacing.open-row-marker}` sepia left rule and a promoted bottom rule — and keeps it while any other row is hovered. Tone alone cannot mark the open row, because hover uses the same tone. `[decision — memlog 106]` The marker **bleeds into the gutter** rather than pushing the row. The row stays content-box at `{spacing.content-width}` and the rule takes a negative left margin. No column moves, and the list never jumps sideways when a row opens |
-| `{components.raw-base-row}` | Background to `{colors.paper-raw-hover}`, so a hovered Raw Base row still reads as a Raw Base row instead of collapsing onto the ordinary hover tone | Same as any row | Same |
-| `{components.expand-affordance}` | Its dotted rule becomes solid in `{colors.sepia}`. The text colour does not change | Text to `{colors.ink}` | — |
-| `{components.craft-recipe}` inactive option | `{colors.ink-secondary}` to `{colors.ink}`, and **its resting dotted sepia rule goes solid** — the same promotion `{components.expand-affordance}` makes. Cursor pointer | Same colour, no further change | **At rest it already carries the dotted sepia rule.** That is the correction of revision 3's first draft, which put the rule on hover only and left the page's one new control with no resting affordance |
-| `{components.craft-recipe}` active option | **No hover state and no pointer cursor.** It is not a target — there is nothing to switch to | — | **2px** solid sepia rule beneath the word, `{colors.ink}` at `700`. Two pixels, not one, so it is never read as the threshold's 1px solid hover |
-| `{components.payout-threshold}` figure | Its resting dotted sepia underline goes solid sepia | — | While editing, the underline goes solid `{colors.rule-strong}`, the caret is `{colors.ink}` and the selection is `{colors.paper-deep}`. The readout track and marker never respond to the pointer |
-| Banner dismiss | `{colors.ink-tertiary}` to `{colors.ink}` | — | — |
-| `{components.trust-strip}` | Cursor pointer across the whole strip. Its affordance text takes the `{components.trust-strip}` `affordanceHoverRule` — a dotted `{colors.sepia}` underline. Nothing else about the resting strip changes | — | While open, the affordance reads `− the full sync report` |
-| `{components.combination-row}`, appendix rows, `{components.sync-report-panel}` contents, trust marks | **No hover state.** They are not interactive, and a hover response on a non-target teaches the wrong thing | — | — |
-| `{components.trade-link}` glyph | `{colors.ink-tertiary}` to `{colors.sepia}`, cursor pointer. Nothing else in the row responds | Same colour, no further change | — |
+**One interaction vocabulary: four looks, plus the ranked row** (memlog 248,
+258 N-12). A look means one thing everywhere, so the player learns it once.
+DESIGN.md specifies each look.
 
-Any colour change is instantaneous or at most a fast linear step (memlog 14).
-No fade on a 28px row — a fade on a row this size reads as lag.
+| Look | Means | Where |
+|---|---|---|
+| Dotted underline + help cursor | Hover for an explanation | `EV (Divine)`. A row's trust mark takes the help cursor alone |
+| Accent ▾ + outline on hover | Click to open | `{components.sync-button}` |
+| Accent text | Show more, or act | `{components.show-more}` in all its uses. ↗ turns accent on hover |
+| Accent-filled control | A setting | `{components.recipe-toggle}`, `{components.threshold-control}` |
+| Row hover highlight + open-row bar | A ranked row opens on click | `{components.ranked-row}` |
+
+**Hover and persistent states.** Nothing lifts, glows or bounces. DESIGN.md owns
+the tones.
+
+| Target | Hover | Persistent |
+|---|---|---|
+| `{components.ranked-row}`, both variants | Row highlight and cursor pointer. No row changes height | An open row keeps its bar while any other row is hovered, and its panel carries the same bar. No column moves when a row opens |
+| `{components.trust-mark}` on a row | Help cursor. Opens `{components.mark-tooltip}` | — |
+| `EV (Divine)` | Opens `{components.ev-tooltip}` | — |
+| `{components.chase-cell}`, cut | Shows its full text in the shared tooltip look (memlog 279). The cursor stays the row's | — |
+| `{components.sync-button}` | Outline and cursor pointer | While the panel is open, the button shows its open state |
+| `{components.recipe-toggle}` inactive segment | Cursor pointer | The active segment is not a target |
+| `{components.threshold-control}` | The figure invites typing. The thumb invites a drag | While editing, the figure shows its editing look |
+| `{components.show-more}` | Cursor pointer | — |
+| `{components.trade-link}` | Turns accent, with cursor pointer. Nothing else in the line responds | — |
+| `{components.expansion-line}`, appendix rows, panel contents | **No hover state.** They are not interactive | — |
+
+**Pointer-down** (memlog 265, 268). A pressed `{components.ranked-row}`,
+`{components.sync-button}` or inactive `{components.recipe-toggle}` segment shows
+its pressed look until release (DESIGN.md). Text-only targets
+(`{components.show-more}`, `{components.trade-link}`) and the slider have no
+pressed state. Any colour change is instantaneous or at most a fast linear step
+(memlog 14).
+
+**What survives a reload** (FR-7). **The Payout Threshold and the active Craft
+Recipe** persist, in the viewer's own browser storage (FR-7, AD-15). Everything
+else resets. Open panels, the lines revealed and the pruned lines shown inside
+them, the grown list and the sync report all start closed. The test: a value that
+the player deliberately sets persists, and a value that records how far the player
+read does not. The recipe is a deliberate setting, like the threshold (memlog 183).
+FR-7 hands that decision to this document by name. **If a saved recipe is no
+longer published, the page silently uses the first published recipe**
+(memlog 275).
 
 **Out of scope, explicitly:** focus-visible styling, `Tab` traversal, keyboard
-shortcuts, access keys, drag of any kind, right-click menus, and touch gestures.
-Input is mouse-only (memlog 13).
+shortcuts, access keys, right-click menus and touch gestures. Input is mouse-only
+(memlog 13).
 
 **Banned everywhere:**
 
 - Sorting by column.
 - Hover-revealed row actions.
-- Tooltips.
-- Modals.
+- Tooltips other than Interaction 8's three kinds, any tooltip that holds a
+  control, and any tooltip that stands in for cut text other than a chase cell's.
+- Modals, drawers, overlays and dropdown panels.
 - Auto-refresh or polling that changes the list under the player's eyes.
 - Any animation that attracts attention to a row.
 - Any write path from the browser (AD-15, AD-21).
 - Copy-to-clipboard JSON snippets per row, rejected for v1.
-- **Mantine's `SegmentedControl`, `Select`, `Radio` or `Switch` for the Craft
-  Recipe.** All four bring a filled track, a radius or a form control's chrome,
-  and the page has none of those. The recipe is two words and a rule, the same
-  way the threshold is a figure and a rule (memlog 73, 181).
 
 ## Accessibility Floor
 
-**This floor is thin because the user decided it should be, not because it was
-overlooked** (memlog 13). This is a product for exactly one person, read on one
-known monitor with a mouse in hand. Accessibility is explicitly not a
-requirement. No WCAG level is targeted, no contrast ratio is claimed, no
-screen-reader behaviour is specified, no keyboard path is provided, and no
-reduced-motion handling is needed because nothing moves. **Do not infer any of
-these from the fact that a floor section exists.** If the product ever acquires
-a second user, this section is the first thing that has to be rewritten.
+**This floor is thin because the user decided it should be** (memlog 13). This is
+a product for one person, read on one known monitor with a mouse in hand. No WCAG
+level is targeted. No screen-reader behaviour is specified. No keyboard path is
+provided. No reduced-motion handling is needed, because nothing moves. If the
+product ever gets a second user, rewrite this section first.
 
 What does bind:
 
-- **NFR-10, reframed as legibility** (memlog 15). Every product-meaningful
-  distinction — Price State (FR-9), Provenance (FR-10), Raw Base versus crafted
-  (FR-3) — carries a non-colour cue alongside any colour: a glyph, a word, a
-  weight, a tint plus an italic, never hue alone. The test is whether the page
-  still reads with every colour removed. It does: two semantic inks, each
-  always spoken with a glyph *and* a word.
-- **The third distinction is the one revision 3 rebuilt.** Raw-Base-versus-crafted
-  was carried by a tint, an italic and the word `RAW BASE`. The user's direction
-  was that the player knows the difference and does not need it spelled, and
-  asked for a glyph or colour instead `[decision — memlog 184]`. **Colour alone
-  was not available under this very rule**, so the word retired in favour of
-  `{components.unit-glyph-raw}` and `{components.unit-glyph-class}` — and a glyph
-  passes the colour-removed test exactly as a word does. The cue count is
-  unchanged at three for a raw row, and a crafted row gained one where it
-  previously relied on being the unmarked default. That last part is the real
-  improvement: FR-3 makes the two units peers, and a distinction carried only by
-  marking one side fails as soon as the other side stops being obvious.
-- The justification is the angled mid-session glance across a desk, not
-  conformance. That is an honest statement of why the rule survived, and it is
-  the same rule either way.
-- **Rendered text, not raw ids.** The Trade Catalogue exists so a `statId`
-  renders as its human text without a runtime call to the trade site (FR-33).
-  Raw ids on the page are a legibility failure, not a cosmetic one.
-  `[decision — memlog 86]` The denomination is rendered as **text**, not as an
-  icon: there is one denomination on the whole page, so the currency-icon half
-  of FR-33 has nothing to do here and no icon appears anywhere in the product.
-  A `statId` renders as its display text from the stats catalogue (FR-33,
-  AD-25). Where the denomination's label comes from is AD-24's, and this
-  document does not restate it `[memlog 229]`.
-- **A Hybrid Modifier label adds no binding** `[decision — rev 17]`. The comma is
-  text, so the label passes the colour-removed test. Telling a hybrid from two
-  separate affixes is not a Price State, Provenance or Raw-versus-crafted
-  distinction, and the page does not claim to carry it (see the Domain Vocabulary
-  decision on the accepted ambiguity). Each line is rendered text from the
-  catalogue or the short-form table, never a raw `statId`.
+- **A contrast floor** (memlog 258 N-18, 265). Every piece of text, dimmed text
+  included, reaches at least **4.5:1** against `{colors.ground}` and against every
+  surface it sits on (`{colors.surface}`, `{colors.surface-raised}`), tooltips
+  included. The trust and rarity colours meet it as text. DESIGN.md, Colors, holds
+  the measurements. The reason is the angled mid-session glance across a desk at a
+  dark page, not conformance.
+- **NFR-10, as legibility** (memlog 15). Colour alone never carries a
+  product-meaningful distinction. The test: the page still reads with every colour
+  removed.
+  - **Price trust**: by silhouette. ◐, ○ and ✕ differ, and an empty slot is the
+    fourth state. The word is inline on an expansion line and one hover away on a
+    row (memlog 247).
+  - **Estimated odds**: by ≈, which no other mark resembles.
+  - **Crafted versus Raw Base**: by the sell-as-is line that a Raw Base row prints
+    in place of chase combinations (memlog 258 N-13). On a Raw Base's expansion,
+    by its lone entry.
+  - **Rank emphasis, dimmed figures and below-threshold lines**: by weight, the
+    minus sign and the words `below threshold`, never by tone alone.
+- **Rendered text, not raw ids.** A `statId` renders as its catalogue display text
+  without a runtime call (FR-33, AD-25; memlog 86). The denomination is text, and
+  AD-24 owns where its label comes from (memlog 229). The marks are inline SVG
+  drawings, the same on every machine (memlog 274). Every word and figure beside
+  them is text.
+- **A Hybrid Modifier label adds no binding** (PRD FR-34). The comma is text. The
+  page does not claim to carry the difference between a hybrid and two affixes.
 
 ## Responsive & Platform
 
-Unusual, and stated explicitly so nobody adds what is missing.
+These platform rules are unusual. This section states them so that nobody adds
+what is deliberately absent.
 
-- **The frame is a constant, not a breakpoint.** `{spacing.frame-width}` wide in
-  a `{spacing.frame-height}` portrait frame, centred on any wider viewport with
-  `{colors.surround}` to the sides.
-- **Target: a 1080x1920 portrait second monitor**, beside the running game, for
-  the length of a session.
-- **The frame is 1060px, not 1080px, and that is deliberate**
-  `[decision — memlog 120/121]`. **Do not "correct" it back to the viewport
-  width.** The document scrolls by design once a panel is opened, and a vertical
-  scrollbar eats ~15–17px of a 1080px monitor, so a 1080px frame would clip its
-  right edge or force a horizontal scrollbar the moment the player expanded
-  anything — and the 1px outline edge made it 2px worse again. 1060px leaves
-  ~3px of slack against a 17px scrollbar.
-- **The 20px came out of the gutters, not the columns.**
-  `{spacing.frame-padding-x}` tightened to 24px so that
-  `{spacing.content-width}` stays exactly 1012px: 1060 − 48 = 1012. **No column
-  contract moves**, all five verified sums survive, and the chase budget stays
-  at 27 characters `[memlog 122]`. Recutting the columns would have taken the
-  20px from the chase cells under the ellipsis principle and dropped the budget
-  to ~26 — and 27 had already forced coining `ES`. A gutter has no contract. A
-  chase cell does. The open-row marker still bleeds 3px into the remaining 24px.
-- **No breakpoints.** Nothing reflows, stacks, collapses or hides below
-  `{spacing.frame-width}`. There is no phone layout and none is planned.
-- **No dark mode.** Light mode is a decision (memlog 12/16) — warm paper chosen
-  against the glare of a dark game at night.
-- **No scrolling in the default state.** Twenty rows, the appendix, the key
-  block and the foot fit inside `{spacing.frame-height}`.
-
-**The overflow rule, stated plainly: *nothing the player has not clicked may
-push the page past 1920px.*** `[decision — memlog 63/64/65]` The no-scroll rule
-binds the resting state — what the player reads at a glance — and not a state he
-opened himself.
-
-1. **`{spacing.frame-slack}` is the expansion budget** — **530px** `[change —
-   memlog 210]`, computed from the committed block heights at the declared
-   line-heights, sitting between the last ranked row and the appendix. Three
-   things are charged against it by *data* rather than by a click and therefore
-   belong to the resting budget: `{spacing.frame-reserve-banner}` for the
-   uniform-prior banner, `{spacing.frame-reserve-health-line}` for the trust
-   strip's health line, and `{spacing.frame-reserve-absence-line}` for each
-   absence line (state 38). They cannot all co-occur. `DESIGN.md`, Layout &
-   Spacing, owns the worst-case resting height and the headroom it leaves
-   `[memlog 213]`.
-2. **The sync report opens against the slack first.** It is capped at
-   `{spacing.sync-report-max-height}` — an independent **400px**, chosen to sit
-   inside that worst-case headroom — and scrolls inside its own band past that. So
-   `{components.sync-report-panel}` alone never makes the page scroll, in any
-   data state.
-3. **A ranked row's expansion is deliberately uncapped.** Capping it would hide
-   tracked Combinations or tombstones, which FR-8 forbids. An expansion — or an
-   expansion plus the sync report — that exceeds the slack **makes the frame
-   scroll**, and that is the intended behaviour, not a defect.
-4. **Collapsing everything restores the exact fit.** The page must return to the
-   same 1920px it started at.
-
-**Which box scrolls** `[decision — memlog 80]`: the frame takes `min-height:
-{spacing.frame-height}`, not `height`, and **the document scrolls**. The frame
-never receives `overflow-y`, and neither does any region inside it except
-`{components.sync-report-panel}`, the one capped band. So the appendix, the key
-block and the running foot travel with the page rather than staying pinned over
-a scrolling list — this is a page, and its printed order stays true when it gets
-longer.
-
-**Forbidden as overflow escape hatches:** shrinking rows, dropping columns,
-truncating `{components.unrankable-appendix}`, hiding
-`{components.key-block}`. Density is fixed and scrolling is the only release
-valve.
-- **Static delivery.** The page paints before it fetches. Both font stacks are
-  system-resident and nothing is downloaded (NFR-7).
+- **Target: a 1080×1920 portrait second monitor**, beside the running game, for
+  the length of a session (memlog 258 N-22).
+- **The frame is bounded, not fixed**, and centred (DESIGN.md, Layout & Spacing;
+  memlog 258 N-22). Below its minimum the page scrolls sideways. There is no phone
+  layout, and none is planned.
+- **One width-dependent rule** (memlog 273). Best combinations shows three cells
+  when the chase column fits a third cell uncut at the measured budget. Otherwise
+  it shows two, each wider. DESIGN.md, *The chase column*, owns the widths. The
+  switch changes every crafted row at once. A cell that still overflows ends in an
+  ellipsis and shows its full text on hover (Interaction 8). The remaining
+  combinations stay one click away in the expansion. Nothing else reflows, stacks,
+  collapses or hides at any width.
+- **The page is as tall as its content** (memlog 243), and the document scrolls.
+  The header bar is the only pinned region. The sync report is the only region
+  with its own scroll. The appendix and the footer move with the page, so its
+  printed order stays true when it grows.
+- **What grows the page.** A click: an expansion, its revealed lines, its pruned
+  lines, the sync report, the grown list. Data: a long appendix, and state 35's
+  two branches. In the FR-30 case (memlog 203), every Item Class is Unrankable
+  until a conforming Weights File exists. The appendix then holds every row,
+  untruncated, at the foot, and the page scrolls beneath it. Scrolling is the only
+  release valve. **Forbidden as overflow escape hatches:** shrinking rows,
+  dropping columns, truncating `{components.unrankable-appendix}`, hiding
+  `{components.footer-legend}`.
+- **Static delivery.** The page paints before it fetches. Its fonts ship as
+  DESIGN.md, Typography, says (memlog 242). The page fetches no font from a third
+  party.
 
 ## Key Flows
 
-The PRD's own journey names and substance, kept verbatim. `[OVERRIDE —
-memlog 21]` These keep the PRD's **"the player"** wording rather than taking a
-named protagonist, departing from the UX method's named-protagonist rule: the
-product has exactly one user, the brief's singular voice already carries the
-concreteness a name would add, and divergent naming across the PRD and this
-document would be a discipline violation under the PRD's Glossary-anchored rule.
+The PRD's own journey names. `[OVERRIDE — memlog 21]` These flows keep the PRD's
+**"the player"** as the protagonist. The product has one user, and the brief's
+singular voice carries the concreteness that a name would add.
 
 ### UJ-1 — The pre-session read
 
-→ Steps 2 to 6 are the page in
-[`mockups/key-hero-resting.html`](mockups/key-hero-resting.html).
+→ Steps 3 to 5 are the page in
+[`mockups/key-redesign-dark.html`](mockups/key-redesign-dark.html).
 
 1. The player is about to map for two hours and opens the view on the second
    monitor.
-2. Skeleton rows paint in the final layout and resolve in one transition
-   `[ASSUMPTION — memlog 51]`.
-3. He reads `{components.trust-strip}` in passing — producer, `generatedAt`,
-   `gamePatch`, last synced. There is no third line on it, which is the strip
-   saying nothing is wrong rather than the strip saying nothing at all.
-4. He glances at the top five rows under his current threshold **and the recipe
-   he left active last session**, which is where the page opens because both
-   persist (FR-7). Each row opens with its glyph, so he can see at a glance that
-   rank 2 is an Item Class he crafts on and rank 3 is a Base Type he sells raw —
-   two different acts, in one ordering. Rank emphasis is carried by weight, so
-   the top band reads first without being bigger.
-5. He notes the two or three Chase Combinations on each crafted row, read as a
-   tier and a canonical short form per affix — `T1 Cold Res · T1 Mana`. He does
-   not have to recall what value spread a tier covers, which is the whole reason
-   the tier is printed and the value is not. A raw row has no chase cells; it
-   carries its note instead, because there is nothing to chase on it.
-6. **Climax:** he closes nothing and touches nothing. The page is already at
-   rest in the state he needs it in, and it stays that way on the second monitor
-   for the whole session. He picks up accordingly — the classes to craft on and
-   the bases to sell raw, told apart without reading a word of either.
+2. The header bar and skeleton rows paint in the final layout and resolve in one
+   transition `[ASSUMPTION — memlog 51]`.
+3. The player's eye crosses the header bar in passing. It sees the league, and the
+   recipe and threshold they left last session (both persist, FR-7). It sees the
+   sync button reading its age, not a count. The button says that nothing is
+   wrong. It is not silent.
+4. They read the top five. Blue names are Item Classes they craft on. Grey names
+   are Base Types they sell as is, and each of those says so in words where the
+   blue rows list combinations. These are two different acts in one ordering. The
+   mark slots after the EV figures are empty, so every price they read is current.
+5. They note the Best combinations on each crafted row, read as a tier and a short
+   form per affix: `T1 Cold Res · T1 Mana`. They do not recall value spreads. The
+   tier is the comparison.
+6. **Climax:** they close nothing and touch nothing. The page is already at rest in
+   the state they need. It stays that way on the second monitor for the whole
+   session. They pick up accordingly: the classes to craft on and the bases to
+   sell as is, told apart by colour at a glance.
 
-Failure path: a required file cannot be used, because it does not match its
-schema, declares a version the page does not read, or was not published.
-`{components.refusal-screen}` replaces the page (**state 26**), naming which
-file and why. Or a data file does not arrive and `{components.fetch-failure-screen}`
-offers him `+ Try again` (**state 28**). Either way he plays without the tool
-rather than with a wrong one, and never with half a ranking.
+Failure path: a required file cannot be used. It does not match its schema,
+declares a version that the page does not read, or was not published. The refusal
+screen replaces the page (**state 26**) and names which file and why. Or a data
+file does not arrive, and the fetch-failure screen offers `+ Try again`
+(**state 28**). Either way the player plays without the tool rather than with a
+wrong one, and never with half a ranking.
 
 ### UJ-2 — The threshold turn
 
 1. The player is now richer than at league start.
-2. He clicks the threshold figure itself and types `1` over `0.25` — the number
-   is the input, so there is nothing to aim at but the number.
-   `[OVERRIDE — memlog 36/37]` He types rather than drags. The slider is gone,
-   though the track beneath still shows him where `1` sits in the range.
-3. On the first valid parse, debounced ~150ms `[ASSUMPTION — memlog 38]`, the
-   ranking re-runs synchronously against the already-loaded artifacts. No
-   network request, no sync.
-4. The list reorders. Steady moderate Item Classes fall away. Jackpot classes
-   rise. Raw Bases move among them on their own prices. This is correct
-   behaviour, not a bug (FR-6).
-5. Chase Combination sets change with it — only Combinations at or above the new
-   threshold remain, and some rows now show fewer than three, or none.
-6. **Climax:** he re-reads the new top five. The page that answered one
-   player's question a moment ago now answers a richer player's question, and
-   nothing else on it moved.
+2. They take the slider's thumb and drag it right (memlog 255). The list sweeps
+   under their hand. Steady moderate Item Classes drop, jackpot classes rise, and
+   Raw Bases move among them on their own prices (FR-6).
+3. They release the thumb near `1`, then click the figure and type `1` exactly. On
+   the first valid parse, debounced about 150 ms `[ASSUMPTION — memlog 38]`, the
+   ranking re-runs synchronously against the loaded artifacts. There is no network
+   request.
+4. Best combinations change with it. Only Combinations at or above the new
+   threshold remain, and some rows now show fewer, or none.
+5. **Climax:** they read the new top five again. The page answered one player's
+   question a moment ago. Now it answers a richer player's question, and nothing
+   else on it moved.
 
-Second turn, the same shape: **richer also means a different recipe.** He clicks
-`perfect` in `{components.craft-recipe}` and the list reorders again — this time
-because a different set of outcomes is reachable, not because a different set
-clears the bar (FR-26). The Craft Cost line under the control tells him what the
-better orbs cost him per attempt, which is the figure that makes the two
-orderings comparable at all.
+Second turn, the same shape: **richer also means a different recipe.** They click
+`perfect` in `{components.recipe-toggle}`, and the list reorders again. This time a
+different set of outcomes is reachable (FR-26). The Craft Cost beside the toggle
+tells them what the better orbs cost per attempt. That figure makes the two
+orderings comparable.
 
-Failure path: he types a value nothing clears (**state 25**). The list does not
-silently look like a data outage — the page must distinguish "nothing clears your
-threshold" from "no data", and it is the only failure path in this document with
-its own remedy already on screen: the figure he typed, 16px away. So the page
-names the condition and the live threshold, states no instruction, and leaves the
-rows where they are (state 25, memlog 204).
+Failure path: they set a value that nothing clears (**state 25**). The page does
+not look like a data outage. The list statement names the condition and the live
+threshold, states no instruction, and leaves the rows where they are. The remedy
+is already under their hand in the header (memlog 204).
 
 ### UJ-3 — The drill-down
 
-→ Steps 3 to 6 are the panel in
-[`mockups/key-expanded-states.html`](mockups/key-expanded-states.html), which
-carries all four Price States on one Item Class.
+→ Steps 3 to 5 are the open Bows panel in
+[`mockups/key-redesign-dark.html`](mockups/key-redesign-dark.html).
 
-1. The player is unsure why an unfamiliar Item Class ranks third.
-2. He clicks anywhere on its `{components.ranked-row}`.
-3. `{components.expansion-panel}` opens in place, repeating the active threshold,
-   the active Craft Recipe and the asking-price framing — the three things the
-   figures above it depend on.
-4. He reads every Tracked Entry on the Item Class: which are `priced` and at
-   what, how old each price is, which returned `no-listings`, which are
-   `not-yet-synced` and why, and which are `unresolvable`.
-5. Entries below the threshold are present and marked as adding nothing to EV —
-   he can see what the ranking deliberately excludes as well as what it is built
-   from.
-6. Exact ages sit here for every entry. Each combination row's **second line**
-   carries the note and **both clocks in their own cells** — *priced 11h ago*
-   beside *tried 4h ago* — so the two are never collapsed and neither is cut
-   `[decision — memlog 101]`. That holds for rows that carried no age upstairs,
-   and for a Raw Base, whose expansion holds the one degenerate Combination row
-   rather than nothing at all `[decision — memlog 71]`. He can leave this panel
-   open and expand a second row beside it to read the two against each other —
-   including a crafted row against a raw one, which is the comparison the mixed
-   list exists to make possible.
-7. **Climax:** the third rank stops being a claim and becomes an argument he can
-   check. He either accepts it or does not, on evidence he just read.
+1. The player is unsure why an unfamiliar Item Class ranks second.
+2. They click anywhere on its `{components.ranked-row}`.
+3. `{components.expansion-panel}` opens in place. Its first line names the class in
+   full. Then it says in plain words that some roll odds are estimated and that
+   every price below is a real listing. The threshold and recipe that the figures
+   depend on are in the sticky header above.
+4. They read its top 8 lines. First come the priced Combinations, by what each adds
+   to the EV. They are quiet where the price is current, and one reads
+   `◐ rough · priced 5 days ago`. Then a dimmed line reads `below threshold`. It
+   shows what the ranking deliberately leaves out, as well as what the ranking
+   uses. Then lines read `○ pending · tried 2 days ago · no listings` and
+   `○ pending · not checked yet`.
+5. They click `+ N more combinations` (memlog 264) and read every other Tracked
+   Entry on the class, down to one `✕ broken · gone after a patch`. Each problem
+   line names its clock, so an old price and a long search are never one
+   unlabelled age. `− show fewer` returns the panel to its top lines.
+6. They leave this panel open and expand a second row beside it: a Raw Base. They
+   read its one line against the crafted ones. That comparison is the reason for
+   the mixed list.
+7. **Climax:** the second rank stops being a claim and becomes an argument they can
+   check. They accept it or not, on evidence they just read.
 
 ### UJ-4 — The trust check
 
-→ Steps 2, 4 and 5 read off
-[`mockups/key-hero-resting.html`](mockups/key-hero-resting.html): the marked
-rows among the silent ones, and the strip beneath the masthead.
+→ Steps 2 and 3 come from the specimen box of
+[`mockups/key-redesign-dark.html`](mockups/key-redesign-dark.html).
 
-1. The player notices an Item Class ranking suspiciously high.
-2. Its Age cell is not empty — and on this page a non-empty cell is the whole
-   signal. It reads *priced 5d ago*.
-3. Above the list, `{components.uniform-prior-banner}` is up: the whole ranking
-   rests on a uniform prior, and relative ordering between Item Classes is not
-   evidence-backed.
-4. He reads `{components.trust-strip}` and sees the `gamePatch` the weights file
-   declares. The page does not tell him the patch is old — it has no way to know
-   what patch is live — but he does, and the two facts sit next to each other.
-5. **Climax:** he discounts that Item Class rather than acting on it. The page
-   did not hide the weakness and did not apologise for it — it simply refused to
-   look more confident than its data deserved.
+1. The player notices an Item Class that ranks suspiciously high.
+2. Its mark slot is not empty. On this page a mark is the whole signal. A ◐ sits
+   after the EV, and an ≈ before it.
+3. They rest the pointer on the ◐:
+   `rough · 74% of this EV rests on unreliable prices`. They rest it on
+   `EV (Divine)`. The tooltip decodes the ≈ as *some roll odds are estimated*, a
+   statement about odds, not price.
+4. They open the row. The lines that carry the figure read
+   `◐ rough · priced 5 days ago`, and the context line names the estimated odds.
+5. They click `Synced 1m ago ▾` and read the Weights File's `gamePatch` in the
+   sync report. The page cannot know which patch is live, but the player does. The
+   two facts are one click apart.
+6. **Climax:** they discount that Item Class rather than act on it. The page did
+   not hide the weakness and did not apologise for it. It refused to look more
+   confident than its data deserved.
 
-*One mark he will not find, and should not look for.* If the suspicious row had
-been a Raw Base, its Provenance cell would be empty — not because the page is
-confident about it, but because a Raw Base rests on no modifier pool at all
-(FR-4). Its trust lives entirely in its Age cell and its price. The key block's
-*Silence means healthy* column is what stops that empty cell reading as a
-withheld judgement.
+*One mark that the player will not find, and should not look for.* A Raw Base never
+carries ≈, because it rests on no modifier pool (FR-4). Its trust lives entirely in
+its own price's verdict. An empty slot there means that the price is current, as
+the footer legend says.
 
 ### UJ-5 — The curation pass
 
-**Partially supported by design** `[OVERRIDE — memlog 22/25]`. The view has no
-write path and offers no JSON snippet to paste. The *review* is fully supported
-on the page. The *edit* happens in a text editor and git.
-
-→ Steps 3 to 5 are in
-[`mockups/key-expanded-states.html`](mockups/key-expanded-states.html): the sync
-report open, and the tombstone band open inside a panel.
+**Partially supported by design** `[OVERRIDE — memlog 22, 25]`. The view has no
+write path and offers no snippet to paste. The page fully supports the *review*.
+The *edit* happens in a text editor and git.
 
 1. The player reviews deliberately after a few weeks.
-2. He does not have to go looking, and he does not have to click anything to
-   start. `{components.trust-strip}` has been carrying the tracked-list edit
-   date in plain type all along — it reads six weeks back, which is what a few
-   weeks of not reviewing looks like `[decision — memlog 89]` — and it has been
-   carrying a rust line, `× 12 unresolvable`, for days
-   `[decision — memlog 70/88]`. Between them, that is why he is here.
-3. He clicks the strip and opens `{components.sync-report-panel}` for the rest:
-   the count behind that rust line (FR-24), the pinned-starvation records
-   (FR-25) that tell him a pin he set is not being served, and the coverage
-   fraction with its denominator, which tells him how much of what he tracks the
-   ranking can speak for at all.
-4. The report counts what broke and does not say which Item Class holds it
-   `[memlog 235]`, so he finds it by opening panels — several at once, left
-   open side by side — and reading their full Combination lists. He finds three
-   Combinations that have returned `no-listings` all league, and one flagged
-   `unresolvable` since the last patch.
-5. He opens `+ N pruned` on a panel and reads the existing tombstones with their
-   reasons — FR-8's inclusion of tombstones is what makes this review possible
-   without opening the file.
-6. `{components.running-foot}` tells him where the edit happens.
-7. **Climax:** he leaves the page knowing exactly which entries to touch and
-   why. He opens `data/tracked.json`, tombstones the dead Combinations with a
-   reason, pins one Combination he wants watched closely, and commits. The next
-   sync run reflects the edit, and the next time he opens the page the
-   tombstones he wrote are in the band and the starvation record is gone from
-   the report.
+2. They do not have to go looking. For days the sync button shows a red
+   `✕ N problems` in place of its age (memlog 254, 265, 270). It is red because a
+   counted entry is broken. That is why the player is here.
+3. They click it. The sync report opens under the header, on its problem list. It
+   shows broken entries (FR-24) and a pinned-starvation record (FR-25). The record
+   tells them that the rotation does not serve a pin they set. Beside them, the
+   Tracked List edit date reads six weeks back. The coverage fraction with its
+   denominator tells them how much of what they track the ranking can speak for.
+4. The report counts what broke but does not say which Item Class holds it
+   (memlog 235). So they open panels, several at once and side by side, and show
+   their full lists with `+ N more combinations`. They find three Combinations that
+   read `○ pending · tried N days ago · no listings` all league, and one
+   `✕ broken · gone after a patch`.
+5. They open `+ N pruned` on a panel and read the existing pruned lines with their
+   reasons. FR-8 includes pruned entries, so this review needs no visit to the
+   file.
+6. The footer tells them where the edit happens:
+   `Curation lives in data/tracked.json.`
+7. **Climax:** they leave the page knowing exactly which entries to touch and why.
+   They open `data/tracked.json`, prune the dead Combinations with a reason, pin
+   one they want to watch closely, and commit. The next sync reflects it. The next
+   time they open the page, the button reads its age again, and the entries they
+   pruned are behind `+ N pruned`.
 
-What stays unsupported: the edit itself. Nothing on the page writes, and no row
-offers a snippet to paste. That is deliberate — `data/tracked.json` is
-hand-owned (AD-15, AD-21) and this is an act performed a handful of times a
-league.
+What stays unsupported: the edit itself. `data/tracked.json` is hand-owned (AD-15,
+AD-21). The player does this a handful of times a league.
 
 ### UJ-6 — The league reset
 
 1. A new league starts. The player edits the active league in `data/config.json`
    and commits.
-2. He opens the page. Every tracked unit renders in canonical order
-   `[decision — memlog 48]` — every Item Class and every Raw Base, each with its
-   glyph — carrying Price State `not-yet-synced` with reason `league-mismatch`.
-3. `[ASSUMPTION — memlog 49]` Rank numerals are suppressed and the list states
-   that this order is canonical and not ranked. An ordering implies a ranking,
-   and this ordering means nothing yet. `[decision — memlog 83]` Every EV cell
-   holds the phrase **no figure yet** — not a blank, not a zero. The money slot
-   answers this state with the vocabulary it already had.
-4. `{components.asking-price-line}` and `{components.key-block}` still render.
-   The page explains itself even with nothing to say.
-5. Over the following day, rows acquire prices as the sync rotation reaches
-   them, and ages start to differ row to row because the refresh is long and
-   partial.
-6. **Climax:** the ranking refills in front of him rather than appearing
-   finished. He watches the recovery happen, which is why a takeover state was
-   rejected — and at no point does the page serve last league's numbers as
-   though they were this league's.
+2. They open the page. Every tracked unit renders in canonical order (memlog 48),
+   every Item Class and every Raw Base. Each carries ○ in its mark slot, and the
+   tooltip reads `pending · price from last league`.
+3. `[ASSUMPTION — memlog 49]` Rank numerals are suppressed, and the list statement
+   says that the order is canonical and not ranked. Every EV cell reads `—` beside
+   its ○: not a blank, not a zero. The page states honestly, on every row, that it
+   has no figure yet (memlog 257).
+4. The footer legend still renders. The page explains itself even with nothing to
+   say.
+5. Over the following day, rows lose their ○ as the sync rotation reaches them. The
+   ranking takes shape row by row, because the refresh is long and partial.
+6. **Climax:** the ranking refills in front of the player rather than appearing
+   finished. They watch the recovery happen. At no point does the page serve last
+   league's numbers as this league's.
 
 ## Coverage Self-Check
 
-Run against `references/validate.md` Pass 1.
-
-- **Flow coverage — complete.** All six PRD journeys (UJ-1…UJ-6) have a Key
-  Flow with numbered steps and a climax beat. Failure paths where one exists:
-  UJ-1, UJ-2. UJ-5's partial support and UJ-6's honest-empty landing are stated
-  as such. Protagonist is "the player" by deliberate override (memlog 21).
-- **State coverage — 39 states enumerated** across Price States and their
-  reasons, Curation Statuses, Provenance values, Unrankable reasons, load,
-  empty, stale, refusal, fetch-failure, report, sync-health, grown-list,
-  **Craft Recipe** and **absent-artifact** conditions. Revision 3 added 12a (a
-  Raw Base's absent Provenance), 34 (a recipe switch), 35 (an uncostable recipe)
-  and 36 (a class unrankable under one recipe only). Revision 7 added 37 (the
-  empty appendix) and 38 (a tolerable artifact absent). **One** carries `[NOTE
-  FOR UX]`: the reason string a recipe-scoped Unrankable would need (36), which
-  is the PRD's to extend and stays declined per PRD memlog 151. Revision 7
-  closed the skeleton's appearance (22, memlog 211). *It was six, then five, and revision 4 closed three at once* — the
-  nothing-clears copy (25, memlog 204), what crafted rows do under an uncostable
-  recipe (35, memlog 205, with PRD revision 19 carrying the player-visible half),
-  and the cross-file report's placement (27, memlog 206). The pinned mark closed
-  the sixth at `[decision — memlog 199]` — state 9 now carries
-  `{components.curation-status-pinned}` and no note. The count is a consequence
-  and not a target.
-- **State-number references swept.** Memlog 170 renumbered rows by script
-  without sweeping the prose that cites them, so five references were off by
-  one. All five are corrected at revision 3 and the numbers are now treated as
-  stable identifiers: **renumbering is a sweep, not a script.**
-- **Component coverage — every component named in `DESIGN.md.Components` has a
-  behavioural row** in Component Patterns, under the same name, including
-  `{components.sync-report-panel}`, `{components.refusal-screen}`,
-  `{components.fetch-failure-screen}` and, new at revision 3,
-  `{components.craft-recipe}`, `{components.unit-glyph-class}` and
-  `{components.unit-glyph-raw}`. There was never a `raw-base-tag` *component*:
-  the `RAW BASE` tag lived inside `{components.raw-base-row}` and retired with
-  its typography role.
-- **Interaction numbering deliberately not resequenced.** The Craft Recipe
-  switch is numbered **1a** rather than 2, because prose elsewhere in this
-  document and in the mockup captions cites interactions by number ("the result
-  of interactions 2, 3 and 5"). Inserting a new 2 would have silently
-  invalidated those. This is the same lesson the state-number sweep above
-  records, applied before the fact rather than after it.
-- **Token references — all resolve** against `DESIGN.md`'s declared token names,
-  verified by script at revision 3: 148 distinct `{…}` references against 140
-  declared tokens, nothing unresolved.
-  **A retired token name is written without braces**, as `typography.row-ev-unit`
-  rather than as a reference, so that `{…}` means *this resolves* and the check
-  above can be run mechanically. Removed upstream and referenced nowhere:
-  `typography.row-ev-unit`, `spacing.col-combination-age`,
-  `typography.raw-base-tag`, and `spacing.col-tombstone-removed` (memlog 234).
-  Three tokens were **renamed** at revision 3 because their names described only the crafted branch's old unit:
-  `spacing.col-base-type` → `{spacing.col-unit}`,
-  `spacing.pad-base-type-right` → `{spacing.pad-unit-right}`, and
-  `typography.row-base-type` → `{typography.row-unit-name}`. The widths are
-  unchanged and no column sum was reopened. The newer
-  `{typography.combination-line-2}`, `{spacing.recipe-panel-width}`,
-  `{typography.row-unit-glyph}` and the `typography.recipe-*` roles are used where they apply.
-- **Revision 3's new visual work went through an `impeccable` critique** before
-  it closed — two isolated assessments, scored **26/36 (Good)**, snapshot in
-  `.impeccable/critique/`. It found one P0 (`{components.craft-recipe}` had no
-  resting affordance, memlog 191) and two P1s, and the mechanical half caught a
-  ragged left edge (195) and a two-typeface glyph vocabulary (196) that the
-  design half missed entirely. All were fixed. **One standing caveat: no browser
-  automation existed in that session**, so nothing here has been rendered and
-  verified by eye — every geometric claim is computed from the CSS and the font
-  outlines. That is why the hanging-indent proposal was recorded rather than
-  applied.
-- **Column sums re-verified by script at revision 3**, not carried on trust:
-  ranked row 32 + 222 + 84 + 88 + 94 + 492 = **1012**; frame 1060 − 2×24 =
-  **1012**; chase 492 ÷ 164 = **3** cells; appendix 292 + 118 + 250 + 310 =
-  **970**; combination line one 460 + 250 + 116 + 116 + 24 = **966**; line two
-  560 + 200 + 206 = **966**; tombstone line two, one cell, **966** (memlog
-  234). New this revision: masthead controls 216 + 16 + 276 = **508**, and 1012 − 508 − 24
-  clearance = **480** = `{spacing.dek-max-width}`. Every chase Combination in
-  both mockups is inside the 27-character budget; the longest is 25.
-- **Note copy checked against its cell.** Every note string this document
-  specifies is 39–68 characters, which sits inside
-  `{spacing.col-combination-note}` less `{spacing.pad-combination-cell-right}`
-  at `{typography.combination-line-2}` with room to spare — and line two wraps
-  rather than truncating in any case, growing by whole absolute-line-height
-  steps, so a longer note added later grows the row instead of losing text.
-  Both clocks have their own cells
-  (`{spacing.col-combination-age-observed}`,
-  `{spacing.col-combination-age-attempted}`) and no longer share one.
-- **Resolved since the first draft.** Each item below was open once and is now
-  settled:
-  - FR-18, by the tracked-list edit date printed as a plain fact on
-    `{components.trust-strip}` (memlog 89).
-  - FR-24 and FR-25, by the rust health line at rest and the figures behind it
-    in `{components.sync-report-panel}` (57, 61, 70, 88).
-  - FR-4's coverage fraction, in the same panel (58).
-  - FR-8's Raw Base expansion (71, 117).
-  - The threshold's range, step and readout (73, 74).
-  - Both failure screens (75).
-  - Display precision (85) and the honest-empty EV cell (83).
-  - Glossary wordings (84) and currency as text (86).
-  - Scroll semantics and the vertical budget (80, 81), and the 1060px frame
-    (120, 121).
-  - The two-line combination row and the tombstone contract (101, 105, 115,
-    116).
-  - The unreviewed cut-off, resolved **by removal** (88). The third loud
-    trigger is gone and no threshold is defined, so nothing is left open there.
-  - **FR-4's coverage bands, resolved by removal upstream** (185). PRD revision
-    18 withdrew the 50–80% band, so the appendix's prominence is now a UX
-    decision rather than a measurement, and the page never switches layout on a
-    figure. This is the second item on this list closed by withdrawal rather
-    than by answer.
-  - **The Craft Recipe's display name** (181), which memlog 107 left open. No
-    name is invented and none is needed: the control prints the one word that
-    distinguishes each composition, derived from the grade prefix its
-    currencies share (233).
-  - **Where Craft Cost lives** (182), which had no home in either spine although
-    FR-26 requires it shown.
-  - **How a mixed-unit list states each row's unit** (180, 184), which FR-3
-    requires and which no treatment covered before revision 3.
-- **Closed at revision 4** (203–206), four of them by one ruling apiece:
-  - **The nothing-clears copy** (204, state 25). Ruled this document's, not the
-    PRD's — the PRD's silence on it had been read as ownership.
-  - **What crafted rows do under an uncostable recipe** (205, state 35). PRD
-    revision 19 carries the player-visible half (FR-26, FR-5); the numerals, the
-    per-branch tiers and the copy are here.
-  - **Where the cross-file validation report lands** (206, state 27). The sync
-    report panel's second column, which forced the back-end-only licence from
-    audience onto register — see *Two registers in one panel*.
-  - **FR-30's no-weights-file world** (203). Closed by ruling, not deferred. The
-    three rules that looked to collide did not: two are mechanism and hold, and
-    the third was a sentence `DESIGN.md` has now split into its two real clauses.
-    The appendix stays at the foot, holds every row, and the page scrolls.
-- **Closed at revision 5** (207, 208):
-  - **The one non-colour cue, serving two boundaries** (208), which was two
-    entries on this list held as one question: the Chase Combination
-    fallback's treatment and the register boundary inside `{components.sync-report-panel}`. Both
-    print **text the page did not write** — the Trade Catalogue's own stat name
-    and value band in one case, the failing check, the entry and its canonical
-    key in the other — so the distinction was always one distinction, and two
-    cues for it was the failure the merge existed to prevent. The answer is a
-    **third type stack, the mono verbatim register**, reserved to that meaning
-    and to those two surfaces. It is not an ink, not a mark and not a glyph, so
-    it neither joins the semantic ink family nor touches the open key-block
-    question. It has no size of its own and reopens no verified number.
-    `DESIGN.md` owns the treatment, in Typography.
-  - **The declared tiebreak for equal EV** (`epics.md` finding D-4), which
-    revision 4 carried as unresolved and `core`'s, on the ground that state 25
-    ties every crafted row at minus its Craft Cost while the rank numerals print
-    over that tie. **AD-17 already declares it**, and always did: the ranked list
-    breaks ties on the row's unit key, then the recipe id, comparing the
-    serialised canonical key of AD-5's arm rather than a bare string, and a raw
-    row, having no recipe id, sorts before a crafted row at an equal EV — which
-    makes the ordering total across the mixed list and not only within each
-    branch. Unit keys are distinct, so even a twenty-way tie prints in an order
-    that is fully determined and identical across loads. The gap was a citation
-    gap and not a missing decision, so no treatment here changes: state 25 cites
-    AD-17, and an acceptance criterion cites AD-17 directly because
-    `IMPLEMENTATION-NOTES.md` does not own this rule. No story invents a
-    tiebreak of its own.
-- **Closed at revision 7** (210–214), from the `[NOTE FOR UX]` entries Epic 2
-  logged in `docs/stories/deferred-work.md`:
-  - **The vertical budget's 2px** (210). `{spacing.frame-slack}` is 530, not
-    528; the gap was the frame's old border, which became an outline.
-  - **The skeleton's appearance** (211, state 22). The flat-bar default is
-    ratified, and the column header paints with its final labels.
-  - **A coverage figure the report omits** (212). *not measured* with a weights
-    envelope loaded, *unknown* without one.
-  - **Absence lines** (213, state 38). Plain lines inside the trust strip, with
-    a budget line of their own. The uniform-prior banner stays down when no
-    crafted ranking exists, which bounds how many reservations can co-occur.
-  - **The empty Unrankable appendix** (214, state 37). Its title alone, the
-    count in ink.
-- **Unresolved, reported not fixed.** None of these is resolved by invention:
-  - Two Combinations that read identically (Domain Vocabulary; memlog 143).
-  - The reason string a recipe-scoped Unrankable would need (state 36), which is
-    the PRD's to extend and stays declined per PRD memlog 151.
-  - Whether `† pruned` and `* pinned` belong in `{components.key-block}`, whose
-    contract is to list every mark that can appear (`DESIGN.md`, Components;
-    memlog 201).
-  - **Whether any Item Class name needs a display mapping is closed, elsewhere.**
-    `epics.md` records that none does: the only transform is AD-5's
-    underscore-to-space trim at render time, identity left verbatim. It is listed
-    here so the closure is not mistaken for an omission.
-- **Closed by decision** (199, 200): the pinned mark. It is
-  `{components.curation-status-pinned}`, and the reason it is loud rather than
-  tasteful is recorded with it — it answers the trust strip's unnamed
-  starvation line, so being findable in a scan *is* the requirement.
-- **Closed against the architecture** (186): the ranked list shows one recipe at
-  a time. AD-17 now rules that `core` orders the cross product and the view
-  renders the active recipe's rows, ratifying the reconciliation these spines
-  were already written to. No change here; cite AD-17.
+- **Flow coverage: complete.** All six PRD journeys (UJ-1 to UJ-6) have a Key Flow
+  with numbered steps and a climax beat. Failure paths: UJ-1 and UJ-2. The other
+  failure paths are known gaps (Foundation). UJ-5's partial support and UJ-6's
+  honest-empty landing are stated as such. The protagonist is "the player" by
+  override (memlog 21).
+- **State coverage: 45 numbered rows, 44 live.** States 1–43 plus 12a and 15a.
+  State 19 is retired (memlog 256). States 42 and 43 cover one published recipe
+  and none (memlog 275).
+- **Component coverage.** Every component in DESIGN.md's token sheet has a row in
+  the Component Patterns index under the same name: header-bar, recipe-toggle,
+  threshold-control, sync-button, sync-report-panel, list-statement, column-header,
+  ev-tooltip, ranked-row, trust-mark, estimate-mark, mark-tooltip, chase-cell,
+  expansion-panel, expansion-line, show-more, trade-link, unrankable-appendix,
+  footer-legend and failure-screen.
+- **Token references.** Every brace reference in this document resolves to a token
+  that DESIGN.md declares. Copy placeholders use angle brackets (Copy Deck). A
+  retired token name is written without braces.
+- **Open items:** Foundation.
