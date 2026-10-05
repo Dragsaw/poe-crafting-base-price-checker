@@ -24,56 +24,6 @@
       "count": 4
     }
   },
-  "packages/contracts/src/base-type.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/canonical-key.ts": {
-    "local/max-comment-run": {
-      "count": 5
-    }
-  },
-  "packages/contracts/src/class-name.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/craft-recipe.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/currency-rate.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/dataset.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
-  "packages/contracts/src/envelopes.ts": {
-    "local/max-comment-run": {
-      "count": 8
-    }
-  },
-  "packages/contracts/src/index.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/contracts/src/index.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/contracts/src/item-class.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
   "packages/contracts/src/modifier-ref.test.ts": {
     "local/max-comment-run": {
       "count": 1

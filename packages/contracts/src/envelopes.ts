@@ -20,51 +20,9 @@ import {
   StaticCatalogueSchema,
 } from './trade-catalogue.ts';
 
-/**
- * Every file envelope, declared here. **One versioning mechanism and one
- * unknown-major refusal, spelled once** — later stories fill the envelopes
- * rather than inventing them. Entity schemas that are members of a versioned
- * file do not repeat `schemaVersion`; the envelope carries it for them.
- */
+/** Every file envelope; a member of a versioned file does not repeat `schemaVersion`. */
 
-/**
- * `data/tracked.json` — the player's curated workload (AD-12). Its envelope is
- * versioned by `TRACKED_SCHEMA_VERSION`, not `SUPPORTED_SCHEMA_VERSION`
- * (IMPLEMENTATION-NOTES §4.1); a loader passes it to `parseEnvelope`.
- *
- * One file-level rule: each `canonicalKey` (§4.1) appears once in `entries`,
- * so entries equal under it are twins whatever else differs. Each repeat is
- * one issue at its own index, naming the key and its first occurrence.
- *
- * A second rule, the shared floor (AD-17, FR-22): every non-`pruned` crafted
- * entry of one `(categoryId, className)` declares the same `itemLevelMin`. The
- * first such entry sets the class's floor; each later entry that declares
- * another is one issue at its own index, naming the class, both floors and the
- * first entry's index. `pruned` tombstones are exempt — they are never
- * summands — and a `raw` entry names no class, so it takes no part. The floor
- * is declared, never derived here (AD-5, IMPLEMENTATION-NOTES.md §8).
- *
- * A third rule, within-file overlap (FR-16, AD-17, IMPLEMENTATION-NOTES.md
- * §2.1): no two non-`pruned` crafted entries of one class overlap under
- * `overlap`, which compares each `statId` both entries sum once, as a sum.
- * Each pair is one issue at the later entry's index, naming both canonical
- * keys, each slot's branch and each summed `statId` whose intervals
- * intersect. Only a pair whose four references are single-line is evaluated
- * here, and such a pair never reads `coOccur`, so `CAN_NEVER_CO_OCCUR` stands in
- * for it. A pair with any `hybrid` reference is `core`'s cross-file
- * `co-occur` check (§2.1, *Who evaluates a pair*).
- *
- * Two more rules, the within-file half of kind agreement (§2.3), over the
- * lines of every non-`pruned` crafted entry. Each issue's path is the
- * offending line: `entries.i.<slot>`, or `entries.i.<slot>.lines.j` in a
- * hybrid (`j` counts the lines as the schema sorted them). A `statId` that one
- * line names banded and another valueless, wherever each sits, is one issue
- * at each later line of the other kind, naming both locations. A summed
- * `statId` (`summedStatIds`) whose operand in either slot is valueless is one
- * issue at that line, naming the entry, the slot and the `statId`. §2.3's
- * third case, a summed operand with a missing bound, is the banded shape's own
- * refusal (AD-5), reported at that slot before these rules run.
- */
+/** `data/tracked.json`, the curated workload (AD-12). File rules: key uniqueness (IMPLEMENTATION-NOTES.md §4.1), shared floor (AD-17, FR-22), overlap (§2.1), kind agreement (§2.3). */
 export const TrackedFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -77,17 +35,7 @@ export const TrackedFileSchema = z
 /** The recipe grade prefixes, as the mixed-grade refusal prints them. */
 const GRADE_PREFIXES = RECIPE_GRADES.map((grade) => `${grade}-`).join(', ');
 
-/**
- * `data/recipes.json` — the Craft Recipes (AD-20). Absent-tolerable (AD-24).
- *
- * Three file-level rules. Each `id` appears once, the same shape as
- * `TrackedFileSchema`'s: each repeat is one issue at its own index, naming the
- * id and its first occurrence. Each recipe derives one word (`recipeWord`): a
- * recipe that mixes grades is one issue at its index. And no two recipes derive
- * the same word: each repeat is one issue at its index, naming the word and its
- * first recipe (Story 3.4 Decision, UX memlog 233; an AD-3 refusal). A repeated
- * id is reported once, as a repeated id.
- */
+/** `data/recipes.json`, absent-tolerable (AD-20, AD-24). File-level rules: unique `id`, one derived word per recipe, no shared word (AD-3, §9.1). */
 export const RecipesFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -135,11 +83,7 @@ export const CurrenciesFileSchema = z.strictObject({
   rates: z.array(CurrencyRateSchema),
 });
 
-/**
- * `data/config.json` — the active league, `minChunkSearches` and
- * `schemaVersion`, **and nothing else** (AD-19). It is a player-owned file, not
- * a settings bag, which is what the `strictObject` enforces.
- */
+/** `data/config.json`: the active league, `minChunkSearches` and `schemaVersion`, nothing else (AD-19). */
 export const ConfigFileSchema = z.strictObject({
   schemaVersion: SchemaVersionSchema,
   league: LeagueIdSchema.describe('The active league id (AD-19).'),
@@ -151,14 +95,7 @@ export const ConfigFileSchema = z.strictObject({
     ),
 });
 
-/**
- * `data/dataset.json` — the published snapshot, latest observation per entry (AD-19).
- *
- * One file-level rule, the same shape as `TrackedFileSchema`'s: each `entryKey`
- * appears once in `entries`, compared as an exact string, so entries with the
- * same key are twins whatever else differs. Each repeat is one issue at its own
- * index, naming the key and its first occurrence.
- */
+/** `data/dataset.json`, the published snapshot (AD-19). Each `entryKey` appears once, compared as an exact string. */
 export const DatasetFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -192,20 +129,12 @@ export const SyncReportFileSchema = SyncRunReportSchema.extend({
   schemaVersion: SchemaVersionSchema,
 });
 
-/**
- * `data/sync-progress.json` — the keys the current pass has completed (AD-7).
- * Internal to `sync`: `web` never fetches it.
- */
+/** `data/sync-progress.json`: keys the current pass has completed (AD-7). Internal to `sync`. */
 export const SyncProgressFileSchema = SyncProgressSchema.extend({
   schemaVersion: SchemaVersionSchema,
 });
 
-/**
- * `data/catalogue/*.json` — the four committed catalogue artifacts. One
- * envelope shape over all four: the captured `result` payload with
- * `schemaVersion` beside it, so a refresh diff stays a diff of the trade API's
- * own response (AD-25).
- */
+/** `data/catalogue/*.json`: the captured `result` payload with `schemaVersion` beside it, so a refresh diffs the API's own response (AD-25). */
 export function catalogueFileEnvelope<
   Shape extends z.ZodRawShape,
   Config extends z.core.$ZodObjectConfig,
@@ -254,14 +183,7 @@ export type EnvelopeResult<T> = EnvelopeAccepted<T> | EnvelopeVersionRefused | E
 
 const VersionProbeSchema = z.object({ schemaVersion: z.string() });
 
-/**
- * The one load path for every versioned file.
- *
- * The version is read **before** the body is parsed, so an unknown major is
- * refused *rather than parsed on* (NFR-8) — a consumer that parsed first would
- * report a pile of shape errors that are really one version mismatch, and a
- * reader would go fixing fields. The refusal names **both** versions.
- */
+/** The one load path for versioned files: the version is checked before the body parses, so an unknown major is refused, not parsed on (NFR-8). */
 export function parseEnvelope<S extends z.ZodType>(
   schema: S,
   data: unknown,

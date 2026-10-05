@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import * as contracts from './index';
 
-/**
- * The barrel is what every other package imports, so a module that exists but
- * is not re-exported is invisible to the workspace. This suite asserts the
- * surface rather than re-testing the modules behind it.
- */
+/** The barrel is what other packages import, so assert its surface rather than the modules behind it. */
 describe('the contracts barrel', () => {
   it('exports one schema per named concept', () => {
     for (const name of [

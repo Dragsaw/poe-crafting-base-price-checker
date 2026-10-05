@@ -1,13 +1,4 @@
-/**
- * `@poe/contracts` — every concept that crosses a package boundary, defined
- * exactly once as a Zod schema with its static type `z.infer`red from it
- * (AD-3), plus the four external effects as `<Thing>Port` interfaces with a
- * pure in-memory fake beside each (AD-1).
- *
- * This package **depends on nothing in this workspace** and must never gain a
- * `workspace:*` dependency. `verbatimModuleSyntax` is on, so every type
- * re-export below is written `export type { … }`.
- */
+/** `@poe/contracts`: every cross-package concept as a Zod schema and its `z.infer` type (AD-3), and the external effects as `<Thing>Port` interfaces with in-memory fakes (AD-1). Depends on no workspace package. */
 
 export {
   checkSchemaVersion,
@@ -65,11 +56,7 @@ export type {
   ValuelessModifierRef,
 } from './modifier-ref.ts';
 
-/**
- * The two arm schemas are **not** exported. They carry none of the union's
- * `superRefine` rules, so parsing with an arm accepts a pruned entry with no
- * reason — a row the I/O matrix requires to fail. `TrackedEntrySchema` is the only parse path.
- */
+/** The arm schemas stay unexported: they lack the union's `superRefine` rules and would accept a pruned entry with no reason. */
 export {
   CurationStatusSchema,
   PrunedReasonSchema,

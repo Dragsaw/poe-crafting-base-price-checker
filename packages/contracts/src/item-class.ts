@@ -1,12 +1,6 @@
 import { z } from 'zod';
 
-/**
- * An item class is the **pair** `(categoryId, className)` — never `className`
- * alone (AD-5, Consistency Conventions, *Naming — entities*). One item class is
- * one modifier pool, and the key has two rungs because the unit is reached two
- * different ways: `categoryId` is what a search can send, `className` is what
- * the weights file keys its pools on.
- */
+/** An item class is the pair `(categoryId, className)`, one modifier pool: a search sends `categoryId`, the weights file keys on `className` (AD-5). */
 
 export const CategoryIdSchema = z
   .string()
@@ -17,11 +11,7 @@ export const CategoryIdSchema = z
 
 export type CategoryId = z.infer<typeof CategoryIdSchema>;
 
-/**
- * The one identifier in the system that is not the trade API's. A poe2db pool
- * name, carried verbatim and **never sent to the trade site**; `sync` reads its
- * grammar only to derive AD-16's class discriminator.
- */
+/** The one identifier not from the trade API: a poe2db pool name, never sent to the trade site; `sync` reads its grammar to derive AD-16's class discriminator. */
 export const ClassNameSchema = z
   .string()
   .min(1)
