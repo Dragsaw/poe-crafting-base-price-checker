@@ -13,12 +13,7 @@ import {
 } from '@poe/contracts';
 import type { parseEnvelope } from '@poe/contracts';
 
-/**
- * The seven artifacts `web` fetches (AD-24), in AD-24 order. An eighth needs
- * an AD-24 amendment. `web` never fetches `catalogue/static.json`. `required`
- * artifacts refuse the render when absent, exactly as when invalid;
- * `tolerable` ones let the page render and name the absence.
- */
+/** The seven artifacts `web` fetches (AD-24): `required` ones refuse the render when absent. */
 
 /** The weights contract major the page reads (WEIGHTS-FILE-SCHEMA.md), defined once in `contracts`; only the major is compared. */
 const WEIGHTS_EXPECTED_VERSION = WEIGHTS_SCHEMA_VERSION;

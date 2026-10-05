@@ -7,10 +7,7 @@ interface AllowlistEntry {
   readonly required: boolean;
 }
 
-/**
- * `tools/prune-pages.mjs` sits outside this package's `rootDir`, so a static
- * import would pull it into the `web` program; the dynamic import does not.
- */
+// `tools/prune-pages.mjs` is outside `rootDir`: a static import would pull it into the program.
 // `import.meta.dirname`, not `import.meta.url`: under jsdom the url is not `file:`.
 const SCRIPT = `${(import.meta as ImportMeta & { readonly dirname: string }).dirname}/../../../../tools/prune-pages.mjs`;
 

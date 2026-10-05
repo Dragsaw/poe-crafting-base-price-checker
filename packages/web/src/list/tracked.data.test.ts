@@ -6,12 +6,7 @@ import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
 import { shortForm } from './short-forms';
 
-/**
- * The live data/tracked.json against the short-form table and the cell width
- * (pnpm test:data). A player edit that adds a stat with no short form, or a
- * combination that falls back to verbatim text or overruns the cell, fails
- * here and not in pnpm test.
- */
+/** The live data/tracked.json against the short-form table and the cell width (pnpm test:data). */
 const committed = import.meta.glob<unknown>('../../../../data/{tracked.json,catalogue/stats.json}', {
   eager: true,
   import: 'default',

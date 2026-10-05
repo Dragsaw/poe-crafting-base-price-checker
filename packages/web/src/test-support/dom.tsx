@@ -1,10 +1,4 @@
-/**
- * Shared DOM test helpers: the fixed test clock, the colour spelling jsdom
- * reports, and one mounted React root per test. Never imported by the app.
- *
- * A file that mounts through `mount` or `mountList` calls `unmount` in its
- * `afterEach`.
- */
+/** Shared DOM test helpers; a file that mounts calls `unmount` in `afterEach`. */
 
 import { rank } from '@poe/core';
 import type { DatasetEntry, RawTrackedEntry } from '@poe/contracts';

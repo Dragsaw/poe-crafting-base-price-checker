@@ -1,7 +1,4 @@
-/**
- * Fixture builders for tracked and dataset entries, for the ranked-list tests.
- * Never imported by the app.
- */
+/** Fixture builders for tracked and dataset entries, for the ranked-list tests. */
 
 import {
   canonicalKey,

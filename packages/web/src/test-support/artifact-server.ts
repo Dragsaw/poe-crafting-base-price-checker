@@ -1,11 +1,6 @@
-/**
- * Test scaffolding for the seven AD-24 artifacts. Never imported by the app.
- *
- * Every web fetch test registers all seven handlers, plus a trap for a path
- * the page never fetches: loopback URLs pass through the shared MSW guard
- * unhandled, so a missing handler would reach a real socket rather than fail
- * loudly.
- */
+// Test scaffolding for the seven AD-24 artifacts, never imported by the app. Loopback URLs pass the
+// shared MSW guard unhandled, so every fetch test registers all seven handlers and a trap for a
+// path the page never fetches: a missing handler would otherwise reach a real socket.
 
 import { http, HttpResponse } from 'msw';
 import type { SetupServer } from 'msw/node';
@@ -13,11 +8,7 @@ import type { SetupServer } from 'msw/node';
 import { ARTIFACT_ORDER, ARTIFACTS, type ArtifactKey } from '../load/artifacts';
 import { artifactUrl } from '../load/load-artifacts';
 
-/**
- * The shared server lives in the root `test/setup.ts`, outside this package's
- * `rootDir`, so a static import would pull it into the `web` program. The
- * dynamic import resolves to the instance Vitest already loaded as a setup file.
- */
+// Root `test/setup.ts` is outside `rootDir`; the dynamic import reuses the instance Vitest loaded.
 // `import.meta.dirname`, not `import.meta.url`: under jsdom the url is not `file:`.
 const SHARED_SETUP = `${(import.meta as ImportMeta & { readonly dirname: string }).dirname}/../../../../test/setup.ts`;
 
@@ -28,10 +19,7 @@ export async function sharedServer(): Promise<SetupServer> {
 
 export const TEST_LEAGUE = 'Forbidden Rites';
 
-/**
- * A file the site publishes that `web` never fetches (AD-24). `serveArtifacts`
- * serves it as a trap, so a request to it lands in the log and a test fails on it.
- */
+/** A published file `web` never fetches (AD-24), served as a trap so a request fails the test. */
 export const NEVER_FETCHED_PATH = 'catalogue/static.json';
 
 /** A minimal valid body for each artifact. */
@@ -107,11 +95,7 @@ function respond(answer: ArtifactAnswer): Response | Promise<Response> {
   }
 }
 
-/**
- * Registers a handler for every artifact, and a trap for `NEVER_FETCHED_PATH`,
- * and returns the log of requests they received. `answers` overrides
- * individual artifacts.
- */
+/** Registers a handler per artifact and a trap for `NEVER_FETCHED_PATH`; returns the log. */
 export function serveArtifacts(
   server: SetupServer,
   answers: Partial<Record<ArtifactKey, ArtifactAnswer>> = {},

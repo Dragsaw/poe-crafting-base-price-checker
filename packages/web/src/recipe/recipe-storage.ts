@@ -1,10 +1,4 @@
-/**
- * The active Craft Recipe's one persisted value (EXPERIENCE.md, *What survives
- * a reload*; FR-7, AD-15). It sits beside the Payout Threshold in the viewer's
- * own browser storage, and takes the threshold's guards: a storage that is
- * absent, blocked or throwing reads as nothing stored, and the page renders
- * the same.
- */
+/** The active recipe's persisted value (EXPERIENCE.md *What survives a reload*; FR-7, AD-15). */
 
 import type { CraftRecipe } from '@poe/contracts';
 
@@ -33,11 +27,7 @@ export function writeStoredRecipe(recipeId: string, storage?: Pick<Storage, 'set
   }
 }
 
-/**
- * The recipe the page ranks under: the stored id when `recipes.json` still
- * declares it, and otherwise the first recipe in file order. `undefined` when
- * there is no recipe at all.
- */
+/** The stored id if `recipes.json` declares it, else the first recipe; `undefined` if none. */
 export function activeRecipe(
   recipes: readonly CraftRecipe[],
   storedId: string | undefined,
