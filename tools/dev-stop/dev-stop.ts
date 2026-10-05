@@ -154,15 +154,14 @@ export interface Snapshot {
   readonly processes: readonly ProcessInfo[];
 }
 
-/** A Windows system tool by absolute path, so a directory early on PATH cannot shadow it. */
-function windowsTool(...segments: string[]): string {
+/** A Windows system tool by absolute path, so a directory early on PATH cannot shadow it; the bare name where SystemRoot is unset. */
+export function windowsTool(name: string, directory = ''): string {
   const root = process.env.SystemRoot;
-  if (root === undefined) {throw new Error('SystemRoot is not set');}
-  return nodePath.join(root, 'System32', ...segments);
+  return root === undefined || root === '' ? name : nodePath.join(root, 'System32', directory, name);
 }
 
 function powershell(script: string): string {
-  return execFileSync(windowsTool('WindowsPowerShell', 'v1.0', 'powershell.exe'), ['-NoProfile', '-NonInteractive', '-Command', script], {
+  return execFileSync(windowsTool('powershell.exe', nodePath.join('WindowsPowerShell', 'v1.0')), ['-NoProfile', '-NonInteractive', '-Command', script], {
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   });

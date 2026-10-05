@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import nodePath from 'node:path';
+
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   DEFAULT_PORT,
@@ -7,6 +9,7 @@ import {
   parsePort,
   planStop,
   type ProcessInfo,
+  windowsTool,
 } from './dev-stop';
 
 const ROOT = String.raw`E:\Projects\poe`;
@@ -215,5 +218,27 @@ describe('parseListenerJson', () => {
 
   it.each(['"x"', '{}', '[1.5]', '["1708"]'])('throws on %s and names the value', (json) => {
     expect(() => parseListenerJson(JSON.parse(json))).toThrow(json);
+  });
+});
+
+describe('windowsTool', () => {
+  const systemRoot = String.raw`C:\Windows`;
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('resolves under System32 of SystemRoot, so PATH cannot shadow it', () => {
+    vi.stubEnv('SystemRoot', systemRoot);
+    expect(windowsTool('taskkill.exe')).toBe(nodePath.join(systemRoot, 'System32', 'taskkill.exe'));
+    expect(windowsTool('powershell.exe', 'WindowsPowerShell')).toBe(
+      nodePath.join(systemRoot, 'System32', 'WindowsPowerShell', 'powershell.exe'),
+    );
+  });
+
+  it.each([undefined, ''])('falls back to the bare name for the PATH lookup when SystemRoot is %j', (root) => {
+    vi.stubEnv('SystemRoot', root);
+    expect(windowsTool('taskkill.exe')).toBe('taskkill.exe');
+    expect(windowsTool('powershell.exe', 'WindowsPowerShell')).toBe('powershell.exe');
   });
 });
