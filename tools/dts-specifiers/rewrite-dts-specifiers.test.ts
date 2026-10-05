@@ -24,6 +24,7 @@ import {
 } from './rewrite-dts-specifiers';
 
 const TOOL = fileURLToPath(new URL('rewrite-dts-specifiers.ts', import.meta.url));
+const ENTRY_GUARD = fileURLToPath(new URL('../entry-guard/is-invoked-directly.ts', import.meta.url));
 const ROOT_PACKAGE_JSON = fileURLToPath(new URL('../../package.json', import.meta.url));
 const PACKAGES_DIR = fileURLToPath(new URL('../../packages', import.meta.url));
 
@@ -251,7 +252,7 @@ describe('TARGET_PACKAGES', () => {
 });
 
 /**
- * A copy of the tool at `<scratch>/tools/dts-specifiers/`: its target is
+ * A copy of the tool and its entry guard at `<scratch>/tools/`: its target is
  * relative to `import.meta.url`, so it then rewrites
  * `<scratch>/packages/{contracts,core,sync}/dist`.
  */
@@ -262,6 +263,8 @@ function copyToolIntoScratch(): { root: string; script: string } {
   mkdirSync(toolDirectory, { recursive: true });
   const script = nodePath.join(toolDirectory, 'rewrite-dts-specifiers.ts');
   copyFileSync(TOOL, script);
+  mkdirSync(nodePath.join(root, 'tools', 'entry-guard'), { recursive: true });
+  copyFileSync(ENTRY_GUARD, nodePath.join(root, 'tools', 'entry-guard', 'is-invoked-directly.ts'));
   return { root, script };
 }
 

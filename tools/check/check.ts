@@ -1,7 +1,7 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { realpathSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 
 /**
  * `pnpm check` runs every quality gate in one pass: stage A (static checks)
@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
  * kept), `--bail` (after the first failing step, abort the running steps and
  * start no further stage).
  *
- * Run by bare `node` (type stripping), so this module imports only builtins.
+ * Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
  */
 
 export type Stage = 'A' | 'B';
@@ -235,18 +235,7 @@ async function main(argv: readonly string[]): Promise<number> {
   return exitCode(results);
 }
 
-/** The entry guard, as in `tools/dev-stop/dev-stop.ts`: running the file checks, importing it (the test) runs nothing. */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {return false;}
-  try {
-    return realpathSync(path.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     process.exitCode = await main(process.argv.slice(2));
   } catch (error) {

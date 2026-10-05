@@ -2,12 +2,13 @@ import {
   existsSync,
   readFileSync,
   readdirSync,
-  realpathSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
 import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 
 /**
  * Post-emit step of `pnpm typecheck`. The packages that `TARGET_PACKAGES` lists
@@ -20,7 +21,7 @@ import { fileURLToPath } from 'node:url';
  * Only `pnpm typecheck` runs this rewrite: a bare `tsc -b`, watch mode or an
  * IDE build that re-emits one of these packages writes the `.ts` specifiers back.
  *
- * Run by bare `node` (type stripping), so this module imports only builtins.
+ * Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
  */
 
 const EXTENSION_MAP: Readonly<Record<string, string>> = {
@@ -97,24 +98,7 @@ const TARGET_DIRS = TARGET_PACKAGES.map((package_) =>
   fileURLToPath(new URL(`../../packages/${package_}/dist`, import.meta.url)),
 );
 
-/**
- * The entry guard. `node tools/dts-specifiers/rewrite-dts-specifiers.ts` runs
- * the rewrite; importing the module — which the co-located test does — runs
- * nothing. Realpaths both sides, as `packages/sync/src/sync.ts` and
- * `packages/sync/src/sync-batch.ts` do, so a
- * junction, symlink or drive-letter case mismatch still runs.
- */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {return false;}
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     for (const directory of TARGET_DIRS) {rewriteDtsSpecifiersIn(directory);}
   } catch (error: unknown) {

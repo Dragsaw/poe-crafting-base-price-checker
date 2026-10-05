@@ -1,7 +1,8 @@
 import { execFile } from 'node:child_process';
-import { existsSync, realpathSync, statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 
 /**
  * The `PostToolUse` hook that registers in `.claude/settings.json`. After an
@@ -32,7 +33,7 @@ import { fileURLToPath } from 'node:url';
  * Fallback if a cold `tsc -b` is ever too slow: run typecheck only for files
  * under `packages/` (see `checkedBy`).
  *
- * Run by bare `node` (type stripping), so this module imports only builtins.
+ * Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
  */
 
 export const CHECK_NAMES = ['lint', 'typecheck', 'depcruise'] as const;
@@ -315,21 +316,7 @@ async function main(): Promise<number> {
   return result.code;
 }
 
-/**
- * The entry guard, as in `tools/dev-stop/dev-stop.ts`: running the file runs
- * the hook, and importing it (the co-located test) runs nothing.
- */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {return false;}
-  try {
-    return realpathSync(path.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     process.exitCode = await main();
   } catch (error) {

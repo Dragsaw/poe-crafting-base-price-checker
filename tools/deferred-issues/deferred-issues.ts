@@ -1,9 +1,7 @@
 import { spawnSync } from 'node:child_process';
-import { realpathSync } from 'node:fs';
-import nodePath from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 import { parseLedger, type LedgerEntry } from './ledger.ts';
 import { LEDGER_PATH, planDuplicateCloses, planSync, readMarker, type IssueInfo, type PlannedClose, type PlannedCreate, type SyncPlan } from './plan.ts';
 
@@ -306,19 +304,7 @@ export function main(argv: readonly string[], runner: Runner, out: Output, error
   return isDryRun ? printDryRun(plan, out) : applyPlan(plan, runner, out, error_);
 }
 
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {
-    return false;
-  }
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   // `process.exitCode`, not `process.exit(1)`: an immediate exit truncates a piped write.
   try {
     process.exitCode = main(process.argv.slice(2), run, process.stdout, process.stderr);

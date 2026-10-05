@@ -1,11 +1,12 @@
 /** `pnpm tracked:lookup`: read-only JSON; `core` owns the interval and the line set (IMPLEMENTATION-NOTES.md §1). */
 
-import { readFileSync, realpathSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import nodePath from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { type WeightsFile } from '@poe/contracts';
 
+import { isInvokedDirectly } from '../../../../tools/entry-guard/is-invoked-directly.ts';
 import { absentAsNull } from './lookup-absent-as-null.ts';
 import { type Command, parseCommand, USAGE } from './lookup-command.ts';
 import { LookupError } from './lookup-error.ts';
@@ -230,20 +231,7 @@ function main(): void {
   }
 }
 
-/** Node realpaths the main module's URL but not `argv[1]`, so both sides are realpathed. */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {
-    return false;
-  }
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     main();
   } catch (error: unknown) {

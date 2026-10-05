@@ -516,7 +516,7 @@
   },
   "tools/dev-stop/dev-stop.ts": {
     "local/max-comment-run": {
-      "count": 9
+      "count": 8
     },
     "unicorn/name-replacements": {
       "count": 1
@@ -532,7 +532,7 @@
   },
   "tools/dts-specifiers/rewrite-dts-specifiers.ts": {
     "local/max-comment-run": {
-      "count": 6
+      "count": 5
     }
   },
   "tools/lint-on-edit/lint-on-edit.e2e.test.ts": {
@@ -542,7 +542,7 @@
   },
   "tools/lint-on-edit/lint-on-edit.ts": {
     "local/max-comment-run": {
-      "count": 4
+      "count": 3
     }
   },
   "tools/prune-pages.mjs": {

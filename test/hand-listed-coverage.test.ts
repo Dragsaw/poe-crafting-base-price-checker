@@ -79,6 +79,7 @@ const TARGETS: readonly Target[] = [
   directoryTarget('tools/deferred-issues'),
   directoryTarget('tools/dev-stop'),
   directoryTarget('tools/dts-specifiers'),
+  directoryTarget('tools/entry-guard'),
   directoryTarget('tools/eslint-rules'),
   directoryTarget('tools/lint-on-edit'),
   // Only `tsconfig.tools.json` lists it: its test lives in `test/`, and no

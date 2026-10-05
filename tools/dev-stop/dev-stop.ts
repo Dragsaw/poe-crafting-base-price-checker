@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { realpathSync } from 'node:fs';
 import nodePath from 'node:path';
-import { fileURLToPath } from 'node:url';
+
+import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 
 /**
  * `pnpm dev:stop [--port <n>]` stops the `pnpm dev` server that listens on a
@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
  * It refuses a listener that is not this checkout's Vite: another worktree's
  * server, or an unrelated program on the port.
  *
- * Run by bare `node` (type stripping), so this module imports only builtins.
+ * Run by bare `node` (type stripping), so this module imports only builtins and `.ts` siblings.
  */
 
 export const DEFAULT_PORT = 5173;
@@ -347,22 +347,7 @@ async function main(): Promise<number> {
   return 1;
 }
 
-/**
- * The entry guard, as in `tools/dts-specifiers/rewrite-dts-specifiers.ts`:
- * running the file stops the server, and importing it (the co-located test)
- * runs nothing.
- */
-function isInvokedDirectly(): boolean {
-  const entry = process.argv[1];
-  if (entry === undefined) {return false;}
-  try {
-    return realpathSync(nodePath.resolve(entry)) === realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
-}
-
-if (isInvokedDirectly()) {
+if (isInvokedDirectly(import.meta.url)) {
   try {
     process.exitCode = await main();
   } catch (error) {
