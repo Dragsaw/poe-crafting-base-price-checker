@@ -78,6 +78,8 @@ export function createLeagueGate(
     if (status >= SERVER_ERROR) {
       return YIELD;
     }
+    // Any other non-2xx aborts like the pricing step's other 4xx (AD-9); the report reason is
+    // `trade-request-rejected`, and a wrong-shape 2xx body is `unrecoverable-error`.
     if (status < 200 || status >= 300) {
       throw new LeagueRequestRejectedError(status);
     }
