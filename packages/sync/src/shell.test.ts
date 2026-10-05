@@ -14,21 +14,9 @@ import {
   writeTextFile,
 } from './shell.ts';
 
-/**
- * The shell's testable half.
- *
- * The real HTTP port is deliberately absent from the import above. It runs
- * only in `shell-fetch.test.ts`, against a loopback server that file starts; a
- * sibling scan in `catalogue-refresh.test.ts` fails if any other test file so
- * much as names it, which is why it is unnamed even in this comment.
- * Everything below is ordinary code that happens to live at the edge, and
- * the `mkdir` inside `writeTextFile` is the load-bearing piece: `data/catalogue/`
- * does not exist on a fresh checkout, so without it the human's first
- * `pnpm catalogue:refresh` spends four live rate-limited requests, passes every
- * validation gate, and then dies on a missing directory.
- *
- * These tests write under the OS temp directory, never under `data/`.
- */
+// The real HTTP port is absent here: a scan in `catalogue-refresh.test.ts` fails any other test
+// file that names it, so this comment does not either. It runs only in `shell-fetch.test.ts`.
+// The `mkdir` in `writeTextFile` matters: `data/catalogue/` is absent on a fresh checkout.
 
 const temporaryDirectories: string[] = [];
 

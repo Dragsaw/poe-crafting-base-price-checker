@@ -77,79 +77,14 @@
       "count": 1
     }
   },
-  "packages/sync/src/pricing/fixture-names.ts": {
-    "local/max-comment-run": {
-      "count": 4
-    }
-  },
   "packages/sync/src/pricing/fixture-port.test.ts": {
     "unicorn/prefer-iterator-to-array": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/pricing/fixture-port.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/pricing/load-currencies.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/pricing/load-item-types.ts": {
-    "local/max-comment-run": {
       "count": 1
     }
   },
   "packages/sync/src/pricing/normalise.test.ts": {
     "unicorn/prefer-iterator-to-array": {
       "count": 1
-    }
-  },
-  "packages/sync/src/pricing/normalise.ts": {
-    "local/max-comment-run": {
-      "count": 6
-    }
-  },
-  "packages/sync/src/pricing/price-entry.fixtures.test.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/pricing/price-entry.hybrid.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/pricing/price-entry.summed.test.ts": {
-    "local/max-comment-run": {
-      "count": 2
-    }
-  },
-  "packages/sync/src/request-counter.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/shell-fetch.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/shell.test.ts": {
-    "local/max-comment-run": {
-      "count": 1
-    }
-  },
-  "packages/sync/src/sync-batch.ts": {
-    "local/max-comment-run": {
-      "count": 3
-    }
-  },
-  "packages/sync/src/trade/client.ts": {
-    "local/max-comment-run": {
-      "count": 21
     }
   },
   "packages/sync/src/trade/endpoints.ts": {

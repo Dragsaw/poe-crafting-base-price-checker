@@ -1,15 +1,5 @@
-/**
- * An offline `HttpPort` that serves the recorded pricing fixtures back
- * (NFR-1, NFR-2). `pnpm sync:dry` and the fixture-backed tests use it.
- *
- * A request is answered only where a fixture carries **its own name**
- * (`fixture-names.ts`: a digest of method, URL and body, or
- * `trade-data-leagues` for the league gate's GET). Every other request
- * rejects loudly with a message naming the missing fixture. The pricing step
- * yields only on a timeout or a network failure, so this rejection is
- * rethrown and fails the run, rather than yielding or pricing from an answer
- * to another question.
- */
+// The pricing step yields only on a timeout or network failure, so an unfixtured request's
+// rejection fails the run instead of pricing from another question's answer (NFR-1, NFR-2).
 
 import { readdir, readFile } from 'node:fs/promises';
 import nodePath from 'node:path';
@@ -23,10 +13,7 @@ export type PricingFixtures = ReadonlyMap<string, string>;
 
 const PRICING_FIXTURE_FILE = /^(trade-(?:search|fetch)-[0-9a-f]+|trade-data-leagues)\.json$/;
 
-/**
- * Reads every `trade-search-*` and `trade-fetch-*` file of a directory, and
- * `trade-data-leagues.json`, which the league gate's GET is served from.
- */
+/** Reads every `trade-search-*`, `trade-fetch-*` and `trade-data-leagues` file of a directory. */
 export async function readPricingFixtures(directory: string): Promise<PricingFixtures> {
   const fixtures = new Map<string, string>();
   const entries = await readdir(directory);

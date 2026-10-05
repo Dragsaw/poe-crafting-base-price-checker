@@ -1,12 +1,4 @@
-/**
- * `data/currencies.json` — the player's hand-maintained rates (AD-20). `sync`
- * reads the file and never fetches against it. An absent file, or one that
- * fails `CurrenciesFileSchema`, is a typed load error naming the file, and it
- * is refused before any request.
- *
- * This module lives outside `chunk/`: the chunk runner receives rates as a
- * value and never names a player file other than its own inputs.
- */
+// Outside `chunk/`: the chunk runner receives rates as a value and names no player file (AD-20).
 
 import { CurrenciesFileSchema, parseEnvelope } from '@poe/contracts';
 import type { CurrencyRate, FilesystemPort } from '@poe/contracts';

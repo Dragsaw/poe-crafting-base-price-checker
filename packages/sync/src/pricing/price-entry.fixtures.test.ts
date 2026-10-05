@@ -18,13 +18,8 @@ import { createFixtureHttpPort, readPricingFixtures } from './fixture-port.ts';
 import { createPricingStep, FETCH_LIMIT } from './price-entry.ts';
 import { itemTypesOf } from './search-body.ts';
 
-/**
- * The parser against **real captured responses** (NFR-2): the searches and
- * fetches `pnpm fixtures:record` recorded for the fixture workload
- * (`FIXTURE_WORKLOAD_PATH`). The config file and the workload are read, never
- * written, because the fixture digests depend on them; the rates are pinned
- * below.
- */
+// Real captured responses (NFR-2). The config and the workload are read, never written:
+// the fixture digests depend on them.
 
 const ROOT = new URL('../../../../', import.meta.url);
 const FIXTURES_DIR = fileURLToPath(new URL('fixtures/', ROOT));
@@ -39,11 +34,8 @@ function readFrozen(path: string): unknown {
 }
 
 const league = ConfigFileSchema.parse(readFrozen('config.json')).league;
-/**
- * Pinned here rather than read from the player-maintained
- * `data/currencies.json`, so a routine rate edit cannot turn the suite red.
- * The recorded fixtures' digests do not depend on rates.
- */
+// Pinned, not read from the player's `data/currencies.json`: a rate edit must not turn the
+// suite red. The fixture digests do not depend on rates.
 const PINNED_AS_OF = '2026-09-26T00:00:00Z';
 const rates: CurrencyRate[] = [
   { currencyId: 'divine', rate: 1, source: 'measured', league, asOf: PINNED_AS_OF },
