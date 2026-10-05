@@ -10,7 +10,8 @@ import {
 
 /** One load, one outcome, never a rejection; `no-cache` fetches accept CDN staleness (AD-24). */
 
-/** `version`: unknown major or bad `schemaVersion`; `content`: invalid body; `missing`: a required artifact answered 404. */
+// `version`: unknown major or bad `schemaVersion`; `content`: invalid body;
+// `missing`: a required artifact answered 404.
 export type RefusalCause = 'version' | 'content' | 'missing';
 
 export type LoadOutcome =
