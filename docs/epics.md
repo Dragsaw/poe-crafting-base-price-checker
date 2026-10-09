@@ -1,9 +1,9 @@
 ---
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
-storiesWrittenForEpics: [1, 2, 3]
+storiesWrittenForEpics: [1, 2, 3, 4]
 storiesPendingForEpics: []
 blockedStories: []
-revisionPass: 'Targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
+revisionPass: 'Targeted revision 2026-10-09 for PRD revision 27 and the Rarity Dark redesign (UX revision 24, DESIGN revision 19): FR inventory to 34, thirteen FR titles retitled, retired-direction UX-DRs marked superseded, Epic 4 appended. Epics 1 to 3 are unedited records. Before it, targeted revision 2026-09-27 of Story 3.6 and the weights-contract citations for spine revision 23 (AD-10 folds Provenance per (itemClass, recipe) pair; contract 6.1.0) and PRD revision 23. Before it, targeted revision 2026-09-27 of Epic 2 and Stories 2.7 and 2.8 (epic 2 retro item 19) for the committed weights.json 6.0.0 with recipes.json published with no recipe, which the masthead dek explains. The last full pass was the re-run of 2026-09-20 against PRD revision 19, EXPERIENCE.md revision 4 and DESIGN.md revision 4.'
 inputDocuments:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
@@ -17,39 +17,39 @@ inputDocuments:
 
 This document holds the complete epic and story breakdown for PoE2 Crafting Base Price Checker. It decomposes the requirements of the PRD, the architecture spine and the UX designs into stories a developer can implement.
 
-**Citation discipline.** Every planning fact has exactly one owning document. This document names each requirement by its stable id. It never restates the owner's text. `prd.md` owns what the player gets. `ARCHITECTURE-SPINE.md` owns the decisions (ADs). `DESIGN.md` owns the tokens and the visual treatment. `EXPERIENCE.md` owns behaviour, states and flows. Under **AD-0**, a companion section that an AD delegates to binds exactly as that AD binds. An acceptance criterion may therefore cite `IMPLEMENTATION-NOTES.md`, `WEIGHTS-FILE-SCHEMA.md` or `AGENT-WORKFLOW.md` by section number. The input list above does not name those three files.
+**Citation discipline.** Every planning fact has exactly one owning document. This document names each requirement by its stable id. It never restates the owner's text. `prd.md` owns what the player gets. `ARCHITECTURE-SPINE.md` owns the decisions (ADs). `DESIGN.md` owns the tokens and the visual treatment. `EXPERIENCE.md` owns behaviour, states and flows. Under **AD-0**, a companion section that an AD delegates to binds exactly as that AD binds. An acceptance criterion may therefore cite `WEIGHTS-FILE-SCHEMA.md` or `AGENT-WORKFLOW.md` by section number. Where an AD names a module as owner of a computation, that module and its tests bind (AD-0), and an acceptance criterion may cite the module. The input list above does not name those two files.
 
 ## Requirements Inventory
 
 ### Functional Requirements
 
-`prd.md` §4 numbers thirty-three functional requirements globally, contiguous from FR-1 to FR-33. A heading marked *Architecture-owned* keeps its acceptance conditions in the cited AD. The PRD does not hold them.
+`prd.md` §4 numbers thirty-four functional requirements globally, contiguous from FR-1 to FR-34. A heading marked *Architecture-owned* keeps its acceptance conditions in the cited AD. The PRD does not hold them. Titles below follow PRD revision 27. FR-34 belongs to Epic 3 and is built.
 
 FR-1: Rank by threshold-truncated expected value (AD-17, AD-4)
 FR-2: Render Chase Combinations on each collapsed row (AD-17)
-FR-3: Rank Raw Bases on a separate branch, visibly labelled (AD-5, AD-16, AD-17)
+FR-3: Rank Raw Bases on a separate branch, each row saying craft or sell as is (AD-5, AD-16, AD-17)
 FR-4: Render Unrankable Item Classes outside the ordering (AD-17, AD-10, AD-27)
 FR-5: Bound the ranked list to a readable length (AD-4)
-FR-6: Set the Payout Threshold and reorder the list immediately (AD-17, AD-20, AD-24)
+FR-6: Set the Payout Threshold directly, and the list follows at once (AD-17, AD-20, AD-24)
 FR-7: Remember the Payout Threshold between visits (AD-15)
-FR-8: Expand a ranked row to its full tracked Combination list (AD-9, AD-12, AD-16, AD-17)
-FR-9: Render the four Price States distinctly, with a reason on `not-yet-synced` (AD-9, AD-19, AD-20)
-FR-10: Propagate and render the weakest Provenance behind every figure (AD-10, AD-11, AD-20)
-FR-11: State the uniform-prior caveat globally when the per-row badge cannot discriminate (AD-10)
-FR-12: Render per-row freshness, and name the clock it reads (AD-9, AD-10, AD-19)
-FR-13: Present estimates as asking prices, never as realised value (AD-12, AD-16)
+FR-8: Open a row to every Combination behind its figure, each with whether its price can be trusted (AD-9, AD-12, AD-16, AD-17)
+FR-9: Never present a missing price as worthless, and make the cause knowable (AD-9, AD-19, AD-20)
+FR-10: Say when a figure rests on something weaker than a measured, current price (AD-10, AD-11, AD-20)
+FR-11: Show which figures rest on estimated roll odds (AD-10)
+FR-12: Say per row whether the price is current enough to act on (AD-9, AD-10, AD-19)
+FR-13: Never present an asking price as a sale (AD-12, AD-16)
 FR-14: Bound every request to one of three declared sources (AD-12)
 FR-15: Honour Curation Status as schema-level behaviour (AD-7, AD-12, AD-17)
-FR-16: Reject an overlapping Tracked List at load — *Architecture-owned* (AD-17, `IMPLEMENTATION-NOTES.md` §2.1, §2.2)
+FR-16: Reject an overlapping Tracked List at load — *Architecture-owned* (AD-17; `areOverlapping` and `overlapBranches` in `packages/contracts/src/overlap.ts`, `coOccur` in `packages/core/src/cross-file.ts`)
 FR-17: Refresh the Tracked List in a defined, deterministic rotation — *Architecture-owned* (AD-7)
-FR-18: Render the Tracked List's age (AD-12, AD-9)
+FR-18: Let the player tell when the Tracked List last changed (AD-12, AD-9)
 FR-19: Run as a bounded, resumable, single-instance Chunk runner — *Architecture-owned* (AD-7, §6, §7)
 FR-20: Route all outbound trade traffic through one rate-limit-adaptive client — *Architecture-owned* (AD-8, §5.3)
 FR-21: Estimate a price from the cheapest live instant-buyout listings — *Architecture-owned* (AD-16, §4.3, §5.2)
 FR-22: Declare each entry's Item Level Floor from its Accepted Tier (AD-5, AD-17, §8)
 FR-23: Normalise every price to Divine at the sync boundary (AD-20, §4.2)
-FR-24: Fail loudly on an unresolvable stat id or Base Type (AD-9, AD-25)
-FR-25: Publish a structured Sync Report (AD-7, AD-9, AD-12, AD-17, AD-27)
+FR-24: Make a patch that breaks a tracked entry loud (AD-9, AD-25)
+FR-25: Publish a structured Sync Report, and make a sync problem visible without going to look (AD-7, AD-9, AD-12, AD-17, AD-27)
 FR-26: Compute Craft Cost in valuation, from synced rates (AD-3, AD-17, AD-20, §9)
 FR-27: Consume a schema-conformant Weights File and never produce one — *Architecture-owned* (AD-11)
 FR-28: Enforce the pool-completeness contract in both directions (AD-11, AD-17, AD-10)
@@ -58,6 +58,9 @@ FR-30: Depend on an externally produced Weights File as a v1 prerequisite (AD-11
 FR-31: Refuse to value an observation from a different league (AD-19, AD-20)
 FR-32: Validate the configured league against the live leagues endpoint — *Architecture-owned* (AD-19, AD-12, AD-7)
 FR-33: Load published artifacts at runtime as one consistent set (AD-3, AD-15, AD-24, AD-25)
+FR-34: Price Hybrid Modifiers and summed Stat Lines as the player reads them (AD-5, AD-16, AD-17)
+
+**Superseded UX design requirements.** UX-DR1–6, 11–17, 21, 24, 30, 32 and 36 below describe the retired paper direction. `EXPERIENCE.md` revision 24 and `DESIGN.md` revision 19 supersede them. Epics 1 to 3 shipped against them and stay unedited as records. Epic 4 acceptance cites `EXPERIENCE.md` state numbers and copies no string or threshold.
 
 ### NonFunctional Requirements
 
@@ -279,7 +282,7 @@ All four findings closed on 2026-09-20 and the owning documents carry those ruli
 
 **D-2 — CLOSED 2026-09-20.** The count was the shallow half of this finding. State 27's *"four checks, not five"* was a correction aimed at the retired straddle rule. Class discriminability arrived later and landed in the slot that sentence had emptied, so the sentence read as a rejection of a binding check. State 27 now enumerates five checks, and the defence is struck. The real payload was FR-4's reason enum. A class that fails any of the five has a `complete`, published pool, so neither existing string was true of it. FR-4 now carries a third string. Cite AD-17.
 
-**D-4 — CLOSED 2026-09-20.** `EXPERIENCE.md` carried *a declared tiebreak for equal EV* on its unresolved list as `core`'s and unanswered, on the ground that state 25 ties every crafted row at minus its Craft Cost and the rank numerals print over that tie, so an undeclared tiebreak would shift the printed order between loads. **AD-17 already declares it.** The ranked list breaks ties on the row's unit key, then the recipe id; the comparison is against the serialised canonical key of AD-5's arm rather than a bare string; and a raw row, having no recipe id, sorts before a crafted row at an equal EV, which makes the ordering total across the mixed list. Under that rule a twenty-way tie on one figure is fully determined and stable across loads, because unit keys are distinct. **The gap is therefore a citation gap and not a missing decision.** Two consequences: `IMPLEMENTATION-NOTES.md` does not own this rule and none of its sections state it, so an acceptance criterion cites AD-17 directly; and `EXPERIENCE.md`'s entry closes against AD-17 rather than waiting on a fresh ruling. UX made that edit on 2026-09-20: the unresolved bullet is gone, state 25 cites AD-17, and the closure is recorded under *Closed against the architecture*. Cite AD-17. No story invents a tiebreak of its own.
+**D-4 — CLOSED 2026-09-20.** `EXPERIENCE.md` carried *a declared tiebreak for equal EV* on its unresolved list as `core`'s and unanswered, on the ground that state 25 ties every crafted row at minus its Craft Cost and the rank numerals print over that tie, so an undeclared tiebreak would shift the printed order between loads. **AD-17 already declares it.** The ranked list breaks ties on the row's unit key, then the recipe id; the comparison is against the serialised canonical key of AD-5's arm rather than a bare string; and a raw row, having no recipe id, sorts before a crafted row at an equal EV, which makes the ordering total across the mixed list. Under that rule a twenty-way tie on one figure is fully determined and stable across loads, because unit keys are distinct. **The gap is therefore a citation gap and not a missing decision.** Two consequences: An acceptance criterion cites AD-17 directly; and `EXPERIENCE.md`'s entry closes against AD-17 rather than waiting on a fresh ruling. UX made that edit on 2026-09-20: the unresolved bullet is gone, state 25 cites AD-17, and the closure is recorded under *Closed against the architecture*. Cite AD-17. No story invents a tiebreak of its own.
 
 **D-3 — CLOSED 2026-09-20.** The recipe axis is settled, and AD-17 now carries the ruling. `core` ranks every `(Item Class, recipe)` pair inside one ordering, which is what gives the recipe-id tie-break work to do. `web` renders only the rows whose recipe is the active one, so a crafted class appears on the page exactly once. The cross product is an ordering-internal fact and is never player-observable. The list does not double, the Craft Recipe control is a filter, and no row names its recipe. AD-4 carries the read-time consequence. Cite AD-17.
 
@@ -322,6 +325,9 @@ FR-30: Epic 3 — the external Weights File as a v1 prerequisite. Its no-weights
 FR-31: Epic 2 — refusing to value an observation from another league
 FR-32: Epic 1 — validating the configured league before the run spends budget
 FR-33: Epic 2 — runtime artifact loading as one consistent set
+FR-34: Epic 3 — Hybrid Modifier and summed Stat Line pricing, built
+
+Epic 4 restyles and re-words the treatment of FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25 and NFR-10 for the Rarity Dark redesign. It adds no FR and changes no ownership above. A story inside Epic 4 owns the changed treatment, and the owning epic above keeps the FR.
 
 ## Epic List
 
@@ -386,6 +392,21 @@ The player reads Item Classes ranked by threshold-truncated expected value, unde
 **Standalone:** yes. It builds on Epics 1 and 2, and neither of them requires it to function. It adds to two components Epic 2 shipped — the appendix and the sync report panel — rather than replacing either.
 
 **Why this is not folded into Epic 2.** Epics 2 and 3 both extend `core` and `web`. The overlap was examined rather than assumed. Consolidation is rejected for two reasons, and neither is a matter of taste. First, Epic 3 is gated on an artifact this project does not produce. FR-30 makes an externally produced Weights File a v1 prerequisite, so merging the epics would make the whole page wait on a dependency that §7.3 does not control. Second, AD-24 declares the raw-only page a *shipped phase* and not a milestone. Epic 2 deploys to Pages and is read during a real league, so its feedback arrives before anyone designs Epic 3's ranking against it. The split therefore buys a real release and a real feedback loop, and that is what justifies touching the same files twice. The two epics also divide cleanly inside those packages. Epic 2 owns the substrate, the raw branch and every chrome component. Epic 3 adds the weights-fed valuation path beside them, rather than rewriting it.
+
+### Epic 4: Rarity Dark — the redesigned page
+
+The player reads the same ranked list on a dark, rarity-coloured page. Silence means a current price and measured odds. A row speaks only when its price needs attention. Sync health is visible without a click.
+
+**FRs retouched:** FR-3, FR-6, FR-7, FR-8, FR-9, FR-10, FR-11, FR-12, FR-13, FR-18, FR-24, FR-25 (ownership stays with Epics 1 to 3)
+
+**Also delivers:**
+  - the dark token set, bundled Inter and the sticky header bar
+  - the price-trust verdict in `core`
+  - the retirement of `UniformPriorBanner`, `KeyBlock`, `TrustStrip` and `RunningFoot`
+
+**NFRs addressed:** NFR-10
+
+**Standalone:** yes. It builds on Epics 1 to 3 and changes no sync behaviour. Story 4.2 waits on the architect gate in the Sprint Change Proposal of 2026-10-09, section 4.3.
 
 ## Epic 1: Foundations and the Background Sync
 
@@ -463,7 +484,7 @@ So that the producer and the consumer of an artifact cannot drift apart while bo
 **Then** the fields serialise in the declared order
 **And** each affix takes one of three distinguishable forms, so an absent affix and a valueless affix can never collide
 **And** the serialisation carries the kind, so the two key spaces cannot collide
-**And** keys compare by UTF-8 code unit, and never by locale collation (`IMPLEMENTATION-NOTES.md` §4.1, Consistency Conventions).
+**And** keys compare by UTF-8 code unit, and never by locale collation (`canonicalKey` in `packages/contracts/src/canonical-key.ts`, Consistency Conventions).
 
 **Given** `acceptedTier` on a modifier reference
 **When** `contracts` types it
@@ -507,7 +528,7 @@ So that I never lose the API access the entire tool depends on.
 **Then** it learns the active rule names at runtime, and it names no rule in code
 **And** it parses the policy header and the `-State` header for each named rule
 **And** it distinguishes the search bucket from the fetch bucket by `X-Rate-Limit-Policy`
-**And** it paces against the tightest unsatisfied bucket, with no rate hardcoded (`IMPLEMENTATION-NOTES.md` §5.3).
+**And** it paces against the tightest unsatisfied bucket, with no rate hardcoded (AD-8; `parseRateLimitHeaders` in `packages/sync/src/trade/rate-limit-headers.ts`).
 
 **Given** a `429` carrying `Retry-After`
 **When** the adapter receives it
@@ -585,7 +606,7 @@ So that I can schedule it repeatedly on my own machine and a crash can never wed
 
 **Given** a lock whose ISO-8601 start time is older than the declared staleness threshold
 **When** a run finds that lock
-**Then** it breaks the lock, proceeds, and writes a distinct `stale-lock-broken` record (`IMPLEMENTATION-NOTES.md` §7).
+**Then** it breaks the lock, proceeds, and writes a distinct `stale-lock-broken` record (AD-7; `STALE_LOCK_AFTER_MS` and `isStaleInstant` in `packages/sync/src/chunk/lock.ts`).
 
 **Given** two runs that arrive at the staleness boundary together
 **When** each run tries to take the lock
@@ -669,7 +690,7 @@ So that I can answer "how often does a row get re-priced?" of any figure, and a 
 **Given** a chunk that cannot fund the pinned set plus at least one `active` entry
 **When** it selects
 **Then** it truncates the pinned set and produces a pinned-starvation record
-**And** it does not change the exit code (`IMPLEMENTATION-NOTES.md` §6).
+**And** it does not change the exit code (AD-7; `checkPinnedCap` in `packages/sync/src/pinned-cap.ts`).
 
 **Given** the load-time inequality that denominates the `pinned` cap against a chunk
 **When** a component evaluates it
@@ -692,7 +713,7 @@ So that every figure the tool shows me is one comparable number resting on a met
 **When** `sync` builds its search
 **Then** `query.type` at the top level carries the entry's `baseTypeId` verbatim, and it is not a filter
 **And** the search carries no category filter
-**And** `type_filters.rarity` is `normal`, and `type_filters.ilvl.min` is the entry's `itemLevelMin` (`IMPLEMENTATION-NOTES.md` §5.2).
+**And** `type_filters.rarity` is `normal`, and `type_filters.ilvl.min` is the entry's `itemLevelMin` (AD-16; `buildSearchBody` in `packages/sync/src/pricing/search-body.ts`).
 
 **Given** any search
 **When** `sync` emits it
@@ -712,7 +733,7 @@ So that every figure the tool shows me is one comparable number resting on a met
 
 **Given** a returned sample of listings
 **When** `sync` takes the median
-**Then** on an even sample the median is the lower of the two middle values, and never their mean. Every persisted price is therefore a price someone actually asked (`IMPLEMENTATION-NOTES.md` §4.3).
+**Then** on an even sample the median is the lower of the two middle values, and never their mean. Every persisted price is therefore a price someone actually asked (AD-16; `lowerMedian` in `packages/sync/src/pricing/normalise.ts`).
 
 **Given** a returned listing
 **When** `sync` normalises it
@@ -846,7 +867,7 @@ So that what the run did and what broke reaches the surface I already read inste
 
 **Given** a chunk that truncated its pinned set
 **When** `sync` writes the report
-**Then** the report carries a pinned-starvation record naming the declared yardstick beside the observed allowance, so the shortfall is diagnosable (`IMPLEMENTATION-NOTES.md` §6).
+**Then** the report carries a pinned-starvation record naming the declared yardstick beside the observed allowance, so the shortfall is diagnosable (AD-7; `checkPinnedCap` in `packages/sync/src/pinned-cap.ts`).
 
 **Given** an unattended run that fails
 **When** it exits
@@ -1050,7 +1071,7 @@ So that the ordering I read is a pure function of what was published, and last l
 **When** `core` breaks the tie
 **Then** it breaks on the serialised canonical key of the entry's own AD-5 arm
 **And** it never breaks on a bare string that a `categoryId` and a `baseTypeId` could both supply
-**And** a raw row carries no recipe id, so it sorts before a crafted row. The ordering is therefore total across the mixed list, and not only within each branch (AD-17, `IMPLEMENTATION-NOTES.md` §4.1).
+**And** a raw row carries no recipe id, so it sorts before a crafted row. The ordering is therefore total across the mixed list, and not only within each branch (AD-17; `canonicalKey` in `packages/contracts/src/canonical-key.ts`).
 
 **Given** a `PriceObservation` whose league differs from `data/config.json`'s active league
 **When** `core` values it
@@ -1447,8 +1468,8 @@ So that a rank stops being a claim and becomes an argument I can check.
 
 **Given** the link's URL
 **When** `web` builds it
-**Then** it takes the form `IMPLEMENTATION-NOTES.md` §5.4 fixes
-**And** **the league segment alone** is percent-encoded, and never the whole path. Live league ids carry spaces, and an unencoded segment silently 404s (AD-24, §5.4).
+**Then** it takes the form `tradeSearchHref` in `packages/web/src/list/trade-link.ts` fixes (AD-24)
+**And** **the league segment alone** is percent-encoded, and never the whole path. Live league ids carry spaces, and an unencoded segment silently 404s (AD-24).
 
 **Given** an entry that fails any of the three conditions
 **When** the row renders
@@ -1734,7 +1755,7 @@ So that the ranking rests on a file somebody else produced and this app never in
 **Given** a line whose `statId` is `null`
 **When** `core` reads it
 **Then** that line is data rather than a file error, never a reason to declare a pool `partial`, and never a fact about coverage
-**And** such a line can never be contained, while its entry still enters the denominator like any other (AD-11, `IMPLEMENTATION-NOTES.md` §1, §3).
+**And** such a line can never be contained, while its entry still enters the denominator like any other (AD-11, AD-17; `untrackableReason` and `affixProbability` in `packages/core/src/probability.ts`).
 
 **Given** a pool declared `complete`
 **When** a developer reads the contract
@@ -1843,7 +1864,7 @@ So that two builders cannot produce two different orderings from the same two fi
 **When** `core` computes it
 **Then** the transmute draws its affix from the prefix and suffix pools combined, by weight, and the augment draws from the other slot's pool with the first affix's `modGroup` removed
 **And** scope, truncate, exclude and renormalise run in that order
-**And** `P = 1` for an absent affix (FR-29, AD-17, `IMPLEMENTATION-NOTES.md` §11).
+**And** `P = 1` for an absent affix (FR-29, AD-17; `combinationProbability` in `packages/core/src/probability.ts`).
 
 **Given** a class where no `modGroup` spans both slots
 **When** `core` computes a Combination's probability
@@ -1865,8 +1886,8 @@ So that two builders cannot produce two different orderings from the same two fi
 
 **Given** a declared `itemLevelMin`
 **When** a component reads it
-**Then** no component derives that floor. `IMPLEMENTATION-NOTES.md` §8 states it as a conformance condition on `data/tracked.json`
-**And** the code reads the declared number (FR-22, AD-5, §8).
+**Then** no component derives that floor. AD-5 states it as a conformance condition on `data/tracked.json`, and `needs` in `packages/core/src/probability.ts` derives it
+**And** the code reads the declared number (FR-22, AD-5).
 
 **Given** a floor declared *higher* than §8 derives
 **When** a check runs over the file
@@ -2025,9 +2046,9 @@ So that a double-counted Combination cannot hand an Item Class the top of the li
 **When** the checks run
 **Then** class discriminability does not run, and nothing is lost. Every crafted entry is unrankable already, and `sync` still builds every crafted search without consulting that file (AD-17, AD-24, AD-5).
 
-**Given** the `IMPLEMENTATION-NOTES.md` sections these checks name
+**Given** the modules AD-17 names for these checks
 **When** a developer builds a shell
-**Then** each check's quantifiers, scope and error payload live in those sections and nowhere else
+**Then** each check's quantifiers, scope and error payload live in `packages/core/src/cross-file/` and `packages/core/src/cross-file.ts` and nowhere else
 **And** a shell that re-derives one has diverged from AD-17, rather than from a style note (AD-0, AD-17).
 
 ### Story 3.4: The crafted EV, Craft Cost and the Craft Recipe control
@@ -2107,7 +2128,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 **Given** the recipe's declared `modifierLevelMin`
 **When** `core` prepares the pool
 **Then** it scopes first, truncates the tiers below that floor second, and renormalises third
-**And** renormalising before truncating is the error. It leaves a denominator that no longer sums its own numerators (FR-26, AD-17, `IMPLEMENTATION-NOTES.md` §9).
+**And** renormalising before truncating is the error. It leaves a denominator that no longer sums its own numerators (FR-26, AD-17; `eligible` and `canRecipeRoll` in `packages/core/src/probability.ts`).
 
 **Given** the two bounds on a tier
 **When** `core` tests eligibility
@@ -2243,7 +2264,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 **When** `core` orders it
 **Then** AD-17's declared tie-break settles it — on the row's unit key, then the recipe id, comparing the serialised canonical key of AD-5's arm rather than a bare string
 **And** because unit keys are distinct, the printed order is fully determined and identical across loads. Nothing here shifts between two builders or two page loads
-**And** no story invents a tie-break of its own. `IMPLEMENTATION-NOTES.md` does not own this rule and none of its sections state it, so an acceptance criterion cites AD-17 directly (state 25, FR-1, AD-17, AD-5, finding D-4).
+**And** no story invents a tie-break of its own. An acceptance criterion cites AD-17 directly (state 25, FR-1, AD-17, AD-5, finding D-4).
 
 **Given** a raw row and a crafted row at an equal EV
 **When** `core` compares them
@@ -2456,3 +2477,198 @@ So that I discount a row rather than acting on it, and a placeholder never keeps
 **When** the report covers coverage
 **Then** the fraction and its denominator are omitted **together**, which is how undefined is spelled
 **And** `web` must never render that omission as `0%` (FR-4, AD-27, §3).
+
+## Epic 4: Rarity Dark — the redesigned page
+
+The player reads the same ranked list on a dark, rarity-coloured page. Silence means a current price and measured odds. A row speaks only when its price needs attention. Sync health is visible without a click. The epic builds on Epics 1 to 3 and changes no sync behaviour.
+
+**Source of truth.** `EXPERIENCE.md` revision 24 and `DESIGN.md` revision 19 replace the paper direction. Every acceptance criterion cites a state number or a section of those documents and copies no string, threshold or token value. PRD revision 27 holds the promises (FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25, NFR-10).
+
+**Order.** 4.1, then 4.2 once the architect gate is closed (Sprint Change Proposal 2026-10-09, section 4.3), then 4.3 to 4.5, then 4.6. `pnpm check` is green after each story.
+
+**Open for UX, not blocking.** The number of Chase Combinations on a collapsed row. Story 4.3 renders whatever `EXPERIENCE.md` states.
+
+### Story 4.1: The dark token set, bundled Inter and the sticky header bar
+
+As the player,
+I want a dark page with a header that stays in view,
+So that the controls and the sync health are always where I look.
+
+**Acceptance Criteria:**
+
+**Given** the page
+**When** it renders
+**Then** the Mantine theme override layer carries `DESIGN.md` revision 19's dark token set, and the fixed paper frame is gone
+**And** no component reads a retired paper token (NFR-10; `DESIGN.md`).
+
+**Given** the typeface
+**When** the page loads
+**Then** Inter is bundled with the build and the page requests no font from a third party
+**And** the spine's stack versions name the font once the architect gate closes (NFR-7, AD-15).
+
+**Given** `{components.header-bar}`
+**When** the player scrolls
+**Then** it stays in view and holds the threshold control, the recipe control and the sync button slots that Story 4.5 fills
+**And** the page keeps its layout in every state (`EXPERIENCE.md` state 22).
+
+**Given** the cold load
+**When** an artifact has not yet arrived
+**Then** the header bar, the column header and the skeleton rows paint at once in the final layout (state 22).
+
+### Story 4.2: The price-trust verdict in `core`
+
+As the player,
+I want each row to say whether its price is current enough to act on,
+So that I discount a row that rests on an old or thin price.
+
+**Acceptance Criteria:**
+
+**Given** a Price Observation or an attempt
+**When** `core` judges one entry
+**Then** it returns one of four verdicts, with the reason, under `EXPERIENCE.md` *Price trust*
+**And** the old and thin triggers are the ones *Price trust* states, read from `core`'s own constants, never copied into `web` (FR-9, FR-12, AD-10).
+
+**Given** a crafted row
+**When** `core` judges the row
+**Then** it applies the row rule that `ARCHITECTURE-SPINE.md` states after the gate, in `core` or in `web` as the spine rules
+**And** it counts below-threshold outcomes in gross value as the spine rules (FR-10, FR-12).
+
+**Given** a crafted row whose gross value is zero
+**When** `core` judges it
+**Then** it uses the zero-gross fallback that *Price trust* states, and never divides by zero (FR-12).
+
+**Given** an entry with no observation
+**When** `core` judges it
+**Then** the clock is the attempt's, and a never-attempted entry carries no age (states 2, 5; FR-12, AD-9).
+
+**Given** weakest-input propagation
+**When** the verdict folds over inputs
+**Then** it follows AD-10 and adds no second propagation rule (FR-10, AD-10).
+
+### Story 4.3: The ranked row — rarity names, the uncrafted-base line, the mark slot and the odds cue
+
+As the player,
+I want each row to say whether I craft on it or sell the base as is, and whether to trust it,
+So that I can read the list without a legend.
+
+**Acceptance Criteria:**
+
+**Given** a ranked row
+**When** it renders
+**Then** the Item Class or Base Type name follows `EXPERIENCE.md` *Item Class labels* and the rarity colour of `DESIGN.md`
+**And** a Raw Base row carries the uncrafted-base line in words, so colour alone never carries craft versus sell (FR-3, NFR-10).
+
+**Given** the mark slot
+**When** a row is rough, pending or broken
+**Then** it shows the mark and `{components.mark-tooltip}` with the reason (states 17, 18, 40, 41; FR-9, FR-12)
+**And** a row with a current price and measured odds shows nothing there (states 1, 11).
+
+**Given** a crafted row on estimated odds
+**When** it renders
+**Then** it carries the per-row estimated-odds cue before the EV, and a measured row and a Raw Base row carry none (states 11, 12, 12a; FR-11)
+**And** the cue is never colour alone (NFR-10).
+
+**Given** the EV figure
+**When** the player asks how it was reached
+**Then** the EV tooltip answers from `EXPERIENCE.md` *Estimated odds* and *Price trust*, and the sentences in the Copy Deck are the only copy (FR-10).
+
+**Given** an Item Class with no qualifying Combination
+**When** it renders
+**Then** its chase cells are empty and its negative EV prints dimmed, as a ranked row (state 21; FR-1, FR-2).
+
+**Given** `unitLabel()`
+**When** an Item Class name carries a defence suffix
+**Then** the label is correct, and a test covers the case that the defect shipped with (FR-3).
+
+### Story 4.4: The expansion — one line per entry, top lines and the trust reasons
+
+As the player,
+I want to open a row and read every combination behind its figure,
+So that I can see which ones I can trust.
+
+**Acceptance Criteria:**
+
+**Given** an opened row
+**When** it renders
+**Then** it opens with the context line (state 12 where odds are estimated) and one line per Tracked Entry (FR-8; `EXPERIENCE.md` *The expansion*).
+
+**Given** a line
+**When** its entry is priced, pending or broken
+**Then** it shows the price state and trust reason of states 1 to 7, and the three `not-yet-synced` causes stay distinct in words (FR-9)
+**And** it shows an age only where *Price trust* says an age explains a problem (FR-12).
+
+**Given** an entry below the threshold
+**When** it renders
+**Then** it is dimmed and carries only the below-threshold statement, and it stays one click away (state 20; FR-8).
+
+**Given** a panel with more lines than the top-lines count
+**When** it opens
+**Then** it shows the top lines and the remainder affordance, and the pruned lines are not in the remainder count (state 39; Interaction 7).
+
+**Given** a pinned entry or a pruned entry
+**When** it renders
+**Then** the pinned mark leads its line and the pruned lines sit behind their own affordance with their reason (states 9, 10; FR-8, FR-15).
+
+**Given** a trade link
+**When** a line offers one
+**Then** it follows FR-33's rule and the link opens in a new tab (FR-33, AD-24).
+
+### Story 4.5: Header controls and the sync button
+
+As the player,
+I want the threshold, the recipe and the sync health in one bar,
+So that I set what counts as a win and know whether the list is healthy without a click.
+
+**Acceptance Criteria:**
+
+**Given** the threshold control
+**When** the player changes it
+**Then** the list follows at once, with no request and no sync, and the value survives a reload (FR-6, FR-7, NFR-6; Interaction 2)
+**And** the control's unset state is the one `EXPERIENCE.md` states, with no PRD default (FR-7).
+
+**Given** the recipe control
+**When** zero, one, two or an uncostable recipe set is in play
+**Then** the header follows states 35, 42 and 43, and no state costs a recipe at zero (FR-26, AD-20).
+
+**Given** a sync problem holds
+**When** the page renders
+**Then** the sync button shows the problem count in place of the age (state 31)
+**And** a healthy page shows the age alone (state 30; FR-25).
+
+**Given** an unresolvable entry, a starved pinned entry or a stale patch
+**When** the page renders
+**Then** each counts as a problem the player sees without a click, where the architect gate rules that the Sync Report exposes it (states 4, 29, 31; FR-24, FR-25).
+
+**Given** the sync report panel
+**When** the player opens it
+**Then** it shows the four-column report of `EXPERIENCE.md` *The sync report* and the date of the last Tracked List change, with an unknown date read as unknown (state 32; FR-18)
+**And** a tolerable absent file prints its plain line and is not a counted problem (state 38).
+
+### Story 4.6: The footer legend, list statements, failure screens and the appendix restyle
+
+As the player,
+I want the rest of the page in the same voice as the list,
+So that no retired element is left over.
+
+**Acceptance Criteria:**
+
+**Given** the page
+**When** it renders
+**Then** `UniformPriorBanner`, `KeyBlock`, `TrustStrip` and `RunningFoot` are gone from the code, with their tests and their dependency-cruiser exceptions (state 19)
+**And** the footer legend of `EXPERIENCE.md` replaces the key block.
+
+**Given** a list state that needs a sentence
+**When** the page renders it
+**Then** the list statement follows states 23, 25 and 35, and names no cause the sync button already carries.
+
+**Given** a refused or missing artifact
+**When** the page loads
+**Then** the failure screens follow states 26 and 28 in the new treatment, and a partial set is never rendered (FR-33, NFR-8).
+
+**Given** the Unrankable appendix
+**When** it renders
+**Then** it follows `DESIGN.md` revision 19 with the reasons of states 14, 15, 15a and 16, and its empty form follows state 37 (FR-4).
+
+**Given** NFR-10
+**When** the whole page is checked
+**Then** price trustworthiness, estimated odds and crafted versus uncrafted each carry a cue that is not colour (NFR-10; `EXPERIENCE.md` *Accessibility Floor*).

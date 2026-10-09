@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 24
+revision: 25
 created: 2026-09-13
-updated: 2026-10-04
+updated: 2026-10-09
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -75,8 +75,6 @@ row of this folder's `.memlog.md` that holds the decision.
 
 **Open items.** This document resolves none of them by invention.
 
-- The share-of-EV formula and the stale-patch data source (`[NOTE FOR ARCHITECT]`
-  in Epistemics; memlog 265).
 - Strings drafted at build (Copy Deck).
 - Two Combinations that read identically (`[NOTE FOR UX]`, Domain Vocabulary;
   memlog 143).
@@ -286,7 +284,7 @@ canonical key. `T1` names the tier that the player chose to chase. It is not a
 claim about any item that a search returned.
 
 **A label may name a mixture** (memlog 137). `T1–T2` is legal. For a multi-`#`
-modifier, the value axis does not partition the tier axis (AD-28). Thus the page
+modifier, the value axis does not partition the tier axis (AD-11). Thus the page
 prints what the curator accepted.
 
 **Chase Combination text uses canonical short forms** (memlog 34). Each tracked
@@ -579,11 +577,8 @@ Three things are problems:
 3. **The game patch is stale.** This is unreliable, not broken, so its
    problem-list line leads with ◐ (memlog 265).
 
-`[NOTE FOR ARCHITECT: memlog 254 counts a stale game patch as a problem, but the
-page makes no call to the game and has no live patch to compare against
-(state 29). The predicate needs a data source the page can read, for example a
-patch the sync run records beside the Weights File's `gamePatch`. None exists yet,
-so this problem cannot fire (memlog 265).]`
+The stale-patch problem cannot fire in v1. No artifact names the current patch
+(ARCHITECTURE-SPINE.md AD-12).
 
 **The count is of affected entries, not of problem kinds** (memlog 265). Every
 broken entry, and every pinned entry that the starvation left out, counts once. A
@@ -670,15 +665,11 @@ decides:
     or below zero still has a defined verdict.
   - *Reason:* `N% of this EV rests on unreliable prices`. N is in whole percent,
     rounded down, so the printed figure never contradicts the rule.
-  - *When gross outcome value is zero:* the measure is the share of the row's
-    priced lines that are unreliable, against the same 70% (memlog 265). Reason:
-    `N% of its priced combinations are unreliable` (memlog 268).
 - **Otherwise** → no mark.
 
-`[NOTE FOR ARCHITECT: the share-of-EV formula belongs in the architecture spine,
-including whether below-threshold outcomes count in the gross value and which
-lines the zero-value fallback counts as priced (memlog 265). State 25 puts every
-crafted row on the fallback.]`
+The share formula and its inputs are ARCHITECTURE-SPINE.md AD-17, *Price trust*.
+The gross value counts every priced combination, including the combinations below
+the threshold. Because of this, the threshold never moves a verdict.
 
 A crafted row carries ✕ only when every entry is broken. Otherwise the ranking
 excludes broken entries (FR-24), and they show on their own expansion lines.
@@ -820,7 +811,7 @@ number.
 | 26 | Refused artifact | Whole page | The refusal variant of `{components.failure-screen}` replaces everything (FR-33, NFR-8; memlog 221). The cause is one of three: a fetched artifact is schema-invalid, declares a version that the page does not read, or is required and not published. The title names no cause (memlog 220). The body names which artifact and why. No retry: the fix for a refusal is a valid published set, and the fixed sentence says so (Copy Deck). An invalid recipe set takes this treatment (*Recipe option words*) |
 | 27 | Cross-file policy check failure | Report, never refusal | Five cross-file checks run at load (AD-17). The page still renders. The affected Item Classes are Unrankable with `class disagrees with weights file` (state 15a). **The sync report's Problems column lists the diagnosis**, in the file's register, and **does not count it** (memlog 206, 275) |
 | 28 | Artifact fetch failure | Whole page | The fetch-failure variant of `{components.failure-screen}`, shown when an artifact does not arrive (AD-24). Its title and body name the file (Copy Deck). `+ Try again` re-attempts the whole set, never a partial one. **A partial set is never rendered** (FR-33) |
-| 29 | Stale Weights File after a patch | `{components.sync-report-panel}` | The page makes no call to the game. It shows the `gamePatch` that the Weights File declares, in the sync report (memlog 258 N-8). The player knows which patch they play. When the page can tell that the patch is stale, it is a counted problem (*Loud when wrong* and its `[NOTE FOR ARCHITECT]`). Neither a stale weights file nor a stale catalogue breaks the page |
+| 29 | Stale Weights File after a patch | `{components.sync-report-panel}` | The page makes no call to the game. It shows the `gamePatch` that the Weights File declares, in the sync report (memlog 258 N-8). The player knows which patch they play. When the page can tell that the patch is stale, it is a counted problem (*Loud when wrong*). In v1 this problem cannot fire (AD-12). Neither a stale weights file nor a stale catalogue breaks the page |
 | 30 | Sync button at rest, healthy | `{components.sync-button}` | `Synced <age> ▾` and nothing else: no dot, no colour, no count (memlog 254). This is the state on most loads |
 | 31 | Sync button, a problem holds | `{components.sync-button}` | The count in place of the age (*Loud when wrong*; Copy Deck). Attribution never raises it |
 | 32 | Sync report open | `{components.sync-report-panel}` | Interaction 5 opens it. Its content follows *The sync report*. It caps its height and scrolls inside past the cap (DESIGN.md) |
@@ -985,7 +976,7 @@ shortcuts, access keys, right-click menus and touch gestures. Input is mouse-onl
 - Modals, drawers, overlays and dropdown panels.
 - Auto-refresh or polling that changes the list under the player's eyes.
 - Any animation that attracts attention to a row.
-- Any write path from the browser (AD-15, AD-21).
+- Any write path from the browser (AD-15, AD-3).
 - Copy-to-clipboard JSON snippets per row, rejected for v1.
 
 ## Accessibility Floor
@@ -1207,7 +1198,7 @@ The *edit* happens in a text editor and git.
    pruned are behind `+ N pruned`.
 
 What stays unsupported: the edit itself. `data/tracked.json` is hand-owned (AD-15,
-AD-21). The player does this a handful of times a league.
+AD-3). The player does this a handful of times a league.
 
 ### UJ-6 — The league reset
 
