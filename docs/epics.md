@@ -406,7 +406,7 @@ The player reads the same ranked list on a dark, rarity-coloured page. Silence m
 
 **NFRs addressed:** NFR-10
 
-**Standalone:** yes. It builds on Epics 1 to 3 and changes no sync behaviour. Story 4.2 waits on the architect gate in the Sprint Change Proposal of 2026-10-09, section 4.3.
+**Standalone:** yes. It builds on Epics 1 to 3 and changes no sync behaviour.
 
 ## Epic 1: Foundations and the Background Sync
 
@@ -2482,11 +2482,11 @@ So that I discount a row rather than acting on it, and a placeholder never keeps
 
 The player reads the same ranked list on a dark, rarity-coloured page. Silence means a current price and measured odds. A row speaks only when its price needs attention. Sync health is visible without a click. The epic builds on Epics 1 to 3 and changes no sync behaviour.
 
-**Source of truth.** `EXPERIENCE.md` revision 24 and `DESIGN.md` revision 19 replace the paper direction. Every acceptance criterion cites a state number or a section of those documents and copies no string, threshold or token value. PRD revision 27 holds the promises (FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25, NFR-10).
+**Source of truth.** `EXPERIENCE.md` revision 25 and `DESIGN.md` revision 19 replace the paper direction. Every acceptance criterion cites a state number or a section of those documents and copies no string, threshold or token value. PRD revision 27 holds the promises (FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25, NFR-10). `ARCHITECTURE-SPINE.md` revision 32 holds the decisions: AD-17 *Price trust*, AD-12's problem-count sources and the Stack table's Inter entry.
 
-**Order.** 4.1, then 4.2 once the architect gate is closed (Sprint Change Proposal 2026-10-09, section 4.3), then 4.3 to 4.5, then 4.6. `pnpm check` is green after each story.
+**Order.** 4.1, then 4.2, then 4.3 to 4.5, then 4.6. `pnpm check` is green after each story.
 
-**Open for UX, not blocking.** The number of Chase Combinations on a collapsed row. Story 4.3 renders whatever `EXPERIENCE.md` states.
+**Known gaps.** `EXPERIENCE.md` *Foundation*, *Open items* lists the gaps that it leaves to the build stories. A story that touches one raises it and does not settle it silently.
 
 ### Story 4.1: The dark token set, bundled Inter and the sticky header bar
 
@@ -2504,7 +2504,7 @@ So that the controls and the sync health are always where I look.
 **Given** the typeface
 **When** the page loads
 **Then** Inter is bundled with the build and the page requests no font from a third party
-**And** the spine's stack versions name the font once the architect gate closes (NFR-7, AD-15).
+**And** the bundled face and its version are the ones the spine's Stack table names (NFR-7, AD-15).
 
 **Given** `{components.header-bar}`
 **When** the player scrolls
@@ -2528,14 +2528,18 @@ So that I discount a row that rests on an old or thin price.
 **Then** it returns one of four verdicts, with the reason, under `EXPERIENCE.md` *Price trust*
 **And** the old and thin triggers are the ones *Price trust* states, read from `core`'s own constants, never copied into `web` (FR-9, FR-12, AD-10).
 
+**Given** a ranked row and each combination `core` returns
+**When** `core` ranks
+**Then** it returns the verdict on the `RankedRow` and beside every combination, so `web` derives no trust fact (AD-17 *Price trust*).
+
 **Given** a crafted row
 **When** `core` judges the row
-**Then** it applies the row rule that `ARCHITECTURE-SPINE.md` states after the gate, in `core` or in `web` as the spine rules
-**And** it counts below-threshold outcomes in gross value as the spine rules (FR-10, FR-12).
+**Then** it applies *Price trust*'s ordered rules, first match wins, with the share rule as AD-17 states it
+**And** the share counts every `priced` non-pruned entry in gross value, below-threshold entries included, so the verdict does not move with the threshold (FR-10, FR-12, AD-17).
 
-**Given** a crafted row whose gross value is zero
+**Given** a crafted row with no `priced` entry
 **When** `core` judges it
-**Then** it uses the zero-gross fallback that *Price trust* states, and never divides by zero (FR-12).
+**Then** the *no priced combination* rule matches before the share rule, and `core` implements no zero-gross fallback (AD-17).
 
 **Given** an entry with no observation
 **When** `core` judges it
@@ -2637,7 +2641,7 @@ So that I set what counts as a win and know whether the list is healthy without 
 
 **Given** an unresolvable entry, a starved pinned entry or a stale patch
 **When** the page renders
-**Then** each counts as a problem the player sees without a click, where the architect gate rules that the Sync Report exposes it (states 4, 29, 31; FR-24, FR-25).
+**Then** the unresolvable and starved counts are problems the player sees without a click, read from the sources AD-12 names, and the stale patch counts nothing because it cannot fire in v1 (AD-12; states 4, 29, 31; FR-24, FR-25).
 
 **Given** the sync report panel
 **When** the player opens it
