@@ -139,7 +139,7 @@ export function composeChunk(options: ComposeChunkPorts): ComposedChunk {
     catalogue: () => loadCatalogueIds(fs),
     latchedRetryAfterMs: () => governor.latchedRetryAfterMs(),
     // The runner sees two narrow ports, never the holder: the run-start
-    // hold-off settle and the pending hold-off action (§13.1, §13.3).
+    // hold-off settle and the pending hold-off action.
     ...(auth !== undefined && {
       auth: {
         settleHeldOffIfDue: (holdOffUntil, now) => {

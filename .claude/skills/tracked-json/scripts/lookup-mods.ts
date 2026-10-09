@@ -12,7 +12,7 @@ export interface ModifierRow {
   readonly slot: Slot;
   readonly modGroup: string;
   readonly text: string;
-  /** The family's line set (`core`'s `lineSet`, IN §1); more than one means a hybrid. */
+  /** The family's line set (`core`'s `lineSet`); more than one means a hybrid. */
   readonly statIds: string[];
   /** False when any tier is untrackable (the null-line rule); `untrackable` lists the tiers. */
   readonly trackable: boolean;
@@ -105,7 +105,7 @@ export interface TierRow {
   readonly lineSet: readonly string[];
   /** `core`'s null-line verdict: why the tier is untrackable, or `null` when it is trackable. */
   readonly untrackable: UntrackableReason | null;
-  /** Whether each recipe can roll this tier (IMPLEMENTATION-NOTES §9). Absent when `data/recipes.json` is unusable. */
+  /** Whether each recipe can roll this tier (`canRecipeRoll`, AD-17). Absent when `data/recipes.json` is unusable. */
   readonly recipes?: readonly { readonly recipeId: string; readonly modifierLevelMin: number; readonly reached: boolean }[];
 }
 

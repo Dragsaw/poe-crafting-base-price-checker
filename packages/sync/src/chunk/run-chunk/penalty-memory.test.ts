@@ -56,7 +56,7 @@ function progressWithNotBefore(completed: readonly string[], notBefore: string):
   return JSON.stringify({ schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION, completed, notBefore });
 }
 
-describe('runChunk: penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3)', () => {
+describe('runChunk: penalty memory across processes (AD-8)', () => {
   it('step 429: progress gets notBefore = NOW + the yield’s retry-after', async () => {
     const { fs, ports } = harness([A, B]);
     const { step } = scriptedStep((entry) =>

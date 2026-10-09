@@ -1,22 +1,22 @@
 import type { ModifierReference } from './modifier-reference.ts';
 import type { TrackedEntry } from './tracked-entry.ts';
 
-/** The canonical `TrackedEntry` key (IN §4.1): one serialisation for tie-breaks (AD-7, AD-17). */
+/** The canonical `TrackedEntry` key: one serialisation for tie-breaks (AD-7, AD-17). */
 
-/** Always three elements: `[statId, min, max]`, with `null` edges for a `valueless` line (§4.1). */
+/** Always three elements: `[statId, min, max]`, with `null` edges for a `valueless` line. */
 export type CanonicalLine = readonly [string, number | null, number | null];
 
-/** A `CanonicalLine`, or `["hybrid", [line, …]]`; the forms cannot collide (§4.1). */
+/** A `CanonicalLine`, or `["hybrid", [line, …]]`; the forms cannot collide. */
 export type CanonicalAffix = CanonicalLine | readonly ['hybrid', readonly CanonicalLine[]];
 
 export type CanonicalKeyElements =
   | readonly ['crafted', string, string, number, CanonicalAffix, CanonicalAffix]
   | readonly ['raw', string, number];
 
-// eslint-disable-next-line unicorn/no-null -- boundary: §4.1 spells a valueless line `[statId, null, null]`, a serialised key that `undefined` would change.
+// eslint-disable-next-line unicorn/no-null -- boundary: a valueless line is spelled `[statId, null, null]`, a serialised key that `undefined` would change.
 const VALUELESS_SLOT = null;
 
-/** The lines are already sorted by `statId`: the schema sorts them on parse (§4.1). */
+/** The lines are already sorted by `statId`: the schema sorts them on parse. */
 export function encodeAffix(reference: ModifierReference): CanonicalAffix {
   switch (reference.kind) {
     case 'banded': {
@@ -36,7 +36,7 @@ export function encodeAffix(reference: ModifierReference): CanonicalAffix {
   }
 }
 
-/** The leading kind tag makes the byte-wise ordering total across a mixed list (§4.1). */
+/** The leading kind tag makes the byte-wise ordering total across a mixed list. */
 export function canonicalKeyElements(entry: TrackedEntry): CanonicalKeyElements {
   switch (entry.kind) {
     case 'crafted': {

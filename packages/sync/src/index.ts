@@ -69,7 +69,7 @@ export { LOCK_PATH, STALE_LOCK_AFTER_MS } from './chunk/lock';
 export { InvalidArtifactError, writeArtifact } from './write-artifact';
 export type { ArtifactSchema } from './write-artifact';
 
-// Pinned cap and starvation record (AD-7, IMPLEMENTATION-NOTES.md §6): the only readers of
+// Pinned cap and starvation record (AD-7): the only readers of
 // `minChunkSearches`, kept outside `chunk/` so the yardstick can never bound a chunk.
 export { checkPinnedCap, PinnedCapExceededError, pinnedStarvationRecord } from './pinned-cap';
 export type { PinnedCapExceeded, PinnedCapResult } from './pinned-cap';

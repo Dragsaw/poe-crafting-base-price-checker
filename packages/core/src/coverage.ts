@@ -12,7 +12,7 @@ export interface PoolCoverage {
 }
 
 /**
- * Pool coverage (AD-27, IN §3); `undefined` when no class is rankable.
+ * Pool coverage (AD-27); `undefined` when no class is rankable.
  */
 export function poolCoverage(
   entries: readonly TrackedEntry[],

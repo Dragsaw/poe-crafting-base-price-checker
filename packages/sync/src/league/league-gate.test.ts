@@ -134,7 +134,7 @@ describe('createLeagueGate', () => {
   it('yields on a 429, with the one request sent and nothing slept out', async () => {
     const { http, gate } = gateAnswering({ status: 429, headers: { 'retry-after': '60' }, body: '' }, 'Standard');
 
-    // The yield carries the delay the chunk remembers as notBefore (§5.3).
+    // The yield carries the delay the chunk remembers as notBefore.
     await expect(gate({ entries: [] })).resolves.toStrictEqual({ kind: 'yield', retryAfterMs: 60_000 });
     expect(http.requests).toHaveLength(1);
   });

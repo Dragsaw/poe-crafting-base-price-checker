@@ -1,7 +1,7 @@
 import { compareByCodeUnit } from './canonical-key.ts';
 import type { HybridLine, ModifierReference, SingleLineModifierReference } from './modifier-reference.ts';
 
-/** The overlap predicate (AD-17, IN §2.1); `coOccur` (§2.2) is injected, it needs the weights. */
+/** The overlap predicate (AD-17); `coOccur` is injected, it needs the weights. */
 
 export type OverlapSlot = 'prefix' | 'suffix';
 
@@ -13,13 +13,13 @@ export interface OverlapAffixes {
   readonly suffix: ModifierReference;
 }
 
-/** `coOccur(x, y, S)` (§2.2): one scoped pool entry holds both references; `summed` lines count. */
+/** `coOccur(x, y, S)`: one scoped pool entry holds both references; `summed` lines count. */
 export type CoOccur = (x: ModifierReference, y: ModifierReference, slot: OverlapSlot, summed: ReadonlySet<string>) => boolean;
 
 /** The within-file `coOccur`: the tracked list alone cannot see a pool. */
 export const CAN_NEVER_CO_OCCUR: CoOccur = () => false;
 
-/** Which §2.1 branch made a slot overlap; `summed`: a reference names no `statId` outside `S`. */
+/** Which branch made a slot overlap; `summed`: a reference names no `statId` outside `S`. */
 export type SlotOverlapBranch = 'summed' | 'co-occur' | 'both-valueless' | 'bands-intersect';
 
 /** One line a reference names: the reference itself when single-line, one of its lines when hybrid. */
@@ -30,7 +30,7 @@ export function linesOf(reference: ModifierReference): readonly NamedLine[] {
   return reference.kind === 'hybrid' ? reference.lines : [reference];
 }
 
-/** `statIds(ref)` (§1), local because `contracts` cannot import `core`. */
+/** `statIds(ref)`, local because `contracts` cannot import `core`. */
 function statIdsOf(reference: ModifierReference): readonly string[] {
   return linesOf(reference).map((line) => line.statId);
 }
@@ -41,7 +41,7 @@ function lineOn(reference: ModifierReference, statId: string): NamedLine | undef
 
 const NO_SUMMED: ReadonlySet<string> = new Set();
 
-/** `summed(e)` (§2.1): the `statId`s both slots of one entry name, in prefix line order. */
+/** `summed(e)`: the `statId`s both slots of one entry name, in prefix line order. */
 export function summedStatIds(affixes: OverlapAffixes): ReadonlySet<string> {
   const suffix = new Set(statIdsOf(affixes.suffix));
   return new Set(statIdsOf(affixes.prefix).filter((statId) => suffix.has(statId)));
@@ -53,14 +53,14 @@ export interface SummedInterval {
   readonly max: number;
 }
 
-/** `sum(e, s)` (§2.1, §5.5): plain addition, never rounded (AD-16); `undefined` without a line. */
+/** `sum(e, s)`: plain addition, never rounded (AD-16); `undefined` without a line. */
 export function summedInterval(affixes: OverlapAffixes, statId: string): SummedInterval | undefined {
   const prefix = lineOn(affixes.prefix, statId);
   const suffix = lineOn(affixes.suffix, statId);
   return prefix === undefined || suffix === undefined || !('valueMin' in prefix) || !('valueMin' in suffix) ? undefined : { min: prefix.valueMin + suffix.valueMin, max: prefix.valueMax + suffix.valueMax };
 }
 
-/** `linesIntersect(x, y, S)` (§2.1) over the shared `statId`s outside `S`, which the caller found non-empty. */
+/** `linesIntersect(x, y, S)` over the shared `statId`s outside `S`, which the caller found non-empty. */
 function areLinesIntersecting(x: ModifierReference, y: ModifierReference, shared: readonly string[]): boolean {
   return shared.every((statId) => {
     const left = lineOn(x, statId);
@@ -83,7 +83,7 @@ export interface SlotOverlapOptions {
   readonly summed?: ReadonlySet<string>;
 }
 
-/** The branch that made the slot overlap, or `undefined` (§2.1); `coOccur` only for hybrids. */
+/** The branch that made the slot overlap, or `undefined`; `coOccur` only for hybrids. */
 export function slotOverlapBranch(
   x: ModifierReference,
   y: ModifierReference,
@@ -109,12 +109,12 @@ export function isSlotOverlapping(x: ModifierReference, y: ModifierReference, op
   return slotOverlapBranch(x, y, options) !== undefined;
 }
 
-/** `overlap(a, b)` (§2.1): both slots overlap outside `S`, and every sum in `S` intersects. */
+/** `overlap(a, b)`: both slots overlap outside `S`, and every sum in `S` intersects. */
 export function areOverlapping(a: OverlapAffixes, b: OverlapAffixes, isCoOccurring: CoOccur): boolean {
   return overlapBranches(a, b, isCoOccurring) !== undefined;
 }
 
-/** A pair is `core`'s when either entry names a `hybrid`, else `contracts`'s (§2.1). */
+/** A pair is `core`'s when either entry names a `hybrid`, else `contracts`'s. */
 export function hasHybridAffix(affixes: OverlapAffixes): boolean {
   return affixes.prefix.kind === 'hybrid' || affixes.suffix.kind === 'hybrid';
 }

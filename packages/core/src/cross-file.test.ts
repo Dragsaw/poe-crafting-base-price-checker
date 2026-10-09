@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { edgeAlignment, emptyContainment } from './cross-file.ts';
 import { band, bows, checksOf, entry, failuresOf, line, OTHER, pools, STAT, T7, T8, tier, valueless } from './cross-file/test-support.ts';
 
-describe('edge alignment (§2.4)', () => {
+describe('edge alignment', () => {
   const scoped = [T7(), T8()];
 
-  it('counts a valueless line as [1, 1] in the extremes (§2.3)', () => {
+  it('counts a valueless line as [1, 1] in the extremes', () => {
     expect(edgeAlignment('prefix', band(1, 2), [tier([line(STAT)]), tier([line(STAT, [2, 2])])], 82)).toBeUndefined();
     expect(edgeAlignment('prefix', band(0, 1), [tier([line(STAT)])], 82)).toContain('extremes [1, 1]');
   });
@@ -52,7 +52,7 @@ describe('edge alignment (§2.4)', () => {
   });
 });
 
-describe('empty containment set (§2.5)', () => {
+describe('empty containment set', () => {
   it('fails when no scoped entry contains the reference, naming the ref, the floor and the absence, and no file', () => {
     const tracked = entry({ prefix: band(12, 15) });
     const [failure, ...rest] = failuresOf([tracked], bows(pools([tier([line(STAT, [5, 15])])])));
@@ -75,7 +75,7 @@ describe('empty containment set (§2.5)', () => {
   });
 });
 
-describe('kind agreement (§2.3), universal', () => {
+describe('kind agreement, universal', () => {
   it('fails a valueless reference when any scoped line on its statId is banded', () => {
     const scoped = [tier([line(STAT)], { itemLevelMin: 55 }), tier([line(STAT, [2, 2])], { itemLevelMin: 82 })];
     const tracked = entry({ prefix: valueless() });
@@ -109,7 +109,7 @@ describe('kind agreement (§2.3), universal', () => {
   });
 });
 
-describe('single-line pairs (§2.1 consequence 3)', () => {
+describe('single-line pairs', () => {
   const hybrid = tier([line(STAT, [10, 20]), line(OTHER, [5, 6])]);
   const first = entry({ prefix: band(10, 20) });
   const second = entry({ prefix: band(5, 6, OTHER) });

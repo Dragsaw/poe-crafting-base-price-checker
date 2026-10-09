@@ -67,7 +67,7 @@ describe('checkSchemaVersion', () => {
   });
 });
 
-describe('trackedEarlierMajorMessage (IMPLEMENTATION-NOTES §4.1)', () => {
+describe('trackedEarlierMajorMessage', () => {
   it('explains an earlier tracked major: the major changed, both affixes, hybrid, re-author', () => {
     const message = trackedEarlierMajorMessage('1.0.0');
     expect(message).toBeDefined();

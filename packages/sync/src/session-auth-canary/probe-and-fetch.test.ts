@@ -14,7 +14,7 @@ import { CANARY, CONTACT, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatc
 
 const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
 
-describe('CAP-4: the probe and the requests after it (IMPLEMENTATION-NOTES.md §13.2, §13.6)', () => {
+describe('CAP-4: the probe and the requests after it', () => {
   const RESULTS = ['r1'];
   const SEARCHED = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length });
   /** One rule more than the baseline answer, which names none: a live probe. */

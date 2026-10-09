@@ -1,4 +1,4 @@
-// Parses GGG's `X-Rate-Limit-*` headers (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// Parses GGG's `X-Rate-Limit-*` headers (AD-8).
 // No rule, policy or rate is compiled in: they arrive at runtime, and the policy and state
 // triples pair positionally. An absent or malformed rule is skipped and recorded, never thrown.
 
@@ -169,12 +169,12 @@ export function parseRateLimitHeaders(
   return { policy, rules, skips };
 }
 
-/** `|names(X-Rate-Limit-Rules)|` (IMPLEMENTATION-NOTES.md §13.2); the probe compares only this. */
+/** `|names(X-Rate-Limit-Rules)|`; the probe compares only this. */
 export function ruleNameCount(headers: Readonly<Record<string, string>>): number {
   return ruleNamesOf(lowerCaseHeaders(headers).get(RULES_HEADER)).length;
 }
 
-/** `policy(X-Rate-Limit-Policy)` of IMPLEMENTATION-NOTES.md §13.2, trimmed and case-folded. */
+/** `policy(X-Rate-Limit-Policy)`, trimmed and case-folded. */
 export function rateLimitPolicyOf(headers: Readonly<Record<string, string>>): string | undefined {
   const value = lowerCaseHeaders(headers).get(POLICY_HEADER)?.trim().toLowerCase();
   return value === undefined || value === '' ? undefined : value;

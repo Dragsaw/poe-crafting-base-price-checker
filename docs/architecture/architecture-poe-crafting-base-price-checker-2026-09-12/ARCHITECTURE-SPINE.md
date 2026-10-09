@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 29
+revision: 30
 created: '2026-09-12'
-updated: '2026-10-04'
+updated: '2026-10-09'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -23,7 +23,6 @@ sources:
     repo, deleted in commit 55fe390)
 companions:
   - WEIGHTS-FILE-SCHEMA.md
-  - IMPLEMENTATION-NOTES.md
   - AGENT-WORKFLOW.md
 ---
 
@@ -75,12 +74,11 @@ companions:
 > a category-wide search, and the jewel arm's derived base type is **catalogue-validated**
 > (AD-25). **AD-17 gains a fifth cross-file check** — *class discriminability* — so a class
 > that needs a discriminator and cannot yield one is caught before budget is spent.
-> `IMPLEMENTATION-NOTES.md` gains **§10** for the derivation and **§2.6** for the check.
 >
 > **The field spelling is evidence, not assumption.** A second live body captured by the
-> player on 2026-09-20 (§5.1) carries `equipment_filters.filters` with `ar`, `ev` and `es`,
+> player on 2026-09-20 carries `equipment_filters.filters` with `ar`, `ev` and `es`,
 > which settles the path and the spelling on the request side the same way the first capture
-> settled `status` and `price`. **AD-27 and §3 count tracked classes**; the `covered(base)`
+> settled `status` and `price`. **AD-27 counts tracked classes**; the `covered(base)`
 > finding and the withdrawn coverage bands are untouched, and the denominator stays in the
 > same order of magnitude, so revision 14's reasoning needs no re-deciding.
 >
@@ -96,9 +94,8 @@ companions:
 > mapping artifact, and **no change to `WEIGHTS-FILE-SCHEMA.md`'s shape**.
 >
 > **AD-16 gains a second query shape** — `type_filters.category` for a crafted entry,
-> `query.type` for a raw one, exactly one emitted — which turns `IMPLEMENTATION-NOTES.md`
-> §5.2 trap 1 from a prohibition into a branch rule, and makes §5.1's captured category
-> browse evidence for the crafted envelope instead of a non-example. **AD-17 ranks two units
+> `query.type` for a raw one, exactly one emitted — which turns a prohibition into a
+> branch rule. **AD-17 ranks two units
 > in one list** and `RankedBase` is renamed **`RankedRow`** for it; `ItemCategory` joins the
 > entity set (renamed to `ItemClass` by revision 17). **AD-27 loses its coverage bands**: FR-4 withdrew them in `prd.md` revision 17
 > rather than re-fit them to a denominator that fell from hundreds of bases to dozens of
@@ -138,10 +135,10 @@ companions:
 > AD-19's central threat re-entering through the currency path. Staleness needs no new
 > mechanism: AD-10 already propagates the oldest timestamp. The step leaves AD-7's rotation,
 > `data/currencies.json` leaves AD-12's request sources (**three**, not four), and
-> `currencyStepSearches` leaves `IMPLEMENTATION-NOTES.md` §6's cap and its record.
+> `currencyStepSearches` leaves the pinned cap and its record.
 > **AD-17 gains a real distribution term**: a `CraftRecipe` declares a `modifierLevelMin` —
 > the game's *Minimum Modifier Level*, 44 for greater orbs and 70 for perfect — and the pool
-> truncates below it and renormalises (new §9). Weights already carry the matching quantity
+> truncates below it and renormalises. Weights already carry the matching quantity
 > as `itemLevelMin`, so the transform needs no number the inputs lack, and the two bounds are
 > **one axis**, not two. Ordering is no longer recipe-invariant, which is player-visible and
 > **routed a scope item to `prd.md`** (§9 of this list, FR/§ cited there). **That routing has
@@ -160,13 +157,12 @@ companions:
 >
 > **Revision 13** takes the two items `prd.md` revision 14 routed here, and adds no AD.
 > AD-5 gains the missing half of its own subject — *who* derives the declared `itemLevelMin`,
-> and from what — pointing at the new `IMPLEMENTATION-NOTES.md` §8, which states the curator's
-> derivation in full and corrects it to read the affix **band** rather than the display-only
-> `acceptedTier` label. `AGENT-WORKFLOW.md` step 2 gains AD-27's absent-file carve-out and the
+> and from what — pointing at the curator's derivation, which reads the affix **band** rather than the
+> display-only `acceptedTier` label. `AGENT-WORKFLOW.md` step 2 gains AD-27's absent-file carve-out and the
 > day-one path, so the build order no longer instructs an escalation for a failure AD-27 says
-> does not exist. With §8 in place, `prd.md` FR-22 can drop the one of its three
+> does not exist. With that derivation in place, `prd.md` FR-22 can drop the one of its three
 > `*(PRD-owned)*` markers that sits over a computation — and **must** also drop the label as
-> that computation's input, which FR-22 still names and §8 corrects away from. Until it does,
+> that computation's input, which FR-22 still names and the curator's derivation corrects away from. Until it does,
 > one derivation has two owners and two different inputs. The gate also turned up a seam
 > neither routed item named: **OQ-23** records that modifier pools are published per **item
 > class** while a tracked entry is keyed on `baseTypeId`, and `WEIGHTS-FILE-SCHEMA.md`'s three
@@ -182,8 +178,7 @@ companions:
 > record; AD-17 applies the threshold to a raw base and gives `web`'s consequence on a
 > cross-file failure; AD-3 states that `recipes.json` is a list; AD-27 reports coverage with
 > its denominator; AD-10's FR-11 raise-back is closed; OQ-12 gains the `valueless` wire
-> shape. `IMPLEMENTATION-NOTES.md` §2.1 names the overlap error payload, §3 the reported
-> denominator and §6 all six pinned-starvation identifiers; `WEIGHTS-FILE-SCHEMA.md` states
+> shape. `WEIGHTS-FILE-SCHEMA.md` states
 > both halves of pool completeness.
 >
 > **Revision 11** closes the nine critical findings of the 2026-09-19 validation gate. It
@@ -194,9 +189,7 @@ companions:
 > AD-8, AD-11, AD-16, AD-17, AD-20, AD-27 and the Conventions table) — makes `core` return
 > each ranked base's ordered summands so
 > FR-2 has a legal implementation (AD-17), and decides `web`'s behaviour on an **absent**
-> artifact as distinct from an invalid one (AD-24). `IMPLEMENTATION-NOTES.md` §2.4's edge
-> alignment was requantified over the contained entries' own-`statId` lines; the previous
-> statement broke every band over a hybrid modifier.
+> artifact as distinct from an invalid one (AD-24).
 >
 > **Revision 10** did two things. It absorbed the approved sprint change proposal of
 > 2026-09-19, which raises the weights contract to **`5.0.0`**: the producer reports
@@ -205,7 +198,7 @@ companions:
 > It also carried a **simplification pass**, taken while no code exists. **Ten ADs merged
 > into their neighbours and their ids retired** (see *Retired AD map*), leaving **19 of the
 > original 29 plus the new AD-0**; the revision history moved to `.memlog.md` and git, and
-> the low-level arithmetic moved to `IMPLEMENTATION-NOTES.md`. **This document states what
+> the low-level arithmetic moved out of the ADs. **This document states what
 > must not diverge. It no longer argues for itself, and it no longer carries formulas a
 > builder executes** — but under **AD-0** the companion it delegates to binds exactly as the
 > AD that cites it, so nothing was downgraded to advice by being moved.
@@ -257,15 +250,16 @@ never import each other.
 ### AD-0 — A cited companion section binds exactly as the AD that cites it
 
 - **Binds:** all
-- **Prevents:** the simplification pass silently downgrading a rule. Revision 10 moved the
-  arithmetic out of the ADs and into `IMPLEMENTATION-NOTES.md`; without this rule a builder
-  reads *"…is in `IMPLEMENTATION-NOTES.md`"* as a pointer to advice, implements the obvious
+- **Prevents:** the simplification pass silently downgrading a rule. Without this rule a builder
+  reads *"…is in `<owner>`"* as a pointer to advice, implements the obvious
   thing instead, and two conforming implementations return different numbers from the same
   files while every artifact stays schema-valid.
-- **Rule:** `IMPLEMENTATION-NOTES.md` is **binding**. Where an AD delegates a computation,
-  an encoding or a threshold to a named section of that file, the section carries the full
-  force of the delegating AD, and a deviation is a violation of that AD and not a style
-  choice. The same holds for `WEIGHTS-FILE-SCHEMA.md`, which is the weights contract itself.
+- **Rule:** Where an AD delegates a computation, an encoding or a threshold to a named
+  section of `WEIGHTS-FILE-SCHEMA.md`, which is the weights contract itself, the section
+  carries the full force of the delegating AD, and a deviation is a violation of that AD and
+  not a style choice. **Where an AD names a module as the owner of a computation, an
+  encoding or a threshold, that module and its tests are the binding statement of it**, and
+  the same holds.
 
   **Precedence.** Where a companion **contradicts** this spine, the spine wins and the
   companion is the defect. Where this spine is **silent** and a companion is not, the
@@ -393,13 +387,14 @@ never import each other.
 
   A valueless reference or line keeps its kind and carries **no edges in the schema**, and
   no component may give it sentinel edges. AD-17's checks read a valueless weights *tier* as
-  the value `[1, 1]` (`IMPLEMENTATION-NOTES.md` §2.3); that reading gives the reference no
+  the value `[1, 1]` (`interval` in `packages/core/src/probability.ts`); that reading gives the reference no
   band. It still carries pool membership and still counts toward completeness.
 
   **The `hybrid` arm is its own discriminant, never inferred.** No component reads a
   reference as hybrid because an optional extra field is present, and no component reads a
-  `banded` reference as a one-line hybrid. The shape rules and the line order are in
-  `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0. Which tiers a hybrid reference
+  `banded` reference as a one-line hybrid. The shape rules and the line order are
+  `ModifierReferenceSchema` in `packages/contracts/src/modifier-reference.ts` and
+  `canonicalKey` in `packages/contracts/src/canonical-key.ts`, binding under AD-0. Which tiers a hybrid reference
   contains, and the completeness rule that ties its line set to theirs, are AD-17's.
 
   **`valueMax` is required, everywhere, with no open-top form.** An omitted ceiling is a
@@ -420,10 +415,10 @@ never import each other.
   same-`statId` sum of AD-16 assumes each slot contributes exactly one reference, and a
   required affix makes that true by construction rather than by a check. An entry that
   lacks either slot is a schema error. **This is a major version of the tracked schema**,
-  so a file of an earlier major is refused at load (message: `IMPLEMENTATION-NOTES.md`
-  §4.1). **The artifacts keyed by the canonical key do not bump**: the hybrid form adds
+  so a file of an earlier major is refused at load (message: `trackedEarlierMajorMessage` in
+  `packages/contracts/src/schema-version.ts`). **The artifacts keyed by the canonical key do not bump**: the hybrid form adds
   keys and changes none, so the committed dataset, progress and report stay valid
-  (`IMPLEMENTATION-NOTES.md` §12.1).
+  (`packages/contracts/src/schema-version.ts`).
 
   Until revision 16 both kinds shared one key on `baseTypeId` and craftedness was read off
   *both affixes absent*. Two things were wrong with that. A crafted entry described a
@@ -470,13 +465,12 @@ never import each other.
   emits *that*, never the name itself. The derivation is **local to the one `className`**,
   which is what preserves the guarantee above: a crafted search is still built from the
   tracked entry and the catalogue alone, and consults `weights.json` for nothing. `sync`
-  owns it because `sync` owns search construction (`IMPLEMENTATION-NOTES.md` §10, binding
-  under AD-0).
+  owns it because `sync` owns search construction (`buildSearchBody` in `packages/sync/src/pricing/search-body.ts`, binding under AD-0).
 
   `baseTypeId` is the trade API's base type `type` string exactly as `data/items` spells it;
   `categoryId` is spelled exactly as the trade category filter list spells it (AD-25). **No
   component derives `baseTypeId` and `categoryId` from each other** — that prohibition is
-  untouched and is the load-bearing half of `IMPLEMENTATION-NOTES.md` §5.2 trap 1 — and no
+  untouched and is the load-bearing half of AD-16's three traps — and no
   component may introduce a second modifier identity. **The one derivation that now exists
   runs `className → discriminator` and in no other direction**, it is governed by a grammar
   `WEIGHTS-FILE-SCHEMA.md` makes normative rather than by a guess at a foreign string's
@@ -500,12 +494,12 @@ never import each other.
   fallback, and never a load error.
 
   **What the declared `itemLevelMin` must equal is a conformance condition on
-  `data/tracked.json`, not an instruction to a person.** `IMPLEMENTATION-NOTES.md` §8 states
-  the derivation, and it binds under AD-0 as a property the artifact either has or lacks — a
+  `data/tracked.json`, not an instruction to a person.** `needs` in `packages/core/src/probability.ts`
+  states the derivation, and it binds under AD-0 as a property the artifact either has or lacks — a
   file whose floors do not satisfy it is a defective file, whoever produced it and whatever
   they intended. **One direction of that property is unchecked and this AD says so:** a floor
-  that is too *low* is caught at load by §2.4 and §2.5, and floors that disagree across one
-  base by AD-17's shared-floor check, but a floor set *higher* than §8 derives is conforming
+  that is too *low* is caught at load by AD-17's edge-alignment and empty-containment checks, and floors that disagree across one
+  base by AD-17's shared-floor check, but a floor set *higher* than `needs` derives is conforming
   to every mechanical check in the system while scoping a wider pool than the curator chose.
   That is a trust surface, recorded here rather than implied.
 
@@ -528,7 +522,7 @@ never import each other.
   `pnpm sync:batch` performs **one chunk, then exits**, for an external scheduler.
   `pnpm sync` is a long-running **session** that runs one chunk per entry: each of its
   chunks is bounded to one entry and takes, uses and releases the lock itself, so the lock
-  is never held across a wait and §7 is unchanged. Whichever of
+  is never held across a wait and AD-7's lock rules are unchanged. Whichever of
   three bounds runs out first bounds the chunk: the remaining search allowance, the
   remaining fetch allowance, or the unprocessed remainder of the workload — and, under the
   session, a fourth: one entry. Progress lives
@@ -536,11 +530,11 @@ never import each other.
   like it (AD-3). A run
   acquires an exclusive on-disk lock; if another **live** run holds it, a batch run logs that
   fact and **exits 0**, because a busy lock is a normal outcome for a repeatedly-invoked job,
-  and the session waits, polling the lock file locally, until it is free or stale by §7.
+  and the session waits, polling the lock file locally, until it is free or stale by AD-7's threshold.
   **A run inside a trade penalty is the same outcome:** `sync-progress.json` also carries
   AD-8's `notBefore` instant, and a run that takes the lock before that instant releases it,
   sends nothing and exits 0, writing nothing except a `stale-lock-broken` record if it broke
-  a lock to get there (`IMPLEMENTATION-NOTES.md` §5.3).
+  a lock to get there (`packages/sync/src/chunk/run-chunk/pause-deferral.ts`).
   The batch command makes no assumption about what invokes it, how often, or where it runs.
 
   **The session waits on local state only, and never on a guessed cadence.** One pacing state
@@ -556,8 +550,8 @@ never import each other.
   wrote no `notBefore` and brought no State reading waits a backoff, and a throw that is none
   of the above and wrote no `notBefore` waits for an input change or the backoff, whichever
   ends first. The backoff starts at the tightest known bucket's even interval, doubles per
-  consecutive such wait, is capped at §7's staleness threshold, and a State reading resets
-  it (formula in `IMPLEMENTATION-NOTES.md` §5.3). A throw never stops the session; the first
+  consecutive such wait, is capped at AD-7's staleness threshold, and a State reading resets
+  it (formula: `backoffMs` in `packages/sync/src/sync/session-state.ts`). A throw never stops the session; the first
   SIGINT or SIGTERM ends a wait at once, or lets the running entry finish, and exits 0.
   The league gate runs on the session's first chunk, on every new pass, and whenever the
   configured league changes. The report's requests-per-source figure covers the session's
@@ -584,7 +578,8 @@ never import each other.
   green surface, the very failure this paragraph exists to prevent. **The ownership condition
   is not a refinement:** a dispossessed run that released unconditionally would delete the
   lock its successor is holding, putting two runs back in the window this rule closes. The threshold
-  and the staleness comparison are in `IMPLEMENTATION-NOTES.md` §7, binding under AD-0.
+  and the staleness comparison are `STALE_LOCK_AFTER_MS` and `isStaleInstant` in
+  `packages/sync/src/chunk/lock.ts`, binding under AD-0.
 
   **Within a chunk, `sync` selects entries in exactly this order**, stopping when any
   bound is reached:
@@ -634,8 +629,8 @@ never import each other.
   truncation that records a distinct **pinned-starvation** record in `sync-report.json`
   without changing the exit code. `web` surfaces that record's presence. `web` is
   expressly **not** obliged to evaluate the load-time check and cannot, because
-  `data/currencies.json` is not in AD-24's fetch set. The inequality and the cadence
-  argument behind it are in `IMPLEMENTATION-NOTES.md` §6, binding under AD-0.
+  `data/currencies.json` is not in AD-24's fetch set. The inequality is `checkPinnedCap` in
+  `packages/sync/src/pinned-cap.ts`, binding under AD-0.
 
   **`minChunkSearches` is a validation yardstick, and never a chunk bound.** It is a
   declared field of `data/config.json` read at exactly one place — the load-time
@@ -661,17 +656,18 @@ never import each other.
   access. A chunk that ends on a refused request therefore persists a **`notBefore`**
   instant in `sync-progress.json`, and AD-7 turns a run started before it into a no-op. A
   429 sets it to now plus the retry delay; AD-9's malformed-request abort sets it to now plus
-  `IMPLEMENTATION-NOTES.md` §7's staleness threshold, because a request `sync` built wrong
+  AD-7's staleness threshold, because a request `sync` built wrong
   will be refused again on the next tick. Both are capped at that threshold, so a malformed
-  header cannot wedge syncing (formula in §5.3). The
-  in-process threshold is a `sync`-side constant (§5.3), never a `data/config.json` field
+  header cannot wedge syncing (formula: `penaltyOf` in `packages/sync/src/trade/client/yield-penalty.ts`). The
+  in-process threshold is a `sync`-side constant (`INVALID_REQUEST_THRESHOLD` in
+  `packages/sync/src/trade/invalid-requests.ts`), never a `data/config.json` field
   (AD-19). The session honours the same `notBefore` by waiting until it (AD-7).
 
   **Spread pacing, under the session.** The session paces every request with the **even
   spread**: before a request on a policy it waits the larger of the batch pacer's delay (a
   restriction, or a full bucket's remaining window) and each bucket's remaining capacity
-  spread evenly over that bucket's period, so no bucket fills in normal use (formula in
-  `IMPLEMENTATION-NOTES.md` §5.3). One pacing state — the ledger and the lane memo — lives
+  spread evenly over that bucket's period, so no bucket fills in normal use (formula: `spreadBeforeNext` in
+  `packages/sync/src/trade/ledger.ts`). One pacing state — the ledger and the lane memo — lives
   for the whole process, and every State reading, other traffic on the IP included, replaces
   its values. Each chunk gets a fresh governor seeded with that state; **invalid-request
   counts stay per chunk**, because a shared count would refuse a policy for the rest of the
@@ -682,8 +678,8 @@ never import each other.
   The adapter sends the `User-Agent` string configured in `POE_SYNC_USER_AGENT` verbatim. By
   default that string names the tool and a contact address, as GGG asks of third-party tools.
   A cookie run uses a browser string instead (AD-30). The adapter also attaches AD-30's
-  optional session cookie, and no other component does. Header-parsing detail and the measured 2026-09-12 buckets are in
-  `IMPLEMENTATION-NOTES.md` §5.3, binding under AD-0.
+  optional session cookie, and no other component does. Header parsing is `parseRateLimitHeaders` in
+  `packages/sync/src/trade/rate-limit-headers.ts`, binding under AD-0.
 
   **Recorded risk: `trade2` is undocumented.** GGG's developer documentation covers the
   OAuth API Reference and makes no mention of the trade or `trade2` endpoints, so every
@@ -788,7 +784,7 @@ never import each other.
   the tier, it is an input like any other entry, so it enters the Provenance fold below and
   never weakens it. The fold must not
   skip it as a non-input, and must not map it to `uniform-prior`. This binds the fold only:
-  a formula that skips a weight-0 draw (`IMPLEMENTATION-NOTES.md` §11) is unaffected.
+  a formula that skips a weight-0 draw (`affixProbability` in `packages/core/src/probability.ts`) is unaffected.
 
   `core` propagates the **weakest provenance and the oldest timestamp** of every input
   into each derived figure, **with no exception** — the numerator-only exception retired
@@ -798,7 +794,7 @@ never import each other.
 
   **A probability's inputs are exactly the entries its formula sums, numerator and
   denominator alike:** the recipe's eligible set of both slots, `E_P ∪ E_S`
-  (`IMPLEMENTATION-NOTES.md` §9, §11), for each tracked entry of the `(itemClass, recipe)`
+  (`eligible` and `affixProbability` in `packages/core/src/probability.ts`), for each tracked entry of the `(itemClass, recipe)`
   pair. The scope is stated here because "every input" has several readings that give
   different labels. A tier below the recipe's floor is not an input, because the figure
   does not rest on it. A `weightSource: "absent"` tier inside the eligible set weakens the
@@ -809,7 +805,7 @@ never import each other.
   rather than within one. The label belongs to the pair, so **two recipes on one Item Class
   may carry different labels**, and a recipe switch may change the mark on a class's row.
   The `absent` rank is not scoped this way: a `partial` pool gives `absent` under every
-  recipe, because coverage is read on the unrestricted pool (§9). `web` must render a
+  recipe, because coverage is read on the unrestricted pool (AD-17). `web` must render a
   figure resting on anything below `measured` visibly differently from one resting on
   `measured`. **Two render treatments, not three.**
 
@@ -860,7 +856,7 @@ never import each other.
   mutual-exclusion group, which AD-17 needs to condition the second affix draw — and
   renumbers the display-only `tierLabel` per stat, T1 = highest item level. **The normative
   `className` grammar that `5.1.0` introduced carries forward unchanged**, because AD-16
-  derives a class discriminator from that key (`IMPLEMENTATION-NOTES.md` §10). The
+  derives a class discriminator from that key (`buildSearchBody`). The
   producer-6.1.0 file of 2026-09-27 satisfies the contract (`WEIGHTS-FILE-SCHEMA.md`
   `6.1.0`).
 
@@ -889,7 +885,7 @@ never import each other.
   class's pool.*
 
   **A line's filter-comparable interval is derived, and `core` derives it the one way, in
-  one place — `IMPLEMENTATION-NOTES.md` §1, binding under AD-0.** The unit is whatever
+  one place — `interval` in `packages/core/src/probability.ts`, binding under AD-0.** The unit is whatever
   quantity the trade stat filter compares, and no other — that is one empirical fact about
   the trade API, not a modelling decision (OQ-12). The derivation must be **exactly
   representable**, because AD-17 compares a curator's declared edge against a derived edge
@@ -900,8 +896,8 @@ never import each other.
   contributes **nothing** to that band's numerator, and that is not an error. It still
   enters the denominator like any other entry in scope. **A hybrid reference contains a tier
   only when the tier's line set equals the reference's and every line is covered.** The
-  `contains` predicate and the rules that ride with it are in `IMPLEMENTATION-NOTES.md` §1
-  *Containment*, binding under AD-0.
+  `contains` predicate and the rules that ride with it are `isCovering` and `isContaining` in
+  `packages/core/src/probability.ts`, binding under AD-0.
 
   Two alternatives were rejected. **Pro-rating** — computing `P(value ∈ band | tier)` from
   raw `ranges` — is correct arithmetic, but it re-sites the producer's withdrawn model
@@ -930,9 +926,9 @@ never import each other.
   the worse case: it sits at the cheap end of the priced sample, which is the end AD-16's
   ascending sort takes ten of, so the band carries the tracked tier's weight while the
   estimate carries the intruder's price, and below AD-17's threshold the summand truncates
-  and takes the tracked tier's mass with it. `IMPLEMENTATION-NOTES.md` §2.4's worked
-  `56.0 – 80.0` band over T7 `[43.0, 56.5]` / T8 `[56.0, 80.0]` is exactly that shape, and
-  edge alignment accepts it. Non-overlap withdrew with the decomposition, so nothing in the
+  and takes the tracked tier's mass with it. A `56.0 – 80.0` band over
+  T7 `[43.0, 56.5]` / T8 `[56.0, 80.0]` is exactly that shape, and edge alignment
+  (`packages/core/src/cross-file/edge-alignment.ts`) accepts it. Non-overlap withdrew with the decomposition, so nothing in the
   contract prevents either shape. **How far the understatement can run is therefore
   unmeasured and unbounded (OQ-21).** The residual is carried under Deferred with its
   revisit condition.
@@ -966,7 +962,7 @@ never import each other.
 - **Binds:** `sync`, `contracts`, `web`, curation workflow
 - **Prevents:** an unbounded, unreviewable request budget; curation becoming a
   mutable-store feature that forces a server into a static architecture; an unenumerated
-  second workload silently consuming the same bucket; and the addendum's named risk — *"a
+  second workload silently consuming the same bucket; and the named risk — *"a
   stale top five that the user trusts is worse than no tool"* — becoming the steady state
   because nothing ever prompts a review.
 - **Rule:** Exactly **four** sources generate a request, and nothing else does:
@@ -1005,8 +1001,8 @@ never import each other.
   AD-9's malformed-request abort happens mid-chunk and is not a gate abort.
 
   **The gates run in cost order, free before costly**, under the lock and in exactly this
-  sequence: AD-8's `notBefore` check; the file loads and their load-time validation, including `IMPLEMENTATION-NOTES.md`
-  §6's pinned-cap inequality; the cross-file gate, or the `weights-absent` record in its
+  sequence: AD-8's `notBefore` check; the file loads and their load-time validation, including AD-7's
+  pinned-cap inequality; the cross-file gate, or the `weights-absent` record in its
   place; the catalogue check; the rotation order (AD-7); then the league gate, the only one
   that costs a request; then the rotation. No request precedes an offline check that could
   have aborted the run. Because the order exists before the league request, **a league
@@ -1112,7 +1108,7 @@ never import each other.
   | Query field | Value |
   | --- | --- |
   | **the unit filter** | **`raw` entry:** `query.type` (top level, **not** a filter) = the entry's `baseTypeId`, verbatim. **`crafted` entry:** `type_filters.category` = the entry's `categoryId`, verbatim, **plus the class discriminator below**. The two branches are chosen by the entry's kind (AD-5) and never mixed |
-  | **the class discriminator** | **`crafted` entry only.** Derived from the entry's `className` (§10) and emitted as one of: an `equipment_filters` **defence signature**; `query.type` carrying the class's base type, for `jewel`; or **nothing at all**, where the entry's `categoryId` carries one class and the category filter is already exact |
+  | **the class discriminator** | **`crafted` entry only.** Derived from the entry's `className` (`buildSearchBody`) and emitted as one of: an `equipment_filters` **defence signature**; `query.type` carrying the class's base type, for `jewel`; or **nothing at all**, where the entry's `categoryId` carries one class and the category filter is already exact |
   | `type_filters.rarity` | `magic` for a `crafted` entry, `normal` for a `raw` entry |
   | `type_filters.ilvl` | `min` = the entry's `itemLevelMin` |
   | stat filters | **one per distinct `statId`** across both affixes, in one `and` group: a `banded` line carries **both `min` and `max`**; a `valueless` line carries the stat id and **no edges at all**. A `hybrid` reference contributes one filter per line, and a **summed `statId`** is **one** filter, below |
@@ -1122,7 +1118,7 @@ never import each other.
 
   **`query.status` is the instant-buyout limb, and `trade_filters.sale_type` is not
   emitted at all.** Until revision 14 this table required `sale_type` set to *"Buyout or
-  Fixed Price"*; the minimum request body the player supplied (2026-09-19, §5.1) carries
+  Fixed Price"*; the minimum request body the player supplied (2026-09-19) carries
   `status.securable` and no `sale_type`, and `securable`'s published label expresses the
   same intent the `sale_type` row was reaching for. One filter now carries that intent, so
   the two can no longer disagree. Emitting `sale_type` as well is not a belt-and-braces
@@ -1140,7 +1136,8 @@ never import each other.
   another filter already carries.
 
   Three traps make this costly to get right in code, and all three are recorded with their
-  evidence in `IMPLEMENTATION-NOTES.md` §5.2, binding under AD-0: `type_filters.category`
+  evidence in `buildSearchBody` (`packages/sync/src/pricing/search-body.ts`) and its tests, binding
+  under AD-0: `type_filters.category`
   and a `raw` entry's `query.type` are **not interchangeable**, neither is derivable from
   the other, and a `raw` entry never carries a category while a `crafted` entry never
   carries `query.type` **except as its `jewel` discriminator**, which is the one place the
@@ -1152,14 +1149,14 @@ never import each other.
   **A summed `statId` — one named by both affixes — is sent as one filter over the sum of
   the two bands.** The trade site sums one `statId` across the item's mods, so two per-slot
   filters on one id would each compare the summed value and match the wrong population.
-  The edges and the operand rules are in `IMPLEMENTATION-NOTES.md` §5.5, binding under
-  AD-0. The premise that the trade site sums is a measurement, not an assumption: the
-  captured request in `IMPLEMENTATION-NOTES.md` §5.1d is its evidence.
+  The edges and the operand rules are `summedInterval` in `packages/contracts/src/overlap.ts`
+  and `buildSearchBody`, binding under AD-0. The premise that the trade site sums is a
+  measurement, not an assumption: the captured fetch leg described in `fixtures/README.md` is
+  its evidence.
 
   **Accepted effect: a summed filter prices a wider population than AD-17 weighs.** The
   summed interval admits value splits, and even single-slot items, that per-slot
-  containment excludes. This is accepted with no mitigation (`IMPLEMENTATION-NOTES.md`
-  §5.5).
+  containment excludes. This is accepted with no mitigation (`buildSearchBody`).
 
   **`sync` emits a band edge exactly as the derivation produces it, and may not round.**
   Rounding a half-integer to reach an integer filter would silently price a different
@@ -1206,7 +1203,7 @@ never import each other.
     three containing armour. **No sibling shares a triple**, so a signature of `min 1` on
     each defence the class has and `max 0` on each it lacks admits exactly one class.
   - **`jewel`'s eight classes carry no defences at all** and are separated by `query.type`
-    instead, because a jewel class's name **is** a base type name (§10).
+    instead, because a jewel class's name **is** a base type name (`buildSearchBody`).
 
   **The `max 0` half cannot be contradicted by the Combination's own stat filters**, which
   is the obvious objection and does not hold. The defence type *is* what determines the
@@ -1220,11 +1217,11 @@ never import each other.
   construction, and no new rule is needed to make that true.
 
   **The `jewel` arm emits `query.type` beside `type_filters.category`, and both are
-  emitted** — verified against a captured working search for `Sapphire` (§5.1c). The two
+  emitted** — verified against a captured working search for `Sapphire`. The two
   cannot disagree, since a jewel base type is in category `jewel` by construction, so this
   is not the withdrawn `sale_type` defect where two filters reached for one intent and could
   diverge. **This is the one shape in which a crafted search carries `query.type`**, and a
-  builder who reads `IMPLEMENTATION-NOTES.md` §5.2 trap 1 as *never both filters* is reading
+  builder who reads AD-16's category/type trap as *never both filters* is reading
   a pre-revision-17 draft: the trap forbids the wrong **value** in either field, and a `raw`
   entry carrying a category. It does not forbid this.
 
@@ -1335,7 +1332,8 @@ never import each other.
   follows the pair (below). A
   **predicate** defines overlap, not an enumeration of shapes — an enumerated list has
   twice been found to miss a case. The predicate, its branch ordering and its
-  consequences are in `IMPLEMENTATION-NOTES.md` §2.1, binding under AD-0. **One predicate
+  consequences are `areOverlapping` and `overlapBranches` in `packages/contracts/src/overlap.ts`, binding
+  under AD-0. **One predicate
   covers all three reference kinds and summed `statId`s**; no kind gets its own overlap
   rule.
 
@@ -1387,8 +1385,8 @@ never import each other.
   `modGroup` removed, and renormalises the rest. **A hybrid reference is one modifier in
   this formula**: its probability is the weight of the tiers it contains, never a product
   across its lines. The formula,
-  and its order after the recipe floor below (scope, truncate, exclude, renormalise), are in
-  `IMPLEMENTATION-NOTES.md` §11, binding under AD-0.
+  and its order after the recipe floor below (scope, truncate, exclude, renormalise), are `affixProbability` and `combinationProbability` in
+  `packages/core/src/probability.ts`, binding under AD-0.
 
   **Where no `modGroup` spans both slots of a class, the result is exactly `P(prefix) ×
   P(suffix)`** — true of all 59 classes on the 2026-09-26 file — so the exclusion changes no
@@ -1433,26 +1431,27 @@ never import each other.
 
   | Check | Fails when | Mechanics |
   | --- | --- | --- |
-  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | §2.4 |
-  | **Empty containment set** | a reference contains no entry under the scope — a validation error, never a `P = 0` | §2.5 |
-  | **`coOccur`** | two entries overlap under §2.1 and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | §2.1, §2.2 |
-  | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | §2.7 |
-  | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under §10's grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | §2.6 |
-  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | §2.3 |
+  | **Edge alignment** | a `banded` reference's or a banded `hybrid` line's edges are not exactly the extremes of its containment set under the scope — which is what closes the sentinel loophole that mere `valueMax` presence leaves open, and additionally catches a band that reaches into a tier it does not contain | `packages/core/src/cross-file/edge-alignment.ts` |
+  | **Empty containment set** | a reference contains no entry under the scope — a validation error, never a `P = 0` | `packages/core/src/cross-file/empty-containment.ts` |
+  | **`coOccur`** | two entries overlap under AD-17's predicate and any of their four references is hybrid, so a single item satisfies both and the partition is not a partition | `coOccur` in `packages/core/src/cross-file.ts`, `packages/contracts/src/overlap.ts` |
+  | **Line-set completeness** | a reference names fewer lines than a tier its search reaches — a hybrid naming a subset of a tier's lines, or a single-line band reaching into a hybrid tier — or a hybrid's contained tiers span more than one `modGroup` | `lineSetCompleteness` in `packages/core/src/cross-file.ts` |
+  | **Class discriminability** | the entry's `categoryId` carries **more than one** `className` in `weights.json`, and the entry's own `className` yields no class discriminator under `WEIGHTS-FILE-SCHEMA.md`'s `className` grammar — so AD-16 would price the entry across sibling classes while FR-1 guarantees it does not. **This is the only check that reads the weights file for something other than a pool** | `packages/core/src/cross-file/class-discriminability.ts` |
+  | **Kind agreement** | **per line**: a **valueless** reference line has a **banded** scoped line on its `statId` — a line's kind is read from **whether its `ranges` is empty**, since the weights contract has no `kind` field. **A banded reference line never disagrees**, because a tier that rolls no number reads as the value 1, the band `[1, 1]`: one `statId` may carry a valueless tier beside a banded one (*"Loads an additional bolt"* is 1 beside the `[2, 2]` tier). The quantifier stays **universal, not existential** for that case: one banded line is a defect however many valueless lines agree. `contracts` separately owns the **within-file** half, which a per-file schema sees on its own | `kindAgreement` in `packages/core/src/cross-file.ts` |
 
   **One null-line rule, reading only the weights file, decides every `statId: null` line**,
   and `tracked:lookup`, `core` and the `sync` gate all call the one `core` implementation,
-  so they reach one verdict. The rule is in `IMPLEMENTATION-NOTES.md` §1, binding under AD-0.
+  so they reach one verdict. The rule is `untrackableReason` in `packages/core/src/probability.ts`, binding under AD-0.
 
   **Where the weights file cannot answer, `core` marks the entry unvalidated rather than
   passing it**: with `weights.json` absent no check runs, and on a class that is absent from
   it or has a `partial` slot only class discriminability runs. **An unvalidated mark is never
   a failure** — the `sync` gate does not abort on it and `pnpm tracked:check` does not fail
   on it — and it changes no ranking, because AD-17 and AD-24 already make that class
-  unrankable (`IMPLEMENTATION-NOTES.md` §2.8).
+  unrankable (`UnvalidatedMark` in `packages/core/src/cross-file.ts`).
 
-  **The named sections carry the full force of this AD (AD-0).** Each check's mechanics —
-  the quantifiers, the scope, the error payload — live there and nowhere else, so a shell
+  **The named modules carry the full force of this AD (AD-0).** Each check's mechanics —
+  the quantifiers, the scope, the error payload — live in `packages/core/src/cross-file/` and
+  `packages/core/src/cross-file.ts` and nowhere else, so a shell
   that re-derives one has diverged from this AD rather than from a style note.
 
   **Class discriminability is the one check whose `sync` abort saves the budget from being
@@ -1520,7 +1519,7 @@ never import each other.
   it from the pool and renormalises the surviving weights** before AD-11's containment and
   this AD's probability term run. The transform is a truncation and a renormalisation; it
   is never a reweighting, and `core` invents no numbers. The predicate and the
-  renormalisation are in `IMPLEMENTATION-NOTES.md` §9, binding under AD-0.
+  renormalisation are `eligible` and `canRecipeRoll` in `packages/core/src/probability.ts`, binding under AD-0.
 
   **The floor and the entry's item level are the same axis, bounding the pool from opposite
   ends.** A tier is eligible when
@@ -1739,7 +1738,7 @@ never import each other.
 
   | Artifact | Endpoint | Carries | Consumed for |
   | --- | --- | --- | --- |
-  | `items.json` | `/api/trade2/data/items` | base types by category | `baseTypeId` validation (AD-9), curation; **and validation of the base type AD-16's `jewel` discriminator derives from a `className`** (§10) — the one derived value in the system that is checked against the catalogue before it is sent, rather than after |
+  | `items.json` | `/api/trade2/data/items` | base types by category | `baseTypeId` validation (AD-9), curation; **and validation of the base type AD-16's `jewel` discriminator derives from a `className`** (`buildSearchBody`) — the one derived value in the system that is checked against the catalogue before it is sent, rather than after |
   | `stats.json` | `/api/trade2/data/stats` | stat ids + display text | `statId` validation (AD-9), modifier text in `web` |
   | `static.json` | `/api/trade2/data/static` | currency ids + labels + icons | `data/currencies.json` id validation in `sync`; **not fetched by `web`** (AD-24) |
   | `filters.json` | `/api/trade2/data/filters` | filter ids + options, including the category filter's option list | search construction (AD-16); **`categoryId` validation (AD-5, AD-9)**, curation |
@@ -1757,7 +1756,7 @@ never import each other.
 
   **One value *derived from* a `className` is catalogue-checkable, and that is not a
   contradiction of the above.** AD-16's `jewel` discriminator turns a `className` into a base
-  type (`IMPLEMENTATION-NOTES.md` §10), and `items.json` carries base types, so `sync`
+  type (`buildSearchBody`), and `items.json` carries base types, so `sync`
   validates that **output** before building the search. The `className` itself remains
   uncheckable here; what the catalogue answers is whether the derivation produced a real base
   type, which is a different question and the one that matters — an unvalidated derivation
@@ -1790,8 +1789,8 @@ never import each other.
   so the
   size of the ranked list is a direct function of the weights file's coverage, and that
   fraction is **unmeasured until someone measures it**. Coverage is the share of *rankable*
-  tracked **item classes** that are *covered*; both predicates are defined exactly in
-  `IMPLEMENTATION-NOTES.md` §3, binding under AD-0, because a measurement that informs a
+  tracked **item classes** that are *covered*; both predicates are defined exactly by `poolCoverage` in
+  `packages/core/src/coverage.ts`, binding under AD-0, because a measurement that informs a
   layout decision must be
   reproducible by two people who have never spoken. The denominator is **the tracked list**,
   not the catalogue. An unresolved stat line does **not** affect coverage.
@@ -1806,7 +1805,7 @@ never import each other.
 
   **The measurement needs a weights file that exists.** Where `data/weights.json` is
   **absent**, coverage is not `0%` — it is undefined, and both fields are omitted from the
-  report together (§3). That state is the
+  report together (AD-27). That state is the
   product's declared day-one phase (AD-12, AD-24), in which every crafted item class is
   unrankable for a reason `web` states, and reading it as a coverage failure would have
   this AD call the product broken precisely when shipping is the plan. The carve-out
@@ -1878,7 +1877,7 @@ never import each other.
   baseline, which holds only while both policies list the same rules. The first answered
   pricing search is the baseline, and one probe search settles the state. A probe `429`
   settles nothing and stays AD-8's `429`: its `notBefore` persists through AD-8's path even
-  when the probe is the last request of the chunk (`IMPLEMENTATION-NOTES.md` §13.3). A probe
+  when the probe is the last request of the chunk (`packages/sync/src/trade/session-auth.ts`). A probe
   `5xx` settles `probe-failed` with no hold-off, like a throw or a timeout. A non-429 probe
   `4xx` settles `probe-rejected`. Neither is an invalid request for the chunk, AD-9's
   malformed-request abort, or AD-9's request with no answer.
@@ -1917,7 +1916,8 @@ never import each other.
   not a measured fact. OQ-26 verifies it.
 
   The sequence, the predicate, the hold-off interval, the yield, the reason identifiers and
-  the value checks are in `IMPLEMENTATION-NOTES.md` §13, binding under AD-0. The premises
+  the value checks are in `packages/sync/src/trade/session-auth.ts` and
+  `packages/sync/src/trade/client/session-cookie.ts`, binding under AD-0. The premises
   this AD rests on are OQ-26's.
 
 ## Retired AD map
@@ -1946,10 +1946,10 @@ id resolves here.
 | Naming — entities | `BaseType`, `ItemClass`, `TrackedEntry`, `ModifierReference`, `PriceObservation`, `ModifierWeight`, `CraftRecipe`, `CurrencyRate`, `RankedRow`, `SyncRunReport`, `TradeCatalogue`. Singular, PascalCase, defined once in `contracts` (AD-3). **`ItemClass` is the `(categoryId, className)` pair and is `prd.md` §3's *Item Class* — the pair, never the `className` half alone** (AD-5). **It was `ItemCategory` for one revision**: revision 16 introduced that name against `prd.md` revision 17's noun, and revision 17 renamed it when `prd.md` revision 18 moved the player-facing unit a rung finer. The underlying key never changed, so this is a rename and not a re-keying, and **`ItemCategory` is not reused for anything else**. `RankedRow` was `RankedBase` until revision 16 and was renamed because it ranks two units — an `ItemClass` on the crafted branch, a `BaseType` on the raw one (AD-5, AD-17). |
 | Naming — files & modules | kebab-case files; one exported concept per file in `core`; adapters named `<port>-<impl>` (e.g. `trade-client-http`, `trade-client-fixture`). |
 | Naming — ports | Interface `<Thing>Port` in `contracts`; every port ships a fake alongside the real adapter. |
-| Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (§10). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (since `5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
+| Ids | `statId`, `baseTypeId` and `categoryId` are the trade API's own identifiers and no component re-encodes them; `baseTypeId` is the `type` string exactly as `data/items` spells it, and `categoryId` is spelled exactly as the trade category filter list in `filters.json` spells it. **`className` is the one identifier in the system that is not the trade API's** — it is a poe2db pool name, carried verbatim, validated only by the cross-file gate against `weights.json`, and **never sent to the trade site** (AD-5, AD-25). **Since revision 17 it is not opaque either**, and that is a deliberate narrowing rather than an erosion: `sync` reads its **grammar** — the defence suffix, or a jewel base name — to derive AD-16's class discriminator (`buildSearchBody`). Three things bound the exposure. The grammar is **normative in `WEIGHTS-FILE-SCHEMA.md` (since `5.1.0`)**, so `sync` reads a contracted key rather than guessing at a foreign string. A `className` that satisfies no arm **fails loudly** — a load error, never a silent fall back to a category-wide search. And the derivation runs **one way only**: nothing derives a `className`, and nothing derives a `categoryId` or a `baseTypeId` from one except the catalogue-validated `jewel` arm. Internal surrogate ids are forbidden, and every id is validated against the committed catalogue (AD-25). **Two fields name things the app does not define, and neither is a counter-example:** `sourceModifierId` is producer-owned, opaque, scoped to one `(baseTypeId, slot)`, never catalogue-validated, and appears only on weights entries; `lastSearchId` is the trade site's own search identifier, stored verbatim, never parsed, and appears only on a dataset entry. Neither is ever a modifier or entity identity. |
 | Bands | A modifier reference is `banded` — `(statId, valueMin, valueMax)` with **inclusive, always-present** edges — `valueless` — `(statId)` with no edges — or `hybrid` — two or more such lines (AD-5). **Weights-file tiers overlap freely in value space; non-overlap is withdrawn at every scope** (AD-11). Edges sit on the lattice the trade filter compares against, which may be finer than the integers. |
-| Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms — banded, valueless, hybrid — so no two kinds can collide (encoding in `IMPLEMENTATION-NOTES.md` §4.1, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
-| Item level | `itemLevelMin` is a declared floor, uniform across an item class's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per `IMPLEMENTATION-NOTES.md` §8 (AD-5). |
+| Entity keys | A `TrackedEntry`'s canonical key follows its kind (AD-5): a `crafted` entry keys on `(categoryId, className, itemLevelMin, prefixBand, suffixBand)` and a `raw` entry on `(baseTypeId, itemLevelMin)`, each serialised in that field order, with each affix encoded in one of three distinguishable forms — banded, valueless, hybrid — so no two kinds can collide (encoding: `canonicalKey` in `packages/contracts/src/canonical-key.ts`, binding under AD-0). **The serialisation carries the kind**, so the two spaces cannot collide and a mixed ordering is total. **Keys compare by UTF-8 code unit, never by locale collation** — every tie-break in the system resolves on this ordering (AD-7's rotation, AD-17's summands), and at cold start, when every entry is equally stale, it is the *only* ordering, so a locale-sensitive comparison would have two builders sync different entries in the first chunk. **`acceptedTier`, `lastSearchId` and `lastSearchLeague` are never part of the key** — a key admitting any of them would make a relabelling or a re-search orphan an entry's price history. |
+| Item level | `itemLevelMin` is a declared floor, uniform across an item class's crafted tracked entries (AD-17) and present on every weights **entry** (AD-11). No component infers or adjusts it; the curator derives it per AD-5. |
 | Dates & time | ISO-8601 UTC strings in all persisted data. Time enters `core` only as a passed-in value (AD-1). |
 | Units | Divine for all currency (AD-20). Band edges and item levels are raw game numbers. No field name implies a unit on its own — schemas name the unit. |
 | Numeric precision | **Band edges are `number`, never `integer`** — the lattice the trade filter compares on may be finer than the integers, and which lattice it is, is a producer-side fact the schema must not pre-empt. AD-17's alignment and containment rules compare edges for **exact equality**, so a producer emits values exact on the lattice and never a rounded approximation. Every persisted divine value — `PriceObservation` and `CurrencyRate` alike — is rounded to **4 decimal places** at the point of normalisation, in `sync`, once; `core` never re-rounds. The figure binds both sides deliberately: a coarser grid would round a cheap crafting currency toward zero and silently collapse AD-17's `craftCost` term. |
@@ -1957,7 +1957,7 @@ id resolves here.
 | Error shape | `core` returns typed results and never throws for expected conditions such as no listings, a missing weight, or an unresolvable stat. `sync` throws only for unrecoverable run failures. Everything else lands in `sync-report.json`. |
 | Validation | Zod schemas in `contracts` are the single source of truth and types are `z.infer`red. Validate at every trust boundary: API response, before artifact write, and on artifact load. |
 | Schema versioning | Every published artifact and input file carries `schemaVersion`. A consumer refuses an unknown major version rather than guessing. |
-| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The one console-only fact is AD-30's auth state line**, and it never enters the report. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. **A repeat is the same record, not a new one:** a record's identity is its kind plus its subject fields, and a repeat replaces its observation fields in place and keeps its position — replacing is not clearing (per-kind fields in `IMPLEMENTATION-NOTES.md` §12, binding under AD-0). A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
+| Logging | `sync` emits structured records into `sync-report.json`, not free-text console output. The report is data the view reads. **The one console-only fact is AD-30's auth state line**, and it never enters the report. **The report holds two kinds of entry, and `SyncRunReport` types them apart.** **Figures** describe the latest chunk and are overwritten by the next one: requests consumed per source (AD-12), the not-reached count (AD-7), the coverage fraction with its denominator (AD-27), the tracked-list edit date (AD-12). **Records** describe an event the player must see: `stale-lock-broken` (AD-7), pinned-starvation (AD-7), an `unresolvable` entry (AD-9), a cross-file gate failure (AD-12). **A record survives the chunk that wrote it.** `sync-report.json` carries the current chunk's records plus every **unacknowledged** record from earlier chunks — a record is cleared by the player's edit, never by the next run. **A repeat is the same record, not a new one:** a record's identity is its kind plus its subject fields, and a repeat replaces its observation fields in place and keeps its position — replacing is not clearing (per-kind fields: `isSameRecord` in `packages/contracts/src/sync-run-report.ts`, binding under AD-0). A report rewritten wholesale each chunk would erase a `stale-lock-broken` or pinned-starvation record within minutes of its being written, which is the window in which nobody is looking. |
 | Config | No runtime environment lookups in `core`. `sync` reads `data/config.json` plus a small env overlay: the required `User-Agent` and, for the `sync` and `sync:batch` shells only, the optional session cookie (AD-30). Both are read at the shell edge and passed in as values. |
 | Tests | Vitest everywhere. `core` is tested as pure functions with literal inputs, `sync` against recorded fixtures through ports, `web` with MSW-served artifacts. |
 
@@ -2241,7 +2241,7 @@ poe-crafting-base-price-checker/
   The producer's evidence points at the **average**, because a 56.5 range edge can only
   arise from averaging two integers, but nobody has confirmed it against a live search.
   **The non-integer half of this question is settled** (2026-09-19): the minimum request
-  body in `IMPLEMENTATION-NOTES.md` §5.1 carries `"value": {"min": 4.5}`, so the filter
+  body captured on that date carries `"value": {"min": 4.5}`, so the filter
   accepts a non-integer edge and AD-16's no-rounding obligation is satisfiable rather than
   merely stated. What remains is the identity of the quantity. Under `5.0.0` the unit
   binds **two parties independently** — the producer, which publishes `ranges`, and `core`,
@@ -2277,7 +2277,7 @@ poe-crafting-base-price-checker/
   its own containment set. A **floor intrusion** is a scoped same-`statId` tier whose
   interval covers the band's `valueMin` without being contained, sharing no edge; it is the
   worse case because AD-16's ascending sort prices the band **on the intruder**, and
-  `IMPLEMENTATION-NOTES.md` §2.4's accepted `56.0 – 80.0` band is exactly this shape. The
+  an accepted `56.0 – 80.0` band over T7 `[43.0, 56.5]` / T8 `[56.0, 80.0]` is exactly this shape. The
   question has two halves, asked of **each** shape: how often it occurs in a real pool, and
   how far the error runs when it does — and for the floor case, how far the *price* moves.
   The obvious remedy — reject any intersecting-but-uncontained tier —
@@ -2292,7 +2292,7 @@ poe-crafting-base-price-checker/
   emitted; `/api/trade2/data/filters` publishes that option under `status_filters` with the
   label **"Instant Buyout"**, which is the intent AD-16's rule expresses. The duplication
   half is closed by removal rather than by measurement: the minimum request body supplied by
-  the player (§5.1) carries `status` and **no `sale_type` at all**, so AD-16 no longer emits
+  the player carries `status` and **no `sale_type` at all**, so AD-16 no longer emits
   `sale_type` and there is no second filter left to overlap with. The *what does omitting it
   do* half is moot for the same reason — the field is never omitted.
 - **~~OQ-24 — what `trade_filters.filters.price` does, and whether AD-16 must emit it.~~
@@ -2351,7 +2351,7 @@ poe-crafting-base-price-checker/
   **What this question's closure bought is the mechanism behind `prd.md` FR-1's new
   consequence** — no base outside the class contributes to a crafted row's price — which is
   an absolute the old category-altitude search could not have satisfied. AD-16 owns the
-  shape, `IMPLEMENTATION-NOTES.md` §10 the derivation, and AD-17's fifth cross-file check
+  shape and the derivation, and AD-17's fifth cross-file check
   the guarantee that a class needing a discriminator always has one.
 - **OQ-26 — do AD-30's two premises hold beyond one sample?** The first premise is that a live
   `POESESSID` adds a rule name to `X-Rate-Limit-Rules`, measured once (research [30]). The
@@ -2376,7 +2376,7 @@ poe-crafting-base-price-checker/
   augmentation floor it at **44**, perfect orbs at **70**, and a plain orb imposes none.
   Weights already carry the matching quantity per tier as `itemLevelMin`, so the transform
   needs no number the inputs lack — it truncates the pool from below and renormalises
-  (AD-17, `IMPLEMENTATION-NOTES.md` §9). The two floors are recipe data and live in
+  (AD-17). The two floors are recipe data and live in
   `data/recipes.json`. This changes player-visible behaviour — the ranking now reorders per
   recipe rather than shifting by a constant cost — so the scope call was the PRD's to make,
   not the spine's. **`prd.md` revision 16 made it**: the feature is out of v2, v1 ships two

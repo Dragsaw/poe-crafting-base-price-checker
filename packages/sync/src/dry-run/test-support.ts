@@ -10,7 +10,7 @@ import { LEAGUES_FIXTURE_NAME, searchFixtureName } from '../pricing/fixture-name
 import { itemTypesOf } from '../pricing/search-body.ts';
 
 export const LEAGUE = 'Test League';
-/** A yardstick of 2, so the one pinned entry fits the load-time cap (IN §6). */
+/** A yardstick of 2, so the one pinned entry fits the load-time cap. */
 const CONFIG = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, league: LEAGUE, minChunkSearches: 2 });
 export const CURRENCY_RATES: CurrencyRate[] = [
   { currencyId: 'divine', rate: 1, source: 'measured', league: LEAGUE, asOf: '2026-01-01T00:00:00Z' },

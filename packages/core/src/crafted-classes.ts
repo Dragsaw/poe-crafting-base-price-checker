@@ -1,6 +1,6 @@
 import type { CraftedTrackedEntry, TrackedEntry } from '@poe/contracts';
 
-/** The serialised Item Class key, `["crafted", categoryId, className]`: the class prefix of its entries' canonical keys (§4.1). */
+/** The serialised Item Class key, `["crafted", categoryId, className]`: the class prefix of its entries' canonical keys. */
 export function classKeyOf(categoryId: string, className: string): string {
   return JSON.stringify(['crafted', categoryId, className]);
 }

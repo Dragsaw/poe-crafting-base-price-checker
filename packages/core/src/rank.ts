@@ -93,7 +93,7 @@ export interface UncostableRecipe {
 }
 
 /**
- * The reason for an empty eligible pool or contained set (IN §9) or exhausted augment (§11).
+ * The reason for an empty eligible pool or contained set or exhausted augment.
  */
 export const RECIPE_UNREACHABLE = 'recipe cannot reach this class';
 
@@ -120,7 +120,7 @@ function unrankableReasonOf(
   if (pools.prefix.poolCoverage === 'partial' || pools.suffix.poolCoverage === 'partial') {
     return 'pool partial';
   }
-  // One definition with `poolCoverage` (IN §3): an empty slot makes the class unrankable under every recipe.
+  // One definition with `poolCoverage`: an empty slot makes the class unrankable under every recipe.
   return isEmptyPool(pools.prefix) || isEmptyPool(pools.suffix) ? RECIPE_UNREACHABLE : undefined;
 }
 

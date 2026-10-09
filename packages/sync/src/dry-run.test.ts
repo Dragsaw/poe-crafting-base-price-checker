@@ -25,7 +25,7 @@ import type * as TradeClientModule from './trade/client.ts';
 const tradeClientOptions = vi.hoisted((): unknown[] => []);
 
 // A pass-through: the real clients are built, and the options are recorded so
-// a test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// a test can inspect what the shell passed (AD-8).
 vi.mock('./trade/client.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof TradeClientModule>();
   return {
@@ -94,7 +94,7 @@ describe('dryRun', () => {
     });
   });
 
-  it('builds its trade clients with the invalid-request threshold of 1 (§5.3)', async () => {
+  it('builds its trade clients with the invalid-request threshold of 1', async () => {
     tradeClientOptions.length = 0;
 
     await dryRun(snapshotOf(entries));

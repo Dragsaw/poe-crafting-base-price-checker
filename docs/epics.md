@@ -2216,7 +2216,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 **Given** the merged-order alternative
 **When** someone re-proposes it
 **Then** it is rejected on a stated ground and not on taste: its error is **anti-correlated with its own trigger**. A recipe goes uncostable when a currency has no league rate, likeliest for the thinly traded one, and of FR-26's two recipes the rarer-orb recipe carries the larger Craft Cost — so the approximation is worst exactly where it fires
-**And** the revisit condition is a **measurement** and never a preference: if Craft Cost is shown small against typical payouts at the default threshold, the merged order becomes defensible and the PRD addendum's revision-19 bullet reopens (state 35, FR-26, PRD `addendum.md` revision 19).
+**And** the revisit condition is a **measurement** and never a preference: if Craft Cost is shown small against typical payouts at the default threshold, the merged order becomes defensible and the merged-order decision reopens (state 35, FR-26).
 
 **Given** FR-5's bound in that state
 **When** `web` applies it
@@ -2232,7 +2232,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 
 **Given** how often this state fires
 **When** someone sizes the work
-**Then** it is a **routine** state on the costlier recipe, and not a defensive one. It is built to the same standard as any resting state (state 35, PRD `addendum.md` revision 19).
+**Then** it is a **routine** state on the costlier recipe, and not a defensive one. It is built to the same standard as any resting state (state 35).
 
 **Given** state 25, where nothing clears the threshold
 **When** the crafted branch renders

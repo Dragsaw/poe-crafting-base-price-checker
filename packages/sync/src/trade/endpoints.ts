@@ -1,7 +1,7 @@
 // Spelled once so `fixtures:record` and `catalogue:refresh` cannot drift apart (AD-25, AD-12).
 // Data only: no request, no client, no filesystem.
 
-/** `IMPLEMENTATION-NOTES.md` §5.1: realm `poe2` on the `trade2` API. */
+/** The realm `poe2` on the `trade2` API. */
 export const TRADE_API_BASE = 'https://www.pathofexile.com/api/trade2';
 
 /** One shared label, so the four data GETs pace against one ledger entry, not four cold lanes. */
@@ -11,14 +11,14 @@ export const DATA_LANE = 'trade-data-get';
 // The run-start league gate (AD-19) GETs it in `DATA_LANE`.
 export const TRADE_LEAGUES_URL = `${TRADE_API_BASE}/data/leagues`;
 
-/** `IMPLEMENTATION-NOTES.md` §5.1: the realm segment of every search and fetch path. */
+/** The realm segment of every search and fetch path. */
 const TRADE_REALM = 'poe2';
 
 /** Two labels, because a search and a fetch spend against two different buckets (AD-8). */
 export const SEARCH_LANE = 'trade-search-post';
 export const FETCH_LANE = 'trade-fetch-get';
 
-// Only the league segment is percent-encoded: ids carry spaces (IMPLEMENTATION-NOTES.md §5.4).
+// Only the league segment is percent-encoded: ids carry spaces.
 export function tradeSearchUrl(league: string): string {
   return `${TRADE_API_BASE}/search/${TRADE_REALM}/${encodeURIComponent(league)}`;
 }

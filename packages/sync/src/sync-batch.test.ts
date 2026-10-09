@@ -19,7 +19,7 @@ import { USER_AGENT_ENV_VAR } from './trade/user-agent.ts';
 const tradeClientOptions = vi.hoisted((): { readonly auth?: { readonly holder: unknown; readonly probe: unknown } }[] => []);
 
 // A pass-through: the real clients are built, and the options are recorded so
-// a test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// a test can inspect what the shell passed (AD-8).
 vi.mock('./trade/client.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof TradeClientModule>();
   return {
@@ -122,7 +122,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('refuses a pinned set over the cap: exit 1, no request, a run-failure naming data/tracked.json', async () => {
-    // One pinned entry against a yardstick of 1: 1 > 0.5 × 1 (IMPLEMENTATION-NOTES.md §6).
+    // One pinned entry against a yardstick of 1: 1 > 0.5 × 1.
     const { deps, fs, http, writes, err } = dependenciesFor(LEAGUE, { tracked: [{ ...ENTRY, status: 'pinned' }] });
 
     expect(await syncCommand(deps)).toBe(1);
@@ -166,7 +166,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       expect.objectContaining({ entryKey: canonicalKey(ENTRY), price: { state: 'no-listings' } }),
     ]);
   });
-  it('builds its trade clients with the invalid-request threshold of 1 (§5.3)', async () => {
+  it('builds its trade clients with the invalid-request threshold of 1', async () => {
     tradeClientOptions.length = 0;
     const { deps } = dependenciesFor(LEAGUE);
 
@@ -178,7 +178,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(tradeClientOptions[0]).not.toHaveProperty('pacing');
   });
 
-  describe('the session cookie at the shell edge (AD-30, IMPLEMENTATION-NOTES.md §13.1, §13.5)', () => {
+  describe('the session cookie at the shell edge (AD-30)', () => {
     const VALID = 'a'.repeat(16) + '0123456789abcdef0123';
 
     it('an absent value: one unauthenticated (absent) line before the first request, exit unchanged', async () => {

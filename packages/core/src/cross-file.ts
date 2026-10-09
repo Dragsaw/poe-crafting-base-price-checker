@@ -33,27 +33,27 @@ export { classDiscriminability } from './cross-file/class-discriminability.ts';
 export { edgeAlignment } from './cross-file/edge-alignment.ts';
 export { emptyContainment } from './cross-file/empty-containment.ts';
 
-/** The six cross-file checks and the unvalidated marks (AD-17, IN §2). Pure (AD-1). */
+/** The six cross-file checks and the unvalidated marks (AD-17). Pure (AD-1). */
 
 export interface CrossFileFailure {
   readonly check: CrossFileCheck;
-  /** The failing entry's canonical key (§4.1). */
+  /** The failing entry's canonical key. */
   readonly entryKey: string;
   readonly categoryId: string;
   readonly className: string;
   readonly detail: string;
 }
 
-/** A crafted entry that no pool check covers (§2.8). Never a failure. */
+/** A crafted entry that no pool check covers. Never a failure. */
 export interface UnvalidatedMark {
-  /** The entry's canonical key (§4.1). */
+  /** The entry's canonical key. */
   readonly entryKey: string;
   readonly categoryId: string;
   readonly className: string;
   readonly reason: 'weights-absent' | 'partial-pool';
 }
 
-/** The failures and the marks, side by side (§2.8). */
+/** The failures and the marks, side by side. */
 export interface CrossFileResult {
   readonly failures: readonly CrossFileFailure[];
   readonly unvalidated: readonly UnvalidatedMark[];
@@ -62,17 +62,17 @@ export interface CrossFileResult {
 /** The two scoped slot sets of one class at one floor. */
 export type ScopedPools = Readonly<Record<Slot, readonly ModifierWeight[]>>;
 
-/** Both slots scoped to the class floor (§2.4): `eligible(pool, floor, 0)`. */
+/** Both slots scoped to the class floor: `eligible(pool, floor, 0)`. */
 export function scopedPools(pools: WeightsClassPools, floor: number): ScopedPools {
   return { prefix: eligible(pools.prefix, floor, 0), suffix: eligible(pools.suffix, floor, 0) };
 }
 
-/** `disagrees(rl, line)` (§2.3): a valueless reference line beside a banded line, same `statId`. */
+/** `disagrees(rl, line)`: a valueless reference line beside a banded line, same `statId`. */
 function isDisagreeing(rl: ReferenceLine, line: WeightsLine): boolean {
   return line.statId === rl.statId && !('valueMin' in rl) && line.ranges.length > 0;
 }
 
-/** §2.3, per line: the detail when a valueless reference line meets a banded scoped line. */
+/** Per line: the detail when a valueless reference line meets a banded scoped line. */
 export function kindAgreement(
   slot: Slot,
   reference: ModifierReference,
@@ -114,7 +114,7 @@ function disagreementsOn(
   return first === undefined ? undefined : { count, first };
 }
 
-/** `meets(rl, line)` (§2.7): the search for `rl` can match a roll of `line`. */
+/** `meets(rl, line)`: the search for `rl` can match a roll of `line`. */
 function isMeeting(rl: ReferenceLine, line: WeightsLine): boolean {
   if (line.statId !== rl.statId) {
     return false;
@@ -126,7 +126,7 @@ function isMeeting(rl: ReferenceLine, line: WeightsLine): boolean {
   return derived.min <= rl.valueMax && rl.valueMin <= derived.max;
 }
 
-/** §2.7: `incomplete(ref) ∨ mixedGroup(ref)`; the `mixedGroup` detail blames `weights.json`. */
+/** `incomplete(ref) ∨ mixedGroup(ref)`; the `mixedGroup` detail blames `weights.json`. */
 export function lineSetCompleteness(
   slot: Slot,
   reference: ModifierReference,
@@ -178,7 +178,7 @@ export function lineSetCompleteness(
   return parts.length === 0 ? undefined : parts.join('; ');
 }
 
-/** §2.2: `coOccur(x, y, S)` on one slot, memoised per reference pair and `S`. */
+/** `coOccur(x, y, S)` on one slot, memoised per reference pair and `S`. */
 export function coOccur(scoped: ScopedPools): CoOccur {
   const cache = new Map<string, boolean>();
   return (x, y, slot, summed) => {
@@ -285,7 +285,7 @@ function appendPartner(partners: Map<string, string[]>, key: string, text: strin
   partners.set(key, [...(partners.get(key) ?? []), text]);
 }
 
-/** §2.1, *Who evaluates a pair*: every pair where either entry names a hybrid reference. */
+/** Every pair where either entry names a hybrid reference. */
 function coOccurFailures(keyed: readonly Keyed[], scopeOf: ScopeOf): CrossFileFailure[] {
   const partners = new Map<string, string[]>();
   for (const [index, left] of keyed.entries()) {
@@ -330,7 +330,7 @@ function checkClass(members: readonly CraftedTrackedEntry[], weights: WeightsFil
   };
 }
 
-/** Every failure of the six checks and every unvalidated mark, by canonical key (§2.8). */
+/** Every failure of the six checks and every unvalidated mark, by canonical key. */
 export function crossFileChecks(entries: readonly TrackedEntry[], weights: WeightsFile | undefined): CrossFileResult {
   const failures: CrossFileFailure[] = [];
   const unvalidated: UnvalidatedMark[] = [];

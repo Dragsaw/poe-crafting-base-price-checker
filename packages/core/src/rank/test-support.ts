@@ -48,7 +48,7 @@ export function weightsWith(...classes: readonly (readonly [string, string, Cove
   for (const [categoryId, className, prefix = 'complete', suffix = 'complete'] of classes) {
     bases[categoryId] = {
       ...bases[categoryId],
-      // A complete slot holds one weighted tier: an empty one is unreachable (IN §3).
+      // A complete slot holds one weighted tier: an empty one is unreachable.
       [className]: { prefix: slotOf(prefix), suffix: slotOf(suffix) },
     };
   }

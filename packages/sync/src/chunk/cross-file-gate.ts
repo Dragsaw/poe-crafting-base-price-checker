@@ -1,6 +1,6 @@
 // Run-start cross-file gate (AD-12, AD-17, FR-33): `core`'s `crossFileChecks` owns the six checks.
 // A failure throws before the order exists, so no budget is spent and nothing is published.
-// Unvalidated marks never fail it (IMPLEMENTATION-NOTES §2.8); no weights file is skipped (AD-24).
+// Unvalidated marks never fail it; no weights file is skipped (AD-24).
 
 import type { CrossFileGateFailureRecord, TrackedEntry, WeightsFile } from '@poe/contracts';
 import { crossFileChecks } from '@poe/core';
@@ -29,7 +29,7 @@ export function crossFileGate(entries: readonly TrackedEntry[], weights: Weights
   }
 }
 
-/** One record per failure, in the checks' own order (§12: `check` + `entryKey` is the subject). */
+/** One record per failure, in the checks' own order. */
 export function crossFileGateRecords(error: CrossFileGateError): CrossFileGateFailureRecord[] {
   return error.failures.map((failure) => ({
     kind: 'cross-file-gate-failure',

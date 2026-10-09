@@ -79,7 +79,7 @@ describe('the Unrankable appendix', () => {
     await settleTo('ready');
     // Producer 6.1.0 declares every pool `complete`; the Emerald entry tracks the global Attack
     // Speed stat its tiers carry. Under the default recipe, an Amulets, a Bows and a Crossbows
-    // reference has no tier at or above the recipe floor, so those pairs are unrankable (IN §9).
+    // reference has no tier at or above the recipe floor, so those pairs are unrankable.
     const rows = appendixRows();
     expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual([
       'Amulets',

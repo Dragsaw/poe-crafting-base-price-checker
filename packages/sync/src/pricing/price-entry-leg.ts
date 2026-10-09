@@ -9,9 +9,9 @@ type Leg =
   | { readonly kind: 'answered'; readonly result: Extract<TradeResult, { kind: 'response' }> }
   | {
       readonly kind: 'yield';
-      /** Set only on a `429` yield: the delay the client's yield carried (§5.3). */
+      /** Set only on a `429` yield: the delay the client's yield carried. */
       readonly retryAfterMs?: number;
-      /** AD-30's downgrade (IMPLEMENTATION-NOTES.md §13.4): read as a request with no answer. */
+      /** AD-30's downgrade: read as a request with no answer. */
       readonly sessionExpired?: true;
     }
   | { readonly kind: 'malformed'; readonly status: number };

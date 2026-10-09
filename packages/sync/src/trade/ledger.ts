@@ -1,4 +1,4 @@
-// Per-policy bucket ledger (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// Per-policy bucket ledger (AD-8).
 // Pure: no clock, so a backoff test asserts a duration without spending it (NFR-3).
 // Keyed on the `X-Rate-Limit-Policy` the response carried, never on an operation.
 
@@ -135,7 +135,7 @@ export function paceBeforeNext(
 }
 
 // The larger of `paceBeforeNext` and the even spread of each bucket's remaining capacity over its
-// period, so no bucket fills in normal use (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// period, so no bucket fills in normal use (AD-8).
 export function spreadBeforeNext(
   ledger: RateLimitLedger,
   policy: string | undefined,

@@ -34,7 +34,7 @@ export async function inputSignature(fs: FilesystemPort): Promise<string> {
   return JSON.stringify(parts);
 }
 
-/** `true` when the lock file is absent or stale (§7); a read that throws is `false`: poll on. */
+/** `true` when the lock file is absent or stale; a read that throws is `false`: poll on. */
 export async function isLockFree(fs: FilesystemPort, clock: ClockPort): Promise<boolean> {
   try {
     const found = await readLock(fs);

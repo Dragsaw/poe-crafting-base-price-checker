@@ -30,7 +30,7 @@ const raw: TrackedEntry = {
 };
 
 describe('canonicalKeyElements', () => {
-  it('puts the kind first and then the declared field order (§4.1)', () => {
+  it('puts the kind first and then the declared field order', () => {
     expect(canonicalKeyElements(crafted)).toEqual([
       'crafted',
       'weapon.bow',
@@ -128,7 +128,7 @@ describe('compareByCodeUnit', () => {
 
 const withPrefix = (prefix: unknown): TrackedEntry => TrackedEntrySchema.parse({ ...crafted, prefix });
 
-describe('the hybrid affix form (§4.1)', () => {
+describe('the hybrid affix form', () => {
   const lineA = { statId: 'explicit.stat_1', valueMin: 25, valueMax: 34 };
   const lineB = { statId: 'explicit.stat_2' };
 

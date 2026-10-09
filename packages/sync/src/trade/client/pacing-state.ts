@@ -13,7 +13,7 @@ export function createPacingState(): PacingState {
   return { ledger: EMPTY_LEDGER, lanePolicies: new Map<string, string>() };
 }
 
-// In place (AD-30, §13.4), so no authenticated reading paces an unauthenticated request. The ledger
+// In place (AD-30), so no authenticated reading paces an unauthenticated request. The ledger
 // becomes a new reference, so a caller comparing by reference sees no fresh State reading.
 export function resetPacingState(pacing: PacingState): void {
   pacing.ledger = EMPTY_LEDGER;

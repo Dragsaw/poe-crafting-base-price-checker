@@ -15,7 +15,7 @@ import {
 const tradeClientOptions = vi.hoisted((): unknown[] => []);
 
 // A pass-through: the real client is built, and the options are recorded so a
-// test can inspect what the shell passed (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// test can inspect what the shell passed (AD-8).
 vi.mock('../trade/client.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof TradeClientModule>();
   return {
@@ -67,7 +67,7 @@ it('issues exactly four requests, one per data endpoint and no leagues request',
   }
 });
 
-it('builds its trade client with the invalid-request threshold of 1 (§5.3)', async () => {
+it('builds its trade client with the invalid-request threshold of 1', async () => {
   tradeClientOptions.length = 0;
 
   await harness(capturedResponses(RATE_LIMIT_HEADERS)).refresh();

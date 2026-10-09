@@ -71,7 +71,7 @@ describe('nextWait: the session matrix', () => {
     expect(nextWait(noAnswer, read, COLD)).toMatchObject({ until: at(36_000) });
   });
 
-  it('session-expired: backoff(1) whatever the backoff count, and no fresh reading resets it (§13.4)', () => {
+  it('session-expired: backoff(1) whatever the backoff count, and no fresh reading resets it', () => {
     const expired = outcome({ ...base, kind: 'yielded', newPass: false, sessionExpired: true });
     const deep: SessionState = { ...INITIAL_SESSION_STATE, backoffCount: 3 };
     const wait = { kind: 'until', until: at(36_000), reason: 'the session cookie expired', orInputChange: false };

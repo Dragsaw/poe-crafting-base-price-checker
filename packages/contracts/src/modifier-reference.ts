@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Cycle-safe only while canonical-key.ts imports this module as types only.
 import { compareByCodeUnit } from './canonical-key.ts';
 
-/** Three kinds (AD-5): `banded` has both edges, `valueless` none, `hybrid` every line (§4.1). */
+/** Three kinds (AD-5): `banded` has both edges, `valueless` none, `hybrid` every line. */
 
 export const StatIdSchema = z
   .string()
@@ -49,33 +49,33 @@ export const ValuelessModifierReferenceSchema = z
     'A modifier that rolls no number. No edges at all, and no component may give it sentinel edges (AD-5).',
   );
 
-/** A banded line of a `hybrid` reference: no `kind` or `acceptedTier`, its edges decide (§4.1). */
+/** A banded line of a `hybrid` reference: no `kind` or `acceptedTier`, its edges decide. */
 export const BandedHybridLineSchema = z
   .strictObject({
     statId: StatIdSchema,
-    valueMin: z.number().nonnegative().describe('The line band floor, inclusive (§4.1).'),
-    valueMax: z.number().nonnegative().describe('The line band ceiling, inclusive and required (§4.1).'),
+    valueMin: z.number().nonnegative().describe('The line band floor, inclusive.'),
+    valueMax: z.number().nonnegative().describe('The line band ceiling, inclusive and required.'),
   })
   .refine((band) => band.valueMin <= band.valueMax, {
     path: ['valueMax'],
     message: 'valueMin must not exceed valueMax: an inverted band contains no tier.',
   })
-  .describe('A hybrid line with both edges (IMPLEMENTATION-NOTES §4.1).');
+  .describe('A hybrid line with both edges.');
 
-/** A valueless line of a `hybrid` reference: no edges at all (§4.1). */
+/** A valueless line of a `hybrid` reference: no edges at all. */
 export const ValuelessHybridLineSchema = z
   .strictObject({
     statId: StatIdSchema,
   })
-  .describe('A hybrid line with no edges (IMPLEMENTATION-NOTES §4.1).');
+  .describe('A hybrid line with no edges.');
 
-/** Both members are strict: a line with one edge, a `kind` or `acceptedTier` fails both (§4.1). */
+/** Both members are strict: a line with one edge, a `kind` or `acceptedTier` fails both. */
 export const HybridLineSchema = z.union([BandedHybridLineSchema, ValuelessHybridLineSchema]);
 
-/** Checked against §4.1 and sorted on parse; the transform sits here to keep a `ZodObject`. */
+/** Checked and sorted on parse; the transform sits here to keep a `ZodObject`. */
 const HybridLinesSchema = z
   .array(HybridLineSchema)
-  .min(2, { message: 'A hybrid reference names at least two lines (§4.1).' })
+  .min(2, { message: 'A hybrid reference names at least two lines.' })
   .superRefine((lines, context) => {
     const seen = new Set<string>();
     for (const [index, line] of lines.entries()) {
@@ -83,7 +83,7 @@ const HybridLinesSchema = z
         context.addIssue({
           code: 'custom',
           path: [index, 'statId'],
-          message: `statId ${line.statId} is repeated within the hybrid reference (§4.1).`,
+          message: `statId ${line.statId} is repeated within the hybrid reference.`,
         });
       }
       seen.add(line.statId);
@@ -98,7 +98,7 @@ export const HybridModifierReferenceSchema = z
     acceptedTier: AcceptedTierSchema.optional(),
   })
   .describe(
-    'One modifier with several stat lines. `acceptedTier` labels the hybrid as a whole, never a line (AD-5, IMPLEMENTATION-NOTES §4.1).',
+    'One modifier with several stat lines. `acceptedTier` labels the hybrid as a whole, never a line (AD-5).',
   );
 
 export const ModifierReferenceSchema = z.discriminatedUnion('kind', [

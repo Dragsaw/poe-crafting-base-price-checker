@@ -18,10 +18,10 @@ const quoting = (cookie: string) => ({
 
 const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
 
-describe('CAP-4: the downgrade (IMPLEMENTATION-NOTES.md §13.4, §13.6)', () => {
+describe('CAP-4: the downgrade', () => {
   const RESULTS = ['r1'];
   const SEARCHED = JSON.stringify({ id: 'S1', complexity: 1, result: RESULTS, total: RESULTS.length });
-  /** Every answer names its policy, as the live API does; a search and a fetch differ (§13.2). */
+  /** Every answer names its policy, as the live API does; a search and a fetch differ. */
   const SEARCH_HEADERS = {
     'x-rate-limit-policy': 'trade-search-request-limit',
     'x-rate-limit-rules': 'Ip',

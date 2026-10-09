@@ -173,7 +173,7 @@ describe('checkTracked', () => {
     ]);
   });
 
-  // Story hybrid-mods 2, I/O matrix "Earlier major": the §4.1 re-author message.
+  // Story hybrid-mods 2, I/O matrix "Earlier major": the re-author message.
   it('refuses an earlier 1.x major with the re-author message, naming both affixes and hybrid', () => {
     const report = checkTracked(inputsOf([], { tracked: trackedText([crafted], '1.0.0') }));
 

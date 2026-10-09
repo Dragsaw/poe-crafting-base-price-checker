@@ -25,9 +25,9 @@ export interface GovernorContext {
   readonly pacing: PacingState;
   /** Per governor: a count shared across chunks would refuse a policy for the whole session. */
   invalidRequests: InvalidRequestCounts;
-  /** A probe `429`'s penalty (IN §13.3): once set, every later `send` yields it. */
+  /** A probe `429`'s penalty: once set, every later `send` yields it. */
   latched: YieldPenalty | undefined;
-  /** Set before the holder hears of a downgrade, so the cookie is dropped first (§13.4 step 1). */
+  /** Set before the holder hears of a downgrade, so the cookie is dropped first. */
   isCookieDropped: boolean;
 }
 

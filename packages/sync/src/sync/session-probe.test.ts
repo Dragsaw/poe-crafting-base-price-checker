@@ -31,7 +31,7 @@ const cookies = (http: ReturnType<typeof createFakeHttpPort>) =>
   http.requests.map((request) => [request.method, request.headers['cookie']]);
 
 describe('pnpm sync: the session with injected ports', () => {
-  describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () => {
+  describe('the session probe (AD-30)', () => {
     const VALUE = `"${'Z'.repeat(32)}"`;
     const COOKIE = `POESESSID=${VALUE}`;
     const THIRD: TrackedEntry = { ...ENTRY, itemLevelMin: 84 };
@@ -53,7 +53,7 @@ describe('pnpm sync: the session with injected ports', () => {
       return probingThen(answers);
     }
 
-    /** As `probing`; later cookie requests are answered by `after`, live by default (§13.4). */
+    /** As `probing`; later cookie requests are answered by `after`, live by default. */
     function probingThen(
       answers: (HttpResponse | Error)[],
       after: (request: HttpRequest, answer: HttpResponse) => HttpResponse = (_request, answer) => ({

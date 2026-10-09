@@ -1,4 +1,4 @@
-/** The `className` grammar (IN §10.2 arm 1), defined once for the weights schema and `sync`. */
+/** The `className` grammar (arm 1), defined once for the weights schema and `sync`. */
 
 /** `str` → armour, `dex` → evasion, `int` → energy shield (WEIGHTS-FILE-SCHEMA.md `5.1.0`). */
 export const DEFENCE_OF_LETTER = { str: 'ar', dex: 'ev', int: 'es' } as const;
@@ -8,7 +8,7 @@ function isDefenceLetter(token: string): token is DefenceLetter {
   return Object.hasOwn(DEFENCE_OF_LETTER, token);
 }
 
-/** Arm 1's split: the maximal trailing run of defence tokens (§10.2). `undefined` means plain. */
+/** Arm 1's split: the maximal trailing run of defence tokens. `undefined` means plain. */
 export function defenceLettersOf(className: string): ReadonlySet<DefenceLetter> | undefined {
   const tokens = className.split('_');
   const letters = new Set<DefenceLetter>();

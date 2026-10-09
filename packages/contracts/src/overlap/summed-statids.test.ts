@@ -8,7 +8,7 @@ import { ALWAYS, band, parse, valueless } from './test-support';
 
 const lines = (...entries: HybridModifierReference['lines']): HybridModifierReference => ({ kind: 'hybrid', lines: entries });
 
-describe('summed statIds (§2.1 summed(e), sum(e, s))', () => {
+describe('summed statIds', () => {
   const RARITY = 'explicit.stat_3917489142';
 
   it('names the statIds both slots name, pure line or hybrid line, either side', () => {
@@ -54,7 +54,7 @@ const hybridOnA = (aMin: number, aMax: number): HybridModifierReference => ({
   ],
 });
 
-describe('overlap with summed statIds (§2.1 S)', () => {
+describe('overlap with summed statIds', () => {
   const RARITY = 'explicit.stat_3917489142';
   const rarity = (prefixMin: number, prefixMax: number, suffixMin: number, suffixMax: number) => ({
     prefix: band(RARITY, prefixMin, prefixMax),

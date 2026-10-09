@@ -16,7 +16,7 @@ export const RawRankedRowSchema = z
     entryKey: z
       .string()
       .min(1)
-      .describe('The tracked entry’s canonical key (IMPLEMENTATION-NOTES.md §4.1).'),
+      .describe('The tracked entry’s canonical key.'),
     baseTypeId: BaseTypeIdSchema,
     itemLevelMin: ItemLevelSchema,
     status: CurationStatusSchema.exclude(['pruned']).describe(
@@ -45,12 +45,12 @@ export const UncostableSchema = z
 
 export const CraftedSummandSchema = z
   .strictObject({
-    entryKey: z.string().min(1).describe('The tracked entry’s canonical key (IMPLEMENTATION-NOTES.md §4.1).'),
+    entryKey: z.string().min(1).describe('The tracked entry’s canonical key.'),
     probability: z
       .number()
       .min(0)
       .max(1)
-      .describe('`combinationProbability` under the recipe (IMPLEMENTATION-NOTES.md §9, §11), verbatim.'),
+      .describe('`combinationProbability` under the recipe, verbatim.'),
     priceDivine: DivineAmountSchema.describe('The active-league observed price, verbatim.'),
     contribution: z.number().min(0).describe('`probability × priceDivine`.'),
   })

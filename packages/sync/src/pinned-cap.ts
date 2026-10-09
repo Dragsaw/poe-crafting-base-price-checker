@@ -1,11 +1,11 @@
-// Load-time half of the `pinned` cap (AD-7, IMPLEMENTATION-NOTES.md §6), the only reader outside
+// Load-time half of the `pinned` cap (AD-7), the only reader outside
 // `chunk/` of `minChunkSearches`: the runner never reads it, so it can never become a chunk bound.
 
 import type { ConfigFile, PinnedStarvationRecord, TrackedEntry } from '@poe/contracts';
 
 import type { ChunkStarvation } from './chunk/run-chunk.ts';
 
-/** The share of a minimum chunk the pinned set may take (§6). */
+/** The share of a minimum chunk the pinned set may take. */
 const PINNED_SHARE = 0.5;
 
 /** `count(pinned) > 0.5 × minChunkSearches`: a `tracked.json` validation error. */
@@ -45,7 +45,7 @@ export function checkPinnedCap(
   };
 }
 
-/** A pinned-cap excess as a load refusal (IMPLEMENTATION-NOTES.md §6), a `run-failure`. */
+/** A pinned-cap excess as a load refusal, a `run-failure`. */
 export class PinnedCapExceededError extends Error {
   readonly exceeded: PinnedCapExceeded;
 

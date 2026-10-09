@@ -6,7 +6,7 @@ import type { Slot } from '../probability.ts';
 import { COMPLETE } from './complete-pool.ts';
 import { formatReference, setText } from './reference-text.ts';
 
-/** The entries §1 excluded from a hybrid reference's containment set, as §2.5 lists them. */
+/** The entries excluded from a hybrid reference's containment set. */
 function hybridExclusions(reference: ModifierReference, scoped: readonly ModifierWeight[]): string[] {
   const named = statIds(reference);
   const lines = linesOf(reference);
@@ -31,7 +31,7 @@ function hybridExclusions(reference: ModifierReference, scoped: readonly Modifie
   return excluded;
 }
 
-/** §2.5: the detail when no scoped entry contains the reference, never `P = 0` (hybrid: §1). */
+/** The detail when no scoped entry contains the reference, never `P = 0`. */
 export function emptyContainment(
   slot: Slot,
   reference: ModifierReference,

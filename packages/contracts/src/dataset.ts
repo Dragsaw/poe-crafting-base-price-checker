@@ -38,7 +38,7 @@ export const DatasetEntrySchema = z
     entryKey: z
       .string()
       .min(1)
-      .describe('The tracked entry’s canonical key (IMPLEMENTATION-NOTES.md §4.1).'),
+      .describe('The tracked entry’s canonical key.'),
     price: PriceStateSchema,
     lastAttemptedAt: IsoTimestampSchema.optional().describe(
       'Present wherever `sync` issued a request. Offline work never stamps it, and a never-synced entry carries no placeholder (AD-9).',

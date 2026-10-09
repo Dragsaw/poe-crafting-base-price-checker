@@ -1,7 +1,7 @@
 import { defenceLettersOf } from '@poe/contracts';
 import type { CraftedTrackedEntry, WeightsFile } from '@poe/contracts';
 
-/** §2.6: `fansOut ∧ ¬discriminable` (§10.2 arms 1–3); the failure detail, else `undefined`. */
+/** `fansOut ∧ ¬discriminable`; the failure detail, else `undefined`. */
 export function classDiscriminability(
   entry: Pick<CraftedTrackedEntry, 'categoryId' | 'className'>,
   weights: WeightsFile,

@@ -5,7 +5,7 @@ import { containedIn, interval } from '../probability.ts';
 import type { Slot } from '../probability.ts';
 import { formatLine, tierIds } from './reference-text.ts';
 
-/** §2.4, per banded line: the detail when its edges are not the extremes of the contained lines. */
+/** Per banded line: the detail when its edges are not the extremes of the contained lines. */
 export function edgeAlignment(
   slot: Slot,
   reference: ModifierReference,

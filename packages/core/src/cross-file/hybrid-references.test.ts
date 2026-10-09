@@ -11,7 +11,7 @@ const bandLine = (statId: string, valueMin: number, valueMax: number): HybridLin
 
 const byString = (pairs: readonly (readonly string[])[]) => pairs.map((pair) => JSON.stringify(pair)).toSorted(byCodeUnit);
 
-describe('hybrid references (§2.1–§2.5, §2.7)', () => {
+describe('hybrid references', () => {
   const A = STAT;
   const B = OTHER;
   const C = 'explicit.stat_3';
@@ -93,7 +93,7 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
     const hybridEntry = entry({ prefix: T1_REF });
     const singleEntry = entry({ prefix: band(30, 40, A) });
     const failures = failuresOf([hybridEntry, singleEntry], bows(pools([H1, pure])));
-    // The single-line band also reaches into H1, so §2.7 reports it beside co-occur.
+    // The single-line band also reaches into H1, so the `meets` check reports it beside co-occur.
     expect(byString(failures.map((failure) => [failure.check, failure.entryKey]))).toEqual(
       byString([
         ['co-occur', canonicalKey(hybridEntry)],
@@ -166,7 +166,7 @@ describe('hybrid references (§2.1–§2.5, §2.7)', () => {
     expect(failures).toEqual([]);
   });
 
-  describe('a hybrid pair whose shared line is summed (§2.1, §2.2)', () => {
+  describe('a hybrid pair whose shared line is summed', () => {
     const L = 'explicit.stat_light';
     /** A suffix family {B, L} in one modGroup, whose L line rolls 15 on every tier. */
     const suffixTier = (bMin: number, bMax: number) =>

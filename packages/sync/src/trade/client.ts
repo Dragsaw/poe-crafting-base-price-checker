@@ -37,7 +37,7 @@ export interface TradeRequest {
   // Opaque to the client: a request is paced before its response names a policy, so the lane
   // remembers its last policy (AD-8). Omitted, it defaults to the method and URL path.
   readonly lane?: string;
-  /** True only on a pricing search or fetch; never inferred from method or lane (AD-30, §13.2). */
+  /** True only on a pricing search or fetch; never inferred from method or lane (AD-30). */
   readonly cookieEligible?: boolean;
 }
 
@@ -61,7 +61,7 @@ export interface TradeResponseResult extends TradeExchange {
   readonly response: HttpResponse;
 }
 
-/** `session-expired` is AD-30's downgrade (§13.4): no response, no penalty, so AD-9's no answer. */
+/** `session-expired` is AD-30's downgrade: no response, no penalty, so AD-9's no answer. */
 export type TradeYieldReason =
   | 'retry-after-header'
   | 'derived-penalty'
@@ -79,7 +79,7 @@ export interface TradeYieldResult extends TradeExchange {
   readonly response?: HttpResponse;
 }
 
-/** The `retryAfter` of §5.3, the input to `notBefore`; `undefined` where no wait recovers. */
+/** The `retryAfter`, the input to `notBefore`; `undefined` where no wait recovers. */
 export function penaltyRetryAfterMs(result: TradeYieldResult): number | undefined {
   // `invalid-request-threshold` and `session-expired` carry no penalty.
   return result.reason === 'retry-after-header' || result.reason === 'derived-penalty'
@@ -118,13 +118,13 @@ export interface TradeGovernorOptions<Source extends string> extends TradeClient
   readonly pacing?: PacingState;
   /** `true`: even spread (`spreadBeforeNext`); otherwise the batch pacer (`paceBeforeNext`). */
   readonly spread?: boolean;
-  /** The auth holder and the session-probe port (AD-30, §13). Omitted: no probe, no cookie. */
+  /** The auth holder and the session-probe port (AD-30). Omitted: no probe, no cookie. */
   readonly auth?: TradeGovernorAuth;
 }
 
 /** The session-cookie half of a governor (AD-30). */
 export interface TradeGovernorAuth {
-  /** Owns the value and state (§13.2); every error the governor passes on goes through it. */
+  /** Owns the value and state; every error the governor passes on goes through it. */
   readonly holder: SessionAuth;
   /** Counted as `session-probe` (AD-12); shares this governor's pacing and serial queue. */
   readonly probe: HttpPort;
@@ -136,7 +136,7 @@ export interface TradeGovernor<Source extends string> {
   readonly pacing: PacingState;
   /** The delay the next request on `lane` would wait now. */
   delayBeforeMs(lane: string): number;
-  /** A latched probe `429` makes the chunk a `429` yield, whatever bound ended it (§13.3). */
+  /** A latched probe `429` makes the chunk a `429` yield, whatever bound ended it. */
   latchedRetryAfterMs(): number | undefined;
 }
 

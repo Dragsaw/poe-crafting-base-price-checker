@@ -12,7 +12,7 @@ import type { ChunkPublication } from '../run-chunk.ts';
 import { DATASET_PATH, PROGRESS_PATH } from './data-paths.ts';
 import type { RunState } from './run-state.ts';
 
-/** How long a failed session cookie is held off (AD-30, IMPLEMENTATION-NOTES.md §13.3). */
+/** How long a failed session cookie is held off (AD-30). */
 const AUTH_HOLD_OFF_MS = 24 * 60 * 60 * 1000;
 
 /** `write` sets the field from this write's `now`, `clear` removes it, none keeps the old. */

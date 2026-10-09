@@ -1,5 +1,5 @@
 // `pnpm tracked:check`: read-only, exit 1 on any issue. A pass does not confirm a floor is the one
-// IN §8 derives: a floor declared too high passes every mechanical check (AD-5).
+// The floor derives: a floor declared too high passes every mechanical check (AD-5).
 
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -35,7 +35,7 @@ export interface CheckStatus {
   readonly status: 'passed' | 'failed' | 'skipped';
 }
 
-/** A crafted entry no pool check covered (IMPLEMENTATION-NOTES §2.8), at its index when it has one. */
+/** A crafted entry no pool check covered, at its index when it has one. */
 export interface CheckUnvalidated extends UnvalidatedMark {
   readonly path?: string;
 }
@@ -177,7 +177,7 @@ function crossFileOutcome(
     return { status: 'skipped', issues: [], unvalidated: [] };
   }
   if (weights.value === undefined) {
-    // No check runs without the weights file, but each crafted entry is marked (§2.8).
+    // No check runs without the weights file, but each crafted entry is marked.
     return { status: 'skipped', issues: [], unvalidated: markedAt(crossFileChecks(entries, undefined).unvalidated, pathOf) };
   }
   const { failures, unvalidated } = crossFileChecks(entries, weights.value);
@@ -211,7 +211,7 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     ['cross-file', crossFile],
   ];
   const issues = outcomes.flatMap(([, outcome]) => outcome.issues);
-  // A mark never moves `ok` (IMPLEMENTATION-NOTES §2.8).
+  // A mark never moves `ok`.
   return {
     ok: issues.length === 0,
     checks: outcomes.map(([check, outcome]) => ({ check, status: outcome.status })),

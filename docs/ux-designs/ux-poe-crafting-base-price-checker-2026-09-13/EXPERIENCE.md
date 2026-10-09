@@ -6,7 +6,6 @@ created: 2026-09-13
 updated: 2026-10-04
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
-  - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - .memlog.md (rows 239-279 hold the visual redesign)
@@ -37,7 +36,7 @@ the Copy Deck or in Epistemics, *Price trust*. This document also writes each fi
 value that the page prints or judges by: the 3-day, 3-listing and 70% price-trust
 thresholds, the 8 lines an expansion opens on, and the 0.25 cold start. The PRD
 keeps the capability and the player-level promise, and it cites this document.
-Mechanism stays with the architecture spine and `IMPLEMENTATION-NOTES.md`.
+Mechanism stays with the architecture spine.
 
 **Substrate: Mantine v9** (`@mantine/core` + `@mantine/hooks` 9.6.1)
 `[ASSUMPTION — memlog 8]`. The page inherits Mantine's component behaviour. This
@@ -570,7 +569,7 @@ Three things are problems:
 2. **Pinned entries are starved** (FR-17, FR-25). This is unreliable, not broken,
    so its problem-list line leads with ◐ (memlog 265). The count comes from the
    pinned-starvation record that matches the loaded curation
-   (`IMPLEMENTATION-NOTES.md` §6; memlog 216, 222). M is the size of the pinned
+   (AD-7; memlog 216, 222). M is the size of the pinned
    set. N is the number of pinned entries that the truncation left out. **When no
    record matches**, no problem is raised. The curation changed after the
    starvation, and the record stays in the sync report as diagnosis. **When N is
@@ -676,7 +675,7 @@ decides:
     `N% of its priced combinations are unreliable` (memlog 268).
 - **Otherwise** → no mark.
 
-`[NOTE FOR ARCHITECT: the share-of-EV formula belongs in IMPLEMENTATION-NOTES,
+`[NOTE FOR ARCHITECT: the share-of-EV formula belongs in the architecture spine,
 including whether below-threshold outcomes count in the gross value and which
 lines the zero-value fallback counts as priced (memlog 265). State 25 puts every
 crafted row on the fallback.]`

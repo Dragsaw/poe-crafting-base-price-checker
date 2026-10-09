@@ -37,7 +37,7 @@ describe('SyncProgressFileSchema', () => {
     expect(result).toMatchObject({ ok: false, reason: 'unknown-major' });
   });
 
-  it('accepts an optional notBefore instant, and refuses a non-instant (AD-8, §5.3)', () => {
+  it('accepts an optional notBefore instant, and refuses a non-instant (AD-8)', () => {
     const file = {
       schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
       completed: [],
@@ -58,12 +58,12 @@ describe('SyncProgressFileSchema', () => {
     ).toBe(true);
   });
 
-  it('reads a 1.1.0 body unchanged, with no authHoldOffUntil (§13.7)', () => {
+  it('reads a 1.1.0 body unchanged, with no authHoldOffUntil', () => {
     const file = { schemaVersion: '1.1.0', completed: ['k'], notBefore: '2026-09-26T16:00:00.000Z' };
     expect(parseEnvelope(SyncProgressFileSchema, file)).toEqual({ ok: true, value: file });
   });
 
-  it('accepts an optional authHoldOffUntil instant, and refuses a non-instant (AD-30, §13.3)', () => {
+  it('accepts an optional authHoldOffUntil instant, and refuses a non-instant (AD-30)', () => {
     const file = {
       schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
       completed: [],

@@ -158,7 +158,7 @@ async function runSessionChunk(runtime: SessionRuntime, state: SessionState): Pr
     stdout(`${PREFIX} ${describeOutcome(outcome)}`);
     return { kind: 'outcome', outcome };
   } catch (error_) {
-    // The governor already redacted what it passed on; this covers the rest (§13.6).
+    // The governor already redacted what it passed on; this covers the rest.
     const error = auth.redact(error_);
     stderr(`${PREFIX} ${error instanceof Error ? error.message : String(error)}`);
     return { kind: 'error', error };
@@ -178,7 +178,7 @@ async function readChunkContext(
     now,
     ...(notBefore !== undefined && { notBefore }),
     // The downgrade's in-place reset gives the ledger a new reference; it
-    // is no State reading (§13.4).
+    // is no State reading.
     freshReading: !isSessionExpired(result) && pacing.ledger !== ledgerBefore,
     evenIntervalMs: sessionEvenIntervalMs(pacing, isWithGate),
   };
@@ -227,7 +227,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDependencies):
     return 1;
   }
 
-  // One holder per process: each settle prints one line, once (§13.1–§13.3, §13.5).
+  // One holder per process: each settle prints one line, once.
   const auth = createSessionAuth(env, { onSettle: (line) => stderr(`${PREFIX} ${line}`) });
   const runtime: SessionRuntime = {
     ports,
@@ -251,7 +251,7 @@ export async function syncSessionCommand(dependencies: SyncSessionDependencies):
   } finally {
     // Runs on a throw too, so the process never ends unsettled without its
     // line. A holder still unsettled had no 2xx pricing search to probe on,
-    // or only probe 429s (§13.5).
+    // or only probe 429s.
     auth.settle('not-probed');
   }
 

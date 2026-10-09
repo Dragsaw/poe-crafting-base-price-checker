@@ -14,7 +14,7 @@ import type { CraftedTrackedEntry, TrackedEntry } from '../tracked-entry.ts';
 
 type TrackedEntries = readonly TrackedEntry[];
 
-/** The kind a tracked line declares: both edges make it banded, none makes it valueless (§4.1). */
+/** The kind a tracked line declares: both edges make it banded, none makes it valueless. */
 type LineKind = 'banded' | 'valueless';
 
 function checkUniqueKeys(entries: TrackedEntries, context: z.RefinementCtx): void {
@@ -67,7 +67,7 @@ function checkWithinFileOverlap(entries: TrackedEntries, context: z.RefinementCt
     const earlier = earlierByClass.get(classKey) ?? [];
     const key = canonicalKey(entry);
     for (const other of earlier) {
-      // A twin is the uniqueness rule's issue; a pair with a hybrid is core's (§2.1).
+      // A twin is the uniqueness rule's issue; a pair with a hybrid is core's.
       if (other.key === key || hasHybridAffix(other.entry) || hasHybridAffix(entry)) {
         continue;
       }
@@ -106,7 +106,7 @@ function checkSlotKinds(site: SlotSite, firstKindByStatId: FirstKindByStatId, co
       context.addIssue({
         code: 'custom',
         path,
-        message: `entry ${canonicalKey(entry)} sums statId ${line.statId} across its prefix and suffix, and its ${slot} line on it is valueless; a summed operand needs both edges (IMPLEMENTATION-NOTES.md §2.3, §5.5)`,
+        message: `entry ${canonicalKey(entry)} sums statId ${line.statId} across its prefix and suffix, and its ${slot} line on it is valueless; a summed operand needs both edges`,
       });
     }
     const first = firstKindByStatId.get(line.statId);
@@ -118,7 +118,7 @@ function checkSlotKinds(site: SlotSite, firstKindByStatId: FirstKindByStatId, co
       context.addIssue({
         code: 'custom',
         path,
-        message: `statId ${line.statId} is ${kind} at ${at} and ${first.kind} at ${first.at}; every tracked line on one statId takes one kind (IMPLEMENTATION-NOTES.md §2.3)`,
+        message: `statId ${line.statId} is ${kind} at ${at} and ${first.kind} at ${first.at}; every tracked line on one statId takes one kind`,
       });
     }
   }

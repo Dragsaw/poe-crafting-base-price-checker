@@ -9,7 +9,7 @@ function changed(value: unknown): unknown {
   return typeof value === 'number' ? value + 1 : `${String(value)}-changed`;
 }
 
-describe('isSameRecord (IMPLEMENTATION-NOTES.md §12)', () => {
+describe('isSameRecord', () => {
   /** One record per kind, plus an observation-only change where the kind has observations. */
   const cases: readonly {
     readonly base: SyncRunRecord;

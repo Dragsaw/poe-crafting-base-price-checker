@@ -16,7 +16,7 @@ export interface ProgressLoad {
   readonly fault: { readonly error: unknown } | undefined;
 }
 
-/** The penalty memory (AD-8, IMPLEMENTATION-NOTES.md §5.3) is read before every other load. */
+/** The penalty memory (AD-8) is read before every other load. */
 export async function loadProgress(fs: FilesystemPort): Promise<ProgressLoad> {
   try {
     const progress = await loadEnvelope(fs, PROGRESS_PATH, (data) => parseEnvelope(SyncProgressFileSchema, data));

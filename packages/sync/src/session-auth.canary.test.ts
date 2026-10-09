@@ -14,7 +14,7 @@ import type { ThrowingHttp } from './session-auth-canary/test-support.ts';
 import { CANARY, CONTACT, LEAGUE, LEAGUES_BODY, NOW, capturing, leaksIn, runBatch, runSession, textOf } from './session-auth-canary/test-support.ts';
 import type { Failure } from './session-auth-canary/test-support.ts';
 
-/** SPEC-poesessid-sync CAP-4, IN §13.6: no 8+ character substring of the canary may leak. */
+/** SPEC-poesessid-sync CAP-4.6: no 8+ character substring of the canary may leak. */
 
 const ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: CANARY };
 

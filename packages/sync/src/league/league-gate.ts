@@ -69,7 +69,7 @@ export function createLeagueGate(
       throw error;
     }
     // A 429 and the invalid-request threshold arrive as a client yield. Only
-    // a 429 carries the delay the chunk remembers as `notBefore` (§5.3).
+    // a 429 carries the delay the chunk remembers as `notBefore`.
     if (result.kind === 'yield') {
       const retryAfterMs = penaltyRetryAfterMs(result);
       return retryAfterMs === undefined ? YIELD : { kind: 'yield', retryAfterMs };

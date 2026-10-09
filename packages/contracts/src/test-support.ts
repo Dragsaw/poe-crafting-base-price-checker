@@ -7,7 +7,7 @@ export function without<T extends object>(value: T, key: keyof T): Partial<T> {
   return copy;
 }
 
-// eslint-disable-next-line unicorn/no-null -- boundary: the wire formats under test carry JSON `null` (`z.nullable()` fields, canonical key slots), which `undefined` cannot stand in for (§4.1).
+// eslint-disable-next-line unicorn/no-null -- boundary: the wire formats under test carry JSON `null` (`z.nullable()` fields, canonical key slots), which `undefined` cannot stand in for.
 export const JSON_NULL = null;
 
 export const byCodeUnit = (a: string, b: string): number => Number(a > b) - Number(a < b);

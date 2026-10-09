@@ -1,4 +1,4 @@
-// Chunk lock (AD-7, IMPLEMENTATION-NOTES.md §7): one atomic exclusive create, stale by time alone.
+// Chunk lock (AD-7): one atomic exclusive create, stale by time alone.
 // A stale break is serialised by a second exclusive file, the break marker, so two breakers cannot
 // interleave; under it the lock is re-read and broken only if it is still the text judged stale.
 
@@ -18,7 +18,7 @@ export const LOCK_PATH = 'data/sync.lock';
 /** Held only for the instant a stale lock is broken. Also matches `*.lock`. */
 export const BREAK_MARKER_PATH = 'data/sync.break.lock';
 
-/** `staleLockAfter`: a ceiling on a chunk, not a player setting (IMPLEMENTATION-NOTES.md §7). */
+/** `staleLockAfter`: a ceiling on a chunk, not a player setting. */
 export const STALE_LOCK_AFTER_MS = 6 * 60 * 60 * 1000;
 
 export type LockState =

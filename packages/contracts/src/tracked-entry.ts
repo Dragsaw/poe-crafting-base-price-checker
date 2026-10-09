@@ -5,7 +5,7 @@ import { CategoryIdSchema, ClassNameSchema } from './item-class.ts';
 import { ModifierReferenceSchema } from './modifier-reference.ts';
 import { ItemLevelSchema } from './primitives.ts';
 
-/** The kind is what the entry names, never an inference (AD-5); keys: IMPLEMENTATION-NOTES §4.1. */
+/** The kind is what the entry names, never an inference (AD-5). */
 
 /** Curation Status is a schema member, not a convention (AD-12, FR-15). */
 export const CurationStatusSchema = z

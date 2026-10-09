@@ -11,7 +11,7 @@ export const PriceObservationSchema = z
     ),
     observedAt: IsoTimestampSchema.describe('When the observation was made.'),
     priceDivine: DivineAmountSchema.describe(
-      'The median of the cheapest listings after normalisation to divine. On an even sample the median is the LOWER of the two middle values, never their mean (AD-16, IMPLEMENTATION-NOTES.md §4.3).',
+      'The median of the cheapest listings after normalisation to divine. On an even sample the median is the LOWER of the two middle values, never their mean (AD-16).',
     ),
     sampleSize: z
       .int()

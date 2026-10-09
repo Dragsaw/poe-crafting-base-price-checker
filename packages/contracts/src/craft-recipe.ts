@@ -40,7 +40,7 @@ export const CraftRecipeSchema = z.strictObject({
 
 export type CraftRecipe = z.infer<typeof CraftRecipeSchema>;
 
-/** The currency-id prefixes that count as grades (IMPLEMENTATION-NOTES.md §9.1). */
+/** The currency-id prefixes that count as grades. */
 export const RECIPE_GRADES = ['greater', 'perfect'] as const;
 
 export type RecipeGrade = (typeof RECIPE_GRADES)[number];
@@ -54,7 +54,7 @@ function gradeOf(currencyId: string): RecipeGrade | undefined {
   return RECIPE_GRADES.find((grade) => currencyId.startsWith(`${grade}-`));
 }
 
-/** The recipe word of IN §9.1; `undefined` for a mixed recipe, which the schema rejects. */
+/** The recipe word; `undefined` for a mixed recipe, which the schema rejects. */
 export function recipeWord(recipe: Pick<CraftRecipe, 'currencies'>): RecipeWord | undefined {
   const grades = new Set(recipe.currencies.map((line) => gradeOf(line.currencyId)));
   if (grades.size > 1) {
