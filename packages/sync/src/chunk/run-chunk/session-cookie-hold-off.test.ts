@@ -21,7 +21,7 @@ const progressWith = (fields: Record<string, unknown>) => ({
   [PROGRESS_PATH]: { contents: JSON.stringify({ schemaVersion: '1.1.0', completed: [], ...fields }) },
 });
 
-describe('runChunk: the session-cookie hold-off (AD-30, IMPLEMENTATION-NOTES.md §13.1, §13.3, §13.4)', () => {
+describe('runChunk: the session-cookie hold-off (AD-30)', () => {
   const HOLD_OFF = '2026-09-27T06:00:00.000Z';
   const NOW_PLUS_24H = '2026-09-27T12:00:00.000Z';
 

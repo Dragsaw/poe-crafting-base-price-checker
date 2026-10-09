@@ -22,7 +22,7 @@ import {
 
 /** Every file envelope; a member of a versioned file does not repeat `schemaVersion`. */
 
-/** `data/tracked.json`, the curated workload (AD-12); file rules in IN §4.1, §2.1, §2.3, AD-17. */
+/** `data/tracked.json`, the curated workload (AD-12); file rules: AD-17. */
 export const TrackedFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -35,7 +35,7 @@ export const TrackedFileSchema = z
 /** The recipe grade prefixes, as the mixed-grade refusal prints them. */
 const GRADE_PREFIXES = RECIPE_GRADES.map((grade) => `${grade}-`).join(', ');
 
-/** `data/recipes.json`, absent-tolerable (AD-20, AD-24); unique `id`, one word each (§9.1). */
+/** `data/recipes.json`, absent-tolerable (AD-20, AD-24); unique `id`, one word each. */
 export const RecipesFileSchema = z
   .strictObject({
     schemaVersion: SchemaVersionSchema,
@@ -91,7 +91,7 @@ export const ConfigFileSchema = z.strictObject({
     .int()
     .min(1)
     .describe(
-      'A validation yardstick, and never a chunk bound. Read at exactly one place — AD-7’s load-time pinned cap (IMPLEMENTATION-NOTES.md §6).',
+      'A validation yardstick, and never a chunk bound. Read at exactly one place — AD-7’s load-time pinned cap.',
     ),
 });
 

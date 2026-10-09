@@ -1,6 +1,6 @@
 # Review: SPEC-tracked-hybrid-mods
 
-Content: `docs/specs/spec-tracked-hybrid-mods/SPEC.md` (docs, defines behavior).
+Content: `docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md` (docs, defines behavior).
 Lenses run: adversarial, edge-case-hunter, structure, prose (after structure). Verification-gap skipped (code only).
 Overlap between lenses is signal and is noted inline. Edge-case and adversarial both flag the summed-statId valueless rule being checked only in `tracked:check`, the missing hybrid `coOccur` rule, the empty/absent weights handling, and the null-`statId` tier split.
 

@@ -5,7 +5,7 @@ import { TRADE_SEARCH_ROOT, tradeSearchHref } from './trade-link';
 const LEAGUE = 'Forbidden Rites';
 
 describe('tradeSearchHref', () => {
-  it('builds the §5.4 URL, encoding the league segment alone', () => {
+  it('builds the trade URL, encoding the league segment alone', () => {
     expect(tradeSearchHref({ lastSearchId: 'Ab/C+d', lastSearchLeague: LEAGUE, status: 'active' }, LEAGUE)).toBe(
       'https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/Ab/C+d',
     );

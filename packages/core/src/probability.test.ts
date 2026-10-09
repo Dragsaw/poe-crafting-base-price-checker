@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { affixProbability, combinationProbability, isContaining, eligible, interval, poolOf } from './probability.ts';
 import { band, line, OTHER, pOf, pools, STAT, tier, unresolvedLine } from './probability/test-support.ts';
 
-describe('interval (§1)', () => {
+describe('interval', () => {
   it('derives [1, 1] for a valueless line, the pair for one #, and edge midpoints for two #', () => {
     expect(interval(line(STAT))).toEqual({ min: 1, max: 1 });
     expect(interval(line(STAT, [30, 33]))).toEqual({ min: 30, max: 33 });
@@ -13,7 +13,7 @@ describe('interval (§1)', () => {
   });
 });
 
-describe('contains (§1)', () => {
+describe('contains', () => {
   it('contains a tier whose derived interval sits exactly on the band edges', () => {
     expect(isContaining(band(47, 50), tier([line(STAT, [47, 50])], 100))).toBe(true);
   });
@@ -40,7 +40,7 @@ describe('contains (§1)', () => {
     expect(isContaining(reference, tier([line(STAT, [1, 2])], 1))).toBe(false);
   });
 
-  it('contains a valueless line for a banded ref whose band holds [1, 1] (§2.3)', () => {
+  it('contains a valueless line for a banded ref whose band holds [1, 1]', () => {
     expect(isContaining(band(1, 1), tier([line(STAT)], 1))).toBe(true);
     expect(isContaining(band(0, 10), tier([line(STAT)], 1))).toBe(true);
     expect(isContaining(band(2, 2), tier([line(STAT)], 1))).toBe(false);
@@ -101,7 +101,7 @@ describe('poolOf', () => {
   });
 });
 
-describe('eligible (§9)', () => {
+describe('eligible', () => {
   const low = tier([line(STAT, [1, 2])], 10, { itemLevelMin: 10 });
   const mid = tier([line(STAT, [3, 4])], 10, { itemLevelMin: 44 });
   const floor = tier([line(STAT, [5, 6])], 10, { itemLevelMin: 65 });

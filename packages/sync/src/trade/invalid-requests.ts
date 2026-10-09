@@ -2,7 +2,6 @@
 // that waiting cannot undo. The client compiles in no threshold; shells pass it to the factory.
 
 // Not a `data/config.json` field: only `sync` reads it and AD-19 keeps that file to three keys.
-// IMPLEMENTATION-NOTES.md §5.3.
 export const INVALID_REQUEST_THRESHOLD = 1;
 
 /** Counts keyed by policy, exactly as the ledger is keyed. */
@@ -24,7 +23,7 @@ export function isInvalidRequest(status: number): boolean {
 const SUCCESS_MIN = 200;
 const SUCCESS_MAX = 299;
 
-/** Every `2xx`: an answered request, the only kind a session probe follows or reads as live (§13.2). */
+/** Every `2xx`: an answered request, the only kind a session probe follows or reads as live. */
 export function isSuccess(status: number): boolean {
   return status >= SUCCESS_MIN && status <= SUCCESS_MAX;
 }

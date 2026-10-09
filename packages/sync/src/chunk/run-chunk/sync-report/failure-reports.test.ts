@@ -54,7 +54,7 @@ describe('runChunk: the Sync Report', () => {
       entryKey: key(D),
       price: { state: 'not-yet-synced', reason: 'never-synced' },
     });
-    // A malformed-request abort remembers the full staleLockAfter (§5.3).
+    // A malformed-request abort remembers the full staleLockAfter.
     expect(await progressOf(fs)).toEqual({
       schemaVersion: SYNC_PROGRESS_SCHEMA_VERSION,
       completed: [key(A), key(B)],

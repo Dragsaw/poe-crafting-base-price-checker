@@ -125,7 +125,7 @@ it('ignores blank and repeated names in the rules header', () => {
 });
 
 it('matches the measured 2026-09-12 shape without compiling any of it in', () => {
-  // IMPLEMENTATION-NOTES.md §5.3 records these buckets as the expected shape.
+  // These buckets are the expected shape.
   // The assertion lives in a test precisely so the numbers are never a
   // constant the client could pace from.
   const parsed = parseRateLimitHeaders({
@@ -139,7 +139,7 @@ it('matches the measured 2026-09-12 shape without compiling any of it in', () =>
   expect(parsed.rules[0]?.buckets.at(-1)).toEqual({ hits: 600, seconds: 21_600, penalty: 3600 });
 });
 
-describe('ruleNameCount (IMPLEMENTATION-NOTES.md §13.2)', () => {
+describe('ruleNameCount', () => {
   it.each([
     [{}, 0],
     [{ 'x-rate-limit-rules': '' }, 0],
@@ -152,7 +152,7 @@ describe('ruleNameCount (IMPLEMENTATION-NOTES.md §13.2)', () => {
   });
 });
 
-describe('rateLimitPolicyOf (IMPLEMENTATION-NOTES.md §13.2)', () => {
+describe('rateLimitPolicyOf', () => {
   it.each([
     [{}, undefined],
     [{ 'x-rate-limit-policy': '' }, undefined],

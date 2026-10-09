@@ -7,7 +7,7 @@ route: 'dispatch'
 baseline_commit: '0080268ced283a821ac4c1efcb2b4c9623db887e'
 review_loop_iteration: 0
 context:
-  - '{project-root}/docs/specs/spec-tracked-hybrid-mods/SPEC.md'
+  - '{project-root}/docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md'
   - '{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/IMPLEMENTATION-NOTES.md'
 ---
 

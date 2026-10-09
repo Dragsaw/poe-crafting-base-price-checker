@@ -46,7 +46,7 @@ that found nothing has no fetch file.
 
 The workload includes one summed-`statId` entry, an Amulets rarity T1 prefix and T1
 suffix. Its search carries the one summed filter, and its fetch leg is the capture that
-IMPLEMENTATION-NOTES §5.1d quotes.
+AD-16's summed-filter evidence rests on.
 
 `tracked.json` is the one hand-edited file here. It is the recorder's input,
 not a capture: a small fixed workload, one entry per distinct search shape,

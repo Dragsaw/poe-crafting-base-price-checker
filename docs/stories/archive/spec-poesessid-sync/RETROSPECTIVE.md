@@ -9,7 +9,7 @@ headless: false
 
 ## Epic summary
 
-- **Mode.** This is a stories-mode retrospective of `docs/specs/spec-poesessid-sync/`, which holds `SPEC.md`, `stories.yaml` and three stories.
+- **Mode.** This is a stories-mode retrospective of `docs/stories/archive/spec-poesessid-sync/`, which holds `SPEC.md`, `stories.yaml` and three stories.
 - **Stories.** All three stories have `status: done` in their frontmatter, so `pending_stories` is empty.
   1. `1-auth-holder-at-the-shell-edge` landed as **926c042**. It was committed as 5090eb0 before the rebase.
   2. `2-baseline-probe-and-settle-in-the-governed-client` landed as **296f807**, with follow-ups **0698562** (`ci: cap the test job at 15 minutes`) and **1186a98** (`test: write the canary fixture at the current tracked schema version`). All three arrived in PR #140, merge 7654dfe.
@@ -110,7 +110,7 @@ Checked by the reviewer and found clean:
 
 ## Previous-retro follow-through
 
-`docs/specs/spec-poesessid-sync/` has no earlier `RETROSPECTIVE.md`, so there is nothing to follow through on for this spec folder. In stories mode, `sprint-status.yaml` action items from other epics are out of scope and were not read.
+`docs/stories/archive/spec-poesessid-sync/` has no earlier `RETROSPECTIVE.md`, so there is nothing to follow through on for this spec folder. In stories mode, `sprint-status.yaml` action items from other epics are out of scope and were not read.
 
 ## Action items
 

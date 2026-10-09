@@ -13,8 +13,8 @@ import {
 } from './overlap';
 import { ALWAYS, band, parse, valueless } from './overlap/test-support';
 
-describe('slotOverlap, in §2.1 branch order', () => {
-  it('never overlaps two references that share no statId, whatever coOccur says (§2.1 consequence 3)', () => {
+describe('slotOverlap, in branch order', () => {
+  it('never overlaps two references that share no statId, whatever coOccur says', () => {
     expect(slotOverlapBranch(band('a', 1, 2), band('b', 1, 2), { slot: 'suffix', coOccur: ALWAYS })).toBeUndefined();
     expect(isSlotOverlapping(band('a', 1, 2), band('b', 1, 2), { slot: 'suffix', coOccur: CAN_NEVER_CO_OCCUR })).toBe(false);
   });
@@ -150,7 +150,7 @@ describe('TrackedFileSchema within-file overlap (FR-16, AD-17)', () => {
   });
 });
 
-describe('slotOverlap with a hybrid reference and no summed statId (§2.1)', () => {
+describe('slotOverlap with a hybrid reference and no summed statId', () => {
   const defaultB: HybridModifierReference['lines'][number] = { statId: 'b', valueMin: 1, valueMax: 2 };
   const hybrid = (
     aMin: number,

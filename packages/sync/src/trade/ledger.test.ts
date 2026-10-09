@@ -172,7 +172,7 @@ it('derives nothing for a policy it has never observed', () => {
   expect(derivedYieldDelayMs(EMPTY_LEDGER, undefined)).toBe(0);
 });
 
-// The spread pacer (AD-8, IMPLEMENTATION-NOTES.md §5.3), on the measured search buckets.
+// The spread pacer (AD-8), on the measured search buckets.
 const MEASURED_SEARCH = '5:10:60,30:300:1800,600:21600:3600';
 
 function searchLedger(state: string): ReturnType<typeof recordObservation> {

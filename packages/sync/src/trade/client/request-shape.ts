@@ -23,7 +23,7 @@ export function laneOf(request: TradeRequest): string {
   return request.lane !== undefined && request.lane.trim() !== '' ? request.lane : defaultLaneOf(request);
 }
 
-/** The standing headers of IN §5.1, applied last so a caller cannot drop them. */
+/** The standing headers, applied last so a caller cannot drop them. */
 export function headersFor(request: TradeRequest, userAgent: string): Record<string, string> {
   const headers: Record<string, string> = {};
   const given = Object.entries(request.headers ?? {});

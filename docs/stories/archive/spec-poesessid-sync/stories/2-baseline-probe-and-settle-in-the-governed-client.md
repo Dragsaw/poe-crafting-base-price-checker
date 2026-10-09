@@ -7,7 +7,7 @@ route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '5090eb0647a3aa9870cce76f235e68f8c9d50a7f'
 context:
-  - '{project-root}/docs/specs/spec-poesessid-sync/SPEC.md'
+  - '{project-root}/docs/stories/archive/spec-poesessid-sync/SPEC.md'
   - '{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/IMPLEMENTATION-NOTES.md'
 ---
 

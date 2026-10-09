@@ -11,7 +11,6 @@ created: 2026-09-13
 updated: 2026-10-04
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
-  - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - .memlog.md (rows 239-279 hold the visual redesign)

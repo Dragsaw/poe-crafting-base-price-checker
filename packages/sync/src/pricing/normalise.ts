@@ -1,4 +1,4 @@
-/** Divine normalisation at the sync boundary: pure, no rate request (AD-20, §4.2-§4.3). */
+/** Divine normalisation at the sync boundary: pure, no rate request (AD-20). */
 
 import type { CurrencyRate, LeagueId } from '@poe/contracts';
 
@@ -8,7 +8,7 @@ const DIVINE_CURRENCY_ID = 'divine';
 const DIVINE_DECIMALS = 4;
 const DIVINE_SCALE = 10 ** DIVINE_DECIMALS;
 
-/** Rounds to 4 decimal places, once per value; `core` never re-rounds (§4.2). */
+/** Rounds to 4 decimal places, once per value; `core` never re-rounds. */
 export function roundDivine(value: number): number {
   return Math.round((value + Number.EPSILON) * DIVINE_SCALE) / DIVINE_SCALE;
 }
@@ -29,12 +29,12 @@ export function currentRates(
   return current;
 }
 
-/** Uses the unrounded file rate, so the product is rounded exactly once (§4.2). */
+/** Uses the unrounded file rate, so the product is rounded exactly once. */
 export function toDivine(amount: number, rate: CurrencyRate): number {
   return roundDivine(amount * rate.rate);
 }
 
-// The lower middle value of an even sample (§4.3). Throws on an empty sample: no listings is
+// The lower middle value of an even sample. Throws on an empty sample: no listings is
 // `no-listings`, never a price.
 export function lowerMedian(values: readonly number[]): number {
   if (values.length === 0) {
@@ -48,7 +48,7 @@ export function lowerMedian(values: readonly number[]): number {
   return middle;
 }
 
-/** Divine at exactly 1, every other rate at 4dp; `league` and `asOf` pass through (§4.2, AD-20). */
+/** Divine at exactly 1, every other rate at 4dp; `league` and `asOf` pass through (AD-20). */
 export function outputRate(rate: CurrencyRate): CurrencyRate {
   return {
     currencyId: rate.currencyId,

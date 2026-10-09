@@ -11,8 +11,8 @@ import { describe, expect, it } from 'vitest';
 import { affixProbability, combinationProbability, eligible, poolOf } from '../probability.ts';
 import { band, isCloseRelative, line, OTHER, pOf, pools, STAT, tier } from './test-support.ts';
 
-describe('combinationProbability (§11)', () => {
-  it('gives empty-contained, never 0, when the floor leaves a declared affix no contained tier (§9)', () => {
+describe('combinationProbability', () => {
+  it('gives empty-contained, never 0, when the floor leaves a declared affix no contained tier', () => {
     const low = tier([line(STAT, [10, 12])], 100, { itemLevelMin: 20 });
     const high = tier([line(STAT, [20, 30])], 300, { itemLevelMin: 70 });
     const suffix = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 70 });

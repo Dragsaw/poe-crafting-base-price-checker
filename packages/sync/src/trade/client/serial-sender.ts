@@ -12,7 +12,7 @@ export function createSerialSender(
   let tail: Promise<unknown> = Promise.resolve();
 
   // Redacted in place, then rethrown: the class, the `name` and the identity
-  // survive, so `isTransportFailure` still classifies the throw (§13.6).
+  // survive, so `isTransportFailure` still classifies the throw.
   const redactedExchange = async (
     holderAuth: TradeGovernorAuth,
     http: HttpPort,

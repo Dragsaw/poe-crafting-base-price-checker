@@ -134,7 +134,7 @@ it('refuses sibling clients at construction when the contact User-Agent is blank
   ).toThrow(MissingUserAgentError);
 });
 
-// The governor and its shared pacing state (AD-8, IMPLEMENTATION-NOTES.md §5.3).
+// The governor and its shared pacing state (AD-8).
 const MEASURED_SEARCH_HEADERS = {
   'x-rate-limit-policy': SEARCH_POLICY,
   'x-rate-limit-rules': 'Ip',
@@ -233,7 +233,7 @@ it('keeps invalid-request counts per governor, so one 4xx does not close a polic
   expect(answered.kind).toBe('response');
 });
 
-describe('resetPacingState (§13.4)', () => {
+describe('resetPacingState', () => {
   it('empties the ledger and the lane memo of the same object', () => {
     const pacing = createPacingState();
     pacing.ledger = { [SEARCH_POLICY]: { policy: SEARCH_POLICY, observedAt: NOW, rules: [] } };

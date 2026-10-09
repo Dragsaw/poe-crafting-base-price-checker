@@ -39,7 +39,7 @@ export async function syncCommand(dependencies: SyncCommandDependencies): Promis
   }
   // After the contact refusal. Each settle prints one line, at the moment it
   // settles: an edge state here, before the first request; a probe outcome
-  // from the governor (IMPLEMENTATION-NOTES.md §13.1–§13.3, §13.5).
+  // from the governor.
   const auth = createSessionAuth(env, { onSettle: (line) => stderr(`pnpm sync:batch: ${line}`) });
   try {
     const outcome = await runSync({ ...ports, userAgent: contact.userAgent, auth });
@@ -47,13 +47,13 @@ export async function syncCommand(dependencies: SyncCommandDependencies): Promis
     stdout(`pnpm sync:batch: ${kind}, ${String(outcome.completed.length)} completed`);
     return 0;
   } catch (error) {
-    // The governor already redacted what it passed on; this covers the rest (§13.6).
+    // The governor already redacted what it passed on; this covers the rest.
     const redacted = auth.redact(error);
     stderr(`pnpm sync:batch: ${redacted instanceof Error ? redacted.message : String(redacted)}`);
     return 1;
   } finally {
     // The process ends after this one chunk: a holder still unsettled had no
-    // 2xx pricing search to probe on, or only a probe 429 (§13.5).
+    // 2xx pricing search to probe on, or only a probe 429.
     auth.settle('not-probed');
   }
 }

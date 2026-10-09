@@ -12,7 +12,7 @@ context: []
 
 ## Intent
 
-**Problem:** This is action item 5 of `docs/specs/spec-poesessid-sync/RETROSPECTIVE.md`. The retro marked V2, V4, V5, R5, A2, A3, A4 and A5 **defer**, but none has a `deferred-work.md` entry. So `pnpm deferred:issues` opens no issue for them and the sweep cannot pick them up. P1 shows this failure: a rejection that names a later story was lost.
+**Problem:** This is action item 5 of `docs/stories/archive/spec-poesessid-sync/RETROSPECTIVE.md`. The retro marked V2, V4, V5, R5, A2, A3, A4 and A5 **defer**, but none has a `deferred-work.md` entry. So `pnpm deferred:issues` opens no issue for them and the sweep cannot pick them up. P1 shows this failure: a rejection that names a later story was lost.
 
 **Approach:** Append one `## Deferred from:` group to `docs/stories/deferred-work.md` with six entries, as item 5 groups them: V2 with V5, V4, R5, A2, A3 with A4, and A5. `source_spec` is the retrospective. Each entry names its owner role, the code sites by symbol, and the retro finding ids. Do not edit other entries.
 

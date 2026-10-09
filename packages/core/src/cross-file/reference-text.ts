@@ -13,7 +13,7 @@ export function formatReference(slot: Slot, reference: ModifierReference): strin
   return reference.kind === 'hybrid' ? `${slot} hybrid (${reference.lines.map((line) => lineText(line)).join(', ')})` : `${slot} ${lineText(reference)}`;
 }
 
-/** One line of a reference, as a per-line payload names it (§2.3, §2.4). */
+/** One line of a reference, as a per-line payload names it. */
 export function formatLine(slot: Slot, reference: ModifierReference, rl: ReferenceLine): string {
   return reference.kind === 'hybrid' ? `${slot} hybrid line ${lineText(rl)}` : `${slot} ${lineText(rl)}`;
 }

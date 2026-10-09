@@ -48,7 +48,7 @@ function declaredYieldFloorMs(parsed: RateLimitHeaders): number {
   return Math.max(floor, MINIMUM_YIELD_MS);
 }
 
-/** The delay and the reason a `429` yields with (§5.3). */
+/** The delay and the reason a `429` yields with. */
 export function penaltyOf(
   ledger: RateLimitLedger,
   response: HttpResponse,

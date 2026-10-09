@@ -49,7 +49,7 @@ export type SessionWait =
   | { readonly kind: 'until'; readonly until: string; readonly reason: string; readonly orInputChange: boolean }
   /** Until an input file changes; with `until`, at most until then. */
   | { readonly kind: 'input-change'; readonly reason: string; readonly until?: string }
-  /** Until the lock file is absent or stale (§7). */
+  /** Until the lock file is absent or stale. */
   | { readonly kind: 'lock'; readonly reason: string };
 
 const NO_WAIT: SessionWait = { kind: 'none' };
@@ -73,7 +73,7 @@ function isBackoff(result: ChunkResult, context: ChunkContext): boolean {
   return result.kind === 'outcome' ? result.outcome.kind === 'yielded' && (!context.freshReading || isSessionExpired(result)) : !isRefusal(result.error);
 }
 
-/** AD-30's downgrade (§13.4) resets pacing in place, so only the outcome tells it apart. */
+/** AD-30's downgrade resets pacing in place, so only the outcome tells it apart. */
 export function isSessionExpired(result: ChunkResult): boolean {
   return result.kind === 'outcome' && result.outcome.kind === 'yielded' && result.outcome.sessionExpired === true;
 }
@@ -129,7 +129,7 @@ export function nextWait(result: ChunkResult, state: SessionState, context: Chun
 function waitAfterError(error: unknown, context: ChunkContext, backoffUntil: () => string): SessionWait {
   const { notBefore } = context;
   if (notBefore !== undefined) {
-    // A malformed request, or the gate's 4xx: the abort `notBefore` (§5.3).
+    // A malformed request, or the gate's 4xx: the abort `notBefore`.
     // An edit may fix a request `sync` built wrong, so that wait also ends on one.
     return {
       kind: 'until',
@@ -152,7 +152,7 @@ function waitAfterYield(
     return { kind: 'until', until: context.notBefore, reason: 'a 429', orInputChange: false };
   }
   if (outcome.sessionExpired === true) {
-    // The downgrade wrote no `notBefore` and reset the pacing: backoff(1) (§13.4).
+    // The downgrade wrote no `notBefore` and reset the pacing: backoff(1).
     return { kind: 'until', until: backoffUntil(), reason: 'the session cookie expired', orInputChange: false };
   }
   if (context.freshReading) {

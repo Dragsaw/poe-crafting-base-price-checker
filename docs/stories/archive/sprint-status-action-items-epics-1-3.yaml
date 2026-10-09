@@ -1,0 +1,261 @@
+# Action items committed by the epic 1-3 retrospectives, all done. Moved out of sprint-status.yaml.
+action_items:
+  - id: "epic-1-retro-item-1-rule-the-run-start-order-in-ad-7-offline"
+    epic: 1
+    action: "Reorder runChunk to AD-12's run-start sequence (ruled spine rev 21):
+      notBefore check, loads + pinned-cap inequality, cross-file gate, catalogue check,
+      order, then the league gate"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-2-on-a-gate-yield-report-the-eligible-coun"
+    epic: 1
+    action: "On a league-gate yield, publish the catalogue marks and report notReachedCount
+      as the eligible count (AD-7 definition; AD-12 rev 21 makes the gate yield an
+      ordinary chunk yield)"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-3-publish-completed-entries-and-catalogue"
+    epic: 1
+    action: "Publish completed entries and catalogue marks on every throw path, not
+      only MalformedRequestError; append the story 1.7 deferral to deferred-work.md"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-4-define-record-identity-per-record-kind-i"
+    epic: 1
+    action: "Implement record identity per IN section 12 (spine rev 21): one identity
+      function in contracts, carryRecords replaces observation fields in place; add
+      a two-chunk record-growth test"
+    owner: "dev (contracts first)"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-5-add-a-canonical-key-uniqueness-refinemen"
+    epic: 1
+    action: "Add a canonical-key uniqueness refinement to TrackedFileSchema"
+    owner: "dev (contracts)"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-6-extract-one-composechunk-ports-used-by-s"
+    epic: 1
+    action: "Extract one composeChunk(ports) used by sync.ts and dry-run.ts; pass
+      the under-lock dataset to the pricing step"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-7-call-checkpinnedcap-from-the-shared-comp"
+    epic: 1
+    action: "Call checkPinnedCap from the shared composition and record its refusal"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-8-decide-where-invalidrequestthreshold-liv"
+    epic: 1
+    action: "Implement AD-8 penalty memory (spine rev 21, IN 5.3): optional notBefore
+      in sync-progress.json (additive minor), written after a 429 or a malformed abort,
+      checked right after the lock; carry retryAfterMs through sendLeg and the step/gate
+      results; pass invalidRequestThreshold = 1 from every shell"
+    owner: "dev (contracts first)"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-9-drop-the-catalogue-refresh-figure-from-s"
+    epic: 1
+    action: "Drop catalogue-refresh from the per-chunk requestsBySource figure (AD-12
+      rev 21); the reader must accept and drop the legacy key in the committed data/sync-report.json
+      (a major bump alone refuses it); the refresh command prints its request count"
+    owner: "dev (contracts first)"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-10-loopback-server-test-for-createfetchhttp"
+    epic: 1
+    action: "Loopback-server test for createFetchHttpPort: the TimeoutError name and
+      the 'fetch failed' literal"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-1-retro-item-10-loopback-server-test-for-createfetchhttp.md"
+  - id: "epic-1-retro-item-11-one-test-parsing-all-four-data-catalogue"
+    epic: 1
+    action: "One test parsing all four data/catalogue/*.json against the Catalogue*FileSchema;
+      retire the two 1.4 ledger entries it closes"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-12-edit-implementation-notes-section-10-2-t"
+    epic: 1
+    action: "Edit IMPLEMENTATION-NOTES section 10.2 to cite AD-25; update docs/epics.md
+      story 1.11 so a 429 on the leagues GET is a yield, not an abort"
+    owner: "docs owners"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-13-replace-comparecodeunits-in-weights-ids"
+    epic: 1
+    action: "Replace compareCodeUnits in weights-ids.ts with the contracts comparator"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: "epic-1-retro-item-14-decide-the-dry-run-instant-derive-it-fro"
+    epic: 1
+    action: "Default sync:dry's clock to the snapshot's latest lastAttemptedAt, add
+      --at <iso>, ignore and print notBefore (AGENT-WORKFLOW, spine rev 21)"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-1-retro-item-14-dry-run-instant.md"
+  - id: "epic-1-retro-item-15-process-the-build-skill-appends-every-sp"
+    epic: 1
+    action: "Process: the build skill appends every spec deferred entry to deferred-work.md
+      in the same commit; write the story-id commit subject convention into AGENT-WORKFLOW.md"
+    owner: "workflow docs"
+    status: done
+    ref: "docs/stories/archive/spec-epic-1-retro-item-15-deferred-ledger-and-commit-convention.md"
+  - id: "epic-1-retro-item-16-commit-the-first-live-run-s-data-dataset"
+    epic: 1
+    action: "Commit the first live run's data/dataset.json, data/sync-progress.json
+      and data/sync-report.json"
+    owner: "player"
+    status: done
+    ref: "docs/stories/epic-1-retro-2026-09-26.md"
+  - id: epic-1-retro-item-17-an-answered-search-keeps-its-lastsearchid
+    epic: 1
+    action: Keep an answered search's lastSearchId and lastSearchLeague when the
+      fetch leg yields or returns a 4xx (AD-9 rev 21, finding L-E2); fix the 
+      price-entry.ts header table and the spec 1.7 matrix row
+    owner: dev
+    status: done
+    ref: docs/stories/epic-1-retro-2026-09-26.md
+  - id: "epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows-mo"
+    epic: 2
+    action: "Render unresolvable Raw Bases as rows (MONEY_PHRASES.unresolvable), or
+      feed ranking.unresolvable.length into the health line when sync-report.json
+      is absent; add a test consuming the story 2.3 -> 2.6 hand-off (retro F1, FR-9)"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-2-retro-item-18-render-unresolvable-raw-bases-as-rows.md"
+  - id: "epic-2-retro-item-19-make-the-committed-day-one-state-explain"
+    epic: 2
+    action: "Make the committed day-one state explain itself: fix the masthead dek
+      (Masthead.tsx:9), say why tracked crafted entries are off the page, and reconcile
+      epics.md:367-368 and the story 2.8 AC :1659-1661 with the story 2.7 recipes.json
+      decision (retro F2)"
+    owner: "UX (copy), PM (epics), dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-2-retro-item-19-make-the-committed-day-one-state-explain.md"
+  - id: "epic-2-retro-item-20-order-the-honest-empty-rows-canonically"
+    epic: 2
+    action: "Order the honest-empty rows canonically across the no-listings and not-yet-synced
+      groups, or reword 'In canonical order'; add a mixed-group test (retro F3)"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-2-retro-item-20-order-the-honest-empty-rows-canonically.md"
+  - id: "epic-2-retro-item-21-configure-a-git-remote-set-pages-source"
+    epic: 2
+    action: "Configure a git remote, set Pages source to GitHub Actions, run deploy.yml
+      once and record the URL (retro F4)"
+    owner: "player"
+    status: done
+    url: "https://dragsaw.github.io/poe-crafting-base-price-checker/"
+    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+  - id: "epic-2-retro-item-22-carry-a-refusal-cause-version-content-mi"
+    epic: 2
+    action: "Carry a refusal cause (version | content | missing) to the failure screen
+      and print per-cause copy instead of 'declares X; expects X' (retro F10)"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-2-retro-item-22-refusal-cause.md"
+  - id: "epic-2-retro-item-23-small-fixes-floor-clamp-coverage-trust-f"
+    epic: 2
+    action: "Small fixes: floor/clamp coverage % (trust-facts.ts:190), reset RankedList
+      grown when remaining <= 0, unitLabel in the Unrankable appendix with an underscore
+      fixture, assert the frame is a flex column (retro F11, F12, F14, F17)"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/archive/spec-epic-2-retro-item-23-small-fixes.md"
+  - id: "epic-2-retro-item-24-ux-rulings-pinned-starvation-count-on-th"
+    epic: 2
+    action: "UX rulings: pinned-starvation count on the health line, one age clock
+      for a league-mismatched price (ageMark vs panel), and the raw row note under
+      the honest-empty state (retro F5, F13, F15)"
+    owner: "UX"
+    status: done
+    ref: "docs/stories/epic-2-retro-2026-09-27.md"
+  - id: "epic-3-retro-item-25-restore-a-green-master-resolve-the-0197d"
+    epic: 3
+    action: "Restore a green master: resolve the 0197df7 Emerald stat_210067635 edit
+      against weights.json and update the three stale App.test.tsx committed-data
+      tests"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-26-replace-the-four-dummy-orb-rates-in-data"
+    epic: 3
+    action: "Replace the four dummy orb rates in data/currencies.json with measured
+      values, or gate on a non-measured source"
+    owner: "player"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-27-rewrite-the-masthead-dek-in-experience-m"
+    epic: 3
+    action: "Rewrite the masthead dek in EXPERIENCE.md, Masthead.tsx and App.test.tsx
+      in one change"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-28-use-one-isemptypool-definition-in-unrank"
+    epic: 3
+    action: "Use one isEmptyPool definition in unrankableReasonOf and carry coverage
+      through the run-chunk failure path"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-29-give-a-rankable-crafted-class-with-no-re"
+    epic: 3
+    action: "Give a rankable crafted class with no recipe a row or reason, and stop
+      formatDivine printing -0.00"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-30-decouple-data-dependent-tests-from-live"
+    epic: 3
+    action: "Decouple data-dependent tests from live data/ with a frozen fixture,
+      let tracked:check own the short-form and fit invariants, and run committed-data
+      tests in CI before deploy"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-31-answer-the-open-owner-rulings-from-epic"
+    epic: 3
+    action: "Answer the open owner rulings from epic 3 (recipe-word predicate, AD-10
+      Age inputs, recipe floor vs cross-file floor, short-form table module, reason
+      wording, diagnosis format)"
+    owner: "architect/PM/UX"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-32-consolidate-the-four-crafted-class-group"
+    epic: 3
+    action: "Consolidate the four crafted-class grouping copies, the double uncostable
+      derivation and the unread UnrankableClass.provenance"
+    owner: "dev"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-33-a-must-discharge-line-in-an-epic-context"
+    epic: 3
+    action: "A must-discharge line in an epic context needs an AC in a story or a
+      named owner and story"
+    owner: "process"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-34-decide-how-jewels-are-crafted-and-ranked"
+    epic: 3
+    action: "Decide how jewels are crafted and ranked, since the recipe floor is item-level
+      based; keep Emerald out of the tracked list until then"
+    owner: "player/architect"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"
+  - id: "epic-3-retro-item-35-make-the-weights-producer-emit-the-local"
+    epic: 3
+    action: "Make the weights producer emit the Local attack-speed id explicit.stat_210067635
+      for weapon classes, regenerate data/weights.json, re-run pnpm sync and pnpm
+      tracked:check"
+    owner: "player (weights producer)"
+    status: done
+    ref: "docs/stories/epic-3-retro-2026-10-03.md"

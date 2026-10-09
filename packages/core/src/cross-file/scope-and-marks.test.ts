@@ -27,7 +27,7 @@ import {
   weightsOf,
 } from './test-support.ts';
 
-describe('unvalidated marks (§2.8)', () => {
+describe('unvalidated marks', () => {
   const a = entry({ prefix: band(43, 56.5) });
   const b = entry({ prefix: band(56, 80) });
 
@@ -62,7 +62,7 @@ describe('unvalidated marks (§2.8)', () => {
   });
 });
 
-describe('class discriminability (§2.6)', () => {
+describe('class discriminability', () => {
   const plain = pools([T7()]);
 
   it('fails a plain class in a mixed category, naming class, category, sibling count and the reason', () => {

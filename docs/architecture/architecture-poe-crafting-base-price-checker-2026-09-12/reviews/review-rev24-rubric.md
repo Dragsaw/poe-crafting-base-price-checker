@@ -9,7 +9,7 @@ verdict: not closed — 4 high, 8 medium, 5 low
 
 Inputs read: `git diff -- docs/architecture`; spine AD-7, AD-8, AD-9, AD-12, AD-13, AD-30,
 Consistency Conventions, Deployment, Deferred; IMPLEMENTATION-NOTES §5.3, §6, §13;
-`docs/specs/spec-poesessid-sync/SPEC.md`; `.memlog.md` rev-24 decisions (lines 340-351); code
+`docs/stories/archive/spec-poesessid-sync/SPEC.md`; `.memlog.md` rev-24 decisions (lines 340-351); code
 `packages/sync/src/trade/client.ts`, `trade/user-agent.ts`, `sync.ts`, `sync-batch.ts`,
 `compose-chunk.ts`, `pricing/price-entry.ts`, `packages/contracts/src/sync-run-report.ts`,
 root `package.json`.

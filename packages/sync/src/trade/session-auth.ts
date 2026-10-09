@@ -1,5 +1,5 @@
-// The process auth holder, sole owner of the cookie value (AD-30, IMPLEMENTATION-NOTES.md §13).
-// The value never leaves it (§13.6): `redact` scrubs errors in place, so classifiers still work.
+// The process auth holder, sole owner of the cookie value (AD-30).
+// The value never leaves it: `redact` scrubs errors in place, so classifiers still work.
 // The holder outlives a chunk's governor, so it keeps the state, baseline and pending hold-off.
 
 import { Buffer } from 'node:buffer';
@@ -7,7 +7,7 @@ import { inspect } from 'node:util';
 
 export const SESSION_COOKIE_ENV_VAR = 'POESESSID';
 
-/** The §13.5 reasons, verbatim: the console prints them as identifiers. */
+/** The reasons, verbatim: the console prints them as identifiers. */
 export type SessionAuthReason =
   | 'absent'
   | 'malformed'
@@ -18,10 +18,10 @@ export type SessionAuthReason =
   | 'not-probed'
   | 'expired';
 
-/** What the next progress write does with `authHoldOffUntil` (§13.3); none carries it forward. */
+/** What the next progress write does with `authHoldOffUntil`; none carries it forward. */
 export type HoldOffAction = 'write' | 'clear';
 
-/** The §13.3 action each settle records; a reason absent here records none. */
+/** The action each settle records; a reason absent here records none. */
 const HOLD_OFF_ACTIONS: Partial<Record<SessionAuthReason | 'authenticated', HoldOffAction>> = {
   authenticated: 'clear',
   'not-elevated': 'write',
@@ -48,7 +48,7 @@ const REDACTED = '[redacted]';
 const COOKIE_HEADER = 'cookie';
 
 export interface SessionAuthOptions {
-  /** Receives each §13.5 console line once, at the moment the holder settles. */
+  /** Receives each console line once, at the moment the holder settles. */
   readonly onSettle?: (line: string) => void;
 }
 
@@ -104,11 +104,11 @@ export class SessionAuth {
   /** Changed by `settle` only from `unsettled`, and by `expire` only from `authenticated`. */
   #state: SessionAuthState;
   readonly #onSettle: ((line: string) => void) | undefined;
-  /** The baseline's rule-name count, kept from the probe for the whole process (§13.2). */
+  /** The baseline's rule-name count, kept from the probe for the whole process. */
   #baselineRuleCount: number | undefined;
-  /** The baseline's `policy(X-Rate-Limit-Policy)`, kept with the count (§13.2). */
+  /** The baseline's `policy(X-Rate-Limit-Policy)`, kept with the count. */
   #baselinePolicy: string | undefined;
-  /** The hold-off action no progress write has applied yet (§13.3). */
+  /** The hold-off action no progress write has applied yet. */
   #pendingHoldOff: HoldOffAction | undefined;
 
   /** Built by `createSessionAuth`; a valid value is the only one kept. */
@@ -135,7 +135,7 @@ export class SessionAuth {
     return this.#state;
   }
 
-  /** The holder is unsettled and keeps a value: the governor may probe (§13.2). */
+  /** The holder is unsettled and keeps a value: the governor may probe. */
   get canProbe(): boolean {
     return this.#state.kind === 'unsettled' && this.#value !== undefined;
   }
@@ -150,23 +150,23 @@ export class SessionAuth {
     return this.#value === undefined ? { ...headers } : { ...headers, [COOKIE_HEADER]: `${SESSION_COOKIE_ENV_VAR}=${this.#value}` };
   }
 
-  /** The baseline's rule-name count (§13.2); `undefined` until the governor probed. */
+  /** The baseline's rule-name count; `undefined` until the governor probed. */
   get baselineRuleCount(): number | undefined {
     return this.#baselineRuleCount;
   }
 
-  /** Only a later cookie answer under this policy is held to the rule-count test (§13.2, §13.4). */
+  /** Only a later cookie answer under this policy is held to the rule-count test. */
   get baselinePolicy(): string | undefined {
     return this.#baselinePolicy;
   }
 
-  /** Called once, at the probe, before settling. Counts only: no rule name is kept (§13.2). */
+  /** Called once, at the probe, before settling. Counts only: no rule name is kept. */
   rememberBaseline(ruleCount: number, policy: string | undefined): void {
     this.#baselineRuleCount = ruleCount;
     this.#baselinePolicy = policy;
   }
 
-  /** Settles by a §13.3 row. A no-op unless `unsettled`, so no §13.5 line prints twice. */
+  /** Settles by a reason row. A no-op unless `unsettled`, so no line prints twice. */
   settle(outcome: SessionAuthReason | 'authenticated'): void {
     if (this.#state.kind !== 'unsettled') {
       return;
@@ -177,7 +177,7 @@ export class SessionAuth {
     );
   }
 
-  /** The downgrade (§13.4); a no-op unless `authenticated`. Returns whether it moved. */
+  /** The downgrade; a no-op unless `authenticated`. Returns whether it moved. */
   expire(): boolean {
     if (this.#state.kind !== 'authenticated') {
       return false;
@@ -186,7 +186,7 @@ export class SessionAuth {
     return true;
   }
 
-  /** The run-start hold-off check (§13.1). Records no action: the field carries forward. */
+  /** The run-start hold-off check. Records no action: the field carries forward. */
   settleHeldOffIfDue(holdOffUntil: string | undefined, now: string): void {
     if (holdOffUntil === undefined || !this.canProbe) {
       return;
@@ -281,7 +281,7 @@ function describeState(state: SessionAuthState): string {
   return state.kind === 'unauthenticated' ? `unauthenticated (${state.reason})` : state.kind;
 }
 
-/** Settles the shell-edge states `absent` and `malformed` (§13.1); a valid value is unsettled. */
+/** Settles the shell-edge states `absent` and `malformed`; a valid value is unsettled. */
 export function createSessionAuth(
   environment: Readonly<Record<string, string | undefined>>,
   options: SessionAuthOptions = {},

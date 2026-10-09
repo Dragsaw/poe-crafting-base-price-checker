@@ -32,7 +32,7 @@ async function publishOnFailure(state: RunState, setup: ChunkSetup, error: unkno
   // The gate's non-429 4xx is a rejected request too, and would be refused again on the next tick.
   const isRejected = error instanceof MalformedRequestError || error instanceof LeagueRequestRejectedError;
   const failing = failingEntry(error);
-  // A probe 429 latched before the throw still persists its penalty (§13.3).
+  // A probe 429 latched before the throw still persists its penalty.
   const latchedMs = isRejected ? undefined : state.ports.latchedRetryAfterMs?.();
   await attempt(state, 'publishing the dataset and progress', () =>
     publish(

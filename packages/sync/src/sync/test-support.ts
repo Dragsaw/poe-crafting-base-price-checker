@@ -122,7 +122,7 @@ export function sessionFor(setup: SessionSetup = {}) {
       }
     },
     stderr: (line) => {
-      // A §13.5 auth line is not a chunk line: kept apart, with the requests sent before it.
+      // An auth line is not a chunk line: kept apart, with the requests sent before it.
       if (AUTH_LINE.test(line)) {
         auth.push({ line, requestsBefore: fake.requests.length });
         return;

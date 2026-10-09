@@ -28,7 +28,7 @@ export type DataFileResult<T> =
   | { readonly ok: true; readonly value: T }
   | { readonly ok: false; readonly error: DataFileError };
 
-/** Explains a refusal the generic text cannot; `undefined` keeps it (IMPLEMENTATION-NOTES §4.1). */
+/** Explains a refusal the generic text cannot; `undefined` keeps it. */
 export type VersionRefusalExplainer = (found: string) => string | undefined;
 
 /** The detail of a version refusal: the explainer's text, or the generic sentence naming both versions. */
@@ -42,7 +42,7 @@ export function describeVersionRefusal(
   );
 }
 
-/** Parses `tracked.json` against `TRACKED_SCHEMA_VERSION`; an earlier major gets §4.1's message. */
+/** Parses `tracked.json` against `TRACKED_SCHEMA_VERSION`; an earlier major gets the re-author message. */
 export function parseTrackedFile(data: unknown): EnvelopeResult<TrackedFile> {
   return parseEnvelope(TrackedFileSchema, data, TRACKED_SCHEMA_VERSION);
 }

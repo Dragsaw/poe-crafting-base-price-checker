@@ -5,7 +5,7 @@ import { TrackedListAgeSchema } from './tracked-list-age.ts';
 
 /** A figure is overwritten by the next chunk; a record survives it (Consistency Conventions). */
 
-/** Exactly four sources generate a request (AD-12); `session-probe`: AD-30, IN §13.2. */
+/** Exactly four sources generate a request (AD-12); `session-probe`: AD-30. */
 export const RequestSourceSchema = z.enum([
   'tracked-list',
   'league-validation',
@@ -47,7 +47,7 @@ export const RequestsBySourceSchema = z
   .describe('Requests the chunk consumed per chunk source, so budget drift is attributable (AD-12, FR-14).');
 
 
-/** 1.2.0 adds `session-probe` (IN §13.7); an older build refuses a newer report. */
+/** 1.2.0 adds `session-probe`; an older build refuses a newer report. */
 export const SYNC_REPORT_SCHEMA_VERSION = '1.2.0';
 
 export const SyncRunFiguresSchema = z
@@ -65,7 +65,7 @@ export const SyncRunFiguresSchema = z
       .max(1)
       .optional()
       .describe(
-        'The share of rankable tracked item classes that are covered — a fraction in [0, 1], never a percentage. Omitted together with its denominator where weights.json is absent, and `web` must not read the omission as 0 (AD-27, IMPLEMENTATION-NOTES.md §3).',
+        'The share of rankable tracked item classes that are covered — a fraction in [0, 1], never a percentage. Omitted together with its denominator where weights.json is absent, and `web` must not read the omission as 0 (AD-27).',
       ),
     rankableClassCount: z
       .int()
@@ -88,7 +88,7 @@ export const StaleLockBrokenRecordSchema = z.strictObject({
   startedAt: IsoTimestampSchema.describe('The broken lock’s start time.'),
 });
 
-/** Exactly five fields (IN §6): the declared yardstick beside the observed one. */
+/** Exactly five fields: the declared yardstick beside the observed one. */
 export const PinnedStarvationRecordSchema = z.strictObject({
   kind: z.literal('pinned-starvation'),
   discoveredAllowance: z
@@ -106,7 +106,7 @@ export const PinnedStarvationRecordSchema = z.strictObject({
 
 export const UnresolvableRecordSchema = z.strictObject({
   kind: z.literal('unresolvable'),
-  entryKey: z.string().min(1).describe('The tracked entry’s canonical key (§4.1).'),
+  entryKey: z.string().min(1).describe('The tracked entry’s canonical key.'),
   identifier: z.string().min(1).describe('The identifier the catalogue no longer exposes.'),
   identifierKind: z.enum(['statId', 'baseTypeId', 'categoryId']),
 });
@@ -147,7 +147,7 @@ export const CrossFileGateFailureRecordSchema = z.strictObject({
     .string()
     .min(1)
     .describe('The failing entry’s canonical key. Every payload names the entry by it (AD-17).'),
-  detail: z.string().min(1).describe('The failing check’s payload, as its § defines it.'),
+  detail: z.string().min(1).describe('The failing check’s payload, as that check defines it.'),
 });
 
 /** A record, not a figure: a failed unattended run otherwise leaves an exit code (FR-25, FR-19). */
@@ -164,7 +164,7 @@ export const RunFailureRecordSchema = z.strictObject({
     .string()
     .min(1)
     .optional()
-    .describe('The canonical key of the entry the chunk was on, where the failure names one (§4.1).'),
+    .describe('The canonical key of the entry the chunk was on, where the failure names one.'),
   status: z.int().optional().describe('The HTTP status the trade API answered, where there was one.'),
   message: z.string().min(1).describe('The error message, as thrown.'),
 });
@@ -203,7 +203,7 @@ export type SyncRunRecordKind = SyncRunRecord['kind'];
 
 type RecordOfKind<Kind extends SyncRunRecordKind> = Extract<SyncRunRecord, { kind: Kind }>;
 
-/** Subject fields name what is wrong and make up record identity (IMPLEMENTATION-NOTES.md §12). */
+/** Subject fields name what is wrong and make up record identity. */
 export const RECORD_SUBJECTS: {
   readonly [Kind in SyncRunRecordKind]: readonly Exclude<keyof RecordOfKind<Kind>, 'kind'>[];
 } = {
@@ -217,7 +217,7 @@ export const RECORD_SUBJECTS: {
   'league-mismatch': ['configuredLeague'],
 };
 
-/** `same(a, b) ⇔ a.kind = b.kind ∧ subject(a) = subject(b)` (§12); an absent subject is a value. */
+/** `same(a, b) ⇔ a.kind = b.kind ∧ subject(a) = subject(b)`; an absent subject is a value. */
 export function isSameRecord(a: SyncRunRecord, b: SyncRunRecord): boolean {
   if (a.kind !== b.kind) {
     return false;

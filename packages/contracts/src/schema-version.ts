@@ -50,10 +50,10 @@ export function checkSchemaVersion(found: string, expected: string): SchemaVersi
   return foundMajor === expectedMajor ? { ok: true, expected, found } : { ok: false, reason: 'unknown-major', expected, found };
 }
 
-/** Versioned apart from `SUPPORTED_SCHEMA_VERSION` (IMPLEMENTATION-NOTES §4.1, §12.1). */
+/** Versioned apart from `SUPPORTED_SCHEMA_VERSION`. */
 export const TRACKED_SCHEMA_VERSION = '2.0.0';
 
-/** The curator must re-author a 1.x file, not retry (IMPLEMENTATION-NOTES §4.1). */
+/** The curator must re-author a 1.x file, not retry. */
 export function trackedEarlierMajorMessage(found: string): string | undefined {
   // The explanation names the 1 → 2 change, so it fits a 1.x file only.
   return majorOf(found) === 1 ? (

@@ -22,7 +22,7 @@ const lineBand = (valueMin: number, valueMax: number, statId = STAT): HybridLine
 /** A hybrid reference, built in the test with its lines in the order given. */
 const hybrid = (...lines: HybridLine[]): ModifierReference => ({ kind: 'hybrid', lines });
 
-describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
+describe('a hybrid reference', () => {
   it('gives the hybrid tiers weight sum only when a pure family shares a statId', () => {
     const h1 = tier([line(STAT, [10, 12]), line(OTHER, [4, 6])], 100);
     const h2 = tier([line(OTHER, [7, 9]), line(STAT, [13, 15])], 50);
@@ -32,7 +32,7 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
     const classPools = pools([h1, h2, pure1, pure2, rest], []);
     const reference = hybrid(lineBand(10, 15), lineBand(4, 9, OTHER));
     expect(pOf(affixProbability(classPools, 'prefix', reference, { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(150 / 1000, 10);
-    // The single-line band on the shared statId still admits both families (§1's existential test).
+    // The single-line band on the shared statId still admits both families.
     expect(pOf(affixProbability(classPools, 'prefix', band(10, 15), { itemLevelMin: 82, modifierLevelMin: 0 }))).toBeCloseTo(650 / 1000, 10);
   });
 
@@ -126,7 +126,7 @@ describe('a hybrid reference (§1 Containment, §11, CAP-3)', () => {
   });
 });
 
-describe('contains with summed statIds (§2.2 contains_S)', () => {
+describe('contains with summed statIds', () => {
   const summed = new Set([OTHER]);
 
   it('drops the band test of a hybrid line on a summed statId and keeps the line-set test', () => {
@@ -154,7 +154,7 @@ describe('contains with summed statIds (§2.2 contains_S)', () => {
   });
 });
 
-describe('needs (§8), over the unscoped pool', () => {
+describe('needs, over the unscoped pool', () => {
   const low = tier([line(STAT, [10, 20]), line(OTHER)], 100, { itemLevelMin: 30 });
   const high = tier([line(STAT, [21, 30]), line(OTHER)], 100, { itemLevelMin: 80 });
   const pool: WeightsPool = { poolCoverage: 'complete', entries: [low, high] };

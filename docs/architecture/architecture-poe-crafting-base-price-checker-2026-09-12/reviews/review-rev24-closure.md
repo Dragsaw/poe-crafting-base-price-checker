@@ -1,6 +1,6 @@
 ---
 review: closure + adversarial
-target: ARCHITECTURE-SPINE.md AD-30 (and its amendments to AD-7, AD-8, AD-9, AD-12) and IMPLEMENTATION-NOTES.md §13, checked against docs/specs/spec-poesessid-sync/SPEC.md
+target: ARCHITECTURE-SPINE.md AD-30 (and its amendments to AD-7, AD-8, AD-9, AD-12) and IMPLEMENTATION-NOTES.md §13, checked against docs/stories/archive/spec-poesessid-sync/SPEC.md
 date: 2026-10-03
 closes: review-rev24-rubric.md, review-rev24-adversarial.md, review-rev24-verification.md
 verdict: not closed (updated 2026-10-03, see the last section). Of 42 earlier findings, 20 are closed, 16 are partly closed and 6 are open. The fixes add 15 new divergence points (5 medium-high, 6 medium, 4 low).

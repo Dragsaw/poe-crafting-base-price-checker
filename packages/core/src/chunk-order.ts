@@ -124,7 +124,7 @@ export function chunkOrder(input: ChunkOrderInput): ChunkOrder {
   };
 }
 
-/** The runtime `pinned` truncation (AD-7, IN §6): it reserves one search for waiting rotation work. */
+/** The runtime `pinned` truncation (AD-7): it reserves one search for waiting rotation work. */
 export function pinnedToKeep(left: number, remaining: number): number {
   return remaining >= left + 1 ? left : Math.min(left, Math.max(remaining - 1, 0));
 }

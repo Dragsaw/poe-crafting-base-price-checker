@@ -7,12 +7,10 @@ import { isTransportFailure } from './transport-failure.ts';
 import { NamedError } from '../test-support/named-error.ts';
 import { SelfCausedError } from '../test-support/self-caused-error.ts';
 
-/** IMPLEMENTATION-NOTES.md §13.1, §13.5, §13.6. */
-
 const CANARY = 'Q7vXk2pLm9RtYw4Nz8HbJc3FgD6sAe1U';
 const withCookie = (value: string | undefined) => createSessionAuth({ [SESSION_COOKIE_ENV_VAR]: value });
 
-/** A holder built with an `onSettle` listener, and the §13.5 lines it received. */
+/** A holder built with an `onSettle` listener, and the auth lines it received. */
 const withLines = (value: string | undefined) => {
   const lines: string[] = [];
   const holder = createSessionAuth({ [SESSION_COOKIE_ENV_VAR]: value }, { onSettle: (line) => { lines.push(line); } });
@@ -140,7 +138,7 @@ describe('redact', () => {
   });
 });
 
-describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () => {
+describe('the probe API', () => {
   it('an unsettled valid value can probe and is not authenticated', () => {
     const { holder, lines } = withLines(CANARY);
     expect(holder.canProbe).toBe(true);
@@ -197,7 +195,7 @@ describe('the probe API (IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () =>
   });
 });
 
-describe('the downgrade and the hold-off (IMPLEMENTATION-NOTES.md §13.1, §13.3, §13.4)', () => {
+describe('the downgrade and the hold-off', () => {
   const NOW = '2026-10-03T12:00:00.000Z';
   const LATER = '2026-10-04T12:00:00.000Z';
 

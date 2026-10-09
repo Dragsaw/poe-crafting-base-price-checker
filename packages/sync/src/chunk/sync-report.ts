@@ -1,5 +1,5 @@
 // Sync Report (FR-25, AD-12): figures replace the previous ones; records carry forward and are
-// replaced by identity at their index (IMPLEMENTATION-NOTES.md §12). Pure.
+// replaced by identity at their index. Pure.
 // The figure keys on chunk sources only, `session-probe` included and always written (AD-12).
 
 import { ChunkRequestSourceSchema, isSameRecord, SYNC_REPORT_SCHEMA_VERSION } from '@poe/contracts';

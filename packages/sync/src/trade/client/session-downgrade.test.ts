@@ -28,7 +28,7 @@ const CLEAR_SEARCH_HEADERS = {
   'x-rate-limit-ip-state': '1:10:0',
 };
 
-describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', () => {
+describe('the session probe (AD-30)', () => {
   /** One rule more than `CLEAR_SEARCH_HEADERS`, nothing saturated. */
   const LIVE_SEARCH_HEADERS = {
     ...CLEAR_SEARCH_HEADERS,
@@ -50,7 +50,7 @@ describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', ()
       options,
     );
 
-  describe('the downgrade (§13.4)', () => {
+  describe('the downgrade', () => {
     const NOT_LIVE_HEADERS = CLEAR_SEARCH_HEADERS;
 
     it.each([

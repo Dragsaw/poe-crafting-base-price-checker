@@ -7,7 +7,7 @@ route: 'dispatch'
 baseline_commit: '0abe73ef1bff3415e8dc6738973a6a3e10757d4f'
 review_loop_iteration: 0
 context:
-  - '{project-root}/docs/specs/spec-tracked-hybrid-mods/SPEC.md'
+  - '{project-root}/docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">

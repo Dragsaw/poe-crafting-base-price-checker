@@ -15,7 +15,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
     expect(await syncCommand(deps)).toBe(0);
 
     expect(http.requests.map((request) => request.url)).toEqual([TRADE_LEAGUES_URL]);
-    // A gate yield publishes like a yielded chunk; progress holds the penalty as notBefore (§5.3).
+    // A gate yield publishes like a yielded chunk; progress holds the penalty as notBefore.
     expect(writes).toEqual([DATASET_PATH, PROGRESS_PATH, REPORT_PATH]);
     expect(JSON.parse((await fs.readTextFile(PROGRESS_PATH)) ?? '')).toEqual({
       completed: [],

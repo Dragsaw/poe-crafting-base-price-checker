@@ -246,7 +246,7 @@ describe('runChunk: the lock', () => {
     expect(failures[0]?.message).toContain(key(A));
   });
 
-  // Story hybrid-mods 2, I/O matrix "Earlier major": IMPLEMENTATION-NOTES §4.1.
+  // Story hybrid-mods 2, I/O matrix "Earlier major".
   it('refuses a tracked list at the earlier 1.x major with the re-author message, before any step', async () => {
     const fs = createFakeFilesystemPort({
       [TRACKED_PATH]: { contents: JSON.stringify({ schemaVersion: '1.0.0', entries: [A] }) },

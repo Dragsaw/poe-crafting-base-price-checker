@@ -15,7 +15,7 @@ type ChunkEnding =
   | { readonly kind: 'yielded'; readonly sessionExpired?: true }
   | { readonly kind: 'bounded'; readonly bound: ChunkBound };
 
-/** How the step loop ended, and the `notBefore` it writes: set only by a step's 429 (§5.3). */
+/** How the step loop ended, and the `notBefore` it writes: set only by a step's 429. */
 export interface ChunkStop {
   readonly ending: ChunkEnding;
   readonly until: string | undefined;
@@ -53,7 +53,7 @@ function recordStep(state: RunState, result: StepResult): void {
   }
 }
 
-/** A downgrade writes no `notBefore` and tells the session (§13.4). */
+/** A downgrade writes no `notBefore` and tells the session. */
 function yieldedStop(state: RunState, result: YieldedStep): ChunkStop {
   return {
     ending: result.sessionExpired === true ? { kind: 'yielded', sessionExpired: true } : { kind: 'yielded' },

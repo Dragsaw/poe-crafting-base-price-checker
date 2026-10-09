@@ -17,7 +17,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
   ])('%s on the search stamps lastAttemptedAt alone and yields', async (_label, response, penalty) => {
     const { run } = setup({ search: response, dataset: [PREVIOUS] });
 
-    // Only a 429 carries the delay the chunk remembers as notBefore (§5.3).
+    // Only a 429 carries the delay the chunk remembers as notBefore.
     expect(await run()).toStrictEqual({
       kind: 'yielded',
       entry: { ...PREVIOUS, lastAttemptedAt: NOW },
@@ -234,7 +234,7 @@ describe('createPricingStep: unanswered and refused requests', () => {
   });
 });
 
-describe('createPricingStep: the session-expired yield (AD-30, IMPLEMENTATION-NOTES.md §13.4)', () => {
+describe('createPricingStep: the session-expired yield (AD-30)', () => {
   const EXPIRED: TradeResult = {
     kind: 'yield',
     lane: 'x',

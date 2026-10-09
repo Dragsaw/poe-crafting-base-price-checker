@@ -1,6 +1,6 @@
 # Review: Story 1.1 — The four-package workspace and the offline development loop
 
-- **Reviewed:** `docs/stories/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md` (2,257 words, `review_loop_iteration: 0`, status `ready-for-dev`)
+- **Reviewed:** `docs/stories/archive/spec-1-1-the-four-package-workspace-and-the-offline-development-loop.md` (2,257 words, `review_loop_iteration: 0`, status `ready-for-dev`)
 - **Date:** 2026-09-20
 - **Lenses run:** adversarial, edge-case-hunter, structure, prose. Verification-gap was skipped — it applies to code, and no application source exists yet.
 - **Brief:** whether the harness this story builds for the development agent is missing anything, or solves its problems non-optimally. Web verification was enabled.

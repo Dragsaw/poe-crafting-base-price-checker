@@ -89,7 +89,7 @@ describe('TrackedFileSchema, hybrid references (CAP-1)', () => {
   });
 
   it('does not evaluate the within-file overlap of a pair with a hybrid reference', () => {
-    // The two hybrids' bands intersect on every line; core evaluates the pair (§2.1).
+    // The two hybrids' bands intersect on every line; core evaluates the pair.
     expect(parse([craftedBow(hybridPrefix(16, 20)), craftedBow(hybridPrefix(18, 22))]).ok).toBe(true);
     expect(
       parse([
@@ -127,7 +127,7 @@ const summedIssuesOf = (entries: readonly unknown[]) => {
   return result.issues;
 };
 
-describe('TrackedFileSchema, within-file kind agreement and summed operands (§2.3)', () => {
+describe('TrackedFileSchema, within-file kind agreement and summed operands', () => {
   const RARITY = 'explicit.stat_3917489142';
 
   it('loads a summed statId with two banded operands', () => {

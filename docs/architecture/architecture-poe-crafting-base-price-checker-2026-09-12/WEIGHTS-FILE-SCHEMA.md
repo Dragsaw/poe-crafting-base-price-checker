@@ -71,7 +71,7 @@ the producer was already following by convention is now one a consumer may rely 
 class**, and closed **OQ-25** by having the trade search reach that class exactly rather
 than pricing across its siblings. The filter that reaches it is derived from the **inner
 `className` key** — a defence signature for an armour class, the class's own base type for a
-jewel (spine AD-16, `IMPLEMENTATION-NOTES.md` §10). That derivation reads the key's
+jewel (spine AD-16; `buildSearchBody` in `packages/sync/src/pricing/search-body.ts`). That derivation reads the key's
 structure, so the key's structure has to be a contract term rather than a habit. **Without
 this revision the consumer would be parsing a string the contract calls opaque**, and a
 producer renaming a pool would silently change which items get priced.
@@ -186,7 +186,7 @@ the producer computes from cell coverage — there are no cells to compute it fr
   entries are not nested under groups.
 
 How `core` applies this rule to a crafting act is spine AD-17 and
-`IMPLEMENTATION-NOTES.md` §11.
+`combinationProbability` in `packages/core/src/probability.ts`.
 
 ## Shape
 
@@ -271,7 +271,7 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 | `gamePatch` | A free-form GGG patch string, operator-asserted. Never `"unknown"`, never inferred. A producer refuses to run without it. |
 | `producer.id` | Stable across regenerations by the same producer. |
 | `bases` key | Two levels. Outer key is a trade category filter id (`categoryId`), spelled exactly as the trade category filter list spells it. Inner key is the poe2db `className` verbatim (never a derived display label) that resolved to that `categoryId` -- `className -> categoryId` is many-to-one (e.g. six armour `className`s collapse to `armour.gloves`), so one `categoryId` can carry several distinct `className` sub-keys, each with its own `{prefix, suffix}` pools. There is no cross-class ownership guard: `(categoryId, className)` cannot collide because `className`s are already distinct. Validated report-only by `sync` (AD-6, AD-25); an item class absent from the file is unrankable. **The pair is the consumer's own key for a crafted tracked entry** (spine AD-5), so a consumer looks a pool up at both rungs directly and **never falls back to a sibling `className`** under a `categoryId` it did find. The fan-out is real and measured on the 2026-09-19 file: 6 of 29 categories carry more than one class, `armour.chest` seven and `jewel` eight. **Since `5.1.0` the inner key also carries a normative grammar** — see the row below, and `5.1.0 — the inner key's grammar becomes normative`. |
-| `className` grammar (`5.1.0`) | The inner key is either **defence-suffixed**, `<family>_<letters>` with `<letters>` a `_`-separated non-repeating sequence over `str` / `dex` / `int` (`Body_Armours_str_dex`, `Boots_int`), or **plain**, carrying no such suffix (`Bows`, `Amulets`, `Time-Lost_Diamond`). Within one `categoryId`: defence-suffixed classes carry **distinct** letter sets, and defence-suffixed and plain classes are **never mixed**. A plain class under an all-plain fan-out `categoryId` is a **base type name with spaces written as underscores**. The consumer derives its trade-search class filter from this grammar (spine AD-16, `IMPLEMENTATION-NOTES.md` §10) and validates the base-type form against the trade catalogue before use, so a violation surfaces at load rather than as a wrong price. **`str` maps to armour, `dex` to evasion, `int` to energy shield** — that mapping is the point of the rule and is stated here because the consumer depends on it. |
+| `className` grammar (`5.1.0`) | The inner key is either **defence-suffixed**, `<family>_<letters>` with `<letters>` a `_`-separated non-repeating sequence over `str` / `dex` / `int` (`Body_Armours_str_dex`, `Boots_int`), or **plain**, carrying no such suffix (`Bows`, `Amulets`, `Time-Lost_Diamond`). Within one `categoryId`: defence-suffixed classes carry **distinct** letter sets, and defence-suffixed and plain classes are **never mixed**. A plain class under an all-plain fan-out `categoryId` is a **base type name with spaces written as underscores**. The consumer derives its trade-search class filter from this grammar (spine AD-16; `buildSearchBody` in `packages/sync/src/pricing/search-body.ts`) and validates the base-type form against the trade catalogue before use, so a violation surfaces at load rather than as a wrong price. **`str` maps to armour, `dex` to evasion, `int` to energy shield** — that mapping is the point of the rule and is stated here because the consumer depends on it. |
 | `slot` | Exactly `prefix` and `suffix`. |
 | `poolCoverage` | See *The pool-completeness rule*. Required, with no default. |
 | `sourceModifierId` | **Required on every entry.** Names the poe2db tier this entry came from. One entry per tier — never split, never merged. Opaque to the app. |
@@ -317,10 +317,10 @@ source of truth; the shape above documents it and is not a parallel definition.
   class filter from this key (spine AD-16), so an unparseable or ambiguous key means it
   cannot build a correct search — and the failure mode without this error is a price
   gathered across sibling classes, which nothing downstream can distinguish from a good one.
-  **This is a whole-file refusal, and it is what makes spine `IMPLEMENTATION-NOTES.md` §2.6's
-  narrower, per-class check effectively unreachable against a file that passes this one** —
+  **This is a whole-file refusal, and it is what makes the spine's
+  narrower, per-class check (`classDiscriminability`, AD-17) effectively unreachable against a file that passes this one** —
   the distinctness and no-mixing halves of this same hard error are exactly what guarantee
-  every `className` lands in a discriminable arm of §10.2's grammar. §2.6 is kept as a
+  every `className` lands in a discriminable arm of the `className` grammar above. That check is kept as a
   cross-file backstop (its consequence, if it ever fires, excludes just the one affected
   class rather than refusing the file), not as a second path to the same outcome as this
   hard error.

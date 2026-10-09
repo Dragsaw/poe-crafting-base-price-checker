@@ -38,7 +38,7 @@ const SATURATED_SEARCH_HEADERS = {
   'x-rate-limit-client-state': '30:300:0',
 };
 
-describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3)', () => {
+describe('the session probe (AD-30)', () => {
   /** One rule more than `CLEAR_SEARCH_HEADERS`, nothing saturated. */
   const LIVE_SEARCH_HEADERS = {
     ...CLEAR_SEARCH_HEADERS,

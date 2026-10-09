@@ -139,7 +139,7 @@ function hybrid(lines: unknown[], extra: Record<string, unknown> = {}): unknown 
   return { kind: 'hybrid', lines, ...extra };
 }
 
-describe('ModifierReferenceSchema, the hybrid arm (IMPLEMENTATION-NOTES §4.1)', () => {
+describe('ModifierReferenceSchema, the hybrid arm', () => {
   it('accepts a banded hybrid and sorts its lines by statId', () => {
     const parsed = ModifierReferenceSchema.parse(
       hybrid(

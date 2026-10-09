@@ -85,7 +85,7 @@ describe('runChunk: the league gate (Story 1.11)', () => {
 
     expect(visited).toEqual([]);
     // The order exists, so the throw publishes the marks. A gate 4xx would be
-    // refused again on the next tick, so it writes the abort notBefore (§5.3).
+    // refused again on the next tick, so it writes the abort notBefore.
     // With no previous dataset there is no earlier label, so the configured one is written.
     const published = DatasetFileSchema.parse(JSON.parse((await fs.readTextFile(DATASET_PATH)) ?? ''));
     expect(published.league).toBe('Standard');

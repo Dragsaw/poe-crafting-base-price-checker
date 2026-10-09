@@ -22,7 +22,7 @@ interface ProbeBaseline {
   readonly response: HttpResponse;
 }
 
-// A downgrade (§13.4): a cookie request answered 401 or 403 (a Cloudflare 403 too), or a 2xx under
+// A downgrade: a cookie request answered 401 or 403 (a Cloudflare 403 too), or a 2xx under
 // the baseline's policy whose rule-name count is not above the baseline's. 429, 5xx, other 4xx: no.
 export function isDowngrade(holder: AuthHolder, response: HttpResponse): boolean {
   if (response.status === UNAUTHORIZED || response.status === FORBIDDEN) {
@@ -53,7 +53,7 @@ export function shouldCarryCookie(context: GovernorContext, request: TradeReques
   );
 }
 
-/** The first `2xx` marked request, sent without the cookie, is the baseline: probe once (§13.2). */
+/** The first `2xx` marked request, sent without the cookie, is the baseline: probe once. */
 export function shouldProbe(
   auth: TradeGovernorAuth | undefined,
   request: TradeRequest,
@@ -62,7 +62,7 @@ export function shouldProbe(
   return auth !== undefined && request.cookieEligible === true && auth.holder.canProbe && isSuccess(response.status);
 }
 
-// Drop the cookie, reset pacing to cold in place, settle the holder `expired`, yield (§13.4).
+// Drop the cookie, reset pacing to cold in place, settle the holder `expired`, yield.
 // The downgrading answer is neither counted nor returned.
 export function expireSession(
   context: GovernorContext,
@@ -90,7 +90,7 @@ function settleProbeStatus(holder: AuthHolder, baseline: HttpResponse, response:
   const { status } = response;
   if (isSuccess(status)) {
     // Kept by the holder: every later cookie answer under the baseline's policy is tested against
-    // it (§13.4).
+    // it.
     const baselineCount = ruleNameCount(baseline.headers);
     holder.rememberBaseline(baselineCount, rateLimitPolicyOf(baseline.headers));
     holder.settle(ruleNameCount(response.headers) > baselineCount ? 'authenticated' : 'not-elevated');
@@ -103,7 +103,7 @@ function settleProbeStatus(holder: AuthHolder, baseline: HttpResponse, response:
   }
 }
 
-// The one session probe (IN §13.2, §13.3): the baseline's request, once, with the cookie. It never
+// The one session probe: the baseline's request, once, with the cookie. It never
 // counts toward the invalid-request count, and its answer and error are never returned.
 export async function probe(context: GovernorContext, auth: TradeGovernorAuth, baseline: ProbeBaseline): Promise<void> {
   const { request, lane } = baseline;
@@ -120,14 +120,14 @@ export async function probe(context: GovernorContext, auth: TradeGovernorAuth, b
       body: request.body,
     });
   } catch {
-    // The error may quote the request, so it goes nowhere. Pricing goes on unauthenticated (§13.3).
+    // The error may quote the request, so it goes nowhere. Pricing goes on unauthenticated.
     auth.holder.settle('probe-failed');
     return;
   }
 
   const { parsed, respondedAt, policy } = fold(context, lane, knownPolicy, response);
   if (response.status === TOO_MANY_REQUESTS) {
-    // Settles nothing. The next `send` yields with this penalty (§13.3).
+    // Settles nothing. The next `send` yields with this penalty.
     context.log?.(describe429({ at: respondedAt, lane, policy, waitedMs }, response.headers, pacedOn));
     context.latched = penaltyOf(context.pacing.ledger, response, parsed, policy);
     return;

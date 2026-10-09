@@ -1,5 +1,5 @@
 /**
- * The chunk runner's two on-disk shapes (AD-7, IMPLEMENTATION-NOTES.md §7).
+ * The chunk runner's two on-disk shapes (AD-7).
  */
 
 import { z } from 'zod';
@@ -23,16 +23,16 @@ export const SyncProgressSchema = z.strictObject({
     .refine((keys) => new Set(keys).size === keys.length, {
       message: 'completed keys must be unique',
     })
-    .describe('Canonical keys (§4.1) of the entries this pass has completed.'),
+    .describe('Canonical keys of the entries this pass has completed.'),
   notBefore: IsoTimestampSchema.optional().describe(
-    'Penalty memory across processes (AD-8, IMPLEMENTATION-NOTES.md §5.3). A run that starts before this instant defers: it sends nothing and exits 0. Written only by a chunk that ends on a 429 or a malformed-request abort; every other ending that writes progress clears it. Absent never defers.',
+    'Penalty memory across processes (AD-8). A run that starts before this instant defers: it sends nothing and exits 0. Written only by a chunk that ends on a 429 or a malformed-request abort; every other ending that writes progress clears it. Absent never defers.',
   ),
   authHoldOffUntil: IsoTimestampSchema.optional().describe(
-    'The session-cookie hold-off across processes (AD-30, IMPLEMENTATION-NOTES.md §13.3). While a run starts before this instant, a valid session cookie settles held-off and no probe is sent. Written as now + 24h by a not-elevated, probe-rejected or expired outcome, removed by a live probe, and carried forward by every other progress write. Holds the due time only, never the cookie value.',
+    'The session-cookie hold-off across processes (AD-30). While a run starts before this instant, a valid session cookie settles held-off and no probe is sent. Written as now + 24h by a not-elevated, probe-rejected or expired outcome, removed by a live probe, and carried forward by every other progress write. Holds the due time only, never the cookie value.',
   ),
 });
 
-/** 1.2.0 adds `authHoldOffUntil` (IMPLEMENTATION-NOTES.md §13.7). */
+/** 1.2.0 adds `authHoldOffUntil`. */
 export const SYNC_PROGRESS_SCHEMA_VERSION = '1.2.0';
 
 export type SyncProgress = z.infer<typeof SyncProgressSchema>;

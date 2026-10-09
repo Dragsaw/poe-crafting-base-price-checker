@@ -1,7 +1,7 @@
 # Review: spec-deferred-live-sync-runs-on-fake-git-port
 
 - **Date:** 2026-09-27
-- **Content:** `docs/stories/spec-deferred-live-sync-runs-on-fake-git-port.md`, a behavioral spec (docs). The lenses also read the implementation under `packages/sync/src` for grounding.
+- **Content:** `docs/stories/archive/spec-deferred-live-sync-runs-on-fake-git-port.md`, a behavioral spec (docs). The lenses also read the implementation under `packages/sync/src` for grounding.
 - **Lenses:** adversarial, edge-case-hunter, structure, prose (prose ran on top of the structure findings). verification-gap did not run, because it applies to code only.
 - **Context:** This is the follow-up review that the first pass requested (`followup_review_recommended: true`). In this procedure, that flag stops the fast-forward to master.
 

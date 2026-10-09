@@ -1,6 +1,6 @@
 import { STALE_LOCK_AFTER_MS } from '../lock.ts';
 
-/** The two `notBefore` formulas (IN §5.3), capped at `staleLockAfter` (a crashed run's lock). */
+/** The two `notBefore` formulas, capped at `staleLockAfter` (a crashed run's lock). */
 export function notBeforeAfter429(now: string, retryAfterMs: number): string {
   return new Date(Date.parse(now) + Math.min(retryAfterMs, STALE_LOCK_AFTER_MS)).toISOString();
 }

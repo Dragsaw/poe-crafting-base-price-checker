@@ -84,7 +84,7 @@ export function dependenciesFor(league: string, setup: Setup = {}) {
   const http = httpFor(league, setup.answers);
   const out: string[] = [];
   const error: string[] = [];
-  /** The §13.5 auth lines, kept apart from `err`, with the requests sent before each. */
+  /** The auth lines, kept apart from `err`, with the requests sent before each. */
   const auth: { readonly line: string; readonly requestsBefore: number }[] = [];
   const dependencies: SyncCommandDependencies = {
     fs: recorded.fs,

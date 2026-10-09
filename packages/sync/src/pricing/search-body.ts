@@ -1,5 +1,5 @@
 /**
- * The AD-16 search body, pure and built before any request (IN §5.1, §5.2, §5.5, §10.2).
+ * The AD-16 search body, pure and built before any request.
  */
 
 import { canonicalKey, defenceLettersOf, linesOf, summedInterval, summedStatIds } from '@poe/contracts';
@@ -20,7 +20,7 @@ export function itemTypesOf(catalogue: ItemCatalogue): ItemTypes {
   return types;
 }
 
-/** The `jewel`-arm refusal: the derived base type is not in `items.json` (IN §10.2, AD-25). */
+/** The `jewel`-arm refusal: the derived base type is not in `items.json` (AD-25). */
 export class UnknownClassBaseTypeError extends Error {
   readonly entryKey: string;
   readonly categoryId: string;
@@ -86,7 +86,7 @@ type Discriminator =
   | { readonly arm: 'type'; readonly baseTypeId: string }
   | { readonly arm: 'none' };
 
-/** Arms tried in order (§10.2); arm 2 reads the category's composition from `items.json` (AD-5). */
+/** Arms tried in order; arm 2 reads the category's composition from `items.json` (AD-5). */
 function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Discriminator {
   const letters = defenceLettersOf(entry.className);
   if (letters !== undefined) {
@@ -103,7 +103,7 @@ function discriminatorOf(entry: CraftedTrackedEntry, itemTypes: ItemTypes): Disc
   return { arm: 'none' };
 }
 
-/** One stat filter per reference line; a banded edge goes out as declared (§5.1, AD-16). */
+/** One stat filter per reference line; a banded edge goes out as declared (AD-16). */
 function statFilterOfLine(line: NamedLine): StatFilter {
   return {
     id: line.statId,
@@ -112,7 +112,7 @@ function statFilterOfLine(line: NamedLine): StatFilter {
   };
 }
 
-/** Prefix lines then suffix lines in one `and` group; a summed `statId` is one filter (§5.5). */
+/** Prefix lines then suffix lines in one `and` group; a summed `statId` is one filter. */
 function statFiltersOf(entry: TrackedEntry): StatFilter[] {
   if (entry.kind === 'raw') {
     return [];
@@ -125,7 +125,7 @@ function statFiltersOf(entry: TrackedEntry): StatFilter[] {
     const sum = summedInterval(entry, line.statId);
     if (sum === undefined) {
       throw new Error(
-        `entry ${canonicalKey(entry)} sums statId ${line.statId} with a valueless operand, which the tracked schema refuses (IMPLEMENTATION-NOTES.md §2.3); no request was issued`,
+        `entry ${canonicalKey(entry)} sums statId ${line.statId} with a valueless operand, which the tracked schema refuses; no request was issued`,
       );
     }
     return statFilterOfLine({ statId: line.statId, valueMin: sum.min, valueMax: sum.max });

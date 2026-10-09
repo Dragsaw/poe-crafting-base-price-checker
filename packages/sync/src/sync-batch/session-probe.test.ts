@@ -15,12 +15,12 @@ const cookies = (http: ReturnType<typeof createFakeHttpPort>) =>
   http.requests.map((request) => [request.method, request.headers['cookie']]);
 
 describe('pnpm sync:batch: the live composition with injected ports', () => {
-  describe('the session probe (AD-30, IMPLEMENTATION-NOTES.md §13.2, §13.3, §13.5)', () => {
+  describe('the session probe (AD-30)', () => {
     const VALUE = 'b'.repeat(16) + '0123456789abcdef0123';
     const COOKIE = `POESESSID=${VALUE}`;
     const COOKIE_ENV = { [USER_AGENT_ENV_VAR]: CONTACT, [SESSION_COOKIE_ENV_VAR]: VALUE };
     const RESULTS = ['r1', 'r2'];
-    /** Every answer names its policy; a search and a fetch differ (§13.2). */
+    /** Every answer names its policy; a search and a fetch differ. */
     const SEARCH_HEADERS = {
       'x-rate-limit-policy': 'trade-search-request-limit',
       'x-rate-limit-rules': 'Ip',
@@ -61,7 +61,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       return probingThen(dependencies, answers);
     }
 
-    /** As `probing`; later cookie requests are answered by `after`, live by default (§13.4). */
+    /** As `probing`; later cookie requests are answered by `after`, live by default. */
     function probingThen(
       dependencies: SyncCommandDependencies,
       answers: (HttpResponse | Error)[],
@@ -120,7 +120,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
       ]);
       expect(http.requests[3]?.url).toBe(tradeFetchUrl(RESULTS, 'S1'));
       // The fetch answers fewer rules than the probe, under its own policy: not tested, no
-      // downgrade (§13.4).
+      // downgrade.
       expect(auth).toEqual([{ line: 'pnpm sync:batch: authenticated', requestsBefore: 3 }]);
       expect(err).toEqual([]);
       expect(out).toEqual(['pnpm sync:batch: completed, 1 completed']);

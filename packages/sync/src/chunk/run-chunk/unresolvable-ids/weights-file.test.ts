@@ -77,7 +77,7 @@ describe('runChunk: unresolvable ids, detected offline (Story 1.10)', () => {
   });
 
   describe('pool coverage (AD-27)', () => {
-    // A `partial` suffix slot leaves a class uncovered (IN §3) and gets no pool check;
+    // A `partial` suffix slot leaves a class uncovered and gets no pool check;
     // a weight-0 suffix would make the cross-file gate refuse the run.
     const X = craftedEntry('weapon.bow', 'explicit.ok', 'Bows');
     const Y = craftedEntry('armour.chest', 'explicit.ok', 'Body_Armours_str');

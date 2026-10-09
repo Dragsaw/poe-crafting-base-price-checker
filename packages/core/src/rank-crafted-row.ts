@@ -60,7 +60,7 @@ function weakestProvenance({ first, recipe, pools, keyed }: CraftedRowOptions): 
   return provenance;
 }
 
-/** One `(Item Class, recipe)` pair (AD-17), or `undefined` if unreachable (IN §9, §11). */
+/** One `(Item Class, recipe)` pair (AD-17), or `undefined` if unreachable. */
 export function craftedRow(options: CraftedRowOptions): CraftedRankedRow | undefined {
   const { first, recipe, cost, keyed, byKey } = options;
   const scan = scanSummands(options);

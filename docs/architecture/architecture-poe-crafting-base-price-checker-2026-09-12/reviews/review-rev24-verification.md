@@ -6,7 +6,7 @@
 - **Lens:** each external fact that AD-30 and §13 rely on is web-researched or reality-checked,
   not asserted from training data. No library or version is bound in this change.
 - **Evidence base:** `docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/research.md`
-  and `digests/` (mainly `capture-trade2-headers.md`), `docs/specs/spec-poesessid-sync/SPEC.md`,
+  and `digests/` (mainly `capture-trade2-headers.md`), `docs/stories/archive/spec-poesessid-sync/SPEC.md`,
   `.memlog.md` revision 24 entries.
 - **Web re-check:** 2026-10-02, with WebFetch of `pathofexile.com/developer/docs`,
   `/developer/docs/authorization`, forum thread 3328601, POEFixer FixerWiki *Trade Cookies*, and

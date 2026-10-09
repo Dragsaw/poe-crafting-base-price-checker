@@ -39,7 +39,7 @@ describe('RequestsBySourceSchema', () => {
     expect('catalogue-refresh' in parsed).toBe(false);
   });
 
-  it('reads a 1.1.0 figure with no session-probe key as 0 (IMPLEMENTATION-NOTES.md §13.7)', () => {
+  it('reads a 1.1.0 figure with no session-probe key as 0', () => {
     expect(RequestsBySourceSchema.parse({ 'tracked-list': 8, 'league-validation': 1 })).toEqual({
       'tracked-list': 8,
       'league-validation': 1,

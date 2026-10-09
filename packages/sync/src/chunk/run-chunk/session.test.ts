@@ -189,7 +189,7 @@ describe('runChunk: under a session (ChunkPorts.session)', () => {
   });
 });
 
-describe('runChunk: a latched probe 429 (IMPLEMENTATION-NOTES.md §13.3)', () => {
+describe('runChunk: a latched probe 429', () => {
   it('the entry completes with no further request: the chunk yields and persists notBefore', async () => {
     const { fs, ports } = harness([A]);
     const { step, latched } = latching({ kind: 'completed' });

@@ -10,7 +10,7 @@ import { TRADE_API_BASE, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoint
 import { createPricingStep } from './price-entry.ts';
 import { itemTypesOf } from './search-body.ts';
 
-// SPEC-tracked-hybrid-mods CAP-6, and the divergence AD-16 accepts (§5.5). The port below is a
+// SPEC-tracked-hybrid-mods CAP-6, and the divergence AD-16 accepts. The port below is a
 // plain `fetch` wrapper that MSW intercepts, not the shell's real port (`shell-fetch.test.ts`).
 
 // The shared server lives outside this package's `rootDir`, so it is imported
@@ -108,7 +108,7 @@ interface Listing {
   readonly amount: number;
 }
 
-/** Compares a filter on a `statId` two mods carry with the sum of both values (§5.1d, AD-16). */
+/** Compares a filter on a `statId` two mods carry with the sum of both values. */
 async function tradeServerOver(listings: readonly Listing[], received: unknown[]): Promise<void> {
   const server = await sharedServer();
   const matched = (body: unknown): readonly Listing[] => {
