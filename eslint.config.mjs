@@ -121,6 +121,9 @@ export default tseslint.config(
       unicorn.configs.recommended,
       comments.recommended,
     ],
+    // The lint-on-edit server (eslint_d) loads other configs too, and then typescript-eslint
+    // cannot infer the root.
+    languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } },
     plugins: { local },
     rules: {
       // Comments: no core or plugin rule bounds their length (the size rules skip them).

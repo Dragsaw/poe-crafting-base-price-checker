@@ -6,34 +6,18 @@ import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 
 // The layout stands in for the repo through `LINT_ON_EDIT_ROOT`, so the test never writes a
-// violating file into the real source tree. Every run sees all violations in the `tsc -b`
-// output, so a run that stays quiet also proves the per-file filter.
+// violating file into the real source tree.
 const HOOK = path.resolve(import.meta.dirname, 'lint-on-edit.ts');
 const REPO_NODE_MODULES = path.resolve(import.meta.dirname, '../../node_modules');
 const SLOW_MS = 90_000;
 
 const FILES: Readonly<Record<string, string>> = {
-  'tsconfig.base.json': JSON.stringify({
-    compilerOptions: {
-      target: 'ES2023',
-      lib: ['ES2023'],
-      module: 'ESNext',
-      moduleResolution: 'bundler',
-      strict: true,
-      types: [],
-      skipLibCheck: true,
-      allowImportingTsExtensions: true,
-    },
-  }),
-  'tsconfig.json': JSON.stringify({ files: [], references: [{ path: './tsconfig.tools.json' }] }),
-  'tsconfig.tools.json': JSON.stringify({
-    extends: './tsconfig.base.json',
-    compilerOptions: { composite: true, noEmit: true, tsBuildInfoFile: './.cache/tools.tsbuildinfo' },
-    include: ['tools/**/*.ts', 'packages/**/*.ts'],
-  }),
   'eslint.config.mjs': [
     "import tseslint from 'typescript-eslint';",
-    "export default tseslint.config({ files: ['**/*.ts'], extends: [tseslint.configs.base], rules: { eqeqeq: 'error' } });",
+    "export default tseslint.config({ files: ['**/*.ts'], extends: [tseslint.configs.base],",
+    // The hook's eslint_d server also holds the repo config, so the root cannot be inferred.
+    '  languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } },',
+    "  rules: { eqeqeq: 'error' } });",
   ].join('\n'),
   '.dependency-cruiser.mjs': `export default {
   forbidden: [{ name: 'no-a-to-b', severity: 'error', from: { path: '^packages/a/' }, to: { path: '^packages/b/' } }],
@@ -41,10 +25,6 @@ const FILES: Readonly<Record<string, string>> = {
 };`,
   'tools/clean.ts': 'export const clean = 1;\n',
   'tools/lint-bad.ts': 'export const isOne = (value: number): boolean => value == 1;\n',
-  'tools/type-bad.ts': "export const wrong: number = 'text';\n",
-  'tools/lib.ts': 'export function twice(value: number): number {\n  return value * 2;\n}\n',
-  // The edit that breaks `caller.ts` is a change to `lib.ts`'s signature; the error sits in the caller.
-  'tools/caller.ts': "import { twice } from './lib.ts';\nexport const four = twice('x');\n",
   'tools/notes.md': '# notes\n',
   'packages/a/a.ts': "import { b } from '../b/b.ts';\n\nexport const a = b;\n",
   'packages/b/b.ts': 'export const b = 1;\n',
@@ -63,6 +43,10 @@ function createLayout(): string {
 const root = createLayout();
 
 afterAll(() => {
+  // The server inherits the test runner's handles on Windows, so a caller that pipes the
+  // output of `vitest` would wait for its idle exit.
+  const server = path.join(REPO_NODE_MODULES, 'eslint_d', 'bin', 'eslint_d.js');
+  spawnSync(process.execPath, [server, 'stop'], { cwd: tmpdir(), env: { ...process.env, ESLINT_D_ROOT: root }, stdio: 'ignore' });
   // Remove the link first: `rmSync` on it must not reach the real `node_modules`.
   rmSync(path.join(root, 'node_modules'), { force: true });
   rmSync(root, { recursive: true, force: true });
@@ -93,12 +77,6 @@ describe('lint-on-edit, end to end', () => {
     expect(edit('tools/clean.ts')).toEqual({ status: 0, stderr: '', stdout: '' });
   }, SLOW_MS);
 
-  it('stays silent when the edit broke a different file', () => {
-    // `caller.ts` has a type error, but the edited file is `lib.ts`.
-    expect(edit('tools/lib.ts')).toEqual({ status: 0, stderr: '', stdout: '' });
-    expect(serena('tools/lib.ts').status).toBe(0);
-  }, SLOW_MS);
-
   it('does not run on a non-TypeScript file or a missing file', () => {
     for (const run of [edit, write, serena]) {
       expect(run('tools/notes.md')).toEqual({ status: 0, stderr: '', stdout: '' });
@@ -111,17 +89,7 @@ describe('lint-on-edit, end to end', () => {
     expect(status).toBe(2);
     expect(stderr).toContain('== lint ==');
     expect(stderr).toContain('eqeqeq');
-    expect(stderr).not.toContain('== typecheck ==');
     expect(stderr).not.toContain('== depcruise ==');
-  }, SLOW_MS);
-
-  it('reports a type error from a Write under typecheck only, and exits 2', () => {
-    const { status, stderr } = write('tools/type-bad.ts');
-    expect(status).toBe(2);
-    expect(stderr).toContain('== typecheck ==');
-    expect(stderr).toContain('tools/type-bad.ts(1,14): error TS2322');
-    expect(stderr).not.toContain('== lint ==');
-    expect(stderr).not.toContain('caller.ts');
   }, SLOW_MS);
 
   it('reports a forbidden import from a Serena edit under depcruise only, and exits 2', () => {
@@ -130,6 +98,5 @@ describe('lint-on-edit, end to end', () => {
     expect(stderr).toContain('== depcruise ==');
     expect(stderr).toContain('no-a-to-b: packages/a/a.ts -> packages/b/b.ts');
     expect(stderr).not.toContain('== lint ==');
-    expect(stderr).not.toContain('== typecheck ==');
   }, SLOW_MS);
 });
