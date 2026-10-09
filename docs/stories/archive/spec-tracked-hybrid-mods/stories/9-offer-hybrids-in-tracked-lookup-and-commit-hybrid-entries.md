@@ -7,7 +7,7 @@ baseline_commit: 'b1cafb075f06eedda305c9efe31f07cbaa2792fe'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
-  - '{project-root}/docs/specs/spec-tracked-hybrid-mods/SPEC.md'
+  - '{project-root}/docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md'
   - '{project-root}/.claude/skills/tracked-json/SKILL.md'
 ---
 

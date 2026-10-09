@@ -6,14 +6,14 @@ status: 'done'
 route: 'oneshot'
 review_loop_iteration: 0
 context:
-  - '{project-root}/docs/specs/spec-poesessid-sync/RETROSPECTIVE.md'
+  - '{project-root}/docs/stories/archive/spec-poesessid-sync/RETROSPECTIVE.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
 ## Intent
 
-**Problem:** Spine rev 28 (0ce556e) limited the post-probe liveness test to a cookie 2xx under the baseline's `X-Rate-Limit-Policy` (IMPLEMENTATION-NOTES §13.2 `tested`, §13.4). Two passages still describe every cookie 2xx: the Assumptions bullet at `docs/specs/spec-poesessid-sync/SPEC.md:99`, and rows 46–47 of the I/O matrix of story 3 (retro finding R3).
+**Problem:** Spine rev 28 (0ce556e) limited the post-probe liveness test to a cookie 2xx under the baseline's `X-Rate-Limit-Policy` (IMPLEMENTATION-NOTES §13.2 `tested`, §13.4). Two passages still describe every cookie 2xx: the Assumptions bullet at `docs/stories/archive/spec-poesessid-sync/SPEC.md:99`, and rows 46–47 of the I/O matrix of story 3 (retro finding R3).
 
 **Approach:** Edit those two passages so that they cite §13.2 `tested` and §13.4, as the rev 28 edits at `SPEC.md:68` and story 3 line 26 already do. A 401 or 403 on any cookie request downgrades; a 2xx downgrades only when it is `tested` and not live; a not-`tested` 2xx is used. The story 3 rows sit inside its frozen block; the operator sanctions this edit by invoking retro item 2 (owner: operator), and the story's Spec Change Log records it. Cite the owner sections; do not restate their predicates.
 

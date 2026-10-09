@@ -113,7 +113,7 @@ The import's matrix had arithmetic and logic errors; see [27]. The Deepen captur
 ## Open questions
 
 - ~~**Does a session cookie raise the PoE2 trade2 budget?**~~ **Answered on 2026-10-02 [30]:** yes, 2× sustained and no burst gain. See *Implementation reality*.
-- ~~**Do the cookie limits hold with the contact `User-Agent` that sync sends?**~~ **Answered by the operator on 2026-10-02:** the trade API accepts only a browser `User-Agent`, so the capture's conditions [30] are the ones that apply. See `docs/specs/spec-poesessid-sync/SPEC.md`.
+- ~~**Do the cookie limits hold with the contact `User-Agent` that sync sends?**~~ **Answered by the operator on 2026-10-02:** the trade API accepts only a browser `User-Agent`, so the capture's conditions [30] are the ones that apply. See `docs/stories/archive/spec-poesessid-sync/SPEC.md`.
 - **Do the `Account` numbers depend on the account?** One account was measured [30]. A second account, for example a newer one or one without supporter packs, would show whether the numbers are global.
 - **Do pasted-cookie requests from a plain Node HTTP client trip Cloudflare over a 24-hour sync window?** A 15-second sample passed [30]. Run the capture on a schedule for a day.
 - **Does a password change revoke POESESSID?** No source says.

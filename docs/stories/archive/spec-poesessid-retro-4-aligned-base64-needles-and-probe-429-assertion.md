@@ -12,7 +12,7 @@ context: []
 
 ## Intent
 
-**Problem:** This is action item 4 of `docs/specs/spec-poesessid-sync/RETROSPECTIVE.md`, which covers findings V3 and V6.
+**Problem:** This is action item 4 of `docs/stories/archive/spec-poesessid-sync/RETROSPECTIVE.md`, which covers findings V3 and V6.
 - V3: the CAP-4 canary in `packages/sync/src/session-auth.canary.test.ts` builds its base64 needles from each 8-byte window of the canary, encoded alone. The encoding of a window inside a longer value depends on the window's byte alignment and on the bytes that follow it. The scan therefore catches a base64 leak only when the canary's characters happen to line up. The SPEC wording is "any 8+ character substring … base64".
 - V6: the test "a probe 429: no line, notBefore persisted, and the next chunk probes again" in `packages/sync/src/sync.test.ts` never reads `sync-progress.json`. Its name claims an assertion that it does not make.
 

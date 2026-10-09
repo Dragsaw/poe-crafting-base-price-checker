@@ -1,7 +1,7 @@
 # Review: spine revision 25 (tracked hybrid mods), reconcile + rubric
 
 - **Subject:** uncommitted diff of `ARCHITECTURE-SPINE.md` (rev 23 to 25), `IMPLEMENTATION-NOTES.md`, `AGENT-WORKFLOW.md`
-- **Inputs:** `docs/specs/spec-tracked-hybrid-mods/SPEC.md`, `owner-change-briefs.md` §2 and §3 (with the *pending spec correction*: there is no `acceptedTier` check), PRD FR-34 (uncommitted)
+- **Inputs:** `docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md`, `owner-change-briefs.md` §2 and §3 (with the *pending spec correction*: there is no `acceptedTier` check), PRD FR-34 (uncommitted)
 - **Date:** 2026-10-03
 - **Verdict:** Every brief item has landed, and no `acceptedTier` validation leaked in. Two predicate defects block a build (F1, F2). Fix them, plus the stale text and citations (F3 to F5), before stories cite §2.1, §2.2 and §2.7.
 

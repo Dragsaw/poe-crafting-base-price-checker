@@ -1,6 +1,6 @@
 # Review: SPEC-tracked-hybrid-mods
 
-- **Content:** `docs/specs/spec-tracked-hybrid-mods/SPEC.md` (docs, a behavior-defining spec)
+- **Content:** `docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md` (docs, a behavior-defining spec)
 - **Lenses:** adversarial, edge-case-hunter, structure, prose (prose ran after structure and used its findings)
 - **Skipped:** verification-gap (it applies to code only)
 - **Date:** 2026-10-03

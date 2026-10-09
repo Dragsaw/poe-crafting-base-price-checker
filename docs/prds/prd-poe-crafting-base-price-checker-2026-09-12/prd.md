@@ -9,8 +9,8 @@ sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/sprint-change-proposal-2026-09-13.md
   - docs/sprint-change-proposal-2026-09-19.md
-  - docs/specs/spec-poesessid-sync/SPEC.md
-  - docs/specs/spec-tracked-hybrid-mods/SPEC.md
+  - docs/stories/archive/spec-poesessid-sync/SPEC.md
+  - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
 inherits:
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/ARCHITECTURE-SPINE.md
   - docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/WEIGHTS-FILE-SCHEMA.md

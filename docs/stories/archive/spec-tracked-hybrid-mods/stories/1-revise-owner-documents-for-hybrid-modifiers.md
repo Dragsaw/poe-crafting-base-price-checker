@@ -34,7 +34,7 @@ Checked and left unchanged:
 - AD-16 L1160 "a summed filter prices a wider population than AD-17 weighs … accepted with no mitigation" already states the upper-bound acceptance.
 - §2.2 "Under `5.0.0`" names the weights version that introduced `lines`. That is historically accurate, so leave it.
 - Retired AD map: no AD id is retired, so it needs no row.
-- Commit the untracked `docs/specs/spec-tracked-hybrid-mods/stories.yaml` with this story.
+- Commit the untracked `docs/stories/archive/spec-tracked-hybrid-mods/stories.yaml` with this story.
 
 Done:
 - Spine `revision: 27`. The ERD affix edges keep `}o--o|`, because a `raw` entry carries no affix and the prose states the crafted both-affixes rule (correction from review: the planned `}o--||` was wrong). They are relabelled "prefix/suffix reference, crafted kind", and the catalogue edge now reads "validates each line's statId". The Core entities prose names the hybrid arm and puts `acceptedTier` on the whole reference.

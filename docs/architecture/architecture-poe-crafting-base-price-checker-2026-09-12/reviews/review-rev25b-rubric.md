@@ -1,7 +1,7 @@
 # Review: spine revision 25 after the altitude pass (rubric)
 
 - **Subject:** `git diff HEAD` of `ARCHITECTURE-SPINE.md`, `IMPLEMENTATION-NOTES.md` (IN) and `AGENT-WORKFLOW.md` (AW), revision 25 plus its altitude pass
-- **Source:** `docs/specs/spec-tracked-hybrid-mods/SPEC.md`, with the *pending spec correction* in `owner-change-briefs.md` (no `acceptedTier` check)
+- **Source:** `docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md`, with the *pending spec correction* in `owner-change-briefs.md` (no `acceptedTier` check)
 - **Prior reviews read:** `review-rev25-rubric.md`, `review-rev25-adversarial.md`, `review-rev25-verification.md`
 - **Date:** 2026-10-03
 - **Verdict:** The altitude pass lost no fact, and every new spine citation resolves to a section that says what the spine claims, apart from one stale count (F3). Most rev-25 review findings are fixed. One gate-level decision, the `partial-pool` unvalidated verdict, exists only in a companion and contradicts the spine's abort rule (F1). The overlap consequence is stated two ways (F2). Fix F1 to F4 before a story cites AD-17 or IN §1, §2.1 or §12.1.

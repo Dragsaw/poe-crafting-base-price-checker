@@ -1,4 +1,4 @@
-# Review: docs/specs/spec-poesessid-sync/SPEC.md
+# Review: docs/stories/archive/spec-poesessid-sync/SPEC.md
 
 - Date: 2026-10-03
 - Content class: docs (behavior-defining spec)

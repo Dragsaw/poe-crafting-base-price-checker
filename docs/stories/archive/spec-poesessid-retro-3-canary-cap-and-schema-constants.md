@@ -12,7 +12,7 @@ context: []
 
 ## Intent
 
-**Problem:** This is action item 3 of `docs/specs/spec-poesessid-sync/RETROSPECTIVE.md`, which covers findings V1 and A6.
+**Problem:** This is action item 3 of `docs/stories/archive/spec-poesessid-sync/RETROSPECTIVE.md`, which covers findings V1 and A6.
 - V1: `runSession` in `packages/sync/src/session-auth.canary.test.ts` stops only after two chunk-result lines. Its fake `sleep` and `wait` resolve at once. Fixture drift that refuses the inputs therefore gives a busy loop that starves Vitest's timeout. This is the hang that shipped to CI before 1186a98 and 0698562.
 - A6: the sync test fixtures hard-code the schema versions that the build writes and reads. Every contract bump then turns into a bulk edit of literals, which was 81 diff lines for the progress bump of story 3. A hard-coded tracked version is also what caused the hang.
 

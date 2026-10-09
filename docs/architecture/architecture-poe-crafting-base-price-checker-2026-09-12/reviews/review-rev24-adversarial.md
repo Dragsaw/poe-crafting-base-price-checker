@@ -5,7 +5,7 @@ target: ARCHITECTURE-SPINE.md revision 24 (AD-30, amendments to AD-8, AD-9, AD-1
 date: '2026-10-02'
 inputs:
   - git diff -- docs/architecture (working tree against fa1a1a8)
-  - docs/specs/spec-poesessid-sync/SPEC.md (the probe shape as amended: the baseline is the first pricing search, and one probe re-sends that body with the cookie)
+  - docs/stories/archive/spec-poesessid-sync/SPEC.md (the probe shape as amended: the baseline is the first pricing search, and one probe re-sends that body with the cookie)
   - docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/digests/capture-trade2-headers.md
   - packages/sync/src (trade/client.ts, trade/ledger.ts, compose-chunk.ts, sync.ts, sync-batch.ts, chunk/run-chunk.ts), read only to ground the unit shapes
 ---

@@ -11,12 +11,12 @@ created: '2026-09-12'
 updated: '2026-10-04'
 binds: []
 sources:
-  - docs/specs/spec-tracked-hybrid-mods/SPEC.md
+  - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/curl-creater-trade-search.txt
-  - docs/specs/spec-poesessid-sync/SPEC.md
+  - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/research/technical-poesessid-vs-oauth-for-trade-api-rate-li-2026-10-02/research.md
   - .memlog.md (revisions 2, 9, 10, 12 record the substance of the PM's Phase 1 handoff and
     both sprint-change proposals; the three source documents themselves are no longer in the

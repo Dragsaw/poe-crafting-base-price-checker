@@ -8,7 +8,7 @@
   IMPLEMENTATION-NOTES section to the letter, and the two still build incompatibly.
 - **Read:** the full diff. AD-5, AD-16 and AD-17 in their revised form. `IMPLEMENTATION-NOTES.md`
   §1, §2.1 to §2.7, §4.1, §8, §11 and §12.1. `WEIGHTS-FILE-SCHEMA.md` `6.1.0`, *pool-completeness*,
-  *Shape* and *Field rules*. `docs/specs/spec-tracked-hybrid-mods/SPEC.md` and
+  *Shape* and *Field rules*. `docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md` and
   `owner-change-briefs.md`.
 - **Measured against the committed `data/weights.json`** (`6.1.0`, every pool `complete`):
   - 552 hybrid tiers (two or more non-null lines) with `weight > 0`.
