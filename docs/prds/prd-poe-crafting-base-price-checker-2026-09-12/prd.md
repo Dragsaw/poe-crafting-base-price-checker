@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 27
+revision: 28
 created: 2026-09-12
 updated: 2026-10-09
 sources:
@@ -132,7 +132,8 @@ EV = ( Σ P(combo) × price(combo) over Combinations that are priced and whose p
 - **No Base Type outside the Item Class contributes to that price** *(PRD-owned)*. An Item Class is valued against its own Base Types alone, so an Item Class the player would never craft on can neither inflate nor depress one he would. The spread above is therefore bounded by a single Item Class, and the ranking separates two Item Classes that a coarser unit would have averaged into one row (AD-16, AD-17, OQ-25).
 - Changing the Payout Threshold reorders the list without a sync (AD-4).
 - The player chooses which Craft Recipe is active, and changing it reorders the list without a sync, as the Payout Threshold does. The ranking is read under one recipe at a time and is not recipe-invariant: the same Item Class can sit at a different rank under each recipe *(PRD-owned)* (FR-26, AD-17).
-- The probability and the price of a Combination describe the same population: both are scoped to the Tracked Entry's Item Level Floor, and a Tracked List in which two Tracked Entries on one Item Class could be satisfied by a single item is refused at load, because the sum is over a partition (AD-17, FR-16).
+- The price of a Combination is the asking price of any item in the Item Class whose rolls satisfy the Combination, at any item level, because a buyer pays for rolled values and not for item level *(PRD-owned)*. The probability of the Combination is scoped to the Tracked Entry's Item Level Floor, because the floor sets what can roll (AD-17, FR-22).
+- A Tracked List in which two Tracked Entries on one Item Class could be satisfied by a single item is refused at load, because the sum is over a partition (AD-17, FR-16).
 
 #### FR-2: Show Chase Combinations on each collapsed row
 

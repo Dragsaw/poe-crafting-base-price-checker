@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 32
+revision: 33
 created: '2026-09-12'
 updated: '2026-10-09'
 binds: []
@@ -966,7 +966,7 @@ never import each other.
   stated there. What this AD owns is the mechanical consequence: the priced population is
   every base type **in the class**, so the payout term describes the class while the
   probability term (AD-17) describes that same class's pool. The two are scoped to **one**
-  population. `core` does not correct for the
+  class; over item level they differ by `prd.md` FR-1. `core` does not correct for the
   within-class spread and must not weight the sample.
 
   **No base outside the class contributes to a crafted row's price** — `prd.md` FR-1 states
@@ -1184,9 +1184,8 @@ never import each other.
   recipe-floor pool below.
 
   *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** the entry's
-  floor, while the crafted search has no item-level filter and returns a superset over item
-  level. Accepted rather than corrected,
-  because correcting it needs an exact-item-level filter the trade API does not offer.
+  floor. The crafted search sends no item-level filter and prices every item level by
+  choice, not by an API limit (`prd.md` FR-1).
 
   **Six cross-file checks are defined once in `core`, and every shell holding both files
   runs them** — `web` at load, and **`sync` as a run-start gate before any priced entry
@@ -1915,9 +1914,8 @@ poe-crafting-base-price-checker/
   AD-12's ceiling, and contradicts the PRD's per-base-type floor. **Revisit if** the
   uniformity rule forces a real choice between two floors worth tracking.
 - **Per-band conditional item level.** AD-17 models the craft as occurring at exactly the
-  entry's floor while the crafted search has no item-level filter and returns a superset over
-  item level. **Revisit only if** the trade
-  API gains an exact-item-level filter.
+  entry's floor, and the crafted price spans every item level (`prd.md` FR-1). **Revisit
+  only if** `prd.md` FR-1 scopes the crafted price to item level again.
 - **Unidentified pool weight.** A per-`(base, slot)` scalar carrying the weight of modifiers
   the source publishes unnamed, entering the denominator but never a numerator. Rejected
   because it is a new way for a producer to hide weight. **Revisit if** unnamed rows recur at

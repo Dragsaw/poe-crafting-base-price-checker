@@ -23,10 +23,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
     - Do not write an id. The id is `dw-` plus a hash of source_spec and summary, so editing either field
       makes a new entry and a new issue.
 -->
-
-## Deferred from: review of spec-remove-ilvl-from-recipe-searches (2026-10-09)
-
-- source_spec: `docs/stories/spec-remove-ilvl-from-recipe-searches.md`
-  summary: [NOTE FOR PM] Update the PRD rule that a crafted price and its probability share one population scoped to the Item Level Floor. The crafted search no longer sends an item-level filter.
-  evidence: `prd.md:135` says "both are scoped to the Tracked Entry's Item Level Floor (AD-17, FR-16)". After this spec, the crafted search body has no `ilvl` filter (`packages/sync/src/pricing/search-body.ts`, AD-16 row `type_filters.ilvl`), so listings below the floor enter the crafted price. Adjacent tiers overlap on 53 of 63 classes (spine OQ-21), so the bands do not exclude them. The user kept the change as built and handed the PRD update to the PM (review triage log, rows 1-6, of the source spec).
-  retry_when: never — needs a human
