@@ -903,7 +903,7 @@ never import each other.
   | **the unit filter** | **`raw` entry:** `query.type` (top level, **not** a filter) = the entry's `baseTypeId`, verbatim. **`crafted` entry:** `type_filters.category` = the entry's `categoryId`, verbatim, **plus the class discriminator below**. The two branches are chosen by the entry's kind (AD-5) and never mixed |
   | **the class discriminator** | **`crafted` entry only.** Derived from the entry's `className` (`buildSearchBody`) and emitted as one of: an `equipment_filters` **defence signature**; `query.type` carrying the class's base type, for `jewel`; or **nothing at all**, where the entry's `categoryId` carries one class and the category filter is already exact |
   | `type_filters.rarity` | `magic` for a `crafted` entry, `normal` for a `raw` entry |
-  | `type_filters.ilvl` | `min` = the entry's `itemLevelMin` |
+  | `type_filters.ilvl` | **`raw` entry only:** `min` = the entry's `itemLevelMin`. A `crafted` entry emits no item-level filter |
   | stat filters | **one per distinct `statId`** across both affixes, in one `and` group: a `banded` line carries **both `min` and `max`**; a `valueless` line carries the stat id and **no edges at all**. A `hybrid` reference contributes one filter per line, and a **summed `statId`** is **one** filter, below |
   | `query.status` | `{"option": "securable"}`, **always emitted** — the option `/api/trade2/data/filters` labels **"Instant Buyout"** |
   | `trade_filters.filters.price` | `{"option": "exalted_divine"}`, **always emitted** — see below |
@@ -1184,7 +1184,8 @@ never import each other.
   recipe-floor pool below.
 
   *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** the entry's
-  floor, while the `ilvl >=` search returns a superset. Accepted rather than corrected,
+  floor, while the crafted search has no item-level filter and returns a superset over item
+  level. Accepted rather than corrected,
   because correcting it needs an exact-item-level filter the trade API does not offer.
 
   **Six cross-file checks are defined once in `core`, and every shell holding both files
@@ -1914,7 +1915,8 @@ poe-crafting-base-price-checker/
   AD-12's ceiling, and contradicts the PRD's per-base-type floor. **Revisit if** the
   uniformity rule forces a real choice between two floors worth tracking.
 - **Per-band conditional item level.** AD-17 models the craft as occurring at exactly the
-  entry's floor while the `ilvl >=` search returns a superset. **Revisit only if** the trade
+  entry's floor while the crafted search has no item-level filter and returns a superset over
+  item level. **Revisit only if** the trade
   API gains an exact-item-level filter.
 - **Unidentified pool weight.** A per-`(base, slot)` scalar carrying the weight of modifiers
   the source publishes unnamed, entering the denominator but never a numerator. Rejected

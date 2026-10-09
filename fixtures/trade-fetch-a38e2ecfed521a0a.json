@@ -1,21 +1,21 @@
 {
   "result": [
     {
-      "id": "c909484892d5df5c3777330d296fb4aa82aee034b9a7b977757bcfcee9590fb9",
+      "id": "a6a8066df5fb2b44a2004cbd93be0030202bd3f635b87a3b56ecbde16803417a",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-25T15:03:42Z",
+        "indexed": "2026-09-29T04:38:33Z",
         "stash": {
-          "name": "상점",
-          "x": 0,
-          "y": 11
+          "name": "6",
+          "x": 10,
+          "y": 1
         },
         "price": {
           "type": "~b/o",
-          "amount": 1,
-          "currency": "exalted"
+          "amount": 88,
+          "currency": "divine"
         },
-        "fee": 4029,
+        "fee": 6964,
         "account": {
           "name": "[redacted]",
           "online": null
@@ -26,408 +26,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU3RlbGxhckFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/a44db4cd4a/StellarAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQ3JpbXNvbkFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/6306715ae7/CrimsonAmulet.png",
         "league": "Forbidden Rites",
-        "id": "c909484892d5df5c3777330d296fb4aa82aee034b9a7b977757bcfcee9590fb9",
+        "id": "a6a8066df5fb2b44a2004cbd93be0030202bd3f635b87a3b56ecbde16803417a",
         "name": "",
-        "typeLine": "Hoarder's Stellar Amulet of Archaeology",
-        "baseType": "Stellar Amulet",
-        "rarity": "Magic",
-        "ilvl": 75,
-        "identified": true,
-        "note": "~b/o 1 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "37",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+5 to all [Attributes|Attributes]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_1379411836",
-            "mods": [
-              {
-                "level": 31,
-                "magnitudes": [
-                  {
-                    "min": "5",
-                    "max": "7"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "31% increased [ItemRarity|Rarity of Items] found",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
-            "mods": [
-              {
-                "name": "Hoarder's",
-                "tier": "P1",
-                "level": 47,
-                "magnitudes": [
-                  {
-                    "min": "16",
-                    "max": "19"
-                  }
-                ]
-              },
-              {
-                "name": "of Archaeology",
-                "tier": "S1",
-                "level": 40,
-                "magnitudes": [
-                  {
-                    "min": "15",
-                    "max": "18"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3917489142",
-                [
-                  0,
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_1379411836",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "0c4b626d0111b06e7e96e2107335f13ccb37410aff1ed065ad7271b375150dbc",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-25T09:35:57Z",
-        "stash": {
-          "name": "1",
-          "x": 2,
-          "y": 10
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "exalted"
-        },
-        "fee": 4245,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "0c4b626d0111b06e7e96e2107335f13ccb37410aff1ed065ad7271b375150dbc",
-        "name": "",
-        "typeLine": "Hoarder's Bloodstone Amulet of Archaeology",
-        "baseType": "Bloodstone Amulet",
-        "rarity": "Magic",
-        "ilvl": 81,
-        "identified": true,
-        "note": "~b/o 1 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "37",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+38 to maximum Life",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3299347043",
-            "mods": [
-              {
-                "level": 23,
-                "magnitudes": [
-                  {
-                    "min": "30",
-                    "max": "40"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "31% increased [ItemRarity|Rarity of Items] found",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
-            "mods": [
-              {
-                "name": "of Archaeology",
-                "tier": "S1",
-                "level": 40,
-                "magnitudes": [
-                  {
-                    "min": "15",
-                    "max": "18"
-                  }
-                ]
-              },
-              {
-                "name": "Hoarder's",
-                "tier": "P1",
-                "level": 47,
-                "magnitudes": [
-                  {
-                    "min": "16",
-                    "max": "19"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3917489142",
-                [
-                  0,
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_3299347043",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "ee011dc8fa60c4bbe5feccb4b3a2ac20b191ff3b41e350cc5aadef19e6bf55ae",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-09T21:19:56Z",
-        "stash": {
-          "name": "1",
-          "x": 6,
-          "y": 11
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "exalted"
-        },
-        "fee": 3448,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQXp1cmVBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e49b170ba2/AzureAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "ee011dc8fa60c4bbe5feccb4b3a2ac20b191ff3b41e350cc5aadef19e6bf55ae",
-        "name": "",
-        "typeLine": "Collector's Azure Amulet of Archaeology",
-        "baseType": "Azure Amulet",
-        "rarity": "Magic",
-        "ilvl": 76,
-        "identified": true,
-        "note": "~b/o 1 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "32",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "23% increased Mana Regeneration Rate",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_789117908",
-            "mods": [
-              {
-                "magnitudes": [
-                  {
-                    "min": "20",
-                    "max": "30"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "33% increased [ItemRarity|Rarity of Items] found",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
-            "mods": [
-              {
-                "name": "Collector's",
-                "tier": "P2",
-                "level": 29,
-                "magnitudes": [
-                  {
-                    "min": "12",
-                    "max": "15"
-                  }
-                ]
-              },
-              {
-                "name": "of Archaeology",
-                "tier": "S1",
-                "level": 40,
-                "magnitudes": [
-                  {
-                    "min": "15",
-                    "max": "18"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3917489142",
-                [
-                  0,
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_789117908",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "ab4d4fc3ee347fd06bb4133c1d550590f82985a9e890cf7e193638a71fa455e5",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-22T15:10:45Z",
-        "stash": {
-          "name": "5",
-          "x": 6,
-          "y": 9
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 1,
-          "currency": "exalted"
-        },
-        "fee": 3730,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "ab4d4fc3ee347fd06bb4133c1d550590f82985a9e890cf7e193638a71fa455e5",
-        "name": "",
-        "typeLine": "Hoarder's Bloodstone Amulet of Raiding",
-        "baseType": "Bloodstone Amulet",
+        "typeLine": "Countess' Crimson Amulet of the Sorcerer",
+        "baseType": "Crimson Amulet",
         "rarity": "Magic",
         "ilvl": 79,
         "identified": true,
-        "note": "~b/o 1 exalted",
+        "note": "~b/o 88 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -441,7 +49,7 @@
             "name": "Level",
             "values": [
               [
-                "37",
+                "60",
                 0
               ]
             ],
@@ -451,16 +59,15 @@
         ],
         "implicitMods": [
           {
-            "description": "+34 to maximum Life",
+            "description": "2.6 Life Regeneration per second",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_3299347043",
+            "hash": "stat.implicit.stat_3325883026",
             "mods": [
               {
-                "level": 23,
                 "magnitudes": [
                   {
-                    "min": "30",
-                    "max": "40"
+                    "min": "2",
+                    "max": "4"
                   }
                 ]
               }
@@ -469,160 +76,36 @@
         ],
         "explicitMods": [
           {
-            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "description": "+47 to [Spirit|Spirit]",
             "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
+            "hash": "stat.explicit.stat_3981240776",
             "mods": [
               {
-                "name": "of Raiding",
-                "tier": "S2",
-                "level": 24,
-                "magnitudes": [
-                  {
-                    "min": "11",
-                    "max": "14"
-                  }
-                ]
-              },
-              {
-                "name": "Hoarder's",
+                "name": "Countess'",
                 "tier": "P1",
-                "level": 47,
+                "level": 54,
                 "magnitudes": [
                   {
-                    "min": "16",
-                    "max": "19"
+                    "min": "47",
+                    "max": "50"
                   }
                 ]
               }
             ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3917489142",
-                [
-                  0,
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_3299347043",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "67df8f9447d630913db0a137faeba385c06dcc39d58e5c1cdc82632908271486",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-21T03:05:01Z",
-        "stash": {
-          "name": "11",
-          "x": 11,
-          "y": 7
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 2,
-          "currency": "exalted"
-        },
-        "fee": 4245,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQmxvb2RzdG9uZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f8bbf74c8e/BloodstoneAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "67df8f9447d630913db0a137faeba385c06dcc39d58e5c1cdc82632908271486",
-        "name": "",
-        "typeLine": "Hoarder's Bloodstone Amulet of Archaeology",
-        "baseType": "Bloodstone Amulet",
-        "rarity": "Magic",
-        "ilvl": 81,
-        "identified": true,
-        "note": "~b/o 2 exalted",
-        "properties": [
+          },
           {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "37",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+39 to maximum Life",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_3299347043",
-            "mods": [
-              {
-                "level": 23,
-                "magnitudes": [
-                  {
-                    "min": "30",
-                    "max": "40"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "description": "+3 to Level of all [Spell|Spell] Skills",
             "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
+            "hash": "stat.explicit.stat_124131830",
             "mods": [
               {
-                "name": "Hoarder's",
-                "tier": "P1",
-                "level": 47,
-                "magnitudes": [
-                  {
-                    "min": "16",
-                    "max": "19"
-                  }
-                ]
-              },
-              {
-                "name": "of Archaeology",
+                "name": "of the Sorcerer",
                 "tier": "S1",
-                "level": 40,
+                "level": 75,
                 "magnitudes": [
                   {
-                    "min": "15",
-                    "max": "18"
+                    "min": "3",
+                    "max": "3"
                   }
                 ]
               }
@@ -635,16 +118,21 @@
           "hashes": {
             "explicit": [
               [
-                "explicit.stat_3917489142",
+                "explicit.stat_3981240776",
                 [
-                  0,
                   1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
                 ]
               ]
             ],
             "implicit": [
               [
-                "implicit.stat_3299347043",
+                "implicit.stat_3325883026",
                 [
                   0
                 ]
@@ -655,21 +143,21 @@
       }
     },
     {
-      "id": "3fef4f2ecd039d2c15bcff74816b8b5d97e25f1c950992140624763c535daff9",
+      "id": "b56052a9d1fa2355a64a18da961586377117772b7f3a70a9823a87c1a8dbcb5c",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-20T21:28:42Z",
+        "indexed": "2026-10-04T05:40:03Z",
         "stash": {
-          "name": "19",
+          "name": "악세",
           "x": 11,
-          "y": 0
+          "y": 11
         },
         "price": {
           "type": "~b/o",
-          "amount": 2,
-          "currency": "exalted"
+          "amount": 100,
+          "currency": "divine"
         },
-        "fee": 4221,
+        "fee": 7168,
         "account": {
           "name": "[redacted]",
           "online": null
@@ -680,16 +168,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvSmFkZUFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/ac51014172/JadeAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQ3JpbXNvbkFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/6306715ae7/CrimsonAmulet.png",
         "league": "Forbidden Rites",
-        "id": "3fef4f2ecd039d2c15bcff74816b8b5d97e25f1c950992140624763c535daff9",
+        "id": "b56052a9d1fa2355a64a18da961586377117772b7f3a70a9823a87c1a8dbcb5c",
         "name": "",
-        "typeLine": "Hoarder's Jade Amulet of Archaeology",
-        "baseType": "Jade Amulet",
+        "typeLine": "Countess' Crimson Amulet of the Sorcerer",
+        "baseType": "Crimson Amulet",
         "rarity": "Magic",
         "ilvl": 80,
         "identified": true,
-        "note": "~b/o 2 exalted",
+        "note": "~b/o 100 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -703,7 +191,7 @@
             "name": "Level",
             "values": [
               [
-                "37",
+                "60",
                 0
               ]
             ],
@@ -713,9 +201,151 @@
         ],
         "implicitMods": [
           {
-            "description": "+13 to [Dexterity|Dexterity]",
+            "description": "3.8 Life Regeneration per second",
             "domain": "implicit",
-            "hash": "stat.implicit.stat_3261801346",
+            "hash": "stat.implicit.stat_3325883026",
+            "mods": [
+              {
+                "magnitudes": [
+                  {
+                    "min": "2",
+                    "max": "4"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+49 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  0
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3325883026",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "31a82487c792eebbe4811f04628fccfb7f9dd0fb9e7ddcf8790e0bf96f52f3da",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-06T11:05:47Z",
+        "stash": {
+          "name": "5",
+          "x": 1,
+          "y": 2
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 100,
+          "currency": "divine"
+        },
+        "fee": 7412,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTGFwaXNBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/572eeaf30b/LapisAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "31a82487c792eebbe4811f04628fccfb7f9dd0fb9e7ddcf8790e0bf96f52f3da",
+        "name": "",
+        "typeLine": "Countess' Lapis Amulet of the Sorcerer",
+        "baseType": "Lapis Amulet",
+        "rarity": "Magic",
+        "ilvl": 83,
+        "identified": true,
+        "note": "~b/o 100 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+12 to [Intelligence|Intelligence]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_328541901",
             "mods": [
               {
                 "level": 10,
@@ -731,29 +361,36 @@
         ],
         "explicitMods": [
           {
-            "description": "33% increased [ItemRarity|Rarity of Items] found",
+            "description": "+47 to [Spirit|Spirit]",
             "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
+            "hash": "stat.explicit.stat_3981240776",
             "mods": [
               {
-                "name": "Hoarder's",
+                "name": "Countess'",
                 "tier": "P1",
-                "level": 47,
+                "level": 54,
                 "magnitudes": [
                   {
-                    "min": "16",
-                    "max": "19"
+                    "min": "47",
+                    "max": "50"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
               {
-                "name": "of Archaeology",
+                "name": "of the Sorcerer",
                 "tier": "S1",
-                "level": 40,
+                "level": 75,
                 "magnitudes": [
                   {
-                    "min": "15",
-                    "max": "18"
+                    "min": "3",
+                    "max": "3"
                   }
                 ]
               }
@@ -766,16 +403,21 @@
           "hashes": {
             "explicit": [
               [
-                "explicit.stat_3917489142",
+                "explicit.stat_3981240776",
                 [
-                  0,
                   1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
                 ]
               ]
             ],
             "implicit": [
               [
-                "implicit.stat_3261801346",
+                "implicit.stat_328541901",
                 [
                   0
                 ]
@@ -786,21 +428,21 @@
       }
     },
     {
-      "id": "b39bab032118e2eac0ab2904585431330863e147f6068d89807c93eedb4fdfa3",
+      "id": "9813462407ad47f3219e2425e9596359106721fae368596e3ce7096e4a78a0cd",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-26T18:22:42Z",
+        "indexed": "2026-09-21T13:33:16Z",
         "stash": {
-          "name": "2",
-          "x": 1,
-          "y": 5
+          "name": "16",
+          "x": 8,
+          "y": 10
         },
         "price": {
           "type": "~b/o",
-          "amount": 3,
-          "currency": "exalted"
+          "amount": 125,
+          "currency": "divine"
         },
-        "fee": 4101,
+        "fee": 6924,
         "account": {
           "name": "[redacted]",
           "online": null
@@ -811,16 +453,16 @@
         "verified": true,
         "w": 1,
         "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTHVuYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e0eef02a23/LunarAmulet.png",
         "league": "Forbidden Rites",
-        "id": "b39bab032118e2eac0ab2904585431330863e147f6068d89807c93eedb4fdfa3",
+        "id": "9813462407ad47f3219e2425e9596359106721fae368596e3ce7096e4a78a0cd",
         "name": "",
-        "typeLine": "Hoarder's Solar Amulet of Archaeology",
-        "baseType": "Solar Amulet",
+        "typeLine": "Countess' Lunar Amulet of the Sorcerer",
+        "baseType": "Lunar Amulet",
         "rarity": "Magic",
-        "ilvl": 79,
+        "ilvl": 78,
         "identified": true,
-        "note": "~b/o 3 exalted",
+        "note": "~b/o 125 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -834,7 +476,583 @@
             "name": "Level",
             "values": [
               [
-                "37",
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+26 to maximum [EnergyShield|Energy Shield]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3489782002",
+            "mods": [
+              {
+                "level": 18,
+                "magnitudes": [
+                  {
+                    "min": "20",
+                    "max": "30"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+49 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  0
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3489782002",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "5f08d3aa3b703951b7759ebcb47f1e474881f2351629994e1cd5a58c01e0188e",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-08T16:18:45Z",
+        "stash": {
+          "name": "8",
+          "x": 1,
+          "y": 4
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 125,
+          "currency": "divine"
+        },
+        "fee": 6964,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "5f08d3aa3b703951b7759ebcb47f1e474881f2351629994e1cd5a58c01e0188e",
+        "name": "",
+        "typeLine": "Countess' Solar Amulet of the Sorcerer",
+        "baseType": "Solar Amulet",
+        "rarity": "Magic",
+        "ilvl": 79,
+        "identified": true,
+        "note": "~b/o 125 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+12 to [Spirit|Spirit]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_3981240776",
+            "mods": [
+              {
+                "level": 38,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+48 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_3981240776",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "cd62a3077d69da6ffaadd860064aee68089608469518b9fa0a2a8da82e36a1e5",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-08T15:33:01Z",
+        "stash": {
+          "name": "5",
+          "x": 1,
+          "y": 3
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 145,
+          "currency": "divine"
+        },
+        "fee": 7412,
+        "account": {
+          "name": "[redacted]",
+          "online": null,
+          "lastCharacterName": "[redacted]",
+          "language": "zh_TW",
+          "realm": "poe2"
+        },
+        "whisper": "[redacted]"
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "cd62a3077d69da6ffaadd860064aee68089608469518b9fa0a2a8da82e36a1e5",
+        "name": "",
+        "typeLine": "Countess' Amber Amulet of the Sorcerer",
+        "baseType": "Amber Amulet",
+        "rarity": "Magic",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 145 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+12 to [Strength|Strength]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_4080418644",
+            "mods": [
+              {
+                "level": 10,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+49 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_4080418644",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "078c41e2986a4569d5384d63a04727d705aac814b641e60ff31ee986a5f6fd05",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-09-17T14:09:01Z",
+        "stash": {
+          "name": "4",
+          "x": 4,
+          "y": 2
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 180,
+          "currency": "divine"
+        },
+        "fee": 7209,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "078c41e2986a4569d5384d63a04727d705aac814b641e60ff31ee986a5f6fd05",
+        "name": "",
+        "typeLine": "Countess' Amber Amulet of the Sorcerer",
+        "baseType": "Amber Amulet",
+        "rarity": "Magic",
+        "ilvl": 81,
+        "identified": true,
+        "note": "~b/o 180 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+10 to [Strength|Strength]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_4080418644",
+            "mods": [
+              {
+                "level": 10,
+                "magnitudes": [
+                  {
+                    "min": "10",
+                    "max": "15"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+50 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_4080418644",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "2174d2386c8a7bbd65721fcc57b970e23fe27ecf1bd56d9904c6061b46b1e094",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-09T08:35:56Z",
+        "stash": {
+          "name": "28",
+          "x": 9,
+          "y": 9
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 180,
+          "currency": "divine"
+        },
+        "fee": 6924,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "2174d2386c8a7bbd65721fcc57b970e23fe27ecf1bd56d9904c6061b46b1e094",
+        "name": "",
+        "typeLine": "Countess' Solar Amulet of the Sorcerer",
+        "baseType": "Solar Amulet",
+        "rarity": "Magic",
+        "ilvl": 78,
+        "identified": true,
+        "note": "~b/o 180 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
                 0
               ]
             ],
@@ -862,29 +1080,36 @@
         ],
         "explicitMods": [
           {
-            "description": "32% increased [ItemRarity|Rarity of Items] found",
+            "description": "+48 to [Spirit|Spirit]",
             "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
+            "hash": "stat.explicit.stat_3981240776",
             "mods": [
               {
-                "name": "of Archaeology",
-                "tier": "S1",
-                "level": 40,
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
                 "magnitudes": [
                   {
-                    "min": "15",
-                    "max": "18"
+                    "min": "47",
+                    "max": "50"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
               {
-                "name": "Hoarder's",
-                "tier": "P1",
-                "level": 47,
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
                 "magnitudes": [
                   {
-                    "min": "16",
-                    "max": "19"
+                    "min": "3",
+                    "max": "3"
                   }
                 ]
               }
@@ -897,9 +1122,14 @@
           "hashes": {
             "explicit": [
               [
-                "explicit.stat_3917489142",
+                "explicit.stat_3981240776",
                 [
-                  0,
+                  0
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
                   1
                 ]
               ]
@@ -917,283 +1147,21 @@
       }
     },
     {
-      "id": "f1a1d3f8bf820b2576490f6996501a3a13a43a9ebbf5e160a9550b907f1c08da",
+      "id": "77eb8e07288d1b1e6173dabdbe326e02ac97ed77f6b56651679d0046e6910de8",
       "listing": {
         "method": "psapi",
-        "indexed": "2026-09-14T07:03:18Z",
+        "indexed": "2026-10-05T22:47:06Z",
         "stash": {
-          "name": "9",
-          "x": 9,
+          "name": "11",
+          "x": 6,
           "y": 0
         },
         "price": {
           "type": "~b/o",
-          "amount": 3,
-          "currency": "exalted"
+          "amount": 190,
+          "currency": "divine"
         },
-        "fee": 4221,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "f1a1d3f8bf820b2576490f6996501a3a13a43a9ebbf5e160a9550b907f1c08da",
-        "name": "",
-        "typeLine": "Hoarder's Amber Amulet of Archaeology",
-        "baseType": "Amber Amulet",
-        "rarity": "Magic",
-        "ilvl": 80,
-        "identified": true,
-        "note": "~b/o 3 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "37",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+10 to [Strength|Strength]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_4080418644",
-            "mods": [
-              {
-                "level": 10,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "31% increased [ItemRarity|Rarity of Items] found",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
-            "mods": [
-              {
-                "name": "of Archaeology",
-                "tier": "S1",
-                "level": 40,
-                "magnitudes": [
-                  {
-                    "min": "15",
-                    "max": "18"
-                  }
-                ]
-              },
-              {
-                "name": "Hoarder's",
-                "tier": "P1",
-                "level": 47,
-                "magnitudes": [
-                  {
-                    "min": "16",
-                    "max": "19"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3917489142",
-                [
-                  0,
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_4080418644",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "323f13e0fef8e44df9f73b6ef1e45a6f9ad8ef26240d4a34935984640eae2482",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-11T21:19:19Z",
-        "stash": {
-          "name": "7",
-          "x": 0,
-          "y": 6
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 4,
-          "currency": "exalted"
-        },
-        "fee": 4101,
-        "account": {
-          "name": "[redacted]",
-          "online": null
-        }
-      },
-      "item": {
-        "realm": "poe2",
-        "verified": true,
-        "w": 1,
-        "h": 1,
-        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvQW1iZXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b2698b19ad/AmberAmulet.png",
-        "league": "Forbidden Rites",
-        "id": "323f13e0fef8e44df9f73b6ef1e45a6f9ad8ef26240d4a34935984640eae2482",
-        "name": "",
-        "typeLine": "Hoarder's Amber Amulet of Archaeology",
-        "baseType": "Amber Amulet",
-        "rarity": "Magic",
-        "ilvl": 79,
-        "identified": true,
-        "note": "~b/o 4 exalted",
-        "properties": [
-          {
-            "name": "Amulet",
-            "values": [],
-            "displayMode": 0,
-            "type": 109
-          }
-        ],
-        "requirements": [
-          {
-            "name": "Level",
-            "values": [
-              [
-                "37",
-                0
-              ]
-            ],
-            "displayMode": 0,
-            "type": 62
-          }
-        ],
-        "implicitMods": [
-          {
-            "description": "+10 to [Strength|Strength]",
-            "domain": "implicit",
-            "hash": "stat.implicit.stat_4080418644",
-            "mods": [
-              {
-                "level": 10,
-                "magnitudes": [
-                  {
-                    "min": "10",
-                    "max": "15"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "explicitMods": [
-          {
-            "description": "32% increased [ItemRarity|Rarity of Items] found",
-            "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
-            "mods": [
-              {
-                "name": "of Archaeology",
-                "tier": "S1",
-                "level": 40,
-                "magnitudes": [
-                  {
-                    "min": "15",
-                    "max": "18"
-                  }
-                ]
-              },
-              {
-                "name": "Hoarder's",
-                "tier": "P1",
-                "level": 47,
-                "magnitudes": [
-                  {
-                    "min": "16",
-                    "max": "19"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "frameType": 1,
-        "frameTypeId": "Magic",
-        "extended": {
-          "hashes": {
-            "explicit": [
-              [
-                "explicit.stat_3917489142",
-                [
-                  0,
-                  1
-                ]
-              ]
-            ],
-            "implicit": [
-              [
-                "implicit.stat_4080418644",
-                [
-                  0
-                ]
-              ]
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": "42069023a6d4e8705694e8dd2a42d180bae2a1057b902253580a85c94ebeeaf2",
-      "listing": {
-        "method": "psapi",
-        "indexed": "2026-09-21T13:41:56Z",
-        "stash": {
-          "name": "5",
-          "x": 0,
-          "y": 7
-        },
-        "price": {
-          "type": "~b/o",
-          "amount": 4,
-          "currency": "exalted"
-        },
-        "fee": 4101,
+        "fee": 6964,
         "account": {
           "name": "[redacted]",
           "online": null
@@ -1206,14 +1174,14 @@
         "h": 1,
         "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU29sYXJBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/f23b75f540/SolarAmulet.png",
         "league": "Forbidden Rites",
-        "id": "42069023a6d4e8705694e8dd2a42d180bae2a1057b902253580a85c94ebeeaf2",
+        "id": "77eb8e07288d1b1e6173dabdbe326e02ac97ed77f6b56651679d0046e6910de8",
         "name": "",
-        "typeLine": "Hoarder's Solar Amulet of Archaeology",
+        "typeLine": "Countess' Solar Amulet of the Sorcerer",
         "baseType": "Solar Amulet",
         "rarity": "Magic",
         "ilvl": 79,
         "identified": true,
-        "note": "~b/o 4 exalted",
+        "note": "~b/o 190 divine",
         "properties": [
           {
             "name": "Amulet",
@@ -1227,7 +1195,7 @@
             "name": "Level",
             "values": [
               [
-                "37",
+                "60",
                 0
               ]
             ],
@@ -1237,7 +1205,7 @@
         ],
         "implicitMods": [
           {
-            "description": "+11 to [Spirit|Spirit]",
+            "description": "+15 to [Spirit|Spirit]",
             "domain": "implicit",
             "hash": "stat.implicit.stat_3981240776",
             "mods": [
@@ -1255,29 +1223,36 @@
         ],
         "explicitMods": [
           {
-            "description": "33% increased [ItemRarity|Rarity of Items] found",
+            "description": "+49 to [Spirit|Spirit]",
             "domain": "explicit",
-            "hash": "stat.explicit.stat_3917489142",
+            "hash": "stat.explicit.stat_3981240776",
             "mods": [
               {
-                "name": "Hoarder's",
+                "name": "Countess'",
                 "tier": "P1",
-                "level": 47,
+                "level": 54,
                 "magnitudes": [
                   {
-                    "min": "16",
-                    "max": "19"
+                    "min": "47",
+                    "max": "50"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
               {
-                "name": "of Archaeology",
+                "name": "of the Sorcerer",
                 "tier": "S1",
-                "level": 40,
+                "level": 75,
                 "magnitudes": [
                   {
-                    "min": "15",
-                    "max": "18"
+                    "min": "3",
+                    "max": "3"
                   }
                 ]
               }
@@ -1290,16 +1265,164 @@
           "hashes": {
             "explicit": [
               [
-                "explicit.stat_3917489142",
+                "explicit.stat_3981240776",
                 [
-                  0,
                   1
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  0
                 ]
               ]
             ],
             "implicit": [
               [
                 "implicit.stat_3981240776",
+                [
+                  0
+                ]
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "f3e60fbf6e6440bc63343e40980b5fa13c817dace7efe6a36ceafbdc26b9b2eb",
+      "listing": {
+        "method": "psapi",
+        "indexed": "2026-10-07T03:50:27Z",
+        "stash": {
+          "name": "25",
+          "x": 0,
+          "y": 0
+        },
+        "price": {
+          "type": "~b/o",
+          "amount": 195,
+          "currency": "divine"
+        },
+        "fee": 7412,
+        "account": {
+          "name": "[redacted]",
+          "online": null
+        }
+      },
+      "item": {
+        "realm": "poe2",
+        "verified": true,
+        "w": 1,
+        "h": 1,
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvU3RlbGxhckFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/a44db4cd4a/StellarAmulet.png",
+        "league": "Forbidden Rites",
+        "id": "f3e60fbf6e6440bc63343e40980b5fa13c817dace7efe6a36ceafbdc26b9b2eb",
+        "name": "",
+        "typeLine": "Countess' Stellar Amulet of the Sorcerer",
+        "baseType": "Stellar Amulet",
+        "rarity": "Magic",
+        "ilvl": 82,
+        "identified": true,
+        "note": "~b/o 195 divine",
+        "properties": [
+          {
+            "name": "Amulet",
+            "values": [],
+            "displayMode": 0,
+            "type": 109
+          }
+        ],
+        "requirements": [
+          {
+            "name": "Level",
+            "values": [
+              [
+                "60",
+                0
+              ]
+            ],
+            "displayMode": 0,
+            "type": 62
+          }
+        ],
+        "implicitMods": [
+          {
+            "description": "+7 to all [Attributes|Attributes]",
+            "domain": "implicit",
+            "hash": "stat.implicit.stat_1379411836",
+            "mods": [
+              {
+                "level": 31,
+                "magnitudes": [
+                  {
+                    "min": "5",
+                    "max": "7"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "explicitMods": [
+          {
+            "description": "+48 to [Spirit|Spirit]",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_3981240776",
+            "mods": [
+              {
+                "name": "Countess'",
+                "tier": "P1",
+                "level": 54,
+                "magnitudes": [
+                  {
+                    "min": "47",
+                    "max": "50"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "+3 to Level of all [Spell|Spell] Skills",
+            "domain": "explicit",
+            "hash": "stat.explicit.stat_124131830",
+            "mods": [
+              {
+                "name": "of the Sorcerer",
+                "tier": "S1",
+                "level": 75,
+                "magnitudes": [
+                  {
+                    "min": "3",
+                    "max": "3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "frameType": 1,
+        "frameTypeId": "Magic",
+        "extended": {
+          "hashes": {
+            "explicit": [
+              [
+                "explicit.stat_3981240776",
+                [
+                  0
+                ]
+              ],
+              [
+                "explicit.stat_124131830",
+                [
+                  1
+                ]
+              ]
+            ],
+            "implicit": [
+              [
+                "implicit.stat_1379411836",
                 [
                   0
                 ]
