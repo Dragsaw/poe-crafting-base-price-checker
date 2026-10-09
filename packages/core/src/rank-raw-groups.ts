@@ -1,5 +1,15 @@
 import { canonicalKey } from '@poe/contracts';
-import type { DatasetEntry, NotYetSyncedReason, RankedRow, RawRankedRow, RawTrackedEntry, TrackedEntry } from '@poe/contracts';
+import type {
+  DatasetEntry,
+  NotYetSyncedReason,
+  PriceTrust,
+  RankedRow,
+  RawRankedRow,
+  RawTrackedEntry,
+  TrackedEntry,
+} from '@poe/contracts';
+
+import { entryTrust, resolvedPrice } from './price-trust.ts';
 
 /** An entry that contributes nothing to the ordering — not zero, nothing (AD-9). */
 export interface UnrankedEntry {
@@ -7,6 +17,7 @@ export interface UnrankedEntry {
   readonly entryKey: string;
   /** Present where the dataset entry carries it, for the view's *tried* clock. */
   readonly lastAttemptedAt?: string;
+  readonly trust: PriceTrust;
 }
 
 export interface NotYetSyncedEntry extends UnrankedEntry {
@@ -17,10 +28,11 @@ function unranked(
   entry: RawTrackedEntry,
   entryKey: string,
   published: DatasetEntry | undefined,
+  trust: PriceTrust,
 ): UnrankedEntry {
   return published?.lastAttemptedAt === undefined
-    ? { entry, entryKey }
-    : { entry, entryKey, lastAttemptedAt: published.lastAttemptedAt };
+    ? { entry, entryKey, trust }
+    : { entry, entryKey, lastAttemptedAt: published.lastAttemptedAt, trust };
 }
 
 type LiveRawEntry = RawTrackedEntry & { readonly status: RawRankedRow['status'] };
@@ -32,6 +44,8 @@ function isLiveRaw(entry: TrackedEntry): entry is LiveRawEntry {
 interface RawGroupingRules {
   readonly activeLeague: string;
   readonly threshold: number;
+  /** ISO-8601, the clock the verdict reads ages against (AD-10). */
+  readonly now: string;
 }
 
 interface RawGroups {
@@ -57,6 +71,7 @@ function rawRankedRow(
     craftCost: 0,
     observation,
     ...(base.lastAttemptedAt !== undefined && { lastAttemptedAt: base.lastAttemptedAt }),
+    trust: base.trust,
   };
 }
 
@@ -68,14 +83,9 @@ function groupRawEntry(
 ): void {
   const entryKey = canonicalKey(entry);
   const published = byKey.get(entryKey);
-  const base = unranked(entry, entryKey, published);
+  const base = unranked(entry, entryKey, published, entryTrust(entry, published, rules.activeLeague, rules.now));
+  const price = resolvedPrice(published, rules.activeLeague);
 
-  if (published === undefined) {
-    groups.notYetSynced.push({ ...base, reason: 'never-synced' });
-    return;
-  }
-
-  const { price } = published;
   if (price.state === 'no-listings') {
     groups.noListings.push(base);
     return;
@@ -88,13 +98,8 @@ function groupRawEntry(
     groups.notYetSynced.push({ ...base, reason: price.reason });
     return;
   }
-  const { observation } = price;
-  if (observation.league !== rules.activeLeague) {
-    groups.notYetSynced.push({ ...base, reason: 'league-mismatch' });
-    return;
-  }
-  const row = rawRankedRow(entry, base, observation);
-  if (observation.priceDivine < rules.threshold) {
+  const row = rawRankedRow(entry, base, price.observation);
+  if (price.observation.priceDivine < rules.threshold) {
     groups.belowThreshold.push(row);
   } else {
     groups.surviving.push(row);

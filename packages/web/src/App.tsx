@@ -138,11 +138,13 @@ function usePersistedRecipe(): readonly [string | undefined, (recipeId: string) 
 function useRanking(view: ViewState, threshold: number): Ranking | undefined {
   const readySet = view.kind === 'ready' ? view.set : undefined;
   const readyFailures = view.kind === 'ready' ? view.crossFileFailures : undefined;
+  const readyNow = view.kind === 'ready' ? view.now : undefined;
   return useMemo(
     () =>
-      readySet === undefined
+      readySet === undefined || readyNow === undefined
         ? undefined
         : rank({
+            now: new Date(readyNow).toISOString(),
             tracked: readySet.tracked.entries,
             dataset: readySet.dataset.entries,
             activeLeague: readySet.config.league,
@@ -152,7 +154,7 @@ function useRanking(view: ViewState, threshold: number): Ranking | undefined {
             recipes: readySet.recipes?.recipes ?? [],
             currencyRates: readySet.dataset.currencyRates,
           }),
-    [readySet, readyFailures, threshold],
+    [readySet, readyFailures, readyNow, threshold],
   );
 }
 

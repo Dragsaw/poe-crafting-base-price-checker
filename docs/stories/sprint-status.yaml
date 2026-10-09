@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-09-2026 23:30
+last_updated: 10-09-2026 23:21
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -71,7 +71,7 @@ development_status:
 
   epic-4: in-progress
   4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar: review
-  4-2-the-price-trust-verdict-in-core: backlog
+  4-2-the-price-trust-verdict-in-core: review
   4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark: backlog
   4-4-the-expansion-one-line-per-entry-top-lines-and-the-trust-rea: backlog
   4-5-header-controls-and-the-sync-button: backlog

@@ -12,6 +12,8 @@ import { TEST_LEAGUE } from './artifact-server';
 
 /** The test clock every unit and list test reads as `now`. */
 export const NOW = Date.parse('2026-09-26T12:00:00.000Z');
+/** `NOW` as `core`'s `RankInput.now` takes it. */
+export const NOW_ISO = new Date(NOW).toISOString();
 
 /** A token hex as the `rgb(...)` jsdom reports for an inline colour. */
 export const rgb = (hex: string): string =>
@@ -93,7 +95,7 @@ function rerender(node: ReactNode): void {
 
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold, weights: undefined }), dataset, NOW);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined }), dataset, NOW);
   return <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />;
 }
 

@@ -4,13 +4,11 @@ import { NOW } from '../test-support/dom';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import {
-  ageMark,
   classPanelSubLine,
   BELOW_THRESHOLD_NOTE,
   combinationAges,
   combinationFigure,
   craftedCombinationNote,
-  FRESHNESS_CUTOFF_HOURS,
   MONEY_PHRASES,
   PANEL_ASKING_SENTENCE,
   PRICE_STATE_GLYPHS,
@@ -28,10 +26,6 @@ import {
 } from './format';
 
 describe('the view constants', () => {
-  it('cuts freshness at 48h', () => {
-    expect(FRESHNESS_CUTOFF_HOURS).toBe(48);
-  });
-
   it('holds the five money-slot phrases, none of them number-shaped', () => {
     expect(Object.values(MONEY_PHRASES)).toEqual([
       'an open question',
@@ -43,52 +37,6 @@ describe('the view constants', () => {
     for (const phrase of Object.values(MONEY_PHRASES)) {
       expect(phrase).not.toMatch(/\d|—|-/);
     }
-  });
-});
-
-describe('ageMark', () => {
-  const pricedAt = (observedAt: string): CombinationState => ({ state: 'priced', priceDivine: 0.5, sampleSize: 10, observedAt });
-  const NO_LISTINGS: CombinationState = { state: 'no-listings' };
-  const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
-  const NEVER: CombinationState = { state: 'not-yet-synced', reason: 'never-synced' };
-
-  it('is silent under the cut-off', () => {
-    expect(ageMark(pricedAt(hoursBefore(NOW, 3)), hoursBefore(NOW, 3), NOW)).toBeUndefined();
-    expect(ageMark(pricedAt(hoursBefore(NOW, 47.99)), hoursBefore(NOW, 47.99), NOW)).toBeUndefined();
-  });
-
-  it('reads the observation clock for a priced row, from exactly 48h', () => {
-    expect(ageMark(pricedAt(hoursBefore(NOW, 48)), hoursBefore(NOW, 48), NOW)).toEqual({
-      kind: 'stale',
-      word: 'priced 2d ago',
-    });
-    expect(ageMark(pricedAt(hoursBefore(NOW, 5 * 24 + 4)), hoursBefore(NOW, 5 * 24 + 4), NOW)).toEqual({
-      kind: 'stale',
-      word: 'priced 5d ago',
-    });
-  });
-
-  it('reads observedAt, not lastAttemptedAt, where the row prints priced', () => {
-    expect(ageMark(pricedAt(hoursBefore(NOW, 72)), hoursBefore(NOW, 1), NOW)).toEqual({
-      kind: 'stale',
-      word: 'priced 3d ago',
-    });
-  });
-
-  it('reads a league-mismatched row by its attempted clock, never as priced', () => {
-    expect(ageMark(MISMATCH, hoursBefore(NOW, 96), NOW)).toEqual({ kind: 'stale', word: 'tried 4d ago' });
-    expect(ageMark(MISMATCH, hoursBefore(NOW, 2), NOW)).toBeUndefined();
-  });
-
-  it('reads lastAttemptedAt where there is no observation', () => {
-    expect(ageMark(NO_LISTINGS, hoursBefore(NOW, 9 * 24 + 1), NOW)).toEqual({ kind: 'stale', word: 'tried 9d ago' });
-    expect(ageMark(NO_LISTINGS, hoursBefore(NOW, 2), NOW)).toBeUndefined();
-  });
-
-  it('reads never attempted where neither clock exists', () => {
-    const never = { kind: 'never', word: 'never attempted' };
-    expect(ageMark(NEVER, undefined, NOW)).toEqual(never);
-    expect(ageMark(NO_LISTINGS, undefined, NOW)).toEqual(never);
   });
 });
 

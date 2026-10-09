@@ -85,7 +85,6 @@ describe('the resting chrome', () => {
     const rows = frame().querySelectorAll('[data-ranked-row]');
     expect(rows[0]?.textContent).toContain('0.50');
     expect(rows[1]?.textContent).toContain('an open question');
-    expect(rows[1]?.textContent).toContain('tried 9d ago');
     // Matrix: unresolvable — a trailing row, not valued.
     expect(rows[2]?.textContent).toContain('Lost Ring');
     expect(rows[2]?.textContent).toContain('not valued');

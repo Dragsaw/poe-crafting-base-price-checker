@@ -12,12 +12,10 @@ import { craftedClassesOf, type Ranking, type UnrankedEntry } from '@poe/core';
 import { formatDivine } from '../shared/money';
 import { combinationText, type AffixPart, type StatTexts } from './combination-text';
 import {
-  ageMark,
   combinationAges,
   craftedCombinationNote,
   MONEY_PHRASES,
   resolvedState,
-  type AgeMark,
   type CombinationAges,
   type CombinationState,
   unitLabel,
@@ -44,14 +42,13 @@ export interface DisplayRow {
   readonly label: string;
   readonly itemLevel: number;
   readonly ev: ExpectedValueCell;
-  readonly age: AgeMark | undefined;
   /** The Curation Status. `pinned` leads the combination cell; the trade-link test refuses `pruned`. */
   readonly status: CurationStatus;
   /** The Price State the expansion prints, as `core` resolved it (a league mismatch included). */
   readonly state: CombinationState;
   /** The row's dataset entry, joined by `entryKey`: its clocks and stored search. `undefined` when never synced. */
   readonly entry: DatasetEntry | undefined;
-  /** The expansion's two exact labelled ages, read against the same `now` as `age`. */
+  /** The expansion's two exact labelled ages, read against the view's held `now`. */
   readonly ages: CombinationAges;
 }
 
@@ -67,7 +64,6 @@ export interface ClassDisplayRow {
   readonly itemLevel: number;
   /** The EV at 2dp — negative is a real figure — or *no figure yet* when the recipe is uncostable. */
   readonly ev: ExpectedValueCell;
-  readonly age: undefined;
   /** `core`'s label of the pair. Only `uniform-prior` prints a mark; `measured` is silence (FR-11). */
   readonly provenance: CraftedRankedRow['provenance'];
   /** The first three of `core`'s summands, in its order, as Combination text; fewer leave blank. */
@@ -188,10 +184,9 @@ function rowDetail(
   { byKey, now }: RowContext,
   entryKey: string,
   state: CombinationState,
-): Pick<DisplayRow, 'age' | 'state' | 'entry' | 'ages'> {
+): Pick<DisplayRow, 'state' | 'entry' | 'ages'> {
   const entry = byKey.get(entryKey);
   return {
-    age: ageMark(state, entry?.lastAttemptedAt, now),
     state,
     entry,
     ages: combinationAges(state, entry?.lastAttemptedAt, now),
@@ -218,7 +213,6 @@ function rankedRows(
           row.ev === null
             ? { kind: 'phrase', text: MONEY_PHRASES.notYetSynced }
             : { kind: 'figure', text: formatDivine(row.ev) },
-        age: undefined,
         provenance: row.provenance,
         ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey: context.byKey, crafted, now: context.now }),
       };

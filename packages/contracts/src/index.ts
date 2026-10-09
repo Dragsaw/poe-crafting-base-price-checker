@@ -119,7 +119,11 @@ export {
 } from './dataset.ts';
 export type { DatasetEntry, NotYetSyncedReason, PriceState } from './dataset.ts';
 
+export { PriceTrustReasonSchema, PriceTrustSchema, PriceTrustVerdictSchema } from './ranked-row/price-trust.ts';
+export type { PriceTrust, PriceTrustReason, PriceTrustVerdict } from './ranked-row/price-trust.ts';
+
 export {
+  CraftedCombinationSchema,
   CraftedRankedRowSchema,
   CraftedSummandSchema,
   ProvenanceSchema,
@@ -127,7 +131,7 @@ export {
   RawRankedRowSchema,
   UncostableSchema,
 } from './ranked-row.ts';
-export type { CraftedRankedRow, CraftedSummand, Provenance, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
+export type { CraftedCombination, CraftedRankedRow, CraftedSummand, Provenance, RankedRow, RawRankedRow, Uncostable } from './ranked-row.ts';
 
 export {
   filterOptionIds,

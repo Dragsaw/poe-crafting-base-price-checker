@@ -1,5 +1,5 @@
 import { canonicalKey } from '@poe/contracts';
-import type { PriceState, RankedRow, RawRankedRow, TrackedEntry } from '@poe/contracts';
+import type { NotYetSyncedReason, PriceState, PriceTrust, RankedRow, RawRankedRow, TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import type { Ranking } from './rank.ts';
@@ -16,6 +16,8 @@ import {
   ranked,
   raw,
 } from './rank/test-support.ts';
+
+const pending = (kind: NotYetSyncedReason): PriceTrust => ({ verdict: 'pending', reasons: [{ kind }] });
 
 /** The raw rows of a ranking, narrowed. */
 const rawRows = (rows: readonly RankedRow[]): RawRankedRow[] => rows.flatMap((row) => (row.kind === 'raw' ? [row] : []));
@@ -35,6 +37,7 @@ describe('rank: the I/O matrix', () => {
         craftCost: 0,
         observation: observation(0.5),
         lastAttemptedAt: ATTEMPTED,
+        trust: { verdict: 'current', reasons: [] },
       },
     ]);
     expect(result.belowThreshold).toEqual([]);
@@ -73,8 +76,8 @@ describe('rank: the I/O matrix', () => {
     expect(result.ordering).toEqual([]);
     expect(result.belowThreshold).toEqual([]);
     expect(result.notYetSynced).toEqual([
-      { entry: A, entryKey: canonicalKey(A), lastAttemptedAt: ATTEMPTED, reason: 'league-mismatch' },
-      { entry: B, entryKey: canonicalKey(B), lastAttemptedAt: ATTEMPTED, reason: 'league-mismatch' },
+      { entry: A, entryKey: canonicalKey(A), lastAttemptedAt: ATTEMPTED, reason: 'league-mismatch', trust: pending('league-mismatch') },
+      { entry: B, entryKey: canonicalKey(B), lastAttemptedAt: ATTEMPTED, reason: 'league-mismatch', trust: pending('league-mismatch') },
     ]);
   });
 
@@ -92,7 +95,7 @@ describe('rank: the I/O matrix', () => {
   it('a tracked entry with no dataset entry is not-yet-synced / never-synced, with no lastAttemptedAt', () => {
     const A = raw('A');
     const result = ranked({ tracked: [A] });
-    expect(result.notYetSynced).toEqual([{ entry: A, entryKey: canonicalKey(A), reason: 'never-synced' }]);
+    expect(result.notYetSynced).toEqual([{ entry: A, entryKey: canonicalKey(A), reason: 'never-synced', trust: pending('never-synced') }]);
     expect(result.notYetSynced[0]).not.toHaveProperty('lastAttemptedAt');
   });
 
@@ -108,10 +111,14 @@ describe('rank: the I/O matrix', () => {
         published(X, { state: 'not-yet-synced', reason: 'no-exchange-rate' }),
       ],
     });
-    expect(result.noListings).toEqual([{ entry: N, entryKey: canonicalKey(N), lastAttemptedAt: ATTEMPTED }]);
-    expect(result.unresolvable).toEqual([{ entry: U, entryKey: canonicalKey(U) }]);
+    expect(result.noListings).toEqual([
+      { entry: N, entryKey: canonicalKey(N), lastAttemptedAt: ATTEMPTED, trust: { verdict: 'pending', reasons: [{ kind: 'no-listings', days: 0 }] } },
+    ]);
+    expect(result.unresolvable).toEqual([
+      { entry: U, entryKey: canonicalKey(U), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } },
+    ]);
     expect(result.notYetSynced).toEqual([
-      { entry: X, entryKey: canonicalKey(X), lastAttemptedAt: ATTEMPTED, reason: 'no-exchange-rate' },
+      { entry: X, entryKey: canonicalKey(X), lastAttemptedAt: ATTEMPTED, reason: 'no-exchange-rate', trust: pending('no-exchange-rate') },
     ]);
     expect(result.ordering).toEqual([]);
     expect(result.belowThreshold).toEqual([]);
