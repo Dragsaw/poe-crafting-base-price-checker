@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 import type { ListStatement as Statement } from './list-statement';
 
 // EXPERIENCE.md states 23 and 25. The two statements are exclusive, so one slot at
@@ -13,10 +13,10 @@ export function ListStatement({ statement }: { readonly statement: Statement }):
     <p
       data-list-statement={statement.kind}
       style={{
-        ...typeStyle('trust-strip'),
-        height: px(spacing.frameReserveListStatement),
-        lineHeight: px(spacing.frameReserveListStatement),
-        color: colors.ink,
+        ...typeStyle('note'),
+        height: px(layout.listStatementHeight),
+        lineHeight: px(layout.listStatementHeight),
+        color: colors.text,
         margin: 0,
       }}
     >

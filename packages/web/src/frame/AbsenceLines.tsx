@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 
 import { ARTIFACTS, type TolerableKey } from '../load/artifacts';
-import { colors, px, spacing } from '../theme/tokens';
+import { colors, px, layout } from '../theme/tokens';
 
 /** What each absence costs the page (Story 2.1 decision 2026-09-26; final copy is UX's). */
 const CONSEQUENCE: Readonly<Record<TolerableKey, string>> = {
@@ -36,13 +36,13 @@ export function AbsenceLines({ absent }: { readonly absent: readonly TolerableKe
           key={key}
           data-absence-line={key}
           style={{
-            height: px(spacing.frameReserveAbsenceLine),
-            lineHeight: px(spacing.frameReserveAbsenceLine),
-            color: colors['ink-secondary'],
+            height: px(layout.absenceLineHeight),
+            lineHeight: px(layout.absenceLineHeight),
+            color: colors['text-secondary'],
             margin: 0,
           }}
         >
-          <span style={{ color: colors.ink, fontWeight: 600 }}>{ABSENCE_LEAD}</span> {absenceBody(key)}
+          <span style={{ color: colors.text, fontWeight: 600 }}>{ABSENCE_LEAD}</span> {absenceBody(key)}
         </p>
       ))}
     </div>

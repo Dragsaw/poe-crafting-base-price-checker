@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cellIn as cell, mountList, NOW, rgb, rowsIn, unmount } from '../test-support/dom';
 import { cssNumber } from '../test-support/css-number';
 import { hoursBefore, many, priced, rawEntry } from '../test-support/list-fixtures';
-import { colors, glyphs, rankedRowColumns, spacing } from '../theme/tokens';
+import { colors, glyphs, rankedRowColumns, layout } from '../theme/tokens';
 import { COLUMN_LABELS } from './ColumnHeader';
 import { rawNote } from './format';
 import { HAIR_SPACE } from './TrustMark';
@@ -61,7 +61,7 @@ describe('a ranked row', () => {
     const belt = rawEntry('Wide Belt');
     const [row] = rowsIn(mountList([belt], [priced(belt, 0.5, hoursBefore(NOW, 3))]));
     const widths = rankedRowColumns.map((c) => cssNumber(cell(row, c.name).style.width));
-    expect(widths.reduce((a, b) => a + b, 0)).toBe(spacing.contentWidth);
+    expect(widths.reduce((a, b) => a + b, 0)).toBe(layout.contentWidth);
     expect(row?.style.height).toBe('28px');
     expect(row?.style.width).toBe('1012px');
   });
@@ -74,7 +74,7 @@ describe('a ranked row', () => {
   });
 
   // Matrix: stale observation, and exactly 48h.
-  it('marks a stale observation with its clock, in rust at 700', () => {
+  it('marks a stale observation with its clock, in trust-broken at 700', () => {
     const a = rawEntry('Gold Amulet');
     const b = rawEntry('Solar Amulet');
     const rows = rowsIn(
@@ -98,9 +98,9 @@ describe('a ranked row', () => {
     expect(cell(rows[5], 'rank').style.fontWeight).toBe('400');
     expect(rows[5]?.querySelector<HTMLElement>('[data-ev-figure]')?.style.fontWeight).toBe('400');
     expect(rows[0]?.querySelector<HTMLElement>('[data-ev-figure]')?.style.fontWeight).toBe('700');
-    expect(cell(rows[0], 'rank').style.color).toBe(rgb(colors.sepia));
-    expect(cell(rows[5], 'rank').style.color).toBe(rgb(colors['ink-secondary']));
-    expect(cell(rows[10], 'rank').style.color).toBe(rgb(colors['ink-tertiary']));
+    expect(cell(rows[0], 'rank').style.color).toBe(rgb(colors.text));
+    expect(cell(rows[5], 'rank').style.color).toBe(rgb(colors['text-secondary']));
+    expect(cell(rows[10], 'rank').style.color).toBe(rgb(colors['text-tertiary']));
   });
 
   // Matrix: row click.
@@ -115,7 +115,7 @@ describe('a ranked row', () => {
     expect(third?.style.borderLeft).toContain('3px solid');
     expect(third?.style.marginLeft).toBe('-3px');
     expect(third?.style.width).toBe('1015px');
-    expect(third?.style.borderBottom).toContain(rgb(colors['rule-strong']));
+    expect(third?.style.borderBottom).toContain(rgb(colors['line-strong']));
     expect(rowsIn(view).filter((r) => r.dataset['open'] !== undefined)).toHaveLength(1);
     act(() => {
       third?.click();

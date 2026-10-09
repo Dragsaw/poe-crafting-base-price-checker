@@ -3,7 +3,7 @@ import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { mount, rgb, unmount } from '../test-support/dom';
-import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
+import { colors, columnSums, glyphs, layout } from '../theme/tokens';
 import { HAIR_SPACE } from './TrustMark';
 import { APPENDIX_LEAD, appendixCount, DISAGREES_NOTE, UnrankableAppendix } from './UnrankableAppendix';
 
@@ -41,28 +41,28 @@ describe('the count', () => {
 });
 
 describe('the empty appendix (state 37)', () => {
-  it('is the title alone, the count in ink, padded 16px 20px 16px, with no lead, row or reason', () => {
+  it('is the title alone, the count in text, padded 16px 20px 16px, with no lead, row or reason', () => {
     const panel = mountAppendix([]);
     expect(panel.textContent).toBe('Appendix: Unrankable — 0 Item Classes');
-    expect(count(panel).style.color).toBe(rgb(colors.ink));
+    expect(count(panel).style.color).toBe(rgb(colors.text));
     expect(panel.style.padding).toBe('16px 20px');
     expect(panel.querySelector('[data-appendix-lead]')).toBeNull();
     expect(panel.querySelectorAll('[data-appendix-row]')).toHaveLength(0);
-    expect(panel.style.background).toBe(rgb(colors['paper-inset']));
+    expect(panel.style.background).toBe(rgb(colors.surface));
   });
 });
 
 describe('the non-empty appendix', () => {
-  it('titles the count in rust, prints the lead, and pads 16px 20px 10px on paper-inset with a hairline', () => {
+  it('titles the count in text, prints the lead, and pads 16px 20px 10px on surface with a hairline', () => {
     const panel = mountAppendix([klass('Bows')]);
     expect(panel.querySelector('h2')?.textContent).toBe('Appendix: Unrankable — 1 Item Class');
-    expect(count(panel).style.color).toBe(rgb(colors.rust));
+    expect(count(panel).style.color).toBe(rgb(colors.text));
     expect(panel.style.padding).toBe('16px 20px 10px');
-    expect(panel.style.background).toBe(rgb(colors['paper-inset']));
-    expect(panel.style.border).toBe(`1px solid ${rgb(colors['rule-hairline'])}`);
+    expect(panel.style.background).toBe(rgb(colors.surface));
+    expect(panel.style.border).toBe(`1px solid ${rgb(colors.line)}`);
     const lead = panel.querySelector<HTMLElement>('[data-appendix-lead]');
     expect(lead?.textContent).toBe(APPENDIX_LEAD);
-    expect(lead?.style.color).toBe(rgb(colors['ink-secondary']));
+    expect(lead?.style.color).toBe(rgb(colors['text-secondary']));
     expect(lead?.style.margin).toBe('5px 0px 12px');
   });
 
@@ -75,7 +75,7 @@ describe('the non-empty appendix', () => {
       classes.map((item) => item.className),
     );
     for (const row of rows) {
-      expect(row.style.height).toBe(`${String(spacing.appendixRowHeight)}px`);
+      expect(row.style.height).toBe(`${String(layout.appendixRowHeight)}px`);
       const widths = Array.from(row.children, (child) => (child as HTMLElement).style.width);
       expect(widths).toEqual(columnSums.appendix.map((width) => `${String(width)}px`));
     }
@@ -106,8 +106,8 @@ describe('the non-empty appendix', () => {
     const panel = mountAppendix([klass('Bows'), klass('Staves'), klass('Wands')]);
     const rows = [...panel.querySelectorAll<HTMLElement>('[data-appendix-row]')];
     expect(rows.map((row) => row.style.borderBottom)).toEqual([
-      `1px solid ${rgb(colors['rule-hairline'])}`,
-      `1px solid ${rgb(colors['rule-hairline'])}`,
+      `1px solid ${rgb(colors.line)}`,
+      `1px solid ${rgb(colors.line)}`,
       '',
     ]);
   });

@@ -55,7 +55,7 @@ describe('the chase cells', () => {
       expect(cell.style.whiteSpace).toBe('nowrap');
       expect(cell.style.textOverflow).toBe('ellipsis');
       expect(cell.style.overflow).toBe('hidden');
-      expect(cell.style.color).toBe(rgb(colors['ink-chase-emphasis']));
+      expect(cell.style.color).toBe(rgb(colors.text));
       // A curated cell prints no numeral but its tier.
       expect(cell.textContent.replaceAll(/T\d+/g, '')).not.toMatch(/\d/);
       expect(cell.querySelector('[data-verbatim]')).toBeNull();
@@ -124,7 +124,7 @@ describe('the chase cells', () => {
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', '', '']);
   });
 
-  it('takes ink-secondary below tier 1', async () => {
+  it('takes text-secondary below tier 1', async () => {
     const now = Date.now();
     const raws = Array.from({ length: 5 }, (_, index) => rawEntry(`Base ${String(index)}`));
     serveWorld(
@@ -138,7 +138,7 @@ describe('the chase cells', () => {
     const row = rowNamed('Rings');
     expect(row.dataset['tier']).toBe('2');
     for (const cell of chaseCells(row)) {
-      expect(cell.style.color).toBe(rgb(colors['ink-secondary']));
+      expect(cell.style.color).toBe(rgb(colors['text-secondary']));
     }
   });
 
@@ -159,7 +159,7 @@ describe('the chase cells', () => {
     expect(first?.textContent).toBe(`${TARGET} 1–10 · ${SUFFIX} 1–10`);
     const verbatim = first?.querySelector<HTMLElement>('[data-verbatim]');
     expect(verbatim?.style.fontFamily).toBe(stacks.mono);
-    // No ink, mark or glyph of its own, and the line's own size and weight.
+    // No colour, mark or glyph of its own, and the line's own size and weight.
     expect(verbatim?.style.color).toBe('');
     expect(verbatim?.style.fontSize).toBe('');
     expect(verbatim?.style.fontWeight).toBe('');

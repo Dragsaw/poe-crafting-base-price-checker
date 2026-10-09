@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ArtifactSet } from '../load/artifacts';
 import { NBSP } from '../shared/text';
 import { rgb, unmount } from '../test-support/dom';
-import { colors, px, spacing } from '../theme/tokens';
+import { colors, px, layout } from '../theme/tokens';
 import { absenceLine } from './AbsenceLines';
 import { BASE_SET, click, COMMITTED_REPORT, line, mountStrip, panel, strip, type SyncReport } from './trust-strip/test-support';
 
@@ -45,7 +45,7 @@ describe('the resting strip', () => {
     expect(strip().textContent).not.toMatch(/(^|[^.\d])0 [a-z]/);
   });
 
-  it('sets labels in ink 600, values in ink-secondary, and | in ink-tertiary padded 9px, with no mark', () => {
+  it('sets labels in text 600, values in text-secondary, and | in text-tertiary padded 9px, with no mark', () => {
     mountStrip();
     const labels = strip().querySelectorAll<HTMLElement>('b');
     expect(Array.from(labels, (label) => label.textContent)).toEqual([
@@ -54,13 +54,13 @@ describe('the resting strip', () => {
       'Tracked List last edited',
     ]);
     for (const label of labels) {
-      expect(label.style.color).toBe(rgb(colors.ink));
+      expect(label.style.color).toBe(rgb(colors.text));
       expect(label.style.fontWeight).toBe('600');
     }
-    expect(strip().style.color).toBe(rgb(colors['ink-secondary']));
+    expect(strip().style.color).toBe(rgb(colors['text-secondary']));
     const separator = strip().querySelector<HTMLElement>('[data-separator]');
-    expect(separator?.style.color).toBe(rgb(colors['ink-tertiary']));
-    expect(separator?.style.padding).toBe(`0px ${px(spacing.trustSeparatorPadX)}`);
+    expect(separator?.style.color).toBe(rgb(colors['text-tertiary']));
+    expect(separator?.style.padding).toBe(`0px ${px(layout.trustSeparatorPadX)}`);
     expect(strip().textContent).not.toContain('×');
   });
 
@@ -101,7 +101,7 @@ describe('the resting strip', () => {
     expect(strip().querySelectorAll('[data-trust-line="weights"] [data-missing]')).toHaveLength(3);
     const absence = strip().querySelectorAll<HTMLElement>('[data-absence-lines] p');
     expect(Array.from(absence, (p) => p.textContent)).toEqual([absenceLine('weights')]);
-    expect(absence[0]?.style.height).toBe(px(spacing.frameReserveAbsenceLine));
+    expect(absence[0]?.style.height).toBe(px(layout.absenceLineHeight));
   });
 
   it('orders absence lines weights, recipes, sync-report after line two and before the health line', () => {
@@ -114,14 +114,14 @@ describe('the resting strip', () => {
     const lead = strip().querySelector<HTMLElement>('[data-absence-lines] p span');
     expect(lead?.textContent).toBe('Not published:');
     expect(lead?.style.fontWeight).toBe('600');
-    expect(lead?.style.color).toBe(rgb(colors.ink));
+    expect(lead?.style.color).toBe(rgb(colors.text));
     // With no report, Last synced is unknown and no health line is raised.
     expect(line('sync')).toBe('Last synced  unknown | Tracked List last edited  unknown');
     expect(strip().querySelector('[data-health-line]')).toBeNull();
   });
 
   // Matrix: broken.
-  it('raises one rust 700 health line for unresolvable records and pinned starvation', () => {
+  it('raises one trust-broken 700 health line for unresolvable records and pinned starvation', () => {
     const records: SyncReport['records'] = [
       ...Array.from({ length: 12 }, (_, index) => ({
         kind: 'unresolvable' as const,
@@ -140,12 +140,12 @@ describe('the resting strip', () => {
     ];
     mountStrip({ syncReport: { ...COMMITTED_REPORT, records }, ...CURATION_5_OF_8 }, ['recipes']);
     const health = strip().querySelector<HTMLElement>('[data-health-line]');
-    expect(health?.style.height).toBe(px(spacing.frameReserveHealthLine));
+    expect(health?.style.height).toBe(px(layout.healthLineHeight));
     expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe('× 12 unresolvable|× 3 of 5 pinned entries starved');
     const signals = health?.querySelectorAll<HTMLElement>('[data-health-signal]') ?? [];
     expect(signals).toHaveLength(2);
     for (const signal of signals) {
-      expect(signal.style.color).toBe(rgb(colors.rust));
+      expect(signal.style.color).toBe(rgb(colors['trust-broken']));
       expect(signal.style.fontWeight).toBe('700');
     }
     // The absence line sits before the health line.

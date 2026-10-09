@@ -15,8 +15,7 @@ import {
   REFUSAL_VERSION_EXPECTS,
   TRY_AGAIN,
 } from './frame/FailureScreen';
-import { MASTHEAD_DEK, MASTHEAD_TITLE } from './frame/Masthead';
-import { DENOMINATION } from './shared/product';
+import { HEADER_TITLE } from './frame/HeaderBar';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
 import {
   gatedArtifacts,
@@ -47,19 +46,19 @@ function refusalBody(path: string): string {
 }
 
 describe('the pending state', () => {
-  it('paints the masthead and twenty skeleton slots in the final layout', () => {
+  it('paints the header bar and twenty skeleton slots in the final layout', () => {
     const held = gatedArtifacts();
     serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(frame().getAttribute('aria-busy')).toBe('true');
-    expect(frame().textContent).toContain(MASTHEAD_TITLE);
+    expect(frame().textContent).toContain(HEADER_TITLE);
     const slots = frame().querySelectorAll('[data-row-slot]');
     expect(slots).toHaveLength(ROW_SLOT_COUNT);
     expect(slots[0]?.querySelectorAll('[data-cell]')).toHaveLength(6);
     // The strip's slot holds its place, blank, so the page never jumps.
     const stripSlot = frame().querySelector<HTMLElement>('[data-trust-strip-slot]');
-    expect(stripSlot?.previousElementSibling?.hasAttribute('data-masthead')).toBe(true);
+    expect(stripSlot?.previousElementSibling?.hasAttribute('data-interim-controls')).toBe(true);
     expect(stripSlot?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     expect(stripSlot?.textContent).toBe('');
     expect(frame().querySelector('[data-trust-strip]')).toBeNull();
@@ -93,7 +92,7 @@ describe('the outcomes', () => {
     const requests = serveArtifacts(server);
     mount();
     await settleTo('ready');
-    expect(frame().textContent).toContain(`League ${TEST_LEAGUE}`);
+    expect(frame().querySelector('[data-eyebrow]')?.textContent).toBe(TEST_LEAGUE);
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
     // The server publishes `catalogue/static.json` as a trap; the page never fetches it.
@@ -116,7 +115,7 @@ describe('the outcomes', () => {
     expect(sentence).not.toContain('declares');
     expect(frame().querySelector('[data-declared]')).toBeNull();
     expect(frame().querySelector('[data-expected]')?.textContent).toBe('2.0.0');
-    expect(frame().textContent).not.toContain(MASTHEAD_TITLE);
+    expect(frame().textContent).not.toContain(HEADER_TITLE);
   });
 
   it('refuses a dataset with a repeated entryKey as a content fault', async () => {
@@ -241,7 +240,7 @@ describe('the outcomes', () => {
     expect(absenceLine('recipes')).toBe('Not published: recipes.json — no crafted rows can be ranked.');
     expect(absenceLine('weights')).toBe('Not published: weights.json — every crafted class is unrankable.');
     expect(absenceLine('syncReport')).toBe('Not published: sync-report.json — the sync report is unavailable.');
-    expect(frame().querySelector('[data-masthead] p')?.textContent).toBe(MASTHEAD_DEK);
+    expect(frame().querySelector('[data-header-bar] p')).toBeNull();
   });
 
   // Matrix: non-JSON body.
@@ -256,7 +255,7 @@ describe('the outcomes', () => {
 });
 
 describe('the copy', () => {
-  it('never says sells for, worth or market value in web source, outside the masthead copy the UX docs own', () => {
+  it('never says sells for, worth or market value in web source, outside the header title the UX docs own', () => {
     const sources = import.meta.glob<string>(['./**/*.{ts,tsx}', '!./**/*.test.{ts,tsx}'], {
       eager: true,
       query: '?raw',
@@ -264,9 +263,7 @@ describe('the copy', () => {
     });
     expect(Object.keys(sources).length).toBeGreaterThan(10);
     for (const [path, text] of Object.entries(sources)) {
-      // The dek is a template in source: strip its source spelling, with the `DENOMINATION` placeholder.
-      const dekSource = MASTHEAD_DEK.replace(DENOMINATION, '${DENOMINATION}');
-      const scanned = text.replaceAll(MASTHEAD_TITLE, '').replaceAll(dekSource, '');
+      const scanned = text.replaceAll(HEADER_TITLE, '');
       expect(scanned, path).not.toMatch(/sells for|worth|market value/i);
     }
   });

@@ -111,7 +111,7 @@ export function healthSignals(report: SyncReport | undefined, curation: Curation
 
 // --- the panel ------------------------------------------------------------
 
-/** A run of panel prose; `verbatim` is mono with no semantic ink (the cross-file diagnosis). */
+/** A run of panel prose; `verbatim` is mono with no semantic colour (the cross-file diagnosis). */
 export type Segment =
   | { readonly kind: 'text'; readonly text: string }
   | { readonly kind: 'figure'; readonly text: string }

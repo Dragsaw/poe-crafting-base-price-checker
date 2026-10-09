@@ -2,7 +2,7 @@ import { useState, type JSX, type ReactNode } from 'react';
 
 import type { ArtifactSet, TolerableKey } from '../load/artifacts';
 import { NBSP } from '../shared/text';
-import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, glyphs, px, layout, typeStyle } from '../theme/tokens';
 import { AbsenceLines } from './AbsenceLines';
 import { SyncReportPanel } from './SyncReportPanel';
 import {
@@ -21,15 +21,15 @@ import {
 } from './trust-facts';
 
 function Label({ children }: { readonly children: ReactNode }): JSX.Element {
-  return <b style={{ color: colors.ink, fontWeight: 600 }}>{children}</b>;
+  return <b style={{ color: colors.text, fontWeight: 600 }}>{children}</b>;
 }
 
-/** The strip's field separator: `|` in ink-tertiary, 9px each side. Never the page's middle dot. */
+/** The strip's field separator: `|` in text-tertiary, 9px each side. Never the page's middle dot. */
 function Separator(): JSX.Element {
   return (
     <span
       data-separator=""
-      style={{ color: colors['ink-tertiary'], fontWeight: 400, padding: `0 ${px(spacing.trustSeparatorPadX)}` }}
+      style={{ color: colors['text-tertiary'], fontWeight: 400, padding: `0 ${px(layout.trustSeparatorPadX)}` }}
     >
       |
     </span>
@@ -72,11 +72,11 @@ export function TrustStrip({
           setOpen((was) => !was);
         }}
         style={{
-          ...typeStyle('trust-strip'),
-          color: colors['ink-secondary'],
-          borderTop: `${px(spacing.hairline)} solid ${colors['rule-strong']}`,
-          borderBottom: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-          padding: `${px(spacing.trustStripPadTop)} 0 ${px(spacing.trustStripPadBottom)}`,
+          ...typeStyle('note'),
+          color: colors['text-secondary'],
+          borderTop: `${px(layout.hairline)} solid ${colors['line-strong']}`,
+          borderBottom: `${px(layout.hairline)} solid ${colors.line}`,
+          padding: `${px(layout.trustStripPadTop)} 0 ${px(layout.trustStripPadBottom)}`,
           cursor: 'pointer',
         }}
       >
@@ -85,7 +85,7 @@ export function TrustStrip({
           <span
             data-strip-affordance=""
             className="fg-strip-affordance"
-            style={{ ...typeStyle('expand-affordance'), color: colors.sepia, alignSelf: 'center', whiteSpace: 'nowrap' }}
+            style={{ ...typeStyle('trust'), color: colors.accent, alignSelf: 'center', whiteSpace: 'nowrap' }}
           >
             {open ? AFFORDANCE_OPEN : AFFORDANCE_CLOSED}
           </span>
@@ -139,14 +139,14 @@ function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.E
     <div
       data-health-line=""
       style={{
-        height: px(spacing.frameReserveHealthLine),
-        lineHeight: px(spacing.frameReserveHealthLine),
+        height: px(layout.healthLineHeight),
+        lineHeight: px(layout.healthLineHeight),
       }}
     >
       {signals.map((signal, index) => (
         <span key={signal}>
           {index > 0 ? <Separator /> : undefined}
-          <span data-health-signal="" style={{ color: colors.rust, fontWeight: 700 }}>
+          <span data-health-signal="" style={{ color: colors['trust-broken'], fontWeight: 700 }}>
             <span style={{ fontSize: px(9) }}>{`${glyphs.unresolvable}${NBSP}`}</span>
             {signal}
           </span>
@@ -158,16 +158,16 @@ function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.E
 
 /** The skeleton's strip: same padding and two empty lines, so the page never jumps (state 22). */
 export function TrustStripSlot(): JSX.Element {
-  const role = typeStyle('trust-strip');
+  const role = typeStyle('note');
   return (
     <div
       data-trust-strip-slot=""
       aria-hidden="true"
       style={{
         ...role,
-        borderTop: `${px(spacing.hairline)} solid ${colors['rule-strong']}`,
-        borderBottom: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-        padding: `${px(spacing.trustStripPadTop)} 0 ${px(spacing.trustStripPadBottom)}`,
+        borderTop: `${px(layout.hairline)} solid ${colors['line-strong']}`,
+        borderBottom: `${px(layout.hairline)} solid ${colors.line}`,
+        padding: `${px(layout.trustStripPadTop)} 0 ${px(layout.trustStripPadBottom)}`,
       }}
     >
       <div style={{ height: `${String(2 * Number(role.lineHeight))}em` }} />

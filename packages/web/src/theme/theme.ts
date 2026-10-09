@@ -1,56 +1,56 @@
-import { colorsTuple, createTheme, type CSSVariablesResolver } from '@mantine/core';
+import { colorsTuple, createTheme, type CSSVariablesResolver, type MantineColorsTuple } from '@mantine/core';
 
-import { colors, stacks, typeRoles } from './tokens';
+import { colors, stacks, typeRoles, type TypeRoleName } from './tokens';
 
 /** The Mantine override layer: it inherits component behaviour, layout and CSS variables only. */
 
 const NONE = 'none';
 
-/** Each `lineHeights` key takes a DESIGN.md role's value; `xl` is `failure-body`'s 1.55. */
+/** Each `lineHeights` key takes a DESIGN.md role's value, so no `Text` resolves Mantine's 1.55. */
 const lineHeights = {
-  xs: typeRoles['row-mark'].lineHeight,
-  sm: typeRoles['detail-row'].lineHeight,
-  md: typeRoles['row-unit-name'].lineHeight,
-  lg: typeRoles.dek.lineHeight,
-  xl: typeRoles['failure-body'].lineHeight,
+  xs: typeRoles.mark.lineHeight,
+  sm: typeRoles['line-text'].lineHeight,
+  md: typeRoles['row-name'].lineHeight,
+  lg: typeRoles.note.lineHeight,
+  xl: typeRoles.tooltip.lineHeight,
 };
 
-const title = typeRoles['masthead-title'];
+function heading(name: Exclude<TypeRoleName, 'tier'>) {
+  const role = typeRoles[name];
+  return { fontSize: role.fontSize, fontWeight: role.fontWeight, lineHeight: role.lineHeight };
+}
 
 /** Every heading level takes a DESIGN.md role, so no `Title` keeps Mantine's ramp. */
 const headings = {
-  fontFamily: stacks.serif,
-  fontWeight: '400',
+  fontFamily: stacks.sans,
+  fontWeight: typeRoles.title.fontWeight,
   textWrap: 'wrap' as const,
   sizes: {
-    h1: { fontSize: title.fontSize, fontWeight: title.fontWeight, lineHeight: title.lineHeight },
-    h2: {
-      fontSize: typeRoles['panel-title'].fontSize,
-      fontWeight: '400',
-      lineHeight: typeRoles['panel-title'].lineHeight,
-    },
-    h3: {
-      fontSize: typeRoles['appendix-title'].fontSize,
-      fontWeight: '400',
-      lineHeight: typeRoles['appendix-title'].lineHeight,
-    },
-    h4: {
-      fontSize: typeRoles['recipe-option'].fontSize,
-      fontWeight: '400',
-      lineHeight: typeRoles['recipe-option'].lineHeight,
-    },
-    h5: {
-      fontSize: typeRoles['row-unit-name'].fontSize,
-      fontWeight: '400',
-      lineHeight: typeRoles['row-unit-name'].lineHeight,
-    },
-    h6: {
-      fontSize: typeRoles['appendix-row'].fontSize,
-      fontWeight: '400',
-      lineHeight: typeRoles['appendix-row'].lineHeight,
-    },
+    h1: heading('title'),
+    h2: heading('row-name'),
+    h3: heading('row-name'),
+    h4: heading('control'),
+    h5: heading('row-name'),
+    h6: heading('line-text'),
   },
 };
+
+/**
+ * Mantine's dark scheme reads `dark[0..9]` for text, borders, input fills and the body.
+ * Built from the neutrals so no Mantine default grey reaches the page.
+ */
+const dark: MantineColorsTuple = [
+  colors.text,
+  colors['text-secondary'],
+  colors['text-tertiary'],
+  colors['text-tertiary'],
+  colors['line-strong'],
+  colors['surface-raised'],
+  colors.surface,
+  colors.ground,
+  colors.ground,
+  colors.ground,
+];
 
 const zeroRadius = { xs: '0px', sm: '0px', md: '0px', lg: '0px', xl: '0px' };
 const noShadows = { xs: NONE, sm: NONE, md: NONE, lg: NONE, xl: NONE };
@@ -74,11 +74,11 @@ const shadowless = Object.fromEntries(
 );
 
 export const theme = createTheme({
-  // A palette built from sepia: carets, focus and selection never go blue.
-  colors: { sepia: colorsTuple(colors.sepia) },
-  primaryColor: 'sepia',
-  black: colors.ink,
-  white: colors.paper,
+  // Blue would read as `{colors.rarity-magic}`; carets, focus and selection take the accent.
+  colors: { accent: colorsTuple(colors.accent), dark },
+  primaryColor: 'accent',
+  black: colors.ground,
+  white: colors.text,
   fontFamily: stacks.sans,
   fontFamilyMonospace: stacks.mono,
   lineHeights,
@@ -112,14 +112,14 @@ export const theme = createTheme({
   },
 });
 
-/** Colour tokens as `--fg-color-<name>` properties, plus body ground and text. Light only. */
+/** Colour tokens as `--fg-color-<name>` properties, plus body ground and text. Dark only. */
 export const cssVariablesResolver: CSSVariablesResolver = () => {
   const tokens = Object.fromEntries(
-    Object.entries(colors).map(([name, hex]) => [`--fg-color-${name}`, hex]),
+    Object.entries(colors).map(([name, value]) => [`--fg-color-${name}`, value]),
   );
   const ground = {
-    '--mantine-color-body': colors.surround,
-    '--mantine-color-text': colors.ink,
+    '--mantine-color-body': colors.ground,
+    '--mantine-color-text': colors.text,
   };
   return { variables: tokens, light: ground, dark: ground };
 };

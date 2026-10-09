@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 import { CombinationRow, type Combination } from './CombinationRow';
 import { combinationString } from './combination-text';
 import type { ClassDisplayRow, CraftedCombination, DisplayRow } from './display-rows';
@@ -53,12 +53,12 @@ function ExpansionPanel({
     <div
       data-expansion-panel=""
       style={{
-        width: px(spacing.contentWidth),
+        width: px(layout.contentWidth),
         boxSizing: 'border-box',
-        margin: `0 0 ${px(spacing.s4)}`,
-        padding: `${px(spacing.panelPadTop)} ${px(spacing.panelPadX)} ${px(spacing.panelPadBottom)}`,
-        background: colors.paper,
-        border: `${px(spacing.hairline)} solid ${colors.edge}`,
+        margin: `0 0 ${px(layout.s4)}`,
+        padding: `${px(layout.panelPadTop)} ${px(layout.panelPadX)} ${px(layout.panelPadBottom)}`,
+        background: colors.ground,
+        border: `${px(layout.hairline)} solid ${colors['line-strong']}`,
         borderTop: 'none',
         whiteSpace: 'normal',
         cursor: 'default',
@@ -66,7 +66,7 @@ function ExpansionPanel({
     >
       <h4
         data-panel-title=""
-        style={{ ...typeStyle('panel-title'), display: 'flex', alignItems: 'baseline', margin: 0, color: colors.ink }}
+        style={{ ...typeStyle('row-name'), display: 'flex', alignItems: 'baseline', margin: 0, color: colors.text }}
       >
         <UnitGlyph unit={unit} />
         <span data-panel-name="" style={{ fontStyle: unit === 'raw' ? 'italic' : 'normal' }}>
@@ -76,9 +76,9 @@ function ExpansionPanel({
       <div
         data-panel-sub=""
         style={{
-          ...typeStyle('panel-sub'),
-          margin: `${px(spacing.panelSubMarginTop)} 0 ${px(spacing.panelSubMarginBottom)}`,
-          color: colors['ink-secondary'],
+          ...typeStyle('note'),
+          margin: `${px(layout.panelSubMarginTop)} 0 ${px(layout.panelSubMarginBottom)}`,
+          color: colors['text-secondary'],
         }}
       >
         {subLine}

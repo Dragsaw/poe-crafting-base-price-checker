@@ -2,12 +2,11 @@ import './frame.css';
 
 import type { JSX, ReactNode } from 'react';
 
-import { colors, px, spacing } from '../theme/tokens';
+import { colors, spacing } from '../theme/tokens';
 
 export type FrameState = 'pending' | 'ready' | 'refused' | 'failed';
 
-// `outline` and `min-height`, not border and height; no `overflow: hidden`
-// (DESIGN.md, Layout & Spacing).
+/** DESIGN.md, Layout & Spacing, *The frame*: one centred column with no fixed height. */
 export function Frame({ state, children }: { readonly state: FrameState; readonly children: ReactNode }): JSX.Element {
   return (
     <div
@@ -15,13 +14,12 @@ export function Frame({ state, children }: { readonly state: FrameState; readonl
       data-state={state}
       aria-busy={state === 'pending' ? true : undefined}
       style={{
-        width: px(spacing.frameWidth),
-        minHeight: px(spacing.frameHeight),
+        minWidth: spacing['content-min'],
+        maxWidth: spacing['content-max'],
         boxSizing: 'border-box',
-        padding: `0 ${px(spacing.framePaddingX)}`,
+        padding: `0 ${spacing.gutter}`,
         margin: '0 auto',
-        background: colors.paper,
-        outline: `${px(spacing.hairline)} solid ${colors.edge}`,
+        background: colors.ground,
         display: 'flex',
         flexDirection: 'column',
       }}

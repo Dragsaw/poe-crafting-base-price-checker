@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { rgb, unmount } from '../../test-support/dom';
-import { colors, px, spacing } from '../../theme/tokens';
+import { colors, px, layout } from '../../theme/tokens';
 import { AFFORDANCE_CLOSED, AFFORDANCE_OPEN, PANEL_HEADINGS } from '../trust-facts';
 import { affordance, click, COMMITTED_REPORT, mountStrip, panel, strip } from './test-support';
 
@@ -37,10 +37,10 @@ describe('the toggle and the panel', () => {
     mountStrip();
     click(strip());
     const open = panel();
-    expect(open?.style.maxHeight).toBe(px(spacing.syncReportMaxHeight));
+    expect(open?.style.maxHeight).toBe(px(layout.syncReportMaxHeight));
     expect(open?.style.overflowY).toBe('auto');
     expect(open?.style.padding).toBe('14px 16px 12px');
-    expect(open?.style.background).toBe(rgb(colors['paper-inset']));
+    expect(open?.style.background).toBe(rgb(colors.surface));
     const columns = [...open?.querySelectorAll<HTMLElement>('[data-panel-column]') ?? []];
     expect(columns).toHaveLength(3);
     expect(columns.map((column) => column.querySelectorAll('[data-panel-heading]').length)).toEqual([1, 1, 1]);
@@ -57,7 +57,7 @@ describe('the toggle and the panel', () => {
     expect(text).not.toContain('2026-09-26');
     expect(text).not.toMatch(/chunk/i);
     const figure = open?.querySelector<HTMLElement>('[data-figure]');
-    expect(figure?.style.color).toBe(rgb(colors.ink));
+    expect(figure?.style.color).toBe(rgb(colors.text));
     expect(figure?.style.fontVariantNumeric).toBe('tabular-nums');
   });
 

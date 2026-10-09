@@ -70,10 +70,10 @@ describe('the crafted panel', () => {
       'tried 4h ago',
       'tried 5h ago',
     ]);
-    // State 4: the rust glyph and the rust money phrase.
+    // State 4: the trust-broken glyph and the trust-broken money phrase.
     const unresolvable = rows[3];
-    expect(unresolvable?.querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors.rust));
-    expect(unresolvable?.querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.rust));
+    expect(unresolvable?.querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors['trust-broken']));
+    expect(unresolvable?.querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors['trust-broken']));
     // The trade link follows the raw path: only the summand carries a stored search.
     const links = rows.map((row) => row.querySelector('[data-cell="trade-link"] a')?.getAttribute('href') ?? undefined);
     expect(links).toEqual(['https://www.pathofexile.com/trade2/search/poe2/Forbidden%20Rites/AbC123', undefined, undefined, undefined]);

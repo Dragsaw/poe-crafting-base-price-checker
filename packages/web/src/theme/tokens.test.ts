@@ -1,210 +1,157 @@
 import { describe, expect, it } from 'vitest';
 
-import { cssNumber } from '../test-support/css-number';
 import {
   colors,
   columnSums,
   combinationLine1Columns,
   combinationLine2Columns,
-  committedChrome,
-  coOccurringReserve,
   glyphs,
-  INKS,
-  PAPER_TONES,
-  px,
+  layout,
   rankedRowColumns,
   REGULAR_ONLY_GLYPHS,
-  reservedChrome,
-  RULES,
-  SEMANTIC_INKS,
+  rounded,
   spacing,
   stacks,
-  sumPx,
   typeRoles,
 } from './tokens';
 
-const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
+const design = Object.values(
+  import.meta.glob<string>('../../../../docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/DESIGN.md', {
+    eager: true,
+    query: '?raw',
+    import: 'default',
+  }),
+)[0];
 
-describe('colour tokens', () => {
-  it('has five paper tones, four inks, three rules, one sepia and exactly two semantic inks', () => {
-    expect(PAPER_TONES).toHaveLength(5);
-    expect(INKS).toHaveLength(4);
-    expect(RULES).toHaveLength(3);
-    expect(SEMANTIC_INKS).toEqual(['ochre', 'rust']);
-    expect(colors.sepia).toBe('#6B4A22');
+type Section = Record<string, string | Record<string, string>>;
+
+/** The frontmatter's top-level maps, two levels deep; enough for colours, type, radii and spacing. */
+function frontmatter(text: string): Record<string, Section> {
+  const yaml = text.split(/^---$/m, 2)[1] ?? '';
+  const sections: Record<string, Section> = {};
+  let section: Section | undefined;
+  let group: Record<string, string> | undefined;
+  for (const raw of yaml.split(/\r?\n/)) {
+    const hash = raw.indexOf(' #');
+    const line = (hash === -1 ? raw : raw.slice(0, hash)).trimEnd();
+    const top = /^([a-z-]+):$/.exec(line);
+    const entry = /^( {2}| {4})([A-Za-z-]+):(.*)$/.exec(line);
+    if (top?.[1] !== undefined) {
+      section = {};
+      sections[top[1]] = section;
+      group = undefined;
+    } else if (entry !== null && section !== undefined) {
+      const [, indent, key = '', rest = ''] = entry;
+      const value = rest.trim();
+      const unquoted = value.replace(/^'(.*)'$/, '$1');
+      if (indent === '  ' && value === '') {
+        group = {};
+        section[key] = group;
+      } else if (indent === '  ') {
+        section[key] = unquoted;
+        group = undefined;
+      } else if (group !== undefined) {
+        group[key] = unquoted;
+      }
+    } else if (line !== '' && !line.startsWith(' ')) {
+      section = undefined;
+    }
+  }
+  return sections;
+}
+
+const tokens = frontmatter(design ?? '');
+const byName = (a: string, b: string): number => a.localeCompare(b);
+const RETIRED = /^(surround|paper|ink|rule|edge|sepia|ochre|rust)(-|$)/;
+
+describe('the DESIGN.md transcription', () => {
+  it('reads DESIGN.md revision 19', () => {
+    expect(design).toMatch(/^revision: 19$/m);
   });
 
-  it('declares nothing beyond those groups, sepia and the surround', () => {
-    const grouped = new Set<string>([
-      ...PAPER_TONES,
-      ...INKS,
-      ...RULES,
-      ...SEMANTIC_INKS,
-      'sepia',
-      'surround',
-    ]);
-    expect(new Set(Object.keys(colors))).toEqual(grouped);
+  it('transcribes every colour exactly, and nothing else', () => {
+    expect(colors).toEqual(tokens['colors']);
   });
 
-  it('has no green and no success colour', () => {
-    for (const [name, hex] of Object.entries(colors)) {
-      expect(name).not.toMatch(/green|success|ok/i);
-      const r = Number.parseInt(hex.slice(1, 3), 16);
-      const g = Number.parseInt(hex.slice(3, 5), 16);
-      const b = Number.parseInt(hex.slice(5, 7), 16);
-      // green-dominant: the green channel above both others by a visible margin
-      expect(g - Math.max(r, b), `${name} ${hex} reads green`).toBeLessThan(8);
+  it('transcribes every radius and every spacing token exactly', () => {
+    expect(rounded).toEqual(tokens['rounded']);
+    expect(spacing).toEqual(tokens['spacing']);
+    expect(Object.keys(spacing)).toHaveLength(15);
+  });
+
+  it('transcribes both stacks, Inter first in the sans stack', () => {
+    const typography = tokens['typography'] ?? {};
+    expect(typography['stack-sans']).toEqual({ fontFamily: stacks.sans });
+    expect(typography['stack-mono']).toEqual({ fontFamily: stacks.mono });
+    expect(stacks.sans.split(',', 1)[0]).toBe('Inter');
+  });
+
+  it('transcribes all seventeen type roles exactly, in the sans stack', () => {
+    const typography = tokens['typography'] ?? {};
+    const roles = Object.entries(typography).filter(([name]) => !name.startsWith('stack-'));
+    expect(roles).toHaveLength(17);
+    expect(Object.keys(typeRoles).toSorted(byName)).toEqual(roles.map(([name]) => name).toSorted(byName));
+    for (const [name, role] of roles) {
+      expect(typeRoles[name as keyof typeof typeRoles], name).toEqual({
+        ...(role as Record<string, string>),
+        fontFamily: stacks.sans,
+      });
     }
   });
 });
 
-describe('the frame and its column contracts', () => {
-  it('holds 1012 = 1060 − 2 × 24', () => {
-    expect(spacing.frameWidth - 2 * spacing.framePaddingX).toBe(spacing.contentWidth);
-    expect(spacing.contentWidth).toBe(1012);
+describe('the token set', () => {
+  it('names no retired paper token', () => {
+    for (const name of Object.keys(colors)) {
+      expect(name).not.toMatch(RETIRED);
+    }
   });
 
+  it('declares a lineHeight on every role but the inline tier', () => {
+    expect('lineHeight' in typeRoles.tier).toBe(false);
+    const lined = Object.entries(typeRoles).filter(([key]) => key !== 'tier');
+    for (const [name, role] of lined) {
+      expect('lineHeight' in role ? role.lineHeight : undefined, name).toMatch(/^\d+(\.\d+)?$/);
+      expect(role.fontSize, name).toMatch(/^\d+(\.5)?px$/);
+    }
+  });
+
+  it('has no green and no success colour', () => {
+    for (const [name, value] of Object.entries(colors)) {
+      expect(name).not.toMatch(/green|success|^ok$/i);
+      const [r = 0, g = 0, b = 0] = value.startsWith('#')
+        ? [1, 3, 5].map((index) => Number.parseInt(value.slice(index, index + 2), 16))
+        : (value.match(/\d+/g) ?? []).map(Number);
+      expect(g - Math.max(r, b), `${name} ${value} reads green`).toBeLessThan(8);
+    }
+  });
+});
+
+const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
+
+describe('the column contracts later stories replace', () => {
   it('sums the six ranked-row columns to the content width, exactly', () => {
     expect(rankedRowColumns.map((column) => column.width)).toEqual([32, 222, 84, 88, 94, 492]);
-    expect(sum(rankedRowColumns.map((column) => column.width))).toBe(spacing.contentWidth);
+    expect(sum(rankedRowColumns.map((column) => column.width))).toBe(layout.contentWidth);
   });
 
   it('holds every other verified sum', () => {
-    expect(sum(columnSums.mastheadControls)).toBe(508);
-    expect(spacing.contentWidth - sum(columnSums.mastheadControls) - 24).toBe(spacing.dekMaxWidth);
+    expect(columnSums.interimControls).toEqual([
+      layout.recipePanelWidth,
+      layout.interimControlGap,
+      layout.thresholdPanelWidth,
+    ]);
     expect(sum(columnSums.combinationLine1)).toBe(966);
     expect(sum(columnSums.combinationLine2)).toBe(966);
     expect(sum(columnSums.tombstoneLine2)).toBe(966);
     expect(sum(columnSums.appendix)).toBe(970);
-    expect(spacing.contentWidth - 2 * spacing.hairline - 2 * spacing.appendixPadX).toBe(sum(columnSums.appendix));
-  });
-});
-
-describe('the payout-threshold panel', () => {
-  it('takes the mockup geometry: 13×15 padding, 4/10/7 gaps, a 4px track and an 11×14 marker centred on it', () => {
-    expect([spacing.controlPanelPadY, spacing.controlPanelPadX]).toEqual([13, 15]);
-    expect([spacing.thresholdValueGap, spacing.thresholdTrackGap, spacing.thresholdRangeGap]).toEqual([4, 10, 7]);
-    expect(spacing.thresholdTrackHeight).toBe(4);
-    expect([spacing.thresholdMarkerWidth, spacing.thresholdMarkerHeight]).toEqual([11, 14]);
-    expect(spacing.thresholdMarkerRise).toBe((spacing.thresholdMarkerHeight - spacing.thresholdTrackHeight) / 2);
+    expect(layout.contentWidth - 2 * layout.hairline - 2 * layout.appendixPadX).toBe(sum(columnSums.appendix));
+    expect(combinationLine1Columns.map((column) => column.width)).toEqual([...columnSums.combinationLine1]);
+    expect(combinationLine2Columns.map((column) => column.width)).toEqual([...columnSums.combinationLine2]);
   });
 
-  it('keeps the control group widths the spacing tokens name', () => {
-    expect(columnSums.mastheadControls).toEqual([
-      spacing.recipePanelWidth,
-      spacing.mastheadControlGap,
-      spacing.thresholdPanelWidth,
-    ]);
-  });
-});
-
-describe('the expansion panel and the combination row', () => {
-  it('pads the panel 18/22/20 inside a 1px border, leaving 966 inside the content width', () => {
-    expect([spacing.panelPadTop, spacing.panelPadX, spacing.panelPadBottom]).toEqual([18, 22, 20]);
-    expect([spacing.panelSubMarginTop, spacing.panelSubMarginBottom]).toEqual([4, 13]);
-    expect(spacing.contentWidth - 2 * spacing.hairline - 2 * spacing.panelPadX).toBe(966);
-  });
-
-  it('cuts line one as 460 + 250 + 116 + 116 + 24 and line two as 560 + 200 + 206, each 966', () => {
-    const line1 = combinationLine1Columns.map((column) => column.width);
-    const line2 = combinationLine2Columns.map((column) => column.width);
-    expect(line1).toEqual([...columnSums.combinationLine1]);
-    expect(line2).toEqual([...columnSums.combinationLine2]);
-    expect(sum(line1)).toBe(966);
-    expect(sum(line2)).toBe(966);
-  });
-
-  it('pads every text cell 12px on the right, and the trade-link cell not at all', () => {
-    for (const column of [...combinationLine1Columns, ...combinationLine2Columns]) {
-      expect(column.padRight, column.name).toBe(column.name === 'trade-link' ? 0 : spacing.padCombinationCellRight);
-    }
-    expect(spacing.padCombinationCellRight).toBe(12);
-  });
-
-  it('is 28 + 20 = 48 at minimum, and line two steps by its absolute 20px lineHeight', () => {
-    expect(spacing.detailRowHeight).toBe(28);
-    expect(spacing.combinationRowLine2Height).toBe(20);
-    expect(spacing.combinationRowHeight).toBe(spacing.detailRowHeight + spacing.combinationRowLine2Height);
-    expect(typeRoles['combination-line-2'].lineHeight).toBe(px(spacing.combinationRowLine2Height));
-  });
-});
-
-describe('the vertical budget', () => {
-  it('commits 1390px, and the frame-slack token is exactly what is left', () => {
-    expect(sumPx(committedChrome)).toBe(1390);
-    // UX memlog 210: the frontmatter now reads 530, which is 1920 − 1390.
-    expect(spacing.frameSlack).toBe(530);
-    expect(spacing.frameSlack).toBe(spacing.frameHeight - sumPx(committedChrome));
-  });
-
-  it('keeps committed chrome plus every reserve inside the frame height', () => {
-    expect(sumPx(committedChrome) + sumPx(reservedChrome)).toBeLessThanOrEqual(spacing.frameHeight);
-  });
-
-  it('gives each absence line its own 21px frameReserveAbsenceLine entry', () => {
-    expect(spacing.frameReserveAbsenceLine).toBe(21);
-    const absence = reservedChrome.filter((line) => line.block.startsWith('absence line'));
-    expect(absence.map((line) => line.block)).toEqual([
-      'absence line: weights.json',
-      'absence line: recipes.json',
-      'absence line: sync-report.json',
-    ]);
-    for (const line of absence) {
-      expect(line.px).toBe(spacing.frameReserveAbsenceLine);
-    }
-  });
-
-  it('gives the list statement one 21px frameReserveListStatement slot, shared by its two exclusive states', () => {
-    expect(spacing.frameReserveListStatement).toBe(21);
-    const slots = reservedChrome.filter((line) => line.block === 'list statement');
-    expect(slots).toEqual([{ block: 'list statement', px: spacing.frameReserveListStatement }]);
-  });
-
-  it('counts a 116px co-occurring worst case, and caps the sync report inside what it leaves', () => {
-    // Banner 74 + max(health line, sync-report absence line) 21 + list statement 21.
-    expect(coOccurringReserve).toBe(116);
-    expect(sumPx(committedChrome) + coOccurringReserve).toBe(1506);
-    expect(spacing.syncReportMaxHeight).toBe(400);
-    expect(spacing.syncReportMaxHeight).toBeLessThanOrEqual(spacing.frameSlack - coOccurringReserve);
-  });
-});
-
-describe('the trust strip and the sync report panel', () => {
-  it('rests at 68px: two 11.5px × 1.85 lines inside 11/12 padding and two hairlines', () => {
-    const line = cssNumber(typeRoles['trust-strip'].fontSize) * cssNumber(typeRoles['trust-strip'].lineHeight);
-    const height = 2 * spacing.hairline + spacing.trustStripPadTop + spacing.trustStripPadBottom + 2 * line;
-    expect(Math.round(height)).toBe(68);
-    expect(committedChrome.find((block) => block.block === 'trust strip')?.px).toBe(68);
-    expect(spacing.trustSeparatorPadX).toBe(9);
-  });
-
-  it('pads the panel 14/16/12, gaps its columns 22px and its groups 8px', () => {
-    expect([spacing.syncReportPadTop, spacing.syncReportPadX, spacing.syncReportPadBottom]).toEqual([14, 16, 12]);
-    expect(spacing.syncReportColumnGap).toBe(22);
-    expect(spacing.syncReportGroupGap).toBe(spacing.s2);
-  });
-});
-
-describe('type roles', () => {
-  it('uses three system stacks and downloads no font', () => {
-    expect(Object.keys(stacks)).toEqual(['serif', 'sans', 'mono']);
-    for (const stack of Object.values(stacks)) {
-      expect(stack).not.toMatch(/url\(|@font-face/);
-    }
-  });
-
-  it('gives every role a literal px size and an explicit lineHeight', () => {
-    for (const [name, role] of Object.entries(typeRoles)) {
-      expect(role.fontSize, name).toMatch(/^\d+(\.5)?px$/);
-      expect(role.lineHeight, name).toMatch(/^(\d+(\.\d+)?|\d+px)$/);
-      expect(Object.values(stacks), name).toContain(role.fontFamily);
-    }
-  });
-
-  it('keeps every in-row role at 1.2 so the 28px row holds', () => {
-    for (const name of ['row-rank', 'row-unit-name', 'row-ev', 'row-mark', 'row-chase', 'money-phrase'] as const) {
-      expect(typeRoles[name].lineHeight).toBe('1.2');
-    }
+  it('keeps the combination row at 28 + 20 = 48 at minimum', () => {
+    expect(layout.combinationRowHeight).toBe(layout.detailRowHeight + layout.combinationRowLine2Height);
   });
 });
 
@@ -213,12 +160,5 @@ describe('the glyph vocabulary', () => {
     const values = Object.values(glyphs);
     expect(new Set(values).size).toBe(values.length);
     expect(REGULAR_ONLY_GLYPHS).toEqual(['↗']);
-  });
-
-  it('uses the resident twins, not the retired fallbacks', () => {
-    expect(glyphs.notYetSynced).toBe('∆');
-    expect(glyphs.prior).toBe('◊');
-    expect(glyphs.unresolvable).toBe('×');
-    expect(glyphs.close).toBe('−');
   });
 });

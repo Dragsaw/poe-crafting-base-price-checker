@@ -98,7 +98,7 @@ describe('the frozen Combination texts', () => {
   it('fits the longest text, led by * pinned, inside the 460px combination cell less its 12px pad, at line one’s size', () => {
     const [cell] = combinationLine1Columns;
     const available = cell.width - cell.padRight;
-    const fontSize = cssNumber(typeRoles['detail-row'].fontSize);
+    const fontSize = cssNumber(typeRoles['line-text'].fontSize);
     const longest = Math.max(...texts.map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`.length));
     expect(available).toBe(448);
     expect(longest * ADVANCE_EM * fontSize).toBeLessThanOrEqual(available);

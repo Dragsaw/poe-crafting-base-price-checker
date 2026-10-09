@@ -1,15 +1,15 @@
 /*
- * The dotted-sepia text button (`+ Try again`, `+ Read the remaining N rows`)
+ * The dotted-accent text button (`+ Try again`, `+ Read the remaining N rows`)
  * and its hover. Token custom properties only, as frame.css states.
  */
 
 .fg-affordance {
   background: none;
   border: 0;
-  border-bottom: 1px dotted var(--fg-color-sepia);
+  border-bottom: 1px dotted var(--fg-color-accent);
   border-radius: 0;
   padding: 0;
-  color: var(--fg-color-sepia);
+  color: var(--fg-color-accent);
   cursor: pointer;
 }
 

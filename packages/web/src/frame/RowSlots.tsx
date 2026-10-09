@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 
 import { ColumnHeader } from '../list/ColumnHeader';
-import { colors, px, rankedRowColumns, spacing } from '../theme/tokens';
+import { colors, px, rankedRowColumns, layout } from '../theme/tokens';
 
 export const ROW_SLOT_COUNT = 20;
 
@@ -21,10 +21,10 @@ export function RowSlots(): JSX.Element {
           style={{
             display: 'flex',
             alignItems: 'center',
-            width: px(spacing.contentWidth),
-            height: px(spacing.rowHeight),
+            width: px(layout.contentWidth),
+            height: px(layout.rowHeight),
             boxSizing: 'border-box',
-            borderBottom: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
+            borderBottom: `${px(layout.hairline)} solid ${colors.line}`,
           }}
         >
           {rankedRowColumns.map((column) => (
@@ -38,7 +38,7 @@ export function RowSlots(): JSX.Element {
                 paddingRight: px(column.padRight),
               }}
             >
-              <div style={{ height: px(BAR_HEIGHT), background: colors['paper-inset'] }} />
+              <div style={{ height: px(BAR_HEIGHT), background: colors.surface }} />
             </div>
           ))}
         </div>

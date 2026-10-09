@@ -193,11 +193,6 @@ describe('the list statement', () => {
     expect(frame().querySelector('[data-absence-lines]')).toBeNull();
     expect(frame().textContent).not.toContain('recipes.json');
     expect(statement()).toBeNull();
-    const dek = frame().querySelector('[data-masthead] p')?.textContent;
-    expect(dek).toBe(
-      'Item Classes ranked by expected payout per craft, beside the Base Types worth selling raw. Every figure is in Divine.',
-    );
-    expect(dek).not.toContain('not ranked yet');
     expect(frame().textContent).not.toContain('not ranked yet');
   });
 });

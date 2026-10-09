@@ -77,6 +77,6 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     expect(statementNode?.textContent).toBe(`In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE}.`);
     const phrase = lostRow().querySelector<HTMLElement>('[data-cell="ev"] [data-money-phrase]');
     expect(phrase?.textContent).toBe('no figure yet');
-    expect(phrase?.style.color).toBe(rgb(colors.ink));
+    expect(phrase?.style.color).toBe(rgb(colors.text));
   });
 });

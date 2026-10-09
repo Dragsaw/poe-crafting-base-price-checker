@@ -4,7 +4,7 @@ import { cssNumber } from '../test-support/css-number';
 import { mount, mountedContainer, rgb, unmount } from '../test-support/dom';
 import { blur, pastDebounce, typeInto } from '../test-support/threshold-input';
 import { PageProvider } from '../theme/PageProvider';
-import { colors, spacing } from '../theme/tokens';
+import { colors, layout } from '../theme/tokens';
 import {
   PayoutThreshold,
   RANGE_HIGH,
@@ -68,16 +68,16 @@ describe('the panel at rest', () => {
     expect(unit.contains(input())).toBe(false);
     expect(input().contains(unit)).toBe(false);
     expect(input().value).not.toContain('Divine');
-    expect(unit.style.color).toBe(rgb(colors['ink-secondary']));
+    expect(unit.style.color).toBe(rgb(colors['text-secondary']));
   });
 
-  it('takes the panel chrome: paper-inset, a hairline border, 13×15 padding, 276 wide', () => {
+  it('takes the panel chrome: surface, a hairline border, 13×15 padding, 276 wide', () => {
     mountPanel(0.25);
     const panel = part('data-payout-threshold');
-    expect(panel.style.width).toBe(`${String(spacing.thresholdPanelWidth)}px`);
+    expect(panel.style.width).toBe(`${String(layout.thresholdPanelWidth)}px`);
     expect(panel.style.boxSizing).toBe('border-box');
-    expect(panel.style.background).toBe(rgb(colors['paper-inset']));
-    expect(panel.style.border).toBe(`1px solid ${rgb(colors['rule-hairline'])}`);
+    expect(panel.style.background).toBe(rgb(colors.surface));
+    expect(panel.style.border).toBe(`1px solid ${rgb(colors.line)}`);
     expect(panel.style.padding).toBe('13px 15px');
   });
 
@@ -100,8 +100,8 @@ describe('the panel at rest', () => {
     }
     const marker = part('data-threshold-marker');
     expect([marker.style.width, marker.style.height]).toEqual(['11px', '14px']);
-    expect(marker.style.background).toBe(rgb(colors.ink));
-    expect(part('data-threshold-fill').style.background).toBe(rgb(colors.sepia));
+    expect(marker.style.background).toBe(rgb(colors.text));
+    expect(part('data-threshold-fill').style.background).toBe(rgb(colors.accent));
     expect(part('data-threshold-track').style.height).toBe('4px');
     const range = Array.from(part('data-threshold-range').children, (node) => node.textContent);
     expect(range).toEqual([RANGE_LOW, RANGE_HIGH]);

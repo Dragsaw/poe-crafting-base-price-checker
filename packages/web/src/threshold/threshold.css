@@ -1,9 +1,9 @@
 /*
  * The Payout Threshold figure. The figure IS the input: no border, no
  * background, no padding, no form chrome. The rule sits under the figure only
- * (the unit is outside the input): dotted sepia at rest, solid sepia under the
- * pointer, solid rule-strong while the player edits. Caret ink, selection
- * paper-deep.
+ * (the unit is outside the input): dotted accent at rest, solid accent under the
+ * pointer, solid line-strong while the player edits. Caret text, selection
+ * accent-soft.
  */
 .fg-threshold input {
   display: block;
@@ -12,12 +12,12 @@
   padding: 0;
   border: 0;
   border-radius: 0;
-  border-bottom: 1px dotted var(--fg-color-sepia);
+  border-bottom: 1px dotted var(--fg-color-accent);
   background: none;
   box-shadow: none;
   outline: none;
-  color: var(--fg-color-ink);
-  caret-color: var(--fg-color-ink);
+  color: var(--fg-color-text);
+  caret-color: var(--fg-color-text);
   transition: none;
 }
 
@@ -26,10 +26,10 @@
 }
 
 .fg-threshold input:focus {
-  border-bottom: 1px solid var(--fg-color-rule-strong);
+  border-bottom: 1px solid var(--fg-color-line-strong);
 }
 
 .fg-threshold input::selection {
-  background: var(--fg-color-paper-deep);
-  color: var(--fg-color-ink);
+  background: var(--fg-color-accent-soft);
+  color: var(--fg-color-text);
 }

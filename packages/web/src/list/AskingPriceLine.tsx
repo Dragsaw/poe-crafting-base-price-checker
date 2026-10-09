@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 
 export const ASKING_PRICE_COPY =
   'Every price here is a current asking price from a live instant-buyout listing. Nothing on this page is an observed sale.';
@@ -11,11 +11,11 @@ export function AskingPriceLine(): JSX.Element {
     <p
       data-asking-price-line=""
       style={{
-        ...typeStyle('asking-note'),
+        ...typeStyle('note'),
         fontStyle: 'italic',
-        color: colors.sepia,
+        color: colors['text-secondary'],
         margin: 0,
-        padding: `${px(spacing.askingPadTop)} 0 ${px(spacing.askingPadBottom)}`,
+        padding: `${px(layout.askingPadTop)} 0 ${px(layout.askingPadBottom)}`,
       }}
     >
       {ASKING_PRICE_COPY}

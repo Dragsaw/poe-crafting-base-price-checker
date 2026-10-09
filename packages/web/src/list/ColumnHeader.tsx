@@ -2,7 +2,7 @@ import type { CSSProperties, JSX } from 'react';
 
 import { fixedCell } from '../shared/cell';
 import { DENOMINATION } from '../shared/product';
-import { colors, px, rankedRowColumns, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, rankedRowColumns, layout, typeStyle } from '../theme/tokens';
 
 type ColumnName = (typeof rankedRowColumns)[number]['name'];
 
@@ -36,12 +36,12 @@ export function ColumnHeader(): JSX.Element {
       style={{
         ...typeStyle('column-header'),
         display: 'flex',
-        width: px(spacing.contentWidth),
+        width: px(layout.contentWidth),
         boxSizing: 'border-box',
-        marginTop: px(spacing.columnHeaderMarginTop),
-        paddingBottom: px(spacing.s1),
-        borderBottom: `${px(spacing.hairline)} solid ${colors['rule-strong']}`,
-        color: colors['ink-tertiary'],
+        marginTop: px(layout.columnHeaderMarginTop),
+        paddingBottom: px(layout.s1),
+        borderBottom: `${px(layout.hairline)} solid ${colors['line-strong']}`,
+        color: colors['text-tertiary'],
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',
       }}

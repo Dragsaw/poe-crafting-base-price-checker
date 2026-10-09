@@ -3,7 +3,7 @@ import './recipe.css';
 import { Fragment, type JSX } from 'react';
 
 import { DENOMINATION } from '../shared/product';
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 
 const RECIPE_LABEL = 'Craft Recipe';
 /** The cost line's unit: *Divine* spelled, `/ craft` the one contraction the panel allows. */
@@ -36,18 +36,18 @@ export function CraftRecipe({
     <div
       data-craft-recipe=""
       style={{
-        width: px(spacing.recipePanelWidth),
+        width: px(layout.recipePanelWidth),
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        background: colors['paper-inset'],
-        border: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-        padding: `${px(spacing.controlPanelPadY)} ${px(spacing.controlPanelPadX)}`,
+        background: colors.surface,
+        border: `${px(layout.hairline)} solid ${colors.line}`,
+        padding: `${px(layout.controlPanelPadY)} ${px(layout.controlPanelPadX)}`,
       }}
     >
       <div
         data-recipe-label=""
-        style={{ ...typeStyle('recipe-label'), color: colors['ink-tertiary'], textTransform: 'uppercase' }}
+        style={{ ...typeStyle('label'), color: colors['text-tertiary'], textTransform: 'uppercase' }}
       >
         {RECIPE_LABEL}
       </div>
@@ -71,7 +71,7 @@ function RecipeOptions({
       data-recipe-options=""
       role="group"
       aria-label={RECIPE_LABEL}
-      style={{ ...typeStyle('recipe-option'), marginTop: px(spacing.recipeOptionsGap), whiteSpace: 'nowrap' }}
+      style={{ ...typeStyle('control'), marginTop: px(layout.recipeOptionsGap), whiteSpace: 'nowrap' }}
     >
       {options.map((option, index) => (
         <Fragment key={option.id}>
@@ -79,7 +79,7 @@ function RecipeOptions({
             <span
               data-separator=""
               aria-hidden="true"
-              style={{ color: colors['ink-tertiary'], fontWeight: 400, padding: `0 ${px(spacing.trustSeparatorPadX)}` }}
+              style={{ color: colors['text-tertiary'], fontWeight: 400, padding: `0 ${px(layout.trustSeparatorPadX)}` }}
             >
               |
             </span>
@@ -111,17 +111,17 @@ function RecipeCostLine({ cost }: { readonly cost: RecipeCost }): JSX.Element {
   return (
     <div
       data-recipe-cost={cost.kind}
-      style={{ marginTop: 'auto', paddingTop: px(spacing.recipeCostGap) }}
+      style={{ marginTop: 'auto', paddingTop: px(layout.recipeCostGap) }}
     >
       {cost.kind === 'figure' ? (
-        <span style={{ ...typeStyle('recipe-cost'), color: colors['ink-secondary'] }}>
+        <span style={{ ...typeStyle('craft-cost'), color: colors['text-secondary'] }}>
           <span
             data-recipe-cost-figure=""
             style={{
-              ...typeStyle('recipe-cost-figure'),
-              color: colors.ink,
+              ...typeStyle('craft-cost'),
+              color: colors.text,
               fontVariantNumeric: 'tabular-nums',
-              marginRight: px(spacing.recipeCostFigureGap),
+              marginRight: px(layout.recipeCostFigureGap),
             }}
           >
             {cost.text}
@@ -131,7 +131,7 @@ function RecipeCostLine({ cost }: { readonly cost: RecipeCost }): JSX.Element {
       ) : (
         <span
           data-money-phrase=""
-          style={{ ...typeStyle('money-phrase'), fontStyle: 'italic', color: colors.ink }}
+          style={{ ...typeStyle('trust'), fontStyle: 'italic', color: colors.text }}
         >
           {cost.text}
         </span>
