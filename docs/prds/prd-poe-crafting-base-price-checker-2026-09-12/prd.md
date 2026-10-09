@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 26
+revision: 27
 created: 2026-09-12
 updated: 2026-10-09
 sources:
@@ -45,7 +45,7 @@ The ranking is not "most expensive base," and everything else in the system exis
 
 - **Decide, at a glance, what to pick up this week.** Functional: convert a live market into a short ordered list of what is worth inventory space — the Item Classes worth crafting on and the Base Types worth selling raw.
 - **Stop paying the memorisation tax.** Emotional: the relief of not holding a top-five list in your head, and of not losing that list at every league start.
-- **Know when the answer has gone stale.** The player must be able to tell a figure resting on real measured weights from a figure resting on a uniform placeholder, and a row priced an hour ago from a row priced yesterday. If the tool does not tell the player, the player will trust the placeholder six months later.
+- **Know when a figure cannot be trusted.** The player must be able to tell, row by row, a figure resting on measured odds and a current price from one resting on something weaker. If the tool does not tell the player, the player will trust the placeholder six months later.
 - **Spend time playing, not crafting.** Contextual: the binding constraint is the player's own time. Outcomes below the player's threshold are worth nothing to him, because that much currency turns up simply from playing. Such outcomes must therefore contribute nothing to the ranking.
 - **Keep a tool alive for a year without the tool becoming a second job.** The maintenance surface is a first-class concern: no credential the product requires, no server to patch, no account system. The one optional credential, a sync session cookie (FR-20), never gates a run and rots harmlessly.
 
@@ -61,9 +61,9 @@ The ranking is not "most expensive base," and everything else in the system exis
 There is a single operator, a single role, no authentication and no multi-device handoff. These journeys are therefore written in the template's lighter form.
 
 - **UJ-1. The pre-session read.** The player is about to map for two hours. The player opens the view, glances at the top five rows under his current threshold — Item Classes to craft on, Base Types to sell raw — notes the two or three Chase Combinations on each crafted row, and closes the view. He picks up accordingly for the rest of the session.
-- **UJ-2. The threshold turn.** The player is now richer than at league start. He types a new threshold over the old one, from a quarter of a Divine to one Divine. The list reorders as soon as the new value is entered — steady moderate rows fall away, jackpot rows rise — and he re-reads the new top five.
-- **UJ-3. The drill-down.** The player is unsure why an unfamiliar Item Class ranks third. He expands that row and reads the full tracked Combination list: which Combinations are priced, at what price, how old each price is, and which Combinations returned no listings.
-- **UJ-4. The trust check.** The player notices a row that ranks suspiciously high. He sees that the price behind it was observed three days ago, and that the whole ranking is flagged as resting on the uniform prior. He discounts that row rather than acting on it.
+- **UJ-2. The threshold turn.** The player is now richer than at league start. He sets a higher threshold. The list follows at once — steady moderate rows fall away, jackpot rows rise — and he re-reads the new top five.
+- **UJ-3. The drill-down.** The player is unsure why an unfamiliar Item Class ranks third. He expands that row and reads the full tracked Combination list: which Combinations are priced, at what price, whether each price can be trusted, and which Combinations returned no listings.
+- **UJ-4. The trust check.** The player notices a row that ranks suspiciously high. The row itself says that its price is not current enough to act on, and that its odds are estimated. He discounts that row rather than acting on it.
 - **UJ-5. The curation pass.** The player reviews deliberately after a few weeks, working through the Combinations he tracks against each Item Class. He sees three Combinations that have returned no listings all league, and one Combination flagged unresolvable since the last patch. He opens `data/tracked.json`, tombstones the dead Combinations with a reason, pins one Combination he wants watched closely, and commits. The next sync run reflects the edit.
 - **UJ-6. The league reset.** A new league starts. The player edits the active league in `data/config.json` and commits. The ranking goes honestly empty rather than quietly serving last league's numbers, and the ranking refills over the following day.
 
@@ -110,7 +110,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 
 ### 4.1 The Ranked List
 
-**Description.** The Ranked List is the product's first screen; in most sessions the player reads nothing else. It is one ordered list, most profitable first, spanning both of the product's ranked units (FR-3). A crafted row carries its EV, the Combinations worth chasing on it, and the Provenance the EV rests on; a raw row carries its price and its freshness. The browser ranks on every input change, so the Payout Threshold reorders at once (AD-4). Realises UJ-1, UJ-2, UJ-3.
+**Description.** The Ranked List is the product's first screen; in most sessions the player reads nothing else. It is one ordered list, most profitable first, spanning both of the product's ranked units (FR-3). A crafted row carries its EV and the Combinations worth chasing on it; every row says what its figure rests on. The browser ranks on every input change, so the Payout Threshold reorders at once (AD-4). Realises UJ-1, UJ-2, UJ-3.
 
 **Functional Requirements:**
 
@@ -149,10 +149,10 @@ Each crafted row names the Combinations most worth chasing on that Item Class, w
 Uncrafted item-level-82 white Base Types rank in the same list, valued as a sale rather than a craft, and labelled as uncrafted.
 
 **Consequences (testable):**
-- The two branches rank **different units**: the crafted branch ranks Item Classes and the raw branch ranks Base Types. The rest of the document cites this statement. The list is therefore mixed, and each row states which unit it names, so a reader never takes a class for a base or a base for a class *(PRD-owned; treatment in `EXPERIENCE.md`)*.
+- The two branches rank **different units**: the crafted branch ranks Item Classes and the raw branch ranks Base Types. The rest of the document cites this statement. The list is therefore mixed, and each row tells the player whether to craft on it or to sell the base uncrafted, so a reader never takes a class for a base or a base for a class *(PRD-owned; treatment in `EXPERIENCE.md`)*.
 - A Raw Base's EV is its observed price with zero Craft Cost. A Raw Base is never a summand in any Item Class's EV sum (AD-17).
 - The Payout Threshold applies to a Raw Base as to any Combination: a Raw Base priced below it leaves the ordering, and is not ranked at its price (AD-17).
-- The view renders a Raw Base distinguishably from a crafted row, and colour alone does not carry the distinction (NFR-10).
+- Colour alone never carries the distinction between a Raw Base row and a crafted row (NFR-10).
 - A Raw Base is priced as a white base at item level 82. That level is the effective item level cap for these bases (AD-5, AD-16).
 
 #### FR-4: Surface Unrankable Item Classes outside the ordering
@@ -191,11 +191,11 @@ The list answers a question rather than presenting an inventory.
 
 #### FR-6: Set the Payout Threshold and see the list reorder immediately
 
-The player types a Payout Threshold in Divine and the ranked list reorders in front of him, with no round trip. Realises UJ-2.
+The player sets the Payout Threshold directly, and the list follows at once with no round trip. Realises UJ-2.
 
 **Consequences (testable):**
 - The control is denominated in Divine, the same unit as every price and every Craft Cost it filters (AD-17, AD-20).
-- The list reorders as the player changes the value, with no separate commit step *(PRD-owned)*. `EXPERIENCE.md` owns the control type and its input behaviour.
+- The list follows the value as the player changes it, with no separate commit step *(PRD-owned)*. `EXPERIENCE.md` owns the control and its input behaviour.
 - A change needs no network request and no sync (AD-24, NFR-6).
 - A change also changes which Chase Combinations a collapsed row shows (FR-2, AD-17).
 - A Raw Base is subject to the threshold exactly as a crafted Combination is (FR-3, AD-17).
@@ -206,9 +206,8 @@ The Payout Threshold survives a page reload. No other view state is promised per
 
 **Consequences (testable):**
 - The value persists only in the viewer's own browser storage: no backend, no account, no authenticated request (AD-15).
-- A first visit, with nothing stored, starts at **0.25 Divine**. That is the early-endgame figure *(PRD-owned)*.
-- Open panels, toggles, the expanded list and banner dismissal may reset on reload; whether any of them survives is UX's decision (`EXPERIENCE.md`).
-- Clearing browser storage returns the control to the default and changes nothing else on the page.
+- Open panels, toggles and the expanded list may reset on reload; whether any of them survives is UX's decision (`EXPERIENCE.md`).
+- Clearing browser storage returns the control to its unset state and changes nothing else on the page. `EXPERIENCE.md` owns that state.
 
 ### 4.3 Combination Detail and Segregated Unknowns
 
@@ -218,24 +217,23 @@ The Payout Threshold survives a page reload. No other view state is promised per
 
 #### FR-8: Expand a ranked row to its full tracked Combination list
 
-The player expands any ranked row and sees all of its Tracked Entries with their prices, Price States and ages. Realises UJ-3, UJ-5.
+Opening a row shows every Combination behind its figure, each with whether its price can be trusted. Realises UJ-3, UJ-5.
 
 **Consequences (testable):**
 - Every Tracked Entry on a crafted row's Item Class appears, whether or not it cleared the Payout Threshold (AD-17; treatment `EXPERIENCE.md`). A raw row expands to the single entry it names (FR-3).
 - `pruned` tombstones are included, set apart from live entries and each showing its prune reason, so UJ-5's review need not open the file (AD-12; treatment `EXPERIENCE.md`).
-- Each entry shows its Combination, its Price State, its price in Divine where priced, the listing count the estimate rested on, and its age, labelled as an observation age or a last-attempted age (AD-9, AD-16, FR-12).
+- Each entry shows its Combination, its Price State, its price in Divine where priced, the listing count the estimate rested on, and whether its price can be trusted (AD-9, AD-16, FR-12).
 - Each entry below the Payout Threshold is visibly marked as contributing nothing to the EV; it is shown, never hidden (AD-17; treatment `EXPERIENCE.md`).
 
-#### FR-9: Render the four Price States distinctly, with a reason on `not-yet-synced`
+#### FR-9: Never present a missing price as worthless, and make the cause knowable
 
-The four Price States are four different things on screen, and the view never collapses one into another. Realises UJ-3, UJ-5.
+The four Price States stay four different things as data, and the view never collapses one into another. Realises UJ-3, UJ-5.
 
 **Consequences (testable):**
 - No Price State reads as worthless: never as zero, as a blank, or as a bare dash (AD-9).
 - `no-listings` is presented as an open question, never as an answer that the Combination is junk (AD-9).
 - `unresolvable` entries are shown, not merely omitted; their presence is the symptom of a game patch (AD-9).
-- `not-yet-synced` carries a reason, displayed and not merely stored, exactly one of `never-synced`, `league-mismatch` (FR-31) or `no-exchange-rate` (FR-23) *(PRD-owned)*. AD-9, AD-19 and AD-20 supply the three causes; the enum and its display are this PRD's, because one state covering three unrelated causes would defeat the point of distinguishing states.
-- The distinction is never carried by colour alone (NFR-10).
+- `not-yet-synced` carries a reason the player can learn, not merely one that is stored: exactly one of `never-synced`, `league-mismatch` (FR-31) or `no-exchange-rate` (FR-23) *(PRD-owned)*. AD-9, AD-19 and AD-20 supply the three causes; the enum and its display are this PRD's, because one state covering three unrelated causes would defeat the point of distinguishing states.
 
 ### 4.4 Provenance and Freshness Surfacing
 
@@ -243,48 +241,45 @@ The four Price States are four different things on screen, and the view never co
 
 **Functional Requirements:**
 
-#### FR-10: Propagate and display the weakest Provenance behind every figure
+#### FR-10: Say when a figure rests on something weaker than a measured, current price
 
-Every displayed derived figure states what it rests on. Realises UJ-4.
+Every figure says when it rests on something weaker than a measured, current price. Realises UJ-4.
 
 **Consequences (testable):**
 - Each derived figure carries the weakest Provenance and the oldest timestamp of every input, with no exception; the three-value order is §3 *Provenance*'s (AD-10).
 - Provenance is derived only from the sources AD-10's table names, and the view never prints the words of the Weights File's per-tier source marker on screen (AD-10).
 - Provenance belongs to an Item Class under one Craft Recipe. One invented tier among the tiers that a recipe can roll on an Item Class makes every probability of that class under that recipe read `uniform-prior`. Two recipes on one Item Class can therefore carry different labels, and a recipe switch can change the mark on a class's row. That is the consequence FR-11 turns on, and it is deliberate (AD-10).
 - A `measured` figure is plain. A figure that rests on anything weaker is visibly degraded. The view shows `absent` as unknown, never as a number (AD-10, AD-17). `EXPERIENCE.md` owns the treatment. Colour alone carries neither distinction (NFR-10).
-- The view shows the Weights File's declared producer, generation time and game patch beside any figure they influenced, so a file left behind by a patch is visible as such (AD-11).
 - The exchange observation that normalised a price participates in Provenance like any other input (AD-20).
 
-#### FR-11: State the uniform-prior caveat globally when the per-row badge cannot discriminate
+#### FR-11: Show which figures rest on estimated roll odds
 
-A Provenance badge identical on every row conveys nothing, and the view must not pretend otherwise. Realises UJ-4.
+The player can tell which figures rest on estimated roll odds. Realises UJ-4.
 
 **Consequences (testable):**
-- The condition is read from the loaded data, never assumed of v1 (FR-30, AD-10).
-- While no probability in the loaded set carries `measured`, the view tells the player two things *(PRD-owned)*. The ranking rests on invented weights. Evidence does not back the ordering between rows. `EXPERIENCE.md` decides how and where.
-- The statement lifts once any `measured` figure is present. It is never a build constant.
-- The per-row Provenance mark is required regardless (FR-10). It discriminates between ranked rows, never within one (AD-10).
+- The condition is read from the loaded data, never assumed of v1 or fixed at build time (FR-30, AD-10).
+- The per-row mark is required (FR-10). It discriminates between ranked rows, never within one (AD-10).
 - A `uniform-prior` mark means something in this pool was invented; it does not mean the pool is invented throughout (AD-10).
-- Where the mark cannot yet discriminate, freshness (FR-12) gets the visual weight (`EXPERIENCE.md`). A per-row mark is enough for the player to judge trust by in v1; no mixed-Provenance indicator is required.
+- No mixed-Provenance indicator is required. `EXPERIENCE.md` owns the treatment.
 
-#### FR-12: Show per-row freshness, and say which clock it is reading
+#### FR-12: Say per row whether the price is current enough to act on
 
-Each row carries its own age, and an unpriced row's age is as meaningful as a priced row's. Realises UJ-4.
+Each row says whether its price is current enough to act on, and an unpriced row's answer is as meaningful as a priced row's. Realises UJ-4.
 
 **Consequences (testable):**
 - A single dataset-level timestamp is never the only freshness signal; rows refresh at different times (AD-7, AD-10).
 - The age is the observation's where one exists, the last attempt's otherwise (AD-9, AD-10).
-- The view always says which of the two ages it shows. A price that is three days old and a search that has found nothing for three days are different facts. They never share one unlabelled age (AD-9).
-- A collapsed row shows no age while its price is younger than the freshness cut-off. At or beyond the cut-off, the row carries a stale mark in words (AD-10). `EXPERIENCE.md` owns the cut-off value and every age string *(PRD-owned)*. AD-10 owns the existence of a cut-off and the clock it reads.
-- A never-synced row says it was never attempted. It never shows an age, a blank or a placeholder (AD-9). This is FR-9's `never-synced` reason.
+- Observation age and attempt age are different facts. A price that is three days old and a search that has found nothing for three days never read as the same fact (AD-9).
+- What counts as current enough is a cut-off. AD-10 owns its existence and the clock it reads. `EXPERIENCE.md` owns its value and every display rule *(PRD-owned)*.
+- A never-synced row is never presented as aged or current. The player can tell it was never attempted (AD-9). This is FR-9's `never-synced` reason.
 - A partially refreshed Dataset renders normally; per-row freshness makes that honest (AD-19).
 
-#### FR-13: Present estimates as asking prices, never as realised value
+#### FR-13: Never present an asking price as a sale
 
-The view's language never implies that a player achieved a price. Realises UJ-4.
+The page never presents an asking price as a sale, and never implies that the player achieved a price. Realises UJ-4.
 
 **Consequences (testable):**
-- The view labels prices as current asking prices from live instant-buyout listings (AD-12, AD-16).
+- Prices are current asking prices from live instant-buyout listings (AD-12, AD-16).
 - No copy implies an observed sale or an achieved price. `EXPERIENCE.md`, *Voice and Tone*, owns the wording rules.
 - This rule is the *only* mitigation in the system for Risk R-1 (§9). The player's manual loop had a real-sale correction, and the tool discards it; a copywriting rule does not replace it *(PRD-owned)*.
 
@@ -337,7 +332,7 @@ Exactly three declared sources may generate a trade API request, and nothing els
 
 #### FR-18: Surface the Tracked List's age
 
-The player can see how long it has been since anyone last edited the Tracked List. Realises UJ-5.
+The player can tell when the Tracked List last changed. A list with no date reads as unknown. Realises UJ-5.
 
 **Consequences (testable):**
 - The Sync Report records the date of the last tracked-list edit, and the view shows it unconditionally, so a list running unattended for months is visible as such (AD-12).
@@ -417,19 +412,19 @@ Raw listing currency never enters valuation; every price the player sees is a Di
 
 #### FR-24: Fail loudly on an unresolvable stat id or Base Type
 
-`sync` never silently skips a Tracked Entry whose stat id or Base Type the trade API no longer exposes (AD-9).
+A patch that breaks a tracked entry is loud: the player learns of it without going to look. `sync` never silently skips a Tracked Entry whose stat id or Base Type the trade API no longer exposes (AD-9).
 
 **Consequences (testable):**
 - Such an entry's Price State becomes `unresolvable` and the Sync Report records it. The entry is never skipped, defaulted or left at its previous value, so a patched-out modifier cannot keep ranking on its last-good price (AD-9).
 - Detection is validation against the committed Trade Catalogue before any request is issued, never inference from results; an empty result set is `no-listings`, never `unresolvable` (AD-9, AD-25).
 - An unresolved id in the Weights File is reported only; `sync` reads that file and never rewrites it (AD-9, AD-3).
 - The Trade Catalogue is refreshed by an explicit command at patch cadence, never by a sync run; its diff is how a renamed id becomes visible (AD-25).
-- The ranking excludes `unresolvable` entries and the view surfaces their existence (AD-9, FR-9).
+- The ranking excludes `unresolvable` entries, and the player learns that they exist without going to look (AD-9, FR-9, FR-25).
 - Whether a row can offer a trade link depends on whether a search identifier is present, never on Price State (AD-24, FR-21).
 
 #### FR-25: Publish a structured Sync Report
 
-Every run's outcome is data the view reads, not console output (Consistency Conventions, *Logging*).
+A sync problem is visible without going to look for it. Every run's outcome is data the view reads, not console output, and the Sync Report carries the detail (Consistency Conventions, *Logging*).
 
 **Consequences (testable):**
 - The Sync Report carries what the player needs to judge the run:
@@ -442,7 +437,7 @@ Every run's outcome is data the view reads, not console output (Consistency Conv
   The spine owns the fields (AD-12, AD-9, AD-27, AD-17).
 - It records the number of due entries not reached in this Chunk, so a partially refreshed Dataset is distinguishable from a stalled one *(PRD-owned; acknowledged in AD-7)*. *Not reached* is a normal rotation outcome, never a skip (AD-7, AD-9).
 - Where a Chunk could not fund the pinned set plus at least one `active` entry, it carries a pinned-starvation record that makes the shortfall diagnosable — the declared yardstick beside the observed allowance (AD-7). Starvation is a curation defect the player must correct; *not reached* is not *(PRD-owned)*.
-- The view surfaces the starvation record's presence alongside the tracked-list age and the unresolvable count — the three figures that tell a player the list is not doing what he thinks *(PRD-owned)* (AD-7, FR-18, FR-24).
+- The player learns of a starvation record, an unresolvable entry or a failed run without going to look. Together with the tracked-list age, these tell a player the list is not doing what he thinks *(PRD-owned)* (AD-7, FR-18, FR-24).
 - A run leaves its output in the player's working tree and commits nothing; what reaches the site is what the player commits and pushes (AD-3).
 
 ### 4.7 Craft Cost
@@ -507,7 +502,7 @@ v1 ranks against a real file that satisfies the real contract, produced by the e
 **Consequences (testable):**
 - Until a conforming Weights File exists, every Item Class is Unrankable and Raw Bases still rank. What the player sees is a white-base price list, and the view names the absence (AD-11, AD-17, AD-24).
 - The dependency is accepted rather than worked around: nothing in this system can source pool membership or item-level availability, and `core` must not invent a pool *(PRD-owned)* (AD-11, AD-25).
-- A uniform-prior file is a legal weighting placeholder but never a sourcing one. Every figure it influences carries Provenance `uniform-prior`, and FR-11's caveat applies while any such entry remains (AD-11, AD-10).
+- A uniform-prior file is a legal weighting placeholder but never a sourcing one. Every figure it influences carries Provenance `uniform-prior`, and FR-11 applies to every figure it influences (AD-11, AD-10).
 - The probability code path runs from day one; the ranking formula does not change shape when measured weights arrive *(PRD-owned)*.
 - Where the producer cannot guarantee completeness it declares `partial`, and the resulting coverage is measured before view work (FR-28, FR-4, AD-27).
 
@@ -548,7 +543,7 @@ The ranking treats a Price Observation from any league but the active one as abs
 `web` reads its data at runtime, never at build time, so a data commit updates the site without a rebuild. Realises UJ-1.
 
 **Consequences (testable):**
-- Sync runs update the dataset on the player's machine; publishing it to the site is the player's own commit and push, so the page's age is bounded by that cadence and every row still states its own (AD-3, AD-10).
+- Sync runs update the dataset on the player's machine; publishing it to the site is the player's own commit and push, so the page's age is bounded by that cadence and every row still says whether its price is current (AD-3, AD-10, FR-12).
 - The view loads one consistent published set and never mixes artifacts across a refresh; a partial set is never rendered (AD-24; treatment `EXPERIENCE.md`).
 - An invalid artifact is refused loudly: the page names it and serves nothing stale (AD-3, AD-24; treatment `EXPERIENCE.md`).
 - An absent artifact is not an invalid one. Where the set can still render without it, the page renders and names the absence on screen, never presenting a diminished list as whole; where it cannot, it says which file did not arrive (AD-24).
@@ -570,7 +565,7 @@ These are engineering and workflow requirements. The cited owner states each one
 - **NFR-7 — Static delivery, zero upkeep.** No server, no secret material, no expiring credential (AD-15). FR-20 and AD-30 cover the optional sync cookie.
 - **NFR-8 — Schema versioning at every trust boundary** (AD-3).
 - **NFR-9 — Third-party citizenship.** Keeping API access is a standing requirement, because the product depends on it entirely (R-7) *(PRD-owned)*. AD-8 and AD-30 own the mechanism and the one operator-chosen departure that OQ-26 verifies.
-- **NFR-10 — Accessibility floor.** Colour alone never carries a product-meaningful distinction: Price State (FR-9), a crafted row versus a Raw Base row (FR-3) and Provenance (FR-10). AD-24 requires this for Provenance; this PRD extends it to the other two *(PRD-owned)*.
+- **NFR-10 — Accessibility floor.** Colour alone never carries a product-meaningful distinction: price trustworthiness (FR-12), estimated odds (FR-11) and crafted versus uncrafted (FR-3). AD-24 requires this for Provenance; this PRD extends it to the others *(PRD-owned)*.
 ## 6. Non-Goals (Explicit)
 
 - **Producing modifier weight data.** The scraper is a separate project; this app consumes a file and is indifferent to its producer (AD-11). The file is a release dependency, not an optional input (§7.3).
@@ -596,7 +591,7 @@ These are engineering and workflow requirements. The cited owner states each one
 - Player-set Payout Threshold, re-ranking at read time.
 - Background sync: unauthenticated by default, with an optional operator session cookie (FR-20), rate-limit adaptive, bounded, resumable, with a defined Refresh Rotation.
 - Four-state pricing with reasons on `not-yet-synced`, and unknowns segregated from the ranking.
-- Provenance and per-row freshness throughout, plus the global uniform-prior caveat.
+- Per-row price trust and an estimated-odds cue on every figure (FR-10 to FR-12).
 - Curation through hand-edited committed files, surfaced read-only in the view with tracked-list age.
 - Two Craft Recipes, each with cost computed from synced rates, and a ranking the player reads under one recipe at a time.
 - A defined Weights File **schema**, with its pool-completeness contract enforced in both directions. The **file** itself is an external deliverable, and is not in scope here (§7.3).
@@ -643,7 +638,7 @@ Behavioural, not numeric. There is one user, and instrumenting the tool would be
 - **SM-C1: Searches per full refresh.** A larger Tracked List makes the tool appear comprehensive and makes a daily refresh impossible. Held at roughly 1,500 **searches**, the quantity the rate limit actually constrains, because an entry count would miss a curator who splits one entry into two bands (AD-12). Counterbalances SM-4.
 - **SM-C2: Refresh frequency.** A faster refresh spends budget that retries, currency rates and a second recipe need, and prices are stable at daily resolution. Counterbalances SM-1.
 - **SM-C3: Number of ranked rows shown.** A longer list is not a better one. Bounded by FR-5. Counterbalances SM-2.
-- **SM-C4: Apparent confidence.** Rendering `uniform-prior` figures as cleanly as measured ones would make the tool feel more authoritative and make it more dangerous. Counterbalances SM-4, and is why FR-10 and FR-11 exist.
+- **SM-C4: Apparent confidence.** Presenting a figure on estimated odds or an old price as cleanly as a measured, current one would make the tool feel more authoritative and make it more dangerous. Counterbalances SM-4, and is why FR-10 to FR-12 exist.
 
 ## 9. Risks
 

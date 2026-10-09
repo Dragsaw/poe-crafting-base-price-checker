@@ -24,10 +24,10 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 
 ## Operating Context
 
-- v1 is built in a four-package workspace (`contracts`, `core`, `sync`, `web`): all three epics are done (`docs/stories/sprint-status.yaml`). The sync pipeline, both ranking branches, the Craft Recipe control, Chase Combinations, Provenance with its banner, and the Unrankable appendix are live. Open work is the deferred-work ledger (`docs/stories/deferred-work.md`).
+- v1 is built in a four-package workspace (`contracts`, `core`, `sync`, `web`): epics 1 to 3 are done (`docs/stories/sprint-status.yaml`). The sync pipeline, both ranking branches, the Craft Recipe control, Chase Combinations, Provenance marks and the Unrankable appendix are live on the paper design. Epic 4 (Rarity Dark redesign) is next. Open work is the deferred-work ledger (`docs/stories/deferred-work.md`).
 - The player reads the ranked list before a play session or when the economy is worth a look; the list is precomputed and never blocks on a live API call (PRD §1).
-- The Payout Threshold is a number input, re-ranking on every valid parse, and it is the only view state promised to survive a reload (FR-6, FR-7).
-- Curation is hand-edited, committed JSON files (`data/tracked.json`, `data/config.json`) reviewed periodically by the player — not a UI-driven workflow. The view surfaces the Tracked List's age so a list left unattended is visible (FR-18).
+- The Payout Threshold is set directly by the player, the list follows at once, and it is the only view state promised to survive a reload (FR-6, FR-7).
+- Curation is hand-edited, committed JSON files (`data/tracked.json`, `data/config.json`) reviewed periodically by the player — not a UI-driven workflow. The player can tell when the Tracked List last changed, so a list left unattended is visible (FR-18).
 - A background sync process (`sync`) is a separate, unattended package from the web view (`web`). It runs as a long-running session the player starts once, or as a one-Chunk command the player's own scheduler starts again (AD-7). It may use the operator's optional POESESSID session cookie to finish a refresh sooner, and never needs it (FR-20, AD-30). A sync run writes to the player's working tree and commits nothing; what reaches the site is what the player commits and pushes, and the view loads data at runtime without a rebuild (FR-25, FR-33).
 - League resets and PoE2 game patches both invalidate prior data; the product must go honestly empty rather than silently serve stale numbers across a reset (PRD UJ-6, FR-31).
 
@@ -43,7 +43,7 @@ The ranking is expected value per craft, threshold-truncated at a player-adjusta
 - Unrankable Item Classes sit in a separate group with a count and one of three reasons, never dropped or ranked anyway (FR-4). Pool coverage is measured and published, but it is reported, not a gate.
 - Four-state pricing model (`priced`, `no-listings`, `not-yet-synced`, `unresolvable`) must always render distinctly — never collapsed, never implied to be zero/worthless — and `not-yet-synced` always shows its reason (AD-9, FR-9).
 - An entry offers a link to its trade-site search when a valid one exists; following it is the player's own act (FR-21, FR-33).
-- Colour alone must never carry a product-meaningful distinction (Price State, crafted vs. Raw Base, Provenance) — NFR-10, extended by the PRD beyond AD-24's literal scope.
+- Colour alone must never carry a product-meaningful distinction (price trustworthiness, estimated odds, crafted vs. Raw Base) — NFR-10, extended by the PRD beyond AD-24's literal scope.
 - Domain terminology (Item Class, Base Type, Modifier Reference, Hybrid Modifier, Tracked Entry, Raw Base, Combination, Chase Combination, Tracked List, Item Level Floor, Accepted Tier, Curation Status, Price State, Payout Threshold, Craft Recipe, Craft Cost, Provenance, Eligible Pool, Unrankable, Sync Report, etc.) is fixed by the PRD Glossary (§3) and must be used verbatim, not re-synonymised, anywhere in product or design work. The view names an Item Class by its own name (*Bow*), never prefixed with the word *class*.
 
 ## Brand Commitments
@@ -65,4 +65,4 @@ Real committed data exists in `data/`: a Weights File from the external producer
 
 ## Accessibility & Inclusion
 
-Colour alone must never be the sole carrier of a product-meaningful distinction — this applies to Price State, crafted-vs-Raw-Base, and Provenance rendering (NFR-10). No other accessibility standard is currently mandated.
+Colour alone must never be the sole carrier of a product-meaningful distinction — this applies to price trustworthiness, estimated odds and crafted-vs-Raw-Base (NFR-10). No other accessibility standard is currently mandated.
