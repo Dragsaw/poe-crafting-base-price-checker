@@ -62,7 +62,8 @@ export interface SearchBody {
       readonly type_filters: {
         readonly filters: {
           readonly category?: { readonly option: string };
-          readonly ilvl: { readonly min: number };
+          /** A raw entry only. A crafted search admits listings below its floor (AD-16, OQ-21). */
+          readonly ilvl?: { readonly min: number };
           readonly rarity: { readonly option: 'magic' | 'normal' };
         };
       };
@@ -158,9 +159,8 @@ const SORT = { price: 'asc' } as const;
 /** The AD-16 body for one entry; `acceptedTier` is never read. @throws UnknownClassBaseTypeError */
 export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): SearchBody {
   const stats = [{ type: 'and', filters: statFiltersOf(entry) }] as const;
-  const ilvl = { min: entry.itemLevelMin };
-
   if (entry.kind === 'raw') {
+    const ilvl = { min: entry.itemLevelMin };
     return {
       query: {
         status: STATUS,
@@ -177,7 +177,7 @@ export function buildSearchBody(entry: TrackedEntry, itemTypes: ItemTypes): Sear
 
   const discriminator = discriminatorOf(entry, itemTypes);
   const typeFilters = {
-    filters: { category: { option: entry.categoryId }, ilvl, rarity: { option: 'magic' } },
+    filters: { category: { option: entry.categoryId }, rarity: { option: 'magic' } },
   } as const;
 
   switch (discriminator.arm) {

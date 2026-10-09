@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 27
+revision: 28
 created: 2026-09-12
 updated: 2026-10-09
 sources:
@@ -84,7 +84,7 @@ Downstream readers and workflows use these terms exactly. A synonym introduced a
 - **Combination** — the outcome a Tracked Entry describes: this Item Class carrying this prefix and this suffix. A Raw Base describes the degenerate Combination of an uncrafted base, and the Payout Threshold applies to it exactly as to any other (FR-3, AD-17).
 - **Chase Combination** — one of the Combinations on an Item Class that contribute most to its EV. The collapsed ranked row shows it, so the player knows what to look for without expanding the row (FR-2).
 - **Tracked List** — the complete curated set of Tracked Entries, held in `data/tracked.json`. It is at once what the tool watches and the tool's entire request budget (AD-12).
-- **Item Level Floor** — the minimum item level a Tracked Entry's search accepts, declared per entry by the curator from the tier worth chasing (FR-22). Crafted entries on one Item Class share one floor; a Raw Base at 82 is exempt (AD-17).
+- **Item Level Floor** — the item level a Tracked Entry is valued at, which scopes the modifiers that can roll on it, declared per entry by the curator from the tier worth chasing (FR-22). Crafted entries on one Item Class share one floor; a Raw Base at 82 is exempt (AD-17).
 - **Accepted Tier** — for a modifier, the tier or run of adjacent tiers worth chasing, expressed as the Modifier Reference's band and labelled beside it as a string such as `T1` or `T1–T2` (AD-5, AD-11). The label is display-only: nothing derives it, validates it, joins it to the Weights File, or keys on it (FR-22).
 - **Curation Status** — exactly one of `active`, `pinned` or `pruned` (AD-12). A `pinned` entry is refreshed ahead of the rotation as AD-7 orders it, within the cap AD-7 sets; a `pruned` entry is a tombstone carrying its reason, excluded from sync and from the ranking (AD-7, FR-15).
 - **Refresh Rotation** — the deterministic order in which Chunks refresh the Tracked List over many runs (AD-7, FR-17).
@@ -132,7 +132,8 @@ EV = ( Σ P(combo) × price(combo) over Combinations that are priced and whose p
 - **No Base Type outside the Item Class contributes to that price** *(PRD-owned)*. An Item Class is valued against its own Base Types alone, so an Item Class the player would never craft on can neither inflate nor depress one he would. The spread above is therefore bounded by a single Item Class, and the ranking separates two Item Classes that a coarser unit would have averaged into one row (AD-16, AD-17, OQ-25).
 - Changing the Payout Threshold reorders the list without a sync (AD-4).
 - The player chooses which Craft Recipe is active, and changing it reorders the list without a sync, as the Payout Threshold does. The ranking is read under one recipe at a time and is not recipe-invariant: the same Item Class can sit at a different rank under each recipe *(PRD-owned)* (FR-26, AD-17).
-- The probability and the price of a Combination describe the same population: both are scoped to the Tracked Entry's Item Level Floor, and a Tracked List in which two Tracked Entries on one Item Class could be satisfied by a single item is refused at load, because the sum is over a partition (AD-17, FR-16).
+- The price of a Combination is the asking price of any item in the Item Class whose rolls satisfy the Combination, at any item level, because a buyer pays for rolled values and not for item level *(PRD-owned)*. The probability of the Combination is scoped to the Tracked Entry's Item Level Floor, because the floor sets what can roll (AD-17, FR-22).
+- A Tracked List in which two Tracked Entries on one Item Class could be satisfied by a single item is refused at load, because the sum is over a partition (AD-17, FR-16).
 
 #### FR-2: Show Chase Combinations on each collapsed row
 
@@ -389,7 +390,7 @@ A curator can track the outcomes the game actually rolls. A Hybrid Modifier is o
 
 #### FR-22: Declare each entry's Item Level Floor from its Accepted Tier
 
-Each Tracked Entry declares the item level its search filters on. A stated curation rule gives that level, not a global constant, and the curator writes it by hand *(PRD-owned)* (AD-5).
+Each Tracked Entry declares the item level that scopes the modifiers it can roll. A stated curation rule gives that level, not a global constant, and the curator writes it by hand *(PRD-owned)* (AD-5).
 
 **Consequences (testable):**
 - The Accepted Tier of a modifier is tier 1, except where tier 1 first appears at item level 81 or 82 and is too rare to chase; the curator then accepts tier 2 *(PRD-owned)*.

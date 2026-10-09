@@ -37,7 +37,6 @@ describe('buildSearchBody: crafted', () => {
     expect(body.query.type).toBeUndefined();
     expect(body.query.filters.type_filters.filters).toEqual({
       category: { option: 'armour.boots' },
-      ilvl: { min: 75 },
       rarity: { option: 'magic' },
     });
     expect(body.query.filters.equipment_filters).toEqual({
@@ -80,7 +79,6 @@ describe('buildSearchBody: crafted', () => {
           type_filters: {
             filters: {
               category: { option: 'accessory.amulet' },
-              ilvl: { min: 75 },
               rarity: { option: 'magic' },
             },
           },
@@ -141,6 +139,15 @@ describe('buildSearchBody: crafted', () => {
     const text = JSON.stringify(withTier);
     expect(text).not.toContain('T5');
     expect(text).not.toContain('sale_type');
+  });
+
+  it.each([
+    ['defence', 'armour.boots', 'Boots_str_int'],
+    ['type', 'jewel', 'Time-Lost_Diamond'],
+    ['none', 'accessory.amulet', 'Amulets'],
+  ])('arm %s sends no ilvl filter', (_arm, categoryId, className) => {
+    const body = buildSearchBody(crafted(categoryId, className), itemTypes);
+    expect(Object.keys(body.query.filters.type_filters.filters)).toEqual(['category', 'rarity']);
   });
 
   it('serialises one entry to one byte string', () => {

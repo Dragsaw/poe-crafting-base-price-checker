@@ -23,9 +23,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
     - Do not write an id. The id is `dw-` plus a hash of source_spec and summary, so editing either field
       makes a new entry and a new issue.
 -->
-
-## Deferred from: user request (2026-10-09)
-
-- source_spec: `docs/stories/spec-deferred-work-github-issues.md`
-  summary: Remove ilvl from recipe searches. The minimum boundary for mod values is already provided, so the ilvl filter is not required.
-  evidence: `packages/sync/src/pricing/search-body.ts` builds `ilvl = { min: entry.itemLevelMin }` (line 161) and puts it in the crafted-base search filters (lines 170 and 180). Tests: `packages/sync/src/pricing/search-body.test.ts`.

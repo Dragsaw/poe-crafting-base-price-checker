@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 32
+revision: 33
 created: '2026-09-12'
 updated: '2026-10-09'
 binds: []
@@ -903,7 +903,7 @@ never import each other.
   | **the unit filter** | **`raw` entry:** `query.type` (top level, **not** a filter) = the entry's `baseTypeId`, verbatim. **`crafted` entry:** `type_filters.category` = the entry's `categoryId`, verbatim, **plus the class discriminator below**. The two branches are chosen by the entry's kind (AD-5) and never mixed |
   | **the class discriminator** | **`crafted` entry only.** Derived from the entry's `className` (`buildSearchBody`) and emitted as one of: an `equipment_filters` **defence signature**; `query.type` carrying the class's base type, for `jewel`; or **nothing at all**, where the entry's `categoryId` carries one class and the category filter is already exact |
   | `type_filters.rarity` | `magic` for a `crafted` entry, `normal` for a `raw` entry |
-  | `type_filters.ilvl` | `min` = the entry's `itemLevelMin` |
+  | `type_filters.ilvl` | **`raw` entry only:** `min` = the entry's `itemLevelMin`. A `crafted` entry emits no item-level filter |
   | stat filters | **one per distinct `statId`** across both affixes, in one `and` group: a `banded` line carries **both `min` and `max`**; a `valueless` line carries the stat id and **no edges at all**. A `hybrid` reference contributes one filter per line, and a **summed `statId`** is **one** filter, below |
   | `query.status` | `{"option": "securable"}`, **always emitted** — the option `/api/trade2/data/filters` labels **"Instant Buyout"** |
   | `trade_filters.filters.price` | `{"option": "exalted_divine"}`, **always emitted** — see below |
@@ -966,7 +966,7 @@ never import each other.
   stated there. What this AD owns is the mechanical consequence: the priced population is
   every base type **in the class**, so the payout term describes the class while the
   probability term (AD-17) describes that same class's pool. The two are scoped to **one**
-  population. `core` does not correct for the
+  class; over item level they differ by `prd.md` FR-1. `core` does not correct for the
   within-class spread and must not weight the sample.
 
   **No base outside the class contributes to a crafted row's price** — `prd.md` FR-1 states
@@ -1184,8 +1184,8 @@ never import each other.
   recipe-floor pool below.
 
   *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** the entry's
-  floor, while the `ilvl >=` search returns a superset. Accepted rather than corrected,
-  because correcting it needs an exact-item-level filter the trade API does not offer.
+  floor. The crafted search sends no item-level filter and prices every item level by
+  choice, not by an API limit (`prd.md` FR-1).
 
   **Six cross-file checks are defined once in `core`, and every shell holding both files
   runs them** — `web` at load, and **`sync` as a run-start gate before any priced entry
@@ -1914,8 +1914,8 @@ poe-crafting-base-price-checker/
   AD-12's ceiling, and contradicts the PRD's per-base-type floor. **Revisit if** the
   uniformity rule forces a real choice between two floors worth tracking.
 - **Per-band conditional item level.** AD-17 models the craft as occurring at exactly the
-  entry's floor while the `ilvl >=` search returns a superset. **Revisit only if** the trade
-  API gains an exact-item-level filter.
+  entry's floor, and the crafted price spans every item level (`prd.md` FR-1). **Revisit
+  only if** `prd.md` FR-1 scopes the crafted price to item level again.
 - **Unidentified pool weight.** A per-`(base, slot)` scalar carrying the weight of modifiers
   the source publishes unnamed, entering the denominator but never a numerator. Rejected
   because it is a new way for a producer to hide weight. **Revisit if** unnamed rows recur at
