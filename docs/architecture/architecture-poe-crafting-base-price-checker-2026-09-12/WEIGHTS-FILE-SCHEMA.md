@@ -68,7 +68,7 @@ unchanged** — verified against all 59 classes on 2026-09-20. What changes is t
 the producer was already following by convention is now one a consumer may rely on.
 
 **Why a consumer needs it.** Spine revision 17 moved the ranked crafted unit to the **item
-class**, and closed **OQ-25** by having the trade search reach that class exactly rather
+class**, and had the trade search reach that class exactly rather
 than pricing across its siblings. The filter that reaches it is derived from the **inner
 `className` key** — a defence signature for an armour class, the class's own base type for a
 jewel (spine AD-16; `buildSearchBody` in `packages/sync/src/pricing/search-body.ts`). That derivation reads the key's
@@ -270,7 +270,7 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 | `schemaVersion` | Semver. `core` refuses a major version that `core` does not implement. `core` does not guess. |
 | `gamePatch` | A free-form GGG patch string, operator-asserted. Never `"unknown"`, never inferred. A producer refuses to run without it. |
 | `producer.id` | Stable across regenerations by the same producer. |
-| `bases` key | Two levels. Outer key is a trade category filter id (`categoryId`), spelled exactly as the trade category filter list spells it. Inner key is the poe2db `className` verbatim (never a derived display label) that resolved to that `categoryId` -- `className -> categoryId` is many-to-one (e.g. six armour `className`s collapse to `armour.gloves`), so one `categoryId` can carry several distinct `className` sub-keys, each with its own `{prefix, suffix}` pools. There is no cross-class ownership guard: `(categoryId, className)` cannot collide because `className`s are already distinct. Validated report-only by `sync` (AD-6, AD-25); an item class absent from the file is unrankable. **The pair is the consumer's own key for a crafted tracked entry** (spine AD-5), so a consumer looks a pool up at both rungs directly and **never falls back to a sibling `className`** under a `categoryId` it did find. The fan-out is real and measured on the 2026-09-19 file: 6 of 29 categories carry more than one class, `armour.chest` seven and `jewel` eight. **Since `5.1.0` the inner key also carries a normative grammar** — see the row below, and `5.1.0 — the inner key's grammar becomes normative`. |
+| `bases` key | Two levels. Outer key is a trade category filter id (`categoryId`), spelled exactly as the trade category filter list spells it. Inner key is the poe2db `className` verbatim (never a derived display label) that resolved to that `categoryId` -- `className -> categoryId` is many-to-one (e.g. six armour `className`s collapse to `armour.gloves`), so one `categoryId` can carry several distinct `className` sub-keys, each with its own `{prefix, suffix}` pools. There is no cross-class ownership guard: `(categoryId, className)` cannot collide because `className`s are already distinct. Validated report-only by `sync` (AD-9, AD-25); an item class absent from the file is unrankable. **The pair is the consumer's own key for a crafted tracked entry** (spine AD-5), so a consumer looks a pool up at both rungs directly and **never falls back to a sibling `className`** under a `categoryId` it did find. The fan-out is real and measured on the 2026-09-19 file: 6 of 29 categories carry more than one class, `armour.chest` seven and `jewel` eight. **Since `5.1.0` the inner key also carries a normative grammar** — see the row below, and `5.1.0 — the inner key's grammar becomes normative`. |
 | `className` grammar (`5.1.0`) | The inner key is either **defence-suffixed**, `<family>_<letters>` with `<letters>` a `_`-separated non-repeating sequence over `str` / `dex` / `int` (`Body_Armours_str_dex`, `Boots_int`), or **plain**, carrying no such suffix (`Bows`, `Amulets`, `Time-Lost_Diamond`). Within one `categoryId`: defence-suffixed classes carry **distinct** letter sets, and defence-suffixed and plain classes are **never mixed**. A plain class under an all-plain fan-out `categoryId` is a **base type name with spaces written as underscores**. The consumer derives its trade-search class filter from this grammar (spine AD-16; `buildSearchBody` in `packages/sync/src/pricing/search-body.ts`) and validates the base-type form against the trade catalogue before use, so a violation surfaces at load rather than as a wrong price. **`str` maps to armour, `dex` to evasion, `int` to energy shield** — that mapping is the point of the rule and is stated here because the consumer depends on it. |
 | `slot` | Exactly `prefix` and `suffix`. |
 | `poolCoverage` | See *The pool-completeness rule*. Required, with no default. |
@@ -281,7 +281,7 @@ How `core` applies this rule to a crafting act is spine AD-17 and
 | `weight` | Raw spawn weight as poe2db published it (`DropChance`), unnormalised, non-negative. `0` is meaningful ("cannot roll on this base") and must still be emitted. **Sole exception (`6.1.0`):** a `weightSource: "not-in-game"` entry carries `0` whatever poe2db published. |
 | `weightSource` | **Required.** `"published"` where poe2db supplied a real weight (a JSON string `DropChance`), `"absent"` where it supplied a filler (a JSON number). Never inferred from the value. **`"not-in-game"` (`6.1.0`):** poe2db lists the tier but it cannot roll in game; `weight` is forced to `0`. Set only from the producer's hand-kept list, never inferred from an unmatched line. |
 | `lines` | **Required, at least one entry.** One item per stat line poe2db's template prints, split at the template's own line breaks — no value math, no partitioning. |
-| `lines[].statId` | A trade API stat id matched by this producer's stat-text resolution, or `null` if unresolved. **Since `6.1.0`, a `null` line inside a `complete` pool is either not-in-game (its entry is `weightSource: "not-in-game"`, `weight: 0`) or an internal engine line with no trade stat of its own (weight unchanged)**; any other `null` line makes its pool `partial`. Never a matching key from `core`'s side — `core` treats it as opaque identity. Validated report-only against the trade catalogue by `sync`, same as `4.x` (AD-6, AD-25). |
+| `lines[].statId` | A trade API stat id matched by this producer's stat-text resolution, or `null` if unresolved. **Since `6.1.0`, a `null` line inside a `complete` pool is either not-in-game (its entry is `weightSource: "not-in-game"`, `weight: 0`) or an internal engine line with no trade stat of its own (weight unchanged)**; any other `null` line makes its pool `partial`. Never a matching key from `core`'s side — `core` treats it as opaque identity. Validated report-only against the trade catalogue by `sync`, same as `4.x` (AD-9, AD-25). |
 | `lines[].ranges` | Verbatim `[min, max]` pairs, one per `#` in that line's own template text, in the order poe2db prints them. A line with no `#` (a flat, valueless line) carries an empty array. **Not** cut, cast, or reduced to a single derived value — a two-number stat's two ranges are both reported as poe2db shows them. |
 
 ## Validation
@@ -300,7 +300,7 @@ source of truth; the shape above documents it and is not a parallel definition.
 - `lines` empty
 - a `lines[]` entry whose `ranges` contains a pair where `min > max`
 - a `lines[]` entry whose `ranges` carries **more than two** pairs. The game publishes at most
-  two `#` on a stat line (confirmed 2026-09-19, OQ-19), and `core` derives a line's interval by
+  two `#` on a stat line (confirmed 2026-09-19), and `core` derives a line's interval by
   dividing by that count: two divides exactly in binary, three or more does not, and AD-17
   compares edges for equality with no tolerance. A three-`#` line would therefore fail edge
   alignment permanently on every affected base, with nothing a curator could write to satisfy
@@ -329,14 +329,14 @@ source of truth; the shape above documents it and is not a parallel definition.
 
 - an unresolved `statId` (`null`) — reported by the producer, never a refusal
 - an uncatalogued `statId`, or an outer `categoryId` the trade category filter list does not
-  spell — `sync`'s concern, report-only (AD-6), same as `4.x`. **The inner `className` is not
+  spell — `sync`'s concern, report-only (AD-9), same as `4.x`. **The inner `className` is not
   checkable against the catalogue**: it is a poe2db name and AD-25's catalogue carries no class
   axis, so `sync` validates the rung it can reach and reports the other as uncheckable rather
   than as clean.
 
-  **That is no longer a gap, and spine revision 16 is why.** The note above cited **OQ-23**,
-  which asked how a tracked entry reached the pool `className` keys. It was closed by
-  withdrawing its premise: a crafted tracked entry now names `(categoryId, className)`
+  **That is no longer a gap, and spine revision 16 is why.** The note above asked
+  how a tracked entry reached the pool `className` keys. The question went away with its
+  premise: a crafted tracked entry now names `(categoryId, className)`
   directly (spine AD-5), so **this file is the authority the `className` is checked against**
   rather than a name needing an authority of its own. The check is the consumer's cross-file
   gate (AD-12) — a tracked entry whose pair is absent from `bases` is unrankable with a

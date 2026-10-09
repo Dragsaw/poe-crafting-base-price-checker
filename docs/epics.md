@@ -17,7 +17,7 @@ inputDocuments:
 
 This document holds the complete epic and story breakdown for PoE2 Crafting Base Price Checker. It decomposes the requirements of the PRD, the architecture spine and the UX designs into stories a developer can implement.
 
-**Citation discipline.** Every planning fact has exactly one owning document. This document names each requirement by its stable id. It never restates the owner's text. `prd.md` owns what the player gets. `ARCHITECTURE-SPINE.md` owns the decisions (ADs). `DESIGN.md` owns the tokens and the visual treatment. `EXPERIENCE.md` owns behaviour, states and flows. Under **AD-0**, a companion section that an AD delegates to binds exactly as that AD binds. An acceptance criterion may therefore cite `IMPLEMENTATION-NOTES.md`, `WEIGHTS-FILE-SCHEMA.md` or `AGENT-WORKFLOW.md` by section number. The input list above does not name those three files.
+**Citation discipline.** Every planning fact has exactly one owning document. This document names each requirement by its stable id. It never restates the owner's text. `prd.md` owns what the player gets. `ARCHITECTURE-SPINE.md` owns the decisions (ADs). `DESIGN.md` owns the tokens and the visual treatment. `EXPERIENCE.md` owns behaviour, states and flows. Under **AD-0**, a companion section that an AD delegates to binds exactly as that AD binds. An acceptance criterion may therefore cite `WEIGHTS-FILE-SCHEMA.md` or `AGENT-WORKFLOW.md` by section number. Where an AD names a module as owner of a computation, that module and its tests bind (AD-0), and an acceptance criterion may cite the module. The input list above does not name those two files.
 
 ## Requirements Inventory
 
@@ -40,7 +40,7 @@ FR-12: Say per row whether the price is current enough to act on (AD-9, AD-10, A
 FR-13: Never present an asking price as a sale (AD-12, AD-16)
 FR-14: Bound every request to one of three declared sources (AD-12)
 FR-15: Honour Curation Status as schema-level behaviour (AD-7, AD-12, AD-17)
-FR-16: Reject an overlapping Tracked List at load — *Architecture-owned* (AD-17, `IMPLEMENTATION-NOTES.md` §2.1, §2.2)
+FR-16: Reject an overlapping Tracked List at load — *Architecture-owned* (AD-17; `areOverlapping` and `overlapBranches` in `packages/contracts/src/overlap.ts`, `coOccur` in `packages/core/src/cross-file.ts`)
 FR-17: Refresh the Tracked List in a defined, deterministic rotation — *Architecture-owned* (AD-7)
 FR-18: Let the player tell when the Tracked List last changed (AD-12, AD-9)
 FR-19: Run as a bounded, resumable, single-instance Chunk runner — *Architecture-owned* (AD-7, §6, §7)
@@ -282,7 +282,7 @@ All four findings closed on 2026-09-20 and the owning documents carry those ruli
 
 **D-2 — CLOSED 2026-09-20.** The count was the shallow half of this finding. State 27's *"four checks, not five"* was a correction aimed at the retired straddle rule. Class discriminability arrived later and landed in the slot that sentence had emptied, so the sentence read as a rejection of a binding check. State 27 now enumerates five checks, and the defence is struck. The real payload was FR-4's reason enum. A class that fails any of the five has a `complete`, published pool, so neither existing string was true of it. FR-4 now carries a third string. Cite AD-17.
 
-**D-4 — CLOSED 2026-09-20.** `EXPERIENCE.md` carried *a declared tiebreak for equal EV* on its unresolved list as `core`'s and unanswered, on the ground that state 25 ties every crafted row at minus its Craft Cost and the rank numerals print over that tie, so an undeclared tiebreak would shift the printed order between loads. **AD-17 already declares it.** The ranked list breaks ties on the row's unit key, then the recipe id; the comparison is against the serialised canonical key of AD-5's arm rather than a bare string; and a raw row, having no recipe id, sorts before a crafted row at an equal EV, which makes the ordering total across the mixed list. Under that rule a twenty-way tie on one figure is fully determined and stable across loads, because unit keys are distinct. **The gap is therefore a citation gap and not a missing decision.** Two consequences: `IMPLEMENTATION-NOTES.md` does not own this rule and none of its sections state it, so an acceptance criterion cites AD-17 directly; and `EXPERIENCE.md`'s entry closes against AD-17 rather than waiting on a fresh ruling. UX made that edit on 2026-09-20: the unresolved bullet is gone, state 25 cites AD-17, and the closure is recorded under *Closed against the architecture*. Cite AD-17. No story invents a tiebreak of its own.
+**D-4 — CLOSED 2026-09-20.** `EXPERIENCE.md` carried *a declared tiebreak for equal EV* on its unresolved list as `core`'s and unanswered, on the ground that state 25 ties every crafted row at minus its Craft Cost and the rank numerals print over that tie, so an undeclared tiebreak would shift the printed order between loads. **AD-17 already declares it.** The ranked list breaks ties on the row's unit key, then the recipe id; the comparison is against the serialised canonical key of AD-5's arm rather than a bare string; and a raw row, having no recipe id, sorts before a crafted row at an equal EV, which makes the ordering total across the mixed list. Under that rule a twenty-way tie on one figure is fully determined and stable across loads, because unit keys are distinct. **The gap is therefore a citation gap and not a missing decision.** Two consequences: An acceptance criterion cites AD-17 directly; and `EXPERIENCE.md`'s entry closes against AD-17 rather than waiting on a fresh ruling. UX made that edit on 2026-09-20: the unresolved bullet is gone, state 25 cites AD-17, and the closure is recorded under *Closed against the architecture*. Cite AD-17. No story invents a tiebreak of its own.
 
 **D-3 — CLOSED 2026-09-20.** The recipe axis is settled, and AD-17 now carries the ruling. `core` ranks every `(Item Class, recipe)` pair inside one ordering, which is what gives the recipe-id tie-break work to do. `web` renders only the rows whose recipe is the active one, so a crafted class appears on the page exactly once. The cross product is an ordering-internal fact and is never player-observable. The list does not double, the Craft Recipe control is a filter, and no row names its recipe. AD-4 carries the read-time consequence. Cite AD-17.
 
@@ -484,7 +484,7 @@ So that the producer and the consumer of an artifact cannot drift apart while bo
 **Then** the fields serialise in the declared order
 **And** each affix takes one of three distinguishable forms, so an absent affix and a valueless affix can never collide
 **And** the serialisation carries the kind, so the two key spaces cannot collide
-**And** keys compare by UTF-8 code unit, and never by locale collation (`IMPLEMENTATION-NOTES.md` §4.1, Consistency Conventions).
+**And** keys compare by UTF-8 code unit, and never by locale collation (`canonicalKey` in `packages/contracts/src/canonical-key.ts`, Consistency Conventions).
 
 **Given** `acceptedTier` on a modifier reference
 **When** `contracts` types it
@@ -528,7 +528,7 @@ So that I never lose the API access the entire tool depends on.
 **Then** it learns the active rule names at runtime, and it names no rule in code
 **And** it parses the policy header and the `-State` header for each named rule
 **And** it distinguishes the search bucket from the fetch bucket by `X-Rate-Limit-Policy`
-**And** it paces against the tightest unsatisfied bucket, with no rate hardcoded (`IMPLEMENTATION-NOTES.md` §5.3).
+**And** it paces against the tightest unsatisfied bucket, with no rate hardcoded (AD-8; `parseRateLimitHeaders` in `packages/sync/src/trade/rate-limit-headers.ts`).
 
 **Given** a `429` carrying `Retry-After`
 **When** the adapter receives it
@@ -606,7 +606,7 @@ So that I can schedule it repeatedly on my own machine and a crash can never wed
 
 **Given** a lock whose ISO-8601 start time is older than the declared staleness threshold
 **When** a run finds that lock
-**Then** it breaks the lock, proceeds, and writes a distinct `stale-lock-broken` record (`IMPLEMENTATION-NOTES.md` §7).
+**Then** it breaks the lock, proceeds, and writes a distinct `stale-lock-broken` record (AD-7; `STALE_LOCK_AFTER_MS` and `isStaleInstant` in `packages/sync/src/chunk/lock.ts`).
 
 **Given** two runs that arrive at the staleness boundary together
 **When** each run tries to take the lock
@@ -690,7 +690,7 @@ So that I can answer "how often does a row get re-priced?" of any figure, and a 
 **Given** a chunk that cannot fund the pinned set plus at least one `active` entry
 **When** it selects
 **Then** it truncates the pinned set and produces a pinned-starvation record
-**And** it does not change the exit code (`IMPLEMENTATION-NOTES.md` §6).
+**And** it does not change the exit code (AD-7; `checkPinnedCap` in `packages/sync/src/pinned-cap.ts`).
 
 **Given** the load-time inequality that denominates the `pinned` cap against a chunk
 **When** a component evaluates it
@@ -713,7 +713,7 @@ So that every figure the tool shows me is one comparable number resting on a met
 **When** `sync` builds its search
 **Then** `query.type` at the top level carries the entry's `baseTypeId` verbatim, and it is not a filter
 **And** the search carries no category filter
-**And** `type_filters.rarity` is `normal`, and `type_filters.ilvl.min` is the entry's `itemLevelMin` (`IMPLEMENTATION-NOTES.md` §5.2).
+**And** `type_filters.rarity` is `normal`, and `type_filters.ilvl.min` is the entry's `itemLevelMin` (AD-16; `buildSearchBody` in `packages/sync/src/pricing/search-body.ts`).
 
 **Given** any search
 **When** `sync` emits it
@@ -733,7 +733,7 @@ So that every figure the tool shows me is one comparable number resting on a met
 
 **Given** a returned sample of listings
 **When** `sync` takes the median
-**Then** on an even sample the median is the lower of the two middle values, and never their mean. Every persisted price is therefore a price someone actually asked (`IMPLEMENTATION-NOTES.md` §4.3).
+**Then** on an even sample the median is the lower of the two middle values, and never their mean. Every persisted price is therefore a price someone actually asked (AD-16; `lowerMedian` in `packages/sync/src/pricing/normalise.ts`).
 
 **Given** a returned listing
 **When** `sync` normalises it
@@ -867,7 +867,7 @@ So that what the run did and what broke reaches the surface I already read inste
 
 **Given** a chunk that truncated its pinned set
 **When** `sync` writes the report
-**Then** the report carries a pinned-starvation record naming the declared yardstick beside the observed allowance, so the shortfall is diagnosable (`IMPLEMENTATION-NOTES.md` §6).
+**Then** the report carries a pinned-starvation record naming the declared yardstick beside the observed allowance, so the shortfall is diagnosable (AD-7; `checkPinnedCap` in `packages/sync/src/pinned-cap.ts`).
 
 **Given** an unattended run that fails
 **When** it exits
@@ -1071,7 +1071,7 @@ So that the ordering I read is a pure function of what was published, and last l
 **When** `core` breaks the tie
 **Then** it breaks on the serialised canonical key of the entry's own AD-5 arm
 **And** it never breaks on a bare string that a `categoryId` and a `baseTypeId` could both supply
-**And** a raw row carries no recipe id, so it sorts before a crafted row. The ordering is therefore total across the mixed list, and not only within each branch (AD-17, `IMPLEMENTATION-NOTES.md` §4.1).
+**And** a raw row carries no recipe id, so it sorts before a crafted row. The ordering is therefore total across the mixed list, and not only within each branch (AD-17; `canonicalKey` in `packages/contracts/src/canonical-key.ts`).
 
 **Given** a `PriceObservation` whose league differs from `data/config.json`'s active league
 **When** `core` values it
@@ -1468,8 +1468,8 @@ So that a rank stops being a claim and becomes an argument I can check.
 
 **Given** the link's URL
 **When** `web` builds it
-**Then** it takes the form `IMPLEMENTATION-NOTES.md` §5.4 fixes
-**And** **the league segment alone** is percent-encoded, and never the whole path. Live league ids carry spaces, and an unencoded segment silently 404s (AD-24, §5.4).
+**Then** it takes the form `tradeSearchHref` in `packages/web/src/list/trade-link.ts` fixes (AD-24)
+**And** **the league segment alone** is percent-encoded, and never the whole path. Live league ids carry spaces, and an unencoded segment silently 404s (AD-24).
 
 **Given** an entry that fails any of the three conditions
 **When** the row renders
@@ -1755,7 +1755,7 @@ So that the ranking rests on a file somebody else produced and this app never in
 **Given** a line whose `statId` is `null`
 **When** `core` reads it
 **Then** that line is data rather than a file error, never a reason to declare a pool `partial`, and never a fact about coverage
-**And** such a line can never be contained, while its entry still enters the denominator like any other (AD-11, `IMPLEMENTATION-NOTES.md` §1, §3).
+**And** such a line can never be contained, while its entry still enters the denominator like any other (AD-11, AD-17; `untrackableReason` and `affixProbability` in `packages/core/src/probability.ts`).
 
 **Given** a pool declared `complete`
 **When** a developer reads the contract
@@ -1864,7 +1864,7 @@ So that two builders cannot produce two different orderings from the same two fi
 **When** `core` computes it
 **Then** the transmute draws its affix from the prefix and suffix pools combined, by weight, and the augment draws from the other slot's pool with the first affix's `modGroup` removed
 **And** scope, truncate, exclude and renormalise run in that order
-**And** `P = 1` for an absent affix (FR-29, AD-17, `IMPLEMENTATION-NOTES.md` §11).
+**And** `P = 1` for an absent affix (FR-29, AD-17; `combinationProbability` in `packages/core/src/probability.ts`).
 
 **Given** a class where no `modGroup` spans both slots
 **When** `core` computes a Combination's probability
@@ -1886,8 +1886,8 @@ So that two builders cannot produce two different orderings from the same two fi
 
 **Given** a declared `itemLevelMin`
 **When** a component reads it
-**Then** no component derives that floor. `IMPLEMENTATION-NOTES.md` §8 states it as a conformance condition on `data/tracked.json`
-**And** the code reads the declared number (FR-22, AD-5, §8).
+**Then** no component derives that floor. AD-5 states it as a conformance condition on `data/tracked.json`, and `needs` in `packages/core/src/probability.ts` derives it
+**And** the code reads the declared number (FR-22, AD-5).
 
 **Given** a floor declared *higher* than §8 derives
 **When** a check runs over the file
@@ -2046,9 +2046,9 @@ So that a double-counted Combination cannot hand an Item Class the top of the li
 **When** the checks run
 **Then** class discriminability does not run, and nothing is lost. Every crafted entry is unrankable already, and `sync` still builds every crafted search without consulting that file (AD-17, AD-24, AD-5).
 
-**Given** the `IMPLEMENTATION-NOTES.md` sections these checks name
+**Given** the modules AD-17 names for these checks
 **When** a developer builds a shell
-**Then** each check's quantifiers, scope and error payload live in those sections and nowhere else
+**Then** each check's quantifiers, scope and error payload live in `packages/core/src/cross-file/` and `packages/core/src/cross-file.ts` and nowhere else
 **And** a shell that re-derives one has diverged from AD-17, rather than from a style note (AD-0, AD-17).
 
 ### Story 3.4: The crafted EV, Craft Cost and the Craft Recipe control
@@ -2128,7 +2128,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 **Given** the recipe's declared `modifierLevelMin`
 **When** `core` prepares the pool
 **Then** it scopes first, truncates the tiers below that floor second, and renormalises third
-**And** renormalising before truncating is the error. It leaves a denominator that no longer sums its own numerators (FR-26, AD-17, `IMPLEMENTATION-NOTES.md` §9).
+**And** renormalising before truncating is the error. It leaves a denominator that no longer sums its own numerators (FR-26, AD-17; `eligible` and `canRecipeRoll` in `packages/core/src/probability.ts`).
 
 **Given** the two bounds on a tier
 **When** `core` tests eligibility
@@ -2264,7 +2264,7 @@ So that the list ranks the decision I actually make rather than the price of a b
 **When** `core` orders it
 **Then** AD-17's declared tie-break settles it — on the row's unit key, then the recipe id, comparing the serialised canonical key of AD-5's arm rather than a bare string
 **And** because unit keys are distinct, the printed order is fully determined and identical across loads. Nothing here shifts between two builders or two page loads
-**And** no story invents a tie-break of its own. `IMPLEMENTATION-NOTES.md` does not own this rule and none of its sections state it, so an acceptance criterion cites AD-17 directly (state 25, FR-1, AD-17, AD-5, finding D-4).
+**And** no story invents a tie-break of its own. An acceptance criterion cites AD-17 directly (state 25, FR-1, AD-17, AD-5, finding D-4).
 
 **Given** a raw row and a crafted row at an equal EV
 **When** `core` compares them
