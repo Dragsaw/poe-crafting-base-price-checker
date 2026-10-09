@@ -13,11 +13,11 @@ describe('the trust mark and the unit glyphs', () => {
     expect(HAIR_SPACE).toBe('\u{200A}');
   });
 
-  it('renders the class glyph ≡ in sepia', () => {
+  it('renders the class glyph ≡ in text-tertiary', () => {
     const container = mount(<UnitGlyph unit="class" />);
     const glyph = container.querySelector<HTMLElement>('[data-unit-glyph="class"]');
     expect(glyph?.textContent).toBe(glyphs.unitClass);
-    expect(glyph?.style.color).toBe(rgb(colors.sepia));
+    expect(glyph?.style.color).toBe(rgb(colors['text-tertiary']));
   });
 });
 

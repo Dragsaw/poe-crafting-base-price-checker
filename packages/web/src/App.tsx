@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } f
 
 import { FailureScreen } from './frame/FailureScreen';
 import { Frame } from './frame/Frame';
-import { Masthead } from './frame/Masthead';
+import { HeaderBar } from './frame/HeaderBar';
+import { InterimControls } from './frame/InterimControls';
 import { RowSlots } from './frame/RowSlots';
 import { TrustStrip, TrustStripSlot } from './frame/TrustStrip';
 import { AskingPriceLine } from './list/AskingPriceLine';
@@ -155,7 +156,7 @@ function useRanking(view: ViewState, threshold: number): Ranking | undefined {
   );
 }
 
-/** A plain call, not a component: the frame and masthead keep their identity into ready. */
+/** A plain call, not a component: the frame and header bar keep their identity into ready. */
 function renderPending({
   threshold,
   onThresholdChange,
@@ -165,7 +166,8 @@ function renderPending({
 }): JSX.Element {
   return (
     <Frame state="pending">
-      <Masthead league={undefined} threshold={threshold} onThresholdChange={onThresholdChange} />
+      <HeaderBar league={undefined} />
+      <InterimControls threshold={threshold} onThresholdChange={onThresholdChange} />
       <TrustStripSlot />
       <AskingPriceLine />
       <RowSlots />
@@ -195,8 +197,8 @@ function renderReady({
   const active = options.find((option) => option.id === recipe?.id);
   return (
     <Frame state="ready">
-      <Masthead
-        league={view.set.config.league}
+      <HeaderBar league={view.set.config.league} />
+      <InterimControls
         threshold={threshold}
         onThresholdChange={onThresholdChange}
         recipe={

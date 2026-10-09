@@ -10,11 +10,11 @@ export const HAIR_SPACE = '\u{200A}';
 const MARKS: Readonly<
   Record<TrustMarkKind, { readonly glyph: string; readonly color: string; readonly weight: 600 | 700 }>
 > = {
-  prior: { glyph: glyphs.prior, color: colors.ochre, weight: 600 },
-  unknown: { glyph: glyphs.unknown, color: colors.ochre, weight: 600 },
-  stale: { glyph: glyphs.stale, color: colors.rust, weight: 700 },
-  never: { glyph: glyphs.stale, color: colors.rust, weight: 700 },
-  unresolvable: { glyph: glyphs.unresolvable, color: colors.rust, weight: 700 },
+  prior: { glyph: glyphs.prior, color: colors['trust-rough'], weight: 600 },
+  unknown: { glyph: glyphs.unknown, color: colors['trust-rough'], weight: 600 },
+  stale: { glyph: glyphs.stale, color: colors['trust-broken'], weight: 700 },
+  never: { glyph: glyphs.stale, color: colors['trust-broken'], weight: 700 },
+  unresolvable: { glyph: glyphs.unresolvable, color: colors['trust-broken'], weight: 700 },
 };
 
 // *never attempted* sets its word in italic, so it differs from an old row without colour (NFR-10).

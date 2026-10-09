@@ -6,7 +6,7 @@ import { useId, useRef, useState, type JSX } from 'react';
 
 import { formatThreshold } from '../shared/money';
 import { DENOMINATION } from '../shared/product';
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 import {
   clampThreshold,
   THRESHOLD_DECIMALS,
@@ -58,17 +58,17 @@ export function PayoutThreshold({
     <div
       data-payout-threshold=""
       style={{
-        width: px(spacing.thresholdPanelWidth),
+        width: px(layout.thresholdPanelWidth),
         boxSizing: 'border-box',
-        background: colors['paper-inset'],
-        border: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-        padding: `${px(spacing.controlPanelPadY)} ${px(spacing.controlPanelPadX)}`,
+        background: colors.surface,
+        border: `${px(layout.hairline)} solid ${colors.line}`,
+        padding: `${px(layout.controlPanelPadY)} ${px(layout.controlPanelPadX)}`,
       }}
     >
       <label
         htmlFor={id}
         data-threshold-label=""
-        style={{ ...typeStyle('threshold-label'), display: 'block', color: colors['ink-tertiary'], textTransform: 'uppercase' }}
+        style={{ ...typeStyle('label'), display: 'block', color: colors['text-tertiary'], textTransform: 'uppercase' }}
       >
         {THRESHOLD_LABEL}
       </label>
@@ -110,9 +110,9 @@ function ThresholdFigure({ id, unitId, draft, onDraftChange, onBlur }: Threshold
     <div
       data-threshold-value=""
       style={{
-        ...typeStyle('threshold-value'),
-        color: colors.ink,
-        marginTop: px(spacing.thresholdValueGap),
+        ...typeStyle('control-figure'),
+        color: colors.text,
+        marginTop: px(layout.thresholdValueGap),
         display: 'flex',
         alignItems: 'baseline',
       }}
@@ -126,14 +126,14 @@ function ThresholdFigure({ id, unitId, draft, onDraftChange, onBlur }: Threshold
             visibility: 'hidden',
             whiteSpace: 'pre',
             fontVariantNumeric: 'tabular-nums',
-            borderBottom: `${px(spacing.hairline)} solid transparent`,
+            borderBottom: `${px(layout.hairline)} solid transparent`,
           }}
         >
           {ghostText(draft)}
         </span>
         <ThresholdInput id={id} unitId={unitId} draft={draft} onDraftChange={onDraftChange} onBlur={onBlur} />
       </span>
-      <span id={unitId} data-threshold-unit="" style={{ ...typeStyle('threshold-value-unit'), color: colors['ink-secondary'] }}>
+      <span id={unitId} data-threshold-unit="" style={{ ...typeStyle('label'), color: colors['text-secondary'] }}>
         {THRESHOLD_UNIT}
       </span>
     </div>
@@ -162,7 +162,7 @@ function ThresholdInput({ id, unitId, draft, onDraftChange, onBlur }: ThresholdF
       styles={{
         wrapper: { display: 'block', height: '100%' },
         input: {
-          ...typeStyle('threshold-value'),
+          ...typeStyle('control-figure'),
           fontVariantNumeric: 'tabular-nums',
           width: '100%',
           height: '100%',
@@ -193,9 +193,9 @@ function ThresholdTrack({ share }: { readonly share: string }): JSX.Element {
       aria-hidden="true"
       style={{
         position: 'relative',
-        marginTop: px(spacing.thresholdTrackGap),
-        height: px(spacing.thresholdTrackHeight),
-        background: colors['rule-hairline'],
+        marginTop: px(layout.thresholdTrackGap),
+        height: px(layout.thresholdTrackHeight),
+        background: colors.line,
         pointerEvents: 'none',
       }}
     >
@@ -205,9 +205,9 @@ function ThresholdTrack({ share }: { readonly share: string }): JSX.Element {
           position: 'absolute',
           left: 0,
           top: 0,
-          height: px(spacing.thresholdTrackHeight),
+          height: px(layout.thresholdTrackHeight),
           width: share,
-          background: colors.sepia,
+          background: colors.accent,
           pointerEvents: 'none',
         }}
       />
@@ -216,11 +216,11 @@ function ThresholdTrack({ share }: { readonly share: string }): JSX.Element {
         style={{
           position: 'absolute',
           left: share,
-          top: px(-spacing.thresholdMarkerRise),
-          marginLeft: px(-spacing.thresholdMarkerWidth / 2),
-          width: px(spacing.thresholdMarkerWidth),
-          height: px(spacing.thresholdMarkerHeight),
-          background: colors.ink,
+          top: px(-layout.thresholdMarkerRise),
+          marginLeft: px(-layout.thresholdMarkerWidth / 2),
+          width: px(layout.thresholdMarkerWidth),
+          height: px(layout.thresholdMarkerHeight),
+          background: colors.text,
           pointerEvents: 'none',
         }}
       />
@@ -233,11 +233,11 @@ function ThresholdRange(): JSX.Element {
     <div
       data-threshold-range=""
       style={{
-        ...typeStyle('threshold-range'),
-        color: colors['ink-tertiary'],
+        ...typeStyle('label'),
+        color: colors['text-tertiary'],
         display: 'flex',
         justifyContent: 'space-between',
-        marginTop: px(spacing.thresholdRangeGap),
+        marginTop: px(layout.thresholdRangeGap),
       }}
     >
       <span>{RANGE_LOW}</span>

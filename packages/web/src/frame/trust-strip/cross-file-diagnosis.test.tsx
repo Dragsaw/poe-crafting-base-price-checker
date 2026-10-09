@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { unmount } from '../../test-support/dom';
-import { px, spacing, stacks } from '../../theme/tokens';
+import { layout, px, stacks, typeRoles } from '../../theme/tokens';
 import type { DiagnosisFailure } from '../trust-facts';
 import { click, mountStrip, panel, strip } from './test-support';
 
@@ -40,16 +40,16 @@ describe('the cross-file diagnosis (AD-17)', () => {
     const groups = broken?.querySelectorAll<HTMLElement>('[data-figure-group]') ?? [];
     expect(groups).toHaveLength(3);
     const diagnosis = groups[2];
-    expect(diagnosis?.style.marginTop).toBe(px(spacing.syncReportGroupGap));
+    expect(diagnosis?.style.marginTop).toBe(px(layout.syncReportGroupGap));
     const lines = [...diagnosis?.querySelectorAll<HTMLElement>('[data-verbatim]') ?? []];
     expect(lines.map((element) => element.textContent)).toEqual(
       FAILURES.map((failure) => `${failure.check} · ${failure.entryKey} · ${failure.detail}`),
     );
     for (const verbatim of lines) {
       expect(verbatim.style.fontFamily).toBe(stacks.mono);
-      expect(verbatim.style.fontSize).toBe('10.5px');
+      expect(verbatim.style.fontSize).toBe(typeRoles.note.fontSize);
       expect(verbatim.style.fontWeight).toBe('400');
-      expect(verbatim.style.lineHeight).toBe('1.85');
+      expect(verbatim.style.lineHeight).toBe(typeRoles.note.lineHeight);
       expect(verbatim.style.color).toBe('');
     }
   });

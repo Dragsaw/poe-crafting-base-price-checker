@@ -1,13 +1,13 @@
 import type { JSX } from 'react';
 
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, layout, px, stacks, typeStyle } from '../theme/tokens';
 import { PANEL_HEADINGS, type FigureGroup, type PanelColumns, type Segment } from './trust-facts';
 
 function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
   switch (segment.kind) {
     case 'figure': {
       return (
-        <span data-figure="" style={{ color: colors.ink, fontVariantNumeric: 'tabular-nums', fontStyle: 'normal' }}>
+        <span data-figure="" style={{ color: colors.text, fontVariantNumeric: 'tabular-nums', fontStyle: 'normal' }}>
           {segment.text}
         </span>
       );
@@ -21,12 +21,12 @@ function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
     }
     case 'verbatim': {
       // The panel's own size, weight and line height in the mono stack; the
-      // panel's ink, never a semantic colour. A canonical key has no spaces,
+      // panel's text colour, never a semantic colour. A canonical key has no spaces,
       // so it may break anywhere.
       return (
         <span
           data-verbatim=""
-          style={{ ...typeStyle('sync-report-verbatim'), fontStyle: 'normal', overflowWrap: 'anywhere' }}
+          style={{ ...typeStyle('note'), fontFamily: stacks.mono, fontStyle: 'normal', overflowWrap: 'anywhere' }}
         >
           {segment.text}
         </span>
@@ -40,7 +40,7 @@ function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
 
 function Group({ group, first }: { readonly group: FigureGroup; readonly first: boolean }): JSX.Element {
   return (
-    <div data-figure-group="" style={{ marginTop: first ? 0 : px(spacing.syncReportGroupGap) }}>
+    <div data-figure-group="" style={{ marginTop: first ? 0 : px(layout.syncReportGroupGap) }}>
       {group.map((line, lineIndex) => (
         <div key={lineIndex}>
           {line.map((segment, segmentIndex) => (
@@ -58,13 +58,13 @@ export function SyncReportPanel({ columns }: { readonly columns: PanelColumns })
     <div
       data-sync-report-panel=""
       style={{
-        ...typeStyle('key-body'),
-        color: colors['ink-secondary'],
-        background: colors['paper-inset'],
-        borderTop: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-        borderBottom: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-        padding: `${px(spacing.syncReportPadTop)} ${px(spacing.syncReportPadX)} ${px(spacing.syncReportPadBottom)}`,
-        maxHeight: px(spacing.syncReportMaxHeight),
+        ...typeStyle('note'),
+        color: colors['text-secondary'],
+        background: colors.surface,
+        borderTop: `${px(layout.hairline)} solid ${colors.line}`,
+        borderBottom: `${px(layout.hairline)} solid ${colors.line}`,
+        padding: `${px(layout.syncReportPadTop)} ${px(layout.syncReportPadX)} ${px(layout.syncReportPadBottom)}`,
+        maxHeight: px(layout.syncReportMaxHeight),
         overflowY: 'auto',
         boxSizing: 'border-box',
         display: 'flex',
@@ -76,16 +76,16 @@ export function SyncReportPanel({ columns }: { readonly columns: PanelColumns })
           <div
             key={PANEL_HEADINGS[columnIndex]}
             data-panel-column=""
-            style={{ flex: '1 1 0', minWidth: 0, paddingRight: isLast ? 0 : px(spacing.syncReportColumnGap) }}
+            style={{ flex: '1 1 0', minWidth: 0, paddingRight: isLast ? 0 : px(layout.syncReportColumnGap) }}
           >
             <span
               data-panel-heading=""
               style={{
-                ...typeStyle('key-heading'),
+                ...typeStyle('column-header'),
                 display: 'block',
-                marginBottom: px(spacing.keyHeadingGap),
+                marginBottom: px(layout.keyHeadingGap),
                 textTransform: 'uppercase',
-                color: colors['ink-tertiary'],
+                color: colors['text-tertiary'],
               }}
             >
               {PANEL_HEADINGS[columnIndex]}

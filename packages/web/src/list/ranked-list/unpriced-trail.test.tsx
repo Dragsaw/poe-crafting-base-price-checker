@@ -45,12 +45,12 @@ describe('the unpriced trail', () => {
     expect(cell(rows[3], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}never attempted`);
     const never_ = cell(rows[3], 'age').querySelector<HTMLElement>('[data-trust-mark="never"]');
     expect(never_?.lastElementChild instanceof HTMLElement ? never_.lastElementChild.style.fontStyle : '').toBe('italic');
-    expect(cell(rows[3], 'ev').querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.ink));
+    expect(cell(rows[3], 'ev').querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.text));
     for (const r of rows.slice(4)) {
       const phrase = cell(r, 'ev').querySelector<HTMLElement>('[data-money-phrase]');
       expect(phrase?.textContent).toBe('not valued');
       expect(phrase?.style.fontStyle).toBe('italic');
-      expect(phrase?.style.color).toBe(rgb(colors.rust));
+      expect(phrase?.style.color).toBe(rgb(colors['trust-broken']));
       expect(cell(r, 'ev').querySelector('[data-ev-figure]')).toBeNull();
     }
     expect(cell(rows[4], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}tried 3d ago`);
@@ -62,8 +62,8 @@ describe('the unpriced trail', () => {
     }
   });
 
-  // Review decision (b): the EV colour follows the phrase shown, so rust goes only to *not valued*.
-  it('prints an honest-empty unresolvable row as no figure yet in ink, not rust', () => {
+  // Review decision (b): the EV colour follows the phrase shown, so trust-broken goes only to *not valued*.
+  it('prints an honest-empty unresolvable row as no figure yet in text, not trust-broken', () => {
     const lost = rawEntry('Lost Ring');
     const tried = rawEntry('Coral Ring');
     const rows = rowsIn(
@@ -79,7 +79,7 @@ describe('the unpriced trail', () => {
     for (const r of rows) {
       const phrase = cell(r, 'ev').querySelector<HTMLElement>('[data-money-phrase]');
       expect(phrase?.textContent).toBe('no figure yet');
-      expect(phrase?.style.color).toBe(rgb(colors.ink));
+      expect(phrase?.style.color).toBe(rgb(colors.text));
     }
   });
 

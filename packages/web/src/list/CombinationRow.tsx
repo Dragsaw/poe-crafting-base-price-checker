@@ -9,7 +9,7 @@ import {
   combinationLine2Columns,
   glyphs,
   px,
-  spacing,
+  layout,
   stacks,
   typeStyle,
 } from '../theme/tokens';
@@ -39,7 +39,7 @@ export interface Combination {
   readonly tradeLabel: string;
 }
 
-/** A fallback affix is set in the mono verbatim register only: no ink, mark or glyph. */
+/** A fallback affix is set in the mono verbatim register only: no colour, mark or glyph. */
 export function CombinationText({ parts }: { readonly parts: readonly AffixPart[] }): JSX.Element {
   return (
     <>
@@ -75,9 +75,9 @@ export function CombinationRow({
       data-combination-row=""
       data-price-state={row.state.state}
       style={{
-        minHeight: px(spacing.combinationRowHeight),
+        minHeight: px(layout.combinationRowHeight),
         boxSizing: 'border-box',
-        borderBottom: last ? undefined : `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
+        borderBottom: last ? undefined : `${px(layout.hairline)} solid ${colors.line}`,
       }}
     >
       <FigureLine row={row} />
@@ -91,29 +91,29 @@ function FigureLine({ row }: { readonly row: Combination }): JSX.Element {
     <div
       data-line="1"
       style={{
-        ...typeStyle('detail-row'),
+        ...typeStyle('line-text'),
         display: 'flex',
         alignItems: 'center',
-        height: px(spacing.detailRowHeight),
+        height: px(layout.detailRowHeight),
         whiteSpace: 'nowrap',
-        color: colors.ink,
+        color: colors.text,
       }}
     >
       <div data-cell="combination" style={fixedCell(combination)}>
         {row.pinned ? (
           <>
-            <span data-curation-pinned="" style={{ fontWeight: 600, fontStyle: 'normal', color: colors['ink-tertiary'] }}>
+            <span data-curation-pinned="" style={{ fontWeight: 600, fontStyle: 'normal', color: colors['text-tertiary'] }}>
               {`${glyphs.pinned} pinned`}
             </span>{' '}
           </>
         ) : undefined}
         <CombinationText parts={row.text} />
       </div>
-      <div data-cell="state" style={{ ...fixedCell(state), ...typeStyle('detail-meta') }}>
+      <div data-cell="state" style={{ ...fixedCell(state), ...typeStyle('trust') }}>
         <span
           data-state-glyph=""
           aria-hidden="true"
-          style={{ fontSize: '9px', color: row.state.state === 'unresolvable' ? colors.rust : undefined }}
+          style={{ fontSize: '9px', color: row.state.state === 'unresolvable' ? colors['trust-broken'] : undefined }}
         >
           {PRICE_STATE_GLYPHS[row.state.state]}
           {NBSP}
@@ -123,13 +123,13 @@ function FigureLine({ row }: { readonly row: Combination }): JSX.Element {
       <div data-cell="figure" style={{ ...fixedCell(figure), textAlign: 'right' }}>
         <FigureValue state={row.state} />
       </div>
-      <div data-cell="sample" style={{ ...fixedCell(sample), ...typeStyle('detail-meta'), color: colors['ink-secondary'] }}>
+      <div data-cell="sample" style={{ ...fixedCell(sample), ...typeStyle('trust'), color: colors['text-secondary'] }}>
         {sampleText(row.state)}
       </div>
       <div
         data-cell="trade-link"
         // The glyph alone is the click target; the cell only places it.
-        style={{ ...fixedCell(tradeLink), ...typeStyle('detail-meta'), textAlign: 'right' }}
+        style={{ ...fixedCell(tradeLink), ...typeStyle('trust'), textAlign: 'right' }}
       >
         {row.tradeHref === undefined ? undefined : <TradeGlyph href={row.tradeHref} label={row.tradeLabel} />}
       </div>
@@ -147,9 +147,9 @@ function FigureValue({ state: priceState }: { readonly state: CombinationState }
     <span
       data-money-phrase=""
       style={{
-        ...typeStyle('money-phrase'),
+        ...typeStyle('trust'),
         fontStyle: 'italic',
-        color: priceState.state === 'unresolvable' ? colors.rust : colors.ink,
+        color: priceState.state === 'unresolvable' ? colors['trust-broken'] : colors.text,
       }}
     >
       {shown.text}
@@ -162,13 +162,14 @@ function EvidenceLine({ row }: { readonly row: Combination }): JSX.Element {
     <div
       data-line="2"
       style={{
-        ...typeStyle('combination-line-2'),
+        ...typeStyle('note'),
+        lineHeight: px(layout.combinationRowLine2Height),
         display: 'flex',
         alignItems: 'flex-start',
-        minHeight: px(spacing.combinationRowLine2Height),
+        minHeight: px(layout.combinationRowLine2Height),
         whiteSpace: 'normal',
         overflowWrap: 'anywhere',
-        color: colors['ink-tertiary'],
+        color: colors['text-tertiary'],
       }}
     >
       <div data-cell="note" style={{ ...fixedCell(note), fontStyle: 'italic' }}>

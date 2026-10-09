@@ -4,7 +4,7 @@ import { Fragment, useCallback, useState, type JSX } from 'react';
 
 import { TOP_ROWS } from '../shared/product';
 import { plural } from '../shared/text';
-import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, glyphs, px, layout, typeStyle } from '../theme/tokens';
 import { ColumnHeader } from './ColumnHeader';
 import type { ListBranches, ListRow } from './display-rows';
 import { ClassExpansionPanel, RawExpansionPanel } from './ExpansionPanel';
@@ -126,7 +126,7 @@ function Branch({
         );
       })}
       {remaining > 0 ? (
-        <div style={{ paddingTop: px(spacing.expandPadTop) }}>
+        <div style={{ paddingTop: px(layout.expandPadTop) }}>
           <button
             type="button"
             data-expand-affordance=""
@@ -135,7 +135,7 @@ function Branch({
             onClick={() => {
               setGrown((current) => !current);
             }}
-            style={{ ...typeStyle('expand-affordance'), color: colors.sepia }}
+            style={{ ...typeStyle('trust'), color: colors.accent }}
           >
             {grown ? COLLAPSE_COPY : expandCopy(remaining)}
           </button>

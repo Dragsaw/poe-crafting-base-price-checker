@@ -18,7 +18,9 @@
     "packages/contracts": {},
     "packages/core": {},
     "packages/sync": {},
-    "packages/web": {}
+    "packages/web": {
+      "ignoreDependencies": ["@fontsource-variable/inter"]
+    }
   },
   "ignoreIssues": {
     "packages/contracts/src/schema-version.ts": ["duplicates"]

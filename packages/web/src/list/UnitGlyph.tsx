@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 
-import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, glyphs, px, layout, typeStyle } from '../theme/tokens';
 
 export type Unit = 'class' | 'raw';
 
@@ -11,13 +11,13 @@ export function UnitGlyph({ unit }: { readonly unit: Unit }): JSX.Element {
       data-unit-glyph={unit}
       aria-hidden="true"
       style={{
-        ...typeStyle('row-unit-glyph'),
+        ...typeStyle('mark'),
         flex: '0 0 auto',
-        width: px(spacing.unitGlyphBox),
-        marginRight: px(spacing.s1),
+        width: px(layout.unitGlyphBox),
+        marginRight: px(layout.s1),
         textAlign: 'center',
         fontStyle: 'normal',
-        color: colors.sepia,
+        color: colors['text-tertiary'],
       }}
     >
       {unit === 'class' ? glyphs.unitClass : glyphs.unitRaw}

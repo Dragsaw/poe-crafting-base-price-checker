@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 import type { ActiveRanking } from './active-ranking';
 
 /** The banner's lead (EXPERIENCE.md, *The uniform-prior banner*): something in the pool was invented. */
@@ -28,31 +28,31 @@ export function UniformPriorBanner({ onDismiss }: { readonly onDismiss: () => vo
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
-        minHeight: px(spacing.frameReserveBanner),
+        minHeight: px(layout.bannerMinHeight),
         boxSizing: 'border-box',
-        background: colors['paper-inset'],
-        borderLeft: `${px(spacing.bannerMarker)} solid ${colors.ochre}`,
+        background: colors.surface,
+        borderLeft: `${px(layout.bannerMarker)} solid ${colors['trust-rough']}`,
         padding: '13px 17px',
-        color: colors.ink,
+        color: colors.text,
       }}
     >
       <div>
-        <p style={{ ...typeStyle('banner-lead'), margin: 0 }}>{BANNER_LEAD}</p>
-        <p style={{ ...typeStyle('banner-body'), margin: 0, color: colors['ink-secondary'] }}>{BANNER_BODY}</p>
+        <p style={{ ...typeStyle('line-text'), margin: 0 }}>{BANNER_LEAD}</p>
+        <p style={{ ...typeStyle('line-text'), margin: 0, color: colors['text-secondary'] }}>{BANNER_BODY}</p>
       </div>
       <button
         type="button"
         data-banner-dismiss=""
         onClick={onDismiss}
         style={{
-          ...typeStyle('banner-body'),
+          ...typeStyle('line-text'),
           flex: '0 0 auto',
           marginLeft: 16,
           padding: 0,
           border: 0,
           background: 'none',
           cursor: 'pointer',
-          color: colors['ink-tertiary'],
+          color: colors['text-tertiary'],
         }}
       >
         {BANNER_DISMISS} ×

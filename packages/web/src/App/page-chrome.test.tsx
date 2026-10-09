@@ -4,7 +4,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ASKING_PRICE_COPY } from '../list/AskingPriceLine';
 import { bodiesWith, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { gatedArtifacts, serveArtifacts } from '../test-support/artifact-server';
-import { flush, settleTo, unmount } from '../test-support/dom';
+import { flush, rgb, settleTo, unmount } from '../test-support/dom';
+import { colors, spacing } from '../theme/tokens';
 import { server, mount, frame } from './test-support';
 
 afterEach(unmount);
@@ -35,6 +36,10 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(ALL);
     expect(frame().querySelector('[data-column-header]')?.textContent).toContain('Item Class / Base Type');
     expect(frame().textContent).toContain(ASKING_PRICE_COPY);
+    // A statement, not a control: never the accent.
+    expect(frame().querySelector<HTMLElement>('[data-asking-price-line]')?.style.color).toBe(
+      rgb(colors['text-secondary']),
+    );
     held.openAll();
   });
 
@@ -60,12 +65,13 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(ALL);
     const order = Array.from(
       frame().querySelectorAll(
-        '[data-masthead], [data-trust-strip], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-key-block], [data-running-foot]',
+        '[data-header-bar], [data-interim-controls], [data-trust-strip], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-key-block], [data-running-foot]',
       ),
       (node) => Object.keys((node as HTMLElement).dataset)[0],
     );
     expect(order).toEqual([
-      'masthead',
+      'headerBar',
+      'interimControls',
       'trustStrip',
       'askingPriceLine',
       'columnHeader',
@@ -146,29 +152,33 @@ describe('the resting chrome', () => {
 });
 
 describe('the frame', () => {
-  it('is 1060 wide, min-height 1920, border-box with 24px sides, an outline edge and no overflow clip', async () => {
+  it('is one centred column between content-min and content-max, with gutters, on the ground and no fixed size', async () => {
     serveArtifacts(server);
     mount();
     await settleTo('ready');
     const style = frame().style;
-    expect(style.width).toBe('1060px');
-    expect(style.minHeight).toBe('1920px');
+    expect(style.minWidth).toBe(spacing['content-min']);
+    expect(style.maxWidth).toBe(spacing['content-max']);
+    expect(style.width).toBe('');
     expect(style.height).toBe('');
+    expect(style.minHeight).toBe('');
     expect(style.boxSizing).toBe('border-box');
-    expect(style.padding).toBe('0px 24px');
-    expect(style.outline).toContain('1px solid');
+    expect(style.padding).toBe(`0px ${spacing.gutter}`);
+    expect(style.margin).toBe('0px auto');
+    expect(style.background).toBe(rgb(colors.ground));
+    expect(style.outline).toBe('');
     expect(style.overflow).toBe('');
     expect(style.border).toBe('');
   });
 });
 
 describe('the trust strip', () => {
-  it('sits between the masthead and the asking-price line, closed on load, and toggles with no request', async () => {
+  it('sits between the interim controls and the asking-price line, closed on load, and toggles with no request', async () => {
     const requests = serveArtifacts(server);
     mount();
     await settleTo('ready');
     const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
-    expect(strip?.previousElementSibling?.hasAttribute('data-masthead')).toBe(true);
+    expect(strip?.previousElementSibling?.hasAttribute('data-interim-controls')).toBe(true);
     expect(strip?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     expect(frame().querySelector('[data-sync-report-panel]')).toBeNull();
     expect(strip?.textContent).toContain('producer poe-mod-weights-producer');

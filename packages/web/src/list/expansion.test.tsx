@@ -3,14 +3,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cssNumber } from '../test-support/css-number';
 import { mountList, NOW, rgb, rowsIn, unmount } from '../test-support/dom';
 import { hoursBefore, many, priced, rawEntry } from '../test-support/list-fixtures';
-import { colors, columnSums, glyphs, spacing } from '../theme/tokens';
+import { colors, columnSums, glyphs, layout, typeRoles } from '../theme/tokens';
 import { PANEL_ASKING_SENTENCE, RAW_NO_RECIPE_SENTENCE } from './format';
 import { click, openOne, panelsIn, SEARCH } from './expansion/test-support';
 
 afterEach(unmount);
 
 describe('the expansion panel', () => {
-  it('opens in place, flush under its row, as a bordered paper card with no top border', () => {
+  it('opens in place, flush under its row, as a bordered card with no top border', () => {
     const { tracked, dataset } = many(3, NOW);
     const view = mountList(tracked, dataset);
     expect(panelsIn(view)).toHaveLength(0);
@@ -23,17 +23,17 @@ describe('the expansion panel', () => {
     expect(panel?.style.padding).toBe('18px 22px 20px');
     expect(panel?.style.margin).toBe('0px 0px 16px');
     expect(panel?.style.borderTopStyle).toBe('none');
-    expect(panel?.style.borderLeft).toBe(`1px solid ${rgb(colors.edge)}`);
-    expect(panel?.style.background).toBe(rgb(colors.paper));
+    expect(panel?.style.borderLeft).toBe(`1px solid ${rgb(colors['line-strong'])}`);
+    expect(panel?.style.background).toBe(rgb(colors.ground));
     expect(panel?.style.transition).toBe('');
     expect(panel?.style.animation).toBe('');
-    expect(second?.style.borderBottom).toContain(rgb(colors['rule-strong']));
+    expect(second?.style.borderBottom).toContain(rgb(colors['line-strong']));
     // Not a modal: nothing is an overlay or a dialog.
     expect(view.querySelector('[role="dialog"]')).toBeNull();
     expect(panel?.style.position).toBe('');
   });
 
-  it('titles the panel with the sepia unit glyph and the italic name, then the sub-line', () => {
+  it('titles the panel with the tertiary unit glyph and the italic name, then the sub-line', () => {
     const belt = rawEntry('Stellar Amulet', 82);
     const view = mountList([belt], [priced(belt, 1.27, hoursBefore(NOW, 11))], 0.5);
     click(rowsIn(view)[0]);
@@ -41,11 +41,11 @@ describe('the expansion panel', () => {
     const title = panel?.querySelector<HTMLElement>('[data-panel-title]');
     const glyph = title?.querySelector<HTMLElement>('[data-unit-glyph]');
     expect(glyph?.textContent).toBe(glyphs.unitRaw);
-    expect(glyph?.style.color).toBe(rgb(colors.sepia));
+    expect(glyph?.style.color).toBe(rgb(colors['text-tertiary']));
     const name = title?.querySelector<HTMLElement>('[data-panel-name]');
     expect(name?.textContent).toBe('Stellar Amulet');
     expect(name?.style.fontStyle).toBe('italic');
-    expect(title?.style.fontSize).toBe('20px');
+    expect(title?.style.fontSize).toBe(typeRoles['row-name'].fontSize);
     const sub = panel?.querySelector<HTMLElement>('[data-panel-sub]');
     expect(sub?.textContent).toBe(
       'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
@@ -63,7 +63,7 @@ describe('the expansion panel', () => {
       Array.from(row.querySelectorAll<HTMLElement>(`[data-line="${line}"] > [data-cell]`), (c) => cssNumber(c.style.width));
     expect(widths('1')).toEqual([...columnSums.combinationLine1]);
     expect(widths('2')).toEqual([...columnSums.combinationLine2]);
-    expect(row.style.minHeight).toBe(`${String(spacing.combinationRowHeight)}px`);
+    expect(row.style.minHeight).toBe(`${String(layout.combinationRowHeight)}px`);
     expect(row.querySelector<HTMLElement>('[data-line="1"]')?.style.height).toBe('28px');
     expect(row.querySelector<HTMLElement>('[data-line="2"]')?.style.minHeight).toBe('20px');
     expect(row.querySelector<HTMLElement>('[data-line="2"]')?.style.lineHeight).toBe('20px');

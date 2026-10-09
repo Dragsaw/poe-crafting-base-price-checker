@@ -3,7 +3,7 @@ import '../shared/affordance.css';
 import type { JSX } from 'react';
 
 import type { RefusalCause } from '../load/load-artifacts';
-import { colors, glyphs, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, glyphs, px, layout, typeStyle } from '../theme/tokens';
 
 /** DESIGN.md `components.refusal-screen` / `components.fetch-failure-screen` copy. */
 export const REFUSAL_EYEBROW = 'THE PAGE WILL NOT RENDER THIS';
@@ -37,10 +37,10 @@ export type FailureScreenProperties =
   | { readonly variant: 'failed'; readonly path: string; readonly onRetry: () => void };
 
 const bodyStyle = {
-  ...typeStyle('failure-body'),
-  color: colors['ink-secondary'],
-  maxWidth: px(spacing.dekMaxWidth),
-  margin: `${px(spacing.s4)} 0 0`,
+  ...typeStyle('line-text'),
+  color: colors['text-secondary'],
+  maxWidth: px(layout.failureBodyMaxWidth),
+  margin: `${px(layout.s4)} 0 0`,
 };
 
 // A content fault names only the expected version: the declared one is not what is wrong.
@@ -81,24 +81,24 @@ function RefusalCauseSentence({
   }
 }
 
-/** Each failure screen replaces the whole page: no masthead, no list, nothing stale served. */
+/** Each failure screen replaces the whole page: no header bar, no list, nothing stale served. */
 export function FailureScreen(properties: FailureScreenProperties): JSX.Element {
   const isRefused = properties.variant === 'refused';
   return (
-    <section data-failure={properties.variant} role="alert" style={{ paddingTop: px(spacing.gutter) }}>
-      <div style={{ ...typeStyle('eyebrow'), color: colors.rust }}>
+    <section data-failure={properties.variant} role="alert" style={{ paddingTop: px(layout.gutter) }}>
+      <div style={{ ...typeStyle('eyebrow'), color: colors['trust-broken'] }}>
         {isRefused ? REFUSAL_EYEBROW : FETCH_FAILURE_EYEBROW}
       </div>
-      <h1 style={{ ...typeStyle('masthead-title'), color: colors.ink, margin: `${px(spacing.s2)} 0 0` }}>
+      <h1 style={{ ...typeStyle('title'), color: colors.text, margin: `${px(layout.s2)} 0 0` }}>
         {isRefused ? REFUSAL_TITLE : FETCH_FAILURE_TITLE}
       </h1>
       {properties.variant === 'refused' ? (
         <>
           <p style={bodyStyle}>
-            <span data-artifact="" style={{ color: colors.ink }}>
+            <span data-artifact="" style={{ color: colors.text }}>
               {properties.path}
             </span>{' '}
-            <span style={{ ...typeStyle('row-mark'), fontSize: 'inherit', lineHeight: 'inherit', fontWeight: 700, color: colors.rust }}>
+            <span style={{ ...typeStyle('mark'), fontSize: 'inherit', lineHeight: 'inherit', fontWeight: 700, color: colors['trust-broken'] }}>
               {glyphs.unresolvable} unresolvable
             </span>
             . <RefusalCauseSentence cause={properties.cause} declared={properties.declared} expected={properties.expected} />
@@ -108,14 +108,14 @@ export function FailureScreen(properties: FailureScreenProperties): JSX.Element 
       ) : (
         <>
           <p style={bodyStyle}>
-            <span data-artifact="" style={{ color: colors.ink }}>
+            <span data-artifact="" style={{ color: colors.text }}>
               {properties.path}
             </span>{' '}
             did not arrive.
           </p>
           <p style={bodyStyle}>{FETCH_FAILURE_RECOVERY}</p>
-          <p style={{ margin: `${px(spacing.s4)} 0 0` }}>
-            <button type="button" className="fg-affordance" style={typeStyle('expand-affordance')} onClick={properties.onRetry}>
+          <p style={{ margin: `${px(layout.s4)} 0 0` }}>
+            <button type="button" className="fg-affordance" style={typeStyle('trust')} onClick={properties.onRetry}>
               {TRY_AGAIN}
             </button>
           </p>

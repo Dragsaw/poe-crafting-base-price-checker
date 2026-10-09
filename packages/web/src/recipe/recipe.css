@@ -1,8 +1,8 @@
 /*
  * `{components.craft-recipe}`'s two words. The inactive word is the click
- * target: ink-secondary at 400 on a dotted sepia rule AT REST, going solid and
- * ink on hover. The active word is not a target: ink at 700 on a 2px solid
- * sepia rule, with no hover state and no pointer. Token custom properties
+ * target: text-secondary at 400 on a dotted accent rule AT REST, going solid and
+ * text on hover. The active word is not a target: text at 700 on a 2px solid
+ * accent rule, with no hover state and no pointer. Token custom properties
  * only, as frame.css states.
  */
 
@@ -17,20 +17,20 @@
 }
 
 .fg-recipe-option[data-active] {
-  color: var(--fg-color-ink);
+  color: var(--fg-color-text);
   font-weight: 700;
-  border-bottom: 2px solid var(--fg-color-sepia);
+  border-bottom: 2px solid var(--fg-color-accent);
   cursor: default;
 }
 
 .fg-recipe-option[data-inactive] {
-  color: var(--fg-color-ink-secondary);
+  color: var(--fg-color-text-secondary);
   font-weight: 400;
-  border-bottom: 1px dotted var(--fg-color-sepia);
+  border-bottom: 1px dotted var(--fg-color-accent);
   cursor: pointer;
 }
 
 .fg-recipe-option[data-inactive]:hover {
-  color: var(--fg-color-ink);
+  color: var(--fg-color-text);
   border-bottom-style: solid;
 }

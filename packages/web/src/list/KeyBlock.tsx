@@ -1,6 +1,6 @@
 import type { CSSProperties, JSX, ReactNode } from 'react';
 
-import { colors, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, px, layout, typeStyle } from '../theme/tokens';
 import { NEVER_ATTEMPTED } from './format';
 import { TrustMark } from './TrustMark';
 
@@ -10,14 +10,14 @@ const TERM: CSSProperties = { fontWeight: 700 };
 
 function Column({ title, last, children }: { readonly title: string; readonly last: boolean; readonly children: ReactNode }): JSX.Element {
   return (
-    <div data-key-column="" style={{ flex: '1 1 0', minWidth: 0, paddingRight: last ? 0 : px(spacing.keyColumnGap) }}>
+    <div data-key-column="" style={{ flex: '1 1 0', minWidth: 0, paddingRight: last ? 0 : px(layout.keyColumnGap) }}>
       <span
         style={{
-          ...typeStyle('key-heading'),
+          ...typeStyle('column-header'),
           display: 'block',
-          marginBottom: px(spacing.keyHeadingGap),
+          marginBottom: px(layout.keyHeadingGap),
           textTransform: 'uppercase',
-          color: colors['ink-tertiary'],
+          color: colors['text-tertiary'],
         }}
       >
         {title}
@@ -35,12 +35,12 @@ export function KeyBlock(): JSX.Element {
     <div
       data-key-block=""
       style={{
-        ...typeStyle('key-body'),
+        ...typeStyle('note'),
         display: 'flex',
-        marginTop: px(spacing.keyMarginTop),
-        paddingTop: px(spacing.keyPadTop),
-        borderTop: `${px(spacing.hairline)} solid ${colors['rule-strong']}`,
-        color: colors['ink-secondary'],
+        marginTop: px(layout.keyMarginTop),
+        paddingTop: px(layout.keyPadTop),
+        borderTop: `${px(layout.hairline)} solid ${colors['line-strong']}`,
+        color: colors['text-secondary'],
       }}
     >
       <Column title={silence} last={false}>

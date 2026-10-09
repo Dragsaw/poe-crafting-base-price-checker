@@ -8,18 +8,18 @@
  */
 
 .fg-trade-glyph {
-  color: var(--fg-color-ink-tertiary);
+  color: var(--fg-color-text-tertiary);
   font-weight: 400;
   text-decoration: none;
 }
 
 .fg-trade-glyph:hover {
-  color: var(--fg-color-sepia);
+  color: var(--fg-color-accent);
 }
 
 /*
  * The trust strip. The whole strip is the target; only its affordance text
- * answers the pointer, with a 1px dotted sepia underline while the strip is
+ * answers the pointer, with a 1px dotted accent underline while the strip is
  * hovered. The rule is transparent at rest so hover shifts no pixel. The sync
  * report panel and the appendix take no hover state at all.
  */
@@ -28,5 +28,5 @@
 }
 
 .fg-trust-strip:hover .fg-strip-affordance {
-  border-bottom-color: var(--fg-color-sepia);
+  border-bottom-color: var(--fg-color-accent);
 }

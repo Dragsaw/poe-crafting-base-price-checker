@@ -3,7 +3,7 @@ import type { JSX } from 'react';
 
 import { fixedCell } from '../shared/cell';
 import { plural } from '../shared/text';
-import { colors, columnSums, px, spacing, typeStyle } from '../theme/tokens';
+import { colors, columnSums, px, layout, typeStyle } from '../theme/tokens';
 import { unitLabel } from './format';
 import { TrustMark } from './TrustMark';
 import { UnitGlyph } from './UnitGlyph';
@@ -34,17 +34,17 @@ export function UnrankableAppendix({ classes }: { readonly classes: readonly Unr
     <section
       data-unrankable-appendix={isEmpty ? 'empty' : ''}
       style={{
-        background: colors['paper-inset'],
-        border: `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
-        padding: `${px(spacing.appendixPadTop)} ${px(spacing.appendixPadX)} ${px(
-          isEmpty ? spacing.appendixPadTop : spacing.appendixPadBottom,
+        background: colors.surface,
+        border: `${px(layout.hairline)} solid ${colors.line}`,
+        padding: `${px(layout.appendixPadTop)} ${px(layout.appendixPadX)} ${px(
+          isEmpty ? layout.appendixPadTop : layout.appendixPadBottom,
         )}`,
         boxSizing: 'border-box',
       }}
     >
-      <h2 data-appendix-title="" style={{ ...typeStyle('appendix-title'), margin: 0, color: colors.ink }}>
+      <h2 data-appendix-title="" style={{ ...typeStyle('row-name'), margin: 0, color: colors.text }}>
         {APPENDIX_TITLE}
-        <span data-appendix-count="" style={{ color: isEmpty ? colors.ink : colors.rust }}>
+        <span data-appendix-count="" style={{ color: colors.text }}>
           {appendixCount(classes.length)}
         </span>
       </h2>
@@ -53,10 +53,10 @@ export function UnrankableAppendix({ classes }: { readonly classes: readonly Unr
           <p
             data-appendix-lead=""
             style={{
-              ...typeStyle('appendix-lead'),
-              margin: `${px(spacing.appendixLeadMarginTop)} 0 ${px(spacing.appendixLeadMarginBottom)}`,
-              maxWidth: px(spacing.appendixLeadMaxWidth),
-              color: colors['ink-secondary'],
+              ...typeStyle('note'),
+              margin: `${px(layout.appendixLeadMarginTop)} 0 ${px(layout.appendixLeadMarginBottom)}`,
+              maxWidth: px(layout.appendixLeadMaxWidth),
+              color: colors['text-secondary'],
             }}
           >
             {APPENDIX_LEAD}
@@ -79,14 +79,14 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
     <div
       data-appendix-row=""
       style={{
-        ...typeStyle('appendix-row'),
+        ...typeStyle('line-text'),
         display: 'flex',
         alignItems: 'center',
-        height: px(spacing.appendixRowHeight),
+        height: px(layout.appendixRowHeight),
         boxSizing: 'border-box',
-        borderBottom: last ? undefined : `${px(spacing.hairline)} solid ${colors['rule-hairline']}`,
+        borderBottom: last ? undefined : `${px(layout.hairline)} solid ${colors.line}`,
         whiteSpace: 'nowrap',
-        color: colors.ink,
+        color: colors.text,
       }}
     >
       <div data-cell="class" style={{ ...fixedCell({ width: baseWidth }), display: 'flex', alignItems: 'baseline' }}>
@@ -102,7 +102,7 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
         data-cell="reason"
         style={{
           ...fixedCell({ width: reasonWidth }),
-          color: colors['ink-secondary'],
+          color: colors['text-secondary'],
         }}
       >
         {item.reason}
@@ -112,7 +112,7 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
         style={{
           ...fixedCell({ width: noteWidth }),
           fontStyle: 'italic',
-          color: colors['ink-tertiary'],
+          color: colors['text-tertiary'],
         }}
       >
         {item.reason === 'class disagrees with weights file' ? DISAGREES_NOTE : undefined}

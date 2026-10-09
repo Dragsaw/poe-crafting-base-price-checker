@@ -62,22 +62,22 @@ describe('the Raw Base combination row', () => {
     ]);
     const phrase = cell(row, 'figure').querySelector<HTMLElement>('[data-money-phrase]');
     expect(phrase?.style.fontStyle).toBe('italic');
-    expect(phrase?.style.color).toBe(rgb(colors.ink));
+    expect(phrase?.style.color).toBe(rgb(colors.text));
     // The link test reads the stored search, never the Price State.
     expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
   });
 
   // Matrix: expansion of an unresolvable Raw Base (EXPERIENCE state 4).
-  it('prints unresolvable: × unresolvable, not valued in rust, no sample, the raw state-4 note, tried only', () => {
+  it('prints unresolvable: × unresolvable, not valued in trust-broken, no sample, the raw state-4 note, tried only', () => {
     const ring = rawEntry('Lost Ring');
     const row = openOne(ring, unpriced(ring, { state: 'unresolvable' }, hoursBefore(NOW, 5), SEARCH));
     expect(line1(row)).toEqual(['no affixes', `${glyphs.unresolvable}\u{A0}unresolvable`, 'not valued', 'no sample']);
     expect(line2(row)).toEqual(['its id is gone from the trade API — a patch did this', '', 'tried 5h ago']);
     const phrase = cell(row, 'figure').querySelector<HTMLElement>('[data-money-phrase]');
     expect(phrase?.style.fontStyle).toBe('italic');
-    expect(phrase?.style.color).toBe(rgb(colors.rust));
+    expect(phrase?.style.color).toBe(rgb(colors['trust-broken']));
     expect(row.dataset['priceState']).toBe('unresolvable');
-    expect(cell(row, 'state').querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors.rust));
+    expect(cell(row, 'state').querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors['trust-broken']));
     expect(cell(row, 'state').querySelector<HTMLElement>('[data-state-word]')?.style.color).toBe('');
     // The link test reads the stored search, never the Price State.
     expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
@@ -122,7 +122,7 @@ describe('the Raw Base combination row', () => {
   });
 
   // Matrix: pinned.
-  it('leads line one with * pinned on a pinned entry, in ink-tertiary at 600, roman', () => {
+  it('leads line one with * pinned on a pinned entry, in text-tertiary at 600, roman', () => {
     const belt = { ...rawEntry('Wide Belt'), status: 'pinned' as const };
     const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 1)));
     expect(cell(row, 'combination').textContent).toBe('* pinned no affixes');
@@ -130,7 +130,7 @@ describe('the Raw Base combination row', () => {
     expect(cell(row, 'combination').firstElementChild).toBe(mark);
     expect(mark?.style.fontWeight).toBe('600');
     expect(mark?.style.fontStyle).toBe('normal');
-    expect(mark?.style.color).toBe(rgb(colors['ink-tertiary']));
+    expect(mark?.style.color).toBe(rgb(colors['text-tertiary']));
     expect(cell(row, 'state').textContent).not.toContain(glyphs.pinned);
   });
 

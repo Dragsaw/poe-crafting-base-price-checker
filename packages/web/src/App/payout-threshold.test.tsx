@@ -1,7 +1,7 @@
 import { act } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CONTROL_GROUP_WIDTH } from '../frame/Masthead';
+import { CONTROL_GROUP_WIDTH } from '../frame/InterimControls';
 import { bodiesWith, hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { gate, gatedArtifacts, serveArtifacts, type ArtifactAnswer } from '../test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from '../load/artifacts';
@@ -67,7 +67,7 @@ describe('the payout threshold', () => {
     localStorage.clear();
   });
 
-  it('lays the control group out as 216 + 16 + 276 = 508, keeping the 480 dek cap', async () => {
+  it('lays the control group out as 216 + 16 + 276 = 508 in the interim band', async () => {
     serveArtifacts(server);
     mount();
     await settleTo('ready');
@@ -80,8 +80,8 @@ describe('the payout threshold', () => {
     expect(threshold?.dataset['payoutThreshold']).toBe('');
     expect(threshold?.style.width).toBe('276px');
     expect(CONTROL_GROUP_WIDTH).toBe(216 + 16 + 276);
-    const dek = frame().querySelector('[data-masthead] p')?.parentElement;
-    expect(dek?.style.maxWidth).toBe('480px');
+    expect(group?.closest('[data-interim-controls]')).not.toBeNull();
+    expect(group?.closest('[data-header-bar]')).toBeNull();
   });
 
   it('renders while pending and ready, and not on the two failure screens', async () => {

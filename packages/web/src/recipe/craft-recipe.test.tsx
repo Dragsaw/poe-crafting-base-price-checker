@@ -34,7 +34,7 @@ describe('the Craft Recipe control', () => {
     expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
     const separator = control().querySelector<HTMLElement>('[data-separator]');
     expect(separator?.textContent).toBe('|');
-    expect(separator?.style.color).toBe(rgb(colors['ink-tertiary']));
+    expect(separator?.style.color).toBe(rgb(colors['text-tertiary']));
     // The active word is not a target; the inactive one is the only button.
     expect(option('greater').tagName).toBe('SPAN');
     expect(option('greater').getAttribute('aria-current')).toBe('true');

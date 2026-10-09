@@ -2,7 +2,6 @@ import type { TrackedEntry } from '@poe/contracts';
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { MASTHEAD_DEK } from '../frame/Masthead';
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { gatedArtifacts, serveArtifacts, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb, settleTo, unmount } from '../test-support/dom';
@@ -120,7 +119,7 @@ describe('the Unrankable appendix', () => {
     }
     const count = appendix().querySelector<HTMLElement>('[data-appendix-count]');
     expect(count?.textContent).toBe('29 Item Classes');
-    expect(count?.style.color).toBe(rgb(colors.rust));
+    expect(count?.style.color).toBe(rgb(colors.text));
     // Readable with nothing expanded.
     expect(frame().querySelectorAll('[data-expansion-panel]')).toHaveLength(0);
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
@@ -131,7 +130,6 @@ describe('the Unrankable appendix', () => {
     expect(order).toEqual(['rankedRow', ...rows.map(() => 'appendixRow'), 'keyBlock', 'runningFoot']);
     // No appendix row is a Base Type.
     expect(appendix().textContent).not.toContain('Wide Belt');
-    expect(frame().querySelector('[data-masthead] p')?.textContent).toBe(MASTHEAD_DEK);
   });
 
   // Matrix: absent weights and absent recipes.
