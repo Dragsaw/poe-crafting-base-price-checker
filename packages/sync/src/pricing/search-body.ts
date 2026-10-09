@@ -62,7 +62,7 @@ export interface SearchBody {
       readonly type_filters: {
         readonly filters: {
           readonly category?: { readonly option: string };
-          /** A raw entry only; a crafted entry's stat bands already floor its mods. */
+          /** A raw entry only. A crafted search admits listings below its floor (AD-16, OQ-21). */
           readonly ilvl?: { readonly min: number };
           readonly rarity: { readonly option: 'magic' | 'normal' };
         };
