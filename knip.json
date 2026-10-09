@@ -8,6 +8,7 @@
         "test/**/*.ts",
         "depcruise.rules.mjs"
       ],
+      "ignoreDependencies": ["eslint_d"],
       "project": [
         "tools/**/*.{ts,mjs}",
         ".claude/skills/tracked-json/scripts/*.ts",

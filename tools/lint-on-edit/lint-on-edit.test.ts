@@ -7,7 +7,6 @@ import {
   type CheckName,
   checkedBy,
   filterDepcruiseViolations,
-  filterTscDiagnostics,
   formatReport,
   type HookDependencies,
   type HookPayload,
@@ -44,7 +43,7 @@ function probe(
   findings: Partial<Record<CheckName, string>> = {},
   changed: string[] = [],
 ): Probe {
-  const received: Record<CheckName, string[][]> = { lint: [], typecheck: [], depcruise: [] };
+  const received: Record<CheckName, string[][]> = { lint: [], depcruise: [] };
   const diff = { calls: 0 };
   const check = (name: CheckName): Check => (files) => {
     received[name].push([...files]);
@@ -57,7 +56,7 @@ function probe(
       diff.calls++;
       return Promise.resolve(changed);
     },
-    checks: { lint: check('lint'), typecheck: check('typecheck'), depcruise: check('depcruise') },
+    checks: { lint: check('lint'), depcruise: check('depcruise') },
     timeoutMs: 1000,
   };
   return { dependencies, received, diff };
@@ -172,39 +171,6 @@ describe('selectFiles', () => {
   });
 });
 
-describe('filterTscDiagnostics', () => {
-  const output = [
-    "tools/a.ts(3,5): error TS2322: Type 'string' is not assignable to type 'number'.",
-    "tools/b.ts(1,1): error TS2304: Cannot find name 'x'.",
-    "tools/a.ts(9,2): error TS2345: Argument of type 'A' is not assignable to parameter of type 'B'.",
-    '  Types of property \'n\' are incompatible.',
-    "    Type 'string' is not assignable to type 'number'.",
-    "tools/c.ts(4,4): error TS2304: Cannot find name 'y'.",
-    '',
-    'Found 4 errors.',
-  ].join('\n');
-
-  it('keeps the diagnostics of the edited files and their continuation lines only', () => {
-    const kept = filterTscDiagnostics(output, ['tools/a.ts']);
-    expect(kept.split('\n')).toEqual([
-      "tools/a.ts(3,5): error TS2322: Type 'string' is not assignable to type 'number'.",
-      "tools/a.ts(9,2): error TS2345: Argument of type 'A' is not assignable to parameter of type 'B'.",
-      "  Types of property 'n' are incompatible.",
-      "    Type 'string' is not assignable to type 'number'.",
-    ]);
-  });
-
-  it('is empty when the edited file has no diagnostic, even though other files do', () => {
-    expect(filterTscDiagnostics(output, ['tools/clean.ts'])).toBe('');
-    expect(filterTscDiagnostics('', ['tools/a.ts'])).toBe('');
-  });
-
-  it('matches a path in Windows or `./` form and reads CRLF output', () => {
-    const windows = output.replaceAll('tools/a.ts', String.raw`.\tools\a.ts`).replaceAll('\n', '\r\n');
-    expect(filterTscDiagnostics(windows, ['tools/a.ts'])).toContain('TS2322');
-  });
-});
-
 describe('filterDepcruiseViolations', () => {
   const rule = { name: 'no-a-to-b', severity: 'error' };
   const json = JSON.stringify({
@@ -230,27 +196,26 @@ describe('filterDepcruiseViolations', () => {
 describe('formatReport', () => {
   it('is empty when no check found anything', () => {
     expect(formatReport({})).toBe('');
-    expect(formatReport({ lint: '  \n', typecheck: '' })).toBe('');
+    expect(formatReport({ lint: '  \n', depcruise: '' })).toBe('');
   });
 
-  it('groups the findings by check, in the order lint, typecheck, depcruise', () => {
-    const report = formatReport({ depcruise: 'D', lint: 'L', typecheck: 'T' });
-    expect(report).toContain('== lint ==\nL\n\n== typecheck ==\nT\n\n== depcruise ==\nD');
+  it('groups the findings by check, in the order lint, depcruise', () => {
+    const report = formatReport({ depcruise: 'D', lint: 'L' });
+    expect(report).toContain('== lint ==\nL\n\n== depcruise ==\nD');
   });
 
   it('omits a clean check', () => {
-    const report = formatReport({ typecheck: 'T' });
-    expect(report).toContain('== typecheck ==');
+    const report = formatReport({ depcruise: 'D' });
+    expect(report).toContain('== depcruise ==');
     expect(report).not.toContain('== lint ==');
   });
 });
 
 describe('checkedBy', () => {
-  it('limits dependency-cruiser to packages/ and gives lint and typecheck every file', () => {
+  it('limits dependency-cruiser to packages/ and gives lint every file', () => {
     const files = ['packages/a/a.ts', 'tools/x.ts'];
     expect(checkedBy('depcruise', files)).toEqual(['packages/a/a.ts']);
     expect(checkedBy('lint', files)).toEqual(files);
-    expect(checkedBy('typecheck', files)).toEqual(files);
   });
 });
 
@@ -276,16 +241,15 @@ describe('runHook', () => {
     expect(result.code).toBe(2);
     expect(result.report).toContain('== lint ==\nlint text');
     expect(result.report).toContain('== depcruise ==\ncruise text');
-    expect(result.report).not.toContain('== typecheck ==');
   });
 
   it('gives dependency-cruiser the files under packages/ only', async () => {
     const state = probe(['tools/a.ts']);
     await runHook(edit('tools/a.ts'), state.dependencies);
-    expect(state.received).toEqual({ lint: [['tools/a.ts']], typecheck: [['tools/a.ts']], depcruise: [] });
+    expect(state.received).toEqual({ lint: [['tools/a.ts']], depcruise: [] });
   });
 
-  it('starts the three checks before any of them finishes', async () => {
+  it('starts the checks before any of them finishes', async () => {
     const order: string[] = [];
     const slow = (name: CheckName): Check => async () => {
       order.push(`start ${name}`);
@@ -294,9 +258,9 @@ describe('runHook', () => {
       return '';
     };
     const { dependencies } = probe(['packages/a/a.ts']);
-    const checks = { lint: slow('lint'), typecheck: slow('typecheck'), depcruise: slow('depcruise') };
+    const checks = { lint: slow('lint'), depcruise: slow('depcruise') };
     await runHook(edit('packages/a/a.ts'), { ...dependencies, checks });
-    expect(order.slice(0, 3).every((entry) => entry.startsWith('start'))).toBe(true);
+    expect(order.slice(0, 2).every((entry) => entry.startsWith('start'))).toBe(true);
   });
 
   it('reports a check that throws, instead of passing the file', async () => {
@@ -309,9 +273,9 @@ describe('runHook', () => {
 
   it('reports a check that outlasts the timeout', async () => {
     const { dependencies } = probe(['tools/a.ts']);
-    const checks = { ...dependencies.checks, typecheck: () => new Promise<string>((done) => setTimeout(done, 300, '')) };
+    const checks = { ...dependencies.checks, lint: () => new Promise<string>((done) => setTimeout(done, 300, '')) };
     const result = await runHook(edit('tools/a.ts'), { ...dependencies, checks, timeoutMs: 30 });
     expect(result.code).toBe(2);
-    expect(result.report).toContain('typecheck did not finish');
+    expect(result.report).toContain('lint did not finish');
   });
 });

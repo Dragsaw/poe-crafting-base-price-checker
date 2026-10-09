@@ -1,16 +1,16 @@
 import { execFile } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import { isInvokedDirectly } from '../entry-guard/is-invoked-directly.ts';
 
 // Lint runs with `LINT_FAST=1`, which skips the type-aware block, so baselined findings look
-// stale: hence `--pass-on-unpruned-suppressions`. Typecheck keeps only the edited files'
-// diagnostics, so a caller the edit just broke is left for `pnpm check`.
+// stale: hence `--pass-on-unpruned-suppressions`. Typecheck runs in `typecheck-on-stop.ts`.
 
 // Run by bare `node` (type stripping): imports only builtins and `.ts` files of other tools.
 
-export const CHECK_NAMES = ['lint', 'typecheck', 'depcruise'] as const;
+export const CHECK_NAMES = ['lint', 'depcruise'] as const;
 export type CheckName = (typeof CHECK_NAMES)[number];
 
 /** A check returns its findings as text, or an empty string when the files are clean. */
@@ -107,23 +107,6 @@ function samePathKey(text: string): string {
   return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
 }
 
-const TSC_DIAGNOSTIC = /^(.+?)\((\d+),(\d+)\): (?:error|warning) TS\d+: /;
-
-/** `output` is `tsc --pretty false` output, whose paths are relative to the repository root. */
-export function filterTscDiagnostics(output: string, files: readonly string[]): string {
-  const wanted = new Set(files.map((file) => samePathKey(file)));
-  const kept: string[] = [];
-  let isKeeping = false;
-  for (const line of output.split(/\r?\n/)) {
-    const match = TSC_DIAGNOSTIC.exec(line);
-    // A diagnostic line sets the state; an indented line continues the last one; any other line ends it.
-    if (match !== null) {isKeeping = wanted.has(samePathKey(match[1] ?? ''));}
-    else if (!line.startsWith(' ') && !line.startsWith('\t')) {isKeeping = false;}
-    if (isKeeping) {kept.push(line);}
-  }
-  return kept.join('\n');
-}
-
 interface DepcruiseViolation {
   readonly from?: string;
   readonly to?: string;
@@ -179,7 +162,7 @@ async function guarded(name: CheckName, check: Check, files: readonly string[], 
   }
 }
 
-/** The whole hook: stdin text in, exit code and stderr report out. The three checks run concurrently. */
+/** The whole hook: stdin text in, exit code and stderr report out. The checks run concurrently. */
 export async function runHook(stdin: string, dependencies: HookDependencies): Promise<HookResult> {
   const payload = parsePayload(stdin);
   if (payload === undefined) {return { code: 0, report: '' };}
@@ -203,7 +186,7 @@ interface RunResult {
 }
 
 /** Runs a program to the end and never rejects on a non-zero exit. The timeout kills it. */
-function run(file: string, arguments_: readonly string[], cwd: string, environment: NodeJS.ProcessEnv = process.env): Promise<RunResult> {
+export function run(file: string, arguments_: readonly string[], cwd: string, environment: NodeJS.ProcessEnv = process.env): Promise<RunResult> {
   return new Promise((done, fail) => {
     execFile(
       file,
@@ -222,19 +205,20 @@ function run(file: string, arguments_: readonly string[], cwd: string, environme
 export function realChecks(root: string): Record<CheckName, Check> {
   const node = process.execPath;
   const bin = (...segments: string[]): string => path.join(root, 'node_modules', ...segments);
-  const rewrite = path.join(root, 'tools', 'dts-specifiers', 'rewrite-dts-specifiers.ts');
   return {
+    // The eslint_d server keeps ESLint loaded between edits. It runs from the temporary
+    // directory because Windows cannot remove a worktree that is a process's cwd.
     async lint(files) {
-      const environment = { ...process.env, LINT_FAST: '1' };
+      const environment = { ...process.env, LINT_FAST: '1', ESLINT_D_ROOT: root };
+      const server = bin('eslint_d', 'bin', 'eslint_d.js');
+      // Node caches the modules of the local rules, so an edited rule loads only in a new server.
+      if (files.some((file) => file.startsWith('tools/eslint-rules/'))) {await run(node, [server, 'stop'], os.tmpdir(), environment);}
+      const suppressions = path.join(root, 'eslint-suppressions.json');
       const flags = ['--no-warn-ignored', '--max-warnings=0', '--pass-on-unpruned-suppressions'];
-      const result = await run(node, [bin('eslint', 'bin', 'eslint.js'), ...flags, ...files], root, environment);
+      if (existsSync(suppressions)) {flags.push('--suppressions-location', suppressions);}
+      const absoluteFiles = files.map((file) => path.join(root, file));
+      const result = await run(node, [server, ...flags, ...absoluteFiles], os.tmpdir(), environment);
       return result.code === 0 ? '' : result.stdout + result.stderr;
-    },
-    async typecheck(files) {
-      const result = await run(node, [bin('typescript', 'bin', 'tsc'), '-b', '--pretty', 'false'], root);
-      // `pnpm typecheck` runs this after `tsc -b`; run it too so `dist` ends up the same.
-      if (existsSync(rewrite)) {await run(node, [rewrite], root);}
-      return filterTscDiagnostics(result.stdout, files);
     },
     async depcruise(files) {
       const cruiser = bin('dependency-cruiser', 'bin', 'dependency-cruiser.mjs');
@@ -262,7 +246,7 @@ async function changedFiles(root: string): Promise<string[]> {
   }
 }
 
-async function readStandardInput(): Promise<string> {
+export async function readStandardInput(): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) {chunks.push(chunk as Buffer);}
   return Buffer.concat(chunks).toString('utf8');
