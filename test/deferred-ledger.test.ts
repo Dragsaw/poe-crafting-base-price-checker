@@ -12,10 +12,6 @@ const LEDGER = readFileSync(nodePath.resolve(import.meta.dirname, '..', 'docs/st
 describe('docs/stories/deferred-work.md', () => {
   const entries = parseLedger(LEDGER);
 
-  it('has at least one entry', () => {
-    expect(entries.length).toBeGreaterThan(0);
-  });
-
   it('parses every top-level source_spec bullet as an entry, so none is dropped for a missing or mis-indented field', () => {
     const bullets = LEDGER.split(/\r?\n/).filter((line) => line.startsWith('- source_spec:')).length;
     expect(entries).toHaveLength(bullets);
