@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+# Append-only working logs: keep both sides on merge conflicts.
+.memlog.md merge=union
