@@ -5,6 +5,7 @@ import { Fragment, useCallback, useState, type JSX } from 'react';
 import { TOP_ROWS } from '../shared/product';
 import { plural } from '../shared/text';
 import { colors, glyphs, px, layout, typeStyle } from '../theme/tokens';
+import { useChaseCellCount, type ChaseCellCount } from './ranked-list/chase-count';
 import { ColumnHeader, type ExpectedValueNote } from './ColumnHeader';
 import type { ListBranches, ListRow } from './display-rows';
 import { ClassExpansionPanel, RawExpansionPanel } from './ExpansionPanel';
@@ -47,12 +48,14 @@ export function RankedList({
   }, []);
 
   const shown = branches ?? [rows ?? []];
+  const { measured, count } = useChaseCellCount();
 
   return (
-    <div data-ranked-list="">
+    <div data-ranked-list="" ref={measured}>
       <ColumnHeader note={note} />
       {shown.map((branch, index) => (
         <Branch
+          chaseCells={count}
           // Positional keys: branches are never reordered, and the first keeps its grown flag when state 35 adds the second.
           key={index}
           rows={branch}
@@ -81,11 +84,13 @@ function Branch({
   onToggle,
   activeLeague,
   kind,
+  chaseCells,
 }: {
   readonly rows: readonly ListRow[];
   readonly open: ReadonlySet<string>;
   readonly onToggle: (key: string) => void;
   readonly activeLeague: string;
+  readonly chaseCells: ChaseCellCount;
   /** Set only in state 35, where the list holds two branches. */
   readonly kind: 'raw' | 'crafted' | undefined;
 }): JSX.Element {
@@ -98,22 +103,24 @@ function Branch({
   }
   const visible = grown ? rows : rows.slice(0, TOP_ROWS);
   // A closed row unmounts its panel, so the panel's own toggles start closed when it reopens (Interactions 3, 7).
-  const expansionPanel = (row: ListRow): JSX.Element => {
+  const expansionPanel = (row: ListRow, isLast: boolean): JSX.Element => {
     return row.unit === 'raw' ? (
-      <RawExpansionPanel key={row.key} row={row} activeLeague={activeLeague} />
+      <RawExpansionPanel key={row.key} row={row} activeLeague={activeLeague} last={isLast} />
     ) : (
-      <ClassExpansionPanel key={row.key} row={row} activeLeague={activeLeague} />
+      <ClassExpansionPanel key={row.key} row={row} activeLeague={activeLeague} last={isLast} />
     );
   };
 
   return (
     <div data-list-branch={kind}>
-      {visible.map((row) => {
+      {visible.map((row, index) => {
         const isOpen = open.has(row.key);
+        // Show-more is not a row, so the last visible row draws no rule above it (DESIGN.md *Density*).
+        const isLast = index === visible.length - 1;
         return (
           <Fragment key={row.key}>
-            <RankedRow row={row} open={isOpen} onToggle={onToggle} />
-            {isOpen ? expansionPanel(row) : undefined}
+            <RankedRow row={row} open={isOpen} onToggle={onToggle} chaseCells={chaseCells} last={isLast} />
+            {isOpen ? expansionPanel(row, isLast) : undefined}
           </Fragment>
         );
       })}

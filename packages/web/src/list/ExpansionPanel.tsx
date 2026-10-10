@@ -66,10 +66,12 @@ function ExpansionPanel({
   row,
   lines,
   pruned,
+  last,
 }: {
   readonly row: DisplayRow | ClassDisplayRow;
   readonly lines: readonly LineView[];
   readonly pruned: readonly PrunedCombination[];
+  readonly last: boolean;
 }): JSX.Element {
   const [isGrown, setGrown] = useState(false);
   const [isPrunedShown, setPrunedShown] = useState(false);
@@ -81,7 +83,7 @@ function ExpansionPanel({
       style={{
         padding: `6px 0 14px ${spacing['expansion-indent']}`,
         background: colors.surface,
-        borderBottom: `1px solid ${colors.line}`,
+        borderBottom: last ? undefined : `1px solid ${colors.line}`,
         boxShadow: `inset ${spacing['open-row-bar']} 0 0 ${colors.accent}`,
         cursor: 'default',
       }}
@@ -118,23 +120,36 @@ function ExpansionPanel({
 }
 
 /** The panel under an open Raw Base row: its context line and its one line. */
-export function RawExpansionPanel({ row, activeLeague }: { readonly row: DisplayRow; readonly activeLeague: string }): JSX.Element {
-  return <ExpansionPanel row={row} lines={[rawLine(row, activeLeague)]} pruned={[]} />;
+export function RawExpansionPanel({
+  row,
+  activeLeague,
+  last = false,
+}: {
+  readonly row: DisplayRow;
+  readonly activeLeague: string;
+  /** Under the last visible row of its branch: no rule (DESIGN.md *Density*). */
+  readonly last?: boolean;
+}): JSX.Element {
+  return <ExpansionPanel row={row} lines={[rawLine(row, activeLeague)]} pruned={[]} last={last} />;
 }
 
 /** The panel under an open crafted row: one line per entry in `core`'s order, then the pruned. */
 export function ClassExpansionPanel({
   row,
   activeLeague,
+  last = false,
 }: {
   readonly row: ClassDisplayRow;
   readonly activeLeague: string;
+  /** Under the last visible row of its branch: no rule (DESIGN.md *Density*). */
+  readonly last?: boolean;
 }): JSX.Element {
   return (
     <ExpansionPanel
       row={row}
       lines={row.combinations.map((combination) => craftedLine(combination, row.label, activeLeague))}
       pruned={row.pruned}
+      last={last}
     />
   );
 }

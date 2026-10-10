@@ -109,7 +109,7 @@ export interface CraftedContext {
   readonly stats: StatTexts;
 }
 
-/** The chase column holds at most three cells (DESIGN.md `col-chase` 492 = 3 × 164). */
+/** The chase column holds at most three cells; `chaseCellCount` picks three or two (DESIGN.md *The chase column*). */
 export const CHASE_CELLS = 3;
 
 /** Any row of the list. */
