@@ -2,7 +2,7 @@ import { WEIGHTS_SCHEMA_VERSION } from '@poe/contracts';
 import type { ModifierReference, WeightsFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { affixProbability, combinationProbability, isContaining, eligible, interval, poolOf } from './probability.ts';
+import { affixProbability, combinationProbability, eligible, floored, interval, isContaining, poolOf, recipeReach } from './probability.ts';
 import { band, line, OTHER, pOf, pools, STAT, tier, unresolvedLine } from './probability/test-support.ts';
 
 describe('interval', () => {
@@ -101,28 +101,61 @@ describe('poolOf', () => {
   });
 });
 
+/** A tier of `group` at `itemLevelMin`, its one line valued at that level. */
+const at = (itemLevelMin: number, group: string, weight = 10) =>
+  tier([line(STAT, [itemLevelMin, itemLevelMin])], weight, { itemLevelMin, modGroup: group });
+
+describe('floored', () => {
+
+  it('drops the tiers of a group below the floor when the group has a tier at or above it', () => {
+    const tiers = [at(30, 'a'), at(60, 'a'), at(75, 'a')];
+    expect(floored({ poolCoverage: 'complete', entries: tiers }, 70)).toEqual([tiers[2]]);
+  });
+
+  it('keeps the top tier alone, at its own weight, of a group whose top tier is below the floor', () => {
+    const tiers = [at(10, 'b', 300), at(40, 'b', 50)];
+    expect(floored({ poolCoverage: 'complete', entries: tiers }, 70)).toEqual([tiers[1]]);
+  });
+
+  it('keeps every tier tied at the top, and never reads a weight-0 tier as the top', () => {
+    const tied = [at(20, 'c'), at(40, 'c'), at(40, 'c')];
+    expect(floored({ poolCoverage: 'complete', entries: tied }, 70)).toEqual([tied[1], tied[2]]);
+    const live = at(40, 'd');
+    const zero = { ...at(60, 'd', 0), weightSource: 'not-in-game' as const };
+    expect(floored({ poolCoverage: 'complete', entries: [live, zero] }, 70)).toContain(live);
+  });
+
+  it('keys groups by modGroup alone: a hybrid group sharing a statId is its own group', () => {
+    const pure = [at(30, 'pure'), at(75, 'pure')];
+    const hybrid = tier([line(STAT, [30, 30]), line(OTHER, [1, 2])], 10, { itemLevelMin: 30, modGroup: 'hybrid' });
+    expect(floored({ poolCoverage: 'complete', entries: [...pure, hybrid] }, 70)).toEqual([pure[1], hybrid]);
+  });
+
+  it('removes nothing at modifierLevelMin 0', () => {
+    const tiers = [at(10, 'a'), at(44, 'a'), at(10, 'b')];
+    expect(floored({ poolCoverage: 'complete', entries: tiers }, 0)).toEqual(tiers);
+  });
+});
+
 describe('eligible', () => {
-  const low = tier([line(STAT, [1, 2])], 10, { itemLevelMin: 10 });
-  const mid = tier([line(STAT, [3, 4])], 10, { itemLevelMin: 44 });
-  const floor = tier([line(STAT, [5, 6])], 10, { itemLevelMin: 65 });
-  const high = tier([line(STAT, [7, 8])], 10, { itemLevelMin: 70 });
-  const pool = { poolCoverage: 'complete' as const, entries: [low, mid, floor, high] };
 
-  it('keeps tiers with modifierLevelMin <= w.itemLevelMin <= entry.itemLevelMin', () => {
-    expect(eligible(pool, 65, 44)).toEqual([mid, floor]);
+  it('takes the top from the unscoped pool: a group whose top is above the item level contributes nothing', () => {
+    const tiers = [at(20, 'c'), at(85, 'c')];
+    expect(eligible({ poolCoverage: 'complete', entries: tiers }, 82, 70)).toEqual([]);
   });
 
-  it('removes nothing beyond the scope at modifierLevelMin 0', () => {
-    expect(eligible(pool, 65, 0)).toEqual([low, mid, floor]);
+  it('gives the item-level scope alone at modifierLevelMin 0', () => {
+    const tiers = [at(10, 'a'), at(44, 'a'), at(70, 'b'), at(85, 'b')];
+    expect(eligible({ poolCoverage: 'complete', entries: tiers }, 65, 0)).toEqual(tiers.slice(0, 2));
   });
 
-  it('gives empty-eligible-pool, never 0, for a recipe floor above the entry floor', () => {
-    const classPools = pools(pool.entries, pool.entries);
-    expect(affixProbability(classPools, 'suffix', band(1, 8), { itemLevelMin: 65, modifierLevelMin: 70 })).toEqual({
+  it('gives empty-eligible-pool, never 0, when the floor and the scope leave a slot nothing', () => {
+    const classPools = pools([at(10, 'a'), at(70, 'a')], [at(10, 'b'), at(70, 'b')]);
+    expect(affixProbability(classPools, 'suffix', band(1, 80), { itemLevelMin: 65, modifierLevelMin: 70 })).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'suffix' },
     });
-    expect(combinationProbability(classPools, { itemLevelMin: 65, prefix: band(1, 8), suffix: band(1, 8) }, 70)).toEqual({
+    expect(combinationProbability(classPools, { itemLevelMin: 65, prefix: band(1, 80), suffix: band(1, 80) }, 70)).toEqual({
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
@@ -141,5 +174,31 @@ describe('eligible', () => {
       ok: false,
       reason: { kind: 'empty-eligible-pool', slot: 'prefix' },
     });
+  });
+});
+
+describe('the recipe floor per modifier group under a perfect recipe (AD-17)', () => {
+  // Group a: 30, 60, 75 keeps 75. Group b: 10, 40 keeps 40. Group c: 20, 85 keeps 85, out of scope at 82.
+  const a = [30, 60, 75].map((level, index) => tier([line(STAT, [10 + index, 10 + index])], level === 75 ? 200 : 100, { itemLevelMin: level, modGroup: 'a' }));
+  const b10 = tier([line(STAT, [1, 2])], 300, { itemLevelMin: 10, modGroup: 'b' });
+  const b40 = tier([line(STAT, [3, 4])], 50, { itemLevelMin: 40, modGroup: 'b' });
+  const c = [20, 85].map((level) => tier([line(STAT, [20, 21])], level === 85 ? 500 : 400, { itemLevelMin: level, modGroup: 'c' }));
+  const d = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 80, modGroup: 'd' });
+  const groupE = tier([line(OTHER, [5, 6])], 300, { itemLevelMin: 72, modGroup: 'e' });
+  const classPools = pools([...a, b10, b40, ...c], [d, groupE]);
+  const entry = { itemLevelMin: 82, prefix: band(3, 4), suffix: band(1, 2, OTHER) };
+
+  it('keeps 75 of a, 40 of b at its own weight, and nothing of c', () => {
+    expect(eligible(classPools.prefix, 82, 70)).toEqual([a[2], b40]);
+  });
+
+  it('gives P by hand: (50 × 100/400 + 100 × 50/250) / (250 + 400)', () => {
+    expect(pOf(combinationProbability(classPools, entry, 70))).toBeCloseTo((50 * (100 / 400) + 100 * (50 / 250)) / 650, 12);
+  });
+
+  it('reaches the entry, and not one whose band holds only tiers the floor removes', () => {
+    expect(recipeReach(classPools, entry, 70)).toEqual({ reached: true });
+    expect(recipeReach(classPools, { ...entry, prefix: band(1, 2) }, 70)).toEqual({ reached: false, slots: ['prefix'] });
+    expect(recipeReach(classPools, { ...entry, prefix: band(1, 2) }, 0)).toEqual({ reached: true });
   });
 });

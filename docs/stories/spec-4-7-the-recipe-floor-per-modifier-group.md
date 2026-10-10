@@ -92,6 +92,12 @@ The top tier is the highest `itemLevelMin` among the group's tiers with `weight 
 
 ## Implementation Notes
 
+- `recipeReach` returns `{ reached: true }` or `{ reached: false, slots }`; `tracked:check` emits one `unreachable` row per empty slot. Classes with an absent or partial pool are skipped, as they are already `unvalidated`. A refused weights file makes `recipe-reach` `skipped`.
+- `unreachable` rows stay out of `issues`; `ok` is false while the list is non-empty.
+- Boundary deviation: five `web` test files (no production `web` file) encoded the old floor in their fixtures and failed under the new rule. Their fixtures now share a `modGroup` where a tier must be floored, and the frozen-data appendix test expects an empty appendix. Kept in a separate commit.
+- `SKILL.md` lines 12 and 40 described `unreachable` as never failing the run; they now match the spec. Line 20 held no recipe-floor rule and is unchanged.
+- No `data/tracked.json` change: `pnpm tracked:check` reports `unreachable: []` on the live data.
+
 ## Spec Change Log
 
 ## Review Triage Log

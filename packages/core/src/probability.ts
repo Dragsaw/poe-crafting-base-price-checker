@@ -121,18 +121,38 @@ export function poolOf(weights: WeightsFile, categoryId: string, className: stri
   return pools === undefined ? { ok: false, reason: { kind: 'class-absent' } } : { ok: true, pools };
 }
 
-/** One slot's eligible set: `modifierLevelMin <= w.itemLevelMin <= itemLevelMin`, one axis. */
+/**
+ * The recipe floor per `modGroup` over the unscoped pool (AD-17): a group whose top
+ * positive-weight tier is below the floor keeps that top tier, since the floor never drops a type.
+ */
+export function floored(pool: WeightsPool, modifierLevelMin: number): readonly ModifierWeight[] {
+  const top = new Map<string, number>();
+  for (const entry of pool.entries) {
+    if (entry.weight > 0) {
+      top.set(entry.modGroup, Math.max(top.get(entry.modGroup) ?? entry.itemLevelMin, entry.itemLevelMin));
+    }
+  }
+  return pool.entries.filter((entry) => entry.itemLevelMin >= Math.min(modifierLevelMin, top.get(entry.modGroup) ?? modifierLevelMin));
+}
+
+/** One slot's eligible set: the recipe floor, then the item-level scope (AD-5, AD-17). */
 export function eligible(
   pool: WeightsPool,
   itemLevelMin: number,
   modifierLevelMin: number,
 ): readonly ModifierWeight[] {
-  return pool.entries.filter((w) => canRecipeRoll(w.itemLevelMin, modifierLevelMin) && w.itemLevelMin <= itemLevelMin);
+  return floored(pool, modifierLevelMin).filter((entry) => entry.itemLevelMin <= itemLevelMin);
 }
 
-/** The recipe-floor half of `eligible`: whether a recipe can roll a tier at all. */
-export function canRecipeRoll(tierItemLevelMin: number, modifierLevelMin: number): boolean {
-  return tierItemLevelMin >= modifierLevelMin;
+/** Whether a recipe can roll an entry: every slot's contained set in `eligible` is non-empty. */
+export type RecipeReach = { readonly reached: true } | { readonly reached: false; readonly slots: readonly Slot[] };
+
+/** The reach verdict of one `(entry, recipe)` pair (AD-17). */
+export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, modifierLevelMin: number): RecipeReach {
+  const slots = (['prefix', 'suffix'] as const).filter(
+    (slot) => containedIn(entry[slot], eligible(pools[slot], entry.itemLevelMin, modifierLevelMin)).length === 0,
+  );
+  return slots.length === 0 ? { reached: true } : { reached: false, slots };
 }
 
 function totalWeight(entries: readonly ModifierWeight[]): number {

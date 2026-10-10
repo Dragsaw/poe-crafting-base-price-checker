@@ -1,5 +1,5 @@
 import { type CraftRecipe, type ModifierWeight, type WeightsFile, type WeightsPool } from '@poe/contracts';
-import { canRecipeRoll, lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
+import { floored, lineSet, type UntrackableReason, untrackableReason } from '@poe/core';
 
 import { absentAsNull } from './lookup-absent-as-null.ts';
 import { type ClassSelector, resolveClass, SLOTS, type Slot } from './lookup-weights.ts';
@@ -105,7 +105,7 @@ export interface TierRow {
   readonly lineSet: readonly string[];
   /** `core`'s null-line verdict: why the tier is untrackable, or `null` when it is trackable. */
   readonly untrackable: UntrackableReason | null;
-  /** Whether each recipe can roll this tier (`canRecipeRoll`, AD-17). Absent when `data/recipes.json` is unusable. */
+  /** Whether each recipe's floor keeps this tier in the unscoped pool (`floored`, AD-17). Absent when `data/recipes.json` is unusable. */
   readonly recipes?: readonly { readonly recipeId: string; readonly modifierLevelMin: number; readonly reached: boolean }[];
 }
 
@@ -121,6 +121,7 @@ export function lookupTiers(
   for (const slot of SLOTS) {
     const pool = resolved.pools[slot];
     const carrying = pool.entries.filter((entry) => entry.lines.some((line) => line.statId === statId));
+    const kept = recipes.map((recipe) => new Set(floored(pool, recipe.modifierLevelMin)));
     for (const entry of carrying.toSorted(byItemLevel)) {
       tiers.push({
         slot,
@@ -133,10 +134,10 @@ export function lookupTiers(
         lineSet: lineSet(entry),
         untrackable: absentAsNull(untrackableReason(entry, pool)),
         ...(recipes.length > 0 && {
-          recipes: recipes.map((recipe) => ({
+          recipes: recipes.map((recipe, index) => ({
             recipeId: recipe.id,
             modifierLevelMin: recipe.modifierLevelMin,
-            reached: canRecipeRoll(entry.itemLevelMin, recipe.modifierLevelMin),
+            reached: kept[index]?.has(entry) === true,
           })),
         }),
       });

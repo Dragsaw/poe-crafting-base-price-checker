@@ -4,7 +4,7 @@ import {
   trackedEarlierMajorMessage,
   WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
-import type { ModifierWeight, WeightsFile } from '@poe/contracts';
+import type { ModifierWeight, RecipesFile, WeightsFile } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -46,6 +46,11 @@ const WEIGHTS: WeightsFile = {
   },
 };
 
+const RECIPES: RecipesFile = {
+  schemaVersion: '1.0.0',
+  recipes: [{ id: 'perfect', currencies: [{ currencyId: 'perfect-orb-of-transmutation', quantity: 1 }], modifierLevelMin: 70 }],
+};
+
 function inputsOf(entries: readonly unknown[], overrides: Partial<TrackedCheckInputs> = {}): TrackedCheckInputs {
   return {
     tracked: trackedText(entries),
@@ -55,6 +60,7 @@ function inputsOf(entries: readonly unknown[], overrides: Partial<TrackedCheckIn
     },
     catalogue: { ok: true, value: CATALOGUE },
     weights: { ok: true, value: WEIGHTS },
+    recipes: { ok: true, value: RECIPES },
     ...overrides,
   };
 }
@@ -70,10 +76,67 @@ describe('checkTracked', () => {
         { check: 'pinned-cap', status: 'passed' },
         { check: 'catalogue', status: 'passed' },
         { check: 'cross-file', status: 'passed' },
+        { check: 'recipe-reach', status: 'passed' },
       ],
       issues: [],
       unvalidated: [],
+      unreachable: [],
     });
+  });
+
+  it('lists an entry whose band holds only tiers the floor removes as unreachable, and fails', () => {
+    // One modGroup at 30 and 75: the perfect floor of 70 keeps only 75, outside the band.
+    const low = { ...tier(PREFIX_STAT, 47, 50), sourceModifierId: 'low', itemLevelMin: 30 };
+    const high = { ...tier(PREFIX_STAT, 60, 65), sourceModifierId: 'high', itemLevelMin: 75 };
+    const weights: WeightsFile = {
+      ...WEIGHTS,
+      bases: {
+        'accessory.amulet': {
+          Amulets: {
+            prefix: { poolCoverage: 'complete', entries: [low, high] },
+            suffix: { poolCoverage: 'complete', entries: [tier(SUFFIX_STAT, 3, 3)] },
+          },
+        },
+      },
+    };
+    const report = checkTracked(inputsOf([gold, crafted], { weights: { ok: true, value: weights } }));
+
+    expect(report.ok).toBe(false);
+    expect(report.issues).toEqual([]);
+    expect(report.checks).toContainEqual({ check: 'recipe-reach', status: 'failed' });
+    expect(report.unreachable).toEqual([
+      {
+        entryKey: expect.stringContaining('"accessory.amulet","Amulets",75') as unknown,
+        recipeId: 'perfect',
+        slot: 'prefix',
+        path: 'entries.1',
+      },
+    ]);
+  });
+
+  it('skips the reach check without a recipes file, and fails on a refused one with its message', () => {
+    const absent = checkTracked(inputsOf([crafted], { recipes: { ok: true, value: undefined } }));
+    expect(absent.ok).toBe(true);
+    expect(absent.checks).toContainEqual({ check: 'recipe-reach', status: 'skipped' });
+    expect(absent.unreachable).toEqual([]);
+
+    const error = new DataFileError('data/recipes.json', 'invalid', 'invalid: recipes: expected array');
+    const refused = checkTracked(inputsOf([crafted], { recipes: { ok: false, error } }));
+    expect(refused.ok).toBe(false);
+    expect(refused.checks).toContainEqual({ check: 'recipe-reach', status: 'failed' });
+    expect(refused.issues).toEqual([{ check: 'recipe-reach', message: error.message }]);
+    expect(refused.unreachable).toEqual([]);
+  });
+
+  it('loads an absent recipes file as absent and an invalid one as a refusal', async () => {
+    const absent = await loadTrackedCheckInputs(createFakeFilesystemPort({}));
+    expect(absent.recipes).toEqual({ ok: true, value: undefined });
+
+    const invalid = await loadTrackedCheckInputs(
+      createFakeFilesystemPort({ 'data/recipes.json': { contents: JSON.stringify({ schemaVersion: '1.0.0', recipes: 'nope' }) } }),
+    );
+    expect(invalid.recipes.ok).toBe(false);
+    expect(invalid.recipes.ok ? '' : invalid.recipes.error.message).toMatch(/^data\/recipes\.json: invalid/);
   });
 
   it('reports each cross-file failure as one issue at its entry, naming the check and the key', () => {
@@ -139,6 +202,7 @@ describe('checkTracked', () => {
       { check: 'pinned-cap', status: 'skipped' },
       { check: 'catalogue', status: 'skipped' },
       { check: 'cross-file', status: 'skipped' },
+      { check: 'recipe-reach', status: 'skipped' },
     ]);
     expect(report.issues.length).toBeGreaterThan(0);
     for (const issue of report.issues) {
@@ -251,6 +315,7 @@ describe('checkTracked', () => {
       { check: 'pinned-cap', status: 'failed' },
       { check: 'catalogue', status: 'failed' },
       { check: 'cross-file', status: 'skipped' },
+      { check: 'recipe-reach', status: 'skipped' },
     ]);
     expect(report.issues.map((issue) => issue.message)).toEqual([
       'data/tracked.json: the file is absent',

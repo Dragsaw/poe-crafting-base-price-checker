@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 const SCRIPT = fileURLToPath(new URL('check.ts', import.meta.url));
 
 describe('pnpm tracked:check over the live data/', () => {
-  it('exits 0 and passes the cross-file check', async () => {
+  it('exits 0, passes the cross-file check and lists no unreachable pair', async () => {
     const run = await new Promise<{ code: number | null; stdout: string; stderr: string }>((resolve) => {
       const child = execFile(process.execPath, [SCRIPT], { encoding: 'utf8' }, (_error, stdout, stderr) => {
         resolve({ code: child.exitCode, stdout, stderr });
@@ -16,10 +16,13 @@ describe('pnpm tracked:check over the live data/', () => {
 
     expect(run.code, run.stderr).toBe(0);
     expect(run.stderr).toBe('');
-    expect(JSON.parse(run.stdout)).toMatchObject({ ok: true, issues: [] });
+    expect(JSON.parse(run.stdout)).toMatchObject({ ok: true, issues: [], unreachable: [] });
     expect(JSON.parse(run.stdout)).toHaveProperty(
       'checks',
-      expect.arrayContaining([{ check: 'cross-file', status: 'passed' }]),
+      expect.arrayContaining([
+        { check: 'cross-file', status: 'passed' },
+        { check: 'recipe-reach', status: 'passed' },
+      ]),
     );
   });
 
