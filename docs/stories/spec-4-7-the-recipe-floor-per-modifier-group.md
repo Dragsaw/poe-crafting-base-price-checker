@@ -110,7 +110,7 @@ The top tier is the highest `itemLevelMin` among the group's tiers with `weight 
 | 2 | verification-gap | Sort order of `unreachable` never observed | low | patch | Every test yields at most one row; adding a test is a direct fix with no product complexity. |
 | 3 | blind | `// A mark never moves ok` misleading | low | patch | `ok` now depends on `reach.unreachable.length` on the next line. |
 | 4 | edge, blind, verification-gap | Weight-0 test asserts only `toContain`; stray blank lines open two `describe` blocks | low | patch | The tier at 60 survives `floored` but the test does not pin it; the blank lines are cosmetic. |
-| 5 | ledger, blind | No deferred-work entry for restoring the 104 pruned entries | medium | defer | Carved out by the Never list; entry appended to `deferred-work.md`. |
+| 5 | ledger, blind | No deferred-work entry for restoring the 104 pruned entries | medium | defer | Carved out by the Never list. The ledger entry was appended, then removed at the human's request; step 2 of the proposal holds the follow-up. |
 | 6 | edge | A weight-0 `absent` tier between a group's top and the floor survives and can turn provenance into `uniform-prior` | low | reject | The schema allows `absent` at weight 0, but the live `weights.json` has none (1995 `absent` tiers, all positive). Unlikely in use, and the fix adds a guard. |
 | 7 | edge | An all-weight-0 group is cut flat | low | reject | Such a group carries no mass. Unlikely in use, and the fix adds a branch. |
 | 8 | edge | An empty `recipes` array reports `recipe-reach` passed | low | reject | No such file ships. Unlikely, and the fix adds a branch. |
