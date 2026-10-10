@@ -114,8 +114,8 @@ describe('the header bar', () => {
     expect(recipe?.querySelector('[data-craft-recipe]')).not.toBeNull();
     expect(threshold?.querySelector('[data-payout-threshold]')).not.toBeNull();
     expect(sync?.querySelector('[data-sync-button]')).not.toBeNull();
-    expect(frame().querySelector('[data-interim-controls], [data-trust-strip]')).toBeNull();
-    expect(headerBar().nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(frame().querySelector('[data-interim-controls], [data-trust-strip], [data-asking-price-line]')).toBeNull();
+    expect(headerBar().nextElementSibling?.hasAttribute('data-ranked-list')).toBe(true);
     // No tooltip hangs on a header control (Interaction 8).
     expect(headerBar().querySelector('[title], [data-ev-tooltip], [data-mark-tooltip]')).toBeNull();
   });

@@ -4,17 +4,17 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { absenceLine, PANEL_HEADINGS } from './frame/trust-facts';
 import {
   FETCH_FAILURE_EYEBROW,
+  FETCH_FAILURE_RECOVERY,
   FETCH_FAILURE_TITLE,
-  REFUSAL_CONTENT,
+  fetchFailureSentence,
   REFUSAL_EYEBROW,
-  REFUSAL_MISSING,
-  REFUSAL_NO_VERSION_DECLARED,
   REFUSAL_RECOVERY,
   REFUSAL_TITLE,
-  REFUSAL_VERSION_DECLARES,
-  REFUSAL_VERSION_EXPECTS,
+  REFUSAL_FRAGMENTS,
+  sentenceText,
   TRY_AGAIN,
 } from './frame/FailureScreen';
+import { colors, failureScreen, px, typeRoles } from './theme/tokens';
 import { HEADER_TITLE } from './frame/HeaderBar';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
 import { ROW_COLUMNS } from './list/row/grid';
@@ -27,25 +27,48 @@ import {
   VALID_BODIES,
 } from './test-support/artifact-server';
 import { ARTIFACT_ORDER } from './load/artifacts';
-import { flush, mountedContainer, settleTo, unmount } from './test-support/dom';
+import { flush, mountedContainer, rgb, settleTo, unmount } from './test-support/dom';
 import { server, mount, frame, panelLines, toggleReport } from './App/test-support';
 import { THRESHOLD_WORD } from './threshold/PayoutThreshold';
 
 afterEach(unmount);
 
-/** The refusal sentence, after the parts every cause shares (eyebrow, title, artifact). */
+const F = REFUSAL_FRAGMENTS;
+
+/** No header bar, no list and no legend: the failure screen replaces the whole page (FR-33, NFR-8). */
+function expectWholePageReplaced(): void {
+  expect(frame().querySelector('[data-header-bar], [data-ranked-list], [data-row-slots], [data-footer-legend], [data-unrankable-appendix]')).toBeNull();
+}
+
+/** The shared failure-screen shape: eyebrow led by the drawn ✕, title, body width (DESIGN.md `failure-screen`). */
+function expectFailureShape(eyebrow: string, title: string): void {
+  const section = frame().querySelector<HTMLElement>('section[data-failure]');
+  expect(section?.style.paddingTop).toBe(px(failureScreen.paddingTop));
+  const lead = frame().querySelector<HTMLElement>('[data-failure-eyebrow]');
+  expect(lead?.textContent).toBe(eyebrow);
+  expect(lead?.style.textTransform).toBe('uppercase');
+  expect(lead?.style.color).toBe(rgb(colors['trust-broken']));
+  expect((lead?.firstElementChild as HTMLElement | SVGElement | null | undefined)?.dataset['mark']).toBe('broken');
+  const heading = frame().querySelector<HTMLElement>('h1');
+  expect(heading?.textContent).toBe(title);
+  expect(heading?.style.fontSize).toBe(typeRoles.title.fontSize);
+  for (const paragraph of frame().querySelectorAll<HTMLElement>('section > p')) {
+    expect(paragraph.style.maxWidth).toBe(px(failureScreen.bodyMaxWidth));
+    expect(paragraph.style.color).toBe(rgb(colors['text-secondary']));
+    expect(paragraph.style.fontSize).toBe(typeRoles['line-text'].fontSize);
+  }
+  expect(frame().querySelector('[style*="italic"], [style*="700"]')).toBeNull();
+  expectWholePageReplaced();
+}
+
+/** The refusal's per-cause sentence, after the parts every cause shares. */
 function refusalBody(path: string): string {
-  const text = frame().textContent;
-  expect(text).toContain(REFUSAL_EYEBROW);
-  expect(text).toContain(REFUSAL_TITLE);
-  expect(text).toContain(REFUSAL_RECOVERY);
-  expect(text).not.toContain(TRY_AGAIN);
+  expectFailureShape(REFUSAL_EYEBROW, REFUSAL_TITLE);
+  expect(frame().textContent).toContain(REFUSAL_RECOVERY);
+  expect(frame().textContent).not.toContain(TRY_AGAIN);
   expect(frame().querySelector('button')).toBeNull();
-  expect(frame().querySelector('[data-artifact]')?.textContent).toBe(path);
-  const body = frame().querySelector('section p')?.textContent ?? '';
-  const lead = `${path} × unresolvable. `;
-  expect(body.startsWith(lead)).toBe(true);
-  return body.slice(lead.length);
+  expect(frame().querySelector('[data-part="artifact"]')?.textContent).toBe(path);
+  return frame().querySelector('[data-failure-sentence]')?.textContent ?? '';
 }
 
 describe('the pending state', () => {
@@ -69,8 +92,9 @@ describe('the pending state', () => {
     expect(header?.querySelector('[data-slot="threshold"] [data-payout-threshold]')).not.toBeNull();
     expect(header?.querySelector('[data-slot="recipe"]')?.childElementCount).toBe(0);
     expect(header?.querySelector('[data-slot="sync"]')?.childElementCount).toBe(0);
-    expect(header?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
-    expect(frame().querySelector('[data-trust-strip], [data-trust-strip-slot], [data-interim-controls]')).toBeNull();
+    expect(header?.nextElementSibling?.hasAttribute('data-row-slots')).toBe(true);
+    expect(frame().querySelector('[data-page-tail] [data-footer-legend]')).not.toBeNull();
+    expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
     held.openAll();
   });
 
@@ -120,10 +144,10 @@ describe('the outcomes', () => {
     expect(frame().querySelector('section')?.getAttribute('role')).toBe('alert');
     expect(frame().hasAttribute('aria-busy')).toBe(false);
     const sentence = refusalBody('tracked.json');
-    expect(sentence).toBe(`${REFUSAL_CONTENT} 2.0.0.`);
+    expect(sentence).toBe(`tracked.json${F.content}2.0.0${F.end}`);
     expect(sentence).not.toContain('declares');
-    expect(frame().querySelector('[data-declared]')).toBeNull();
-    expect(frame().querySelector('[data-expected]')?.textContent).toBe('2.0.0');
+    expect(frame().querySelector('[data-part="declared"]')).toBeNull();
+    expect(frame().querySelector('[data-part="expected"]')?.textContent).toBe('2.0.0');
     expect(frame().textContent).not.toContain(HEADER_TITLE);
   });
 
@@ -138,7 +162,7 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const sentence = refusalBody('dataset.json');
-    expect(sentence).toBe(`${REFUSAL_CONTENT} 1.0.0.`);
+    expect(sentence).toBe(`dataset.json${F.content}1.0.0${F.end}`);
     expect(sentence).not.toContain('declares');
   });
 
@@ -148,11 +172,9 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const sentence = refusalBody('dataset.json');
-    expect(sentence).toBe(`${REFUSAL_VERSION_DECLARES} 2.0.0; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
-    // The version sentence is unchanged by the per-cause split.
-    expect(sentence).toBe('It declares schema version 2.0.0; the page expects 1.0.0.');
-    expect(frame().querySelector('[data-declared]')?.textContent).toBe('2.0.0');
-    expect(frame().querySelector('[data-expected]')?.textContent).toBe('1.0.0');
+    expect(sentence).toBe(`dataset.json${F.declares}2.0.0${F.expects}1.0.0${F.end}`);
+    expect(frame().querySelector('[data-part="declared"]')?.textContent).toBe('2.0.0');
+    expect(frame().querySelector('[data-part="expected"]')?.textContent).toBe('1.0.0');
   });
 
   // Matrix: malformed version string.
@@ -160,7 +182,7 @@ describe('the outcomes', () => {
     serveArtifacts(server, { dataset: { kind: 'json', body: { ...(VALID_BODIES.dataset as object), schemaVersion: 'abc' } } });
     mount();
     await settleTo('refused');
-    expect(refusalBody('dataset.json')).toBe(`${REFUSAL_VERSION_DECLARES} abc; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
+    expect(refusalBody('dataset.json')).toBe(`dataset.json${F.declares}abc${F.expects}1.0.0${F.end}`);
   });
 
   // Regression: a declared "none" is printed as declared, not read as no version.
@@ -169,9 +191,9 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const sentence = refusalBody('dataset.json');
-    expect(sentence).toBe(`${REFUSAL_VERSION_DECLARES} none; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
-    expect(sentence).not.toContain(REFUSAL_NO_VERSION_DECLARED);
-    expect(frame().querySelector('[data-declared]')?.textContent).toBe('none');
+    expect(sentence).toBe(`dataset.json${F.declares}none${F.expects}1.0.0${F.end}`);
+    expect(sentence).not.toBe(`dataset.json${F.noVersion}1.0.0${F.end}`);
+    expect(frame().querySelector('[data-part="declared"]')?.textContent).toBe('none');
   });
 
   // Matrix: missing version.
@@ -180,10 +202,9 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const sentence = refusalBody('config.json');
-    expect(sentence).toBe(`${REFUSAL_NO_VERSION_DECLARED}; ${REFUSAL_VERSION_EXPECTS} 1.0.0.`);
-    expect(sentence).toContain('declares no schema version');
-    expect(frame().querySelector('[data-declared]')).toBeNull();
-    expect(frame().querySelector('[data-expected]')?.textContent).toBe('1.0.0');
+    expect(sentence).toBe(`config.json${F.noVersion}1.0.0${F.end}`);
+    expect(frame().querySelector('[data-part="declared"]')).toBeNull();
+    expect(frame().querySelector('[data-part="expected"]')?.textContent).toBe('1.0.0');
   });
 
   // Matrix: network error / 5xx, and the retry.
@@ -191,16 +212,22 @@ describe('the outcomes', () => {
     const requests = serveArtifacts(server, { catalogueStats: { kind: 'status', status: 503 } });
     mount();
     await settleTo('failed');
-    expect(frame().textContent).toContain(FETCH_FAILURE_EYEBROW);
-    expect(frame().textContent).toContain(FETCH_FAILURE_TITLE);
-    expect(FETCH_FAILURE_TITLE).toBe('One of the data files did not arrive.');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('catalogue/stats.json');
+    expectFailureShape(FETCH_FAILURE_EYEBROW, FETCH_FAILURE_TITLE);
+    expect(frame().querySelector('[data-failure-sentence]')?.textContent).toBe(
+      sentenceText(fetchFailureSentence('catalogue/stats.json')),
+    );
+    expect(frame().textContent).toContain(FETCH_FAILURE_RECOVERY);
+    expect(frame().querySelector('[data-part="artifact"]')?.textContent).toBe('catalogue/stats.json');
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
 
     // The file is back; the retry fetches the whole set again.
     const retried = serveArtifacts(server);
-    const button = frame().querySelector('button');
+    const button = frame().querySelector<HTMLElement>('button[data-show-more="retry"]');
     expect(button?.textContent).toBe(TRY_AGAIN);
+    // `{components.show-more}`: accent text, no chrome.
+    expect(button?.style.color).toBe(rgb(colors.accent));
+    expect(button?.style.background).toBe('none');
+    expect(button?.className).toBe('');
     act(() => {
       button?.click();
     });
@@ -213,7 +240,7 @@ describe('the outcomes', () => {
     serveArtifacts(server, { catalogueStats: { kind: 'network-error' } });
     mount();
     await settleTo('failed');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('catalogue/stats.json');
+    expect(frame().querySelector('[data-part="artifact"]')?.textContent).toBe('catalogue/stats.json');
   });
 
   // Matrix: required absent.
@@ -222,10 +249,10 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const sentence = refusalBody('tracked.json');
-    expect(sentence).toBe(REFUSAL_MISSING);
+    expect(sentence).toBe(`tracked.json${F.missing}`);
     expect(sentence).not.toContain('schema version');
-    expect(frame().querySelector('[data-declared]')).toBeNull();
-    expect(frame().querySelector('[data-expected]')).toBeNull();
+    expect(frame().querySelector('[data-part="declared"]')).toBeNull();
+    expect(frame().querySelector('[data-part="expected"]')).toBeNull();
   });
 
   // Matrix: mixed failure.
@@ -236,7 +263,7 @@ describe('the outcomes', () => {
     });
     mount();
     await settleTo('failed');
-    expect(frame().querySelector('[data-artifact]')?.textContent).toBe('config.json');
+    expect(frame().querySelector('[data-part="artifact"]')?.textContent).toBe('config.json');
   });
 
   // Matrix: tolerable absent.
@@ -259,7 +286,7 @@ describe('the outcomes', () => {
     mount();
     await settleTo('refused');
     const sentence = refusalBody('dataset.json');
-    expect(sentence).toBe(`${REFUSAL_CONTENT} 1.0.0.`);
+    expect(sentence).toBe(`dataset.json${F.content}1.0.0${F.end}`);
     expect(sentence).not.toContain('declares');
   });
 });

@@ -7,16 +7,13 @@ import { Frame } from './frame/Frame';
 import { HeaderBar } from './frame/HeaderBar';
 import { pendingControls, readyControls, useReportToggle, type ReadyControlsInput } from './frame/header-controls';
 import { RowSlots } from './frame/RowSlots';
-import { AskingPriceLine } from './list/AskingPriceLine';
 import { forRecipe, type ListRecipe } from './list/active-ranking';
 import { statTexts } from './list/combination-text';
 import { toListBranches } from './list/display-rows';
-import { KeyBlock } from './list/KeyBlock';
+import { FooterLegend } from './list/FooterLegend';
 import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
-import { RunningFoot } from './list/RunningFoot';
-import { isBannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
@@ -172,7 +169,6 @@ function renderPending({
   return (
     <Frame state="pending">
       <HeaderBar league={undefined} controls={pendingControls(threshold, onThresholdChange)} />
-      <AskingPriceLine />
       <RowSlots />
       <PageTail />
     </Frame>
@@ -197,7 +193,6 @@ function renderReady({
     <Frame state="ready">
       <HeaderBar league={set.config.league} controls={controls} />
       {panel}
-      <AskingPriceLine />
       <ReadyBody
         set={set}
         threshold={rest.threshold}
@@ -226,20 +221,16 @@ function ReadyBody({
 }): JSX.Element {
   // The catalogue's stat texts, for the Combination fallback: built once per load.
   const stats = useMemo(() => statTexts(set.catalogueStats), [set]);
-  // The banner's dismissal lives in memory for the session only: a reload brings it back.
-  const [bannerDismissed, setBannerDismissed] = useState(false);
-  const { branches, statement, unrankable, banner } = useMemo(() => {
+  const { branches, statement, unrankable } = useMemo(() => {
     const active = forRecipe(ranking, recipe);
     return {
       branches: toListBranches(active, set.dataset.entries, { tracked: set.tracked.entries, stats }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
-      banner: isBannerRaised(active),
     };
   }, [ranking, recipe, set, threshold, stats]);
   return (
     <>
-      {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : undefined}
       <ListStatement statement={statement} />
       <RankedList
         branches={branches}
@@ -256,8 +247,7 @@ function PageTail({ appendix }: { readonly appendix?: ReactNode }): JSX.Element 
   return (
     <div data-page-tail="" style={{ marginTop: 'auto' }}>
       {appendix}
-      <KeyBlock />
-      <RunningFoot />
+      <FooterLegend />
     </div>
   );
 }

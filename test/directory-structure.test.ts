@@ -12,7 +12,6 @@ const CAP = 25;
 const OVER_CAP: Readonly<Record<string, number>> = {
   'packages/contracts/src': 44,
   'packages/sync/src': 27,
-  'packages/web/src/list': 30,
 };
 
 const SCOPE = [/^packages\/[^/]+\/src\//, /^tools\//, /^test\//, /^\.claude\/skills\/tracked-json\/scripts\//];

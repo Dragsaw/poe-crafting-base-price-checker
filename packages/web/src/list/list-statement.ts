@@ -1,7 +1,7 @@
 import type { Ranking } from '@poe/core';
 
 import { formatThreshold } from '../shared/money';
-import { DENOMINATION } from '../shared/product';
+import { DIV_UNIT } from '../shared/product';
 import type { ActiveRanking } from './active-ranking';
 
 /** The list's one statement, at most one printed (EXPERIENCE.md states 23, 25, 35). */
@@ -18,10 +18,10 @@ export function honestEmptyCopy(league: string, isOnlyUnresolvable = false): str
 
 /** State 25's copy: the live threshold at the page's 2dp. */
 export function nothingClearsCopy(threshold: number): string {
-  return `Nothing clears your Payout Threshold of ${formatThreshold(threshold)} ${DENOMINATION}.`;
+  return `Nothing clears your Payout Threshold of ${formatThreshold(threshold)} ${DIV_UNIT}.`;
 }
 
-/** State 35's copy (EXPERIENCE.md). */
+/** State 35's copy (EXPERIENCE.md Copy Deck). */
 export function uncostableCopy(recipeWord: string): string {
   return `The ${recipeWord} Craft Recipe has no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.`;
 }

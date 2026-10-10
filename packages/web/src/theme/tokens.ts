@@ -70,54 +70,24 @@ export const floatingShadows = {
 /** The column header's height (DESIGN.md `column-header`). */
 export const COLUMN_HEADER_HEIGHT = '30px';
 
-/** Component measurements in px that Stories 4.5 and 4.6 replace with `{spacing.*}`. */
+/** Interim px measurements of the sync report and the rows, which DESIGN.md writes as no `{spacing.*}`. */
 export const layout = {
-  /** The appendix's fixed width until Story 4.6. */
-  contentWidth: 1012,
-  gutter: 34,
   hairline: 1,
-  appendixRowHeight: 29,
-  appendixPadTop: 16,
-  appendixPadX: 20,
-  appendixPadBottom: 10,
-  appendixLeadMarginTop: 5,
-  appendixLeadMarginBottom: 12,
-  appendixLeadMaxWidth: 760,
-  bannerMinHeight: 74,
-  bannerMarker: 5,
-  healthLineHeight: 21,
-  absenceLineHeight: 21,
-  listStatementHeight: 21,
   syncReportMaxHeight: 400,
-  trustStripPadTop: 11,
-  trustStripPadBottom: 12,
-  trustSeparatorPadX: 9,
   syncReportPadTop: 14,
   syncReportPadX: 16,
   syncReportPadBottom: 12,
   syncReportColumnGap: 22,
   syncReportGroupGap: 8,
   syncReportHeadingGap: 4,
-  failureBodyMaxWidth: 480,
   s1: 4,
   s2: 8,
   s3: 12,
   s4: 16,
   s5: 20,
   s6: 24,
-  /** The fixed box both unit glyphs centre in, so every unit name starts at one x. */
-  unitGlyphBox: 14,
-  askingPadTop: 12,
-  askingPadBottom: 3,
   columnHeaderMarginTop: 16,
   expandPadTop: 14,
-  keyMarginTop: 22,
-  keyPadTop: 11,
-  keyColumnGap: 22,
-  keyHeadingGap: 4,
-  footMarginTop: 18,
-  footPadTop: 10,
-  footMarginBottom: 20,
 } as const;
 
 /** A px number as a CSS length. */
@@ -125,10 +95,11 @@ export function px(value: number): string {
   return `${String(value)}px`;
 }
 
-/** The other fixed column sums. Nothing on these surfaces flexes. */
-export const columnSums = {
-  appendix: [292, 118, 250, 310],
-} as const;
+/** The px values DESIGN.md `footer-legend` writes inline. */
+export const footerLegend = { marginTop: 28, paddingTop: 14, gap: 22 } as const;
+
+/** The px values DESIGN.md `failure-screen` writes inline. */
+export const failureScreen = { paddingTop: 24, bodyMaxWidth: 640 } as const;
 
 /** The px values DESIGN.md `recipe-toggle`, `threshold-control` and `sync-button` write inline. */
 export const headerControls = {
@@ -222,14 +193,8 @@ export function typeStyle(name: TypeRoleName): CSSProperties {
 
 // --- glyphs ---------------------------------------------------------------
 
-// Story 4.6 retires the paper marks among these (DESIGN.md, Typography: marks are drawn).
+/** The show-more signs: Inter text, not drawn marks (DESIGN.md `show-more`). */
 export const glyphs = {
-  unitClass: '≡',
-  unitRaw: '▪',
-  unresolvable: '×',
-  prior: '◊',
-  unknown: '?',
-  stale: '»',
   open: '+',
   close: '−',
 } as const;

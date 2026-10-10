@@ -5,6 +5,7 @@ import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry } from '../test
 import { gatedArtifacts, serveArtifacts, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb, settleTo, unmount } from '../test-support/dom';
 import { colors } from '../theme/tokens';
+import { APPENDIX_NOTES, APPENDIX_TITLE, appendixCount } from '../list/UnrankableAppendix';
 import { server, mount, frame, reportPanel, syncButton, toggleReport } from './test-support';
 
 afterEach(unmount);
@@ -62,7 +63,7 @@ describe('the Unrankable appendix', () => {
   });
 
   // Matrix: committed.
-  it('renders the appendix on the frozen data fixture, above the key block and the foot', async () => {
+  it('renders the appendix on the frozen data fixture, above the footer legend, as the title alone', async () => {
     const committed = import.meta.glob<unknown>('../../../../test/fixtures/frozen-data/{dataset,tracked,recipes,weights}.json', {
       eager: true,
       import: 'default',
@@ -78,8 +79,8 @@ describe('the Unrankable appendix', () => {
     // Producer 6.1.0 declares every pool `complete`, and the recipe floor keeps each group's top
     // tier (AD-17), so every crafted pair of the fixture ranks and the appendix is empty.
     expect(appendixRows()).toEqual([]);
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('0 Item Classes');
-    expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
+    expect(appendix().textContent).toBe(`${APPENDIX_TITLE}${appendixCount(0)}`);
+    expect(tailOrder()).toEqual(['unrankableAppendix', 'footerLegend']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.
     expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
@@ -88,7 +89,7 @@ describe('the Unrankable appendix', () => {
   });
 
   // Matrix: absent weights.
-  it('lists 29 crafted classes when weights.json is absent, every row whole, then the key block and the foot', async () => {
+  it('lists 29 crafted classes when weights.json is absent, every row whole, then the footer legend', async () => {
     const now = Date.now();
     const belt = rawEntry('Wide Belt');
     const classes = twentyNineClasses();
@@ -106,18 +107,20 @@ describe('the Unrankable appendix', () => {
     expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(sortedClassNames());
     for (const row of rows) {
       expect(row.querySelector('[data-cell="reason"]')?.textContent).toBe(ABSENT_REASON);
+      // State 15: every absent class carries its note, as no signal marks a fresh scrape.
+      expect(row.querySelector('[data-cell="note"]')?.textContent).toBe(APPENDIX_NOTES[ABSENT_REASON]);
     }
     const count = appendix().querySelector<HTMLElement>('[data-appendix-count]');
     expect(count?.textContent).toBe('29 Item Classes');
     expect(count?.style.color).toBe(rgb(colors.text));
     // Readable with nothing expanded.
     expect(frame().querySelectorAll('[data-expansion-panel]')).toHaveLength(0);
-    expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
+    expect(tailOrder()).toEqual(['unrankableAppendix', 'footerLegend']);
     const order = Array.from(
-      frame().querySelectorAll('[data-ranked-row], [data-appendix-row], [data-key-block], [data-running-foot]'),
+      frame().querySelectorAll('[data-ranked-row], [data-appendix-row], [data-footer-legend]'),
       (node) => Object.keys((node as HTMLElement).dataset)[0],
     );
-    expect(order).toEqual(['rankedRow', ...rows.map(() => 'appendixRow'), 'keyBlock', 'runningFoot']);
+    expect(order).toEqual(['rankedRow', ...rows.map(() => 'appendixRow'), 'footerLegend']);
     // No appendix row is a Base Type.
     expect(appendix().textContent).not.toContain('Wide Belt');
   });
@@ -167,6 +170,9 @@ describe('the Unrankable appendix', () => {
     // Amulets is rankable but no recipe is served (retro item 29): the recipe-less reason.
     expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('recipe cannot reach this class');
     expect(rows[1]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
+    // Matrix: unreachable — no note. Disagrees — the 15a note, no check name.
+    expect(rows[0]?.querySelector('[data-cell="note"]')?.textContent).toBe('');
+    expect(rows[1]?.querySelector('[data-cell="note"]')?.textContent).toBe(APPENDIX_NOTES['class disagrees with weights file']);
     expect(appendix().textContent).not.toContain('edge-alignment');
     expect(frame().querySelectorAll('[data-ranked-row]')).toHaveLength(1);
 
@@ -196,13 +202,13 @@ describe('the Unrankable appendix', () => {
   });
 
   // Matrix: loading.
-  it('is absent while pending, and the tail keeps the key block and the foot', async () => {
+  it('is absent while pending, and the tail keeps the footer legend', async () => {
     const held = gatedArtifacts();
     serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
-    expect(tailOrder()).toEqual(['keyBlock', 'runningFoot']);
+    expect(tailOrder()).toEqual(['footerLegend']);
     expect(frame().querySelector('[data-page-tail]')?.parentElement).toBe(frame());
     held.openAll();
     await settleTo('ready');

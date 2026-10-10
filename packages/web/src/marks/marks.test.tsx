@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { mount, rgb, unmount } from '../test-support/dom';
 import { colors } from '../theme/tokens';
-import { EstimateMark, TradeLinkMark, VerdictMark } from './marks';
+import { EstimateMark, SwatchMark, TradeLinkMark, VerdictMark } from './marks';
 
 afterEach(unmount);
 
@@ -56,5 +56,19 @@ describe('the drawn marks', () => {
     const broken = drawn(<VerdictMark verdict="broken" />);
     expect(broken.querySelector('circle')).toBeNull();
     expect(broken.querySelector('path')?.getAttribute('d')?.match(/M/g)).toHaveLength(2);
+  });
+
+  it.each([
+    ['crafted', colors['rarity-magic']],
+    ['raw', colors['rarity-normal']],
+  ] as const)('draws the %s swatch as one solid square in its rarity colour, with no glyph', (unit, token) => {
+    const svg = drawn(<SwatchMark unit={unit} />);
+    expect(svg.dataset['mark']).toBe(`swatch-${unit}`);
+    expect(svg.getAttribute('width')).toBe('1em');
+    expect(svg.style.color).toBe(rgb(token));
+    const square = svg.querySelector('rect');
+    expect(square?.getAttribute('fill')).toBe('currentColor');
+    expect(square?.getAttribute('width')).toBe(square?.getAttribute('height'));
+    expect(svg.textContent).toBe('');
   });
 });

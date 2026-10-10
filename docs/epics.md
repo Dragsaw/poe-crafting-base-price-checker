@@ -2722,3 +2722,29 @@ So that a recipe's ranking matches the game.
 **Given** the change is done
 **When** `pnpm check` runs
 **Then** it passes, and any entry that is now unreachable is pruned with the tracked-json skill.
+
+### Story 4.8: The appendix's raw-ranks note
+
+As the player,
+I want an unrankable Item Class to say when some of its bases still rank as Raw Base rows,
+So that I know the class is not wholly out of the list.
+
+**Open question (human):** which artifact names a Raw Base's Item Class. A raw Tracked Entry carries only `baseTypeId`, so the answer may need a `contracts` or `core` change; Story 4.6 left it open (`docs/stories/deferred-work.md`).
+
+**Acceptance Criteria:**
+
+**Given** an unrankable Item Class and a Raw Base row of that class in the active ranking's ordering
+**When** the appendix renders
+**Then** the class's row carries the state 16 note after its reason's note, joined by ` · ` (EXPERIENCE.md state 16, FR-4).
+
+**Given** a Raw Base row
+**When** the page needs its Item Class
+**Then** a loaded artifact names that class, and the page never infers it from the Base Type's name.
+
+**Given** an unrankable class with no Raw Base row in the ordering
+**When** the appendix renders
+**Then** the row carries no state 16 note.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes.

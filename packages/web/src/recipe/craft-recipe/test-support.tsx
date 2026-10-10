@@ -119,7 +119,7 @@ export const RATES = [
 export const bows = chase('weapon.bow', 'Bows');
 export const staves = chase('weapon.staff', 'Staves');
 export const belt = rawEntry('Wide Belt');
-export const amulet = rawEntry('Gold Amulet');
+const amulet = rawEntry('Gold Amulet');
 
 interface World {
   readonly tracked: readonly TrackedEntry[];

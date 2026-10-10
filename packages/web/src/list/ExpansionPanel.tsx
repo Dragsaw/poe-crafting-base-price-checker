@@ -2,6 +2,7 @@ import { useState, type JSX } from 'react';
 
 import { EstimateMark } from '../marks/marks';
 import { TOP_LINES } from '../shared/product';
+import { ShowMore } from '../shared/ShowMore';
 import { colors, spacing, typeStyle } from '../theme/tokens';
 import { combinationString } from './combination-text';
 import type { ClassDisplayRow, CraftedCombination, DisplayRow, PrunedCombination } from './display-rows';
@@ -36,40 +37,6 @@ function craftedLine(combination: CraftedCombination, className: string, activeL
     tradeHref: tradeSearchHref({ ...combination.entry, status: combination.status }, activeLeague),
     tradeLabel: `Open the trade search for ${combinationString(combination.text)} on ${className}`,
   };
-}
-
-/** DESIGN.md `show-more`: accent text, `+` or `−`, no chrome. */
-function ShowMore({
-  name,
-  isOpen,
-  onToggle,
-  children,
-}: {
-  readonly name: string;
-  readonly isOpen: boolean;
-  readonly onToggle: () => void;
-  readonly children: string;
-}): JSX.Element {
-  return (
-    <div style={{ paddingTop: '8px' }}>
-      <button
-        type="button"
-        data-show-more={name}
-        aria-expanded={isOpen}
-        onClick={onToggle}
-        style={{
-          ...typeStyle('trust'),
-          padding: 0,
-          border: 0,
-          background: 'none',
-          color: colors.accent,
-          cursor: 'pointer',
-        }}
-      >
-        {children}
-      </button>
-    </div>
-  );
 }
 
 /** The name in the row's rarity colour, then the ≈ sentence on a `uniform-prior` row (state 12). */

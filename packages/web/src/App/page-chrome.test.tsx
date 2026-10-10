@@ -1,13 +1,15 @@
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ASKING_PRICE_COPY } from '../list/AskingPriceLine';
 import { COLUMN_LABELS } from '../list/ColumnHeader';
+import { FOOTER_LEGEND_ITEMS } from '../list/FooterLegend';
+import { VERDICT_WORDS } from '../list/row/trust-words';
+import { MARK_COLORS } from '../marks/marks';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { bodiesWith, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { gatedArtifacts, serveArtifacts } from '../test-support/artifact-server';
 import { flush, rgb, settleTo, unmount } from '../test-support/dom';
-import { colors, spacing } from '../theme/tokens';
+import { colors, footerLegend, px, spacing, typeRoles } from '../theme/tokens';
 import { server, mount, frame } from './test-support';
 
 afterEach(unmount);
@@ -15,33 +17,32 @@ afterEach(unmount);
 describe('the resting chrome', () => {
   function chrome(): Record<string, boolean> {
     return Object.fromEntries(
-      ['data-asking-price-line', 'data-column-header', 'data-key-block', 'data-running-foot'].map((attribute) => [
+      ['data-column-header', 'data-footer-legend'].map((attribute) => [
         attribute,
         frame().querySelector(`[${attribute}]`) !== null,
       ]),
     );
   }
   const ALL = {
-    'data-asking-price-line': true,
     'data-column-header': true,
-    'data-key-block': true,
-    'data-running-foot': true,
+    'data-footer-legend': true,
   };
   const NONE = Object.fromEntries(Object.keys(ALL).map((key) => [key, false]));
 
   // Matrix: skeleton.
-  it('paints the asking line, the labelled header, the slots, the key block and the foot while pending', () => {
+  // Matrix: pending.
+  it('paints the labelled header, the slots and the footer legend while pending, with no appendix', () => {
     const held = gatedArtifacts();
     serveArtifacts(server, held.answers);
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(chrome()).toEqual(ALL);
     expect(frame().querySelector('[data-column-header]')?.textContent).toContain(COLUMN_LABELS.name);
-    expect(frame().textContent).toContain(ASKING_PRICE_COPY);
-    // A statement, not a control: never the accent.
-    expect(frame().querySelector<HTMLElement>('[data-asking-price-line]')?.style.color).toBe(
-      rgb(colors['text-secondary']),
-    );
+    // The legend carries the asking-price sentence (FR-13), in text-secondary, never the accent.
+    const asking = FOOTER_LEGEND_ITEMS.at(-1)?.meaning ?? '';
+    expect(frame().querySelector('[data-footer-legend]')?.textContent).toContain(asking);
+    expect(frame().querySelector<HTMLElement>('[data-footer-legend]')?.style.color).toBe(rgb(colors['text-secondary']));
+    expect(frame().querySelector('[data-unrankable-appendix]')).toBeNull();
     held.openAll();
   });
 
@@ -67,20 +68,18 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(ALL);
     const order = Array.from(
       frame().querySelectorAll(
-        '[data-header-bar], [data-interim-controls], [data-trust-strip], [data-sync-report-panel], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-key-block], [data-running-foot]',
+        '[data-header-bar], [data-sync-report-panel], [data-list-statement], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-footer-legend]',
       ),
       (node) => Object.keys((node as HTMLElement).dataset)[0],
     );
     expect(order).toEqual([
       'headerBar',
-      'askingPriceLine',
       'columnHeader',
       'rankedRow',
       'rankedRow',
       'rankedRow',
       'unrankableAppendix',
-      'keyBlock',
-      'runningFoot',
+      'footerLegend',
     ]);
     const rows = frame().querySelectorAll('[data-ranked-row]');
     expect(rows[0]?.textContent).toContain('0.50');
@@ -169,5 +168,96 @@ describe('the frame', () => {
     expect(style.outline).toBe('');
     expect(style.overflow).toBe('');
     expect(style.border).toBe('');
+  });
+});
+
+async function legend(): Promise<HTMLElement> {
+  serveArtifacts(server);
+  mount();
+  await settleTo('ready');
+  const found = frame().querySelector<HTMLElement>('[data-footer-legend]');
+  if (found === null) {
+    throw new Error('no footer legend rendered');
+  }
+  return found;
+}
+
+/** A mark's drawn shapes, without its name or colour. */
+function drawing(item: Element | undefined): string {
+  const serializer = new XMLSerializer();
+  return Array.from(item?.querySelector('svg')?.children ?? [], (shape) => serializer.serializeToString(shape)).join('');
+}
+
+const legendItems = (root: HTMLElement): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('[data-legend-item]')];
+
+describe('the footer legend', () => {
+  // Matrix: ready, healthy.
+  it('prints the nine Copy Deck items in deck order, each mark drawn, the text items as Inter text', async () => {
+    const found = legendItems(await legend());
+    expect(found).toHaveLength(FOOTER_LEGEND_ITEMS.length);
+    expect(found).toHaveLength(9);
+    for (const [index, item] of FOOTER_LEGEND_ITEMS.entries()) {
+      const node = found[index];
+      const word = item.kind === 'verdict' ? VERDICT_WORDS[item.verdict] : '';
+      expect(node?.textContent).toBe(`${word}${item.meaning}`);
+      const mark = node?.querySelector('svg')?.dataset['mark'];
+      const expected = {
+        swatch: item.kind === 'swatch' ? `swatch-${item.unit}` : undefined,
+        verdict: item.kind === 'verdict' ? item.verdict : undefined,
+        estimate: 'estimate',
+        text: undefined,
+      }[item.kind];
+      expect(mark).toBe(expected);
+    }
+  });
+
+  it('sets each verdict word in its mark colour at 600 and the meaning in text-secondary', async () => {
+    const root = await legend();
+    expect(root.style.color).toBe(rgb(colors['text-secondary']));
+    const verdicts = legendItems(root).filter((item) => item.dataset['legendItem'] === 'verdict');
+    expect(verdicts).toHaveLength(3);
+    for (const node of verdicts) {
+      const verdict = node.querySelector('svg')?.dataset['mark'] as keyof typeof VERDICT_WORDS;
+      const word = node.querySelector<HTMLElement>('[data-legend-word]');
+      expect(word?.textContent).toBe(VERDICT_WORDS[verdict]);
+      expect(word?.style.color).toBe(rgb(MARK_COLORS[verdict]));
+      expect(word?.style.fontWeight).toBe('600');
+      expect(node.querySelector<HTMLElement>('[data-legend-meaning]')?.style.color).toBe('');
+    }
+    expect(root.querySelector('[style*="italic"], [style*="700"]')).toBeNull();
+  });
+
+  it('lays one wrapping row in the note role after a line rule, the last item at the right edge', async () => {
+    const root = await legend();
+    expect(root.style.display).toBe('flex');
+    expect(root.style.flexWrap).toBe('wrap');
+    expect(root.style.gap).toBe(px(footerLegend.gap));
+    expect(root.style.marginTop).toBe(px(footerLegend.marginTop));
+    expect(root.style.paddingTop).toBe(px(footerLegend.paddingTop));
+    expect(root.style.borderTop).toBe(`1px solid ${rgb(colors.line)}`);
+    expect(root.style.fontSize).toBe(typeRoles.note.fontSize);
+    const found = legendItems(root);
+    expect(found.at(-1)?.style.marginLeft).toBe('auto');
+    expect(found.slice(0, -1).map((node) => node.style.marginLeft)).toEqual(found.slice(0, -1).map(() => ''));
+  });
+
+  // NFR-10: with colour removed, every cue still differs by silhouette or words.
+  it('tells crafted from Raw Base by words, and the trust states and ≈ apart by silhouette', async () => {
+    const found = legendItems(await legend());
+    // The drawings alone, colour aside: ◐ ○ ✕ and ≈ must each draw a different shape.
+    const shapes = found
+      .filter((node) => node.dataset['legendItem'] === 'verdict' || node.dataset['legendItem'] === 'estimate')
+      .map((node) => drawing(node));
+    expect(shapes).toHaveLength(4);
+    expect(shapes.every((shape) => shape !== '')).toBe(true);
+    expect(new Set(shapes).size).toBe(shapes.length);
+    // The two swatches draw one shape, so their meaning words carry the difference.
+    const [crafted, raw] = found;
+    expect(drawing(crafted)).toBe(drawing(raw));
+    const craftedWords = crafted?.querySelector('[data-legend-meaning]')?.textContent ?? '';
+    const rawWords = raw?.querySelector('[data-legend-meaning]')?.textContent ?? '';
+    expect(craftedWords).not.toBe('');
+    expect(rawWords).not.toBe('');
+    expect(craftedWords).not.toBe(rawWords);
   });
 });

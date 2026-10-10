@@ -169,7 +169,7 @@ describe('the Craft Recipe control', () => {
       mount();
       // eslint-disable-next-line no-await-in-loop -- sequential on purpose: one mounted root and one served world at a time
       await settleTo('refused');
-      expect(frame().querySelector('[data-artifact]')?.textContent).toBe('recipes.json');
+      expect(frame().querySelector('[data-part="artifact"]')?.textContent).toBe('recipes.json');
       unmount();
     }
   });

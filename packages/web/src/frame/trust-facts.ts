@@ -15,13 +15,9 @@ export const UNKNOWN = 'unknown';
 export const NOT_MEASURED = 'not measured';
 const NOT_COMMITTED_SUFFIX = ' (not committed)';
 
-export const WEIGHTS_FILE_LABEL = 'Weights File';
-export const LAST_SYNCED_LABEL = 'Last synced';
+const WEIGHTS_FILE_LABEL = 'Weights File';
+const LAST_SYNCED_LABEL = 'Last synced';
 export const TRACKED_LIST_EDITED_LABEL = 'Tracked List last edited';
-
-export const AFFORDANCE_CLOSED = '+ the full sync report';
-/** U+2212, the minus sign, never a hyphen or an em dash. */
-export const AFFORDANCE_OPEN = '− the full sync report';
 
 /** EXPERIENCE.md, Copy Deck: *Sync report* column headings, in order. */
 export const PANEL_HEADINGS = ['Problems', 'Sync run', 'Weights coverage', 'Built from'] as const;
@@ -38,7 +34,7 @@ export const DIAGNOSIS_LEAD = 'Disagreements with the weights file';
 export const SYNCED_LABEL = 'Synced';
 export const NOT_SYNCED_YET = 'Not synced yet';
 
-export const ABSENCE_LEAD = 'Not published';
+const ABSENCE_LEAD = 'Not published';
 /** What each absence costs the page (EXPERIENCE.md, Copy Deck, *Sync report*). */
 const ABSENCE_CONSEQUENCE: Readonly<Record<TolerableKey, string>> = {
   syncReport: 'the sync report is unavailable.',
@@ -46,9 +42,9 @@ const ABSENCE_CONSEQUENCE: Readonly<Record<TolerableKey, string>> = {
   recipes: 'no crafted rows can be ranked.',
 };
 /** The absence lines appear in this order, and only for absent files. */
-export const ABSENCE_ORDER = ['weights', 'recipes', 'syncReport'] as const satisfies readonly TolerableKey[];
+const ABSENCE_ORDER = ['weights', 'recipes', 'syncReport'] as const satisfies readonly TolerableKey[];
 
-export function absenceBody(key: TolerableKey): string {
+function absenceBody(key: TolerableKey): string {
   return `${ARTIFACTS[key].path} — ${ABSENCE_CONSEQUENCE[key]}`;
 }
 
@@ -122,7 +118,7 @@ export type Segment =
   | { readonly kind: 'mark'; readonly mark: ProblemMark; readonly text: string };
 
 /** One line of segments. */
-export type FigureLine = readonly Segment[];
+type FigureLine = readonly Segment[];
 
 /** One figure group: one or more lines. */
 export type FigureGroup = readonly FigureLine[];
@@ -140,7 +136,7 @@ const valueOrUnknown = (value: string | undefined): Segment => (value === undefi
 const mark = (problem: ProblemMark): Segment => ({ kind: 'mark', mark: problem, text: '' });
 
 /** A line as plain text, marks dropped. */
-export function lineText(line: FigureLine): string {
+function lineText(line: FigureLine): string {
   return line.map((segment) => segment.text).join('').trim();
 }
 
@@ -234,7 +230,7 @@ export type PanelColumns = readonly [
 ];
 
 /** What one diagnosis line prints: the check, the canonical key and the detail. */
-export type DiagnosisFailure = Pick<CrossFileFailure, 'check' | 'entryKey' | 'detail'>;
+type DiagnosisFailure = Pick<CrossFileFailure, 'check' | 'entryKey' | 'detail'>;
 
 /** One diagnosis line, verbatim: `check · canonical key · detail`. */
 function diagnosisLine(failure: DiagnosisFailure): string {
