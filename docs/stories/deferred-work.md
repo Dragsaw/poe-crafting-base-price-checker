@@ -75,3 +75,8 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Drop the bottom rule under the last row of a list (DESIGN.md Layout & Spacing, Density).
   evidence: RankedRow in packages/web/src/list/RankedRow.tsx draws a 1px line border on every row, the last included, as the old row also did. The fix needs an isLast signal from RankedList or the border moved into list.css.
   retry_when: a story that restyles the ranked list is planned
+
+- source_spec: `docs/stories/spec-4-7-the-recipe-floor-per-modifier-group.md`
+  summary: Re-check the 104 data/tracked.json entries pruned under the old recipe floor (Amulets 56, Helmets_str 21, Crossbows 12, Sceptres 8, Bows 7) with the tracked-json skill, and restore the ones the per-modifier-group floor makes reachable.
+  evidence: The Story 4.7 spec's Never list excludes the restore and names it step 2 of docs/sprint-change-proposal-2026-10-10.md, which counts the pruned entries by class. Story 4.7 changed no data/tracked.json entry.
+  retry_when: Story 4.7 is merged, so pnpm tracked:lookup reports reach under the per-group floor

@@ -2,7 +2,7 @@
 title: 'Story 4.7: The recipe floor per modifier group'
 type: 'bugfix'
 created: '2026-10-10'
-status: 'in-progress'
+status: 'done'
 baseline_commit: '566ab0c1c1bef5ed6c50fc34bdc2ef04fea328a0'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -30,7 +30,7 @@ context:
 - The first commit carries the docs edits and, in its message, the decision and the three rejected alternatives that proposal section 5 names.
 
 **Never:**
-- No change to `data/weights.json`, the weights schema, `sync` run logic or any `web` file.
+- No change to `data/weights.json`, the weights schema, `sync` run logic or any production `web` file. Web test fixtures that encode the old floor follow the new rule.
 - No `P = 0` for an unreachable entry, and no new unrankable reason.
 - No restoring of the 104 pruned `tracked.json` entries. That is the follow-up step 2 of the proposal.
 - No PRD edit.
@@ -65,13 +65,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Docs targets above -- apply proposal section 4 verbatim; add Story 4.7 with the proposal section 5 criteria -- first commit, own message.
-- [ ] `packages/core/src/probability.ts` -- add `floored(pool, modifierLevelMin)` (the per-group floor, unscoped); rebuild `eligible` on it; add the reach verdict `recipeReach(pools, entry, modifierLevelMin)`, unreachable when a slot's contained set in `eligible` is empty; delete `canRecipeRoll` -- AD-17.
-- [ ] `packages/core/src/index.ts` -- export the new functions in place of `canRecipeRoll`.
-- [ ] `.claude/skills/tracked-json/scripts/lookup-mods.ts` -- `reached` is membership of the tier in `floored(pool, recipe.modifierLevelMin)`; update its doc comment.
-- [ ] `packages/sync/src/curation/check.ts` -- load recipes; add the `recipe-reach` check and an `unreachable` list of `{ entryKey, recipeId, slot }` with the entry path; `ok` is false while it is non-empty.
-- [ ] Tests -- update the files in the Code Map; add the three-group fixture of the matrix to `probability.test.ts`; add `check.test.ts` cases for unreachable, absent and refused recipes; assert `unreachable: []` in `check.data.test.ts`.
-- [ ] `data/tracked.json` -- only if `pnpm tracked:check` reports an unreachable pair, prune it with the tracked-json skill.
+- [x] Docs targets above -- apply proposal section 4 verbatim; add Story 4.7 with the proposal section 5 criteria -- first commit, own message.
+- [x] `packages/core/src/probability.ts` -- add `floored(pool, modifierLevelMin)` (the per-group floor, unscoped); rebuild `eligible` on it; add the reach verdict `recipeReach(pools, entry, modifierLevelMin)`, unreachable when a slot's contained set in `eligible` is empty; delete `canRecipeRoll` -- AD-17.
+- [x] `packages/core/src/index.ts` -- export the new functions in place of `canRecipeRoll`.
+- [x] `.claude/skills/tracked-json/scripts/lookup-mods.ts` -- `reached` is membership of the tier in `floored(pool, recipe.modifierLevelMin)`; update its doc comment.
+- [x] `packages/sync/src/curation/check.ts` -- load recipes; add the `recipe-reach` check and an `unreachable` list of `{ entryKey, recipeId, slot }` with the entry path; `ok` is false while it is non-empty.
+- [x] Tests -- update the files in the Code Map; add the three-group fixture of the matrix to `probability.test.ts`; add `check.test.ts` cases for unreachable, absent and refused recipes; assert `unreachable: []` in `check.data.test.ts`.
+- [x] `data/tracked.json` -- only if `pnpm tracked:check` reports an unreachable pair, prune it with the tracked-json skill.
 
 **Acceptance Criteria:**
 - Given the live `data/`, when `pnpm test:data` runs, then it passes with `unreachable` empty.
@@ -94,10 +94,33 @@ The top tier is the highest `itemLevelMin` among the group's tiers with `weight 
 
 - `recipeReach` returns `{ reached: true }` or `{ reached: false, slots }`; `tracked:check` emits one `unreachable` row per empty slot. Classes with an absent or partial pool are skipped, as they are already `unvalidated`. A refused weights file makes `recipe-reach` `skipped`.
 - `unreachable` rows stay out of `issues`; `ok` is false while the list is non-empty.
-- Boundary deviation: five `web` test files (no production `web` file) encoded the old floor in their fixtures and failed under the new rule. Their fixtures now share a `modGroup` where a tier must be floored, and the frozen-data appendix test expects an empty appendix. Kept in a separate commit.
+- Boundary deviation: four `web` test and fixture files (no production `web` file) encoded the old floor in their fixtures and failed under the new rule. Their fixtures now share a `modGroup` where a tier must be floored, and the frozen-data appendix test expects an empty appendix. Kept in a separate commit.
 - `SKILL.md` lines 12 and 40 described `unreachable` as never failing the run; they now match the spec. Line 20 held no recipe-floor rule and is unchanged.
 - No `data/tracked.json` change: `pnpm tracked:check` reports `unreachable: []` on the live data.
 
 ## Spec Change Log
 
+- 2026-10-10, human: the "Never" boundary on `web` narrowed from any `web` file to production `web` files. Trigger: nine web tests in four web test and fixture files encoded the old floor and blocked `pnpm check`. Avoids: a `pnpm check` gate that cannot pass under the frozen rule. KEEP: no production `web` change.
+
 ## Review Triage Log
+
+| # | Source | Finding | Verdict | Route | Evidence |
+|---|--------|---------|---------|-------|----------|
+| 1 | verification-gap, blind | Partial-pool and absent/refused-weights skips of `recipe-reach` are untested | medium | patch | Pre-verified gap; the only partial-pool test never asserts `unreachable` or `recipe-reach`. |
+| 2 | verification-gap | Sort order of `unreachable` never observed | low | patch | Every test yields at most one row; adding a test is a direct fix with no product complexity. |
+| 3 | blind | `// A mark never moves ok` misleading | low | patch | `ok` now depends on `reach.unreachable.length` on the next line. |
+| 4 | edge, blind, verification-gap | Weight-0 test asserts only `toContain`; stray blank lines open two `describe` blocks | low | patch | The tier at 60 survives `floored` but the test does not pin it; the blank lines are cosmetic. |
+| 5 | ledger, blind | No deferred-work entry for restoring the 104 pruned entries | medium | defer | Carved out by the Never list; entry appended to `deferred-work.md`. |
+| 6 | edge | A weight-0 `absent` tier between a group's top and the floor survives and can turn provenance into `uniform-prior` | low | reject | The schema allows `absent` at weight 0, but the live `weights.json` has none (1995 `absent` tiers, all positive). Unlikely in use, and the fix adds a guard. |
+| 7 | edge | An all-weight-0 group is cut flat | low | reject | Such a group carries no mass. Unlikely in use, and the fix adds a branch. |
+| 8 | edge | An empty `recipes` array reports `recipe-reach` passed | low | reject | No such file ships. Unlikely, and the fix adds a branch. |
+| 9 | edge | A refused recipes file fails even when the schema check failed | false | reject | This mirrors `crossFileOutcome`, which reports a refused weights file before the schema skip. |
+| 10 | edge, blind | One empty-containment entry is reported as a `cross-file` issue and as an `unreachable` row | low | reject | It only happens on an entry that is already broken. Developer noise only, and the fix adds a branch. |
+| 11 | edge | `epics.md:2134` (Story 3.4) still cites `canRecipeRoll` | false | reject | Proposal §4.2 keeps the Story 3.4 body unchanged under a superseded note. |
+| 12 | blind | `tracked:lookup` `reached` ignores the entry's item level | low | reject | The spec task defines `reached` on the unscoped `floored`. The tiers lookup has no entry, and SKILL step 7's `tracked:check` catches the case. |
+| 13 | blind | AD-17 names `eligible` and restates a command rule; it drops `[ASSUMPTION]` and the P=0 rule; EXPERIENCE state 36 describes tooling; AGENT-WORKFLOW placement | false | reject | The text is the approved proposal §4 verbatim. A reviewer does not edit an owner document (Review brief rule 2). |
+| 14 | blind | Spine revision not bumped; Epic 4 cites revision 32 | low | reject | The approved proposal names no bump. The revision-32 citation predates this change. |
+| 15 | blind | Spec/sprint-status status mismatch; web file count and SKILL line numbers in notes | false | reject | Sprint status syncs at presentation. The note fixes edit this spec. The file count was corrected as a factual error. |
+| 16 | blind | App appendix test no longer covers a populated appendix | low | reject | The populated state 36 is still covered in `crafted-states.test.tsx` (WANDS) and `list-statement.test.ts`. |
+| 17 | blind | Core `GREATER` fixture floor is 0 | low | reject | The fixture predates this change, and `floored` unit tests cover a partial cut that keeps the top tier. |
+| 18 | blind | The hand-computed P formula does not show the order term | false | reject | `(wp·ws/S + ws·wp/P)/(P+S)` is identical to `wp·ws/(P·S)`, and the test matches the AC's hand value. |
