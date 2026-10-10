@@ -54,8 +54,8 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   evidence: epics.md *Order* predates the proposal and omits 4.7 and 4.8. epic-4-context.md now cites both sources, but a recompile from epics.md would bring the stale order back. The PM owns epics.md, so a build review does not edit it (AGENT-WORKFLOW.md *Review brief*, rule 2).
   retry_when: now
 
-## Deferred from: spec-4-8-the-appendix-s-raw-ranks-note (2026-10-10)
+## Deferred from: spec-deferred-4-8-appendix-row-min-height (2026-10-10)
 
-- source_spec: `docs/stories/spec-4-8-the-appendix-s-raw-ranks-note.md`
-  summary: [NOTE FOR UX] DESIGN.md `components.unrankable-appendix.row` reads as a fixed height, but a wrapped note now grows the row. Restate the row height as a minimum in DESIGN.md.
-  evidence: Story 4.8 (human decision, 2026-10-10) lets an over-long appendix note wrap inside its note cell. UnrankableAppendix.tsx sets `minHeight: line-height-expansion` on the row, and only the note cell wraps. The 14 + 16 joined note wraps to two lines at the 1080px target width.
+- source_spec: `docs/stories/spec-deferred-4-8-appendix-row-min-height.md`
+  summary: [NOTE FOR UX] EXPERIENCE.md *What may be cut* has no bullet for the unrankable appendix, yet UnrankableAppendix.tsx and DESIGN.md `components.unrankable-appendix.note` rely on "appendix text is never cut" and cite that section.
+  evidence: The section lists ranked rows, expansion lines, marks and expansions only. The code comment above `NO_WRAP` in UnrankableAppendix.tsx cites it for the appendix rule. EXPERIENCE.md is outside this chore's authorized edit.
