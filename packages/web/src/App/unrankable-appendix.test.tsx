@@ -76,19 +76,10 @@ describe('the Unrankable appendix', () => {
     });
     mount();
     await settleTo('ready');
-    // Producer 6.1.0 declares every pool `complete`; the Emerald entry tracks the global Attack
-    // Speed stat its tiers carry. Under the default recipe, an Amulets, a Bows and a Crossbows
-    // reference has no tier at or above the recipe floor, so those pairs are unrankable.
-    const rows = appendixRows();
-    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual([
-      'Amulets',
-      'Bows',
-      'Crossbows',
-    ]);
-    for (const row of rows) {
-      expect(row.querySelector('[data-cell="reason"]')?.textContent).toBe('recipe cannot reach this class');
-    }
-    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('3 Item Classes');
+    // Producer 6.1.0 declares every pool `complete`, and the recipe floor keeps each group's top
+    // tier (AD-17), so every crafted pair of the fixture ranks and the appendix is empty.
+    expect(appendixRows()).toEqual([]);
+    expect(appendix().querySelector<HTMLElement>('[data-appendix-count]')?.textContent).toBe('0 Item Classes');
     expect(tailOrder()).toEqual(['unrankableAppendix', 'keyBlock', 'runningFoot']);
     expect(frame().querySelector<HTMLElement>('[data-page-tail]')?.style.marginTop).toBe('auto');
     // The pin needs the tail to be a direct child of the flex frame.

@@ -160,14 +160,14 @@ describe('lookupTiers', () => {
     });
   });
 
-  it('says, per tier and recipe, whether the recipe can roll the tier', () => {
+  it('says, per tier and recipe, whether the floor keeps the tier: a group below the floor keeps its top tier', () => {
     const found = lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets', recipes: [recipe('greater', 44), recipe('perfect', 70)] });
 
     expect(found.tiers.map((row) => [row.itemLevelMin, row.recipes?.map((item) => [item.recipeId, item.reached])])).toEqual([
       [16, [['greater', false], ['perfect', false]]],
       [25, [['greater', false], ['perfect', false]]],
-      [54, [['greater', true], ['perfect', false]]],
-      [40, [['greater', false], ['perfect', false]]],
+      [54, [['greater', true], ['perfect', true]]],
+      [40, [['greater', true], ['perfect', true]]],
     ]);
     expect(found.tiers[2]?.recipes?.[0]).toEqual({ recipeId: 'greater', modifierLevelMin: 44, reached: true });
     expect(lookupTiers(WEIGHTS, SPIRIT, { className: 'Amulets' }).tiers[0]).not.toHaveProperty('recipes');

@@ -12,9 +12,9 @@ import { affixProbability, combinationProbability, eligible, poolOf } from '../p
 import { band, isCloseRelative, line, OTHER, pOf, pools, STAT, tier } from './test-support.ts';
 
 describe('combinationProbability', () => {
-  it('gives empty-contained, never 0, when the floor leaves a declared affix no contained tier', () => {
-    const low = tier([line(STAT, [10, 12])], 100, { itemLevelMin: 20 });
-    const high = tier([line(STAT, [20, 30])], 300, { itemLevelMin: 70 });
+  it('gives empty-contained, never 0, when the floor removes the contained tier from its group', () => {
+    const low = tier([line(STAT, [10, 12])], 100, { itemLevelMin: 20, modGroup: 'g' });
+    const high = tier([line(STAT, [20, 30])], 300, { itemLevelMin: 70, modGroup: 'g' });
     const suffix = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 70 });
     const classPools = pools([low, high], [suffix]);
     const suffixReference = band(1, 2, OTHER);

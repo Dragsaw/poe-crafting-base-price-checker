@@ -52,11 +52,12 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     }
   });
 
-  it('does not count an invented tier below the recipe floor, and follows the recipe', () => {
+  it('does not count an invented tier the recipe floor removes from its group, and follows the recipe', () => {
+    // One group at 50 and 75: the greater floor keeps both, the perfect floor keeps 75 alone.
     const weights = poolsFile([
       'weapon.bow',
       'Bows',
-      [[tierOf(TARGET, 10, 75), invented(tierOf(FILLER, 10, 1))], [tierOf(SUFFIX_STAT, 10, 80)]],
+      [[tierOf(TARGET, 10, 75, 'shared'), invented(tierOf(FILLER, 10, 50, 'shared'))], [tierOf(SUFFIX_STAT, 10, 80)]],
     ]);
     const rows = craftedRows(rankCrafted({ tracked: [target], dataset: priced1, weights }).ordering);
     expect(rows.map((row) => [row.recipeId, row.provenance]).toSorted(byPair)).toEqual([

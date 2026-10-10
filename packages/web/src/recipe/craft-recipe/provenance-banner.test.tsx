@@ -37,8 +37,14 @@ const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSou
 
 describe('the estimated-odds cue and the banner', () => {
   /** An invented tier at floor 50: in the greater recipe's set (floor 44), under perfect (70). */
-  const priorBows: Pools = [[tier(TARGET, 10, 75), invented(tier(FILLER, 10, 50)), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
-  const priorStaves: Pools = [[tier(TARGET, 50, 50), invented(tier(FILLER, 50, 50))], [tier(SUFFIX, 10, 80)]];
+  const priorBows: Pools = [
+    [tier(TARGET, 10, 75, 'bows'), invented(tier(FILLER, 10, 50, 'bows')), tier(LOW, 80, 1, 'bows')],
+    [tier(SUFFIX, 10, 80)],
+  ];
+  const priorStaves: Pools = [
+    [tier(TARGET, 50, 50, 'staves'), invented(tier(FILLER, 50, 50, 'staves')), tier(FILLER, 50, 75, 'staves')],
+    [tier(SUFFIX, 10, 80)],
+  ];
 
   it('draws ≈ before the EV of a pair with an invented tier, raises the banner, and follows a recipe switch', async () => {
     serveWorld(standardWorld({ classes: [['weapon.bow', 'Bows', priorBows], ['weapon.staff', 'Staves', priorStaves]] }));
