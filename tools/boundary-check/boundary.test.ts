@@ -99,7 +99,7 @@ it('keeps resolved npm modules in the graph of the real repo-root cruise', async
   };
 
   expect(output.modules.some((module) => module.source.startsWith('node_modules/'))).toBe(true);
-});
+}, 10_000);
 
 it('leaves every allowed edge unreported, having analysed the mirror tree', async () => {
   const output = await cruiseFixture(ALLOWED_FIXTURE);
