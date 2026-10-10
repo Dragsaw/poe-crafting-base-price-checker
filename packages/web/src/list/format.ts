@@ -3,13 +3,10 @@ import type { DatasetEntry, NotYetSyncedReason } from '@poe/contracts';
 import { formatDivine, formatThreshold } from '../shared/money';
 import { DENOMINATION } from '../shared/product';
 import { plural } from '../shared/text';
-import { exactAge, HOUR_MS } from '../shared/time';
+import { exactAge } from '../shared/time';
 import { glyphs } from '../theme/tokens';
 
 // `web` computes no ranking term (AD-4): every helper here turns a held value into text.
-
-/** The freshness cut-off, in hours (AD-10, FR-12). A younger row shows no age. */
-export const FRESHNESS_CUTOFF_HOURS = 48;
 
 /** The five money-slot phrases (EXPERIENCE.md, Money slots). A missing figure is never `0`. */
 export const MONEY_PHRASES = {
@@ -19,33 +16,6 @@ export const MONEY_PHRASES = {
   unknown: 'unknown',
   pruned: 'not tracked',
 } as const;
-
-/** A trust mark in the Age cell: the stale mark names its clock; the never mark has no age. */
-export type AgeMark =
-  | { readonly kind: 'stale'; readonly word: string }
-  | { readonly kind: 'never'; readonly word: 'never attempted' };
-
-export const NEVER_ATTEMPTED = 'never attempted';
-
-// The Age cell (FR-12, AD-9, AD-10). The clock follows the resolved Price State, not the stored
-// one: a league-mismatched observation resolves to `not-yet-synced`, so it reads `lastAttemptedAt`.
-export function ageMark(
-  state: CombinationState,
-  lastAttemptedAt: string | undefined,
-  now: number,
-): AgeMark | undefined {
-  const priced = state.state === 'priced' ? state.observedAt : undefined;
-  const clock = priced ?? lastAttemptedAt;
-  if (clock === undefined) {
-    return { kind: 'never', word: NEVER_ATTEMPTED };
-  }
-  const hours = (now - Date.parse(clock)) / HOUR_MS;
-  if (hours >= FRESHNESS_CUTOFF_HOURS) {
-    const days = Math.floor(hours / 24);
-    return { kind: 'stale', word: `${priced === undefined ? 'tried' : 'priced'} ${String(days)}d ago` };
-  }
-  return undefined;
-}
 
 /** Only the label changes; the stored `className` stays the identity (AD-5). */
 export function unitLabel(className: string): string {

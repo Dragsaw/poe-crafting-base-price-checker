@@ -55,3 +55,8 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Re-pin the values whose literal tests Story 4.1 removed (the resident glyph twins, the 1.2 line height of in-row roles, and the threshold gaps and marker rise) once their replacements land.
   evidence: The tests were deleted from packages/web/src/theme/tokens.test.ts. glyphs.prior and glyphs.close and layout.thresholdTrackGap, thresholdRangeGap, thresholdValueGap and thresholdMarkerRise are now unpinned.
   retry_when: Story 4.5 is done in sprint-status.yaml
+
+- source_spec: `docs/stories/spec-4-2-the-price-trust-verdict-in-core.md`
+  summary: Make core return a recipeless-class group when the published recipe set is empty, with each crafted class's pending no-recipe verdict and its per-entry verdicts, so state 43 can list crafted rows unranked.
+  evidence: Story 4.2 Decision 1. rank in packages/core/src/rank.ts returns no crafted row when recipes is absent or empty, so the Price trust rule "No recipe is published" has no row to carry it.
+  retry_when: Story 4.3 is done in sprint-status.yaml

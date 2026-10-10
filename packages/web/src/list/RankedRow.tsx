@@ -58,9 +58,7 @@ export function RankedRow({
           <TrustMark kind="prior" word={PRIOR_ONLY} />
         ) : undefined}
       </div>
-      <div data-cell="age" style={{ ...cellStyle(COLUMNS.age), ...typeStyle('mark') }}>
-        {row.age === undefined ? undefined : <TrustMark kind={row.age.kind} word={row.age.word} />}
-      </div>
+      <div data-cell="age" style={{ ...cellStyle(COLUMNS.age), ...typeStyle('mark') }} />
       <ChaseCell row={row} />
     </div>
   );

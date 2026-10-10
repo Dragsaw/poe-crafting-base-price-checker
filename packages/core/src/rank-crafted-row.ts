@@ -1,8 +1,17 @@
 import { compareCanonicalKeys } from '@poe/contracts';
-import type { CraftedRankedRow, CraftedSummand, CraftedTrackedEntry, CraftRecipe, DatasetEntry, WeightsClassPools } from '@poe/contracts';
+import type {
+  CraftedCombination,
+  CraftedRankedRow,
+  CraftedSummand,
+  CraftedTrackedEntry,
+  CraftRecipe,
+  DatasetEntry,
+  WeightsClassPools,
+} from '@poe/contracts';
 
 import type { CraftCostResult } from './craft-cost.ts';
 import { classKeyOf } from './crafted-classes.ts';
+import { craftedTrust, type CraftedTrustEntry, entryTrust, resolvedPrice } from './price-trust.ts';
 import { combinationProbability } from './probability.ts';
 import { foldPair, oldestOf, weakest } from './provenance.ts';
 
@@ -20,16 +29,33 @@ interface CraftedRowOptions {
   readonly byKey: ReadonlyMap<string, DatasetEntry>;
   readonly activeLeague: string;
   readonly threshold: number;
+  /** ISO-8601, the clock the verdict reads ages against (AD-10). */
+  readonly now: string;
 }
 
 interface SummandScan {
   readonly summands: CraftedSummand[];
+  readonly combinations: CraftedCombination[];
+  /** Every entry of the pair, for the share rule of *Price trust*. */
+  readonly trusted: CraftedTrustEntry[];
   readonly stamps: string[];
 }
 
+const COMBINATION_GROUP = { current: 0, rough: 0, pending: 1, broken: 2 } as const;
+
+/** Below-threshold (priced), then pending, then broken, then the entry's canonical key. */
+function compareCombinations(left: CraftedCombination, right: CraftedCombination): number {
+  return (
+    COMBINATION_GROUP[left.trust.verdict] - COMBINATION_GROUP[right.trust.verdict] ||
+    compareCanonicalKeys(left.entryKey, right.entryKey)
+  );
+}
+
 /** `undefined`: the recipe cannot reach the class. P is computed priced or not, so no threshold. */
-function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold }: CraftedRowOptions): SummandScan | undefined {
+function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold, now }: CraftedRowOptions): SummandScan | undefined {
   const summands: CraftedSummand[] = [];
+  const combinations: CraftedCombination[] = [];
+  const trusted: CraftedTrustEntry[] = [];
   // Summands only: the rates' asOf is not a timestamp input (AD-10).
   const stamps: string[] = [];
   for (const { entry, entryKey } of keyed) {
@@ -37,19 +63,25 @@ function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold }: 
     if (!probability.ok) {
       return undefined;
     }
-    const price = byKey.get(entryKey)?.price;
-    if (
-      price?.state !== 'priced' ||
-      price.observation.league !== activeLeague ||
-      price.observation.priceDivine < threshold
-    ) {
+    const published = byKey.get(entryKey);
+    const trust = entryTrust(entry, published, activeLeague, now);
+    const price = resolvedPrice(published, activeLeague);
+    if (price.state !== 'priced') {
+      trusted.push({ trust });
+      combinations.push({ entryKey, trust });
       continue;
     }
-    const priceDivine = price.observation.priceDivine;
-    stamps.push(price.observation.observedAt);
-    summands.push({ entryKey, probability: probability.p, priceDivine, contribution: probability.p * priceDivine });
+    const { priceDivine, observedAt } = price.observation;
+    const contribution = probability.p * priceDivine;
+    trusted.push({ trust, gross: contribution });
+    if (priceDivine < threshold) {
+      combinations.push({ entryKey, trust });
+      continue;
+    }
+    stamps.push(observedAt);
+    summands.push({ entryKey, probability: probability.p, priceDivine, contribution, trust });
   }
-  return { summands, stamps };
+  return { summands, combinations: combinations.toSorted(compareCombinations), trusted, stamps };
 }
 
 function weakestProvenance({ first, recipe, pools, keyed }: CraftedRowOptions): CraftedRankedRow['provenance'] {
@@ -87,8 +119,10 @@ export function craftedRow(options: CraftedRowOptions): CraftedRankedRow | undef
     // eslint-disable-next-line unicorn/no-null -- boundary: `RankedRow.ev` is `z.number().nullable()` in the contracts schema.
     ev: cost.ok ? grossPayout - cost.divine : null,
     summands: ordered,
+    combinations: scan.combinations,
     provenance: weakestProvenance(options),
     ...(asOf !== undefined && { asOf }),
     ...(lastAttemptedAt !== undefined && { lastAttemptedAt }),
+    trust: craftedTrust({ uncostable: !cost.ok, entries: scan.trusted }),
   };
 }

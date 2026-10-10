@@ -20,6 +20,16 @@ export type {
   UnrankedEntry,
 } from './rank.ts';
 
+/** The price-trust verdict (AD-17, AD-10) and its EXPERIENCE.md *Price trust* bounds. */
+export {
+  craftedTrust,
+  entryTrust,
+  OLD_AFTER_HOURS,
+  THIN_BELOW_LISTINGS,
+  UNRELIABLE_SHARE_MIN,
+} from './price-trust.ts';
+export type { CraftedTrustEntry, CraftedTrustInput } from './price-trust.ts';
+
 /** The Craft Cost of a recipe (AD-20): costed from the dataset's rates, or uncostable, never `0`. */
 export { craftCost } from './craft-cost.ts';
 export type { CraftCostResult } from './craft-cost.ts';

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+import { PriceTrustSchema } from './ranked-row/price-trust';
 import { ProvenanceSchema, RankedRowSchema } from './ranked-row';
 import { JSON_NULL, without } from './test-support';
+
+const CURRENT = { verdict: 'current', reasons: [] };
 
 const observation = {
   league: 'Forbidden Rites',
@@ -26,6 +29,7 @@ const row = {
   ev: 0.1235,
   craftCost: 0,
   observation,
+  trust: CURRENT,
 };
 
 describe('RankedRowSchema', () => {
@@ -54,6 +58,9 @@ describe('RankedRowSchema', () => {
   });
 });
 
+const SUMMAND = { entryKey: '["crafted","weapon.bow","Bows",82,null,null]', probability: 0.1, priceDivine: 3, contribution: 0.3, trust: CURRENT };
+const COMBINATION = { entryKey: '["crafted","weapon.bow","Bows",82,"a",null]', trust: { verdict: 'pending', reasons: [{ kind: 'never-synced' }] } };
+
 const craftedRow = {
   kind: 'crafted',
   classKey: '["crafted","weapon.bow","Bows"]',
@@ -64,9 +71,11 @@ const craftedRow = {
   grossPayout: 0.3,
   craftCost: 0.05,
   ev: 0.25,
-  summands: [{ entryKey: '["crafted","weapon.bow","Bows",82,null,null]', probability: 0.1, priceDivine: 3, contribution: 0.3 }],
+  summands: [SUMMAND],
+  combinations: [COMBINATION],
   provenance: 'measured',
   asOf: '2026-09-26T00:00:00Z',
+  trust: CURRENT,
 };
 
 describe('RankedRowSchema, the crafted arm', () => {
@@ -100,5 +109,39 @@ describe('RankedRowSchema, the crafted arm', () => {
     const summand = { ...craftedRow.summands[0], probability: 1.5 };
     expect(RankedRowSchema.safeParse({ ...craftedRow, summands: [summand] }).success).toBe(false);
     expect(RankedRowSchema.safeParse(without(craftedRow, 'recipeId')).success).toBe(false);
+  });
+});
+
+describe('RankedRowSchema, the price trust', () => {
+  it('requires a trust on a raw row, a crafted row, a summand and a combination', () => {
+    expect(RankedRowSchema.safeParse(without(row, 'trust')).success).toBe(false);
+    expect(RankedRowSchema.safeParse(without(craftedRow, 'trust')).success).toBe(false);
+    expect(RankedRowSchema.safeParse(without(craftedRow, 'combinations')).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...craftedRow, summands: [without(SUMMAND, 'trust')] }).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...craftedRow, combinations: [without(COMBINATION, 'trust')] }).success).toBe(false);
+  });
+
+  it('parses each reason kind, and refuses a display string or an unknown kind', () => {
+    const rough = { verdict: 'rough', reasons: [{ kind: 'old', days: 3 }, { kind: 'thin', listings: 2 }] };
+    expect(RankedRowSchema.parse({ ...row, trust: rough })).toEqual({ ...row, trust: rough });
+    const share = { verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 70 }] };
+    expect(RankedRowSchema.parse({ ...craftedRow, trust: share })).toEqual({ ...craftedRow, trust: share });
+    expect(RankedRowSchema.safeParse({ ...row, trust: { verdict: 'rough', reasons: ['priced 3 days ago'] } }).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...row, trust: { verdict: 'rough', reasons: [{ kind: 'stale' }] } }).success).toBe(false);
+    expect(RankedRowSchema.safeParse({ ...row, trust: { verdict: 'rough', reasons: [{ kind: 'old', days: 3, text: 'x' }] } }).success).toBe(false);
+  });
+
+  it('refuses a current verdict with a reason and any other verdict without one', () => {
+    expect(PriceTrustSchema.safeParse({ verdict: 'current', reasons: [{ kind: 'thin', listings: 1 }] }).success).toBe(false);
+    expect(PriceTrustSchema.safeParse({ verdict: 'pending', reasons: [] }).success).toBe(false);
+    expect(PriceTrustSchema.parse({ verdict: 'pending', reasons: [{ kind: 'no-listings' }] })).toEqual({
+      verdict: 'pending',
+      reasons: [{ kind: 'no-listings' }],
+    });
+  });
+
+  it('refuses a fractional day count and a share above 100 percent', () => {
+    expect(PriceTrustSchema.safeParse({ verdict: 'rough', reasons: [{ kind: 'old', days: 3.5 }] }).success).toBe(false);
+    expect(PriceTrustSchema.safeParse({ verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 101 }] }).success).toBe(false);
   });
 });

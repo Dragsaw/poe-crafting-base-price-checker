@@ -7,7 +7,6 @@ import { hoursBefore, many, priced, rawEntry } from '../test-support/list-fixtur
 import { colors, glyphs, rankedRowColumns, layout } from '../theme/tokens';
 import { COLUMN_LABELS } from './ColumnHeader';
 import { rawNote } from './format';
-import { HAIR_SPACE } from './TrustMark';
 
 afterEach(unmount);
 
@@ -73,20 +72,11 @@ describe('a ranked row', () => {
     expect(cell(row, 'ev').textContent).toBe('< 0.01');
   });
 
-  // Matrix: stale observation, and exactly 48h.
-  it('marks a stale observation with its clock, in trust-broken at 700', () => {
+  // `web` applies no cut-off of its own (AD-10); the verdict is `core`'s (EXPERIENCE.md *Price trust*).
+  it('prints no age mark, however old the observation', () => {
     const a = rawEntry('Gold Amulet');
-    const b = rawEntry('Solar Amulet');
-    const rows = rowsIn(
-      mountList([a, b], [priced(a, 2, hoursBefore(NOW, 5 * 24 + 4)), priced(b, 1, hoursBefore(NOW, 48))]),
-    );
-    expect(cell(rows[0], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}priced 5d ago`);
-    expect(cell(rows[1], 'age').textContent).toBe(`${glyphs.stale}${HAIR_SPACE}priced 2d ago`);
-    const mark = cell(rows[0], 'age').querySelector<HTMLElement>('[data-trust-mark]');
-    expect(mark?.dataset['trustMark']).toBe('stale');
-    expect(mark?.style.fontWeight).toBe('700');
-    expect(mark?.style.background).toBe('');
-    expect(mark?.style.border).toBe('');
+    const [row] = rowsIn(mountList([a], [priced(a, 2, hoursBefore(NOW, 5 * 24 + 4))]));
+    expect(cell(row, 'age').childNodes).toHaveLength(0);
   });
 
   it('takes its tier from position only: weight and rank colour', () => {

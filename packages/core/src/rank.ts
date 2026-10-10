@@ -14,6 +14,7 @@ import type {
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
+import { assertClock } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 import { compareOrdering } from './rank-order.ts';
 import { craftedRow } from './rank-crafted-row.ts';
@@ -34,6 +35,8 @@ export interface RankInput {
   readonly activeLeague: string;
   /** The Payout Threshold in divine (FR-7), finite and ≥ 0; any other value throws `RangeError`. */
   readonly threshold: number;
+  /** The clock price trust reads ages against, ISO-8601 (AD-10); an unparseable value throws `RangeError`. */
+  readonly now: string;
   /** Parsed weights, or `undefined` when absent (AD-24); `partial` is Unrankable (FR-4). */
   readonly weights: WeightsFile | undefined;
   /** Cross-file failures from `crossFileChecks`, once per load; other Unrankable reasons win. */
@@ -208,7 +211,7 @@ function rankCraftedClass(
     return;
   }
   for (const { recipe, cost } of costed) {
-    const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold });
+    const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold, now: input.now });
     if (row === undefined) {
       unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
         categoryId: first.categoryId,
@@ -248,6 +251,7 @@ export function rank(input: RankInput): Ranking {
       `rank: threshold must be a finite number >= 0, got ${String(input.threshold)}`,
     );
   }
+  assertClock(input.now);
   const byKey = new Map(input.dataset.map((published) => [published.entryKey, published]));
   const rates = input.currencyRates ?? [];
   const costed = (input.recipes ?? []).map((recipe) => ({

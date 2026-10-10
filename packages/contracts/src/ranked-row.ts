@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { BaseTypeIdSchema } from './base-type.ts';
 import { CurrencyIdSchema } from './currency-rate.ts';
 import { PriceObservationSchema } from './price-observation.ts';
+import { PriceTrustSchema } from './ranked-row/price-trust.ts';
 import { DivineAmountSchema, IsoTimestampSchema, ItemLevelSchema } from './primitives.ts';
 import { CurationStatusSchema } from './tracked-entry.ts';
 
@@ -32,6 +33,7 @@ export const RawRankedRowSchema = z
     lastAttemptedAt: IsoTimestampSchema.optional().describe(
       'Carried from the dataset entry where present, for the view’s freshness clock (AD-9).',
     ),
+    trust: PriceTrustSchema.describe('The verdict of the row’s one entry (AD-17, *Price trust*).'),
   })
   .describe('A ranked Raw Base (AD-17).');
 
@@ -53,8 +55,16 @@ export const CraftedSummandSchema = z
       .describe('`combinationProbability` under the recipe, verbatim.'),
     priceDivine: DivineAmountSchema.describe('The active-league observed price, verbatim.'),
     contribution: z.number().min(0).describe('`probability × priceDivine`.'),
+    trust: PriceTrustSchema.describe('The summand entry’s own verdict (AD-17, *Price trust*).'),
   })
   .describe('One summand of a crafted EV (AD-17).');
+
+export const CraftedCombinationSchema = z
+  .strictObject({
+    entryKey: z.string().min(1).describe('The tracked entry’s canonical key.'),
+    trust: PriceTrustSchema.describe('The combination entry’s own verdict (AD-17, *Price trust*).'),
+  })
+  .describe('A non-pruned entry of the class that is not a summand: below the threshold, pending or broken (AD-17).');
 
 /** An uncostable recipe has `ev` null and still orders by `grossPayout` (EXPERIENCE.md 35). */
 export const CraftedRankedRowSchema = z
@@ -74,6 +84,9 @@ export const CraftedRankedRowSchema = z
       .describe('Σ quantity × rate over the recipe’s currencies, in divine; or uncostable (AD-20).'),
     ev: z.number().nullable().describe('`grossPayout − craftCost`; `null` exactly when the recipe is uncostable.'),
     summands: z.array(CraftedSummandSchema).describe('By contribution descending, then canonical key.'),
+    combinations: z
+      .array(CraftedCombinationSchema)
+      .describe('Below-threshold, then pending, then broken, then canonical key.'),
     provenance: ProvenanceSchema.exclude(['absent']).describe(
       'The weakest Provenance over the pair’s inputs: the recipe’s eligible set over both slots (AD-10). A ranked row is never absent.',
     ),
@@ -83,6 +96,7 @@ export const CraftedRankedRowSchema = z
     lastAttemptedAt: IsoTimestampSchema.optional().describe(
       'Set only when there is no summand: the oldest `lastAttemptedAt` among the class’s non-pruned entries that have one (AD-10). With `asOf` also unset, the class was never attempted.',
     ),
+    trust: PriceTrustSchema.describe('The first matching crafted rule of *Price trust* (AD-17).'),
   })
   .describe('A ranked `(Item Class, recipe)` pair (AD-17).');
 
@@ -103,5 +117,6 @@ export type Provenance = z.infer<typeof ProvenanceSchema>;
 export type RawRankedRow = z.infer<typeof RawRankedRowSchema>;
 export type CraftedRankedRow = z.infer<typeof CraftedRankedRowSchema>;
 export type CraftedSummand = z.infer<typeof CraftedSummandSchema>;
+export type CraftedCombination = z.infer<typeof CraftedCombinationSchema>;
 export type Uncostable = z.infer<typeof UncostableSchema>;
 export type RankedRow = z.infer<typeof RankedRowSchema>;

@@ -20,6 +20,8 @@ export const LEAGUE = 'Forbidden Rites';
 export const OLD_LEAGUE = 'Standard Rites';
 export const THRESHOLD = 0.25;
 export const ATTEMPTED = '2026-09-26T11:00:00Z';
+/** Two hours after `observation()`'s `observedAt`, so a default price is current. */
+export const NOW = '2026-09-26T12:00:00Z';
 
 export function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): TrackedEntry {
   return status === 'pruned'
@@ -107,7 +109,7 @@ export function published(
 }
 
 export function ranked(input: Partial<RankInput> & Pick<RankInput, 'tracked'>): Ranking {
-  return rank({ dataset: [], activeLeague: LEAGUE, threshold: THRESHOLD, weights: WEIGHTS, ...input });
+  return rank({ dataset: [], activeLeague: LEAGUE, threshold: THRESHOLD, now: NOW, weights: WEIGHTS, ...input });
 }
 
 export const keysOf = (items: readonly ({ entryKey: string } | { classKey: string })[]): string[] =>
@@ -238,6 +240,7 @@ export function rankCrafted(input: Partial<RankInput> & Pick<RankInput, 'tracked
     dataset: [],
     activeLeague: LEAGUE,
     threshold: THRESHOLD,
+    now: NOW,
     weights: poolsFile(['weapon.bow', 'Bows', BOWS_POOLS]),
     recipes: [GREATER, PERFECT],
     currencyRates: RATES,

@@ -22,15 +22,16 @@ describe('the trust mark and the unit glyphs', () => {
 });
 
 describe('the key block', () => {
-  it('holds three columns, the first being Silence means healthy, and no curation marks', () => {
+  it('holds two columns, the first being Silence means healthy, and no curation or age marks', () => {
     const container = mount(<KeyBlock />);
     const columns = [...container.querySelectorAll('[data-key-column]')];
-    expect(columns).toHaveLength(3);
+    expect(columns).toHaveLength(2);
     expect(columns.map((c) => c.firstElementChild?.textContent)).toEqual([...KEY_TITLES]);
     expect(KEY_TITLES[0]).toBe('Silence means healthy');
     const text = container.textContent;
     expect(text).toContain('nothing here is degraded');
-    expect(text).toContain('never attempted — no request was ever issued');
+    expect(text).not.toContain('Age cell');
+    expect(text).not.toContain('never attempted');
     expect(text).not.toContain(glyphs.pruned);
     expect(text).not.toContain(glyphs.unitRaw);
     expect(text).not.toContain(glyphs.unitClass);

@@ -4,14 +4,14 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
-import { NOW } from '../test-support/dom';
+import { NOW, NOW_ISO } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { tierOf, toDisplayRows, type DisplayRow } from './display-rows';
 import { isHonestEmpty } from './list-statement';
 
 /** A raw-only list, narrowed to Raw Base rows. */
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
-  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, threshold: DEFAULT_THRESHOLD, weights: undefined });
+  const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
   return toDisplayRows(ranking, dataset, NOW).flatMap((row) => (row.unit === 'raw' ? [row] : []));
 }
 
@@ -35,11 +35,11 @@ describe('toDisplayRows', () => {
         unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 9 * 24 + 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.text, row.age?.word])).toEqual([
-      ['Solar Amulet', 1, 1, '1.25', 'priced 5d ago'],
-      ['Gold Amulet', 2, 1, '0.50', undefined],
-      ['Coral Ring', undefined, 3, 'an open question', 'tried 9d ago'],
-      ['Wide Belt', undefined, 3, 'no figure yet', 'never attempted'],
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.text])).toEqual([
+      ['Solar Amulet', 1, 1, '1.25'],
+      ['Gold Amulet', 2, 1, '0.50'],
+      ['Coral Ring', undefined, 3, 'an open question'],
+      ['Wide Belt', undefined, 3, 'no figure yet'],
     ]);
     expect(rows.map((row) => row.ev.kind)).toEqual(['figure', 'figure', 'phrase', 'phrase']);
     expect(rows.every((row) => row.unit === 'raw' && row.itemLevel === 82)).toBe(true);
@@ -131,6 +131,7 @@ describe('toDisplayRows', () => {
       tracked: [belt, amulet, ring, cheap],
       dataset,
       activeLeague: TEST_LEAGUE,
+      now: NOW_ISO,
       threshold: DEFAULT_THRESHOLD,
       weights: undefined,
     });
@@ -159,12 +160,12 @@ describe('toDisplayRows', () => {
         unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.kind, row.ev.text, row.age?.word, row.state.state])).toEqual([
-      ['Gold Amulet', 1, 1, 'figure', '0.50', undefined, 'priced'],
-      ['Coral Ring', undefined, 3, 'phrase', 'an open question', undefined, 'no-listings'],
-      ['Wide Belt', undefined, 3, 'phrase', 'no figure yet', 'never attempted', 'not-yet-synced'],
-      ['Broken Ring', undefined, 3, 'phrase', 'not valued', 'tried 3d ago', 'unresolvable'],
-      ['Lost Ring', undefined, 3, 'phrase', 'not valued', undefined, 'unresolvable'],
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.kind, row.ev.text, row.state.state])).toEqual([
+      ['Gold Amulet', 1, 1, 'figure', '0.50', 'priced'],
+      ['Coral Ring', undefined, 3, 'phrase', 'an open question', 'no-listings'],
+      ['Wide Belt', undefined, 3, 'phrase', 'no figure yet', 'not-yet-synced'],
+      ['Broken Ring', undefined, 3, 'phrase', 'not valued', 'unresolvable'],
+      ['Lost Ring', undefined, 3, 'phrase', 'not valued', 'unresolvable'],
     ]);
     expect(rows[4]?.ages).toEqual({ observed: undefined, attempted: 'tried 1h ago' });
   });
@@ -176,7 +177,7 @@ describe('toDisplayRows', () => {
       [cheap, old],
       [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), { league: 'Standard' })],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.age?.word])).toEqual([
+    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.ages.attempted])).toEqual([
       ['Jade Amulet', undefined, 'no figure yet', 'tried 3d ago'],
     ]);
   });
@@ -188,6 +189,7 @@ describe('toDisplayRows', () => {
         tracked: entries,
         dataset: entries.map((entry, index) => priced(entry, 30 - index, hoursBefore(NOW, 1))),
         activeLeague: TEST_LEAGUE,
+        now: NOW_ISO,
         threshold: 0,
         weights: undefined,
       }),
@@ -200,7 +202,7 @@ describe('toDisplayRows', () => {
 
     const tiny = rawEntry('Tiny');
     const [only] = toDisplayRows(
-      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, threshold: 0, weights: undefined }),
+      rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined }),
       [],
       NOW,
     );

@@ -1,12 +1,12 @@
 import { plural } from './text';
 
-/** Clock units and age spellings; the 48h stale mark (`ageMark`) stays in `list/format.ts`. */
+/** Clock units and age spellings; the price-trust verdict and its old bound are `core`'s (AD-10). */
 
 export const MINUTE_MS = 60_000;
 export const HOUR_MS = 60 * MINUTE_MS;
 export const DAY_MS = 24 * HOUR_MS;
 
-/** An exact age, no 48h cut-off: `< 1h`, hours, then days; a clock ahead of `now` reads `< 1h`. */
+/** An exact age, no cut-off: `< 1h`, hours, then days; a clock ahead of `now` reads `< 1h`. */
 export function exactAge(clock: string, now: number): string {
   const hours = (now - Date.parse(clock)) / HOUR_MS;
   if (hours >= 1) {
