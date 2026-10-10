@@ -70,9 +70,9 @@ export const floatingShadows = {
 /** The column header's height (DESIGN.md `column-header`). */
 export const COLUMN_HEADER_HEIGHT = '30px';
 
-/** Component measurements in px that Stories 4.4 to 4.6 replace with `{spacing.*}`. */
+/** Component measurements in px that Stories 4.5 and 4.6 replace with `{spacing.*}`. */
 export const layout = {
-  /** The expansion panel's and the appendix's fixed width until Stories 4.4 and 4.6. */
+  /** The appendix's fixed width until Story 4.6. */
   contentWidth: 1012,
   gutter: 34,
   hairline: 1,
@@ -133,17 +133,6 @@ export const layout = {
   footMarginTop: 18,
   footPadTop: 10,
   footMarginBottom: 20,
-  panelPadTop: 18,
-  panelPadX: 22,
-  panelPadBottom: 20,
-  panelSubMarginTop: 4,
-  panelSubMarginBottom: 13,
-  padCombinationCellRight: 12,
-  detailRowHeight: 28,
-  /** Line two's wrap quantum; a wrapped note grows the row by whole steps. */
-  combinationRowLine2Height: 20,
-  /** A minimum: 28 + 20. */
-  combinationRowHeight: 48,
 } as const;
 
 /** A px number as a CSS length. */
@@ -154,27 +143,22 @@ export function px(value: number): string {
 /** The other fixed column sums. Nothing on these surfaces flexes. */
 export const columnSums = {
   interimControls: [216, 16, 276],
-  combinationLine1: [460, 250, 116, 116, 24],
-  combinationLine2: [560, 200, 206],
-  tombstoneLine2: [560, 406],
   appendix: [292, 118, 250, 310],
 } as const;
 
-/** Combination row line one; the trade-link cell has no right padding. */
-export const combinationLine1Columns = [
-  { name: 'combination', width: 460, padRight: 12 },
-  { name: 'state', width: 250, padRight: 12 },
-  { name: 'figure', width: 116, padRight: 12 },
-  { name: 'sample', width: 116, padRight: 12 },
-  { name: 'trade-link', width: 24, padRight: 0 },
-] as const;
+/** The px widths DESIGN.md `expansion-line.grid` writes inline rather than as `{spacing.*}`. */
+export const expansionLineWidths = { price: '90px', link: '24px', paddingRight: '16px' } as const;
 
-/** Line two, the evidence: note, observed age and attempted age. */
-export const combinationLine2Columns = [
-  { name: 'note', width: 560, padRight: 12 },
-  { name: 'observed', width: 200, padRight: 12 },
-  { name: 'attempted', width: 206, padRight: 12 },
-] as const;
+/** DESIGN.md `expansion-line`: combination 1fr · price · trust · link, one line high. */
+export const expansionLineGrid = {
+  display: 'grid',
+  gridTemplateColumns: `1fr ${expansionLineWidths.price} ${spacing['expansion-trust-cell']} ${expansionLineWidths.link}`,
+  columnGap: spacing['col-gap'],
+  alignItems: 'center',
+  paddingRight: expansionLineWidths.paddingRight,
+  height: spacing['line-height-expansion'],
+  boxSizing: 'border-box',
+} as const satisfies CSSProperties;
 
 // --- type -----------------------------------------------------------------
 
@@ -234,22 +218,14 @@ export function typeStyle(name: TypeRoleName): CSSProperties {
 
 // --- glyphs ---------------------------------------------------------------
 
-// Story 4.3 replaces these with drawn marks (DESIGN.md, Typography). `↗` is pinned to weight 400.
+// Story 4.6 retires the paper marks among these (DESIGN.md, Typography: marks are drawn).
 export const glyphs = {
   unitClass: '≡',
   unitRaw: '▪',
-  priced: '●',
-  noListings: '○',
-  notYetSynced: '∆',
   unresolvable: '×',
   prior: '◊',
   unknown: '?',
   stale: '»',
-  tradeLink: '↗',
-  pinned: '*',
   open: '+',
   close: '−',
 } as const;
-
-/** The one glyph resident at a single weight. */
-export const REGULAR_ONLY_GLYPHS: readonly string[] = [glyphs.tradeLink];

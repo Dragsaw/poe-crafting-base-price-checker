@@ -28,6 +28,7 @@ function craftedRow(overrides: Partial<ClassDisplayRow> = {}): ClassDisplayRow {
     provenance: 'measured',
     chase: [[{ text: 'T1 Mana', verbatim: false }]],
     combinations: [],
+    pruned: [],
     ...overrides,
   };
 }

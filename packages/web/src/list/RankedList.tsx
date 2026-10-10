@@ -22,21 +22,15 @@ export const COLLAPSE_COPY = `${glyphs.close} Show only the top ${String(TOP_ROW
 export function RankedList({
   rows,
   branches,
-  threshold,
   activeLeague,
-  recipeWord,
   note,
 }: {
   /** One branch: the list as `toDisplayRows` printed it. Ignored when `branches` is given. */
   readonly rows?: readonly ListRow[];
   /** The list's branches (`toListBranches`). */
   readonly branches?: ListBranches;
-  /** The active Payout Threshold, repeated in each open panel's sub-line. */
-  readonly threshold: number;
   /** The active league, for the trade-link test. */
   readonly activeLeague: string;
-  /** The active Craft Recipe's word, repeated in an open crafted panel's sub-line. */
-  readonly recipeWord?: string;
   /** The live threshold and Craft Cost the EV tooltip states. */
   readonly note?: ExpectedValueNote;
 }): JSX.Element {
@@ -64,9 +58,7 @@ export function RankedList({
           rows={branch}
           open={open}
           onToggle={toggle}
-          threshold={threshold}
           activeLeague={activeLeague}
-          recipeWord={recipeWord}
           kind={branchKind(shown.length, index)}
         />
       ))}
@@ -87,17 +79,13 @@ function Branch({
   rows,
   open,
   onToggle,
-  threshold,
   activeLeague,
-  recipeWord = '',
   kind,
 }: {
   readonly rows: readonly ListRow[];
   readonly open: ReadonlySet<string>;
   readonly onToggle: (key: string) => void;
-  readonly threshold: number;
   readonly activeLeague: string;
-  readonly recipeWord: string | undefined;
   /** Set only in state 35, where the list holds two branches. */
   readonly kind: 'raw' | 'crafted' | undefined;
 }): JSX.Element {
@@ -109,11 +97,12 @@ function Branch({
     setGrown(false);
   }
   const visible = grown ? rows : rows.slice(0, TOP_ROWS);
+  // A closed row unmounts its panel, so the panel's own toggles start closed when it reopens (Interactions 3, 7).
   const expansionPanel = (row: ListRow): JSX.Element => {
     return row.unit === 'raw' ? (
-      <RawExpansionPanel row={row} threshold={threshold} activeLeague={activeLeague} />
+      <RawExpansionPanel key={row.key} row={row} activeLeague={activeLeague} />
     ) : (
-      <ClassExpansionPanel row={row} threshold={threshold} recipeWord={recipeWord} activeLeague={activeLeague} />
+      <ClassExpansionPanel key={row.key} row={row} activeLeague={activeLeague} />
     );
   };
 

@@ -19,23 +19,24 @@ export function click(target: HTMLElement | null | undefined): void {
   });
 }
 
-/** Mounts one row, opens it, and returns its only combination row. */
+export function linesIn(within: HTMLElement): HTMLElement[] {
+  return [...within.querySelectorAll<HTMLElement>('[data-expansion-line]')];
+}
+
+/** Mounts one row, opens it, and returns its only expansion line. */
 export function openOne(entry: RawTrackedEntry, published: DatasetEntry | undefined, threshold = DEFAULT_THRESHOLD): HTMLElement {
   const view = mountList([entry], published === undefined ? [] : [published], threshold);
   click(rowsIn(view)[0]);
-  const rows = [...view.querySelectorAll<HTMLElement>('[data-combination-row]')];
-  expect(rows).toHaveLength(1);
-  const [only] = rows;
+  const lines = linesIn(view);
+  expect(lines).toHaveLength(1);
+  const [only] = lines;
   if (only === undefined) {
-    throw new Error('no combination row');
+    throw new Error('no expansion line');
   }
   return only;
 }
 
-export function line1(row: HTMLElement): string[] {
-  return ['combination', 'state', 'figure', 'sample'].map((name) => cell(row, name).textContent);
-}
-
-export function line2(row: HTMLElement): string[] {
-  return ['note', 'observed', 'attempted'].map((name) => cell(row, name).textContent);
+/** The line's combination, price and trust cells as text; the link cell is read on its own. */
+export function lineText(line: HTMLElement): string[] {
+  return ['combination', 'price', 'trust'].map((name) => cell(line, name).textContent);
 }

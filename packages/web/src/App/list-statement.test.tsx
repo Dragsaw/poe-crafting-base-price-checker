@@ -7,6 +7,7 @@ import { ARTIFACT_ORDER } from '../load/artifacts';
 import { settleTo, unmount } from '../test-support/dom';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
+import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, TRUST_JOINER, VERDICT_WORDS } from '../list/row/trust-words';
 import { server, mount, frame, payoutField, unitNames } from './test-support';
 
 afterEach(unmount);
@@ -78,8 +79,8 @@ describe('the list statement', () => {
     act(() => {
       first?.click();
     });
-    expect(frame().querySelector('[data-expansion-panel] [data-cell="state"]')?.textContent).toBe(
-      '∆\u{A0}not-yet-synced · league-mismatch',
+    expect(frame().querySelector('[data-expansion-panel] [data-cell="trust"]')?.textContent).toBe(
+      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['league-mismatch']].join(TRUST_JOINER),
     );
     expectChromeAround();
   });
@@ -112,14 +113,14 @@ describe('the list statement', () => {
     expect(eventCells()).toEqual([MISSING_FIGURE, MISSING_FIGURE, MISSING_FIGURE]);
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
-    // The no-listings row's expansion keeps its own state and phrase.
+    // The no-listings row's expansion keeps its own reason, on the attempt's clock.
     const amuletRow = frame().querySelectorAll<HTMLElement>('[data-ranked-row]')[1];
     act(() => {
       amuletRow?.click();
     });
     const panel = frame().querySelector('[data-expansion-panel]');
-    expect(panel?.querySelector('[data-cell="state"]')?.textContent).toContain('no-listings');
-    expect(panel?.querySelector('[data-cell="figure"]')?.textContent).toBe('an open question');
+    expect(panel?.querySelector('[data-cell="trust"]')?.textContent).toContain(NO_LISTINGS_LINE);
+    expect(panel?.querySelector('[data-cell="price"]')?.textContent).toBe(MISSING_FIGURE);
   });
 
   // Matrix: partial refresh.

@@ -1,7 +1,16 @@
 import { PriceTrustReasonSchema, type PriceTrustReason } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { FIXED_ROW_REASONS, markTooltipParts, rowReasonWords, TRUST_JOINER, VERDICT_WORDS } from './trust-words';
+import {
+  FIXED_ROW_REASONS,
+  lineReasonWords,
+  lineTrustParts,
+  markTooltipParts,
+  NO_LISTINGS_LINE,
+  rowReasonWords,
+  TRUST_JOINER,
+  VERDICT_WORDS,
+} from './trust-words';
 
 const experience = Object.values(
   import.meta.glob<string>('../../../../../docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/EXPERIENCE.md', {
@@ -96,5 +105,38 @@ describe('the mark tooltip', () => {
     ['broken', 'unresolvable'],
   ] as const)('words a %s row with its %s reason', (verdict, kind) => {
     expect(markTooltipParts({ verdict, reasons: [{ kind }] })).toEqual({ word: VERDICT_WORDS[verdict], reason: FIXED_ROW_REASONS[kind] });
+  });
+});
+
+describe('the reason words of an expansion line', () => {
+  it.each(Object.entries(SAMPLES))('words %s as EXPERIENCE.md writes it', (_kind, { reason, count }) => {
+    const words = lineReasonWords(reason);
+    expect(isWrittenInExperience(words, reason.kind === 'no-listings' ? reason.days : count), words).toBe(true);
+  });
+
+  // Matrix: no listings (state 2).
+  it('names the attempt clock on no-listings, and only there', () => {
+    expect(lineReasonWords({ kind: 'no-listings', days: 2 })).toBe(`tried 2 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', days: 1 })).toBe(`tried 1 day ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings' })).toBe(NO_LISTINGS_LINE);
+    const others = Object.values(SAMPLES).filter(({ reason }) => reason.kind !== 'no-listings');
+    expect(others.map(({ reason }) => lineReasonWords(reason))).toEqual(others.map(({ reason }) => rowReasonWords(reason)));
+  });
+
+  // Matrix: rough, old 4 and thin 2.
+  it('prints the line form `<word> · <reason>`, age first, and nothing when current', () => {
+    expect(lineTrustParts({ verdict: 'current', reasons: [] })).toBeUndefined();
+    const parts = lineTrustParts({ verdict: 'rough', reasons: [{ kind: 'old', days: 4 }, { kind: 'thin', listings: 2 }] });
+    expect(parts).toEqual({ word: VERDICT_WORDS.rough, reason: `priced 4 days ago${TRUST_JOINER}only 2 listings` });
+  });
+
+  // Matrix: not yet synced (states 5–7): three distinct reasons, no age.
+  it('keeps the three not-yet-synced causes apart, with no age', () => {
+    const kinds = ['never-synced', 'league-mismatch', 'no-exchange-rate'] as const;
+    const reasons = kinds.map((kind) => lineTrustParts({ verdict: 'pending', reasons: [{ kind }] })?.reason);
+    expect(new Set(reasons).size).toBe(3);
+    for (const reason of reasons) {
+      expect(reason).not.toMatch(/ago/);
+    }
   });
 });

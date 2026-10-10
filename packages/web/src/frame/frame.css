@@ -7,16 +7,6 @@
  * `list/list.css`, `threshold/threshold.css`).
  */
 
-.fg-trade-glyph {
-  color: var(--fg-color-text-tertiary);
-  font-weight: 400;
-  text-decoration: none;
-}
-
-.fg-trade-glyph:hover {
-  color: var(--fg-color-accent);
-}
-
 /*
  * The trust strip. The whole strip is the target; only its affordance text
  * answers the pointer, with a 1px dotted accent underline while the strip is

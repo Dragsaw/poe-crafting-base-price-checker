@@ -286,7 +286,7 @@ export function chaseTexts(row: HTMLElement): string[] {
 }
 
 export function panelRows(): HTMLElement[] {
-  return [...frame().querySelectorAll<HTMLElement>(':scope [data-expansion-panel] [data-combination-row]')];
+  return [...frame().querySelectorAll<HTMLElement>(':scope [data-expansion-panel] [data-expansion-line]')];
 }
 
 export function panelCell(row: HTMLElement, cell: string): string {

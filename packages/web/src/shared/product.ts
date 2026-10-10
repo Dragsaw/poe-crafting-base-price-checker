@@ -3,6 +3,9 @@
 /** The top-N bound. A display slice only: `core` ranks the full Tracked List (FR-5). */
 export const TOP_ROWS = 20;
 
+/** The lines an expansion opens on (EXPERIENCE.md state 39). Every entry stays one click away (FR-8). */
+export const TOP_LINES = 8;
+
 /** The Payout Threshold the page starts at, in Divine (FR-7). Story 2.4 makes it editable. */
 export const DEFAULT_THRESHOLD = 0.25;
 

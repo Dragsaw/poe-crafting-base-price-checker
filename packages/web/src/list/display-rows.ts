@@ -8,18 +8,11 @@ import {
   type PriceTrust,
   type TrackedEntry,
 } from '@poe/contracts';
-import { craftedClassesOf, type Ranking, type UnrankedEntry } from '@poe/core';
+import { classKeyOf, type Ranking, type UnrankedEntry } from '@poe/core';
 
 import { formatDivine } from '../shared/money';
 import { combinationText, type AffixPart, type StatTexts } from './combination-text';
-import {
-  combinationAges,
-  craftedCombinationNote,
-  resolvedState,
-  type CombinationAges,
-  type CombinationState,
-  unitLabel,
-} from './format';
+import { unitLabel } from './format';
 import type { ActiveRanking } from './active-ranking';
 import { isHonestEmpty } from './list-statement';
 
@@ -55,14 +48,12 @@ export interface DisplayRow {
   readonly ev: ExpectedValueCell;
   /** `core`'s verdict on the row's one entry; `web` derives none (AD-17). */
   readonly trust: PriceTrust;
-  /** The Curation Status. `pinned` leads the combination cell; the trade-link test refuses `pruned`. */
+  /** The Curation Status. `pinned` leads the expansion line; the trade-link test refuses `pruned`. */
   readonly status: CurationStatus;
-  /** The Price State the expansion prints, as `core` resolved it (a league mismatch included). */
-  readonly state: CombinationState;
-  /** The row's dataset entry, joined by `entryKey`: its clocks and stored search. `undefined` when never synced. */
+  /** The ranked observation's price; `undefined` on an unpriced row, whose line prints `—`. */
+  readonly price: number | undefined;
+  /** The row's dataset entry, joined by `entryKey`, for its stored search. `undefined` when never synced. */
   readonly entry: DatasetEntry | undefined;
-  /** The expansion's two exact labelled ages, read against the view's held `now`. */
-  readonly ages: CombinationAges;
 }
 
 /** One crafted row, keyed by class key so its panel survives a recipe switch (state 34, AD-10). */
@@ -83,28 +74,39 @@ export interface ClassDisplayRow {
   readonly provenance: CraftedRankedRow['provenance'];
   /** The first three of `core`'s summands, in its order, as Combination text; fewer leave blank. */
   readonly chase: readonly (readonly AffixPart[])[];
-  /** The expansion's combination rows: the summands in `core`'s order, then every other non-pruned entry by canonical key. */
+  /** The expansion lines in `core`'s order: `summands`, then `combinations`. */
   readonly combinations: readonly CraftedCombination[];
+  /** The class's pruned entries, by canonical key, behind `+ N pruned` (FR-15). */
+  readonly pruned: readonly PrunedCombination[];
 }
 
-/** One crafted Tracked Entry as its combination row prints it. */
+/** One non-pruned crafted Tracked Entry as its expansion line prints it. */
 export interface CraftedCombination {
   /** The entry's canonical key. */
   readonly key: string;
   readonly text: readonly AffixPart[];
   readonly status: CurationStatus;
-  readonly state: CombinationState;
-  readonly note: string;
+  /** The price in Divine, or `undefined` where `—` prints beside the mark. */
+  readonly price: number | undefined;
+  /** `core`'s verdict on the entry (AD-17). */
+  readonly trust: PriceTrust;
+  /** A priced member of `core`'s `combinations`: below the threshold (state 20). */
+  readonly isBelowThreshold: boolean;
   /** The entry's dataset entry, for its stored search. `undefined` when never synced. */
   readonly entry: DatasetEntry | undefined;
-  readonly ages: CombinationAges;
 }
 
-/** What a crafted row needs beyond `core`'s row: the tracked list, the catalogue's stat texts and the active league. */
+/** One pruned crafted Tracked Entry: its text and the reason the curator gave (state 10). */
+export interface PrunedCombination {
+  readonly key: string;
+  readonly text: readonly AffixPart[];
+  readonly reason: string;
+}
+
+/** What a crafted row needs beyond `core`'s row: the tracked list, pruned entries included, and the catalogue's stat texts. */
 export interface CraftedContext {
   readonly tracked: readonly TrackedEntry[];
   readonly stats: StatTexts;
-  readonly activeLeague: string;
 }
 
 /** The chase column holds at most three cells (DESIGN.md `col-chase` 492 = 3 × 164). */
@@ -123,94 +125,78 @@ export function tierOf(position: number): Tier {
   return position <= 10 ? 2 : 3;
 }
 
-const NO_CRAFTED_CONTEXT: CraftedContext = { tracked: [], stats: new Map(), activeLeague: '' };
+const NO_CRAFTED_CONTEXT: CraftedContext = { tracked: [], stats: new Map() };
 
-interface KeyedEntry {
-  readonly entry: CraftedTrackedEntry;
-  readonly entryKey: string;
+/** Every crafted entry, pruned included, grouped by its class key (`classKeyOf`). */
+function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, readonly CraftedTrackedEntry[]> {
+  const classes = new Map<string, CraftedTrackedEntry[]>();
+  for (const entry of tracked) {
+    if (entry.kind !== 'crafted') {
+      continue;
+    }
+    const key = classKeyOf(entry.categoryId, entry.className);
+    classes.set(key, [...(classes.get(key) ?? []), entry]);
+  }
+  return classes;
 }
 
-/** The non-pruned crafted entries, grouped by their class key, each with its canonical key. */
-function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, readonly KeyedEntry[]> {
-  return new Map(
-    [...craftedClassesOf(tracked)].map(([classKey, members]) => [
-      classKey,
-      members.map((entry) => ({ entry, entryKey: canonicalKey(entry) })),
-    ]),
-  );
+/** The stored observation's price; read only for a line `core` judged priced. */
+function storedPrice(entry: DatasetEntry | undefined): number | undefined {
+  return entry?.price.state === 'priced' ? entry.price.observation.priceDivine : undefined;
 }
 
-/** `web` reorders nothing: `core`'s summands, then the class's other non-pruned entries by key. */
+function isPriced(trust: PriceTrust): boolean {
+  return trust.verdict === 'current' || trust.verdict === 'rough';
+}
+
+/** `web` reorders nothing: `core`'s summands, then its combinations, then the pruned entries by key. */
 function craftedDetail(
   row: CraftedRankedRow,
   {
     entries,
     byKey,
-    crafted: { stats, activeLeague },
-    now,
+    crafted: { stats },
   }: {
-    readonly entries: readonly KeyedEntry[];
+    readonly entries: readonly CraftedTrackedEntry[];
     readonly byKey: ReadonlyMap<string, DatasetEntry>;
     readonly crafted: CraftedContext;
-    readonly now: number;
   },
-): Pick<ClassDisplayRow, 'chase' | 'combinations'> {
-  const tracked = new Map(entries.map((keyed) => [keyed.entryKey, keyed.entry]));
-  const summandKeys = new Set(row.summands.map((summand) => summand.entryKey));
+): Pick<ClassDisplayRow, 'chase' | 'combinations' | 'pruned'> {
+  const tracked = new Map(entries.map((entry) => [canonicalKey(entry), entry]));
   const text = (entryKey: string): readonly AffixPart[] => {
     const entry = tracked.get(entryKey);
     return entry === undefined ? [] : combinationText(entry, stats);
   };
-  const combination = (entryKey: string): CraftedCombination[] => {
+  const line = (
+    entryKey: string,
+    { trust, price, isBelowThreshold }: Pick<CraftedCombination, 'trust' | 'price' | 'isBelowThreshold'>,
+  ): CraftedCombination[] => {
     const entry = tracked.get(entryKey);
-    if (entry === undefined) {
-      return [];
-    }
-    const stored = byKey.get(entryKey);
-    const state = resolvedState(stored, activeLeague);
-    return [
-      {
-        key: entryKey,
-        text: combinationText(entry, stats),
-        status: entry.status,
-        state,
-        note: craftedCombinationNote(state, summandKeys.has(entryKey)),
-        entry: stored,
-        ages: combinationAges(state, stored?.lastAttemptedAt, now),
-      },
-    ];
+    return entry === undefined
+      ? []
+      : [{ key: entryKey, text: text(entryKey), status: entry.status, price, trust, isBelowThreshold, entry: byKey.get(entryKey) }];
   };
-  const rest = entries
-    .map((keyed) => keyed.entryKey)
-    .filter((entryKey) => !summandKeys.has(entryKey))
-    .toSorted(compareCanonicalKeys);
+  const pruned = [...tracked]
+    .filter(([, entry]) => entry.status === 'pruned')
+    .toSorted(([left], [right]) => compareCanonicalKeys(left, right))
+    .map(([entryKey, entry]) => ({ key: entryKey, text: text(entryKey), reason: entry.prunedReason ?? '' }));
   return {
     chase: row.summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),
-    combinations: [...row.summands.map((summand) => summand.entryKey), ...rest].flatMap((entryKey) => combination(entryKey)),
-  };
-}
-
-interface RowContext {
-  readonly byKey: ReadonlyMap<string, DatasetEntry>;
-  readonly now: number;
-}
-
-function rowDetail(
-  { byKey, now }: RowContext,
-  entryKey: string,
-  state: CombinationState,
-): Pick<DisplayRow, 'state' | 'entry' | 'ages'> {
-  const entry = byKey.get(entryKey);
-  return {
-    state,
-    entry,
-    ages: combinationAges(state, entry?.lastAttemptedAt, now),
+    combinations: [
+      ...row.summands.flatMap((summand) => line(summand.entryKey, { trust: summand.trust, price: summand.priceDivine, isBelowThreshold: false })),
+      ...row.combinations.flatMap((combination) => {
+        const isBelowThreshold = isPriced(combination.trust);
+        const price = isBelowThreshold ? storedPrice(byKey.get(combination.entryKey)) : undefined;
+        return line(combination.entryKey, { trust: combination.trust, price, isBelowThreshold });
+      }),
+    ],
+    pruned,
   };
 }
 
 function rankedRows(
   ranking: Ranking,
-  context: RowContext,
+  byKey: ReadonlyMap<string, DatasetEntry>,
   crafted: CraftedContext,
   isNumbered: boolean,
 ): ListRow[] {
@@ -227,7 +213,7 @@ function rankedRows(
         ev: row.ev === null || hasNoFigure(row.trust) ? MISSING : figure(row.ev),
         trust: row.trust,
         provenance: row.provenance,
-        ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey: context.byKey, crafted, now: context.now }),
+        ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey, crafted }),
       };
     }
     return {
@@ -239,17 +225,13 @@ function rankedRows(
       ev: figure(row.ev),
       trust: row.trust,
       status: row.status,
-      ...rowDetail(context, row.entryKey, {
-        state: 'priced',
-        priceDivine: row.observation.priceDivine,
-        sampleSize: row.observation.sampleSize,
-        observedAt: row.observation.observedAt,
-      }),
+      price: row.observation.priceDivine,
+      entry: byKey.get(row.entryKey),
     };
   });
 }
 
-function unpricedRow(context: RowContext, entry: UnrankedEntry, state: CombinationState): DisplayRow {
+function unpricedRow(byKey: ReadonlyMap<string, DatasetEntry>, entry: UnrankedEntry): DisplayRow {
   return {
     key: entry.entryKey,
     numeral: undefined,
@@ -260,32 +242,28 @@ function unpricedRow(context: RowContext, entry: UnrankedEntry, state: Combinati
     ev: MISSING,
     trust: entry.trust,
     status: entry.entry.status,
-    ...rowDetail(context, entry.entryKey, state),
+    price: undefined,
+    entry: byKey.get(entry.entryKey),
   };
 }
 
-function trailingRows(ranking: Ranking, context: RowContext): DisplayRow[] {
-  return [
-    ...ranking.noListings.map((entry) => unpricedRow(context, entry, { state: 'no-listings' })),
-    ...ranking.notYetSynced.map((entry) => unpricedRow(context, entry, { state: 'not-yet-synced', reason: entry.reason })),
-    ...ranking.unresolvable.map((entry) => unpricedRow(context, entry, { state: 'unresolvable' })),
-  ];
+function trailingRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntry>): DisplayRow[] {
+  return [...ranking.noListings, ...ranking.notYetSynced, ...ranking.unresolvable].map((entry) => unpricedRow(byKey, entry));
 }
 
-/** `core`'s `ordering`, then unpriced Raw Bases at tier 3 (FR-24, state 4); belowThreshold out. */
+/** `core`'s `ordering`, then unpriced Raw Bases at tier 3 (FR-24, state 4); `belowThreshold` out. */
 export function toDisplayRows(
   ranking: Ranking,
   dataset: readonly DatasetEntry[],
-  now: number,
   {
     numbered = true,
     honestEmpty = isHonestEmpty(ranking),
     crafted = NO_CRAFTED_CONTEXT,
   }: { readonly numbered?: boolean; readonly honestEmpty?: boolean; readonly crafted?: CraftedContext } = {},
 ): ListRow[] {
-  const context: RowContext = { byKey: new Map(dataset.map((entry) => [entry.entryKey, entry])), now };
-  const ranked = rankedRows(ranking, context, crafted, numbered);
-  const trailing = trailingRows(ranking, context);
+  const byKey = new Map(dataset.map((entry) => [entry.entryKey, entry]));
+  const ranked = rankedRows(ranking, byKey, crafted, numbered);
+  const trailing = trailingRows(ranking, byKey);
 
   // State 23 prints "In canonical order": one sequence across the crafted rows and all three
   // unpriced groups, by key (a class key or a canonical key), with no numeral and every EV `—`.
@@ -297,14 +275,9 @@ export function toDisplayRows(
 }
 
 /** One branch in every state but 35, where an uncostable recipe gives raw then crafted. */
-export function toListBranches(
-  active: ActiveRanking,
-  dataset: readonly DatasetEntry[],
-  now: number,
-  crafted: CraftedContext,
-): ListBranches {
+export function toListBranches(active: ActiveRanking, dataset: readonly DatasetEntry[], crafted: CraftedContext): ListBranches {
   if (!active.split) {
-    return [toDisplayRows(active, dataset, now, { crafted })];
+    return [toDisplayRows(active, dataset, { crafted })];
   }
   const rawOnly = { ...active, ordering: active.ordering.filter((row) => row.kind === 'raw') };
   const craftedOnly = {
@@ -315,7 +288,7 @@ export function toListBranches(
     unresolvable: [],
   };
   return [
-    toDisplayRows(rawOnly, dataset, now, { numbered: false, honestEmpty: false, crafted }),
-    toDisplayRows(craftedOnly, dataset, now, { numbered: false, honestEmpty: false, crafted }),
+    toDisplayRows(rawOnly, dataset, { numbered: false, honestEmpty: false, crafted }),
+    toDisplayRows(craftedOnly, dataset, { numbered: false, honestEmpty: false, crafted }),
   ];
 }

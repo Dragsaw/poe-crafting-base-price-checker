@@ -106,17 +106,17 @@ describe('the Craft Recipe control', () => {
     expect(names()[0]).toBe('Staves');
   });
 
-  it('keeps an open panel open across a switch, and its sub-line names the new recipe', async () => {
+  it('keeps an open panel open across a switch, on the same row', async () => {
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
     click(rowNamed('Bows'));
-    const sub = (): string => frame().querySelector('[data-expansion-panel] [data-panel-sub]')?.textContent ?? '';
-    expect(sub()).toContain('Craft Recipe greater');
+    const context = (): string => frame().querySelector('[data-expansion-panel] [data-context-name]')?.textContent ?? '';
+    expect(context()).toBe('Bows');
     click(option('perfect'));
     expect(frame().querySelectorAll('[data-expansion-panel]')).toHaveLength(1);
     expect(rowNamed('Bows').dataset['open']).toBeDefined();
-    expect(sub()).toContain('Craft Recipe perfect');
+    expect(context()).toBe('Bows');
   });
 
   it('keeps the slot empty, at its width, when recipes.json holds no recipe', async () => {

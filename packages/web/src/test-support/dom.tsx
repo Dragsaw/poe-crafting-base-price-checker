@@ -84,7 +84,7 @@ export async function settleTo(state: string): Promise<void> {
 }
 
 /** Renders `node` into the kept root, so mounted components keep their state. */
-function rerender(node: ReactNode): void {
+export function rerender(node: ReactNode): void {
   const { root } = mounted;
   if (root === undefined) {
     throw new Error('no mounted root');
@@ -96,10 +96,10 @@ function rerender(node: ReactNode): void {
 
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
-  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined }), dataset, NOW);
+  const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined }), dataset);
   return (
     <PageProvider>
-      <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} note={{ threshold, cost: { kind: 'no-recipe' } }} />
+      <RankedList rows={rows} activeLeague={TEST_LEAGUE} note={{ threshold, cost: { kind: 'no-recipe' } }} />
     </PageProvider>
   );
 }

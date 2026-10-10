@@ -40,12 +40,37 @@ export function rowReasonWords(reason: PriceTrustReason): string {
   }
 }
 
-/** The mark tooltip's `<word> · <reason>`, the reasons in `core`'s order; `undefined` when current. */
-export function markTooltipParts(trust: PriceTrust): { readonly word: string; readonly reason: string } | undefined {
+/** A trust verdict's word and its joined reasons; `undefined` when current. */
+export interface TrustParts {
+  readonly word: string;
+  readonly reason: string;
+}
+
+function trustParts(trust: PriceTrust, words: (reason: PriceTrustReason) => string): TrustParts | undefined {
   return trust.verdict === 'current'
     ? undefined
-    : {
-        word: VERDICT_WORDS[trust.verdict],
-        reason: trust.reasons.map((reason) => rowReasonWords(reason)).join(TRUST_JOINER),
-      };
+    : { word: VERDICT_WORDS[trust.verdict], reason: trust.reasons.map((reason) => words(reason)).join(TRUST_JOINER) };
+}
+
+/** The mark tooltip's `<word> · <reason>`, the reasons in `core`'s order. */
+export function markTooltipParts(trust: PriceTrust): TrustParts | undefined {
+  return trustParts(trust, rowReasonWords);
+}
+
+/** The `no-listings` reason on an expansion line, which names its attempt clock (*Price trust*). */
+export const NO_LISTINGS_LINE = 'no listings';
+
+/** One reason in the words of an expansion line; only `no-listings` differs from the row tooltip. */
+export function lineReasonWords(reason: PriceTrustReason): string {
+  if (reason.kind !== 'no-listings') {
+    return rowReasonWords(reason);
+  }
+  return reason.days === undefined
+    ? NO_LISTINGS_LINE
+    : `tried ${String(reason.days)} ${plural(reason.days, 'day', 'days')} ago${TRUST_JOINER}${NO_LISTINGS_LINE}`;
+}
+
+/** An expansion line's trust cell, `<word> · <reason>`, the reasons in `core`'s order. */
+export function lineTrustParts(trust: PriceTrust): TrustParts | undefined {
+  return trustParts(trust, lineReasonWords);
 }

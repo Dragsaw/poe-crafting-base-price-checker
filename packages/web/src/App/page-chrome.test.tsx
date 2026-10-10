@@ -146,9 +146,9 @@ describe('the resting chrome', () => {
         /^https:\/\/www\.pathofexile\.com\/trade2\/search\/poe2\/Forbidden%20Rites\/[^/\s]+$/,
       );
     }
-    expect(panels.map((panel) => panel.querySelector('[data-panel-sub]')?.textContent)).toEqual([
-      expect.stringContaining('Payout Threshold 0.25 Divine.'),
-    ]);
+    expect(panels.map((panel) => panel.querySelector('[data-context-name]')?.textContent)).toEqual(
+      rows.slice(0, 1).map((row) => row.querySelector('[data-unit-name]')?.textContent),
+    );
     expect(requests).toHaveLength(fetched);
   });
 });

@@ -1,154 +1,114 @@
+import type { DatasetEntry } from '@poe/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { cellIn as cell, NOW, rgb, unmount } from '../../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list-fixtures';
-import { colors, glyphs } from '../../theme/tokens';
-import { HREF, line1, line2, openOne, SEARCH } from './test-support';
+import { colors } from '../../theme/tokens';
+import { CURATION_MARKS } from '../format';
+import { MISSING_FIGURE } from '../row/ExpectedValueCell';
+import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, rowReasonWords, TRUST_JOINER, VERDICT_WORDS } from '../row/trust-words';
+import { HREF, lineText, openOne, SEARCH } from './test-support';
 
 afterEach(unmount);
 
-describe('the Raw Base combination row', () => {
-  // Matrix: priced raw.
-  it('prints a priced raw entry: ● priced, 0.80, 10 listings, the raw note, both ages and ↗', () => {
+const DAY_HOURS = 24;
+
+const trustText = (word: string, ...reasons: string[]): string => [word, ...reasons].join(TRUST_JOINER);
+
+function withSample(entry: DatasetEntry, sampleSize: number): DatasetEntry {
+  if (entry.price.state !== 'priced') {
+    throw new Error('fixture');
+  }
+  return { ...entry, price: { ...entry.price, observation: { ...entry.price.observation, sampleSize } } };
+}
+
+describe('the Raw Base expansion line', () => {
+  // Matrix: priced, current; Raw Base (state 1).
+  it('prints a current price with no Combination text, an empty trust cell and a drawn ↗', () => {
     const belt = rawEntry('Wide Belt', 82);
-    const row = openOne(belt, {
-      ...priced(belt, 0.8, hoursBefore(NOW, 11), { search: SEARCH }),
-      lastAttemptedAt: hoursBefore(NOW, 11),
-    });
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.priced}\u{A0}priced`, '0.80', '10 listings']);
-    expect(line2(row)).toEqual([
-      'no affixes — this Base Type priced as it drops, at Item Level 82',
-      'priced 11h ago',
-      'tried 11h ago',
-    ]);
-    const link = cell(row, 'trade-link').querySelector<HTMLAnchorElement>('a');
-    expect(link?.textContent).toBe(glyphs.tradeLink);
+    const line = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), { search: SEARCH }));
+    expect(lineText(line)).toEqual(['', '0.80', '']);
+    expect(cell(line, 'trust').childNodes).toHaveLength(0);
+    const link = cell(line, 'trade-link').querySelector<HTMLAnchorElement>('a');
     expect(link?.getAttribute('href')).toBe(HREF);
     expect(link?.target).toBe('_blank');
     expect(link?.rel).toBe('noopener');
-    expect(link?.style.fontWeight).toBe('400');
-    expect(link?.className).toBe('fg-trade-glyph');
-    expect(cell(row, 'note').style.fontStyle).toBe('italic');
-    expect(cell(row, 'figure').style.textAlign).toBe('right');
+    expect(link?.textContent).toBe('');
+    expect(link?.querySelector('svg[data-mark="trade-link"]')).not.toBeNull();
+    expect(link?.getAttribute('aria-label')).toBe('Open the trade search for Wide Belt');
   });
 
-  // Matrix: tiny price.
   it('prints a tiny price as < 0.01', () => {
     const belt = rawEntry('Wide Belt');
-    const row = openOne(belt, priced(belt, 0.003, hoursBefore(NOW, 2)), 0);
-    expect(cell(row, 'figure').textContent).toBe('< 0.01');
-    expect(cell(row, 'figure').querySelector('[data-money-phrase]')).toBeNull();
+    const line = openOne(belt, priced(belt, 0.003, hoursBefore(NOW, 2)), 0);
+    expect(cell(line, 'price').textContent).toBe('< 0.01');
   });
 
-  it('prints 1 listing in the singular', () => {
+  // Matrix: rough, old 4 and thin 2. The age leads; no listing count prints elsewhere.
+  it('prints ◐ rough with both reasons, age first', () => {
     const belt = rawEntry('Wide Belt');
-    const one = priced(belt, 2, hoursBefore(NOW, 2));
-    if (one.price.state !== 'priced') {
-      throw new Error('fixture');
-    }
-    const row = openOne(belt, { ...one, price: { ...one.price, observation: { ...one.price.observation, sampleSize: 1 } } });
-    expect(cell(row, 'sample').textContent).toBe('1 listing');
-  });
-
-  // Matrix: no listings.
-  it('prints no-listings: ○, an open question, 0 listings found, the state-2 note, tried only', () => {
-    const ring = rawEntry('Coral Ring');
-    const row = openOne(ring, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 3), SEARCH));
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.noListings}\u{A0}no-listings`, 'an open question', '0 listings found']);
-    expect(line2(row)).toEqual([
-      'nobody is listing this right now — a jackpot and junk look alike here',
+    const line = openOne(belt, withSample(priced(belt, 0.8, hoursBefore(NOW, 4 * DAY_HOURS + 1)), 2));
+    expect(lineText(line)).toEqual([
       '',
-      'tried 3h ago',
+      '0.80',
+      trustText(VERDICT_WORDS.rough, rowReasonWords({ kind: 'old', days: 4 }), rowReasonWords({ kind: 'thin', listings: 2 })),
     ]);
-    const phrase = cell(row, 'figure').querySelector<HTMLElement>('[data-money-phrase]');
-    expect(phrase?.style.fontStyle).toBe('italic');
-    expect(phrase?.style.color).toBe(rgb(colors.text));
-    // The link test reads the stored search, never the Price State.
-    expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
+    expect(cell(line, 'trust').querySelector('[data-line-mark="rough"] svg[data-mark="rough"]')).not.toBeNull();
   });
 
-  // Matrix: expansion of an unresolvable Raw Base (EXPERIENCE state 4).
-  it('prints unresolvable: × unresolvable, not valued in trust-broken, no sample, the raw state-4 note, tried only', () => {
-    const ring = rawEntry('Lost Ring');
-    const row = openOne(ring, unpriced(ring, { state: 'unresolvable' }, hoursBefore(NOW, 5), SEARCH));
-    expect(line1(row)).toEqual(['no affixes', `${glyphs.unresolvable}\u{A0}unresolvable`, 'not valued', 'no sample']);
-    expect(line2(row)).toEqual(['its id is gone from the trade API — a patch did this', '', 'tried 5h ago']);
-    const phrase = cell(row, 'figure').querySelector<HTMLElement>('[data-money-phrase]');
-    expect(phrase?.style.fontStyle).toBe('italic');
-    expect(phrase?.style.color).toBe(rgb(colors['trust-broken']));
-    expect(row.dataset['priceState']).toBe('unresolvable');
-    expect(cell(row, 'state').querySelector<HTMLElement>('[data-state-glyph]')?.style.color).toBe(rgb(colors['trust-broken']));
-    expect(cell(row, 'state').querySelector<HTMLElement>('[data-state-word]')?.style.color).toBe('');
-    // The link test reads the stored search, never the Price State.
-    expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
-  });
-
-  // Matrix: never synced.
-  it('prints never-synced: ∆ with its reason, no figure yet, no sample, the state-5 note, no ages and no link', () => {
-    const belt = rawEntry('Wide Belt');
-    const row = openOne(belt, undefined);
-    expect(line1(row)).toEqual([
-      'no affixes',
-      `${glyphs.notYetSynced}\u{A0}not-yet-synced · never-synced`,
-      'no figure yet',
-      'no sample',
-    ]);
-    expect(line2(row)).toEqual(['no request was ever issued for this entry', '', '']);
-    expect(cell(row, 'observed').childNodes).toHaveLength(0);
-    expect(cell(row, 'attempted').childNodes).toHaveLength(0);
-    expect(cell(row, 'trade-link').childNodes).toHaveLength(0);
-  });
-
-  // Matrix: league mismatch, and an old-league search.
-  it('prints a league mismatch with its reason and the state-6 note, and blanks an old-league link', () => {
-    const amulet = rawEntry('Jade Amulet');
-    const row = openOne(amulet, priced(amulet, 3, hoursBefore(NOW, 50), { league: 'Standard', search: { id: 'old', league: 'Standard' } }));
-    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · league-mismatch`);
-    expect(line2(row)).toEqual(['the observation belongs to another league', '', 'tried 2d ago']);
-    const blank = cell(row, 'trade-link');
-    expect(blank.childNodes).toHaveLength(0);
-    expect(blank.style.opacity).toBe('');
-  });
-
-  it('prints no-exchange-rate with its note, and keeps its active-league link', () => {
+  // Matrix: no listings, days 2 (state 2). The attempt's clock, not the tooltip's words.
+  it('prints — and ○ pending with the attempt age on a no-listings entry', () => {
     const ring = rawEntry('Coral Ring');
-    const row = openOne(
+    const line = openOne(ring, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 2 * DAY_HOURS + 3), SEARCH));
+    expect(lineText(line)).toEqual([
+      '',
+      MISSING_FIGURE,
+      trustText(VERDICT_WORDS.pending, `tried 2 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`),
+    ]);
+    expect(cell(line, 'trust').textContent).not.toContain(FIXED_ROW_REASONS['no-listings']);
+    expect(cell(line, 'trust').querySelector('svg[data-mark="pending"]')).not.toBeNull();
+    // The link test reads the stored search, never the trust verdict.
+    expect(cell(line, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
+  });
+
+  // Matrix: not yet synced (states 5–7). Three causes, three reasons, no age.
+  const coral = rawEntry('Coral Ring');
+  const longAgo = hoursBefore(NOW, 6 * DAY_HOURS);
+  it.each([
+    ['never-synced', undefined],
+    ['league-mismatch', priced(coral, 3, longAgo, { league: 'Standard' })],
+    ['no-exchange-rate', unpriced(coral, { state: 'not-yet-synced', reason: 'no-exchange-rate' }, longAgo)],
+  ] as const)('prints — and ○ pending with the %s reason and no age', (reason, published) => {
+    const line = openOne(coral, published);
+    expect(lineText(line)).toEqual(['', MISSING_FIGURE, trustText(VERDICT_WORDS.pending, FIXED_ROW_REASONS[reason])]);
+    expect(cell(line, 'trust').textContent).not.toContain('ago');
+  });
+
+  // Matrix: broken (state 4).
+  it('prints — and ✕ broken on an unresolvable entry', () => {
+    const ring = rawEntry('Lost Ring');
+    const line = openOne(ring, unpriced(ring, { state: 'unresolvable' }, hoursBefore(NOW, 5), SEARCH));
+    expect(lineText(line)).toEqual(['', MISSING_FIGURE, trustText(VERDICT_WORDS.broken, FIXED_ROW_REASONS.unresolvable)]);
+    expect(cell(line, 'trust').querySelector('svg[data-mark="broken"]')).not.toBeNull();
+  });
+
+  // Matrix: foreign search. A `lastSearchId` from another league leaves the cell empty.
+  it('leaves the link cell empty for a search stored under another league', () => {
+    const ring = rawEntry('Coral Ring');
+    const line = openOne(
       ring,
-      unpriced(ring, { state: 'not-yet-synced', reason: 'no-exchange-rate' }, hoursBefore(NOW, 6), SEARCH),
+      unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 3), { id: 'old', league: 'Standard' }),
     );
-    expect(cell(row, 'state').textContent).toBe(`${glyphs.notYetSynced}\u{A0}not-yet-synced · no-exchange-rate`);
-    expect(line2(row)).toEqual(['the listing currency had no rate at sync time', '', 'tried 6h ago']);
-    expect(cell(row, 'trade-link').querySelector('a')?.getAttribute('href')).toBe(HREF);
+    expect(cell(line, 'trade-link').childNodes).toHaveLength(0);
   });
 
-  // Matrix: pinned.
-  it('leads line one with * pinned on a pinned entry, in text-tertiary at 600, roman', () => {
+  // Matrix: pinned (state 9).
+  it('leads a pinned line with * pinned, at 600 in text-tertiary', () => {
     const belt = { ...rawEntry('Wide Belt'), status: 'pinned' as const };
-    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 1)));
-    expect(cell(row, 'combination').textContent).toBe('* pinned no affixes');
-    const mark = cell(row, 'combination').querySelector<HTMLElement>('[data-curation-pinned]');
-    expect(cell(row, 'combination').firstElementChild).toBe(mark);
+    const line = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 1)));
+    expect(cell(line, 'combination').textContent).toBe(CURATION_MARKS.pinned);
+    const mark = cell(line, 'combination').querySelector<HTMLElement>('[data-curation="pinned"]');
     expect(mark?.style.fontWeight).toBe('600');
-    expect(mark?.style.fontStyle).toBe('normal');
     expect(mark?.style.color).toBe(rgb(colors['text-tertiary']));
-    expect(cell(row, 'state').textContent).not.toContain(glyphs.pinned);
-  });
-
-  it('leads line one with * pinned on a pinned unpriced entry: no-listings and never-synced', () => {
-    const ring = { ...rawEntry('Coral Ring'), status: 'pinned' as const };
-    const noListings = openOne(ring, unpriced(ring, { state: 'no-listings' }, hoursBefore(NOW, 3)));
-    expect(cell(noListings, 'combination').textContent).toBe('* pinned no affixes');
-    unmount();
-
-    const belt = { ...rawEntry('Wide Belt'), status: 'pinned' as const };
-    const never = openOne(belt, undefined);
-    expect(cell(never, 'combination').textContent).toBe('* pinned no affixes');
-  });
-
-  it('marks nothing on an active entry', () => {
-    const belt = rawEntry('Wide Belt');
-    const row = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 1)));
-    expect(cell(row, 'combination').textContent).toBe('no affixes');
-    expect(row.querySelector('[data-curation-pinned]')).toBeNull();
   });
 });

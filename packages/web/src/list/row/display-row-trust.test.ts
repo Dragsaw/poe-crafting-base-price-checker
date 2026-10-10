@@ -61,7 +61,7 @@ describe('the trust each row carries', () => {
       unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
     ];
     const ranking = rank({ tracked: [fresh, old, tried, lost], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined });
-    const rows = toDisplayRows(ranking, dataset, NOW);
+    const rows = toDisplayRows(ranking, dataset);
     const expected = new Map([
       ...ranking.ordering.flatMap((row) => (row.kind === 'raw' ? [[row.entryKey, row.trust] as const] : [])),
       ...[...ranking.noListings, ...ranking.notYetSynced, ...ranking.unresolvable].map((entry) => [entry.entryKey, entry.trust] as const),
@@ -83,7 +83,7 @@ describe('the trust each row carries', () => {
     [{ verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 74 }] }, 1.5, '1.50', false],
   ] as const)('prints a crafted %j row at EV %s as %s', (trust, expectedValue, printed, isNegative) => {
     const own: PriceTrust = { verdict: trust.verdict, reasons: [...trust.reasons] };
-    const [row] = toDisplayRows(rankingOf(craftedRow(own, expectedValue)), [], NOW, { honestEmpty: false });
+    const [row] = toDisplayRows(rankingOf(craftedRow(own, expectedValue)), [], { honestEmpty: false });
     expect(printedValue(row)).toBe(printed);
     expect(row?.trust).toEqual(trust);
     expect(row?.ev.kind === 'figure' && row.ev.negative).toBe(isNegative);

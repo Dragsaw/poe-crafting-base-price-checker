@@ -180,7 +180,7 @@ describe('the chase cells', () => {
     mount();
     await settleTo('ready');
     click(rowNamed('Rings'));
-    const notes = (): string[] => panelRows().map((row) => panelCell(row, 'note'));
+    const notes = (): string[] => panelRows().map((row) => panelCell(row, 'trust'));
     expect(notes()).toEqual(['', '', '', '', '']);
     click(option('perfect'));
     // Life is mostly out of reach under perfect: its P is small, so it sorts last of the summands.
