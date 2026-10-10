@@ -1,0 +1,81 @@
+import { canonicalKey, compareCanonicalKeys } from '@poe/contracts';
+import { describe, expect, it } from 'vitest';
+
+import {
+  ABSENT,
+  BOWS_POOLS,
+  chase,
+  craftedRows,
+  FILLER,
+  NO_RECIPE,
+  PARTIAL,
+  poolsFile,
+  priced,
+  published,
+  rankCrafted,
+  raw,
+  TARGET,
+  weightsWith,
+} from './test-support.ts';
+
+describe('rank: the recipeless group (state 43)', () => {
+  it.each([[[]], [undefined]])(
+    'a rankable class with no recipe (%j) is recipeless: no-recipe verdict, one verdict per live entry',
+    (recipes) => {
+      const target = chase('Bows');
+      const filler = chase('Bows', FILLER);
+      const pruned = chase('Bows', 'explicit.stat_low', 'pruned');
+      const A = raw('A');
+      const result = rankCrafted({
+        tracked: [filler, pruned, target, A],
+        dataset: [published(target, priced(2)), published(filler, { state: 'unresolvable' }), published(A, priced(0.5))],
+        recipes,
+      });
+      expect(result.ordering.map((row) => row.kind)).toEqual(['raw']);
+      expect(result.unrankable).toEqual([]);
+      expect(result.uncostableRecipes).toEqual([]);
+      const combinations = [
+        { entryKey: canonicalKey(target), trust: { verdict: 'current', reasons: [] } },
+        { entryKey: canonicalKey(filler), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } },
+      ].toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey));
+      expect(result.recipeless).toEqual([
+        {
+          classKey: '["crafted","weapon.bow","Bows"]',
+          categoryId: 'weapon.bow',
+          className: 'Bows',
+          itemLevelMin: 82,
+          trust: NO_RECIPE,
+          combinations,
+        },
+      ]);
+    },
+  );
+
+  it('orders the group by class key, whatever the Tracked List order', () => {
+    const result = rankCrafted({
+      tracked: [chase('Bows'), chase('Amulets', TARGET, 'active', 'accessory.amulet')],
+      weights: poolsFile(['weapon.bow', 'Bows', BOWS_POOLS], ['accessory.amulet', 'Amulets', BOWS_POOLS]),
+      recipes: [],
+    });
+    expect(result.recipeless.map((item) => item.classKey)).toEqual([
+      '["crafted","accessory.amulet","Amulets"]',
+      '["crafted","weapon.bow","Bows"]',
+    ]);
+  });
+
+  it.each([
+    ['absent from weights', { weights: undefined }, ABSENT],
+    ['partial', { weights: weightsWith(['weapon.bow', 'Bows', 'partial']) }, PARTIAL],
+    ['disagreeing', { crossFileFailures: [{ categoryId: 'weapon.bow', className: 'Bows' }] }, 'class disagrees with weights file'],
+  ] as const)('with no recipe, a class %s keeps its FR-4 reason and is not recipeless', (_label, override, reason) => {
+    const result = rankCrafted({ tracked: [chase('Bows')], recipes: [], ...override });
+    expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason }]);
+    expect(result.recipeless).toEqual([]);
+  });
+
+  it('holds no recipeless class while any recipe is published', () => {
+    const result = rankCrafted({ tracked: [chase('Bows')] });
+    expect(result.recipeless).toEqual([]);
+    expect(craftedRows(result.ordering).map((row) => row.recipeId)).toEqual(['greater', 'perfect']);
+  });
+});

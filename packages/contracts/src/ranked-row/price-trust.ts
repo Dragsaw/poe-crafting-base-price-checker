@@ -18,6 +18,7 @@ export const PriceTrustReasonSchema = z
     z.strictObject({ kind: z.literal('league-mismatch') }),
     z.strictObject({ kind: z.literal('no-exchange-rate') }),
     z.strictObject({ kind: z.literal('unresolvable') }),
+    z.strictObject({ kind: z.literal('no-recipe') }),
     z.strictObject({ kind: z.literal('uncostable') }),
     z.strictObject({ kind: z.literal('all-broken') }),
     z.strictObject({ kind: z.literal('no-prices') }),

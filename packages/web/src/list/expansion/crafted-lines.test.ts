@@ -59,6 +59,7 @@ describe('the lines of a crafted row', () => {
       notYetSynced: [],
       unresolvable: [],
       unrankable: [],
+      recipeless: [],
       uncostableRecipes: [],
       pricedInLeague: true,
     };

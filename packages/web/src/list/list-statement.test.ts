@@ -119,6 +119,30 @@ describe('listStatement', () => {
     });
     expect(statementFor([belt, ring], [lost])).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
   });
+
+  // State 43 under state 23: a recipeless class is a pending row, so it keeps "yet".
+  it('keeps "yet" for a recipeless class, alone or beside an unresolvable row', () => {
+    const recipeless: Ranking['recipeless'] = [
+      {
+        classKey: '["crafted","weapon.bow","Bows"]',
+        categoryId: 'weapon.bow',
+        className: 'Bows',
+        itemLevelMin: 82,
+        trust: { verdict: 'pending', reasons: [{ kind: 'no-recipe' }] },
+        combinations: [],
+      },
+    ];
+    const rankingOf = (dataset: readonly DatasetEntry[]): Ranking => ({
+      ...rank({ tracked: dataset.length > 0 ? [belt] : [], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0.25, weights: undefined }),
+      recipeless,
+    });
+    const alone = rankingOf([]);
+    expect(alone.pricedInLeague).toBe(false);
+    expect(listStatement(alone, 0.25, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
+    const withLost = rankingOf([unpriced(belt, { state: 'unresolvable' }, hoursBefore(NOW, 1))]);
+    expect(withLost.unresolvable).toHaveLength(1);
+    expect(listStatement(withLost, 0.25, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
+  });
 });
 
 const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow => ({
@@ -151,6 +175,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
     notYetSynced: [],
     unresolvable: [],
     unrankable: [],
+    recipeless: [],
     uncostableRecipes: [],
     pricedInLeague: true,
   };

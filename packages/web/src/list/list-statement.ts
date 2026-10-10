@@ -31,8 +31,13 @@ export function isHonestEmpty(ranking: Ranking): boolean {
   return (
     !ranking.pricedInLeague &&
     // The rows the list prints when nothing is priced: the active recipe's crafted rows, then
-    // `noListings`, `notYetSynced` and `unresolvable`. Unpriced, no Raw Base is in the ordering.
-    ranking.ordering.length + ranking.noListings.length + ranking.notYetSynced.length + ranking.unresolvable.length > 0
+    // `noListings`, `notYetSynced`, `unresolvable` and `recipeless`. Unpriced, no Raw Base is in the ordering.
+    ranking.ordering.length +
+      ranking.noListings.length +
+      ranking.notYetSynced.length +
+      ranking.unresolvable.length +
+      ranking.recipeless.length >
+      0
   );
 }
 
@@ -49,9 +54,12 @@ export function listStatement(
   league: string,
 ): ListStatement {
   if (isHonestEmpty(ranking)) {
-    // Every row the list shows is `unresolvable` when no crafted row and neither other unpriced group remains.
+    // Every row is `unresolvable` when no crafted row, recipeless class or other unpriced group remains.
     const isOnlyUnresolvable =
-      ranking.ordering.length === 0 && ranking.noListings.length === 0 && ranking.notYetSynced.length === 0;
+      ranking.ordering.length === 0 &&
+      ranking.noListings.length === 0 &&
+      ranking.notYetSynced.length === 0 &&
+      ranking.recipeless.length === 0;
     return { kind: 'honest-empty', text: honestEmptyCopy(league, isOnlyUnresolvable) };
   }
   if (ranking.split === true && ranking.recipe !== undefined) {

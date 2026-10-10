@@ -37,9 +37,9 @@ function Separator(): JSX.Element {
   );
 }
 
-/** A value, or the italic *unknown* a missing value always reads. Never a placeholder. */
+/** A value, or the *unknown* a missing value always reads. Never a placeholder. */
 function Value({ value }: { readonly value: string | undefined }): JSX.Element {
-  return value === undefined ? <em data-missing="" style={{ fontStyle: 'italic' }}>{UNKNOWN}</em> : <>{value}</>;
+  return value === undefined ? <span data-missing="">{UNKNOWN}</span> : <>{value}</>;
 }
 
 /** The strip toggles `{components.sync-report-panel}`, closed on load (FR-18). */

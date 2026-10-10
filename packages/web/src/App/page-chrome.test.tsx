@@ -42,6 +42,7 @@ describe('the resting chrome', () => {
     expect(frame().querySelector<HTMLElement>('[data-asking-price-line]')?.style.color).toBe(
       rgb(colors['text-secondary']),
     );
+    expect(frame().querySelector<HTMLElement>('[data-asking-price-line]')?.style.fontStyle).toBe('');
     held.openAll();
   });
 
