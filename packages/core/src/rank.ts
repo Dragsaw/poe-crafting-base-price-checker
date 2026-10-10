@@ -18,7 +18,7 @@ import type { CrossFileFailure } from './cross-file.ts';
 import { assertClock, entryTrust, NO_RECIPE_TRUST } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 import { compareOrdering } from './rank-order.ts';
-import { craftedRow } from './rank-crafted-row.ts';
+import { compareCombinations, craftedRow } from './rank-crafted-row.ts';
 import { groupRawEntries, type NotYetSyncedEntry, type UnrankedEntry } from './rank-raw-groups.ts';
 
 export { compareRankedRows } from './rank-order.ts';
@@ -75,7 +75,7 @@ export interface RecipelessClass {
   readonly className: string;
   readonly itemLevelMin: number;
   readonly trust: PriceTrust;
-  /** Each non-pruned entry's verdict, in canonical key order. */
+  /** Each non-pruned entry's verdict, in `compareCombinations` order. */
   readonly combinations: readonly { readonly entryKey: string; readonly trust: PriceTrust }[];
 }
 
@@ -227,10 +227,9 @@ function rankCraftedClass(
       className: first.className,
       itemLevelMin: first.itemLevelMin,
       trust: NO_RECIPE_TRUST,
-      combinations: keyed.map(({ entry, entryKey }) => ({
-        entryKey,
-        trust: entryTrust(entry, byKey.get(entryKey), input.activeLeague, input.now),
-      })),
+      combinations: keyed
+        .map(({ entry, entryKey }) => ({ entryKey, trust: entryTrust(entry, byKey.get(entryKey), input.activeLeague, input.now) }))
+        .toSorted(compareCombinations),
     });
     return;
   }

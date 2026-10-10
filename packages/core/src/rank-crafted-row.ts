@@ -43,8 +43,8 @@ interface SummandScan {
 
 const COMBINATION_GROUP = { current: 0, rough: 0, pending: 1, broken: 2 } as const;
 
-/** Below-threshold (priced), then pending, then broken, then the entry's canonical key. */
-function compareCombinations(left: CraftedCombination, right: CraftedCombination): number {
+/** Priced (current or rough), then pending, then broken, then the entry's canonical key (EXPERIENCE.md *The expansion*). */
+export function compareCombinations(left: CraftedCombination, right: CraftedCombination): number {
   return (
     COMBINATION_GROUP[left.trust.verdict] - COMBINATION_GROUP[right.trust.verdict] ||
     compareCanonicalKeys(left.entryKey, right.entryKey)

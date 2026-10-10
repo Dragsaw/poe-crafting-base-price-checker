@@ -11,9 +11,9 @@ export type ListStatement =
   | { readonly kind: 'nothing-clears'; readonly text: string }
   | { readonly kind: 'none' };
 
-/** State 23's copy; a list of only `unresolvable` rows drops "yet": no sync will price them. */
-export function honestEmptyCopy(league: string, isOnlyUnresolvable = false): string {
-  return `In canonical order, not ranked: no tracked unit has a price from ${league}${isOnlyUnresolvable ? '' : ' yet'}.`;
+/** State 23's copy; a list of only broken rows drops "yet": no sync will price them. */
+export function honestEmptyCopy(league: string, isNeverPriced = false): string {
+  return `In canonical order, not ranked: no tracked unit has a price from ${league}${isNeverPriced ? '' : ' yet'}.`;
 }
 
 /** State 25's copy: the live threshold at the page's 2dp. */
@@ -41,6 +41,13 @@ export function isHonestEmpty(ranking: Ranking): boolean {
   );
 }
 
+/** State 23 drops "yet" on core's verdict (AD-17): a pending row may still be priced by a sync, a broken one never. */
+function isEveryRowBroken(ranking: Ranking): boolean {
+  return [ranking.ordering, ranking.noListings, ranking.notYetSynced, ranking.unresolvable, ranking.recipeless]
+    .flat()
+    .every((row) => row.trust.verdict === 'broken');
+}
+
 /** State 25's predicate: nothing clears, while something is on the list to say it of. */
 function isNothingClearing(ranking: Ranking): boolean {
   const hasCleared = ranking.ordering.some((row) => row.kind === 'raw' || row.summands.length > 0);
@@ -54,13 +61,7 @@ export function listStatement(
   league: string,
 ): ListStatement {
   if (isHonestEmpty(ranking)) {
-    // Every row is `unresolvable` when no crafted row, recipeless class or other unpriced group remains.
-    const isOnlyUnresolvable =
-      ranking.ordering.length === 0 &&
-      ranking.noListings.length === 0 &&
-      ranking.notYetSynced.length === 0 &&
-      ranking.recipeless.length === 0;
-    return { kind: 'honest-empty', text: honestEmptyCopy(league, isOnlyUnresolvable) };
+    return { kind: 'honest-empty', text: honestEmptyCopy(league, isEveryRowBroken(ranking)) };
   }
   if (ranking.split === true && ranking.recipe !== undefined) {
     return { kind: 'uncostable', text: uncostableCopy(ranking.recipe.word) };

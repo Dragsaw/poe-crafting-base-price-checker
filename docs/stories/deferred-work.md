@@ -25,6 +25,12 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 -->
 
 
+## Deferred from: spec-retro-4-2 review (2026-10-10)
+
+- source_spec: `docs/stories/spec-retro-4-2-state-23-verdict-and-recipeless-order.md`
+  summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
+  evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
+
 ## Deferred from: spec-epic-4-retro-item-3-small-web-fixes (2026-10-10)
 
 - source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
