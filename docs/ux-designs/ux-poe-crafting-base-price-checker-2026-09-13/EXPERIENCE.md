@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 28
+revision: 29
 created: 2026-09-13
 updated: 2026-10-10
 sources:
@@ -81,13 +81,6 @@ row of this folder's `.memlog.md` that holds the decision.
 - The reason string that a recipe-scoped Unrankable would need (state 36). The PRD
   owns that extension.
 
-**Known gaps** (memlog 279, 288). Nobody ruled on these, and this document does
-not invent an answer now. The owner is UX. Each gap has a
-`docs/stories/deferred-work.md` entry (memlog 288).
-
-- The failure paths of UJ-3, UJ-4 and UJ-5.
-- The show-more affordance when the list has 20 rows or fewer.
-
 ## Information Architecture
 
 One surface. Everything below is a region of it, in fixed vertical order.
@@ -99,7 +92,7 @@ One surface. Everything below is a region of it, in fixed vertical order.
 | `{components.list-statement}` | States 23, 25 and 35 | One plain declarative above the column header |
 | `{components.column-header}` + twenty `{components.ranked-row}` | Always visible | The product. Crafted rows name an **Item Class**, and Raw Base rows name a **Base Type**, in one list (FR-3). UJ-1, UJ-2, UJ-4 |
 | `{components.expansion-panel}` | Interaction 2 | Every Tracked Entry on that Item Class, or the one entry that a Raw Base names. UJ-3, UJ-5 |
-| `{components.show-more}` (list) | Below row 20 | The remainder of the ranked list (FR-5; Interaction 4) |
+| `{components.show-more}` (list) | Below row 20, past 20 rows only | The remainder of the ranked list (FR-5; Interaction 4) |
 | `{components.unrankable-appendix}` | Foot, above the footer | **Item Classes** kept out of the ordering, with their reason and count (FR-4). Every row is an Item Class. A Raw Base needs no Eligible Pool and ranks regardless |
 | `{components.footer-legend}` | Foot | How to read the marks, the asking-price sentence, and where curation happens. It is the only place where the page says where curation happens. It renders in every state except the failure screens |
 
@@ -897,7 +890,9 @@ identifiers.
    because the remainder holds both units. It is reversible. It grows the list in
    place to the full ranked length, and a second click restores the top 20
    exactly. `core` ranks the full Tracked List and the page truncates. Thus the
-   threshold and the recipe reorder across everything (FR-5).
+   threshold and the recipe reorder across everything (FR-5). A list of 20 rows or
+   fewer shows them all, with no affordance, and the appendix follows the last row
+   (memlog 291), as a short panel does (state 39).
 
 5. **Open the sync report.** Click `{components.sync-button}` (memlog 254,
    258 N-7). The panel opens in place under the header bar and pushes the list
@@ -1159,6 +1154,11 @@ is already under their hand in the header (memlog 204).
 7. **Climax:** the second rank stops being a claim and becomes an argument they can
    check. They accept it or not, on evidence they just read.
 
+Failure path (memlog 292): the row they open has no evidence yet. Every line is
+pending, broken or below threshold (states 18, 41, 20 and 21). The panel cannot
+argue the rank. It prints each line with its own reason and clock, so the player
+reads *not checkable yet*, never *worthless* (FR-9).
+
 ### UJ-4 — The trust check
 
 → Steps 2 and 3 come from the specimen box of
@@ -1179,6 +1179,11 @@ is already under their hand in the header (memlog 204).
 6. **Climax:** they discount that Item Class rather than act on it. The page did
    not hide the weakness and did not apologise for it. It refused to look more
    confident than its data deserved.
+
+Failure path (memlog 292): the suspicious row's mark slot is empty, and no ≈ sits
+before its EV. Silence means healthy (Epistemics), so the page has nothing more to
+say. The player's last check is the live listing: they open the row and follow the
+↗ on the line that carries the figure (Interaction 6).
 
 *One mark that the player will not find, and should not look for.* A Raw Base never
 carries ≈, because it rests on no modifier pool (FR-4). Its trust lives entirely in
@@ -1216,6 +1221,11 @@ The *edit* happens in a text editor and git.
    time they open the page, the button reads its age again, and the entries they
    pruned are behind `+ N pruned`.
 
+Failure path (memlog 292): no `sync-report.json` is published (*The sync report*).
+The button still turns red on broken entries, and Problems still lists them, but
+every report figure reads `unknown`. The player finds the entries through the
+panels, as in step 4, and edits the file as before.
+
 What stays unsupported: the edit itself. `data/tracked.json` is hand-owned (AD-15,
 AD-3). The player does this a handful of times a league.
 
@@ -1238,13 +1248,17 @@ AD-3). The player does this a handful of times a league.
    finished. They watch the recovery happen. At no point does the page serve last
    league's numbers as this league's.
 
+Failure path (memlog 292): the player opens the page before they edit the active
+league in `data/config.json`. The header eyebrow still names last league (Copy
+Deck), and the ranking is last league's. The eyebrow is the signal, and step 1 is
+the fix.
+
 ## Coverage Self-Check
 
 - **Flow coverage: complete.** All six PRD journeys (UJ-1 to UJ-6) have a Key Flow
-  with numbered steps and a climax beat. Failure paths: UJ-1 and UJ-2. The other
-  failure paths are known gaps (Foundation). UJ-5's partial support and UJ-6's
-  honest-empty landing are stated as such. The protagonist is "the player" by
-  override (memlog 21).
+  with numbered steps, a climax beat and a failure path (memlog 292). UJ-5's
+  partial support and UJ-6's honest-empty landing are stated as such. The
+  protagonist is "the player" by override (memlog 21).
 - **State coverage: 45 numbered rows, 44 live.** States 1–43 plus 12a and 15a.
   State 19 is retired (memlog 256). States 42 and 43 cover one published recipe
   and none (memlog 275).

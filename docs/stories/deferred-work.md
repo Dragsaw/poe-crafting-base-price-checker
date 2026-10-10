@@ -30,20 +30,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-retro-4-2-state-23-verdict-and-recipeless-order.md`
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
-
-## Deferred from: epic 4 retro item 5 (2026-10-10)
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
-  summary: UX rules on the failure paths of UJ-3, UJ-4 and UJ-5 and writes the ruling into EXPERIENCE.md.
-  evidence: EXPERIENCE.md Foundation *Known gaps* and Coverage Self-Check list them as unruled, owner UX (UX memlog 279, 288); epic-4-retro-2026-10-10.md finding S-Gaps. Nobody raised them during Epic 4.
-  retry_when: never — needs a human
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
-  summary: UX rules on the list show-more affordance when the ranked list has 20 rows or fewer, and writes the ruling into EXPERIENCE.md.
-  evidence: EXPERIENCE.md Foundation *Known gaps* lists it as unruled, owner UX (UX memlog 279, 288); Interaction 4 and state 33 cover only a list past 20 rows; epic-4-retro-2026-10-10.md finding S-Gaps.
-  retry_when: never — needs a human
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
-  summary: UX reconciles the EXPERIENCE.md Coverage Self-Check failure-path sentence with *Known gaps*, ruling whether UJ-6 has a failure path.
-  evidence: EXPERIENCE.md Coverage Self-Check says failure paths other than UJ-1 and UJ-2 are known gaps, which covers UJ-6, but *Known gaps* lists only UJ-3 to UJ-5 (memlog 279). Pre-existing; review finding 10 of this spec.
-  retry_when: never — needs a human
