@@ -4,9 +4,9 @@
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { canonicalKey } from '@poe/contracts';
-import type { ConfigFile, FilesystemPort, TrackedEntry, WeightsFile } from '@poe/contracts';
-import { crossFileChecks, type UnvalidatedMark } from '@poe/core';
+import { canonicalKey, compareByCodeUnit, compareCanonicalKeys, parseEnvelope, RecipesFileSchema } from '@poe/contracts';
+import type { ConfigFile, CraftedTrackedEntry, FilesystemPort, RecipesFile, TrackedEntry, WeightsFile } from '@poe/contracts';
+import { craftedClassesOf, crossFileChecks, isPoolCheckable, poolOf, recipeReach, type Slot, type UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -15,12 +15,14 @@ import { checkCatalogue } from '../chunk/catalogue-check.ts';
 import { isInvokedDirectly } from '../entry/is-invoked-directly.ts';
 import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 import { loadConfig } from '../load-config.ts';
-import { DataFileError, describeVersionRefusal, explainTrackedVersion, parseTrackedFile } from '../load-data-file.ts';
+import { DataFileError, describeVersionRefusal, explainTrackedVersion, loadDataFile, parseTrackedFile } from '../load-data-file.ts';
 import type { DataFileResult } from '../load-data-file.ts';
 import { checkPinnedCap } from '../pinned-cap.ts';
 import { createNodeFilesystemPort } from '../shell.ts';
 
-export type CheckName = 'schema' | 'pinned-cap' | 'catalogue' | 'cross-file';
+export type CheckName = 'schema' | 'pinned-cap' | 'catalogue' | 'cross-file' | 'recipe-reach';
+
+export const RECIPES_PATH = 'data/recipes.json';
 
 export interface CheckIssue {
   readonly check: CheckName;
@@ -31,7 +33,10 @@ export interface CheckIssue {
 
 export interface CheckStatus {
   readonly check: CheckName;
-  /** `skipped` when the schema check failed, so there are no entries to check, or, for `cross-file`, when the weights file is absent. */
+  /**
+   * `skipped` when the schema check failed, so there are no entries to check; for `cross-file`, when the weights file
+   * is absent; for `recipe-reach`, when the recipes file is absent or the weights file is absent or refused.
+   */
   readonly status: 'passed' | 'failed' | 'skipped';
 }
 
@@ -40,13 +45,23 @@ export interface CheckUnvalidated extends UnvalidatedMark {
   readonly path?: string;
 }
 
+/** One `(entry, recipe)` pair that AD-17 makes unreachable, once per slot that `recipeReach` names. */
+export interface CheckUnreachable {
+  readonly entryKey: string;
+  readonly recipeId: string;
+  readonly slot: Slot;
+  readonly path?: string;
+}
+
 export interface TrackedCheckReport {
-  /** Whether every check passed. An unvalidated mark never makes it `false`. */
+  /** Whether every check passed and nothing is unreachable. An unvalidated mark never makes it `false`. */
   readonly ok: boolean;
   readonly checks: readonly CheckStatus[];
   readonly issues: readonly CheckIssue[];
   /** One mark per unvalidated crafted entry, sorted by canonical key. Listed, never a failure. */
   readonly unvalidated: readonly CheckUnvalidated[];
+  /** Every unreachable pair, by canonical key, then recipe, then slot. A non-empty list makes `ok` `false`. */
+  readonly unreachable: readonly CheckUnreachable[];
 }
 
 /** The inputs of one check, as loaded. */
@@ -57,6 +72,8 @@ export interface TrackedCheckInputs {
   readonly catalogue: DataFileResult<CatalogueIds>;
   /** The parsed `data/weights.json`; `undefined` when the file is absent. */
   readonly weights: DataFileResult<WeightsFile | undefined>;
+  /** The parsed `data/recipes.json`; `undefined` when the file is absent. */
+  readonly recipes: DataFileResult<RecipesFile | undefined>;
 }
 
 type SchemaResult =
@@ -192,6 +209,60 @@ function crossFileOutcome(
   };
 }
 
+function classUnreachable(members: readonly CraftedTrackedEntry[], weights: WeightsFile, recipes: RecipesFile, pathOf: PathOf): CheckUnreachable[] {
+  const [first] = members;
+  const lookup = first === undefined ? undefined : poolOf(weights, first.categoryId, first.className);
+  // An absent class or a partial pool is an unvalidated mark already; containment is not defined there.
+  if (lookup?.ok !== true || !isPoolCheckable(lookup.pools)) {
+    return [];
+  }
+  const found: CheckUnreachable[] = [];
+  for (const entry of members) {
+    const entryKey = canonicalKey(entry);
+    for (const recipe of recipes.recipes) {
+      const reach = recipeReach(lookup.pools, entry, recipe.modifierLevelMin);
+      if (!reach.reached) {
+        found.push(...reach.slots.map((slot) => ({ entryKey, recipeId: recipe.id, slot, ...pathOf(entryKey) })));
+      }
+    }
+  }
+  return found;
+}
+
+function unreachableOf(
+  entries: readonly TrackedEntry[],
+  weights: WeightsFile,
+  recipes: RecipesFile,
+  pathOf: PathOf,
+): CheckUnreachable[] {
+  return craftedClassesOf(entries)
+    .values()
+    .flatMap((members) => classUnreachable(members, weights, recipes, pathOf))
+    .toArray()
+    .toSorted(
+      (left, right) =>
+        compareCanonicalKeys(left.entryKey, right.entryKey) ||
+        compareByCodeUnit(left.recipeId, right.recipeId) ||
+        compareByCodeUnit(left.slot, right.slot),
+    );
+}
+
+function recipeReachOutcome(
+  loaded: Pick<TrackedCheckInputs, 'recipes' | 'weights'>,
+  entries: readonly TrackedEntry[] | undefined,
+  pathOf: PathOf,
+): CheckOutcome & { readonly unreachable: readonly CheckUnreachable[] } {
+  const { recipes, weights } = loaded;
+  if (!recipes.ok) {
+    return { status: 'failed', issues: [{ check: 'recipe-reach', message: recipes.error.message }], unreachable: [] };
+  }
+  if (entries === undefined || recipes.value === undefined || !weights.ok || weights.value === undefined) {
+    return { status: 'skipped', issues: [], unreachable: [] };
+  }
+  const unreachable = unreachableOf(entries, weights.value, recipes.value, pathOf);
+  return { status: unreachable.length === 0 ? 'passed' : 'failed', issues: [], unreachable };
+}
+
 /** Pure: the loaded inputs in, the report out. */
 export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   const schema = checkSchema(loaded.tracked);
@@ -203,20 +274,23 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
   const cap = pinnedCapOutcome(loaded.config, entries);
   const catalogue = catalogueOutcome(loaded.catalogue, entries, pathOf);
   const crossFile = crossFileOutcome(loaded.weights, entries, pathOf);
+  const reach = recipeReachOutcome(loaded, entries, pathOf);
 
   const outcomes: readonly (readonly [CheckName, CheckOutcome])[] = [
     ['schema', schemaOutcome],
     ['pinned-cap', cap],
     ['catalogue', catalogue],
     ['cross-file', crossFile],
+    ['recipe-reach', reach],
   ];
   const issues = outcomes.flatMap(([, outcome]) => outcome.issues);
-  // A mark never moves `ok`.
+  // An `unvalidated` mark never moves `ok`.
   return {
-    ok: issues.length === 0,
+    ok: issues.length === 0 && reach.unreachable.length === 0,
     checks: outcomes.map(([check, outcome]) => ({ check, status: outcome.status })),
     issues,
     unvalidated: crossFile.unvalidated,
+    unreachable: reach.unreachable,
   };
 }
 
@@ -233,14 +307,22 @@ async function loadWeights(fs: FilesystemPort): Promise<DataFileResult<WeightsFi
   }
 }
 
-/** Reads the four inputs through `fs`. Reads only; a refusal is carried as a value. */
+/** The recipes file as a value: absent is `undefined`, a refusal is carried. */
+async function loadRecipes(fs: FilesystemPort): Promise<DataFileResult<RecipesFile | undefined>> {
+  const result = await loadDataFile(fs, RECIPES_PATH, (data) => parseEnvelope(RecipesFileSchema, data));
+  return !result.ok && result.error.reason === 'absent' ? { ok: true, value: undefined } : result;
+}
+
+/** Reads the five inputs through `fs`. Reads only; a refusal is carried as a value. */
 export async function loadTrackedCheckInputs(fs: FilesystemPort): Promise<TrackedCheckInputs> {
-  return {
-    tracked: await fs.readTextFile(TRACKED_PATH),
-    config: await loadConfig(fs),
-    catalogue: await loadCatalogueIds(fs),
-    weights: await loadWeights(fs),
-  };
+  const [tracked, config, catalogue, weights, recipes] = await Promise.all([
+    fs.readTextFile(TRACKED_PATH),
+    loadConfig(fs),
+    loadCatalogueIds(fs),
+    loadWeights(fs),
+    loadRecipes(fs),
+  ]);
+  return { tracked, config, catalogue, weights, recipes };
 }
 
 /** `packages/sync/src/curation/` → the repository root. */

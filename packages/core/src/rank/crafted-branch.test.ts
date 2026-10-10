@@ -109,9 +109,9 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     ]);
   });
 
-  it('a recipe floor that empties the pool makes that pair unrankable, and the other recipe ranks (state 36)', () => {
+  it('a recipe floor that removes the contained tier makes that pair unrankable, and the other recipe ranks (state 36)', () => {
     const target = chase('Bows');
-    const lowOnly = poolsFile(['weapon.bow', 'Bows', [[tierOf(TARGET, 10, 1)], [tierOf(SUFFIX_STAT, 10, 1)]]]);
+    const lowOnly = poolsFile(['weapon.bow', 'Bows', [[tierOf(TARGET, 10, 1, 'g'), tierOf(FILLER, 10, 75, 'g')], [tierOf(SUFFIX_STAT, 10, 1)]]]);
     const result = rankCrafted({ tracked: [target], dataset: [published(target, priced(1))], weights: lowOnly });
     expect(craftedRows(result.ordering).map((row) => row.recipeId)).toEqual(['greater']);
     expect(result.unrankable).toEqual([
@@ -241,8 +241,8 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
 
   it('two recipes over one Tracked List give orderings that differ by more than a constant offset', () => {
     // Bows: P = 0.1 at floor 0 and 0.5 at floor 70. Staves: P = 0.5 at floor 0, and at floor 70 its
-    // reference contains no eligible tier.
-    const staves: Pools = [[tierOf(TARGET, 50, 1), tierOf(FILLER, 50, 75)], [tierOf(SUFFIX_STAT, 10, 80)]];
+    // reference contains no eligible tier: its group's top tier is FILLER's.
+    const staves: Pools = [[tierOf(TARGET, 50, 1, 'staves'), tierOf(FILLER, 50, 75, 'staves')], [tierOf(SUFFIX_STAT, 10, 80)]];
     const bows = chase('Bows');
     const stavesEntry = chase('Staves', TARGET, 'active', 'weapon.staff');
     const result = rankCrafted({

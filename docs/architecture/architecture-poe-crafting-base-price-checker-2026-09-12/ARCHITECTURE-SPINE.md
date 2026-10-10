@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 33
+revision: 34
 created: '2026-09-12'
-updated: '2026-10-09'
+updated: '2026-10-10'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -1174,14 +1174,14 @@ never import each other.
   `modGroup` removed, and renormalises the rest. **A hybrid reference is one modifier in
   this formula**: its probability is the weight of the tiers it contains, never a product
   across its lines. The formula,
-  and its order after the recipe floor below (scope, truncate, exclude, renormalise), are `affixProbability` and `combinationProbability` in
+  and its order after the recipe floor below (scope, floor, renormalise, exclude, renormalise), are `affixProbability` and `combinationProbability` in
   `packages/core/src/probability.ts`, binding under AD-0.
 
   **Where no `modGroup` spans both slots of a class, the result is exactly `P(prefix) ×
   P(suffix)`**; the exclusion exists so a patch that shares a group across slots is valued
   correctly rather than overstated. **An augment left with no eligible entry makes that `(itemClass,
-  recipe)` pair unrankable with a reason, never a zero**, on the same ruling as an empty
-  recipe-floor pool below.
+  recipe)` pair unrankable with a reason, never a zero**, on the same ruling as an entry a
+  recipe cannot reach below.
 
   *[ASSUMPTION]* The model treats the crafting act as occurring at **exactly** the entry's
   floor. The crafted search sends no item-level filter and prices every item level by
@@ -1296,38 +1296,32 @@ never import each other.
   to FR-4's enum; if that enum has no member for the empty pool, that is a finding for the
   PRD and not a licence for `core` to relabel it as `partial`.
 
-  **A recipe restricts the pool from below, and that is its whole distribution term.** A
-  `CraftRecipe` declares a **`modifierLevelMin`** — the game's *Minimum Modifier Level*,
-  which a greater or perfect orb imposes and a plain orb does not. A tier whose
-  `itemLevelMin` is **below** that floor cannot roll under that recipe, so `core` **removes
-  it from the pool and renormalises the surviving weights** before AD-11's containment and
-  this AD's probability term run. The transform is a truncation and a renormalisation; it
-  is never a reweighting, and `core` invents no numbers. The predicate and the
-  renormalisation are `eligible` and `canRecipeRoll` in `packages/core/src/probability.ts`, binding under AD-0.
+  **A recipe restricts the pool from below, one modifier group at a time, and that is its
+  whole distribution term.** A `CraftRecipe` declares a **`modifierLevelMin`** — the game's
+  *Minimum Modifier Level*, which a greater or perfect orb imposes and a plain orb does not.
+  After AD-5's scope, `core` takes each `modGroup` of each slot on its own. **Where the
+  group has a tier at or above the floor, its tiers below the floor are removed. Where the
+  group's highest tier is below the floor, that tier alone survives at its own weight**,
+  because the floor never removes a modifier type entirely. `core` then renormalises the
+  surviving weights, before AD-11's containment and this AD's probability term run. The
+  transform is a truncation and a renormalisation; it is never a reweighting, and `core`
+  invents no numbers. The predicate is `eligible` in `packages/core/src/probability.ts`,
+  binding under AD-0.
 
-  **The floor and the entry's item level are the same axis, bounding the pool from opposite
-  ends.** A tier is eligible when
-  `recipe.modifierLevelMin ≤ tier.itemLevelMin ≤ entry.itemLevelMin`: the recipe's orb
-  cannot reach below the floor, and the item cannot roll a modifier above its own level.
-  They are one axis, not two — `itemLevelMin` on
-  a weights tier *is* that modifier's level (`WEIGHTS-FILE-SCHEMA.md`), the same quantity
-  the orb's floor names.
+  **The highest tier is the group's highest tier in the unscoped pool, not the highest the
+  item level allows.** A group whose top tier is above the entry's item level, and whose
+  other tiers are below the floor, contributes nothing under that recipe.
 
-  **An empty surviving pool makes that `(itemClass, recipe)` pair unrankable with a
-  reason, never a probability of zero.** A perfect orb's floor of 70 against an entry whose item level
-  floor is 65 admits no tier at all; a zero probability there would rank the pair at
-  `−craftCost` and bury a *this recipe cannot make this class* case inside the ordering,
-  where it reads as a bad craft rather than an impossible one.
+  **An entry that a recipe cannot reach is a curation defect, not a ranking input.** `core`
+  exposes the reach verdict for each `(entry, recipe)` pair. `pnpm tracked:check` fails
+  while any entry is unreachable under any recipe in `data/recipes.json`
+  (`AGENT-WORKFLOW.md`). Ranking keeps the backstop: an unreachable entry makes its
+  `(itemClass, recipe)` pair unrankable.
 
   **Ordering is therefore recipe-dependent**, and the cross product AD-3 ranks is a real
   cross product rather than one distribution repeated at different cost offsets. The floors
   themselves are recipe **data** and live in `data/recipes.json`, never in this document, so
   adding a recipe stays the data edit AD-3 promises.
-
-  *[ASSUMPTION]* The floor truncates and the remainder renormalises proportionally — that
-  is, an orb removes mass from the pool without redistributing it unevenly across what
-  survives. Nothing in the inputs measures a second-order effect, and a uniform
-  renormalisation is the only reading that needs no number nobody has.
 
 ### AD-19 — League is part of every observation's identity; the dataset is a snapshot and git is the history
 

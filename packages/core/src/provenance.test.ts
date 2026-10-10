@@ -48,8 +48,8 @@ describe('provenance (AD-10)', () => {
     expect(foldPair(pools([{ ...tier('absent', 1), weight: 0 }], []), { itemLevelMin: 82 }, 0)).toBe('uniform-prior');
   });
 
-  it('ignores an invented tier below the recipe floor, and one above the entry floor', () => {
-    const p = pools([tier('absent', 10), tier('absent', 90), tier('published', 50)], []);
+  it('ignores an invented tier the recipe floor removes from its group, and one above the entry floor', () => {
+    const p = pools([{ ...tier('absent', 10), modGroup: 'g-published-50' }, tier('absent', 90), tier('published', 50)], []);
     expect(foldPair(p, { itemLevelMin: 82 }, 20)).toBe('measured');
     expect(foldPair(p, { itemLevelMin: 82 }, 0)).toBe('uniform-prior');
   });

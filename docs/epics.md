@@ -2053,6 +2053,8 @@ So that a double-counted Combination cannot hand an Item Class the top of the li
 
 ### Story 3.4: The crafted EV, Craft Cost and the Craft Recipe control
 
+*Superseded for the recipe floor by Story 4.7 (AD-17).*
+
 As the player,
 I want Item Classes ranked by threshold-truncated expected value under a Craft Recipe I choose, with the Craft Cost I pay on every attempt shown once,
 So that the list ranks the decision I actually make rather than the price of a base.
@@ -2676,3 +2678,47 @@ So that no retired element is left over.
 **Given** NFR-10
 **When** the whole page is checked
 **Then** price trustworthiness, estimated odds and crafted versus uncrafted each carry a cue that is not colour (NFR-10; `EXPERIENCE.md` *Accessibility Floor*).
+
+### Story 4.7: The recipe floor per modifier group
+
+As the player,
+I want a greater or perfect recipe valued on the modifiers it can really roll,
+So that a recipe's ranking matches the game.
+
+**Acceptance Criteria:**
+
+**Given** a `modGroup` in a slot of the scoped pool
+**When** `core` applies the recipe floor
+**Then** it removes the group's tiers below `modifierLevelMin` if the group has a tier at or above the floor
+**And** otherwise it keeps only the group's absolute top tier, at its own weight
+**And** it never removes a whole group because of the floor (AD-17).
+
+**Given** a hybrid `modGroup`
+**When** `core` applies the floor
+**Then** the hybrid is its own group, and groups that share a `statId` are not merged (AD-17).
+
+**Given** the pool transforms
+**When** `core` builds a pool
+**Then** scope runs first, then the floor, then renormalisation, all before containment, and coverage is read on the unrestricted pool (AD-17, AD-27).
+
+**Given** a `modifierLevelMin` of `0`
+**When** `core` applies the floor
+**Then** nothing changes, through the same code path.
+
+**Given** an `(entry, recipe)` pair
+**When** a caller asks whether the recipe can reach the entry
+**Then** `core` returns a reach verdict that replaces `canRecipeRoll`
+**And** the `reached` flag of `pnpm tracked:lookup tiers` uses that verdict.
+
+**Given** an unreachable pair
+**When** `pnpm tracked:check` or `pnpm test:data` runs
+**Then** `tracked:check` lists it under `unreachable` and exits non-zero, and `test:data` fails on the same list (`AGENT-WORKFLOW.md`)
+**And** ranking keeps the backstop: the entry makes its `(itemClass, recipe)` pair unrankable (AD-17; state 36).
+
+**Given** a fixture with a group that has a tier at or above the floor, a group whose top tier is below the floor and a group whose top tier is above the item level
+**When** `core` computes the perfect-recipe probabilities
+**Then** they match the per-group rule.
+
+**Given** the change is done
+**When** `pnpm check` runs
+**Then** it passes, and any entry that is now unreachable is pruned with the tracked-json skill.

@@ -155,7 +155,7 @@ describe('the crafted states', () => {
     mount();
     await settleTo('ready');
     expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('regular|perfect');
-    // At floor 0 every Wands tier is eligible and the target is all of its prefix pool.
+    // At floor 0 every Wands tier is eligible and the target is half of its prefix pool.
     expect(names()).toEqual(['Wands', 'Bows']);
     expect(frame().querySelector('[data-appendix-row]')).toBeNull();
     click(option('perfect'));

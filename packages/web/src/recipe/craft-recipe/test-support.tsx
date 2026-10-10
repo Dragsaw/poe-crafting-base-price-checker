@@ -40,11 +40,12 @@ const nextSerial = ((): (() => number) => {
   };
 })();
 
-export function tier(statId: string, weight: number, itemLevelMin: number): ModifierWeight {
+/** One pool tier; a shared `modGroup` makes the recipe floor act on the tiers together (AD-17). */
+export function tier(statId: string, weight: number, itemLevelMin: number, group?: string): ModifierWeight {
   const serial = nextSerial();
   return {
     sourceModifierId: `m${String(serial)}`,
-    modGroup: `g${String(serial)}`,
+    modGroup: group ?? `g${String(serial)}`,
     itemLevelMin,
     weight,
     weightSource: 'published',
@@ -73,11 +74,11 @@ export const SUFFIX = 'explicit.stat_4';
 export type Pools = readonly [readonly ModifierWeight[], readonly ModifierWeight[]];
 
 /** At floor 44 the target is half the prefix pool; at floor 70 it is all of it. */
-export const BOWS: Pools = [[tier(TARGET, 10, 75), tier(FILLER, 10, 50), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
+export const BOWS: Pools = [[tier(TARGET, 10, 75, 'bows'), tier(FILLER, 10, 50, 'bows'), tier(LOW, 80, 1, 'bows')], [tier(SUFFIX, 10, 80)]];
 /** Floor 44: the target is half the prefix pool; floor 70: a quarter. None in reach: a reason. */
-export const STAVES: Pools = [[tier(TARGET, 50, 50), tier(TARGET, 25, 75), tier(FILLER, 75, 75)], [tier(SUFFIX, 10, 80)]];
-/** Every tier below both floors: no recipe reaches it (state 36). */
-export const WANDS: Pools = [[tier(TARGET, 10, 1)], [tier(SUFFIX, 10, 1)]];
+export const STAVES: Pools = [[tier(TARGET, 50, 50, 'staves'), tier(TARGET, 25, 75, 'staves'), tier(FILLER, 75, 75)], [tier(SUFFIX, 10, 80)]];
+/** The target shares a group with a tier at 75, so both floors remove it: no such recipe reaches it (state 36). */
+export const WANDS: Pools = [[tier(TARGET, 10, 1, 'wands'), tier(FILLER, 10, 75, 'wands')], [tier(SUFFIX, 10, 1)]];
 
 export function chase(categoryId: string, className: string): CraftedTrackedEntry {
   return {
@@ -235,7 +236,7 @@ export const COLD_RES = 'explicit.stat_4220027924';
 
 /** Five prefixes, one suffix. Life's main tier is below the perfect floor (70): small P there. */
 const RINGS: Pools = [
-  [tier(ATK_DMG, 10, 75), tier(MANA, 10, 75), tier(LIFE, 10, 50), tier(LIFE, 1, 75), tier(ES, 10, 75), tier(RARITY, 10, 75)],
+  [tier(ATK_DMG, 10, 75), tier(MANA, 10, 75), tier(LIFE, 10, 50, 'life'), tier(LIFE, 1, 75, 'life'), tier(ES, 10, 75), tier(RARITY, 10, 75)],
   [tier(COLD_RES, 10, 80)],
 ];
 
