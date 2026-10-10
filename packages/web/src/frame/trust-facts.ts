@@ -102,6 +102,8 @@ export interface Curation {
   readonly pinnedCount: number;
   /** The loaded `config.minChunkSearches`. */
   readonly minChunkSearches: number;
+  /** Canonical keys of `pruned` entries: they are never re-checked, so they never count as broken. */
+  readonly prunedKeys: ReadonlySet<string>;
 }
 
 // --- segments -------------------------------------------------------------
@@ -176,13 +178,13 @@ function starvationLine(pinned: number, left: number): FigureLine {
   return [mark('rough'), text(` ${words}`)];
 }
 
-/** Broken entries from the dataset, starved ones from the matching record; a stale patch has no source (AD-12). */
+/** Broken non-pruned entries from the dataset, starved ones from the matching record; a stale patch has no source (AD-12). */
 export function problemSummary(
   dataset: readonly DatasetEntry[],
   report: SyncReport | undefined,
   curation: Curation,
 ): ProblemSummary {
-  const broken = dataset.filter((entry) => entry.price.state === 'unresolvable').length;
+  const broken = dataset.filter((entry) => entry.price.state === 'unresolvable' && !curation.prunedKeys.has(entry.entryKey)).length;
   const lines: FigureLine[] = [];
   if (broken > 0) {
     lines.push([mark('broken'), text(` ${count(broken)} ${plural(broken, 'entry', 'entries')} can no longer be priced`)]);

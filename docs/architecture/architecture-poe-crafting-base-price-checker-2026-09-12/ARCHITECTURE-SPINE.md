@@ -847,7 +847,7 @@ never import each other.
 
   | Problem | Count source |
   | --- | --- |
-  | Broken entries | the dataset entries whose state is `unresolvable` (AD-9), not the report's `unresolvable` records. Those records survive until the player's edit, so they outlive a recovered id |
+  | Broken entries | the non-pruned dataset entries whose state is `unresolvable` (AD-9), not the report's `unresolvable` records. Those records survive until the player's edit, so they outlive a recovered id |
   | Starved pinned entries | the `pinned-starvation` record that matches the loaded curation (AD-7). `pinnedCount − pinnedRefreshed` is the number left out |
   | Stale game patch | **none, so the problem cannot fire in v1** |
 

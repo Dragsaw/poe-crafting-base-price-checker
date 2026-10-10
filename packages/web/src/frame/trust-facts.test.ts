@@ -61,7 +61,7 @@ const starvation = {
 };
 
 // The loaded curation that the `starvation` fixture describes: 6 pinned, yardstick 8.
-const CURATION = { pinnedCount: 6, minChunkSearches: 8 };
+const CURATION = { pinnedCount: 6, minChunkSearches: 8, prunedKeys: new Set<string>() };
 
 const lines = (summary: ProblemSummary): string[] => summary.lines.map((line) => groupText([line]));
 
@@ -147,21 +147,21 @@ describe('the problem summary (AD-12)', () => {
     const summary = problemSummary(datasetWithBroken(0), report({ records: [{ ...starvation, pinnedRefreshed: 6 }] }), CURATION);
     expect(summary).toMatchObject({ starved: 1, kind: 'rough' });
     expect(lines(summary)).toEqual(['6 pinned entries take every search, so nothing else rotates']);
-    const single = problemSummary([], report({ records: [{ ...starvation, pinnedCount: 1, pinnedRefreshed: 1 }] }), { pinnedCount: 1, minChunkSearches: 8 });
+    const single = problemSummary([], report({ records: [{ ...starvation, pinnedCount: 1, pinnedRefreshed: 1 }] }), { ...CURATION, pinnedCount: 1, minChunkSearches: 8 });
     expect(lines(single)).toEqual(['1 pinned entry takes every search, so nothing else rotates']);
   });
 
   it('counts nothing for a stale record: the pinned set or the yardstick changed since', () => {
     const records = [starvation];
-    expect(problemSummary([], report({ records }), { pinnedCount: 8, minChunkSearches: 8 }).kind).toBeUndefined();
-    expect(problemSummary([], report({ records }), { pinnedCount: 6, minChunkSearches: 10 }).kind).toBeUndefined();
+    expect(problemSummary([], report({ records }), { ...CURATION, pinnedCount: 8, minChunkSearches: 8 }).kind).toBeUndefined();
+    expect(problemSummary([], report({ records }), { ...CURATION, pinnedCount: 6, minChunkSearches: 10 }).kind).toBeUndefined();
   });
 
   it('reads the matching record, not the last by position, and counts nothing for an empty pinned set', () => {
     const matching = { ...starvation, pinnedCount: 8, pinnedRefreshed: 2 };
-    expect(problemSummary([], report({ records: [matching, starvation] }), { pinnedCount: 8, minChunkSearches: 8 }).starved).toBe(6);
+    expect(problemSummary([], report({ records: [matching, starvation] }), { ...CURATION, pinnedCount: 8, minChunkSearches: 8 }).starved).toBe(6);
     const empty = { ...starvation, pinnedCount: 0, pinnedRefreshed: 0 };
-    expect(problemSummary([], report({ records: [empty] }), { pinnedCount: 0, minChunkSearches: 8 }).kind).toBeUndefined();
+    expect(problemSummary([], report({ records: [empty] }), { ...CURATION, pinnedCount: 0, minChunkSearches: 8 }).kind).toBeUndefined();
   });
 
   it('leads with the broken mark when anything counted is broken, and lists broken first', () => {
@@ -178,7 +178,7 @@ describe('the problem summary (AD-12)', () => {
 
   it('groups large counts the en-US way', () => {
     const large = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 500 };
-    const summary = problemSummary([], report({ records: [large] }), { pinnedCount: 12_000, minChunkSearches: 8 });
+    const summary = problemSummary([], report({ records: [large] }), { ...CURATION, pinnedCount: 12_000, minChunkSearches: 8 });
     expect(lines(summary)).toEqual(['11,500 of 12,000 pinned entries are not being refreshed']);
   });
 });
