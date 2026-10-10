@@ -7,3 +7,6 @@ export const NBSP = String.fromCodePoint(0xA0);
 export function plural(count: number, singular: string, pluralForm: string): string {
   return count === 1 ? singular : pluralForm;
 }
+
+/** The middle dot between a word and its reason, two reasons, two affixes or two notes (EXPERIENCE.md Copy Deck). */
+export const JOINER = ' · ';

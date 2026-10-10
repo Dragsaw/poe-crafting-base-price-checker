@@ -1,5 +1,7 @@
 import type { DatasetEntry, PriceObservation, PriceState, PriceTrust, PriceTrustReason, TrackedEntry } from '@poe/contracts';
 
+import { DAY_MS, HOUR_MS, MINUTE_MS } from './clock.ts';
+
 /** EXPERIENCE.md *Price trust*: a price this many hours old or older is old. */
 export const OLD_AFTER_HOURS = 72;
 /** EXPERIENCE.md *Price trust*: a price on fewer listings than this is thin. */
@@ -7,9 +9,6 @@ export const THIN_BELOW_LISTINGS = 3;
 /** EXPERIENCE.md *Price trust*: a crafted row is rough when this share of its gross is unreliable. */
 export const UNRELIABLE_SHARE_MIN = 0.7;
 
-const MINUTE_MS = 60 * 1000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
 /** A share built from `P × price` sums carries float error; a share at the bound must still match it. */
 const SHARE_TOLERANCE = 1e-9;
 

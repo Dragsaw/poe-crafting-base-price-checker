@@ -1,7 +1,7 @@
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { absenceLine, PANEL_HEADINGS } from './frame/trust-facts';
+import { absenceLine, PANEL_HEADINGS } from './frame/trust-copy';
 import {
   FETCH_FAILURE_EYEBROW,
   FETCH_FAILURE_RECOVERY,

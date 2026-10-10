@@ -14,8 +14,8 @@ import { BELOW_THRESHOLD_NOTE, CURATION_MARKS, ESTIMATED_ODDS_CONTEXT, FEWER_LIN
 import { RankedList } from './RankedList';
 import { NAME_COLORS } from './RankedRow';
 import { MISSING_FIGURE } from './row/ExpectedValueCell';
-import { TRUST_JOINER } from './row/trust-words';
 import { click, linesIn, openOne, panelsIn, SEARCH } from './expansion/test-support';
+import { JOINER } from '../shared/text';
 
 afterEach(unmount);
 
@@ -107,7 +107,7 @@ describe('the expansion panel', () => {
   it('continues a uniform-prior row’s context line with the ≈ sentence', () => {
     const view = mount(panel(classRow(1, 0, { provenance: 'uniform-prior' })));
     const context = view.querySelector<HTMLElement>('[data-context-line]');
-    expect(context?.textContent).toBe(`Rings${TRUST_JOINER} ${ESTIMATED_ODDS_CONTEXT}`);
+    expect(context?.textContent).toBe(`Rings${JOINER} ${ESTIMATED_ODDS_CONTEXT}`);
     expect(context?.querySelector('svg[data-mark="estimate"]')).not.toBeNull();
     expect(context?.querySelector<HTMLElement>('[data-context-name]')?.style.color).toBe(rgb(NAME_COLORS.class));
   });

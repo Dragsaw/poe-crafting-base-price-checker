@@ -75,7 +75,7 @@ function scanSummands({ recipe, pools, keyed, byKey, activeLeague, threshold, no
     const contribution = probability.p * priceDivine;
     trusted.push({ trust, gross: contribution });
     if (priceDivine < threshold) {
-      combinations.push({ entryKey, trust });
+      combinations.push({ entryKey, trust, priceDivine });
       continue;
     }
     stamps.push(observedAt);

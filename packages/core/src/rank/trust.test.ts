@@ -9,6 +9,7 @@ import {
   GREATER,
   keysOf,
   observation,
+  OLD_LEAGUE,
   poolsFile,
   priced,
   published,
@@ -115,6 +116,21 @@ describe('rank: price trust on every row, summand and combination', () => {
     expect(keysOf(row.combinations)).toEqual([key(s2), ...[key(s3), key(s5)].toSorted(compareCanonicalKeys), key(s4)]);
     expect(row.combinations.map((combination) => combination.trust.verdict)).toEqual(['current', 'pending', 'pending', 'broken']);
     expect(row.trust).toEqual({ verdict: 'current', reasons: [] });
+  });
+
+  it('puts the active-league price on a below-threshold combination only', () => {
+    const row = onlyRow(
+      rankBows([
+        published(s1, priced(10)),
+        published(s2, priced(0.1)),
+        published(s3, { state: 'no-listings' }),
+        published(s4, { state: 'unresolvable' }),
+        published(s5, priced(0.2, OLD_LEAGUE)),
+      ]),
+    );
+    const prices = new Map(row.combinations.map((combination) => [combination.entryKey, combination.priceDivine]));
+    expect(prices).toEqual(new Map([[key(s2), 0.1], [key(s3), undefined], [key(s4), undefined], [key(s5), undefined]]));
+    expect(row.combinations.filter((combination) => 'priceDivine' in combination).map((combination) => combination.entryKey)).toEqual([key(s2)]);
   });
 });
 

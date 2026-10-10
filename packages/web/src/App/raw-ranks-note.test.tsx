@@ -4,11 +4,12 @@ import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ARTIFACT_ORDER } from '../load/artifacts';
-import { APPENDIX_NOTES, NOTE_JOINER, RAW_RANKS_NOTE } from '../list/UnrankableAppendix';
+import { APPENDIX_NOTES, RAW_RANKS_NOTE } from '../list/UnrankableAppendix';
 import { serveArtifacts, VALID_BODIES } from '../test-support/artifact-server';
 import { settleTo, unmount } from '../test-support/dom';
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { frame, mount, server } from './test-support';
+import { JOINER } from '../shared/text';
 
 afterEach(() => {
   unmount();
@@ -106,7 +107,7 @@ describe('the state 16 note through the page', () => {
     await settleTo('ready');
     // Rows 1, 2 and 4: Bows ranks a raw base; Staves' is pruned, Wands' below threshold; Belts ranks.
     expect(appendixCells()).toEqual({
-      Bows: ['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(NOTE_JOINER)],
+      Bows: ['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(JOINER)],
       Staves: ['pool partial', PARTIAL],
       Wands: ['class absent from weights file', ABSENT],
     });
@@ -117,14 +118,14 @@ describe('the state 16 note through the page', () => {
     });
     expect(appendixCells()).toEqual({
       Amulets: [RECIPE_UNREACHABLE, ''],
-      Bows: ['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(NOTE_JOINER)],
+      Bows: ['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(JOINER)],
       Staves: ['pool partial', PARTIAL],
       Wands: ['class absent from weights file', ABSENT],
     });
 
     // 0.30 still keeps the 0.3 bow base; 0.35 drops it from the ordering, and the note with it.
     stepThresholdUp();
-    expect(appendixCells()['Bows']).toEqual(['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(NOTE_JOINER)]);
+    expect(appendixCells()['Bows']).toEqual(['pool partial', [PARTIAL, RAW_RANKS_NOTE].join(JOINER)]);
     stepThresholdUp();
     expect(appendixCells()['Bows']).toEqual(['pool partial', PARTIAL]);
 

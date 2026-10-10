@@ -1,16 +1,8 @@
 import { PriceTrustReasonSchema, type PriceTrustReason } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import {
-  FIXED_ROW_REASONS,
-  lineReasonWords,
-  lineTrustParts,
-  markTooltipParts,
-  NO_LISTINGS_LINE,
-  rowReasonWords,
-  TRUST_JOINER,
-  VERDICT_WORDS,
-} from './trust-words';
+import { FIXED_ROW_REASONS, lineReasonWords, lineTrustParts, markTooltipParts, NO_LISTINGS_LINE, rowReasonWords, VERDICT_WORDS } from './trust-words';
+import { JOINER } from '../../shared/text';
 
 const experience = Object.values(
   import.meta.glob<string>('../../../../../docs/ux-designs/ux-poe-crafting-base-price-checker-2026-09-13/EXPERIENCE.md', {
@@ -91,17 +83,17 @@ describe('the mark tooltip', () => {
   it('prints `<word> · <reason>` for a rough share', () => {
     const parts = markTooltipParts({ verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 74 }] });
     expect(parts?.word).toBe(VERDICT_WORDS.rough);
-    expect(isWrittenInExperience(`${parts?.word ?? ''}${TRUST_JOINER}${parts?.reason ?? ''}`)).toBe(true);
+    expect(isWrittenInExperience(`${parts?.word ?? ''}${JOINER}${parts?.reason ?? ''}`)).toBe(true);
   });
 
   it('joins the reasons in core’s order', () => {
     const old = { kind: 'old', days: 4 } as const;
     const thin = { kind: 'thin', listings: 2 } as const;
     expect(markTooltipParts({ verdict: 'rough', reasons: [old, thin] })?.reason).toBe(
-      `${rowReasonWords(old)}${TRUST_JOINER}${rowReasonWords(thin)}`,
+      `${rowReasonWords(old)}${JOINER}${rowReasonWords(thin)}`,
     );
     expect(markTooltipParts({ verdict: 'rough', reasons: [thin, old] })?.reason).toBe(
-      `${rowReasonWords(thin)}${TRUST_JOINER}${rowReasonWords(old)}`,
+      `${rowReasonWords(thin)}${JOINER}${rowReasonWords(old)}`,
     );
   });
 
@@ -111,7 +103,7 @@ describe('the mark tooltip', () => {
     ['pending', 'uncostable'],
     ['broken', 'unresolvable'],
   ] as const)('words a %s row with its %s reason', (verdict, kind) => {
-    expect(markTooltipParts({ verdict, reasons: [{ kind }] })).toEqual({ word: VERDICT_WORDS[verdict], reason: FIXED_ROW_REASONS[kind] });
+    expect(markTooltipParts({ verdict, reasons: [{ kind }] })).toEqual({ verdict, word: VERDICT_WORDS[verdict], reason: FIXED_ROW_REASONS[kind] });
   });
 });
 
@@ -129,11 +121,11 @@ describe('the reason words of an expansion line', () => {
 
   // Matrix: no listings (state 2), attempt 59 s, 1 h, 4 h and 2 d ago.
   it('names the attempt clock on no-listings, and only there', () => {
-    expect(lineReasonWords({ kind: 'no-listings', minutes: 0 })).toBe(`tried 0 min ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
-    expect(lineReasonWords({ kind: 'no-listings', minutes: 60 })).toBe(`tried 1 hour ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
-    expect(lineReasonWords({ kind: 'no-listings', minutes: 240 })).toBe(`tried 4 hours ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
-    expect(lineReasonWords({ kind: 'no-listings', minutes: 2 * 1440 })).toBe(`tried 2 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
-    expect(lineReasonWords({ kind: 'no-listings', minutes: 1440 })).toBe(`tried 1 day ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 0 })).toBe(`tried 0 min ago${JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 60 })).toBe(`tried 1 hour ago${JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 240 })).toBe(`tried 4 hours ago${JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 2 * 1440 })).toBe(`tried 2 days ago${JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 1440 })).toBe(`tried 1 day ago${JOINER}${NO_LISTINGS_LINE}`);
     expect(lineReasonWords({ kind: 'no-listings' })).toBe(NO_LISTINGS_LINE);
     const others = Object.values(SAMPLES).filter(({ reason }) => reason.kind !== 'no-listings');
     expect(others.map(({ reason }) => lineReasonWords(reason))).toEqual(others.map(({ reason }) => rowReasonWords(reason)));
@@ -143,7 +135,7 @@ describe('the reason words of an expansion line', () => {
   it('prints the line form `<word> · <reason>`, age first, and nothing when current', () => {
     expect(lineTrustParts({ verdict: 'current', reasons: [] })).toBeUndefined();
     const parts = lineTrustParts({ verdict: 'rough', reasons: [{ kind: 'old', days: 4 }, { kind: 'thin', listings: 2 }] });
-    expect(parts).toEqual({ word: VERDICT_WORDS.rough, reason: `priced 4 days ago${TRUST_JOINER}only 2 listings` });
+    expect(parts).toEqual({ verdict: 'rough', word: VERDICT_WORDS.rough, reason: `priced 4 days ago${JOINER}only 2 listings` });
   });
 
   // Matrix: not yet synced (states 5–7): three distinct reasons, no age.

@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 
 import { EstimateMark, MARK_COLORS, SwatchMark, SWATCH_COLORS, VerdictMark, type MarkedVerdict } from '../marks/marks';
+import { JOINER } from '../shared/text';
 import { colors, footerLegend, layout, px, typeStyle } from '../theme/tokens';
 import { CURATION_MARKS } from './format';
 import { VERDICT_WORDS } from './row/trust-words';
@@ -19,7 +20,7 @@ export const FOOTER_LEGEND_ITEMS: readonly LegendItem[] = [
   { kind: 'verdict', verdict: 'rough', meaning: 'unreliable price (a row: 70%+ of its EV)' },
   { kind: 'verdict', verdict: 'pending', meaning: 'no price yet' },
   { kind: 'verdict', verdict: 'broken', meaning: 'can no longer be priced' },
-  { kind: 'text', meaning: `${CURATION_MARKS.pruned} · ${CURATION_MARKS.pinned}` },
+  { kind: 'text', meaning: `${CURATION_MARKS.pruned}${JOINER}${CURATION_MARKS.pinned}` },
   { kind: 'estimate', meaning: 'some roll odds estimated' },
   { kind: 'text', meaning: 'Prices are live asking prices, not sales. Read-only. Curation lives in data/tracked.json.' },
 ];

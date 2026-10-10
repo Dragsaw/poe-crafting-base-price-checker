@@ -1,10 +1,10 @@
 import type { TrackedEntry } from '@poe/contracts';
+import { MINUTE_MS } from '@poe/core';
 import { act } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { absenceLine, NOT_SYNCED_YET, PANEL_HEADINGS, SYNCED_LABEL, TRACKED_LIST_EDITED_LABEL, UNKNOWN } from '../frame/trust-facts';
+import { absenceLine, NOT_SYNCED_YET, PANEL_HEADINGS, SYNCED_LABEL, TRACKED_LIST_EDITED_LABEL, UNKNOWN } from '../frame/trust-copy';
 import { MARK_COLORS } from '../marks/marks';
-import { MINUTE_MS } from '../shared/time';
 import { serveArtifacts, VALID_BODIES, type ArtifactAnswer } from '../test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from '../load/artifacts';
 import { rgb, settleTo, unmount } from '../test-support/dom';

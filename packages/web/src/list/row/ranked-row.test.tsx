@@ -9,7 +9,8 @@ import { PageProvider } from '../../theme/PageProvider';
 import type { ClassDisplayRow, ExpectedValueCell } from '../display-rows';
 import { NAME_COLORS, RankedRow } from '../RankedRow';
 import { MISSING_FIGURE } from './ExpectedValueCell';
-import { FIXED_ROW_REASONS, rowReasonWords, TRUST_JOINER, VERDICT_WORDS } from './trust-words';
+import { FIXED_ROW_REASONS, rowReasonWords, VERDICT_WORDS } from './trust-words';
+import { JOINER } from '../../shared/text';
 
 afterEach(unmount);
 
@@ -104,7 +105,7 @@ describe('a ranked crafted row', () => {
     const row = mountRow(craftedRow({ trust: { verdict: 'rough', reasons: [share] } }));
     expect(row.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe('rough');
     expect(valueCellOf(row)?.textContent).toBe('1.25');
-    expect(tooltipText(row)).toBe(`${VERDICT_WORDS.rough}${TRUST_JOINER}${rowReasonWords(share)}`);
+    expect(tooltipText(row)).toBe(`${VERDICT_WORDS.rough}${JOINER}${rowReasonWords(share)}`);
     hover(row.querySelector('[data-row-mark]'));
     const word = document.body.querySelector<HTMLElement>('[data-mark-tooltip] span');
     expect(word?.style.fontWeight).toBe('600');
@@ -122,7 +123,7 @@ describe('a ranked crafted row', () => {
     expect(valueCellOf(row)?.textContent).toBe(MISSING_FIGURE);
     expect(row.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe(verdict);
     expect(row.querySelector(`svg[data-mark="${verdict}"]`)).not.toBeNull();
-    expect(tooltipText(row)).toBe(`${VERDICT_WORDS[verdict]}${TRUST_JOINER}${FIXED_ROW_REASONS[kind]}`);
+    expect(tooltipText(row)).toBe(`${VERDICT_WORDS[verdict]}${JOINER}${FIXED_ROW_REASONS[kind]}`);
   });
 
   // Matrix: no qualifying combination (state 21).

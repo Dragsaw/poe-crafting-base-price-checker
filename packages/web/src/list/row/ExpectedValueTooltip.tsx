@@ -4,7 +4,7 @@ import { EstimateMark, VerdictMark } from '../../marks/marks';
 import { formatThreshold } from '../../shared/money';
 import { DIV_UNIT } from '../../shared/product';
 import { colors } from '../../theme/tokens';
-import { TRUST_JOINER } from './trust-words';
+import { JOINER } from '../../shared/text';
 
 /** The active recipe's Craft Cost as the EV tooltip states it (EXPERIENCE.md Copy Deck, three variants). */
 export type ExpectedValueCost =
@@ -86,11 +86,11 @@ export function ExpectedValueTooltipLabel({ threshold, cost }: { readonly thresh
       <p style={{ margin: '6px 0 0' }}>{EXPECTED_VALUE_TOOLTIP_COPY.raw}</p>
       <p style={{ margin: '6px 0 0', color: colors['text-secondary'] }}>
         <Decoded mark={<EstimateMark />} words={EXPECTED_VALUE_TOOLTIP_COPY.estimate} />
-        {TRUST_JOINER}
+        {JOINER}
         <Decoded mark={<VerdictMark verdict="rough" />} words={EXPECTED_VALUE_TOOLTIP_COPY.rough} />
-        {TRUST_JOINER}
+        {JOINER}
         <Decoded mark={<VerdictMark verdict="pending" />} words={EXPECTED_VALUE_TOOLTIP_COPY.pending} />
-        {TRUST_JOINER}
+        {JOINER}
         <Decoded mark={<VerdictMark verdict="broken" />} words={EXPECTED_VALUE_TOOLTIP_COPY.broken} />. {EXPECTED_VALUE_TOOLTIP_COPY.hover}
       </p>
     </div>

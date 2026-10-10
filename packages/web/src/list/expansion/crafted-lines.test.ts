@@ -45,7 +45,7 @@ describe('the lines of a crafted row', () => {
         { entryKey: canonicalKey(top), probability: 0.25, priceDivine: 4, contribution: 1, trust: CURRENT },
       ],
       combinations: [
-        { entryKey: canonicalKey(cheap), trust: ROUGH },
+        { entryKey: canonicalKey(cheap), trust: ROUGH, priceDivine: 0.1 },
         { entryKey: canonicalKey(waiting), trust: PENDING },
         { entryKey: canonicalKey(gone), trust: BROKEN },
       ],

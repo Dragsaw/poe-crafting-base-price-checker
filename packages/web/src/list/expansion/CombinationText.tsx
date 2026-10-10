@@ -1,7 +1,8 @@
 import { Fragment, type JSX } from 'react';
 
 import { stacks, typeStyle } from '../../theme/tokens';
-import { AFFIX_JOIN, type AffixPart } from '../combination-text';
+import type { AffixPart } from '../combination-text';
+import { JOINER } from '../../shared/text';
 
 /** The Accepted Tier that opens a curated affix: `T1`, or a mixture such as `T1–T2`. */
 const TIER = /^T\d+(?:[–-]T\d+)?(?= )/u;
@@ -41,7 +42,7 @@ export function CombinationText({
         <Fragment key={index}>
           {index === 0 ? undefined : (
             <span data-joiner="" style={tones === undefined ? undefined : { color: tones.joiner }}>
-              {AFFIX_JOIN}
+              {JOINER}
             </span>
           )}
           {part.verbatim ? (

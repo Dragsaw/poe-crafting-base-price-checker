@@ -2,11 +2,11 @@ import { canonicalKey } from '@poe/contracts';
 import type { DatasetEntry, PriceState, PriceTrust } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { HOUR_MS } from './clock.ts';
 import { craftedTrust, entryTrust, OLD_AFTER_HOURS, THIN_BELOW_LISTINGS, UNRELIABLE_SHARE_MIN } from './price-trust.ts';
 import { LEAGUE, observation, OLD_LEAGUE, raw } from './rank/test-support.ts';
 
 const NOW = '2026-10-01T12:00:00.000Z';
-const HOUR_MS = 60 * 60 * 1000;
 const A = raw('A');
 
 const hoursBefore = (hours: number): string => new Date(Date.parse(NOW) - hours * HOUR_MS).toISOString();

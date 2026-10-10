@@ -23,7 +23,9 @@ const amuletsPruned: CraftedTrackedEntry = {
 const bows = craftedEntry('Bows', 'weapon.bow');
 
 /** `core`'s recipeless class, its entries' verdicts given in canonical key order. */
-function recipeless(entries: readonly { entry: CraftedTrackedEntry; trust: RecipelessClass['trust'] }[]): RecipelessClass {
+function recipeless(
+  entries: readonly { entry: CraftedTrackedEntry; trust: RecipelessClass['trust']; priceDivine?: number }[],
+): RecipelessClass {
   const [first] = entries;
   if (first === undefined) {
     throw new Error('a recipeless class has an entry');
@@ -35,7 +37,7 @@ function recipeless(entries: readonly { entry: CraftedTrackedEntry; trust: Recip
     itemLevelMin: first.entry.itemLevelMin,
     trust: NO_RECIPE,
     combinations: entries
-      .map(({ entry, trust }) => ({ entryKey: canonicalKey(entry), trust }))
+      .map(({ entry, trust, priceDivine }) => ({ entryKey: canonicalKey(entry), trust, ...(priceDivine !== undefined && { priceDivine }) }))
       .toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey)),
   };
 }
@@ -61,7 +63,7 @@ describe('toDisplayRows, the recipeless group (state 43)', () => {
       priced(amulets, 2, hoursBefore(NOW, 1)),
     ];
     const rows = rowsFor(tracked, dataset, [
-      recipeless([{ entry: amulets, trust: CURRENT }, { entry: amuletsToo, trust: NEVER }]),
+      recipeless([{ entry: amulets, trust: CURRENT, priceDivine: 2 }, { entry: amuletsToo, trust: NEVER }]),
       recipeless([{ entry: bows, trust: NEVER }]),
     ]);
     expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.kind])).toEqual([

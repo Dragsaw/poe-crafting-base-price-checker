@@ -1,14 +1,7 @@
+import { DAY_MS, HOUR_MS, MINUTE_MS } from '@poe/core';
 import { describe, expect, it } from 'vitest';
 
-import { compactAge, DAY_MS, HOUR_MS, MINUTE_MS, reasonAge, relativeAge } from './time';
-
-describe('the clock units', () => {
-  it('holds a minute, an hour and a day in milliseconds', () => {
-    expect(MINUTE_MS).toBe(60_000);
-    expect(HOUR_MS).toBe(3_600_000);
-    expect(DAY_MS).toBe(86_400_000);
-  });
-});
+import { compactAge, reasonAge, relativeAge } from './time';
 
 describe('relativeAge', () => {
   it('steps the relative age through minutes, hours and days, singular at one', () => {
@@ -27,13 +20,13 @@ describe('relativeAge', () => {
 describe('reasonAge', () => {
   it('steps a reason age through min, hours and days, rounded down; min never pluralises', () => {
     expect(reasonAge(0)).toBe('0 min ago');
-    expect(reasonAge(1)).toBe('1 min ago');
-    expect(reasonAge(59)).toBe('59 min ago');
-    expect(reasonAge(60)).toBe('1 hour ago');
-    expect(reasonAge(4 * 60)).toBe('4 hours ago');
-    expect(reasonAge(1439)).toBe('23 hours ago');
-    expect(reasonAge(1440)).toBe('1 day ago');
-    expect(reasonAge(2 * 1440 + 59)).toBe('2 days ago');
+    expect(reasonAge(MINUTE_MS)).toBe('1 min ago');
+    expect(reasonAge(59 * MINUTE_MS)).toBe('59 min ago');
+    expect(reasonAge(60 * MINUTE_MS)).toBe('1 hour ago');
+    expect(reasonAge(4 * HOUR_MS)).toBe('4 hours ago');
+    expect(reasonAge(1439 * MINUTE_MS)).toBe('23 hours ago');
+    expect(reasonAge(1440 * MINUTE_MS)).toBe('1 day ago');
+    expect(reasonAge((2 * 1440 + 59) * MINUTE_MS)).toBe('2 days ago');
   });
 });
 

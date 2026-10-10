@@ -1,10 +1,10 @@
 import type { PriceTrust, PriceTrustReason } from '@poe/contracts';
+import { DAY_MS, MINUTE_MS } from '@poe/core';
 
-import { plural } from '../../shared/text';
+import type { MarkedVerdict } from '../../marks/marks';
+import { JOINER, plural } from '../../shared/text';
 import { reasonAge } from '../../shared/time';
-
-/** The joiner between a word and its reason, and between two reasons (EXPERIENCE.md Copy Deck). */
-export const TRUST_JOINER = ' · ';
+import { NO_FIGURE_YET } from '../format';
 
 /** The state words of EXPERIENCE.md *Price trust*. A current price has none. */
 export const VERDICT_WORDS = { rough: 'rough', pending: 'pending', broken: 'broken' } as const;
@@ -19,7 +19,7 @@ export const FIXED_ROW_REASONS: Readonly<Record<FixedReason, string>> = {
   'no-exchange-rate': 'no Divine rate for its currency',
   unresolvable: 'gone after a patch',
   'no-recipe': 'no recipe published',
-  uncostable: 'no figure yet — craft cost unknown',
+  uncostable: `${NO_FIGURE_YET} — craft cost unknown`,
   'all-broken': 'all combinations gone after a patch',
   'no-prices': 'no prices yet',
 };
@@ -28,7 +28,7 @@ export const FIXED_ROW_REASONS: Readonly<Record<FixedReason, string>> = {
 export function rowReasonWords(reason: PriceTrustReason): string {
   switch (reason.kind) {
     case 'old': {
-      return `priced ${String(reason.days)} days ago`;
+      return `priced ${reasonAge(reason.days * DAY_MS)}`;
     }
     case 'thin': {
       return `only ${String(reason.listings)} ${plural(reason.listings, 'listing', 'listings')}`;
@@ -42,8 +42,9 @@ export function rowReasonWords(reason: PriceTrustReason): string {
   }
 }
 
-/** A trust verdict's word and its joined reasons; `undefined` when current. */
+/** A trust verdict's mark, word and joined reasons; `undefined` when current. */
 export interface TrustParts {
+  readonly verdict: MarkedVerdict;
   readonly word: string;
   readonly reason: string;
 }
@@ -51,7 +52,7 @@ export interface TrustParts {
 function trustParts(trust: PriceTrust, words: (reason: PriceTrustReason) => string): TrustParts | undefined {
   return trust.verdict === 'current'
     ? undefined
-    : { word: VERDICT_WORDS[trust.verdict], reason: trust.reasons.map((reason) => words(reason)).join(TRUST_JOINER) };
+    : { verdict: trust.verdict, word: VERDICT_WORDS[trust.verdict], reason: trust.reasons.map((reason) => words(reason)).join(JOINER) };
 }
 
 /** The mark tooltip's `<word> · <reason>`, the reasons in `core`'s order. */
@@ -67,7 +68,7 @@ export function lineReasonWords(reason: PriceTrustReason): string {
   if (reason.kind !== 'no-listings') {
     return rowReasonWords(reason);
   }
-  return reason.minutes === undefined ? NO_LISTINGS_LINE : `tried ${reasonAge(reason.minutes)}${TRUST_JOINER}${NO_LISTINGS_LINE}`;
+  return reason.minutes === undefined ? NO_LISTINGS_LINE : `tried ${reasonAge(reason.minutes * MINUTE_MS)}${JOINER}${NO_LISTINGS_LINE}`;
 }
 
 /** An expansion line's trust cell, `<word> · <reason>`, the reasons in `core`'s order. */

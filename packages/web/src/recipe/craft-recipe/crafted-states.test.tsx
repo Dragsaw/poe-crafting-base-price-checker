@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { MONEY_PHRASES } from '../../list/format';
+import { NO_FIGURE_YET } from '../../list/format';
 import { honestEmptyCopy, uncostableCopy } from '../../list/list-statement';
 import { RECIPE_COST_UNIT } from '../CraftRecipe';
 import { expandCopy } from '../../list/RankedList';
@@ -61,7 +61,7 @@ describe('the crafted states', () => {
     expect(statement()).toBeNull();
     expect(costLine()).toBe(`0.03 ${RECIPE_COST_UNIT}`);
     click(option('perfect'));
-    expect(costLine()).toBe(MONEY_PHRASES.notYetSynced);
+    expect(costLine()).toBe(NO_FIGURE_YET);
     expect(control().querySelector('[data-recipe-cost-figure]')).toBeNull();
     expect(statement()?.dataset['listStatement']).toBe('uncostable');
     expect(statement()?.textContent).toBe(uncostableCopy('perfect'));
@@ -136,7 +136,7 @@ describe('the crafted states', () => {
     };
     expectCanonicalSequence('greater');
     click(option('perfect'));
-    expect(costLine()).toBe(MONEY_PHRASES.notYetSynced);
+    expect(costLine()).toBe(NO_FIGURE_YET);
     expectCanonicalSequence('perfect');
   });
 

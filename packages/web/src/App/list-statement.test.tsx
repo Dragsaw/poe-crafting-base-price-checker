@@ -7,12 +7,13 @@ import { ARTIFACT_ORDER } from '../load/artifacts';
 import { rgb, settleTo, unmount } from '../test-support/dom';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
-import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, TRUST_JOINER, VERDICT_WORDS } from '../list/row/trust-words';
-import { absenceLine } from '../frame/trust-facts';
+import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, VERDICT_WORDS } from '../list/row/trust-words';
+import { absenceLine } from '../frame/trust-copy';
 import { honestEmptyCopy, nothingClearsCopy } from '../list/list-statement';
 import { colors, typeRoles } from '../theme/tokens';
 import { RECIPE_COST_UNIT } from '../recipe/CraftRecipe';
 import { server, mount, frame, payoutField, toggleReport, unitNames } from './test-support';
+import { JOINER } from '../shared/text';
 
 afterEach(unmount);
 
@@ -86,7 +87,7 @@ describe('the list statement', () => {
       first?.click();
     });
     expect(frame().querySelector('[data-expansion-panel] [data-cell="trust"]')?.textContent).toBe(
-      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['league-mismatch']].join(TRUST_JOINER),
+      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['league-mismatch']].join(JOINER),
     );
     expectChromeAround();
   });

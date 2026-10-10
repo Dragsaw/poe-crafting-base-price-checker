@@ -1,16 +1,10 @@
-import { plural } from '../shared/text';
+import { JOINER, plural } from '../shared/text';
 import { glyphs } from '../theme/tokens';
 
 // `web` computes no ranking term (AD-4): every helper here turns a held value into text.
 
-/** The five money-slot phrases (EXPERIENCE.md, Money slots). A missing figure is never `0`. */
-export const MONEY_PHRASES = {
-  noListings: 'an open question',
-  notYetSynced: 'no figure yet',
-  unresolvable: 'not valued',
-  unknown: 'unknown',
-  pruned: 'not tracked',
-} as const;
+/** An uncostable Craft Cost (EXPERIENCE.md *Price trust*, state 35). A missing figure is never `0`. */
+export const NO_FIGURE_YET = 'no figure yet';
 
 const DEFENCE_WORDS: Readonly<Record<string, string>> = { str: 'Str', dex: 'Dex', int: 'Int' };
 
@@ -36,7 +30,7 @@ export function itemLevelFloor(itemLevelMin: number): string {
 
 /** The Raw Base row's chase slot: `Sell as is · item level 82+` (EXPERIENCE.md Copy Deck). */
 export function sellAsIsLine(itemLevelMin: number): string {
-  return `${SELL_AS_IS} · ${itemLevelFloor(itemLevelMin)}`;
+  return `${SELL_AS_IS}${JOINER}${itemLevelFloor(itemLevelMin)}`;
 }
 
 // --- the expansion panel ---------------------------------------------------

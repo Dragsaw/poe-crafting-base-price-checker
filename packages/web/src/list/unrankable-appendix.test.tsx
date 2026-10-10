@@ -4,16 +4,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { mount, rgb, unmount } from '../test-support/dom';
 import { colors, layout, px, spacing, typeRoles } from '../theme/tokens';
-import {
-  APPENDIX_LEAD,
-  APPENDIX_TITLE,
-  APPENDIX_NOTES,
-  appendixClassKey,
-  appendixCount,
-  NOTE_JOINER,
-  RAW_RANKS_NOTE,
-  UnrankableAppendix,
-} from './UnrankableAppendix';
+import { APPENDIX_LEAD, APPENDIX_TITLE, APPENDIX_NOTES, appendixClassKey, appendixCount, RAW_RANKS_NOTE, UnrankableAppendix } from './UnrankableAppendix';
+import { JOINER } from '../shared/text';
 
 const REASON = 'class absent from weights file';
 
@@ -191,7 +183,7 @@ describe('the note cell (states 14 to 16, 36)', () => {
   it('joins the state 16 note after the reason note when a Raw Base of the class ranks', () => {
     const item = klass('Bows', 'pool partial');
     expect(noteOf(item, new Set([appendixClassKey(item)]))).toBe(
-      [APPENDIX_NOTES['pool partial'], RAW_RANKS_NOTE].join(NOTE_JOINER),
+      [APPENDIX_NOTES['pool partial'], RAW_RANKS_NOTE].join(JOINER),
     );
     expect(noteOf(item, new Set([appendixClassKey(klass('Wands'))]))).toBe(APPENDIX_NOTES['pool partial']);
   });

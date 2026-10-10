@@ -2,7 +2,9 @@ import type { JSX } from 'react';
 
 import { VerdictMark } from '../marks/marks';
 import { colors, layout, px, stacks, typeStyle } from '../theme/tokens';
-import { PANEL_HEADINGS, type FigureGroup, type PanelColumns, type Segment } from './trust-facts';
+import type { PanelColumns } from './panel-columns';
+import type { FigureGroup, Segment } from './segments';
+import { PANEL_HEADINGS } from './trust-copy';
 
 function SegmentText({ segment }: { readonly segment: Segment }): JSX.Element {
   switch (segment.kind) {

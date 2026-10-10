@@ -1,10 +1,12 @@
 import { canonicalKey, compareCanonicalKeys, compareTrackedEntries } from '@poe/contracts';
 import type { DatasetEntry, TrackedEntry } from '@poe/contracts';
 
+import { DAY_MS } from './clock.ts';
+
 /** The chunk runner's selection order: Refresh Rotation rows and ordering (AD-7, FR-17). */
 
 /** The bounded retry interval for row 3 (AD-7). */
-export const UNRESOLVABLE_RETRY_MS = 24 * 60 * 60 * 1000;
+export const UNRESOLVABLE_RETRY_MS = DAY_MS;
 
 export interface ChunkOrderInput {
   readonly tracked: readonly TrackedEntry[];

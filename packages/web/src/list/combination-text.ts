@@ -8,6 +8,7 @@ import {
 } from '@poe/contracts';
 
 import { shortForm } from './short-forms';
+import { JOINER } from '../shared/text';
 
 // The one formatter for a Combination's text (EXPERIENCE.md, *A Combination is written as tier plus
 // short form, never as a value*; UX-DR39, UX-DR40).
@@ -20,9 +21,6 @@ export interface AffixPart {
 
 /** `statId` → the Trade Catalogue's display text. */
 export type StatTexts = ReadonlyMap<string, string>;
-
-/** The middle dot that joins two affixes in one Combination: this affix AND that one. */
-export const AFFIX_JOIN = ' · ';
 
 /** The first category group to name an id wins; a later duplicate changes nothing. */
 export function statTexts(catalogue: StatCatalogue): StatTexts {
@@ -86,5 +84,5 @@ export function combinationText(entry: CraftedTrackedEntry, stats: StatTexts): r
 
 /** The parts as one plain string, joined by the middle dot. */
 export function combinationString(parts: readonly AffixPart[]): string {
-  return parts.map((part) => part.text).join(AFFIX_JOIN);
+  return parts.map((part) => part.text).join(JOINER);
 }

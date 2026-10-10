@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { BELOW_THRESHOLD_NOTE, CURATION_MARKS } from '../../list/format';
 import { MISSING_FIGURE } from '../../list/row/ExpectedValueCell';
-import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, TRUST_JOINER, VERDICT_WORDS } from '../../list/row/trust-words';
+import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, VERDICT_WORDS } from '../../list/row/trust-words';
 import { rgb, settleTo, unmount } from '../../test-support/dom';
 import { hoursBefore, priced, unpriced } from '../../test-support/list-fixtures';
 import { colors } from '../../theme/tokens';
@@ -24,6 +24,7 @@ import {
   panelRows,
   panelCell,
 } from './test-support';
+import { JOINER } from '../../shared/text';
 
 afterEach(() => {
   unmount();
@@ -61,8 +62,8 @@ describe('the crafted panel', () => {
     expect(rows.map((row) => panelCell(row, 'trust'))).toEqual([
       '',
       BELOW_THRESHOLD_NOTE,
-      [VERDICT_WORDS.pending, `tried 4 hours ago${TRUST_JOINER}${NO_LISTINGS_LINE}`].join(TRUST_JOINER),
-      [VERDICT_WORDS.broken, FIXED_ROW_REASONS.unresolvable].join(TRUST_JOINER),
+      [VERDICT_WORDS.pending, `tried 4 hours ago${JOINER}${NO_LISTINGS_LINE}`].join(JOINER),
+      [VERDICT_WORDS.broken, FIXED_ROW_REASONS.unresolvable].join(JOINER),
     ]);
     // State 20: dimmed, with no mark.
     const below = rows[1];
@@ -108,8 +109,8 @@ describe('the crafted panel', () => {
     // FR-9: the three not-yet-synced causes keep distinct words, and no age prints.
     expect(rows.map((row) => panelCell(row, 'trust'))).toEqual([
       '',
-      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['league-mismatch']].join(TRUST_JOINER),
-      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['never-synced']].join(TRUST_JOINER),
+      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['league-mismatch']].join(JOINER),
+      [VERDICT_WORDS.pending, FIXED_ROW_REASONS['never-synced']].join(JOINER),
     ]);
   });
 });

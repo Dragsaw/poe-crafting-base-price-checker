@@ -1,10 +1,11 @@
 import { useCallback, useState, type RefCallback } from 'react';
 
+import { JOINER } from '../../shared/text';
 import { spacing } from '../../theme/tokens';
 import { CHASE_CELLS } from '../display-rows';
 
 /** The widest chase text of at most 27 characters that the short-form table builds (spec Q1). */
-export const CHASE_BUDGET_TEXT = 'T1 % Armour · T1 Mana Regen';
+export const CHASE_BUDGET_TEXT = `T1 % Armour${JOINER}T1 Mana Regen`;
 
 /**
  * The chase-cell budget *B* in px: {@link CHASE_BUDGET_TEXT} at `typography.chase` in bundled Inter, its tiers at

@@ -1,5 +1,6 @@
 import { canonicalKey, compareCanonicalKeys } from '@poe/contracts';
 import type {
+  CraftedCombination,
   CraftedTrackedEntry,
   CraftRecipe,
   CurrencyRate,
@@ -15,7 +16,7 @@ import type {
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
-import { assertClock, entryTrust, NO_RECIPE_TRUST } from './price-trust.ts';
+import { assertClock, entryTrust, NO_RECIPE_TRUST, resolvedPrice } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 import { compareOrdering } from './rank-order.ts';
 import { compareCombinations, craftedRow } from './rank-crafted-row.ts';
@@ -75,8 +76,8 @@ export interface RecipelessClass {
   readonly className: string;
   readonly itemLevelMin: number;
   readonly trust: PriceTrust;
-  /** Each non-pruned entry's verdict, in `compareCombinations` order. */
-  readonly combinations: readonly { readonly entryKey: string; readonly trust: PriceTrust }[];
+  /** Each non-pruned entry's verdict and active-league price, in `compareCombinations` order. */
+  readonly combinations: readonly CraftedCombination[];
 }
 
 export interface Ranking {
@@ -228,7 +229,12 @@ function rankCraftedClass(
       itemLevelMin: first.itemLevelMin,
       trust: NO_RECIPE_TRUST,
       combinations: keyed
-        .map(({ entry, entryKey }) => ({ entryKey, trust: entryTrust(entry, byKey.get(entryKey), input.activeLeague, input.now) }))
+        .map(({ entry, entryKey }): CraftedCombination => {
+          const published = byKey.get(entryKey);
+          const trust = entryTrust(entry, published, input.activeLeague, input.now);
+          const price = resolvedPrice(published, input.activeLeague);
+          return price.state === 'priced' ? { entryKey, trust, priceDivine: price.observation.priceDivine } : { entryKey, trust };
+        })
         .toSorted(compareCombinations),
     });
     return;
