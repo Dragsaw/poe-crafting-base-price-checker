@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { MONEY_PHRASES } from '../../list/format';
 import { uncostableCopy } from '../../list/list-statement';
+import { RECIPE_COST_UNIT } from '../CraftRecipe';
 import { expandCopy } from '../../list/RankedList';
 import { MISSING_FIGURE } from '../../list/row/ExpectedValueCell';
 import { MINUS } from '../../shared/money';
@@ -56,9 +58,9 @@ describe('the crafted states', () => {
     mount();
     await settleTo('ready');
     expect(statement()).toBeNull();
-    expect(costLine()).toBe('0.03Divine / craft');
+    expect(costLine()).toBe(`0.03 ${RECIPE_COST_UNIT}`);
     click(option('perfect'));
-    expect(costLine()).toBe('no figure yet');
+    expect(costLine()).toBe(MONEY_PHRASES.notYetSynced);
     expect(control().querySelector('[data-recipe-cost-figure]')).toBeNull();
     expect(statement()?.dataset['listStatement']).toBe('uncostable');
     expect(statement()?.textContent).toBe(uncostableCopy('perfect'));
@@ -133,7 +135,7 @@ describe('the crafted states', () => {
     };
     expectCanonicalSequence('greater');
     click(option('perfect'));
-    expect(costLine()).toBe('no figure yet');
+    expect(costLine()).toBe(MONEY_PHRASES.notYetSynced);
     expectCanonicalSequence('perfect');
   });
 
@@ -154,7 +156,7 @@ describe('the crafted states', () => {
     );
     mount();
     await settleTo('ready');
-    expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('regular|perfect');
+    expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('regularperfect');
     // At floor 0 every Wands tier is eligible and the target is half of its prefix pool.
     expect(names()).toEqual(['Wands', 'Bows']);
     expect(frame().querySelector('[data-appendix-row]')).toBeNull();

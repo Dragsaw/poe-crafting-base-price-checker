@@ -1,7 +1,7 @@
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { absenceLine } from './frame/AbsenceLines';
+import { absenceLine, PANEL_HEADINGS } from './frame/trust-facts';
 import {
   FETCH_FAILURE_EYEBROW,
   FETCH_FAILURE_TITLE,
@@ -28,7 +28,8 @@ import {
 } from './test-support/artifact-server';
 import { ARTIFACT_ORDER } from './load/artifacts';
 import { flush, mountedContainer, settleTo, unmount } from './test-support/dom';
-import { server, mount, frame } from './App/test-support';
+import { server, mount, frame, panelLines, toggleReport } from './App/test-support';
+import { THRESHOLD_WORD } from './threshold/PayoutThreshold';
 
 afterEach(unmount);
 
@@ -63,12 +64,13 @@ describe('the pending state', () => {
     expect(skeletonLabel).not.toBeNull();
     expect(skeletonLabel?.style.borderBottom).toBe('');
     expect(skeletonLabel?.style.cursor).toBe('');
-    // The strip's slot holds its place, blank, so the page never jumps.
-    const stripSlot = frame().querySelector<HTMLElement>('[data-trust-strip-slot]');
-    expect(stripSlot?.previousElementSibling?.hasAttribute('data-interim-controls')).toBe(true);
-    expect(stripSlot?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
-    expect(stripSlot?.textContent).toBe('');
-    expect(frame().querySelector('[data-trust-strip]')).toBeNull();
+    // The threshold control is live in its slot; the recipe and sync slots hold their widths, empty.
+    const header = frame().querySelector<HTMLElement>(':scope > [data-header-bar]');
+    expect(header?.querySelector('[data-slot="threshold"] [data-payout-threshold]')).not.toBeNull();
+    expect(header?.querySelector('[data-slot="recipe"]')?.childElementCount).toBe(0);
+    expect(header?.querySelector('[data-slot="sync"]')?.childElementCount).toBe(0);
+    expect(header?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(frame().querySelector('[data-trust-strip], [data-trust-strip-slot], [data-interim-controls]')).toBeNull();
     held.openAll();
   });
 
@@ -242,11 +244,12 @@ describe('the outcomes', () => {
     serveArtifacts(server, { recipes: { kind: 'status', status: 404 } });
     mount();
     await settleTo('ready');
-    const lines = frame().querySelectorAll('[data-trust-strip] [data-absence-lines] p');
-    expect(Array.from(lines, (line) => line.textContent)).toEqual([absenceLine('recipes')]);
-    expect(absenceLine('recipes')).toBe('Not published: recipes.json — no crafted rows can be ranked.');
-    expect(absenceLine('weights')).toBe('Not published: weights.json — every crafted class is unrankable.');
-    expect(absenceLine('syncReport')).toBe('Not published: sync-report.json — the sync report is unavailable.');
+    expect(frame().textContent).not.toContain(absenceLine('recipes'));
+    toggleReport();
+    expect(panelLines(PANEL_HEADINGS.indexOf('Built from')).slice(2)).toEqual([absenceLine('recipes')]);
+    expect(absenceLine('recipes')).toBe('Not published recipes.json — no crafted rows can be ranked.');
+    expect(absenceLine('weights')).toBe('Not published weights.json — every crafted class is unrankable.');
+    expect(absenceLine('syncReport')).toBe('Not published sync-report.json — the sync report is unavailable.');
     expect(frame().querySelector('[data-header-bar] p')).toBeNull();
   });
 
@@ -271,7 +274,9 @@ describe('the copy', () => {
     expect(Object.keys(sources).length).toBeGreaterThan(10);
     for (const [path, text] of Object.entries(sources)) {
       // The EV tooltip's count of outcomes worth at least the threshold is the other owned use (EXPERIENCE.md, Voice and Tone).
-      const scanned = text.replaceAll(HEADER_TITLE, '').replaceAll(EXPECTED_VALUE_TOOLTIP_COPY.what, '');
+      // The threshold label is the third (Copy Deck, *Threshold*), in its control's source only.
+      const owned = text.replaceAll(HEADER_TITLE, '').replaceAll(EXPECTED_VALUE_TOOLTIP_COPY.what, '');
+      const scanned = path === './threshold/PayoutThreshold.tsx' ? owned.replaceAll(`'${THRESHOLD_WORD}'`, '') : owned;
       expect(scanned, path).not.toMatch(/sells for|worth|market value/i);
     }
   });

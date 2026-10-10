@@ -4,7 +4,8 @@ import type { ArtifactSet } from '../load/artifacts';
 import { NBSP } from '../shared/text';
 import { rgb, unmount } from '../test-support/dom';
 import { colors, px, layout } from '../theme/tokens';
-import { absenceLine } from './AbsenceLines';
+import { rawEntry, unpriced } from '../test-support/list-fixtures';
+import { absenceLine } from './trust-facts';
 import { BASE_SET, click, COMMITTED_REPORT, line, mountStrip, panel, strip, type SyncReport } from './trust-strip/test-support';
 
 /** 5 pinned entries and `minChunkSearches: 8`; the two active ones prove only pinned count. */
@@ -112,7 +113,7 @@ describe('the resting strip', () => {
     const lines = Array.from(strip().querySelectorAll('[data-absence-lines] p'), (p) => p.textContent);
     expect(lines).toEqual([absenceLine('weights'), absenceLine('recipes'), absenceLine('syncReport')]);
     const lead = strip().querySelector<HTMLElement>('[data-absence-lines] p span');
-    expect(lead?.textContent).toBe('Not published:');
+    expect(lead?.textContent).toBe('Not published');
     expect(lead?.style.fontWeight).toBe('600');
     expect(lead?.style.color).toBe(rgb(colors.text));
     // With no report, Last synced is unknown and no health line is raised.
@@ -121,14 +122,8 @@ describe('the resting strip', () => {
   });
 
   // Matrix: broken.
-  it('raises one trust-broken 700 health line for unresolvable records and pinned starvation', () => {
+  it('raises one trust-broken 700 health line for broken dataset entries and pinned starvation', () => {
     const records: SyncReport['records'] = [
-      ...Array.from({ length: 12 }, (_, index) => ({
-        kind: 'unresolvable' as const,
-        entryKey: `raw:${String(index)}`,
-        identifier: String(index),
-        identifierKind: 'statId' as const,
-      })),
       {
         kind: 'pinned-starvation' as const,
         discoveredAllowance: 4,
@@ -138,10 +133,16 @@ describe('the resting strip', () => {
         activeRefreshed: 0,
       },
     ];
-    mountStrip({ syncReport: { ...COMMITTED_REPORT, records }, ...CURATION_5_OF_8 }, ['recipes']);
+    const dataset = {
+      ...BASE_SET.dataset,
+      entries: Array.from({ length: 12 }, (_, index) => unpriced(rawEntry(`Lost ${String(index)}`), { state: 'unresolvable' })),
+    };
+    mountStrip({ syncReport: { ...COMMITTED_REPORT, records }, ...CURATION_5_OF_8, dataset }, ['recipes']);
     const health = strip().querySelector<HTMLElement>('[data-health-line]');
     expect(health?.style.height).toBe(px(layout.healthLineHeight));
-    expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe('× 12 unresolvable|× 3 of 5 pinned entries starved');
+    expect(health?.textContent?.replaceAll(NBSP, ' ')).toBe(
+      '× 12 entries can no longer be priced|× 3 of 5 pinned entries are not being refreshed',
+    );
     const signals = health?.querySelectorAll<HTMLElement>('[data-health-signal]') ?? [];
     expect(signals).toHaveLength(2);
     for (const signal of signals) {
@@ -158,7 +159,7 @@ describe('the resting strip', () => {
   });
 
   // Matrix: only a non-matching record, no unresolvable.
-  it('raises no health line for a starvation record of another curation, and the panel still lists it', () => {
+  it('raises no health line for a starvation record of another curation, and the panel counts nothing', () => {
     const records: SyncReport['records'] = [
       {
         kind: 'pinned-starvation' as const,
@@ -173,7 +174,6 @@ describe('the resting strip', () => {
     expect(strip().querySelector('[data-health-line]')).toBeNull();
     click(strip());
     const text = panel()?.textContent ?? '';
-    expect(text).toContain('1 pinned-starvation record.');
-    expect(text).toContain('2 of 8 pinned entries refreshed');
+    expect(text).not.toContain('pinned');
   });
 });

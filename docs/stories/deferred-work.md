@@ -27,16 +27,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar (2026-10-09)
 
 - source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
-  summary: Move the CraftRecipe and PayoutThreshold panels from the interim band into the header-bar recipe and threshold slots, then delete frame/InterimControls.tsx and the data-interim-controls band.
-  evidence: The frozen decision (Open Question 1, option B) in the spec. packages/web/src/frame/InterimControls.tsx holds the band, and the data-slot="recipe|threshold|sync" divs in packages/web/src/frame/HeaderBar.tsx stay empty.
-  retry_when: Story 4.5 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
-  summary: Re-measure the reserved header-bar slot widths (recipe 294, threshold 238, sync 128) against the real controls, and add a test that the brand block, slots and gaps fit the bar at content-min.
-  evidence: HEADER_SLOT_WIDTHS in packages/web/src/frame/HeaderBar.tsx came from the mockup at 1000px (about 939px of 952px). No test holds the budget sum.
-  retry_when: Story 4.5 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
   summary: Restyle the components Story 4.1 repointed mechanically, replace the interim px values in the tokens.ts layout group, change weight 700 to the DESIGN.md weights, and fix the failure screen to padding-top 24px and a 640px body.
   evidence: Spec Design Notes call the repointing interim. Weight 700 in recipe.css, TrustStrip.tsx, KeyBlock.tsx, FailureScreen.tsx and TrustMark.tsx. FailureScreen reads layout.gutter (34) and layout.failureBodyMaxWidth (480). UniformPriorBanner lead and body share the line-text role and differ only by colour.
   retry_when: Story 4.6 is done in sprint-status.yaml
@@ -45,11 +35,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Remove italic from the page, since DESIGN.md Typography says the page sets no italic and only upright Inter faces are bundled, so every italic run is a synthesized oblique.
   evidence: About 10 fontStyle italic sites in packages/web/src (RankedRow, CombinationRow, ExpansionPanel, AskingPriceLine, UnrankableAppendix, CraftRecipe, TrustStrip, SyncReportPanel, TrustMark). TrustMark's italic is the NFR-10 cue for never attempted, so it goes when Story 4.3 draws the marks.
   retry_when: Story 4.3 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
-  summary: Re-pin the values whose literal tests Story 4.1 removed (the resident glyph twins, the 1.2 line height of in-row roles, and the threshold gaps and marker rise) once their replacements land.
-  evidence: The tests were deleted from packages/web/src/theme/tokens.test.ts. glyphs.prior and glyphs.close and layout.thresholdTrackGap, thresholdRangeGap, thresholdValueGap and thresholdMarkerRise are now unpinned.
-  retry_when: Story 4.5 is done in sprint-status.yaml
 
 - source_spec: `docs/stories/spec-4-2-the-price-trust-verdict-in-core.md`
   summary: Make core return a recipeless-class group when the published recipe set is empty, with each crafted class's pending no-recipe verdict and its per-entry verdicts, so state 43 can list crafted rows unranked.
@@ -79,4 +64,21 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-4-4-the-expansion-one-line-per-entry-top-lines-and-the-trust-reasons.md`
   summary: Make an expansion line's no-listings reason follow EXPERIENCE.md *Ages* under a day (`tried N min ago` / `tried N hours ago`, then `tried N days ago` from one day), in place of `tried 0 days ago`.
   evidence: Decided 2026-10-10 (option 1 of three): follow *Ages*; the *Price trust* table's `tried N days ago` is the from-one-day case. The no-listings reason in contracts carries whole days only (`{ kind: 'no-listings', days? }`), and core fills it in entryTrust (packages/core/src/price-trust.ts), so lineReasonWords in packages/web/src/list/row/trust-words.ts cannot print a sub-day age. Needs contracts and core to carry the attempt age at minute grain (check AD-17), then the web wording. A sync runs about every 15 hours, so a fresh no-listings attempt is the common case.
+  retry_when: now
+
+## Deferred from: spec-4-5-header-controls-and-the-sync-button (2026-10-10)
+
+- source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
+  summary: Delete TrustStrip.tsx, its tests (frame/trust-strip.test.tsx, frame/trust-strip/) and any dependency-cruiser exception it has, now that no page mounts it.
+  evidence: The spec's Design Notes and Never list leave the deletion to Story 4.6. packages/web/src/App.tsx no longer mounts TrustStrip; only its own tests render it.
+  retry_when: Story 4.6 is done in sprint-status.yaml
+
+- source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
+  summary: Pin glyphs.prior with a literal test, or retire it.
+  evidence: The removed Story 4.1 re-pin entry also covered glyphs.prior. Its only test reference is `expect(text).not.toContain(glyphs.prior)` in packages/web/src/list/ranked-list/key-and-glyphs.test.tsx, which passes for any value.
+  retry_when: Story 4.6 is done in sprint-status.yaml
+
+- source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
+  summary: Repair docs/stories/epic-4-context.md: the order sentence "4.3, then 4.7 ahead of 4.4 to 4.6, then 4.6 last" is garbled, and the rewrite dropped the Inter glyph check (− † * · — – at every weight) and the "no colour on a surface below the contrast floor" constraint without citing their owners.
+  evidence: The epic-context rewrite that added Story 4.7 was in the working tree before this build's baseline. A review of Story 4.5 found the wording and the two dropped lines.
   retry_when: now

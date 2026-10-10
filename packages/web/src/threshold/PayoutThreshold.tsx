@@ -1,12 +1,13 @@
 import './threshold.css';
 
-import { NumberInput } from '@mantine/core';
+import { NumberInput, Slider } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { useId, useRef, useState, type JSX } from 'react';
 
+import { GreaterEqualMark } from '../marks/marks';
 import { formatThreshold } from '../shared/money';
-import { DENOMINATION } from '../shared/product';
-import { colors, px, layout, typeStyle } from '../theme/tokens';
+import { DIV_UNIT } from '../shared/product';
+import { colors, headerControls, px, rounded, typeStyle } from '../theme/tokens';
 import {
   clampThreshold,
   THRESHOLD_DECIMALS,
@@ -15,12 +16,11 @@ import {
   THRESHOLD_STEP,
 } from './threshold-storage';
 
-export const THRESHOLD_LABEL = 'Payout Threshold';
+/** EXPERIENCE.md, Copy Deck: the threshold label's word; its ≥ is drawn. */
+export const THRESHOLD_WORD = 'Worth';
 /** A no-break space joins the figure and the unit. */
-export const THRESHOLD_UNIT = `\u{A0}${DENOMINATION}`;
-export const RANGE_LOW = `${String(THRESHOLD_MIN)} ${DENOMINATION}`;
-export const RANGE_HIGH = `${String(THRESHOLD_MAX)} ${DENOMINATION}`;
-/** About 150ms between a valid parse and the re-rank (UX-DR18). */
+export const THRESHOLD_UNIT = `\u{A0}${DIV_UNIT}`;
+/** About 150ms between a valid typed parse and the re-rank (Interaction 1). */
 export const COMMIT_DEBOUNCE_MS = 150;
 
 /** A leading digit is required: `fixedDecimalScale` pads a lone `.` to `.00`, which is not a parse. */
@@ -42,7 +42,7 @@ function ghostText(draft: number | string): string {
   return draft === '' ? '0' : draft;
 }
 
-/** `{components.payout-threshold}`: `Divine` sits outside the input; a readout (UX-DR18). */
+/** `{components.threshold-control}`: the slider and the typed figure, two ways onto one value (Interaction 1). */
 export function PayoutThreshold({
   value,
   onChange,
@@ -52,35 +52,49 @@ export function PayoutThreshold({
 }): JSX.Element {
   const id = useId();
   const unitId = useId();
-  const { draft, onDraftChange, onBlur } = useThresholdDraft(value, onChange);
+  const { draft, current, onDraftChange, onBlur, onSlide } = useThresholdDraft(value, onChange);
 
   return (
-    <div
-      data-payout-threshold=""
-      style={{
-        width: px(layout.thresholdPanelWidth),
-        boxSizing: 'border-box',
-        background: colors.surface,
-        border: `${px(layout.hairline)} solid ${colors.line}`,
-        padding: `${px(layout.controlPanelPadY)} ${px(layout.controlPanelPadX)}`,
-      }}
-    >
+    <div data-payout-threshold="" style={{ display: 'flex', alignItems: 'center', gap: px(headerControls.labelGap) }}>
       <label
         htmlFor={id}
         data-threshold-label=""
-        style={{ ...typeStyle('label'), display: 'block', color: colors['text-tertiary'], textTransform: 'uppercase' }}
+        style={{
+          ...typeStyle('label'),
+          color: colors['text-secondary'],
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.25em',
+        }}
       >
-        {THRESHOLD_LABEL}
+        {THRESHOLD_WORD}
+        <GreaterEqualMark />
       </label>
       <ThresholdFigure id={id} unitId={unitId} draft={draft} onDraftChange={onDraftChange} onBlur={onBlur} />
-      <ThresholdTrack share={`${String((value / THRESHOLD_MAX) * 100)}%`} />
-      <ThresholdRange />
+      <Slider
+        data-threshold-slider=""
+        classNames={{ root: 'fg-threshold-slider', thumb: 'fg-threshold-thumb' }}
+        styles={{ thumb: { boxShadow: `0 0 0 ${px(headerControls.thumbRing)} ${colors.ground}` } }}
+        style={{ width: px(headerControls.sliderWidth), flex: '0 0 auto' }}
+        size={headerControls.sliderHeight}
+        radius={headerControls.sliderRadius}
+        thumbSize={headerControls.thumbSize}
+        color={colors.accent}
+        label={null} // eslint-disable-line unicorn/no-null -- boundary: Mantine turns its floating value label off only on `null`.
+        min={THRESHOLD_MIN}
+        max={THRESHOLD_MAX}
+        step={THRESHOLD_STEP}
+        value={current}
+        onChange={onSlide}
+      />
     </div>
   );
 }
 
+// The typed figure commits debounced and the slider at each step; both share the last valid value.
 function useThresholdDraft(value: number, onChange: (value: number) => void) {
   const [draft, setDraft] = useState<number | string>(value);
+  const [current, setCurrent] = useState(value);
   const lastValid = useRef(value);
   const commit = useDebouncedCallback(
     (next: number) => {
@@ -88,6 +102,10 @@ function useThresholdDraft(value: number, onChange: (value: number) => void) {
     },
     { delay: COMMIT_DEBOUNCE_MS, flushOnUnmount: true },
   );
+  const settle = (threshold: number): void => {
+    lastValid.current = threshold;
+    setCurrent(threshold);
+  };
   const onDraftChange = (next: number | string): void => {
     setDraft(next);
     const parsed = parseDraft(next);
@@ -95,40 +113,52 @@ function useThresholdDraft(value: number, onChange: (value: number) => void) {
       return;
     }
     const threshold = clampThreshold(parsed);
-    lastValid.current = threshold;
+    settle(threshold);
     commit(threshold);
   };
   const onBlur = (): void => {
     commit.flush();
     setDraft(lastValid.current);
   };
-  return { draft, onDraftChange, onBlur };
+  const onSlide = (next: number): void => {
+    commit.cancel();
+    const threshold = clampThreshold(next);
+    settle(threshold);
+    setDraft(threshold);
+    onChange(threshold);
+  };
+  return { draft, current, onDraftChange, onBlur, onSlide };
+}
+
+interface ThresholdFigureProperties {
+  readonly id: string;
+  readonly unitId: string;
+  readonly draft: number | string;
+  readonly onDraftChange: (next: number | string) => void;
+  readonly onBlur: () => void;
 }
 
 function ThresholdFigure({ id, unitId, draft, onDraftChange, onBlur }: ThresholdFigureProperties): JSX.Element {
   return (
     <div
-      data-threshold-value=""
+      data-threshold-figure=""
+      className="fg-threshold-figure"
       style={{
         ...typeStyle('control-figure'),
         color: colors.text,
-        marginTop: px(layout.thresholdValueGap),
+        background: colors.surface,
+        borderRadius: rounded.control,
+        padding: `${px(headerControls.figurePadY)} ${px(headerControls.figurePadX)}`,
+        minWidth: px(headerControls.figureMinWidth),
+        boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'baseline',
+        justifyContent: 'flex-end',
       }}
     >
-      {/* The input sizes to its figure: a hidden twin sets the width, so the rule sits under the figure only. */}
+      {/* The input sizes to its figure: a hidden twin sets the width, so the unit sits beside the figure. */}
       <span style={{ position: 'relative', display: 'inline-block' }}>
-        <span
-          aria-hidden="true"
-          style={{
-            display: 'inline-block',
-            visibility: 'hidden',
-            whiteSpace: 'pre',
-            fontVariantNumeric: 'tabular-nums',
-            borderBottom: `${px(layout.hairline)} solid transparent`,
-          }}
-        >
+        <span aria-hidden="true" style={{ display: 'inline-block', visibility: 'hidden', whiteSpace: 'pre', fontVariantNumeric: 'tabular-nums' }}>
           {ghostText(draft)}
         </span>
         <ThresholdInput id={id} unitId={unitId} draft={draft} onDraftChange={onDraftChange} onBlur={onBlur} />
@@ -138,14 +168,6 @@ function ThresholdFigure({ id, unitId, draft, onDraftChange, onBlur }: Threshold
       </span>
     </div>
   );
-}
-
-interface ThresholdFigureProperties {
-  readonly id: string;
-  readonly unitId: string;
-  readonly draft: number | string;
-  readonly onDraftChange: (next: number | string) => void;
-  readonly onBlur: () => void;
 }
 
 function ThresholdInput({ id, unitId, draft, onDraftChange, onBlur }: ThresholdFigureProperties): JSX.Element {
@@ -183,65 +205,5 @@ function ThresholdInput({ id, unitId, draft, onDraftChange, onBlur }: ThresholdF
       onChange={onDraftChange}
       onBlur={onBlur}
     />
-  );
-}
-
-function ThresholdTrack({ share }: { readonly share: string }): JSX.Element {
-  return (
-    <div
-      data-threshold-track=""
-      aria-hidden="true"
-      style={{
-        position: 'relative',
-        marginTop: px(layout.thresholdTrackGap),
-        height: px(layout.thresholdTrackHeight),
-        background: colors.line,
-        pointerEvents: 'none',
-      }}
-    >
-      <i
-        data-threshold-fill=""
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          height: px(layout.thresholdTrackHeight),
-          width: share,
-          background: colors.accent,
-          pointerEvents: 'none',
-        }}
-      />
-      <b
-        data-threshold-marker=""
-        style={{
-          position: 'absolute',
-          left: share,
-          top: px(-layout.thresholdMarkerRise),
-          marginLeft: px(-layout.thresholdMarkerWidth / 2),
-          width: px(layout.thresholdMarkerWidth),
-          height: px(layout.thresholdMarkerHeight),
-          background: colors.text,
-          pointerEvents: 'none',
-        }}
-      />
-    </div>
-  );
-}
-
-function ThresholdRange(): JSX.Element {
-  return (
-    <div
-      data-threshold-range=""
-      style={{
-        ...typeStyle('label'),
-        color: colors['text-tertiary'],
-        display: 'flex',
-        justifyContent: 'space-between',
-        marginTop: px(layout.thresholdRangeGap),
-      }}
-    >
-      <span>{RANGE_LOW}</span>
-      <span>{RANGE_HIGH}</span>
-    </div>
   );
 }

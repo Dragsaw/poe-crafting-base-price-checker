@@ -8,6 +8,7 @@ import {
   expansionLineWidths,
   floatingShadows,
   glyphs,
+  headerControls,
   layout,
   rankedRowGrid,
   rounded,
@@ -163,13 +164,41 @@ describe('the expansion-line grid', () => {
   });
 });
 
+const component = (name: string): Record<string, string> =>
+  ((tokens['components'] ?? {})[name] ?? {}) as Record<string, string>;
+
+describe('the header controls', () => {
+  it('transcribes the recipe toggle: label and cost gaps, frame padding and segment padding', () => {
+    const toggle = component('recipe-toggle');
+    expect(toggle['label']).toContain(`${String(headerControls.labelGap)}px before the toggle`);
+    expect(toggle['craftCost']).toContain(`${String(headerControls.labelGap)}px after the toggle`);
+    expect(toggle['frame']).toContain(`${String(headerControls.framePadding)}px padding`);
+    expect(toggle['segment']).toContain(`padding ${String(headerControls.segmentPadY)}px ${String(headerControls.segmentPadX)}px`);
+  });
+
+  it('transcribes the threshold control: figure box, slider track and thumb', () => {
+    const threshold = component('threshold-control');
+    expect(threshold['label']).toContain(`${String(headerControls.labelGap)}px before the figure`);
+    expect(threshold['figureBox']).toContain(
+      `padding ${String(headerControls.figurePadY)}px ${String(headerControls.figurePadX)}px, min-width ${String(headerControls.figureMinWidth)}px`,
+    );
+    expect(threshold['slider']).toContain(
+      `${String(headerControls.sliderWidth)}px track, ${String(headerControls.sliderHeight)}px tall, {colors.line-strong}, ${String(headerControls.sliderRadius)}px radius`,
+    );
+    expect(threshold['sliderThumb']).toMatch(
+      new RegExp(String.raw`^${String(headerControls.thumbSize)}px circle in \S+ with a ${String(headerControls.thumbRing)}px \S+ ring`),
+    );
+  });
+
+  it('transcribes the sync button: padding and the open sign gap', () => {
+    const button = component('sync-button');
+    expect(button['padding']).toBe(`${String(headerControls.syncPadY)}px ${String(headerControls.syncPadX)}px`);
+    expect(button['openSign']).toContain(`${String(headerControls.openSignGap)}px after the label`);
+  });
+});
+
 describe('the column contracts later stories replace', () => {
   it('holds every other verified sum', () => {
-    expect(columnSums.interimControls).toEqual([
-      layout.recipePanelWidth,
-      layout.interimControlGap,
-      layout.thresholdPanelWidth,
-    ]);
     expect(sum(columnSums.appendix)).toBe(970);
     expect(layout.contentWidth - 2 * layout.hairline - 2 * layout.appendixPadX).toBe(sum(columnSums.appendix));
   });

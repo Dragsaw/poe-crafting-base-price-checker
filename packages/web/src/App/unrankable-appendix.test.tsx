@@ -1,12 +1,11 @@
 import type { TrackedEntry } from '@poe/contracts';
-import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { gatedArtifacts, serveArtifacts, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb, settleTo, unmount } from '../test-support/dom';
 import { colors } from '../theme/tokens';
-import { server, mount, frame } from './test-support';
+import { server, mount, frame, reportPanel, syncButton, toggleReport } from './test-support';
 
 afterEach(unmount);
 
@@ -171,14 +170,11 @@ describe('the Unrankable appendix', () => {
     expect(appendix().textContent).not.toContain('edge-alignment');
     expect(frame().querySelectorAll('[data-ranked-row]')).toHaveLength(1);
 
-    const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
-    expect(strip?.textContent).not.toContain('edge-alignment');
-    expect(strip?.querySelector('[data-health-line]')).toBeNull();
-    act(() => {
-      strip?.click();
-    });
-    const broken = frame().querySelectorAll('[data-sync-report-panel] [data-panel-column]')[1];
-    const lines = Array.from(broken?.querySelectorAll('[data-verbatim]') ?? [], (node) => node.textContent);
+    // Listed in the sync report, never counted (state 27).
+    expect(syncButton().dataset['syncButton']).toBe('synced');
+    toggleReport();
+    const problems = reportPanel()?.querySelectorAll('[data-panel-column]')[0];
+    const lines = Array.from(problems?.querySelectorAll('[data-verbatim]') ?? [], (node) => node.textContent);
     expect(lines).toHaveLength(1);
     expect(lines[0]).toMatch(/^edge-alignment · \["crafted","weapon\.bow","Bows",82,/);
   });

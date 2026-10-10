@@ -1,10 +1,19 @@
 /*
- * The Payout Threshold figure. The figure IS the input: no border, no
- * background, no padding, no form chrome. The rule sits under the figure only
- * (the unit is outside the input): dotted accent at rest, solid accent under the
- * pointer, solid line-strong while the player edits. Caret text, selection
- * accent-soft.
+ * `{components.threshold-control}`. The figure box is the typed input's frame:
+ * a line-strong border at rest, accent under the pointer and while editing.
+ * The input itself has no chrome. The slider takes the line-strong track, the
+ * accent fill and an accent thumb; its ground ring is set inline from the tokens.
  */
+.fg-threshold-figure {
+  border: 1px solid var(--fg-color-line-strong);
+  cursor: text;
+}
+
+.fg-threshold-figure:hover,
+.fg-threshold-figure:focus-within {
+  border-color: var(--fg-color-accent);
+}
+
 .fg-threshold input {
   display: block;
   box-sizing: border-box;
@@ -12,24 +21,33 @@
   padding: 0;
   border: 0;
   border-radius: 0;
-  border-bottom: 1px dotted var(--fg-color-accent);
   background: none;
   box-shadow: none;
   outline: none;
+  text-align: right;
   color: var(--fg-color-text);
   caret-color: var(--fg-color-text);
   transition: none;
 }
 
-.fg-threshold input:hover {
-  border-bottom-style: solid;
-}
-
-.fg-threshold input:focus {
-  border-bottom: 1px solid var(--fg-color-line-strong);
-}
-
 .fg-threshold input::selection {
   background: var(--fg-color-accent-soft);
   color: var(--fg-color-text);
+}
+
+[data-payout-threshold] .fg-threshold-slider {
+  --slider-track-bg: var(--fg-color-line-strong);
+}
+
+[data-payout-threshold] .fg-threshold-thumb {
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--fg-color-accent);
+  transition: none;
+  cursor: grab;
+}
+
+[data-payout-threshold] .fg-threshold-thumb[data-dragging] {
+  transform: translate(-50%, -50%);
+  cursor: grabbing;
 }

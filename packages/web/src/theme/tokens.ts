@@ -97,23 +97,8 @@ export const layout = {
   syncReportPadBottom: 12,
   syncReportColumnGap: 22,
   syncReportGroupGap: 8,
+  syncReportHeadingGap: 4,
   failureBodyMaxWidth: 480,
-  recipePanelWidth: 216,
-  interimControlGap: 16,
-  thresholdPanelWidth: 276,
-  controlPanelPadY: 13,
-  controlPanelPadX: 15,
-  thresholdValueGap: 4,
-  thresholdTrackGap: 10,
-  thresholdRangeGap: 7,
-  thresholdTrackHeight: 4,
-  recipeOptionsGap: 9,
-  recipeCostGap: 10,
-  recipeCostFigureGap: 4,
-  thresholdMarkerWidth: 11,
-  thresholdMarkerHeight: 14,
-  /** The marker's rise above the track's top edge: (14 − 4) / 2. */
-  thresholdMarkerRise: 5,
   s1: 4,
   s2: 8,
   s3: 12,
@@ -142,8 +127,27 @@ export function px(value: number): string {
 
 /** The other fixed column sums. Nothing on these surfaces flexes. */
 export const columnSums = {
-  interimControls: [216, 16, 276],
   appendix: [292, 118, 250, 310],
+} as const;
+
+/** The px values DESIGN.md `recipe-toggle`, `threshold-control` and `sync-button` write inline. */
+export const headerControls = {
+  /** A control label sits this far before its control, and Craft Cost this far after the toggle. */
+  labelGap: 10,
+  framePadding: 2,
+  segmentPadY: 4,
+  segmentPadX: 10,
+  figurePadY: 3,
+  figurePadX: 8,
+  figureMinWidth: 64,
+  sliderWidth: 100,
+  sliderHeight: 4,
+  sliderRadius: 2,
+  thumbSize: 12,
+  thumbRing: 3,
+  syncPadY: 4,
+  syncPadX: 8,
+  openSignGap: 6,
 } as const;
 
 /** The px widths DESIGN.md `expansion-line.grid` writes inline rather than as `{spacing.*}`. */

@@ -1,11 +1,9 @@
 import { act } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CONTROL_GROUP_WIDTH } from '../frame/InterimControls';
 import { bodiesWith, hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { gate, gatedArtifacts, serveArtifacts, type ArtifactAnswer } from '../test-support/artifact-server';
 import { ARTIFACT_ORDER, type ArtifactKey } from '../load/artifacts';
-import { cssNumber } from '../test-support/css-number';
 import { settleTo, unmount } from '../test-support/dom';
 import { blur, pastDebounce, typeInto } from '../test-support/threshold-input';
 import { THRESHOLD_STORAGE_KEY } from '../threshold/threshold-storage';
@@ -67,21 +65,62 @@ describe('the payout threshold', () => {
     localStorage.clear();
   });
 
-  it('lays the control group out as 216 + 16 + 276 = 508 in the interim band', async () => {
+  it('sits in the header bar threshold slot, and the interim band is gone', async () => {
     serveArtifacts(server);
     mount();
     await settleTo('ready');
-    const group = frame().querySelector<HTMLElement>('[data-control-group]');
-    expect(group?.style.width).toBe('508px');
-    expect(group?.style.gap).toBe('16px');
-    const [recipe, threshold] = [...group?.children ?? []] as HTMLElement[];
-    expect(recipe?.dataset['recipeSlot']).toBe('');
-    expect(recipe?.style.width).toBe('216px');
-    expect(threshold?.dataset['payoutThreshold']).toBe('');
-    expect(threshold?.style.width).toBe('276px');
-    expect(CONTROL_GROUP_WIDTH).toBe(216 + 16 + 276);
-    expect(group?.closest('[data-interim-controls]')).not.toBeNull();
-    expect(group?.closest('[data-header-bar]')).toBeNull();
+    const control = frame().querySelector<HTMLElement>('[data-payout-threshold]');
+    expect(control?.parentElement?.dataset['slot']).toBe('threshold');
+    expect(control?.closest('[data-header-bar]')).not.toBeNull();
+    expect(frame().querySelector('[data-interim-controls], [data-control-group]')).toBeNull();
+  });
+
+  // I/O matrix: drag.
+  it('re-ranks at each slider step with no debounce and no request, and the figure follows', async () => {
+    const requests = serveLadder();
+    mount();
+    await settleTo('ready');
+    growList();
+    expect(unitNames()).toContain('Mid Belt');
+    const thumb = frame().querySelector<HTMLElement>('[data-payout-threshold] [role="slider"]');
+    const seen: boolean[] = [];
+    for (let step = 0; step < 5; step += 1) {
+      act(() => {
+        thumb?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      });
+      seen.push(unitNames().includes('Mid Belt'));
+    }
+    // 0.30 … 0.50 keep the 0.5 base; the sixth step, 0.55, drops it at once.
+    expect(seen).toEqual([true, true, true, true, true]);
+    act(() => {
+      thumb?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    });
+    expect(unitNames()).not.toContain('Mid Belt');
+    expect(payoutField().value).toBe('0.55');
+    expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.55');
+    expect(requests).toHaveLength(ARTIFACT_ORDER.length);
+  });
+
+  // I/O matrix: drag, then type.
+  it('slides to 0.40, then a typed 1.234 blurs to 1.23 and re-ranks debounced', async () => {
+    serveLadder();
+    mount();
+    await settleTo('ready');
+    growList();
+    const thumb = frame().querySelector<HTMLElement>('[data-payout-threshold] [role="slider"]');
+    for (let step = 0; step < 3; step += 1) {
+      act(() => {
+        thumb?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      });
+    }
+    expect(payoutField().value).toBe('0.40');
+    typeInto(payoutField(), '1.234');
+    expect(unitNames()).toContain('High Belt');
+    await pastDebounce();
+    expect(unitNames()).not.toContain('High Belt');
+    blur(payoutField());
+    expect(payoutField().value).toBe('1.23');
+    expect(thumb?.getAttribute('aria-valuenow')).toBe('1.23');
   });
 
   it('renders while pending and ready, and not on the two failure screens', async () => {
@@ -127,8 +166,8 @@ describe('the payout threshold', () => {
     expect(frame().textContent).not.toContain('Mid Belt');
     expect(requests).toHaveLength(ARTIFACT_ORDER.length);
     expect(localStorage.getItem(THRESHOLD_STORAGE_KEY)).toBe('0.6');
-    const marker = frame().querySelector<HTMLElement>('[data-threshold-marker]');
-    expect(cssNumber(marker?.style.left ?? '')).toBeCloseTo(20, 5);
+    // The slider follows the typed value.
+    expect(frame().querySelector('[data-payout-threshold] [role="slider"]')?.getAttribute('aria-valuenow')).toBe('0.6');
   });
 
   it('keeps a threshold typed while pending through the move to ready, and ranks at it', async () => {
