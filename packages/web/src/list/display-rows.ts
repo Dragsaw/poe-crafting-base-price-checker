@@ -228,6 +228,24 @@ function recipelessRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntr
   });
 }
 
+function classRow(
+  row: CraftedRankedRow,
+  position: Pick<ClassDisplayRow, 'numeral' | 'tier'>,
+  source: ClassLineSource,
+): ClassDisplayRow {
+  return {
+    key: row.classKey,
+    ...position,
+    unit: 'class',
+    label: unitLabel(row.className),
+    itemLevel: row.itemLevelMin,
+    ev: row.ev === null || hasNoFigure(row.trust) ? MISSING : figure(row.ev),
+    trust: row.trust,
+    provenance: row.provenance,
+    ...craftedDetail(row, source),
+  };
+}
+
 function rankedRows(
   ranking: Ranking,
   byKey: ReadonlyMap<string, DatasetEntry>,
@@ -238,17 +256,7 @@ function rankedRows(
   return ranking.ordering.map((row, index): ListRow => {
     const position = { numeral: isNumbered ? index + 1 : undefined, tier: tierOf(index + 1) };
     if (row.kind === 'crafted') {
-      return {
-        key: row.classKey,
-        ...position,
-        unit: 'class',
-        label: unitLabel(row.className),
-        itemLevel: row.itemLevelMin,
-        ev: row.ev === null || hasNoFigure(row.trust) ? MISSING : figure(row.ev),
-        trust: row.trust,
-        provenance: row.provenance,
-        ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey, crafted }),
-      };
+      return classRow(row, position, { entries: classes.get(row.classKey) ?? [], byKey, crafted });
     }
     return {
       key: row.entryKey,
@@ -281,11 +289,22 @@ function unpricedRow(byKey: ReadonlyMap<string, DatasetEntry>, entry: UnrankedEn
   };
 }
 
-function trailingRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntry>): DisplayRow[] {
-  return [...ranking.noListings, ...ranking.notYetSynced, ...ranking.unresolvable].map((entry) => unpricedRow(byKey, entry));
+/** States 18 and 41: pending classes, pending Raw Bases, broken classes, broken Raw Bases; each block in `core`'s order. */
+function trailingRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntry>, crafted: CraftedContext): ListRow[] {
+  const classes = trackedByClass(crafted.tracked);
+  const classRows = ranking.unpricedCrafted.map((row) =>
+    classRow(row, { numeral: undefined, tier: 3 }, { entries: classes.get(row.classKey) ?? [], byKey, crafted }),
+  );
+  const raw = (entries: readonly UnrankedEntry[]): DisplayRow[] => entries.map((entry) => unpricedRow(byKey, entry));
+  return [
+    ...classRows.filter((row) => row.trust.verdict === 'pending'),
+    ...raw([...ranking.noListings, ...ranking.notYetSynced]),
+    ...classRows.filter((row) => row.trust.verdict === 'broken'),
+    ...raw(ranking.unresolvable),
+  ];
 }
 
-/** `core`'s `ordering`, unpriced Raw Bases (FR-24, state 4), then recipeless classes (state 43); `belowThreshold` out. */
+/** `core`'s `ordering`, unpriced classes and Raw Bases (FR-1, FR-24), then recipeless classes (state 43); `belowThreshold` out. */
 export function toDisplayRows(
   ranking: Ranking,
   dataset: readonly DatasetEntry[],
@@ -297,10 +316,10 @@ export function toDisplayRows(
 ): ListRow[] {
   const byKey = new Map(dataset.map((entry) => [entry.entryKey, entry]));
   const ranked = rankedRows(ranking, byKey, crafted, numbered);
-  const trailing = [...trailingRows(ranking, byKey), ...recipelessRows(ranking, byKey, crafted)];
+  const trailing = [...trailingRows(ranking, byKey, crafted), ...recipelessRows(ranking, byKey, crafted)];
 
-  // State 23 prints "In canonical order": one sequence across the crafted rows and all three
-  // unpriced groups and the recipeless classes, by key (a class key or a canonical key), with no numeral and every EV `—`.
+  // State 23 prints "In canonical order": one sequence across the crafted rows, every
+  // unpriced group and the recipeless classes, by key (a class key or a canonical key), with no numeral and every EV `—`.
   return honestEmpty
     ? [...ranked, ...trailing]
         .map((row): ListRow => ({ ...row, numeral: undefined, tier: 3, ev: MISSING }))
@@ -313,7 +332,7 @@ export function toListBranches(active: ActiveRanking, dataset: readonly DatasetE
   if (!active.split) {
     return [toDisplayRows(active, dataset, { crafted })];
   }
-  const rawOnly = { ...active, ordering: active.ordering.filter((row) => row.kind === 'raw') };
+  const rawOnly = { ...active, ordering: active.ordering.filter((row) => row.kind === 'raw'), unpricedCrafted: [] };
   const craftedOnly = {
     ...active,
     ordering: active.ordering.filter((row) => row.kind === 'crafted'),

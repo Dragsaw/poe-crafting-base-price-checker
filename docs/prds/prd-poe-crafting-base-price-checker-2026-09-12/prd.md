@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 28
+revision: 29
 created: 2026-09-12
-updated: 2026-10-09
+updated: 2026-10-10
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
@@ -127,7 +127,8 @@ EV = ( Σ P(combo) × price(combo) over Combinations that are priced and whose p
 
 - The Payout Threshold compares against a Combination's gross price, never its price net of Craft Cost; Craft Cost is subtracted once per Item Class, not once per Combination (AD-17).
 - A Combination whose Price State is not `priced`, or whose Curation Status is `pruned`, contributes nothing to the sum — not zero, nothing. Pruning therefore changes the ranking (AD-9, AD-12).
-- An Item Class with no Combination above the Payout Threshold is still ranked, at an EV of minus its Craft Cost; it is not Unrankable (AD-17).
+- An Item Class whose priced Combinations all fall below the Payout Threshold is still ranked, at an EV of minus its Craft Cost; it is not Unrankable (AD-17).
+- An Item Class with no priced Combination has no EV and is not ranked, because a missing price is not zero. The list shows it after every ranked row *(PRD-owned)* (FR-9, AD-17).
 - A crafted row's payout term describes the **Item Class, not any one base in it**: the price behind a Combination is the asking price for that Combination across every Base Type in the class, so a strong base in the class is understated and a weak one overstated (FR-13). The probability term carries no such spread, because the modifier pool genuinely is the class's. This is an accepted property of the figure rather than a defect — the player crafts on whatever the class gives him, so the class is the decision the number is for — and the view does not claim otherwise *(PRD-owned)* (AD-16, AD-17).
 - **No Base Type outside the Item Class contributes to that price** *(PRD-owned)*. An Item Class is valued against its own Base Types alone, so an Item Class the player would never craft on can neither inflate nor depress one he would. The spread above is therefore bounded by a single Item Class, and the ranking separates two Item Classes that a coarser unit would have averaged into one row (AD-16, AD-17, OQ-25).
 - Changing the Payout Threshold reorders the list without a sync (AD-4).

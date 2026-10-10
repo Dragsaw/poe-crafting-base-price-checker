@@ -35,9 +35,12 @@ function craftedRow(trust: PriceTrust, expectedValue: number | undefined): Craft
   };
 }
 
+/** `core`'s routing (FR-1): a costable row with no priced Combination trails, outside `ordering`. */
 function rankingOf(row: CraftedRankedRow): Ranking {
+  const isUnpriced = row.ev !== null && (row.trust.verdict === 'pending' || row.trust.verdict === 'broken');
   return {
-    ordering: [row],
+    ordering: isUnpriced ? [] : [row],
+    unpricedCrafted: isUnpriced ? [row] : [],
     belowThreshold: [],
     noListings: [],
     notYetSynced: [],
@@ -89,5 +92,17 @@ describe('the trust each row carries', () => {
     expect(printedValue(row)).toBe(printed);
     expect(row?.trust).toEqual(trust);
     expect(row?.ev.kind === 'figure' && row.ev.negative).toBe(isNegative);
+  });
+
+  // FR-1: a costable row with no priced combination trails unnumbered; an uncostable one keeps its rank (state 35).
+  it.each([
+    [{ verdict: 'pending', reasons: [{ kind: 'no-prices' }] }, -0.03, undefined, 3],
+    [{ verdict: 'broken', reasons: [{ kind: 'all-broken' }] }, -0.03, undefined, 3],
+    [{ verdict: 'pending', reasons: [{ kind: 'uncostable' }] }, undefined, 1, 1],
+  ] as const)('numbers a crafted %j row at EV %s as %s, tier %s', (trust, expectedValue, numeral, tier) => {
+    const own: PriceTrust = { verdict: trust.verdict, reasons: [...trust.reasons] };
+    const [row] = toDisplayRows(rankingOf(craftedRow(own, expectedValue)), [], { honestEmpty: false });
+    expect(row?.numeral).toBe(numeral);
+    expect(row?.tier).toBe(tier);
   });
 });

@@ -124,8 +124,8 @@ export function poolOf(weights: WeightsFile, categoryId: string, className: stri
 }
 
 /**
- * The recipe floor per `modGroup` over the unscoped pool (AD-17): a group whose top
- * positive-weight tier is below the floor keeps that top tier, since the floor never drops a type.
+ * The recipe floor per `modGroup` over the unscoped pool, before the item-level scope (AD-17): a group
+ * whose top positive-weight tier is below the floor keeps that top tier, but the scope can still drop it.
  */
 export function floored(pool: WeightsPool, modifierLevelMin: number): readonly ModifierWeight[] {
   const top = new Map<string, number>();
@@ -251,7 +251,7 @@ function orderedTerm(
 }
 
 /**
- * `P(prefix ∧ suffix | recipe)`: scope, truncate, exclude, renormalise; reasons per slot.
+ * `P(prefix ∧ suffix | recipe)`: floor, scope, renormalise, exclude, renormalise; reasons per slot.
  */
 export function combinationProbability(
   pools: WeightsClassPools,

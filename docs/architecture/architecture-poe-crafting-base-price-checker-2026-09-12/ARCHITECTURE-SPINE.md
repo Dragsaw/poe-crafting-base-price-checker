@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 35
+revision: 36
 created: '2026-09-12'
 updated: '2026-10-10'
 binds: []
@@ -1061,7 +1061,9 @@ never import each other.
   ties only within a kind, so the key's own leading kind tag never decides between kinds.
   **A class whose summands all fall below the threshold ranks at `EV = −craftCost`** with
   an empty summand list — it is ranked, not unrankable, because the threshold excluding
-  every outcome is an answer about that class and not an absence of data.
+  every outcome is an answer about that class and not an absence of data. **A class with no
+  priced entry is outside the ordering** (FR-1): `core` returns it in its own group, sorted
+  by the tie-break above. `EXPERIENCE.md` state 18 places it.
 
   **The ordering spans the cross product; the view renders one recipe's rows.** `core`
   ranks every `(itemClass, recipe)` pair inside the single ordering above — which is what
@@ -1174,7 +1176,7 @@ never import each other.
   `modGroup` removed, and renormalises the rest. **A hybrid reference is one modifier in
   this formula**: its probability is the weight of the tiers it contains, never a product
   across its lines. The formula,
-  and its order after the recipe floor below (scope, floor, renormalise, exclude, renormalise), are `affixProbability` and `combinationProbability` in
+  and its order with the recipe floor below (floor over the unscoped pool, then scope, renormalise, exclude, renormalise; the scope can drop a group the floor kept), are `affixProbability` and `combinationProbability` in
   `packages/core/src/probability.ts`, binding under AD-0.
 
   **Where no `modGroup` spans both slots of a class, the result is exactly `P(prefix) ×
@@ -1299,10 +1301,11 @@ never import each other.
   **A recipe restricts the pool from below, one modifier group at a time, and that is its
   whole distribution term.** A `CraftRecipe` declares a **`modifierLevelMin`** — the game's
   *Minimum Modifier Level*, which a greater or perfect orb imposes and a plain orb does not.
-  After AD-5's scope, `core` takes each `modGroup` of each slot on its own. **Where the
-  group has a tier at or above the floor, its tiers below the floor are removed. Where the
-  group's highest tier is below the floor, that tier alone survives at its own weight**,
-  because the floor never removes a modifier type entirely. `core` then renormalises the
+  Before AD-5's scope, `core` takes each `modGroup` of each slot of the unscoped pool on its
+  own. **Where the group has a tier at or above the floor, its tiers below the floor are
+  removed. Where the group's highest tier is below the floor, that tier alone survives at
+  its own weight**, because the floor never removes a modifier type entirely. AD-5's scope
+  runs next, and it can drop a group the floor kept. `core` then renormalises the
   surviving weights, before AD-11's containment and this AD's probability term run. The
   transform is a truncation and a renormalisation; it is never a reweighting, and `core`
   invents no numbers. The predicate is `eligible` in `packages/core/src/probability.ts`,

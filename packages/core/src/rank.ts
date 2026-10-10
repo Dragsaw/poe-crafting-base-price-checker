@@ -1,6 +1,7 @@
 import { canonicalKey, compareCanonicalKeys } from '@poe/contracts';
 import type {
   CraftedCombination,
+  CraftedRankedRow,
   CraftedTrackedEntry,
   CraftRecipe,
   CurrencyRate,
@@ -18,7 +19,7 @@ import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
 import { assertClock, entryTrust, NO_RECIPE_TRUST, resolvedPrice } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
-import { compareOrdering } from './rank-order.ts';
+import { compareOrdering, compareRankedRows } from './rank-order.ts';
 import { compareCombinations, craftedRow } from './rank-crafted-row.ts';
 import { groupRawEntries, type NotYetSyncedEntry, type UnrankedEntry } from './rank-raw-groups.ts';
 
@@ -85,6 +86,8 @@ export interface Ranking {
    * Every ranked row over every recipe (AD-17): by EV, uncostable rows (EV `null`) last (state 35).
    */
   readonly ordering: readonly RankedRow[];
+  /** Costable crafted rows with no priced Combination (FR-1, AD-17), by `compareRankedRows`. Never in `ordering`. */
+  readonly unpricedCrafted: readonly CraftedRankedRow[];
   /** Priced raw rows below the threshold, in canonical key order. Never in `ordering`. */
   readonly belowThreshold: readonly RawRankedRow[];
   /** In canonical key order. */
@@ -195,9 +198,10 @@ interface CostedRecipe {
   readonly cost: CraftCostResult;
 }
 
-/** Where one class's outcome lands: ranked rows, unreachable pairs, or the recipeless group. */
+/** Where one class's outcome lands: ranked rows, unpriced rows, unreachable pairs, or the recipeless group. */
 interface RankedClasses {
   readonly surviving: RankedRow[];
+  readonly unpricedCrafted: CraftedRankedRow[];
   readonly unrankable: Map<string, UnrankableClass>;
   readonly recipeless: RecipelessClass[];
 }
@@ -206,6 +210,11 @@ interface RankClassContext {
   readonly costed: readonly CostedRecipe[];
   readonly byKey: ReadonlyMap<string, DatasetEntry>;
   readonly input: RankInput;
+}
+
+/** Costable with no Combination priced in the active league (FR-1); a below-threshold class stays ranked. */
+function isUnpriced(row: CraftedRankedRow): boolean {
+  return row.ev !== null && (row.trust.verdict === 'pending' || row.trust.verdict === 'broken');
 }
 
 function rankCraftedClass(
@@ -248,6 +257,8 @@ function rankCraftedClass(
         reason: RECIPE_UNREACHABLE,
         recipeId: recipe.id,
       });
+    } else if (isUnpriced(row)) {
+      out.unpricedCrafted.push(row);
     } else {
       out.surviving.push(row);
     }
@@ -291,12 +302,14 @@ export function rank(input: RankInput): Ranking {
   const raw = groupRawEntries(input.tracked, byKey, input);
   const { unrankable, rankable } = sortCraftedClasses(input);
   const recipeless: RecipelessClass[] = [];
+  const unpricedCrafted: CraftedRankedRow[] = [];
   for (const crafted of rankable.values()) {
-    rankCraftedClass(crafted, { costed, byKey, input }, { surviving: raw.surviving, unrankable, recipeless });
+    rankCraftedClass(crafted, { costed, byKey, input }, { surviving: raw.surviving, unpricedCrafted, unrankable, recipeless });
   }
 
   return {
     ordering: raw.surviving.toSorted(compareOrdering),
+    unpricedCrafted: unpricedCrafted.toSorted(compareRankedRows),
     belowThreshold: raw.belowThreshold.toSorted(byEntryKey),
     noListings: raw.noListings.toSorted(byEntryKey),
     notYetSynced: raw.notYetSynced.toSorted(byEntryKey),

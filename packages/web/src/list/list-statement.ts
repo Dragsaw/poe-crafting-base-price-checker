@@ -30,9 +30,10 @@ export function uncostableCopy(recipeWord: string): string {
 export function isHonestEmpty(ranking: Ranking): boolean {
   return (
     !ranking.pricedInLeague &&
-    // The rows the list prints when nothing is priced: the active recipe's crafted rows, then
-    // `noListings`, `notYetSynced`, `unresolvable` and `recipeless`. Unpriced, no Raw Base is in the ordering.
+    // The rows the list prints when nothing is priced: the active recipe's crafted rows, ranked or
+    // `unpricedCrafted`, then `noListings`, `notYetSynced`, `unresolvable` and `recipeless`. Unpriced, no Raw Base is in the ordering.
     ranking.ordering.length +
+      ranking.unpricedCrafted.length +
       ranking.noListings.length +
       ranking.notYetSynced.length +
       ranking.unresolvable.length +
@@ -43,7 +44,7 @@ export function isHonestEmpty(ranking: Ranking): boolean {
 
 /** State 23 drops "yet" on core's verdict (AD-17): a pending row may still be priced by a sync, a broken one never. */
 function isEveryRowBroken(ranking: Ranking): boolean {
-  return [ranking.ordering, ranking.noListings, ranking.notYetSynced, ranking.unresolvable, ranking.recipeless]
+  return [ranking.ordering, ranking.unpricedCrafted, ranking.noListings, ranking.notYetSynced, ranking.unresolvable, ranking.recipeless]
     .flat()
     .every((row) => row.trust.verdict === 'broken');
 }

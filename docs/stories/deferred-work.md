@@ -45,3 +45,13 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: [NOTE FOR ARCHITECT] Record the accept-then-finish sequence in AGENT-WORKFLOW.md, and update the WORKFLOW NOTES comment in sprint-status.yaml, which still ends the story flow at `review`.
   evidence: AGENT-WORKFLOW.md owns command-level rules (AGENTS.md); `docs/stories/sprint-status.yaml` line 29 says "Dev moves story to 'review', then runs code-review" (Blind Hunter finding).
   retry_when: never — needs a human
+
+## Deferred from: spec-epic-4-retro-item-7-no-priced-crafted-row-rank review (2026-10-10)
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-7-no-priced-crafted-row-rank.md`
+  summary: Check in agent-browser that a crafted row with no priced combination (states 18 and 41) shows no numeral, tier 3 and EV `—`, and trails every ranked row in the state 18 trail order, on data that holds such a class.
+  evidence: The live `data/` set on `pnpm dev` holds no unpriced crafted class (16 rows, ranks 1..16 contiguous), so the trailing row was checked only through `packages/web/src/recipe/craft-recipe/crafted-states.test.tsx` (Deferred Ledger Auditor; Blind Hunter). Needs a dev fixture world or a sync that leaves a crafted class unpriced.
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-7-no-priced-crafted-row-rank.md`
+  summary: Make the sync loopback fetch test immune to undici's bad-port block: `server.listen(0)` can draw a port on the WHATWG bad-port list, and fetch then fails with "bad port".
+  evidence: `pnpm check` failed once on 2026-10-10 in `packages/sync/src/shell-fetch.test.ts` "round-trips the method, headers and body…" with `TypeError: fetch failed` / `Caused by: Error: bad port`; three isolated re-runs and the next full gate passed. The branch changes nothing under `packages/sync`. The port comes from `server.listen(0, '127.0.0.1')` at `shell-fetch.test.ts:25`.

@@ -24,6 +24,7 @@ export function forRecipe(ranking: Ranking, recipe: ListRecipe | undefined): Act
   return {
     ...ranking,
     ordering,
+    unpricedCrafted: ranking.unpricedCrafted.filter((row) => row.recipeId === id),
     unrankable: ranking.unrankable.filter((item) => item.recipeId === undefined || item.recipeId === id),
     recipe,
     uncostable: isUncostable,

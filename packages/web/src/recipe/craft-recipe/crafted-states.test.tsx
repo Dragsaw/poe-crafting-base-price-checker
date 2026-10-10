@@ -38,7 +38,7 @@ afterEach(() => {
 });
 
 describe('the crafted states', () => {
-  it('state 25: nothing clears, every crafted pair ranks at minus its Craft Cost, numerals print', async () => {
+  it('state 25: nothing clears, a priced crafted pair ranks at minus its Craft Cost, an unpriced one trails', async () => {
     const now = Date.now();
     serveWorld(
       standardWorld({
@@ -49,9 +49,9 @@ describe('the crafted states', () => {
     await settleTo('ready');
     expect(statement()?.dataset['listStatement']).toBe('nothing-clears');
     expect(names()).toEqual(['Bows', 'Staves', 'Gold Amulet']);
-    // Staves has no priced combination, so it reads `—` beside ○ (state 18), though it still ranks.
+    // Staves has no priced combination: unranked, after every ranked row, `—` beside ○ (FR-1, state 18).
     expect(cells('ev')).toEqual([`${MINUS}0.03`, MISSING_FIGURE, MISSING_FIGURE]);
-    expect(cells('rank')).toEqual(['1', '2', '']);
+    expect(cells('rank')).toEqual(['1', '', '']);
   });
 
   it('state 35: an uncostable recipe splits the list into two branches, with no numerals and a declarative', async () => {
