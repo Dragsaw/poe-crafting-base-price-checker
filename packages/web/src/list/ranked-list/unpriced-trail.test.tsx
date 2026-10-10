@@ -64,7 +64,7 @@ describe('the unpriced trail', () => {
       expect(r.dataset['raw']).toBeDefined();
       expect(r.querySelector('[data-sell-as-is]')?.textContent).toBe(sellAsIsLine(82));
     }
-    // The Raw Base tooltip column: `no-listings` prints with no days.
+    // The Raw Base tooltip column: `no-listings` prints with no age.
     expect(tooltipOf(rows[2])).toBe(`${VERDICT_WORDS.pending}${TRUST_JOINER}${FIXED_ROW_REASONS['no-listings']}`);
     expect(tooltipOf(rows[3])).toBe(`${VERDICT_WORDS.pending}${TRUST_JOINER}${FIXED_ROW_REASONS['never-synced']}`);
     expect(tooltipOf(rows[5])).toBe(`${VERDICT_WORDS.broken}${TRUST_JOINER}${FIXED_ROW_REASONS.unresolvable}`);

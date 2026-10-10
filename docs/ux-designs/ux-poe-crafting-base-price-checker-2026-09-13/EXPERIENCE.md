@@ -207,8 +207,8 @@ not ship.
 Observation*, *Trade Catalogue*, `lastAttemptedAt` and *Accepted Tier*. The Dataset
 is what the page renders. A Price Observation shows as a price, and as an age only
 when that age is a problem. The Trade Catalogue is why a `statId` reads as human
-text. `lastAttemptedAt` prints as *tried N days ago*. An Accepted Tier is the bare
-`T1` that opens every Combination.
+text. `lastAttemptedAt` prints as *tried* and an age (Voice and Tone, *Ages*). An
+Accepted Tier is the bare `T1` that opens every Combination.
 
 **Back-end only, never on the page:** Modifier Reference, Stat Line, Source
 Modifier, Eligible Pool, Modifier Weight, Chunk, Workload, Refresh Rotation,
@@ -626,8 +626,9 @@ the states, their thresholds and their words. DESIGN.md owns each mark's colour.
 `only 2 listings`, and nowhere else on the page (memlog 263). **A price that is
 both old and thin prints both reasons**, age first (memlog 268).
 
-**One entry's verdict and reason** (memlog 257, 263). N is whole days, rounded
-down.
+**One entry's verdict and reason** (memlog 257, 263). After `priced`, N is whole
+days, rounded down. After `tried`, the age takes the reason form of Voice and
+Tone, *Ages*.
 
 | Entry condition | Mark · word | Reason on an expansion line | Reason in a Raw Base row's tooltip |
 |---|---|---|---|
@@ -636,7 +637,7 @@ down.
 | `priced`, on 1 listing | ◐ `rough` | `only 1 listing` | `only 1 listing` |
 | `priced`, on 2 listings | ◐ `rough` | `only 2 listings` | `only 2 listings` |
 | `priced`, 3 days or older, on 1 or 2 listings | ◐ `rough` | `priced N days ago · only 1 listing` / `priced N days ago · only 2 listings` | the same |
-| `no-listings` | ○ `pending` | `tried N days ago · no listings` | `no listings found` |
+| `no-listings` | ○ `pending` | `tried N min/hours/days ago · no listings` (*Ages*, In a reason) | `no listings found` |
 | `not-yet-synced` · `never-synced` | ○ `pending` | `not checked yet` | `not checked yet` |
 | `not-yet-synced` · `league-mismatch` | ○ `pending` | `price from last league` | `price from last league` |
 | `not-yet-synced` · `no-exchange-rate` | ○ `pending` | `no Divine rate for its currency` | `no Divine rate for its currency` |
@@ -786,7 +787,7 @@ number.
 | # | State | Where | Treatment |
 |---|---|---|---|
 | 1 | Price State `priced` | `{components.expansion-line}` | The price in Divine at 2 decimal places. The trust cell follows *Price trust*: empty under 3 days on 3 listings or more, ◐ when old or thin |
-| 2 | Price State `no-listings` | Expansion line | Price `—`. ○ `pending` with its reason (*Price trust*). A `no-listings` entry carries no observation, so its clock is the attempt's |
+| 2 | Price State `no-listings` | Expansion line | Price `—`. ○ `pending` with its reason (*Price trust*). A `no-listings` entry carries no observation, so its clock is the attempt's, and its age follows *Ages*, In a reason |
 | 3 | Price State `not-yet-synced` | Expansion line | Price `—`. ○ `pending` with the reason of states 5–7, so the three causes never collapse in words (FR-9) |
 | 4 | Price State `unresolvable` | Expansion line, surfaced not omitted | Price `—`. ✕ `broken` with one reason for every broken entry, Raw Base or Combination, because the line already names what it prices. Excluded from the ranking (FR-24) and counted as a problem (state 31) |
 | 5 | reason `never-synced` | Expansion line | ○ `pending`. No age, because no request was ever issued |
@@ -1132,7 +1133,7 @@ is already under their hand in the header (memlog 204).
    to the EV. They are quiet where the price is current, and one reads
    `◐ rough · priced 5 days ago`. Then a dimmed line reads `below threshold`. It
    shows what the ranking deliberately leaves out, as well as what the ranking
-   uses. Then lines read `○ pending · tried 2 days ago · no listings` and
+   uses. Then lines read `○ pending · tried 4 hours ago · no listings` and
    `○ pending · not checked yet`.
 5. They click `+ N more combinations` (memlog 264) and read every other Tracked
    Entry on the class, down to one `✕ broken · gone after a patch`. Each problem
@@ -1188,7 +1189,7 @@ The *edit* happens in a text editor and git.
 4. The report counts what broke but does not say which Item Class holds it
    (memlog 235). So they open panels, several at once and side by side, and show
    their full lists with `+ N more combinations`. They find three Combinations that
-   read `○ pending · tried N days ago · no listings` all league, and one
+   read `○ pending · tried N hours ago · no listings` all league, and one
    `✕ broken · gone after a patch`.
 5. They open `+ N pruned` on a panel and read the existing pruned lines with their
    reasons. FR-8 includes pruned entries, so this review needs no visit to the

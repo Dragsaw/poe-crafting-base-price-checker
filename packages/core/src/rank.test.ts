@@ -114,7 +114,7 @@ describe('rank: the I/O matrix', () => {
       ],
     });
     expect(result.noListings).toEqual([
-      { entry: N, entryKey: canonicalKey(N), lastAttemptedAt: ATTEMPTED, trust: { verdict: 'pending', reasons: [{ kind: 'no-listings', days: 0 }] } },
+      { entry: N, entryKey: canonicalKey(N), lastAttemptedAt: ATTEMPTED, trust: { verdict: 'pending', reasons: [{ kind: 'no-listings', minutes: 60 }] } },
     ]);
     expect(result.unresolvable).toEqual([
       { entry: U, entryKey: canonicalKey(U), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } },

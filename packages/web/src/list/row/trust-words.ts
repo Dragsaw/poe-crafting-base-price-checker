@@ -1,6 +1,7 @@
 import type { PriceTrust, PriceTrustReason } from '@poe/contracts';
 
 import { plural } from '../../shared/text';
+import { reasonAge } from '../../shared/time';
 
 /** The joiner between a word and its reason, and between two reasons (EXPERIENCE.md Copy Deck). */
 export const TRUST_JOINER = ' · ';
@@ -66,9 +67,7 @@ export function lineReasonWords(reason: PriceTrustReason): string {
   if (reason.kind !== 'no-listings') {
     return rowReasonWords(reason);
   }
-  return reason.days === undefined
-    ? NO_LISTINGS_LINE
-    : `tried ${String(reason.days)} ${plural(reason.days, 'day', 'days')} ago${TRUST_JOINER}${NO_LISTINGS_LINE}`;
+  return reason.minutes === undefined ? NO_LISTINGS_LINE : `tried ${reasonAge(reason.minutes)}${TRUST_JOINER}${NO_LISTINGS_LINE}`;
 }
 
 /** An expansion line's trust cell, `<word> · <reason>`, the reasons in `core`'s order. */

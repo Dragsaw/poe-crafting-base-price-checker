@@ -22,6 +22,19 @@ export function relativeAge(ageMs: number): string {
   return ageMs < DAY_MS ? unitAgo(Math.floor(ageMs / HOUR_MS), 'hour') : unitAgo(Math.floor(ageMs / DAY_MS), 'day');
 }
 
+const MINUTES_PER_HOUR = HOUR_MS / MINUTE_MS;
+const MINUTES_PER_DAY = DAY_MS / MINUTE_MS;
+
+/** An age inside a reason, from whole minutes, rounded down (EXPERIENCE.md, Voice and Tone, *Ages*, In a reason). */
+export function reasonAge(minutes: number): string {
+  if (minutes < MINUTES_PER_HOUR) {
+    return `${String(minutes)} min ago`;
+  }
+  return minutes < MINUTES_PER_DAY
+    ? unitAgo(Math.floor(minutes / MINUTES_PER_HOUR), 'hour')
+    : unitAgo(Math.floor(minutes / MINUTES_PER_DAY), 'day');
+}
+
 /** The sync button's compact age, rounded down (EXPERIENCE.md, Voice and Tone, *Ages*). */
 export function compactAge(ageMs: number): string {
   if (ageMs < MINUTE_MS) {
