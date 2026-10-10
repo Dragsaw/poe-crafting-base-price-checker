@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { rgb, settleTo, unmount } from '../test-support/dom';
 import { NAME_COLORS } from '../list/RankedRow';
-import { colors } from '../theme/tokens';
+import { HEADER_SLOT_WIDTHS } from '../frame/HeaderBar';
+import { colors, headerControls, px, rounded } from '../theme/tokens';
+import { RECIPE_COST_UNIT, RECIPE_LABEL } from './CraftRecipe';
 import { RECIPE_STORAGE_KEY } from './recipe-storage';
 import { formatThreshold } from '../shared/money';
 import { DEFAULT_THRESHOLD } from '../shared/product';
@@ -23,6 +25,7 @@ import {
   click,
   rowNamed,
   RATES,
+  RECIPES,
 } from './craft-recipe/test-support';
 
 afterEach(() => {
@@ -31,16 +34,29 @@ afterEach(() => {
 });
 
 describe('the Craft Recipe control', () => {
-  it('prints one word per recipe, divided by the pipe, the first recipe active, and the Craft Cost once', async () => {
+  it('prints one segment per recipe in the header slot, the first recipe active, and the Craft Cost once', async () => {
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
-    expect(control().closest('[data-recipe-slot]')).not.toBeNull();
-    expect(control().querySelector('[data-recipe-label]')?.textContent).toBe('Craft Recipe');
-    expect(control().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
-    const separator = control().querySelector<HTMLElement>('[data-separator]');
-    expect(separator?.textContent).toBe('|');
-    expect(separator?.style.color).toBe(rgb(colors['text-tertiary']));
+    expect(control().closest('[data-header-bar] [data-slot="recipe"]')).not.toBeNull();
+    const label = control().querySelector<HTMLElement>('[data-recipe-label]');
+    expect(label?.textContent).toBe(RECIPE_LABEL);
+    expect(label?.style.color).toBe(rgb(colors['text-secondary']));
+    expect(control().style.gap).toBe(px(headerControls.labelGap));
+    const toggle = control().querySelector<HTMLElement>('[data-recipe-options]');
+    expect(toggle?.textContent).toBe('greaterperfect');
+    expect(toggle?.style.background).toBe(rgb(colors.surface));
+    expect(toggle?.style.border).toBe(`1px solid ${rgb(colors['line-strong'])}`);
+    expect(toggle?.style.borderRadius).toBe(rounded.control);
+    expect(toggle?.style.padding).toBe(px(headerControls.framePadding));
+    // NFR-10: the active segment reads by its weight, not its colour alone.
+    expect(option('greater').className).toBe('fg-recipe-segment');
+    expect(option('greater').style.fontWeight).toBe('600');
+    expect(option('perfect').style.fontWeight).toBe('');
+    for (const id of ['greater', 'perfect']) {
+      expect(option(id).style.padding).toBe(`${px(headerControls.segmentPadY)} ${px(headerControls.segmentPadX)}`);
+      expect(option(id).style.borderRadius).toBe(rounded.segment);
+    }
     // The active word is not a target; the inactive one is the only button.
     expect(option('greater').tagName).toBe('SPAN');
     expect(option('greater').getAttribute('aria-current')).toBe('true');
@@ -48,11 +64,24 @@ describe('the Craft Recipe control', () => {
     expect(control().querySelectorAll('button')).toHaveLength(1);
     // No form control of any kind.
     expect(control().querySelectorAll('input, select, [role="radio"], [role="switch"]')).toHaveLength(0);
-    expect(costLine()).toBe('0.03Divine / craft');
+    expect(costLine()).toBe(`0.03 ${RECIPE_COST_UNIT}`);
     expect(control().querySelector('[data-recipe-cost-figure]')?.textContent).toBe('0.03');
+    expect(control().querySelector<HTMLElement>('[data-recipe-cost]')?.style.color).toBe(rgb(colors['text-secondary']));
     // Craft Cost prints nowhere else.
-    expect(frame().textContent.split('/ craft')).toHaveLength(2);
-    expect(control().style.width).toBe('216px');
+    expect(frame().textContent.split(RECIPE_COST_UNIT)).toHaveLength(2);
+  });
+
+  // State 42.
+  it('prints the one published recipe as plain text, with no toggle, beside its Craft Cost', async () => {
+    serveWorld(standardWorld({ recipes: [RECIPES[0]] }));
+    mount();
+    await settleTo('ready');
+    expect(control().querySelector('[data-recipe-label]')?.textContent).toBe(RECIPE_LABEL);
+    const word = control().querySelector<HTMLElement>('[data-recipe-word]');
+    expect(word?.textContent).toBe('greater');
+    expect(word?.style.color).toBe(rgb(colors.text));
+    expect(control().querySelectorAll('button, [data-recipe-options], [data-recipe-option]')).toHaveLength(0);
+    expect(costLine()).toBe(`0.03 ${RECIPE_COST_UNIT}`);
   });
 
   it('ranks crafted rows with the Item Class name in magic blue and the EV, beside raw rows', async () => {
@@ -78,7 +107,7 @@ describe('the Craft Recipe control', () => {
     expect(option('greater').tagName).toBe('BUTTON');
     expect(names()).toEqual(['Bows', 'Wide Belt', 'Gold Amulet', 'Staves']);
     expect(cells('ev')).toEqual(['0.70', '0.40', '0.30', '0.20']);
-    expect(costLine()).toBe('0.30Divine / craft');
+    expect(costLine()).toBe(`0.30 ${RECIPE_COST_UNIT}`);
     expect(localStorage.getItem(RECIPE_STORAGE_KEY)).toBe('perfect');
     unmount();
     serveWorld(standardWorld());
@@ -119,13 +148,15 @@ describe('the Craft Recipe control', () => {
     expect(context()).toBe('Bows');
   });
 
+  // State 43.
   it('keeps the slot empty, at its width, when recipes.json holds no recipe', async () => {
     serveWorld(standardWorld({ recipes: [] }));
     mount();
     await settleTo('ready');
-    const slot = frame().querySelector<HTMLElement>('[data-recipe-slot]');
+    const slot = frame().querySelector<HTMLElement>('[data-header-bar] [data-slot="recipe"]');
     expect(slot?.children).toHaveLength(0);
-    expect(slot?.style.width).toBe('216px');
+    expect(slot?.style.width).toBe(px(HEADER_SLOT_WIDTHS.recipe));
+    expect(frame().textContent).not.toContain(RECIPE_COST_UNIT);
     expect(names()).toEqual(['Wide Belt', 'Gold Amulet']);
   });
 

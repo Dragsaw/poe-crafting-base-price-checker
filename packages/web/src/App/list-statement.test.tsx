@@ -8,7 +8,9 @@ import { settleTo, unmount } from '../test-support/dom';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, TRUST_JOINER, VERDICT_WORDS } from '../list/row/trust-words';
-import { server, mount, frame, payoutField, unitNames } from './test-support';
+import { absenceLine } from '../frame/trust-facts';
+import { RECIPE_COST_UNIT } from '../recipe/CraftRecipe';
+import { server, mount, frame, payoutField, toggleReport, unitNames } from './test-support';
 
 afterEach(unmount);
 
@@ -189,11 +191,12 @@ describe('the list statement', () => {
     mount();
     await settleTo('ready');
     expect((recipes as { readonly recipes: readonly unknown[] }).recipes).toHaveLength(2);
-    expect(frame().querySelector('[data-recipe-options]')?.textContent).toBe('greater|perfect');
+    expect(frame().querySelector('[data-recipe-options]')?.textContent).toBe('greaterperfect');
     // The committed dataset now has an orb rate: the cost line is a figure, not the no-figure one.
-    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe('0.01Divine / craft');
-    expect(frame().querySelector('[data-absence-lines]')).toBeNull();
+    expect(frame().querySelector('[data-recipe-cost]')?.textContent).toBe(`0.01 ${RECIPE_COST_UNIT}`);
     expect(frame().textContent).not.toContain('recipes.json');
+    toggleReport();
+    expect(frame().textContent).not.toContain(absenceLine('recipes'));
     expect(statement()).toBeNull();
     expect(frame().textContent).not.toContain('not ranked yet');
   });

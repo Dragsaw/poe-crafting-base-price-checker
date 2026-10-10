@@ -21,3 +21,14 @@ export function relativeAge(ageMs: number): string {
   }
   return ageMs < DAY_MS ? unitAgo(Math.floor(ageMs / HOUR_MS), 'hour') : unitAgo(Math.floor(ageMs / DAY_MS), 'day');
 }
+
+/** The sync button's compact age, rounded down (EXPERIENCE.md, Voice and Tone, *Ages*). */
+export function compactAge(ageMs: number): string {
+  if (ageMs < MINUTE_MS) {
+    return 'just now';
+  }
+  if (ageMs < HOUR_MS) {
+    return `${String(Math.floor(ageMs / MINUTE_MS))}m ago`;
+  }
+  return ageMs < DAY_MS ? `${String(Math.floor(ageMs / HOUR_MS))}h ago` : `${String(Math.floor(ageMs / DAY_MS))}d ago`;
+}

@@ -8,10 +8,11 @@ import { SyncReportPanel } from './SyncReportPanel';
 import {
   AFFORDANCE_CLOSED,
   AFFORDANCE_OPEN,
-  healthSignals,
   LAST_SYNCED_LABEL,
   lastSynced,
+  lineText,
   panelColumns,
+  problemSummary,
   TRACKED_LIST_EDITED_LABEL,
   trackedListEdit,
   UNKNOWN,
@@ -57,10 +58,11 @@ export function TrustStrip({
   const [open, setOpen] = useState(false);
   const report = set.syncReport;
   const edit = trackedListEdit(report);
-  const signals = healthSignals(report, {
+  const problems = problemSummary(set.dataset.entries, report, {
     pinnedCount: set.tracked.entries.filter((entry) => entry.status === 'pinned').length,
     minChunkSearches: set.config.minChunkSearches,
   });
+  const signals = problems.lines.map((line) => lineText(line));
 
   return (
     <>
@@ -94,7 +96,11 @@ export function TrustStrip({
         <AbsenceLines absent={absent} />
         <HealthLine signals={signals} />
       </div>
-      {open ? <SyncReportPanel columns={panelColumns(report, set.weights !== undefined, crossFileFailures)} /> : undefined}
+      {open ? (
+        <SyncReportPanel
+          columns={panelColumns({ report, weights: set.weights, absent, now, problems, crossFileFailures })}
+        />
+      ) : undefined}
     </>
   );
 }
@@ -156,21 +162,3 @@ function HealthLine({ signals }: { readonly signals: readonly string[] }): JSX.E
   );
 }
 
-/** The skeleton's strip: same padding and two empty lines, so the page never jumps (state 22). */
-export function TrustStripSlot(): JSX.Element {
-  const role = typeStyle('note');
-  return (
-    <div
-      data-trust-strip-slot=""
-      aria-hidden="true"
-      style={{
-        ...role,
-        borderTop: `${px(layout.hairline)} solid ${colors['line-strong']}`,
-        borderBottom: `${px(layout.hairline)} solid ${colors.line}`,
-        padding: `${px(layout.trustStripPadTop)} 0 ${px(layout.trustStripPadBottom)}`,
-      }}
-    >
-      <div style={{ height: `${String(2 * Number(role.lineHeight))}em` }} />
-    </div>
-  );
-}

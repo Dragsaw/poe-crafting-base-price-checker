@@ -1,36 +1,34 @@
 /*
- * `{components.craft-recipe}`'s two words. The inactive word is the click
- * target: text-secondary at 400 on a dotted accent rule AT REST, going solid and
- * text on hover. The active word is not a target: text at 700 on a 2px solid
- * accent rule, with no hover state and no pointer. Token custom properties
- * only, as frame.css states.
+ * `{components.recipe-toggle}`'s segments. Only an inactive segment is a
+ * target: text-secondary at rest, text on hover, the raised step while
+ * pressed. The active segment takes the accent-soft fill and accent text at
+ * 600, with no hover and no pointer. Token custom properties only.
  */
 
-.fg-recipe-option {
-  display: inline;
+.fg-recipe-segment {
+  display: inline-block;
   margin: 0;
-  padding: 0 0 1px;
   border: 0;
-  border-radius: 0;
   background: none;
   font: inherit;
+  line-height: inherit;
 }
 
-.fg-recipe-option[data-active] {
-  color: var(--fg-color-text);
-  font-weight: 700;
-  border-bottom: 2px solid var(--fg-color-accent);
+.fg-recipe-segment[data-active] {
+  background: var(--fg-color-accent-soft);
+  color: var(--fg-color-accent);
   cursor: default;
 }
 
-.fg-recipe-option[data-inactive] {
+.fg-recipe-segment[data-inactive] {
   color: var(--fg-color-text-secondary);
-  font-weight: 400;
-  border-bottom: 1px dotted var(--fg-color-accent);
   cursor: pointer;
 }
 
-.fg-recipe-option[data-inactive]:hover {
+.fg-recipe-segment[data-inactive]:hover {
   color: var(--fg-color-text);
-  border-bottom-style: solid;
+}
+
+.fg-recipe-segment[data-inactive]:active {
+  background: var(--fg-color-surface-raised);
 }

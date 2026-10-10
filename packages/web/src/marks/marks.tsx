@@ -74,3 +74,21 @@ export function TradeLinkMark(): JSX.Element {
     </MarkBox>
   );
 }
+
+/** ≥: an angle pointing right over one horizontal bar (DESIGN.md `threshold-control`). */
+export function GreaterEqualMark(): JSX.Element {
+  return (
+    <MarkBox name="greater-equal" color="currentColor">
+      <path d="M4 2.5 L12 6.5 L4 10.5 M4 13.5 H12" strokeLinejoin="round" />
+    </MarkBox>
+  );
+}
+
+/** ▾: a small solid triangle pointing down, the sync button's open sign (DESIGN.md `sync-button`). */
+export function OpenSignMark(): JSX.Element {
+  return (
+    <MarkBox name="open-sign" color={colors.accent}>
+      <path d="M4 6 H12 L8 11 Z" fill="currentColor" stroke="none" />
+    </MarkBox>
+  );
+}

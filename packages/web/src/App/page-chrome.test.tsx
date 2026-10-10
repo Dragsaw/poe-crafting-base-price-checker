@@ -67,14 +67,12 @@ describe('the resting chrome', () => {
     expect(chrome()).toEqual(ALL);
     const order = Array.from(
       frame().querySelectorAll(
-        '[data-header-bar], [data-interim-controls], [data-trust-strip], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-key-block], [data-running-foot]',
+        '[data-header-bar], [data-interim-controls], [data-trust-strip], [data-sync-report-panel], [data-asking-price-line], [data-column-header], [data-ranked-row], [data-unrankable-appendix], [data-key-block], [data-running-foot]',
       ),
       (node) => Object.keys((node as HTMLElement).dataset)[0],
     );
     expect(order).toEqual([
       'headerBar',
-      'interimControls',
-      'trustStrip',
       'askingPriceLine',
       'columnHeader',
       'rankedRow',
@@ -171,38 +169,5 @@ describe('the frame', () => {
     expect(style.outline).toBe('');
     expect(style.overflow).toBe('');
     expect(style.border).toBe('');
-  });
-});
-
-describe('the trust strip', () => {
-  it('sits between the interim controls and the asking-price line, closed on load, and toggles with no request', async () => {
-    const requests = serveArtifacts(server);
-    mount();
-    await settleTo('ready');
-    const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
-    expect(strip?.previousElementSibling?.hasAttribute('data-interim-controls')).toBe(true);
-    expect(strip?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
-    expect(frame().querySelector('[data-sync-report-panel]')).toBeNull();
-    expect(strip?.textContent).toContain('producer poe-mod-weights-producer');
-    // A healthy run: no third line, no count of nothing.
-    expect(strip?.querySelector('[data-health-line]')).toBeNull();
-    expect(strip?.textContent).not.toContain('0 unresolvable');
-    const fetched = requests.length;
-
-    act(() => {
-      strip?.click();
-    });
-    await flush();
-    const panel = frame().querySelector('[data-sync-report-panel]');
-    expect(panel).not.toBeNull();
-    expect(strip?.nextElementSibling).toBe(panel);
-    expect(panel?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
-
-    act(() => {
-      strip?.click();
-    });
-    await flush();
-    expect(frame().querySelector('[data-sync-report-panel]')).toBeNull();
-    expect(requests).toHaveLength(fetched);
   });
 });

@@ -5,9 +5,8 @@ import { useCallback, useEffect, useMemo, useState, type JSX, type ReactNode } f
 import { FailureScreen } from './frame/FailureScreen';
 import { Frame } from './frame/Frame';
 import { HeaderBar } from './frame/HeaderBar';
-import { InterimControls } from './frame/InterimControls';
+import { pendingControls, readyControls, useReportToggle, type ReadyControlsInput } from './frame/header-controls';
 import { RowSlots } from './frame/RowSlots';
-import { TrustStrip, TrustStripSlot } from './frame/TrustStrip';
 import { AskingPriceLine } from './list/AskingPriceLine';
 import { forRecipe, type ListRecipe } from './list/active-ranking';
 import { statTexts } from './list/combination-text';
@@ -21,8 +20,8 @@ import { isBannerRaised, UniformPriorBanner } from './list/UniformPriorBanner';
 import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
-import { activeRecipe, readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
-import { expectedValueCost, recipeCostLine, recipeOptions } from './recipe/recipe-view';
+import { readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
+import { expectedValueCost } from './recipe/recipe-view';
 import type { ExpectedValueNote } from './list/ColumnHeader';
 import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold-storage';
 
@@ -38,6 +37,7 @@ export function App(): JSX.Element {
   const [threshold, changeThreshold] = usePersistedThreshold();
   const [storedRecipe, changeRecipe] = usePersistedRecipe();
   const ranking = useRanking(view, threshold);
+  const [isReportOpen, toggleReport] = useReportToggle();
 
   switch (view.kind) {
     case 'pending': {
@@ -54,6 +54,8 @@ export function App(): JSX.Element {
         storedRecipe,
         onThresholdChange: changeThreshold,
         onRecipeChange: changeRecipe,
+        isReportOpen,
+        onReportToggle: toggleReport,
       });
     }
     case 'refused': {
@@ -169,9 +171,7 @@ function renderPending({
 }): JSX.Element {
   return (
     <Frame state="pending">
-      <HeaderBar league={undefined} />
-      <InterimControls threshold={threshold} onThresholdChange={onThresholdChange} />
-      <TrustStripSlot />
+      <HeaderBar league={undefined} controls={pendingControls(threshold, onThresholdChange)} />
       <AskingPriceLine />
       <RowSlots />
       <PageTail />
@@ -181,52 +181,29 @@ function renderPending({
 
 function renderReady({
   view,
-  ranking,
-  threshold,
-  storedRecipe,
-  onThresholdChange,
-  onRecipeChange,
-}: {
+  ...rest
+}: Omit<ReadyControlsInput, 'set' | 'absent' | 'now' | 'crossFileFailures'> & {
   readonly view: Extract<ViewState, { readonly kind: 'ready' }>;
-  readonly ranking: Ranking;
-  readonly threshold: number;
-  readonly storedRecipe: string | undefined;
-  readonly onThresholdChange: (value: number) => void;
-  readonly onRecipeChange: (recipeId: string) => void;
 }): JSX.Element {
-  const recipes = view.set.recipes?.recipes ?? [];
-  const recipe = activeRecipe(recipes, storedRecipe);
-  const options = recipeOptions(recipes);
-  const active = options.find((option) => option.id === recipe?.id);
-  const cost =
-    recipe === undefined
-      ? undefined
-      : recipeCostLine(
-          recipe,
-          view.set.dataset.currencyRates,
-          view.set.config.league,
-          ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
-        );
+  const { set } = view;
+  const { controls, panel, active, cost } = readyControls({
+    ...rest,
+    set,
+    absent: view.absent,
+    now: view.now,
+    crossFileFailures: view.crossFileFailures,
+  });
   return (
     <Frame state="ready">
-      <HeaderBar league={view.set.config.league} />
-      <InterimControls
-        threshold={threshold}
-        onThresholdChange={onThresholdChange}
-        recipe={
-          recipe === undefined || cost === undefined
-            ? undefined
-            : { options, activeId: recipe.id, cost, onChange: onRecipeChange }
-        }
-      />
-      <TrustStrip set={view.set} absent={view.absent} now={view.now} crossFileFailures={view.crossFileFailures} />
+      <HeaderBar league={set.config.league} controls={controls} />
+      {panel}
       <AskingPriceLine />
       <ReadyBody
-        set={view.set}
-        threshold={threshold}
-        ranking={ranking}
+        set={set}
+        threshold={rest.threshold}
+        ranking={rest.ranking}
         recipe={active}
-        note={{ threshold, cost: expectedValueCost(cost) }}
+        note={{ threshold: rest.threshold, cost: expectedValueCost(cost) }}
       />
     </Frame>
   );

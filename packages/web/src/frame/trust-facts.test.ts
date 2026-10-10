@@ -1,21 +1,29 @@
+import type { DatasetEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import type { Parsed } from '../load/artifacts';
 import { VALID_BODIES } from '../test-support/artifact-server';
 import { NOW } from '../test-support/dom';
+import { priced, rawEntry, unpriced } from '../test-support/list-fixtures';
+import { MINUTE_MS } from '../shared/time';
 import {
-  AFFORDANCE_CLOSED,
-  AFFORDANCE_OPEN,
+  absenceLine,
+  DIAGNOSIS_LEAD,
   groupText,
-  healthSignals,
   lastSynced,
   NOT_MEASURED,
+  NOT_SYNCED_YET,
+  PANEL_HEADINGS,
   panelColumns,
+  problemSummary,
+  syncButtonFace,
   trackedListEdit,
   UNKNOWN,
   utcDate,
   weightsFacts,
   type FigureGroup,
+  type PanelInput,
+  type ProblemSummary,
 } from './trust-facts';
 
 type SyncReport = Parsed<'syncReport'>;
@@ -28,8 +36,15 @@ function report(overrides: Partial<SyncReport> = {}, figures: Partial<SyncReport
   return { ...BASE_REPORT, ...overrides, figures: { ...BASE_REPORT.figures, ...figures } };
 }
 
-const unresolvable = (n: number): SyncReport['records'] =>
-  Array.from({ length: n }, (_, index) => ({
+/** `n` dataset entries the catalogue lost (state `unresolvable`), plus one priced entry. */
+function datasetWithBroken(n: number): DatasetEntry[] {
+  const broken = Array.from({ length: n }, (_, index) => unpriced(rawEntry(`Lost ${String(index)}`), { state: 'unresolvable' }));
+  return [...broken, priced(rawEntry('Kept'), 1, new Date(NOW).toISOString())];
+}
+
+/** Five report records that outlived a recovered id: they never count (AD-12). */
+const STALE_RECORDS: SyncReport['records'] =
+  Array.from({ length: 5 }, (_, index) => ({
     kind: 'unresolvable' as const,
     entryKey: `raw:Base ${String(index)}`,
     identifier: `Base ${String(index)}`,
@@ -40,10 +55,15 @@ const starvation = {
   kind: 'pinned-starvation' as const,
   discoveredAllowance: 4,
   declaredMinChunkSearches: 8,
-  pinnedCount: 5,
-  pinnedRefreshed: 2,
+  pinnedCount: 6,
+  pinnedRefreshed: 5,
   activeRefreshed: 0,
 };
+
+// The loaded curation that the `starvation` fixture describes: 6 pinned, yardstick 8.
+const CURATION = { pinnedCount: 6, minChunkSearches: 8 };
+
+const lines = (summary: ProblemSummary): string[] => summary.lines.map((line) => groupText([line]));
 
 describe('line one', () => {
   it('reads producer, generatedAt as a UTC date, and gamePatch from the header', () => {
@@ -93,141 +113,140 @@ describe('line two', () => {
   });
 });
 
-describe('the health line', () => {
-  // The loaded curation that the `starvation` fixture describes: 5 pinned, yardstick 8.
-  const CURATION = { pinnedCount: 5, minChunkSearches: 8 };
-
-  it('raises nothing on a healthy run or an absent report', () => {
-    expect(healthSignals(report(), CURATION)).toEqual([]);
-    expect(healthSignals(undefined, CURATION)).toEqual([]);
+describe('the problem summary (AD-12)', () => {
+  it('counts nothing on a healthy dataset, with or without a report', () => {
+    for (const published of [report(), undefined]) {
+      expect(problemSummary(datasetWithBroken(0), published, CURATION)).toEqual({ broken: 0, starved: 0, kind: undefined, lines: [] });
+    }
   });
 
-  it('counts unresolvable records', () => {
-    expect(healthSignals(report({ records: unresolvable(12) }), CURATION)).toEqual(['12 unresolvable']);
+  it('counts the dataset entries in state unresolvable, never the report records', () => {
+    const summary = problemSummary(datasetWithBroken(2), report({ records: STALE_RECORDS }), CURATION);
+    expect(summary).toMatchObject({ broken: 2, starved: 0, kind: 'broken' });
+    expect(lines(summary)).toEqual(['2 entries can no longer be priced']);
+    expect(problemSummary(datasetWithBroken(0), report({ records: STALE_RECORDS }), CURATION).kind).toBeUndefined();
   });
 
-  it('counts starved pinned entries as N of M from the record that matches the curation', () => {
-    expect(healthSignals(report({ records: [starvation] }), CURATION)).toEqual(['3 of 5 pinned entries starved']);
+  it('words one broken entry in the singular, and leads the line with the broken mark', () => {
+    const summary = problemSummary(datasetWithBroken(1), undefined, CURATION);
+    expect(lines(summary)).toEqual(['1 entry can no longer be priced']);
+    expect(summary.lines[0]?.[0]).toMatchObject({ kind: 'mark', mark: 'broken' });
   });
 
-  it('words N = 0 as the pinned entries that left the rotation no search', () => {
-    const none = { ...starvation, pinnedRefreshed: 5 };
-    expect(healthSignals(report({ records: [none] }), CURATION)).toEqual([
-      '5 pinned entries left the rotation no search',
-    ]);
+  it('counts the starved pinned entries of the matching record as M − refreshed, led by the rough mark', () => {
+    const summary = problemSummary(datasetWithBroken(0), report({ records: [{ ...starvation, pinnedRefreshed: 3 }] }), CURATION);
+    expect(summary).toMatchObject({ broken: 0, starved: 3, kind: 'rough' });
+    expect(lines(summary)).toEqual(['3 of 6 pinned entries are not being refreshed']);
+    expect(summary.lines[0]?.[0]).toMatchObject({ kind: 'mark', mark: 'rough' });
+    const one = problemSummary(datasetWithBroken(0), report({ records: [starvation] }), CURATION);
+    expect(one.starved).toBe(1);
+    expect(lines(one)).toEqual(['1 of 6 pinned entries are not being refreshed']);
   });
 
-  it('raises no starvation signal when the pinned set changed since the record', () => {
-    const older = { ...starvation, pinnedCount: 8 };
-    expect(healthSignals(report({ records: [older] }), CURATION)).toEqual([]);
+  it('counts a starvation that left out no entry as one, with its own wording', () => {
+    const summary = problemSummary(datasetWithBroken(0), report({ records: [{ ...starvation, pinnedRefreshed: 6 }] }), CURATION);
+    expect(summary).toMatchObject({ starved: 1, kind: 'rough' });
+    expect(lines(summary)).toEqual(['6 pinned entries take every search, so nothing else rotates']);
+    const single = problemSummary([], report({ records: [{ ...starvation, pinnedCount: 1, pinnedRefreshed: 1 }] }), { pinnedCount: 1, minChunkSearches: 8 });
+    expect(lines(single)).toEqual(['1 pinned entry takes every search, so nothing else rotates']);
   });
 
-  it('raises no starvation signal when the yardstick changed since the record', () => {
-    expect(healthSignals(report({ records: [starvation] }), { pinnedCount: 5, minChunkSearches: 10 })).toEqual([]);
+  it('counts nothing for a stale record: the pinned set or the yardstick changed since', () => {
+    const records = [starvation];
+    expect(problemSummary([], report({ records }), { pinnedCount: 8, minChunkSearches: 8 }).kind).toBeUndefined();
+    expect(problemSummary([], report({ records }), { pinnedCount: 6, minChunkSearches: 10 }).kind).toBeUndefined();
   });
 
-  it('reads the matching record, not the last by position', () => {
+  it('reads the matching record, not the last by position, and counts nothing for an empty pinned set', () => {
     const matching = { ...starvation, pinnedCount: 8, pinnedRefreshed: 2 };
-    const older = { ...starvation, pinnedCount: 5, pinnedRefreshed: 4 };
-    expect(
-      healthSignals(report({ records: [matching, older] }), { pinnedCount: 8, minChunkSearches: 8 }),
-    ).toEqual(['6 of 8 pinned entries starved']);
-  });
-
-  it('raises no starvation signal for an empty pinned set, which would print a zero', () => {
+    expect(problemSummary([], report({ records: [matching, starvation] }), { pinnedCount: 8, minChunkSearches: 8 }).starved).toBe(6);
     const empty = { ...starvation, pinnedCount: 0, pinnedRefreshed: 0 };
-    expect(healthSignals(report({ records: [empty] }), { pinnedCount: 0, minChunkSearches: 8 })).toEqual([]);
+    expect(problemSummary([], report({ records: [empty] }), { pinnedCount: 0, minChunkSearches: 8 }).kind).toBeUndefined();
   });
 
-  it('formats the starvation counts with en-US grouping', () => {
-    const large = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 500 };
-    expect(healthSignals(report({ records: [large] }), { pinnedCount: 12_000, minChunkSearches: 8 })).toEqual([
-      '11,500 of 12,000 pinned entries starved',
-    ]);
-    const none = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 12_000 };
-    expect(healthSignals(report({ records: [none] }), { pinnedCount: 12_000, minChunkSearches: 8 })).toEqual([
-      '12,000 pinned entries left the rotation no search',
-    ]);
-  });
-
-  it('raises both triggers in order, and never prints "this run"', () => {
-    const signals = healthSignals(report({ records: [...unresolvable(12), starvation] }), CURATION);
-    expect(signals).toEqual(['12 unresolvable', '3 of 5 pinned entries starved']);
-    expect(signals.join(' ')).not.toContain('this run');
+  it('leads with the broken mark when anything counted is broken, and lists broken first', () => {
+    const summary = problemSummary(datasetWithBroken(2), report({ records: [starvation] }), CURATION);
+    expect(summary).toMatchObject({ broken: 2, starved: 1, kind: 'broken' });
+    expect(lines(summary)).toHaveLength(2);
+    expect(lines(summary).join(' ')).not.toContain('this run');
   });
 
   it('ignores records of other kinds', () => {
     const other = { kind: 'stale-lock-broken' as const, pid: 1, startedAt: '2026-09-26T10:00:00Z' };
-    expect(healthSignals(report({ records: [other] }), CURATION)).toEqual([]);
+    expect(problemSummary([], report({ records: [other] }), CURATION).kind).toBeUndefined();
+  });
+
+  it('groups large counts the en-US way', () => {
+    const large = { ...starvation, pinnedCount: 12_000, pinnedRefreshed: 500 };
+    const summary = problemSummary([], report({ records: [large] }), { pinnedCount: 12_000, minChunkSearches: 8 });
+    expect(lines(summary)).toEqual(['11,500 of 12,000 pinned entries are not being refreshed']);
   });
 });
 
+/** A report whose run finished `minutesAgo` before `NOW`. */
+function finished(minutesAgo: number): SyncReport {
+  return report({
+    runStartedAt: new Date(NOW - (minutesAgo + 1) * MINUTE_MS).toISOString(),
+    runFinishedAt: new Date(NOW - minutesAgo * MINUTE_MS).toISOString(),
+  });
+}
+
+describe('the sync button face', () => {
+  const healthy = problemSummary([], undefined, CURATION);
+
+  it('reads the compact age when healthy, and nothing else', () => {
+    expect(syncButtonFace(healthy, finished(40), NOW)).toEqual({ kind: 'synced', text: 'Synced 40m ago' });
+    expect(syncButtonFace(healthy, finished(0), NOW).text).toBe('Synced just now');
+  });
+
+  it('reads Not synced yet with no report and no problem', () => {
+    expect(syncButtonFace(healthy, undefined, NOW)).toEqual({ kind: 'not-synced', text: NOT_SYNCED_YET });
+  });
+
+  it('puts the count in place of the age, with the kind of the summary', () => {
+    const broken = problemSummary(datasetWithBroken(2), finished(40), CURATION);
+    expect(syncButtonFace(broken, finished(40), NOW)).toEqual({ kind: 'problem', mark: 'broken', text: '2 problems' });
+    const starved = problemSummary([], report({ records: [starvation] }), CURATION);
+    expect(syncButtonFace(starved, finished(40), NOW)).toEqual({ kind: 'problem', mark: 'rough', text: '1 problem' });
+    const both = problemSummary(datasetWithBroken(998), report({ records: [starvation] }), CURATION);
+    expect(syncButtonFace(both, undefined, NOW).text).toBe('999 problems');
+  });
+});
+
+function input(overrides: Partial<PanelInput> = {}): PanelInput {
+  return {
+    report: report(),
+    weights: WEIGHTS,
+    absent: [],
+    now: NOW,
+    problems: problemSummary([], undefined, CURATION),
+    ...overrides,
+  };
+}
+
+const texts = (groups: readonly FigureGroup[]): string[] => groups.map((group) => groupText(group));
+
 describe('the panel copy', () => {
-  it('prints the five published figure groups, zeros included, in three columns', () => {
-    const full = report(
-      { records: [...unresolvable(12), starvation] },
-      { requestsBySource: { 'tracked-list': 10, 'league-validation': 1, 'session-probe': 0 }, notReachedCount: 0, coverage: 0.862, rankableClassCount: 29 },
-    );
-    const [run, broken, cover] = panelColumns(full, true);
-    expect(run.map((group) => groupText(group))).toEqual([
-      '10 tracked list · 1 league validation request this pass.',
-      '0 tracked entries were not reached in the last sync pass.',
-    ]);
-    expect(broken.map((group) => groupText(group))).toEqual([
-      '12 entries are unresolvable.',
-      '1 pinned-starvation record.\n2 of 5 pinned entries refreshed',
-    ]);
-    expect(cover.map((group) => groupText(group))).toEqual(['86% of 29 tracked Item Classes.']);
+  it('has four columns, in the Copy Deck order', () => {
+    expect(panelColumns(input())).toHaveLength(PANEL_HEADINGS.length);
   });
 
-  // Matrix: one not reached, one unresolvable, one starvation record; zero and many unchanged.
-  it('agrees each count with its noun and verb: singular at one, plural at zero and many', () => {
-    const first = (group: FigureGroup): string => groupText(group).split('\n', 1)[0] ?? '';
-
-    const [oneRun, oneBroken] = panelColumns(report({ records: [...unresolvable(1), starvation] }, { notReachedCount: 1 }), true);
-    expect(oneRun.map((group) => first(group))[1]).toBe('1 tracked entry was not reached in the last sync pass.');
-    expect(oneBroken.map((group) => first(group))).toEqual(['1 entry is unresolvable.', '1 pinned-starvation record.']);
-
-    const [manyRun, manyBroken] = panelColumns(
-      report(
-        { records: [...unresolvable(3), starvation, starvation] },
-        { notReachedCount: 3, requestsBySource: { 'tracked-list': 10, 'league-validation': 2, 'session-probe': 0 } },
-      ),
-      true,
-    );
-    expect(manyRun.map((group) => first(group))[0]).toBe('10 tracked list · 2 league validation requests this pass.');
-    expect(manyRun.map((group) => first(group))[1]).toBe('3 tracked entries were not reached in the last sync pass.');
-    expect(manyBroken.map((group) => first(group))).toEqual(['3 entries are unresolvable.', '2 pinned-starvation records.']);
-
-    const onePinned = { ...starvation, pinnedCount: 1, pinnedRefreshed: 1 };
-    const [, pinnedBroken, oneCover] = panelColumns(
-      report({ records: [onePinned] }, { coverage: 1, rankableClassCount: 1 }),
-      true,
-    );
-    expect(groupText(pinnedBroken[1] ?? [])).toBe('1 pinned-starvation record.\n1 of 1 pinned entry refreshed');
-    expect(oneCover.map((group) => groupText(group))).toEqual(['100% of 1 tracked Item Class.']);
-    const unknownCover = panelColumns(report({}, { coverage: 0.5 }), true)[2];
-    expect(unknownCover.map((group) => groupText(group))).toEqual(['50% of unknown tracked Item Classes.']);
-
-    const [zeroRun] = panelColumns(
-      report({}, { notReachedCount: 0, requestsBySource: { 'tracked-list': 0, 'league-validation': 0, 'session-probe': 0 } }),
-      true,
-    );
-    expect(zeroRun.map((group) => first(group))[0]).toBe('0 tracked list · 0 league validation requests this pass.');
-    expect(zeroRun.map((group) => first(group))[1]).toBe('0 tracked entries were not reached in the last sync pass.');
+  it('prints the sync run requests per source, never session-probe, and the entries not reached', () => {
+    const full = report({}, { requestsBySource: { 'tracked-list': 1200, 'league-validation': 1, 'session-probe': 7 }, notReachedCount: 12 });
+    const [, run] = panelColumns(input({ report: full }));
+    expect(texts(run)).toEqual(['Requests price searches 1,200 | league checks 1', '12 entries not reached in the last sync pass']);
+    expect(texts(run).join(' ')).not.toMatch(/session|probe|7/);
+    const [, one] = panelColumns(input({ report: report({}, { notReachedCount: 1 }) }));
+    expect(texts(one)[1]).toBe('1 entry not reached in the last sync pass');
   });
 
-  it('prints zero unresolvable and zero pinned-starvation records on a healthy run', () => {
-    const [, broken] = panelColumns(report(), true);
-    expect(broken.map((group) => groupText(group))).toEqual(['0 entries are unresolvable.', '0 pinned-starvation records.']);
-  });
-
-  it('never says Chunk', () => {
-    for (const column of panelColumns(report(), true)) {
-      for (const group of column) {
-        expect(groupText(group)).not.toMatch(/chunk/i);
-      }
-    }
+  it('prints pool coverage with its denominator', () => {
+    const cover = panelColumns(input({ report: report({}, { coverage: 0.862, rankableClassCount: 29 }) }))[2];
+    expect(texts(cover)).toEqual(['Pool coverage 86% of 29 tracked Item Classes']);
+    const single = panelColumns(input({ report: report({}, { coverage: 1, rankableClassCount: 1 }) }))[2];
+    expect(texts(single)).toEqual(['Pool coverage 100% of 1 tracked Item Class']);
+    const noDenominator = panelColumns(input({ report: report({}, { coverage: 0.5 }) }))[2];
+    expect(texts(noDenominator)).toEqual(['Pool coverage 50% of unknown tracked Item Classes']);
   });
 
   it.each([
@@ -240,71 +259,94 @@ describe('the panel copy', () => {
     [1 - 1e-12, '99%'],
     [0.01, '1%'],
   ])('prints coverage %s as %s', (coverage, percent) => {
-    const cover = panelColumns(report({}, { coverage, rankableClassCount: 29 }), true)[2];
-    expect(cover.map((group) => groupText(group))).toEqual([`${percent} of 29 tracked Item Classes.`]);
+    const cover = panelColumns(input({ report: report({}, { coverage, rankableClassCount: 29 }) }))[2];
+    expect(texts(cover)).toEqual([`Pool coverage ${percent} of 29 tracked Item Classes`]);
   });
 
-  it('reads omitted coverage as not measured with weights loaded, unknown without, never 0', () => {
-    const loaded = panelColumns(report(), true)[2];
-    const absent = panelColumns(report(), false)[2];
-    expect(loaded).toEqual([[[{ kind: 'missing', text: NOT_MEASURED }]]]);
-    expect(absent).toEqual([[[{ kind: 'missing', text: UNKNOWN }]]]);
+  it('reads omitted coverage as not measured with weights loaded, never 0', () => {
+    expect(texts(panelColumns(input())[2])).toEqual([`Pool coverage ${NOT_MEASURED}`]);
   });
 
-  it('reads every group unknown when sync-report.json is absent', () => {
-    const columns = panelColumns(undefined, true);
-    expect(columns.map((groups) => groups.length)).toEqual([2, 2, 1]);
-    for (const groups of columns) {
-      for (const group of groups) {
-        expect(group).toEqual([[{ kind: 'missing', text: UNKNOWN }]]);
+  it('prints the two attribution lines in Built from', () => {
+    const published = report(
+      { runStartedAt: '2026-09-26T11:18:00Z', runFinishedAt: '2026-09-26T11:19:00Z' },
+      { trackedListEditedAt: { source: 'file-modified', at: '2026-09-25T09:00:00Z' } },
+    );
+    const built = panelColumns(input({ report: published }))[3];
+    expect(texts(built)).toEqual([
+      'Weights File producer poe-mod-weights-producer | generatedAt 2026-09-26 | gamePatch 0.5.5\nLast synced 41 minutes ago | Tracked List last edited 2026-09-25 (not committed)',
+    ]);
+  });
+
+  it('reads a missing Tracked List date as unknown', () => {
+    const figures = { ...BASE_REPORT.figures };
+    delete figures.trackedListEditedAt;
+    const built = panelColumns(input({ report: { ...BASE_REPORT, figures } }))[3];
+    expect(groupText(built[0] ?? []).split('\n', 2)[1]).toBe(`Last synced < 1 minute ago | Tracked List last edited ${UNKNOWN}`);
+  });
+
+  it('adds one Not published line per absent tolerable file, in order, and counts none of them', () => {
+    const [problems, , cover, built] = panelColumns(input({ weights: undefined, absent: ['syncReport', 'weights'] }));
+    expect(texts(built)[1]).toBe([absenceLine('weights'), absenceLine('syncReport')].join('\n'));
+    expect(texts(cover)).toEqual([`Pool coverage ${UNKNOWN}`]);
+    expect(texts(built)[0]).toContain(`producer ${UNKNOWN} | generatedAt ${UNKNOWN} | gamePatch ${UNKNOWN}`);
+    expect(texts(problems)).not.toContain(absenceLine('weights'));
+  });
+
+  it('reads every report figure unknown when sync-report.json is absent', () => {
+    const [, run, cover, built] = panelColumns(input({ report: undefined, absent: ['syncReport'] }));
+    expect(texts(run)).toEqual([`Requests ${UNKNOWN}`, `${UNKNOWN} entries not reached in the last sync pass`]);
+    expect(texts(cover)).toEqual([`Pool coverage ${UNKNOWN}`]);
+    expect(groupText(built[0] ?? []).split('\n', 2)[1]).toBe(`Last synced ${UNKNOWN} | Tracked List last edited ${UNKNOWN}`);
+    expect(texts(built)[1]).toBe(absenceLine('syncReport'));
+  });
+
+  it('holds the problem lines in Problems, and nothing with no problem', () => {
+    expect(panelColumns(input())[0]).toEqual([]);
+    const problems = problemSummary(datasetWithBroken(2), report({ records: [starvation] }), CURATION);
+    expect(texts(panelColumns(input({ problems }))[0])).toEqual([lines(problems).join('\n')]);
+  });
+
+  it('never says Chunk', () => {
+    for (const column of panelColumns(input())) {
+      for (const group of column) {
+        expect(groupText(group)).not.toMatch(/chunk/i);
       }
     }
   });
-
-  it('does not repeat the Tracked List edit date', () => {
-    const edited = report({}, { trackedListEditedAt: { source: 'git-author-date', at: '2026-08-01T10:00:00Z' } });
-    const all = panelColumns(edited, true).flatMap((groups) => groups.map((group) => groupText(group))).join(' ');
-    expect(all).not.toContain('2026-08-01');
-  });
 });
 
-describe('the cross-file diagnosis group', () => {
+describe('the cross-file diagnosis', () => {
   const failure = {
     check: 'empty-containment-set',
     entryKey: '["crafted","jewel","Emerald",1,["explicit.stat_1",12,15],null]',
     detail: 'prefix explicit.stat_1 band [12, 15] at floor 1: no scoped entry contains it (1 scoped entry carries that statId)',
   } as const;
 
-  it('sits after the pinned-starvation group, one verbatim line per failure: check, key, detail', () => {
-    const [, broken] = panelColumns(report(), true, [failure, { ...failure, check: 'kind-agreement' }]);
-    expect(broken).toHaveLength(3);
-    expect(broken[2]).toEqual([
+  it('follows the problem lines under its lead, one verbatim line per failure, and is not counted', () => {
+    const problems = problemSummary(datasetWithBroken(1), undefined, CURATION);
+    const [column] = panelColumns(input({ problems, crossFileFailures: [failure, { ...failure, check: 'kind-agreement' }] }));
+    expect(column).toHaveLength(2);
+    expect(column[1]).toEqual([
+      [{ kind: 'text', text: DIAGNOSIS_LEAD }],
       [{ kind: 'verbatim', text: `empty-containment-set · ${failure.entryKey} · ${failure.detail}` }],
       [{ kind: 'verbatim', text: `kind-agreement · ${failure.entryKey} · ${failure.detail}` }],
     ]);
+    expect(problems.broken).toBe(1);
   });
 
   it('shows beside an absent report too, since web ran the checks itself', () => {
-    const [, broken] = panelColumns(undefined, true, [failure]);
-    expect(broken).toHaveLength(3);
+    expect(panelColumns(input({ report: undefined, crossFileFailures: [failure] }))[0]).toHaveLength(1);
   });
 
   it('renders nothing with no failure', () => {
-    expect(panelColumns(report(), true, []).map((groups) => groups.length)).toEqual([2, 2, 1]);
+    expect(panelColumns(input({ crossFileFailures: [] }))[0]).toEqual([]);
   });
 
   it('reads one unknown line when no weights envelope loaded, since the checks did not run', () => {
     for (const published of [report(), undefined]) {
-      const [, broken] = panelColumns(published, false, []);
-      expect(broken).toHaveLength(3);
-      expect(broken[2]).toEqual([[{ kind: 'missing', text: UNKNOWN }]]);
+      const [column] = panelColumns(input({ report: published, weights: undefined }));
+      expect(column).toEqual([[[{ kind: 'text', text: DIAGNOSIS_LEAD }], [{ kind: 'missing', text: UNKNOWN }]]]);
     }
-  });
-});
-
-describe('the affordance', () => {
-  it('reads + closed and U+2212 open', () => {
-    expect(AFFORDANCE_CLOSED).toBe('+ the full sync report');
-    expect(AFFORDANCE_OPEN).toBe('− the full sync report');
   });
 });

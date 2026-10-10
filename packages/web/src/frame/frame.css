@@ -1,10 +1,10 @@
 /*
  * The few rules inline styles cannot express: hover states. Every value is a
  * token custom property (`--fg-color-*`, set by theme.ts from tokens.ts), so
- * this file holds no colour of its own. No transition, no shadow, no radius.
- * The shared affordance, the ranked row and the Payout Threshold figure keep
- * their rules next to their components (`shared/affordance.css`,
- * `list/list.css`, `threshold/threshold.css`).
+ * this file holds no colour of its own. No transition, no shadow.
+ * The shared affordance, the ranked row and the header controls keep their
+ * rules next to their components (`shared/affordance.css`, `list/list.css`,
+ * `threshold/threshold.css`, `recipe/recipe.css`).
  */
 
 /*
@@ -19,4 +19,29 @@
 
 .fg-trust-strip:hover .fg-strip-affordance {
   border-bottom-color: var(--fg-color-accent);
+}
+
+/*
+ * `{components.sync-button}`: a transparent outline at rest, line-strong under
+ * the pointer and while its panel is open, the raised step while pressed.
+ */
+.fg-sync-button {
+  margin: 0;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--fg-color-text-secondary);
+  cursor: pointer;
+}
+
+.fg-sync-button:hover {
+  border-color: var(--fg-color-line-strong);
+  color: var(--fg-color-text);
+}
+
+.fg-sync-button[data-open] {
+  border-color: var(--fg-color-line-strong);
+}
+
+.fg-sync-button:active {
+  background: var(--fg-color-surface-raised);
 }

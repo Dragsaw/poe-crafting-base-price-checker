@@ -1,13 +1,13 @@
 import { canonicalKey } from '@poe/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { absenceLine } from '../frame/AbsenceLines';
+import { absenceLine, PANEL_HEADINGS } from '../frame/trust-facts';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { bodiesWith, hoursBefore, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { serveArtifacts, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb, settleTo, unmount } from '../test-support/dom';
 import { colors } from '../theme/tokens';
-import { server, mount, frame } from './test-support';
+import { server, mount, frame, panelLines, syncButton, toggleReport } from './test-support';
 
 afterEach(unmount);
 
@@ -27,7 +27,8 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
   const bodies = bodiesWith([lost], [unpriced(lost, { state: 'unresolvable' }, hoursBefore(Date.now(), 1))]);
 
   // Matrix: report absent.
-  it('renders the unresolvable row with sync-report.json absent, and the strip raises no health line', async () => {
+  // I/O matrix: report absent. The count still comes from the dataset (AD-12).
+  it('renders the unresolvable row with sync-report.json absent, and the button counts the broken entry', async () => {
     serveArtifacts(server, {
       tracked: { kind: 'json', body: bodies.tracked },
       dataset: { kind: 'json', body: bodies.dataset },
@@ -37,13 +38,14 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     await settleTo('ready');
     // A lone unresolvable row makes the list honest-empty: its EV cell reads `—` beside ✕.
     expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
-    const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
-    const lines = strip?.querySelectorAll('[data-absence-lines] p') ?? [];
-    expect(Array.from(lines, (line) => line.textContent)).toEqual([absenceLine('syncReport')]);
-    expect(strip?.querySelector('[data-health-line]')).toBeNull();
+    expect(syncButton().dataset['syncButton']).toBe('problem');
+    expect(syncButton().textContent).toBe('1 problem');
+    expect(syncButton().querySelector('[data-problem-count="broken"] svg[data-mark="broken"]')).not.toBeNull();
+    toggleReport();
+    expect(panelLines(PANEL_HEADINGS.indexOf('Built from')).at(-1)).toBe(absenceLine('syncReport'));
   });
 
-  it('renders the row, and the health line counts the report record as before', async () => {
+  it('counts the dataset entry, not the report record that names it', async () => {
     serveArtifacts(server, {
       tracked: { kind: 'json', body: bodies.tracked },
       dataset: { kind: 'json', body: bodies.dataset },
@@ -59,8 +61,8 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     await settleTo('ready');
     // A lone unresolvable row makes the list honest-empty: its EV cell reads `—` beside ✕.
     expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
-    const health = frame().querySelector('[data-trust-strip] [data-health-line]');
-    expect(health?.textContent?.replaceAll('\u{A0}', ' ')).toBe('× 1 unresolvable');
+    expect(syncButton().dataset['syncButton']).toBe('problem');
+    expect(syncButton().textContent).toBe('1 problem');
   });
 
   // Matrix: only unresolvable.

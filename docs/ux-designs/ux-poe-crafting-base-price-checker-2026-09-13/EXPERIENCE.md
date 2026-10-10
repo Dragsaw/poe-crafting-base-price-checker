@@ -477,6 +477,8 @@ The headings, figure groups and diagnosis lead (memlog 278):
 | Place | String |
 |---|---|
 | Sync report column headings | `Problems` · `Sync run` · `Weights coverage` · `Built from` (set uppercase) |
+| Problem line, broken entries | `✕ N entries can no longer be priced` (`✕ 1 entry can no longer be priced`) |
+| Problem line, starved pinned entries | `◐ N of M pinned entries are not being refreshed`; when N is 0, `◐ M pinned entries take every search, so nothing else rotates` (`◐ 1 pinned entry takes every search, so nothing else rotates`) |
 | Sync run figures | `Requests` · `price searches N` \| `league checks N`, for the `tracked-list` and `league-validation` sources; then `N entries not reached in the last sync pass` |
 | Weights coverage figure | `Pool coverage` · `N% of N tracked Item Classes` (memlog 235) |
 | Diagnosis lead | `Disagreements with the weights file` |
@@ -500,8 +502,7 @@ The headings, figure groups and diagnosis lead (memlog 278):
 | Fetch-failure body | `<file> did not arrive.` then `The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.` |
 
 **Strings drafted at build** (memlog 265): the list statements of states 25 and
-35, the sync report's problem-list lines, and the refusal screen's per-cause body
-sentences. The build drafts them under Voice and Tone. Their review happens in
+35, and the refusal screen's per-cause body sentences. The build drafts them under Voice and Tone. Their review happens in
 the PR that builds them, and that PR writes them into this deck. Thus the rule still
 holds: a string not written here does not ship.
 
