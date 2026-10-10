@@ -51,15 +51,23 @@ export function checkSchemaVersion(found: string, expected: string): SchemaVersi
 }
 
 /** Versioned apart from `SUPPORTED_SCHEMA_VERSION`. */
-export const TRACKED_SCHEMA_VERSION = '2.0.0';
+export const TRACKED_SCHEMA_VERSION = '3.0.0';
 
-/** The curator must re-author a 1.x file, not retry. */
+/** The curator must re-author an earlier-major file, not retry. */
 export function trackedEarlierMajorMessage(found: string): string | undefined {
-  // The explanation names the 1 → 2 change, so it fits a 1.x file only.
-  return majorOf(found) === 1 ? (
+  const major = majorOf(found);
+  if (major === undefined || major < 1 || major > 2) {
+    return undefined;
+  }
+  const changes = [
+    ...(major === 1 ? [
+      'crafted entries require both a prefix and a suffix, and an affix accepts the "hybrid" kind (2.0.0)',
+    ] : []),
+    'raw entries require a categoryId and a className, their item class (3.0.0)',
+  ];
+  return (
     `schemaVersion ${found} refused (unknown-major; this build reads ${TRACKED_SCHEMA_VERSION}): ` +
-    `the tracked schema's major version changed to ${TRACKED_SCHEMA_VERSION}: crafted entries now require ` +
-    'both a prefix and a suffix, and an affix accepts the "hybrid" kind. Re-author the file against ' +
-    `schemaVersion ${TRACKED_SCHEMA_VERSION}; retrying will not help.`
-  ) : undefined;
+    `the tracked schema's major version changed to ${TRACKED_SCHEMA_VERSION}: ${changes.join('; ')}. ` +
+    `Re-author the file against schemaVersion ${TRACKED_SCHEMA_VERSION}; retrying will not help.`
+  );
 }

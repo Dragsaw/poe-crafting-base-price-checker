@@ -24,6 +24,8 @@ const row = {
   kind: 'raw',
   entryKey: '["raw","Stellar Amulet",82]',
   baseTypeId: 'Stellar Amulet',
+  categoryId: 'accessory.amulet',
+  className: 'Amulets',
   itemLevelMin: 82,
   status: 'active',
   ev: 0.1235,

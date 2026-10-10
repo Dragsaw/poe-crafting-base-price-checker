@@ -47,21 +47,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   evidence: Decided 2026-10-10 (option 1 of three): follow *Ages*; the *Price trust* table's `tried N days ago` is the from-one-day case. The no-listings reason in contracts carries whole days only (`{ kind: 'no-listings', days? }`), and core fills it in entryTrust (packages/core/src/price-trust.ts), so lineReasonWords in packages/web/src/list/row/trust-words.ts cannot print a sub-day age. Needs contracts and core to carry the attempt age at minute grain (check AD-17), then the web wording. A sync runs about every 15 hours, so a fresh no-listings attempt is the common case.
   retry_when: now
 
-## Deferred from: spec-4-6-the-footer-legend-list-statements-failure-screens-and-the-appendix-restyle (2026-10-10)
-
-- source_spec: `docs/stories/spec-4-6-the-footer-legend-list-statements-failure-screens-and-the-appendix-restyle.md`
-  summary: Wire the appendix's state 16 note in App.tsx. A raw Tracked Entry carries no (categoryId, className), so the page cannot tell which Item Class a ranked Raw Base belongs to.
-  evidence: RawTrackedEntrySchema in packages/contracts/src/tracked-entry.ts holds only baseTypeId, itemLevelMin and status, and no artifact the page loads maps a baseTypeId to its class (epic-2 retro P1 notes the same gap for Story 2.8). UnrankableAppendix takes an optional rawRanks set and prints the note, but ReadyBody passes none. Needs a contracts or core change that the Story 4.6 spec forbids, so a human must choose the source of the join.
-  retry_when: Story 4.8
-
-- source_spec: `docs/stories/spec-4-6-the-footer-legend-list-statements-failure-screens-and-the-appendix-restyle.md`
-  summary: Decide how an appendix row lays out a joined two-part note; the row is nowrap and the note cell has no overflow guard.
-  evidence: The 14 + 16 joined note is about 93 characters, about 560px at the note size, against about 450px for the 1fr note column at the target width. No single note overflows today, and the joined note appears only once Story 4.8 wires state 16.
-  retry_when: Story 4.8
-
 ## Deferred from: spec-deferred-4-5-repair-epic-4-context (2026-10-10)
 
 - source_spec: `docs/stories/spec-deferred-4-5-repair-epic-4-context.md`
   summary: [NOTE FOR PM] Bring the Epic 4 *Order* of docs/epics.md ("4.3 to 4.5, then 4.6") in line with docs/sprint-change-proposal-2026-10-10.md *Order*, which puts 4.7 and the tracked.json re-check after 4.3, and place Story 4.8.
   evidence: epics.md *Order* predates the proposal and omits 4.7 and 4.8. epic-4-context.md now cites both sources, but a recompile from epics.md would bring the stale order back. The PM owns epics.md, so a build review does not edit it (AGENT-WORKFLOW.md *Review brief*, rule 2).
   retry_when: now
+
+## Deferred from: spec-4-8-the-appendix-s-raw-ranks-note (2026-10-10)
+
+- source_spec: `docs/stories/spec-4-8-the-appendix-s-raw-ranks-note.md`
+  summary: [NOTE FOR UX] DESIGN.md `components.unrankable-appendix.row` reads as a fixed height, but a wrapped note now grows the row. Restate the row height as a minimum in DESIGN.md.
+  evidence: Story 4.8 (human decision, 2026-10-10) lets an over-long appendix note wrap inside its note cell. UnrankableAppendix.tsx sets `minHeight: line-height-expansion` on the row, and only the note cell wraps. The 14 + 16 joined note wraps to two lines at the 1080px target width.

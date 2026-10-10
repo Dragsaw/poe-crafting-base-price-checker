@@ -138,16 +138,16 @@ describe('the outcomes', () => {
 
   // Matrix: invalid shape.
   it('refuses an invalid tracked.json as a content fault, with no retry', async () => {
-    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '2.0.0', entries: 42 } } });
+    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '3.0.0', entries: 42 } } });
     mount();
     await settleTo('refused');
     expect(frame().querySelector('section')?.getAttribute('role')).toBe('alert');
     expect(frame().hasAttribute('aria-busy')).toBe(false);
     const sentence = refusalBody('tracked.json');
-    expect(sentence).toBe(`tracked.json${F.content}2.0.0${F.end}`);
+    expect(sentence).toBe(`tracked.json${F.content}3.0.0${F.end}`);
     expect(sentence).not.toContain('declares');
     expect(frame().querySelector('[data-part="declared"]')).toBeNull();
-    expect(frame().querySelector('[data-part="expected"]')?.textContent).toBe('2.0.0');
+    expect(frame().querySelector('[data-part="expected"]')?.textContent).toBe('3.0.0');
     expect(frame().textContent).not.toContain(HEADER_TITLE);
   });
 

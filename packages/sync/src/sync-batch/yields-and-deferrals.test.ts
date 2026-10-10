@@ -47,7 +47,7 @@ describe('pnpm sync:batch: the live composition with injected ports', () => {
   });
 
   it('a gate 429 publishes the catalogue marks, and the not-reached count is every eligible entry', async () => {
-    const ghost: TrackedEntry = { kind: 'raw', baseTypeId: 'Ghost Amulet', itemLevelMin: 82, status: 'active' };
+    const ghost: TrackedEntry = { kind: 'raw', baseTypeId: 'Ghost Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
     const others: TrackedEntry[] = [ENTRY, { ...ENTRY, itemLevelMin: 83 }, { ...ENTRY, itemLevelMin: 84 }];
     const { deps, fs, http } = dependenciesFor(LEAGUE, {
       tracked: [ghost, ...others],

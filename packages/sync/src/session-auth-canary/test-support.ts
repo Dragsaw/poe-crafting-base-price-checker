@@ -15,7 +15,7 @@ export const CANARY = 'k3Zq8VwT1nRb6YpXe4LmHs9DjCg2FaUo7Qi5';
 export const LEAGUE = 'Test League';
 export const NOW = '2026-09-26T12:00:00.000Z';
 export const CONTACT = 'poe-crafting-base-price-checker/0.0.0 (contact: someone@example.test)';
-export const ENTRY: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' };
+export const ENTRY: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
 
 export const LEAGUES_BODY = JSON.stringify({
   result: [

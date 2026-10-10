@@ -19,6 +19,8 @@ export const RawRankedRowSchema = z
       .min(1)
       .describe('The tracked entry’s canonical key.'),
     baseTypeId: BaseTypeIdSchema,
+    categoryId: z.string().min(1).describe('The tracked entry’s `categoryId`, for the appendix’s raw-ranks note (FR-4 state 16).'),
+    className: z.string().min(1).describe('The tracked entry’s `className`, for the appendix’s raw-ranks note (FR-4 state 16).'),
     itemLevelMin: ItemLevelSchema,
     status: CurationStatusSchema.exclude(['pruned']).describe(
       'A pruned entry is excluded from every ranking group, so a row is never pruned (AD-12).',

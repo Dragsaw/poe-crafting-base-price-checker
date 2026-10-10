@@ -14,8 +14,14 @@ import { TEST_LEAGUE, VALID_BODIES } from './artifact-server';
 
 const HOUR = 3_600_000;
 
-export function rawEntry(baseTypeId: string, itemLevelMin = 82): RawTrackedEntry {
-  return { kind: 'raw', baseTypeId, itemLevelMin, status: 'active' };
+const AMULETS = { categoryId: 'accessory.amulet', className: 'Amulets' } as const;
+
+export function rawEntry(
+  baseTypeId: string,
+  itemLevelMin = 82,
+  unit: Pick<RawTrackedEntry, 'categoryId' | 'className'> = AMULETS,
+): RawTrackedEntry {
+  return { kind: 'raw', baseTypeId, ...unit, itemLevelMin, status: 'active' };
 }
 
 /** A crafted entry on one `(categoryId, className)`, carrying a valueless prefix and a valueless suffix. */

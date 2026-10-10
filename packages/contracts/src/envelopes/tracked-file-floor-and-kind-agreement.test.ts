@@ -56,7 +56,7 @@ describe('TrackedFileSchema shared floor (AD-17, FR-22)', () => {
   });
 
   it('loads a raw entry at 75 beside a crafted entry at 82', () => {
-    const raw = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 75, status: 'active' };
+    const raw = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 75, status: 'active' };
     expect(parse([amulet(82, 'explicit.a'), raw]).ok).toBe(true);
   });
 
@@ -222,7 +222,7 @@ describe('TrackedFileSchema, within-file kind agreement and summed operands', ()
       parse([
         craftedAmulet(banded('explicit.stat_a', 1, 2), banded('explicit.stat_s', 1, 2)),
         craftedAmulet(valueless('explicit.stat_a'), valueless('explicit.stat_a'), { status: 'pruned' }),
-        { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' },
+        { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
       ]).ok,
     ).toBe(true);
   });

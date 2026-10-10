@@ -11,7 +11,7 @@ const SORT = { price: 'asc' };
 describe('buildSearchBody: raw', () => {
   it('sends query.type, no category, rarity normal and the ilvl floor', () => {
     const body = buildSearchBody(
-      { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' },
+      { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
       itemTypes,
     );
 

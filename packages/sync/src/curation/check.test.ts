@@ -19,8 +19,8 @@ const CATALOGUE: CatalogueIds = {
   categoryIds: new Set(['accessory.amulet']),
 };
 
-const gold = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
-const solar = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' };
+const gold = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
+const solar = { kind: 'raw', baseTypeId: 'Solar Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
 
 const tier = (statId: string, min: number, max: number): ModifierWeight => ({
   sourceModifierId: statId,
@@ -216,7 +216,7 @@ describe('checkTracked', () => {
   });
 
   it('reports a schema issue at its path and skips the checks that need entries', () => {
-    const statusless = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82 };
+    const statusless = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82 };
     const report = checkTracked(inputsOf([crafted, statusless]));
 
     expect(report.ok).toBe(false);
@@ -244,7 +244,7 @@ describe('checkTracked', () => {
   });
 
   it('refuses a later unknown major as one schemaVersion issue, with the generic message', () => {
-    const report = checkTracked(inputsOf([], { tracked: trackedText([], '3.0.0') }));
+    const report = checkTracked(inputsOf([], { tracked: trackedText([], '4.0.0') }));
 
     expect(report.ok).toBe(false);
     expect(report.issues).toEqual([

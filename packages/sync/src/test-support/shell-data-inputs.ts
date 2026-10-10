@@ -5,6 +5,27 @@ import { TRACKED_PATH } from '../chunk/run-chunk.ts';
 
 const TEST_LEAGUE = 'Test League';
 
+/** A filters catalogue naming the categories the raw test entries declare (AD-9). */
+export const RAW_CLASS_FILTERS = JSON.stringify({
+  schemaVersion: SUPPORTED_SCHEMA_VERSION,
+  result: [
+    {
+      id: 'type_filters',
+      filters: [
+        {
+          id: 'category',
+          option: {
+            options: [
+              { id: 'accessory.amulet', text: 'Amulet' },
+              { id: 'accessory.belt', text: 'Belt' },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+});
+
 export interface ShellDataInputs {
   readonly tracked: readonly TrackedEntry[];
   /** The configured league; the currency rate is always `TEST_LEAGUE`'s. */
@@ -42,7 +63,7 @@ export function shellDataInputs(options: ShellDataInputs): Parameters<typeof cre
       }),
     },
     'data/catalogue/stats.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
-    'data/catalogue/filters.json': { contents: JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] }) },
+    'data/catalogue/filters.json': { contents: RAW_CLASS_FILTERS },
     'data/weights.json': {
       contents: JSON.stringify({
         schemaVersion: WEIGHTS_SCHEMA_VERSION,

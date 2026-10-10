@@ -10,8 +10,8 @@ const EARLIER = '2026-09-25T12:00:00.000Z';
 
 function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): TrackedEntry {
   return status === 'pruned'
-    ? { kind: 'raw', baseTypeId, itemLevelMin: 82, status, prunedReason: 'no market' }
-    : { kind: 'raw', baseTypeId, itemLevelMin: 82, status };
+    ? { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status, prunedReason: 'no market' }
+    : { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status };
 }
 
 const key = canonicalKey;

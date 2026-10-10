@@ -48,6 +48,9 @@ const APPENDIX_GRID = {
   alignItems: 'center',
 } as const;
 
+// Only the note cell wraps; appendix text is never cut (EXPERIENCE.md *What may be cut*).
+const NO_WRAP = { whiteSpace: 'nowrap' } as const;
+
 // `{components.unrankable-appendix}`: every row renders, nothing switches on a count; rows are not interactive.
 export function UnrankableAppendix({
   classes,
@@ -109,20 +112,23 @@ function AppendixRow({
       data-appendix-row=""
       style={{
         ...APPENDIX_GRID,
-        height: spacing['line-height-expansion'],
+        minHeight: spacing['line-height-expansion'],
         boxSizing: 'border-box',
         borderBottom: last ? undefined : `${px(layout.hairline)} solid ${colors.line}`,
-        whiteSpace: 'nowrap',
       }}
     >
-      <span data-cell="rank" />
-      <span data-cell="class" data-appendix-class="" style={{ ...typeStyle('line-text'), color: colors['rarity-magic'] }}>
+      <span data-cell="rank" style={NO_WRAP} />
+      <span
+        data-cell="class"
+        data-appendix-class=""
+        style={{ ...typeStyle('line-text'), ...NO_WRAP, color: colors['rarity-magic'] }}
+      >
         {unitLabel(item.className)}
       </span>
-      <span data-cell="reason" style={{ ...typeStyle('line-text'), color: colors['text-secondary'] }}>
+      <span data-cell="reason" style={{ ...typeStyle('line-text'), ...NO_WRAP, color: colors['text-secondary'] }}>
         {item.reason}
       </span>
-      <span data-cell="note" style={{ ...typeStyle('note'), color: colors['text-tertiary'] }}>
+      <span data-cell="note" style={{ ...typeStyle('note'), paddingBlock: px(layout.s1), color: colors['text-tertiary'] }}>
         {note}
       </span>
     </div>

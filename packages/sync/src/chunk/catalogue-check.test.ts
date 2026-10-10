@@ -8,11 +8,11 @@ import { checkCatalogue, markUnresolvable } from './catalogue-check.ts';
 const IDS: CatalogueIds = {
   statIds: new Set(['explicit.a', 'explicit.b']),
   baseTypeIds: new Set(['Gold Amulet']),
-  categoryIds: new Set(['weapon.bow']),
+  categoryIds: new Set(['weapon.bow', 'accessory.amulet']),
 };
 
-const RAW: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
-const GONE_BASE: TrackedEntry = { kind: 'raw', baseTypeId: 'Gone Amulet', itemLevelMin: 82, status: 'active' };
+const RAW: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
+const GONE_BASE: TrackedEntry = { kind: 'raw', baseTypeId: 'Gone Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
 
 function crafted(
   categoryId: string,
@@ -109,6 +109,18 @@ describe('checkCatalogue', () => {
       { kind: 'unresolvable', entryKey: canonicalKey(GONE_BASE), identifier: 'Gone Amulet', identifierKind: 'baseTypeId' },
       { kind: 'unresolvable', entryKey: canonicalKey(entry), identifier: 'weapon.gone', identifierKind: 'categoryId' },
     ]);
+  });
+
+  it('checks a raw categoryId, after its baseTypeId, in field order (AD-9)', () => {
+    const goneClass: TrackedEntry = { ...RAW, categoryId: 'accessory.gone' };
+    const goneBoth: TrackedEntry = { ...GONE_BASE, categoryId: 'accessory.gone' };
+    const check = checkCatalogue([goneClass, goneBoth], [], IDS);
+    expect(check.records).toEqual([
+      { kind: 'unresolvable', entryKey: canonicalKey(goneClass), identifier: 'accessory.gone', identifierKind: 'categoryId' },
+      { kind: 'unresolvable', entryKey: canonicalKey(goneBoth), identifier: 'Gone Amulet', identifierKind: 'baseTypeId' },
+      { kind: 'unresolvable', entryKey: canonicalKey(goneBoth), identifier: 'accessory.gone', identifierKind: 'categoryId' },
+    ]);
+    expect(check.excludedKeys).toEqual(new Set([canonicalKey(goneClass), canonicalKey(goneBoth)]));
   });
 
   it('writes one record per miss, in field order: category, prefix, suffix', () => {

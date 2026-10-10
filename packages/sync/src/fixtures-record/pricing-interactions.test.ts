@@ -18,11 +18,13 @@ const RATE_LIMIT_HEADERS = {
 describe('recordFixtures: the search and fetch leg per tracked entry', () => {
   const league = 'Forbidden Rites';
   const itemTypes = itemTypesOf({ result: [] });
-  const priced: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
-  const empty: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'pinned' };
+  const priced: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
+  const empty: TrackedEntry = { kind: 'raw', baseTypeId: 'Solar Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'pinned' };
   const pruned: TrackedEntry = {
     kind: 'raw',
     baseTypeId: 'Wide Belt',
+    categoryId: 'accessory.belt',
+    className: 'Belts',
     itemLevelMin: 82,
     status: 'pruned',
     prunedReason: 'no market',

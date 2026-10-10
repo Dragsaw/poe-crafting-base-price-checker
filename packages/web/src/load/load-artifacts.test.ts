@@ -35,7 +35,7 @@ describe('the seven artifacts', () => {
   it('expects weights major 6 and version 1 elsewhere', () => {
     expect(ARTIFACTS.weights.expected).toBe('6.1.0');
     expect(ARTIFACTS.dataset.expected).toBe('1.0.0');
-    expect(ARTIFACTS.tracked.expected).toBe('2.0.0');
+    expect(ARTIFACTS.tracked.expected).toBe('3.0.0');
   });
 });
 
@@ -68,13 +68,13 @@ describe('loadArtifacts', () => {
 
   // Matrix: invalid shape.
   it('refuses a body that fails its schema, naming the path and both versions', async () => {
-    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '2.0.0', entries: 'nope' } } });
+    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '3.0.0', entries: 'nope' } } });
     expect(await loadArtifacts({ baseUrl: '/' })).toEqual({
       kind: 'refused',
       path: 'tracked.json',
       cause: 'content',
-      declared: '2.0.0',
-      expected: '2.0.0',
+      declared: '3.0.0',
+      expected: '3.0.0',
     });
   });
 
@@ -86,7 +86,18 @@ describe('loadArtifacts', () => {
       kind: 'refused',
       path: 'tracked.json',
       declared: '1.0.0',
-      expected: '2.0.0',
+      expected: '3.0.0',
+    });
+  });
+
+  // Story 4.8, I/O matrix "2.x tracked file".
+  it('refuses a tracked.json at the earlier 2.x major, naming both versions', async () => {
+    serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '2.0.0', entries: [] } } });
+    expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
+      kind: 'refused',
+      path: 'tracked.json',
+      declared: '2.0.0',
+      expected: '3.0.0',
     });
   });
 
@@ -212,7 +223,7 @@ describe('loadArtifacts', () => {
       path: 'tracked.json',
       cause: 'missing',
       declared: undefined,
-      expected: '2.0.0',
+      expected: '3.0.0',
     });
   });
 

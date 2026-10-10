@@ -48,7 +48,7 @@ export const VALID_BODIES: Readonly<Record<ArtifactKey, unknown>> = {
     bases: {},
   },
   recipes: { schemaVersion: '1.0.0', recipes: [] },
-  tracked: { schemaVersion: '2.0.0', entries: [] },
+  tracked: { schemaVersion: '3.0.0', entries: [] },
   config: { schemaVersion: '1.0.0', league: TEST_LEAGUE, minChunkSearches: 1 },
   catalogueStats: { schemaVersion: '1.0.0', result: [] },
 };

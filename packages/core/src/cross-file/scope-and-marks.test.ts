@@ -114,7 +114,7 @@ describe('crossFileChecks scope', () => {
 
   it('sees neither pruned nor raw entries', () => {
     const pruned: TrackedEntry = { ...entry({ prefix: band(0, 9999) }), status: 'pruned', prunedReason: 'gone' };
-    const raw: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
+    const raw: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
     expect(failuresOf([pruned, raw], bows(pools([T7()])))).toEqual([]);
   });
 

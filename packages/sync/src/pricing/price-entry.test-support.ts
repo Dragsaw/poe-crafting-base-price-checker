@@ -12,7 +12,7 @@ export const NOW = '2026-09-26T12:00:00.000Z';
 export const SEARCH_ID = 'Ab3dE';
 export const SEARCH_URL = tradeSearchUrl(LEAGUE);
 
-export const ENTRY: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'active' };
+export const ENTRY: TrackedEntry = { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
 export const KEY = canonicalKey(ENTRY);
 
 export function rate(currencyId: string, value: number, league = LEAGUE): CurrencyRate {
