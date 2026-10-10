@@ -132,7 +132,7 @@ action_items:
     action: "Rule where a crafted row with no priced combination ranks (R4) and fix
       the spine floor/scope order wording (R15)"
     owner: "architect + ux"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-8-add-an-acceptance-step-to-finish-worktre"
     epic: 4

@@ -173,6 +173,7 @@ const craftedRow = (summands: number, recipeId = 'greater'): CraftedRankedRow =>
 describe('listStatement with crafted rows (Story 3.4)', () => {
   const empty: Ranking = {
     ordering: [],
+    unpricedCrafted: [],
     belowThreshold: [],
     noListings: [],
     notYetSynced: [],
@@ -240,7 +241,7 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
 
   it('state 23: a broken crafted row drops "yet" beside an unresolvable row, and keeps it beside a pending one', () => {
     const broken: CraftedRankedRow = { ...craftedRow(0), trust: { verdict: 'broken', reasons: [{ kind: 'all-broken' }] } };
-    const reset: Ranking = { ...empty, pricedInLeague: false, ordering: [broken] };
+    const reset: Ranking = { ...empty, pricedInLeague: false, unpricedCrafted: [broken] };
     const lost: Ranking['unresolvable'][number] = { entry: belt, entryKey: canonicalKey(belt), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } };
     const waiting: Ranking['notYetSynced'][number] = { ...lost, reason: 'never-synced', trust: { verdict: 'pending', reasons: [{ kind: 'never-synced' }] } };
     expect(listStatement({ ...reset, unresolvable: [lost] }, 0.5, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE, true) });

@@ -139,7 +139,7 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: ABSENT }]);
   });
 
-  it('pricedInLeague: false after a league reset, though every crafted pair still ranks, costable or not', () => {
+  it('pricedInLeague: false after a league reset; the costable pair trails unpriced, the uncostable pair still ranks', () => {
     const target = chase('Bows');
     const A = raw('A');
     const reset = rankCrafted({
@@ -148,10 +148,11 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
       currencyRates: RATES.slice(0, 2),
     });
     expect(reset.pricedInLeague).toBe(false);
+    expect(reset.unpricedCrafted.map((row) => row.recipeId)).toEqual(['greater']);
+    expect(String(reset.unpricedCrafted[0]?.ev)).toBe(String(-GREATER_COST));
     const resetRows = craftedRows(reset.ordering);
-    expect(resetRows.map((row) => row.recipeId)).toEqual(['greater', 'perfect']);
-    expect(String(resetRows[0]?.ev)).toBe(String(-GREATER_COST));
-    expect(resetRows[1]?.ev).toBeNull();
+    expect(resetRows.map((row) => row.recipeId)).toEqual(['perfect']);
+    expect(resetRows[0]?.ev).toBeNull();
     expect(reset.uncostableRecipes.map((item) => item.recipeId)).toEqual(['perfect']);
   });
 

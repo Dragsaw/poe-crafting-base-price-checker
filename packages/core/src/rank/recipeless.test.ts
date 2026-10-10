@@ -103,6 +103,6 @@ describe('rank: the recipeless group (state 43)', () => {
   it('holds no recipeless class while any recipe is published', () => {
     const result = rankCrafted({ tracked: [chase('Bows')] });
     expect(result.recipeless).toEqual([]);
-    expect(craftedRows(result.ordering).map((row) => row.recipeId)).toEqual(['greater', 'perfect']);
+    expect([...craftedRows(result.ordering), ...result.unpricedCrafted].map((row) => row.recipeId)).toEqual(['greater', 'perfect']);
   });
 });

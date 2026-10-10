@@ -54,6 +54,7 @@ describe('the lines of a crafted row', () => {
     };
     const ranking: Ranking = {
       ordering: [row],
+      unpricedCrafted: [],
       belowThreshold: [],
       noListings: [],
       notYetSynced: [],

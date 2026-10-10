@@ -90,18 +90,16 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
     const filler = chase('Bows', FILLER);
     const low = chase('Bows', 'explicit.stat_low');
     const rates = RATES.map((rate) => ({ ...rate, asOf: '2026-09-10T00:00:00Z' }));
-    const [tried] = craftedRows(
-      rankCrafted({
-        tracked: [target, filler, low],
-        dataset: [
-          published(filler, { state: 'no-listings' }, '2026-09-25T00:00:00Z'),
-          published(low, { state: 'no-listings' }, false),
-          published(target, { state: 'no-listings' }, '2026-09-20T00:00:00Z'),
-        ],
-        recipes: [GREATER],
-        currencyRates: rates,
-      }).ordering,
-    );
+    const [tried] = rankCrafted({
+      tracked: [target, filler, low],
+      dataset: [
+        published(filler, { state: 'no-listings' }, '2026-09-25T00:00:00Z'),
+        published(low, { state: 'no-listings' }, false),
+        published(target, { state: 'no-listings' }, '2026-09-20T00:00:00Z'),
+      ],
+      recipes: [GREATER],
+      currencyRates: rates,
+    }).unpricedCrafted;
     expect(tried?.summands).toEqual([]);
     expect(tried).not.toHaveProperty('asOf');
     expect(tried?.lastAttemptedAt).toBe('2026-09-20T00:00:00Z');
@@ -109,7 +107,7 @@ describe('rank: Provenance and the oldest timestamp (AD-10)', () => {
   });
 
   it('with no summand and no attempted entry, sets neither field: never attempted (AD-10)', () => {
-    const [bare] = craftedRows(rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: RATES }).ordering);
+    const [bare] = rankCrafted({ tracked: [target], dataset: [], recipes: [GREATER], currencyRates: RATES }).unpricedCrafted;
     expect(bare).not.toHaveProperty('asOf');
     expect(bare).not.toHaveProperty('lastAttemptedAt');
     expect(bare !== undefined && RankedRowSchema.parse(bare)).toEqual(bare);

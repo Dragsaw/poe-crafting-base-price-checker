@@ -56,7 +56,21 @@ function onlyRow(result: Ranking): CraftedRankedRow {
   return row;
 }
 
+function onlyUnpriced(result: Ranking): CraftedRankedRow {
+  expect(result.ordering).toEqual([]);
+  const [row] = result.unpricedCrafted;
+  if (row === undefined) {
+    throw new Error('no unpriced crafted row');
+  }
+  return row;
+}
+
 const key = (entry: TrackedEntry): string => canonicalKey(entry);
+
+/** `−craftCost`, or `undefined` when the recipe is uncostable. */
+function minusCost(row: CraftedRankedRow): number | undefined {
+  return typeof row.craftCost === 'number' ? -row.craftCost : undefined;
+}
 
 describe('rank: price trust on every row, summand and combination', () => {
   it('parses every output row with RankedRowSchema, each carrying a trust', () => {
@@ -157,13 +171,13 @@ describe('rank: the crafted rules', () => {
   });
 
   it('every entry broken is broken all-broken', () => {
-    expect(onlyRow(rankBows(broken)).trust).toEqual({ verdict: 'broken', reasons: [{ kind: 'all-broken' }] });
+    expect(onlyUnpriced(rankBows(broken)).trust).toEqual({ verdict: 'broken', reasons: [{ kind: 'all-broken' }] });
   });
 
   it('no priced entry is pending no-prices, whether all pending or pending and broken', () => {
     const noPrices = { verdict: 'pending', reasons: [{ kind: 'no-prices' }] };
-    expect(onlyRow(rankBows([])).trust).toEqual(noPrices);
-    expect(onlyRow(rankBows([published(s1, { state: 'unresolvable' }), published(s2, priced(1, 'Standard'))])).trust).toEqual(
+    expect(onlyUnpriced(rankBows([])).trust).toEqual(noPrices);
+    expect(onlyUnpriced(rankBows([published(s1, { state: 'unresolvable' }), published(s2, priced(1, 'Standard'))])).trust).toEqual(
       noPrices,
     );
   });
@@ -186,6 +200,48 @@ describe('rank: the crafted rules', () => {
     const above = onlyRow(rankBows(dataset, 5));
     expect(above.asOf).toBe(OLD_OBSERVED);
     expect(keysOf(above.summands)).toEqual([key(s1)]);
+  });
+});
+
+describe('rank: a costable crafted row with no priced combination (FR-1)', () => {
+  it('routes a pending row out of the ordering, keeping its EV at minus the craft cost', () => {
+    const result = rankBows([]);
+    const row = onlyUnpriced(result);
+    expect(row.ev).not.toBeNull();
+    expect(row.ev).toBe(minusCost(row));
+    expect(RankedRowSchema.parse(row)).toEqual(row);
+  });
+
+  it('routes an all-broken row out of the ordering', () => {
+    const result = rankBows([s1, s2, s3, s4, s5].map((entry) => published(entry, { state: 'unresolvable' })));
+    expect(onlyUnpriced(result).trust.verdict).toBe('broken');
+  });
+
+  it('keeps a row whose priced entries all fall below the threshold ranked (state 25)', () => {
+    const result = rankBows([published(s1, priced(0.1))]);
+    expect(result.unpricedCrafted).toEqual([]);
+    const row = onlyRow(result);
+    expect(row.summands).toEqual([]);
+    expect(row.ev).toBe(minusCost(row));
+  });
+
+  it('returns the group in key order, whatever the tracked order', () => {
+    const staves = chase('Staves', STATS[0]);
+    const bows = chase('Bows', STATS[0]);
+    const result = rankCrafted({
+      tracked: [staves, bows],
+      dataset: [],
+      weights: poolsFile(['weapon.bow', 'Staves', FIVE_POOLS], ['weapon.bow', 'Bows', FIVE_POOLS]),
+      recipes: [GREATER],
+    });
+    expect(result.ordering).toEqual([]);
+    expect(result.unpricedCrafted.map((row) => row.className)).toEqual(['Bows', 'Staves']);
+  });
+
+  it('keeps an uncostable row in the ordering with a null EV (state 35)', () => {
+    const result = rankBows([], 0.25, false);
+    expect(result.unpricedCrafted).toEqual([]);
+    expect(onlyRow(result).ev).toBeNull();
   });
 });
 

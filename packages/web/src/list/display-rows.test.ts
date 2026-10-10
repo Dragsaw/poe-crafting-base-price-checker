@@ -1,5 +1,5 @@
 import { rank } from '@poe/core';
-import { compareCanonicalKeys, type DatasetEntry, type RawTrackedEntry } from '@poe/contracts';
+import { compareCanonicalKeys, type CraftedRankedRow, type DatasetEntry, type PriceTrust, type RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_THRESHOLD } from '../shared/product';
@@ -23,6 +23,25 @@ function reasonOf(row: ListRow): string | undefined {
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
   const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
   return toDisplayRows(ranking, dataset).flatMap((row) => (row.unit === 'raw' ? [row] : []));
+}
+
+/** A costable crafted row with no priced Combination, as `core` returns it in `unpricedCrafted`. */
+function unpricedClass(className: string, trust: PriceTrust): CraftedRankedRow {
+  return {
+    kind: 'crafted',
+    classKey: JSON.stringify(['crafted', 'weapon', className]),
+    categoryId: 'weapon',
+    className,
+    itemLevelMin: 82,
+    recipeId: 'greater',
+    grossPayout: 0,
+    craftCost: 0.03,
+    ev: -0.03,
+    summands: [],
+    combinations: [],
+    provenance: 'measured',
+    trust,
+  };
 }
 
 describe('tierOf', () => {
@@ -178,6 +197,35 @@ describe('toDisplayRows', () => {
       ['Lost Ring', undefined, 3, 'missing', 'unresolvable'],
     ]);
     expect(rows[4]?.price).toBeUndefined();
+  });
+
+  // Matrix: trail order (FR-1, states 18 and 41).
+  it('trails pending classes, pending Raw Bases, broken classes, broken Raw Bases, each unnumbered', () => {
+    const a = rawEntry('Gold Amulet');
+    const tried = rawEntry('Coral Ring');
+    const never = rawEntry('Wide Belt');
+    const lost = rawEntry('Lost Ring');
+    const dataset = [
+      priced(a, 0.5, hoursBefore(NOW, 3)),
+      unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
+      unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
+    ];
+    const ranking = rank({ tracked: [lost, never, a, tried], dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
+    const unpricedCrafted = [
+      unpricedClass('Bows', { verdict: 'pending', reasons: [{ kind: 'no-prices' }] }),
+      unpricedClass('Claws', { verdict: 'broken', reasons: [{ kind: 'all-broken' }] }),
+      unpricedClass('Staves', { verdict: 'pending', reasons: [{ kind: 'no-prices' }] }),
+    ];
+    const rows = toDisplayRows({ ...ranking, unpricedCrafted }, dataset);
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, printedValue(row), row.trust.verdict])).toEqual([
+      ['Gold Amulet', 1, 1, '0.50', 'current'],
+      ['Bows', undefined, 3, 'missing', 'pending'],
+      ['Staves', undefined, 3, 'missing', 'pending'],
+      ['Coral Ring', undefined, 3, 'missing', 'pending'],
+      ['Wide Belt', undefined, 3, 'missing', 'pending'],
+      ['Claws', undefined, 3, 'missing', 'broken'],
+      ['Lost Ring', undefined, 3, 'missing', 'broken'],
+    ]);
   });
 
   it('drops below-threshold entries, and carries a league mismatch as core judged it', () => {
