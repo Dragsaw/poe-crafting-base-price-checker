@@ -53,7 +53,11 @@ const ADVANCE_PX: Readonly<Record<string, number>> = {
   y: 7.025146484375,
 };
 
-function estimatedWidth(text: string): number {
+/** `T1` at `typography.tier` (600, 0.9em, 0.01em tracking), read with canvas `measureText` beside the B measurement. */
+const TIER_T1_PX = 12.4088134765625;
+const TIER = 'T1';
+
+function glyphWidth(text: string): number {
   let width = 0;
   for (const glyph of text) {
     const advance = ADVANCE_PX[glyph];
@@ -61,6 +65,19 @@ function estimatedWidth(text: string): number {
       throw new Error(`no measured advance for "${glyph}": re-measure B`);
     }
     width += advance;
+  }
+  return width;
+}
+
+/** Each affix opens with its tier, which the chase cell sets at `typography.tier`. */
+function estimatedWidth(text: string): number {
+  const affixes = text.split(AFFIX_JOIN);
+  let width = glyphWidth(AFFIX_JOIN) * (affixes.length - 1);
+  for (const affix of affixes) {
+    if (!affix.startsWith(TIER)) {
+      throw new Error(`"${affix}" opens with no ${TIER}`);
+    }
+    width += TIER_T1_PX + glyphWidth(affix.slice(TIER.length));
   }
   return width;
 }

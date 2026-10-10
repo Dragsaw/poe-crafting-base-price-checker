@@ -7,10 +7,11 @@ import { CHASE_CELLS } from '../display-rows';
 export const CHASE_BUDGET_TEXT = 'T1 % Armour · T1 Mana Regen';
 
 /**
- * The chase-cell budget *B* in px: {@link CHASE_BUDGET_TEXT} at `typography.chase` in bundled Inter, 177.55px in
- * Chromium, rounded up (DESIGN.md *Measure at build*). `chase-count.test.ts` fails when the table outgrows it.
+ * The chase-cell budget *B* in px: {@link CHASE_BUDGET_TEXT} at `typography.chase` in bundled Inter, its tiers at
+ * `typography.tier`, 176.09px in Chromium, rounded up (DESIGN.md *Measure at build*). `chase-count.test.ts` fails when
+ * the table outgrows it.
  */
-export const CHASE_CELL_BUDGET = 178;
+export const CHASE_CELL_BUDGET = 177;
 
 const pixels = (value: string): number => Number(value.replace(/px$/u, ''));
 

@@ -6,7 +6,7 @@ import { AFFIX_JOIN, type AffixPart } from '../combination-text';
 /** The Accepted Tier that opens a curated affix: `T1`, or a mixture such as `T1–T2`. */
 const TIER = /^T\d+(?:[–-]T\d+)?(?= )/u;
 
-/** The tier and joiner colours of an expansion line (DESIGN.md `expansion-line.combination`). */
+/** The tier and joiner colours (DESIGN.md `expansion-line.combination`, `chase-cell`). */
 export interface CombinationTones {
   readonly tier: string;
   readonly joiner: string;
@@ -32,7 +32,7 @@ export function CombinationText({
   tones,
 }: {
   readonly parts: readonly AffixPart[];
-  /** Set on an expansion line; a ranked row's chase cell keeps one tone. */
+  /** Unset, the tier and joiner take the host's colour and type. */
   readonly tones?: CombinationTones;
 }): JSX.Element {
   return (

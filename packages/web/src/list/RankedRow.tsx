@@ -142,7 +142,10 @@ function ChaseCells({
 /** Opens under the cell, its text on the cell's left edge (DESIGN.md `chase-cell.cutHover`). */
 const CUT_TOOLTIP_OFFSET = { mainAxis: 4, crossAxis: -(markTooltipInset.padding + markTooltipInset.border) } as const;
 
-/** The row's dim tones fail the contrast floor on the raised step (DESIGN.md `chase-cell.cutHover`). */
+/** DESIGN.md `chase-cell` tier and joiner. */
+const ROW_TONES: CombinationTones = { tier: colors['text-secondary'], joiner: colors['text-tertiary'] };
+
+/** The row's tertiary joiner fails the contrast floor on the raised step (DESIGN.md `chase-cell.cutHover`). */
 const CUT_TONES: CombinationTones = { tier: colors['text-secondary'], joiner: colors['text-secondary'] };
 
 /** A filled cell; only a cell its width cut opens its full text on hover (EXPERIENCE.md Interaction 8). */
@@ -170,7 +173,7 @@ function ChaseCell({ parts }: { readonly parts: readonly AffixPart[] }): JSX.Ele
           setOpen(false);
         }}
       >
-        <CombinationText parts={parts} />
+        <CombinationText parts={parts} tones={ROW_TONES} />
       </div>
     </Tooltip>
   );
