@@ -1,3 +1,4 @@
+import { canonicalKey } from '@poe/contracts';
 import { rank, type Ranking } from '@poe/core';
 import type { CraftedRankedRow, DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
@@ -235,6 +236,15 @@ describe('listStatement with crafted rows (Story 3.4)', () => {
     expect(reset.uncostable).toBe(true);
     expect(reset.split).toBe(false);
     expect(listStatement(reset, 0.5, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
+  });
+
+  it('state 23: a broken crafted row drops "yet" beside an unresolvable row, and keeps it beside a pending one', () => {
+    const broken: CraftedRankedRow = { ...craftedRow(0), trust: { verdict: 'broken', reasons: [{ kind: 'all-broken' }] } };
+    const reset: Ranking = { ...empty, pricedInLeague: false, ordering: [broken] };
+    const lost: Ranking['unresolvable'][number] = { entry: belt, entryKey: canonicalKey(belt), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } };
+    const waiting: Ranking['notYetSynced'][number] = { ...lost, reason: 'never-synced', trust: { verdict: 'pending', reasons: [{ kind: 'never-synced' }] } };
+    expect(listStatement({ ...reset, unresolvable: [lost] }, 0.5, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE, true) });
+    expect(listStatement({ ...reset, notYetSynced: [waiting] }, 0.5, TEST_LEAGUE)).toEqual({ kind: 'honest-empty', text: honestEmptyCopy(TEST_LEAGUE) });
   });
 
   it('is not honest-empty while anything is priced in the league, nor with nothing to show', () => {

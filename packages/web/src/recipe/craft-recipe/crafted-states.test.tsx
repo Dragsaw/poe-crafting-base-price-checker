@@ -1,13 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { MONEY_PHRASES } from '../../list/format';
-import { uncostableCopy } from '../../list/list-statement';
+import { honestEmptyCopy, uncostableCopy } from '../../list/list-statement';
 import { RECIPE_COST_UNIT } from '../CraftRecipe';
 import { expandCopy } from '../../list/RankedList';
 import { MISSING_FIGURE } from '../../list/row/ExpectedValueCell';
 import { MINUS } from '../../shared/money';
 import { settleTo, unmount } from '../../test-support/dom';
-import { hoursBefore, priced, rawEntry } from '../../test-support/list-fixtures';
+import { hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list-fixtures';
+import { TEST_LEAGUE } from '../../test-support/artifact-server';
 import {
   mount,
   frame,
@@ -137,6 +138,23 @@ describe('the crafted states', () => {
     click(option('perfect'));
     expect(costLine()).toBe(MONEY_PHRASES.notYetSynced);
     expectCanonicalSequence('perfect');
+  });
+
+  it('state 23: a crafted row whose combinations are all broken drops "yet"; uncostable, it is pending and keeps it', async () => {
+    serveWorld(
+      standardWorld({
+        tracked: [bows],
+        dataset: [unpriced(bows, { state: 'unresolvable' })],
+        // greater costable, perfect uncostable.
+        rates: RATES.slice(0, 2),
+      }),
+    );
+    mount();
+    await settleTo('ready');
+    expect(names()).toEqual(['Bows']);
+    expect(statement()?.textContent).toBe(honestEmptyCopy(TEST_LEAGUE, true));
+    click(option('perfect'));
+    expect(statement()?.textContent).toBe(honestEmptyCopy(TEST_LEAGUE));
   });
 
   it('state 36: a pair the recipe cannot reach is Unrankable under that recipe only', async () => {

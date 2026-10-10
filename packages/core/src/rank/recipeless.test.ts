@@ -37,7 +37,7 @@ describe('rank: the recipeless group (state 43)', () => {
       const combinations = [
         { entryKey: canonicalKey(target), trust: { verdict: 'current', reasons: [] } },
         { entryKey: canonicalKey(filler), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } },
-      ].toSorted((left, right) => compareCanonicalKeys(left.entryKey, right.entryKey));
+      ];
       expect(result.recipeless).toEqual([
         {
           classKey: '["crafted","weapon.bow","Bows"]',
@@ -50,6 +50,20 @@ describe('rank: the recipeless group (state 43)', () => {
       ]);
     },
   );
+
+  it('orders a class’s combinations priced, then pending, then broken, as a crafted row’s', () => {
+    const withPrice = chase('Bows');
+    const pending = chase('Bows', 'explicit.stat_low');
+    const broken = chase('Bows', FILLER);
+    const result = rankCrafted({
+      tracked: [withPrice, pending, broken],
+      dataset: [published(withPrice, priced(2)), published(broken, { state: 'unresolvable' })],
+      recipes: [],
+    });
+    const byTrust = [withPrice, pending, broken].map((entry) => canonicalKey(entry));
+    expect(byTrust.toSorted(compareCanonicalKeys)).toEqual(byTrust.toReversed());
+    expect(result.recipeless[0]?.combinations.map((line) => line.entryKey)).toEqual(byTrust);
+  });
 
   it('orders the group by class key, whatever the Tracked List order', () => {
     const result = rankCrafted({

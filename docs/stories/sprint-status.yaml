@@ -93,7 +93,7 @@ action_items:
       an all-broken crafted row (R2); order recipeless-class combinations by COMBINATION_GROUP
       (R3)"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-3-small-web-fixes-plural-in-morelinescopy"
     epic: 4
