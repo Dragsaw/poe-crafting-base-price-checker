@@ -20,8 +20,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -88,8 +87,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -108,27 +106,6 @@
         "statId": "explicit.stat_518292764",
         "valueMin": 4.41,
         "valueMax": 5,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.bow",
-      "className": "Bows",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1940865751",
-        "valueMin": 35,
-        "valueMax": 52.5,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2694482655",
-        "valueMin": 23,
-        "valueMax": 25,
         "acceptedTier": "T1"
       },
       "status": "active"
@@ -147,6 +124,27 @@
       },
       "suffix": {
         "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 35,
+        "valueMax": 52.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
         "statId": "explicit.stat_1202301673",
         "valueMin": 3,
         "valueMax": 4,
@@ -194,8 +192,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -214,27 +211,6 @@
         "statId": "explicit.stat_518292764",
         "valueMin": 4.41,
         "valueMax": 5,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.bow",
-      "className": "Bows",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1509134228",
-        "valueMin": 155,
-        "valueMax": 179,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2694482655",
-        "valueMin": 23,
-        "valueMax": 25,
         "acceptedTier": "T1"
       },
       "status": "active"
@@ -253,6 +229,27 @@
       },
       "suffix": {
         "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
         "statId": "explicit.stat_1202301673",
         "valueMin": 3,
         "valueMax": 4,
@@ -300,8 +297,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -320,27 +316,6 @@
         "statId": "explicit.stat_518292764",
         "valueMin": 4.41,
         "valueMax": 5,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.bow",
-      "className": "Bows",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1037193709",
-        "valueMin": 69,
-        "valueMax": 102,
-        "acceptedTier": "T1-T2"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2694482655",
-        "valueMin": 23,
-        "valueMax": 25,
         "acceptedTier": "T1"
       },
       "status": "active"
@@ -359,6 +334,27 @@
       },
       "suffix": {
         "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.bow",
+      "className": "Bows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 69,
+        "valueMax": 102,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
         "statId": "explicit.stat_1202301673",
         "valueMin": 3,
         "valueMax": 4,
@@ -406,8 +402,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -512,8 +507,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -618,8 +612,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -733,8 +726,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -871,12 +863,11 @@
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_1967051901",
-        "valueMin": 1,
-        "valueMax": 1,
+        "valueMin": 2,
+        "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -894,48 +885,6 @@
         "kind": "banded",
         "statId": "explicit.stat_518292764",
         "valueMin": 4.41,
-        "valueMax": 5,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.crossbow",
-      "className": "Crossbows",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1037193709",
-        "valueMin": 140,
-        "valueMax": 156.5,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2694482655",
-        "valueMin": 23,
-        "valueMax": 25,
-        "acceptedTier": "T1"
-      },
-      "status": "active"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "weapon.crossbow",
-      "className": "Crossbows",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1037193709",
-        "valueMin": 140,
-        "valueMax": 156.5,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_1202301673",
-        "valueMin": 5,
         "valueMax": 5,
         "acceptedTier": "T1"
       },
@@ -955,13 +904,54 @@
       },
       "suffix": {
         "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1202301673",
+        "valueMin": 5,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.crossbow",
+      "className": "Crossbows",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 140,
+        "valueMax": 156.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
         "statId": "explicit.stat_210067635",
         "valueMin": 17,
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -978,12 +968,11 @@
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_1967051901",
-        "valueMin": 1,
-        "valueMax": 1,
+        "valueMin": 2,
+        "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1067,8 +1056,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1085,12 +1073,11 @@
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_1967051901",
-        "valueMin": 1,
-        "valueMax": 1,
+        "valueMin": 2,
+        "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1174,8 +1161,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1192,12 +1178,11 @@
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_1967051901",
-        "valueMin": 1,
-        "valueMax": 1,
+        "valueMin": 2,
+        "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1281,8 +1266,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1299,12 +1283,11 @@
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_1967051901",
-        "valueMin": 1,
-        "valueMax": 1,
+        "valueMin": 2,
+        "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1388,8 +1371,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1406,12 +1388,11 @@
       "suffix": {
         "kind": "banded",
         "statId": "explicit.stat_1967051901",
-        "valueMin": 1,
-        "valueMax": 1,
+        "valueMin": 2,
+        "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1495,8 +1476,7 @@
         "valueMax": 19,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1517,8 +1497,7 @@
         "valueMax": 24,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1539,8 +1518,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1561,8 +1539,7 @@
         "valueMax": 27,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1583,8 +1560,7 @@
         "valueMax": 45,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1605,8 +1581,7 @@
         "valueMax": 38,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1627,8 +1602,7 @@
         "valueMax": 39,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1649,8 +1623,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1671,8 +1644,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1693,8 +1665,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1715,8 +1686,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1737,8 +1707,7 @@
         "valueMax": 33,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1759,8 +1728,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -1781,8 +1749,7 @@
         "valueMax": 69,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2013,8 +1980,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2056,8 +2022,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2309,28 +2274,6 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "accessory.amulet",
-      "className": "Amulets",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_2106365538",
-        "valueMin": 45,
-        "valueMax": 50,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_328541901",
-        "valueMin": 31,
-        "valueMax": 33,
-        "acceptedTier": "T1"
-      },
       "status": "active"
     },
     {
@@ -2347,13 +2290,33 @@
       },
       "suffix": {
         "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2106365538",
+        "valueMin": 45,
+        "valueMax": 50,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
         "statId": "explicit.stat_3917489142",
         "valueMin": 15,
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2605,28 +2568,6 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
-    },
-    {
-      "kind": "crafted",
-      "categoryId": "accessory.amulet",
-      "className": "Amulets",
-      "itemLevelMin": 82,
-      "prefix": {
-        "kind": "banded",
-        "statId": "explicit.stat_3489782002",
-        "valueMin": 80,
-        "valueMax": 89,
-        "acceptedTier": "T1"
-      },
-      "suffix": {
-        "kind": "banded",
-        "statId": "explicit.stat_328541901",
-        "valueMin": 31,
-        "valueMax": 33,
-        "acceptedTier": "T1"
-      },
       "status": "active"
     },
     {
@@ -2643,13 +2584,33 @@
       },
       "suffix": {
         "kind": "banded",
+        "statId": "explicit.stat_328541901",
+        "valueMin": 31,
+        "valueMax": 33,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.amulet",
+      "className": "Amulets",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3489782002",
+        "valueMin": 80,
+        "valueMax": 89,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
         "statId": "explicit.stat_3917489142",
         "valueMin": 15,
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2691,8 +2652,7 @@
         "valueMax": 24,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2713,8 +2673,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2735,8 +2694,7 @@
         "valueMax": 27,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2757,8 +2715,7 @@
         "valueMax": 45,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2779,8 +2736,7 @@
         "valueMax": 38,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2801,8 +2757,7 @@
         "valueMax": 39,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2823,8 +2778,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2845,8 +2799,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2867,8 +2820,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2889,8 +2841,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2911,8 +2862,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2933,8 +2883,7 @@
         "valueMax": 33,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2955,8 +2904,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -2977,8 +2925,7 @@
         "valueMax": 69,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3209,8 +3156,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3252,8 +3198,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3295,8 +3240,7 @@
         "valueMax": 24,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3317,8 +3261,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3339,8 +3282,7 @@
         "valueMax": 27,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3361,8 +3303,7 @@
         "valueMax": 45,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3383,8 +3324,7 @@
         "valueMax": 38,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3405,8 +3345,7 @@
         "valueMax": 39,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3427,8 +3366,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3449,8 +3387,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3471,8 +3408,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3493,8 +3429,7 @@
         "valueMax": 3,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3515,8 +3450,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3537,8 +3471,7 @@
         "valueMax": 33,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3559,8 +3492,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3581,8 +3513,7 @@
         "valueMax": 69,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3813,8 +3744,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -3856,8 +3786,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4109,8 +4038,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4152,8 +4080,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4405,8 +4332,7 @@
         "valueMax": 28,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4448,8 +4374,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4491,8 +4416,7 @@
         "valueMax": 43,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4513,8 +4437,7 @@
         "valueMax": 27,
         "acceptedTier": "T1-T2"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4535,8 +4458,7 @@
         "valueMax": 45,
         "acceptedTier": "T1-T2"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4557,8 +4479,7 @@
         "valueMax": 34,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4579,8 +4500,7 @@
         "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4601,8 +4521,7 @@
         "valueMax": 33,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4623,8 +4542,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4645,8 +4563,7 @@
         "valueMax": 23,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4667,8 +4584,7 @@
         "valueMax": 43,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4689,8 +4605,7 @@
         "valueMax": 27,
         "acceptedTier": "T1-T2"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4711,8 +4626,7 @@
         "valueMax": 45,
         "acceptedTier": "T1-T2"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4733,8 +4647,7 @@
         "valueMax": 34,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4755,8 +4668,7 @@
         "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4777,8 +4689,7 @@
         "valueMax": 33,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4799,8 +4710,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4821,8 +4731,7 @@
         "valueMax": 23,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect prefix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4852,8 +4761,7 @@
         "valueMax": 43,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4943,8 +4851,7 @@
         "valueMax": 34,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -4974,8 +4881,7 @@
         "valueMax": 2,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -5035,8 +4941,7 @@
         "valueMax": 18,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (greater suffix, perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -5066,8 +4971,7 @@
         "valueMax": 23,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7320,8 +7224,7 @@
         "valueMax": 16,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7342,8 +7245,7 @@
         "valueMax": 20,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7427,8 +7329,7 @@
         "valueMax": 16,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7449,8 +7350,7 @@
         "valueMax": 20,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7534,8 +7434,7 @@
         "valueMax": 16,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7556,8 +7455,7 @@
         "valueMax": 20,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7668,8 +7566,7 @@
         "valueMax": 16,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -7699,8 +7596,7 @@
         "valueMax": 20,
         "acceptedTier": "T1"
       },
-      "status": "pruned",
-      "prunedReason": "recipe cannot reach this combination (perfect suffix tier below the recipe modifier level floor)"
+      "status": "active"
     },
     {
       "kind": "crafted",
@@ -8404,6 +8300,4062 @@
         "valueMin": 3,
         "valueMax": 4,
         "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_274716455",
+        "valueMin": 53,
+        "valueMax": 59,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 5,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4226189338",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2254480358",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_591105508",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1545858329",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1600707273",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 50,
+        "valueMax": 52,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 90,
+        "valueMax": 109,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2505884597",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 90,
+        "valueMax": 104,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_274716455",
+        "valueMin": 53,
+        "valueMax": 59,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 5,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4226189338",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2254480358",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_591105508",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1545858329",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1600707273",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 50,
+        "valueMax": 52,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 90,
+        "valueMax": 109,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3015669065",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 90,
+        "valueMax": 104,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_274716455",
+        "valueMin": 53,
+        "valueMax": 59,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 5,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4226189338",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2254480358",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_591105508",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1545858329",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1600707273",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 50,
+        "valueMax": 52,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 90,
+        "valueMax": 109,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3278136794",
+        "valueMin": 55,
+        "valueMax": 60,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 90,
+        "valueMax": 104,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_274716455",
+        "valueMin": 53,
+        "valueMax": 59,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 5,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4226189338",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2254480358",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_591105508",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1545858329",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1600707273",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 50,
+        "valueMax": 52,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 90,
+        "valueMax": 109,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2974417149",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 90,
+        "valueMax": 104,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_274716455",
+        "valueMin": 53,
+        "valueMax": 59,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 5,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4226189338",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2254480358",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_591105508",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1545858329",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1600707273",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 50,
+        "valueMax": 52,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 90,
+        "valueMax": 109,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_2974417149",
+            "valueMin": 89,
+            "valueMax": 98
+          },
+          {
+            "statId": "explicit.stat_1050105434",
+            "valueMin": 83,
+            "valueMax": 90
+          }
+        ],
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 90,
+        "valueMax": 104,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_274716455",
+        "valueMin": 53,
+        "valueMax": 59,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_124131830",
+        "valueMin": 5,
+        "valueMax": 6,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4226189338",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2254480358",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_591105508",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1545858329",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1600707273",
+        "valueMin": 7,
+        "valueMax": 7,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 50,
+        "valueMax": 52,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_737908626",
+        "valueMin": 90,
+        "valueMax": 109,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.staff",
+      "className": "Staves",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 209,
+        "valueMax": 238,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 90,
+        "valueMax": 104,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 156.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 156.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 156.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 156.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 156.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_669069897",
+        "valueMin": 8,
+        "valueMax": 8.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 188.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 188.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 188.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 188.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 188.5,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_669069897",
+        "valueMin": 8,
+        "valueMax": 8.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_669069897",
+        "valueMin": 8,
+        "valueMax": 8.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 179,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_669069897",
+        "valueMin": 8,
+        "valueMax": 8.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_669069897",
+        "valueMin": 8,
+        "valueMax": 8.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.warstaff",
+      "className": "Quarterstaves",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 79
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 200
+          }
+        ],
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_669069897",
+        "valueMin": 8,
+        "valueMax": 8.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 134,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 134,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 134,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1037193709",
+        "valueMin": 105,
+        "valueMax": 134,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 158,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 158,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 158,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3336890334",
+        "valueMin": 120,
+        "valueMax": 158,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1940865751",
+        "valueMin": 50,
+        "valueMax": 74.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 169,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 169,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 169,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1509134228",
+        "valueMin": 155,
+        "valueMax": 169,
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_387439868",
+        "valueMin": 100,
+        "valueMax": 139,
+        "acceptedTier": "T1-T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 74
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 174
+          }
+        ],
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_518292764",
+        "valueMin": 4.41,
+        "valueMax": 5,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 74
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 174
+          }
+        ],
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2694482655",
+        "valueMin": 23,
+        "valueMax": 25,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 74
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 174
+          }
+        ],
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_9187492",
+        "valueMin": 4,
+        "valueMax": 5,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "weapon.talisman",
+      "className": "Talismans",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "hybrid",
+        "lines": [
+          {
+            "statId": "explicit.stat_1509134228",
+            "valueMin": 65,
+            "valueMax": 74
+          },
+          {
+            "statId": "explicit.stat_691932474",
+            "valueMin": 150,
+            "valueMax": 174
+          }
+        ],
+        "acceptedTier": "T2"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_210067635",
+        "valueMin": 26,
+        "valueMax": 28,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4067062424",
+        "valueMin": 26.5,
+        "valueMax": 30.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3291658075",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1573130764",
+        "valueMin": 31,
+        "valueMax": 37,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_736967255",
+        "valueMin": 27,
+        "valueMax": 30,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 165,
+        "valueMax": 179,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 16,
+        "valueMax": 19,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2897413282",
+        "valueMin": 11,
+        "valueMax": 13,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2901986750",
+        "valueMin": 15,
+        "valueMax": 16,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 45,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2891184298",
+        "valueMin": 22,
+        "valueMax": 24,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3917489142",
+        "valueMin": 15,
+        "valueMax": 18,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2557965901",
+        "valueMin": 7,
+        "valueMax": 7.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_707457662",
+        "valueMin": 6,
+        "valueMax": 6.9,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.ring",
+      "className": "Rings",
+      "itemLevelMin": 82,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3032590688",
+        "valueMin": 17,
+        "valueMax": 25.5,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_789117908",
+        "valueMin": 60,
+        "valueMax": 69,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 150,
+        "valueMax": 174,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 150,
+        "valueMax": 174,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 40,
+        "acceptedTier": "T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3299347043",
+        "valueMin": 150,
+        "valueMax": 174,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3325883026",
+        "valueMin": 23.1,
+        "valueMax": 29,
+        "acceptedTier": "T1"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 105,
+        "valueMax": 124,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_1050105434",
+        "valueMin": 105,
+        "valueMax": 124,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 40,
+        "acceptedTier": "T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_809229260",
+        "valueMin": 312,
+        "valueMax": 351,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_2923486259",
+        "valueMin": 20,
+        "valueMax": 27,
+        "acceptedTier": "T1-T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_809229260",
+        "valueMin": 312,
+        "valueMax": 351,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_4220027924",
+        "valueMin": 36,
+        "valueMax": 40,
+        "acceptedTier": "T2"
+      },
+      "status": "active"
+    },
+    {
+      "kind": "crafted",
+      "categoryId": "accessory.belt",
+      "className": "Belts",
+      "itemLevelMin": 81,
+      "prefix": {
+        "kind": "banded",
+        "statId": "explicit.stat_809229260",
+        "valueMin": 312,
+        "valueMax": 351,
+        "acceptedTier": "T1"
+      },
+      "suffix": {
+        "kind": "banded",
+        "statId": "explicit.stat_3325883026",
+        "valueMin": 23.1,
+        "valueMax": 29,
+        "acceptedTier": "T1"
       },
       "status": "active"
     }
