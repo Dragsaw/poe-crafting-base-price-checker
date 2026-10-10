@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { BELOW_PRINTABLE, formatDivine, formatThreshold, MINUS } from './money';
+import { BELOW_PRINTABLE, formatDivine, formatThreshold, LOSS_BELOW_PRINTABLE, MINUS } from './money';
 
 describe('formatDivine', () => {
   it('prints 2dp', () => {
@@ -19,9 +19,18 @@ describe('formatDivine', () => {
 });
 
 describe('formatDivine on a negative figure', () => {
-  it('never prints -0.00', () => {
-    expect(formatDivine(-0.001)).toBe('0.00');
-    expect(formatDivine(-0.0049)).toBe('0.00');
+  it('prints a loss too small for 2dp as < 0.00, never 0.00 or -0.00', () => {
+    expect(LOSS_BELOW_PRINTABLE).toBe('< 0.00');
+    expect(formatDivine(-0.001)).toBe('< 0.00');
+    expect(formatDivine(-0.0049)).toBe('< 0.00');
+    expect(formatDivine(-0.00499999)).toBe('< 0.00');
+  });
+
+  it('prints -0.005 as a figure, the mirror of 0.005', () => {
+    expect(formatDivine(-0.005)).toBe(`${MINUS}0.01`);
+  });
+
+  it('prints negative zero as 0.00', () => {
     expect(formatDivine(-0)).toBe('0.00');
   });
 
@@ -41,8 +50,9 @@ describe('formatThreshold', () => {
     expect(formatThreshold(0)).toBe('0.00');
   });
 
-  it('has no < 0.01 floor, unlike formatDivine', () => {
+  it('has no < 0.01 or < 0.00 floor, unlike formatDivine', () => {
     expect(formatThreshold(0.004)).toBe('0.00');
+    expect(formatThreshold(-0.003)).toBe('0.00');
     expect(formatDivine(0.004)).toBe(BELOW_PRINTABLE);
   });
 });

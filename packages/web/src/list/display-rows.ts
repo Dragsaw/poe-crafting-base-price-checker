@@ -10,7 +10,7 @@ import {
 } from '@poe/contracts';
 import { classKeyOf, type Ranking, type UnrankedEntry } from '@poe/core';
 
-import { formatDivine, MINUS } from '../shared/money';
+import { formatDivine, LOSS_BELOW_PRINTABLE, MINUS } from '../shared/money';
 import { combinationText, type AffixPart, type StatTexts } from './combination-text';
 import { unitLabel } from './format';
 import type { ActiveRanking } from './active-ranking';
@@ -31,10 +31,10 @@ function hasNoFigure(trust: PriceTrust): boolean {
   return trust.verdict === 'pending' || trust.verdict === 'broken';
 }
 
-/** The dim rides the printed minus sign, never tone alone (EXPERIENCE.md Accessibility Floor, NFR-10). */
+/** The dim rides the printed minus sign or `< 0.00`, never tone alone (EXPERIENCE.md Accessibility Floor, NFR-10). */
 function figure(expectedValue: number): ExpectedValueCell {
   const text = formatDivine(expectedValue);
-  return { kind: 'figure', text, negative: text.startsWith(MINUS) };
+  return { kind: 'figure', text, negative: text.startsWith(MINUS) || text === LOSS_BELOW_PRINTABLE };
 }
 
 /** One Raw Base row as the view prints it. Nothing here is a ranking term: `core` ordered it. */
