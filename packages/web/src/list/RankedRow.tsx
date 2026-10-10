@@ -3,7 +3,7 @@ import './list.css';
 import { Tooltip } from '@mantine/core';
 import { useState, type CSSProperties, type JSX } from 'react';
 
-import { colors, rankedRowGrid, spacing, typeStyle } from '../theme/tokens';
+import { colors, markTooltipInset, rankedRowGrid, spacing, typeStyle } from '../theme/tokens';
 import type { ChaseCellCount } from './ranked-list/chase-count';
 import type { AffixPart } from './combination-text';
 import { CHASE_CELLS, type ListRow } from './display-rows';
@@ -56,7 +56,7 @@ export function RankedRow({
   readonly onToggle: (key: string) => void;
   /** One count for every crafted row of the page (`useChaseCellCount`). */
   readonly chaseCells?: ChaseCellCount;
-  /** The last visible row of its branch draws no rule (DESIGN.md *Density*). */
+  /** The list's last row, or the row above show-more: it draws no rule (DESIGN.md *Density*). */
   readonly last?: boolean;
 }): JSX.Element {
   const isEmphasised = row.tier === 1;
@@ -140,9 +140,9 @@ function ChaseCells({
 }
 
 /** Opens under the cell, its text on the cell's left edge (DESIGN.md `chase-cell.cutHover`). */
-const CUT_TOOLTIP_OFFSET = { mainAxis: 4, crossAxis: -9 } as const;
+const CUT_TOOLTIP_OFFSET = { mainAxis: 4, crossAxis: -(markTooltipInset.padding + markTooltipInset.border) } as const;
 
-/** The full text of a cut cell: lighter tones than the row's, which fall under the floor on the raised step. */
+/** The row's dim tones fail the contrast floor on the raised step (DESIGN.md `chase-cell.cutHover`). */
 const CUT_TONES: CombinationTones = { tier: colors['text-secondary'], joiner: colors['text-secondary'] };
 
 /** A filled cell; only a cell its width cut opens its full text on hover (EXPERIENCE.md Interaction 8). */

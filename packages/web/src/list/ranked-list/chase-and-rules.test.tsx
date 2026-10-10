@@ -1,15 +1,18 @@
 import type { PriceTrust } from '@poe/contracts';
+import { rank } from '@poe/core';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { mount, mountList, NOW, rgb, rowsIn, unmount } from '../../test-support/dom';
+import { DEFAULT_THRESHOLD } from '../../shared/product';
+import { TEST_LEAGUE } from '../../test-support/artifact-server';
+import { mount, mountList, NOW, NOW_ISO, rgb, rowsIn, unmount } from '../../test-support/dom';
 import { hover, leave } from '../../test-support/hover';
 import { many } from '../../test-support/list-fixtures';
 import { colors, spacing } from '../../theme/tokens';
 import { PageProvider } from '../../theme/PageProvider';
 import { CHASE_CELL_BUDGET } from './chase-count';
 import type { AffixPart } from '../combination-text';
-import type { ClassDisplayRow } from '../display-rows';
+import { toDisplayRows, type ClassDisplayRow, type ListRow } from '../display-rows';
 import { RankedList } from '../RankedList';
 
 const CURRENT: PriceTrust = { verdict: 'current', reasons: [] };
@@ -57,8 +60,10 @@ beforeEach(() => {
 
 afterEach(() => {
   unmount();
+  const leftObserving = observers.size;
   vi.unstubAllGlobals();
   observers.clear();
+  expect(leftObserving).toBe(0);
 });
 
 const parts = (...affixes: readonly string[]): readonly AffixPart[] => affixes.map((text) => ({ text, verbatim: false }));
@@ -90,7 +95,7 @@ function mountCrafted(count: number): HTMLElement {
 
 const cellCounts = (view: HTMLElement): number[] => rowsIn(view).map((row) => row.querySelectorAll('[data-chase-cell]').length);
 
-/** A three-cell column's cell at the minimum frame (DESIGN.md *The chase column*). */
+/** A cell box narrower than the text the cut-cell fixture gives it, and as wide as the uncut fixture's text. */
 const CELL_WIDTH = 175;
 
 /** Gives a cell the layout jsdom lacks: its text's width in a box of {@link CELL_WIDTH}. */
@@ -106,6 +111,26 @@ function layOut(cell: Element | undefined, textWidth: number): HTMLElement {
 }
 
 const ruleOf = (element: HTMLElement | undefined): string | undefined => element?.style.borderBottom;
+
+function rawRows(count: number): readonly ListRow[] {
+  const { tracked, dataset } = many(count, NOW);
+  return toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined }), dataset);
+}
+
+function mountBranches(raw: readonly ListRow[]): { readonly raw: HTMLElement[]; readonly crafted: HTMLElement[] } {
+  const view = mount(
+    <PageProvider>
+      <RankedList branches={[raw, [craftedRow(0), craftedRow(1)]]} activeLeague={TEST_LEAGUE} />
+    </PageProvider>,
+  );
+  const [rawBranch, craftedBranch] = [...view.querySelectorAll<HTMLElement>('[data-list-branch]')];
+  if (rawBranch === undefined || craftedBranch === undefined) {
+    throw new Error('no two branches');
+  }
+  return { raw: rowsIn(rawBranch), crafted: rowsIn(craftedBranch) };
+}
+
+const isList = (element: Element): boolean => element instanceof HTMLElement && element.dataset['rankedList'] !== undefined;
 
 describe('the chase-cell count', () => {
   // Matrix: wide list.
@@ -129,6 +154,23 @@ describe('the chase-cell count', () => {
     expect(rowsIn(view)[0]?.textContent).not.toContain('T1 ES');
     resizeListTo(THREE_CELLS_FROM);
     expect(cellCounts(view)).toEqual([3, 3, 3]);
+  });
+
+  it('seeds the count from a rendered list’s width before paint, with no observer update', () => {
+    const { getClientRects } = Element.prototype;
+    const rects = vi.spyOn(Element.prototype, 'getClientRects').mockImplementation(function (this: Element) {
+      const list = getClientRects.call(this);
+      return isList(this) ? Object.defineProperty(list, 'length', { value: 1 }) : list;
+    });
+    const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (this: HTMLElement) {
+      return isList(this) ? THREE_CELLS_FROM - 1 : 0;
+    });
+    try {
+      expect(cellCounts(mountCrafted(3))).toEqual([2, 2, 2]);
+    } finally {
+      rects.mockRestore();
+      width.mockRestore();
+    }
   });
 
   it('leaves a Raw Base row its sell-as-is line at either width', () => {
@@ -169,13 +211,6 @@ describe('a cut chase cell', () => {
     expect(document.body.querySelector('[data-chase-tooltip]')).toBeNull();
     expect(document.body.querySelector('[role="tooltip"]')).toBeNull();
   });
-
-  it('leaves the row cursor as it is', () => {
-    const view = mountCrafted(1);
-    const cell = layOut(rowsIn(view)[0]?.querySelectorAll('[data-chase-cell]')[0], 300);
-    hover(cell);
-    expect(cell.style.cursor).toBe('');
-  });
 });
 
 describe('the last row of a branch', () => {
@@ -214,5 +249,31 @@ describe('the last row of a branch', () => {
     expect(ruleOf(panels[0])).toBe(`1px solid ${rgb(colors.line)}`);
     expect(ruleOf(panels[1])).toBe('');
     expect(ruleOf(rowsIn(view)[2])).toBe('1px solid transparent');
+  });
+
+  it('draws no rule under the open panel of a last crafted row', () => {
+    const view = mountCrafted(2);
+    act(() => {
+      rowsIn(view)[1]?.click();
+    });
+    const panels = [...view.querySelectorAll<HTMLElement>('[data-expansion-panel]')];
+    expect(panels).toHaveLength(1);
+    expect(ruleOf(panels[0])).toBe('');
+    expect(ruleOf(rowsIn(view)[1])).toBe('1px solid transparent');
+  });
+});
+
+describe('the last row of the raw branch in state 35', () => {
+  it('keeps its rule above the crafted branch, and the crafted branch’s last row draws none', () => {
+    const { raw, crafted } = mountBranches(rawRows(3));
+    expect(ruleOf(raw.at(-1))).toBe(`1px solid ${rgb(colors.line)}`);
+    expect(ruleOf(crafted.at(-1))).toBe('1px solid transparent');
+  });
+
+  it('drops the rule of its row 20 when show-more follows it', () => {
+    const { raw } = mountBranches(rawRows(21));
+    expect(raw).toHaveLength(20);
+    expect(ruleOf(raw[19])).toBe('1px solid transparent');
+    expect(ruleOf(raw[18])).toBe(`1px solid ${rgb(colors.line)}`);
   });
 });

@@ -32,6 +32,11 @@ export function useChaseCellCount(): { readonly measured: RefCallback<HTMLElemen
     if (!element) {
       return;
     }
+    // Seeded before paint, so a narrow list never shows three cells for a frame; an unrendered element has no box.
+    if (element.getClientRects().length > 0) {
+      const style = getComputedStyle(element);
+      setCount(chaseCellCount(element.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight)));
+    }
     const observer = new ResizeObserver((entries) => {
       const last = entries.at(-1);
       if (last !== undefined) {

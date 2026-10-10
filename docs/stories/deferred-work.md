@@ -59,3 +59,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-4-8-the-appendix-s-raw-ranks-note.md`
   summary: [NOTE FOR UX] DESIGN.md `components.unrankable-appendix.row` reads as a fixed height, but a wrapped note now grows the row. Restate the row height as a minimum in DESIGN.md.
   evidence: Story 4.8 (human decision, 2026-10-10) lets an over-long appendix note wrap inside its note cell. UnrankableAppendix.tsx sets `minHeight: line-height-expansion` on the row, and only the note cell wraps. The 14 + 16 joined note wraps to two lines at the 1080px target width.
+
+## Deferred from: spec-deferred-4-1-sweep (2026-10-10)
+
+- source_spec: `docs/stories/spec-deferred-4-1-sweep.md`
+  summary: Colour the tier and joiner of a crafted row's own chase-cell text (DESIGN.md `typography.chase`, *The chase column*); the deferred 4.1 sweep toned them only in the cut-cell tooltip.
+  evidence: The spec's Boundaries *Never* carve this out as a separate gap. ChaseCell in packages/web/src/list/RankedRow.tsx renders the in-row `CombinationText` without `tones`, while the tooltip passes `CUT_TONES`.
+  retry_when: a story that restyles the chase cells is planned
+
+- source_spec: `docs/stories/spec-deferred-4-1-sweep.md`
+  summary: "[NOTE FOR UX] Write the last-row rule's two build rulings into DESIGN.md: an open last row's expansion panel draws no rule, and a row directly above show-more counts as a last row (in state 35, a raw branch followed directly by the crafted branch keeps its rule)."
+  evidence: DESIGN.md *Density* says only "the last row of a list has no rule below it", and `components.expansion-panel.borderBottom` is `1px solid {colors.line}` with no exception. The human ruled on both cases during the deferred 4.1 sweep (spec Spec Change Log, iteration 1), and the code follows that ruling (Branch in packages/web/src/list/RankedList.tsx). A reviewer does not edit DESIGN.md (AGENT-WORKFLOW.md Review brief, rule 2).
+  retry_when: now

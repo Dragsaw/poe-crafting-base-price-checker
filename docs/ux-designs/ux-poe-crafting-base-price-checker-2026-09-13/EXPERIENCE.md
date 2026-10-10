@@ -1189,7 +1189,7 @@ The *edit* happens in a text editor and git.
 4. The report counts what broke but does not say which Item Class holds it
    (memlog 235). So they open panels, several at once and side by side, and show
    their full lists with `+ N more combinations`. They find three Combinations that
-   read `○ pending · tried N hours ago · no listings` all league, and one
+   read `○ pending · tried 9 days ago · no listings` all league, and one
    `✕ broken · gone after a patch`.
 5. They open `+ N pruned` on a panel and read the existing pruned lines with their
    reasons. FR-8 includes pruned entries, so this review needs no visit to the

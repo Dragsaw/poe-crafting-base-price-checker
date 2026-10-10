@@ -127,7 +127,7 @@ export function RawExpansionPanel({
 }: {
   readonly row: DisplayRow;
   readonly activeLeague: string;
-  /** Under the last visible row of its branch: no rule (DESIGN.md *Density*). */
+  /** Under the list's last row, or the row above show-more: no rule (DESIGN.md *Density*). */
   readonly last?: boolean;
 }): JSX.Element {
   return <ExpansionPanel row={row} lines={[rawLine(row, activeLeague)]} pruned={[]} last={last} />;
@@ -141,7 +141,7 @@ export function ClassExpansionPanel({
 }: {
   readonly row: ClassDisplayRow;
   readonly activeLeague: string;
-  /** Under the last visible row of its branch: no rule (DESIGN.md *Density*). */
+  /** Under the list's last row, or the row above show-more: no rule (DESIGN.md *Density*). */
   readonly last?: boolean;
 }): JSX.Element {
   return (

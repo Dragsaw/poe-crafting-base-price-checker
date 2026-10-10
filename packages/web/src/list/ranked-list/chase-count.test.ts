@@ -94,7 +94,7 @@ describe('chaseCellCount', () => {
     expect(chaseCellCount(bound - 0.5)).toBe(2);
   });
 
-  it('shows two at the minimum frame and three at the maximum (DESIGN.md *The chase column*)', () => {
+  it('shows two at the 952px list width of the minimum frame and three at the 1072px of the maximum (DESIGN.md *The chase column*)', () => {
     expect(chaseCellCount(952)).toBe(2);
     expect(chaseCellCount(1072)).toBe(3);
   });

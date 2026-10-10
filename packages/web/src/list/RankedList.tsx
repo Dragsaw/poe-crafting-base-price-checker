@@ -63,6 +63,7 @@ export function RankedList({
           onToggle={toggle}
           activeLeague={activeLeague}
           kind={branchKind(shown.length, index)}
+          isFinal={index === shown.length - 1}
         />
       ))}
     </div>
@@ -85,6 +86,7 @@ function Branch({
   activeLeague,
   kind,
   chaseCells,
+  isFinal,
 }: {
   readonly rows: readonly ListRow[];
   readonly open: ReadonlySet<string>;
@@ -93,6 +95,8 @@ function Branch({
   readonly chaseCells: ChaseCellCount;
   /** Set only in state 35, where the list holds two branches. */
   readonly kind: 'raw' | 'crafted' | undefined;
+  /** The list's last branch: nothing follows it. */
+  readonly isFinal: boolean;
 }): JSX.Element {
   const [grown, setGrown] = useState(false);
   const remaining = rows.length - TOP_ROWS;
@@ -103,20 +107,19 @@ function Branch({
   }
   const visible = grown ? rows : rows.slice(0, TOP_ROWS);
   // A closed row unmounts its panel, so the panel's own toggles start closed when it reopens (Interactions 3, 7).
-  const expansionPanel = (row: ListRow, isLast: boolean): JSX.Element => {
-    return row.unit === 'raw' ? (
+  const expansionPanel = (row: ListRow, isLast: boolean): JSX.Element =>
+    row.unit === 'raw' ? (
       <RawExpansionPanel key={row.key} row={row} activeLeague={activeLeague} last={isLast} />
     ) : (
       <ClassExpansionPanel key={row.key} row={row} activeLeague={activeLeague} last={isLast} />
     );
-  };
 
   return (
     <div data-list-branch={kind}>
       {visible.map((row, index) => {
         const isOpen = open.has(row.key);
-        // Show-more is not a row, so the last visible row draws no rule above it (DESIGN.md *Density*).
-        const isLast = index === visible.length - 1;
+        // Show-more is not a row; a raw branch followed by the crafted one keeps its rule (DESIGN.md *Density*).
+        const isLast = index === visible.length - 1 && (isFinal || remaining > 0);
         return (
           <Fragment key={row.key}>
             <RankedRow row={row} open={isOpen} onToggle={onToggle} chaseCells={chaseCells} last={isLast} />
