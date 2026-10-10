@@ -116,12 +116,12 @@ describe('floored', () => {
     expect(floored({ poolCoverage: 'complete', entries: tiers }, 70)).toEqual([tiers[1]]);
   });
 
-  it('keeps every tier tied at the top, and never reads a weight-0 tier as the top', () => {
+  it('keeps every tier tied at the top, and never reads or keeps a weight-0 tier below the floor as the top', () => {
     const tied = [at(20, 'c'), at(40, 'c'), at(40, 'c')];
     expect(floored({ poolCoverage: 'complete', entries: tied }, 70)).toEqual([tied[1], tied[2]]);
     const live = at(40, 'd');
     const zero = { ...at(60, 'd', 0), weightSource: 'not-in-game' as const };
-    expect(floored({ poolCoverage: 'complete', entries: [live, zero] }, 70)).toEqual([live, zero]);
+    expect(floored({ poolCoverage: 'complete', entries: [live, zero] }, 70)).toEqual([live]);
   });
 
   it('keys groups by modGroup alone: a hybrid group sharing a statId is its own group', () => {
@@ -198,5 +198,17 @@ describe('the recipe floor per modifier group under a perfect recipe (AD-17)', (
     expect(recipeReach(classPools, entry, 70)).toEqual({ reached: true });
     expect(recipeReach(classPools, { ...entry, prefix: band(1, 2) }, 70)).toEqual({ reached: false, slots: ['prefix'] });
     expect(recipeReach(classPools, { ...entry, prefix: band(1, 2) }, 0)).toEqual({ reached: true });
+  });
+
+  it('does not reach a pair whose first draw exhausts the other slot, as the ranking backstop drops it', () => {
+    const prefix = at(75, 'shared');
+    const suffix = tier([line(OTHER, [1, 2])], 100, { itemLevelMin: 75, modGroup: 'shared' });
+    // Group other's top, 85, is above the item level, so the floor leaves the suffix only the shared group.
+    const other = [30, 85].map((level) => tier([line(OTHER, [3, 4])], 100, { itemLevelMin: level, modGroup: 'other' }));
+    const exhausted = { itemLevelMin: 82, prefix: band(75, 75), suffix: band(1, 2, OTHER) };
+    const sharedPools = pools([prefix, at(75, 'filler')], [suffix, ...other]);
+    expect(recipeReach(sharedPools, exhausted, 0)).toEqual({ reached: true });
+    expect(recipeReach(sharedPools, exhausted, 70)).toEqual({ reached: false, slots: ['suffix'] });
+    expect(combinationProbability(sharedPools, exhausted, 70)).toMatchObject({ ok: false, reason: { kind: 'augment-exhausted' } });
   });
 });

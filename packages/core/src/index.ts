@@ -44,6 +44,7 @@ export {
   crossFileChecks,
   edgeAlignment,
   emptyContainment,
+  isPoolCheckable,
   kindAgreement,
   lineSetCompleteness,
   scopedPools,

@@ -205,7 +205,8 @@ const REF_CHECKS: readonly (readonly [CrossFileCheck, ReferenceCheck])[] = [
   ['line-set-completeness', lineSetCompleteness],
 ];
 
-function isPoolCheckable(pools: WeightsClassPools): boolean {
+/** Whether pool checks are defined on a class: neither slot is `partial`. */
+export function isPoolCheckable(pools: WeightsClassPools): boolean {
   return pools.prefix.poolCoverage !== 'partial' && pools.suffix.poolCoverage !== 'partial';
 }
 

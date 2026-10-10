@@ -17,6 +17,8 @@ import type {
 
 export type Slot = 'prefix' | 'suffix';
 
+const SLOTS: readonly Slot[] = ['prefix', 'suffix'];
+
 /** The one filter-comparable interval of a banded line. */
 export interface Interval {
   readonly min: number;
@@ -132,7 +134,9 @@ export function floored(pool: WeightsPool, modifierLevelMin: number): readonly M
       top.set(entry.modGroup, Math.max(top.get(entry.modGroup) ?? entry.itemLevelMin, entry.itemLevelMin));
     }
   }
-  return pool.entries.filter((entry) => entry.itemLevelMin >= Math.min(modifierLevelMin, top.get(entry.modGroup) ?? modifierLevelMin));
+  return pool.entries.filter(
+    (entry) => entry.itemLevelMin >= modifierLevelMin || (entry.weight > 0 && entry.itemLevelMin === top.get(entry.modGroup)),
+  );
 }
 
 /** One slot's eligible set: the recipe floor, then the item-level scope (AD-5, AD-17). */
@@ -144,15 +148,18 @@ export function eligible(
   return floored(pool, modifierLevelMin).filter((entry) => entry.itemLevelMin <= itemLevelMin);
 }
 
-/** Whether a recipe can roll an entry: every slot's contained set in `eligible` is non-empty. */
+/** Whether a recipe can roll an entry: `combinationProbability` is defined, as the ranking backstop requires. */
 export type RecipeReach = { readonly reached: true } | { readonly reached: false; readonly slots: readonly Slot[] };
 
 /** The reach verdict of one `(entry, recipe)` pair (AD-17). */
 export function recipeReach(pools: WeightsClassPools, entry: CombinationInput, modifierLevelMin: number): RecipeReach {
-  const slots = (['prefix', 'suffix'] as const).filter(
-    (slot) => containedIn(entry[slot], eligible(pools[slot], entry.itemLevelMin, modifierLevelMin)).length === 0,
-  );
-  return slots.length === 0 ? { reached: true } : { reached: false, slots };
+  const result = combinationProbability(pools, entry, modifierLevelMin);
+  if (result.ok) {
+    return { reached: true };
+  }
+  const empty = SLOTS.filter((slot) => containedIn(entry[slot], eligible(pools[slot], entry.itemLevelMin, modifierLevelMin)).length === 0);
+  // Both contained sets are non-empty only when a first draw exhausts the other slot.
+  return { reached: false, slots: empty.length > 0 ? empty : SLOTS.filter((slot) => !(result.reason.kind === 'augment-exhausted' && result.reason.firstDrawSlot === slot)) };
 }
 
 function totalWeight(entries: readonly ModifierWeight[]): number {

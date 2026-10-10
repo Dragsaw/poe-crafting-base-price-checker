@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { canonicalKey, compareByCodeUnit, compareCanonicalKeys, parseEnvelope, RecipesFileSchema } from '@poe/contracts';
-import type { ConfigFile, FilesystemPort, RecipesFile, TrackedEntry, WeightsFile } from '@poe/contracts';
-import { craftedClassesOf, crossFileChecks, poolOf, recipeReach, type Slot, type UnvalidatedMark } from '@poe/core';
+import type { ConfigFile, CraftedTrackedEntry, FilesystemPort, RecipesFile, TrackedEntry, WeightsFile } from '@poe/contracts';
+import { craftedClassesOf, crossFileChecks, isPoolCheckable, poolOf, recipeReach, type Slot, type UnvalidatedMark } from '@poe/core';
 
 import { loadCatalogueIds } from '../catalogue/catalogue-ids.ts';
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -45,7 +45,7 @@ export interface CheckUnvalidated extends UnvalidatedMark {
   readonly path?: string;
 }
 
-/** One `(entry, recipe)` pair that AD-17 makes unreachable, once per slot whose contained set is empty. */
+/** One `(entry, recipe)` pair that AD-17 makes unreachable, once per slot that `recipeReach` names. */
 export interface CheckUnreachable {
   readonly entryKey: string;
   readonly recipeId: string;
@@ -209,31 +209,42 @@ function crossFileOutcome(
   };
 }
 
+function classUnreachable(members: readonly CraftedTrackedEntry[], weights: WeightsFile, recipes: RecipesFile, pathOf: PathOf): CheckUnreachable[] {
+  const [first] = members;
+  const lookup = first === undefined ? undefined : poolOf(weights, first.categoryId, first.className);
+  // An absent class or a partial pool is an unvalidated mark already; containment is not defined there.
+  if (lookup?.ok !== true || !isPoolCheckable(lookup.pools)) {
+    return [];
+  }
+  const found: CheckUnreachable[] = [];
+  for (const entry of members) {
+    const entryKey = canonicalKey(entry);
+    for (const recipe of recipes.recipes) {
+      const reach = recipeReach(lookup.pools, entry, recipe.modifierLevelMin);
+      if (!reach.reached) {
+        found.push(...reach.slots.map((slot) => ({ entryKey, recipeId: recipe.id, slot, ...pathOf(entryKey) })));
+      }
+    }
+  }
+  return found;
+}
+
 function unreachableOf(
   entries: readonly TrackedEntry[],
   weights: WeightsFile,
   recipes: RecipesFile,
   pathOf: PathOf,
 ): CheckUnreachable[] {
-  const crafted = craftedClassesOf(entries).values().toArray().flat();
-  const found = crafted.flatMap((entry) => {
-    const lookup = poolOf(weights, entry.categoryId, entry.className);
-    // An absent class or a partial pool is an unvalidated mark already; containment is not defined there.
-    if (!lookup.ok || lookup.pools.prefix.poolCoverage === 'partial' || lookup.pools.suffix.poolCoverage === 'partial') {
-      return [];
-    }
-    const entryKey = canonicalKey(entry);
-    return recipes.recipes.flatMap((recipe) => {
-      const reach = recipeReach(lookup.pools, entry, recipe.modifierLevelMin);
-      return reach.reached ? [] : reach.slots.map((slot) => ({ entryKey, recipeId: recipe.id, slot, ...pathOf(entryKey) }));
-    });
-  });
-  return found.toSorted(
-    (left, right) =>
-      compareCanonicalKeys(left.entryKey, right.entryKey) ||
-      compareByCodeUnit(left.recipeId, right.recipeId) ||
-      compareByCodeUnit(left.slot, right.slot),
-  );
+  return craftedClassesOf(entries)
+    .values()
+    .flatMap((members) => classUnreachable(members, weights, recipes, pathOf))
+    .toArray()
+    .toSorted(
+      (left, right) =>
+        compareCanonicalKeys(left.entryKey, right.entryKey) ||
+        compareByCodeUnit(left.recipeId, right.recipeId) ||
+        compareByCodeUnit(left.slot, right.slot),
+    );
 }
 
 function recipeReachOutcome(
@@ -304,13 +315,14 @@ async function loadRecipes(fs: FilesystemPort): Promise<DataFileResult<RecipesFi
 
 /** Reads the five inputs through `fs`. Reads only; a refusal is carried as a value. */
 export async function loadTrackedCheckInputs(fs: FilesystemPort): Promise<TrackedCheckInputs> {
-  return {
-    tracked: await fs.readTextFile(TRACKED_PATH),
-    config: await loadConfig(fs),
-    catalogue: await loadCatalogueIds(fs),
-    weights: await loadWeights(fs),
-    recipes: await loadRecipes(fs),
-  };
+  const [tracked, config, catalogue, weights, recipes] = await Promise.all([
+    fs.readTextFile(TRACKED_PATH),
+    loadConfig(fs),
+    loadCatalogueIds(fs),
+    loadWeights(fs),
+    loadRecipes(fs),
+  ]);
+  return { tracked, config, catalogue, weights, recipes };
 }
 
 /** `packages/sync/src/curation/` → the repository root. */
