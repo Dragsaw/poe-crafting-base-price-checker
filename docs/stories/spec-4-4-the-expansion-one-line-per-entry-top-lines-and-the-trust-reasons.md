@@ -90,6 +90,34 @@ context:
 - Given a panel, when it is searched, then it holds no tooltip, no ellipsis and no hover state other than the ↗ accent.
 - Given `pnpm check`, when it runs, then it is green.
 
+### Review Findings
+
+Code review 2026-10-10 of `master...Dragsaw/story-4-4`, test files excluded at the user's request.
+
+- [x] [Review][Patch] The pruned line's reason line ignores the line's 16px right padding, so a long reason wraps 16px past the right edge of the lines above it (DESIGN.md `expansion-line.pruned`: "across the line's width") [packages/web/src/list/expansion/ExpansionLine.tsx:155]
+- [x] [Review][Patch] No test closes and reopens a panel to prove that both show-more toggles reset; a refactor that keeps the panel mounted or lifts the toggle state would pass the suite (Interactions 3, 7) [packages/web/src/list/expansion/open-set.test.tsx]
+- [x] [Review][Patch] The new deferred-work entry cites `packages/core/src/price-trust.ts:73`, a line number that drifts; cite `entryTrust` instead [docs/stories/deferred-work.md:81]
+
+**Rejected**
+
+- `false`: the review diff leaves out the tests. The user excluded them on purpose.
+- `false`: `retry_when: now` is not a checkable form. The sweep judges a free-text precondition from the repository (condition 6), and other entries use free text; `now` is trivially true.
+- spec edit: Triage Log row 2 says `[NOTE FOR UX]`, but the ledger entry carries no such tag. Rejected, because the fix edits the spec under review.
+- spec edit: the spec says `done` and sprint-status says `review`. Rejected, because the fix edits the spec; step 6 of this review syncs both.
+- spec edit: the Implementation Notes hold process history. Rejected, because the fix edits the spec under review.
+- `false`: the trust cell may not fit the worst case. Every line reason comes from `entryTrust`. The measured longest, `rough · priced 5 days ago · only 2 listings`, had 23px to spare, so a two-digit age adds about 7px and `pending · no Divine rate for its currency` is shorter.
+- `false`: a pinned Raw Base shows a bare `* pinned`. `ExpansionLine` handles that case on purpose (no space when the text is empty), and the output satisfies both spec rules.
+- `false` (blind, edge): `craftedDetail` drops a line whose `entryKey` is missing from the tracked map. `core` ranks from the same Tracked List that `App` passes as the crafted context, so the join cannot miss. The pattern also predates this change.
+- `false` (blind, edge): a below-threshold price may be missing or come from another league. `core` returns `current`/`rough` only for a priced active-league dataset entry (`entryTrust` → `resolvedPrice`), and `byKey` is built from the same dataset.
+- low/no harm: `key={row.key}` on the panels is misleading. The comment now names the unmount as the reset, and no harm is named.
+- `false`: `TrustCell` tests the same condition twice. The `trust.verdict === 'current'` test narrows the type for `VerdictMark` and `MARK_COLORS`.
+- no harm: `NAME_COLORS` is imported from `RankedRow`. This is a module-placement preference with no harm named.
+- `false`: `trackedByClass` copies the array on every insert, which is quadratic. Per-class entry counts are small and the copy predates this change, so it has no measurable cost.
+- low: an open row that moves to the other `Branch` (state 35 split) remounts its panel and resets its toggles. This is rare, and the fix (lifting the toggle state into `RankedList`) adds state surface.
+- `false`: `isGrown` survives a drop to 8 or fewer lines. The spec resets the toggles only when the panel closes, and Triage Log row 6 deleted that reset on purpose.
+- already deferred (edge, auditor): a no-listings line under a day prints `tried 0 days ago`. The new deferred-work entry covers it.
+- `false`: opened pruned lines sit between the two toggles. They are still the last lines, behind `+ N pruned`, which comes after `+ N more combinations` (Design Notes). The design reviewer agrees.
+
 ## Implementation Notes
 
 - The implementation subagent stalled twice on Serena MCP calls that never returned. The main session finished the tests with the built-in edit tools and converted 18 files that the subagent had saved with CRLF back to LF.

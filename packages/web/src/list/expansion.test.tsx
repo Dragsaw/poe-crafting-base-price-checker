@@ -11,6 +11,7 @@ import type { AffixPart } from './combination-text';
 import type { ClassDisplayRow, CraftedCombination, PrunedCombination } from './display-rows';
 import { ClassExpansionPanel } from './ExpansionPanel';
 import { BELOW_THRESHOLD_NOTE, CURATION_MARKS, ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, moreLinesCopy, prunedCopy } from './format';
+import { RankedList } from './RankedList';
 import { NAME_COLORS } from './RankedRow';
 import { MISSING_FIGURE } from './row/ExpectedValueCell';
 import { TRUST_JOINER } from './row/trust-words';
@@ -213,5 +214,26 @@ describe('the expansion panel', () => {
     rerender(panel(classRow(11, 0)));
     expect(linesIn(view)).toHaveLength(11);
     expect(showMore(view, 'lines')?.textContent).toBe(FEWER_LINES_COPY);
+  });
+
+  // Interactions 3, 7: closing the row resets both toggles.
+  it('reopens with the remainder and the pruned lines closed', () => {
+    const view = mount(
+      <PageProvider>
+        <RankedList rows={[classRow(11, 2)]} activeLeague="Forbidden Rites" />
+      </PageProvider>,
+    );
+    click(rowsIn(view)[0]);
+    click(showMore(view, 'lines'));
+    click(showMore(view, 'pruned'));
+    expect(view.querySelectorAll('[data-pruned-line]')).toHaveLength(2);
+
+    click(rowsIn(view)[0]);
+    expect(panelsIn(view)).toHaveLength(0);
+    click(rowsIn(view)[0]);
+    expect(linesIn(view)).toHaveLength(TOP_LINES);
+    expect(showMore(view, 'lines')?.textContent).toBe(moreLinesCopy(3));
+    expect(showMore(view, 'pruned')?.textContent).toBe(prunedCopy(2, false));
+    expect(view.querySelectorAll('[data-pruned-line]')).toHaveLength(0);
   });
 });

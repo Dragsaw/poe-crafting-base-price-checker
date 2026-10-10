@@ -5,7 +5,7 @@ import type { CSSProperties, JSX } from 'react';
 
 import { MARK_COLORS, TradeLinkMark, VerdictMark } from '../../marks/marks';
 import { formatDivine } from '../../shared/money';
-import { colors, expansionLineGrid, typeStyle } from '../../theme/tokens';
+import { colors, expansionLineGrid, expansionLineWidths, typeStyle } from '../../theme/tokens';
 import type { AffixPart } from '../combination-text';
 import { BELOW_THRESHOLD_NOTE, CURATION_MARKS } from '../format';
 import { MISSING_FIGURE } from '../row/ExpectedValueCell';
@@ -152,7 +152,10 @@ export function PrunedLine({ text, reason }: { readonly text: readonly AffixPart
         <div data-cell="trust" />
         <div data-cell="trade-link" />
       </div>
-      <div data-prune-reason="" style={{ ...typeStyle('note'), color: colors['text-tertiary'] }}>
+      <div
+        data-prune-reason=""
+        style={{ ...typeStyle('note'), paddingRight: expansionLineWidths.paddingRight, color: colors['text-tertiary'] }}
+      >
         {reason}
       </div>
     </div>
