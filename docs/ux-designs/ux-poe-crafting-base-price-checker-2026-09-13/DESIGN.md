@@ -304,7 +304,7 @@ components:
   expansion-panel:
     join: 'flush under its open row, no gap, no rule between'
     background: '{colors.surface}'
-    borderBottom: '1px solid {colors.line}'
+    borderBottom: '1px solid {colors.line}; none under the last row (Density)'
     padding: '6px 0 14px {spacing.expansion-indent}'
     bar: 'the row''s inset {spacing.open-row-bar} {colors.accent} bar continues down the panel'
     title: 'none, and no sub-line (memlog 258 N-11)'
@@ -631,7 +631,11 @@ a trailing ellipsis, and nothing else.
 
 **Density.** Ranked rows and expansion lines are uniform. One `{colors.line}`
 hairline separates each one from the next. There is no zebra striping. The last
-row of a list has no rule below it. Only a pruned line's reason line adds height.
+row of a list has no rule below it, and neither does a row directly above
+show-more. An open last row's expansion panel draws no rule either. Show-more
+does not count as a row. When a raw branch is followed directly by the crafted
+branch (state 35), the raw branch's last row keeps its rule. Only a pruned
+line's reason line adds height.
 
 **An open row does not move the grid.** The open-row bar is an inset box-shadow
 inside the row. It takes no width, so no column moves when a row opens.
