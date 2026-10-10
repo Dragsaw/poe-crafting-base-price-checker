@@ -10,7 +10,7 @@ import {
 } from '@poe/contracts';
 import { classKeyOf, type Ranking, type UnrankedEntry } from '@poe/core';
 
-import { formatDivine } from '../shared/money';
+import { formatDivine, MINUS } from '../shared/money';
 import { combinationText, type AffixPart, type StatTexts } from './combination-text';
 import { unitLabel } from './format';
 import type { ActiveRanking } from './active-ranking';
@@ -31,8 +31,10 @@ function hasNoFigure(trust: PriceTrust): boolean {
   return trust.verdict === 'pending' || trust.verdict === 'broken';
 }
 
+/** The dim rides the printed minus sign, never tone alone (EXPERIENCE.md Accessibility Floor, NFR-10). */
 function figure(expectedValue: number): ExpectedValueCell {
-  return { kind: 'figure', text: formatDivine(expectedValue), negative: expectedValue < 0 };
+  const text = formatDivine(expectedValue);
+  return { kind: 'figure', text, negative: text.startsWith(MINUS) };
 }
 
 /** One Raw Base row as the view prints it. Nothing here is a ranking term: `core` ordered it. */
@@ -114,6 +116,11 @@ export const CHASE_CELLS = 3;
 
 /** Any row of the list. */
 export type ListRow = DisplayRow | ClassDisplayRow;
+
+/** ≈ qualifies a printed figure, so a `—` cell carries none (state 12). */
+export function hasEstimate(row: ListRow): boolean {
+  return row.unit === 'class' && row.provenance === 'uniform-prior' && row.ev.kind === 'figure';
+}
 
 /** The list's rows in branches: one branch, or in state 35 the raw branch then the crafted branch. */
 export type ListBranches = readonly (readonly ListRow[])[];

@@ -1,3 +1,4 @@
+import { canonicalKey } from '@poe/contracts';
 import type { CrossFileFailure, Ranking } from '@poe/core';
 import { useCallback, useState, type ReactNode } from 'react';
 
@@ -67,6 +68,7 @@ export function readyControls(input: ReadyControlsInput): ReadyControls {
   const problems = problemSummary(set.dataset.entries, set.syncReport, {
     pinnedCount: set.tracked.entries.filter((entry) => entry.status === 'pinned').length,
     minChunkSearches: set.config.minChunkSearches,
+    prunedKeys: new Set(set.tracked.entries.filter((entry) => entry.status === 'pruned').map((entry) => canonicalKey(entry))),
   });
   const panel = input.isReportOpen ? (
     <SyncReportPanel

@@ -1,10 +1,6 @@
 /*
- * The few rules inline styles cannot express: hover states. Every value is a
- * token custom property (`--fg-color-*`, set by theme.ts from tokens.ts), so
- * this file holds no colour of its own. No transition, no shadow.
- * The shared affordance, the ranked row and the header controls keep their
- * rules next to their components (`shared/affordance.css`, `list/list.css`,
- * `threshold/threshold.css`, `recipe/recipe.css`).
+ * Hover states only: inline styles cannot express them. Every value is a token
+ * custom property, so this file holds no colour of its own. No transition, no shadow.
  */
 
 /*

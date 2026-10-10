@@ -112,6 +112,13 @@ describe('the expansion panel', () => {
     expect(context?.querySelector<HTMLElement>('[data-context-name]')?.style.color).toBe(rgb(NAME_COLORS.class));
   });
 
+  it('ends a uniform-prior row’s context line at the name when its EV is `—`', () => {
+    const pending: PriceTrust = { verdict: 'pending', reasons: [{ kind: 'no-prices' }] };
+    const view = mount(panel(classRow(1, 0, { provenance: 'uniform-prior', ev: { kind: 'missing' }, trust: pending })));
+    expect(view.querySelector('[data-context-line]')?.textContent).toBe('Rings');
+    expect(view.querySelector('[data-context-estimate]')).toBeNull();
+  });
+
   it('gives each line the expansion-line grid, one line high', () => {
     const belt = rawEntry('Wide Belt');
     const line = openOne(belt, priced(belt, 0.8, hoursBefore(NOW, 11), { search: SEARCH }));

@@ -1,8 +1,6 @@
 /*
- * `{components.recipe-toggle}`'s segments. Only an inactive segment is a
- * target: text-secondary at rest, text on hover, the raised step while
- * pressed. The active segment takes the accent-soft fill and accent text at
- * 600, with no hover and no pointer. Token custom properties only.
+ * `{components.recipe-toggle}`. The active segment names the current recipe,
+ * not an action, so it takes no hover and no pointer.
  */
 
 .fg-recipe-segment {

@@ -85,7 +85,7 @@ action_items:
     action: "Exclude pruned entries from the broken-entry problem count with a test
       (R1); architect amends the AD-12 Broken entries source row to non-pruned"
     owner: "dev + architect"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-2-make-the-state-23-all-broken-test-read-t"
     epic: 4

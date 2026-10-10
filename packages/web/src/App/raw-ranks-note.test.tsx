@@ -37,7 +37,7 @@ const valuelessPools = (suffixCoverage: string) => ({
   suffix: slot(suffixCoverage, [tier(SUFFIX_STAT, 1, [])]),
 });
 
-/** One world for matrix rows 1 to 4 of Story 4.8, under the frozen fixture's two recipes. */
+/** One world under the frozen fixture's two recipes. */
 function serveWorld(): ReturnType<typeof serveArtifacts> {
   const seen = hoursBefore(Date.now(), 1);
   const bowBase = rawEntry('Advanced Dualstring Bow', 82, BOWS);
