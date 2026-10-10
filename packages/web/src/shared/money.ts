@@ -6,6 +6,9 @@ export const MONEY_DECIMALS = 2;
 /** The figure a present but too-small value prints. It is a quantity, not a money slot. */
 export const BELOW_PRINTABLE = '< 0.01';
 
+/** The figure a loss too small to print takes. It is a quantity, not a money slot. */
+export const LOSS_BELOW_PRINTABLE = '< 0.00';
+
 /** A value at the page's money precision, with no floor. A negative that rounds to zero prints `0.00`, never `-0.00`. */
 function formatTwoDecimals(value: number): string {
   const text = value.toFixed(MONEY_DECIMALS);
@@ -20,10 +23,13 @@ export function formatThreshold(value: number): string {
 /** The sign a negative figure takes: U+2212, never a hyphen (EXPERIENCE.md, Money). */
 export const MINUS = '\u{2212}';
 
-/** EV and price at 2dp. A value `0 < v < 0.005` would print `0.00`, so it prints `< 0.01`. */
+/** EV and price at 2dp. A value that would print `0.00` prints `< 0.01`, or `< 0.00` when negative; `-0` stays `0.00`. */
 export function formatDivine(value: number): string {
   if (value > 0 && value < 0.005) {
     return BELOW_PRINTABLE;
+  }
+  if (value < 0 && value > -0.005) {
+    return LOSS_BELOW_PRINTABLE;
   }
   const text = formatTwoDecimals(value);
   return text.startsWith('-') ? `${MINUS}${text.slice(1)}` : text;

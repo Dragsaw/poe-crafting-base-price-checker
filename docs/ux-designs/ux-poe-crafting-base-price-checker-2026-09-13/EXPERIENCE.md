@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 27
+revision: 29
 created: 2026-09-13
 updated: 2026-10-10
 sources:
@@ -81,13 +81,6 @@ row of this folder's `.memlog.md` that holds the decision.
 - The reason string that a recipe-scoped Unrankable would need (state 36). The PRD
   owns that extension.
 
-**Known gaps** (memlog 279, 288). Nobody ruled on these, and this document does
-not invent an answer now. The owner is UX. Each gap has a
-`docs/stories/deferred-work.md` entry (memlog 288).
-
-- The failure paths of UJ-3, UJ-4 and UJ-5.
-- The show-more affordance when the list has 20 rows or fewer.
-
 ## Information Architecture
 
 One surface. Everything below is a region of it, in fixed vertical order.
@@ -99,7 +92,7 @@ One surface. Everything below is a region of it, in fixed vertical order.
 | `{components.list-statement}` | States 23, 25 and 35 | One plain declarative above the column header |
 | `{components.column-header}` + twenty `{components.ranked-row}` | Always visible | The product. Crafted rows name an **Item Class**, and Raw Base rows name a **Base Type**, in one list (FR-3). UJ-1, UJ-2, UJ-4 |
 | `{components.expansion-panel}` | Interaction 2 | Every Tracked Entry on that Item Class, or the one entry that a Raw Base names. UJ-3, UJ-5 |
-| `{components.show-more}` (list) | Below row 20 | The remainder of the ranked list (FR-5; Interaction 4) |
+| `{components.show-more}` (list) | Below row 20, past 20 rows only | The remainder of the ranked list (FR-5; Interaction 4) |
 | `{components.unrankable-appendix}` | Foot, above the footer | **Item Classes** kept out of the ordering, with their reason and count (FR-4). Every row is an Item Class. A Raw Base needs no Eligible Pool and ranks regardless |
 | `{components.footer-legend}` | Foot | How to read the marks, the asking-price sentence, and where curation happens. It is the only place where the page says where curation happens. It renders in every state except the failure screens |
 
@@ -194,7 +187,7 @@ not ship.
 | Divine | Spelled out in the EV header. `div` after a figure in the header bar and the tooltip. A row figure carries no unit |
 | Item Level Floor | The floor that FR-3 fixes, inside the sell-as-is line |
 | Price State and its `not-yet-synced` reasons | A price-trust mark and a reason (Epistemics, *Price trust*). The enum values never print |
-| Provenance (AD-10; internal only) | Never printed. `measured` prints nothing. `uniform-prior` prints ≈. `absent` prints its appendix reason and nothing else |
+| Provenance (AD-10; internal only) | Never printed. `measured` prints nothing. `uniform-prior` prints ≈ beside a figure, never beside `—` (*Estimated odds*). `absent` prints its appendix reason and nothing else |
 | Curation Status | `* pinned` and `† pruned`. `active` prints nothing |
 | Sync Report | Opened by the sync button |
 | Weights File, `generatedAt`, `gamePatch`, Tracked List edit date | Inside the sync report (Copy Deck) |
@@ -259,7 +252,9 @@ derivation lives (memlog 233).
 the threshold alike. `core` stores figures at 4 decimal places, and the page
 rounds each figure once, for display. A figure that is present and non-zero but
 rounds to `0.00` prints **`< 0.01`**. That is a quantity, not a missing figure. A
-negative figure takes the minus sign U+2212, not a hyphen.
+negative figure takes the minus sign U+2212, not a hyphen. A negative figure that
+rounds to `0.00` prints **`< 0.00`**, dimmed: a loss too small to print (memlog
+289).
 
 **Craft Cost prints once**, beside the recipe (memlog 182, 258 N-16; FR-26). The
 player checks every crafted EV against it. Where the recipe is **uncostable**, the
@@ -710,6 +705,9 @@ odds are estimated*. ≈ and ◐ share one colour and differ in shape (DESIGN.md
 - **≈ does not mean the pool is invented.** It states that something in the set is
   estimated. The cue, the context line and the tooltip must not say more.
 - **A Raw Base never carries ≈**, because it rests on no modifier pool (FR-4).
+- **≈ sits only beside a figure** (memlog 290). A `uniform-prior` row whose EV cell
+  is `—` (pending, broken or uncostable) carries no ≈, and its context line ends at
+  the name. ≈ qualifies a figure, and `—` has none to qualify.
 - AD-10's `absent` value cannot reach a ranked row. A `partial` pool makes the Item
   Class Unrankable, and the appendix prints its reason alone (state 13).
 
@@ -729,8 +727,8 @@ A missing price never holds a number-shaped placeholder (memlog 43, 258 N-5).
   *which* question is open, so the dash cannot read as worthless (FR-9).
 - **Where no mark sits beside the slot, a phrase holds it.** The Craft Cost slot of
   an uncostable recipe reads `no figure yet` (state 35).
-- Never `0`, never `0.00`, never blank. `< 0.01` is a quantity. A negative EV is a
-  known figure, dimmed but printed (state 21).
+- Never `0`, never `0.00`, never blank. `< 0.01` and `< 0.00` are quantities. A
+  negative EV is a known figure, dimmed but printed (state 21).
 - `no-listings` is an open question, never an answer that a Combination is junk.
   Listings cannot tell a jackpot from junk.
 
@@ -804,7 +802,7 @@ number.
 | 9 | Curation Status `pinned` | Expansion line | `* pinned` **leads** the line, ahead of tier plus short form (memlog 199). **It is a lookup key, not a badge.** The starvation problem names no entries, so this mark is what the player scans open panels for |
 | 10 | Curation Status `pruned` | Inside the expansion, behind `+ N pruned` | Collapsed by default (memlog 25; Interaction 3). When opened: the Combination struck through, `† pruned`, price `—`, and a **second line that carries the prune reason alone** (memlog 116, 234, 258 N-3). No age, because a prune is a decision, not a reading of either clock. No trade link |
 | 11 | Odds `measured` | Ranked row | Nothing before the EV. The absence is the statement |
-| 12 | Odds `uniform-prior` | Ranked row + expansion | ≈ before the EV (*Estimated odds*). Its expansion opens with the ≈ context line (Copy Deck) |
+| 12 | Odds `uniform-prior` | Ranked row + expansion | ≈ before the EV (*Estimated odds*). Its expansion opens with the ≈ context line (Copy Deck). An EV cell of `—` takes no ≈, and its context line ends at the name |
 | 12a | Raw Base odds | Ranked row | **Nothing.** A Raw Base needs no Eligible Pool (FR-4), so no odds value reaches it. Not a gap |
 | 13 | Odds `absent` | Appendix only | The row prints its FR-4 reason and **no mark** (memlog 258 N-9) |
 | 14 | Unrankable, `pool partial` | Appendix | Reason verbatim, plus its note (Copy Deck) |
@@ -815,7 +813,7 @@ number.
 | 18 | Pending row | Ranked row | ○ in the mark slot, EV `—`. Raw Base: its entry is pending, and the tooltip carries the entry's reason. Crafted: no combination is priced, reason `no prices yet`. This holds in every state, not only in state 23 (memlog 265). States 35 and 43 take their own reasons (*Price trust*) |
 | 19 | Retired (memlog 256) | — | The global estimated-odds banner, its dismiss control and its copy are retired. ≈ is per row only (state 12) |
 | 20 | Below-threshold entry | Expansion line | **Dimmed**, with `below threshold` in the trust cell and no mark (memlog 258 N-3). Shown, never hidden (FR-8). **It prints only `below threshold`**, even when its price is also unreliable (memlog 265) |
-| 21 | Item Class with no qualifying Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and prints at 2 decimal places, **dimmed** (memlog 258 N-20). It is a known figure and bad news, not missing news. Thus it is never `—` and never a phrase. It is **ranked, not Unrankable** (FR-1) |
+| 21 | Item Class with no qualifying Combination | Ranked row | Chase cells empty. Its EV is negative by its Craft Cost and prints at 2 decimal places, **dimmed** (memlog 258 N-20), or `< 0.00` when it rounds to zero (*Money*). It is a known figure and bad news, not missing news. Thus it is never `—` and never a phrase. It is **ranked, not Unrankable** (FR-1) |
 | 22 | Cold load / skeleton | Whole page | `{components.header-bar}`, the column header with its final labels, and twenty skeleton rows paint at once in the final layout. The eyebrow stays blank until the league is known (memlog 211). The page never jumps (memlog 50). `[ASSUMPTION — memlog 51]` Every artifact resolves in a **single transition**, never row by row |
 | 23 | Honest empty: league reset | Whole list | (memlog 48) Every tracked unit, every Item Class and every Raw Base, renders in **canonical order**. The list refills over the following day. `[ASSUMPTION — memlog 49]` Rank numerals are **suppressed**, and the list statement says that the order is canonical (Copy Deck). Every row reads ○ pending, or ✕ broken for a broken entry, and every EV cell reads `—` (memlog 257). After a pure reset, the pending reason is `price from last league`. After a mixed reset, some rows carry a new-league reason such as `no listings found`. Each expansion keeps its entries' own reasons. The statement drops `yet` when every listed row is broken, and keeps it while one row is pending. It names no cause, because the sync button's count already carries broken entries |
 | 24 | Partially refreshed dataset | Whole list | Renders normally. Per-row price trust makes that honest. No global "stale" treatment |
@@ -892,7 +890,9 @@ identifiers.
    because the remainder holds both units. It is reversible. It grows the list in
    place to the full ranked length, and a second click restores the top 20
    exactly. `core` ranks the full Tracked List and the page truncates. Thus the
-   threshold and the recipe reorder across everything (FR-5).
+   threshold and the recipe reorder across everything (FR-5). A list of 20 rows or
+   fewer shows them all, with no affordance, and the appendix follows the last row
+   (memlog 291), as a short panel does (state 39).
 
 5. **Open the sync report.** Click `{components.sync-button}` (memlog 254,
    258 N-7). The panel opens in place under the header bar and pushes the list
@@ -1020,7 +1020,7 @@ What does bind:
     in place of chase combinations (memlog 258 N-13). On a Raw Base's expansion,
     by its lone entry.
   - **Rank emphasis, dimmed figures and below-threshold lines**: by weight, the
-    minus sign and the words `below threshold`, never by tone alone.
+    minus sign or `< 0.00`, and the words `below threshold`, never by tone alone.
 - **Rendered text, not raw ids.** A `statId` renders as its catalogue display text
   without a runtime call (FR-33, AD-25; memlog 86). The denomination is text, and
   AD-24 owns where its label comes from (memlog 229). The marks are inline SVG
@@ -1154,6 +1154,11 @@ is already under their hand in the header (memlog 204).
 7. **Climax:** the second rank stops being a claim and becomes an argument they can
    check. They accept it or not, on evidence they just read.
 
+Failure path (memlog 292): the row they open has no evidence yet. Every line is
+pending, broken or below threshold (states 18, 41, 20 and 21). The panel cannot
+argue the rank. It prints each line with its own reason and clock, so the player
+reads *not checkable yet*, never *worthless* (FR-9).
+
 ### UJ-4 — The trust check
 
 → Steps 2 and 3 come from the specimen box of
@@ -1174,6 +1179,11 @@ is already under their hand in the header (memlog 204).
 6. **Climax:** they discount that Item Class rather than act on it. The page did
    not hide the weakness and did not apologise for it. It refused to look more
    confident than its data deserved.
+
+Failure path (memlog 292): the suspicious row's mark slot is empty, and no ≈ sits
+before its EV. Silence means healthy (Epistemics), so the page has nothing more to
+say. The player's last check is the live listing: they open the row and follow the
+↗ on the line that carries the figure (Interaction 6).
 
 *One mark that the player will not find, and should not look for.* A Raw Base never
 carries ≈, because it rests on no modifier pool (FR-4). Its trust lives entirely in
@@ -1211,6 +1221,11 @@ The *edit* happens in a text editor and git.
    time they open the page, the button reads its age again, and the entries they
    pruned are behind `+ N pruned`.
 
+Failure path (memlog 292): no `sync-report.json` is published (*The sync report*).
+The button still turns red on broken entries, and Problems still lists them, but
+every report figure reads `unknown`. The player finds the entries through the
+panels, as in step 4, and edits the file as before.
+
 What stays unsupported: the edit itself. `data/tracked.json` is hand-owned (AD-15,
 AD-3). The player does this a handful of times a league.
 
@@ -1233,13 +1248,17 @@ AD-3). The player does this a handful of times a league.
    finished. They watch the recovery happen. At no point does the page serve last
    league's numbers as this league's.
 
+Failure path (memlog 292): the player opens the page before they edit the active
+league in `data/config.json`. The header eyebrow still names last league (Copy
+Deck), and the ranking is last league's. The eyebrow is the signal, and step 1 is
+the fix.
+
 ## Coverage Self-Check
 
 - **Flow coverage: complete.** All six PRD journeys (UJ-1 to UJ-6) have a Key Flow
-  with numbered steps and a climax beat. Failure paths: UJ-1 and UJ-2. The other
-  failure paths are known gaps (Foundation). UJ-5's partial support and UJ-6's
-  honest-empty landing are stated as such. The protagonist is "the player" by
-  override (memlog 21).
+  with numbered steps, a climax beat and a failure path (memlog 292). UJ-5's
+  partial support and UJ-6's honest-empty landing are stated as such. The
+  protagonist is "the player" by override (memlog 21).
 - **State coverage: 45 numbered rows, 44 live.** States 1–43 plus 12a and 15a.
   State 19 is retired (memlog 256). States 42 and 43 cover one published recipe
   and none (memlog 275).

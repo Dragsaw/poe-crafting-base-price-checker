@@ -9,6 +9,9 @@ import { readStandardInput, run } from './lint-on-edit.ts';
 /** Returns the `tsc -b` diagnostics as text, or an empty string when the build is clean. */
 export type Typecheck = () => Promise<string>;
 
+/** Returns the uncommitted paths (staged, unstaged, untracked), or undefined when git fails. */
+export type ListChanged = () => Promise<readonly string[] | undefined>;
+
 export interface StopResult {
   /** 2 blocks the stop and hands the report to the agent; 1 shows it to the user only. */
   readonly code: 0 | 1 | 2;
@@ -25,8 +28,30 @@ export function isRepeatStop(stdin: string): boolean {
   }
 }
 
+/** Parses `git status --porcelain=v1 -z`; a rename or copy record carries its source path as the next field. */
+export function parsePorcelain(text: string): string[] {
+  const fields = text.split('\0');
+  const paths: string[] = [];
+  for (let index = 0; index < fields.length; index += 1) {
+    const field = fields[index] ?? '';
+    if (field.length < 4) {continue;}
+    paths.push(field.slice(3));
+    if (!/[RC]/.test(field.slice(0, 2))) {continue;}
+    paths.push(fields[index + 1] ?? '');
+    index += 1;
+  }
+  return paths;
+}
+
+/** A tsconfig edit changes the build as much as a source edit does. */
+export function isTypescriptInput(file: string): boolean {
+  return /\.[cm]?tsx?$/.test(file) || /(^|\/)tsconfig[^/]*\.json$/.test(file);
+}
+
 /** A repeat stop with errors left does not block again, or an unfixable error would loop the agent. */
-export async function runStopHook(stdin: string, typecheck: Typecheck): Promise<StopResult> {
+export async function runStopHook(stdin: string, typecheck: Typecheck, listChanged: ListChanged): Promise<StopResult> {
+  const changed = await listChanged();
+  if (changed?.every((file) => !isTypescriptInput(file)) === true) {return { code: 0, report: '' };}
   const output = await typecheck();
   const findings = output.trim();
   if (findings === '') {return { code: 0, report: '' };}
@@ -45,10 +70,22 @@ export function realTypecheck(root: string): Typecheck {
   };
 }
 
+/** A git failure gives undefined, so the hook typechecks rather than skip. */
+export function realListChanged(root: string): ListChanged {
+  return async () => {
+    try {
+      const result = await run('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all'], root);
+      return result.code === 0 ? parsePorcelain(result.stdout) : undefined;
+    } catch {
+      return;
+    }
+  };
+}
+
 if (isInvokedDirectly(import.meta.url)) {
   try {
     const root = path.resolve(import.meta.dirname, '../..');
-    const result = await runStopHook(await readStandardInput(), realTypecheck(root));
+    const result = await runStopHook(await readStandardInput(), realTypecheck(root), realListChanged(root));
     if (result.report !== '') {process.stderr.write(`${result.report}\n`);}
     process.exitCode = result.code;
   } catch (error) {

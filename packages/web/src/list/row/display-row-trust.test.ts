@@ -81,7 +81,7 @@ describe('the trust each row carries', () => {
     [{ verdict: 'broken', reasons: [{ kind: 'all-broken' }] }, -0.03, 'missing', false],
     [{ verdict: 'pending', reasons: [{ kind: 'uncostable' }] }, undefined, 'missing', false],
     [{ verdict: 'current', reasons: [] }, -0.03, `${MINUS}0.03`, true],
-    [{ verdict: 'current', reasons: [] }, -0.003, '0.00', false],
+    [{ verdict: 'current', reasons: [] }, -0.003, '< 0.00', true],
     [{ verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 74 }] }, 1.5, '1.50', false],
   ] as const)('prints a crafted %j row at EV %s as %s', (trust, expectedValue, printed, isNegative) => {
     const own: PriceTrust = { verdict: trust.verdict, reasons: [...trust.reasons] };
