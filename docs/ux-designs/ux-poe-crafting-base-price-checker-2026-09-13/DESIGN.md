@@ -6,9 +6,9 @@ description: >-
   The game's rarity colours say what each row is, bronze marks what the player
   can operate, and every other colour appears only when a price needs attention.
 status: final
-revision: 19
+revision: 20
 created: 2026-09-13
-updated: 2026-10-04
+updated: 2026-10-10
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -344,11 +344,11 @@ components:
     borderTop: '1px solid {colors.line-strong}'
     title: '{typography.row-name} in {colors.text}; the count in {colors.text}, never an attention colour (memlog 258 N-9)'
     lead: '{typography.note} in {colors.text-secondary}'
-    row: '{spacing.line-height-expansion} tall, 1px {colors.line} between rows, last row without a rule'
+    row: 'at least {spacing.line-height-expansion} tall, a wrapped note grows it; 1px {colors.line} between rows, last row without a rule'
     grid: 'item class {spacing.col-name} (after a blank {spacing.col-rank}) · reason {spacing.expansion-trust-cell} · note 1fr, gap {spacing.col-gap}'
     itemClass: '{typography.line-text} in {colors.rarity-magic}'
     reason: '{typography.line-text} in {colors.text-secondary}, no mark'
-    note: '{typography.note} in {colors.text-tertiary}'
+    note: '{typography.note} in {colors.text-tertiary}, padding 4px 0; the one cell that wraps, never cut'
     empty: 'the title alone'
   footer-legend:
     marginTop: '28px'
@@ -827,7 +827,7 @@ states 26 and 28, owns the causes and the copy.
 | Open the sync report and a ranked row in place, pushing the page down | Put either in an overlay, a dropdown, a modal or a drawer |
 | Keep tooltips for explanation only, left-aligned | Put an action, a link or a control in a tooltip |
 | Carry rank emphasis with weight and the rank numeral's colour | Make a top-ranked row taller or its type larger |
-| Hold every ranked row at `{spacing.row-height}` and every expansion line at `{spacing.line-height-expansion}`. A pruned line's reason line is the one addition | Vary row height by rank, content or state |
+| Hold every ranked row at `{spacing.row-height}` and every expansion line at `{spacing.line-height-expansion}`. A pruned line's reason line is the one addition. An appendix row is the one exception: a wrapped note grows it past `{spacing.line-height-expansion}` | Vary row height by rank, content or state |
 | Reserve `{spacing.mark-slot}` on every row | Let figures shift when a mark appears |
 | Print `—` for a missing price only beside a mark | Print `0`, `0.00` or a blank where a figure is missing, or a `—` with no mark to explain it |
 | Print the uncostable phrase in the Craft Cost slot | Cost an uncostable recipe at zero |

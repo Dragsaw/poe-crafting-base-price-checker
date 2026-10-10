@@ -45,8 +45,8 @@ const SAMPLES: Readonly<Record<PriceTrustReason['kind'], { readonly reason: Pric
 };
 
 describe('the reason words of a ranked row', () => {
-  it('reads EXPERIENCE.md revision 25', () => {
-    expect(experience).toMatch(/^revision: 25$/m);
+  it('reads EXPERIENCE.md revision 26', () => {
+    expect(experience).toMatch(/^revision: 26$/m);
   });
 
   it('samples every reason kind core can return', () => {

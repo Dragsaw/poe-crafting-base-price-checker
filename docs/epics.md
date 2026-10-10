@@ -2486,7 +2486,7 @@ The player reads the same ranked list on a dark, rarity-coloured page. Silence m
 
 **Source of truth.** `EXPERIENCE.md` revision 25 and `DESIGN.md` revision 19 replace the paper direction. Every acceptance criterion cites a state number or a section of those documents and copies no string, threshold or token value. PRD revision 27 holds the promises (FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25, NFR-10). `ARCHITECTURE-SPINE.md` revision 32 holds the decisions: AD-17 *Price trust*, AD-12's problem-count sources and the Stack table's Inter entry.
 
-**Order.** 4.1, then 4.2, then 4.3 to 4.5, then 4.6. `pnpm check` is green after each story.
+**Order.** 4.1, then 4.2, then 4.3, then 4.7 and the re-check of the pruned `tracked.json` entries, then 4.4 to 4.6, then 4.8. `docs/sprint-change-proposal-2026-10-10.md` *Order* owns the place of 4.7 and the re-check. Story 4.8 follows 4.6 because it closes an open question that 4.6 left. `pnpm check` is green after each story.
 
 **Known gaps.** `EXPERIENCE.md` *Foundation*, *Open items* lists the gaps that it leaves to the build stories. A story that touches one raises it and does not settle it silently.
 
