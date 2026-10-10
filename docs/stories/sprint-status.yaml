@@ -101,7 +101,7 @@ action_items:
       EV (R7), no -0.00 (R8), trim the CSS header comments and story-id test comments
       (A6, A7)"
     owner: "dev"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-4-flip-4-1-4-2-4-6-4-8-to-done-in-sprint-s"
     epic: 4

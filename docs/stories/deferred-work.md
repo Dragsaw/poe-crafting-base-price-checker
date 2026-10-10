@@ -31,19 +31,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
 
-## Deferred from: spec-epic-4-retro-item-3-small-web-fixes (2026-10-10)
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
-  summary: "[NOTE FOR UX] Rule the printed form of a negative EV in (−0.005, 0). EXPERIENCE.md *Money* says a non-zero figure that rounds to `0.00` prints `< 0.01`, and states 21 and 25 say a negative EV is dimmed. `formatDivine` prints `0.00` for such a value, and the row is now undimmed because the dim follows the printed minus sign (NFR-10). Options: an unsigned `< 0.01` (undimmed), or a signed `−< 0.01` (dimmed)."
-  evidence: `packages/web/src/shared/money.ts` `formatDivine` guards only `0 < v < 0.005`; `money.test.ts` asserts `formatDivine(-0.003)` is `0.00` (Epic 3 item 5). `packages/web/src/list/display-rows.ts` `figure()`. Raised by the impeccable design review and the blind hunter on this spec. Reachable only when a Craft Cost or a net EV is below 0.005 div.
-  retry_when: never — needs a human
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
-  summary: "[NOTE FOR UX] Write the R7 ruling into EXPERIENCE.md *Estimated odds* and state 12: a uniform-prior row whose EV cell is `—` (pending, broken, uncostable) carries no ≈, and its expansion context line ends at the name. Today the text says every uniform-prior row prints ≈."
-  evidence: Epic 4 retro R7 and action item 3 (`docs/stories/epic-4-retro-2026-10-10.md`). The code now gates both the EV cell and the context line on `hasEstimate` in `packages/web/src/list/display-rows.ts`. EXPERIENCE.md *Provenance* row (`uniform-prior` prints ≈) and state 12 have no exception for a `—` cell.
-  retry_when: never — needs a human
-
-
 ## Deferred from: epic 4 retro item 5 (2026-10-10)
 
 - source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
@@ -60,3 +47,9 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: UX reconciles the EXPERIENCE.md Coverage Self-Check failure-path sentence with *Known gaps*, ruling whether UJ-6 has a failure path.
   evidence: EXPERIENCE.md Coverage Self-Check says failure paths other than UJ-1 and UJ-2 are known gaps, which covers UJ-6, but *Known gaps* lists only UJ-3 to UJ-5 (memlog 279). Pre-existing; review finding 10 of this spec.
   retry_when: never — needs a human
+
+## Deferred from: UX ruling on spec-epic-4-retro-item-3-small-web-fixes R8 (2026-10-10)
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
+  summary: Print a negative EV or price in (−0.005, 0) as `< 0.00`, dimmed, per EXPERIENCE.md *Money* and state 21 (UX memlog 289). Today it prints `0.00`, undimmed.
+  evidence: `packages/web/src/shared/money.ts` `formatDivine` guards only `0 < v < 0.005`, and `money.test.ts` asserts `formatDivine(-0.003)` is `0.00`. `packages/web/src/list/display-rows.ts` `figure()` derives `negative` from the U+2212 sign, so it must also dim `< 0.00`. EXPERIENCE.md revision 28.
