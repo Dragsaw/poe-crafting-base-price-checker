@@ -47,9 +47,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: UX reconciles the EXPERIENCE.md Coverage Self-Check failure-path sentence with *Known gaps*, ruling whether UJ-6 has a failure path.
   evidence: EXPERIENCE.md Coverage Self-Check says failure paths other than UJ-1 and UJ-2 are known gaps, which covers UJ-6, but *Known gaps* lists only UJ-3 to UJ-5 (memlog 279). Pre-existing; review finding 10 of this spec.
   retry_when: never — needs a human
-
-## Deferred from: UX ruling on spec-epic-4-retro-item-3-small-web-fixes R8 (2026-10-10)
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
-  summary: Print a negative EV or price in (−0.005, 0) as `< 0.00`, dimmed, per EXPERIENCE.md *Money* and state 21 (UX memlog 289). Today it prints `0.00`, undimmed.
-  evidence: `packages/web/src/shared/money.ts` `formatDivine` guards only `0 < v < 0.005`, and `money.test.ts` asserts `formatDivine(-0.003)` is `0.00`. `packages/web/src/list/display-rows.ts` `figure()` derives `negative` from the U+2212 sign, so it must also dim `< 0.00`. EXPERIENCE.md revision 28.
