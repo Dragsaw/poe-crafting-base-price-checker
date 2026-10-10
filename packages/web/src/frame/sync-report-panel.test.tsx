@@ -15,7 +15,7 @@ type SyncReport = Parsed<'syncReport'>;
 afterEach(unmount);
 
 const REPORT = VALID_BODIES.syncReport as SyncReport;
-const CURATION = { pinnedCount: 2, minChunkSearches: 1 };
+const CURATION = { pinnedCount: 2, minChunkSearches: 1, prunedKeys: new Set<string>() };
 const STARVED = {
   kind: 'pinned-starvation' as const,
   discoveredAllowance: 1,
