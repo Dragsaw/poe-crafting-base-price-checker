@@ -71,11 +71,13 @@ export function HeaderBar({
       </div>
       {HEADER_SLOTS.map((slot) => {
         const control = controls[slot];
-        // A filled slot sizes to its control so the brand block takes the free space.
-        const size =
-          control === undefined
-            ? { flex: `0 0 ${px(HEADER_SLOT_WIDTHS[slot])}`, width: px(HEADER_SLOT_WIDTHS[slot]) }
-            : { flex: '0 0 auto' };
+        // A filled slot sizes to its control so the brand block takes the free space. The sync
+        // slot holds its width, start-aligned: its face only exists once loaded, and the
+        // threshold beside it must not move then (state 22).
+        const isReserved = control === undefined || slot === 'sync';
+        const size = isReserved
+          ? { flex: `0 0 ${px(HEADER_SLOT_WIDTHS[slot])}`, width: px(HEADER_SLOT_WIDTHS[slot]) }
+          : { flex: '0 0 auto' };
         return (
           <div
             key={slot}

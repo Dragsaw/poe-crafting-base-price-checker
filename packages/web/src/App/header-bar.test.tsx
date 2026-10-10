@@ -49,9 +49,16 @@ describe('the header bar', () => {
     expect(headerBar().firstElementChild?.hasAttribute('data-brand')).toBe(true);
     expect(slots().map((slot) => slot.dataset['slot'])).toEqual(['recipe', 'threshold', 'sync']);
     // A filled slot sizes to its control, so the brand block takes the free space.
+    const [recipe, threshold, sync] = slots();
+    for (const slot of [recipe, threshold]) {
+      expect(slot?.style.flex).toBe('0 0 auto');
+      expect(slot?.style.width).toBe('');
+    }
+    // The sync slot holds its reserved width with the button at its start: 22px from the threshold.
+    expect(sync?.style.flex).toBe(`0 0 ${px(HEADER_SLOT_WIDTHS.sync)}`);
+    expect(sync?.style.width).toBe(px(HEADER_SLOT_WIDTHS.sync));
+    expect(sync?.style.justifyContent).toBe('');
     for (const slot of slots()) {
-      expect(slot.style.flex).toBe('0 0 auto');
-      expect(slot.style.width).toBe('');
       expect(slot.childElementCount).toBe(1);
     }
   });
@@ -96,7 +103,7 @@ describe('the header bar', () => {
     expect(eyebrow?.style.display).toBe('block');
     const [recipe, threshold, sync] = slots();
     expect(recipe?.style.flex).toBe(`0 0 ${px(HEADER_SLOT_WIDTHS.recipe)}`);
-    expect([threshold?.style.flex, sync?.style.flex]).toEqual(['0 0 auto', '0 0 auto']);
+    expect([threshold?.style.flex, sync?.style.flex]).toEqual(['0 0 auto', `0 0 ${px(HEADER_SLOT_WIDTHS.sync)}`]);
   });
 
   it('holds the recipe toggle, the threshold control and the sync button in its slots, with no band under it', async () => {
@@ -146,6 +153,13 @@ describe('the header bar', () => {
   });
 });
 
+/** The threshold and sync slots' sizes, which decide where the threshold control sits. */
+function sizes(): string[] {
+  return slots()
+    .slice(1)
+    .map((slot) => `${slot.style.flex}|${slot.style.width}`);
+}
+
 describe('the cold load (state 22)', () => {
   it('paints the bar with a blank eyebrow, the column header and twenty flat surface bars at once', () => {
     const held = gatedArtifacts();
@@ -179,9 +193,12 @@ describe('the cold load (state 22)', () => {
     serveArtifacts(server, held.answers);
     mount();
     const pendingBar = headerBar();
+    const pendingSizes = sizes();
     held.openAll();
     await settleTo('ready');
     expect(headerBar()).toBe(pendingBar);
+    // The threshold and sync slots keep their sizes, so the threshold control does not move.
+    expect(sizes()).toEqual(pendingSizes);
     expect(headerBar().querySelector('[data-eyebrow]')?.textContent).toBe(TEST_LEAGUE);
     expect(frame().querySelectorAll('[data-row-slot]')).toHaveLength(0);
   });

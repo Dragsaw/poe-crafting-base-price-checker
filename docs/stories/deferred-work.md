@@ -79,11 +79,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   retry_when: Story 4.6 is done in sprint-status.yaml
 
 - source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
-  summary: Check in a real browser that each header control's widest face fits its reserved slot at content-min, so the width-budget test checks rendered widths and not only the constants.
-  evidence: The width-budget test in packages/web/src/App/header-bar.test.tsx adds HEADER_TITLE_WIDTH, HEADER_SLOT_WIDTHS and the gaps, all constants. jsdom has no layout, so a control that grows past its slot still passes. The only check today is a manual agent-browser measurement.
-  retry_when: a browser test mode exists in the repository
-
-- source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
   summary: Repair docs/stories/epic-4-context.md: the order sentence "4.3, then 4.7 ahead of 4.4 to 4.6, then 4.6 last" is garbled, and the rewrite dropped the Inter glyph check (− † * · — – at every weight) and the "no colour on a surface below the contrast floor" constraint without citing their owners.
   evidence: The epic-context rewrite that added Story 4.7 was in the working tree before this build's baseline. A review of Story 4.5 found the wording and the two dropped lines.
   retry_when: now
