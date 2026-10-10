@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-10-2026 18:08
+last_updated: 10-10-2026 20:16
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -69,14 +69,98 @@ development_status:
   3-6-provenance-the-uniform-prior-banner-and-the-appendix-s-remai: done
   epic-3-retrospective: done
 
-  epic-4: in-progress
-  4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar: review
-  4-2-the-price-trust-verdict-in-core: review
+  epic-4: done
+  4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar: done
+  4-2-the-price-trust-verdict-in-core: done
   4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark: done
   4-4-the-expansion-one-line-per-entry-top-lines-and-the-trust-rea: done
   4-5-header-controls-and-the-sync-button: done
-  4-6-the-footer-legend-list-statements-failure-screens-and-the-ap: review
+  4-6-the-footer-legend-list-statements-failure-screens-and-the-ap: done
   4-7-the-recipe-floor-per-modifier-group: done
-  4-8-the-appendix-s-raw-ranks-note: review
-  epic-4-retrospective: optional
-action_items: []
+  4-8-the-appendix-s-raw-ranks-note: done
+  epic-4-retrospective: done
+action_items:
+  - id: "epic-4-retro-item-1-exclude-pruned-entries-from-the-broken-e"
+    epic: 4
+    action: "Exclude pruned entries from the broken-entry problem count with a test
+      (R1); architect amends the AD-12 Broken entries source row to non-pruned"
+    owner: "dev + architect"
+    status: done
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-2-make-the-state-23-all-broken-test-read-t"
+    epic: 4
+    action: "Make the state 23 all-broken test read the 4.2 verdict, with a test for
+      an all-broken crafted row (R2); order recipeless-class combinations by COMBINATION_GROUP
+      (R3)"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-3-small-web-fixes-plural-in-morelinescopy"
+    epic: 4
+    action: "Small web fixes: plural in moreLinesCopy (R6), no odds cue on a dash
+      EV (R7), no -0.00 (R8), trim the CSS header comments and story-id test comments
+      (A6, A7)"
+    owner: "dev"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-4-flip-4-1-4-2-4-6-4-8-to-done-in-sprint-s"
+    epic: 4
+    action: "Flip 4-1, 4-2, 4-6, 4-8 to done in sprint-status.yaml (T1); git rm the
+      two rev-26 altitude handovers once their outcomes are confirmed (T3)"
+    owner: "player"
+    status: in-progress
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-5-bump-revision-and-add-memlog-rows-for-un"
+    epic: 4
+    action: "Bump revision and add memlog rows for unversioned owner-doc edits d26b787,
+      7a64307, f252ca9, 816818b (S5); write the spec rulings back to EXPERIENCE.md
+      Open items and give the two unraised gaps an owner (S-Gaps); fix stale revision
+      citations and Interaction 2 in epics.md and epic-4-context.md (S2-S4)"
+    owner: "ux + architect + pm"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-6-one-story-one-age-ladder-one-joiner-one"
+    epic: 4
+    action: "One story: one age ladder, one joiner, one price-state phrase set (UX
+      ruling on wording); split frame/trust-facts.ts by job; make core trust helpers
+      non-public and move the below-threshold split into core (A1-A5, R9)"
+    owner: "dev (deferred)"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-7-rule-where-a-crafted-row-with-no-priced"
+    epic: 4
+    action: "Rule where a crafted row with no priced combination ranks (R4) and fix
+      the spine floor/scope order wording (R15)"
+    owner: "architect + ux"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-8-add-an-acceptance-step-to-finish-worktre"
+    epic: 4
+    action: "Add an acceptance step to finish-worktree or bmad-build that sets the
+      story to done on human accept, or refuses to merge a story still at review (T1)"
+    owner: "process"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-9-a-story-is-done-only-after-agent-browser"
+    epic: 4
+    action: "A story is done only after agent browser checks re-run after the last
+      review fix, against the spec Agent browser checks section (L1)"
+    owner: "process"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-10-a-correct-course-that-inserts-a-story-up"
+    epic: 4
+    action: "A correct-course that inserts a story updates epics.md Order in the same
+      commit, and the epic context is regenerated from it (S-Order)"
+    owner: "process"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
+  - id: "epic-4-retro-item-11-deferrals-tie-to-a-story-or-a-testable-r"
+    epic: 4
+    action: "Deferrals tie to a story or a testable retry_when; lint CSS comment runs;
+      skip typecheck-on-stop during subagent edits and test its real tsc path with
+      a blocking timeout (R5); drop the per-story spec-size split question (L2, L3,
+      L5)"
+    owner: "process"
+    status: open
+    ref: "docs/stories/epic-4-retro-2026-10-10.md"
