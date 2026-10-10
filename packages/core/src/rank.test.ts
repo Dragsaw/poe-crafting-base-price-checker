@@ -131,7 +131,8 @@ describe('rank: the I/O matrix', () => {
       dataset: [published(P, priced(0.5)), published(crafted, priced(0.5))],
     });
     expect(everyKey(result)).toEqual([]);
-    expect(result.unrankable.map((item) => item.reason)).toEqual([NO_RECIPE]);
+    expect(result.unrankable).toEqual([]);
+    expect(result.recipeless.map((item) => item.trust)).toEqual([NO_RECIPE]);
   });
 
   it('a dataset entry whose key is not tracked is ignored', () => {

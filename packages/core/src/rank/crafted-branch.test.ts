@@ -167,18 +167,6 @@ describe('rank: the crafted branch (AD-17, AD-20)', () => {
     expect(isPricedIn([published(target, { state: 'no-listings' })])).toBe(false);
   });
 
-  it.each([[[]], [undefined]])(
-    'a rankable class with no recipe (%j) ranks no row and is Unrankable with no recipe id',
-    (recipes) => {
-      const result = rankCrafted({ tracked: [chase('Bows'), chase('Bows')], recipes });
-      expect(result.ordering).toEqual([]);
-      expect(result.unrankable).toEqual([
-        { categoryId: 'weapon.bow', className: 'Bows', reason: 'recipe cannot reach this class' },
-      ]);
-      expect(result.uncostableRecipes).toEqual([]);
-    },
-  );
-
   it('a currency without a rate, or with another league’s rate, makes the recipe uncostable, never 0', () => {
     const target = chase('Bows');
     const rates = [...RATES.slice(0, 2), rateOf('perfect-orb-of-transmutation', 0.1, OLD_LEAGUE)];

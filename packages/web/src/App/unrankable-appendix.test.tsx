@@ -1,9 +1,12 @@
 import type { TrackedEntry } from '@poe/contracts';
+import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { bodiesWith, craftedEntry, hoursBefore, priced, rawEntry } from '../test-support/list-fixtures';
 import { gatedArtifacts, serveArtifacts, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb, settleTo, unmount } from '../test-support/dom';
+import { hover, leave } from '../test-support/hover';
+import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { colors } from '../theme/tokens';
 import { APPENDIX_NOTES, APPENDIX_TITLE, appendixCount } from '../list/UnrankableAppendix';
 import { server, mount, frame, reportPanel, syncButton, toggleReport } from './test-support';
@@ -166,15 +169,13 @@ describe('the Unrankable appendix', () => {
     await settleTo('ready');
 
     const rows = appendixRows();
-    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Amulets', 'Bows']);
-    // Amulets is rankable but no recipe is served (retro item 29): the recipe-less reason.
-    expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('recipe cannot reach this class');
-    expect(rows[1]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
-    // Matrix: unreachable — no note. Disagrees — the 15a note, no check name.
-    expect(rows[0]?.querySelector('[data-cell="note"]')?.textContent).toBe('');
-    expect(rows[1]?.querySelector('[data-cell="note"]')?.textContent).toBe(APPENDIX_NOTES['class disagrees with weights file']);
+    expect(rows.map((row) => row.querySelector('[data-appendix-class]')?.textContent)).toEqual(['Bows']);
+    expect(rows[0]?.querySelector('[data-cell="reason"]')?.textContent).toBe('class disagrees with weights file');
+    // Matrix: disagrees — the 15a note, no check name.
+    expect(rows[0]?.querySelector('[data-cell="note"]')?.textContent).toBe(APPENDIX_NOTES['class disagrees with weights file']);
     expect(appendix().textContent).not.toContain('edge-alignment');
-    expect(frame().querySelectorAll('[data-ranked-row]')).toHaveLength(1);
+    // Amulets is rankable but no recipe is served: an unranked crafted row (state 43).
+    expect(frame().querySelectorAll('[data-ranked-row]')).toHaveLength(2);
 
     // Listed in the sync report, never counted (state 27).
     expect(syncButton().dataset['syncButton']).toBe('synced');
@@ -183,6 +184,45 @@ describe('the Unrankable appendix', () => {
     const lines = Array.from(problems?.querySelectorAll('[data-verbatim]') ?? [], (node) => node.textContent);
     expect(lines).toHaveLength(1);
     expect(lines[0]).toMatch(/^edge-alignment · \["crafted","weapon\.bow","Bows",82,/);
+  });
+
+  // State 43 and state 37: no recipe served.
+  it('lists a rankable class with no recipe as an unnumbered pending row below the Raw Bases, and the appendix title alone', async () => {
+    const now = Date.now();
+    const belt = rawEntry('Wide Belt');
+    const amulet = rawEntry('Gold Amulet');
+    const amulets = craftedEntry('Amulets', 'accessory.amulet');
+    const weights = {
+      ...(VALID_BODIES.weights as object),
+      bases: { 'accessory.amulet': { Amulets: poolsOf('explicit.stat_3299347043', []) } },
+    };
+    const bodies = bodiesWith([amulets, belt, amulet], [priced(belt, 0.5, hoursBefore(now, 1)), priced(amulet, 0.4, hoursBefore(now, 1))]);
+    serveArtifacts(server, {
+      tracked: { kind: 'json', body: bodies.tracked },
+      dataset: { kind: 'json', body: bodies.dataset },
+      weights: { kind: 'json', body: weights },
+    });
+    mount();
+    await settleTo('ready');
+
+    const rows = [...frame().querySelectorAll<HTMLElement>('[data-ranked-row]')];
+    expect(rows.map((row) => row.querySelector('[data-unit-name]')?.textContent)).toEqual(['Wide Belt', 'Gold Amulet', 'Amulets']);
+    expect(rows.map((row) => row.querySelector('[data-cell="rank"]')?.textContent)).toEqual(['1', '2', '']);
+    const crafted = rows[2];
+    expect(crafted?.querySelector('[data-ev-missing]')?.textContent).toBe(MISSING_FIGURE);
+    expect(crafted?.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe('pending');
+    const mark = crafted?.querySelector('[data-row-mark]');
+    hover(mark);
+    expect(document.body.querySelector('[data-mark-tooltip]')?.textContent).toBe('pending · no recipe published');
+    leave(mark);
+    act(() => {
+      crafted?.click();
+    });
+    const lines = [...frame().querySelectorAll<HTMLElement>('[data-expansion-panel] [data-expansion-line]')];
+    expect(lines.map((line) => line.dataset['verdict'])).toEqual(['pending']);
+
+    expect(appendix().textContent).toBe('Appendix: Unrankable — 0 Item Classes');
+    expect(appendixRows()).toHaveLength(0);
   });
 
   // Matrix: no crafted entries.

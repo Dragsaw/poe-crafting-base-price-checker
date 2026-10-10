@@ -126,6 +126,9 @@ describe('RankedRowSchema, the price trust', () => {
     expect(RankedRowSchema.parse({ ...row, trust: rough })).toEqual({ ...row, trust: rough });
     const share = { verdict: 'rough', reasons: [{ kind: 'unreliable-share', percent: 70 }] };
     expect(RankedRowSchema.parse({ ...craftedRow, trust: share })).toEqual({ ...craftedRow, trust: share });
+    const noRecipe = { verdict: 'pending', reasons: [{ kind: 'no-recipe' }] };
+    expect(PriceTrustSchema.parse(noRecipe)).toEqual(noRecipe);
+    expect(PriceTrustSchema.safeParse({ verdict: 'pending', reasons: [{ kind: 'no-recipe', recipeId: 'x' }] }).success).toBe(false);
     expect(RankedRowSchema.safeParse({ ...row, trust: { verdict: 'rough', reasons: ['priced 3 days ago'] } }).success).toBe(false);
     expect(RankedRowSchema.safeParse({ ...row, trust: { verdict: 'rough', reasons: [{ kind: 'stale' }] } }).success).toBe(false);
     expect(RankedRowSchema.safeParse({ ...row, trust: { verdict: 'rough', reasons: [{ kind: 'old', days: 3, text: 'x' }] } }).success).toBe(false);

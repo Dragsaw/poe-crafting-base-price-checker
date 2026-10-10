@@ -126,8 +126,12 @@ export const everyKey = (result: Ranking): string[] => [
 
 export const ABSENT = 'class absent from weights file';
 export const PARTIAL = 'pool partial';
-/** What a rankable class gets when `ranked` is given no recipe (retro item 29). */
-export const NO_RECIPE = 'recipe cannot reach this class';
+/** The verdict of a rankable class when `ranked` is given no recipe (state 43). */
+export const NO_RECIPE = { verdict: 'pending', reasons: [{ kind: 'no-recipe' }] } as const;
+
+/** The `(categoryId, className)` pairs of the recipeless group, in its order. */
+export const recipelessPairs = (result: Ranking): { categoryId: string; className: string }[] =>
+  result.recipeless.map(({ categoryId, className }) => ({ categoryId, className }));
 
 /** A deterministic permutation, so the test itself uses no randomness. */
 export function permute<T>(items: readonly T[], seed: number): T[] {

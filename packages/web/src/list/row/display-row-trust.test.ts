@@ -43,6 +43,7 @@ function rankingOf(row: CraftedRankedRow): Ranking {
     notYetSynced: [],
     unresolvable: [],
     unrankable: [],
+    recipeless: [],
     uncostableRecipes: [],
     pricedInLeague: true,
   };

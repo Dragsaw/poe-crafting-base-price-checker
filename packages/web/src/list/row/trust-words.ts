@@ -17,6 +17,7 @@ export const FIXED_ROW_REASONS: Readonly<Record<FixedReason, string>> = {
   'league-mismatch': 'price from last league',
   'no-exchange-rate': 'no Divine rate for its currency',
   unresolvable: 'gone after a patch',
+  'no-recipe': 'no recipe published',
   uncostable: 'no figure yet — craft cost unknown',
   'all-broken': 'all combinations gone after a patch',
   'no-prices': 'no prices yet',

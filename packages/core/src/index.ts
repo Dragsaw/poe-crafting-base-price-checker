@@ -14,6 +14,7 @@ export type {
   NotYetSyncedEntry,
   RankInput,
   Ranking,
+  RecipelessClass,
   UncostableRecipe,
   UnrankableClass,
   UnrankableReason,

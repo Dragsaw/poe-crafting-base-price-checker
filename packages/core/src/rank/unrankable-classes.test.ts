@@ -1,7 +1,19 @@
 import type { TrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { ABSENT, NO_RECIPE, PARTIAL, permute, ranked, raw, WEIGHTS, weightsWith, priced, published } from './test-support.ts';
+import {
+  ABSENT,
+  NO_RECIPE,
+  PARTIAL,
+  permute,
+  priced,
+  published,
+  ranked,
+  raw,
+  recipelessPairs,
+  WEIGHTS,
+  weightsWith,
+} from './test-support.ts';
 
 function craftedOf(
   categoryId: string,
@@ -57,23 +69,23 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       tracked: [craftedOf('jewel', 'Emerald'), craftedOf('jewel', 'Emerald', 'pinned', 82), craftedOf('weapon.bow', 'Bows')],
       weights: weightsWith(['jewel', 'Emerald', prefix, suffix], ['weapon.bow', 'Bows']),
     });
-    expect(result.unrankable).toEqual([
-      { categoryId: 'weapon.bow', className: 'Bows', reason: NO_RECIPE },
-      { categoryId: 'jewel', className: 'Emerald', reason: PARTIAL },
-    ]);
+    expect(result.unrankable).toEqual([{ categoryId: 'jewel', className: 'Emerald', reason: PARTIAL }]);
+    expect(recipelessPairs(result)).toEqual([{ categoryId: 'weapon.bow', className: 'Bows' }]);
     expect(result.ordering).toEqual([]);
   });
 
-  it('makes no weights claim for a complete class: no ranked row, only the no-recipe reason', () => {
+  it('makes no weights claim for a complete class: no ranked row, only the no-recipe verdict', () => {
     const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weights: WEIGHTS });
-    expect(result.unrankable).toEqual([{ categoryId: 'weapon.bow', className: 'Bows', reason: NO_RECIPE }]);
+    expect(result.unrankable).toEqual([]);
+    expect(result.recipeless.map((item) => item.trust)).toEqual([NO_RECIPE]);
     expect(result.ordering).toEqual([]);
     expect(result.belowThreshold).toEqual([]);
   });
 
   it('holds no weights-file reason, and never the string, while a weights envelope is loaded', () => {
     const result = ranked({ tracked: [craftedOf('weapon.bow', 'Bows')], weights: WEIGHTS });
-    expect(result.unrankable.map((item) => item.reason)).toEqual([NO_RECIPE]);
+    expect(result.unrankable).toEqual([]);
+    expect(recipelessPairs(result)).toEqual([{ categoryId: 'weapon.bow', className: 'Bows' }]);
     expect(JSON.stringify(result)).not.toContain(ABSENT);
   });
 
@@ -128,9 +140,9 @@ describe('rank: the Unrankable Item Classes (AD-24, FR-4)', () => {
       crossFileFailures: [{ categoryId: 'weapon.bow', className: 'Bows' }, { categoryId: 'weapon.bow', className: 'Bows' }],
     });
     expect(result.unrankable).toEqual([
-      { categoryId: 'accessory.amulet', className: 'Amulets', reason: NO_RECIPE },
       { categoryId: 'weapon.bow', className: 'Bows', reason: 'class disagrees with weights file' },
     ]);
+    expect(recipelessPairs(result)).toEqual([{ categoryId: 'accessory.amulet', className: 'Amulets' }]);
   });
 
   it('lets the lookup reasons take precedence over a cross-file failure', () => {
