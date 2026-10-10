@@ -16,7 +16,7 @@ context:
 
 **Problem:** AD-17 models a recipe's `modifierLevelMin` as a cut of every tier below the floor. In the game the floor never removes a modifier type: a group whose top tier sits below the floor still rolls that top tier. Every greater and perfect ranking is wrong, and `tracked:lookup` advises pruning reachable picks.
 
-**Approach:** Apply the floor per `modGroup` of each slot, as decided in section 1 of the sprint change proposal (`docs/sprint-change-proposal-2026-10-10.md`). `core` exposes a reach verdict per `(entry, recipe)` that replaces `canRecipeRoll`. `pnpm tracked:check` gains an `unreachable` list. The docs edits of proposal section 4 land in the first commit of the branch.
+**Approach:** Apply the floor per `modGroup` of each slot, as decided in section 1 of the sprint change proposal (`docs/sprint-change-proposal-2026-10-10.md`). `core` exposes a reach verdict per `(entry, recipe)` that replaces `canRecipeRoll`. `pnpm tracked:check` gains an `unreachable` list. The docs edits of proposal section 4 are master's `78af60e`, and this story follows them.
 
 ## Boundaries & Constraints
 
@@ -27,7 +27,7 @@ context:
 - Survivors renormalise before containment. Coverage stays on the unrestricted pool (AD-17, AD-27).
 - `modifierLevelMin` `0` goes through the same code path and changes nothing.
 - Ranking keeps the backstop: an unreachable entry makes its `(itemClass, recipe)` pair unrankable.
-- The first commit carries the docs edits and, in its message, the decision and the three rejected alternatives that proposal section 5 names.
+- The docs edits are master's `78af60e`. Its message carries the decision and the three rejected alternatives that proposal section 5 names. Where this spec and those docs differ, the docs win.
 
 **Never:**
 - No change to `data/weights.json`, the weights schema, `sync` run logic or any production `web` file. Web test fixtures that encode the old floor follow the new rule.
@@ -60,13 +60,13 @@ context:
 - `packages/sync/src/curation/check.ts` -- `checkTracked`, `loadTrackedCheckInputs`, `CheckName`. Recipes are not loaded today. Reuse `loadDataFile` from `../load-data-file.ts` with `parseEnvelope(RecipesFileSchema, …)`; an absent file is `skipped`, as `crossFileOutcome` does for weights.
 - `packages/sync/src/curation/check.data.test.ts` -- `pnpm test:data` over live `data/`.
 - Tests that encode the old rule: `packages/core/src/probability.test.ts` (lines 111–130), `rank/crafted-branch.test.ts:112`, `rank/provenance.test.ts:55`, `provenance.test.ts:51`, `.claude/skills/tracked-json/scripts/lookup.mods.test.ts:166`, `packages/sync/src/curation/check.test.ts`.
-- Docs targets (proposal section 4): `ARCHITECTURE-SPINE.md` AD-17 lines 1299–1330; `AGENT-WORKFLOW.md` near line 104; `EXPERIENCE.md` line 821 (state 36); `.claude/skills/tracked-json/SKILL.md` lines 20, 36, 58; `docs/epics.md` Story 3.4 (line 2054) and a new Story 4.7 after Story 4.6.
+- Docs targets (proposal section 4), landed on master in `78af60e`: `ARCHITECTURE-SPINE.md` AD-17 lines 1299–1330; `AGENT-WORKFLOW.md` near line 104; `EXPERIENCE.md` line 821 (state 36); `.claude/skills/tracked-json/SKILL.md` lines 20, 36, 58; `docs/epics.md` Story 3.4 (line 2054) and a new Story 4.7 after Story 4.6.
 
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] Docs targets above -- apply proposal section 4 verbatim; add Story 4.7 with the proposal section 5 criteria -- first commit, own message.
-- [x] `packages/core/src/probability.ts` -- add `floored(pool, modifierLevelMin)` (the per-group floor, unscoped); rebuild `eligible` on it; add the reach verdict `recipeReach(pools, entry, modifierLevelMin)`, unreachable when a slot's contained set in `eligible` is empty; delete `canRecipeRoll` -- AD-17.
+- [x] Docs targets above -- apply proposal section 4 verbatim; add Story 4.7 with the proposal section 5 criteria -- landed on master in `78af60e`.
+- [x] `packages/core/src/probability.ts` -- add `floored(pool, modifierLevelMin)` (the per-group floor, unscoped); rebuild `eligible` on it; add the reach verdict `recipeReach(pools, entry, modifierLevelMin)`, unreachable when `combinationProbability` is not defined, as the ranking backstop requires; delete `canRecipeRoll` -- AD-17.
 - [x] `packages/core/src/index.ts` -- export the new functions in place of `canRecipeRoll`.
 - [x] `.claude/skills/tracked-json/scripts/lookup-mods.ts` -- `reached` is membership of the tier in `floored(pool, recipe.modifierLevelMin)`; update its doc comment.
 - [x] `packages/sync/src/curation/check.ts` -- load recipes; add the `recipe-reach` check and an `unreachable` list of `{ entryKey, recipeId, slot }` with the entry path; `ok` is false while it is non-empty.
@@ -92,15 +92,16 @@ The top tier is the highest `itemLevelMin` among the group's tiers with `weight 
 
 ## Implementation Notes
 
-- `recipeReach` returns `{ reached: true }` or `{ reached: false, slots }`; `tracked:check` emits one `unreachable` row per empty slot. Classes with an absent or partial pool are skipped, as they are already `unvalidated`. A refused weights file makes `recipe-reach` `skipped`.
+- `recipeReach` returns `{ reached: true }` or `{ reached: false, slots }`; `slots` names each slot whose contained set is empty, or the slot that a first draw exhausts. `tracked:check` emits one `unreachable` row per named slot. Classes with an absent or partial pool are skipped, as they are already `unvalidated`. A refused weights file makes `recipe-reach` `skipped`.
 - `unreachable` rows stay out of `issues`; `ok` is false while the list is non-empty.
 - Boundary deviation: four `web` test and fixture files (no production `web` file) encoded the old floor in their fixtures and failed under the new rule. Their fixtures now share a `modGroup` where a tier must be floored, and the frozen-data appendix test expects an empty appendix. Kept in a separate commit.
-- `SKILL.md` lines 12 and 40 described `unreachable` as never failing the run; they now match the spec. Line 20 held no recipe-floor rule and is unchanged.
+- `SKILL.md` follows master's `78af60e`. Only its `unreachable` line differs: it names the fields that `check.ts` emits (`path`, `entryKey`, `recipeId`, `slot`), because the code owns the report field identifiers.
 - No `data/tracked.json` change: `pnpm tracked:check` reports `unreachable: []` on the live data.
 
 ## Spec Change Log
 
 - 2026-10-10, human: the "Never" boundary on `web` narrowed from any `web` file to production `web` files. Trigger: nine web tests in four web test and fixture files encoded the old floor and blocked `pnpm check`. Avoids: a `pnpm check` gate that cannot pass under the frozen rule. KEEP: no production `web` change.
+- 2026-10-10, human: the docs edits follow master's `78af60e`, not this branch's first commit. Trigger: an earlier branch landed the same docs on master before this branch was created from `566ab0c`, and the two versions conflicted. Avoids: two versions of AD-17, Story 4.7 and the tracked-json skill. KEEP: the per-group floor and the reach verdict. Triage rows 13 and 14 concern the replaced branch docs; master carries spine revision 34.
 
 ## Review Triage Log
 
