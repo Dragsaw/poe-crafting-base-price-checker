@@ -28,7 +28,7 @@ describe('the open set', () => {
 
     click(affordance);
     expect(openNames()).toEqual(['Base 02', 'Base 21']);
-    expect(panelsIn(view).map((p) => p.querySelector('[data-panel-name]')?.textContent)).toEqual(['Base 02', 'Base 21']);
+    expect(panelsIn(view).map((p) => p.querySelector('[data-context-name]')?.textContent)).toEqual(['Base 02', 'Base 21']);
     for (const panel of panelsIn(view)) {
       expect(panel.previousElementSibling?.hasAttribute('data-open')).toBe(true);
     }
@@ -41,8 +41,8 @@ describe('the open set', () => {
     click(rowsIn(view)[2]);
     expect(panelsIn(view)).toHaveLength(2);
     // A click inside a panel closes nothing.
-    click(panelsIn(view)[0]?.querySelector<HTMLElement>('[data-combination-row]'));
-    click(panelsIn(view)[0]?.querySelector<HTMLElement>('[data-panel-title]'));
+    click(panelsIn(view)[0]?.querySelector<HTMLElement>('[data-expansion-line]'));
+    click(panelsIn(view)[0]?.querySelector<HTMLElement>('[data-context-line]'));
     expect(panelsIn(view)).toHaveLength(2);
     click(rowsIn(view)[2]);
     expect(panelsIn(view)).toHaveLength(1);

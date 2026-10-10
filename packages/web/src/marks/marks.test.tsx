@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { mount, rgb, unmount } from '../test-support/dom';
 import { colors } from '../theme/tokens';
-import { EstimateMark, VerdictMark } from './marks';
+import { EstimateMark, TradeLinkMark, VerdictMark } from './marks';
 
 afterEach(unmount);
 
@@ -34,6 +34,16 @@ describe('the drawn marks', () => {
     expect(svg.dataset['mark']).toBe('estimate');
     expect(svg.getAttribute('width')).toBe('1em');
     expect(svg.style.color).toBe(rgb(colors['trust-rough']));
+  });
+
+  it('draws ↗ as one open-headed shaft in its host colour, with no glyph', () => {
+    const svg = drawn(<TradeLinkMark />);
+    expect(svg.dataset['mark']).toBe('trade-link');
+    expect(svg.getAttribute('width')).toBe('1em');
+    expect(svg.getAttribute('fill')).toBe('none');
+    expect(svg.style.color).toBe('currentcolor');
+    expect(svg.querySelector('path')?.getAttribute('d')?.match(/M/g)).toHaveLength(2);
+    expect(svg.textContent).toBe('');
   });
 
   it('gives ◐ and ○ one ring, ◐ filling its left half, and ✕ two crossing strokes', () => {

@@ -1,11 +1,12 @@
 import { CatalogueStatsFileSchema, TrackedFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { cssNumber } from '../test-support/css-number';
-import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
+import { combinationCellAtContentMin, cssNumber } from '../test-support/css-number';
+import { typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
+import { CURATION_MARKS } from './format';
 
-// Line one is `nowrap`, so overlong text would run into the state cell. jsdom lays out no text:
+// An expansion line is `nowrap` and never cut, so overlong text would run into the price cell. jsdom lays out no text:
 // the width is an estimate at 0.6em per character. Real widths: Story 2.5 Implementation Notes.
 const committed = import.meta.glob<unknown>('../../../../test/fixtures/frozen-data/{tracked.json,catalogue/stats.json}', {
   eager: true,
@@ -95,12 +96,11 @@ describe('the frozen Combination texts', () => {
     }
   });
 
-  it('fits the longest text, led by * pinned, inside the 460px combination cell less its 12px pad, at line one’s size', () => {
-    const [cell] = combinationLine1Columns;
-    const available = cell.width - cell.padRight;
+  it('fits the longest text, led by * pinned, inside the combination cell at content-min, at the line size', () => {
+    const available = combinationCellAtContentMin();
     const fontSize = cssNumber(typeRoles['line-text'].fontSize);
-    const longest = Math.max(...texts.map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`.length));
-    expect(available).toBe(448);
+    const longest = Math.max(...texts.map((parts) => `${CURATION_MARKS.pinned} ${combinationString(parts)}`.length));
+    expect(available).toBe(464);
     expect(longest * ADVANCE_EM * fontSize).toBeLessThanOrEqual(available);
   });
 

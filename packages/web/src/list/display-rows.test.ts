@@ -14,10 +14,15 @@ function printedValue(row: ListRow): string {
   return row.ev.kind === 'figure' ? row.ev.text : 'missing';
 }
 
+/** The first reason `core` gave the row's one entry; `undefined` when current. */
+function reasonOf(row: ListRow): string | undefined {
+  return row.trust.reasons[0]?.kind;
+}
+
 /** A raw-only list, narrowed to Raw Base rows. */
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
   const ranking = rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: DEFAULT_THRESHOLD, weights: undefined });
-  return toDisplayRows(ranking, dataset, NOW).flatMap((row) => (row.unit === 'raw' ? [row] : []));
+  return toDisplayRows(ranking, dataset).flatMap((row) => (row.unit === 'raw' ? [row] : []));
 }
 
 describe('tierOf', () => {
@@ -66,10 +71,10 @@ describe('toDisplayRows', () => {
         unpriced(amber, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.state.state])).toEqual([
-      ['Coral Ring', undefined, 'missing', 'not-yet-synced'],
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), reasonOf(row)])).toEqual([
+      ['Coral Ring', undefined, 'missing', 'league-mismatch'],
       ['Gold Amulet', undefined, 'missing', 'no-listings'],
-      ['Wide Belt', undefined, 'missing', 'not-yet-synced'],
+      ['Wide Belt', undefined, 'missing', 'league-mismatch'],
       ['amber Ring', undefined, 'missing', 'no-listings'],
     ]);
     const keys = rows.map((row) => row.key);
@@ -90,8 +95,8 @@ describe('toDisplayRows', () => {
         unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.state.state])).toEqual([
-      ['Coral Ring', undefined, 'missing', 'not-yet-synced'],
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), reasonOf(row)])).toEqual([
+      ['Coral Ring', undefined, 'missing', 'league-mismatch'],
       ['Gold Amulet', undefined, 'missing', 'no-listings'],
       ['Lost Ring', undefined, 'missing', 'unresolvable'],
     ]);
@@ -142,7 +147,7 @@ describe('toDisplayRows', () => {
     });
     expect(ranking.belowThreshold.length).toBeGreaterThan(0);
     expect(isHonestEmpty(ranking)).toBe(false);
-    const rows = toDisplayRows(ranking, dataset, NOW);
+    const rows = toDisplayRows(ranking, dataset);
     expect(rows.map((row) => [row.label, printedValue(row)])).toEqual([
       ['Gold Amulet', 'missing'],
       ['Coral Ring', 'missing'],
@@ -165,25 +170,25 @@ describe('toDisplayRows', () => {
         unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.tier, printedValue(row), row.state.state])).toEqual([
-      ['Gold Amulet', 1, 1, '0.50', 'priced'],
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, printedValue(row), reasonOf(row)])).toEqual([
+      ['Gold Amulet', 1, 1, '0.50', undefined],
       ['Coral Ring', undefined, 3, 'missing', 'no-listings'],
-      ['Wide Belt', undefined, 3, 'missing', 'not-yet-synced'],
+      ['Wide Belt', undefined, 3, 'missing', 'never-synced'],
       ['Broken Ring', undefined, 3, 'missing', 'unresolvable'],
       ['Lost Ring', undefined, 3, 'missing', 'unresolvable'],
     ]);
-    expect(rows[4]?.ages).toEqual({ observed: undefined, attempted: 'tried 1h ago' });
+    expect(rows[4]?.price).toBeUndefined();
   });
 
-  it('drops below-threshold entries, and gives a league mismatch its attempted age', () => {
+  it('drops below-threshold entries, and carries a league mismatch as core judged it', () => {
     const cheap = rawEntry('Iron Ring');
     const old = rawEntry('Jade Amulet');
     const rows = rowsFor(
       [cheap, old],
       [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), { league: 'Standard' })],
     );
-    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.ages.attempted])).toEqual([
-      ['Jade Amulet', undefined, 'missing', 'tried 3d ago'],
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.trust, row.price])).toEqual([
+      ['Jade Amulet', undefined, 'missing', { verdict: 'pending', reasons: [{ kind: 'league-mismatch' }] }, undefined],
     ]);
   });
 
@@ -199,7 +204,6 @@ describe('toDisplayRows', () => {
         weights: undefined,
       }),
       [],
-      NOW,
     );
     expect(rows).toHaveLength(25);
     expect(rows.slice(20).every((row) => row.tier === 3)).toBe(true);
@@ -209,28 +213,24 @@ describe('toDisplayRows', () => {
     const [only] = toDisplayRows(
       rank({ tracked: [tiny], dataset: [priced(tiny, 0.0031, hoursBefore(NOW, 1))], activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold: 0, weights: undefined }),
       [],
-      NOW,
     );
     expect(only?.ev).toEqual({ kind: 'figure', text: '< 0.01', negative: false });
   });
 });
 
 describe('the detail each row carries for its expansion', () => {
-  it('carries the priced state, status, dataset entry and both exact ages on a ranked row', () => {
+  it('carries the price, status, dataset entry and core’s trust on a ranked row', () => {
     const belt = { ...rawEntry('Wide Belt', 75), status: 'pinned' as const };
-    const published = {
-      ...priced(belt, 0.8, hoursBefore(NOW, 11), { search: { id: 'abc', league: TEST_LEAGUE } }),
-      lastAttemptedAt: hoursBefore(NOW, 4),
-    };
+    const published = priced(belt, 0.8, hoursBefore(NOW, 11), { search: { id: 'abc', league: TEST_LEAGUE } });
     const [row] = rowsFor([belt], [published]);
     expect(row?.status).toBe('pinned');
     expect(row?.itemLevel).toBe(75);
     expect(row?.entry).toBe(published);
-    expect(row?.state).toEqual({ state: 'priced', priceDivine: 0.8, sampleSize: 10, observedAt: hoursBefore(NOW, 11) });
-    expect(row?.ages).toEqual({ observed: 'priced 11h ago', attempted: 'tried 4h ago' });
+    expect(row?.price).toBeCloseTo(0.8);
+    expect(row?.trust).toEqual({ verdict: 'current', reasons: [] });
   });
 
-  it('resolves no-listings, never-synced and league-mismatch, keeping the ordering', () => {
+  it('carries no price on an unpriced row, and core’s reason for each', () => {
     const tried = rawEntry('Coral Ring');
     const never = rawEntry('Wide Belt');
     const old = rawEntry('Jade Amulet');
@@ -238,13 +238,12 @@ describe('the detail each row carries for its expansion', () => {
       [never, tried, old],
       [unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 3)), priced(old, 3, hoursBefore(NOW, 72), { league: 'Standard' })],
     );
-    expect(rows.map((row) => [row.label, row.state, row.ages])).toEqual([
-      ['Coral Ring', { state: 'no-listings' }, { observed: undefined, attempted: 'tried 3h ago' }],
-      ['Jade Amulet', { state: 'not-yet-synced', reason: 'league-mismatch' }, { observed: undefined, attempted: 'tried 3d ago' }],
-      ['Wide Belt', { state: 'not-yet-synced', reason: 'never-synced' }, { observed: undefined, attempted: undefined }],
+    expect(rows.map((row) => [row.label, row.price, reasonOf(row)])).toEqual([
+      ['Coral Ring', undefined, 'no-listings'],
+      ['Jade Amulet', undefined, 'league-mismatch'],
+      ['Wide Belt', undefined, 'never-synced'],
     ]);
     expect(rows[2]?.entry).toBeUndefined();
-    expect(rows.every((row) => row.status === 'active')).toBe(true);
   });
 });
 
@@ -262,9 +261,8 @@ describe('the summands in web', () => {
     expect(uses.length).toBeGreaterThan(0);
     // Each code use of `summands` in web source, verbatim. Prose in comments starts with no `.` or `(`.
     const allowed = new Set([
-      './display-rows.ts: summands.map((summand) => summand.entryKey));',
       './display-rows.ts: summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),',
-      './display-rows.ts: summands.map((summand) => summand.entryKey), ...rest].flatMap((entryKey) => combination(entryKey)),',
+      './display-rows.ts: summands.flatMap((summand) => line(summand.entryKey, { trust: summand.trust, price: summand.priceDivine, isBelowThreshold: false })),',
       // State 25 reads whether any summand survives (Story 3.4).
       './list-statement.ts: summands.length > 0);',
     ]);

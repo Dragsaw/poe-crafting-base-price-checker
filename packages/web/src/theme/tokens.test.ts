@@ -4,13 +4,12 @@ import {
   colors,
   COLUMN_HEADER_HEIGHT,
   columnSums,
-  combinationLine1Columns,
-  combinationLine2Columns,
+  expansionLineGrid,
+  expansionLineWidths,
   floatingShadows,
   glyphs,
   layout,
   rankedRowGrid,
-  REGULAR_ONLY_GLYPHS,
   rounded,
   spacing,
   stacks,
@@ -148,32 +147,37 @@ describe('the ranked-row grid', () => {
   });
 });
 
-describe('the column contracts later stories replace', () => {
+describe('the expansion-line grid', () => {
+  it('transcribes DESIGN.md `expansion-line`: combination 1fr, price, trust cell and link, one line high', () => {
+    const line = (tokens['components'] ?? {})['expansion-line'] as Record<string, string>;
+    expect(line['grid']).toBe(
+      `combination 1fr · price ${expansionLineWidths.price} · trust {spacing.expansion-trust-cell} · link ${expansionLineWidths.link}, column gap {spacing.col-gap}, padding-right ${expansionLineWidths.paddingRight}`,
+    );
+    expect(line['height']).toBe('{spacing.line-height-expansion}');
+    expect(expansionLineGrid.gridTemplateColumns).toBe(
+      `1fr ${expansionLineWidths.price} ${spacing['expansion-trust-cell']} ${expansionLineWidths.link}`,
+    );
+    expect(expansionLineGrid.columnGap).toBe(spacing['col-gap']);
+    expect(expansionLineGrid.paddingRight).toBe(expansionLineWidths.paddingRight);
+    expect(expansionLineGrid.height).toBe(spacing['line-height-expansion']);
+  });
+});
 
+describe('the column contracts later stories replace', () => {
   it('holds every other verified sum', () => {
     expect(columnSums.interimControls).toEqual([
       layout.recipePanelWidth,
       layout.interimControlGap,
       layout.thresholdPanelWidth,
     ]);
-    expect(sum(columnSums.combinationLine1)).toBe(966);
-    expect(sum(columnSums.combinationLine2)).toBe(966);
-    expect(sum(columnSums.tombstoneLine2)).toBe(966);
     expect(sum(columnSums.appendix)).toBe(970);
     expect(layout.contentWidth - 2 * layout.hairline - 2 * layout.appendixPadX).toBe(sum(columnSums.appendix));
-    expect(combinationLine1Columns.map((column) => column.width)).toEqual([...columnSums.combinationLine1]);
-    expect(combinationLine2Columns.map((column) => column.width)).toEqual([...columnSums.combinationLine2]);
-  });
-
-  it('keeps the combination row at 28 + 20 = 48 at minimum', () => {
-    expect(layout.combinationRowHeight).toBe(layout.detailRowHeight + layout.combinationRowLine2Height);
   });
 });
 
 describe('the glyph vocabulary', () => {
-  it('holds each mark once, and pins only ↗ to one weight', () => {
+  it('holds each mark once', () => {
     const values = Object.values(glyphs);
     expect(new Set(values).size).toBe(values.length);
-    expect(REGULAR_ONLY_GLYPHS).toEqual(['↗']);
   });
 });

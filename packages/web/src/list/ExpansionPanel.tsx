@@ -1,133 +1,173 @@
-import type { JSX } from 'react';
+import { useState, type JSX } from 'react';
 
-import { colors, px, layout, typeStyle } from '../theme/tokens';
-import { CombinationRow, type Combination } from './CombinationRow';
+import { EstimateMark } from '../marks/marks';
+import { TOP_LINES } from '../shared/product';
+import { colors, spacing, typeStyle } from '../theme/tokens';
 import { combinationString } from './combination-text';
-import type { ClassDisplayRow, CraftedCombination, DisplayRow } from './display-rows';
-import { classPanelSubLine, NO_AFFIXES, rawCombinationNote, rawPanelSubLine } from './format';
+import type { ClassDisplayRow, CraftedCombination, DisplayRow, PrunedCombination } from './display-rows';
+import { ExpansionLine, PrunedLine, type LineView } from './expansion/ExpansionLine';
+import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, moreLinesCopy, prunedCopy } from './format';
+import { NAME_COLORS } from './RankedRow';
+import { TRUST_JOINER } from './row/trust-words';
 import { tradeSearchHref } from './trade-link';
-import { UnitGlyph, type Unit } from './UnitGlyph';
 
-// A Raw Base is the degenerate Combination of no affixes (FR-8, FR-3). An unpriced one takes its
-// state's note in place of the raw note (decision 2026-09-26).
-function rawCombination(row: DisplayRow, activeLeague: string): Combination {
+/** A Raw Base expands to one line with no Combination text: the context line names it. */
+function rawLine(row: DisplayRow, activeLeague: string): LineView {
   return {
     key: row.key,
-    text: [{ text: NO_AFFIXES, verbatim: false }],
-    pinned: row.status === 'pinned',
-    state: row.state,
-    note: rawCombinationNote(row.state, row.itemLevel),
-    ages: row.ages,
+    text: [],
+    isPinned: row.status === 'pinned',
+    price: row.price,
+    trust: row.trust,
+    isBelowThreshold: false,
     tradeHref: tradeSearchHref({ ...row.entry, status: row.status }, activeLeague),
     tradeLabel: `Open the trade search for ${row.label}`,
   };
 }
 
-// Follows the raw path; the text is its tier + short form, or the verbatim fallback.
-function craftedCombination(combination: CraftedCombination, className: string, activeLeague: string): Combination {
+function craftedLine(combination: CraftedCombination, className: string, activeLeague: string): LineView {
   return {
     key: combination.key,
     text: combination.text,
-    pinned: combination.status === 'pinned',
-    state: combination.state,
-    note: combination.note,
-    ages: combination.ages,
+    isPinned: combination.status === 'pinned',
+    price: combination.price,
+    trust: combination.trust,
+    isBelowThreshold: combination.isBelowThreshold,
     tradeHref: tradeSearchHref({ ...combination.entry, status: combination.status }, activeLeague),
     tradeLabel: `Open the trade search for ${combinationString(combination.text)} on ${className}`,
   };
 }
 
-// `{components.expansion-panel}`: the row's bottom rule is the panel's top edge, so no top border.
-function ExpansionPanel({
-  unit,
-  label,
-  subLine,
-  combinations,
+/** DESIGN.md `show-more`: accent text, `+` or `−`, no chrome. */
+function ShowMore({
+  name,
+  isOpen,
+  onToggle,
+  children,
 }: {
-  readonly unit: Unit;
-  readonly label: string;
-  readonly subLine: string;
-  readonly combinations: readonly Combination[];
+  readonly name: string;
+  readonly isOpen: boolean;
+  readonly onToggle: () => void;
+  readonly children: string;
 }): JSX.Element {
   return (
-    <div
-      data-expansion-panel=""
-      style={{
-        width: px(layout.contentWidth),
-        boxSizing: 'border-box',
-        margin: `0 0 ${px(layout.s4)}`,
-        padding: `${px(layout.panelPadTop)} ${px(layout.panelPadX)} ${px(layout.panelPadBottom)}`,
-        background: colors.ground,
-        border: `${px(layout.hairline)} solid ${colors['line-strong']}`,
-        borderTop: 'none',
-        whiteSpace: 'normal',
-        cursor: 'default',
-      }}
-    >
-      <h4
-        data-panel-title=""
-        style={{ ...typeStyle('row-name'), display: 'flex', alignItems: 'baseline', margin: 0, color: colors.text }}
-      >
-        <UnitGlyph unit={unit} />
-        <span data-panel-name="" style={{ fontStyle: unit === 'raw' ? 'italic' : 'normal' }}>
-          {label}
-        </span>
-      </h4>
-      <div
-        data-panel-sub=""
+    <div style={{ paddingTop: '8px' }}>
+      <button
+        type="button"
+        data-show-more={name}
+        aria-expanded={isOpen}
+        onClick={onToggle}
         style={{
-          ...typeStyle('note'),
-          margin: `${px(layout.panelSubMarginTop)} 0 ${px(layout.panelSubMarginBottom)}`,
-          color: colors['text-secondary'],
+          ...typeStyle('trust'),
+          padding: 0,
+          border: 0,
+          background: 'none',
+          color: colors.accent,
+          cursor: 'pointer',
         }}
       >
-        {subLine}
-      </div>
-      {combinations.map((combination, index) => (
-        <CombinationRow key={combination.key} combination={combination} last={index === combinations.length - 1} />
-      ))}
+        {children}
+      </button>
     </div>
   );
 }
 
-/** The panel under an open Raw Base row: its sub-line and its single combination. */
-export function RawExpansionPanel({
-  row,
-  threshold,
-  activeLeague,
-}: {
-  readonly row: DisplayRow;
-  readonly threshold: number;
-  readonly activeLeague: string;
-}): JSX.Element {
+/** The name in the row's rarity colour, then the ≈ sentence on a `uniform-prior` row (state 12). */
+function ContextLine({ row }: { readonly row: DisplayRow | ClassDisplayRow }): JSX.Element {
+  const isEstimated = row.unit === 'class' && row.provenance === 'uniform-prior';
   return (
-    <ExpansionPanel
-      unit={row.unit}
-      label={row.label}
-      subLine={rawPanelSubLine(row.itemLevel, threshold)}
-      combinations={[rawCombination(row, activeLeague)]}
-    />
+    <div data-context-line="" style={{ ...typeStyle('note'), padding: '4px 0 8px', color: colors['text-tertiary'] }}>
+      <span data-context-name="" style={{ color: NAME_COLORS[row.unit] }}>
+        {row.label}
+      </span>
+      {isEstimated ? (
+        <span data-context-estimate="">
+          {TRUST_JOINER}
+          <span style={{ display: 'inline-flex', verticalAlign: '-0.125em' }}>
+            <EstimateMark />
+          </span>{' '}
+          {ESTIMATED_ODDS_CONTEXT}
+        </span>
+      ) : undefined}
+    </div>
   );
 }
 
-// Non-pruned entries only: the summands in `core`'s order, then the rest by canonical key.
+// `{components.expansion-panel}`: flush under its open row, the row's bar continued down its edge.
+// Its two toggles are local state, so they reset when the row closes and unmounts the panel.
+function ExpansionPanel({
+  row,
+  lines,
+  pruned,
+}: {
+  readonly row: DisplayRow | ClassDisplayRow;
+  readonly lines: readonly LineView[];
+  readonly pruned: readonly PrunedCombination[];
+}): JSX.Element {
+  const [isGrown, setGrown] = useState(false);
+  const [isPrunedShown, setPrunedShown] = useState(false);
+  const hidden = lines.length - TOP_LINES;
+  const visible = isGrown ? lines : lines.slice(0, TOP_LINES);
+  return (
+    <div
+      data-expansion-panel=""
+      style={{
+        padding: `6px 0 14px ${spacing['expansion-indent']}`,
+        background: colors.surface,
+        borderBottom: `1px solid ${colors.line}`,
+        boxShadow: `inset ${spacing['open-row-bar']} 0 0 ${colors.accent}`,
+        cursor: 'default',
+      }}
+    >
+      <ContextLine row={row} />
+      {visible.map((line) => (
+        <ExpansionLine key={line.key} line={line} />
+      ))}
+      {hidden > 0 ? (
+        <ShowMore
+          name="lines"
+          isOpen={isGrown}
+          onToggle={() => {
+            setGrown((current) => !current);
+          }}
+        >
+          {isGrown ? FEWER_LINES_COPY : moreLinesCopy(hidden)}
+        </ShowMore>
+      ) : undefined}
+      {isPrunedShown ? pruned.map((line) => <PrunedLine key={line.key} text={line.text} reason={line.reason} />) : undefined}
+      {pruned.length > 0 ? (
+        <ShowMore
+          name="pruned"
+          isOpen={isPrunedShown}
+          onToggle={() => {
+            setPrunedShown((current) => !current);
+          }}
+        >
+          {prunedCopy(pruned.length, isPrunedShown)}
+        </ShowMore>
+      ) : undefined}
+    </div>
+  );
+}
+
+/** The panel under an open Raw Base row: its context line and its one line. */
+export function RawExpansionPanel({ row, activeLeague }: { readonly row: DisplayRow; readonly activeLeague: string }): JSX.Element {
+  return <ExpansionPanel row={row} lines={[rawLine(row, activeLeague)]} pruned={[]} />;
+}
+
+/** The panel under an open crafted row: one line per entry in `core`'s order, then the pruned. */
 export function ClassExpansionPanel({
   row,
-  threshold,
-  recipeWord,
   activeLeague,
 }: {
   readonly row: ClassDisplayRow;
-  readonly threshold: number;
-  readonly recipeWord: string;
   readonly activeLeague: string;
 }): JSX.Element {
   return (
     <ExpansionPanel
-      unit={row.unit}
-      label={row.label}
-      subLine={classPanelSubLine(threshold, recipeWord)}
-      combinations={row.combinations.map((combination) => craftedCombination(combination, row.label, activeLeague))}
+      row={row}
+      lines={row.combinations.map((combination) => craftedLine(combination, row.label, activeLeague))}
+      pruned={row.pruned}
     />
   );
 }

@@ -1,0 +1,15 @@
+/*
+ * The trade link is the one target inside an expansion: it turns accent under
+ * the pointer and nothing else in the line responds (EXPERIENCE.md,
+ * Interaction Primitives). Token custom properties only, as frame.css states.
+ */
+
+.fg-trade-link {
+  display: inline-flex;
+  color: var(--fg-color-text-tertiary);
+  text-decoration: none;
+}
+
+.fg-trade-link:hover {
+  color: var(--fg-color-accent);
+}

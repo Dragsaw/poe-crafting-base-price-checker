@@ -6,15 +6,6 @@ export const MINUTE_MS = 60_000;
 export const HOUR_MS = 60 * MINUTE_MS;
 export const DAY_MS = 24 * HOUR_MS;
 
-/** An exact age, no cut-off: `< 1h`, hours, then days; a clock ahead of `now` reads `< 1h`. */
-export function exactAge(clock: string, now: number): string {
-  const hours = (now - Date.parse(clock)) / HOUR_MS;
-  if (hours >= 1) {
-    return hours < 24 ? `${String(Math.floor(hours))}h` : `${String(Math.floor(hours / 24))}d`;
-  }
-  return '< 1h';
-}
-
 function unitAgo(count: number, unit: string): string {
   const units = `${unit}s`;
   return `${String(count)} ${plural(count, unit, units)} ago`;

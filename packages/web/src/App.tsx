@@ -223,7 +223,6 @@ function renderReady({
       <AskingPriceLine />
       <ReadyBody
         set={view.set}
-        now={view.now}
         threshold={threshold}
         ranking={ranking}
         recipe={active}
@@ -236,14 +235,12 @@ function renderReady({
 /** `web` renders the one ranking and orders nothing (AD-4); a recipe click narrows it. */
 function ReadyBody({
   set,
-  now,
   threshold,
   ranking,
   recipe,
   note,
 }: {
   readonly set: ArtifactSet;
-  readonly now: number;
   readonly threshold: number;
   readonly ranking: Ranking;
   /** The active Craft Recipe, or `undefined` when no recipe is loaded. */
@@ -257,25 +254,19 @@ function ReadyBody({
   const { branches, statement, unrankable, banner } = useMemo(() => {
     const active = forRecipe(ranking, recipe);
     return {
-      branches: toListBranches(active, set.dataset.entries, now, {
-        tracked: set.tracked.entries,
-        stats,
-        activeLeague: set.config.league,
-      }),
+      branches: toListBranches(active, set.dataset.entries, { tracked: set.tracked.entries, stats }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
       banner: isBannerRaised(active),
     };
-  }, [ranking, recipe, set, now, threshold, stats]);
+  }, [ranking, recipe, set, threshold, stats]);
   return (
     <>
       {banner && !bannerDismissed ? <UniformPriorBanner onDismiss={() => { setBannerDismissed(true); }} /> : undefined}
       <ListStatement statement={statement} />
       <RankedList
         branches={branches}
-        threshold={threshold}
         activeLeague={set.config.league}
-        recipeWord={recipe?.word}
         note={note}
       />
       <PageTail appendix={<UnrankableAppendix classes={unrankable} />} />

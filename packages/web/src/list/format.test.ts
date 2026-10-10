@@ -1,30 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { NOW } from '../test-support/dom';
-import { TEST_LEAGUE } from '../test-support/artifact-server';
-import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import {
-  classPanelSubLine,
   BELOW_THRESHOLD_NOTE,
-  combinationAges,
-  combinationFigure,
-  craftedCombinationNote,
-  MONEY_PHRASES,
-  PANEL_ASKING_SENTENCE,
-  PRICE_STATE_GLYPHS,
-  RAW_NO_RECIPE_SENTENCE,
-  rawCombinationNote,
-  rawExpansionNote,
+  CURATION_MARKS,
+  FEWER_LINES_COPY,
   itemLevelFloor,
-  rawPanelSubLine,
-  resolvedState,
-  sampleText,
+  MONEY_PHRASES,
+  moreLinesCopy,
+  prunedCopy,
   SELL_AS_IS,
   sellAsIsLine,
-  STATE_NOTES,
-  stateWord,
   unitLabel,
-  type CombinationState,
 } from './format';
 
 describe('the view constants', () => {
@@ -71,104 +57,16 @@ describe('labels', () => {
 });
 
 describe('the expansion copy', () => {
-  const PRICED: Extract<CombinationState, { state: 'priced' }> = { state: 'priced', priceDivine: 0.8, sampleSize: 10, observedAt: hoursBefore(NOW, 11) };
-  const NO_LISTINGS: CombinationState = { state: 'no-listings' };
-  const NEVER: CombinationState = { state: 'not-yet-synced', reason: 'never-synced' };
-  const MISMATCH: CombinationState = { state: 'not-yet-synced', reason: 'league-mismatch' };
-  const NO_RATE: CombinationState = { state: 'not-yet-synced', reason: 'no-exchange-rate' };
-  const UNRESOLVABLE: CombinationState = { state: 'unresolvable' };
-
-  it('notes a crafted summand with nothing, a priced non-summand as below the threshold, and every other state as a Raw Base', () => {
-    expect(craftedCombinationNote(PRICED, true)).toBe('');
-    expect(craftedCombinationNote(PRICED, false)).toBe(BELOW_THRESHOLD_NOTE);
-    expect(BELOW_THRESHOLD_NOTE).toBe('below the threshold — adds nothing to EV');
-    expect(craftedCombinationNote(NO_LISTINGS, false)).toBe(STATE_NOTES['no-listings']);
-    expect(craftedCombinationNote(NEVER, false)).toBe(STATE_NOTES['never-synced']);
-    expect(craftedCombinationNote(MISMATCH, false)).toBe(STATE_NOTES['league-mismatch']);
-    expect(craftedCombinationNote(NO_RATE, false)).toBe(STATE_NOTES['no-exchange-rate']);
-    expect(craftedCombinationNote(UNRESOLVABLE, false)).toBe(STATE_NOTES.unresolvable);
+  // State 39 and Interaction 7: one show-more look, `+` closed and `−` open.
+  it('counts the hidden lines and the pruned lines in the show-more forms', () => {
+    expect(moreLinesCopy(3)).toBe('+ 3 more combinations');
+    expect(FEWER_LINES_COPY).toBe('− show fewer');
+    expect(prunedCopy(2, false)).toBe('+ 2 pruned');
+    expect(prunedCopy(2, true)).toBe('− 2 pruned');
   });
 
-  it('resolves a stored Price State as core resolves a Raw Base: absent is never-synced, another league is a mismatch', () => {
-    const entry = rawEntry('Gold Amulet');
-    expect(resolvedState(undefined, TEST_LEAGUE)).toEqual(NEVER);
-    expect(resolvedState(priced(entry, 0.8, PRICED.observedAt, { league: 'Standard' }), TEST_LEAGUE)).toEqual(MISMATCH);
-    expect(resolvedState(priced(entry, 0.8, PRICED.observedAt), TEST_LEAGUE)).toEqual(PRICED);
-    expect(resolvedState(unpriced(entry, UNRESOLVABLE), TEST_LEAGUE)).toEqual(UNRESOLVABLE);
-    expect(resolvedState(unpriced(entry, NO_RATE), TEST_LEAGUE)).toEqual(NO_RATE);
-  });
-
-  it('labels both clocks, shows priced only on a priced row, and leaves a missing clock empty', () => {
-    expect(combinationAges(PRICED, hoursBefore(NOW, 3), NOW)).toEqual({ observed: 'priced 11h ago', attempted: 'tried 3h ago' });
-    expect(combinationAges(PRICED, undefined, NOW)).toEqual({ observed: 'priced 11h ago', attempted: undefined });
-    expect(combinationAges(NO_LISTINGS, hoursBefore(NOW, 3), NOW)).toEqual({ observed: undefined, attempted: 'tried 3h ago' });
-    expect(combinationAges(MISMATCH, hoursBefore(NOW, 50), NOW)).toEqual({ observed: undefined, attempted: 'tried 2d ago' });
-    expect(combinationAges(UNRESOLVABLE, hoursBefore(NOW, 5), NOW)).toEqual({ observed: undefined, attempted: 'tried 5h ago' });
-  });
-
-  it('leaves both age cells empty for a never-synced entry, even with a stamped clock', () => {
-    expect(combinationAges(NEVER, undefined, NOW)).toEqual({ observed: undefined, attempted: undefined });
-    expect(combinationAges(NEVER, hoursBefore(NOW, 3), NOW)).toEqual({ observed: undefined, attempted: undefined });
-  });
-
-  it('prints the sample: N listings, 1 listing, 0 listings found, no sample', () => {
-    expect(sampleText(PRICED)).toBe('10 listings');
-    expect(sampleText({ ...PRICED, sampleSize: 1 })).toBe('1 listing');
-    expect(sampleText(NO_LISTINGS)).toBe('0 listings found');
-    expect(sampleText(NEVER)).toBe('no sample');
-    expect(sampleText(NO_RATE)).toBe('no sample');
-    expect(sampleText(UNRESOLVABLE)).toBe('no sample');
-  });
-
-  it('prints the state word, with the reason for not-yet-synced, and a glyph per state', () => {
-    expect([PRICED, NO_LISTINGS, NEVER, MISMATCH, NO_RATE, UNRESOLVABLE].map((state) => stateWord(state))).toEqual([
-      'priced',
-      'no-listings',
-      'not-yet-synced · never-synced',
-      'not-yet-synced · league-mismatch',
-      'not-yet-synced · no-exchange-rate',
-      'unresolvable',
-    ]);
-    expect(PRICE_STATE_GLYPHS).toEqual({ priced: '●', 'no-listings': '○', 'not-yet-synced': '∆', unresolvable: '×' });
-  });
-
-  it('prints a figure at 2dp or < 0.01, and a money phrase for no figure', () => {
-    expect(combinationFigure(PRICED)).toEqual({ kind: 'figure', text: '0.80' });
-    expect(combinationFigure({ ...PRICED, priceDivine: 0.003 })).toEqual({ kind: 'figure', text: '< 0.01' });
-    expect(combinationFigure(NO_LISTINGS)).toEqual({ kind: 'phrase', text: 'an open question' });
-    expect(combinationFigure(NEVER)).toEqual({ kind: 'phrase', text: 'no figure yet' });
-    expect(combinationFigure(UNRESOLVABLE)).toEqual({ kind: 'phrase', text: 'not valued' });
-  });
-
-  it('takes the raw note when priced and the state note verbatim otherwise', () => {
-    expect(rawExpansionNote(82)).toBe('no affixes — this Base Type priced as it drops, at Item Level 82');
-    expect(rawCombinationNote(PRICED, 75)).toBe('no affixes — this Base Type priced as it drops, at Item Level 75');
-    expect(rawCombinationNote(NO_LISTINGS, 82)).toBe('nobody is listing this right now — a jackpot and junk look alike here');
-    expect(rawCombinationNote(NEVER, 82)).toBe('no request was ever issued for this entry');
-    expect(rawCombinationNote(MISMATCH, 82)).toBe('the observation belongs to another league');
-    expect(rawCombinationNote(NO_RATE, 82)).toBe('the listing currency had no rate at sync time');
-    expect(rawCombinationNote(UNRESOLVABLE, 82)).toBe('its id is gone from the trade API — a patch did this');
-    expect(STATE_NOTES['no-listings']).not.toMatch(/worthless|no value/);
-  });
-
-  it('repeats the Item Level, the threshold at 2dp, the no-recipe sentence and the asking-price sentence', () => {
-    const line = rawPanelSubLine(82, 0.5);
-    expect(line).toBe(
-      'Uncrafted at Item Level 82, valued at its own current asking price and not at a craft outcome. ' +
-        'One Combination is tracked here: the degenerate Combination of no affixes. ' +
-        'Payout Threshold 0.50 Divine. ' +
-        'No Craft Recipe applies — a Raw Base is sold, not crafted, so it carries no Craft Cost. ' +
-        'Every price here is a current asking price from a live instant-buyout listing.',
-    );
-    expect(line.endsWith(PANEL_ASKING_SENTENCE)).toBe(true);
-    expect(rawPanelSubLine(70, 0.25)).toContain('Item Level 70,');
-    expect(rawPanelSubLine(70, 0.25)).toContain('Payout Threshold 0.25 Divine.');
-    expect(line).toContain(RAW_NO_RECIPE_SENTENCE);
-  });
-
-  it('names the threshold and the active Craft Recipe on a crafted panel', () => {
-    expect(classPanelSubLine(0.5, 'perfect')).toBe(
-      `Payout Threshold 0.50 Divine | Craft Recipe perfect. ${PANEL_ASKING_SENTENCE}`,
-    );
+  it('holds the curation marks and the below-threshold word of the Copy Deck', () => {
+    expect(CURATION_MARKS).toEqual({ pinned: '* pinned', pruned: '† pruned' });
+    expect(BELOW_THRESHOLD_NOTE).toBe('below threshold');
   });
 });

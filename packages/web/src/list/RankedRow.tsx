@@ -3,8 +3,8 @@ import './list.css';
 import type { CSSProperties, JSX } from 'react';
 
 import { colors, rankedRowGrid, spacing, typeStyle } from '../theme/tokens';
-import { CombinationText } from './CombinationRow';
 import { CHASE_CELLS, type ListRow } from './display-rows';
+import { CombinationText } from './expansion/CombinationText';
 import { itemLevelFloor, SELL_AS_IS } from './format';
 import { ExpectedValueCell } from './row/ExpectedValueCell';
 import { cellStyle } from './row/grid';

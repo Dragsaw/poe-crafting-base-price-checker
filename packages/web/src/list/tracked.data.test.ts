@@ -1,9 +1,10 @@
 import { CatalogueStatsFileSchema, TrackedFileSchema } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { cssNumber } from '../test-support/css-number';
-import { combinationLine1Columns, glyphs, typeRoles } from '../theme/tokens';
+import { combinationCellAtContentMin, cssNumber } from '../test-support/css-number';
+import { typeRoles } from '../theme/tokens';
 import { combinationString, combinationText, statTexts } from './combination-text';
+import { CURATION_MARKS } from './format';
 import { shortForm } from './short-forms';
 
 /** The live data/tracked.json against the short-form table and the cell width (pnpm test:data). */
@@ -35,12 +36,11 @@ describe('the live data/tracked.json', () => {
     expect(fallbacks).toEqual([]);
   });
 
-  it('fits the longest combination text inside the combination cell, at line one’s size', () => {
-    const [cell] = combinationLine1Columns;
-    const available = cell.width - cell.padRight;
+  it('fits the longest combination text, led by * pinned, inside the combination cell at content-min', () => {
+    const available = combinationCellAtContentMin();
     const fontSize = cssNumber(typeRoles['line-text'].fontSize);
     const overlong = texts
-      .map((parts) => `${glyphs.pinned} pinned ${combinationString(parts)}`)
+      .map((parts) => `${CURATION_MARKS.pinned} ${combinationString(parts)}`)
       .filter((text) => text.length * ADVANCE_EM * fontSize > available);
     expect(overlong).toEqual([]);
   });

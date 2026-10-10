@@ -65,3 +65,12 @@ export function EstimateMark(): JSX.Element {
     </MarkBox>
   );
 }
+
+/** ↗: a straight shaft rising to the upper right with an open arrowhead (DESIGN.md `trade-link`). */
+export function TradeLinkMark(): JSX.Element {
+  return (
+    <MarkBox name="trade-link" color="currentColor">
+      <path d="M3.5 12.5 L12.5 3.5 M6 3.5 H12.5 V10" strokeLinejoin="round" />
+    </MarkBox>
+  );
+}
