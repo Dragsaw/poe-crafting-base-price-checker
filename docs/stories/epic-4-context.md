@@ -15,12 +15,13 @@ Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the sa
 - Story 4.5: Header controls and the sync button
 - Story 4.6: The footer legend, list statements, failure screens and the appendix restyle
 - Story 4.7: The recipe floor per modifier group
+- Story 4.8: The appendix's raw-ranks note
 
 ## Requirements & Constraints
 
 - Epic 4 retouches FR-3, FR-6 to FR-13, FR-18, FR-24 and FR-25. Their ownership stays with Epics 1 to 3. NFR-10 is the epic's own requirement.
 - **Colour alone never carries a meaning (NFR-10).** The page must still read with every colour removed. Price trust shows by mark silhouette, and the empty slot is the fourth state. Estimated odds show by ≈. Crafted versus Raw Base shows by the sell-as-is line. Rank emphasis and dimmed figures show by weight and the minus sign.
-- A contrast floor of 4.5:1 applies to all text on every surface it sits on. Measure each new colour pairing before it ships.
+- A contrast floor of 4.5:1 applies to all text on every surface it sits on; a colour never goes on a surface where `DESIGN.md` *Colors* (*Measured contrast*) shows it below that floor. Measure each new colour pairing before it ships.
 - A missing figure is never `0`, `0.00` or blank. It is `—` beside a mark, or a phrase where no mark sits.
 - A threshold or recipe change re-ranks synchronously and locally, under 100 ms (NFR-6), with no network request. Only the threshold and the active recipe survive a reload.
 - Static delivery (NFR-7): the page fetches no font from a third party.
@@ -30,7 +31,7 @@ Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the sa
 ## Technical Decisions
 
 - **Theme.** The Mantine theme override layer carries the dark token set of `DESIGN.md`, replacing Mantine's palette, radii, shadows and type ramp. Build `theme.primaryColor` from the bronze accent, so that no Mantine blue appears (blue reads as rarity magic). `defaultRadius` is 0: rows and panels are square, and only controls and floating layers are rounded. One dark theme; it does not follow the OS colour scheme. No component reads a retired paper token.
-- **Typography.** Inter is bundled as `@fontsource-variable/inter`, at the version the spine's Stack table pins. Every role declares a `lineHeight`, because Mantine's default of 1.55 changes row heights. Font sizes are literal px. Column figures use tabular numerals. The marks ◐ ○ ✕ ≈ ▾ ↗ ■ ≥ are inline SVG in a 1em box, not glyphs.
+- **Typography.** Inter is bundled as `@fontsource-variable/inter`, at the version the spine's Stack table pins. Every role declares a `lineHeight`, because Mantine's default of 1.55 changes row heights. Font sizes are literal px. Column figures use tabular numerals. The marks ◐ ○ ✕ ≈ ▾ ↗ ■ ≥ are inline SVG in a 1em box, not glyphs. The text characters that `DESIGN.md` *Typography* lists after the marks stay Inter and must render at every weight the page uses; Story 4.1 ran that check and found no gap (its Implementation Notes).
 - **Price trust (AD-17, AD-10).** `core` computes a four-state verdict (current, rough, pending, broken) with its reason, on every `RankedRow` and beside every combination. Inputs are the Price State, the age under AD-10's clock and `sampleSize`. The age is `observedAt` when an observation exists, else `lastAttemptedAt`; a never-attempted entry has no age. The clock is passed in. The old, thin and share thresholds are `core` named constants, not config, and `web` never copies them.
   - A raw row's verdict is its one entry's verdict.
   - A crafted row follows the ordered rules of *Price trust*, first match wins. *No priced combination* matches before the share rule. No zero-gross fallback.
@@ -55,6 +56,6 @@ Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the sa
 
 ## Cross-Story Dependencies
 
-- Order: 4.1, then 4.2, then 4.3, then 4.7 ahead of 4.4 to 4.6, then 4.6 last. Story 4.7 touches no UI file of 4.4 to 4.6. Story 4.1 provides the token layer and the header bar slots that Story 4.5 fills. Stories 4.3 and 4.4 render the verdict that Story 4.2 returns, and `web` must not recompute it. Story 4.6 retires components only after Stories 4.3 to 4.5 have replaced what they did.
+- Order: 4.1, 4.2 and 4.3 (`epics.md` *Order*), then 4.7, the `tracked.json` re-check, 4.4, 4.5 and 4.6 (`docs/sprint-change-proposal-2026-10-10.md` *Order*). Story 4.8 waits on its open question. Story 4.7 touches no UI file of 4.4 to 4.6. Story 4.1 provides the token layer and the header bar slots that Story 4.5 fills. Stories 4.3 and 4.4 render the verdict that Story 4.2 returns, and `web` must not recompute it. Story 4.6 retires components only after Stories 4.3 to 4.5 have replaced what they did.
 - After Story 4.7, previously pruned `tracked.json` entries are re-checked with the tracked-json skill, and reachable ones are restored. Any entry still unreachable stays pruned so `test:data` stays green.
 - The epic builds on the Epic 2 page (rows, threshold, expansion, sync report, appendix) and the Epic 3 crafted branch (recipe control, chase cells, Provenance). Story 4.7 supersedes Story 3.4's recipe-floor rule. The epic changes nothing in `sync`.
