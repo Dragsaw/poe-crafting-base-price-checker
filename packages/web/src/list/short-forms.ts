@@ -67,6 +67,14 @@ export const SHORT_FORMS: Readonly<Record<string, string>> = {
   'explicit.stat_1998951374': 'Allies Atk Spd',
   'explicit.stat_289128254': 'Allies Cast Spd',
   'explicit.stat_1574590649': 'Allies Flat Phys',
+  'explicit.stat_669069897': 'Mana Leech',
+  'explicit.stat_707457662': 'Mana Leech',
+  'explicit.stat_2557965901': 'Life Leech',
+  'explicit.stat_4067062424': 'Added Cold',
+  'explicit.stat_1573130764': 'Added Fire',
+  'explicit.stat_3032590688': 'Added Phys',
+  'explicit.stat_2897413282': 'All Attr',
+  'explicit.stat_809229260': 'Armour',
 };
 
 /** The short form for `statId`, or `undefined` for a product gap (no entry in the table). */

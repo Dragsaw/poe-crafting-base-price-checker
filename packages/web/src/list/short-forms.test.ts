@@ -9,7 +9,7 @@ const tracked = TrackedFileSchema.parse(committed['../../../../test/fixtures/fro
 describe('the short-form table', () => {
   it('gives no two modifiers one form (coinage rule 3), but for a Local variant that shares its global twin’s form', () => {
     // A jewel or ring rolls the global modifier and a weapon the Local one; to the player they are one stat.
-    const LOCAL_VARIANTS = new Set(['explicit.stat_210067635']);
+    const LOCAL_VARIANTS = new Set(['explicit.stat_210067635', 'explicit.stat_669069897', 'explicit.stat_809229260', 'explicit.stat_2897413282']);
     const forms = Object.entries(SHORT_FORMS)
       .filter(([statId]) => !LOCAL_VARIANTS.has(statId))
       .map(([, form]) => form);
