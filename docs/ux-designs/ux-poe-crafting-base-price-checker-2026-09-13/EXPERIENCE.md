@@ -1,7 +1,7 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 26
+revision: 27
 created: 2026-09-13
 updated: 2026-10-10
 sources:
@@ -81,16 +81,12 @@ row of this folder's `.memlog.md` that holds the decision.
 - The reason string that a recipe-scoped Unrankable would need (state 36). The PRD
   owns that extension.
 
-**Known gaps for the build stories** (memlog 279). Nobody ruled on these. The
-build story that meets a gap rules on it. This document does not invent an answer
-now.
+**Known gaps** (memlog 279, 288). Nobody ruled on these, and this document does
+not invent an answer now. The owner is UX. Each gap has a
+`docs/stories/deferred-work.md` entry (memlog 288).
 
 - The failure paths of UJ-3, UJ-4 and UJ-5.
-- The page when `sync-report.json` is absent.
-- State 35's branch boundary and the look of its suppressed ranks.
 - The show-more affordance when the list has 20 rows or fewer.
-- An expansion panel whose every line is pruned.
-- A non-numeric threshold entry.
 
 ## Information Architecture
 
@@ -169,7 +165,8 @@ coverage fraction with its denominator is one click down, in the sync report.
   a second line, for its prune reason. Line treatments: states 1–10 and 20.
 - **Line order** (memlog 265). Priced lines come first, by their contribution to
   EV, largest first. Then come below-threshold lines, then pending, then broken.
-  Pruned lines come last, behind `+ N pruned` (Interaction 3).
+  Pruned lines come last, behind `+ N pruned` (Interaction 3). A panel whose
+  every line is pruned cannot occur (spec-4-4, Design Notes; memlog 288).
 - **Top lines.** The panel opens on the top 8 lines of that order (state 39).
 - **A Raw Base** expands to one line (memlog 265). The line has no Combination
   text, because the context line names the base. It holds the price or `—`, the
@@ -493,7 +490,7 @@ The headings, figure groups and diagnosis lead (memlog 278):
 | Place | String |
 |---|---|
 | Appendix title | `Appendix: Unrankable — N Item Classes` |
-| Appendix reasons | `pool partial` · `class absent from weights file` · `class disagrees with weights file`, verbatim from FR-4. One string covers all five cross-file checks. FR-4 owns this enum, so re-read FR-4 on every absorption rather than trusting this copy |
+| Appendix reasons | `pool partial` · `class absent from weights file` · `class disagrees with weights file`. FR-4 owns the three causes, and this row owns their words. One string covers all five cross-file checks (memlog 288) |
 | Appendix lead | `Tracked, but kept out of the ordering.` (memlog 278) |
 | Appendix note, state 14 | `ranks once the weights file covers its whole pool` |
 | Appendix note, state 15 | `may return after the next weights run` |
@@ -760,6 +757,13 @@ height cap.
 4. **Built from.** The two attribution lines, and one `Not published` line per
    absent tolerable file (state 38).
 
+**With no `sync-report.json`** (spec-4-5, Decision 1; memlog 288), the sync button
+takes the Copy Deck row *Sync button, sync time unknown*, or *Sync button, a
+problem holds* when the dataset holds broken entries (state 31). Problems still
+lists the dataset's broken entries (state 31). The panel shows `unknown` for each
+report figure, and Built from carries the `sync-report.json` absence line
+(state 38).
+
 ### Two registers in one panel
 
 (memlog 206, 208) The cross-file diagnosis makes the sync report the one region
@@ -825,7 +829,7 @@ number.
 | 32 | Sync report open | `{components.sync-report-panel}` | Interaction 5 opens it. Its content follows *The sync report*. It caps its height and scrolls inside past the cap (DESIGN.md) |
 | 33 | Ranked list grown past 20 | Ranked list | Interaction 4 grows it. The list holds every ranked unit. Ranks 21+ are plain. The appendix and footer stay below. A click caused the growth, so it may scroll the page |
 | 34 | Craft Recipe switched | Whole list + `{components.recipe-toggle}` | Interaction 1a. A row's ≈ swaps silently when the new pair differs (memlog 238) |
-| 35 | Active recipe uncostable | `{components.recipe-toggle}` + ranked list | A recipe that names a currency with no current rate is **uncostable**. It is never costed at zero (FR-26, AD-20). Craft Cost reads `no figure yet`. **Every row stays** (memlog 205), and no class becomes Unrankable. **Each branch keeps its own order, and no rank numeral spans the two.** Rank numerals are suppressed, and the top-five emphasis runs **per branch**. A list statement names the active recipe. It says that the two branches are not comparable while the state holds. Every crafted row reads ○ with EV `—` (*Price trust*). **FR-5's bound applies per branch**: up to 20 rows of each, with one list affordance under each. Thus the resting page can hold 40 rows and scroll |
+| 35 | Active recipe uncostable | `{components.recipe-toggle}` + ranked list | A recipe that names a currency with no current rate is **uncostable**. It is never costed at zero (FR-26, AD-20). Craft Cost reads `no figure yet`. **Every row stays** (memlog 205), and no class becomes Unrankable. **Each branch keeps its own order, and no rank numeral spans the two.** Rank numerals are suppressed, and the top-five emphasis runs **per branch**. A list statement names the active recipe. It says that the two branches are not comparable while the state holds. Every crafted row reads ○ with EV `—` (*Price trust*). **FR-5's bound applies per branch**: up to 20 rows of each, with one list affordance under each. Thus the resting page can hold 40 rows and scroll. **The branch boundary has no chrome of its own**: the raw branch's list affordance ends it, and the crafted branch follows. The rank cell stays reserved and blank (spec-4-6, Decision 2; memlog 288) |
 | 36 | An Item Class unrankable under one recipe only | Appendix or list | AD-17 makes that pair unrankable only when a tracked entry of the class cannot be reached under that recipe. `pnpm tracked:check` rejects such an entry, so this state is a backstop. The class is Unrankable while that recipe is active, and it ranks under the other. **FR-4's reason enum is not extended** (the PRD's memlog, row 151). `[NOTE FOR UX]` If it ever fires, neither string describes it, and the enum is the PRD's to extend |
 | 37 | Unrankable appendix with no rows | `{components.unrankable-appendix}` | (memlog 214) No recipe published (state 43), or `recipes.json` absent. The appendix keeps its place and shows its title alone, `Appendix: Unrankable — 0 Item Classes`, with a neutral count. **It does not say why it is empty.** It never prints `class absent from weights file` while a weights envelope is loaded |
 | 38 | A tolerable file absent | `{components.sync-report-panel}` | (memlog 213, 258 N-8) One plain `Not published` line per absent file in the Built from column, with no mark and no colour. **Not a counted problem.** The line gives the reason once. Nothing else on the page repeats it: not the appendix (state 37) and not the `unknown` fields. An absent `weights.json` also turns the *Weights File* fields to `unknown`. An absent `recipes.json` also gives state 43 |
@@ -851,8 +855,10 @@ identifiers.
    - **Click the figure and type**, to 0.01. The `div` unit is outside the
      editable region. Re-ranking fires on every valid parse, debounced about
      150 ms `[ASSUMPTION — memlog 38]`. Thus typing `0.25` does not re-rank at `0`
-     and again at `0.2`. Out-of-range input is clamped on blur. The slider follows
-     the typed value. Its thumb sits between steps when the value does.
+     and again at `0.2`. Out-of-range input is clamped on blur. Non-numeric input
+     does not re-rank, and blur restores the last valid figure (spec-4-5,
+     Decision 3; memlog 288). The slider follows the typed value. Its thumb sits
+     between steps when the value does.
    - **Constraints, shared by both** (memlog 74): min `0`, max `3`, 2 decimal
      places. The slider is linear across that range. A negative threshold cannot
      be entered.

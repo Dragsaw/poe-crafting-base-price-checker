@@ -42,3 +42,21 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: "[NOTE FOR UX] Write the R7 ruling into EXPERIENCE.md *Estimated odds* and state 12: a uniform-prior row whose EV cell is `—` (pending, broken, uncostable) carries no ≈, and its expansion context line ends at the name. Today the text says every uniform-prior row prints ≈."
   evidence: Epic 4 retro R7 and action item 3 (`docs/stories/epic-4-retro-2026-10-10.md`). The code now gates both the EV cell and the context line on `hasEstimate` in `packages/web/src/list/display-rows.ts`. EXPERIENCE.md *Provenance* row (`uniform-prior` prints ≈) and state 12 have no exception for a `—` cell.
   retry_when: never — needs a human
+
+
+## Deferred from: epic 4 retro item 5 (2026-10-10)
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
+  summary: UX rules on the failure paths of UJ-3, UJ-4 and UJ-5 and writes the ruling into EXPERIENCE.md.
+  evidence: EXPERIENCE.md Foundation *Known gaps* and Coverage Self-Check list them as unruled, owner UX (UX memlog 279, 288); epic-4-retro-2026-10-10.md finding S-Gaps. Nobody raised them during Epic 4.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
+  summary: UX rules on the list show-more affordance when the ranked list has 20 rows or fewer, and writes the ruling into EXPERIENCE.md.
+  evidence: EXPERIENCE.md Foundation *Known gaps* lists it as unruled, owner UX (UX memlog 279, 288); Interaction 4 and state 33 cover only a list past 20 rows; epic-4-retro-2026-10-10.md finding S-Gaps.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-5-owner-doc-hygiene.md`
+  summary: UX reconciles the EXPERIENCE.md Coverage Self-Check failure-path sentence with *Known gaps*, ruling whether UJ-6 has a failure path.
+  evidence: EXPERIENCE.md Coverage Self-Check says failure paths other than UJ-1 and UJ-2 are known gaps, which covers UJ-6, but *Known gaps* lists only UJ-3 to UJ-5 (memlog 279). Pre-existing; review finding 10 of this spec.
+  retry_when: never — needs a human

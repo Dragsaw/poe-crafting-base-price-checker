@@ -2484,7 +2484,7 @@ So that I discount a row rather than acting on it, and a placeholder never keeps
 
 The player reads the same ranked list on a dark, rarity-coloured page. Silence means a current price and measured odds. A row speaks only when its price needs attention. Sync health is visible without a click. The epic builds on Epics 1 to 3 and changes no sync behaviour.
 
-**Source of truth.** `EXPERIENCE.md` revision 25 and `DESIGN.md` revision 19 replace the paper direction. Every acceptance criterion cites a state number or a section of those documents and copies no string, threshold or token value. PRD revision 27 holds the promises (FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25, NFR-10). `ARCHITECTURE-SPINE.md` revision 32 holds the decisions: AD-17 *Price trust*, AD-12's problem-count sources and the Stack table's Inter entry.
+**Source of truth.** `EXPERIENCE.md` revision 27 and `DESIGN.md` revision 21 replace the paper direction. Every acceptance criterion cites a state number or a section of those documents and copies no string, threshold or token value. PRD revision 27 holds the promises (FR-3, FR-6 to FR-13, FR-18, FR-24, FR-25, NFR-10). `ARCHITECTURE-SPINE.md` revision 35 holds the decisions: AD-17 *Price trust*, AD-12's problem-count sources and the Stack table's Inter entry.
 
 **Order.** 4.1, then 4.2, then 4.3, then 4.7 and the re-check of the pruned `tracked.json` entries, then 4.4 to 4.6, then 4.8. `docs/sprint-change-proposal-2026-10-10.md` *Order* owns the place of 4.7 and the re-check. Story 4.8 follows 4.6 because it closes an open question that 4.6 left. `pnpm check` is green after each story.
 
@@ -2500,7 +2500,7 @@ So that the controls and the sync health are always where I look.
 
 **Given** the page
 **When** it renders
-**Then** the Mantine theme override layer carries `DESIGN.md` revision 19's dark token set, and the fixed paper frame is gone
+**Then** the Mantine theme override layer carries `DESIGN.md` revision 21's dark token set, and the fixed paper frame is gone
 **And** no component reads a retired paper token (NFR-10; `DESIGN.md`).
 
 **Given** the typeface
@@ -2629,7 +2629,7 @@ So that I set what counts as a win and know whether the list is healthy without 
 
 **Given** the threshold control
 **When** the player changes it
-**Then** the list follows at once, with no request and no sync, and the value survives a reload (FR-6, FR-7, NFR-6; Interaction 2)
+**Then** the list follows at once, with no request and no sync, and the value survives a reload (FR-6, FR-7, NFR-6; Interaction 1)
 **And** the control's unset state is the one `EXPERIENCE.md` states, with no PRD default (FR-7).
 
 **Given** the recipe control
@@ -2673,7 +2673,7 @@ So that no retired element is left over.
 
 **Given** the Unrankable appendix
 **When** it renders
-**Then** it follows `DESIGN.md` revision 19 with the reasons of states 14, 15, 15a and 16, and its empty form follows state 37 (FR-4).
+**Then** it follows `DESIGN.md` revision 21 with the reasons of states 14, 15, 15a and 16, and its empty form follows state 37 (FR-4).
 
 **Given** NFR-10
 **When** the whole page is checked

@@ -4,7 +4,7 @@
 
 ## Goal
 
-Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the same, and it now sits on one dark charcoal page coloured by game rarity. A crafted Item Class prints in magic blue and a Raw Base in normal grey. Silence is the statement: a row with a current price and measured odds carries no mark. A row speaks only when its price needs attention. Sync health shows on the header without a click. The epic also moves the price-trust verdict into `core`, retires the paper direction's leftover components, corrects the recipe floor so that a greater or perfect recipe is valued on the modifiers it can really roll, and adds the appendix note that an unrankable Item Class still has Base Types ranking as Raw Base rows. It changes no sync behaviour. `EXPERIENCE.md` revision 25 and `DESIGN.md` revision 19 are the source of truth for the page. Acceptance criteria cite state numbers and sections of those documents. They never copy a string, threshold or token value.
+Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the same, and it now sits on one dark charcoal page coloured by game rarity. A crafted Item Class prints in magic blue and a Raw Base in normal grey. Silence is the statement: a row with a current price and measured odds carries no mark. A row speaks only when its price needs attention. Sync health shows on the header without a click. The epic also moves the price-trust verdict into `core`, retires the paper direction's leftover components, corrects the recipe floor so that a greater or perfect recipe is valued on the modifiers it can really roll, and adds the appendix note that an unrankable Item Class still has Base Types ranking as Raw Base rows. It changes no sync behaviour. `EXPERIENCE.md` revision 27 and `DESIGN.md` revision 21 are the source of truth for the page. Acceptance criteria cite state numbers and sections of those documents. They never copy a string, threshold or token value.
 
 ## Stories
 
@@ -25,7 +25,7 @@ Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the sa
 - A missing figure is never `0`, `0.00` or blank. It is `—` beside a mark, or a phrase where no mark sits.
 - A threshold or recipe change re-ranks synchronously and locally, under 100 ms (NFR-6), with no network request. Only the threshold and the active recipe survive a reload.
 - Static delivery (NFR-7): the page fetches no font from a third party.
-- `web` derives no trust fact, no freshness cut-off and no problem count of its own.
+- `web` derives no trust fact and no freshness cut-off, and reads each problem count from the source AD-12 names.
 - `pnpm check` must be green after each story.
 
 ## Technical Decisions
@@ -52,7 +52,7 @@ Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the sa
 - **Controls.** The threshold slider snaps to 0.05 and re-ranks live; the typed figure re-ranks debounced. The recipe toggle is a segmented control, re-ranks undebounced and keeps open panels open. States 35, 42 and 43 handle an uncostable recipe, one recipe and no recipe.
 - **Expansion.** Opens in place and instantly; several panels may be open. A context line comes first, then one line per entry: priced by contribution, below-threshold, pending, broken. Pruned lines sit behind `+ N pruned`. The panel opens on its top lines with a remainder affordance (state 39).
 - **Tooltips** are only the row mark, the EV label and a cut chase cell, and never hold a control. Modals, drawers, sorting, animation and polling are banned.
-- **Open gaps** are left to the build stories; a story that meets one raises it and does not settle it silently: the failure paths of UJ-3 to UJ-5, the page when `sync-report.json` is absent, the state 35 branch boundary and its suppressed ranks, the show-more affordance at 20 rows or fewer, an expansion whose every line is pruned, and a non-numeric threshold entry.
+- **Open gaps.** `EXPERIENCE.md` holds the rulings on an absent `sync-report.json`, the state 35 branch boundary, an all-pruned expansion and a non-numeric threshold entry (UX memlog 288). Two gaps stay open, owner UX, each with a `deferred-work.md` entry: the failure paths of UJ-3 to UJ-5, and the show-more affordance at 20 rows or fewer. A story that meets one raises it and does not settle it silently.
 
 ## Cross-Story Dependencies
 

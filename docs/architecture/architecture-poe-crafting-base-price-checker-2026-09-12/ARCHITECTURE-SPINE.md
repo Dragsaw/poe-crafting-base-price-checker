@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 34
+revision: 35
 created: '2026-09-12'
 updated: '2026-10-10'
 binds: []
