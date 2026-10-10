@@ -88,6 +88,16 @@ describe('a ranked crafted row', () => {
     expect(document.body.querySelector('[role="tooltip"]')).toBeNull();
   });
 
+  it.each([
+    ['pending', 'no-prices'],
+    ['broken', 'all-broken'],
+    ['pending', 'uncostable'],
+  ] as const)('draws no ≈ beside `—` on a uniform-prior %s row (%s)', (verdict, kind) => {
+    const row = mountRow(craftedRow({ provenance: 'uniform-prior', ev: { kind: 'missing' }, trust: { verdict, reasons: [{ kind }] } }));
+    expect(valueCellOf(row)?.textContent).toBe(MISSING_FIGURE);
+    expect(row.querySelector('[data-estimate]')).toBeNull();
+  });
+
   // Matrix: rough share (state 17).
   it('draws ◐ for a rough share and names the share in the mark tooltip', () => {
     const share = { kind: 'unreliable-share', percent: 74 } as const;

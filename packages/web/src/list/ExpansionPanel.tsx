@@ -5,7 +5,7 @@ import { TOP_LINES } from '../shared/product';
 import { ShowMore } from '../shared/ShowMore';
 import { colors, spacing, typeStyle } from '../theme/tokens';
 import { combinationString } from './combination-text';
-import type { ClassDisplayRow, CraftedCombination, DisplayRow, PrunedCombination } from './display-rows';
+import { hasEstimate, type ClassDisplayRow, type CraftedCombination, type DisplayRow, type PrunedCombination } from './display-rows';
 import { ExpansionLine, PrunedLine, type LineView } from './expansion/ExpansionLine';
 import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, moreLinesCopy, prunedCopy } from './format';
 import { NAME_COLORS } from './RankedRow';
@@ -39,9 +39,9 @@ function craftedLine(combination: CraftedCombination, className: string, activeL
   };
 }
 
-/** The name in the row's rarity colour, then the ≈ sentence on a `uniform-prior` row (state 12). */
+/** The name in the row's rarity colour, then the ≈ sentence when the row carries ≈ (state 12). */
 function ContextLine({ row }: { readonly row: DisplayRow | ClassDisplayRow }): JSX.Element {
-  const isEstimated = row.unit === 'class' && row.provenance === 'uniform-prior';
+  const isEstimated = hasEstimate(row);
   return (
     <div data-context-line="" style={{ ...typeStyle('note'), padding: '4px 0 8px', color: colors['text-tertiary'] }}>
       <span data-context-name="" style={{ color: NAME_COLORS[row.unit] }}>

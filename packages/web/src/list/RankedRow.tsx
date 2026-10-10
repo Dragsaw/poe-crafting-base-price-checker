@@ -6,7 +6,7 @@ import { useState, type CSSProperties, type JSX } from 'react';
 import { colors, markTooltipInset, rankedRowGrid, spacing, typeStyle } from '../theme/tokens';
 import type { ChaseCellCount } from './ranked-list/chase-count';
 import type { AffixPart } from './combination-text';
-import { CHASE_CELLS, type ListRow } from './display-rows';
+import { hasEstimate, CHASE_CELLS, type ListRow } from './display-rows';
 import { CombinationText, type CombinationTones } from './expansion/CombinationText';
 import { itemLevelFloor, SELL_AS_IS } from './format';
 import { ExpectedValueCell } from './row/ExpectedValueCell';
@@ -92,7 +92,7 @@ export function RankedRow({
       <ExpectedValueCell
         ev={row.ev}
         trust={row.trust}
-        isEstimated={row.unit === 'class' && row.provenance === 'uniform-prior'}
+        isEstimated={hasEstimate(row)}
         isEmphasised={isEmphasised}
       />
       {isRaw ? <SellAsIsCell itemLevel={row.itemLevel} /> : <ChaseCells chase={row.chase} count={chaseCells} />}

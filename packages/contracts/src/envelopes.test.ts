@@ -80,7 +80,7 @@ describe('parseEnvelope', () => {
     });
   });
 
-  // Story 4.8, I/O matrix "2.x tracked file": a raw entry now names its class.
+  // Refused because a 2.x raw entry names no item class.
   it('refuses a tracked file at the earlier 2.x major as unknown-major, never a throw', () => {
     const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '2.0.0' }, TRACKED_SCHEMA_VERSION);
     expect(result).toEqual({
