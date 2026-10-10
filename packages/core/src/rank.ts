@@ -4,6 +4,7 @@ import type {
   CraftRecipe,
   CurrencyRate,
   DatasetEntry,
+  PriceTrust,
   RankedRow,
   RawRankedRow,
   TrackedEntry,
@@ -14,7 +15,7 @@ import type {
 import { craftCost, type CraftCostResult } from './craft-cost.ts';
 import { classKeyOf, craftedClassesOf } from './crafted-classes.ts';
 import type { CrossFileFailure } from './cross-file.ts';
-import { assertClock } from './price-trust.ts';
+import { assertClock, entryTrust, NO_RECIPE_TRUST } from './price-trust.ts';
 import { isEmptyPool, poolOf } from './probability.ts';
 import { compareOrdering } from './rank-order.ts';
 import { craftedRow } from './rank-crafted-row.ts';
@@ -41,7 +42,7 @@ export interface RankInput {
   readonly weights: WeightsFile | undefined;
   /** Cross-file failures from `crossFileChecks`, once per load; other Unrankable reasons win. */
   readonly crossFileFailures?: readonly Pick<CrossFileFailure, 'categoryId' | 'className'>[];
-  /** The Craft Recipes in `recipes.json` order (AD-3); absent or empty means no crafted row. */
+  /** The Craft Recipes in `recipes.json` order (AD-3); absent or empty fills `recipeless`, not `ordering`. */
   readonly recipes?: readonly CraftRecipe[];
   /** The rate set `core` costs recipes from: `dataset.json`'s `currencyRates` (AD-20). Absent means none. */
   readonly currencyRates?: readonly CurrencyRate[];
@@ -67,6 +68,16 @@ export interface UnrankableClass {
   readonly recipeId?: string;
 }
 
+/** A rankable crafted class while no recipe is published (state 43): no EV, odds or provenance exist. */
+export interface RecipelessClass {
+  readonly classKey: string;
+  readonly categoryId: string;
+  readonly className: string;
+  readonly itemLevelMin: number;
+  readonly trust: PriceTrust;
+  /** Each non-pruned entry's verdict, in canonical key order. */
+  readonly combinations: readonly { readonly entryKey: string; readonly trust: PriceTrust }[];
+}
 
 export interface Ranking {
   /**
@@ -83,6 +94,8 @@ export interface Ranking {
   readonly unresolvable: readonly UnrankedEntry[];
   /** One per Unrankable class and unreachable pair; by `className`, `categoryId`, `recipeId`. */
   readonly unrankable: readonly UnrankableClass[];
+  /** Empty unless the recipe set is absent or empty; then each rankable crafted class, by class key. */
+  readonly recipeless: readonly RecipelessClass[];
   /** The recipes `core` could not cost, in `recipes.json` file order, each naming its first unrated currency (AD-20). */
   readonly uncostableRecipes: readonly UncostableRecipe[];
   /** Some non-pruned entry has a `priced` observation in the active league; false after a reset. */
@@ -181,6 +194,13 @@ interface CostedRecipe {
   readonly cost: CraftCostResult;
 }
 
+/** Where one class's outcome lands: ranked rows, unreachable pairs, or the recipeless group. */
+interface RankedClasses {
+  readonly surviving: RankedRow[];
+  readonly unrankable: Map<string, UnrankableClass>;
+  readonly recipeless: RecipelessClass[];
+}
+
 interface RankClassContext {
   readonly costed: readonly CostedRecipe[];
   readonly byKey: ReadonlyMap<string, DatasetEntry>;
@@ -190,8 +210,7 @@ interface RankClassContext {
 function rankCraftedClass(
   { pools, entries }: RankableClass,
   { costed, byKey, input }: RankClassContext,
-  surviving: RankedRow[],
-  unrankable: Map<string, UnrankableClass>,
+  out: RankedClasses,
 ): void {
   // Canonical key order, so the summation order and so the figure never depend on the input order.
   const keyed = entries
@@ -202,25 +221,30 @@ function rankCraftedClass(
     return;
   }
   if (costed.length === 0) {
-    // No recipe exists to try, so the class would be in neither list nor appendix. Retro item 29.
-    unrankable.set(classKeyOf(first.categoryId, first.className), {
+    out.recipeless.push({
+      classKey: classKeyOf(first.categoryId, first.className),
       categoryId: first.categoryId,
       className: first.className,
-      reason: RECIPE_UNREACHABLE,
+      itemLevelMin: first.itemLevelMin,
+      trust: NO_RECIPE_TRUST,
+      combinations: keyed.map(({ entry, entryKey }) => ({
+        entryKey,
+        trust: entryTrust(entry, byKey.get(entryKey), input.activeLeague, input.now),
+      })),
     });
     return;
   }
   for (const { recipe, cost } of costed) {
     const row = craftedRow({ first, recipe, cost, pools, keyed, byKey, activeLeague: input.activeLeague, threshold: input.threshold, now: input.now });
     if (row === undefined) {
-      unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
+      out.unrankable.set(JSON.stringify([classKeyOf(first.categoryId, first.className), recipe.id]), {
         categoryId: first.categoryId,
         className: first.className,
         reason: RECIPE_UNREACHABLE,
         recipeId: recipe.id,
       });
     } else {
-      surviving.push(row);
+      out.surviving.push(row);
     }
   }
 }
@@ -261,8 +285,9 @@ export function rank(input: RankInput): Ranking {
 
   const raw = groupRawEntries(input.tracked, byKey, input);
   const { unrankable, rankable } = sortCraftedClasses(input);
+  const recipeless: RecipelessClass[] = [];
   for (const crafted of rankable.values()) {
-    rankCraftedClass(crafted, { costed, byKey, input }, raw.surviving, unrankable);
+    rankCraftedClass(crafted, { costed, byKey, input }, { surviving: raw.surviving, unrankable, recipeless });
   }
 
   return {
@@ -272,6 +297,7 @@ export function rank(input: RankInput): Ranking {
     notYetSynced: raw.notYetSynced.toSorted(byEntryKey),
     unresolvable: raw.unresolvable.toSorted(byEntryKey),
     unrankable: unrankable.values().toArray().toSorted(byItemClass),
+    recipeless: recipeless.toSorted((left, right) => compareCanonicalKeys(left.classKey, right.classKey)),
     uncostableRecipes: uncostableOf(costed),
     pricedInLeague: hasPricedInLeague(input, byKey),
   };

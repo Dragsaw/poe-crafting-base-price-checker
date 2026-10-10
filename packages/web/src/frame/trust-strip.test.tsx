@@ -86,13 +86,14 @@ describe('the resting strip', () => {
   });
 
   // Matrix: no edit date.
-  it('reads an italic unknown with no edit date', () => {
+  it('reads an upright unknown with no edit date', () => {
     const figures = { ...COMMITTED_REPORT.figures };
     delete figures.trackedListEditedAt;
     mountStrip({ syncReport: { ...COMMITTED_REPORT, figures } });
     expect(line('sync')).toMatch(/Tracked List last edited {2}unknown$/);
     const missing = strip().querySelector<HTMLElement>('[data-trust-line="sync"] [data-missing]');
-    expect(missing?.style.fontStyle).toBe('italic');
+    expect(missing?.tagName).toBe('SPAN');
+    expect(missing?.style.fontStyle).toBe('');
   });
 
   // Matrix: weights absent.

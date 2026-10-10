@@ -99,6 +99,7 @@ describe('the non-empty appendix', () => {
       expect(mark?.textContent).toBe(`${glyphs.unknown}${HAIR_SPACE}unknown`);
       expect(row.querySelector('[data-cell="reason"]')?.textContent).toBe(REASON);
       expect(row.querySelector('[data-cell="note"]')?.textContent).toBe('');
+      expect(row.querySelector<HTMLElement>('[data-cell="note"]')?.style.fontStyle).toBe('');
     }
   });
 

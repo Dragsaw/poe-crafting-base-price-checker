@@ -157,7 +157,8 @@ describe('the Craft Recipe control', () => {
     expect(slot?.children).toHaveLength(0);
     expect(slot?.style.width).toBe(px(HEADER_SLOT_WIDTHS.recipe));
     expect(frame().textContent).not.toContain(RECIPE_COST_UNIT);
-    expect(names()).toEqual(['Wide Belt', 'Gold Amulet']);
+    // The crafted classes list unranked below the Raw Bases, in class key order.
+    expect(names()).toEqual(['Wide Belt', 'Gold Amulet', 'Bows', 'Staves']);
   });
 
   it('takes the refusal screen when two recipes derive one word, or one mixes grades', async () => {

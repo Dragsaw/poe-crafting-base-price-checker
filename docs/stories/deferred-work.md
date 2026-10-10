@@ -31,16 +31,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   evidence: Spec Design Notes call the repointing interim. Weight 700 in recipe.css, TrustStrip.tsx, KeyBlock.tsx, FailureScreen.tsx and TrustMark.tsx. FailureScreen reads layout.gutter (34) and layout.failureBodyMaxWidth (480). UniformPriorBanner lead and body share the line-text role and differ only by colour.
   retry_when: Story 4.6 is done in sprint-status.yaml
 
-- source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
-  summary: Remove italic from the page, since DESIGN.md Typography says the page sets no italic and only upright Inter faces are bundled, so every italic run is a synthesized oblique.
-  evidence: About 10 fontStyle italic sites in packages/web/src (RankedRow, CombinationRow, ExpansionPanel, AskingPriceLine, UnrankableAppendix, CraftRecipe, TrustStrip, SyncReportPanel, TrustMark). TrustMark's italic is the NFR-10 cue for never attempted, so it goes when Story 4.3 draws the marks.
-  retry_when: Story 4.3 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-2-the-price-trust-verdict-in-core.md`
-  summary: Make core return a recipeless-class group when the published recipe set is empty, with each crafted class's pending no-recipe verdict and its per-entry verdicts, so state 43 can list crafted rows unranked.
-  evidence: Story 4.2 Decision 1. rank in packages/core/src/rank.ts returns no crafted row when recipes is absent or empty, so the Price trust rule "No recipe is published" has no row to carry it.
-  retry_when: Story 4.3 is done in sprint-status.yaml
-
 - source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
   summary: Delete packages/web/src/list/TrustMark.tsx, its unused 'prior' kind and glyphs.prior, and move its remaining readers (UnrankableAppendix, KeyBlock) to the drawn marks in packages/web/src/marks/.
   evidence: The Story 4.3 spec's Never list gives the TrustMark deletion to Story 4.6, but the Story 4.6 retirement list in docs/stories/epic-4-context.md names only UniformPriorBanner, KeyBlock, TrustStrip and RunningFoot. After Story 4.3 no production code renders TrustMark kind 'prior'.

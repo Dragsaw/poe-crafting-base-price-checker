@@ -17,14 +17,13 @@ const MARKS: Readonly<
   unresolvable: { glyph: glyphs.unresolvable, color: colors['trust-broken'], weight: 700 },
 };
 
-// *never attempted* sets its word in italic, so it differs from an old row without colour (NFR-10).
 export function TrustMark({ kind, word }: { readonly kind: TrustMarkKind; readonly word: string }): JSX.Element {
   const mark = MARKS[kind];
   return (
     <span data-trust-mark={kind} style={{ color: mark.color, fontWeight: mark.weight }}>
       <span aria-hidden="true">{mark.glyph}</span>
       {HAIR_SPACE}
-      <span style={kind === 'never' ? { fontStyle: 'italic' } : undefined}>{word}</span>
+      <span>{word}</span>
     </span>
   );
 }

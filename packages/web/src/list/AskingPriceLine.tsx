@@ -12,7 +12,6 @@ export function AskingPriceLine(): JSX.Element {
       data-asking-price-line=""
       style={{
         ...typeStyle('note'),
-        fontStyle: 'italic',
         color: colors['text-secondary'],
         margin: 0,
         padding: `${px(layout.askingPadTop)} 0 ${px(layout.askingPadBottom)}`,

@@ -111,7 +111,6 @@ function AppendixRow({ item, last }: { readonly item: UnrankableClass; readonly 
         data-cell="note"
         style={{
           ...fixedCell({ width: noteWidth }),
-          fontStyle: 'italic',
           color: colors['text-tertiary'],
         }}
       >

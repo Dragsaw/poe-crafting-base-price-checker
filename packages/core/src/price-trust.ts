@@ -95,7 +95,10 @@ export interface CraftedTrustInput {
   readonly entries: readonly CraftedTrustEntry[];
 }
 
-/** A crafted pair's verdict: the ordered rules of *Price trust*, first match wins (AD-17). */
+/** The first crafted rule of *Price trust*: with no recipe published, every crafted class reads it. */
+export const NO_RECIPE_TRUST: PriceTrust = { verdict: 'pending', reasons: [{ kind: 'no-recipe' }] };
+
+/** A crafted pair's verdict: the ordered rules of *Price trust* after the no-recipe rule (`NO_RECIPE_TRUST`), first match wins (AD-17). */
 export function craftedTrust({ uncostable, entries }: CraftedTrustInput): PriceTrust {
   if (uncostable) {
     return { verdict: 'pending', reasons: [{ kind: 'uncostable' }] };

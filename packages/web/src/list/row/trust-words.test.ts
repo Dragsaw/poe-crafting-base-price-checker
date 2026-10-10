@@ -37,6 +37,7 @@ const SAMPLES: Readonly<Record<PriceTrustReason['kind'], { readonly reason: Pric
   'league-mismatch': { reason: { kind: 'league-mismatch' } },
   'no-exchange-rate': { reason: { kind: 'no-exchange-rate' } },
   unresolvable: { reason: { kind: 'unresolvable' } },
+  'no-recipe': { reason: { kind: 'no-recipe' } },
   uncostable: { reason: { kind: 'uncostable' } },
   'all-broken': { reason: { kind: 'all-broken' } },
   'no-prices': { reason: { kind: 'no-prices' } },
