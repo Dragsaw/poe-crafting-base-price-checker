@@ -1,6 +1,6 @@
 import { colorsTuple, createTheme, type CSSVariablesResolver, type MantineColorsTuple } from '@mantine/core';
 
-import { colors, stacks, typeRoles, type TypeRoleName } from './tokens';
+import { colors, floatingShadows, rounded, stacks, typeRoles, type TypeRoleName } from './tokens';
 
 /** The Mantine override layer: it inherits component behaviour, layout and CSS variables only. */
 
@@ -69,6 +69,27 @@ export const SHADOWED_COMPONENTS = [
   'Dialog',
 ] as const;
 
+/** Every tooltip opens and closes instantly, with no arrow (EXPERIENCE.md Interaction 8). */
+export const TOOLTIP_DEFAULT_PROPS = {
+  withArrow: false,
+  radius: rounded.tooltip,
+  color: colors['surface-raised'],
+  transitionProps: { duration: 0 },
+} as const;
+
+/** DESIGN.md `mark-tooltip`: the shared shell. The EV tooltip overrides width, padding, shadow and type. */
+export const MARK_TOOLTIP_SHELL = {
+  ...typeRoles.trust,
+  padding: '6px 9px',
+  background: colors['surface-raised'],
+  border: `1px solid ${colors['line-strong']}`,
+  borderRadius: rounded.tooltip,
+  boxShadow: floatingShadows['mark-tooltip'],
+  color: colors['text-secondary'],
+  textAlign: 'left',
+  whiteSpace: 'nowrap',
+} as const;
+
 const shadowless = Object.fromEntries(
   SHADOWED_COMPONENTS.map((name) => [name, { defaultProps: { shadow: NONE } }]),
 );
@@ -108,6 +129,10 @@ export const theme = createTheme({
         transitionDuration: 0,
         animateOpacity: false,
       },
+    },
+    Tooltip: {
+      defaultProps: TOOLTIP_DEFAULT_PROPS,
+      styles: { tooltip: MARK_TOOLTIP_SHELL },
     },
   },
 });

@@ -7,7 +7,9 @@ import { SHORT_FORMS } from '../../list/short-forms';
 import { rgb, settleTo, unmount } from '../../test-support/dom';
 import { banded, hoursBefore, priced, rawEntry } from '../../test-support/list-fixtures';
 import { pastDebounce, typeInto } from '../../test-support/threshold-input';
-import { colors, stacks } from '../../theme/tokens';
+import { colors, spacing, stacks } from '../../theme/tokens';
+import { MISSING_FIGURE } from '../../list/row/ExpectedValueCell';
+import { MINUS } from '../../shared/money';
 import {
   mount,
   frame,
@@ -39,23 +41,21 @@ afterEach(() => {
 });
 
 describe('the chase cells', () => {
-  it('prints the first three summands as three fixed 164px cells, tier plus short form, in chase emphasis on tier 1', async () => {
+  it('prints the first three summands as three equal cells, tier plus short form, in the dim mod colour', async () => {
     serveWorld(ringsWorld());
     mount();
     await settleTo('ready');
     const row = rowNamed('Rings');
     expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', 'T1 Life · T1 Cold Res']);
     const column = row.querySelector<HTMLElement>('[data-cell="chase"]');
-    expect(column?.style.width).toBe('492px');
-    expect(column?.style.paddingRight).toBe('');
+    expect(column?.style.display).toBe('grid');
+    expect(column?.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(column?.style.columnGap).toBe(spacing['chase-gap']);
     for (const cell of chaseCells(row)) {
-      expect(cell.style.width).toBe('164px');
-      expect(cell.style.flex).toBe('0 0 164px');
-      expect(cell.style.paddingRight).toBe('10px');
       expect(cell.style.whiteSpace).toBe('nowrap');
       expect(cell.style.textOverflow).toBe('ellipsis');
       expect(cell.style.overflow).toBe('hidden');
-      expect(cell.style.color).toBe(rgb(colors.text));
+      expect(cell.style.color).toBe(rgb(colors['rarity-magic-dim']));
       // A curated cell prints no numeral but its tier.
       expect(cell.textContent.replaceAll(/T\d+/g, '')).not.toMatch(/\d/);
       expect(cell.querySelector('[data-verbatim]')).toBeNull();
@@ -108,7 +108,7 @@ describe('the chase cells', () => {
     }
   });
 
-  it('keeps the raw rows’ italic note in place of chase cells, and leaves unused slots empty', async () => {
+  it('keeps the raw rows’ sell-as-is line in place of chase cells, and leaves unused slots empty', async () => {
     const now = Date.now();
     serveWorld(
       ringsWorld({
@@ -119,12 +119,12 @@ describe('the chase cells', () => {
     mount();
     await settleTo('ready');
     const raw = rowNamed('Wide Belt');
-    expect(raw.querySelector('[data-raw-note]')).not.toBeNull();
+    expect(raw.querySelector('[data-sell-as-is]')).not.toBeNull();
     expect(chaseCells(raw)).toHaveLength(0);
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['T1 Atk Dmg · T1 Cold Res', '', '']);
   });
 
-  it('takes text-secondary below tier 1', async () => {
+  it('keeps the dim mod colour below rank 5: emphasis is the rank, name and figure only', async () => {
     const now = Date.now();
     const raws = Array.from({ length: 5 }, (_, index) => rawEntry(`Base ${String(index)}`));
     serveWorld(
@@ -138,7 +138,7 @@ describe('the chase cells', () => {
     const row = rowNamed('Rings');
     expect(row.dataset['tier']).toBe('2');
     for (const cell of chaseCells(row)) {
-      expect(cell.style.color).toBe(rgb(colors['text-secondary']));
+      expect(cell.style.color).toBe(rgb(colors['rarity-magic-dim']));
     }
   });
 
@@ -147,7 +147,10 @@ describe('the chase cells', () => {
     mount();
     await settleTo('ready');
     expect(chaseTexts(rowNamed('Rings'))).toEqual(['', '', '']);
-    expect(cells('ev')).toEqual(['-0.03']);
+    expect(cells('ev')).toEqual([`${MINUS}0.03`]);
+    const figure = rowNamed('Rings').querySelector<HTMLElement>('[data-ev-figure]');
+    expect(figure?.style.color).toBe(rgb(colors['text-tertiary']));
+    expect(rowNamed('Rings').querySelector('[data-row-mark]')).toBeNull();
     expect(cells('rank')).toEqual(['1']);
   });
 
@@ -206,7 +209,8 @@ describe('the chase cells', () => {
     await settleTo('ready');
     click(option('perfect'));
     const row = rowNamed('Rings');
-    expect(row.querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
+    expect(row.querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
+    expect(row.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe('pending');
     expect(chaseTexts(row)).toEqual(['T1 Atk Dmg · T1 Cold Res', 'T1 Mana · T1 Cold Res', 'T1 ES · T1 Cold Res']);
   });
 });

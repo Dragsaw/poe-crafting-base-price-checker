@@ -1,14 +1,15 @@
 import type { JSX } from 'react';
 
 import { ColumnHeader } from '../list/ColumnHeader';
-import { colors, px, rankedRowColumns, layout } from '../theme/tokens';
+import { cellStyle, ROW_COLUMNS } from '../list/row/grid';
+import { colors, rankedRowGrid, spacing } from '../theme/tokens';
 
 export const ROW_SLOT_COUNT = 20;
 
-/** The height of each skeleton bar inside its 28px row. */
-const BAR_HEIGHT = 10;
+/** DESIGN.md `ranked-row.skeleton`: each cell a flat bar this tall. */
+const BAR_HEIGHT = '10px';
 
-/** The load state in the final six-column layout (EXPERIENCE.md state 22; memlog 211). */
+/** The load state in the final four-column layout, flat bars and no shimmer (EXPERIENCE.md state 22). */
 export function RowSlots(): JSX.Element {
   return (
     <div data-row-slots="">
@@ -19,26 +20,15 @@ export function RowSlots(): JSX.Element {
           data-row-slot=""
           aria-hidden="true"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            width: px(layout.contentWidth),
-            height: px(layout.rowHeight),
+            ...rankedRowGrid,
+            height: spacing['row-height'],
             boxSizing: 'border-box',
-            borderBottom: `${px(layout.hairline)} solid ${colors.line}`,
+            borderBottom: `1px solid ${colors.line}`,
           }}
         >
-          {rankedRowColumns.map((column) => (
-            <div
-              key={column.name}
-              data-cell={column.name}
-              style={{
-                flex: `0 0 ${px(column.width)}`,
-                width: px(column.width),
-                boxSizing: 'border-box',
-                paddingRight: px(column.padRight),
-              }}
-            >
-              <div style={{ height: px(BAR_HEIGHT), background: colors.surface }} />
+          {ROW_COLUMNS.map((column) => (
+            <div key={column} data-cell={column} style={cellStyle(column)}>
+              <div style={{ height: BAR_HEIGHT, background: colors.surface }} />
             </div>
           ))}
         </div>

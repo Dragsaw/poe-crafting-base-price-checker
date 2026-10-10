@@ -27,7 +27,8 @@ describe('the expansion panel', () => {
     expect(panel?.style.background).toBe(rgb(colors.ground));
     expect(panel?.style.transition).toBe('');
     expect(panel?.style.animation).toBe('');
-    expect(second?.style.borderBottom).toContain(rgb(colors['line-strong']));
+    // The open row's bottom border is transparent, so the row joins its panel (DESIGN.md `ranked-row.open`).
+    expect(second?.style.borderBottom).toContain('transparent');
     // Not a modal: nothing is an overlay or a dialog.
     expect(view.querySelector('[role="dialog"]')).toBeNull();
     expect(panel?.style.position).toBe('');

@@ -2,6 +2,7 @@ import { recipeWord, type CraftRecipe, type CurrencyRate } from '@poe/contracts'
 import { craftCost } from '@poe/core';
 
 import { MONEY_PHRASES } from '../list/format';
+import type { ExpectedValueCost } from '../list/row/ExpectedValueTooltip';
 import { formatDivine } from '../shared/money';
 import type { RecipeCost, RecipeOption } from './CraftRecipe';
 
@@ -31,4 +32,12 @@ export function recipeCostLine(
     throw new Error(`recipe ${recipe.id} is costable per Ranking.uncostableRecipes but craftCost refused it`);
   }
   return { kind: 'figure', text: formatDivine(cost.divine) };
+}
+
+/** The EV tooltip's variant: the Craft Cost figure, uncostable, or no recipe published (EXPERIENCE.md Copy Deck). */
+export function expectedValueCost(cost: RecipeCost | undefined): ExpectedValueCost {
+  if (cost === undefined) {
+    return { kind: 'no-recipe' };
+  }
+  return cost.kind === 'figure' ? { kind: 'costed', text: cost.text } : { kind: 'uncostable' };
 }

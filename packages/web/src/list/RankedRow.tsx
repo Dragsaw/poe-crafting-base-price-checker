@@ -2,30 +2,31 @@ import './list.css';
 
 import type { CSSProperties, JSX } from 'react';
 
-import { colors, px, rankedRowColumns, layout, typeStyle } from '../theme/tokens';
-import { fixedCell } from '../shared/cell';
-import { cellStyle } from './ColumnHeader';
+import { colors, rankedRowGrid, spacing, typeStyle } from '../theme/tokens';
 import { CombinationText } from './CombinationRow';
 import { CHASE_CELLS, type ListRow } from './display-rows';
-import { MONEY_PHRASES, rawNote } from './format';
-import { TrustMark } from './TrustMark';
-import { UnitGlyph } from './UnitGlyph';
-
-/** The row mark's word for `uniform-prior`: never the enum value, never a `weightSource` word. */
-const PRIOR_ONLY = 'prior only';
+import { itemLevelFloor, SELL_AS_IS } from './format';
+import { ExpectedValueCell } from './row/ExpectedValueCell';
+import { cellStyle } from './row/grid';
+import { TRUST_JOINER } from './row/trust-words';
 
 const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
-/** Rank-numeral colour per tier; tier 1 also sets the numeral, name and EV at 700 (DESIGN.md `ranked-row-tier-*`). */
-const RANK_COLOR = { 1: colors.text, 2: colors['text-secondary'], 3: colors['text-tertiary'] } as const;
+/** DESIGN.md `ranked-row`: ranks 1–5 are emphasised by weight and numeral colour, never by size. */
+export const RANK_EMPHASIS = {
+  emphasised: { rank: 600, name: 600, color: colors.text },
+  plain: { rank: 400, name: 500, color: colors['text-tertiary'] },
+} as const;
 
-const [rank, unit, event, provenance, age, chase] = rankedRowColumns;
-const COLUMNS = { rank, unit, ev: event, provenance, age, chase } as const;
+/** The name's rarity colour: magic for a crafted Item Class, normal for a Raw Base (DESIGN.md `ranked-row`). */
+export const NAME_COLORS = { class: colors['rarity-magic'], raw: colors['rarity-normal'] } as const;
 
-/** The three chase slots. An unused slot stays an empty cell (state 21). */
+/** The chase slots. An unused slot stays an empty cell (state 21). */
 const CHASE_SLOTS = Array.from({ length: CHASE_CELLS }, (_, slot) => slot);
 
-/** Hover tones live in `list.css`, never inline; an open row's marker bleeds into the gutter. */
+const ELLIPSIS: CSSProperties = { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
+
+/** Hover and open tones live in `list.css`; the open bar is inset, so no column moves. */
 export function RankedRow({
   row,
   open,
@@ -35,7 +36,8 @@ export function RankedRow({
   readonly open: boolean;
   readonly onToggle: (key: string) => void;
 }): JSX.Element {
-  const strong = row.tier === 1 ? 700 : 400;
+  const isEmphasised = row.tier === 1;
+  const emphasis = isEmphasised ? RANK_EMPHASIS.emphasised : RANK_EMPHASIS.plain;
   const isRaw = row.unit === 'raw';
 
   return (
@@ -48,157 +50,73 @@ export function RankedRow({
       onClick={() => {
         onToggle(row.key);
       }}
-      style={rowStyle(open)}
-    >
-      <RankCell row={row} strong={strong} />
-      <UnitCell row={row} strong={strong} isRaw={isRaw} />
-      <ExpectedValueCell ev={row.ev} strong={strong} />
-      <div data-cell="provenance" style={{ ...cellStyle(COLUMNS.provenance), ...typeStyle('mark') }}>
-        {row.unit === 'class' && row.provenance === 'uniform-prior' ? (
-          <TrustMark kind="prior" word={PRIOR_ONLY} />
-        ) : undefined}
-      </div>
-      <div data-cell="age" style={{ ...cellStyle(COLUMNS.age), ...typeStyle('mark') }} />
-      <ChaseCell row={row} />
-    </div>
-  );
-}
-
-function rowStyle(isOpen: boolean): CSSProperties {
-  const marker = isOpen ? layout.openRowMarker : 0;
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    width: px(layout.contentWidth + marker),
-    marginLeft: marker === 0 ? undefined : px(-marker),
-    height: px(layout.rowHeight),
-    boxSizing: 'border-box',
-    borderLeft: marker === 0 ? undefined : `${px(marker)} solid ${colors.accent}`,
-    borderBottom: `${px(layout.hairline)} solid ${isOpen ? colors['line-strong'] : colors.line}`,
-    whiteSpace: 'nowrap',
-  };
-}
-
-function RankCell({ row, strong }: { readonly row: ListRow; readonly strong: 400 | 700 }): JSX.Element {
-  return (
-    <div
-      data-cell="rank"
       style={{
-        ...cellStyle(COLUMNS.rank),
-        ...typeStyle('row-rank'),
-        ...TABULAR,
-        fontWeight: strong,
-        color: RANK_COLOR[row.tier],
+        ...rankedRowGrid,
+        height: spacing['row-height'],
+        boxSizing: 'border-box',
+        whiteSpace: 'nowrap',
+        borderBottom: `1px solid ${open ? 'transparent' : colors.line}`,
+        boxShadow: open ? `inset ${spacing['open-row-bar']} 0 0 ${colors.accent}` : undefined,
       }}
     >
-      {row.numeral}
+      <div
+        data-cell="rank"
+        style={{ ...cellStyle('rank'), ...typeStyle('row-rank'), ...TABULAR, fontWeight: emphasis.rank, color: emphasis.color }}
+      >
+        {row.numeral}
+      </div>
+      <div data-cell="name" style={{ ...cellStyle('name'), ...typeStyle('row-name') }}>
+        <span
+          data-unit-name=""
+          style={{ ...ELLIPSIS, display: 'block', fontWeight: emphasis.name, color: NAME_COLORS[row.unit] }}
+        >
+          {row.label}
+        </span>
+      </div>
+      <ExpectedValueCell
+        ev={row.ev}
+        trust={row.trust}
+        isEstimated={row.unit === 'class' && row.provenance === 'uniform-prior'}
+        isEmphasised={isEmphasised}
+      />
+      {isRaw ? <SellAsIsCell itemLevel={row.itemLevel} /> : <ChaseCells chase={row.chase} />}
     </div>
   );
 }
 
-function UnitCell({
-  row,
-  strong,
-  isRaw,
-}: {
-  readonly row: ListRow;
-  readonly strong: 400 | 700;
-  readonly isRaw: boolean;
-}): JSX.Element {
+/** DESIGN.md `ranked-row.chaseRaw`: the line that tells a Raw Base from a crafted class without colour. */
+function SellAsIsCell({ itemLevel }: { readonly itemLevel: number }): JSX.Element {
   return (
-    <div
-      data-cell="unit"
-      style={{ ...cellStyle(COLUMNS.unit), ...typeStyle('row-name'), display: 'flex', alignItems: 'baseline', color: colors.text }}
-    >
-      <UnitGlyph unit={row.unit} />
-      <span
-        data-unit-name=""
-        style={{
-          flex: '1 1 auto',
-          minWidth: 0,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          fontWeight: strong,
-          fontStyle: isRaw ? 'italic' : 'normal',
-        }}
-      >
-        {row.label}
+    <div data-cell="chase" style={{ ...cellStyle('chase'), ...typeStyle('chase'), ...ELLIPSIS, color: colors['text-secondary'] }}>
+      <span data-sell-as-is="">
+        <span style={{ fontWeight: 600, color: colors['rarity-normal'] }}>{SELL_AS_IS}</span>
+        {TRUST_JOINER}
+        {itemLevelFloor(itemLevel)}
       </span>
     </div>
   );
 }
 
-function ExpectedValueCell({ ev, strong }: { readonly ev: ListRow['ev']; readonly strong: 400 | 700 }): JSX.Element {
-  return (
-    <div data-cell="ev" style={{ ...cellStyle(COLUMNS.ev), overflow: 'hidden' }}>
-      {ev.kind === 'figure' ? (
-        <span data-ev-figure="" style={{ ...typeStyle('row-figure'), ...TABULAR, fontWeight: strong, color: colors.text }}>
-          {ev.text}
-        </span>
-      ) : (
-        <span
-          data-money-phrase=""
-          style={{
-            ...typeStyle('trust'),
-            fontStyle: 'italic',
-            // The colour follows the phrase shown: an honest-empty `unresolvable` row reads *no
-            // figure yet* in text.
-            color: ev.text === MONEY_PHRASES.unresolvable ? colors['trust-broken'] : colors.text,
-          }}
-        >
-          {ev.text}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function ChaseCell({ row }: { readonly row: ListRow }): JSX.Element {
-  const isRaw = row.unit === 'raw';
+function ChaseCells({ chase }: { readonly chase: Extract<ListRow, { unit: 'class' }>['chase'] }): JSX.Element {
   return (
     <div
       data-cell="chase"
       style={{
-        ...cellStyle(COLUMNS.chase),
+        ...cellStyle('chase'),
         ...typeStyle('chase'),
-        overflow: 'hidden',
-        // A crafted row's three cells carry `pad-chase-cell-right`, so the column pads no more.
-        ...(!isRaw && { display: 'flex', paddingRight: undefined }),
+        display: 'grid',
+        gridTemplateColumns: `repeat(${String(CHASE_CELLS)}, minmax(0, 1fr))`,
+        columnGap: spacing['chase-gap'],
       }}
     >
-      {isRaw ? (
-        <span
-          data-raw-note=""
-          style={{
-            display: 'block',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            fontStyle: 'italic',
-            color: colors['text-tertiary'],
-          }}
-        >
-          {rawNote(row.itemLevel)}
-        </span>
-      ) : (
-        CHASE_SLOTS.map((slot) => {
-          const parts = row.chase[slot];
-          return (
-            <div
-              key={slot}
-              data-chase-cell=""
-              style={{
-                ...fixedCell({ width: layout.chaseCell, padRight: layout.padChaseCellRight }),
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                color: row.tier === 1 ? colors.text : colors['text-secondary'],
-              }}
-            >
-              {parts === undefined ? undefined : <CombinationText parts={parts} />}
-            </div>
-          );
-        })
-      )}
+      {CHASE_SLOTS.map((slot) => {
+        const parts = chase[slot];
+        return (
+          <div key={slot} data-chase-cell="" style={{ ...ELLIPSIS, minWidth: 0, color: colors['rarity-magic-dim'] }}>
+            {parts === undefined ? undefined : <CombinationText parts={parts} />}
+          </div>
+        );
+      })}
     </div>
   );
 }

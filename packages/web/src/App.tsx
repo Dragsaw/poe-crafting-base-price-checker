@@ -22,7 +22,8 @@ import { UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
 import { activeRecipe, readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
-import { recipeCostLine, recipeOptions } from './recipe/recipe-view';
+import { expectedValueCost, recipeCostLine, recipeOptions } from './recipe/recipe-view';
+import type { ExpectedValueNote } from './list/ColumnHeader';
 import { readStoredThreshold, writeStoredThreshold } from './threshold/threshold-storage';
 
 type ReadyOutcome = Extract<LoadOutcome, { readonly kind: 'ready' }>;
@@ -197,6 +198,15 @@ function renderReady({
   const recipe = activeRecipe(recipes, storedRecipe);
   const options = recipeOptions(recipes);
   const active = options.find((option) => option.id === recipe?.id);
+  const cost =
+    recipe === undefined
+      ? undefined
+      : recipeCostLine(
+          recipe,
+          view.set.dataset.currencyRates,
+          view.set.config.league,
+          ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
+        );
   return (
     <Frame state="ready">
       <HeaderBar league={view.set.config.league} />
@@ -204,24 +214,21 @@ function renderReady({
         threshold={threshold}
         onThresholdChange={onThresholdChange}
         recipe={
-          recipe === undefined
+          recipe === undefined || cost === undefined
             ? undefined
-            : {
-                options,
-                activeId: recipe.id,
-                cost: recipeCostLine(
-                  recipe,
-                  view.set.dataset.currencyRates,
-                  view.set.config.league,
-                  ranking.uncostableRecipes.some((item) => item.recipeId === recipe.id),
-                ),
-                onChange: onRecipeChange,
-              }
+            : { options, activeId: recipe.id, cost, onChange: onRecipeChange }
         }
       />
       <TrustStrip set={view.set} absent={view.absent} now={view.now} crossFileFailures={view.crossFileFailures} />
       <AskingPriceLine />
-      <ReadyBody set={view.set} now={view.now} threshold={threshold} ranking={ranking} recipe={active} />
+      <ReadyBody
+        set={view.set}
+        now={view.now}
+        threshold={threshold}
+        ranking={ranking}
+        recipe={active}
+        note={{ threshold, cost: expectedValueCost(cost) }}
+      />
     </Frame>
   );
 }
@@ -233,6 +240,7 @@ function ReadyBody({
   threshold,
   ranking,
   recipe,
+  note,
 }: {
   readonly set: ArtifactSet;
   readonly now: number;
@@ -240,6 +248,7 @@ function ReadyBody({
   readonly ranking: Ranking;
   /** The active Craft Recipe, or `undefined` when no recipe is loaded. */
   readonly recipe: ListRecipe | undefined;
+  readonly note: ExpectedValueNote;
 }): JSX.Element {
   // The catalogue's stat texts, for the Combination fallback: built once per load.
   const stats = useMemo(() => statTexts(set.catalogueStats), [set]);
@@ -267,6 +276,7 @@ function ReadyBody({
         threshold={threshold}
         activeLeague={set.config.league}
         recipeWord={recipe?.word}
+        note={note}
       />
       <PageTail appendix={<UnrankableAppendix classes={unrankable} />} />
     </>

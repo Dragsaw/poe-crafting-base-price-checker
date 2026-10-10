@@ -1,8 +1,8 @@
 import { DEFAULT_THEME, mergeMantineTheme } from '@mantine/core';
 import { describe, expect, it } from 'vitest';
 
-import { cssVariablesResolver, SHADOWED_COMPONENTS, theme } from './theme';
-import { colors, stacks, typeRoles } from './tokens';
+import { cssVariablesResolver, MARK_TOOLTIP_SHELL, SHADOWED_COMPONENTS, theme, TOOLTIP_DEFAULT_PROPS } from './theme';
+import { colors, floatingShadows, rounded, stacks, typeRoles } from './tokens';
 
 const merged = mergeMantineTheme(DEFAULT_THEME, theme);
 
@@ -79,6 +79,22 @@ describe('the Mantine override layer', () => {
     expect(merged.components['Collapse']?.defaultProps).toEqual({
       transitionDuration: 0,
       animateOpacity: false,
+    });
+  });
+
+  it('gives every Tooltip the mark-tooltip shell: raised, line-strong, rounded, shadowed, instant, no arrow', () => {
+    const tooltip = merged.components['Tooltip'];
+    expect(tooltip?.defaultProps).toEqual(TOOLTIP_DEFAULT_PROPS);
+    expect(TOOLTIP_DEFAULT_PROPS).toMatchObject({ withArrow: false, radius: rounded.tooltip, transitionProps: { duration: 0 } });
+    expect(tooltip?.styles).toEqual({ tooltip: MARK_TOOLTIP_SHELL });
+    expect(MARK_TOOLTIP_SHELL).toMatchObject({
+      background: colors['surface-raised'],
+      border: `1px solid ${colors['line-strong']}`,
+      borderRadius: rounded.tooltip,
+      boxShadow: floatingShadows['mark-tooltip'],
+      color: colors['text-secondary'],
+      fontSize: typeRoles.trust.fontSize,
+      lineHeight: typeRoles.trust.lineHeight,
     });
   });
 

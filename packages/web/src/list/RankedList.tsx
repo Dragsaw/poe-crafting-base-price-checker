@@ -5,7 +5,7 @@ import { Fragment, useCallback, useState, type JSX } from 'react';
 import { TOP_ROWS } from '../shared/product';
 import { plural } from '../shared/text';
 import { colors, glyphs, px, layout, typeStyle } from '../theme/tokens';
-import { ColumnHeader } from './ColumnHeader';
+import { ColumnHeader, type ExpectedValueNote } from './ColumnHeader';
 import type { ListBranches, ListRow } from './display-rows';
 import { ClassExpansionPanel, RawExpansionPanel } from './ExpansionPanel';
 import { RankedRow } from './RankedRow';
@@ -25,6 +25,7 @@ export function RankedList({
   threshold,
   activeLeague,
   recipeWord,
+  note,
 }: {
   /** One branch: the list as `toDisplayRows` printed it. Ignored when `branches` is given. */
   readonly rows?: readonly ListRow[];
@@ -36,6 +37,8 @@ export function RankedList({
   readonly activeLeague: string;
   /** The active Craft Recipe's word, repeated in an open crafted panel's sub-line. */
   readonly recipeWord?: string;
+  /** The live threshold and Craft Cost the EV tooltip states. */
+  readonly note?: ExpectedValueNote;
 }): JSX.Element {
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
 
@@ -53,7 +56,7 @@ export function RankedList({
 
   return (
     <div data-ranked-list="">
-      <ColumnHeader />
+      <ColumnHeader note={note} />
       {shown.map((branch, index) => (
         <Branch
           // Positional keys: branches are never reordered, and the first keeps its grown flag when state 35 adds the second.

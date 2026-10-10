@@ -1,7 +1,7 @@
 /*
  * The ranked row. Its tone lives here, never inline, so hover can move it:
- * ground at rest, surface under the pointer, surface on pointer-down.
- * Instantaneous — no transition on a 28px row.
+ * ground at rest, surface under the pointer, on pointer-down and while open.
+ * Instantaneous: no transition.
  */
 .fg-row {
   background: var(--fg-color-ground);
@@ -9,10 +9,8 @@
   transition: none;
 }
 
-.fg-row:hover {
-  background: var(--fg-color-surface);
-}
-
-.fg-row:active {
+.fg-row:hover,
+.fg-row:active,
+.fg-row[data-open] {
   background: var(--fg-color-surface);
 }
