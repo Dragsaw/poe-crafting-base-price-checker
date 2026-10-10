@@ -188,7 +188,7 @@ describe('dryRun', () => {
   });
 
   it('marks an uncatalogued base type offline: no request, the others priced', async () => {
-    const unknown: TrackedEntry = { kind: 'raw', baseTypeId: 'Patched Out', itemLevelMin: 82, status: 'active' };
+    const unknown: TrackedEntry = { kind: 'raw', baseTypeId: 'Patched Out', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' };
     const report = await dryRun(snapshotOf([...entries, unknown]));
     expect(report.completed).not.toContain(canonicalKey(unknown));
     expect(report.report?.figures.requestsBySource['tracked-list']).toBe(2);

@@ -34,8 +34,8 @@ describe('craftedClassesOf', () => {
   });
 
   it('keeps one className under two categoryIds apart', () => {
-    const one = { ...crafted('Jewels', 'tracked', 1), categoryId: 'jewel.a' } as unknown as TrackedEntry;
-    const two = { ...crafted('Jewels', 'tracked', 1), categoryId: 'jewel.b' } as unknown as TrackedEntry;
+    const one = { ...crafted('Jewels', 'tracked', 1), categoryId: 'jewel.a' };
+    const two = { ...crafted('Jewels', 'tracked', 1), categoryId: 'jewel.b' };
     expect(craftedClassesOf([one, two]).size).toBe(2);
   });
 });

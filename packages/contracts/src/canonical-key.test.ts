@@ -25,6 +25,8 @@ const crafted: TrackedEntry = {
 const raw: TrackedEntry = {
   kind: 'raw',
   baseTypeId: 'Advanced Dualstring Bow',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
   itemLevelMin: 79,
   status: 'active',
 };

@@ -11,8 +11,8 @@ const HOURS_AGO = (hours: number): string =>
 
 function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): TrackedEntry {
   return status === 'pruned'
-    ? { kind: 'raw', baseTypeId, itemLevelMin: 82, status, prunedReason: 'no market' }
-    : { kind: 'raw', baseTypeId, itemLevelMin: 82, status };
+    ? { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status, prunedReason: 'no market' }
+    : { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status };
 }
 
 const crafted: TrackedEntry = {

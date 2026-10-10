@@ -31,6 +31,8 @@ describe('rank: the I/O matrix', () => {
         kind: 'raw',
         entryKey: canonicalKey(A),
         baseTypeId: 'A',
+        categoryId: 'accessory.amulet',
+        className: 'Amulets',
         itemLevelMin: 82,
         status: 'active',
         ev: 0.5,
@@ -150,8 +152,8 @@ describe('rank: the I/O matrix', () => {
   });
 
   it('breaks ties on the whole serialised key, not a bare base type id', () => {
-    const low: TrackedEntry = { kind: 'raw', baseTypeId: 'A', itemLevelMin: 86, status: 'active' };
-    const high: TrackedEntry = { kind: 'raw', baseTypeId: 'A', itemLevelMin: 100, status: 'active' };
+    const low: TrackedEntry = { kind: 'raw', baseTypeId: 'A', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 86, status: 'active' };
+    const high: TrackedEntry = { kind: 'raw', baseTypeId: 'A', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 100, status: 'active' };
     const result = ranked({
       tracked: [low, high],
       dataset: [published(low, priced(0.5)), published(high, priced(0.5))],

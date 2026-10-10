@@ -263,7 +263,7 @@ describe('runChunk: the lock', () => {
 
   it('refuses a later or malformed tracked major with the generic message', async () => {
     await Promise.all(
-      ['3.0.0', 'abc'].map(async (version) => {
+      ['4.0.0', 'abc'].map(async (version) => {
         const fs = createFakeFilesystemPort({
           [TRACKED_PATH]: { contents: JSON.stringify({ schemaVersion: version, entries: [] }) },
         });

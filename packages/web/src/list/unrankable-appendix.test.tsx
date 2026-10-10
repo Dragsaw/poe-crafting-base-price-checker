@@ -3,7 +3,7 @@ import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { mount, rgb, unmount } from '../test-support/dom';
-import { colors, spacing, typeRoles } from '../theme/tokens';
+import { colors, layout, px, spacing, typeRoles } from '../theme/tokens';
 import {
   APPENDIX_LEAD,
   APPENDIX_TITLE,
@@ -95,7 +95,8 @@ describe('the non-empty appendix', () => {
       classes.map((item) => item.className),
     );
     for (const row of rows) {
-      expect(row.style.height).toBe(spacing['line-height-expansion']);
+      expect(row.style.minHeight).toBe(spacing['line-height-expansion']);
+      expect(row.style.height).toBe('');
       expect(row.style.gridTemplateColumns).toBe(
         `${spacing['col-rank']} ${spacing['col-name']} ${spacing['expansion-trust-cell']} minmax(0, 1fr)`,
       );
@@ -127,6 +128,21 @@ describe('the non-empty appendix', () => {
       expect(note?.style.fontStyle).toBe('');
     }
     expect(panel.querySelector('[style*="italic"], [style*="700"]')).toBeNull();
+  });
+
+  // A wrapped note grows the row and hides nothing (EXPERIENCE.md *What may be cut*).
+  it('keeps the rank, class and reason cells on one line and lets only the note cell wrap', () => {
+    const item = klass('Bows', 'pool partial');
+    const row = mountAppendix([item], new Set([appendixClassKey(item)])).querySelector<HTMLElement>('[data-appendix-row]');
+    expect(row?.style.whiteSpace).toBe('');
+    for (const name of ['rank', 'class', 'reason']) {
+      expect(cell(row, name)?.style.whiteSpace, name).toBe('nowrap');
+    }
+    const note = cell(row, 'note');
+    expect(note?.style.whiteSpace).toBe('');
+    expect(note?.style.paddingBlock).toBe(px(layout.s1));
+    expect(note?.style.textOverflow).toBe('');
+    expect(note?.style.overflow).toBe('');
   });
 
   it('drops the rule under the last row only', () => {

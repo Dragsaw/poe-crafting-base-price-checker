@@ -8,6 +8,7 @@ import type { CurrencyRate, TrackedEntry } from '@poe/contracts';
 import type { DryRunSnapshot } from '../dry-run.ts';
 import { LEAGUES_FIXTURE_NAME, searchFixtureName } from '../pricing/fixture-names.ts';
 import { itemTypesOf } from '../pricing/search-body.ts';
+import { RAW_CLASS_FILTERS } from '../test-support/shell-data-inputs.ts';
 
 export const LEAGUE = 'Test League';
 /** A yardstick of 2, so the one pinned entry fits the load-time cap. */
@@ -28,7 +29,7 @@ export const ITEMS_CATALOGUE = {
 };
 const ITEMS = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, ...ITEMS_CATALOGUE });
 const STATS = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] });
-const FILTERS = JSON.stringify({ schemaVersion: SUPPORTED_SCHEMA_VERSION, result: [] });
+const FILTERS = RAW_CLASS_FILTERS;
 /** A present weights file with no ids, so no weights record arises. */
 const WEIGHTS = JSON.stringify({ schemaVersion: WEIGHTS_SCHEMA_VERSION, gamePatch: '0.5.5', producer: { id: 'test', generatedAt: '2026-09-26T00:00:00Z' }, bases: {} });
 
@@ -62,7 +63,7 @@ export function snapshotOf(entries: readonly TrackedEntry[] | undefined, extra: 
 }
 
 export const entries: TrackedEntry[] = [
-  { kind: 'raw', baseTypeId: 'Solar Amulet', itemLevelMin: 82, status: 'active' },
-  { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 82, status: 'pinned' },
-  { kind: 'raw', baseTypeId: 'Wide Belt', itemLevelMin: 82, status: 'pruned', prunedReason: 'x' },
+  { kind: 'raw', baseTypeId: 'Solar Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
+  { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'pinned' },
+  { kind: 'raw', baseTypeId: 'Wide Belt', categoryId: 'accessory.belt', className: 'Belts', itemLevelMin: 82, status: 'pruned', prunedReason: 'x' },
 ];

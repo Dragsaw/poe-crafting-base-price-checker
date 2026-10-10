@@ -14,7 +14,7 @@ import { FooterLegend } from './list/FooterLegend';
 import { listStatement } from './list/list-statement';
 import { ListStatement } from './list/ListStatement';
 import { RankedList } from './list/RankedList';
-import { UnrankableAppendix } from './list/UnrankableAppendix';
+import { appendixClassKey, UnrankableAppendix } from './list/UnrankableAppendix';
 import type { ArtifactSet } from './load/artifacts';
 import { loadArtifacts, type LoadOutcome } from './load/load-artifacts';
 import { readStoredRecipe, writeStoredRecipe } from './recipe/recipe-storage';
@@ -221,12 +221,13 @@ function ReadyBody({
 }): JSX.Element {
   // The catalogue's stat texts, for the Combination fallback: built once per load.
   const stats = useMemo(() => statTexts(set.catalogueStats), [set]);
-  const { branches, statement, unrankable } = useMemo(() => {
+  const { branches, statement, unrankable, rawRanks } = useMemo(() => {
     const active = forRecipe(ranking, recipe);
     return {
       branches: toListBranches(active, set.dataset.entries, { tracked: set.tracked.entries, stats }),
       statement: listStatement(active, threshold, set.config.league),
       unrankable: active.unrankable,
+      rawRanks: new Set(active.ordering.filter((row) => row.kind === 'raw').map((row) => appendixClassKey(row))),
     };
   }, [ranking, recipe, set, threshold, stats]);
   return (
@@ -237,7 +238,7 @@ function ReadyBody({
         activeLeague={set.config.league}
         note={note}
       />
-      <PageTail appendix={<UnrankableAppendix classes={unrankable} />} />
+      <PageTail appendix={<UnrankableAppendix classes={unrankable} rawRanks={rawRanks} />} />
     </>
   );
 }

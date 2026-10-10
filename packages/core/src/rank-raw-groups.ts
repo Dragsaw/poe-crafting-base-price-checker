@@ -65,6 +65,8 @@ function rawRankedRow(
     kind: 'raw',
     entryKey: base.entryKey,
     baseTypeId: entry.baseTypeId,
+    categoryId: entry.categoryId,
+    className: entry.className,
     itemLevelMin: entry.itemLevelMin,
     status: entry.status,
     ev: observation.priceDivine,

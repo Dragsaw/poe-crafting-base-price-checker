@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.0.0",
+  "schemaVersion": "3.0.0",
   "entries": [
     {
       "kind": "crafted",
@@ -64,9 +64,9 @@
       },
       "status": "active"
     },
-    { "kind": "raw", "baseTypeId": "Gold Amulet", "itemLevelMin": 82, "status": "active" },
-    { "kind": "raw", "baseTypeId": "Solar Amulet", "itemLevelMin": 82, "status": "active" },
-    { "kind": "raw", "baseTypeId": "Utility Belt", "itemLevelMin": 82, "status": "active" },
-    { "kind": "raw", "baseTypeId": "Wide Belt", "itemLevelMin": 82, "status": "pruned", "prunedReason": "no market" }
+    { "kind": "raw", "baseTypeId": "Gold Amulet", "categoryId": "accessory.amulet", "className": "Amulets", "itemLevelMin": 82, "status": "active" },
+    { "kind": "raw", "baseTypeId": "Solar Amulet", "categoryId": "accessory.amulet", "className": "Amulets", "itemLevelMin": 82, "status": "active" },
+    { "kind": "raw", "baseTypeId": "Utility Belt", "categoryId": "accessory.belt", "className": "Belts", "itemLevelMin": 82, "status": "active" },
+    { "kind": "raw", "baseTypeId": "Wide Belt", "categoryId": "accessory.belt", "className": "Belts", "itemLevelMin": 82, "status": "pruned", "prunedReason": "no market" }
   ]
 }

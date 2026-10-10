@@ -6,8 +6,8 @@ import { checkPinnedCap, PinnedCapExceededError, pinnedStarvationRecord } from '
 
 function raw(baseTypeId: string, status: TrackedEntry['status']): TrackedEntry {
   return status === 'pruned'
-    ? { kind: 'raw', baseTypeId, itemLevelMin: 82, status, prunedReason: 'no market' }
-    : { kind: 'raw', baseTypeId, itemLevelMin: 82, status };
+    ? { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status, prunedReason: 'no market' }
+    : { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status };
 }
 
 const threePinned = [

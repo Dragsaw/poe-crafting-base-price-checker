@@ -37,14 +37,14 @@ type Miss = Pick<UnresolvableRecord, 'identifier' | 'identifierKind'>;
 
 function missesOf(entry: TrackedEntry, ids: CatalogueIds): Miss[] {
   const misses: Miss[] = [];
-  if (entry.kind === 'raw') {
-    if (!ids.baseTypeIds.has(entry.baseTypeId)) {
-      misses.push({ identifier: entry.baseTypeId, identifierKind: 'baseTypeId' });
-    }
-    return misses;
+  if (entry.kind === 'raw' && !ids.baseTypeIds.has(entry.baseTypeId)) {
+    misses.push({ identifier: entry.baseTypeId, identifierKind: 'baseTypeId' });
   }
   if (!ids.categoryIds.has(entry.categoryId)) {
     misses.push({ identifier: entry.categoryId, identifierKind: 'categoryId' });
+  }
+  if (entry.kind === 'raw') {
+    return misses;
   }
   for (const reference of [entry.prefix, entry.suffix]) {
     // A hybrid reference names one statId per line, in its sorted line order.

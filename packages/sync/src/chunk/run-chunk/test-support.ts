@@ -64,8 +64,8 @@ export function run(ports: TestPorts, step: ChunkStep): Promise<ChunkOutcome> {
 
 export function raw(baseTypeId: string, status: TrackedEntry['status'] = 'active'): TrackedEntry {
   return status === 'pruned'
-    ? { kind: 'raw', baseTypeId, itemLevelMin: 82, status, prunedReason: 'no market' }
-    : { kind: 'raw', baseTypeId, itemLevelMin: 82, status };
+    ? { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status, prunedReason: 'no market' }
+    : { kind: 'raw', baseTypeId, categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status };
 }
 
 export const A = raw('A');

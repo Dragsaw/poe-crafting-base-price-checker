@@ -93,7 +93,7 @@ describe('poolCoverage', () => {
   });
 
   it('is undefined when only raw or pruned entries exist', () => {
-    const raw: TrackedEntry = { kind: 'raw', baseTypeId: 'x', itemLevelMin: 1, status: 'active' };
+    const raw: TrackedEntry = { kind: 'raw', baseTypeId: 'x', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 1, status: 'active' };
     const weights = weightsOf({ 'armour.chest': { A: full } });
     expect(poolCoverage([raw], weights)).toBeUndefined();
     expect(poolCoverage([raw, crafted('A', 'pruned')], weights)).toBeUndefined();

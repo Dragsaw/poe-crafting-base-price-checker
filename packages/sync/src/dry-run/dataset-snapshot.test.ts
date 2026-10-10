@@ -18,10 +18,10 @@ import { LEAGUE, snapshotOf } from './test-support.ts';
 
 describe('dryRun: the dataset snapshot', () => {
   const rotation: TrackedEntry[] = [
-    { kind: 'raw', baseTypeId: 'A', itemLevelMin: 82, status: 'active' },
-    { kind: 'raw', baseTypeId: 'B', itemLevelMin: 82, status: 'active' },
-    { kind: 'raw', baseTypeId: 'C', itemLevelMin: 82, status: 'active' },
-    { kind: 'raw', baseTypeId: 'P', itemLevelMin: 82, status: 'pinned' },
+    { kind: 'raw', baseTypeId: 'A', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
+    { kind: 'raw', baseTypeId: 'B', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
+    { kind: 'raw', baseTypeId: 'C', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'active' },
+    { kind: 'raw', baseTypeId: 'P', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 82, status: 'pinned' },
   ];
   const [A, B, C, P] = rotation as [TrackedEntry, TrackedEntry, TrackedEntry, TrackedEntry];
   const rotationTracked = JSON.stringify({ schemaVersion: TRACKED_SCHEMA_VERSION, entries: rotation });
@@ -70,7 +70,7 @@ describe('dryRun: the dataset snapshot', () => {
       catalogue: () =>
         Promise.resolve({
           ok: true,
-          value: { statIds: new Set(), baseTypeIds: new Set(['A', 'B', 'C', 'P']), categoryIds: new Set() },
+          value: { statIds: new Set(), baseTypeIds: new Set(['A', 'B', 'C', 'P']), categoryIds: new Set(['accessory.amulet']) },
         }),
     });
 

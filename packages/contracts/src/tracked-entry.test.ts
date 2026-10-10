@@ -17,6 +17,8 @@ const craftedEntry = {
 const rawEntry = {
   kind: 'raw',
   baseTypeId: 'Advanced Dualstring Bow',
+  categoryId: 'weapon.bow',
+  className: 'Bows',
   itemLevelMin: 82,
   status: 'active',
 } as const;
@@ -82,11 +84,16 @@ describe('TrackedEntrySchema', () => {
     expect(keys).toContain('prefix');
   });
 
-  it('refuses a raw entry carrying a category', () => {
-    const keys = issuesOf({ ...rawEntry, categoryId: 'weapon.bow' }).flatMap((issue) =>
+  it('refuses a raw entry carrying an affix', () => {
+    const keys = issuesOf({ ...rawEntry, prefix: craftedEntry.prefix }).flatMap((issue) =>
       issue.code === 'unrecognized_keys' ? issue.keys : [],
     );
-    expect(keys).toContain('categoryId');
+    expect(keys).toContain('prefix');
+  });
+
+  it('requires a raw entry to name its item class pair (FR-4 state 16)', () => {
+    expect(issuesOf(without(rawEntry, 'className')).map((issue) => issue.path.join('.'))).toEqual(['className']);
+    expect(issuesOf(without(rawEntry, 'categoryId')).map((issue) => issue.path.join('.'))).toEqual(['categoryId']);
   });
 
   it('carries status as a schema member, not a convention', () => {

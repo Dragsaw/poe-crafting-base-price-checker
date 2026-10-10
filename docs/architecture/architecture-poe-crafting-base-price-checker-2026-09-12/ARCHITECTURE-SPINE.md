@@ -223,7 +223,7 @@ never import each other.
   | Kind | Key | For |
   | --- | --- | --- |
   | `crafted` | `(categoryId, className, itemLevelMin, prefix, suffix)`, **both affixes required** | the modifier combinations the product ranks |
-  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all | a white ilvl-82 base, priced as it comes |
+  | `raw` | `(baseTypeId, itemLevelMin)`, no affix members at all; it also names its item class pair `(categoryId, className)`, outside the key and never sent (FR-4 state 16) | a white ilvl-82 base, priced as it comes |
 
   **A crafted entry names both affixes, and no component handles an absent one.** The
   same-`statId` sum of AD-16 assumes each slot contributes exactly one reference, and a

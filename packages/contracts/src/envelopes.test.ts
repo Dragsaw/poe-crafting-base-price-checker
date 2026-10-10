@@ -23,6 +23,8 @@ const trackedFile = {
     {
       kind: 'raw',
       baseTypeId: 'Advanced Dualstring Bow',
+      categoryId: 'weapon.bow',
+      className: 'Bows',
       itemLevelMin: 82,
       status: 'active',
     },
@@ -69,12 +71,23 @@ describe('ConfigFileSchema', () => {
 describe('parseEnvelope', () => {
   // I/O matrix: "Unknown major".
   it('refuses an unknown major with a typed result naming both versions', () => {
-    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '3.0.0' }, TRACKED_SCHEMA_VERSION);
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '4.0.0' }, TRACKED_SCHEMA_VERSION);
     expect(result).toEqual({
       ok: false,
       reason: 'unknown-major',
       expected: TRACKED_SCHEMA_VERSION,
-      found: '3.0.0',
+      found: '4.0.0',
+    });
+  });
+
+  // Story 4.8, I/O matrix "2.x tracked file": a raw entry now names its class.
+  it('refuses a tracked file at the earlier 2.x major as unknown-major, never a throw', () => {
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '2.0.0' }, TRACKED_SCHEMA_VERSION);
+    expect(result).toEqual({
+      ok: false,
+      reason: 'unknown-major',
+      expected: TRACKED_SCHEMA_VERSION,
+      found: '2.0.0',
     });
   });
 
@@ -93,7 +106,7 @@ describe('parseEnvelope', () => {
     const result = parseEnvelope(
       TrackedFileSchema,
       {
-        schemaVersion: '3.0.0',
+        schemaVersion: '4.0.0',
         entries: 'not even an array',
       },
       TRACKED_SCHEMA_VERSION,
@@ -104,7 +117,7 @@ describe('parseEnvelope', () => {
 
   // I/O matrix: "Known major, newer minor".
   it('accepts a newer minor under a known major', () => {
-    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '2.4.0' }, TRACKED_SCHEMA_VERSION);
+    const result = parseEnvelope(TrackedFileSchema, { ...trackedFile, schemaVersion: '3.4.0' }, TRACKED_SCHEMA_VERSION);
     expect(result.ok).toBe(true);
     expect(result.ok && result.value.entries).toHaveLength(1);
   });
@@ -144,6 +157,8 @@ describe('TrackedFileSchema canonical-key uniqueness (L-A1)', () => {
   const rawTwin = {
     kind: 'raw',
     baseTypeId: 'Advanced Dualstring Bow',
+    categoryId: 'weapon.bow',
+    className: 'Bows',
     itemLevelMin: 82,
     status: 'active',
   } as const;

@@ -36,6 +36,8 @@ const CraftedTrackedEntrySchema = z.strictObject({
 const RawTrackedEntrySchema = z.strictObject({
   kind: z.literal('raw'),
   baseTypeId: BaseTypeIdSchema,
+  categoryId: CategoryIdSchema.describe('Hand-curated, outside the canonical key and never sent (AD-5).'),
+  className: ClassNameSchema.describe('Hand-curated, outside the canonical key and never sent (AD-5).'),
   itemLevelMin: ItemLevelSchema,
   status: CurationStatusSchema,
   prunedReason: PrunedReasonSchema.optional(),

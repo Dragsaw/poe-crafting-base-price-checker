@@ -167,7 +167,7 @@ describe('weightsAbsentRecord', () => {
         craftedOf('Amulets', 'pinned'),
         craftedOf('Bows'),
         craftedOf('Pruned_Class', 'pruned'),
-        { kind: 'raw', baseTypeId: 'Gold Amulet', itemLevelMin: 1, status: 'active' },
+        { kind: 'raw', baseTypeId: 'Gold Amulet', categoryId: 'accessory.amulet', className: 'Amulets', itemLevelMin: 1, status: 'active' },
       ]),
     ).toEqual({ kind: 'weights-absent', uncheckableClassNames: ['Amulets', 'Bows', 'bows'] });
   });

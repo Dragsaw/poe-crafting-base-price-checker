@@ -81,11 +81,23 @@ describe('trackedEarlierMajorMessage', () => {
 
   it('leaves the current, a later and a malformed major to the generic refusal', () => {
     expect(trackedEarlierMajorMessage(TRACKED_SCHEMA_VERSION)).toBeUndefined();
-    expect(trackedEarlierMajorMessage('3.0.0')).toBeUndefined();
+    expect(trackedEarlierMajorMessage('4.0.0')).toBeUndefined();
     expect(trackedEarlierMajorMessage('abc')).toBeUndefined();
   });
 
-  it('explains only the 1.x major, not another earlier major', () => {
+  it('explains a 2.x file: the raw class requirement, not the 1 → 2 change', () => {
+    const message = trackedEarlierMajorMessage('2.0.0') ?? '';
+    expect(message).toContain('refused (unknown-major');
+    expect(message).toContain('raw entries require a categoryId and a className');
+    expect(message).toContain('Re-author');
+    expect(message).not.toContain('both a prefix and a suffix');
+  });
+
+  it('names the raw class requirement for a 1.x file too', () => {
+    expect(trackedEarlierMajorMessage('1.0.0')).toContain('raw entries require a categoryId and a className');
+  });
+
+  it('explains only the 1.x and 2.x majors, not another earlier major', () => {
     expect(trackedEarlierMajorMessage('0.9.0')).toBeUndefined();
   });
 
@@ -98,7 +110,7 @@ describe('trackedEarlierMajorMessage', () => {
   });
 
   it('versions tracked.json apart from every other file', () => {
-    expect(TRACKED_SCHEMA_VERSION).toBe('2.0.0');
+    expect(TRACKED_SCHEMA_VERSION).toBe('3.0.0');
     expect(INITIAL_SCHEMA_VERSION).toBe('1.0.0');
   });
 });
