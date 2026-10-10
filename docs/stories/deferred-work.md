@@ -46,10 +46,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Make an expansion line's no-listings reason follow EXPERIENCE.md *Ages* under a day (`tried N min ago` / `tried N hours ago`, then `tried N days ago` from one day), in place of `tried 0 days ago`.
   evidence: Decided 2026-10-10 (option 1 of three): follow *Ages*; the *Price trust* table's `tried N days ago` is the from-one-day case. The no-listings reason in contracts carries whole days only (`{ kind: 'no-listings', days? }`), and core fills it in entryTrust (packages/core/src/price-trust.ts), so lineReasonWords in packages/web/src/list/row/trust-words.ts cannot print a sub-day age. Needs contracts and core to carry the attempt age at minute grain (check AD-17), then the web wording. A sync runs about every 15 hours, so a fresh no-listings attempt is the common case.
   retry_when: now
-
-## Deferred from: spec-deferred-4-5-repair-epic-4-context (2026-10-10)
-
-- source_spec: `docs/stories/spec-deferred-4-5-repair-epic-4-context.md`
-  summary: [NOTE FOR PM] Bring the Epic 4 *Order* of docs/epics.md ("4.3 to 4.5, then 4.6") in line with docs/sprint-change-proposal-2026-10-10.md *Order*, which puts 4.7 and the tracked.json re-check after 4.3, and place Story 4.8.
-  evidence: epics.md *Order* predates the proposal and omits 4.7 and 4.8. epic-4-context.md now cites both sources, but a recompile from epics.md would bring the stale order back. The PM owns epics.md, so a build review does not edit it (AGENT-WORKFLOW.md *Review brief*, rule 2).
-  retry_when: now
