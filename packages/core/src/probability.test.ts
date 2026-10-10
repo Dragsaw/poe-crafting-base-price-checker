@@ -106,7 +106,6 @@ const at = (itemLevelMin: number, group: string, weight = 10) =>
   tier([line(STAT, [itemLevelMin, itemLevelMin])], weight, { itemLevelMin, modGroup: group });
 
 describe('floored', () => {
-
   it('drops the tiers of a group below the floor when the group has a tier at or above it', () => {
     const tiers = [at(30, 'a'), at(60, 'a'), at(75, 'a')];
     expect(floored({ poolCoverage: 'complete', entries: tiers }, 70)).toEqual([tiers[2]]);
@@ -122,7 +121,7 @@ describe('floored', () => {
     expect(floored({ poolCoverage: 'complete', entries: tied }, 70)).toEqual([tied[1], tied[2]]);
     const live = at(40, 'd');
     const zero = { ...at(60, 'd', 0), weightSource: 'not-in-game' as const };
-    expect(floored({ poolCoverage: 'complete', entries: [live, zero] }, 70)).toContain(live);
+    expect(floored({ poolCoverage: 'complete', entries: [live, zero] }, 70)).toEqual([live, zero]);
   });
 
   it('keys groups by modGroup alone: a hybrid group sharing a statId is its own group', () => {
@@ -138,7 +137,6 @@ describe('floored', () => {
 });
 
 describe('eligible', () => {
-
   it('takes the top from the unscoped pool: a group whose top is above the item level contributes nothing', () => {
     const tiers = [at(20, 'c'), at(85, 'c')];
     expect(eligible({ poolCoverage: 'complete', entries: tiers }, 82, 70)).toEqual([]);

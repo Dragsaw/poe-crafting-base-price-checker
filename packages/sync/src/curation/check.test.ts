@@ -4,7 +4,7 @@ import {
   trackedEarlierMajorMessage,
   WEIGHTS_SCHEMA_VERSION,
 } from '@poe/contracts';
-import type { ModifierWeight, RecipesFile, WeightsFile } from '@poe/contracts';
+import type { CraftRecipe, ModifierWeight, RecipesFile, WeightsFile, WeightsPool } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import type { CatalogueIds } from '../catalogue/catalogue-ids.ts';
@@ -46,10 +46,23 @@ const WEIGHTS: WeightsFile = {
   },
 };
 
-const RECIPES: RecipesFile = {
-  schemaVersion: '1.0.0',
-  recipes: [{ id: 'perfect', currencies: [{ currencyId: 'perfect-orb-of-transmutation', quantity: 1 }], modifierLevelMin: 70 }],
-};
+const PERFECT: CraftRecipe = { id: 'perfect', currencies: [{ currencyId: 'perfect-orb-of-transmutation', quantity: 1 }], modifierLevelMin: 70 };
+const RECIPES: RecipesFile = { schemaVersion: '1.0.0', recipes: [PERFECT] };
+
+/** One modGroup at 30 and 75: the perfect floor of 70 keeps only 75, outside the band. */
+function floored(statId: string, inBand: [number, number], outside: [number, number]): ModifierWeight[] {
+  return [
+    { ...tier(statId, ...inBand), sourceModifierId: `${statId}-low`, itemLevelMin: 30 },
+    { ...tier(statId, ...outside), sourceModifierId: `${statId}-high`, itemLevelMin: 75 },
+  ];
+}
+
+/** `WEIGHTS` with the prefix floored out of `crafted`'s band, and `suffix` as given. */
+function flooredWeights(suffix?: WeightsPool): WeightsFile {
+  const otherSlot = suffix ?? { poolCoverage: 'complete', entries: [tier(SUFFIX_STAT, 3, 3)] };
+  const prefix = { poolCoverage: 'complete' as const, entries: floored(PREFIX_STAT, [47, 50], [60, 65]) };
+  return { ...WEIGHTS, bases: { 'accessory.amulet': { Amulets: { prefix, suffix: otherSlot } } } };
+}
 
 function inputsOf(entries: readonly unknown[], overrides: Partial<TrackedCheckInputs> = {}): TrackedCheckInputs {
   return {
@@ -85,22 +98,7 @@ describe('checkTracked', () => {
   });
 
   it('lists an entry whose band holds only tiers the floor removes as unreachable, and fails', () => {
-    // One modGroup at 30 and 75: the perfect floor of 70 keeps only 75, outside the band.
-    const low = { ...tier(PREFIX_STAT, 47, 50), sourceModifierId: 'low', itemLevelMin: 30 };
-    const high = { ...tier(PREFIX_STAT, 60, 65), sourceModifierId: 'high', itemLevelMin: 75 };
-    const weights: WeightsFile = {
-      ...WEIGHTS,
-      bases: {
-        'accessory.amulet': {
-          Amulets: {
-            prefix: { poolCoverage: 'complete', entries: [low, high] },
-            suffix: { poolCoverage: 'complete', entries: [tier(SUFFIX_STAT, 3, 3)] },
-          },
-        },
-      },
-    };
-    const report = checkTracked(inputsOf([gold, crafted], { weights: { ok: true, value: weights } }));
-
+    const report = checkTracked(inputsOf([gold, crafted], { weights: { ok: true, value: flooredWeights() } }));
     expect(report.ok).toBe(false);
     expect(report.issues).toEqual([]);
     expect(report.checks).toContainEqual({ check: 'recipe-reach', status: 'failed' });
@@ -112,6 +110,31 @@ describe('checkTracked', () => {
         path: 'entries.1',
       },
     ]);
+  });
+
+  it('sorts unreachable rows by key, then recipe, then slot', () => {
+    const suffix = { poolCoverage: 'complete' as const, entries: floored(SUFFIX_STAT, [3, 3], [5, 5]) };
+    const recipes: RecipesFile = { ...RECIPES, recipes: [PERFECT, { ...PERFECT, id: 'alpha' }] };
+    const weights = { ok: true, value: flooredWeights(suffix) } as const;
+    const report = checkTracked(inputsOf([crafted], { weights, recipes: { ok: true, value: recipes } }));
+    expect(report.unreachable.map((row) => [row.recipeId, row.slot])).toEqual([['alpha', 'prefix'], ['alpha', 'suffix'], ['perfect', 'prefix'], ['perfect', 'suffix']]);
+  });
+
+  it('does not reach-check a class with a partial slot', () => {
+    const partial = { poolCoverage: 'partial' as const, entries: [tier(SUFFIX_STAT, 3, 3)] };
+    const report = checkTracked(inputsOf([crafted], { weights: { ok: true, value: flooredWeights(partial) } }));
+    expect(report.ok).toBe(true);
+    expect(report.checks).toContainEqual({ check: 'recipe-reach', status: 'passed' });
+    expect(report.unreachable).toEqual([]);
+  });
+
+  it('skips the reach check without a weights file, and with a refused one', () => {
+    const error = new DataFileError('data/weights.json', 'unknown-major', 'schemaVersion 9.0.0 refused');
+    for (const weights of [{ ok: true, value: undefined }, { ok: false, error }] as const) {
+      const report = checkTracked(inputsOf([crafted], { weights }));
+      expect(report.checks).toContainEqual({ check: 'recipe-reach', status: 'skipped' });
+      expect(report.unreachable).toEqual([]);
+    }
   });
 
   it('skips the reach check without a recipes file, and fails on a refused one with its message', () => {

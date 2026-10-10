@@ -273,7 +273,7 @@ export function checkTracked(loaded: TrackedCheckInputs): TrackedCheckReport {
     ['recipe-reach', reach],
   ];
   const issues = outcomes.flatMap(([, outcome]) => outcome.issues);
-  // A mark never moves `ok`.
+  // An `unvalidated` mark never moves `ok`.
   return {
     ok: issues.length === 0 && reach.unreachable.length === 0,
     checks: outcomes.map(([check, outcome]) => ({ check, status: outcome.status })),
