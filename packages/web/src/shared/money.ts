@@ -17,7 +17,14 @@ export function formatThreshold(value: number): string {
   return formatTwoDecimals(value);
 }
 
+/** The sign a negative figure takes: U+2212, never a hyphen (EXPERIENCE.md, Money). */
+export const MINUS = '\u{2212}';
+
 /** EV and price at 2dp. A value `0 < v < 0.005` would print `0.00`, so it prints `< 0.01`. */
 export function formatDivine(value: number): string {
-  return value > 0 && value < 0.005 ? BELOW_PRINTABLE : formatTwoDecimals(value);
+  if (value > 0 && value < 0.005) {
+    return BELOW_PRINTABLE;
+  }
+  const text = formatTwoDecimals(value);
+  return text.startsWith('-') ? `${MINUS}${text.slice(1)}` : text;
 }

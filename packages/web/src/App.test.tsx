@@ -17,6 +17,8 @@ import {
 } from './frame/FailureScreen';
 import { HEADER_TITLE } from './frame/HeaderBar';
 import { ROW_SLOT_COUNT } from './frame/RowSlots';
+import { ROW_COLUMNS } from './list/row/grid';
+import { EXPECTED_VALUE_TOOLTIP_COPY } from './list/row/ExpectedValueTooltip';
 import {
   gatedArtifacts,
   NEVER_FETCHED_PATH,
@@ -55,7 +57,12 @@ describe('the pending state', () => {
     expect(frame().textContent).toContain(HEADER_TITLE);
     const slots = frame().querySelectorAll('[data-row-slot]');
     expect(slots).toHaveLength(ROW_SLOT_COUNT);
-    expect(slots[0]?.querySelectorAll('[data-cell]')).toHaveLength(6);
+    expect(slots[0]?.querySelectorAll('[data-cell]')).toHaveLength(ROW_COLUMNS.length);
+    // No tooltip opens before the data arrives, so the EV label has no hover look yet.
+    const skeletonLabel = frame().querySelector<HTMLElement>('[data-row-slots] [data-ev-label]');
+    expect(skeletonLabel).not.toBeNull();
+    expect(skeletonLabel?.style.borderBottom).toBe('');
+    expect(skeletonLabel?.style.cursor).toBe('');
     // The strip's slot holds its place, blank, so the page never jumps.
     const stripSlot = frame().querySelector<HTMLElement>('[data-trust-strip-slot]');
     expect(stripSlot?.previousElementSibling?.hasAttribute('data-interim-controls')).toBe(true);
@@ -263,7 +270,8 @@ describe('the copy', () => {
     });
     expect(Object.keys(sources).length).toBeGreaterThan(10);
     for (const [path, text] of Object.entries(sources)) {
-      const scanned = text.replaceAll(HEADER_TITLE, '');
+      // The EV tooltip's count of outcomes worth at least the threshold is the other owned use (EXPERIENCE.md, Voice and Tone).
+      const scanned = text.replaceAll(HEADER_TITLE, '').replaceAll(EXPECTED_VALUE_TOOLTIP_COPY.what, '');
       expect(scanned, path).not.toMatch(/sells for|worth|market value/i);
     }
   });

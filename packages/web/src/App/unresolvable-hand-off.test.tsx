@@ -2,6 +2,7 @@ import { canonicalKey } from '@poe/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { absenceLine } from '../frame/AbsenceLines';
+import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { bodiesWith, hoursBefore, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { serveArtifacts, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';
 import { rgb, settleTo, unmount } from '../test-support/dom';
@@ -34,8 +35,8 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     });
     mount();
     await settleTo('ready');
-    // A lone unresolvable row makes the list honest-empty, so its EV cell reads state 23's phrase.
-    expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
+    // A lone unresolvable row makes the list honest-empty: its EV cell reads `—` beside ✕.
+    expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
     const strip = frame().querySelector<HTMLElement>('[data-trust-strip]');
     const lines = strip?.querySelectorAll('[data-absence-lines] p') ?? [];
     expect(Array.from(lines, (line) => line.textContent)).toEqual([absenceLine('syncReport')]);
@@ -56,8 +57,8 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     });
     mount();
     await settleTo('ready');
-    // A lone unresolvable row makes the list honest-empty, so its EV cell reads state 23's phrase.
-    expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe('no figure yet');
+    // A lone unresolvable row makes the list honest-empty: its EV cell reads `—` beside ✕.
+    expect(lostRow().querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
     const health = frame().querySelector('[data-trust-strip] [data-health-line]');
     expect(health?.textContent?.replaceAll('\u{A0}', ' ')).toBe('× 1 unresolvable');
   });
@@ -75,8 +76,9 @@ describe('the unresolvable hand-off (story 2.3 to story 2.6)', () => {
     expect(statementNode?.dataset['listStatement']).toBe('honest-empty');
     // EXPERIENCE.md revision 9: a list of only unresolvable rows drops "yet".
     expect(statementNode?.textContent).toBe(`In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE}.`);
-    const phrase = lostRow().querySelector<HTMLElement>('[data-cell="ev"] [data-money-phrase]');
-    expect(phrase?.textContent).toBe('no figure yet');
-    expect(phrase?.style.color).toBe(rgb(colors.text));
+    const missing = lostRow().querySelector<HTMLElement>('[data-cell="ev"] [data-ev-missing]');
+    expect(missing?.textContent).toBe(MISSING_FIGURE);
+    expect(missing?.style.color).toBe(rgb(colors['text-tertiary']));
+    expect(lostRow().querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe('broken');
   });
 });

@@ -37,11 +37,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   retry_when: Story 4.5 is done in sprint-status.yaml
 
 - source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
-  summary: Replace the fixed 1012px ranked-row grid with the DESIGN.md grid so rows stop overhanging the right gutter of the centred column below about 1060px wide.
-  evidence: Spec Design Notes. rankedRowColumns and layout.contentWidth in packages/web/src/theme/tokens.ts against spacing.content-min in Frame.tsx. The overhang also shows beside the sticky header bar, and the old 1012 = 1060 − 2 × 24 test was removed.
-  retry_when: Story 4.3 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
   summary: Restyle the components Story 4.1 repointed mechanically, replace the interim px values in the tokens.ts layout group, change weight 700 to the DESIGN.md weights, and fix the failure screen to padding-top 24px and a 640px body.
   evidence: Spec Design Notes call the repointing interim. Weight 700 in recipe.css, TrustStrip.tsx, KeyBlock.tsx, FailureScreen.tsx and TrustMark.tsx. FailureScreen reads layout.gutter (34) and layout.failureBodyMaxWidth (480). UniformPriorBanner lead and body share the line-text role and differ only by colour.
   retry_when: Story 4.6 is done in sprint-status.yaml
@@ -60,3 +55,23 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: Make core return a recipeless-class group when the published recipe set is empty, with each crafted class's pending no-recipe verdict and its per-entry verdicts, so state 43 can list crafted rows unranked.
   evidence: Story 4.2 Decision 1. rank in packages/core/src/rank.ts returns no crafted row when recipes is absent or empty, so the Price trust rule "No recipe is published" has no row to carry it.
   retry_when: Story 4.3 is done in sprint-status.yaml
+
+- source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
+  summary: Delete packages/web/src/list/TrustMark.tsx, its unused 'prior' kind and glyphs.prior, and move its remaining readers (UnrankableAppendix, KeyBlock) to the drawn marks in packages/web/src/marks/.
+  evidence: The Story 4.3 spec's Never list gives the TrustMark deletion to Story 4.6, but the Story 4.6 retirement list in docs/stories/epic-4-context.md names only UniformPriorBanner, KeyBlock, TrustStrip and RunningFoot. After Story 4.3 no production code renders TrustMark kind 'prior'.
+  retry_when: Story 4.6 is done in sprint-status.yaml
+
+- source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
+  summary: Give a cut chase cell its full-text tooltip (DESIGN.md chase-cell.cutHover; EXPERIENCE.md What may be cut), the third tooltip kind.
+  evidence: ChaseCells in packages/web/src/list/RankedRow.tsx cuts with an ellipsis and has no Tooltip. Neither the old row nor Story 4.3's task list built it, and docs/epics.md names no story for it.
+  retry_when: a story that owns the chase cells is planned
+
+- source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
+  summary: Switch the crafted chase column from three cells to two below the budget B (DESIGN.md Layout & Spacing, The chase column; ranked-row.chaseCrafted).
+  evidence: ChaseCells in packages/web/src/list/RankedRow.tsx always renders repeat(CHASE_CELLS = 3). The row has no two-cell form, and docs/epics.md names no story for it.
+  retry_when: a story that owns the chase cells is planned
+
+- source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
+  summary: Drop the bottom rule under the last row of a list (DESIGN.md Layout & Spacing, Density).
+  evidence: RankedRow in packages/web/src/list/RankedRow.tsx draws a 1px line border on every row, the last included, as the old row also did. The fix needs an isLast signal from RankedList or the border moved into list.css.
+  retry_when: a story that restyles the ranked list is planned

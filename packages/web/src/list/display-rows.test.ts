@@ -6,8 +6,13 @@ import { DEFAULT_THRESHOLD } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW, NOW_ISO } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
-import { tierOf, toDisplayRows, type DisplayRow } from './display-rows';
+import { tierOf, toDisplayRows, type DisplayRow, type ListRow } from './display-rows';
 import { isHonestEmpty } from './list-statement';
+
+/** The EV cell as a test reads it: the figure text, or `missing` where `—` prints beside a mark. */
+function printedValue(row: ListRow): string {
+  return row.ev.kind === 'figure' ? row.ev.text : 'missing';
+}
 
 /** A raw-only list, narrowed to Raw Base rows. */
 function rowsFor(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[]): DisplayRow[] {
@@ -35,13 +40,13 @@ describe('toDisplayRows', () => {
         unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 9 * 24 + 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.text])).toEqual([
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, printedValue(row)])).toEqual([
       ['Solar Amulet', 1, 1, '1.25'],
       ['Gold Amulet', 2, 1, '0.50'],
-      ['Coral Ring', undefined, 3, 'an open question'],
-      ['Wide Belt', undefined, 3, 'no figure yet'],
+      ['Coral Ring', undefined, 3, 'missing'],
+      ['Wide Belt', undefined, 3, 'missing'],
     ]);
-    expect(rows.map((row) => row.ev.kind)).toEqual(['figure', 'figure', 'phrase', 'phrase']);
+    expect(rows.map((row) => row.ev.kind)).toEqual(['figure', 'figure', 'missing', 'missing']);
     expect(rows.every((row) => row.unit === 'raw' && row.itemLevel === 82)).toBe(true);
   });
 
@@ -61,19 +66,19 @@ describe('toDisplayRows', () => {
         unpriced(amber, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.state.state])).toEqual([
-      ['Coral Ring', undefined, 'no figure yet', 'not-yet-synced'],
-      ['Gold Amulet', undefined, 'no figure yet', 'no-listings'],
-      ['Wide Belt', undefined, 'no figure yet', 'not-yet-synced'],
-      ['amber Ring', undefined, 'no figure yet', 'no-listings'],
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.state.state])).toEqual([
+      ['Coral Ring', undefined, 'missing', 'not-yet-synced'],
+      ['Gold Amulet', undefined, 'missing', 'no-listings'],
+      ['Wide Belt', undefined, 'missing', 'not-yet-synced'],
+      ['amber Ring', undefined, 'missing', 'no-listings'],
     ]);
     const keys = rows.map((row) => row.key);
     expect(keys).toEqual(keys.toSorted(compareCanonicalKeys));
-    expect(rows.every((row) => row.ev.kind === 'phrase' && row.tier === 3)).toBe(true);
+    expect(rows.every((row) => row.ev.kind === 'missing' && row.tier === 3)).toBe(true);
   });
 
-  // Matrix: mixed reset with an unresolvable row. State 23's EV phrase holds whatever the Price State.
-  it('folds the unresolvable rows into the honest-empty canonical sequence, each reading no figure yet', () => {
+  // Matrix: mixed reset with an unresolvable row. State 23's missing EV holds whatever the Price State.
+  it('folds the unresolvable rows into the honest-empty canonical sequence, each EV missing (—)', () => {
     const ring = rawEntry('Coral Ring');
     const amulet = rawEntry('Gold Amulet');
     const lost = rawEntry('Lost Ring');
@@ -85,10 +90,10 @@ describe('toDisplayRows', () => {
         unpriced(lost, { state: 'unresolvable' }, hoursBefore(NOW, 1)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.state.state])).toEqual([
-      ['Coral Ring', undefined, 'no figure yet', 'not-yet-synced'],
-      ['Gold Amulet', undefined, 'no figure yet', 'no-listings'],
-      ['Lost Ring', undefined, 'no figure yet', 'unresolvable'],
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.state.state])).toEqual([
+      ['Coral Ring', undefined, 'missing', 'not-yet-synced'],
+      ['Gold Amulet', undefined, 'missing', 'no-listings'],
+      ['Lost Ring', undefined, 'missing', 'unresolvable'],
     ]);
     const keys = rows.map((row) => row.key);
     expect(keys).toEqual(keys.toSorted(compareCanonicalKeys));
@@ -108,11 +113,11 @@ describe('toDisplayRows', () => {
         unpriced(amulet, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.ev.text])).toEqual([
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row)])).toEqual([
       ['Solar Amulet', 1, '1.25'],
-      ['Gold Amulet', undefined, 'an open question'],
-      ['Coral Ring', undefined, 'no figure yet'],
-      ['Wide Belt', undefined, 'no figure yet'],
+      ['Gold Amulet', undefined, 'missing'],
+      ['Coral Ring', undefined, 'missing'],
+      ['Wide Belt', undefined, 'missing'],
     ]);
   });
 
@@ -138,10 +143,10 @@ describe('toDisplayRows', () => {
     expect(ranking.belowThreshold.length).toBeGreaterThan(0);
     expect(isHonestEmpty(ranking)).toBe(false);
     const rows = toDisplayRows(ranking, dataset, NOW);
-    expect(rows.map((row) => [row.label, row.ev.text])).toEqual([
-      ['Gold Amulet', 'an open question'],
-      ['Coral Ring', 'no figure yet'],
-      ['Wide Belt', 'no figure yet'],
+    expect(rows.map((row) => [row.label, printedValue(row)])).toEqual([
+      ['Gold Amulet', 'missing'],
+      ['Coral Ring', 'missing'],
+      ['Wide Belt', 'missing'],
     ]);
   });
 
@@ -160,12 +165,12 @@ describe('toDisplayRows', () => {
         unpriced(tried, { state: 'no-listings' }, hoursBefore(NOW, 2)),
       ],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.tier, row.ev.kind, row.ev.text, row.state.state])).toEqual([
-      ['Gold Amulet', 1, 1, 'figure', '0.50', 'priced'],
-      ['Coral Ring', undefined, 3, 'phrase', 'an open question', 'no-listings'],
-      ['Wide Belt', undefined, 3, 'phrase', 'no figure yet', 'not-yet-synced'],
-      ['Broken Ring', undefined, 3, 'phrase', 'not valued', 'unresolvable'],
-      ['Lost Ring', undefined, 3, 'phrase', 'not valued', 'unresolvable'],
+    expect(rows.map((row) => [row.label, row.numeral, row.tier, printedValue(row), row.state.state])).toEqual([
+      ['Gold Amulet', 1, 1, '0.50', 'priced'],
+      ['Coral Ring', undefined, 3, 'missing', 'no-listings'],
+      ['Wide Belt', undefined, 3, 'missing', 'not-yet-synced'],
+      ['Broken Ring', undefined, 3, 'missing', 'unresolvable'],
+      ['Lost Ring', undefined, 3, 'missing', 'unresolvable'],
     ]);
     expect(rows[4]?.ages).toEqual({ observed: undefined, attempted: 'tried 1h ago' });
   });
@@ -177,8 +182,8 @@ describe('toDisplayRows', () => {
       [cheap, old],
       [priced(cheap, 0.1, hoursBefore(NOW, 1)), priced(old, 3, hoursBefore(NOW, 72), { league: 'Standard' })],
     );
-    expect(rows.map((row) => [row.label, row.numeral, row.ev.text, row.ages.attempted])).toEqual([
-      ['Jade Amulet', undefined, 'no figure yet', 'tried 3d ago'],
+    expect(rows.map((row) => [row.label, row.numeral, printedValue(row), row.ages.attempted])).toEqual([
+      ['Jade Amulet', undefined, 'missing', 'tried 3d ago'],
     ]);
   });
 
@@ -206,7 +211,7 @@ describe('toDisplayRows', () => {
       [],
       NOW,
     );
-    expect(only?.ev).toEqual({ kind: 'figure', text: '< 0.01' });
+    expect(only?.ev).toEqual({ kind: 'figure', text: '< 0.01', negative: false });
   });
 });
 

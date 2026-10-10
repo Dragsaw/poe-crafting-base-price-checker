@@ -53,15 +53,29 @@ export const spacing = {
   'open-row-bar': '2px',
 } as const;
 
-/**
- * Component measurements in px that Stories 4.3 to 4.6 replace with `{spacing.*}`.
- * The ranked-row grid and its 28px rows stay until Story 4.3.
- */
+/** DESIGN.md `ranked-row.grid`, shared by the column header, the rows and the skeleton. */
+export const rankedRowGrid = {
+  display: 'grid',
+  gridTemplateColumns: `${spacing['col-rank']} ${spacing['col-name']} ${spacing['col-ev']} minmax(0, 1fr)`,
+  columnGap: spacing['col-gap'],
+  alignItems: 'center',
+} as const satisfies CSSProperties;
+
+/** The drop shadows of the two floating layers (DESIGN.md `mark-tooltip`, `ev-tooltip`). */
+export const floatingShadows = {
+  'mark-tooltip': '0 6px 18px rgba(0,0,0,.5)',
+  'ev-tooltip': '0 8px 24px rgba(0,0,0,.6)',
+} as const;
+
+/** The column header's height (DESIGN.md `column-header`). */
+export const COLUMN_HEADER_HEIGHT = '30px';
+
+/** Component measurements in px that Stories 4.4 to 4.6 replace with `{spacing.*}`. */
 export const layout = {
+  /** The expansion panel's and the appendix's fixed width until Stories 4.4 and 4.6. */
   contentWidth: 1012,
   gutter: 34,
   hairline: 1,
-  rowHeight: 28,
   appendixRowHeight: 29,
   appendixPadTop: 16,
   appendixPadX: 20,
@@ -106,11 +120,8 @@ export const layout = {
   s4: 16,
   s5: 20,
   s6: 24,
-  openRowMarker: 3,
   /** The fixed box both unit glyphs centre in, so every unit name starts at one x. */
   unitGlyphBox: 14,
-  chaseCell: 164,
-  padChaseCellRight: 10,
   askingPadTop: 12,
   askingPadBottom: 3,
   columnHeaderMarginTop: 16,
@@ -139,16 +150,6 @@ export const layout = {
 export function px(value: number): string {
   return `${String(value)}px`;
 }
-
-/** The ranked-row column budget (memlog 40). Six widths, summing to `contentWidth`, exact. */
-export const rankedRowColumns = [
-  { name: 'rank', width: 32, padRight: 10 },
-  { name: 'unit', width: 222, padRight: 8 },
-  { name: 'ev', width: 84, padRight: 12 },
-  { name: 'provenance', width: 88, padRight: 0 },
-  { name: 'age', width: 94, padRight: 0 },
-  { name: 'chase', width: 492, padRight: 10 },
-] as const;
 
 /** The other fixed column sums. Nothing on these surfaces flexes. */
 export const columnSums = {
@@ -245,7 +246,6 @@ export const glyphs = {
   unknown: '?',
   stale: '»',
   tradeLink: '↗',
-  pruned: '†',
   pinned: '*',
   open: '+',
   close: '−',

@@ -5,6 +5,7 @@ import {
   type CraftedTrackedEntry,
   type CurationStatus,
   type DatasetEntry,
+  type PriceTrust,
   type TrackedEntry,
 } from '@poe/contracts';
 import { craftedClassesOf, type Ranking, type UnrankedEntry } from '@poe/core';
@@ -14,7 +15,6 @@ import { combinationText, type AffixPart, type StatTexts } from './combination-t
 import {
   combinationAges,
   craftedCombinationNote,
-  MONEY_PHRASES,
   resolvedState,
   type CombinationAges,
   type CombinationState,
@@ -26,10 +26,21 @@ import { isHonestEmpty } from './list-statement';
 /** Ranks 1–5, 6–10, 11 onward, by position only, never by kind (UX-DR11); state 35: per branch. */
 export type Tier = 1 | 2 | 3;
 
-/** What an EV cell holds: a figure at 2dp, or the money-slot phrase naming the open question. */
-type ExpectedValueCell =
-  | { readonly kind: 'figure'; readonly text: string }
-  | { readonly kind: 'phrase'; readonly text: string };
+/** What an EV cell holds: a figure at 2dp, dimmed when negative (state 21), or a missing figure beside its mark. */
+export type ExpectedValueCell =
+  | { readonly kind: 'figure'; readonly text: string; readonly negative: boolean }
+  | { readonly kind: 'missing' };
+
+const MISSING: ExpectedValueCell = { kind: 'missing' };
+
+/** A pending or broken row's EV cell is `—` beside its mark (EXPERIENCE.md *Missing figures*; states 18, 41). */
+function hasNoFigure(trust: PriceTrust): boolean {
+  return trust.verdict === 'pending' || trust.verdict === 'broken';
+}
+
+function figure(expectedValue: number): ExpectedValueCell {
+  return { kind: 'figure', text: formatDivine(expectedValue), negative: expectedValue < 0 };
+}
 
 /** One Raw Base row as the view prints it. Nothing here is a ranking term: `core` ordered it. */
 export interface DisplayRow {
@@ -42,6 +53,8 @@ export interface DisplayRow {
   readonly label: string;
   readonly itemLevel: number;
   readonly ev: ExpectedValueCell;
+  /** `core`'s verdict on the row's one entry; `web` derives none (AD-17). */
+  readonly trust: PriceTrust;
   /** The Curation Status. `pinned` leads the combination cell; the trade-link test refuses `pruned`. */
   readonly status: CurationStatus;
   /** The Price State the expansion prints, as `core` resolved it (a league mismatch included). */
@@ -62,9 +75,11 @@ export interface ClassDisplayRow {
   /** The `className` with each underscore a space (AD-5). */
   readonly label: string;
   readonly itemLevel: number;
-  /** The EV at 2dp — negative is a real figure — or *no figure yet* when the recipe is uncostable. */
+  /** The EV at 2dp — negative is a real figure — or missing when the recipe is uncostable. */
   readonly ev: ExpectedValueCell;
-  /** `core`'s label of the pair. Only `uniform-prior` prints a mark; `measured` is silence (FR-11). */
+  /** `core`'s first matching crafted rule (AD-17). */
+  readonly trust: PriceTrust;
+  /** `core`'s label of the pair. Only `uniform-prior` prints ≈; `measured` is silence (FR-11). */
   readonly provenance: CraftedRankedRow['provenance'];
   /** The first three of `core`'s summands, in its order, as Combination text; fewer leave blank. */
   readonly chase: readonly (readonly AffixPart[])[];
@@ -209,10 +224,8 @@ function rankedRows(
         unit: 'class',
         label: unitLabel(row.className),
         itemLevel: row.itemLevelMin,
-        ev:
-          row.ev === null
-            ? { kind: 'phrase', text: MONEY_PHRASES.notYetSynced }
-            : { kind: 'figure', text: formatDivine(row.ev) },
+        ev: row.ev === null || hasNoFigure(row.trust) ? MISSING : figure(row.ev),
+        trust: row.trust,
         provenance: row.provenance,
         ...craftedDetail(row, { entries: classes.get(row.classKey) ?? [], byKey: context.byKey, crafted, now: context.now }),
       };
@@ -223,7 +236,8 @@ function rankedRows(
       unit: 'raw',
       label: row.baseTypeId,
       itemLevel: row.itemLevelMin,
-      ev: { kind: 'figure', text: formatDivine(row.ev) },
+      ev: figure(row.ev),
+      trust: row.trust,
       status: row.status,
       ...rowDetail(context, row.entryKey, {
         state: 'priced',
@@ -235,7 +249,7 @@ function rankedRows(
   });
 }
 
-function unpricedRow(context: RowContext, entry: UnrankedEntry, phrase: string, state: CombinationState): DisplayRow {
+function unpricedRow(context: RowContext, entry: UnrankedEntry, state: CombinationState): DisplayRow {
   return {
     key: entry.entryKey,
     numeral: undefined,
@@ -243,7 +257,8 @@ function unpricedRow(context: RowContext, entry: UnrankedEntry, phrase: string, 
     unit: 'raw',
     label: entry.entry.baseTypeId,
     itemLevel: entry.entry.itemLevelMin,
-    ev: { kind: 'phrase', text: phrase },
+    ev: MISSING,
+    trust: entry.trust,
     status: entry.entry.status,
     ...rowDetail(context, entry.entryKey, state),
   };
@@ -251,13 +266,9 @@ function unpricedRow(context: RowContext, entry: UnrankedEntry, phrase: string, 
 
 function trailingRows(ranking: Ranking, context: RowContext): DisplayRow[] {
   return [
-    ...ranking.noListings.map((entry) => unpricedRow(context, entry, MONEY_PHRASES.noListings, { state: 'no-listings' })),
-    ...ranking.notYetSynced.map((entry) =>
-      unpricedRow(context, entry, MONEY_PHRASES.notYetSynced, { state: 'not-yet-synced', reason: entry.reason }),
-    ),
-    ...ranking.unresolvable.map((entry) =>
-      unpricedRow(context, entry, MONEY_PHRASES.unresolvable, { state: 'unresolvable' }),
-    ),
+    ...ranking.noListings.map((entry) => unpricedRow(context, entry, { state: 'no-listings' })),
+    ...ranking.notYetSynced.map((entry) => unpricedRow(context, entry, { state: 'not-yet-synced', reason: entry.reason })),
+    ...ranking.unresolvable.map((entry) => unpricedRow(context, entry, { state: 'unresolvable' })),
   ];
 }
 
@@ -277,14 +288,12 @@ export function toDisplayRows(
   const trailing = trailingRows(ranking, context);
 
   // State 23 prints "In canonical order": one sequence across the crafted rows and all three
-  // unpriced groups, by key (a class key or a canonical key), with no numeral and one EV phrase.
-  if (honestEmpty) {
-    const phrase: ExpectedValueCell = { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
-    return [...ranked, ...trailing]
-      .map((row): ListRow => ({ ...row, numeral: undefined, tier: 3, ev: phrase }))
-      .toSorted((left, right) => compareCanonicalKeys(left.key, right.key));
-  }
-  return [...ranked, ...trailing];
+  // unpriced groups, by key (a class key or a canonical key), with no numeral and every EV `—`.
+  return honestEmpty
+    ? [...ranked, ...trailing]
+        .map((row): ListRow => ({ ...row, numeral: undefined, tier: 3, ev: MISSING }))
+        .toSorted((left, right) => compareCanonicalKeys(left.key, right.key))
+    : [...ranked, ...trailing];
 }
 
 /** One branch in every state but 35, where an uncostable recipe gives raw then crafted. */

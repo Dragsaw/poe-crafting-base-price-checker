@@ -2,6 +2,8 @@ import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ASKING_PRICE_COPY } from '../list/AskingPriceLine';
+import { COLUMN_LABELS } from '../list/ColumnHeader';
+import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { bodiesWith, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { gatedArtifacts, serveArtifacts } from '../test-support/artifact-server';
 import { flush, rgb, settleTo, unmount } from '../test-support/dom';
@@ -34,7 +36,7 @@ describe('the resting chrome', () => {
     mount();
     expect(frame().dataset['state']).toBe('pending');
     expect(chrome()).toEqual(ALL);
-    expect(frame().querySelector('[data-column-header]')?.textContent).toContain('Item Class / Base Type');
+    expect(frame().querySelector('[data-column-header]')?.textContent).toContain(COLUMN_LABELS.name);
     expect(frame().textContent).toContain(ASKING_PRICE_COPY);
     // A statement, not a control: never the accent.
     expect(frame().querySelector<HTMLElement>('[data-asking-price-line]')?.style.color).toBe(
@@ -84,10 +86,11 @@ describe('the resting chrome', () => {
     ]);
     const rows = frame().querySelectorAll('[data-ranked-row]');
     expect(rows[0]?.textContent).toContain('0.50');
-    expect(rows[1]?.textContent).toContain('an open question');
-    // Matrix: unresolvable — a trailing row, not valued.
+    expect(rows[1]?.querySelector('[data-cell="ev"]')?.textContent).toBe(MISSING_FIGURE);
+    expect(rows[1]?.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe('pending');
+    // Matrix: unresolvable — a trailing row, broken.
     expect(rows[2]?.textContent).toContain('Lost Ring');
-    expect(rows[2]?.textContent).toContain('not valued');
+    expect(rows[2]?.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark']).toBe('broken');
   });
 
   it('paints none of it on the refusal screen', async () => {
@@ -116,7 +119,7 @@ describe('the resting chrome', () => {
     expect(frame().textContent).not.toContain('Solar Amulet');
     expect(frame().textContent).not.toContain('Utility Belt');
     for (const row of rows) {
-      expect(row.querySelectorAll('[data-unit-glyph]')).toHaveLength(1);
+      expect(row.querySelectorAll('[data-sell-as-is]')).toHaveLength(1);
     }
   });
 

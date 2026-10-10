@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { BELOW_PRINTABLE, formatDivine, formatThreshold } from './money';
+import { BELOW_PRINTABLE, formatDivine, formatThreshold, MINUS } from './money';
 
 describe('formatDivine', () => {
   it('prints 2dp', () => {
@@ -25,9 +25,11 @@ describe('formatDivine on a negative figure', () => {
     expect(formatDivine(-0)).toBe('0.00');
   });
 
-  it('keeps the sign of a negative figure that rounds to a non-zero value', () => {
-    expect(formatDivine(-0.01)).toBe('-0.01');
-    expect(formatDivine(-2.5)).toBe('-2.50');
+  it('keeps the sign of a negative figure that rounds to a non-zero value, as U+2212', () => {
+    expect(MINUS).toBe('\u{2212}');
+    expect(formatDivine(-0.01)).toBe(`${MINUS}0.01`);
+    expect(formatDivine(-2.5)).toBe(`${MINUS}2.50`);
+    expect(formatDivine(-2.5)).not.toContain('-');
   });
 });
 

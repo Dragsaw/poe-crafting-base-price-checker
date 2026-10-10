@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { rgb, settleTo, unmount } from '../test-support/dom';
+import { NAME_COLORS } from '../list/RankedRow';
 import { colors } from '../theme/tokens';
 import { RECIPE_STORAGE_KEY } from './recipe-storage';
+import { formatThreshold } from '../shared/money';
+import { DEFAULT_THRESHOLD } from '../shared/product';
+import { hover, leave } from '../test-support/hover';
+import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import {
   mount,
   frame,
@@ -17,6 +22,7 @@ import {
   statement,
   click,
   rowNamed,
+  RATES,
 } from './craft-recipe/test-support';
 
 afterEach(() => {
@@ -49,15 +55,15 @@ describe('the Craft Recipe control', () => {
     expect(control().style.width).toBe('216px');
   });
 
-  it('ranks crafted rows with the class glyph, the Item Class name and the EV, beside raw rows', async () => {
+  it('ranks crafted rows with the Item Class name in magic blue and the EV, beside raw rows', async () => {
     serveWorld(standardWorld());
     mount();
     await settleTo('ready');
     expect(names()).toEqual(['Staves', 'Bows', 'Wide Belt', 'Gold Amulet']);
     expect(cells('ev')).toEqual(['0.97', '0.47', '0.40', '0.30']);
     expect(cells('rank')).toEqual(['1', '2', '3', '4']);
-    const glyph = rowNamed('Bows').querySelector<HTMLElement>('[data-unit-glyph]');
-    expect(glyph?.dataset['unitGlyph']).toBe('class');
+    expect(rowNamed('Bows').querySelector<HTMLElement>('[data-unit-name]')?.style.color).toBe(rgb(NAME_COLORS.class));
+    expect(rowNamed('Bows').querySelector('[data-sell-as-is]')).toBeNull();
     expect(rowNamed('Bows').dataset['raw']).toBeUndefined();
     expect(statement()).toBeNull();
   });
@@ -135,5 +141,40 @@ describe('the Craft Recipe control', () => {
       expect(frame().querySelector('[data-artifact]')?.textContent).toBe('recipes.json');
       unmount();
     }
+  });
+});
+
+function valueTooltip(): HTMLElement | null {
+  hover(frame().querySelector('[data-ev-label]'));
+  const tooltip = document.body.querySelector<HTMLElement>('[data-ev-tooltip]');
+  leave(frame().querySelector('[data-ev-label]'));
+  return tooltip;
+}
+
+const boldFigures = (tooltip: HTMLElement | null): string[] =>
+  [...(tooltip?.querySelectorAll<HTMLElement>('p:first-child span') ?? [])]
+    .filter((span) => span.style.fontWeight === '600')
+    .map((span) => span.textContent);
+
+describe('the EV tooltip the page renders', () => {
+  it('states the active recipe’s Craft Cost and the live threshold, then the uncostable variant, then a typed threshold', async () => {
+    serveWorld(standardWorld({ rates: RATES.slice(0, 2) }));
+    mount();
+    await settleTo('ready');
+    const costed = valueTooltip();
+    expect(costed?.dataset['evTooltip']).toBe('costed');
+    const cost = control().querySelector('[data-recipe-cost-figure]')?.textContent;
+    expect(boldFigures(costed)).toEqual([formatThreshold(DEFAULT_THRESHOLD), cost]);
+    click(option('perfect'));
+    const uncostable = valueTooltip();
+    expect(uncostable?.dataset['evTooltip']).toBe('uncostable');
+    expect(boldFigures(uncostable)).toEqual([formatThreshold(DEFAULT_THRESHOLD)]);
+    const field = frame().querySelector<HTMLInputElement>('[data-payout-threshold] input');
+    if (field === null) {
+      throw new Error('no threshold input');
+    }
+    typeInto(field, '1.5');
+    await pastDebounce();
+    expect(boldFigures(valueTooltip())).toEqual([formatThreshold(1.5)]);
   });
 });

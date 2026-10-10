@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { uncostableCopy } from '../../list/list-statement';
 import { expandCopy } from '../../list/RankedList';
+import { MISSING_FIGURE } from '../../list/row/ExpectedValueCell';
+import { MINUS } from '../../shared/money';
 import { settleTo, unmount } from '../../test-support/dom';
 import { hoursBefore, priced, rawEntry } from '../../test-support/list-fixtures';
 import {
@@ -44,7 +46,8 @@ describe('the crafted states', () => {
     await settleTo('ready');
     expect(statement()?.dataset['listStatement']).toBe('nothing-clears');
     expect(names()).toEqual(['Bows', 'Staves', 'Gold Amulet']);
-    expect(cells('ev')).toEqual(['-0.03', '-0.03', 'no figure yet']);
+    // Staves has no priced combination, so it reads `—` beside ○ (state 18), though it still ranks.
+    expect(cells('ev')).toEqual([`${MINUS}0.03`, MISSING_FIGURE, MISSING_FIGURE]);
     expect(cells('rank')).toEqual(['1', '2', '']);
   });
 
@@ -65,7 +68,7 @@ describe('the crafted states', () => {
     expect(names(rawBranch)).toEqual(['Wide Belt', 'Gold Amulet']);
     // The crafted branch keeps the gross-payout order: Bows 1 × 1, Staves 0.25 × 2.
     expect(names(craftedBranch)).toEqual(['Bows', 'Staves']);
-    expect(cells('ev', craftedBranch)).toEqual(['no figure yet', 'no figure yet']);
+    expect(cells('ev', craftedBranch)).toEqual([MISSING_FIGURE, MISSING_FIGURE]);
     expect(cells('rank')).toEqual(['', '', '', '']);
     // Tiers run per branch: each branch opens at tier 1.
     expect(Array.from(frame().querySelectorAll<HTMLElement>('[data-ranked-row]'), (row) => row.dataset['tier'])).toEqual([
@@ -126,7 +129,7 @@ describe('the crafted states', () => {
       // Canonical key order: every crafted class key sorts before every raw key.
       expect(names(), recipeId).toEqual(['Bows', 'Staves', 'Gold Amulet', 'Wide Belt']);
       expect(cells('rank'), recipeId).toEqual(['', '', '', '']);
-      expect(cells('ev'), recipeId).toEqual(['no figure yet', 'no figure yet', 'no figure yet', 'no figure yet']);
+      expect(cells('ev'), recipeId).toEqual([MISSING_FIGURE, MISSING_FIGURE, MISSING_FIGURE, MISSING_FIGURE]);
     };
     expectCanonicalSequence('greater');
     click(option('perfect'));

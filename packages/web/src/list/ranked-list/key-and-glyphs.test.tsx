@@ -22,17 +22,18 @@ describe('the trust mark and the unit glyphs', () => {
 });
 
 describe('the key block', () => {
-  it('holds two columns, the first being Silence means healthy, and no curation or age marks', () => {
+  // Story 4.3 retires the row's Provenance cell, so its key lines go; Story 4.6 retires the rest.
+  it('holds one column of provenance marks, with no prior-only, unit, curation or age line', () => {
     const container = mount(<KeyBlock />);
     const columns = [...container.querySelectorAll('[data-key-column]')];
-    expect(columns).toHaveLength(2);
+    expect(columns).toHaveLength(1);
     expect(columns.map((c) => c.firstElementChild?.textContent)).toEqual([...KEY_TITLES]);
-    expect(KEY_TITLES[0]).toBe('Silence means healthy');
     const text = container.textContent;
-    expect(text).toContain('nothing here is degraded');
+    expect(text).not.toContain('prior only');
+    expect(text).not.toContain(glyphs.prior);
+    expect(text).not.toContain('Provenance cell');
     expect(text).not.toContain('Age cell');
     expect(text).not.toContain('never attempted');
-    expect(text).not.toContain(glyphs.pruned);
     expect(text).not.toContain(glyphs.unitRaw);
     expect(text).not.toContain(glyphs.unitClass);
   });

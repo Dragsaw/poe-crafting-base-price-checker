@@ -15,10 +15,12 @@ import {
   RAW_NO_RECIPE_SENTENCE,
   rawCombinationNote,
   rawExpansionNote,
-  rawNote,
+  itemLevelFloor,
   rawPanelSubLine,
   resolvedState,
   sampleText,
+  SELL_AS_IS,
+  sellAsIsLine,
   STATE_NOTES,
   stateWord,
   unitLabel,
@@ -47,10 +49,24 @@ describe('labels', () => {
     expect(unitLabel('_a__b_')).toBe(' a  b ');
   });
 
-  it('spells the Item Level Floor in the raw note', () => {
-    expect(rawNote(82)).toBe(
-      'uncrafted at Item Level 82 — valued at its own current asking price, not at a craft outcome',
-    );
+  // The shipped defect printed `Helmets_str` as `Helmets str`.
+  it('spells a trailing defence suffix as a capitalised, slash-joined parenthetical', () => {
+    expect(unitLabel('Helmets_str')).toBe('Helmets (Str)');
+    expect(unitLabel('Gloves_dex_int')).toBe('Gloves (Dex/Int)');
+    expect(unitLabel('Body_Armours_str_dex_int')).toBe('Body Armours (Str/Dex/Int)');
+    expect(unitLabel('Bows')).toBe('Bows');
+    expect(unitLabel('Amulets')).toBe('Amulets');
+  });
+
+  it('keeps a defence word that is the whole name or sits mid-name', () => {
+    expect(unitLabel('str')).toBe('str');
+    expect(unitLabel('dex_Gloves')).toBe('dex Gloves');
+  });
+
+  it('spells the Item Level Floor in the sell-as-is line', () => {
+    expect(sellAsIsLine(82)).toBe(`${SELL_AS_IS} · ${itemLevelFloor(82)}`);
+    expect(itemLevelFloor(82)).toBe('item level 82+');
+    expect(sellAsIsLine(75)).toBe('Sell as is · item level 75+');
   });
 });
 

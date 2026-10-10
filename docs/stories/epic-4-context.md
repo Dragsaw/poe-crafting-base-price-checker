@@ -54,4 +54,3 @@ Epic 4 restyles the page that Epics 1 to 3 shipped. The ranked list stays the sa
 
 - The order is 4.1, then 4.2, then 4.3 to 4.5, then 4.6. Story 4.1 provides the token layer and the header bar slots that Story 4.5 fills. Stories 4.3 and 4.4 render the verdict that Story 4.2 returns, and `web` must not recompute it. Story 4.6 retires components only after Stories 4.3 to 4.5 have replaced what they did.
 - The epic builds on the Epic 2 page (rows, threshold, expansion, sync report, appendix) and the Epic 3 crafted branch (recipe control, chase cells, Provenance). It extends them and does not rebuild them. It changes nothing in `sync`.
-- Story 4.3 owes a fix and a test for `unitLabel()` on Item Class names that carry a defence suffix.

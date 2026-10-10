@@ -1,9 +1,7 @@
 import type { ModifierWeight } from '@poe/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { HAIR_SPACE } from '../../list/TrustMark';
 import { settleTo, unmount } from '../../test-support/dom';
-import { glyphs } from '../../theme/tokens';
 import {
   mount,
   frame,
@@ -29,31 +27,33 @@ afterEach(() => {
 });
 
 const banner = (): HTMLElement | null => frame().querySelector<HTMLElement>('[data-uniform-prior-banner]');
-const priorMarks = (): string[] =>
-  Array.from(frame().querySelectorAll('[data-ranked-row] [data-cell="provenance"]'), (node) => node.textContent ?? '');
+/** The names of the rows that draw ≈ before their EV (state 12). */
+const estimated = (): string[] =>
+  Array.from(frame().querySelectorAll('[data-ranked-row]'), (row) =>
+    row.querySelector('[data-cell="ev"] [data-estimate] svg[data-mark="estimate"]') === null ? '' : (row.querySelector('[data-unit-name]')?.textContent ?? ''),
+  );
 
 const invented = (item: ModifierWeight): ModifierWeight => ({ ...item, weightSource: 'absent' });
 
-describe('Provenance marks and the banner', () => {
+describe('the estimated-odds cue and the banner', () => {
   /** An invented tier at floor 50: in the greater recipe's set (floor 44), under perfect (70). */
   const priorBows: Pools = [[tier(TARGET, 10, 75), invented(tier(FILLER, 10, 50)), tier(LOW, 80, 1)], [tier(SUFFIX, 10, 80)]];
   const priorStaves: Pools = [[tier(TARGET, 50, 50), invented(tier(FILLER, 50, 50))], [tier(SUFFIX, 10, 80)]];
 
-  it('prints prior only on a pair with an invented tier, raises the banner, and follows a recipe switch', async () => {
+  it('draws ≈ before the EV of a pair with an invented tier, raises the banner, and follows a recipe switch', async () => {
     serveWorld(standardWorld({ classes: [['weapon.bow', 'Bows', priorBows], ['weapon.staff', 'Staves', priorStaves]] }));
     mount();
     await settleTo('ready');
     expect(banner()).not.toBeNull();
     expect(banner()?.textContent).not.toMatch(/uniform-prior|absent|published/);
-    const marks = priorMarks().filter((text) => text !== '');
-    expect(marks).toHaveLength(2);
-    expect(marks.every((text) => text === `${glyphs.prior}${HAIR_SPACE}prior only`)).toBe(true);
-    // The raw rows stay silent, and no expansion repeats the mark.
+    expect(estimated().filter((name) => name !== '').toSorted((a, b) => a.localeCompare(b))).toEqual(['Bows', 'Staves']);
+    // The raw rows stay silent (state 12a), and no expansion repeats the mark.
+    expect(frame().querySelectorAll('[data-ranked-row][data-raw] [data-estimate]')).toHaveLength(0);
     click(rowNamed('Bows'));
     expect(frame().querySelector('[data-expansion-panel] [data-trust-mark="prior"]')).toBeNull();
     click(option('perfect'));
     expect(banner()).toBeNull();
-    expect(priorMarks().filter((text) => text !== '')).toEqual([]);
+    expect(estimated().filter((name) => name !== '')).toEqual([]);
     click(option('greater'));
     expect(banner()).not.toBeNull();
   });
@@ -67,7 +67,7 @@ describe('Provenance marks and the banner', () => {
     click(option('perfect'));
     click(option('greater'));
     expect(banner()).toBeNull();
-    expect(priorMarks().filter((text) => text !== '')).toHaveLength(2);
+    expect(estimated().filter((name) => name !== '')).toHaveLength(2);
   });
 
   it('lowers the banner while a measured crafted row is on the list, and prints no mark', async () => {
@@ -75,7 +75,7 @@ describe('Provenance marks and the banner', () => {
     mount();
     await settleTo('ready');
     expect(banner()).toBeNull();
-    expect(priorMarks().filter((text) => text !== '')).toHaveLength(1);
+    expect(estimated().filter((name) => name !== '')).toHaveLength(1);
   });
 
   it('raises no banner with no crafted row', async () => {

@@ -1,14 +1,30 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { cellIn as cell, mountList, NOW, rgb, rowsIn, unmount } from '../../test-support/dom';
+import { hover, leave } from '../../test-support/hover';
 import { hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list-fixtures';
 import { colors } from '../../theme/tokens';
+import { sellAsIsLine } from '../format';
+import { MISSING_FIGURE } from '../row/ExpectedValueCell';
+import { FIXED_ROW_REASONS, TRUST_JOINER, VERDICT_WORDS } from '../row/trust-words';
 
 afterEach(unmount);
 
+function markOf(row: HTMLElement | undefined): string | undefined {
+  return row?.querySelector<HTMLElement>('[data-row-mark]')?.dataset['rowMark'];
+}
+
+function tooltipOf(row: HTMLElement | undefined): string | null | undefined {
+  const mark = row?.querySelector('[data-row-mark]');
+  hover(mark);
+  const text = document.body.querySelector('[data-mark-tooltip]')?.textContent;
+  leave(mark);
+  return text;
+}
+
 describe('the unpriced trail', () => {
-  // Matrix: unpriced trail, and unresolvable (trail order, row cells, stale unresolvable).
-  it('numbers the priced rows, then trails an open question, no figure yet and not valued, the age cell blank', () => {
+  // Matrix: unpriced raw trail (states 18, 40).
+  it('numbers the priced rows, then trails pending and broken rows, each `—` beside its mark', () => {
     const a = rawEntry('Gold Amulet');
     const b = rawEntry('Solar Amulet');
     const tried = rawEntry('Coral Ring');
@@ -37,30 +53,24 @@ describe('the unpriced trail', () => {
       'Broken Ring',
       'Lost Ring',
     ]);
-    expect(cell(rows[2], 'ev').textContent).toBe('an open question');
-    expect(cell(rows[3], 'ev').textContent).toBe('no figure yet');
-    expect(cell(rows[3], 'ev').querySelector<HTMLElement>('[data-money-phrase]')?.style.fontStyle).toBe('italic');
-    expect(cell(rows[3], 'ev').querySelector<HTMLElement>('[data-money-phrase]')?.style.color).toBe(rgb(colors.text));
-    for (const r of rows.slice(4)) {
-      const phrase = cell(r, 'ev').querySelector<HTMLElement>('[data-money-phrase]');
-      expect(phrase?.textContent).toBe('not valued');
-      expect(phrase?.style.fontStyle).toBe('italic');
-      expect(phrase?.style.color).toBe(rgb(colors['trust-broken']));
-      expect(cell(r, 'ev').querySelector('[data-ev-figure]')).toBeNull();
-    }
-    // `web` derives no age mark (AD-10); the verdict is `core`'s (EXPERIENCE.md *Price trust*).
-    for (const r of rows) {
-      expect(cell(r, 'age').childNodes).toHaveLength(0);
-    }
+    expect(rows.map((r) => markOf(r))).toEqual([undefined, undefined, 'pending', 'pending', 'broken', 'broken']);
     for (const r of rows.slice(2)) {
+      const missing = cell(r, 'ev').querySelector<HTMLElement>('[data-ev-missing]');
+      expect(cell(r, 'ev').textContent).toBe(MISSING_FIGURE);
+      expect(missing?.style.color).toBe(rgb(colors['text-tertiary']));
+      expect(missing?.style.fontWeight).toBe('400');
+      expect(cell(r, 'ev').querySelector('[data-ev-figure]')).toBeNull();
       expect(r.dataset['tier']).toBe('3');
       expect(r.dataset['raw']).toBeDefined();
-      expect(r.querySelector('[data-raw-note]')).not.toBeNull();
+      expect(r.querySelector('[data-sell-as-is]')?.textContent).toBe(sellAsIsLine(82));
     }
+    // The Raw Base tooltip column: `no-listings` prints with no days.
+    expect(tooltipOf(rows[2])).toBe(`${VERDICT_WORDS.pending}${TRUST_JOINER}${FIXED_ROW_REASONS['no-listings']}`);
+    expect(tooltipOf(rows[3])).toBe(`${VERDICT_WORDS.pending}${TRUST_JOINER}${FIXED_ROW_REASONS['never-synced']}`);
+    expect(tooltipOf(rows[5])).toBe(`${VERDICT_WORDS.broken}${TRUST_JOINER}${FIXED_ROW_REASONS.unresolvable}`);
   });
 
-  // Review decision (b): the EV colour follows the phrase shown, so trust-broken goes only to *not valued*.
-  it('prints an honest-empty unresolvable row as no figure yet in text, not trust-broken', () => {
+  it('keeps each entry’s own mark and reason in an honest-empty list', () => {
     const lost = rawEntry('Lost Ring');
     const tried = rawEntry('Coral Ring');
     const rows = rowsIn(
@@ -73,20 +83,18 @@ describe('the unpriced trail', () => {
       ),
     );
     expect(rows).toHaveLength(2);
-    for (const r of rows) {
-      const phrase = cell(r, 'ev').querySelector<HTMLElement>('[data-money-phrase]');
-      expect(phrase?.textContent).toBe('no figure yet');
-      expect(phrase?.style.color).toBe(rgb(colors.text));
-    }
+    expect(rows.map((r) => cell(r, 'ev').textContent)).toEqual([MISSING_FIGURE, MISSING_FIGURE]);
+    expect(rows.map((r) => markOf(r))).toEqual(['pending', 'broken']);
   });
 
-  it('never prints 0, a blank or an em dash in an EV cell', () => {
+  it('never prints 0, a blank, or a `—` with no mark beside it', () => {
     const tried = rawEntry('Coral Ring');
     const never = rawEntry('Wide Belt');
     const rows = rowsIn(mountList([tried, never], [unpriced(tried, { state: 'no-listings' })]));
     for (const r of rows) {
       const text = cell(r, 'ev').textContent;
-      expect(text).not.toMatch(/^(0|0\.00|—|)$/);
+      expect(text).not.toMatch(/^(0|0\.00|)$/);
+      expect(text === MISSING_FIGURE && markOf(r) === undefined).toBe(false);
     }
   });
 });

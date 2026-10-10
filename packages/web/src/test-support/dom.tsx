@@ -8,6 +8,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { toDisplayRows } from '../list/display-rows';
 import { RankedList } from '../list/RankedList';
 import { DEFAULT_THRESHOLD } from '../shared/product';
+import { PageProvider } from '../theme/PageProvider';
 import { TEST_LEAGUE } from './artifact-server';
 
 /** The test clock every unit and list test reads as `now`. */
@@ -96,7 +97,11 @@ function rerender(node: ReactNode): void {
 /** The ranked list for `tracked` against `dataset` at `threshold`, at `NOW`. */
 function rankedList(tracked: readonly RawTrackedEntry[], dataset: readonly DatasetEntry[], threshold: number): ReactNode {
   const rows = toDisplayRows(rank({ tracked, dataset, activeLeague: TEST_LEAGUE, now: NOW_ISO, threshold, weights: undefined }), dataset, NOW);
-  return <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} />;
+  return (
+    <PageProvider>
+      <RankedList rows={rows} threshold={threshold} activeLeague={TEST_LEAGUE} note={{ threshold, cost: { kind: 'no-recipe' } }} />
+    </PageProvider>
+  );
 }
 
 /** Ranks `tracked` against `dataset` at `threshold` and mounts the ranked list at `NOW`. */

@@ -17,14 +17,31 @@ export const MONEY_PHRASES = {
   pruned: 'not tracked',
 } as const;
 
-/** Only the label changes; the stored `className` stays the identity (AD-5). */
+const DEFENCE_WORDS: Readonly<Record<string, string>> = { str: 'Str', dex: 'Dex', int: 'Int' };
+
+/** Only the label changes; the stored `className` stays the identity (AD-5). EXPERIENCE.md *Item Class labels*. */
 export function unitLabel(className: string): string {
-  return className.replaceAll('_', ' ');
+  const words = className.split('_');
+  let cut = words.length;
+  while (cut > 1 && DEFENCE_WORDS[words[cut - 1] ?? ''] !== undefined) {
+    cut -= 1;
+  }
+  const name = words.slice(0, cut).join(' ');
+  const defences = words.slice(cut).map((word) => DEFENCE_WORDS[word] ?? word);
+  return defences.length === 0 ? name : `${name} (${defences.join('/')})`;
 }
 
-/** The Raw Base row's note, spelling the Item Level Floor (DESIGN.md `raw-base-row`). */
-export function rawNote(itemLevelMin: number): string {
-  return `uncrafted at Item Level ${String(itemLevelMin)} — valued at its own current asking price, not at a craft outcome`;
+/** The lead words of the Raw Base row's chase slot (EXPERIENCE.md Copy Deck). */
+export const SELL_AS_IS = 'Sell as is';
+
+/** The Item Level Floor as the sell-as-is line spells it. */
+export function itemLevelFloor(itemLevelMin: number): string {
+  return `item level ${String(itemLevelMin)}+`;
+}
+
+/** The Raw Base row's chase slot: `Sell as is · item level 82+` (EXPERIENCE.md Copy Deck). */
+export function sellAsIsLine(itemLevelMin: number): string {
+  return `${SELL_AS_IS} · ${itemLevelFloor(itemLevelMin)}`;
 }
 
 // --- the expansion panel ---------------------------------------------------

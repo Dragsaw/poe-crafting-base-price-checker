@@ -83,9 +83,9 @@ describe('the non-empty appendix', () => {
   });
 
   // Matrix: underscored class. The web trims at render time (AD-5).
-  it('prints an underscored class name with spaces', () => {
+  it('prints an underscored class name with spaces and its defence suffix as words', () => {
     const panel = mountAppendix([klass('Body_Armours_dex_int')]);
-    expect(panel.querySelector('[data-appendix-class]')?.textContent).toBe('Body Armours dex int');
+    expect(panel.querySelector('[data-appendix-class]')?.textContent).toBe('Body Armours (Dex/Int)');
   });
 
   it('leads each row with the class glyph, marks it unknown, and prints the reason verbatim with an empty note', () => {

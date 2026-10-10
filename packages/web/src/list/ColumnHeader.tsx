@@ -1,54 +1,103 @@
-import type { CSSProperties, JSX } from 'react';
+import { Tooltip } from '@mantine/core';
+import type { JSX } from 'react';
 
-import { fixedCell } from '../shared/cell';
 import { DENOMINATION } from '../shared/product';
-import { colors, px, rankedRowColumns, layout, typeStyle } from '../theme/tokens';
+import {
+  colors,
+  COLUMN_HEADER_HEIGHT,
+  floatingShadows,
+  px,
+  layout,
+  rankedRowGrid,
+  spacing,
+  typeRoles,
+  typeStyle,
+} from '../theme/tokens';
+import { cellStyle, ROW_COLUMNS, type RowColumn } from './row/grid';
+import { ExpectedValueTooltipLabel, type ExpectedValueCost } from './row/ExpectedValueTooltip';
 
-type ColumnName = (typeof rankedRowColumns)[number]['name'];
-
-// DESIGN.md `column-header`. The second label names both ranked units (FR-3);
-// the fourth is `Provenance`, never `Weight`.
-export const COLUMN_LABELS: Readonly<Record<ColumnName, string>> = {
-  rank: '',
-  unit: 'Item Class / Base Type',
+/** EXPERIENCE.md Copy Deck, *Column headers*. The second label names both ranked units (FR-3). */
+export const COLUMN_LABELS: Readonly<Record<RowColumn, string>> = {
+  rank: '#',
+  name: 'Item class / base',
   ev: `EV (${DENOMINATION})`,
-  provenance: 'Provenance',
-  age: 'Age',
-  chase: 'Chase Combinations, by contribution to EV',
+  chase: 'Best combinations',
 };
 
-/** Columns whose content sits against the right edge: the numeral and the figure. */
-const RIGHT_ALIGNED: ReadonlySet<ColumnName> = new Set(['rank', 'ev']);
-
-/** One fixed-width flex cell of the six-column contract, shared by the header, the rows and the skeleton. */
-export function cellStyle(column: (typeof rankedRowColumns)[number]): CSSProperties {
-  return {
-    ...fixedCell(column),
-    textAlign: RIGHT_ALIGNED.has(column.name) ? 'right' : undefined,
-  };
+/** What the EV tooltip states: the live threshold and the active recipe's Craft Cost. */
+export interface ExpectedValueNote {
+  readonly threshold: number;
+  readonly cost: ExpectedValueCost;
 }
 
-// Fixed flex cells, never inline-block spans. No artifact feeds its text: the skeleton paints it.
-export function ColumnHeader(): JSX.Element {
+/** DESIGN.md `ev-tooltip`: the mark-tooltip shell, wider, padded, deeper and in the tooltip role. */
+const EV_TOOLTIP_STYLES = {
+  tooltip: {
+    ...typeRoles.tooltip,
+    width: '330px',
+    padding: '10px 12px',
+    boxShadow: floatingShadows['ev-tooltip'],
+    color: colors.text,
+    whiteSpace: 'normal',
+    letterSpacing: 'normal',
+    textTransform: 'none',
+  },
+} as const;
+
+/** DESIGN.md `column-header.evLabel`: dotted underline and help cursor, the look of a hover explanation. */
+function ExpectedValueLabel({ note }: { readonly note: ExpectedValueNote | undefined }): JSX.Element {
+  if (note === undefined) {
+    return (
+      <span data-ev-label="" style={{ color: colors['text-secondary'] }}>
+        {COLUMN_LABELS.ev}
+      </span>
+    );
+  }
+  return (
+    <Tooltip
+      label={<ExpectedValueTooltipLabel threshold={note.threshold} cost={note.cost} />}
+      position="bottom-end"
+      multiline
+      styles={EV_TOOLTIP_STYLES}
+    >
+      <span
+        data-ev-label=""
+        style={{
+          color: colors['text-secondary'],
+          borderBottom: `1px dotted ${colors['text-tertiary']}`,
+          cursor: 'help',
+        }}
+      >
+        {COLUMN_LABELS.ev}
+      </span>
+    </Tooltip>
+  );
+}
+
+// No artifact feeds the labels, so the skeleton paints them; only the EV tooltip waits for the data.
+export function ColumnHeader({ note }: { readonly note?: ExpectedValueNote }): JSX.Element {
   return (
     <div
       data-column-header=""
       style={{
         ...typeStyle('column-header'),
-        display: 'flex',
-        width: px(layout.contentWidth),
+        ...rankedRowGrid,
+        height: COLUMN_HEADER_HEIGHT,
         boxSizing: 'border-box',
         marginTop: px(layout.columnHeaderMarginTop),
-        paddingBottom: px(layout.s1),
-        borderBottom: `${px(layout.hairline)} solid ${colors['line-strong']}`,
+        borderBottom: `1px solid ${colors['line-strong']}`,
         color: colors['text-tertiary'],
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',
       }}
     >
-      {rankedRowColumns.map((column) => (
-        <div key={column.name} data-header-cell={column.name} style={cellStyle(column)}>
-          {COLUMN_LABELS[column.name]}
+      {ROW_COLUMNS.map((column) => (
+        <div
+          key={column}
+          data-header-cell={column}
+          style={{ ...cellStyle(column), paddingRight: column === 'ev' ? spacing['mark-slot'] : undefined }}
+        >
+          {column === 'ev' ? <ExpectedValueLabel note={note} /> : COLUMN_LABELS[column]}
         </div>
       ))}
     </div>

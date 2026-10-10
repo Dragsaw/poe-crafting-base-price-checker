@@ -8,3 +8,6 @@ export const DEFAULT_THRESHOLD = 0.25;
 
 /** The denomination word the page prints (PRD §3, AD-24, AD-20); not read from `static.json`. */
 export const DENOMINATION = 'Divine';
+
+/** The unit word after a figure in the header bar and the EV tooltip (EXPERIENCE.md, Mapping). */
+export const DIV_UNIT = 'div';

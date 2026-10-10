@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   colors,
+  COLUMN_HEADER_HEIGHT,
   columnSums,
   combinationLine1Columns,
   combinationLine2Columns,
+  floatingShadows,
   glyphs,
   layout,
-  rankedRowColumns,
+  rankedRowGrid,
   REGULAR_ONLY_GLYPHS,
   rounded,
   spacing,
@@ -129,11 +131,24 @@ describe('the token set', () => {
 
 const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
 
-describe('the column contracts later stories replace', () => {
-  it('sums the six ranked-row columns to the content width, exactly', () => {
-    expect(rankedRowColumns.map((column) => column.width)).toEqual([32, 222, 84, 88, 94, 492]);
-    expect(sum(rankedRowColumns.map((column) => column.width))).toBe(layout.contentWidth);
+describe('the ranked-row grid', () => {
+  it('lays rank, name and EV at their spacing widths and gives the chase column the rest', () => {
+    expect(rankedRowGrid.gridTemplateColumns).toBe(
+      `${spacing['col-rank']} ${spacing['col-name']} ${spacing['col-ev']} minmax(0, 1fr)`,
+    );
+    expect(rankedRowGrid.columnGap).toBe(spacing['col-gap']);
   });
+
+  it('transcribes the column-header height and both floating shadows', () => {
+    const components = tokens['components'] ?? {};
+    expect(COLUMN_HEADER_HEIGHT).toBe((components['column-header'] as Record<string, string>)['height']);
+    for (const name of ['mark-tooltip', 'ev-tooltip'] as const) {
+      expect(floatingShadows[name], name).toBe((components[name] as Record<string, string>)['shadow']);
+    }
+  });
+});
+
+describe('the column contracts later stories replace', () => {
 
   it('holds every other verified sum', () => {
     expect(columnSums.interimControls).toEqual([

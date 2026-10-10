@@ -6,6 +6,7 @@ import { serveArtifacts, TEST_LEAGUE } from '../test-support/artifact-server';
 import { ARTIFACT_ORDER } from '../load/artifacts';
 import { settleTo, unmount } from '../test-support/dom';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
+import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { server, mount, frame, payoutField, unitNames } from './test-support';
 
 afterEach(unmount);
@@ -41,7 +42,7 @@ describe('the list statement', () => {
   });
 
   // Matrix: league reset.
-  it('lists a league reset in canonical order, with no numerals, no figure yet in every EV cell and the canonical statement', async () => {
+  it('lists a league reset in canonical order, with no numerals, a dash in every EV cell and the canonical statement', async () => {
     const now = Date.now();
     const belt = rawEntry('Wide Belt');
     const ring = rawEntry('Coral Ring');
@@ -69,7 +70,7 @@ describe('the list statement', () => {
     // Canonical key order: for three iLvl-82 raw bases, the base type ids in order.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(eventCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    expect(eventCells()).toEqual([MISSING_FIGURE, MISSING_FIGURE, MISSING_FIGURE]);
     // None of last league's figures, anywhere on the list.
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
@@ -84,7 +85,7 @@ describe('the list statement', () => {
   });
 
   // Matrix: mixed reset. A league reset mid-refill, where one entry already reads no-listings.
-  it('lists a mixed reset in canonical order across both unpriced groups, no figure yet in every EV cell', async () => {
+  it('lists a mixed reset in canonical order across both unpriced groups, a dash in every EV cell', async () => {
     const now = Date.now();
     const belt = rawEntry('Wide Belt');
     const ring = rawEntry('Coral Ring');
@@ -108,7 +109,7 @@ describe('the list statement', () => {
     // Canonical key order across the groups, not no-listings first.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
-    expect(eventCells()).toEqual(['no figure yet', 'no figure yet', 'no figure yet']);
+    expect(eventCells()).toEqual([MISSING_FIGURE, MISSING_FIGURE, MISSING_FIGURE]);
     expect(frame().querySelector('[data-ranked-list]')?.textContent).not.toMatch(/\d\.\d\d/);
 
     // The no-listings row's expansion keeps its own state and phrase.
@@ -137,7 +138,7 @@ describe('the list statement', () => {
     expect(statement()).toBeNull();
     expect(unitNames()).toEqual(['Wide Belt', 'Coral Ring']);
     expect(numerals()).toEqual(['1', '']);
-    expect(eventCells()).toEqual(['1.50', 'no figure yet']);
+    expect(eventCells()).toEqual(['1.50', MISSING_FIGURE]);
     expect(frame().textContent).not.toMatch(/stale/i);
     expectChromeAround();
   });
@@ -162,7 +163,7 @@ describe('the list statement', () => {
     expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
     // Not a money-slot phrase: the trail row keeps its own phrase, as it was.
     expect(unitNames()).toEqual(['Lost Belt']);
-    expect(eventCells()).toEqual(['no figure yet']);
+    expect(eventCells()).toEqual([MISSING_FIGURE]);
     expectChromeAround();
 
     typeInto(payoutField(), '1');
