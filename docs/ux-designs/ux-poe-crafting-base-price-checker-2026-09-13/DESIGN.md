@@ -6,7 +6,7 @@ description: >-
   The game's rarity colours say what each row is, bronze marks what the player
   can operate, and every other colour appears only when a price needs attention.
 status: final
-revision: 20
+revision: 21
 created: 2026-09-13
 updated: 2026-10-10
 sources:

@@ -67,8 +67,8 @@ const byName = (a: string, b: string): number => a.localeCompare(b);
 const RETIRED = /^(surround|paper|ink|rule|edge|sepia|ochre|rust)(-|$)/;
 
 describe('the DESIGN.md transcription', () => {
-  it('reads DESIGN.md revision 20', () => {
-    expect(design).toMatch(/^revision: 20$/m);
+  it('reads DESIGN.md revision 21', () => {
+    expect(design).toMatch(/^revision: 21$/m);
   });
 
   it('transcribes every colour exactly, and nothing else', () => {

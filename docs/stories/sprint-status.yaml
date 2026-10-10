@@ -117,7 +117,7 @@ action_items:
       Open items and give the two unraised gaps an owner (S-Gaps); fix stale revision
       citations and Interaction 2 in epics.md and epic-4-context.md (S2-S4)"
     owner: "ux + architect + pm"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-6-one-story-one-age-ladder-one-joiner-one"
     epic: 4
