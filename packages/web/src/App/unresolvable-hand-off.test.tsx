@@ -1,7 +1,7 @@
 import { canonicalKey } from '@poe/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { absenceLine, PANEL_HEADINGS } from '../frame/trust-facts';
+import { absenceLine, PANEL_HEADINGS } from '../frame/trust-copy';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { bodiesWith, hoursBefore, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { serveArtifacts, TEST_LEAGUE, VALID_BODIES } from '../test-support/artifact-server';

@@ -11,7 +11,7 @@ import { CombinationText, type CombinationTones } from './expansion/CombinationT
 import { itemLevelFloor, SELL_AS_IS } from './format';
 import { ExpectedValueCell } from './row/ExpectedValueCell';
 import { cellStyle } from './row/grid';
-import { TRUST_JOINER } from './row/trust-words';
+import { JOINER } from '../shared/text';
 
 const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
@@ -106,7 +106,7 @@ function SellAsIsCell({ itemLevel }: { readonly itemLevel: number }): JSX.Elemen
     <div data-cell="chase" style={{ ...cellStyle('chase'), ...typeStyle('chase'), ...ELLIPSIS, color: colors['text-secondary'] }}>
       <span data-sell-as-is="">
         <span style={{ fontWeight: 600, color: colors['rarity-normal'] }}>{SELL_AS_IS}</span>
-        {TRUST_JOINER}
+        {JOINER}
         {itemLevelFloor(itemLevel)}
       </span>
     </div>

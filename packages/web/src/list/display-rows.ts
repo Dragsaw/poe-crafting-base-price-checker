@@ -147,15 +147,6 @@ function trackedByClass(tracked: readonly TrackedEntry[]): ReadonlyMap<string, r
   return classes;
 }
 
-/** The stored observation's price; read only for a line `core` judged priced. */
-function storedPrice(entry: DatasetEntry | undefined): number | undefined {
-  return entry?.price.state === 'priced' ? entry.price.observation.priceDivine : undefined;
-}
-
-function isPriced(trust: PriceTrust): boolean {
-  return trust.verdict === 'current' || trust.verdict === 'rough';
-}
-
 /** `web` reorders nothing: `core`'s summands, then its combinations, then the pruned entries by key. */
 function craftedDetail(
   row: CraftedRankedRow,
@@ -166,11 +157,9 @@ function craftedDetail(
     chase: row.summands.slice(0, CHASE_CELLS).map((summand) => text(summand.entryKey)),
     combinations: [
       ...row.summands.flatMap((summand) => line(summand.entryKey, { trust: summand.trust, price: summand.priceDivine, isBelowThreshold: false })),
-      ...row.combinations.flatMap((combination) => {
-        const isBelowThreshold = isPriced(combination.trust);
-        const price = isBelowThreshold ? storedPrice(byKey.get(combination.entryKey)) : undefined;
-        return line(combination.entryKey, { trust: combination.trust, price, isBelowThreshold });
-      }),
+      ...row.combinations.flatMap(({ entryKey, trust, priceDivine }) =>
+        line(entryKey, { trust, price: priceDivine, isBelowThreshold: priceDivine !== undefined }),
+      ),
     ],
     pruned,
   };
@@ -231,8 +220,8 @@ function recipelessRows(ranking: Ranking, byKey: ReadonlyMap<string, DatasetEntr
       ev: MISSING,
       trust: item.trust,
       chase: [],
-      combinations: item.combinations.flatMap(({ entryKey, trust }) =>
-        line(entryKey, { trust, price: isPriced(trust) ? storedPrice(byKey.get(entryKey)) : undefined, isBelowThreshold: false }),
+      combinations: item.combinations.flatMap(({ entryKey, trust, priceDivine }) =>
+        line(entryKey, { trust, price: priceDivine, isBelowThreshold: false }),
       ),
       pruned,
     };

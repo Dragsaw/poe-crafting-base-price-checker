@@ -123,6 +123,12 @@ describe('RankedRowSchema, the price trust', () => {
     expect(RankedRowSchema.safeParse({ ...craftedRow, combinations: [without(COMBINATION, 'trust')] }).success).toBe(false);
   });
 
+  it('takes an optional positive price on a combination', () => {
+    const priced = { entryKey: COMBINATION.entryKey, trust: CURRENT, priceDivine: 0.4 };
+    expect(RankedRowSchema.parse({ ...craftedRow, combinations: [priced] })).toEqual({ ...craftedRow, combinations: [priced] });
+    expect(RankedRowSchema.safeParse({ ...craftedRow, combinations: [{ ...priced, priceDivine: 0 }] }).success).toBe(false);
+  });
+
   it('parses each reason kind, and refuses a display string or an unknown kind', () => {
     const rough = { verdict: 'rough', reasons: [{ kind: 'old', days: 3 }, { kind: 'thin', listings: 2 }] };
     expect(RankedRowSchema.parse({ ...row, trust: rough })).toEqual({ ...row, trust: rough });

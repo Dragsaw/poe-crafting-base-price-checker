@@ -9,8 +9,8 @@ import { hasEstimate, type ClassDisplayRow, type CraftedCombination, type Displa
 import { ExpansionLine, PrunedLine, type LineView } from './expansion/ExpansionLine';
 import { ESTIMATED_ODDS_CONTEXT, FEWER_LINES_COPY, moreLinesCopy, prunedCopy } from './format';
 import { NAME_COLORS } from './RankedRow';
-import { TRUST_JOINER } from './row/trust-words';
 import { tradeSearchHref } from './trade-link';
+import { JOINER } from '../shared/text';
 
 /** A Raw Base expands to one line with no Combination text: the context line names it. */
 function rawLine(row: DisplayRow, activeLeague: string): LineView {
@@ -49,7 +49,7 @@ function ContextLine({ row }: { readonly row: DisplayRow | ClassDisplayRow }): J
       </span>
       {isEstimated ? (
         <span data-context-estimate="">
-          {TRUST_JOINER}
+          {JOINER}
           <span style={{ display: 'inline-flex', verticalAlign: '-0.125em' }}>
             <EstimateMark />
           </span>{' '}

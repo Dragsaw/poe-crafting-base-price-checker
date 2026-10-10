@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 
 import { MARK_COLORS, OpenSignMark, VerdictMark } from '../marks/marks';
 import { headerControls, px, rounded, typeStyle } from '../theme/tokens';
-import type { SyncButtonFace } from './trust-facts';
+import type { SyncButtonFace } from './sync-button-face';
 
 /** `{components.sync-button}`: the age when healthy, the problem count in its place when not (states 30, 31). */
 export function SyncButton({

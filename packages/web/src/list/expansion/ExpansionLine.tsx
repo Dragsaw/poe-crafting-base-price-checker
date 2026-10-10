@@ -3,13 +3,14 @@ import './expansion.css';
 import type { PriceTrust } from '@poe/contracts';
 import type { CSSProperties, JSX } from 'react';
 
-import { MARK_COLORS, TradeLinkMark, VerdictMark } from '../../marks/marks';
+import { TradeLinkMark, VerdictMark } from '../../marks/marks';
 import { formatDivine } from '../../shared/money';
 import { colors, expansionLineGrid, expansionLineWidths, typeStyle } from '../../theme/tokens';
 import type { AffixPart } from '../combination-text';
 import { BELOW_THRESHOLD_NOTE, CURATION_MARKS } from '../format';
 import { MISSING_FIGURE } from '../row/ExpectedValueCell';
-import { lineTrustParts, TRUST_JOINER } from '../row/trust-words';
+import { lineTrustParts } from '../row/trust-words';
+import { TrustWords } from '../row/TrustWords';
 import { CombinationText } from './CombinationText';
 
 /** One expansion line as it prints; every fact on it comes from `core` or the dataset. */
@@ -72,18 +73,12 @@ function TrustCell({ trust, isBelowThreshold }: { readonly trust: PriceTrust; re
   }
   return (
     <div data-cell="trust" style={style}>
-      {parts === undefined || trust.verdict === 'current' ? undefined : (
+      {parts === undefined ? undefined : (
         <>
-          <span data-line-mark={trust.verdict} style={{ display: 'inline-flex', verticalAlign: '-0.125em', marginRight: '6px' }}>
-            <VerdictMark verdict={trust.verdict} />
+          <span data-line-mark={parts.verdict} style={{ display: 'inline-flex', verticalAlign: '-0.125em', marginRight: '6px' }}>
+            <VerdictMark verdict={parts.verdict} />
           </span>
-          <span data-trust-word="" style={{ color: MARK_COLORS[trust.verdict] }}>
-            {parts.word}
-          </span>
-          <span data-trust-reason="">
-            {TRUST_JOINER}
-            {parts.reason}
-          </span>
+          <TrustWords parts={parts} isTagged />
         </>
       )}
     </div>

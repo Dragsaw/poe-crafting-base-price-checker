@@ -1,7 +1,7 @@
 import { RECIPE_UNREACHABLE, type UnrankableClass, type UnrankableReason } from '@poe/core';
 import type { JSX } from 'react';
 
-import { plural } from '../shared/text';
+import { plural, JOINER } from '../shared/text';
 import { colors, layout, px, spacing, typeStyle } from '../theme/tokens';
 import { unitLabel } from './format';
 
@@ -14,13 +14,11 @@ export const APPENDIX_LEAD = 'Tracked, but kept out of the ordering.';
 export const APPENDIX_NOTES: Readonly<Partial<Record<UnrankableReason, string>>> = {
   'pool partial': 'ranks once the weights file covers its whole pool',
   'class absent from weights file': 'may return after the next weights run',
-  'class disagrees with weights file': 'fixable in data/tracked.json · the sync report has the detail',
+  'class disagrees with weights file': `fixable in data/tracked.json${JOINER}the sync report has the detail`,
 };
 
 /** State 16's note: the class's Base Types still rank as Raw Base rows. */
 export const RAW_RANKS_NOTE = 'some of its bases still rank, sold as is';
-
-export const NOTE_JOINER = ' · ';
 
 /** `1 Item Class`, `N Item Classes`. */
 export function appendixCount(count: number): string {
@@ -38,7 +36,7 @@ function appendixNote(item: UnrankableClass, hasRankingBases: boolean): string {
     return '';
   }
   const notes = [APPENDIX_NOTES[item.reason], hasRankingBases ? RAW_RANKS_NOTE : undefined];
-  return notes.filter((note) => note !== undefined).join(NOTE_JOINER);
+  return notes.filter((note) => note !== undefined).join(JOINER);
 }
 
 const APPENDIX_GRID = {

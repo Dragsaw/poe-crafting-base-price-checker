@@ -5,8 +5,8 @@ import {
   CURATION_MARKS,
   FEWER_LINES_COPY,
   itemLevelFloor,
-  MONEY_PHRASES,
   moreLinesCopy,
+  NO_FIGURE_YET,
   prunedCopy,
   SELL_AS_IS,
   sellAsIsLine,
@@ -14,17 +14,9 @@ import {
 } from './format';
 
 describe('the view constants', () => {
-  it('holds the five money-slot phrases, none of them number-shaped', () => {
-    expect(Object.values(MONEY_PHRASES)).toEqual([
-      'an open question',
-      'no figure yet',
-      'not valued',
-      'unknown',
-      'not tracked',
-    ]);
-    for (const phrase of Object.values(MONEY_PHRASES)) {
-      expect(phrase).not.toMatch(/\d|—|-/);
-    }
+  it('holds the uncostable phrase, not number-shaped', () => {
+    expect(NO_FIGURE_YET).toBe('no figure yet');
+    expect(NO_FIGURE_YET).not.toMatch(/\d|—|-/);
   });
 });
 

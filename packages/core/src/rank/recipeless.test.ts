@@ -8,6 +8,7 @@ import {
   craftedRows,
   FILLER,
   NO_RECIPE,
+  OLD_LEAGUE,
   PARTIAL,
   poolsFile,
   priced,
@@ -35,7 +36,7 @@ describe('rank: the recipeless group (state 43)', () => {
       expect(result.unrankable).toEqual([]);
       expect(result.uncostableRecipes).toEqual([]);
       const combinations = [
-        { entryKey: canonicalKey(target), trust: { verdict: 'current', reasons: [] } },
+        { entryKey: canonicalKey(target), trust: { verdict: 'current', reasons: [] }, priceDivine: 2 },
         { entryKey: canonicalKey(filler), trust: { verdict: 'broken', reasons: [{ kind: 'unresolvable' }] } },
       ];
       expect(result.recipeless).toEqual([
@@ -63,6 +64,18 @@ describe('rank: the recipeless group (state 43)', () => {
     const byTrust = [withPrice, pending, broken].map((entry) => canonicalKey(entry));
     expect(byTrust.toSorted(compareCanonicalKeys)).toEqual(byTrust.toReversed());
     expect(result.recipeless[0]?.combinations.map((line) => line.entryKey)).toEqual(byTrust);
+  });
+
+  it('puts the price on an active-league priced entry only', () => {
+    const withPrice = chase('Bows');
+    const otherLeague = chase('Bows', 'explicit.stat_low');
+    const result = rankCrafted({
+      tracked: [withPrice, otherLeague],
+      dataset: [published(withPrice, priced(2)), published(otherLeague, priced(3, OLD_LEAGUE))],
+      recipes: [],
+    });
+    const prices = new Map(result.recipeless[0]?.combinations.map((line) => [line.entryKey, line.priceDivine]));
+    expect(prices).toEqual(new Map([[canonicalKey(withPrice), 2], [canonicalKey(otherLeague), undefined]]));
   });
 
   it('orders the group by class key, whatever the Tracked List order', () => {

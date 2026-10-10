@@ -2,7 +2,7 @@ import { canonicalKey } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { rawEntry, unpriced } from '../test-support/list-fixtures';
-import { problemSummary } from './trust-facts';
+import { problemSummary } from './problem-summary';
 
 const CURATION = { pinnedCount: 0, minChunkSearches: 8 };
 const NONE = { broken: 0, starved: 0, kind: undefined, lines: [] };

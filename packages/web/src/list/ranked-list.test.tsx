@@ -10,8 +10,9 @@ import { itemLevelFloor, SELL_AS_IS, sellAsIsLine } from './format';
 import { NAME_COLORS, RANK_EMPHASIS } from './RankedRow';
 import { EXPECTED_VALUE_TOOLTIP_COPY } from './row/ExpectedValueTooltip';
 import { FIGURE_WEIGHT } from './row/ExpectedValueCell';
-import { rowReasonWords, TRUST_JOINER, VERDICT_WORDS } from './row/trust-words';
+import { rowReasonWords, VERDICT_WORDS } from './row/trust-words';
 import { DIV_UNIT } from '../shared/product';
+import { JOINER } from '../shared/text';
 
 afterEach(unmount);
 
@@ -105,7 +106,7 @@ describe('a ranked Raw Base row', () => {
     expect(mark?.style.cursor).toBe('help');
     hover(mark);
     expect(document.body.querySelector('[data-mark-tooltip]')?.textContent).toBe(
-      [VERDICT_WORDS.rough, rowReasonWords({ kind: 'old', days: 4 }), rowReasonWords({ kind: 'thin', listings: 1 })].join(TRUST_JOINER),
+      [VERDICT_WORDS.rough, rowReasonWords({ kind: 'old', days: 4 }), rowReasonWords({ kind: 'thin', listings: 1 })].join(JOINER),
     );
   });
 

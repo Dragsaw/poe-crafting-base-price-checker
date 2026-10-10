@@ -10,7 +10,9 @@ import { PayoutThreshold } from '../threshold/PayoutThreshold';
 import type { HeaderSlot } from './HeaderBar';
 import { SyncButton } from './SyncButton';
 import { SyncReportPanel } from './SyncReportPanel';
-import { panelColumns, problemSummary, syncButtonFace } from './trust-facts';
+import { panelColumns } from './panel-columns';
+import { problemSummary } from './problem-summary';
+import { syncButtonFace } from './sync-button-face';
 
 /** The sync report starts closed on every load and never persists; opening it brings it into view (Interaction 5). */
 export function useReportToggle(): readonly [boolean, () => void] {

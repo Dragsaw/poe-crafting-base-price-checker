@@ -6,7 +6,7 @@ import { hover } from '../../test-support/hover';
 import { PageProvider } from '../../theme/PageProvider';
 import { ColumnHeader, type ExpectedValueNote } from '../ColumnHeader';
 import { EXPECTED_VALUE_TOOLTIP_COPY as COPY } from './ExpectedValueTooltip';
-import { TRUST_JOINER } from './trust-words';
+import { JOINER } from '../../shared/text';
 
 afterEach(unmount);
 
@@ -32,7 +32,7 @@ describe('the EV tooltip', () => {
     const figures = [...(first?.querySelectorAll<HTMLElement>('span') ?? [])].filter((span) => span.style.fontWeight === '600');
     expect(figures.map((span) => span.textContent)).toEqual(['0.25', '0.03']);
     expect(plain(second)).toBe(COPY.raw);
-    expect(plain(third).trim()).toBe(`${[COPY.estimate, COPY.rough, COPY.pending, COPY.broken].join(TRUST_JOINER)}. ${COPY.hover}`);
+    expect(plain(third).trim()).toBe(`${[COPY.estimate, COPY.rough, COPY.pending, COPY.broken].join(JOINER)}. ${COPY.hover}`);
     expect([...(third?.querySelectorAll('svg') ?? [])].map((svg) => svg.dataset['mark'])).toEqual(['estimate', 'rough', 'pending', 'broken']);
   });
 

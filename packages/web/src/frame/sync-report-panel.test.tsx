@@ -7,7 +7,9 @@ import { rawEntry, unpriced } from '../test-support/list-fixtures';
 import { PageProvider } from '../theme/PageProvider';
 import { colors, layout, px, stacks, typeRoles } from '../theme/tokens';
 import { SyncReportPanel } from './SyncReportPanel';
-import { PANEL_HEADINGS, panelColumns, problemSummary, type PanelInput } from './trust-facts';
+import { panelColumns, type PanelInput } from './panel-columns';
+import { problemSummary } from './problem-summary';
+import { PANEL_HEADINGS } from './trust-copy';
 import type { Parsed } from '../load/artifacts';
 
 type SyncReport = Parsed<'syncReport'>;

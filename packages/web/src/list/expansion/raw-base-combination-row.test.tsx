@@ -1,19 +1,21 @@
 import type { DatasetEntry } from '@poe/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { MARK_COLORS } from '../../marks/marks';
 import { cellIn as cell, NOW, rgb, unmount } from '../../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list-fixtures';
 import { colors } from '../../theme/tokens';
 import { CURATION_MARKS } from '../format';
 import { MISSING_FIGURE } from '../row/ExpectedValueCell';
-import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, rowReasonWords, TRUST_JOINER, VERDICT_WORDS } from '../row/trust-words';
+import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, rowReasonWords, VERDICT_WORDS } from '../row/trust-words';
 import { HREF, lineText, openOne, SEARCH } from './test-support';
+import { JOINER } from '../../shared/text';
 
 afterEach(unmount);
 
 const DAY_HOURS = 24;
 
-const trustText = (word: string, ...reasons: string[]): string => [word, ...reasons].join(TRUST_JOINER);
+const trustText = (word: string, ...reasons: string[]): string => [word, ...reasons].join(JOINER);
 
 function withSample(entry: DatasetEntry, sampleSize: number): DatasetEntry {
   if (entry.price.state !== 'priced') {
@@ -54,6 +56,9 @@ describe('the Raw Base expansion line', () => {
       trustText(VERDICT_WORDS.rough, rowReasonWords({ kind: 'old', days: 4 }), rowReasonWords({ kind: 'thin', listings: 2 })),
     ]);
     expect(cell(line, 'trust').querySelector('[data-line-mark="rough"] svg[data-mark="rough"]')).not.toBeNull();
+    const word = cell(line, 'trust').querySelector<HTMLElement>('[data-trust-word]');
+    expect(word?.style.color).toBe(rgb(MARK_COLORS.rough));
+    expect(word?.style.fontWeight).toBe('');
   });
 
   // Matrix: no listings, days 2 (state 2). The attempt's clock, not the tooltip's words.
@@ -63,7 +68,7 @@ describe('the Raw Base expansion line', () => {
     expect(lineText(line)).toEqual([
       '',
       MISSING_FIGURE,
-      trustText(VERDICT_WORDS.pending, `tried 2 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`),
+      trustText(VERDICT_WORDS.pending, `tried 2 days ago${JOINER}${NO_LISTINGS_LINE}`),
     ]);
     expect(cell(line, 'trust').textContent).not.toContain(FIXED_ROW_REASONS['no-listings']);
     expect(cell(line, 'trust').querySelector('svg[data-mark="pending"]')).not.toBeNull();

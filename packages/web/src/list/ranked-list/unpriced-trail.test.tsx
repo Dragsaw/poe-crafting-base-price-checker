@@ -6,7 +6,8 @@ import { hoursBefore, priced, rawEntry, unpriced } from '../../test-support/list
 import { colors } from '../../theme/tokens';
 import { sellAsIsLine } from '../format';
 import { MISSING_FIGURE } from '../row/ExpectedValueCell';
-import { FIXED_ROW_REASONS, TRUST_JOINER, VERDICT_WORDS } from '../row/trust-words';
+import { FIXED_ROW_REASONS, VERDICT_WORDS } from '../row/trust-words';
+import { JOINER } from '../../shared/text';
 
 afterEach(unmount);
 
@@ -65,9 +66,9 @@ describe('the unpriced trail', () => {
       expect(r.querySelector('[data-sell-as-is]')?.textContent).toBe(sellAsIsLine(82));
     }
     // The Raw Base tooltip column: `no-listings` prints with no age.
-    expect(tooltipOf(rows[2])).toBe(`${VERDICT_WORDS.pending}${TRUST_JOINER}${FIXED_ROW_REASONS['no-listings']}`);
-    expect(tooltipOf(rows[3])).toBe(`${VERDICT_WORDS.pending}${TRUST_JOINER}${FIXED_ROW_REASONS['never-synced']}`);
-    expect(tooltipOf(rows[5])).toBe(`${VERDICT_WORDS.broken}${TRUST_JOINER}${FIXED_ROW_REASONS.unresolvable}`);
+    expect(tooltipOf(rows[2])).toBe(`${VERDICT_WORDS.pending}${JOINER}${FIXED_ROW_REASONS['no-listings']}`);
+    expect(tooltipOf(rows[3])).toBe(`${VERDICT_WORDS.pending}${JOINER}${FIXED_ROW_REASONS['never-synced']}`);
+    expect(tooltipOf(rows[5])).toBe(`${VERDICT_WORDS.broken}${JOINER}${FIXED_ROW_REASONS.unresolvable}`);
   });
 
   it('keeps each entry’s own mark and reason in an honest-empty list', () => {

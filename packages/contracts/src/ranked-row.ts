@@ -65,6 +65,7 @@ export const CraftedCombinationSchema = z
   .strictObject({
     entryKey: z.string().min(1).describe('The tracked entry’s canonical key.'),
     trust: PriceTrustSchema.describe('The combination entry’s own verdict (AD-17, *Price trust*).'),
+    priceDivine: DivineAmountSchema.optional().describe('The active-league observed price, verbatim; set only when the entry is priced.'),
   })
   .describe('A non-pruned entry of the class that is not a summand: below the threshold, pending or broken (AD-17).');
 

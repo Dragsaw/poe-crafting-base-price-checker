@@ -1,7 +1,7 @@
 import { recipeWord, type CraftRecipe, type CurrencyRate } from '@poe/contracts';
 import { craftCost } from '@poe/core';
 
-import { MONEY_PHRASES } from '../list/format';
+import { NO_FIGURE_YET } from '../list/format';
 import type { ExpectedValueCost } from '../list/row/ExpectedValueTooltip';
 import { formatDivine } from '../shared/money';
 import type { RecipeCost, RecipeOption } from './CraftRecipe';
@@ -25,7 +25,7 @@ export function recipeCostLine(
   isUncostable: boolean,
 ): RecipeCost {
   if (isUncostable) {
-    return { kind: 'phrase', text: MONEY_PHRASES.notYetSynced };
+    return { kind: 'phrase', text: NO_FIGURE_YET };
   }
   const cost = craftCost(recipe, rates, league);
   if (!cost.ok) {

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-10-2026 22:05
+last_updated: 10-10-2026 22:40
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -125,7 +125,7 @@ action_items:
       ruling on wording); split frame/trust-facts.ts by job; make core trust helpers
       non-public and move the below-threshold split into core (A1-A5, R9)"
     owner: "dev (deferred)"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-7-rule-where-a-crafted-row-with-no-priced"
     epic: 4

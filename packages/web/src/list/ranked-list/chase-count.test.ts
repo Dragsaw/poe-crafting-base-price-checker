@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { CHASE_BUDGET_TEXT, CHASE_CELL_BUDGET, chaseCellCount } from './chase-count';
-import { AFFIX_JOIN } from '../combination-text';
 import { SHORT_FORMS } from '../short-forms';
+import { JOINER } from '../../shared/text';
 
 /** EXPERIENCE.md *Combinations and short forms*: the working budget of a chase cell, in characters. */
 const CHASE_BUDGET_CHARACTERS = 27;
@@ -71,8 +71,8 @@ function glyphWidth(text: string): number {
 
 /** Each affix opens with its tier, which the chase cell sets at `typography.tier`. */
 function estimatedWidth(text: string): number {
-  const affixes = text.split(AFFIX_JOIN);
-  let width = glyphWidth(AFFIX_JOIN) * (affixes.length - 1);
+  const affixes = text.split(JOINER);
+  let width = glyphWidth(JOINER) * (affixes.length - 1);
   for (const affix of affixes) {
     if (!affix.startsWith(TIER)) {
       throw new Error(`"${affix}" opens with no ${TIER}`);
@@ -86,7 +86,7 @@ function estimatedWidth(text: string): number {
 function candidates(): readonly string[] {
   const forms = [...new Set(Object.values(SHORT_FORMS))];
   return forms
-    .flatMap((first) => forms.filter((second) => second !== first).map((second) => `T1 ${first}${AFFIX_JOIN}T1 ${second}`))
+    .flatMap((first) => forms.filter((second) => second !== first).map((second) => `T1 ${first}${JOINER}T1 ${second}`))
     .filter((text) => text.length <= CHASE_BUDGET_CHARACTERS);
 }
 
