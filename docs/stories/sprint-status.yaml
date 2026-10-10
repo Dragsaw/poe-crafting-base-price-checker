@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-10-2026 20:20
+last_updated: 10-10-2026 22:05
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -139,7 +139,7 @@ action_items:
     action: "Add an acceptance step to finish-worktree or bmad-build that sets the
       story to done on human accept, or refuses to merge a story still at review (T1)"
     owner: "process"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-9-a-story-is-done-only-after-agent-browser"
     epic: 4

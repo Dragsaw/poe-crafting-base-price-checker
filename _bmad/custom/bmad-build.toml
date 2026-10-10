@@ -19,6 +19,8 @@ Launch a subagent with no prior conversation context, with this prompt:
 """
 
 on_complete = """
+Accept step (epic 4 retro T1). Do this only when `{story_key}` is set and `development_status[{story_key}]` reads `review` in `docs/stories/sprint-status.yaml` at the end of this run. Ask the user: "Accept story {story_key}? Answer yes to set it to done." HALT for the answer. An answer that clearly accepts (yes, accept, or a misspelling of accept) sets the key to `done` and updates `last_updated`. Preserve comments and structure, and do not change the epic key. Then commit only that file with the message `docs(stories): accept {story_key}`. If the answer is unclear, ask once more. If the answer is no, leave the key at `review` and tell the user that the user-level finish-worktree skill, where it has the review guard, refuses to push a branch that leaves a story at `review`.
+
 If the diff changed a file under packages/web/src/, offer the user one optional step. Run `/impeccable critique` on the changed surface, with `pnpm dev` and agent-browser in a named session (AGENTS.md). Then run `/impeccable polish` on the findings the user accepts. Apply the Review brief of AGENT-WORKFLOW.md to each finding. Do not start this step without a yes.
 """
 
