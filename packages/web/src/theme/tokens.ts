@@ -71,6 +71,9 @@ export const floatingShadows = {
 export const COLUMN_HEADER_HEIGHT = '30px';
 
 /** Interim px measurements of the sync report and the rows, which DESIGN.md writes as no `{spacing.*}`. */
+/** DESIGN.md `mark-tooltip`: the shell's horizontal padding and border, in px, between its edge and its text. */
+export const markTooltipInset = { padding: 9, border: 1 } as const;
+
 export const layout = {
   hairline: 1,
   syncReportMaxHeight: 400,

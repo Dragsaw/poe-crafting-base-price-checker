@@ -26,13 +26,19 @@ function isWrittenInExperience(text: string, count?: number): boolean {
   return experience.includes(`\`${text}\``) || experience.includes(`\`${template}\``);
 }
 
+/** A `tried` reason, its age written once for every *Ages* unit as `N min/hours/days ago`. */
+function isTriedWrittenInExperience(text: string): boolean {
+  const template = text.replace(/^tried \d+ (?:min|hours?|days?) ago/u, 'tried N min/hours/days ago');
+  return template !== text && experience.includes(`\`${template}\``);
+}
+
 const byName = (a: string, b: string): number => a.localeCompare(b);
 
 /** One sample of each reason kind; a kind with a figure takes 5, 1 or 74. */
 const SAMPLES: Readonly<Record<PriceTrustReason['kind'], { readonly reason: PriceTrustReason; readonly count?: number }>> = {
   old: { reason: { kind: 'old', days: 5 }, count: 5 },
   thin: { reason: { kind: 'thin', listings: 1 } },
-  'no-listings': { reason: { kind: 'no-listings', days: 2 } },
+  'no-listings': { reason: { kind: 'no-listings', minutes: 2 * 1440 } },
   'never-synced': { reason: { kind: 'never-synced' } },
   'league-mismatch': { reason: { kind: 'league-mismatch' } },
   'no-exchange-rate': { reason: { kind: 'no-exchange-rate' } },
@@ -59,8 +65,8 @@ describe('the reason words of a ranked row', () => {
     expect(isWrittenInExperience(words, count), words).toBe(true);
   });
 
-  it('prints no-listings with no days: the Raw Base tooltip column', () => {
-    expect(rowReasonWords({ kind: 'no-listings', days: 9 })).toBe(FIXED_ROW_REASONS['no-listings']);
+  it('prints no-listings with no age: the Raw Base tooltip column', () => {
+    expect(rowReasonWords({ kind: 'no-listings', minutes: 9 * 1440 })).toBe(FIXED_ROW_REASONS['no-listings']);
     expect(rowReasonWords({ kind: 'no-listings' })).toBe(FIXED_ROW_REASONS['no-listings']);
   });
 
@@ -112,13 +118,22 @@ describe('the mark tooltip', () => {
 describe('the reason words of an expansion line', () => {
   it.each(Object.entries(SAMPLES))('words %s as EXPERIENCE.md writes it', (_kind, { reason, count }) => {
     const words = lineReasonWords(reason);
-    expect(isWrittenInExperience(words, reason.kind === 'no-listings' ? reason.days : count), words).toBe(true);
+    const isWritten = reason.kind === 'no-listings' ? isTriedWrittenInExperience(words) : isWrittenInExperience(words, count);
+    expect(isWritten, words).toBe(true);
   });
 
-  // Matrix: no listings (state 2).
+  it.each([0, 59, 60, 4 * 60, 1440, 2 * 1440])('words a tried age of %i minutes in an *Ages* form', (minutes) => {
+    const words = lineReasonWords({ kind: 'no-listings', minutes });
+    expect(isTriedWrittenInExperience(words), words).toBe(true);
+  });
+
+  // Matrix: no listings (state 2), attempt 59 s, 1 h, 4 h and 2 d ago.
   it('names the attempt clock on no-listings, and only there', () => {
-    expect(lineReasonWords({ kind: 'no-listings', days: 2 })).toBe(`tried 2 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
-    expect(lineReasonWords({ kind: 'no-listings', days: 1 })).toBe(`tried 1 day ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 0 })).toBe(`tried 0 min ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 60 })).toBe(`tried 1 hour ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 240 })).toBe(`tried 4 hours ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 2 * 1440 })).toBe(`tried 2 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
+    expect(lineReasonWords({ kind: 'no-listings', minutes: 1440 })).toBe(`tried 1 day ago${TRUST_JOINER}${NO_LISTINGS_LINE}`);
     expect(lineReasonWords({ kind: 'no-listings' })).toBe(NO_LISTINGS_LINE);
     const others = Object.values(SAMPLES).filter(({ reason }) => reason.kind !== 'no-listings');
     expect(others.map(({ reason }) => lineReasonWords(reason))).toEqual(others.map(({ reason }) => rowReasonWords(reason)));

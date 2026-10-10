@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { compactAge, DAY_MS, HOUR_MS, MINUTE_MS, relativeAge } from './time';
+import { compactAge, DAY_MS, HOUR_MS, MINUTE_MS, reasonAge, relativeAge } from './time';
 
 describe('the clock units', () => {
   it('holds a minute, an hour and a day in milliseconds', () => {
@@ -21,6 +21,19 @@ describe('relativeAge', () => {
     expect(relativeAge(23 * 60 * MINUTE_MS + 59 * MINUTE_MS)).toBe('23 hours ago');
     expect(relativeAge(24 * 60 * MINUTE_MS)).toBe('1 day ago');
     expect(relativeAge(9 * 24 * 60 * MINUTE_MS)).toBe('9 days ago');
+  });
+});
+
+describe('reasonAge', () => {
+  it('steps a reason age through min, hours and days, rounded down; min never pluralises', () => {
+    expect(reasonAge(0)).toBe('0 min ago');
+    expect(reasonAge(1)).toBe('1 min ago');
+    expect(reasonAge(59)).toBe('59 min ago');
+    expect(reasonAge(60)).toBe('1 hour ago');
+    expect(reasonAge(4 * 60)).toBe('4 hours ago');
+    expect(reasonAge(1439)).toBe('23 hours ago');
+    expect(reasonAge(1440)).toBe('1 day ago');
+    expect(reasonAge(2 * 1440 + 59)).toBe('2 days ago');
   });
 });
 

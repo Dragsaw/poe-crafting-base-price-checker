@@ -1,6 +1,6 @@
 import { colorsTuple, createTheme, type CSSVariablesResolver, type MantineColorsTuple } from '@mantine/core';
 
-import { colors, floatingShadows, rounded, stacks, typeRoles, type TypeRoleName } from './tokens';
+import { colors, floatingShadows, markTooltipInset, px, rounded, stacks, typeRoles, type TypeRoleName } from './tokens';
 
 /** The Mantine override layer: it inherits component behaviour, layout and CSS variables only. */
 
@@ -80,9 +80,9 @@ export const TOOLTIP_DEFAULT_PROPS = {
 /** DESIGN.md `mark-tooltip`: the shared shell. The EV tooltip overrides width, padding, shadow and type. */
 export const MARK_TOOLTIP_SHELL = {
   ...typeRoles.trust,
-  padding: '6px 9px',
+  padding: `6px ${px(markTooltipInset.padding)}`,
   background: colors['surface-raised'],
-  border: `1px solid ${colors['line-strong']}`,
+  border: `${px(markTooltipInset.border)} solid ${colors['line-strong']}`,
   borderRadius: rounded.tooltip,
   boxShadow: floatingShadows['mark-tooltip'],
   color: colors['text-secondary'],

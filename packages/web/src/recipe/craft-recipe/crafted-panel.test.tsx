@@ -61,7 +61,7 @@ describe('the crafted panel', () => {
     expect(rows.map((row) => panelCell(row, 'trust'))).toEqual([
       '',
       BELOW_THRESHOLD_NOTE,
-      [VERDICT_WORDS.pending, `tried 0 days ago${TRUST_JOINER}${NO_LISTINGS_LINE}`].join(TRUST_JOINER),
+      [VERDICT_WORDS.pending, `tried 4 hours ago${TRUST_JOINER}${NO_LISTINGS_LINE}`].join(TRUST_JOINER),
       [VERDICT_WORDS.broken, FIXED_ROW_REASONS.unresolvable].join(TRUST_JOINER),
     ]);
     // State 20: dimmed, with no mark.

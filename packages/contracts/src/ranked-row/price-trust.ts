@@ -12,7 +12,9 @@ export const PriceTrustReasonSchema = z
     z.strictObject({ kind: z.literal('thin'), listings: z.int().min(1).describe('The observation’s `sampleSize`.') }),
     z.strictObject({
       kind: z.literal('no-listings'),
-      days: WholeCountSchema.optional().describe('Whole days since `lastAttemptedAt`, rounded down; unset without one.'),
+      minutes: WholeCountSchema.optional().describe(
+        'Whole minutes since `lastAttemptedAt`, rounded down and clamped at 0; unset without one.',
+      ),
     }),
     z.strictObject({ kind: z.literal('never-synced') }),
     z.strictObject({ kind: z.literal('league-mismatch') }),

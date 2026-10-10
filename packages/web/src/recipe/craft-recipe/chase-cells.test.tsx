@@ -56,6 +56,14 @@ describe('the chase cells', () => {
       expect(cell.style.textOverflow).toBe('ellipsis');
       expect(cell.style.overflow).toBe('hidden');
       expect(cell.style.color).toBe(rgb(colors['rarity-magic-dim']));
+      // DESIGN.md `chase-cell`: tiers in `typography.tier` and secondary, the joiner tertiary.
+      const tiers = [...cell.querySelectorAll<HTMLElement>('[data-tier]')];
+      expect(tiers.map((span) => span.textContent)).toEqual(['T1', 'T1']);
+      for (const span of tiers) {
+        expect(span.style.color).toBe(rgb(colors['text-secondary']));
+        expect(span.style.fontWeight).toBe('600');
+      }
+      expect(cell.querySelector<HTMLElement>('[data-joiner]')?.style.color).toBe(rgb(colors['text-tertiary']));
       // A curated cell prints no numeral but its tier.
       expect(cell.textContent.replaceAll(/T\d+/g, '')).not.toMatch(/\d/);
       expect(cell.querySelector('[data-verbatim]')).toBeNull();

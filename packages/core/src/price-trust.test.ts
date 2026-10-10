@@ -22,6 +22,8 @@ function entryOf(price: PriceState, lastAttemptedAt?: string): DatasetEntry {
 }
 
 const trustOf = (published: DatasetEntry | undefined): PriceTrust => entryTrust(A, published, LEAGUE, NOW);
+const msBefore = (ms: number): string => new Date(Date.parse(NOW) - ms).toISOString();
+const noListingsReason = (attemptedAt: string): unknown => trustOf(entryOf({ state: 'no-listings' }, attemptedAt)).reasons[0];
 
 const CURRENT: PriceTrust = { verdict: 'current', reasons: [] };
 const ROUGH: PriceTrust = { verdict: 'rough', reasons: [{ kind: 'old', days: 3 }] };
@@ -83,23 +85,29 @@ describe('entryTrust: a priced entry', () => {
 });
 
 describe('entryTrust: an entry with no price', () => {
-  it('no-listings is pending, with the whole days since lastAttemptedAt', () => {
-    expect(trustOf(entryOf({ state: 'no-listings' }, hoursBefore(2 * 24 + 5)))).toEqual({
+  it('no-listings is pending, with the whole minutes since lastAttemptedAt', () => {
+    expect(trustOf(entryOf({ state: 'no-listings' }, hoursBefore(4)))).toEqual({
       verdict: 'pending',
-      reasons: [{ kind: 'no-listings', days: 2 }],
+      reasons: [{ kind: 'no-listings', minutes: 240 }],
     });
+  });
+
+  it('rounds the minutes down', () => {
+    expect(noListingsReason(msBefore(59_999))).toEqual({ kind: 'no-listings', minutes: 0 });
+    expect(noListingsReason(msBefore(60_000))).toEqual({ kind: 'no-listings', minutes: 1 });
+    expect(noListingsReason(hoursBefore(2 * 24 + 0.5))).toEqual({ kind: 'no-listings', minutes: 2 * 1440 + 30 });
   });
 
   it('reads a clock ahead of now as age zero', () => {
     const ahead = new Date(Date.parse(NOW) + HOUR_MS).toISOString();
     expect(trustOf(entryOf({ state: 'no-listings' }, ahead))).toEqual({
       verdict: 'pending',
-      reasons: [{ kind: 'no-listings', days: 0 }],
+      reasons: [{ kind: 'no-listings', minutes: 0 }],
     });
     expect(trustOf(entryOf(pricedAt(ahead)))).toEqual(CURRENT);
   });
 
-  it('no-listings with no lastAttemptedAt carries no days', () => {
+  it('no-listings with no lastAttemptedAt carries no minutes', () => {
     expect(trustOf(entryOf({ state: 'no-listings' }))).toEqual({ verdict: 'pending', reasons: [{ kind: 'no-listings' }] });
   });
 

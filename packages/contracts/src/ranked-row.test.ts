@@ -143,6 +143,11 @@ describe('RankedRowSchema, the price trust', () => {
       verdict: 'pending',
       reasons: [{ kind: 'no-listings' }],
     });
+    expect(PriceTrustSchema.parse({ verdict: 'pending', reasons: [{ kind: 'no-listings', minutes: 240 }] }).reasons).toEqual([
+      { kind: 'no-listings', minutes: 240 },
+    ]);
+    expect(PriceTrustSchema.safeParse({ verdict: 'pending', reasons: [{ kind: 'no-listings', days: 2 }] }).success).toBe(false);
+    expect(PriceTrustSchema.safeParse({ verdict: 'pending', reasons: [{ kind: 'no-listings', minutes: -1 }] }).success).toBe(false);
   });
 
   it('refuses a fractional day count and a share above 100 percent', () => {
