@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-10-2026 20:16
+last_updated: 10-10-2026 20:20
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -85,7 +85,7 @@ action_items:
     action: "Exclude pruned entries from the broken-entry problem count with a test
       (R1); architect amends the AD-12 Broken entries source row to non-pruned"
     owner: "dev + architect"
-    status: done
+    status: open
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-2-make-the-state-23-all-broken-test-read-t"
     epic: 4
@@ -108,7 +108,7 @@ action_items:
     action: "Flip 4-1, 4-2, 4-6, 4-8 to done in sprint-status.yaml (T1); git rm the
       two rev-26 altitude handovers once their outcomes are confirmed (T3)"
     owner: "player"
-    status: in-progress
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-5-bump-revision-and-add-memlog-rows-for-un"
     epic: 4
