@@ -60,6 +60,7 @@ describe('the expansion copy', () => {
   // State 39 and Interaction 7: one show-more look, `+` closed and `−` open.
   it('counts the hidden lines and the pruned lines in the show-more forms', () => {
     expect(moreLinesCopy(3)).toBe('+ 3 more combinations');
+    expect(moreLinesCopy(1)).toBe('+ 1 more combination');
     expect(FEWER_LINES_COPY).toBe('− show fewer');
     expect(prunedCopy(2, false)).toBe('+ 2 pruned');
     expect(prunedCopy(2, true)).toBe('− 2 pruned');

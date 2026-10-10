@@ -1,3 +1,4 @@
+import { plural } from '../shared/text';
 import { glyphs } from '../theme/tokens';
 
 // `web` computes no ranking term (AD-4): every helper here turns a held value into text.
@@ -51,7 +52,7 @@ export const ESTIMATED_ODDS_CONTEXT = 'Some roll odds are estimated: no publishe
 
 /** The remainder affordance, closed: N counts the hidden lines without the pruned ones (state 39). */
 export function moreLinesCopy(hidden: number): string {
-  return `${glyphs.open} ${String(hidden)} more combinations`;
+  return `${glyphs.open} ${String(hidden)} more ${plural(hidden, 'combination', 'combinations')}`;
 }
 
 /** The remainder affordance, open (Interaction 7). */

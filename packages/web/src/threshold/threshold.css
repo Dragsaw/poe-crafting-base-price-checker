@@ -1,8 +1,6 @@
 /*
- * `{components.threshold-control}`. The figure box is the typed input's frame:
- * a line-strong border at rest, accent under the pointer and while editing.
- * The input itself has no chrome. The slider takes the line-strong track, the
- * accent fill and an accent thumb; its ground ring is set inline from the tokens.
+ * `{components.threshold-control}`. The input has no chrome of its own: the
+ * figure box is its frame.
  */
 .fg-threshold-figure {
   border: 1px solid var(--fg-color-line-strong);

@@ -24,3 +24,15 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
       makes a new entry and a new issue.
 -->
 
+
+## Deferred from: spec-epic-4-retro-item-3-small-web-fixes (2026-10-10)
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
+  summary: "[NOTE FOR UX] Rule the printed form of a negative EV in (−0.005, 0). EXPERIENCE.md *Money* says a non-zero figure that rounds to `0.00` prints `< 0.01`, and states 21 and 25 say a negative EV is dimmed. `formatDivine` prints `0.00` for such a value, and the row is now undimmed because the dim follows the printed minus sign (NFR-10). Options: an unsigned `< 0.01` (undimmed), or a signed `−< 0.01` (dimmed)."
+  evidence: `packages/web/src/shared/money.ts` `formatDivine` guards only `0 < v < 0.005`; `money.test.ts` asserts `formatDivine(-0.003)` is `0.00` (Epic 3 item 5). `packages/web/src/list/display-rows.ts` `figure()`. Raised by the impeccable design review and the blind hunter on this spec. Reachable only when a Craft Cost or a net EV is below 0.005 div.
+  retry_when: never — needs a human
+
+- source_spec: `docs/stories/spec-epic-4-retro-item-3-small-web-fixes.md`
+  summary: "[NOTE FOR UX] Write the R7 ruling into EXPERIENCE.md *Estimated odds* and state 12: a uniform-prior row whose EV cell is `—` (pending, broken, uncostable) carries no ≈, and its expansion context line ends at the name. Today the text says every uniform-prior row prints ≈."
+  evidence: Epic 4 retro R7 and action item 3 (`docs/stories/epic-4-retro-2026-10-10.md`). The code now gates both the EV cell and the context line on `hasEstimate` in `packages/web/src/list/display-rows.ts`. EXPERIENCE.md *Provenance* row (`uniform-prior` prints ≈) and state 12 have no exception for a `—` cell.
+  retry_when: never — needs a human

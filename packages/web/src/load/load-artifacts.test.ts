@@ -90,7 +90,6 @@ describe('loadArtifacts', () => {
     });
   });
 
-  // Story 4.8, I/O matrix "2.x tracked file".
   it('refuses a tracked.json at the earlier 2.x major, naming both versions', async () => {
     serveArtifacts(server, { tracked: { kind: 'json', body: { schemaVersion: '2.0.0', entries: [] } } });
     expect(await loadArtifacts({ baseUrl: '/' })).toMatchObject({
