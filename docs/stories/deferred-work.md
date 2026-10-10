@@ -53,9 +53,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
   summary: [NOTE FOR PM] Bring the Epic 4 *Order* of docs/epics.md ("4.3 to 4.5, then 4.6") in line with docs/sprint-change-proposal-2026-10-10.md *Order*, which puts 4.7 and the tracked.json re-check after 4.3, and place Story 4.8.
   evidence: epics.md *Order* predates the proposal and omits 4.7 and 4.8. epic-4-context.md now cites both sources, but a recompile from epics.md would bring the stale order back. The PM owns epics.md, so a build review does not edit it (AGENT-WORKFLOW.md *Review brief*, rule 2).
   retry_when: now
-
-## Deferred from: spec-deferred-4-8-appendix-row-min-height (2026-10-10)
-
-- source_spec: `docs/stories/spec-deferred-4-8-appendix-row-min-height.md`
-  summary: [NOTE FOR UX] EXPERIENCE.md *What may be cut* has no bullet for the unrankable appendix, yet UnrankableAppendix.tsx and DESIGN.md `components.unrankable-appendix.note` rely on "appendix text is never cut" and cite that section.
-  evidence: The section lists ranked rows, expansion lines, marks and expansions only. The code comment above `NO_WRAP` in UnrankableAppendix.tsx cites it for the appendix rule. EXPERIENCE.md is outside this chore's authorized edit.

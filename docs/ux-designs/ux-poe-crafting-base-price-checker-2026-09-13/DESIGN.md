@@ -6,9 +6,9 @@ description: >-
   The game's rarity colours say what each row is, bronze marks what the player
   can operate, and every other colour appears only when a price needs attention.
 status: final
-revision: 19
+revision: 20
 created: 2026-09-13
-updated: 2026-10-04
+updated: 2026-10-10
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md

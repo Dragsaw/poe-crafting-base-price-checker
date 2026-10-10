@@ -1,9 +1,9 @@
 ---
 title: PoE2 Crafting Base Price Checker — Experience
 status: final
-revision: 25
+revision: 26
 created: 2026-09-13
-updated: 2026-10-09
+updated: 2026-10-10
 sources:
   - docs/prds/prd-poe-crafting-base-price-checker-2026-09-12/prd.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
@@ -353,6 +353,9 @@ Truncation is legitimate only where the text has somewhere to go (memlog 103).
   cell does.
 - **An expansion hides whole lines** behind `+ N more combinations` (state 39) and
   never cuts one. Thus every Tracked Entry stays one click away (FR-8).
+- **The appendix cuts nothing.** Its item class and reason stay on one line. A
+  note that is wider than its cell wraps to a second line, and the row grows to
+  hold it. No tooltip stands in for the note.
 
 ## Voice and Tone
 
