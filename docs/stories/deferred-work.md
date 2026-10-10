@@ -26,15 +26,6 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 
 ## Deferred from: spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar (2026-10-09)
 
-- source_spec: `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`
-  summary: Restyle the components Story 4.1 repointed mechanically, replace the interim px values in the tokens.ts layout group, change weight 700 to the DESIGN.md weights, and fix the failure screen to padding-top 24px and a 640px body.
-  evidence: Spec Design Notes call the repointing interim. Weight 700 in recipe.css, TrustStrip.tsx, KeyBlock.tsx, FailureScreen.tsx and TrustMark.tsx. FailureScreen reads layout.gutter (34) and layout.failureBodyMaxWidth (480). UniformPriorBanner lead and body share the line-text role and differ only by colour.
-  retry_when: Story 4.6 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
-  summary: Delete packages/web/src/list/TrustMark.tsx, its unused 'prior' kind and glyphs.prior, and move its remaining readers (UnrankableAppendix, KeyBlock) to the drawn marks in packages/web/src/marks/.
-  evidence: The Story 4.3 spec's Never list gives the TrustMark deletion to Story 4.6, but the Story 4.6 retirement list in docs/stories/epic-4-context.md names only UniformPriorBanner, KeyBlock, TrustStrip and RunningFoot. After Story 4.3 no production code renders TrustMark kind 'prior'.
-  retry_when: Story 4.6 is done in sprint-status.yaml
 
 - source_spec: `docs/stories/spec-4-3-the-ranked-row-rarity-names-the-uncrafted-base-line-the-mark-slot-and-the-odds-cue.md`
   summary: Give a cut chase cell its full-text tooltip (DESIGN.md chase-cell.cutHover; EXPERIENCE.md What may be cut), the third tooltip kind.
@@ -59,16 +50,18 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 ## Deferred from: spec-4-5-header-controls-and-the-sync-button (2026-10-10)
 
 - source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
-  summary: Delete TrustStrip.tsx, its tests (frame/trust-strip.test.tsx, frame/trust-strip/) and any dependency-cruiser exception it has, now that no page mounts it.
-  evidence: The spec's Design Notes and Never list leave the deletion to Story 4.6. packages/web/src/App.tsx no longer mounts TrustStrip; only its own tests render it.
-  retry_when: Story 4.6 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
-  summary: Pin glyphs.prior with a literal test, or retire it.
-  evidence: The removed Story 4.1 re-pin entry also covered glyphs.prior. Its only test reference is `expect(text).not.toContain(glyphs.prior)` in packages/web/src/list/ranked-list/key-and-glyphs.test.tsx, which passes for any value.
-  retry_when: Story 4.6 is done in sprint-status.yaml
-
-- source_spec: `docs/stories/spec-4-5-header-controls-and-the-sync-button.md`
   summary: Repair docs/stories/epic-4-context.md: the order sentence "4.3, then 4.7 ahead of 4.4 to 4.6, then 4.6 last" is garbled, and the rewrite dropped the Inter glyph check (− † * · — – at every weight) and the "no colour on a surface below the contrast floor" constraint without citing their owners.
   evidence: The epic-context rewrite that added Story 4.7 was in the working tree before this build's baseline. A review of Story 4.5 found the wording and the two dropped lines.
   retry_when: now
+
+## Deferred from: spec-4-6-the-footer-legend-list-statements-failure-screens-and-the-appendix-restyle (2026-10-10)
+
+- source_spec: `docs/stories/spec-4-6-the-footer-legend-list-statements-failure-screens-and-the-appendix-restyle.md`
+  summary: Wire the appendix's state 16 note in App.tsx. A raw Tracked Entry carries no (categoryId, className), so the page cannot tell which Item Class a ranked Raw Base belongs to.
+  evidence: RawTrackedEntrySchema in packages/contracts/src/tracked-entry.ts holds only baseTypeId, itemLevelMin and status, and no artifact the page loads maps a baseTypeId to its class (epic-2 retro P1 notes the same gap for Story 2.8). UnrankableAppendix takes an optional rawRanks set and prints the note, but ReadyBody passes none. Needs a contracts or core change that the Story 4.6 spec forbids, so a human must choose the source of the join.
+  retry_when: Story 4.8
+
+- source_spec: `docs/stories/spec-4-6-the-footer-legend-list-statements-failure-screens-and-the-appendix-restyle.md`
+  summary: Decide how an appendix row lays out a joined two-part note; the row is nowrap and the note cell has no overflow guard.
+  evidence: The 14 + 16 joined note is about 93 characters, about 560px at the note size, against about 450px for the 1fr note column at the target width. No single note overflows today, and the joined note appears only once Story 4.8 wires state 16.
+  retry_when: Story 4.8

@@ -444,6 +444,8 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 | `{components.show-more}` | `+ N more combinations` / `− show fewer` (memlog 264) · `+ N pruned` · `+ Read the remaining N rows` / `− Show only the top 20` · `+ Try again` |
 | Footer legend | Nine items, in this order: (1) `■ craft this class` (2) `■ sell this base as is` (3) `no mark = current price` (memlog 275) (4) `◐ rough unreliable price (a row: 70%+ of its EV)` (5) `○ pending no price yet` (6) `✕ broken can no longer be priced` (7) `† pruned · * pinned` (8) `≈ some roll odds estimated` (9) `Prices are live asking prices, not sales. Read-only. Curation lives in data/tracked.json.` |
 | List statement, state 23 | `In canonical order, not ranked: no tracked unit has a price from <league> yet.` (without `yet` when every listed row is broken) |
+| List statement, state 25 | `Nothing clears your Payout Threshold of N.NN div.` |
+| List statement, state 35 (`<recipe>`: the active recipe's option word) | `The <recipe> Craft Recipe has no Craft Cost figure yet: Item Classes and Raw Bases are ordered apart, not ranked against each other.` |
 
 ### Sync report
 
@@ -496,15 +498,16 @@ The headings, figure groups and diagnosis lead (memlog 278):
 | Appendix note, state 16 | `some of its bases still rank, sold as is` |
 | Refusal eyebrow | `✕ The page will not render this` (set uppercase; memlog 278) |
 | Refusal title | `A required file cannot be used.` (memlog 220) |
+| Refusal body, by cause (X: the declared version; Y: the version the page reads) | Declared version: `<file> declares schema version X; the page expects Y.` · No version: `<file> declares no schema version; the page expects Y.` · Schema-invalid: `<file> does not match the schema the page expects, version Y.` · Not published: `<file> was not published, and the page cannot render without it.` |
 | Refusal, fixed sentence | `The page renders again as soon as a valid set is published, and serves nothing old in the meantime.` |
 | Fetch-failure eyebrow | `✕ The page could not load its data` (set uppercase; memlog 278) |
 | Fetch-failure title | `One of the data files did not arrive.` (memlog 237) |
 | Fetch-failure body | `<file> did not arrive.` then `The page shows nothing rather than a partial set, because half a ranking is worse than no ranking.` |
 
-**Strings drafted at build** (memlog 265): the list statements of states 25 and
-35, and the refusal screen's per-cause body sentences. The build drafts them under Voice and Tone. Their review happens in
-the PR that builds them, and that PR writes them into this deck. Thus the rule still
-holds: a string not written here does not ship.
+**Strings drafted at build** (memlog 265): none is open. The build drafts such a
+string under Voice and Tone. Its review happens in the PR that builds it, and that
+PR writes it into this deck. Thus the rule still holds: a string not written here
+does not ship.
 
 ## Component Patterns
 

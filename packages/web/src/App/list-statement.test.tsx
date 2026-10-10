@@ -4,11 +4,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { bodiesWith, hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
 import { serveArtifacts, TEST_LEAGUE } from '../test-support/artifact-server';
 import { ARTIFACT_ORDER } from '../load/artifacts';
-import { settleTo, unmount } from '../test-support/dom';
+import { rgb, settleTo, unmount } from '../test-support/dom';
 import { pastDebounce, typeInto } from '../test-support/threshold-input';
 import { MISSING_FIGURE } from '../list/row/ExpectedValueCell';
 import { FIXED_ROW_REASONS, NO_LISTINGS_LINE, TRUST_JOINER, VERDICT_WORDS } from '../list/row/trust-words';
 import { absenceLine } from '../frame/trust-facts';
+import { honestEmptyCopy, nothingClearsCopy } from '../list/list-statement';
+import { colors, typeRoles } from '../theme/tokens';
 import { RECIPE_COST_UNIT } from '../recipe/CraftRecipe';
 import { server, mount, frame, payoutField, toggleReport, unitNames } from './test-support';
 
@@ -34,7 +36,7 @@ function eventCells(): string[] {
 }
 
 function expectChromeAround(): void {
-  for (const attribute of ['data-asking-price-line', 'data-unrankable-appendix', 'data-key-block', 'data-running-foot']) {
+  for (const attribute of ['data-unrankable-appendix', 'data-footer-legend']) {
     expect(frame().querySelector(`[${attribute}]`), attribute).not.toBeNull();
   }
 }
@@ -63,13 +65,15 @@ describe('the list statement', () => {
     mount();
     await settleTo('ready');
     expect(statement()?.dataset['listStatement']).toBe('honest-empty');
-    expect(statement()?.textContent).toBe(
-      `In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE} yet.`,
-    );
-    // Under the asking-price line, above the column header.
-    expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(statement()?.textContent).toBe(honestEmptyCopy(TEST_LEAGUE));
+    // One line under the header bar, above the column header, in the label role and text-secondary.
+    expect(statement()?.previousElementSibling?.hasAttribute('data-header-bar')).toBe(true);
     expect(statement()?.nextElementSibling?.querySelector('[data-column-header]')).not.toBeNull();
-    expect(statement()?.style.height).toBe('21px');
+    expect(statement()?.style.fontSize).toBe(typeRoles.label.fontSize);
+    expect(statement()?.style.color).toBe(rgb(colors['text-secondary']));
+    expect(statement()?.style.whiteSpace).toBe('nowrap');
+    // State 23 names no cause.
+    expect(statement()?.textContent).not.toMatch(/broken|reset|sync/i);
     // Canonical key order: for three iLvl-82 raw bases, the base type ids in order.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
@@ -106,9 +110,7 @@ describe('the list statement', () => {
     mount();
     await settleTo('ready');
     expect(statement()?.dataset['listStatement']).toBe('honest-empty');
-    expect(statement()?.textContent).toBe(
-      `In canonical order, not ranked: no tracked unit has a price from ${TEST_LEAGUE} yet.`,
-    );
+    expect(statement()?.textContent).toBe(honestEmptyCopy(TEST_LEAGUE));
     // Canonical key order across the groups, not no-listings first.
     expect(unitNames()).toEqual(['Coral Ring', 'Gold Amulet', 'Wide Belt']);
     expect(numerals()).toEqual(['', '', '']);
@@ -147,7 +149,7 @@ describe('the list statement', () => {
   });
 
   // Matrix: nothing clears, then threshold lowered.
-  it('states that nothing clears 3.00, keeps the trail rows, and drops the statement once a row clears', async () => {
+  it('states that nothing clears 2.50, keeps the trail rows, and drops the statement once a row clears', async () => {
     const now = Date.now();
     const belt = rawEntry('Wide Belt');
     const ring = rawEntry('Coral Ring');
@@ -159,11 +161,12 @@ describe('the list statement', () => {
     await settleTo('ready');
     expect(statement()).toBeNull();
 
-    typeInto(payoutField(), '3');
+    typeInto(payoutField(), '2.5');
     await pastDebounce();
     expect(statement()?.dataset['listStatement']).toBe('nothing-clears');
-    expect(statement()?.textContent).toBe('Nothing clears your Payout Threshold of 3.00 Divine.');
-    expect(statement()?.previousElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(statement()?.textContent).toBe(nothingClearsCopy(2.5));
+    expect(statement()?.textContent).toContain('2.50');
+    expect(statement()?.previousElementSibling?.hasAttribute('data-header-bar')).toBe(true);
     // Not a money-slot phrase: the trail row keeps its own phrase, as it was.
     expect(unitNames()).toEqual(['Lost Belt']);
     expect(eventCells()).toEqual([MISSING_FIGURE]);

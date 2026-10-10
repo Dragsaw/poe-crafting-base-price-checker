@@ -8,20 +8,6 @@
  */
 
 /*
- * The trust strip. The whole strip is the target; only its affordance text
- * answers the pointer, with a 1px dotted accent underline while the strip is
- * hovered. The rule is transparent at rest so hover shifts no pixel. The sync
- * report panel and the appendix take no hover state at all.
- */
-.fg-strip-affordance {
-  border-bottom: 1px dotted transparent;
-}
-
-.fg-trust-strip:hover .fg-strip-affordance {
-  border-bottom-color: var(--fg-color-accent);
-}
-
-/*
  * `{components.sync-button}`: a transparent outline at rest, line-strong under
  * the pointer and while its panel is open, the raised step while pressed.
  */

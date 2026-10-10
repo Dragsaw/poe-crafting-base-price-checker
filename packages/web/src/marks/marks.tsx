@@ -92,3 +92,18 @@ export function OpenSignMark(): JSX.Element {
     </MarkBox>
   );
 }
+
+/** The unit a footer-legend swatch stands for, in its rarity colour (DESIGN.md `footer-legend.swatches`). */
+export const SWATCH_COLORS = {
+  crafted: colors['rarity-magic'],
+  raw: colors['rarity-normal'],
+} as const;
+
+/** ■: a solid square, one per unit of the mixed list (DESIGN.md `footer-legend`). */
+export function SwatchMark({ unit }: { readonly unit: keyof typeof SWATCH_COLORS }): JSX.Element {
+  return (
+    <MarkBox name={`swatch-${unit}`} color={SWATCH_COLORS[unit]}>
+      <rect x="2.5" y="2.5" width="11" height="11" fill="currentColor" stroke="none" />
+    </MarkBox>
+  );
+}

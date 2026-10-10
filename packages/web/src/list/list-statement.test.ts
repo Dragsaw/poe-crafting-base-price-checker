@@ -2,6 +2,7 @@ import { rank, type Ranking } from '@poe/core';
 import type { CraftedRankedRow, DatasetEntry, RawTrackedEntry } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
+import { DENOMINATION, DIV_UNIT } from '../shared/product';
 import { TEST_LEAGUE } from '../test-support/artifact-server';
 import { NOW, NOW_ISO } from '../test-support/dom';
 import { hoursBefore, priced, rawEntry, unpriced } from '../test-support/list-fixtures';
@@ -28,8 +29,9 @@ describe('the copy', () => {
     expect(honestEmptyCopy('Forbidden Rites', true)).toBe(
       'In canonical order, not ranked: no tracked unit has a price from Forbidden Rites.',
     );
-    expect(nothingClearsCopy(3)).toBe('Nothing clears your Payout Threshold of 3.00 Divine.');
-    expect(nothingClearsCopy(0.6)).toBe('Nothing clears your Payout Threshold of 0.60 Divine.');
+    expect(nothingClearsCopy(3).endsWith(` 3.00 ${DIV_UNIT}.`)).toBe(true);
+    expect(nothingClearsCopy(0.6).endsWith(` 0.60 ${DIV_UNIT}.`)).toBe(true);
+    expect(nothingClearsCopy(3)).not.toContain(DENOMINATION);
   });
 });
 
@@ -86,7 +88,7 @@ describe('listStatement', () => {
     const dataset = [priced(belt, 1.5, hoursBefore(NOW, 1)), priced(ring, 0.8, hoursBefore(NOW, 1))];
     expect(statementFor([belt, ring, amulet], dataset, 3)).toEqual({
       kind: 'nothing-clears',
-      text: 'Nothing clears your Payout Threshold of 3.00 Divine.',
+      text: nothingClearsCopy(3),
     });
   });
 

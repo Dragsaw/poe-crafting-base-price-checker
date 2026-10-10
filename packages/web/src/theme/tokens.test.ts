@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest';
 import {
   colors,
   COLUMN_HEADER_HEIGHT,
-  columnSums,
   expansionLineGrid,
   expansionLineWidths,
+  failureScreen,
   floatingShadows,
+  footerLegend,
   glyphs,
   headerControls,
-  layout,
   rankedRowGrid,
   rounded,
   spacing,
@@ -129,8 +129,6 @@ describe('the token set', () => {
   });
 });
 
-const sum = (values: readonly number[]): number => values.reduce((a, b) => a + b, 0);
-
 describe('the ranked-row grid', () => {
   it('lays rank, name and EV at their spacing widths and gives the chase column the rest', () => {
     expect(rankedRowGrid.gridTemplateColumns).toBe(
@@ -197,16 +195,23 @@ describe('the header controls', () => {
   });
 });
 
-describe('the column contracts later stories replace', () => {
-  it('holds every other verified sum', () => {
-    expect(sum(columnSums.appendix)).toBe(970);
-    expect(layout.contentWidth - 2 * layout.hairline - 2 * layout.appendixPadX).toBe(sum(columnSums.appendix));
+describe('the foot and the failure screen', () => {
+  it('transcribes the footer legend: margin, padding and gaps', () => {
+    const legend = component('footer-legend');
+    expect(legend['marginTop']).toBe(`${String(footerLegend.marginTop)}px`);
+    expect(legend['paddingTop']).toBe(`${String(footerLegend.paddingTop)}px`);
+    expect(legend['layout']).toContain(`${String(footerLegend.gap)}px gaps`);
+  });
+
+  it('transcribes the failure screen: padding-top and the body width', () => {
+    const screen = component('failure-screen');
+    expect(screen['frame']).toContain(`padding-top ${String(failureScreen.paddingTop)}px`);
+    expect(screen['body']).toContain(`at most ${String(failureScreen.bodyMaxWidth)}px wide`);
   });
 });
 
 describe('the glyph vocabulary', () => {
-  it('holds each mark once', () => {
-    const values = Object.values(glyphs);
-    expect(new Set(values).size).toBe(values.length);
+  it('holds only the show-more signs: every other mark is drawn', () => {
+    expect(Object.values(glyphs)).toEqual(['+', '−']);
   });
 });

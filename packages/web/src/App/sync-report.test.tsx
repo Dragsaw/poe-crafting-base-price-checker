@@ -173,7 +173,7 @@ describe('the sync report (Interaction 5, state 32)', () => {
     toggleReport();
     const panel = reportPanel();
     expect(panel?.previousElementSibling?.hasAttribute('data-header-bar')).toBe(true);
-    expect(panel?.nextElementSibling?.hasAttribute('data-asking-price-line')).toBe(true);
+    expect(panel?.nextElementSibling?.hasAttribute('data-ranked-list')).toBe(true);
     expect(syncButton().dataset['open']).toBe('');
     expect(syncButton().getAttribute('aria-expanded')).toBe('true');
     expect(panelLines(PROBLEMS)).toEqual(['1 entry can no longer be priced']);

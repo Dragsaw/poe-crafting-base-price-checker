@@ -59,9 +59,9 @@ describe('the interaction surface', () => {
       expect(row.style.cursor).toBe('');
     }
 
-    // Every interaction Epic 2 builds: the strip, a row, the list growth and the threshold.
+    // Every interaction the page builds: the sync button, a row, the list growth and the threshold.
     act(() => {
-      frame().querySelector<HTMLElement>('[data-trust-strip]')?.click();
+      frame().querySelector<HTMLElement>('[data-sync-button]')?.click();
     });
     act(() => {
       frame().querySelector<HTMLElement>('[data-ranked-row]')?.click();
