@@ -433,7 +433,7 @@ Braces in this document always mean a DESIGN.md token, never a placeholder.
 | Raw Base row, chase slot | `Sell as is · item level 82+` |
 | Mark tooltip | `<word> · <reason>`, e.g. `rough · 74% of this EV rests on unreliable prices` |
 | Chase cell, cut | the cell's full Combination text on hover; no other string |
-| Expansion context line | `<name>`, e.g. `Body Armours (Str/Dex/Int)` (memlog 265). With ≈ it continues: `<name> · ≈ Some roll odds are estimated: no published weight for one mod tier. All prices below are real listings.` |
+| Expansion context line | `<name>`, e.g. `Body Armours (Str/Dex/Int)` (memlog 265). With ≈ it continues: `<name> · ≈ Some roll odds are estimated: no published weight for one mod tier. All prices below come from real listings.` |
 | Expansion line, below threshold | `below threshold` |
 | Curation marks | `* pinned` · `† pruned` |
 | `{components.show-more}` | `+ N more combinations` / `− show fewer` (memlog 264) · `+ N pruned` · `+ Read the remaining N rows` / `− Show only the top 20` · `+ Try again` |
@@ -1136,7 +1136,7 @@ is already under their hand in the header (memlog 204).
 2. They click anywhere on its `{components.ranked-row}`.
 3. `{components.expansion-panel}` opens in place. Its first line names the class in
    full. Then it says in plain words that some roll odds are estimated and that
-   every price below is a real listing. The threshold and recipe that the figures
+   every price below comes from real listings. The threshold and recipe that the figures
    depend on are in the sticky header above.
 4. They read its top 8 lines. First come the priced Combinations, by what each adds
    to the EV. They are quiet where the price is current, and one reads

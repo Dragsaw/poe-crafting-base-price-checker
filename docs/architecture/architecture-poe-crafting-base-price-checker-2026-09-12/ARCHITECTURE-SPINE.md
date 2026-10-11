@@ -6,7 +6,7 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 37
+revision: 38
 created: '2026-09-12'
 updated: '2026-10-11'
 binds: []
@@ -951,11 +951,13 @@ never import each other.
   adapter side. If the filter turns out to reject non-integer edges, that is a failure to
   surface, not one to paper over here.
 
-  The `PriceObservation` is the **median of those listings' prices after normalisation to
-  divine** (AD-20), recorded with the sample size actually returned. **On an even sample
-  the median is the lower of the two middle values, never their mean** — ten results is
-  the normal path, so this is not an edge case, and the lower value keeps every persisted
-  price a price someone actually asked.
+  The `PriceObservation` is the **mean of the first two listings in the result order, each
+  normalised to divine** (AD-20), and the one listing's price when only one is returned. It
+  is recorded with the sample size actually returned, not two: the other listings are
+  fetched and counted, never priced, so `sampleSize` measures depth for the trust rule. The
+  mean is taken over unrounded divine values and rounded once. Its exchange observation is
+  the rate of the first of the two listings not in divine, or divine's own rate when both
+  are in divine.
 
   **`sync` records the search identifier on the entry rather than on the observation**
   (AD-9), whenever the trade site answers the search, **whatever that answer contains**.
@@ -1008,7 +1010,9 @@ never import each other.
   Four further effects are accepted and recorded rather than corrected. The API's ascending sort
   is per listing currency, so a result set spanning currencies may not be the globally
   cheapest ten — the price filter above holds that span to **two** currencies rather than
-  removing it. That filter's own cost is the second effect: **a listing asking any other
+  removing it. Because the price is the first two results, this effect reaches the price
+  directly: in a result set that spans both currencies, the pair priced may not be the two
+  cheapest in divine. This is accepted, and `sync` does not re-sort. That filter's own cost is the second effect: **a listing asking any other
   currency is invisible**, so the sample can be smaller than the market and `no-listings`
   can fire on a base that has listings in chaos alone. Fewer than 10 results is valid and
   records the true count; zero is
@@ -1389,7 +1393,7 @@ never import each other.
 
   **AD-16 is expressly not the instrument here either, and the reason is not cost.** AD-16's
   search is item-shaped — `query.type`, rarity, item level, stat filters — and has no form a
-  currency fits; and AD-16's median is taken over prices **already normalised to divine**,
+  currency fits; and AD-16's estimate is taken over prices **already normalised to divine**,
   which is circular for the step that computes that normalisation. A builder who reached for
   AD-16 would have to invent both a query shape and a way out of the circularity, and two
   builders would invent them differently.

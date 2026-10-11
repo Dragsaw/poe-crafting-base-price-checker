@@ -732,8 +732,10 @@ So that every figure the tool shows me is one comparable number resting on a met
 **Then** it emits the value exactly, and it never rounds the value to reach an integer filter (AD-16).
 
 **Given** a returned sample of listings
-**When** `sync` takes the median
-**Then** on an even sample the median is the lower of the two middle values, and never their mean. Every persisted price is therefore a price someone actually asked (AD-16; `lowerMedian` in `packages/sync/src/pricing/normalise.ts`).
+**When** `sync` takes the estimate
+**Then** the price is the mean of the first two listings in the result order, after normalisation to Divine
+**And** with one listing the price is that listing's
+**And** `sampleSize` is the count returned, not the two that were priced (AD-16; `normalise.ts` in `packages/sync/src/pricing/`).
 
 **Given** a returned listing
 **When** `sync` normalises it

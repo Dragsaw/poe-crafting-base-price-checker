@@ -1,14 +1,15 @@
 ---
 title: PoE2 Crafting Base Price Checker
 status: final
-revision: 29
+revision: 30
 created: 2026-09-12
-updated: 2026-10-10
+updated: 2026-10-11
 sources:
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/brief.md
   - docs/briefs/brief-poe-crafting-base-price-checker-2026-09-12/addendum.md
   - docs/sprint-change-proposal-2026-09-13.md
   - docs/sprint-change-proposal-2026-09-19.md
+  - docs/sprint-change-proposal-2026-10-11.md
   - docs/stories/archive/spec-poesessid-sync/SPEC.md
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
 inherits:
@@ -380,7 +381,7 @@ A curator can track the outcomes the game actually rolls. A Hybrid Modifier is o
 
 #### FR-21: Estimate a price from the cheapest live instant-buyout listings
 
-*Architecture-owned.* For each Tracked Entry, one search and one fetch produce one Price Observation: the median of the cheapest live instant-buyout listings matching that entry, in Divine (AD-16).
+*Architecture-owned.* For each Tracked Entry, one search and one fetch produce one Price Observation: the mean of the two cheapest live instant-buyout listings matching that entry, in Divine, or the one listing's price when only one is found (AD-16).
 
 **Consequences (testable):**
 - What a search may be built from, and its shape, is AD-16's. The product requirement is only that a search reaches the Tracked Entry's own unit and nothing wider: a crafted entry's search prices its Item Class alone (FR-1), a raw entry's its Base Type alone (FR-3).
