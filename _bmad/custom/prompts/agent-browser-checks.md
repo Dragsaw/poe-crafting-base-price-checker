@@ -1,0 +1,9 @@
+# Agent browser checks (epic 4 retro L1, item 9)
+
+1. **When a list is required.** A change that touches `packages/web/`, `packages/core/`, `packages/contracts/` or a file under `data/` needs an `**Agent browser checks:**` list in its spec. `packages/web/vite.config.ts` copies `data/` into `dist/`, and the page fetches it at runtime. A spec that states why the page cannot change is exempt. A change outside these paths, for example only `docs/` or `tools/`, needs no list.
+2. **Where the list goes.** A dispatch spec puts the list in `## Verification`, in the form of `docs/stories/spec-4-1-the-dark-token-set-bundled-inter-and-the-sticky-header-bar.md`. A oneshot spec has no `## Verification` section, so it puts the list under Implementation Notes. The list is part of verification.
+3. **Who runs it.** The implementing agent runs the list itself. It never hands the list to the human.
+4. **Dev server.** Follow the agent-browser rules of AGENTS.md: a named session with `--session <id>` on each call, and `pnpm dev` in the background. When port 5173 is taken, use `pnpm dev --port <n>` and `pnpm dev:stop --port <n>`. Run `pnpm dev:stop` (with `--port <n>` when used) at the end, and also before any HALT, escalation or hand-back.
+5. **Re-run after review.** After the last review fix, re-run the whole list, not only the checks near the fix. A failed check is a defect: fix it, then re-run the whole list.
+6. **The record.** Write the results in Implementation Notes under `### Agent browser checks (after review)`. The record names the session id, each screenshot path, the local time of the run, the `git rev-parse HEAD` it ran against, and whether the tree was dirty. A run before review may use any heading. Only `### Agent browser checks (after review)` satisfies the gate.
+7. **The gate.** Do not set the spec to `done`, and do not set the story key to `review` or `done`, until the after-review record exists and is later than the last fix.

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-11-2026 12:00
+last_updated: 10-11-2026 13:00
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -146,7 +146,7 @@ action_items:
     action: "A story is done only after agent browser checks re-run after the last
       review fix, against the spec Agent browser checks section (L1)"
     owner: "process"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-10-a-correct-course-that-inserts-a-story-up"
     epic: 4
