@@ -1,4 +1,5 @@
 import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
+import css from '@eslint/css';
 import js from '@eslint/js';
 import vitest from '@vitest/eslint-plugin';
 import sonarjs from 'eslint-plugin-sonarjs';
@@ -179,6 +180,13 @@ export default tseslint.config(
       // Kebab-case for every file; React `.tsx` files may also be PascalCase (see below).
       'unicorn/filename-case': ['error', { cases: { kebabCase: true } }],
     },
+  },
+  {
+    // CSS gets the comment-run limit only; the TS rules above do not apply to it.
+    files: ['packages/**/*.css'],
+    language: 'css/css',
+    plugins: { css, local },
+    rules: { 'local/max-comment-run': ['error', { maxLines: 3 }] },
   },
   {
     // React components are named after the component they export.

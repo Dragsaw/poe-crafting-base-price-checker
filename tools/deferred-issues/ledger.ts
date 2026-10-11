@@ -9,7 +9,7 @@ export interface LedgerEntry {
   readonly sourceSpec: string;
   readonly summary: string;
   readonly evidence: string;
-  /** A `retry_when:` precondition that a human wrote, if the entry has one. */
+  /** A `retry_when:` precondition, if the entry has one. */
   readonly retryWhen: string | undefined;
   /** Every field of the bullet by key, `source_spec` included. */
   readonly fields: Readonly<Record<string, string>>;

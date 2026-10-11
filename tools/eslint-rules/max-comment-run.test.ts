@@ -1,3 +1,4 @@
+import css from '@eslint/css';
 import { RuleTester } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
@@ -51,6 +52,39 @@ new RuleTester().run('max-comment-run', rule, {
       name: 'the default limit applies without options',
       code: '// a\n// b\n// c\n// d\n// e\n// f\n// g\nconst x = 1;',
       errors: [{ messageId: 'tooLong', data: { lines: 7, max: 6 }, line: 1 }],
+    },
+  ],
+});
+
+new RuleTester({ plugins: { css }, language: 'css/css' }).run('max-comment-run on CSS', rule, {
+  valid: [
+    { name: 'a CSS block comment at the limit', code: '/*\n * a\n * b\n * c\n */\n.x { color: red; }', options },
+    { name: 'a blank line splits two CSS runs', code: '/* a\n b */\n\n/* c\n d */\n.x { color: red; }', options },
+    { name: 'a trailing CSS comment is not counted', code: '.x {\n  color: red; /* a\n b\n c\n d */\n}', options },
+    {
+      name: 'a CSS directive comment ends a run and is not counted',
+      code: '/* a\n b\n c */\n/* eslint-enable */\n/* d */\n.x { color: red; }',
+      options,
+    },
+  ],
+  invalid: [
+    {
+      name: 'a 4-line CSS comment',
+      code: '/*\n * a\n * b\n * c\n * d\n */\n.x { color: red; }',
+      options,
+      errors: [{ ...tooLong(), column: 1 }],
+    },
+    {
+      name: 'an indented CSS run inside a rule',
+      code: '.x {\n  /* a\n     b */\n  /* c\n     d */\n  color: red;\n}',
+      options,
+      errors: [{ ...tooLong(2), column: 3 }],
+    },
+    {
+      name: 'two CSS runs where only one is too long report once',
+      code: '/* a\n b */\n\n.x { color: red; }\n/* c\n d\n e\n f */\n.y { color: blue; }',
+      options,
+      errors: [tooLong(5)],
     },
   ],
 });
