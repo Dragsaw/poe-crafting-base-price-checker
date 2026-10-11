@@ -30,7 +30,7 @@ context:
 
 ## Implementation Notes
 
-- `normalise.ts`: `lowerMedian` → `meanOfFirstTwo` (no sort, throws on empty). `toDivine` now returns the unrounded product, so `priceOf` rounds the mean once; it had no other caller. `DIVINE_CURRENCY_ID` is exported for the exchange observation choice.
+- `normalise.ts`: `lowerMedian` → `meanOfFirstTwo` (no sort, throws on empty). `toDivine` now returns the unrounded product, so `priceOf` rounds the mean once. Its only in-repo caller is `priceOf`; it stays exported from `packages/sync/src/index.ts`. `DIVINE_CURRENCY_ID` is exported for the exchange observation choice.
 - `price-entry.ts` `priceOf`: every listing is still normalised first, so one unrated currency anywhere gives `no-exchange-rate`. The price comes from the first two, and the exchange observation is the first non-divine of the pair, or the first listing.
 - Fixture expectations were recomputed by hand from the six `fixtures/trade-fetch-*.json` captures: `[0.002, 0.0654, 0.0905, 1, 1, 94]`. The hybrid MSW test (1, 2, 3 div) moves from 2 to 1.5.
 - The round-once test uses 1 ex and 5 ex: rounding each listing first would give 0.0061, and rounding once gives 0.006.
