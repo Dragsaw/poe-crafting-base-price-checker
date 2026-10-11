@@ -16,7 +16,8 @@ interface Run {
 /** Spawns the script the way `pnpm sync:dry` does, with both streams piped. */
 function runScript(arguments_: readonly string[] = []): Promise<Run> {
   return new Promise((resolve) => {
-    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8' }, (_error, stdout, stderr) => {
+    // The live report outgrows the 1 MiB default buffer, and an overrun kills the child.
+    const child = execFile(process.execPath, [SCRIPT, ...arguments_], { encoding: 'utf8', maxBuffer: Infinity }, (_error, stdout, stderr) => {
       resolve({ code: child.exitCode, stdout, stderr });
     });
   });
