@@ -3,6 +3,8 @@
 persistent_facts = [
   "Before you triage, reject or fix any review finding, read the Review brief section of {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md and apply it. It covers the Accessibility Floor ruling and the rule that a reviewer does not edit an owner document.",
   "file:{project-root}/_bmad/custom/prompts/agent-browser-checks.md",
+  "Each deferred entry you append either has no `retry_when` or uses one of the three sweep forms. A `Story <n.n>` form names a story already in sprint-status.yaml. Never tie an entry to a future planning event (epic 4 retro L2).",
+  "The human's standing answer to the step-02 token-count gate is Keep full spec (epic 4 retro L3). Do not ask; state the token count in CHECKPOINT 1.",
 ]
 
 activation_steps_prepend = [
@@ -56,7 +58,7 @@ Each finding must:
 
 - Name `docs/stories/deferred-work.md` as the file.
 - State the carved-out item in one sentence.
-- Give the entry `docs/stories/deferred-work.md` needs, in its format: `source_spec`, `summary`, `evidence`.
+- Give the entry `docs/stories/deferred-work.md` needs, in its format: `source_spec`, `summary`, `evidence`, and an optional `retry_when` in one of the three sweep forms that the ledger's format comment lists. Never a future planning event.
 - State this warning: a carved-out item with no ledger entry is lost work. Story 1.7 lost a carved-out item this way. No one recorded the loss until a later, separate item caught it.
 
 Output a Markdown list of findings. Output nothing else.
@@ -89,7 +91,7 @@ Each finding must:
 
 - Name `docs/stories/deferred-work.md` as the file.
 - State the carved-out item in one sentence.
-- Give the entry `docs/stories/deferred-work.md` needs, in its format: `source_spec`, `summary`, `evidence`.
+- Give the entry `docs/stories/deferred-work.md` needs, in its format: `source_spec`, `summary`, `evidence`, and an optional `retry_when` in one of the three sweep forms that the ledger's format comment lists. Never a future planning event.
 - State this warning: a carved-out item with no ledger entry is lost work. Story 1.7 lost a carved-out item this way. No one recorded the loss until a later, separate item caught it.
 
 Output a Markdown list of findings. Output nothing else.

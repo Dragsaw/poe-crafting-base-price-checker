@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
+    "@eslint/css": "2.0.0",
     "@eslint/js": "10.0.1",
     "@poe/contracts": "workspace:*",
     "@poe/core": "workspace:*",

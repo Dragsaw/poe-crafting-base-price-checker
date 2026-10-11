@@ -116,7 +116,12 @@ describe('selectFiles', () => {
     expect(await selected(text, ['tools/x/x.ts'])).toEqual(['tools/x/x.ts']);
   });
 
-  it('ignores a non-TypeScript file, a missing file and a directory', async () => {
+  it('takes an edited CSS file, which ESLint lints for comment runs', async () => {
+    const entries = ['packages/web/src/a.css'];
+    expect(await selected(payload('Edit', { file_path: abs('packages/web/src/a.css') }), entries)).toEqual(['packages/web/src/a.css']);
+  });
+
+  it('ignores a file that is neither TypeScript nor CSS, a missing file and a directory', async () => {
     const entries = ['README.md', 'data/', 'tools/a.mjs'];
     const files = ['README.md', 'tools/a.mjs', 'tools/gone.ts', 'data'];
     const results = await Promise.all(files.map((file) => selected(payload('Write', { file_path: abs(file) }), entries)));
@@ -212,8 +217,8 @@ describe('formatReport', () => {
 });
 
 describe('checkedBy', () => {
-  it('limits dependency-cruiser to packages/ and gives lint every file', () => {
-    const files = ['packages/a/a.ts', 'tools/x.ts'];
+  it('limits dependency-cruiser to TypeScript under packages/ and gives lint every file', () => {
+    const files = ['packages/a/a.ts', 'packages/a/a.css', 'tools/x.ts'];
     expect(checkedBy('depcruise', files)).toEqual(['packages/a/a.ts']);
     expect(checkedBy('lint', files)).toEqual(files);
   });

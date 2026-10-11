@@ -15,6 +15,12 @@ interface CommentLike {
   readonly loc?: Location | null;
 }
 
+/** The part of `@eslint/css`'s CSSSourceCode this rule reads, typed here to avoid a runtime import. */
+interface CssSourceCode {
+  readonly ast: { readonly type: string };
+  readonly comments?: readonly CommentLike[];
+}
+
 interface Run {
   readonly first: Location;
   readonly lines: number;
@@ -87,18 +93,24 @@ const rule: Rule.RuleModule = {
     const { maxLines = DEFAULT_MAX_LINES } = (context.options[0] ?? {}) as Options;
     const { sourceCode } = context;
 
-    const isOwnLine = ({ start }: Location): boolean =>
-      (sourceCode.lines[start.line - 1] ?? '').slice(0, start.column).trim() === '';
+    // `@eslint/css` counts columns from 1 and keeps its comments off the AST.
+    const css = sourceCode as unknown as CssSourceCode;
+    const isCss = css.ast.type === 'StyleSheet';
+    const columnStart = isCss ? 1 : 0;
 
-    return {
-      'Program:exit'() {
-        for (const { first, lines } of findRuns(sourceCode.getAllComments(), isOwnLine)) {
-          if (lines > maxLines) {
-            context.report({ loc: first, messageId: 'tooLong', data: { lines, max: maxLines } });
-          }
+    const isOwnLine = ({ start }: Location): boolean =>
+      (sourceCode.lines[start.line - 1] ?? '').slice(0, start.column - columnStart).trim() === '';
+
+    const check = (): void => {
+      const comments = isCss ? (css.comments ?? []) : sourceCode.getAllComments();
+      for (const { first, lines } of findRuns(comments, isOwnLine)) {
+        if (lines > maxLines) {
+          context.report({ loc: first, messageId: 'tooLong', data: { lines, max: maxLines } });
         }
-      },
+      }
     };
+
+    return { 'Program:exit': check, 'StyleSheet:exit': check };
   },
 };
 

@@ -24,6 +24,8 @@ export const MAX_DIFF_FILES = 20;
 
 const MAX_BUFFER = 64 * 1024 * 1024;
 const TYPESCRIPT_FILE = /\.tsx?$/;
+/** ESLint lints CSS comment runs too (epic 4 retro A6). */
+const LINTED_FILE = /\.(?:tsx?|css)$/;
 const SKIPPED_SEGMENT = /(^|\/)(node_modules|dist)\//;
 const SERENA_PREFIX = 'mcp__serena__';
 
@@ -69,7 +71,7 @@ function insideRoot(root: string, candidate: string): string | undefined {
 
 function wantedFile(candidate: string, dependencies: SelectionDependencies): string | undefined {
   const relativePath = insideRoot(dependencies.root, candidate);
-  if (relativePath === undefined || !TYPESCRIPT_FILE.test(relativePath) || SKIPPED_SEGMENT.test(relativePath)) {
+  if (relativePath === undefined || !LINTED_FILE.test(relativePath) || SKIPPED_SEGMENT.test(relativePath)) {
     return undefined;
   }
   return dependencies.kindOf(path.resolve(dependencies.root, relativePath)) === 'file' ? relativePath : undefined;
@@ -81,7 +83,7 @@ function canReachOtherFiles(payload: HookPayload, namedKind: PathKind): boolean 
   return payload.toolName.startsWith(SERENA_PREFIX) && (name === 'rename_symbol' || (name === 'replace_in_files' && namedKind !== 'file'));
 }
 
-/** The edited TypeScript files, repository-relative with forward slashes. Ignores other extensions and missing files. */
+/** The edited TypeScript and CSS files, repository-relative with forward slashes. Ignores other extensions and missing files. */
 export async function selectFiles(payload: HookPayload, dependencies: SelectionDependencies): Promise<string[]> {
   const named = payload.path === '' ? undefined : wantedFile(payload.path, dependencies);
   const namedKind = payload.path === '' ? 'missing' : dependencies.kindOf(path.resolve(dependencies.root, payload.path));
@@ -97,8 +99,10 @@ export async function selectFiles(payload: HookPayload, dependencies: SelectionD
 
 /** Which of `files` a check applies to. */
 export function checkedBy(check: CheckName, files: readonly string[]): string[] {
-  // dependency-cruiser's rules name `packages/` only.
-  return check === 'depcruise' ? files.filter((file) => file.startsWith('packages/')) : [...files];
+  // dependency-cruiser's rules name `packages/` only, and a CSS file has no imports to cruise.
+  return check === 'depcruise'
+    ? files.filter((file) => file.startsWith('packages/') && TYPESCRIPT_FILE.test(file))
+    : [...files];
 }
 
 /** Compares paths of edited files and tool output: both use forward slashes, and Windows ignores case. */
@@ -179,6 +183,11 @@ export async function runHook(stdin: string, dependencies: HookDependencies): Pr
   return { code: report === '' ? 0 : 2, report };
 }
 
+interface RunOptions {
+  readonly environment?: NodeJS.ProcessEnv;
+  readonly timeoutMs?: number;
+}
+
 interface RunResult {
   readonly code: number;
   readonly stdout: string;
@@ -186,12 +195,17 @@ interface RunResult {
 }
 
 /** Runs a program to the end and never rejects on a non-zero exit. The timeout kills it. */
-export function run(file: string, arguments_: readonly string[], cwd: string, environment: NodeJS.ProcessEnv = process.env): Promise<RunResult> {
+export function run(
+  file: string,
+  arguments_: readonly string[],
+  cwd: string,
+  { environment = process.env, timeoutMs = TIMEOUT_MS }: RunOptions = {},
+): Promise<RunResult> {
   return new Promise((done, fail) => {
     execFile(
       file,
       [...arguments_],
-      { cwd, env: environment, timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER, windowsHide: true, encoding: 'utf8' },
+      { cwd, env: environment, timeout: timeoutMs, maxBuffer: MAX_BUFFER, windowsHide: true, encoding: 'utf8' },
       (error, stdout, stderr) => {
         const code = (error as { code?: unknown } | null)?.code;
         if (error !== null && typeof code !== 'number') {fail(error);}
@@ -212,12 +226,12 @@ export function realChecks(root: string): Record<CheckName, Check> {
       const environment = { ...process.env, LINT_FAST: '1', ESLINT_D_ROOT: root };
       const server = bin('eslint_d', 'bin', 'eslint_d.js');
       // Node caches the modules of the local rules, so an edited rule loads only in a new server.
-      if (files.some((file) => file.startsWith('tools/eslint-rules/'))) {await run(node, [server, 'stop'], os.tmpdir(), environment);}
+      if (files.some((file) => file.startsWith('tools/eslint-rules/'))) {await run(node, [server, 'stop'], os.tmpdir(), { environment });}
       const suppressions = path.join(root, 'eslint-suppressions.json');
       const flags = ['--no-warn-ignored', '--max-warnings=0', '--pass-on-unpruned-suppressions'];
       if (existsSync(suppressions)) {flags.push('--suppressions-location', suppressions);}
       const absoluteFiles = files.map((file) => path.join(root, file));
-      const result = await run(node, [server, ...flags, ...absoluteFiles], os.tmpdir(), environment);
+      const result = await run(node, [server, ...flags, ...absoluteFiles], os.tmpdir(), { environment });
       return result.code === 0 ? '' : result.stdout + result.stderr;
     },
     async depcruise(files) {

@@ -6,9 +6,9 @@ altitude: feature
 paradigm: 'functional core / imperative shell with ports-and-adapters at the edges'
 scope: 'Whole system: trade-API sync, price estimation, valuation and ranking, published dataset, web view, and the weights-file contract.'
 status: final
-revision: 36
+revision: 37
 created: '2026-09-12'
-updated: '2026-10-10'
+updated: '2026-10-11'
 binds: []
 sources:
   - docs/stories/archive/spec-tracked-hybrid-mods/SPEC.md
@@ -1697,6 +1697,7 @@ Everything in this section is true at cold-start and owned by the code once it e
 | MSW | 2.15.0 |
 | jsdom (Vitest DOM environment for `web`) | 30.1.0 |
 | ESLint + typescript-eslint | 10.11.0 + 8.70.0 |
+| ESLint CSS language (`@eslint/css`) | 2.0.0 |
 | dependency-cruiser | 18.4.0 |
 | Hosting | GitHub Pages via Actions build workflow |
 | Sync invoker | `pnpm sync`, a long-running session; or `pnpm sync:batch` under Windows Task Scheduler (host-agnostic per AD-7) |
