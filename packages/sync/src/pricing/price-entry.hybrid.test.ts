@@ -113,6 +113,6 @@ describe('createPricingStep: a hybrid entry against an MSW trade server', () => 
       },
     });
     expect(result.kind).toBe('completed');
-    expect(result.entry?.price).toMatchObject({ state: 'priced', observation: { priceDivine: 2, sampleSize: 3 } });
+    expect(result.entry?.price).toMatchObject({ state: 'priced', observation: { priceDivine: 1.5, sampleSize: 3 } });
   });
 });

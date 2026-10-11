@@ -16,7 +16,7 @@ import { markUnresolvable } from '../chunk/catalogue-check.ts';
 import type { ChunkStep, StepResult } from '../chunk/run-chunk.ts';
 import type { TradeClient } from '../trade/client.ts';
 import { FETCH_LANE, SEARCH_LANE, tradeFetchUrl, tradeSearchUrl } from '../trade/endpoints.ts';
-import { currentRates, lowerMedian, outputRate, toDivine } from './normalise.ts';
+import { currentRates, DIVINE_CURRENCY_ID, meanOfFirstTwo, outputRate, roundDivine, toDivine } from './normalise.ts';
 import { sendLeg, yieldedWith } from './price-entry-leg.ts';
 import { buildSearchBody, UnknownClassBaseTypeError } from './search-body.ts';
 import type { ItemTypes } from './search-body.ts';
@@ -138,20 +138,20 @@ function priceOf(
     }
     normalised.push({ value: toDivine(listing.amount, rate), rate });
   }
-  const priceDivine = lowerMedian(normalised.map((listing) => listing.value));
-  // The exchange observation is the one behind the median listing itself.
-  const median = normalised.find((listing) => listing.value === priceDivine);
-  if (median === undefined) {
-    throw new RangeError('priceOf: the median is not one of the listings');
+  const priced = normalised.slice(0, 2);
+  const [first] = priced;
+  if (first === undefined) {
+    throw new RangeError('priceOf: a non-empty sample has no first listing');
   }
+  const exchange = priced.find((listing) => listing.rate.currencyId !== DIVINE_CURRENCY_ID) ?? first;
   return {
     state: 'priced',
     observation: {
       league,
       observedAt,
-      priceDivine,
+      priceDivine: roundDivine(meanOfFirstTwo(priced.map((listing) => listing.value))),
       sampleSize: normalised.length,
-      exchangeObservation: outputRate(median.rate),
+      exchangeObservation: outputRate(exchange.rate),
     },
   };
 }

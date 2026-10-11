@@ -1,7 +1,7 @@
 import type { CurrencyRate } from '@poe/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { currentRates, lowerMedian, outputRates, roundDivine, toDivine } from './normalise.ts';
+import { currentRates, meanOfFirstTwo, outputRates, roundDivine, toDivine } from './normalise.ts';
 
 const LEAGUE = 'Forbidden Rites';
 
@@ -21,25 +21,25 @@ describe('currentRates', () => {
 });
 
 describe('toDivine and roundDivine', () => {
-  it('normalises with n × rate and rounds once to 4dp', () => {
-    expect(toDivine(3, rate('exalted', 0.002012))).toBeCloseTo(0.006, 10);
-    expect(toDivine(7, rate('chaos', 0.13078))).toBeCloseTo(0.9155, 10);
+  it('normalises with n × rate unrounded, and roundDivine rounds to 4dp', () => {
+    expect(toDivine(3, rate('exalted', 0.002012))).toBeCloseTo(0.006036, 10);
+    expect(toDivine(7, rate('chaos', 0.13078))).toBeCloseTo(0.91546, 10);
     expect(roundDivine(1.00005)).toBeCloseTo(1.0001, 10);
     expect(roundDivine(2)).toBe(2);
   });
 });
 
-describe('lowerMedian', () => {
-  it('takes the lower of the two middle values on an even sample', () => {
-    expect(lowerMedian([10, 1, 9, 2, 8, 3, 7, 4, 6, 5])).toBe(5);
+describe('meanOfFirstTwo', () => {
+  it('takes the mean of the first two values in the given order, never re-sorted', () => {
+    expect(meanOfFirstTwo([9, 4, 1, 10, 2, 8, 3, 7, 6, 5])).toBe(6.5);
   });
 
-  it('takes the middle value on an odd sample', () => {
-    expect(lowerMedian([3, 1, 2])).toBe(2);
+  it('takes the one value of a single-value sample', () => {
+    expect(meanOfFirstTwo([3])).toBe(3);
   });
 
   it('refuses an empty sample', () => {
-    expect(() => lowerMedian([])).toThrow(RangeError);
+    expect(() => meanOfFirstTwo([])).toThrow(RangeError);
   });
 });
 

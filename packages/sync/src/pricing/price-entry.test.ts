@@ -23,8 +23,9 @@ const FETCH_HEADERS = {
 };
 
 describe('createPricingStep: a priced entry', () => {
-  it('sends one search and one fetch of at most 10 ids, then takes the lower median', async () => {
-    const prices = [10, 1, 9, 2, 8, 3, 7, 4, 6, 5].map((n) => [n, 'divine'] as const);
+  it('sends one search and one fetch of at most 10 ids, then prices the mean of the first two', async () => {
+    // 6.5 differs from the median (5.5), the lower median (5) and the two lowest (1.5).
+    const prices = [9, 4, 1, 10, 2, 8, 3, 7, 6, 5].map((n) => [n, 'divine'] as const);
     const { http, run } = setup({ results: ids(12), fetch: ok(listings(prices), FETCH_HEADERS), search: undefined });
 
     const result = await run();
@@ -42,7 +43,7 @@ describe('createPricingStep: a priced entry', () => {
         observation: {
           league: LEAGUE,
           observedAt: NOW,
-          priceDivine: 5,
+          priceDivine: 6.5,
           sampleSize: 10,
           exchangeObservation: rate('divine', 1),
         },
@@ -54,11 +55,11 @@ describe('createPricingStep: a priced entry', () => {
     expect(DatasetEntrySchema.parse(result.entry)).toEqual(result.entry);
   });
 
-  it('normalises each listing once and records the median listing’s rate', async () => {
-    // 100 ex = 0.2012 div, 1 div = 1, 300 ex = 0.6036 div → median 0.6036 (exalted).
+  it('prices the first two in result order without a re-sort, and counts all three', async () => {
+    // 300 ex = 0.6036 div and 1 div are first; the cheaper 100 ex third is counted, never priced.
     const { run } = setup({
       results: ids(3),
-      fetch: ok(listings([[100, 'exalted'], [1, 'divine'], [300, 'exalted']])),
+      fetch: ok(listings([[300, 'exalted'], [1, 'divine'], [100, 'exalted']])),
     });
 
     const result = await run();
@@ -68,11 +69,46 @@ describe('createPricingStep: a priced entry', () => {
       observation: {
         league: LEAGUE,
         observedAt: NOW,
-        priceDivine: 0.6036,
+        priceDivine: 0.8018,
         sampleSize: 3,
         exchangeObservation: rate('exalted', 0.002),
       },
     });
+  });
+
+  it('takes the exchange observation from the first non-divine listing of the pair', async () => {
+    // (1 + 0.5030) / 2 over unrounded values = 0.7515.
+    const { run } = setup({ results: ids(2), fetch: ok(listings([[1, 'divine'], [250, 'exalted']])) });
+    const result = await run();
+    expect(result.entry?.price).toMatchObject({
+      state: 'priced',
+      observation: { priceDivine: 0.7515, sampleSize: 2, exchangeObservation: rate('exalted', 0.002) },
+    });
+  });
+
+  it('takes divine’s own rate when both listings of the pair are in divine', async () => {
+    const { run } = setup({ results: ids(3), fetch: ok(listings([[1, 'divine'], [2, 'divine'], [100, 'exalted']])) });
+    const result = await run();
+    expect(result.entry?.price).toMatchObject({
+      state: 'priced',
+      observation: { priceDivine: 1.5, sampleSize: 3, exchangeObservation: rate('divine', 1) },
+    });
+  });
+
+  it('prices one listing at that listing', async () => {
+    const { run } = setup({ results: ids(1), fetch: ok(listings([[3, 'exalted']])) });
+    const result = await run();
+    expect(result.entry?.price).toMatchObject({
+      state: 'priced',
+      observation: { priceDivine: 0.006, sampleSize: 1, exchangeObservation: rate('exalted', 0.002) },
+    });
+  });
+
+  it('rounds the mean once, not each listing', async () => {
+    // (0.002012 + 0.01006) / 2 = 0.006036 → 0.006; rounding each first gives (0.002 + 0.0101) / 2 → 0.0061.
+    const { run } = setup({ results: ids(2), fetch: ok(listings([[1, 'exalted'], [5, 'exalted']])) });
+    const result = await run();
+    expect(result.entry?.price).toMatchObject({ state: 'priced', observation: { priceDivine: 0.006 } });
   });
 
   it('prices a short sample with its true size', async () => {
@@ -119,6 +155,12 @@ describe('createPricingStep: states by cause', () => {
     expect(result.entry?.lastSearchId).toBe(SEARCH_ID);
   });
 
+  it('an unrated currency after the priced pair is still no-exchange-rate', async () => {
+    const { run } = setup({ results: ids(3), fetch: ok(listings([[1, 'divine'], [2, 'divine'], [5, 'chaos']])) });
+    const result = await run();
+    expect(result.entry?.price).toEqual({ state: 'not-yet-synced', reason: 'no-exchange-rate' });
+  });
+
   it('a rate from another league is treated as missing', async () => {
     const { run } = setup({
       results: ids(1),
@@ -146,7 +188,7 @@ describe('createPricingStep: states by cause', () => {
     });
   });
 
-  it('leaves null listings out of sampleSize', async () => {
+  it('leaves null listings out of sampleSize and out of the priced pair', async () => {
     const { run } = setup({
       results: ids(4),
       fetch: ok({
@@ -159,7 +201,7 @@ describe('createPricingStep: states by cause', () => {
       }),
     });
     const result = await run();
-    expect(result.entry?.price.state === 'priced' && result.entry.price.observation.sampleSize).toBe(2);
+    expect(result.entry?.price).toMatchObject({ state: 'priced', observation: { priceDivine: 2, sampleSize: 2 } });
   });
 
   it('leaves listings with no readable price out of sampleSize', async () => {

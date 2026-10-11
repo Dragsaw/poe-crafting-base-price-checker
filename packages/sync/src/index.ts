@@ -88,7 +88,7 @@ export {
   UnknownClassBaseTypeError,
 } from './pricing/search-body';
 export type { ItemTypes, SearchBody } from './pricing/search-body';
-export { currentRates, lowerMedian, outputRates, roundDivine, toDivine } from './pricing/normalise';
+export { currentRates, meanOfFirstTwo, outputRates, roundDivine, toDivine } from './pricing/normalise';
 export { CURRENCIES_PATH, loadCurrencies } from './pricing/load-currencies';
 export { CATALOGUE_ITEMS_PATH, loadItemTypes } from './pricing/load-item-types';
 export { CONFIG_PATH, loadActiveLeague, loadConfig } from './load-config';

@@ -42,7 +42,7 @@ export const BELOW_THRESHOLD_NOTE = 'below threshold';
 export const CURATION_MARKS = { pinned: '* pinned', pruned: '† pruned' } as const;
 
 /** The ≈ context sentence after the name of a `uniform-prior` row (EXPERIENCE.md Copy Deck, state 12). */
-export const ESTIMATED_ODDS_CONTEXT = 'Some roll odds are estimated: no published weight for one mod tier. All prices below are real listings.';
+export const ESTIMATED_ODDS_CONTEXT = 'Some roll odds are estimated: no published weight for one mod tier. All prices below come from real listings.';
 
 /** The remainder affordance, closed: N counts the hidden lines without the pruned ones (state 39). */
 export function moreLinesCopy(hidden: number): string {

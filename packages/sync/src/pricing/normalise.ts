@@ -3,7 +3,7 @@
 import type { CurrencyRate, LeagueId } from '@poe/contracts';
 
 /** The one currency whose rate is exactly `1` by definition (AD-20). */
-const DIVINE_CURRENCY_ID = 'divine';
+export const DIVINE_CURRENCY_ID = 'divine';
 
 const DIVINE_DECIMALS = 4;
 const DIVINE_SCALE = 10 ** DIVINE_DECIMALS;
@@ -29,23 +29,19 @@ export function currentRates(
   return current;
 }
 
-/** Uses the unrounded file rate, so the product is rounded exactly once. */
+/** The raw `amount × rate`, unrounded; the caller rounds once with `roundDivine` (AD-16). */
 export function toDivine(amount: number, rate: CurrencyRate): number {
-  return roundDivine(amount * rate.rate);
+  return amount * rate.rate;
 }
 
-// The lower middle value of an even sample. Throws on an empty sample: no listings is
-// `no-listings`, never a price.
-export function lowerMedian(values: readonly number[]): number {
-  if (values.length === 0) {
-    throw new RangeError('lowerMedian: an empty sample has no median');
+// The values in their given order, never re-sorted (AD-16). Throws on an empty sample: no
+// listings is `no-listings`, never a price.
+export function meanOfFirstTwo(values: readonly number[]): number {
+  const [first, second] = values;
+  if (first === undefined) {
+    throw new RangeError('meanOfFirstTwo: an empty sample has no price');
   }
-  const sorted = values.toSorted((a, b) => a - b);
-  const middle = sorted[Math.floor((sorted.length - 1) / 2)];
-  if (middle === undefined) {
-    throw new RangeError('lowerMedian: unreachable index');
-  }
-  return middle;
+  return second === undefined ? first : (first + second) / 2;
 }
 
 /** Divine at exactly 1, every other rate at 4dp; `league` and `asOf` pass through (AD-20). */
