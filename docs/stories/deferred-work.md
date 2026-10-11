@@ -55,10 +55,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-epic-4-retro-item-7-no-priced-crafted-row-rank.md`
   summary: Make the sync loopback fetch test immune to undici's bad-port block: `server.listen(0)` can draw a port on the WHATWG bad-port list, and fetch then fails with "bad port".
   evidence: `pnpm check` failed once on 2026-10-10 in `packages/sync/src/shell-fetch.test.ts` "round-trips the method, headers and body…" with `TypeError: fetch failed` / `Caused by: Error: bad port`; three isolated re-runs and the next full gate passed. The branch changes nothing under `packages/sync`. The port comes from `server.listen(0, '127.0.0.1')` at `shell-fetch.test.ts:25`.
-
-## Deferred from: spec-epic-4-retro-item-9-agent-browser-recheck review (2026-10-11)
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-9-agent-browser-recheck.md`
-  summary: Decide whether the agent browser checks trigger also covers root `package.json`/`pnpm-lock.yaml` dependency bumps (Mantine, React, Vite) and shared build config, which change the page outside `packages/web/`, `core/`, `contracts/` and `data/`.
-  evidence: The human-chosen trigger (spec frozen Decisions, 2026-10-11) names only those four paths, so widening it needs a human (Blind Hunter finding). A Mantine bump that restyles the page currently needs no browser run.
-  retry_when: never — needs a human

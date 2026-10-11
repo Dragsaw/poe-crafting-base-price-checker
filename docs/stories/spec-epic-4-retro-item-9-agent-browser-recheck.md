@@ -78,7 +78,7 @@ Layers: Blind Hunter, Edge Case Hunter, Verification Gap (no gaps: instruction t
 - low, patch — an impeccable polish after the record could change the page unchecked. Fixed: the impeccable offer now comes before the record check, and the record must be later than any polish.
 - low, patch — "a committed data file that the page loads" named no path. Fixed: `data/`.
 - low, patch — `last_updated` was a placeholder time. Fixed.
-- low, defer — the trigger misses root dependency bumps and shared config. The human fixed the trigger set; recorded in deferred-work.md.
+- low, reject — the trigger misses root dependency bumps and shared config. Human ruling (2026-10-11): these files stay out of scope, because a browser check needs something specific to see on the rendered page. The deferred entry was cancelled.
 - false — an interactive run with an unfixable check loops forever: step-04 already HALTs and escalates when `## Verification` fails, and the list is part of it.
 - false — the action item and retro note say `done` before review ends: nothing is committed until step-05, which sets the spec to `done` first (the item 8 pattern).
 - low, reject — screenshot paths live in a temp scratchpad; the written result is the evidence, as in spec-4-1, and a lasting store adds machinery for no named reader.
