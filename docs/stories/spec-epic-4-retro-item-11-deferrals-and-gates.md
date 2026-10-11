@@ -95,7 +95,7 @@ context:
 - low — `ledger-rules.ts` claimed bare-node use; `storyIds` doc claimed development_status scope (Blind Hunter). Patched: comment removed, doc and test name corrected.
 - low — `LedgerEntry.retryWhen` JSDoc said "that a human wrote" (Blind Hunter). Patched.
 - medium — AGENT-WORKFLOW.md copied the code-owned 100 s / 120 s numbers (Blind Hunter). Patched: behavior plus a `TYPECHECK_BUDGET_MS` citation.
-- low, deferred — deferred-work-sweep SKILL.md still describes free-form human-written `retry_when` (Blind Hunter). Agent-context file edit; recorded in deferred-work.md.
+- low — deferred-work-sweep SKILL.md still described free-form human-written `retry_when` (Blind Hunter). First deferred as an agent-context edit; the human ruled to fix it in this story. Patched: the entry definition and condition 6 name the step 5.2 forms and the ledger test.
 - false — `background_tasks` is unverified (Blind Hunter, Verification Gap): the Claude Code hooks reference documents Stop's `background_tasks` with `type: 'subagent'` entries for in-flight tasks; cited in Implementation Notes.
 - false — a finished subagent entry would skip forever (Edge Case Hunter): the reference lists only in-flight tasks in `background_tasks`.
 - false — spec `in-review` while sprint-status reads `done` (Blind Hunter): the finalize step moves the spec to `done` in the same commit, as item 8 did.

@@ -56,9 +56,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-epic-4-retro-item-7-no-priced-crafted-row-rank.md`
   summary: Make the sync loopback fetch test immune to undici's bad-port block: `server.listen(0)` can draw a port on the WHATWG bad-port list, and fetch then fails with "bad port".
   evidence: `pnpm check` failed once on 2026-10-10 in `packages/sync/src/shell-fetch.test.ts` "round-trips the method, headers and body…" with `TypeError: fetch failed` / `Caused by: Error: bad port`; three isolated re-runs and the next full gate passed. The branch changes nothing under `packages/sync`. The port comes from `server.listen(0, '127.0.0.1')` at `shell-fetch.test.ts:25`.
-
-## Deferred from: spec-epic-4-retro-item-11-deferrals-and-gates review (2026-10-11)
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-11-deferrals-and-gates.md`
-  summary: Bring `.claude/skills/deferred-work-sweep/SKILL.md` in line with the testable `retry_when` rule: line 43 still calls `retry_when` "a line that a human wrote", and condition 6 still treats free-form ledger preconditions as the normal case.
-  evidence: The ledger header and `tools/deferred-issues/ledger-rules.ts` now allow only the three §5.2 forms, and the bmad-build deferral fact tells agents to write them (Blind Hunter finding). Review routes edits to agent-context files (skills) to defer.
