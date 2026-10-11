@@ -188,6 +188,14 @@ The `must-discharge-audit` review layer (`_bmad/custom/bmad-build-auto.toml`) ch
 
 The `on_complete` of `_bmad/custom/bmad-correct-course.toml` runs these steps at the end of correct-course.
 
+## Story acceptance
+
+Only acceptance moves a story key in `docs/stories/sprint-status.yaml` from `review` to `done`. `_bmad/custom/prompts/story-acceptance.md` holds the edit and the commit. It also sets `epic-N` to `done` when the accepted story was the last open story of epic N. The sequence is: build, accept, then finish-worktree.
+
+1. **bmad-build** asks the human at the end of its run and HALTs for the answer. A no leaves the key at `review`.
+2. **bmad-build-auto** accepts on its own when its run ends `done` and the agent browser record check has passed. A deferred-work-sweep run never edits `sprint-status.yaml`, so it never accepts.
+3. **finish-worktree** (a user-level skill) refuses to push a branch that leaves a story key it changed at `review`. Accept the story first, then run finish-worktree again.
+
 ## Definition of done for an agent task
 
 1. `pnpm check` passes, and the command makes no network call.

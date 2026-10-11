@@ -3,6 +3,7 @@
 persistent_facts = [
   "Before you triage, reject or fix any review finding, read the Review brief section of {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md and apply it. It covers the Accessibility Floor ruling and the rule that a reviewer does not edit an owner document.",
   "file:{project-root}/_bmad/custom/prompts/agent-browser-checks.md",
+  "file:{project-root}/_bmad/custom/prompts/story-acceptance.md",
   "Agent browser checks in an unattended run. If a check cannot run, HALT with status `blocked` and the condition `agent browser check <name> cannot run: <reason>`. If a failed check cannot be fixed, HALT with status `blocked` and the condition `agent browser check <name> failed: <defect>`. Run `pnpm dev:stop` (with `--port <n>` when used) before the HALT.",
 ]
 
@@ -22,6 +23,8 @@ Launch a subagent with no prior conversation context, with this prompt:
 
 on_complete = """
 Agent browser record check (rule: `_bmad/custom/prompts/agent-browser-checks.md`). Run this whatever `{story_key}` is. Find the trigger paths in the diff of this run. Run the whole list and write the `### Agent browser checks (after review)` record in either of two cases: the diff touches a trigger path and `{spec_file}` has neither the list nor the stated exception, or `{spec_file}` has the list but no after-review record later than the last review fix. When there is no list, write it first in the place the rule names. When every check passes, commit only `{spec_file}` with the message `docs(stories): agent browser checks for <spec slug>`. When a check fails or cannot run, do not fix it here. Run `pnpm dev:stop` (with `--port <n>` when used), then HALT with status `blocked` and the condition of the unattended agent browser fact.
+
+Auto-accept. Do this only when the agent browser record check above did not HALT, the spec status is `done`, `{story_key}` is set, and `development_status[{story_key}]` reads `review` in `docs/stories/sprint-status.yaml`. Skip it when the intent of the run forbids edits to `sprint-status.yaml`, as a deferred-work-sweep run does. Do not ask. Accept the story by the story acceptance rule (`_bmad/custom/prompts/story-acceptance.md`), and name the accept commit, and the closed epic if any, in the final report.
 """
 
 # This layer stops a lost ledger entry. It runs in
