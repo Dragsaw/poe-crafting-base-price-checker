@@ -31,13 +31,3 @@ Each entry names work carved out of a spec. Append new entries. Do not rewrite o
 - source_spec: `docs/stories/spec-retro-4-2-state-23-verdict-and-recipeless-order.md`
   summary: Guard against CRLF in edited files: Serena `replace_content` writes CRLF on Windows, so add a CR check to lint-on-edit or a Known pitfalls line in AGENTS.md.
   evidence: Every Serena edit on this branch left CRLF in the working copy despite `.gitattributes` `eol=lf`; `packages/web/src/list/display-rows.test.ts`'s raw-source scan of `summands` uses then failed on a trailing `\r` until the files were normalised (Blind Hunter finding).
-
-## Deferred from: spec-epic-4-retro-item-7-no-priced-crafted-row-rank review (2026-10-10)
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-7-no-priced-crafted-row-rank.md`
-  summary: Check in agent-browser that a crafted row with no priced combination (states 18 and 41) shows no numeral, tier 3 and EV `—`, and trails every ranked row in the state 18 trail order, on data that holds such a class.
-  evidence: The live `data/` set on `pnpm dev` holds no unpriced crafted class (16 rows, ranks 1..16 contiguous), so the trailing row was checked only through `packages/web/src/recipe/craft-recipe/crafted-states.test.tsx` (Deferred Ledger Auditor; Blind Hunter). Needs a dev fixture world or a sync that leaves a crafted class unpriced.
-
-- source_spec: `docs/stories/spec-epic-4-retro-item-7-no-priced-crafted-row-rank.md`
-  summary: Make the sync loopback fetch test immune to undici's bad-port block: `server.listen(0)` can draw a port on the WHATWG bad-port list, and fetch then fails with "bad port".
-  evidence: `pnpm check` failed once on 2026-10-10 in `packages/sync/src/shell-fetch.test.ts` "round-trips the method, headers and body…" with `TypeError: fetch failed` / `Caused by: Error: bad port`; three isolated re-runs and the next full gate passed. The branch changes nothing under `packages/sync`. The port comes from `server.listen(0, '127.0.0.1')` at `shell-fetch.test.ts:25`.

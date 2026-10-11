@@ -11,6 +11,7 @@ import { isTransportFailure } from './trade/transport-failure.ts';
 
 type Handler = (request: IncomingMessage, response: ServerResponse) => void;
 
+const HIGHEST_BAD_PORT = 10_080;
 const servers: Server[] = [];
 const sockets = new Set<Socket>();
 
@@ -21,11 +22,19 @@ async function startServer(handler: Handler): Promise<{ server: Server; origin: 
     socket.on('close', () => sockets.delete(socket));
   });
   servers.push(server);
-  await new Promise<void>((listening) => {
-    server.listen(0, '127.0.0.1', listening);
-  });
-  const { port } = server.address() as AddressInfo;
-  return { server, origin: `http://127.0.0.1:${port}` };
+  // fetch refuses the WHATWG bad ports, all of them <= 10080, and an ephemeral range can start at 1024.
+  for (;;) {
+    /* eslint-disable no-await-in-loop -- retry: each drawn port decides whether the next listen runs */
+    await new Promise<void>((listening) => {
+      server.listen(0, '127.0.0.1', listening);
+    });
+    const { port } = server.address() as AddressInfo;
+    if (port > HIGHEST_BAD_PORT) {
+      return { server, origin: `http://127.0.0.1:${port}` };
+    }
+    await closeServer(server);
+    /* eslint-enable no-await-in-loop -- end of the retry */
+  }
 }
 
 function closeServer(server: Server): Promise<void> {
