@@ -2,7 +2,7 @@
 title: 'Agent Development Workflow'
 status: final
 created: '2026-09-12'
-updated: '2026-10-03'
+updated: '2026-10-11'
 governed_by: [AD-1, AD-13]
 ---
 
@@ -175,6 +175,18 @@ Every must-discharge line therefore needs one of two anchors, written before the
 2. **An owner and a due story.** The line names the role that owns it and the story before which it must be done. A line with an owner and no story is not anchored.
 
 The `must-discharge-audit` review layer (`_bmad/custom/bmad-build-auto.toml`) checks this for the epic of the spec under review. A story that closes a must-discharge line removes the line from the context in the same commit.
+
+## A change to the stories of an epic
+
+`docs/epics.md` owns the story order of each epic, in the `**Order.**` paragraph of the epic. A change proposal never owns that order. A change that inserts, removes or reorders a story of epic N does these steps in one commit, after the user approves the change. For a change proposal, that commit holds the proposal. The other owner-document edits of a proposal can go in a later commit.
+
+1. In `epics.md`, add or remove the story section, and edit the *Order* paragraph of epic N so that it states the full new order without a citation of the proposal.
+2. In `docs/stories/sprint-status.yaml`, add the key of each new story as `backlog` and remove the key of each removed story that has not started.
+3. If `docs/stories/epic-N-context.md` exists, regenerate it from `epics.md` with `compile-epic-context.md` of the installed bmad-build skill. Do not patch the order or the story list of the context by hand. The "Edit freely" header of the compiler does not cancel this rule.
+   - Keep each must-discharge line of the old file. Check that the story it names still exists and still comes at or after the point the line needs. Report each line that fails the check to the user.
+   - Compare the bullets of the old and the new file. Show the user each constraint that the new file dropped, and add back each one that the user keeps.
+
+The `on_complete` of `_bmad/custom/bmad-correct-course.toml` runs these steps at the end of correct-course.
 
 ## Definition of done for an agent task
 

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-20-2026 12:00
-last_updated: 10-10-2026 22:40
+last_updated: 10-11-2026 12:00
 project: poe-crafting-base-price-checker
 project_key: NOKEY
 tracking_system: file-system
@@ -153,7 +153,7 @@ action_items:
     action: "A correct-course that inserts a story updates epics.md Order in the same
       commit, and the epic context is regenerated from it (S-Order)"
     owner: "process"
-    status: open
+    status: done
     ref: "docs/stories/epic-4-retro-2026-10-10.md"
   - id: "epic-4-retro-item-11-deferrals-tie-to-a-story-or-a-testable-r"
     epic: 4

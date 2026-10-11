@@ -1,0 +1,11 @@
+[workflow]
+
+persistent_facts = [
+  "Apply the section *A change to the stories of an epic* of {project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md to every proposal that inserts, removes or reorders a story.",
+]
+
+on_complete = """
+Story-order step (epic 4 retro S-Order). Do this only when the user approved the proposal and the proposal inserts, removes or reorders a story of an epic N. Otherwise skip this step.
+
+Read the section *A change to the stories of an epic* of `{project-root}/docs/architecture/architecture-poe-crafting-base-price-checker-2026-09-12/AGENT-WORKFLOW.md` and do its steps for each such epic. For the regeneration, launch a context-free subagent with this prompt: "Read `{skill-root}/../bmad-build/compile-epic-context.md` and follow it. The epic number is N. The epics file is `{project-root}/docs/epics.md`. The planning artifacts directory is `{project-root}/docs`. The output path is `{project-root}/docs/stories/epic-N-context.md`." Copy the old context file before the subagent writes the new one. Show the user the diff of the context file before the commit.
+"""
