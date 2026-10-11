@@ -17,7 +17,8 @@ async function commentRunErrors(code: string): Promise<number> {
   return messages.filter((message) => message.severity === 2 && message.ruleId === 'local/max-comment-run').length;
 }
 
-describe('eslint.config.mjs on CSS', () => {
+// The first lint loads the whole config cold, which passes 5 s under the full pnpm check load.
+describe('eslint.config.mjs on CSS', { timeout: 20_000 }, () => {
   it('reports a 4-line CSS comment', async () => {
     expect(await commentRunErrors('/*\n * a\n * b\n * c\n * d\n */\n.x { color: red; }\n')).toBe(1);
   });
