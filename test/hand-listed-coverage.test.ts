@@ -65,6 +65,7 @@ const TARGETS: readonly Target[] = [
   }),
   directoryTarget('tools/boundary-check'),
   directoryTarget('tools/check'),
+  directoryTarget('tools/currencies-refresh'),
   directoryTarget('tools/deferred-issues'),
   directoryTarget('tools/dev-stop'),
   directoryTarget('tools/dts-specifiers'),

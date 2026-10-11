@@ -14,6 +14,7 @@
     "test/**/*.ts",
     "tools/boundary-check/*.ts",
     "tools/check/*.ts",
+    "tools/currencies-refresh/*.ts",
     "tools/deferred-issues/*.ts",
     "tools/dev-stop/*.ts",
     "tools/dts-specifiers/*.ts",

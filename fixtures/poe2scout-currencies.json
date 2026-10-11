@@ -1,0 +1,1135 @@
+{
+  "CurrentPage": 1,
+  "Pages": 1,
+  "Total": 38,
+  "Items": [
+    {
+      "CurrencyItemId": 18,
+      "ItemId": 295,
+      "CurrencyCategoryId": 21,
+      "ApiId": "mirror",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyDuplicate",
+      "Text": "Mirror of Kalandra",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lEdXBsaWNhdGUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/26bc31680e/CurrencyDuplicate.png",
+      "ItemMetadata": {
+        "name": "Mirror of Kalandra",
+        "base_type": "Mirror of Kalandra",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lEdXBsaWNhdGUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b7f5cc7884/CurrencyDuplicate.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "Right click this item then left click an equipable non-unique item to apply it. Mirrored copies cannot be modified.",
+        "effect": [
+          "Creates a Mirrored copy of an item"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 4104926.8,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 400
+        }
+      ],
+      "CurrentPrice": 4025206,
+      "CurrentQuantity": 39
+    },
+    {
+      "CurrencyItemId": 271,
+      "ItemId": 4287,
+      "CurrencyCategoryId": 21,
+      "ApiId": "hinekoras-lock",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyHinekorasLock",
+      "Text": "Hinekora's Lock",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvSGluZWtvcmFzTG9jayIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/ab2163ae06/HinekorasLock.png",
+      "ItemMetadata": {
+        "name": "Hinekora's Lock",
+        "base_type": "Hinekora's Lock",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvSGluZWtvcmFzTG9jayIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/40f6bbbb39/HinekorasLock.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "Right click this item then left click an item to apply it.",
+        "effect": [
+          "Allows an item to foresee the result of the next Currency item used on it\nModifying the item in any way removes the ability to foresee"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 1258685.8,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 468
+        }
+      ],
+      "CurrentPrice": 1181343.5,
+      "CurrentQuantity": 45
+    },
+    {
+      "CurrencyItemId": 266,
+      "ItemId": 4277,
+      "CurrencyCategoryId": 21,
+      "ApiId": "perfect-chaos-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyRerollRare3",
+      "Text": "Perfect Chaos Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+      "ItemMetadata": {
+        "name": "Perfect Chaos Orb",
+        "base_type": "Perfect Chaos Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/20cd0159b7/CurrencyRerollRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it.",
+        "effect": [
+          "Removes a random modifier and augments a Rare item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 7118.69,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 32984
+        }
+      ],
+      "CurrentPrice": 6490.084,
+      "CurrentQuantity": 4471
+    },
+    {
+      "CurrencyItemId": 17,
+      "ItemId": 294,
+      "CurrencyCategoryId": 21,
+      "ApiId": "fracturing-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyFractureRare",
+      "Text": "Fracturing Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvRnJhY3R1cmluZ09yYiIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/8b85ed1dc2/FracturingOrb.png",
+      "ItemMetadata": {
+        "name": "Fracturing Orb",
+        "base_type": "Fracturing Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvRnJhY3R1cmluZ09yYiIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/c88bcda072/FracturingOrb.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it. Cannot be used on Fractured items.",
+        "effect": [
+          "Fracture a random modifier on a rare item with at least 4 modifiers, locking it in place."
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 5953.66,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 23540
+        }
+      ],
+      "CurrentPrice": 5791.1436,
+      "CurrentQuantity": 2144
+    },
+    {
+      "CurrencyItemId": 270,
+      "ItemId": 4285,
+      "CurrencyCategoryId": 21,
+      "ApiId": "perfect-exalted-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddModToRare3",
+      "Text": "Perfect Exalted Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+      "ItemMetadata": {
+        "name": "Perfect Exalted Orb",
+        "base_type": "Perfect Exalted Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/4ef5836606/CurrencyAddModToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it. Rare items can have up to six random modifiers.",
+        "effect": [
+          "Augments a Rare item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 2117.7878,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 64866
+        }
+      ],
+      "CurrentPrice": 2052.8157,
+      "CurrentQuantity": 7446
+    },
+    {
+      "CurrencyItemId": 14,
+      "ItemId": 291,
+      "CurrencyCategoryId": 21,
+      "ApiId": "divine",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyModValues",
+      "Text": "Divine Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+      "ItemMetadata": {
+        "name": "Divine Orb",
+        "base_type": "Divine Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/af4036c345/CurrencyModValues.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "Right click this item then left click an item to apply it.",
+        "effect": [
+          "Randomises the numeric values of modifiers on an item"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 773.8757,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 11588354
+        }
+      ],
+      "CurrentPrice": 750.0276,
+      "CurrentQuantity": 1116285
+    },
+    {
+      "CurrencyItemId": 15,
+      "ItemId": 292,
+      "CurrencyCategoryId": 21,
+      "ApiId": "annul",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyRemoveMod",
+      "Text": "Orb of Annulment",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQW5udWxsT3JiIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/2daba8ccca/AnnullOrb.png",
+      "ItemMetadata": {
+        "name": "Orb of Annulment",
+        "base_type": "Orb of Annulment",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQW5udWxsT3JiIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/9b33007500/AnnullOrb.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click on a magic or rare item to apply it.",
+        "effect": [
+          "Removes a random modifier from an item"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 361.25314,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 359736
+        }
+      ],
+      "CurrentPrice": 337.31094,
+      "CurrentQuantity": 32894
+    },
+    {
+      "CurrencyItemId": 207,
+      "ItemId": 4015,
+      "CurrencyCategoryId": 21,
+      "ApiId": "perfect-jewellers-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddSkillGemSocket5",
+      "Text": "Perfect Jeweller's Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxTb2NrZXROdW1iZXJzMDMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ac6398e6a0/CurrencyRerollSocketNumbers03.png",
+      "ItemMetadata": {
+        "name": "Perfect Jeweller's Orb",
+        "base_type": "Perfect Jeweller's Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxTb2NrZXROdW1iZXJzMDMiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/5fed40edcf/CurrencyRerollSocketNumbers03.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a Skill Gem to apply it. Can only apply to Skill Gems with fewer than 5 Support Gem Sockets.",
+        "effect": [
+          "Sets a Skill Gem to have 5 Support Gem Sockets"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 311.57028,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 54973
+        }
+      ],
+      "CurrentPrice": 288.07596,
+      "CurrentQuantity": 5064
+    },
+    {
+      "CurrencyItemId": 265,
+      "ItemId": 4275,
+      "CurrencyCategoryId": 21,
+      "ApiId": "greater-chaos-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyRerollRare2",
+      "Text": "Greater Chaos Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+      "ItemMetadata": {
+        "name": "Greater Chaos Orb",
+        "base_type": "Greater Chaos Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/20cd0159b7/CurrencyRerollRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it.",
+        "effect": [
+          "Removes a random modifier and augments a Rare item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 218.02393,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 227120
+        }
+      ],
+      "CurrentPrice": 206.37138,
+      "CurrentQuantity": 23061
+    },
+    {
+      "CurrencyItemId": 264,
+      "ItemId": 4273,
+      "CurrencyCategoryId": 21,
+      "ApiId": "perfect-orb-of-augmentation",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddModToMagic3",
+      "Text": "Perfect Orb of Augmentation",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c8ad0ddc84/CurrencyAddModToMagic.png",
+      "ItemMetadata": {
+        "name": "Perfect Orb of Augmentation",
+        "base_type": "Perfect Orb of Augmentation",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/6f089a6497/CurrencyAddModToMagic.png",
+        "stack_size": 1,
+        "max_stack_size": 30,
+        "description": "Right click this item then left click a magic item to apply it. Magic items can have up to two random modifiers.",
+        "effect": [
+          "Augments a Magic item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 205.62822,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 201530
+        }
+      ],
+      "CurrentPrice": 197.9044,
+      "CurrentQuantity": 18305
+    },
+    {
+      "CurrencyItemId": 1931,
+      "ItemId": 13451,
+      "CurrencyCategoryId": 21,
+      "ApiId": "cryptic-key",
+      "BaseItemTypeId": "Metadata/Items/Currency/StrongboxKey",
+      "Text": "Cryptic Key",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvU3Ryb25nYm94U2tlbGV0b25LZXkiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ae08d02326/StrongboxSkeletonKey.png",
+      "ItemMetadata": {
+        "name": "Cryptic Key",
+        "base_type": "Cryptic Key",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvU3Ryb25nYm94U2tlbGV0b25LZXkiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e8a1e40dee/StrongboxSkeletonKey.png",
+        "stack_size": 1,
+        "max_stack_size": null,
+        "description": "Right click this item then left click a Strongbox to open it. May only be used once per Strongbox.",
+        "effect": [
+          "Opens an unopened Strongbox allowing it to be opened an additional time"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 114.098045,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 13043
+        }
+      ],
+      "CurrentPrice": 101.78477,
+      "CurrentQuantity": 1020
+    },
+    {
+      "CurrencyItemId": 1,
+      "ItemId": 278,
+      "CurrencyCategoryId": 21,
+      "ApiId": "transmutation-shard",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeToMagicShard",
+      "Text": "Transmutation Shard",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpY1NoYXJkIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/e67bca229b/CurrencyUpgradeToMagicShard.png",
+      "ItemMetadata": {
+        "name": "Transmutation Shard",
+        "base_type": "Transmutation Shard",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpY1NoYXJkIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/ba4cb5a0fa/CurrencyUpgradeToMagicShard.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "A stack of 10 shards becomes an Orb of Transmutation",
+        "effect": []
+      },
+      "PriceLogs": [
+        {
+          "Price": 70.70558,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 1
+        }
+      ],
+      "CurrentPrice": 70.70558,
+      "CurrentQuantity": 1
+    },
+    {
+      "CurrencyItemId": 10,
+      "ItemId": 287,
+      "CurrencyCategoryId": 21,
+      "ApiId": "chaos",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyRerollRare",
+      "Text": "Chaos Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+      "ItemMetadata": {
+        "name": "Chaos Orb",
+        "base_type": "Chaos Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/20cd0159b7/CurrencyRerollRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it.",
+        "effect": [
+          "Removes a random modifier and augments a Rare item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 73.3076,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 28785965
+        }
+      ],
+      "CurrentPrice": 70.271515,
+      "CurrentQuantity": 2489865
+    },
+    {
+      "CurrencyItemId": 21,
+      "ItemId": 298,
+      "CurrencyCategoryId": 21,
+      "ApiId": "etcher",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyMagicQuality",
+      "Text": "Arcanist's Etcher",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lXZWFwb25NYWdpY1F1YWxpdHkiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/516e8f1131/CurrencyWeaponMagicQuality.png",
+      "ItemMetadata": {
+        "name": "Arcanist's Etcher",
+        "base_type": "Arcanist's Etcher",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lXZWFwb25NYWdpY1F1YWxpdHkiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ef9f8f0aa2/CurrencyWeaponMagicQuality.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a wand, staff or sceptre to apply it.",
+        "effect": [
+          "Improves the quality of a wand, staff or sceptre"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 16.287815,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 102310
+        }
+      ],
+      "CurrentPrice": 32.994823,
+      "CurrentQuantity": 13323
+    },
+    {
+      "CurrencyItemId": 268,
+      "ItemId": 4281,
+      "CurrencyCategoryId": 21,
+      "ApiId": "perfect-regal-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeMagicToRare3",
+      "Text": "Perfect Regal Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e8fb148e80/CurrencyUpgradeMagicToRare.png",
+      "ItemMetadata": {
+        "name": "Perfect Regal Orb",
+        "base_type": "Perfect Regal Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c27779a8b7/CurrencyUpgradeMagicToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a magic item to apply it. Current modifiers are retained and a new one is added.",
+        "effect": [
+          "Upgrades a Magic item to a Rare item, adding 1 modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 32.484406,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 28618
+        }
+      ],
+      "CurrentPrice": 31.295303,
+      "CurrentQuantity": 2560
+    },
+    {
+      "CurrencyItemId": 23,
+      "ItemId": 300,
+      "CurrencyCategoryId": 21,
+      "ApiId": "gcp",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyGemQuality",
+      "Text": "Gemcutter's Prism",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lHZW1RdWFsaXR5Iiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/f4bace18d7/CurrencyGemQuality.png",
+      "ItemMetadata": {
+        "name": "Gemcutter's Prism",
+        "base_type": "Gemcutter's Prism",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lHZW1RdWFsaXR5IiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/b813ef94bd/CurrencyGemQuality.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a skill gem to apply it.",
+        "effect": [
+          "Improves the quality of a Skill Gem"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 28.290985,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 198469
+        }
+      ],
+      "CurrentPrice": 26.328127,
+      "CurrentQuantity": 17274
+    },
+    {
+      "CurrencyItemId": 262,
+      "ItemId": 4269,
+      "CurrencyCategoryId": 21,
+      "ApiId": "perfect-orb-of-transmutation",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeToMagic3",
+      "Text": "Perfect Orb of Transmutation",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpYyIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/2f8e1ff9f8/CurrencyUpgradeToMagic.png",
+      "ItemMetadata": {
+        "name": "Perfect Orb of Transmutation",
+        "base_type": "Perfect Orb of Transmutation",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpYyIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f6f8d6cedc/CurrencyUpgradeToMagic.png",
+        "stack_size": 1,
+        "max_stack_size": 40,
+        "description": "Right click this item then left click a normal item to apply it.",
+        "effect": [
+          "Upgrades a Normal item to a Magic item with 1 modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 16.880955,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 37734
+        }
+      ],
+      "CurrentPrice": 17.313654,
+      "CurrentQuantity": 4082
+    },
+    {
+      "CurrencyItemId": 11,
+      "ItemId": 288,
+      "CurrencyCategoryId": 21,
+      "ApiId": "vaal",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyCorrupt",
+      "Text": "Vaal Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lWYWFsIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/72bc84396c/CurrencyVaal.png",
+      "ItemMetadata": {
+        "name": "Vaal Orb",
+        "base_type": "Vaal Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lWYWFsIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/2a4a95ff38/CurrencyVaal.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click an item to corrupt it. Corrupted items cannot be modified again.",
+        "effect": [
+          "Modifies an item unpredictably and Corrupts it"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 11.254591,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 2374934
+        }
+      ],
+      "CurrentPrice": 10.350643,
+      "CurrentQuantity": 232058
+    },
+    {
+      "CurrencyItemId": 269,
+      "ItemId": 4283,
+      "CurrencyCategoryId": 21,
+      "ApiId": "greater-exalted-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddModToRare2",
+      "Text": "Greater Exalted Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+      "ItemMetadata": {
+        "name": "Greater Exalted Orb",
+        "base_type": "Greater Exalted Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/4ef5836606/CurrencyAddModToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it. Rare items can have up to six random modifiers.",
+        "effect": [
+          "Augments a Rare item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 11.23809,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 175890
+        }
+      ],
+      "CurrentPrice": 10.341333,
+      "CurrentQuantity": 15199
+    },
+    {
+      "CurrencyItemId": 8,
+      "ItemId": 285,
+      "CurrencyCategoryId": 21,
+      "ApiId": "chance",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeRandomly",
+      "Text": "Orb of Chance",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9VbmlxdWUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/93c6cc8d5b/CurrencyUpgradeToUnique.png",
+      "ItemMetadata": {
+        "name": "Orb of Chance",
+        "base_type": "Orb of Chance",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9VbmlxdWUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/a5813cbccd/CurrencyUpgradeToUnique.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "Right click this item then left click a normal item to apply it.",
+        "effect": [
+          "Unpredictably either upgrades a Normal item to Unique rarity or destroys it"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 8.082781,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 72959
+        }
+      ],
+      "CurrentPrice": 8.847295,
+      "CurrentQuantity": 3844
+    },
+    {
+      "CurrencyItemId": 19,
+      "ItemId": 296,
+      "CurrencyCategoryId": 21,
+      "ApiId": "scrap",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyArmourQuality",
+      "Text": "Armourer's Scrap",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBcm1vdXJRdWFsaXR5Iiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/d5868f596d/CurrencyArmourQuality.png",
+      "ItemMetadata": {
+        "name": "Armourer's Scrap",
+        "base_type": "Armourer's Scrap",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBcm1vdXJRdWFsaXR5IiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/8518f80f8d/CurrencyArmourQuality.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click an armour to apply it.",
+        "effect": [
+          "Improves the quality of an armour"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 8.591591,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 518087
+        }
+      ],
+      "CurrentPrice": 8.624671,
+      "CurrentQuantity": 57378
+    },
+    {
+      "CurrencyItemId": 22,
+      "ItemId": 299,
+      "CurrencyCategoryId": 21,
+      "ApiId": "bauble",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyFlaskQuality",
+      "Text": "Glassblower's Bauble",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lGbGFza1F1YWxpdHkiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/1cec279e01/CurrencyFlaskQuality.png",
+      "ItemMetadata": {
+        "name": "Glassblower's Bauble",
+        "base_type": "Glassblower's Bauble",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lGbGFza1F1YWxpdHkiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/0bc9edd6ed/CurrencyFlaskQuality.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a flask to apply it.",
+        "effect": [
+          "Improves the quality of a flask"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 6.094565,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 40918
+        }
+      ],
+      "CurrentPrice": 7.37895,
+      "CurrentQuantity": 2755
+    },
+    {
+      "CurrencyItemId": 267,
+      "ItemId": 4279,
+      "CurrencyCategoryId": 21,
+      "ApiId": "greater-regal-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2",
+      "Text": "Greater Regal Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e8fb148e80/CurrencyUpgradeMagicToRare.png",
+      "ItemMetadata": {
+        "name": "Greater Regal Orb",
+        "base_type": "Greater Regal Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c27779a8b7/CurrencyUpgradeMagicToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a magic item to apply it. Current modifiers are retained and a new one is added.",
+        "effect": [
+          "Upgrades a Magic item to a Rare item, adding 1 modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 8.232172,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 37463
+        }
+      ],
+      "CurrentPrice": 6.8662453,
+      "CurrentQuantity": 5640
+    },
+    {
+      "CurrencyItemId": 206,
+      "ItemId": 4013,
+      "CurrencyCategoryId": 21,
+      "ApiId": "greater-jewellers-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddSkillGemSocket4",
+      "Text": "Greater Jeweller's Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxTb2NrZXROdW1iZXJzMDIiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/7dd6ee75be/CurrencyRerollSocketNumbers02.png",
+      "ItemMetadata": {
+        "name": "Greater Jeweller's Orb",
+        "base_type": "Greater Jeweller's Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxTb2NrZXROdW1iZXJzMDIiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c290c9d673/CurrencyRerollSocketNumbers02.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a Skill Gem to apply it. Can only apply to Skill Gems with fewer than 4 Support Gem Sockets.",
+        "effect": [
+          "Sets a Skill Gem to have 4 Support Gem Sockets"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 4.5796566,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 16996
+        }
+      ],
+      "CurrentPrice": 3.7527647,
+      "CurrentQuantity": 1648
+    },
+    {
+      "CurrencyItemId": 20,
+      "ItemId": 297,
+      "CurrencyCategoryId": 21,
+      "ApiId": "whetstone",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyWeaponQuality",
+      "Text": "Blacksmith's Whetstone",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lXZWFwb25RdWFsaXR5Iiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/18715ea7be/CurrencyWeaponQuality.png",
+      "ItemMetadata": {
+        "name": "Blacksmith's Whetstone",
+        "base_type": "Blacksmith's Whetstone",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lXZWFwb25RdWFsaXR5IiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/ad76ec392e/CurrencyWeaponQuality.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a martial weapon to apply it.",
+        "effect": [
+          "Improves the quality of a martial weapon"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 3.7791636,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 140327
+        }
+      ],
+      "CurrentPrice": 3.5309885,
+      "CurrentQuantity": 12583
+    },
+    {
+      "CurrencyItemId": 16,
+      "ItemId": 293,
+      "CurrencyCategoryId": 21,
+      "ApiId": "artificers",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddEquipmentSocket",
+      "Text": "Artificer's Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRFcXVpcG1lbnRTb2NrZXQiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/5131fd4774/CurrencyAddEquipmentSocket.png",
+      "ItemMetadata": {
+        "name": "Artificer's Orb",
+        "base_type": "Artificer's Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRFcXVpcG1lbnRTb2NrZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c6654e69aa/CurrencyAddEquipmentSocket.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a Martial Weapon, wand, staff or Armour to apply it.",
+        "effect": [
+          "Adds an Augment Socket to a Martial Weapon, wand, staff or Armour"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 4.433185,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 36733
+        }
+      ],
+      "CurrentPrice": 3.4927075,
+      "CurrentQuantity": 3595
+    },
+    {
+      "CurrencyItemId": 12,
+      "ItemId": 289,
+      "CurrencyCategoryId": 21,
+      "ApiId": "regal",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeMagicToRare",
+      "Text": "Regal Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/e8fb148e80/CurrencyUpgradeMagicToRare.png",
+      "ItemMetadata": {
+        "name": "Regal Orb",
+        "base_type": "Regal Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/c27779a8b7/CurrencyUpgradeMagicToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a magic item to apply it. Current modifiers are retained and a new one is added.",
+        "effect": [
+          "Upgrades a Magic item to a Rare item, adding 1 modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 2.7130618,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 178259
+        }
+      ],
+      "CurrentPrice": 3.3295772,
+      "CurrentQuantity": 13094
+    },
+    {
+      "CurrencyItemId": 9,
+      "ItemId": 286,
+      "CurrencyCategoryId": 21,
+      "ApiId": "alch",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeToRare",
+      "Text": "Orb of Alchemy",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9SYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/9b80b44821/CurrencyUpgradeToRare.png",
+      "ItemMetadata": {
+        "name": "Orb of Alchemy",
+        "base_type": "Orb of Alchemy",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9SYXJlIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/141f000e97/CurrencyUpgradeToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a normal or magic item to apply it. Current modifiers are not retained.",
+        "effect": [
+          "Upgrades a Normal or Magic item to a Rare item with 4 random modifiers"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 3.794273,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 706991
+        }
+      ],
+      "CurrentPrice": 3.1556478,
+      "CurrentQuantity": 90160
+    },
+    {
+      "CurrencyItemId": 263,
+      "ItemId": 4271,
+      "CurrencyCategoryId": 21,
+      "ApiId": "greater-orb-of-augmentation",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddModToMagic2",
+      "Text": "Greater Orb of Augmentation",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c8ad0ddc84/CurrencyAddModToMagic.png",
+      "ItemMetadata": {
+        "name": "Greater Orb of Augmentation",
+        "base_type": "Greater Orb of Augmentation",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/6f089a6497/CurrencyAddModToMagic.png",
+        "stack_size": 1,
+        "max_stack_size": 30,
+        "description": "Right click this item then left click a magic item to apply it. Magic items can have up to two random modifiers.",
+        "effect": [
+          "Augments a Magic item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 3.2128553,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 158716
+        }
+      ],
+      "CurrentPrice": 2.790341,
+      "CurrentQuantity": 16424
+    },
+    {
+      "CurrencyItemId": 7,
+      "ItemId": 284,
+      "CurrencyCategoryId": 21,
+      "ApiId": "aug",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddModToMagic",
+      "Text": "Orb of Augmentation",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c8ad0ddc84/CurrencyAddModToMagic.png",
+      "ItemMetadata": {
+        "name": "Orb of Augmentation",
+        "base_type": "Orb of Augmentation",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb01hZ2ljIiwidyI6MSwiaCI6MSwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/6f089a6497/CurrencyAddModToMagic.png",
+        "stack_size": 1,
+        "max_stack_size": 30,
+        "description": "Right click this item then left click a magic item to apply it. Magic items can have up to two random modifiers.",
+        "effect": [
+          "Augments a Magic item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 2.5838768,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 251422
+        }
+      ],
+      "CurrentPrice": 2.528598,
+      "CurrentQuantity": 18795
+    },
+    {
+      "CurrencyItemId": 6,
+      "ItemId": 283,
+      "CurrencyCategoryId": 21,
+      "ApiId": "transmute",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeToMagic",
+      "Text": "Orb of Transmutation",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpYyIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/2f8e1ff9f8/CurrencyUpgradeToMagic.png",
+      "ItemMetadata": {
+        "name": "Orb of Transmutation",
+        "base_type": "Orb of Transmutation",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpYyIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f6f8d6cedc/CurrencyUpgradeToMagic.png",
+        "stack_size": 1,
+        "max_stack_size": 40,
+        "description": "Right click this item then left click a normal item to apply it.",
+        "effect": [
+          "Upgrades a Normal item to a Magic item with 1 modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 1.2062043,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 154719
+        }
+      ],
+      "CurrentPrice": 1.1075773,
+      "CurrentQuantity": 6904
+    },
+    {
+      "CurrencyItemId": 13,
+      "ItemId": 290,
+      "CurrencyCategoryId": 21,
+      "ApiId": "exalted",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddModToRare",
+      "Text": "Exalted Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+      "ItemMetadata": {
+        "name": "Exalted Orb",
+        "base_type": "Exalted Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/4ef5836606/CurrencyAddModToRare.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a rare item to apply it. Rare items can have up to six random modifiers.",
+        "effect": [
+          "Augments a Rare item with a new random modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 1,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 46788808
+        }
+      ],
+      "CurrentPrice": 1,
+      "CurrentQuantity": 3810212
+    },
+    {
+      "CurrencyItemId": 261,
+      "ItemId": 4267,
+      "CurrencyCategoryId": 21,
+      "ApiId": "greater-orb-of-transmutation",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeToMagic2",
+      "Text": "Greater Orb of Transmutation",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpYyIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/2f8e1ff9f8/CurrencyUpgradeToMagic.png",
+      "ItemMetadata": {
+        "name": "Greater Orb of Transmutation",
+        "base_type": "Greater Orb of Transmutation",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9NYWdpYyIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f6f8d6cedc/CurrencyUpgradeToMagic.png",
+        "stack_size": 1,
+        "max_stack_size": 40,
+        "description": "Right click this item then left click a normal item to apply it.",
+        "effect": [
+          "Upgrades a Normal item to a Magic item with 1 modifier"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 0.8074033,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 59784
+        }
+      ],
+      "CurrentPrice": 0.8917386,
+      "CurrentQuantity": 4007
+    },
+    {
+      "CurrencyItemId": 2,
+      "ItemId": 279,
+      "CurrencyCategoryId": 21,
+      "ApiId": "chance-shard",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeRandomlyShard",
+      "Text": "Chance Shard",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9VbmlxdWVTaGFyZCIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/9828a70270/CurrencyUpgradeToUniqueShard.png",
+      "ItemMetadata": {
+        "name": "Chance Shard",
+        "base_type": "Chance Shard",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9VbmlxdWVTaGFyZCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/f096031fb4/CurrencyUpgradeToUniqueShard.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "A stack of 10 shards becomes an Orb of Chance.",
+        "effect": []
+      },
+      "PriceLogs": [
+        {
+          "Price": 1.211585,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 70
+        }
+      ],
+      "CurrentPrice": 0.25,
+      "CurrentQuantity": 8
+    },
+    {
+      "CurrencyItemId": 3,
+      "ItemId": 280,
+      "CurrencyCategoryId": 21,
+      "ApiId": "regal-shard",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyUpgradeMagicToRareShard",
+      "Text": "Regal Shard",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmVTaGFyZCIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/e4128abe92/CurrencyUpgradeMagicToRareShard.png",
+      "ItemMetadata": {
+        "name": "Regal Shard",
+        "base_type": "Regal Shard",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlTWFnaWNUb1JhcmVTaGFyZCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/795e43e374/CurrencyUpgradeMagicToRareShard.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "A stack of 10 shards becomes a Regal Orb.",
+        "effect": []
+      },
+      "PriceLogs": [
+        null
+      ],
+      "CurrentPrice": 0.25,
+      "CurrentQuantity": 12
+    },
+    {
+      "CurrencyItemId": 4,
+      "ItemId": 281,
+      "CurrencyCategoryId": 21,
+      "ApiId": "artificers-shard",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard",
+      "Text": "Artificer's Shard",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRFcXVpcG1lbnRTb2NrZXRTaGFyZCIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/cdcdd8bf3f/CurrencyAddEquipmentSocketShard.png",
+      "ItemMetadata": {
+        "name": "Artificer's Shard",
+        "base_type": "Artificer's Shard",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRFcXVpcG1lbnRTb2NrZXRTaGFyZCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/addca9d654/CurrencyAddEquipmentSocketShard.png",
+        "stack_size": 1,
+        "max_stack_size": 10,
+        "description": "A stack of 10 shards becomes an Artificer's Orb.",
+        "effect": []
+      },
+      "PriceLogs": [
+        {
+          "Price": 1.7857143,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 42
+        }
+      ],
+      "CurrentPrice": 0.16666667,
+      "CurrentQuantity": 6
+    },
+    {
+      "CurrencyItemId": 5,
+      "ItemId": 282,
+      "CurrencyCategoryId": 21,
+      "ApiId": "wisdom",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyIdentification",
+      "Text": "Scroll of Wisdom",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lJZGVudGlmaWNhdGlvbiIsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/884f7bc58b/CurrencyIdentification.png",
+      "ItemMetadata": {
+        "name": "Scroll of Wisdom",
+        "base_type": "Scroll of Wisdom",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lJZGVudGlmaWNhdGlvbiIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/8a3bcb5e8a/CurrencyIdentification.png",
+        "stack_size": 1,
+        "max_stack_size": 40,
+        "description": "Right click this item then left click an unidentified item to apply it.",
+        "effect": [
+          "Identifies an item"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 0.053457186,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 284367
+        }
+      ],
+      "CurrentPrice": 0.070714526,
+      "CurrentQuantity": 18229
+    },
+    {
+      "CurrencyItemId": 205,
+      "ItemId": 4011,
+      "CurrencyCategoryId": 21,
+      "ApiId": "lesser-jewellers-orb",
+      "BaseItemTypeId": "Metadata/Items/Currency/CurrencyAddSkillGemSocket3",
+      "Text": "Lesser Jeweller's Orb",
+      "CategoryApiId": "currency",
+      "IconUrl": "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxTb2NrZXROdW1iZXJzMDEiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b0b9a43ed8/CurrencyRerollSocketNumbers01.png",
+      "ItemMetadata": {
+        "name": "Lesser Jeweller's Orb",
+        "base_type": "Lesser Jeweller's Orb",
+        "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxTb2NrZXROdW1iZXJzMDEiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/4cea3cd1b7/CurrencyRerollSocketNumbers01.png",
+        "stack_size": 1,
+        "max_stack_size": 20,
+        "description": "Right click this item then left click a Skill Gem to apply it. Can only apply to Skill Gems with fewer than 3 Support Gem Sockets.",
+        "effect": [
+          "Sets a Skill Gem to have 3 Support Gem Sockets"
+        ]
+      },
+      "PriceLogs": [
+        {
+          "Price": 1.6392883,
+          "Time": "2026-10-11T00:00:00.0000000Z",
+          "Quantity": 11198
+        }
+      ],
+      "CurrentPrice": 0.027131783,
+      "CurrentQuantity": 1809
+    }
+  ]
+}

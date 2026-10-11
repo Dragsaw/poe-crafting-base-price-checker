@@ -28,6 +28,7 @@
     "sync:dry": "node packages/sync/src/dry-run.ts",
     "fixtures:record": "node --env-file-if-exists=.env packages/sync/src/fixtures-record.ts",
     "catalogue:refresh": "node --env-file-if-exists=.env packages/sync/src/catalogue-refresh.ts",
+    "currencies:refresh": "node tools/currencies-refresh/currencies-refresh.ts",
     "tracked:lookup": "node .claude/skills/tracked-json/scripts/lookup.ts",
     "tracked:check": "node packages/sync/src/curation/check.ts"
   },
@@ -51,6 +52,7 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",
     "vite": "8.3.0",
-    "vitest": "5.0.1"
+    "vitest": "5.0.1",
+    "zod": "4.6.5"
   }
 }

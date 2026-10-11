@@ -49,11 +49,14 @@ Fixtures are **real captured trade-API responses**. The project commits the fixt
 ```
 pnpm fixtures:record      # EXPLICIT, human-invoked, hits the live API
 pnpm catalogue:refresh    # EXPLICIT, human-invoked, hits the live API (AD-25)
+pnpm currencies:refresh   # EXPLICIT, human-invoked, hits poe2scout; rewrites data/currencies.json (AD-20)
 ```
 
-Neither command is part of a test run. An agent does not run either command unattended. The output of each command is a diff against the committed files. **That diff is the mechanism that makes a change by GGG visible.** A patch that changes the shape of a response appears as a change that a human can review. Such a patch does not appear as a production incident.
+No such command is part of a test run. An agent does not run any of them unattended. The output of each command is a diff against the committed files. **That diff is the mechanism that makes a change by GGG or poe2scout visible.** A patch that changes the shape of a response appears as a change that a human can review. Such a patch does not appear as a production incident.
 
 `catalogue:refresh` reads the four trade data endpoints and writes them into `data/catalogue/` (AD-25). Run `catalogue:refresh` when GGG releases a patch. Do not run `catalogue:refresh` on a schedule. A renamed stat id appears as a line in that diff. AD-9 checks the tracked list against the catalogue. That check gives the renamed stat id an `unresolvable` state instead of a silent mismatch.
+
+Run `currencies:refresh` by hand when the rates in `data/currencies.json` look stale, and review its diff before you commit it. Do not run it on a schedule.
 
 Fixture hygiene:
 

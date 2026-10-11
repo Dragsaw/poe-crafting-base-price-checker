@@ -48,6 +48,12 @@ The workload includes one summed-`statId` entry, an Amulets rarity T1 prefix and
 suffix. Its search carries the one summed filter, and its fetch leg is the capture that
 AD-16's summed-filter evidence rests on.
 
+`poe2scout-currencies.json` is the `pnpm currencies:refresh` response for the league
+Forbidden Rites (slug `forbiddenrites`), captured 2026-10-11. No command records it.
+To re-capture it by hand, GET
+`https://api.poe2scout.com/poe2/Leagues/forbiddenrites/Currencies/ByCategory?Category=currency&Page=1&PerPage=100`,
+cut each `PriceLogs` to its first entry, and write it as two-space JSON.
+
 `tracked.json` is the one hand-edited file here. It is the recorder's input,
 not a capture: a small fixed workload, one entry per distinct search shape,
 that the fixture-backed tests own. It is deliberately not `data/tracked.json`,
