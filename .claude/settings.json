@@ -15,14 +15,6 @@
       "Read(./.env.*)"
     ]
   },
-  "defaultShell": "bash",
-  "worktree": {
-    "baseRef": "head"
-  },
-  "enabledPlugins": {
-    "bmad-method@bmad": true,
-    "bmad-toolbox@bmad": true
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -69,5 +61,14 @@
         ]
       }
     ]
+  },
+  "worktree": {
+    "baseRef": "head"
+  },
+  "defaultShell": "bash",
+  "enabledPlugins": {
+    "bmad-method@bmad": true,
+    "bmad-toolbox@bmad": true,
+    "impeccable@impeccable": true
   }
 }
